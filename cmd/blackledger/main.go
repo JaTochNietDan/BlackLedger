@@ -191,6 +191,7 @@ func (a *app) generateAttempt(snapshot *core.World, feedback string) error {
 		activePrompt = focusedPrompt
 		contextData = focusedContext(snapshot, operation, connection, feedback, beneficiaries)
 	}
+	attributeDirectorContext(contextData, snapshot, connection)
 	contextData["active_business_ceasefires_until_minute"] = snapshot.ActiveBusinessTruces()
 	contextData["allowed_speaker_ids"] = directorSpeakers(snapshot, connection)
 	affiliation := map[string][]string{}

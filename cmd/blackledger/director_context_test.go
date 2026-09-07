@@ -62,3 +62,55 @@ func TestFocusedFollowUpUsesRelevantContactAndCurrentOwnership(t *testing.T) {
 		t.Fatal("fresh requests cannot see the city")
 	}
 }
+
+func TestDirectorAttributesFormerLifeWithoutGivingNewPersonItsAchievements(t *testing.T) {
+	w := core.New(27)
+	w.Arrangements = []core.ArrangementMemory{{Life: 1, Speaker: "mara", Operation: "mediation", Status: "completed", Offer: "An unverified allegation.", Result: "You completed the mediation."}}
+	w.Log("Work finished", "You completed the mediation.", "result")
+	w.Die("Previous life ended.")
+	next, err := core.Execute(w, core.Command{Kind: "new_life", Revision: w.Revision})
+	if err != nil {
+		t.Fatal(err)
+	}
+	c := map[string]any{}
+	attributeDirectorContext(c, next, nil)
+	if len(c["recent_arrangements"].([]attributedArrangement)) != 0 || c["required_connection"] != nil {
+		t.Fatal("old work attributed to newcomer")
+	}
+	old := c["previous_people_arrangements"].([]attributedArrangement)
+	if len(old) != 1 || old[0].Participant != w.Player.Name || old[0].Result != "You completed the mediation." || old[0].Offer != "" || old[0].OriginalRequest != "" {
+		t.Fatal("former identity or canonical result lost", old)
+	}
+	if len(c["previous_people_history"].([]map[string]any)) == 0 {
+		t.Fatal("former history omitted")
+	}
+	for _, row := range c["previous_people_history"].([]map[string]any) {
+		if row["participant"] != w.Player.Name {
+			t.Fatal("history participant wrong")
+		}
+	}
+	participants := c["dialogue_participants"].(map[string]any)
+	if participants["addressee"] != next.Player.Name || participants["addressee"] == w.Player.Name {
+		t.Fatal("new addressee missing")
+	}
+	if next.Arrangements[0].Offer != "An unverified allegation." {
+		t.Fatal("save memory mutated")
+	}
+}
+
+func TestDirectorCallbackSeparatesClaimsAndNamesSpeakerHierarchy(t *testing.T) {
+	w := core.New(27)
+	w.Player.Crew = []core.Crew{{ID: "leo", Name: "Leo Carver", Loyalty: 65}}
+	m := core.ArrangementMemory{Life: w.Life, Speaker: "leo", Operation: "courier", Status: "completed", Offer: "The supplier secretly owns this building.", Result: "You completed the requested delivery."}
+	c := map[string]any{}
+	attributeDirectorContext(c, w, &m)
+	connection := c["required_connection"].(attributedArrangement)
+	if connection.Offer != "" || connection.OriginalRequest != m.Offer || connection.Result != m.Result || connection.Participant != w.Player.Name {
+		t.Fatal("callback claims promoted or attribution lost")
+	}
+	participants := c["dialogue_participants"].(map[string]any)
+	speakers := participants["allowed_speakers"].([]map[string]string)
+	if len(speakers) != 1 || speakers[0]["id"] != "leo" || speakers[0]["relationship_to_addressee"] != "the player's employee bringing their boss a lead" {
+		t.Fatal("crew hierarchy missing", speakers)
+	}
+}
