@@ -1,0 +1,93 @@
+{
+  "model": "qwen3:14b",
+  "purpose": "Offline semantic-review feasibility; curated cases, not production acceptance",
+  "cases": [
+    {
+      "name": "invented_owner",
+      "expected_supported": false,
+      "dialogue": "The Monarch is under new management. Its new owner refuses Bellandi's terms. Settle this without a scene.",
+      "previous": null,
+      "review": {
+        "supported": false,
+        "reasons": [
+          "The dialogue claims that The Monarch is under new management, but the facts state that ownership has not changed (ownership_changed: false).",
+          "The dialogue implies that the new owner refuses Bellandi's terms, which contradicts the fact that the operation was a mediation between Mara Bell and the Bellandi Family, not a dispute with a new owner."
+        ]
+      },
+      "matched": true,
+      "seconds": 2.594
+    },
+    {
+      "name": "ordinary_disagreement",
+      "expected_supported": true,
+      "dialogue": "Two staff members at The Monarch disagree about loading hours. Hear both sides and find a practical schedule.",
+      "previous": null,
+      "review": {
+        "supported": true,
+        "reasons": []
+      },
+      "matched": true,
+      "seconds": 0.455
+    },
+    {
+      "name": "false_completed_callback",
+      "expected_supported": false,
+      "dialogue": "You delivered that ledger for me. Now settle a disagreement between two staff at The Monarch.",
+      "previous": {
+        "operation": "courier",
+        "status": "declined",
+        "result": ""
+      },
+      "review": {
+        "supported": true,
+        "reasons": []
+      },
+      "matched": false,
+      "seconds": 0.455
+    },
+    {
+      "name": "true_completed_callback",
+      "expected_supported": true,
+      "dialogue": "You delivered the sealed package and reported back. Now two staff at The Monarch disagree about access to the loading bay; help them agree on a schedule.",
+      "previous": {
+        "operation": "courier",
+        "status": "completed",
+        "result": "You delivered the sealed package and reported back."
+      },
+      "review": {
+        "supported": true,
+        "reasons": []
+      },
+      "matched": true,
+      "seconds": 0.525
+    },
+    {
+      "name": "invented_treaty",
+      "expected_supported": false,
+      "dialogue": "Settle access to The Monarch and the Bellandi Family will cancel the hit against you and grant you ownership of the casino.",
+      "previous": null,
+      "review": {
+        "supported": false,
+        "reasons": [
+          "The dialogue falsely claims that the Bellandi Family will cancel the hit against the player and grant ownership of The Monarch, which contradicts the fact that ownership did not change and no agreement or treaty was made.",
+          "The dialogue promises outcomes (cancellation of hit, ownership transfer) that are explicitly prohibited by the limits provided in the facts."
+        ]
+      },
+      "matched": true,
+      "seconds": 1.987
+    },
+    {
+      "name": "ordinary_discretion",
+      "expected_supported": true,
+      "dialogue": "At The Monarch, the manager and a supplier disagree over delivery hours. Speak to them discreetly and help them agree without violence.",
+      "previous": null,
+      "review": {
+        "supported": true,
+        "reasons": []
+      },
+      "matched": true,
+      "seconds": 0.484
+    }
+  ],
+  "matches": 5
+}

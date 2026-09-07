@@ -1,0 +1,96 @@
+{
+  "model": "qwen3:14b",
+  "purpose": "Offline semantic-review feasibility; curated cases, not production acceptance",
+  "cases": [
+    {
+      "name": "invented_owner",
+      "expected_supported": false,
+      "dialogue": "The Monarch is under new management. Its new owner refuses Bellandi's terms. Settle this without a scene.",
+      "previous": null,
+      "review": {
+        "supported": false,
+        "reasons": [
+          "The dialogue claims that 'The Monarch is under new management' and 'its new owner refuses Bellandi's terms', which implies that ownership has changed. However, the facts state that 'ownership_changed': false, meaning the Bellandi Family still owns The Monarch.",
+          "The dialogue suggests a conflict over terms, but the facts do not mention any new management or terms being refused, making this claim unsupported."
+        ]
+      },
+      "matched": true,
+      "seconds": 2.694
+    },
+    {
+      "name": "ordinary_disagreement",
+      "expected_supported": true,
+      "dialogue": "Two staff members at The Monarch disagree about loading hours. Hear both sides and find a practical schedule.",
+      "previous": null,
+      "review": {
+        "supported": true,
+        "reasons": []
+      },
+      "matched": true,
+      "seconds": 0.391
+    },
+    {
+      "name": "false_completed_callback",
+      "expected_supported": false,
+      "dialogue": "You delivered that ledger for me. Now settle a disagreement between two staff at The Monarch.",
+      "previous": {
+        "operation": "courier",
+        "status": "declined",
+        "result": ""
+      },
+      "review": {
+        "supported": false,
+        "reasons": [
+          "The dialogue claims that the player delivered a ledger, but the previous operation was a declined courier mission with no result, and the facts do not confirm that the ledger was delivered.",
+          "The dialogue implies that a previous action (delivering the ledger) has already occurred, which contradicts the status of the previous operation being 'declined' and 'not completed'."
+        ]
+      },
+      "matched": true,
+      "seconds": 2.095
+    },
+    {
+      "name": "true_completed_callback",
+      "expected_supported": true,
+      "dialogue": "You delivered the sealed package and reported back. Now two staff at The Monarch disagree about access to the loading bay; help them agree on a schedule.",
+      "previous": {
+        "operation": "courier",
+        "status": "completed",
+        "result": "You delivered the sealed package and reported back."
+      },
+      "review": {
+        "supported": true,
+        "reasons": []
+      },
+      "matched": true,
+      "seconds": 0.573
+    },
+    {
+      "name": "invented_treaty",
+      "expected_supported": false,
+      "dialogue": "Settle access to The Monarch and the Bellandi Family will cancel the hit against you and grant you ownership of the casino.",
+      "previous": null,
+      "review": {
+        "supported": false,
+        "reasons": [
+          "The dialogue claims that the Bellandi Family will cancel the hit and grant ownership of the casino, which contradicts the fact that ownership has not changed and no property transfer is allowed.",
+          "The allowed result of the current job does not include cancellation of threats or transfer of ownership, both of which are promised in the dialogue."
+        ]
+      },
+      "matched": true,
+      "seconds": 1.987
+    },
+    {
+      "name": "ordinary_discretion",
+      "expected_supported": true,
+      "dialogue": "At The Monarch, the manager and a supplier disagree over delivery hours. Speak to them discreetly and help them agree without violence.",
+      "previous": null,
+      "review": {
+        "supported": true,
+        "reasons": []
+      },
+      "matched": true,
+      "seconds": 0.515
+    }
+  ],
+  "matches": 6
+}
