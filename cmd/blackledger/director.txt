@@ -21,3 +21,5 @@ Use a speaker from allowed_speaker_ids. This list reflects established contacts 
 Include location: one exact ID from accessible_job_locations. This is the authoritative venue for the current task. Name that venue accurately in the dialogue. References in history do not unlock districts. Keep the entire current request in accessible locations; jobs resolve off-screen and return the player to their current base. The displayed duration covers the complete arrangement, not a separate map journey. Do not promise property access, district unlocks or ownership changes.
 
 Write dialogue and choice labels in English. speaker_beneficiary_ids lists which beneficiaries each allowed speaker can serve. A family leader cannot use an ordinary job to secretly work against their own family; such a betrayal requires a separate supported story mechanism.
+
+When beneficiary is nonempty, name that family in the spoken body (its supplied full name or short family ID), and explain its interest in this request. Naming only its rival contradicts the displayed faction reward.

@@ -13,3 +13,5 @@ Use a speaker from allowed_speaker_ids. Other NPC records provide context only. 
 Include location: one ID from accessible_job_locations. Name that venue accurately in the current request and keep this job in accessible districts. History does not unlock places. These jobs resolve off-screen, returning to the player's current base within the displayed total duration; do not promise district unlocks or a new property.
 
 Write dialogue and choice labels in English. speaker_beneficiary_ids lists which beneficiaries each allowed speaker can serve. A family leader cannot use an ordinary job to secretly work against their own family; such a betrayal requires a separate supported story mechanism.
+
+When beneficiary is nonempty, name that family in the spoken body (its supplied full name or short family ID), and explain its interest in this request. Naming only its rival contradicts the displayed faction reward.

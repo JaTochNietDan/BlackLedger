@@ -51,7 +51,7 @@ func TestWrongLeaderBeneficiaryIsCorrectedBeforeQueue(t *testing.T) {
 		if calls > 1 {
 			beneficiary = "russo"
 		}
-		b, _ := json.Marshal(core.Proposal{Location: "bar", Title: "A scheduling dispute", Body: "Mediate shared access at Saint Agnes.", Speaker: "elena", Beneficiary: beneficiary, Operation: "mediation", Outcome: "Settled."})
+		b, _ := json.Marshal(core.Proposal{Location: "bar", Title: "A scheduling dispute", Body: "Mediate shared access at Saint Agnes for " + beneficiary + ".", Speaker: "elena", Beneficiary: beneficiary, Operation: "mediation", Outcome: "Settled."})
 		json.NewEncoder(w).Encode(map[string]any{"message": map[string]string{"content": string(b)}})
 	}))
 	defer model.Close()
@@ -63,5 +63,55 @@ func TestWrongLeaderBeneficiaryIsCorrectedBeforeQueue(t *testing.T) {
 	saved, _ := a.s.Read()
 	if calls != 2 || len(saved.Offers) != 1 || saved.Offers[0].Event.Beneficiary != "russo" {
 		t.Fatal("contradictory job queued")
+	}
+}
+
+func TestSpokenOfferNamesTheFactionReceivingCredit(t *testing.T) {
+	w := core.New(27)
+	for _, tc := range []struct {
+		body, beneficiary string
+		valid             bool
+	}{
+		{"A vendor refuses his contract with Bellandi. Settle the dispute.", "russo", false},
+		{"Settle shared access for the Russo Outfit.", "russo", true},
+		{"This is Russo's business.", "russo", true},
+		{"This helps Russoness.", "russo", false},
+		{"Bellandi disagrees, but Russo needs shared access.", "russo", true},
+		{"Settle a disagreement between two staff.", "", true},
+	} {
+		if (validateBeneficiaryMention(w, core.Proposal{Body: tc.body, Beneficiary: tc.beneficiary}) == nil) != tc.valid {
+			t.Fatal(tc)
+		}
+	}
+}
+
+func TestRivalOnlyDialogueIsCorrectedBeforeQueue(t *testing.T) {
+	a := testApp(t)
+	if err := a.s.Change(func(w *core.World) error {
+		w.Factions[1].Goodwill = 9
+		w.Arrangements = []core.ArrangementMemory{{Life: w.Life, Speaker: "mara", Operation: "courier", Status: "declined"}}
+		return nil
+	}); err != nil {
+		t.Fatal(err)
+	}
+	calls := 0
+	model := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		calls++
+		body := "At Mercer Exchange, settle the vendor's contract with Bellandi."
+		if calls > 1 {
+			body = "At Mercer Exchange, settle loading access for Russo suppliers."
+		}
+		b, _ := json.Marshal(core.Proposal{Location: "market", Title: "Shared access", Body: body, Speaker: "elena", Beneficiary: "russo", Operation: "mediation", Outcome: "Settled."})
+		json.NewEncoder(w).Encode(map[string]any{"message": map[string]string{"content": string(b)}})
+	}))
+	defer model.Close()
+	t.Setenv("BLACK_LEDGER_OLLAMA", model.URL)
+	snapshot, _ := a.s.Read()
+	if err := a.generate(snapshot); err != nil {
+		t.Fatal(err)
+	}
+	saved, _ := a.s.Read()
+	if calls != 2 || len(saved.Offers) != 1 || saved.Offers[0].Event.Body != "At Mercer Exchange, settle loading access for Russo suppliers." {
+		t.Fatal("rival-only dialogue entered the queue")
 	}
 }

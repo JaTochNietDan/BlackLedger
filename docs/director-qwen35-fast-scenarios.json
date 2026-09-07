@@ -1,0 +1,764 @@
+{
+  "cases": [
+    {
+      "allowed_speakers": [
+        "leo"
+      ],
+      "factions": [
+        {
+          "id": "bellandi",
+          "name": "Bellandi Family",
+          "leader": "Vittorio Bellandi",
+          "power": 90,
+          "goodwill": 0,
+          "cash": 8000
+        },
+        {
+          "id": "russo",
+          "name": "Russo Outfit",
+          "leader": "Elena Russo",
+          "power": 58,
+          "goodwill": 0,
+          "cash": 4500
+        }
+      ],
+      "life": 1,
+      "name": "crew_after_declined_delivery",
+      "offers": [
+        {
+          "ready": 510,
+          "event": {
+            "operation": "mediation",
+            "alternatives": {
+              "approach:careful": {
+                "reward": 40,
+                "respect": 5,
+                "heat": 0,
+                "minutes": 90
+              },
+              "approach:press": {
+                "reward": 75,
+                "respect": 5,
+                "heat": 5,
+                "minutes": 45
+              }
+            },
+            "target": "bar",
+            "id": "acb1dc263c31df1cbe725556854f9fd5",
+            "title": "Settle the Back Door Dispute",
+            "body": "I'm keeping an eye on things at Saint Agnes for you, friend. Two of our men are arguing over who gets to use the back door for the evening rush. It's causing a scene that could bring unwanted attention. I need you to step in right now and settle their disagreement before it escalates. Please handle this mediation quietly inside the bar so we can keep the peace.",
+            "speaker": "leo",
+            "choices": [
+              {
+                "id": "accept",
+                "label": "Mediate the dispute",
+                "detail": "Saint Agnes · $55 · 60 minutes · +5 respect · +0 heat · At 15 heat, police may stop completion.",
+                "cost": 0,
+                "disabled": false
+              },
+              {
+                "id": "approach:careful",
+                "label": "Take my time, handle it gently",
+                "detail": "Saint Agnes · $40 · 90 minutes · +5 respect · +0 heat · At 15 heat, police may stop completion.",
+                "cost": 0,
+                "disabled": false
+              },
+              {
+                "id": "approach:press",
+                "label": "Push the schedule now",
+                "detail": "Saint Agnes · $75 · 45 minutes · +5 respect · +5 heat · At 15 heat, police may stop completion.",
+                "cost": 0,
+                "disabled": false
+              },
+              {
+                "id": "decline",
+                "label": "Decline the arrangement",
+                "detail": "No cost or time.",
+                "cost": 0,
+                "disabled": false
+              }
+            ],
+            "kind": "proposal",
+            "source": "local-ai",
+            "minute": 480,
+            "effect": {
+              "reward": 55,
+              "respect": 5,
+              "heat": 0,
+              "minutes": 60
+            },
+            "outcome": "You completed the requested mediation without violence."
+          }
+        }
+      ],
+      "operation": "mediation",
+      "player": {
+        "name": "Alex Varga",
+        "cash": 90,
+        "health": 100,
+        "respect": 6,
+        "heat": 0,
+        "location": "room",
+        "home": "room",
+        "security": 0,
+        "contacts": 0,
+        "crew": [
+          {
+            "id": "leo",
+            "name": "Leo Carver",
+            "loyalty": 65
+          }
+        ],
+        "alive": true,
+        "earned": 0,
+        "job_count": 0
+      },
+      "previous_arrangements": [
+        {
+          "id": "96e886020f848320dbab87b2dbcb5202",
+          "life": 1,
+          "minute": 0,
+          "title": "A delivery declined",
+          "offer": "Carry a sealed envelope.",
+          "speaker": "mara",
+          "operation": "courier",
+          "beneficiary": "",
+          "status": "declined"
+        }
+      ],
+      "properties": {
+        "apartment": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 0,
+          "carry": 0
+        },
+        "bar": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 0,
+          "carry": 0
+        },
+        "casino": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 48,
+          "carry": 0
+        },
+        "club": {
+          "owner": "bellandi",
+          "condition": 100,
+          "income": 0,
+          "carry": 0
+        },
+        "docks": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 0,
+          "carry": 0
+        },
+        "estate": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 0,
+          "carry": 0
+        },
+        "garage": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 24,
+          "carry": 0
+        },
+        "laundry": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 14,
+          "carry": 0
+        },
+        "market": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 0,
+          "carry": 0
+        },
+        "room": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 0,
+          "carry": 0
+        }
+      },
+      "seconds": 17.886532583,
+      "status": "ready"
+    },
+    {
+      "allowed_speakers": [
+        "elena"
+      ],
+      "factions": [
+        {
+          "id": "bellandi",
+          "name": "Bellandi Family",
+          "leader": "Vittorio Bellandi",
+          "power": 90,
+          "goodwill": 0,
+          "cash": 8000
+        },
+        {
+          "id": "russo",
+          "name": "Russo Outfit",
+          "leader": "Elena Russo",
+          "power": 58,
+          "goodwill": 9,
+          "cash": 4500
+        }
+      ],
+      "life": 1,
+      "name": "leader_new_request",
+      "offers": [
+        {
+          "ready": 510,
+          "event": {
+            "operation": "mediation",
+            "alternatives": {
+              "approach:careful": {
+                "reward": 40,
+                "respect": 5,
+                "heat": 0,
+                "minutes": 90
+              },
+              "approach:press": {
+                "reward": 75,
+                "respect": 5,
+                "heat": 5,
+                "minutes": 45
+              }
+            },
+            "beneficiary": "russo",
+            "target": "laundry",
+            "id": "cc72c861095de42e67fa232394301fce",
+            "title": "A quiet shift at the laundry",
+            "body": "We met at Saint Agnes to clear your room dispute, Elena. Now I need you to mediate a schedule clash between my drivers and staff at Bluebird Laundry. The owner demands quiet loading, but the Russo crew needs space for repairs. We must agree on a shared shift without raising the heat from local police or rival gangs.",
+            "speaker": "elena",
+            "choices": [
+              {
+                "id": "accept",
+                "label": "Mediate the dispute",
+                "detail": "Bluebird Laundry · $55 · 60 minutes · +5 respect · +0 heat · At 15 heat, police may stop completion. · Russo Outfit standing +6; rival standing −3.",
+                "cost": 0,
+                "disabled": false
+              },
+              {
+                "id": "approach:careful",
+                "label": "Slow prep at laundry",
+                "detail": "Bluebird Laundry · $40 · 90 minutes · +5 respect · +0 heat · At 15 heat, police may stop completion. · Russo Outfit standing +6; rival standing −3.",
+                "cost": 0,
+                "disabled": false
+              },
+              {
+                "id": "approach:press",
+                "label": "Rush the meeting now",
+                "detail": "Bluebird Laundry · $75 · 45 minutes · +5 respect · +5 heat · At 15 heat, police may stop completion. · Russo Outfit standing +6; rival standing −3.",
+                "cost": 0,
+                "disabled": false
+              },
+              {
+                "id": "decline",
+                "label": "Decline the arrangement",
+                "detail": "No cost or time.",
+                "cost": 0,
+                "disabled": false
+              }
+            ],
+            "kind": "proposal",
+            "source": "local-ai",
+            "minute": 480,
+            "effect": {
+              "reward": 55,
+              "respect": 5,
+              "heat": 0,
+              "minutes": 60
+            },
+            "outcome": "You completed the requested mediation without violence."
+          }
+        }
+      ],
+      "operation": "mediation",
+      "player": {
+        "name": "Alex Varga",
+        "cash": 90,
+        "health": 100,
+        "respect": 0,
+        "heat": 0,
+        "location": "room",
+        "home": "room",
+        "security": 0,
+        "contacts": 0,
+        "crew": [],
+        "alive": true,
+        "earned": 0,
+        "job_count": 0
+      },
+      "previous_arrangements": [
+        {
+          "id": "6e30cffd63189e86623f6e8ecb73f08f",
+          "life": 1,
+          "minute": 0,
+          "title": "A refused introduction",
+          "offer": "",
+          "speaker": "mara",
+          "operation": "courier",
+          "beneficiary": "",
+          "status": "declined"
+        }
+      ],
+      "properties": {
+        "apartment": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 0,
+          "carry": 0
+        },
+        "bar": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 0,
+          "carry": 0
+        },
+        "casino": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 48,
+          "carry": 0
+        },
+        "club": {
+          "owner": "bellandi",
+          "condition": 100,
+          "income": 0,
+          "carry": 0
+        },
+        "docks": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 0,
+          "carry": 0
+        },
+        "estate": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 0,
+          "carry": 0
+        },
+        "garage": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 24,
+          "carry": 0
+        },
+        "laundry": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 14,
+          "carry": 0
+        },
+        "market": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 0,
+          "carry": 0
+        },
+        "room": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 0,
+          "carry": 0
+        }
+      },
+      "seconds": 16.663824208,
+      "status": "ready"
+    },
+    {
+      "allowed_speakers": [
+        "mara"
+      ],
+      "factions": [
+        {
+          "id": "bellandi",
+          "name": "Bellandi Family",
+          "leader": "Vittorio Bellandi",
+          "power": 90,
+          "goodwill": 0,
+          "cash": 8000
+        },
+        {
+          "id": "russo",
+          "name": "Russo Outfit",
+          "leader": "Elena Russo",
+          "power": 58,
+          "goodwill": 0,
+          "cash": 4500
+        }
+      ],
+      "life": 1,
+      "name": "completed_tool_dispute",
+      "offers": [
+        {
+          "ready": 510,
+          "event": {
+            "connection": {
+              "id": "269b66fd1151bf05d434d9ca995c7972",
+              "title": "A tool shared",
+              "result": "You completed the requested mediation without violence."
+            },
+            "operation": "collection",
+            "alternatives": {
+              "approach:careful": {
+                "reward": 115,
+                "respect": 3,
+                "heat": 2,
+                "minutes": 120
+              },
+              "approach:press": {
+                "reward": 150,
+                "respect": 3,
+                "heat": 10,
+                "minutes": 75
+              }
+            },
+            "target": "garage",
+            "id": "42cce8b00decbd80345b6283712f9fa1",
+            "title": "Cash for mediation",
+            "body": "Alex, the mechanics at Russo Motor Works have settled their argument about that shared tool. Now we need to collect the cash owed for the mediation work just completed. My contacts in the garage say they expect payment before noon. Bring the bag and be ready to walk out with it. Discretion matters here since Russo men watch the doors closely.",
+            "speaker": "mara",
+            "choices": [
+              {
+                "id": "accept",
+                "label": "Collect the payment",
+                "detail": "Russo Motor Works · $130 · 90 minutes · +3 respect · +5 heat · At 15 heat, police may stop completion.",
+                "cost": 0,
+                "disabled": false
+              },
+              {
+                "id": "approach:careful",
+                "label": "Cash in hand",
+                "detail": "Russo Motor Works · $115 · 120 minutes · +3 respect · +2 heat · At 15 heat, police may stop completion.",
+                "cost": 0,
+                "disabled": false
+              },
+              {
+                "id": "approach:press",
+                "label": "Quick visit",
+                "detail": "Russo Motor Works · $150 · 75 minutes · +3 respect · +10 heat · At 15 heat, police may stop completion.",
+                "cost": 0,
+                "disabled": false
+              },
+              {
+                "id": "decline",
+                "label": "Decline the arrangement",
+                "detail": "No cost or time.",
+                "cost": 0,
+                "disabled": false
+              }
+            ],
+            "kind": "proposal",
+            "source": "local-ai",
+            "minute": 480,
+            "effect": {
+              "reward": 130,
+              "respect": 3,
+              "heat": 5,
+              "minutes": 90
+            },
+            "outcome": "You collected the agreed payment and reported back."
+          }
+        }
+      ],
+      "operation": "collection",
+      "player": {
+        "name": "Alex Varga",
+        "cash": 90,
+        "health": 100,
+        "respect": 0,
+        "heat": 0,
+        "location": "garage",
+        "home": "room",
+        "security": 0,
+        "contacts": 0,
+        "crew": [],
+        "alive": true,
+        "earned": 0,
+        "job_count": 0
+      },
+      "previous_arrangements": [
+        {
+          "location": "garage",
+          "id": "269b66fd1151bf05d434d9ca995c7972",
+          "life": 1,
+          "minute": 0,
+          "title": "A tool shared",
+          "offer": "Two mechanics at Russo Motor Works disagree about access to a tool. Help them agree on how to share it.",
+          "speaker": "mara",
+          "operation": "mediation",
+          "beneficiary": "",
+          "status": "completed",
+          "result": "You completed the requested mediation without violence."
+        }
+      ],
+      "properties": {
+        "apartment": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 0,
+          "carry": 0
+        },
+        "bar": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 0,
+          "carry": 0
+        },
+        "casino": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 48,
+          "carry": 0
+        },
+        "club": {
+          "owner": "bellandi",
+          "condition": 100,
+          "income": 0,
+          "carry": 0
+        },
+        "docks": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 0,
+          "carry": 0
+        },
+        "estate": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 0,
+          "carry": 0
+        },
+        "garage": {
+          "owner": "player:1",
+          "condition": 100,
+          "income": 24,
+          "carry": 0
+        },
+        "laundry": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 14,
+          "carry": 0
+        },
+        "market": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 0,
+          "carry": 0
+        },
+        "room": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 0,
+          "carry": 0
+        }
+      },
+      "seconds": 9.00708925,
+      "status": "ready"
+    },
+    {
+      "allowed_speakers": [
+        "mara"
+      ],
+      "factions": [
+        {
+          "id": "bellandi",
+          "name": "Bellandi Family",
+          "leader": "Vittorio Bellandi",
+          "power": 90,
+          "goodwill": 0,
+          "cash": 8000
+        },
+        {
+          "id": "russo",
+          "name": "Russo Outfit",
+          "leader": "Elena Russo",
+          "power": 58,
+          "goodwill": 0,
+          "cash": 4500
+        }
+      ],
+      "life": 2,
+      "name": "new_person_after_death",
+      "offers": [
+        {
+          "ready": 990,
+          "event": {
+            "operation": "mediation",
+            "alternatives": {
+              "approach:careful": {
+                "reward": 40,
+                "respect": 5,
+                "heat": 0,
+                "minutes": 90
+              },
+              "approach:press": {
+                "reward": 75,
+                "respect": 5,
+                "heat": 5,
+                "minutes": 45
+              }
+            },
+            "target": "docks",
+            "id": "3543b8290d5ba8cac154c5a0e920da05",
+            "title": "Dock Dispute Mediation",
+            "body": "Listen, Nico. The watermen at Pier 14 won't dock their barges until the Russo boys stop blocking the channel this afternoon. They argue over access to the loading slips while Elena's men wait by the gangplank. I need you to step in and settle their dispute right now so no one gets shot in front of my eyes. Keep it low-key and bring them back to me before sundown.",
+            "speaker": "mara",
+            "choices": [
+              {
+                "id": "accept",
+                "label": "Mediate the dispute",
+                "detail": "Pier 14 · $55 · 60 minutes · +5 respect · +0 heat · At 15 heat, police may stop completion.",
+                "cost": 0,
+                "disabled": false
+              },
+              {
+                "id": "approach:careful",
+                "label": "Quiet Negotiation",
+                "detail": "Pier 14 · $40 · 90 minutes · +5 respect · +0 heat · At 15 heat, police may stop completion.",
+                "cost": 0,
+                "disabled": false
+              },
+              {
+                "id": "approach:press",
+                "label": "Fast Track",
+                "detail": "Pier 14 · $75 · 45 minutes · +5 respect · +5 heat · At 15 heat, police may stop completion.",
+                "cost": 0,
+                "disabled": false
+              },
+              {
+                "id": "decline",
+                "label": "Decline the arrangement",
+                "detail": "No cost or time.",
+                "cost": 0,
+                "disabled": false
+              }
+            ],
+            "kind": "proposal",
+            "source": "local-ai",
+            "minute": 960,
+            "effect": {
+              "reward": 55,
+              "respect": 5,
+              "heat": 0,
+              "minutes": 60
+            },
+            "outcome": "You completed the requested mediation without violence."
+          }
+        }
+      ],
+      "operation": "mediation",
+      "player": {
+        "name": "Nico Ward",
+        "cash": 90,
+        "health": 100,
+        "respect": 0,
+        "heat": 0,
+        "location": "room",
+        "home": "room",
+        "security": 0,
+        "contacts": 0,
+        "crew": [],
+        "alive": true,
+        "earned": 0,
+        "job_count": 0
+      },
+      "previous_arrangements": [
+        {
+          "id": "f95643a2af4258ce1d39046028365005",
+          "life": 1,
+          "minute": 0,
+          "title": "Alex's old mediation",
+          "offer": "",
+          "speaker": "mara",
+          "operation": "mediation",
+          "beneficiary": "",
+          "status": "completed",
+          "result": "You completed the requested mediation without violence."
+        }
+      ],
+      "properties": {
+        "apartment": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 0,
+          "carry": 0
+        },
+        "bar": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 0,
+          "carry": 0
+        },
+        "casino": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 48,
+          "carry": 0
+        },
+        "club": {
+          "owner": "bellandi",
+          "condition": 100,
+          "income": 0,
+          "carry": 0
+        },
+        "docks": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 0,
+          "carry": 0
+        },
+        "estate": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 0,
+          "carry": 0
+        },
+        "garage": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 24,
+          "carry": 0
+        },
+        "laundry": {
+          "owner": "former:Alex Varga",
+          "condition": 100,
+          "income": 12,
+          "carry": 0
+        },
+        "market": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 0,
+          "carry": 0
+        },
+        "room": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 0,
+          "carry": 0
+        }
+      },
+      "seconds": 10.798658459,
+      "status": "ready"
+    }
+  ],
+  "finished_utc": "2026-09-07T23:30:59.971065Z",
+  "method": "Selected scenarios use isolated temporary saves, actual local provider and production generation/validation path. No user campaign access. Prose requires manual assessment; test success is not semantic acceptance.",
+  "model": "qwen3.5:9b",
+  "started_utc": "2026-09-07T23:30:05.584031Z",
+  "thinking": false
+}

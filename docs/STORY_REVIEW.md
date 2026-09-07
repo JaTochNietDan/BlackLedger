@@ -46,3 +46,19 @@ python3 scripts/evaluate-story-review.py --think --cases docs/story-review-campa
 On the same development corpus and unchanged simple-review prompt, reasoning mode achieved5/7 scored matches, with no invalid responses. It caught the two invented-owner stories and accepted all three valid cases, but missed the leader/beneficiary contradiction and nonexistent deadline. One accepted response included reasons despite the prompt asking for an empty list. Two ambiguous cases remain unscored. See story-review-campaign-thinking.json.
 
 The nine requests took198.76seconds total; median21.00seconds, range13.55–45.72seconds. This is a substantial local latency cost and remains an inadequate gate. Correct verdicts still require human assessment of their explanations. A separate opt-in generation experiment (`BLACK_LEDGER_DIRECTOR_THINK=1`) tests whether reasoning improves the original dialogue rather than adding an unreliable second pass; it does not enable story review or change gameplay authority.
+
+## Live generation scenarios
+
+The opt-in Go harness exercises the real provider through production generation and validation, using isolated temporary saves. Ordinary tests skip it. Set an absolute, previously unused report filename (Go tests run from their package directory):
+
+```sh
+BLACK_LEDGER_LIVE_DIRECTOR_EVAL=1 \
+BLACK_LEDGER_MODEL=qwen3:14b \
+BLACK_LEDGER_DIRECTOR_THINK=1 \
+BLACK_LEDGER_LIVE_EVAL_REPORT=/tmp/blackledger-live-new.json \
+/usr/local/go/bin/go test ./cmd/blackledger -run '^TestLiveDirectorScenarios$' -count=1 -v -timeout=20m
+```
+
+Reports preserve context and generated dialogue incrementally. A green test means one offer arrived without advancing cash or time; assess speaker role, beneficiary, callback, prior-life identity, unsupported agreements and deadlines separately. The first four-case reasoning run passed mechanical checks but failed narrative acceptance; see director-thinking-scenarios.json and DEVELOPMENT.md. Results are stochastic samples, not a benchmark proving model superiority.
+
+An exploratory qwen3.5:9b non-thinking run completed the same four scenarios in54.39seconds, but also failed manual narrative review: confused addressee identity, invented previous meeting, invented payment obligations and unsupported deadlines. See director-qwen35-fast-scenarios.json. It used the later beneficiary-name guard/prompt, whereas the first14b run predated that change. Neither comparison justifies changing defaults.

@@ -3,6 +3,8 @@ package main
 import (
 	"blackledger/core"
 	"fmt"
+	"strings"
+	"unicode"
 )
 
 // Independent fixers and associates can bring work for either family. A family
@@ -32,6 +34,29 @@ func validateSpeakerBeneficiary(w *core.World, speaker, beneficiary string) erro
 		}
 	}
 	return fmt.Errorf("speaker %q must use exactly one of %q as beneficiary; ordinary jobs cannot invent a betrayal or change faction allegiance", speaker, allowed)
+}
+
+// A minimum observable link between spoken terms and the faction receiving
+// credit. Mentioning a family is not proof of semantic consistency, but an
+// offer naming only its rival cannot silently award credit to this beneficiary.
+func validateBeneficiaryMention(w *core.World, p core.Proposal) error {
+	if p.Beneficiary == "" {
+		return nil
+	}
+	words := func(s string) string {
+		return " " + strings.Join(strings.FieldsFunc(strings.ToLower(s), func(r rune) bool { return !unicode.IsLetter(r) && !unicode.IsDigit(r) }), " ") + " "
+	}
+	for _, f := range w.Factions {
+		if f.ID != p.Beneficiary {
+			continue
+		}
+		body := words(p.Body)
+		if strings.Contains(body, words(f.Name)) || strings.Contains(body, words(f.ID)) {
+			return nil
+		}
+		return fmt.Errorf("body must name beneficiary %q and explain how this job serves that family; naming only a rival contradicts the displayed faction reward", f.Name)
+	}
+	return fmt.Errorf("unknown beneficiary %q", p.Beneficiary)
 }
 
 func directorConnection(w *core.World) *core.ArrangementMemory {
