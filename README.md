@@ -12,7 +12,7 @@ npm run build
 go run ./cmd/blackledger
 ```
 
-Then open http://127.0.0.1:8791. Rebuild after frontend edits. React provides the interface and Pixi renders the illustrated city; the Go server serves the compiled frontend from `dist/`.
+Then open http://127.0.0.1:8791. Rebuild after frontend edits. React provides the interface and destination directory; an isolated 2D canvas renders the painted street; the Go server serves the compiled frontend from `dist/`.
 
 State: `.runtime/campaign.sqlite3`. Override BLACK_LEDGER_DB for isolated tests. The HTTP server binds only localhost. Go owns all game rules and saves; the browser only sends commands and displays public state.
 

@@ -1,10 +1,10 @@
 # Simulation, director and presentation
 
-The Go core owns truth. A command authorizes a bounded amount of game time. The core advances an event schedule, stops at any player intervention, commits results, and returns public state plus presentation records. React/Pixi can take seconds to illustrate those records or skip immediately. Backend time never depends on animation duration, display frame rate, or whether the page is visible.
+The Go core owns truth. A command authorizes a bounded amount of game time. The core advances an event schedule, stops at any player intervention, commits results, and returns public state plus presentation records. React/canvas can take seconds to illustrate those records or skip immediately. Backend time never depends on animation duration, display frame rate, or whether the page is visible.
 
 The core can prepare next options while presentation plays. AI may prepare candidate situations in parallel. Neither may commit future player choices speculatively. A revision and incident ID anchor every response; late proposals for a different life/world are discarded. Private plans are filtered out of the public projection.
 
-Boundary: React components (input/accessibility/layout) + Pixi scene (art/animation) → versioned command API → Go core → SQLite transactional state and receipts. Model and voice services are replaceable HTTP providers. Headless commands exercise the same rules as the frontend.
+Boundary: React components (input/accessibility/layout) + isolated canvas street (art/animation) → versioned command API → Go core → SQLite transactional state and receipts. Model and voice services are replaceable HTTP providers. Headless commands exercise the same rules as the frontend.
 
 Performance policy: prioritize correct event scheduling and bounded work. Do not simulate decorative pedestrians as autonomous NPCs. The Go clock jumps to scheduled boundaries (task completion, attacks, warning times, midnight bills, or the authorized action end), integrating passive income over each interval. It does not loop over every game minute. Do not claim idle animations save CPU if the renderer is needlessly repainting continuously.
 
