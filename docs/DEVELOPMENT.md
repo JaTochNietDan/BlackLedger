@@ -20,3 +20,13 @@
 - React/Pixi production build passes. Browser QA exercised travel to Saint Agnes and two courier jobs, reaching the first paused authored conversation. Full campaign, AI encounter and voice QA remain outstanding.
 - Renderer retains its active texture until replacement is ready, and disposes removed texture resources; SVG object URLs are revoked even after failed decoding.
 - Documented prepared time segments, speculative AI proposals, and the rule that animation speed cannot alter authoritative outcomes.
+
+## Browser campaign and consequence QA
+- Played authored opening through first Bluebird Laundry purchase: $55 cash, 10 respect, Day 1 11:55 after acquisition.
+- A real local model encounter arrived. Requested speech and observed Speaking status; no browser warnings/errors were reported. Audio quality and late-response cancellation still need a dedicated check.
+- Accepted the model encounter then immediately reloaded. Recovery yielded $146 at 13:25: $70 job reward plus $21 passive income, exactly once.
+- Traveled back to Saint Agnes and clicked Skip journey. Arrival stayed at 13:50 with $151; skipping only removed the presentation.
+- Found model prose claiming a character had been removed during a collection job. Completion records now come from the approved operation, and choices name the actual task. Prompts request concrete noncombat work. This does not constitute semantic validation of all generated dialogue.
+- Added HTTP tests for duplicate/stale commands, private plot filtering, closed-event speech, invalid input and foreign origins.
+- New-life regression ensures NPC identity persists while personal trust and obsolete director state reset.
+- Remaining: full timed campaign, broader dynamic rival incidents, voice prefetch/cancellation QA, responsive visual refinements, and end-to-end death/security/expansion playtests.

@@ -179,7 +179,7 @@ func (a *app) prepare() bool {
 	return true
 }
 func (a *app) generate(snapshot *core.World) error {
-	contextData := map[string]any{"life": snapshot.Life, "minute": snapshot.Minute, "player": snapshot.Player, "factions": snapshot.Factions, "npcs": snapshot.NPCs, "dead": snapshot.Dead, "recent_history": snapshot.History[max(0, len(snapshot.History)-12):]}
+	contextData := map[string]any{"life": snapshot.Life, "minute": snapshot.Minute, "player": snapshot.Player, "factions": snapshot.Factions, "npcs": snapshot.NPCs, "dead": snapshot.Dead, "places": core.Locations, "properties": snapshot.Properties, "recent_history": snapshot.History[max(0, len(snapshot.History)-12):]}
 	b, _ := json.Marshal(contextData)
 	payload, _ := json.Marshal(map[string]any{"model": env("BLACK_LEDGER_MODEL", "qwen3:14b"), "stream": false, "think": false, "format": "json", "messages": []map[string]string{{"role": "system", "content": prompt}, {"role": "user", "content": string(b)}}, "options": map[string]any{"temperature": .8, "num_predict": 700}})
 	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)

@@ -27,6 +27,10 @@ func (w *World) apply(c Command) error {
 		w.Event = nil
 		w.Offers = []Offer{}
 		w.Plots = []Plot{}
+		for i := range w.NPCs {
+			w.NPCs[i].Trust = 0
+		}
+		w.Director = Director{"available", "A new life begins. Ready to prepare encounters.", -9999}
 		w.Minute += 480
 		for i := range w.Factions {
 			w.Factions[i].Goodwill = 0

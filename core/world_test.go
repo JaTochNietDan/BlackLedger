@@ -235,3 +235,29 @@ func TestScheduleStopsBeforePostAttackTask(t *testing.T) {
 		t.Fatal("advanced past player decision")
 	}
 }
+
+func TestNewPersonDoesNotInheritRelationshipsOrPendingDirector(t *testing.T) {
+	w := New(27)
+	w.NPCs[0].Trust = 85
+	name := w.NPCs[0].Name
+	w.Director.Status = "writing"
+	w.Die("A previous life ended.")
+	act(t, &w, "new_life", "")
+	if w.NPCs[0].Trust != 0 || w.NPCs[0].Name != name || w.Director.Status == "writing" {
+		t.Fatal("new person inherited trust or an obsolete generation job")
+	}
+}
+
+func TestDirectorCannotInventMechanicalCompletion(t *testing.T) {
+	w := New(27)
+	scene, err := w.ValidateProposal(Proposal{"A payment", "Please collect this payment.", "mara", "collection", "The rival is killed and you own his casino."})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if scene.Outcome != "You collected the agreed payment and reported back." {
+		t.Fatal("unverified outcome became canonical")
+	}
+	if scene.Choices[0].Label != "Collect the payment" {
+		t.Fatal("operation hidden behind vague choice")
+	}
+}
