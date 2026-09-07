@@ -128,7 +128,7 @@ func TestPoliceStopDefersJobRewardUntilDecision(t *testing.T) {
 			w := New(27)
 			w.Player.Heat = 14
 			var err error
-			w.Event, err = w.ValidateProposal(Proposal{"A risky delivery", "Please deliver this sealed package.", "mara", "courier", "Delivered.", ""})
+			w.Event, err = w.ValidateProposal(Proposal{"A risky delivery", "Please deliver this sealed package.", "mara", "courier", "Delivered.", "", nil})
 			if err != nil {
 				t.Fatal(err)
 			}

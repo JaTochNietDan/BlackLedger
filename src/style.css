@@ -18,3 +18,5 @@
 .person .painted-portrait{display:block;width:64px;height:64px;flex:none;background-image:url('/art/cast-noir-v1.png');background-size:300% 200%;border:1px solid #665d43}.scene .person .painted-portrait{width:76px;height:76px}
 /* Keep room for the illustrated street at ordinary laptop heights. */
 @media(min-width:801px){.map-heading{top:18px}.map-heading h1{font-size:28px}.map-heading p{display:none}.city-view-switch{top:84px}.street-scene{padding-top:126px}}
+
+@media(min-width:1000px){.scene.extended{width:min(960px,100%)}.scene.extended .choices{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:18px}.scene.extended .spoken{font-size:18px;line-height:1.55}.scene.extended h2{margin-top:15px}.scene.extended .choices .action{margin:0;padding:12px;align-items:flex-start}.scene.extended .desc{line-height:1.5}}

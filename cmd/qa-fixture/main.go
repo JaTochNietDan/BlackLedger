@@ -31,7 +31,7 @@ func main() {
 	err = s.Change(func(w *core.World) error {
 		w.Player.Heat = 14
 		w.Player.Location = "bar"
-		scene, err := w.ValidateProposal(core.Proposal{Title: "A Russo delivery", Body: "Take these sealed papers to our contact. With police watching your movements, the arrangement may become expensive.", Speaker: "mara", Operation: "courier", Outcome: "Delivered the sealed papers.", Beneficiary: "russo"})
+		scene, err := w.ValidateProposal(core.Proposal{Title: "A Russo delivery", Body: "Take these sealed papers to our contact. With police watching your movements, the arrangement may become expensive.", Speaker: "mara", Operation: "courier", Outcome: "Delivered the sealed papers.", Beneficiary: "russo", Approaches: []core.Approach{{Method: "careful", Label: "Wait until the street clears"}, {Method: "press", Label: "Deliver before the doors close"}}})
 		if err != nil {
 			return err
 		}

@@ -118,7 +118,16 @@ func (w *World) apply(c Command) error {
 				w.Log("The arrangement abandoned", "You surrender the package or paperwork and leave without completing the job. No reward was paid. Police attention eases.", "story")
 			}
 		case "proposal":
-			if c.Choice == "accept" {
+			alternative, hasAlternative := e.Alternatives[c.Choice]
+			if hasAlternative {
+				e.Effect = alternative
+				if c.Choice == "approach:careful" {
+					e.Outcome += " You took extra time to keep the work discreet."
+				} else {
+					e.Outcome += " You pushed the schedule and drew more attention."
+				}
+			}
+			if c.Choice == "accept" || hasAlternative {
 				w.Advance(e.Effect.Minutes)
 				if p.Alive && w.Event == nil {
 					if p.Heat+e.Effect.Heat >= 15 {

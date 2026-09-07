@@ -88,3 +88,10 @@
 - Found repeatable respect rewards from moving between homes. Track the highest housing tier reached in this life; only entering a new tier earns respect. Starting a new life resets that progression.
 - Save schema v2 repairs an active v1 estate purchase on load and initializes housing rank from the saved residence without charging money, changing revision or advancing time. The migration does not invent ownership for dead players.
 - Regression tests cover purchase/return/death/new-life ownership, repeated rental moves, and legacy save migration. Go race suite and frontend production build passed. Owned residences display condition rather than a misleading zero hourly business income.
+
+## AI-authored approaches with bounded consequences
+- Added optional contextual approach labels to model proposals. The director may offer careful preparation or a pressured schedule; Go assigns fixed tradeoffs in time, reward and heat. Unsupported/duplicate approaches and invalid labels are rejected; unoffered choices cannot be forged. Existing offers remain compatible.
+- Saved approach effects survive cloning/persistence and police interruptions. Other incidents that interrupt the work still prevent completion credit. Regression covers discreet completion, pressured police interruption/payment, forged choices and business-pressure interruption.
+- The authored opening also introduces both approaches, preserving playable choices without the model.
+- Verified a real qwen3:14b response through a fresh isolated server: Mara proposed a Bellandi delivery with waiting until the club emptied versus approaching during a busy shift. Chose waiting at 09:00; at 10:15 cash rose from $135 to $195, respect 2 to 5, heat remained zero, and Bellandi received +6 standing.
+- Browser inspection found four options overfilled the former narrow dialog. Four-choice scenes now use a wider two-column desktop layout, retaining a single column at compact widths. Visually checked the desktop fixture with all choices and footer visible; no browser errors. Full narrow-viewport and uninterrupted pacing verification remain outstanding.
