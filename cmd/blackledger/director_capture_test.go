@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
@@ -20,8 +21,11 @@ import (
 func captureLiveProvider(t *testing.T, target string) func() []map[string]any {
 	t.Helper()
 	var mu sync.Mutex
+	var active sync.WaitGroup
 	attempts := []map[string]any{}
 	proxy := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		active.Add(1)
+		defer active.Done()
 		start := time.Now()
 		requestBody, err := io.ReadAll(io.LimitReader(r.Body, 2<<20))
 		if err != nil {
@@ -76,6 +80,7 @@ func captureLiveProvider(t *testing.T, target string) func() []map[string]any {
 	t.Cleanup(proxy.Close)
 	t.Setenv("BLACK_LEDGER_OLLAMA", proxy.URL)
 	return func() []map[string]any {
+		active.Wait()
 		mu.Lock()
 		defer mu.Unlock()
 		out := make([]map[string]any, len(attempts))
@@ -105,5 +110,40 @@ func TestLiveProviderRecorderPreservesFailuresAndOmitsReasoning(t *testing.T) {
 	encoded, _ := json.Marshal(rows)
 	if strings.Contains(string(encoded), "private reasoning") || len(rows[0]["request_sha256"].(string)) != 64 {
 		t.Fatal("invalid report provenance or leaked reasoning")
+	}
+}
+
+func TestLiveProviderRecorderWaitsForCancelledAttempt(t *testing.T) {
+	started := make(chan struct{})
+	target := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, _ = io.Copy(io.Discard, r.Body)
+		close(started)
+		<-r.Context().Done()
+	}))
+	defer target.Close()
+	records := captureLiveProvider(t, target.URL)
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	req, _ := http.NewRequestWithContext(ctx, "POST", env("BLACK_LEDGER_OLLAMA", ""), strings.NewReader(`{"model":"test"}`))
+	finished := make(chan error, 1)
+	go func() {
+		response, err := http.DefaultClient.Do(req)
+		if response != nil {
+			response.Body.Close()
+		}
+		finished <- err
+	}()
+	select {
+	case <-started:
+	case <-time.After(3 * time.Second):
+		t.Fatal("request did not reach provider")
+	}
+	cancel()
+	if err := <-finished; err == nil {
+		t.Fatal("cancelled request unexpectedly succeeded")
+	}
+	rows := records()
+	if len(rows) != 1 || rows[0]["error"] == nil {
+		t.Fatal("cancelled provider attempt missing", rows)
 	}
 }

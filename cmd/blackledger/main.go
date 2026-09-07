@@ -227,12 +227,19 @@ func (a *app) generateAttempt(snapshot *core.World, feedback string) error {
 		return fmt.Errorf("model returned %d", res.StatusCode)
 	}
 	var answer struct {
-		Message struct {
+		DoneReason string `json:"done_reason"`
+		Message    struct {
 			Content string `json:"content"`
 		} `json:"message"`
 	}
 	if e = json.NewDecoder(io.LimitReader(res.Body, responseLimit)).Decode(&answer); e != nil {
 		return e
+	}
+	if answer.DoneReason == "length" {
+		// A token budget failure is not a bad story proposal. Repeating the same
+		// bounded request as a "correction" wastes another model call and can
+		// still never produce a complete offer.
+		return fmt.Errorf("model exhausted its %d-token response budget; no offer was queued", predictionLimit)
 	}
 	var proposal core.Proposal
 	if e = json.Unmarshal([]byte(answer.Message.Content), &proposal); e != nil {

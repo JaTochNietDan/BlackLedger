@@ -1,0 +1,275 @@
+{
+  "brief_mode": "full",
+  "cases": [
+    {
+      "allowed_speakers": [
+        "leo"
+      ],
+      "attempts": [
+        {
+          "content": "",
+          "done_reason": "length",
+          "eval_count": 4096,
+          "eval_duration": 60711080000,
+          "http_status": 200,
+          "load_duration": 1254375,
+          "prompt_eval_count": 3032,
+          "request_sha256": "3e015c054d7a95d5b1e473eddf4c5e9936d6d9af389f480a543c791bf6f9ba2b",
+          "seconds": 63.042088416,
+          "total_duration": 63035250500
+        }
+      ],
+      "error": "Post \"http://127.0.0.1:49429/api/chat\": context deadline exceeded",
+      "factions": [
+        {
+          "id": "bellandi",
+          "name": "Bellandi Family",
+          "leader": "Vittorio Bellandi",
+          "power": 90,
+          "goodwill": 0,
+          "cash": 8000
+        },
+        {
+          "id": "russo",
+          "name": "Russo Outfit",
+          "leader": "Elena Russo",
+          "power": 58,
+          "goodwill": 0,
+          "cash": 4500
+        }
+      ],
+      "life": 1,
+      "name": "crew_after_declined_delivery",
+      "offers": [],
+      "operation": "mediation",
+      "player": {
+        "name": "Alex Varga",
+        "cash": 90,
+        "health": 100,
+        "respect": 6,
+        "heat": 0,
+        "location": "room",
+        "home": "room",
+        "security": 0,
+        "contacts": 0,
+        "crew": [
+          {
+            "id": "leo",
+            "name": "Leo Carver",
+            "loyalty": 65
+          }
+        ],
+        "alive": true,
+        "earned": 0,
+        "job_count": 0
+      },
+      "previous_arrangements": [
+        {
+          "id": "717130e7d8aed7c9da40e4969fd7b246",
+          "life": 1,
+          "minute": 0,
+          "title": "A delivery declined",
+          "offer": "Carry a sealed envelope.",
+          "speaker": "mara",
+          "operation": "courier",
+          "beneficiary": "",
+          "status": "declined"
+        }
+      ],
+      "properties": {
+        "apartment": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 0,
+          "carry": 0
+        },
+        "bar": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 0,
+          "carry": 0
+        },
+        "casino": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 48,
+          "carry": 0
+        },
+        "club": {
+          "owner": "bellandi",
+          "condition": 100,
+          "income": 0,
+          "carry": 0
+        },
+        "docks": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 0,
+          "carry": 0
+        },
+        "estate": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 0,
+          "carry": 0
+        },
+        "garage": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 24,
+          "carry": 0
+        },
+        "laundry": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 14,
+          "carry": 0
+        },
+        "market": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 0,
+          "carry": 0
+        },
+        "room": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 0,
+          "carry": 0
+        }
+      },
+      "seconds": 243.060883375,
+      "status": "failed"
+    },
+    {
+      "allowed_speakers": [
+        "elena"
+      ],
+      "factions": [
+        {
+          "id": "bellandi",
+          "name": "Bellandi Family",
+          "leader": "Vittorio Bellandi",
+          "power": 90,
+          "goodwill": 0,
+          "cash": 8000
+        },
+        {
+          "id": "russo",
+          "name": "Russo Outfit",
+          "leader": "Elena Russo",
+          "power": 58,
+          "goodwill": 9,
+          "cash": 4500
+        }
+      ],
+      "life": 1,
+      "name": "leader_new_request",
+      "operation": "mediation",
+      "player": {
+        "name": "Alex Varga",
+        "cash": 90,
+        "health": 100,
+        "respect": 0,
+        "heat": 0,
+        "location": "room",
+        "home": "room",
+        "security": 0,
+        "contacts": 0,
+        "crew": [],
+        "alive": true,
+        "earned": 0,
+        "job_count": 0
+      },
+      "previous_arrangements": [
+        {
+          "id": "96bc50d4c031449d2758c308b58081c4",
+          "life": 1,
+          "minute": 0,
+          "title": "A refused introduction",
+          "offer": "",
+          "speaker": "mara",
+          "operation": "courier",
+          "beneficiary": "",
+          "status": "declined"
+        }
+      ],
+      "properties": {
+        "apartment": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 0,
+          "carry": 0
+        },
+        "bar": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 0,
+          "carry": 0
+        },
+        "casino": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 48,
+          "carry": 0
+        },
+        "club": {
+          "owner": "bellandi",
+          "condition": 100,
+          "income": 0,
+          "carry": 0
+        },
+        "docks": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 0,
+          "carry": 0
+        },
+        "estate": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 0,
+          "carry": 0
+        },
+        "garage": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 24,
+          "carry": 0
+        },
+        "laundry": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 14,
+          "carry": 0
+        },
+        "market": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 0,
+          "carry": 0
+        },
+        "room": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 0,
+          "carry": 0
+        }
+      },
+      "status": "interrupted",
+      "note": "Experiment stopped during this scenario; no final result available."
+    }
+  ],
+  "method": "Selected scenarios use isolated temporary saves, actual local provider and production generation/validation path. No user campaign access. Prose requires manual assessment; test success is not semantic acceptance.",
+  "model": "qwen3.5:35b-a3b",
+  "started_utc": "2026-09-07T23:49:25.9081Z",
+  "thinking": true,
+  "stopped_utc": "2026-09-07T23:57:11.814701+00:00",
+  "status": "stopped_after_repeated_incomplete_responses",
+  "manual_review": {
+    "accepted_as_coherent_suite": false,
+    "source_commit": "f29be37",
+    "assessment": "First scenario exhausted4096 tokens with empty final content, then its correction timed out180seconds later (243.06seconds total). The second scenario also logged an incomplete JSON response before correction. Stopped the identified test process71575 deliberately after436.45seconds; remaining cases were not completed. The second first-attempt done_reason was not retained, so its precise cause is unverified.",
+    "limitation": "Old recorder snapshotted attempts before cancellation handler finished, so the timed-out request lacks its own attempt row; the scenario error retains the timeout. New recorder waits for active handlers. This is a partial failed experiment, not a four-case result."
+  }
+}
