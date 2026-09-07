@@ -43,3 +43,12 @@
 - Browser visual inspection found the initial road overlapped façades; moved traffic and pavements outward. This remains a two-building study, not the integrated gameplay neighborhood. People still use simple procedural silhouettes.
 - Added ownership-driven faction pressure. A scheduled demand pauses action time; paying improves relations, refusal or rival backing can schedule hidden sabotage, and damage reduces property income. Available loyal crew mitigate business damage; home guards do not.
 - Added regression coverage for interruption timing, private schedules, limited tribute protection, hidden sabotage, crew availability, and no demands without a business.
+
+## Live street integration and browser faction test
+- The app goal is active again. The expanded visual requirements remain recorded in GOAL.md.
+- Integrated the two-building street into the actual React game with same-origin, source-checked, whitelisted inspection messages. Selecting either building changes the real action panel. The wider city remains in the directory pending additional art.
+- Sidebar previews now use painted assets for the café and casino. Fixed preview clipping and overlapping header controls found during visual inspection.
+- In an independent QA save on port 8793, one-hour wait stopped at 08:30 for the faction demand. Refused it, then advanced two hours: cash $255, respect 12, and laundry damage 35. Browser report did not reveal the hidden attacker's identity.
+- The visible QA session on 8792 had additional interactions between observations, so used a separate hidden browser/save for controlled checks.
+- Added a visible condition/repair hint for owned businesses and an ambience pause control to the live street.
+- Still incomplete: full painted neighborhood, detailed pedestrians, committed travel animation inside street view (currently a saved-arrival banner), voice prefetch/cancellation audit, and full timed campaign playtest.

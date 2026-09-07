@@ -1,4 +1,6 @@
 // Presentation-only study: no API commands, economy, outcomes, or authoritative clock.
+const embedded=new URLSearchParams(location.search).get('embed')==='1';
+if(embedded)document.body.classList.add('embedded');
 const canvas=document.querySelector('#city'),ctx=canvas.getContext('2d'),light=document.querySelector('#light'),motion=document.querySelector('#motion'),status=document.querySelector('#status');
 const reduced=matchMedia('(prefers-reduced-motion: reduce)');motion.checked=!reduced.matches;
 const assets={};let t=0,last=0,frame=0,selected='',arrival=null;
@@ -33,7 +35,9 @@ function render(){const n=Number(light.value)/100;ctx.setTransform(canvas.width/
 function tick(now){frame=0;if(document.hidden)return;const dt=last?Math.min(.05,(now-last)/1000):0;last=now;if(motion.checked)t+=dt;render();if(motion.checked)frame=requestAnimationFrame(tick)}
 function wake(){if(frame)cancelAnimationFrame(frame);last=0;frame=requestAnimationFrame(tick)}
 function resize(){canvas.width=Math.round(canvas.clientWidth*Math.min(devicePixelRatio,2));canvas.height=Math.round(canvas.clientWidth*820/1280*Math.min(devicePixelRatio,2));wake()}
-function inspect(id){selected=id;status.textContent=buildings.find(b=>b.id===id).info;wake()}
+function inspect(id){selected=id;status.textContent=buildings.find(b=>b.id===id).info;if(embedded)parent.postMessage({type:'blackledger:inspect',location:id==='cafe'?'bar':'club'},location.origin);wake()}
 document.querySelector('#cafe').onclick=()=>inspect('cafe');document.querySelector('#casino').onclick=()=>inspect('casino');light.oninput=wake;motion.onchange=wake;document.querySelector('#arrival').onclick=()=>{if(reduced.matches){status.textContent='Arrival preview skipped because reduced motion is enabled.';return}motion.checked=true;arrival={start:t,reported:false};status.textContent='A car is approaching The Monarch. Preview only; no game time passes.';wake()};document.addEventListener('visibilitychange',wake);reduced.addEventListener('change',()=>{motion.checked=!reduced.matches;wake()});
 canvas.addEventListener('click',e=>{const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)*1280/r.width,y=(e.clientY-r.top)*820/r.height;const b=[...buildings].reverse().find(b=>x>b.x+b.w*.18&&x<b.x+b.w*.82&&y>b.y+b.h*.2&&y<b.y+b.h*.97);if(b)inspect(b.id)});
 try{await Promise.all([...buildings.map(b=>[b.id,b.file]),['car','sedan-noir-v1.png']].map(async([id,file])=>{const img=new Image();img.src='/art/'+file;await img.decode();assets[id]=img}));new ResizeObserver(resize).observe(canvas);resize()}catch(e){status.className='error';status.textContent='An art asset could not load. Reload this study to retry.'}
+
+if(embedded){window.addEventListener('message',e=>{if(e.source!==parent||e.origin!==location.origin||e.data?.type!=='blackledger:presentation')return;const data=e.data;selected=data.selected==='bar'?'cafe':data.selected==='club'?'casino':'';if(Number.isFinite(data.minute)){const hour=(data.minute%1440)/60;light.value=String(Math.round((hour<6||hour>=20?1:hour<8?(8-hour)/2:hour>17?(hour-17)/3:0)*100))}if(typeof data.motion==='boolean')motion.checked=data.motion&&!reduced.matches;wake()});parent.postMessage({type:'blackledger:ready'},location.origin)}
