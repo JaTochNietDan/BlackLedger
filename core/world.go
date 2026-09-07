@@ -365,6 +365,8 @@ func (w *World) Actions(id string) []Action {
 			reason = "Leo is already in your crew"
 		}
 		add("recruit", "Recruit Leo Carver", 30, 90, reason, "A driver and collector. $12 daily wages; loyalty matters.")
+	case "garage":
+		add("audience", "Request an audience with Russo", 45, 0, "", "Discuss your standing with the Russo Outfit.")
 	case "docks":
 		add("dockwork", "Work the night cargo", 90, 0, "", "Earn $75 and 1 respect. Small chance of a work injury.")
 	case "market":

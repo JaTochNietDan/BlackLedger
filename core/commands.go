@@ -102,18 +102,8 @@ func (w *World) apply(c Command) error {
 			}
 			w.VisualCues = append(w.VisualCues, VisualCue{ID(), "attack", p.Home, caption})
 		case "audience":
-			if c.Choice == "tribute" {
-				w.Factions[0].Goodwill += 8
-				remaining := []Plot{}
-				for _, t := range w.Plots {
-					if t.Actor != "bellandi" {
-						remaining = append(remaining, t)
-					}
-				}
-				w.Plots = remaining
-				w.Log("A temporary understanding", "Bellandi accepts the tribute and calls off his current operation against you.", "politics")
-			} else {
-				w.Log("You leave the Monarch", "Nothing was agreed. Existing threats remain.", "personal")
+			if err := w.ResolveAudience(e, c.Choice); err != nil {
+				return err
 			}
 		case "business_pressure":
 			if err := w.ResolvePressure(e, c.Choice); err != nil {
@@ -235,7 +225,7 @@ func (w *World) apply(c Command) error {
 					p.Heat = max(0, p.Heat-10)
 					w.Log("Out of the spotlight", "You avoid attention for a while.", "personal")
 				case "audience":
-					w.Event = &Scene{ID: ID(), Title: "A seat across from Bellandi", Body: "“People mistake an open door for an invitation. Tell me you understand the difference.”", Speaker: "vittorio", Kind: "audience", Source: "authored", Minute: w.Minute, Choices: []Choice{{ID: "tribute", Label: "Offer $150 in tribute", Cost: 150, Detail: "Improves relations and cancels his current operation against you."}, {ID: "leave", Label: "Leave without an agreement", Detail: "No payment. Existing threats remain."}}}
+					w.OpenAudience(target)
 				case "acquire":
 					if w.NextPressure == 0 {
 						w.NextPressure = w.Minute + 180
