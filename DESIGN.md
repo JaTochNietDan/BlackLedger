@@ -11,3 +11,5 @@ AI proposes typed situations and speaks through persistent named characters. Rul
 First validation: complete a business progression, provoke a powerful casino owner, exercise warning/intervention/unaware attack, die and start as a stranger in the changed city. Refresh during decisions and repeat action IDs without duplicate consequences. Test browser at desktop and compact sizes, text-only failure states, keyboard focus, saved-game restart, and rejected AI output.
 
 Later: more districts and businesses, richer diplomacy and investigations, staff at residences, unique commissioned scene art. Legacy/succession and marriage/children are explicitly deferred.
+
+Visual direction: realistic painted noir in modular 2D isometric assets, warm vintage daylight and amber/crimson nightlife. See docs/ART_DIRECTION.md for approved references and production constraints.

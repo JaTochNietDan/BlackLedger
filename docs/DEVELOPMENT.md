@@ -30,3 +30,9 @@
 - Added HTTP tests for duplicate/stale commands, private plot filtering, closed-event speech, invalid input and foreign origins.
 - New-life regression ensures NPC identity persists while personal trust and obsolete director state reset.
 - Remaining: full timed campaign, broader dynamic rival incidents, voice prefetch/cancellation QA, responsive visual refinements, and end-to-end death/security/expansion playtests.
+
+## Approved painted-noir direction
+- User approved painted noir realism with warm daylight and richer nightlife. Saved both reference studies in docs/art.
+- Created a transparent casino asset and standalone /art-study.html with day/night grading and animated marquee lights.
+- Inspected night presentation in the browser; transparency and bulb placement are usable for the first study. Production street assembly, window masks and moving actors remain pending.
+- Frontend production build passes.
