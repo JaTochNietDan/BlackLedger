@@ -200,8 +200,20 @@ func (a *app) generateAttempt(snapshot *core.World, feedback string) error {
 	contextData["speaker_beneficiary_ids"] = affiliation
 	contextData["accessible_job_locations"] = accessibleJobLocations(snapshot)
 	b, _ := json.Marshal(contextData)
-	payload, _ := json.Marshal(map[string]any{"model": env("BLACK_LEDGER_MODEL", "qwen3:14b"), "stream": false, "think": false, "format": responseFormat, "messages": []map[string]string{{"role": "system", "content": activePrompt}, {"role": "user", "content": string(b)}}, "options": map[string]any{"temperature": .8, "num_predict": 700}})
-	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
+	// Experimental opt-in: reasoning shares the bounded generation budget with
+	// the final JSON. Requests remain asynchronous and bounded; structural
+	// validation and the save boundary still own what can enter the game.
+	thinking := env("BLACK_LEDGER_DIRECTOR_THINK", "0") == "1"
+	predictionLimit := 700
+	requestTimeout := 100 * time.Second
+	responseLimit := int64(20000)
+	if thinking {
+		predictionLimit = 4096
+		requestTimeout = 180 * time.Second
+		responseLimit = 128 * 1024
+	}
+	payload, _ := json.Marshal(map[string]any{"model": env("BLACK_LEDGER_MODEL", "qwen3:14b"), "stream": false, "think": thinking, "format": responseFormat, "messages": []map[string]string{{"role": "system", "content": activePrompt}, {"role": "user", "content": string(b)}}, "options": map[string]any{"temperature": .8, "num_predict": predictionLimit}})
+	ctx, cancel := context.WithTimeout(context.Background(), requestTimeout)
 	defer cancel()
 	req, _ := http.NewRequestWithContext(ctx, "POST", env("BLACK_LEDGER_OLLAMA", "http://127.0.0.1:11435")+"/api/chat", bytes.NewReader(payload))
 	req.Header.Set("Content-Type", "application/json")
@@ -218,7 +230,7 @@ func (a *app) generateAttempt(snapshot *core.World, feedback string) error {
 			Content string `json:"content"`
 		} `json:"message"`
 	}
-	if e = json.NewDecoder(io.LimitReader(res.Body, 20000)).Decode(&answer); e != nil {
+	if e = json.NewDecoder(io.LimitReader(res.Body, responseLimit)).Decode(&answer); e != nil {
 		return e
 	}
 	var proposal core.Proposal

@@ -36,6 +36,7 @@ def main():
     parser.add_argument("--holdout", action="store_true")
     parser.add_argument("--cases", type=Path, help="JSON corpus with per-case facts; null expected_supported leaves an ambiguous case unscored")
     parser.add_argument("--audit", action="store_true", help="Experimental evidence-before-verdict prompt/schema")
+    parser.add_argument("--think", action="store_true", help="Enable the local model's reasoning mode; slower, still offline-only")
     args = parser.parse_args()
     if args.cases and args.holdout:
         parser.error("--cases and --holdout are mutually exclusive")
@@ -51,17 +52,19 @@ def main():
         if case.get("expected_supported") is not None and type(case["expected_supported"]) is not bool:
             parser.error("expected_supported must be boolean or null")
     prompt, schema = (AUDIT_PROMPT, AUDIT_SCHEMA) if args.audit else (PROMPT, SCHEMA)
-    report = {"model": args.model, "purpose": "Offline semantic-review feasibility; not production acceptance", "cases": [], "prompt": prompt, "schema": schema, "source": {key: value for key, value in corpus.items() if key != "cases"}}
+    token_limit = 4096 if args.think else (600 if args.audit else 350)
+    report = {"model": args.model, "think": args.think, "num_predict": token_limit, "purpose": "Offline semantic-review feasibility; not production acceptance", "cases": [], "prompt": prompt, "schema": schema, "source": {key: value for key, value in corpus.items() if key != "cases"}}
     output = Path(args.output)
     for case in cases:
         name, expected, dialogue, previous = case["name"], case.get("expected_supported"), case["dialogue"], case.get("previous")
-        payload = {"model": args.model, "stream": False, "think": False, "format": schema, "options": {"temperature": 0, "num_predict": 600 if args.audit else 350}, "messages": [{"role": "system", "content": prompt}, {"role": "user", "content": json.dumps({"facts": case["facts"], "previous": ({**previous, "completed": previous["status"] == "completed"} if previous else None), "dialogue": dialogue})}]}
+        payload = {"model": args.model, "stream": False, "think": args.think, "format": schema, "options": {"temperature": 0, "num_predict": token_limit}, "messages": [{"role": "system", "content": prompt}, {"role": "user", "content": json.dumps({"facts": case["facts"], "previous": ({**previous, "completed": previous["status"] == "completed"} if previous else None), "dialogue": dialogue})}]}
         start = time.monotonic()
         row = dict(case)
         try:
             request = urllib.request.Request(args.url + "/api/chat", data=json.dumps(payload).encode(), headers={"Content-Type": "application/json"})
             with urllib.request.urlopen(request, timeout=110) as response:
                 answer = json.load(response)
+            row["generation"] = {key: answer.get(key) for key in ("done_reason", "eval_count", "prompt_eval_count", "total_duration")}
             verdict = json.loads(answer["message"]["content"])
             row["raw_review"] = verdict
             if args.audit:

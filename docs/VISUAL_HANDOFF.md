@@ -96,3 +96,5 @@ Gameplay integration note (2026-09-07): main now adds an optional `business_truc
 
 ### Additional functional UI to preserve
 The gameplay branch now shows the existing public `known_threats` on Families as well as City, alongside business-ceasefire terms. Preserve that warning when restyling; standing alone does not cancel a reported hit. People resolves family-leader affiliation from the supplied factions and labels Harlow as a city authority. These are small `src/main.tsx` changes; no art or API schema changed.
+
+On boot, the gameplay client now selects the player's current public location, using the directory if it lacks street art. A brand-new person in the starting room is still directed toward Saint Agnes. Preserve this useful reload behavior when replacing navigation. No simulation state is stored in the view.

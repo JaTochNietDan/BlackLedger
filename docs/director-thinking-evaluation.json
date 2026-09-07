@@ -1,0 +1,153 @@
+{
+  "model": "qwen3:14b",
+  "mode": "full prompt, thinking enabled",
+  "source_save": ".runtime/full-playtest-20260907-b.sqlite3",
+  "method": "Isolated copies of earned Day2 10:40 campaign. Existing event and queued drafts cleared only in the copies to request fresh work; history and ownership preserved. This is an experiment, not a fresh campaign.",
+  "first_attempt": {
+    "port": 8850,
+    "binary": ".runtime/blackledger-thinking",
+    "status": "timeout",
+    "request_timeout_seconds": 100,
+    "evidence": "Server log: 2026/09/07 18:07:15 context deadline exceeded; public director offline. No generated job was queued."
+  },
+  "second_attempt": {
+    "port": 8851,
+    "binary": ".runtime/blackledger-thinking-bounded",
+    "request_timeout_seconds": 180,
+    "response_limit_bytes": 131072,
+    "status": "ready",
+    "started_utc": "2026-09-07T23:09:59.897608+00:00",
+    "request": {
+      "started": true
+    },
+    "observed_seconds": 40.08,
+    "public_director": {
+      "status": "ready",
+      "detail": "A local AI encounter is ready. It can arrive after your next activity.",
+      "last_request": 2080
+    },
+    "minute": 2080,
+    "cash": 155,
+    "offers": [
+      {
+        "ready": 2110,
+        "event": {
+          "connection": {
+            "id": "b89befcd647190ad6862986bcbf57701",
+            "title": "A Dispute at the Garage",
+            "result": "You completed the requested mediation without violence. You pushed the schedule and drew more attention."
+          },
+          "operation": "collection",
+          "alternatives": {
+            "approach:careful": {
+              "reward": 115,
+              "respect": 3,
+              "heat": 2,
+              "minutes": 120
+            },
+            "approach:press": {
+              "reward": 150,
+              "respect": 3,
+              "heat": 10,
+              "minutes": 75
+            }
+          },
+          "target": "garage",
+          "id": "38c173d82e93d38b947a28a9401d86bf",
+          "title": "An Overdue Deposit",
+          "body": "I need you to collect a payment that\u2019s overdue at Russo Motor Works. A supplier left a deposit there, and the crew hasn\u2019t accounted for it. If you can retrieve it without incident, I\u2019ll see to it you\u2019re properly compensated. The tool dispute we resolved earlier makes this easier\u2014no one wants another mess.",
+          "speaker": "mara",
+          "choices": [
+            {
+              "id": "accept",
+              "label": "Collect the payment",
+              "detail": "Russo Motor Works \u00b7 $130 \u00b7 90 minutes \u00b7 +3 respect \u00b7 +5 heat \u00b7 At 15 heat, police may stop completion.",
+              "cost": 0,
+              "disabled": false
+            },
+            {
+              "id": "approach:careful",
+              "label": "inspect the storage area",
+              "detail": "Russo Motor Works \u00b7 $115 \u00b7 120 minutes \u00b7 +3 respect \u00b7 +2 heat \u00b7 At 15 heat, police may stop completion.",
+              "cost": 0,
+              "disabled": false
+            },
+            {
+              "id": "approach:press",
+              "label": "press the crew for results",
+              "detail": "Russo Motor Works \u00b7 $150 \u00b7 75 minutes \u00b7 +3 respect \u00b7 +10 heat \u00b7 At 15 heat, police may stop completion.",
+              "cost": 0,
+              "disabled": false
+            },
+            {
+              "id": "decline",
+              "label": "Decline the arrangement",
+              "detail": "No cost or time.",
+              "cost": 0,
+              "disabled": false
+            }
+          ],
+          "kind": "proposal",
+          "source": "local-ai",
+          "minute": 2080,
+          "effect": {
+            "reward": 130,
+            "respect": 3,
+            "heat": 5,
+            "minutes": 90
+          },
+          "outcome": "You collected the agreed payment and reported back."
+        }
+      }
+    ],
+    "previous_arrangement": {
+      "id": "b89befcd647190ad6862986bcbf57701",
+      "life": 1,
+      "minute": 2035,
+      "title": "A Dispute at the Garage",
+      "offer": "\u201cThe Russo Motor Works is having a disagreement between two mechanics over the use of a specific tool. One says the other borrowed it without asking, and the other claims it was left behind. I can\u2019t have this turning into a fight, not with the Bellandi men watching. If you can talk them into splitting the space or sharing the tool, I\u2019ll owe you a favor.\u201d",
+      "speaker": "mara",
+      "operation": "mediation",
+      "beneficiary": "",
+      "status": "completed",
+      "result": "You completed the requested mediation without violence. You pushed the schedule and drew more attention."
+    },
+    "assessment": "Partial improvement: correctly recalls the prior garage tool dispute and preserves neutral affiliation and accessible venue. Does not invent an owner or promise a separate reward. The overdue payment versus deposit already left at the garage is muddled, and the claim that prior mediation makes it easier is only flavor, not an actual difficulty benefit. One stochastic sample does not establish general coherence or prove the larger timeout caused the improvement."
+  },
+  "updated_utc": "2026-09-07T23:14:12.316737+00:00",
+  "browser_validation": {
+    "actions": "Wait60; select careful120; reload at police stop; pay40; inspect ledger.",
+    "minute": 2260,
+    "player": {
+      "name": "Alex Varga",
+      "cash": 344,
+      "health": 100,
+      "respect": 44,
+      "heat": 5,
+      "location": "garage",
+      "home": "apartment",
+      "best_home": 1,
+      "security": 1,
+      "contacts": 2,
+      "crew": [
+        {
+          "id": "leo",
+          "name": "Leo Carver",
+          "loyalty": 65
+        }
+      ],
+      "alive": true,
+      "earned": 1516,
+      "job_count": 4
+    },
+    "completion": {
+      "id": "0004eb53fd95a17c922fe11926ec021b",
+      "minute": 2260,
+      "life": 1,
+      "title": "An Overdue Deposit",
+      "text": "You collected the agreed payment and reported back. You took extra time to keep the work discreet. ($115, respect +3)",
+      "kind": "story"
+    },
+    "assessment": "Income38/hour:155+38+76-40+115=344. Original job title An Overdue Deposit is preserved after police. No gameplay time advanced during generation. Browser opened at current garage after boot, directory selected for its district."
+  }
+}

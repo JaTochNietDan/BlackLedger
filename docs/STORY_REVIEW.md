@@ -34,3 +34,15 @@ Before enabling in gameplay:
 - Bound review latency and retries; a reviewer outage must not freeze the clock or mutate the save.
 - Revalidate life/revision-relevant facts at commit, and retain the existing structural checks.
 - Keep evidence of both rejection and acceptance. These twelve curated cases are insufficient to declare arbitrary stories coherent.
+
+## Reasoning-mode comparison
+
+`--think` enables local-model reasoning and raises the shared reasoning/final-answer budget to4,096 tokens. The endpoint timeout remains110seconds. Reports include inference mode, token limit and generation counters. The production reviewer remains disabled.
+
+```sh
+python3 scripts/evaluate-story-review.py --think --cases docs/story-review-campaign-cases.json --output /tmp/campaign-thinking.json
+```
+
+On the same development corpus and unchanged simple-review prompt, reasoning mode achieved5/7 scored matches, with no invalid responses. It caught the two invented-owner stories and accepted all three valid cases, but missed the leader/beneficiary contradiction and nonexistent deadline. One accepted response included reasons despite the prompt asking for an empty list. Two ambiguous cases remain unscored. See story-review-campaign-thinking.json.
+
+The nine requests took198.76seconds total; median21.00seconds, range13.55–45.72seconds. This is a substantial local latency cost and remains an inadequate gate. Correct verdicts still require human assessment of their explanations. A separate opt-in generation experiment (`BLACK_LEDGER_DIRECTOR_THINK=1`) tests whether reasoning improves the original dialogue rather than adding an unreliable second pass; it does not enable story review or change gameplay authority.

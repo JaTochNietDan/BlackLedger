@@ -16,7 +16,7 @@ Then open http://127.0.0.1:8791. Rebuild after frontend edits. React provides th
 
 State: `.runtime/campaign.sqlite3`. Override BLACK_LEDGER_DB for isolated tests. The HTTP server binds only localhost. Go owns all game rules and saves; the browser only sends commands and displays public state.
 
-AI: BLACK_LEDGER_OLLAMA (default http://127.0.0.1:11435), BLACK_LEDGER_MODEL (default qwen3:14b). Voice: AFTERLIGHT_DIRECTOR_URL (default http://127.0.0.1:8787). Neither service is required to play authored scenarios.
+AI: BLACK_LEDGER_OLLAMA (default http://127.0.0.1:11435), BLACK_LEDGER_MODEL (default qwen3:14b). Experimental director reasoning: BLACK_LEDGER_DIRECTOR_THINK=1 (off by default; up to 4,096 generated tokens within a 180-second asynchronous request timeout; fast mode remains at 100 seconds). This requires a model that supports reasoning and is still under evaluation. Voice: AFTERLIGHT_DIRECTOR_URL (default http://127.0.0.1:8787). Neither service is required to play authored scenarios.
 
 ## Verify
 
