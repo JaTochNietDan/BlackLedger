@@ -595,6 +595,29 @@ func (w *World) Advance(minutes int) {
 		}
 	}
 }
+
+// KnownThreats exposes discovered intelligence, never schedules or undiscovered plans.
+func (w *World) KnownThreats() []string {
+	out := []string{}
+	if !w.Player.Alive {
+		return out
+	}
+	for _, p := range w.Plots {
+		if p.Life != w.Life || !p.Known {
+			continue
+		}
+		text := w.factionName(p.Actor) + " has commissioned an attack against you. Consider leaving home, arranging security, or negotiating."
+		if p.Kind == "sabotage" {
+			l, ok := PlaceByID(p.Target)
+			if !ok {
+				continue
+			}
+			text = w.factionName(p.Actor) + " is targeting " + l.Name + ". Available loyal crew can limit damage; negotiation can stop this family's current operations."
+		}
+		out = append(out, text)
+	}
+	return out
+}
 func (w *World) Public() map[string]any {
 	locs := []map[string]any{}
 	income := 0.0
@@ -617,7 +640,7 @@ func (w *World) Public() map[string]any {
 	if len(history) > 60 {
 		history = history[len(history)-60:]
 	}
-	return map[string]any{"id": w.ID, "version": w.Version, "revision": w.Revision, "life": w.Life, "minute": w.Minute, "player": w.Player, "district": w.District, "factions": w.Factions, "npcs": w.NPCs, "locations": locs, "event": scene, "history": history, "dead": w.Dead, "tasks": w.Tasks, "director": w.Director, "last_result": w.LastResult, "daily_cost": w.DailyCost(), "income": income, "security": w.Guard(), "opportunity": w.NextOpportunity()}
+	return map[string]any{"id": w.ID, "version": w.Version, "revision": w.Revision, "life": w.Life, "minute": w.Minute, "player": w.Player, "district": w.District, "factions": w.Factions, "npcs": w.NPCs, "locations": locs, "event": scene, "history": history, "dead": w.Dead, "tasks": w.Tasks, "director": w.Director, "last_result": w.LastResult, "daily_cost": w.DailyCost(), "income": income, "security": w.Guard(), "opportunity": w.NextOpportunity(), "known_threats": w.KnownThreats()}
 }
 func (w *World) hasRecord(title string) bool {
 	for _, r := range w.History {

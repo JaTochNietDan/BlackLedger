@@ -325,3 +325,27 @@ func TestFavorCanCreateRussoFeud(t *testing.T) {
 		t.Fatal("Russo feud has no consequence")
 	}
 }
+
+func TestKnownThreatsRevealOnlyDiscoveredCurrentLifePlans(t *testing.T) {
+	w := New(27)
+	w.RetaliationFrom("russo")
+	if len(w.KnownThreats()) != 0 {
+		t.Fatal("undiscovered plot exposed")
+	}
+	w.Plots[0].Known = true
+	w.Plots = append(w.Plots, Plot{Kind: "hit", Actor: "bellandi", Life: 0, Known: true})
+	hints := w.KnownThreats()
+	if len(hints) != 1 || !strings.Contains(hints[0], "Russo") {
+		t.Fatal("wrong intelligence shown")
+	}
+	data, _ := json.Marshal(hints)
+	if strings.Contains(string(data), "due") || strings.Contains(string(data), w.Plots[0].ID) {
+		t.Fatal("private schedule or id exposed")
+	}
+	if err := w.ResolveAudience(&Scene{Actor: "russo"}, "tribute"); err != nil {
+		t.Fatal(err)
+	}
+	if len(w.KnownThreats()) != 0 {
+		t.Fatal("cancelled operation still shown")
+	}
+}

@@ -12,13 +12,13 @@ import (
 
 func main() {
 	if len(os.Args) < 2 || len(os.Args) > 3 {
-		log.Fatal("usage: go run ./cmd/qa-fixture <new-qa.sqlite3> [police|damage|warning|attack|voice]")
+		log.Fatal("usage: go run ./cmd/qa-fixture <new-qa.sqlite3> [police|damage|warning|russo-warning|attack|voice]")
 	}
 	scenario := "police"
 	if len(os.Args) == 3 {
 		scenario = os.Args[2]
 	}
-	if scenario != "police" && scenario != "damage" && scenario != "warning" && scenario != "attack" && scenario != "voice" {
+	if scenario != "police" && scenario != "damage" && scenario != "warning" && scenario != "russo-warning" && scenario != "attack" && scenario != "voice" {
 		log.Fatal("unsupported QA scenario")
 	}
 	path := os.Args[1]
@@ -40,6 +40,17 @@ func main() {
 			w.Player.Location = "laundry"
 			w.Properties["laundry"].Owner = "player:1"
 			w.Plots = append(w.Plots, core.Plot{ID: core.ID(), Kind: "sabotage", Life: w.Life, Due: w.Minute + 15, Actor: "bellandi", Target: "laundry", Strength: 35})
+			return nil
+		}
+		if scenario == "russo-warning" {
+			w.Player.Contacts = 2
+			w.Player.Cash = 300
+			w.Player.Home = "apartment"
+			w.Player.Location = "apartment"
+			w.District = 1
+			w.Factions[1].Goodwill = -40
+			w.RetaliationFrom("russo")
+			w.Advance(240)
 			return nil
 		}
 		if scenario == "warning" {
