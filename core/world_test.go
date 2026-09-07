@@ -1,0 +1,217 @@
+package core
+
+import (
+	"encoding/json"
+	"strings"
+	"testing"
+)
+
+func act(t *testing.T, w **World, kind, target string) {
+	t.Helper()
+	n, e := Execute(*w, Command{Revision: (*w).Revision, Kind: kind, Target: target})
+	if e != nil {
+		t.Fatal(e)
+	}
+	*w = n
+}
+func choice(t *testing.T, w **World, c string) {
+	t.Helper()
+	n, e := Execute(*w, Command{Revision: (*w).Revision, Kind: "choice", Event: (*w).Event.ID, Choice: c})
+	if e != nil {
+		t.Fatal(e)
+	}
+	*w = n
+}
+func TestReadingDoesNotAdvance(t *testing.T) {
+	w := New(27)
+	before, _ := json.Marshal(w)
+	for i := 0; i < 10; i++ {
+		w.Public()
+	}
+	after, _ := json.Marshal(w)
+	if string(before) != string(after) {
+		t.Fatal("reading mutated world")
+	}
+}
+func TestTravel(t *testing.T) {
+	w := New(27)
+	act(t, &w, "travel", "bar")
+	if w.Player.Location != "bar" || w.Minute != 480+TravelMinutes("room", "bar") {
+		t.Fatal("bad travel")
+	}
+}
+func TestUnavailableActions(t *testing.T) {
+	for _, c := range []Command{{Kind: "courier", Target: "bar"}, {Kind: "acquire", Target: "laundry"}, {Kind: "security", Target: "room"}, {Kind: "new_life"}} {
+		w := New(27)
+		_, e := Execute(w, c)
+		if e == nil || w.Revision != 0 || w.Player.Cash != 90 {
+			t.Fatal("invalid command accepted or mutated state")
+		}
+	}
+}
+func TestEarlyProgression(t *testing.T) {
+	w := New(27)
+	act(t, &w, "travel", "bar")
+	for i := 0; i < 3; i++ {
+		act(t, &w, "courier", "bar")
+		if w.Event != nil {
+			choice(t, &w, "accept")
+		}
+	}
+	act(t, &w, "travel", "laundry")
+	act(t, &w, "acquire", "laundry")
+	if !w.Own("laundry") {
+		t.Fatal("not acquired")
+	}
+	cash := w.Player.Cash
+	act(t, &w, "wait", "laundry")
+	if w.Player.Cash <= cash {
+		t.Fatal("no income")
+	}
+}
+func TestHiddenHit(t *testing.T) {
+	w := New(27)
+	act(t, &w, "travel", "club")
+	act(t, &w, "provoke", "club")
+	if len(w.Plots) != 1 {
+		t.Fatal("no plot")
+	}
+	data, _ := json.Marshal(w.Public())
+	if strings.Contains(string(data), w.Plots[0].ID) || strings.Contains(string(data), `"rng"`) || strings.Contains(string(data), `"plots"`) {
+		t.Fatal("private state exposed")
+	}
+}
+func TestWarningAndInterruption(t *testing.T) {
+	w := New(27)
+	w.Player.Contacts = 2
+	w.Retaliation()
+	w.Advance(151)
+	if !w.Plots[0].Known {
+		t.Fatal("no warning")
+	}
+	w.Advance(300)
+	if w.Minute != 720 || w.Event == nil {
+		t.Fatal("did not pause at attack")
+	}
+}
+func TestAbsentPlayer(t *testing.T) {
+	w := New(27)
+	w.Player.Location = "bar"
+	w.Retaliation()
+	w.Advance(300)
+	if !w.Player.Alive || w.Properties["room"].Condition != 55 {
+		t.Fatal("absent target killed at home")
+	}
+}
+func TestTribute(t *testing.T) {
+	w := New(27)
+	w.Player.Cash = 300
+	act(t, &w, "travel", "club")
+	act(t, &w, "provoke", "club")
+	act(t, &w, "audience", "club")
+	choice(t, &w, "tribute")
+	if len(w.Plots) != 0 {
+		t.Fatal("plot not canceled")
+	}
+}
+func TestStaleChoice(t *testing.T) {
+	w := New(27)
+	act(t, &w, "travel", "club")
+	act(t, &w, "audience", "club")
+	_, e := Execute(w, Command{Revision: w.Revision, Kind: "choice", Event: "stale", Choice: "leave"})
+	if e == nil || w.Event == nil {
+		t.Fatal("stale decision accepted")
+	}
+}
+func TestSecurityMatters(t *testing.T) {
+	for _, g := range []int{0, 3} {
+		w := New(50)
+		w.Player.Security = g
+		w.Player.Contacts = 2
+		w.Retaliation()
+		w.Advance(240)
+		choice(t, &w, "defend")
+		if w.Player.Alive != (g == 3) {
+			t.Fatalf("security %d outcome wrong", g)
+		}
+	}
+}
+func TestDeathAndNewLife(t *testing.T) {
+	w := New(27)
+	id := w.ID
+	w.Properties["laundry"].Owner = "player:1"
+	w.Die("Test death")
+	act(t, &w, "new_life", "")
+	if w.ID != id || w.Life != 2 || w.Own("laundry") || w.Player.Cash != 90 || len(w.Dead) != 1 {
+		t.Fatal("legacy reset broken")
+	}
+}
+func TestDelegate(t *testing.T) {
+	w := New(27)
+	w.Player.Crew = []Crew{{"leo", "Leo", 65}}
+	act(t, &w, "delegate", "room")
+	before := w.Player.Cash
+	w.Advance(130)
+	if w.Player.Cash != before+65 {
+		t.Fatal("task payment")
+	}
+	w.Advance(50)
+	if w.Player.Cash != before+65 {
+		t.Fatal("task paid twice")
+	}
+}
+func TestBills(t *testing.T) {
+	w := New(27)
+	w.Minute = 1439
+	w.Advance(1)
+	if w.Player.Cash != 75 {
+		t.Fatal("bad rent")
+	}
+}
+func TestValidation(t *testing.T) {
+	w := New(27)
+	for _, p := range []Proposal{{}, {Speaker: "unknown"}, {Speaker: "mara", Operation: "kill_player"}} {
+		if _, e := w.ValidateProposal(p); e == nil {
+			t.Fatal("bad proposal accepted")
+		}
+	}
+	e, err := w.ValidateProposal(Proposal{"Sealed envelope", "Would you deliver this?", "mara", "courier", "Secret future sentence."})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if e.Effect.Reward != 55 {
+		t.Fatal("model owns economics")
+	}
+	w.Event = e
+	b, _ := json.Marshal(w.Public())
+	if strings.Contains(string(b), "Secret future sentence") {
+		t.Fatal("future exposed")
+	}
+}
+func TestInterruptedRestNoFreeHealing(t *testing.T) {
+	w := New(27)
+	w.Player.Health = 25
+	w.Player.Security = 1
+	w.Retaliation()
+	w.Plots[0].Due = w.Minute + 15
+	act(t, &w, "rest", "room")
+	if w.Player.Health != 25 || w.Event == nil || w.Minute != 495 {
+		t.Fatal("rest completed despite interruption")
+	}
+}
+func TestInspectNotInfiniteRespect(t *testing.T) {
+	w := New(27)
+	w.Player.Location = "laundry"
+	w.Properties["laundry"].Owner = "player:1"
+	act(t, &w, "inspect", "laundry")
+	if w.Player.Respect != 0 {
+		t.Fatal("inspection farming exploit")
+	}
+}
+func BenchmarkAdvanceCityDay(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		w := New(27)
+		w.Properties["laundry"].Owner = "player:1"
+		w.Advance(1440)
+	}
+}
