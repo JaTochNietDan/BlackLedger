@@ -12,13 +12,13 @@ import (
 
 func main() {
 	if len(os.Args) < 2 || len(os.Args) > 3 {
-		log.Fatal("usage: go run ./cmd/qa-fixture <new-qa.sqlite3> [police|damage]")
+		log.Fatal("usage: go run ./cmd/qa-fixture <new-qa.sqlite3> [police|damage|warning]")
 	}
 	scenario := "police"
 	if len(os.Args) == 3 {
 		scenario = os.Args[2]
 	}
-	if scenario != "police" && scenario != "damage" {
+	if scenario != "police" && scenario != "damage" && scenario != "warning" {
 		log.Fatal("unsupported QA scenario")
 	}
 	path := os.Args[1]
@@ -36,6 +36,13 @@ func main() {
 	}
 	defer s.DB.Close()
 	err = s.Change(func(w *core.World) error {
+		if scenario == "warning" {
+			w.Player.Contacts = 2
+			w.Player.Health = 60
+			w.Retaliation()
+			w.Advance(240)
+			return nil
+		}
 		if scenario == "damage" {
 			w.Player.Location = "laundry"
 			w.Player.Respect = 6

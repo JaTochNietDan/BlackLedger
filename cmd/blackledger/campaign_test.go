@@ -35,6 +35,9 @@ func TestHTTPRiseFallAndNewLife(t *testing.T) {
 		for i := 0; i < 4 && state().Event != nil; i++ {
 			e := state().Event
 			decision := "accept"
+			if e.Kind == "warning" {
+				decision = "acknowledge"
+			}
 			if e.Kind == "business_pressure" {
 				decision = "pay"
 				if state().Player.Cash < 60 {
@@ -98,6 +101,9 @@ func TestHTTPRiseFallAndNewLife(t *testing.T) {
 		travel("apartment")
 		for tick := 0; tick < 6 && state().Player.Alive && state().Event == nil; tick++ {
 			command("rest", "apartment", "")
+			if state().Event != nil && state().Event.Kind == "warning" {
+				command("choice", "", "acknowledge")
+			}
 		}
 		if state().Event != nil {
 			if state().Event.Kind == "attack" {

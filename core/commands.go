@@ -61,6 +61,8 @@ func (w *World) apply(c Command) error {
 		}
 		w.Event = nil
 		switch e.Kind {
+		case "warning":
+			w.Log("Time to prepare", "You heed Mara's warning. The threat remains; your next action is yours to choose.", "intel")
 		case "attack":
 			if c.Choice == "bargain" {
 				p.Respect = max(0, p.Respect-5)

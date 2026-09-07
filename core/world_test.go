@@ -105,9 +105,14 @@ func TestWarningAndInterruption(t *testing.T) {
 	w.Player.Contacts = 2
 	w.Retaliation()
 	w.Advance(151)
-	if !w.Plots[0].Known {
-		t.Fatal("no warning")
+	if !w.Plots[0].Known || w.Event == nil || w.Event.Kind != "warning" || w.Minute != 630 {
+		t.Fatal("warning did not interrupt at its own boundary")
 	}
+	w.Advance(300)
+	if w.Minute != 630 {
+		t.Fatal("unanswered warning advanced time")
+	}
+	choice(t, &w, "acknowledge")
 	w.Advance(300)
 	if w.Minute != 720 || w.Event == nil {
 		t.Fatal("did not pause at attack")
@@ -149,6 +154,8 @@ func TestSecurityMatters(t *testing.T) {
 		w.Player.Contacts = 2
 		w.Retaliation()
 		w.Advance(240)
+		choice(t, &w, "acknowledge")
+		w.Advance(90)
 		choice(t, &w, "defend")
 		if w.Player.Alive != (g == 3) {
 			t.Fatalf("security %d outcome wrong", g)
@@ -301,5 +308,25 @@ func TestInjuryReducesAttackSurvival(t *testing.T) {
 	healthy, injured := survived(100), survived(25)
 	if healthy <= injured || injured == 0 {
 		t.Fatalf("health has no meaningful bounded effect: healthy %d injured %d", healthy, injured)
+	}
+}
+
+func TestWarningAllowsLeavingBeforeHit(t *testing.T) {
+	w := New(27)
+	w.Player.Contacts = 2
+	w.Player.Health = 60
+	w.Retaliation()
+	act(t, &w, "rest", "room")
+	if w.Minute != 630 || w.Player.Health != 60 || w.Event == nil || w.Event.Kind != "warning" {
+		t.Fatal("rest completed instead of pausing for warning")
+	}
+	choice(t, &w, "acknowledge")
+	if w.Minute != 630 || len(w.Plots) != 1 {
+		t.Fatal("acknowledgment consumed time or canceled threat")
+	}
+	act(t, &w, "travel", "bar")
+	w.Advance(90)
+	if !w.Player.Alive || w.Event != nil || w.Player.Location != "bar" || w.Properties["room"].Condition != 55 {
+		t.Fatal("leaving after warning did not avoid the home attack")
 	}
 }

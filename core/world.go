@@ -534,6 +534,10 @@ func (w *World) Advance(minutes int) {
 			if plot.Kind == "hit" && !plot.Known && p.Contacts >= 2 && plot.Due-w.Minute <= 90 {
 				plot.Known = true
 				w.Log("Mara has heard something", "Bellandi men have been asking where you sleep. You may have very little time.", "danger")
+				if plot.Due > w.Minute {
+					w.Event = &Scene{ID: "warning-" + plot.ID, Title: "A call worth answering", Body: "Bellandi men have been asking where you sleep. I cannot tell you exactly when they will come. Stop what you are doing and think about where you want to be tonight.", Speaker: "mara", Kind: "warning", Source: "authored", Minute: w.Minute, Choices: []Choice{{ID: "acknowledge", Label: "Put down the phone and prepare", Detail: "Clock stays paused. You can leave, arrange security or seek an audience. The threat remains."}}}
+					return
+				}
 			}
 			if plot.Due <= w.Minute {
 				copy := *plot
