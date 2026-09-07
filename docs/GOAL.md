@@ -14,6 +14,13 @@ The task goal was recreated with this amended scope on 2026-09-07 after the cont
 
 Build and playtest the full Black Ledger single-player mafia vertical slice described in DESIGN.md: a playable 20–30-minute rise from rented housing through contacts, crew and business ownership, into consequential rival incidents; permanent death and new people in a persistent city; validated AI opportunities; reliable transactional saves and optional stable-character speech.
 
+## Current gameplay acceptance priorities
+
+1. Improve narrative correctness without replacing the Go rules with model judgments. The completed 20m18s campaign demonstrated rise, ownership, retaliation and recovery, but failed story-coherence acceptance. The experimental second-model reviewer also failed on real dialogue and remains offline-only.
+2. Verify the integrated gameplay changes in a fresh isolated campaign: arrival encounters, contact variety, located jobs, business ceasefires, danger pacing, resumable interrupted work and stale-draft protection. Passing individual tests is not evidence that the main preview has those changes; its older running server and user save remain separate.
+3. Continue public-state headless campaigns and targeted browser playtests for progression, permanent consequences, transactional saves and optional voice behavior. Preserve failure evidence and commit corrections.
+4. Maintain the visual handoff and interface contract. Another visual agent has not yet been launched; preparation is complete, visual production itself is not.
+
 ## Approved visual expansion — 2026-09-07
 
 The user approved a modern 2D isometric city inspired by the visual approach of Gangsters: Organized Crime. Painted noir realism is the core; warm vintage daylight and amber/crimson nightlife are lighting variations. This replaces the schematic cartoon map as the intended visual destination.
