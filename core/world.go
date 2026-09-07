@@ -653,7 +653,9 @@ func (w *World) hasRecord(title string) bool {
 	return false
 }
 func (w *World) OfferIfReady() {
-	if !w.Player.Alive || w.Event != nil {
+	// Leave room to prepare for discovered danger. Hidden plots must not
+	// change offer timing and indirectly reveal themselves.
+	if !w.Player.Alive || w.Event != nil || len(w.KnownThreats()) > 0 {
 		return
 	}
 	if len(w.Offers) > 0 && w.Minute >= w.Offers[0].Ready {

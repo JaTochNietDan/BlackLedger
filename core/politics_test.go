@@ -349,3 +349,23 @@ func TestKnownThreatsRevealOnlyDiscoveredCurrentLifePlans(t *testing.T) {
 		t.Fatal("cancelled operation still shown")
 	}
 }
+
+func TestDefensiveContributionReportsActualDamageAvoided(t *testing.T) {
+	for _, tc := range []struct {
+		condition, strength, want int
+		credited                  bool
+	}{{100, 35, 85, true}, {5, 35, 0, false}, {100, 5, 95, false}, {100, 0, 100, false}} {
+		w := New(27)
+		w.Properties["laundry"].Owner = "player:1"
+		w.Properties["laundry"].Condition = tc.condition
+		w.Player.Crew = []Crew{{ID: "leo", Name: "Leo Carver", Loyalty: 65}}
+		w.ResolveSabotage(Plot{Actor: "bellandi", Target: "laundry", Strength: tc.strength})
+		if w.Properties["laundry"].Condition != tc.want {
+			t.Fatal("defense increased or miscounted damage", tc)
+		}
+		text := w.History[len(w.History)-1].Text
+		if strings.Contains(text, "Leo Carver helped defend") != tc.credited {
+			t.Fatal("incorrect defensive credit", text)
+		}
+	}
+}

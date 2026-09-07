@@ -105,20 +105,25 @@ func (w *World) ResolveSabotage(p Plot) {
 	if !ok {
 		return
 	}
-	damage := p.Strength
+	damage := max(0, p.Strength)
+	unguarded := min(damage, w.Properties[p.Target].Condition)
 	// Available loyal crew can protect businesses; guards protect the residence only.
 	if len(w.Player.Crew) > 0 && len(w.Tasks) == 0 && w.Player.Crew[0].Loyalty >= 50 {
-		damage = max(10, damage-20)
+		damage = min(damage, max(10, damage-20))
 	}
 	prop := w.Properties[p.Target]
 	damage = min(damage, prop.Condition)
 	prop.Condition -= damage
+	defense := ""
+	if prevented := unguarded - damage; prevented > 0 {
+		defense = fmt.Sprintf(" %s helped defend the business, preventing %d additional condition loss.", w.Player.Crew[0].Name, prevented)
+	}
 	evidence := "The attackers left no proof of who sent them."
 	if p.Known {
 		evidence = "This matches the operation your sources uncovered."
 	}
 	w.VisualCues = append(w.VisualCues, VisualCue{ID(), "attack", p.Target, fmt.Sprintf("The attack damaged %s. Condition is now %d%%.", l.Name, prop.Condition)})
-	w.Log("Broken glass at "+l.Name, fmt.Sprintf("An attack damaged the business by %d condition. Income is reduced until repairs are made. %s", damage, evidence), "danger")
+	w.Log("Broken glass at "+l.Name, fmt.Sprintf("An attack damaged the business by %d condition. Income is reduced until repairs are made. %s", damage, evidence)+defense, "danger")
 }
 
 // Investigation reveals only actual, still-active plans and identifies their real target.
