@@ -93,3 +93,6 @@ Commit small coherent changes on the visual branch. Record commit hashes, screen
 Acceptance: use [VISUAL_ACCEPTANCE.md](VISUAL_ACCEPTANCE.md). A pretty screenshot alone is not sufficient.
 
 Gameplay integration note (2026-09-07): main now adds an optional `business_truces` expiry map to `Snapshot` and a short active-agreement status in each Families card (`src/types.ts`, `src/main.tsx`). Preserve this functional status when integrating visual layout changes; the public API contract is in API.md. No visual-agent worktree files were changed.
+
+### Additional functional UI to preserve
+The gameplay branch now shows the existing public `known_threats` on Families as well as City, alongside business-ceasefire terms. Preserve that warning when restyling; standing alone does not cancel a reported hit. People resolves family-leader affiliation from the supplied factions and labels Harlow as a city authority. These are small `src/main.tsx` changes; no art or API schema changed.

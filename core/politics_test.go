@@ -137,9 +137,13 @@ func TestPoliceStopDefersJobRewardUntilDecision(t *testing.T) {
 				t.Fatal("police stop failed to defer reward")
 			}
 			oldID := w.Event.ID
+			w = w.Clone() // Resume the saved police decision after a reload.
 			choice(t, &w, decision)
 			if decision == "pay" && (w.Player.Cash != 125 || w.Player.Respect != 3 || w.Player.Heat != 7) {
 				t.Fatal("paid completion incorrect")
+			}
+			if decision == "pay" && w.History[len(w.History)-1].Title != "A risky delivery" {
+				t.Fatal("completion lost the original arrangement title")
 			}
 			if decision == "abandon" && (w.Player.Cash != 90 || w.Player.Respect != 0 || w.Player.Heat != 8) {
 				t.Fatal("abandoned job paid reward")

@@ -1,0 +1,2240 @@
+{
+  "started_utc": "2026-09-07T22:44:35.238532+00:00",
+  "server": "http://127.0.0.1:8849",
+  "save": ".runtime/integrated-campaign-20260907.sqlite3",
+  "binary": ".runtime/blackledger-integrated-40ca80b",
+  "commit": "40ca80b",
+  "status": "completed_playtest_with_findings",
+  "method": "Fresh isolated campaign; normal browser commands only. Read-only API checkpoints. Build and save remain unchanged during the campaign. Reading and reporting time included in wall duration.",
+  "initial": {
+    "minute": 480,
+    "player": {
+      "name": "Alex Varga",
+      "cash": 90,
+      "health": 100,
+      "respect": 0,
+      "heat": 0,
+      "location": "room",
+      "home": "room",
+      "security": 0,
+      "contacts": 0,
+      "crew": [],
+      "alive": true,
+      "earned": 0,
+      "job_count": 0
+    }
+  },
+  "observations": [
+    "Opening two courier jobs and cautious authored arrangement: reload preserved $240, respect7, heat0 at11:00. Manual voice reached Speaking state promptly; decisions remained available. Audio quality was not assessed by listening.",
+    "Queued local-AI mediation appeared on completed arrival at Bluebird11:25; dialogue named The Monarch and Bellandi, stakes matched $55/60min/+5respect/+6Bellandi. A practical contract dispute, no explicit unsupported ownership/deadline promise. Completed12:25 at$295.",
+    "Acquired Bluebird for$180/60min at13:25, cash115 respect16. People panel labels even faction bosses as Independent contact; guide still calls The Monarch a casino rather than a club. Cosmetic city placeholders remain for visual owner.",
+    "Recruited Leo14:20, then completed cautious local-AI collection16:20: $37 + $115 reward + $28 passive income = $180, heat2. Follow-up card correctly shows prior mediation, but prose has no explicit callback and adds a vague debt promise and weeks-ago backstory.",
+    "Coffee interrupted by first demand16:25: no coffee fee/contact awarded. Refused tribute, then bought two coffees. Expanded Ashbury for$100/90min. Sabotage reduced laundry to85%; ledger explicitly credited Leo with preventing20 additional condition loss.",
+    "Leo brought the next AI courier, confirming cast change. Task named Monarch pickup and docks recipient; beneficiary Bellandi supplied by stakes but not named in dialogue. Crew speaks as employer (I will pay you), still awkward hierarchy. Press approach yielded$95/30min/+8heat as displayed.",
+    "Rented Ashbury19:55 to20:55, delegated Leo21:10, rested untilDay2 01:10. Cash103, health100, heat5, apartment and Leo retained after midnight bills. No home security yet; laundry85%.",
+    "Correction to terminology finding: address book also classifies The Monarch as casino. It is mixed casino/club terminology across game prose, not simply a wrong guide category.",
+    "Natural integration path: collection startedDay2 03:00, demand interrupted04:25 with5minremaining. Paid$60, reloaded, resumed5min into police check at04:30. Paid$40 and received$130 once; cash147 respect37 heat5. Ledger incorrectly titles job completion Too familiar a face (police scene title); canonical prior-job card later still shows An overdue payment.",
+    "Bought Bellandi business ceasefire for$100 at05:15; Families showed expiryDay3 05:15 and personal-threat exclusion. ProvokedMonarch05:45, returnedhome, completedanothercourier. Rest interrupted by known warning07:45 despite business agreement.",
+    "Added second security detail08:15. Explicitly requested another AI encounter through Settings during known danger; read-only public state confirmed ready before rest. Rest stopped09:15 at attack, no routine dialogue displaced it. Held entrance and died with no reroll. Death survives reload. Cash64, respect41, earned991, laundry85% passed to survivors.",
+    "Families screenshot readable at1235x1051, but it omits the known personal threat and says relationship waiting to take shape even while the City screen names an active hit. This misleading functional feedback needs correction. Browser reported no warnings/errors.",
+    "Later Mara courier invents new business arrangement with a rival outfit; no corresponding inter-family agreement exists in the exposed gameplay. Coherence acceptance still fails.",
+    "New life Nico startsDay2 17:15 with$90, respect0, health100, heat0, no crew/security/businesses. Families reset personal standings and omit previous ceasefire; Alex death remains in history. Read-only save verification after play confirms old queued offers, suspended job and business truce cleared. First life lasted11m08s wall time, not another20-minute campaign."
+  ],
+  "updated_utc": "2026-09-07T22:56:14.143417+00:00",
+  "checkpoint": {
+    "minute": 1510,
+    "player": {
+      "name": "Alex Varga",
+      "cash": 103,
+      "health": 100,
+      "respect": 29,
+      "heat": 5,
+      "location": "apartment",
+      "home": "apartment",
+      "best_home": 1,
+      "security": 0,
+      "contacts": 2,
+      "crew": [
+        {
+          "id": "leo",
+          "name": "Leo Carver",
+          "loyalty": 65
+        }
+      ],
+      "alive": true,
+      "earned": 630,
+      "job_count": 2
+    },
+    "director": {
+      "status": "ready",
+      "detail": "A local AI encounter is ready. It can arrive after your next activity.",
+      "last_request": 1255
+    },
+    "locations": [
+      {
+        "actions": [
+          {
+            "id": "travel",
+            "label": "Visit The Mariner",
+            "minutes": 50,
+            "cost": 0,
+            "disabled": false,
+            "reason": "",
+            "detail": "Travel advances the city clock. Known threats may interrupt you.",
+            "target": "room"
+          }
+        ],
+        "blurb": "A rented room above the waterfront. Thin walls. One stairway. Yours, for now.",
+        "condition": 100,
+        "cost": 0,
+        "district": 0,
+        "id": "room",
+        "income": 0,
+        "locked": false,
+        "name": "The Mariner",
+        "owned": false,
+        "owner": "independent",
+        "type": "home",
+        "x": 220,
+        "y": 205
+      },
+      {
+        "actions": [
+          {
+            "id": "travel",
+            "label": "Visit Saint Agnes",
+            "minutes": 30,
+            "cost": 0,
+            "disabled": false,
+            "reason": "",
+            "detail": "Travel advances the city clock. Known threats may interrupt you.",
+            "target": "bar"
+          }
+        ],
+        "blurb": "Coffee by daylight, whispered arrangements after dark. Your contact keeps the corner booth.",
+        "condition": 100,
+        "cost": 0,
+        "district": 0,
+        "id": "bar",
+        "income": 0,
+        "locked": false,
+        "name": "Saint Agnes",
+        "owned": false,
+        "owner": "independent",
+        "type": "bar",
+        "x": 415,
+        "y": 210
+      },
+      {
+        "actions": [
+          {
+            "id": "travel",
+            "label": "Visit Pier 14",
+            "minutes": 75,
+            "cost": 0,
+            "disabled": false,
+            "reason": "",
+            "detail": "Travel advances the city clock. Known threats may interrupt you.",
+            "target": "docks"
+          }
+        ],
+        "blurb": "Cargo arrives every morning. Honest work and less honest favors both pay cash.",
+        "condition": 100,
+        "cost": 0,
+        "district": 0,
+        "id": "docks",
+        "income": 0,
+        "locked": false,
+        "name": "Pier 14",
+        "owned": false,
+        "owner": "independent",
+        "type": "work",
+        "x": 130,
+        "y": 420
+      },
+      {
+        "actions": [
+          {
+            "id": "travel",
+            "label": "Visit Bluebird Laundry",
+            "minutes": 60,
+            "cost": 0,
+            "disabled": false,
+            "reason": "",
+            "detail": "Travel advances the city clock. Known threats may interrupt you.",
+            "target": "laundry"
+          }
+        ],
+        "blurb": "A neighborhood business seeking protection. A small beginning, if you can honor the arrangement.",
+        "condition": 85,
+        "cost": 180,
+        "district": 0,
+        "id": "laundry",
+        "income": 14,
+        "locked": false,
+        "name": "Bluebird Laundry",
+        "owned": true,
+        "owner": "player:1",
+        "type": "racket",
+        "x": 320,
+        "y": 425
+      },
+      {
+        "actions": [
+          {
+            "id": "travel",
+            "label": "Visit The Monarch",
+            "minutes": 35,
+            "cost": 0,
+            "disabled": false,
+            "reason": "",
+            "detail": "Travel advances the city clock. Known threats may interrupt you.",
+            "target": "club"
+          }
+        ],
+        "blurb": "Bellandi men watch the doors. This casino belongs to a family that does not tolerate outsiders making demands.",
+        "condition": 100,
+        "cost": 0,
+        "district": 0,
+        "id": "club",
+        "income": 0,
+        "locked": false,
+        "name": "The Monarch",
+        "owned": false,
+        "owner": "bellandi",
+        "type": "casino",
+        "x": 570,
+        "y": 380
+      },
+      {
+        "actions": [
+          {
+            "id": "travel",
+            "label": "Visit Mercer Exchange",
+            "minutes": 20,
+            "cost": 0,
+            "disabled": false,
+            "reason": "",
+            "detail": "Travel advances the city clock. Known threats may interrupt you.",
+            "target": "market"
+          }
+        ],
+        "blurb": "People sell information here. Its value depends on whom you ask, and who sees you asking.",
+        "condition": 100,
+        "cost": 0,
+        "district": 0,
+        "id": "market",
+        "income": 0,
+        "locked": false,
+        "name": "Mercer Exchange",
+        "owned": false,
+        "owner": "independent",
+        "type": "market",
+        "x": 585,
+        "y": 180
+      },
+      {
+        "actions": [
+          {
+            "id": "rest",
+            "label": "Rest for four hours",
+            "minutes": 240,
+            "cost": 0,
+            "disabled": false,
+            "reason": "",
+            "detail": "Recover up to 25 health as you rest. Rivals can act while you sleep.",
+            "target": "apartment"
+          },
+          {
+            "id": "security",
+            "label": "Hire another security detail",
+            "minutes": 30,
+            "cost": 100,
+            "disabled": false,
+            "reason": "",
+            "detail": "Improves detection and survival at home. Adds $10/day upkeep.",
+            "target": "apartment"
+          },
+          {
+            "id": "delegate",
+            "label": "Send Leo on collections",
+            "minutes": 15,
+            "cost": 0,
+            "disabled": false,
+            "reason": "",
+            "detail": "Completes after 120 game minutes: $65. Requires 30 loyalty.",
+            "target": "apartment"
+          },
+          {
+            "id": "crew_bonus",
+            "label": "Pay Leo a bonus",
+            "minutes": 15,
+            "cost": 40,
+            "disabled": false,
+            "reason": "",
+            "detail": "Restore up to 25 loyalty. Below 30 he refuses collections; at 50 he can help protect businesses when available.",
+            "target": "apartment"
+          },
+          {
+            "id": "wait",
+            "label": "Let an hour pass",
+            "minutes": 60,
+            "cost": 0,
+            "disabled": false,
+            "reason": "",
+            "detail": "Income, rent, operations and rival plans continue.",
+            "target": "apartment"
+          }
+        ],
+        "blurb": "A private entrance, a respectable address, and a landlord willing to mind his own business.",
+        "condition": 100,
+        "cost": 180,
+        "district": 1,
+        "id": "apartment",
+        "income": 0,
+        "locked": false,
+        "name": "Ashbury Court",
+        "owned": false,
+        "owner": "independent",
+        "type": "home",
+        "x": 790,
+        "y": 200
+      },
+      {
+        "actions": [
+          {
+            "id": "travel",
+            "label": "Visit Russo Motor Works",
+            "minutes": 20,
+            "cost": 0,
+            "disabled": false,
+            "reason": "",
+            "detail": "Travel advances the city clock. Known threats may interrupt you.",
+            "target": "garage"
+          }
+        ],
+        "blurb": "A working garage at the edge of Russo territory. An investment that requires political tact.",
+        "condition": 100,
+        "cost": 350,
+        "district": 1,
+        "id": "garage",
+        "income": 24,
+        "locked": false,
+        "name": "Russo Motor Works",
+        "owned": false,
+        "owner": "independent",
+        "type": "racket",
+        "x": 800,
+        "y": 405
+      },
+      {
+        "actions": [
+          {
+            "id": "travel",
+            "label": "Visit The Blue Hour",
+            "minutes": 40,
+            "cost": 0,
+            "disabled": false,
+            "reason": "",
+            "detail": "Travel advances the city clock. Known threats may interrupt you.",
+            "target": "casino"
+          }
+        ],
+        "blurb": "A shuttered gambling house. Restore its reputation and the tables could support an entire crew.",
+        "condition": 100,
+        "cost": 850,
+        "district": 1,
+        "id": "casino",
+        "income": 48,
+        "locked": false,
+        "name": "The Blue Hour",
+        "owned": false,
+        "owner": "independent",
+        "type": "casino",
+        "x": 700,
+        "y": 585
+      },
+      {
+        "actions": [
+          {
+            "id": "expand",
+            "label": "Establish contacts across town",
+            "minutes": 90,
+            "cost": 100,
+            "disabled": false,
+            "reason": "",
+            "detail": "Opens the next district. Existing businesses and rivals remain.",
+            "target": "estate"
+          }
+        ],
+        "blurb": "High walls above the city. A statement of success, and a very conspicuous address.",
+        "condition": 100,
+        "cost": 3500,
+        "district": 2,
+        "id": "estate",
+        "income": 0,
+        "locked": true,
+        "name": "Cypress House",
+        "owned": false,
+        "owner": "independent",
+        "type": "home",
+        "x": 930,
+        "y": 95
+      }
+    ]
+  },
+  "elapsed_wall_seconds": 331.99762,
+  "history_checkpoint": [
+    {
+      "id": "04dae4c62f98da946d168becdf2c2aa8",
+      "minute": 480,
+      "life": 1,
+      "title": "A room. A name. No protection.",
+      "text": "Mara Bell left word at Saint Agnes: there is work, if you can be discreet. Your room costs $15 each midnight.",
+      "kind": "personal"
+    },
+    {
+      "id": "8b981b5a4af54b6eff2f7789bbe474f1",
+      "minute": 495,
+      "life": 1,
+      "title": "Arrived at Saint Agnes",
+      "text": "The journey took 15 minutes.",
+      "kind": "travel"
+    },
+    {
+      "id": "660cff3abd803bc42ed4b11ca244f85e",
+      "minute": 540,
+      "life": 1,
+      "title": "Envelope delivered",
+      "text": "Mara pays $45. A small favor, completed without questions.",
+      "kind": "work"
+    },
+    {
+      "id": "48c6aee4ae2cab19956d671b697ef9a2",
+      "minute": 585,
+      "life": 1,
+      "title": "Envelope delivered",
+      "text": "Mara pays $45. A small favor, completed without questions.",
+      "kind": "work"
+    },
+    {
+      "id": "c853277683ecfaddc6b443be6d0b3390",
+      "minute": 585,
+      "life": 1,
+      "title": "A favor with a price",
+      "text": "Mara offers more sensitive work.",
+      "kind": "story"
+    },
+    {
+      "id": "db0b35cf83defc5bfd3fdc22cfe2a05d",
+      "minute": 660,
+      "life": 1,
+      "title": "A favor with a price",
+      "text": "You delivered the sealed package and reported back. You took extra time to keep the work discreet. ($60, respect +3)",
+      "kind": "story"
+    },
+    {
+      "id": "9e4282c20c2234c46e9f7a5543bb4c13",
+      "minute": 685,
+      "life": 1,
+      "title": "Arrived at Bluebird Laundry",
+      "text": "The journey took 25 minutes.",
+      "kind": "travel"
+    },
+    {
+      "id": "7c8952f8aa8e9baac4e1edd23d7ee506",
+      "minute": 685,
+      "life": 1,
+      "title": "A quiet settlement",
+      "text": "I need you to help settle a disagreement between two of my contacts at The Monarch. They\u2019re both trying to secure the same contract, and the tension is getting out of hand. If you can smooth things over, I\u2019ll make sure it\u2019s handled quietly. This is a Bellandi matter, so I expect your discretion.",
+      "kind": "story"
+    },
+    {
+      "id": "79df9720e7a82d591aa5f2c9991420d5",
+      "minute": 745,
+      "life": 1,
+      "title": "An alliance takes shape",
+      "text": "Bellandi Family appreciates the completed arrangement. Standing improves by 6.",
+      "kind": "politics"
+    },
+    {
+      "id": "7e345ca9ea16415595fc3bdd6aa8f886",
+      "minute": 745,
+      "life": 1,
+      "title": "A quiet settlement",
+      "text": "You completed the requested mediation without violence. ($55, respect +5)",
+      "kind": "story"
+    },
+    {
+      "id": "d63d39463584352dbbf3367a43788c87",
+      "minute": 805,
+      "life": 1,
+      "title": "A foothold in the city",
+      "text": "Bluebird Laundry now produces income for you. Earnings accrue as game time passes.",
+      "kind": "business"
+    },
+    {
+      "id": "29d286a625b98d3e16a1c5af184e36c3",
+      "minute": 830,
+      "life": 1,
+      "title": "Arrived at Saint Agnes",
+      "text": "The journey took 25 minutes.",
+      "kind": "travel"
+    },
+    {
+      "id": "872489eb46cb4f2bff50b98c241ab99c",
+      "minute": 860,
+      "life": 1,
+      "title": "Your first associate",
+      "text": "Leo Carver joins you. He expects $12 a day and a boss who keeps their word.",
+      "kind": "personal"
+    },
+    {
+      "id": "9df6f275cd7f4fa02eef6cf9c8e3dc20",
+      "minute": 860,
+      "life": 1,
+      "title": "A quiet collection",
+      "text": "I need you to collect a payment owed to us by a supplier at The Monarch. It\u2019s a quiet matter, and I expect you to handle it with care. The money was promised weeks ago, and we\u2019ve been waiting. If you can retrieve it without drawing attention, I\u2019ll be in your debt.",
+      "kind": "story"
+    },
+    {
+      "id": "e75eeee23d1827dffa5f4829b783d92f",
+      "minute": 980,
+      "life": 1,
+      "title": "An alliance takes shape",
+      "text": "Bellandi Family appreciates the completed arrangement. Standing improves by 6.",
+      "kind": "politics"
+    },
+    {
+      "id": "9d0c09b98dfd42f08b370d88899a03be",
+      "minute": 980,
+      "life": 1,
+      "title": "A quiet collection",
+      "text": "You collected the agreed payment and reported back. You took extra time to keep the work discreet. ($115, respect +3)",
+      "kind": "story"
+    },
+    {
+      "id": "2337b05155f74e2f7bb1daab224af6d6",
+      "minute": 985,
+      "life": 1,
+      "title": "A family wants a share",
+      "text": "Bellandi Family has delivered a demand concerning Bluebird Laundry.",
+      "kind": "politics"
+    },
+    {
+      "id": "3b8c0c1301c55a51f8fae785d57ccf8c",
+      "minute": 985,
+      "life": 1,
+      "title": "A commitment interrupted",
+      "text": "Unspent funds were returned. The arrangement was not completed.",
+      "kind": "personal"
+    },
+    {
+      "id": "f0d3925fee7a99247fa550a979cbe80c",
+      "minute": 985,
+      "life": 1,
+      "title": "Taking a side",
+      "text": "You reject Bellandi Family's terms. The relationship has worsened.",
+      "kind": "politics"
+    },
+    {
+      "id": "44b69bca2c95a3a0310402d371ff138c",
+      "minute": 1015,
+      "life": 1,
+      "title": "A useful conversation",
+      "text": "Mara will keep an ear open. Your information network improves.",
+      "kind": "personal"
+    },
+    {
+      "id": "85d1343adde7c2c4beeea272037ee799",
+      "minute": 1045,
+      "life": 1,
+      "title": "A useful conversation",
+      "text": "Mara will keep an ear open. Your information network improves.",
+      "kind": "personal"
+    },
+    {
+      "id": "5be1ad78c290ce23460a931443aa01ca",
+      "minute": 1105,
+      "life": 1,
+      "title": "Broken glass at Bluebird Laundry",
+      "text": "An attack damaged the business by 15 condition. Income is reduced until repairs are made. The attackers left no proof of who sent them. Leo Carver helped defend the business, preventing 20 additional condition loss.",
+      "kind": "danger"
+    },
+    {
+      "id": "e532b6b89bebd877366be10582af1ade",
+      "minute": 1135,
+      "life": 1,
+      "title": "The city opens up",
+      "text": "Your contacts introduce you to another district. More properties are accessible.",
+      "kind": "city"
+    },
+    {
+      "id": "26b348fce0f2f14efb1265419c3c3ecb",
+      "minute": 1135,
+      "life": 1,
+      "title": "A sensitive delivery",
+      "text": "I need you to carry a sealed envelope from The Monarch to a contact at the docks. The contents are sensitive\u2014this isn't something to be discussed. I'll pay you for the work, but I need discretion. If you're up for it, I can have it ready for you at the club right now.",
+      "kind": "story"
+    },
+    {
+      "id": "a72e8724344b45596305644509625563",
+      "minute": 1165,
+      "life": 1,
+      "title": "An alliance takes shape",
+      "text": "Bellandi Family appreciates the completed arrangement. Standing improves by 6.",
+      "kind": "politics"
+    },
+    {
+      "id": "76cef58f040a6d963f8d09e65b8b32e4",
+      "minute": 1165,
+      "life": 1,
+      "title": "A sensitive delivery",
+      "text": "You delivered the sealed package and reported back. You pushed the schedule and drew more attention. ($95, respect +3)",
+      "kind": "story"
+    },
+    {
+      "id": "5da6ca8327af97480a60a8b4b4915778",
+      "minute": 1195,
+      "life": 1,
+      "title": "Arrived at Ashbury Court",
+      "text": "The journey took 30 minutes.",
+      "kind": "travel"
+    },
+    {
+      "id": "4b8e1d66321ba0d87ad68ccf3d47c3bf",
+      "minute": 1255,
+      "life": 1,
+      "title": "A different view",
+      "text": "Ashbury Court is now your residence. Hired security must be arranged here.",
+      "kind": "personal"
+    },
+    {
+      "id": "00149bdab9f9eecf951ed12c711874fd",
+      "minute": 1255,
+      "life": 1,
+      "title": "Leo heads out",
+      "text": "Collections should be completed in two hours.",
+      "kind": "work"
+    },
+    {
+      "id": "5cd922934112d20abcbeb4826665d1a0",
+      "minute": 1375,
+      "life": 1,
+      "title": "Leo returns",
+      "text": "$65 from collections. He is available again.",
+      "kind": "business"
+    },
+    {
+      "id": "66ba796b82afeed2beedd6769d83a5a5",
+      "minute": 1440,
+      "life": 1,
+      "title": "Accounts settled",
+      "text": "$47 paid for housing, security and crew.",
+      "kind": "business"
+    },
+    {
+      "id": "997819aab51151d4b66fa545d5d516c0",
+      "minute": 1510,
+      "life": 1,
+      "title": "Time to recover",
+      "text": "Rest restored your health. The city did not stop while you slept.",
+      "kind": "personal"
+    }
+  ],
+  "death_checkpoint": {
+    "business_truces": {},
+    "daily_cost": 67,
+    "dead": [
+      {
+        "name": "Alex Varga",
+        "minute": 1995,
+        "life": 1,
+        "cause": "You did not survive the attack at your residence."
+      }
+    ],
+    "director": {
+      "status": "ready",
+      "detail": "A local AI encounter is ready. It can arrive after your next activity.",
+      "last_request": 1935
+    },
+    "district": 1,
+    "event": null,
+    "factions": [
+      {
+        "id": "bellandi",
+        "name": "Bellandi Family",
+        "leader": "Vittorio Bellandi",
+        "power": 90,
+        "goodwill": -7,
+        "cash": 8160
+      },
+      {
+        "id": "russo",
+        "name": "Russo Outfit",
+        "leader": "Elena Russo",
+        "power": 58,
+        "goodwill": -18,
+        "cash": 4500
+      }
+    ],
+    "history": [
+      {
+        "id": "04dae4c62f98da946d168becdf2c2aa8",
+        "minute": 480,
+        "life": 1,
+        "title": "A room. A name. No protection.",
+        "text": "Mara Bell left word at Saint Agnes: there is work, if you can be discreet. Your room costs $15 each midnight.",
+        "kind": "personal"
+      },
+      {
+        "id": "8b981b5a4af54b6eff2f7789bbe474f1",
+        "minute": 495,
+        "life": 1,
+        "title": "Arrived at Saint Agnes",
+        "text": "The journey took 15 minutes.",
+        "kind": "travel"
+      },
+      {
+        "id": "660cff3abd803bc42ed4b11ca244f85e",
+        "minute": 540,
+        "life": 1,
+        "title": "Envelope delivered",
+        "text": "Mara pays $45. A small favor, completed without questions.",
+        "kind": "work"
+      },
+      {
+        "id": "48c6aee4ae2cab19956d671b697ef9a2",
+        "minute": 585,
+        "life": 1,
+        "title": "Envelope delivered",
+        "text": "Mara pays $45. A small favor, completed without questions.",
+        "kind": "work"
+      },
+      {
+        "id": "c853277683ecfaddc6b443be6d0b3390",
+        "minute": 585,
+        "life": 1,
+        "title": "A favor with a price",
+        "text": "Mara offers more sensitive work.",
+        "kind": "story"
+      },
+      {
+        "id": "db0b35cf83defc5bfd3fdc22cfe2a05d",
+        "minute": 660,
+        "life": 1,
+        "title": "A favor with a price",
+        "text": "You delivered the sealed package and reported back. You took extra time to keep the work discreet. ($60, respect +3)",
+        "kind": "story"
+      },
+      {
+        "id": "9e4282c20c2234c46e9f7a5543bb4c13",
+        "minute": 685,
+        "life": 1,
+        "title": "Arrived at Bluebird Laundry",
+        "text": "The journey took 25 minutes.",
+        "kind": "travel"
+      },
+      {
+        "id": "7c8952f8aa8e9baac4e1edd23d7ee506",
+        "minute": 685,
+        "life": 1,
+        "title": "A quiet settlement",
+        "text": "I need you to help settle a disagreement between two of my contacts at The Monarch. They\u2019re both trying to secure the same contract, and the tension is getting out of hand. If you can smooth things over, I\u2019ll make sure it\u2019s handled quietly. This is a Bellandi matter, so I expect your discretion.",
+        "kind": "story"
+      },
+      {
+        "id": "79df9720e7a82d591aa5f2c9991420d5",
+        "minute": 745,
+        "life": 1,
+        "title": "An alliance takes shape",
+        "text": "Bellandi Family appreciates the completed arrangement. Standing improves by 6.",
+        "kind": "politics"
+      },
+      {
+        "id": "7e345ca9ea16415595fc3bdd6aa8f886",
+        "minute": 745,
+        "life": 1,
+        "title": "A quiet settlement",
+        "text": "You completed the requested mediation without violence. ($55, respect +5)",
+        "kind": "story"
+      },
+      {
+        "id": "d63d39463584352dbbf3367a43788c87",
+        "minute": 805,
+        "life": 1,
+        "title": "A foothold in the city",
+        "text": "Bluebird Laundry now produces income for you. Earnings accrue as game time passes.",
+        "kind": "business"
+      },
+      {
+        "id": "29d286a625b98d3e16a1c5af184e36c3",
+        "minute": 830,
+        "life": 1,
+        "title": "Arrived at Saint Agnes",
+        "text": "The journey took 25 minutes.",
+        "kind": "travel"
+      },
+      {
+        "id": "872489eb46cb4f2bff50b98c241ab99c",
+        "minute": 860,
+        "life": 1,
+        "title": "Your first associate",
+        "text": "Leo Carver joins you. He expects $12 a day and a boss who keeps their word.",
+        "kind": "personal"
+      },
+      {
+        "id": "9df6f275cd7f4fa02eef6cf9c8e3dc20",
+        "minute": 860,
+        "life": 1,
+        "title": "A quiet collection",
+        "text": "I need you to collect a payment owed to us by a supplier at The Monarch. It\u2019s a quiet matter, and I expect you to handle it with care. The money was promised weeks ago, and we\u2019ve been waiting. If you can retrieve it without drawing attention, I\u2019ll be in your debt.",
+        "kind": "story"
+      },
+      {
+        "id": "e75eeee23d1827dffa5f4829b783d92f",
+        "minute": 980,
+        "life": 1,
+        "title": "An alliance takes shape",
+        "text": "Bellandi Family appreciates the completed arrangement. Standing improves by 6.",
+        "kind": "politics"
+      },
+      {
+        "id": "9d0c09b98dfd42f08b370d88899a03be",
+        "minute": 980,
+        "life": 1,
+        "title": "A quiet collection",
+        "text": "You collected the agreed payment and reported back. You took extra time to keep the work discreet. ($115, respect +3)",
+        "kind": "story"
+      },
+      {
+        "id": "2337b05155f74e2f7bb1daab224af6d6",
+        "minute": 985,
+        "life": 1,
+        "title": "A family wants a share",
+        "text": "Bellandi Family has delivered a demand concerning Bluebird Laundry.",
+        "kind": "politics"
+      },
+      {
+        "id": "3b8c0c1301c55a51f8fae785d57ccf8c",
+        "minute": 985,
+        "life": 1,
+        "title": "A commitment interrupted",
+        "text": "Unspent funds were returned. The arrangement was not completed.",
+        "kind": "personal"
+      },
+      {
+        "id": "f0d3925fee7a99247fa550a979cbe80c",
+        "minute": 985,
+        "life": 1,
+        "title": "Taking a side",
+        "text": "You reject Bellandi Family's terms. The relationship has worsened.",
+        "kind": "politics"
+      },
+      {
+        "id": "44b69bca2c95a3a0310402d371ff138c",
+        "minute": 1015,
+        "life": 1,
+        "title": "A useful conversation",
+        "text": "Mara will keep an ear open. Your information network improves.",
+        "kind": "personal"
+      },
+      {
+        "id": "85d1343adde7c2c4beeea272037ee799",
+        "minute": 1045,
+        "life": 1,
+        "title": "A useful conversation",
+        "text": "Mara will keep an ear open. Your information network improves.",
+        "kind": "personal"
+      },
+      {
+        "id": "5be1ad78c290ce23460a931443aa01ca",
+        "minute": 1105,
+        "life": 1,
+        "title": "Broken glass at Bluebird Laundry",
+        "text": "An attack damaged the business by 15 condition. Income is reduced until repairs are made. The attackers left no proof of who sent them. Leo Carver helped defend the business, preventing 20 additional condition loss.",
+        "kind": "danger"
+      },
+      {
+        "id": "e532b6b89bebd877366be10582af1ade",
+        "minute": 1135,
+        "life": 1,
+        "title": "The city opens up",
+        "text": "Your contacts introduce you to another district. More properties are accessible.",
+        "kind": "city"
+      },
+      {
+        "id": "26b348fce0f2f14efb1265419c3c3ecb",
+        "minute": 1135,
+        "life": 1,
+        "title": "A sensitive delivery",
+        "text": "I need you to carry a sealed envelope from The Monarch to a contact at the docks. The contents are sensitive\u2014this isn't something to be discussed. I'll pay you for the work, but I need discretion. If you're up for it, I can have it ready for you at the club right now.",
+        "kind": "story"
+      },
+      {
+        "id": "a72e8724344b45596305644509625563",
+        "minute": 1165,
+        "life": 1,
+        "title": "An alliance takes shape",
+        "text": "Bellandi Family appreciates the completed arrangement. Standing improves by 6.",
+        "kind": "politics"
+      },
+      {
+        "id": "76cef58f040a6d963f8d09e65b8b32e4",
+        "minute": 1165,
+        "life": 1,
+        "title": "A sensitive delivery",
+        "text": "You delivered the sealed package and reported back. You pushed the schedule and drew more attention. ($95, respect +3)",
+        "kind": "story"
+      },
+      {
+        "id": "5da6ca8327af97480a60a8b4b4915778",
+        "minute": 1195,
+        "life": 1,
+        "title": "Arrived at Ashbury Court",
+        "text": "The journey took 30 minutes.",
+        "kind": "travel"
+      },
+      {
+        "id": "4b8e1d66321ba0d87ad68ccf3d47c3bf",
+        "minute": 1255,
+        "life": 1,
+        "title": "A different view",
+        "text": "Ashbury Court is now your residence. Hired security must be arranged here.",
+        "kind": "personal"
+      },
+      {
+        "id": "00149bdab9f9eecf951ed12c711874fd",
+        "minute": 1255,
+        "life": 1,
+        "title": "Leo heads out",
+        "text": "Collections should be completed in two hours.",
+        "kind": "work"
+      },
+      {
+        "id": "5cd922934112d20abcbeb4826665d1a0",
+        "minute": 1375,
+        "life": 1,
+        "title": "Leo returns",
+        "text": "$65 from collections. He is available again.",
+        "kind": "business"
+      },
+      {
+        "id": "66ba796b82afeed2beedd6769d83a5a5",
+        "minute": 1440,
+        "life": 1,
+        "title": "Accounts settled",
+        "text": "$47 paid for housing, security and crew.",
+        "kind": "business"
+      },
+      {
+        "id": "997819aab51151d4b66fa545d5d516c0",
+        "minute": 1510,
+        "life": 1,
+        "title": "Time to recover",
+        "text": "Rest restored your health. The city did not stop while you slept.",
+        "kind": "personal"
+      },
+      {
+        "id": "afcd8534017c57673be271550b66a487",
+        "minute": 1510,
+        "life": 1,
+        "title": "Someone at the door",
+        "text": "Another security detail is assigned to your residence. It adds $10 a day to your expenses.",
+        "kind": "personal"
+      },
+      {
+        "id": "4c5889d3a749933bb27564b512610945",
+        "minute": 1540,
+        "life": 1,
+        "title": "A scheduling dispute",
+        "text": "I need you to settle a disagreement between two of our men at The Monarch. They\u2019re arguing over the schedule for a shift\u2014nothing serious, but it\u2019s causing friction. If you can smooth things over and get them to agree on a time, I\u2019ll owe you a favor. This is Bellandi business, so keep it under wraps.",
+        "kind": "story"
+      },
+      {
+        "id": "a05b220923dec4effad9832604564cde",
+        "minute": 1585,
+        "life": 1,
+        "title": "An alliance takes shape",
+        "text": "Bellandi Family appreciates the completed arrangement. Standing improves by 6.",
+        "kind": "politics"
+      },
+      {
+        "id": "83e29f3cc7de5b17fd33c253aeefe13c",
+        "minute": 1585,
+        "life": 1,
+        "title": "A scheduling dispute",
+        "text": "You completed the requested mediation without violence. You pushed the schedule and drew more attention. ($75, respect +5)",
+        "kind": "story"
+      },
+      {
+        "id": "1aabe4a5c905a059941b5f18a417bdb3",
+        "minute": 1620,
+        "life": 1,
+        "title": "Arrived at The Monarch",
+        "text": "The journey took 35 minutes.",
+        "kind": "travel"
+      },
+      {
+        "id": "00cab9a77ea5656142176445023aceaa",
+        "minute": 1620,
+        "life": 1,
+        "title": "An overdue payment",
+        "text": "I need you to collect an overdue payment from a supplier who\u2019s been avoiding us. It\u2019s a quiet matter, but it\u2019s been dragging on for weeks. You\u2019ll find the money locked in a drawer at The Monarch. Just take it and come back. No need for extra trouble, but if you\u2019re pressed for time, I can understand.",
+        "kind": "story"
+      },
+      {
+        "id": "bbcc06e076b2fa2026c4a430086f9200",
+        "minute": 1705,
+        "life": 1,
+        "title": "A family wants a share",
+        "text": "Bellandi Family has delivered a demand concerning Bluebird Laundry.",
+        "kind": "politics"
+      },
+      {
+        "id": "424946fd39a22ea4e62741fa071734a1",
+        "minute": 1705,
+        "life": 1,
+        "title": "Work put on hold",
+        "text": "An overdue payment is paused with 5 minutes left. Resolve the demand, then resume or abandon the job. No reward has been paid.",
+        "kind": "story"
+      },
+      {
+        "id": "bc9124df6d156579035ffcdae7ed381d",
+        "minute": 1705,
+        "life": 1,
+        "title": "A purchased understanding",
+        "text": "You pay $60 to Bellandi Family. The next business demand is postponed for a day; personal threats are unchanged.",
+        "kind": "politics"
+      },
+      {
+        "id": "0180c34fba5e76701115d454d61ad4f5",
+        "minute": 1710,
+        "life": 1,
+        "title": "Police attention catches up",
+        "text": "A detective interrupts the arrangement before its reward is paid.",
+        "kind": "danger"
+      },
+      {
+        "id": "ecf947352637ccbf215d9aa9eb02fdb1",
+        "minute": 1710,
+        "life": 1,
+        "title": "An alliance takes shape",
+        "text": "Bellandi Family appreciates the completed arrangement. Standing improves by 6.",
+        "kind": "politics"
+      },
+      {
+        "id": "9dd80d968b558b97558d8f6f6b83ee99",
+        "minute": 1710,
+        "life": 1,
+        "title": "Too familiar a face",
+        "text": "You collected the agreed payment and reported back. ($130, respect +3)",
+        "kind": "story"
+      },
+      {
+        "id": "fa1a29ff2fe6b4ea79b7d4f63bc43872",
+        "minute": 1755,
+        "life": 1,
+        "title": "A business ceasefire",
+        "text": "Bellandi Family accepts $100. Business demands and sabotage pause until Day 3 05:15. Personal threats and other families remain unaffected.",
+        "kind": "politics"
+      },
+      {
+        "id": "5295c09df32f800d4db2047032736bbc",
+        "minute": 1755,
+        "life": 1,
+        "title": "A demand nobody forgets",
+        "text": "The manager refuses. A Bellandi man watches you leave. You have challenged a powerful family on its own ground.",
+        "kind": "politics"
+      },
+      {
+        "id": "7582533880993b1effee1f3e230c0983",
+        "minute": 1820,
+        "life": 1,
+        "title": "Arrived at Ashbury Court",
+        "text": "The journey took 35 minutes.",
+        "kind": "travel"
+      },
+      {
+        "id": "a8658344145548f2b302a375575628b4",
+        "minute": 1820,
+        "life": 1,
+        "title": "A confidential arrangement",
+        "text": "I need you to deliver a sealed envelope to Vittorio Bellandi at The Monarch. It contains details about a new business arrangement we\u2019ve made with a rival outfit. Discretion is essential\u2014word of this must not get out. If you\u2019d rather avoid drawing attention, take your time. But if you're pressed for time, I can understand.",
+        "kind": "story"
+      },
+      {
+        "id": "0fb1b88909e7ad5d62c964cb515c9228",
+        "minute": 1895,
+        "life": 1,
+        "title": "An alliance takes shape",
+        "text": "Bellandi Family appreciates the completed arrangement. Standing improves by 6.",
+        "kind": "politics"
+      },
+      {
+        "id": "af508542059db005c6e2516670263c30",
+        "minute": 1895,
+        "life": 1,
+        "title": "A confidential arrangement",
+        "text": "You delivered the sealed package and reported back. You took extra time to keep the work discreet. ($60, respect +3)",
+        "kind": "story"
+      },
+      {
+        "id": "94e602e5e87bd78ad71160a02a49c70f",
+        "minute": 1905,
+        "life": 1,
+        "title": "Mara has heard something",
+        "text": "Bellandi Family has people asking where you sleep. You may have very little time.",
+        "kind": "danger"
+      },
+      {
+        "id": "cb076cdc9579ea08c249a5785476a2ad",
+        "minute": 1905,
+        "life": 1,
+        "title": "Time to prepare",
+        "text": "You heed Mara's warning. The threat remains; your next action is yours to choose.",
+        "kind": "intel"
+      },
+      {
+        "id": "d7bb860cab098f1c3404daad76516868",
+        "minute": 1905,
+        "life": 1,
+        "title": "Someone at the door",
+        "text": "Another security detail is assigned to your residence. It adds $10 a day to your expenses.",
+        "kind": "personal"
+      },
+      {
+        "id": "53530157835ab37bd30f0e531ca2f132",
+        "minute": 1995,
+        "life": 1,
+        "title": "Alex Varga is dead",
+        "text": "You did not survive the attack at your residence. Your life ends here. The city continues.",
+        "kind": "death"
+      }
+    ],
+    "id": "ba276e06619952ed30a642ccec6eaecd",
+    "income": 0,
+    "known_threats": [],
+    "last_result": {
+      "cues": [
+        {
+          "id": "50904869cdea33fb0ea5f6a26d455482",
+          "kind": "attack",
+          "target": "apartment",
+          "caption": "The attack ended your life."
+        }
+      ],
+      "from_location": "apartment",
+      "to_location": "apartment",
+      "elapsed": 0,
+      "records": [
+        {
+          "id": "53530157835ab37bd30f0e531ca2f132",
+          "minute": 1995,
+          "life": 1,
+          "title": "Alex Varga is dead",
+          "text": "You did not survive the attack at your residence. Your life ends here. The city continues.",
+          "kind": "death"
+        }
+      ]
+    },
+    "life": 1,
+    "locations": [
+      {
+        "actions": [],
+        "blurb": "A rented room above the waterfront. Thin walls. One stairway. Yours, for now.",
+        "condition": 100,
+        "cost": 0,
+        "district": 0,
+        "id": "room",
+        "income": 0,
+        "locked": false,
+        "name": "The Mariner",
+        "owned": false,
+        "owner": "independent",
+        "type": "home",
+        "x": 220,
+        "y": 205
+      },
+      {
+        "actions": [],
+        "blurb": "Coffee by daylight, whispered arrangements after dark. Your contact keeps the corner booth.",
+        "condition": 100,
+        "cost": 0,
+        "district": 0,
+        "id": "bar",
+        "income": 0,
+        "locked": false,
+        "name": "Saint Agnes",
+        "owned": false,
+        "owner": "independent",
+        "type": "bar",
+        "x": 415,
+        "y": 210
+      },
+      {
+        "actions": [],
+        "blurb": "Cargo arrives every morning. Honest work and less honest favors both pay cash.",
+        "condition": 100,
+        "cost": 0,
+        "district": 0,
+        "id": "docks",
+        "income": 0,
+        "locked": false,
+        "name": "Pier 14",
+        "owned": false,
+        "owner": "independent",
+        "type": "work",
+        "x": 130,
+        "y": 420
+      },
+      {
+        "actions": [],
+        "blurb": "A neighborhood business seeking protection. A small beginning, if you can honor the arrangement.",
+        "condition": 85,
+        "cost": 180,
+        "district": 0,
+        "id": "laundry",
+        "income": 12,
+        "locked": false,
+        "name": "Bluebird Laundry",
+        "owned": false,
+        "owner": "former:Alex Varga",
+        "type": "racket",
+        "x": 320,
+        "y": 425
+      },
+      {
+        "actions": [],
+        "blurb": "Bellandi men watch the doors. This casino belongs to a family that does not tolerate outsiders making demands.",
+        "condition": 100,
+        "cost": 0,
+        "district": 0,
+        "id": "club",
+        "income": 0,
+        "locked": false,
+        "name": "The Monarch",
+        "owned": false,
+        "owner": "bellandi",
+        "type": "casino",
+        "x": 570,
+        "y": 380
+      },
+      {
+        "actions": [],
+        "blurb": "People sell information here. Its value depends on whom you ask, and who sees you asking.",
+        "condition": 100,
+        "cost": 0,
+        "district": 0,
+        "id": "market",
+        "income": 0,
+        "locked": false,
+        "name": "Mercer Exchange",
+        "owned": false,
+        "owner": "independent",
+        "type": "market",
+        "x": 585,
+        "y": 180
+      },
+      {
+        "actions": [],
+        "blurb": "A private entrance, a respectable address, and a landlord willing to mind his own business.",
+        "condition": 100,
+        "cost": 180,
+        "district": 1,
+        "id": "apartment",
+        "income": 0,
+        "locked": false,
+        "name": "Ashbury Court",
+        "owned": false,
+        "owner": "independent",
+        "type": "home",
+        "x": 790,
+        "y": 200
+      },
+      {
+        "actions": [],
+        "blurb": "A working garage at the edge of Russo territory. An investment that requires political tact.",
+        "condition": 100,
+        "cost": 350,
+        "district": 1,
+        "id": "garage",
+        "income": 24,
+        "locked": false,
+        "name": "Russo Motor Works",
+        "owned": false,
+        "owner": "independent",
+        "type": "racket",
+        "x": 800,
+        "y": 405
+      },
+      {
+        "actions": [],
+        "blurb": "A shuttered gambling house. Restore its reputation and the tables could support an entire crew.",
+        "condition": 100,
+        "cost": 850,
+        "district": 1,
+        "id": "casino",
+        "income": 48,
+        "locked": false,
+        "name": "The Blue Hour",
+        "owned": false,
+        "owner": "independent",
+        "type": "casino",
+        "x": 700,
+        "y": 585
+      },
+      {
+        "actions": [],
+        "blurb": "High walls above the city. A statement of success, and a very conspicuous address.",
+        "condition": 100,
+        "cost": 3500,
+        "district": 2,
+        "id": "estate",
+        "income": 0,
+        "locked": true,
+        "name": "Cypress House",
+        "owned": false,
+        "owner": "independent",
+        "type": "home",
+        "x": 930,
+        "y": 95
+      }
+    ],
+    "minute": 1995,
+    "npcs": [
+      {
+        "id": "mara",
+        "name": "Mara Bell",
+        "role": "Fixer",
+        "trust": 35,
+        "voice": "af_heart",
+        "color": "#a48761"
+      },
+      {
+        "id": "leo",
+        "name": "Leo Carver",
+        "role": "Driver",
+        "trust": 26,
+        "voice": "am_michael",
+        "color": "#9ca795"
+      },
+      {
+        "id": "vittorio",
+        "name": "Vittorio Bellandi",
+        "role": "Bellandi boss",
+        "trust": 0,
+        "voice": "bm_george",
+        "color": "#ad7970"
+      },
+      {
+        "id": "elena",
+        "name": "Elena Russo",
+        "role": "Russo boss",
+        "trust": 0,
+        "voice": "bf_emma",
+        "color": "#83989b"
+      },
+      {
+        "id": "harlow",
+        "name": "Detective Harlow",
+        "role": "City detective",
+        "trust": 0,
+        "voice": "bm_lewis",
+        "color": "#7c8791"
+      }
+    ],
+    "opportunity": null,
+    "player": {
+      "name": "Alex Varga",
+      "cash": 64,
+      "health": 0,
+      "respect": 41,
+      "heat": 5,
+      "location": "apartment",
+      "home": "apartment",
+      "best_home": 1,
+      "security": 2,
+      "contacts": 2,
+      "crew": [
+        {
+          "id": "leo",
+          "name": "Leo Carver",
+          "loyalty": 65
+        }
+      ],
+      "alive": false,
+      "earned": 991,
+      "job_count": 2
+    },
+    "revision": 37,
+    "security": 3,
+    "tasks": [],
+    "version": 2
+  },
+  "first_life_ended_utc": "2026-09-07T22:55:42.922241+00:00",
+  "first_life_wall_seconds": 667.683709,
+  "new_life_checkpoint": {
+    "business_truces": {},
+    "daily_cost": 15,
+    "dead": [
+      {
+        "name": "Alex Varga",
+        "minute": 1995,
+        "life": 1,
+        "cause": "You did not survive the attack at your residence."
+      }
+    ],
+    "director": {
+      "status": "available",
+      "detail": "A new life begins. Ready to prepare encounters.",
+      "last_request": -9999
+    },
+    "district": 1,
+    "event": null,
+    "factions": [
+      {
+        "id": "bellandi",
+        "name": "Bellandi Family",
+        "leader": "Vittorio Bellandi",
+        "power": 90,
+        "goodwill": 0,
+        "cash": 8160
+      },
+      {
+        "id": "russo",
+        "name": "Russo Outfit",
+        "leader": "Elena Russo",
+        "power": 58,
+        "goodwill": 0,
+        "cash": 4500
+      }
+    ],
+    "history": [
+      {
+        "id": "04dae4c62f98da946d168becdf2c2aa8",
+        "minute": 480,
+        "life": 1,
+        "title": "A room. A name. No protection.",
+        "text": "Mara Bell left word at Saint Agnes: there is work, if you can be discreet. Your room costs $15 each midnight.",
+        "kind": "personal"
+      },
+      {
+        "id": "8b981b5a4af54b6eff2f7789bbe474f1",
+        "minute": 495,
+        "life": 1,
+        "title": "Arrived at Saint Agnes",
+        "text": "The journey took 15 minutes.",
+        "kind": "travel"
+      },
+      {
+        "id": "660cff3abd803bc42ed4b11ca244f85e",
+        "minute": 540,
+        "life": 1,
+        "title": "Envelope delivered",
+        "text": "Mara pays $45. A small favor, completed without questions.",
+        "kind": "work"
+      },
+      {
+        "id": "48c6aee4ae2cab19956d671b697ef9a2",
+        "minute": 585,
+        "life": 1,
+        "title": "Envelope delivered",
+        "text": "Mara pays $45. A small favor, completed without questions.",
+        "kind": "work"
+      },
+      {
+        "id": "c853277683ecfaddc6b443be6d0b3390",
+        "minute": 585,
+        "life": 1,
+        "title": "A favor with a price",
+        "text": "Mara offers more sensitive work.",
+        "kind": "story"
+      },
+      {
+        "id": "db0b35cf83defc5bfd3fdc22cfe2a05d",
+        "minute": 660,
+        "life": 1,
+        "title": "A favor with a price",
+        "text": "You delivered the sealed package and reported back. You took extra time to keep the work discreet. ($60, respect +3)",
+        "kind": "story"
+      },
+      {
+        "id": "9e4282c20c2234c46e9f7a5543bb4c13",
+        "minute": 685,
+        "life": 1,
+        "title": "Arrived at Bluebird Laundry",
+        "text": "The journey took 25 minutes.",
+        "kind": "travel"
+      },
+      {
+        "id": "7c8952f8aa8e9baac4e1edd23d7ee506",
+        "minute": 685,
+        "life": 1,
+        "title": "A quiet settlement",
+        "text": "I need you to help settle a disagreement between two of my contacts at The Monarch. They\u2019re both trying to secure the same contract, and the tension is getting out of hand. If you can smooth things over, I\u2019ll make sure it\u2019s handled quietly. This is a Bellandi matter, so I expect your discretion.",
+        "kind": "story"
+      },
+      {
+        "id": "79df9720e7a82d591aa5f2c9991420d5",
+        "minute": 745,
+        "life": 1,
+        "title": "An alliance takes shape",
+        "text": "Bellandi Family appreciates the completed arrangement. Standing improves by 6.",
+        "kind": "politics"
+      },
+      {
+        "id": "7e345ca9ea16415595fc3bdd6aa8f886",
+        "minute": 745,
+        "life": 1,
+        "title": "A quiet settlement",
+        "text": "You completed the requested mediation without violence. ($55, respect +5)",
+        "kind": "story"
+      },
+      {
+        "id": "d63d39463584352dbbf3367a43788c87",
+        "minute": 805,
+        "life": 1,
+        "title": "A foothold in the city",
+        "text": "Bluebird Laundry now produces income for you. Earnings accrue as game time passes.",
+        "kind": "business"
+      },
+      {
+        "id": "29d286a625b98d3e16a1c5af184e36c3",
+        "minute": 830,
+        "life": 1,
+        "title": "Arrived at Saint Agnes",
+        "text": "The journey took 25 minutes.",
+        "kind": "travel"
+      },
+      {
+        "id": "872489eb46cb4f2bff50b98c241ab99c",
+        "minute": 860,
+        "life": 1,
+        "title": "Your first associate",
+        "text": "Leo Carver joins you. He expects $12 a day and a boss who keeps their word.",
+        "kind": "personal"
+      },
+      {
+        "id": "9df6f275cd7f4fa02eef6cf9c8e3dc20",
+        "minute": 860,
+        "life": 1,
+        "title": "A quiet collection",
+        "text": "I need you to collect a payment owed to us by a supplier at The Monarch. It\u2019s a quiet matter, and I expect you to handle it with care. The money was promised weeks ago, and we\u2019ve been waiting. If you can retrieve it without drawing attention, I\u2019ll be in your debt.",
+        "kind": "story"
+      },
+      {
+        "id": "e75eeee23d1827dffa5f4829b783d92f",
+        "minute": 980,
+        "life": 1,
+        "title": "An alliance takes shape",
+        "text": "Bellandi Family appreciates the completed arrangement. Standing improves by 6.",
+        "kind": "politics"
+      },
+      {
+        "id": "9d0c09b98dfd42f08b370d88899a03be",
+        "minute": 980,
+        "life": 1,
+        "title": "A quiet collection",
+        "text": "You collected the agreed payment and reported back. You took extra time to keep the work discreet. ($115, respect +3)",
+        "kind": "story"
+      },
+      {
+        "id": "2337b05155f74e2f7bb1daab224af6d6",
+        "minute": 985,
+        "life": 1,
+        "title": "A family wants a share",
+        "text": "Bellandi Family has delivered a demand concerning Bluebird Laundry.",
+        "kind": "politics"
+      },
+      {
+        "id": "3b8c0c1301c55a51f8fae785d57ccf8c",
+        "minute": 985,
+        "life": 1,
+        "title": "A commitment interrupted",
+        "text": "Unspent funds were returned. The arrangement was not completed.",
+        "kind": "personal"
+      },
+      {
+        "id": "f0d3925fee7a99247fa550a979cbe80c",
+        "minute": 985,
+        "life": 1,
+        "title": "Taking a side",
+        "text": "You reject Bellandi Family's terms. The relationship has worsened.",
+        "kind": "politics"
+      },
+      {
+        "id": "44b69bca2c95a3a0310402d371ff138c",
+        "minute": 1015,
+        "life": 1,
+        "title": "A useful conversation",
+        "text": "Mara will keep an ear open. Your information network improves.",
+        "kind": "personal"
+      },
+      {
+        "id": "85d1343adde7c2c4beeea272037ee799",
+        "minute": 1045,
+        "life": 1,
+        "title": "A useful conversation",
+        "text": "Mara will keep an ear open. Your information network improves.",
+        "kind": "personal"
+      },
+      {
+        "id": "5be1ad78c290ce23460a931443aa01ca",
+        "minute": 1105,
+        "life": 1,
+        "title": "Broken glass at Bluebird Laundry",
+        "text": "An attack damaged the business by 15 condition. Income is reduced until repairs are made. The attackers left no proof of who sent them. Leo Carver helped defend the business, preventing 20 additional condition loss.",
+        "kind": "danger"
+      },
+      {
+        "id": "e532b6b89bebd877366be10582af1ade",
+        "minute": 1135,
+        "life": 1,
+        "title": "The city opens up",
+        "text": "Your contacts introduce you to another district. More properties are accessible.",
+        "kind": "city"
+      },
+      {
+        "id": "26b348fce0f2f14efb1265419c3c3ecb",
+        "minute": 1135,
+        "life": 1,
+        "title": "A sensitive delivery",
+        "text": "I need you to carry a sealed envelope from The Monarch to a contact at the docks. The contents are sensitive\u2014this isn't something to be discussed. I'll pay you for the work, but I need discretion. If you're up for it, I can have it ready for you at the club right now.",
+        "kind": "story"
+      },
+      {
+        "id": "a72e8724344b45596305644509625563",
+        "minute": 1165,
+        "life": 1,
+        "title": "An alliance takes shape",
+        "text": "Bellandi Family appreciates the completed arrangement. Standing improves by 6.",
+        "kind": "politics"
+      },
+      {
+        "id": "76cef58f040a6d963f8d09e65b8b32e4",
+        "minute": 1165,
+        "life": 1,
+        "title": "A sensitive delivery",
+        "text": "You delivered the sealed package and reported back. You pushed the schedule and drew more attention. ($95, respect +3)",
+        "kind": "story"
+      },
+      {
+        "id": "5da6ca8327af97480a60a8b4b4915778",
+        "minute": 1195,
+        "life": 1,
+        "title": "Arrived at Ashbury Court",
+        "text": "The journey took 30 minutes.",
+        "kind": "travel"
+      },
+      {
+        "id": "4b8e1d66321ba0d87ad68ccf3d47c3bf",
+        "minute": 1255,
+        "life": 1,
+        "title": "A different view",
+        "text": "Ashbury Court is now your residence. Hired security must be arranged here.",
+        "kind": "personal"
+      },
+      {
+        "id": "00149bdab9f9eecf951ed12c711874fd",
+        "minute": 1255,
+        "life": 1,
+        "title": "Leo heads out",
+        "text": "Collections should be completed in two hours.",
+        "kind": "work"
+      },
+      {
+        "id": "5cd922934112d20abcbeb4826665d1a0",
+        "minute": 1375,
+        "life": 1,
+        "title": "Leo returns",
+        "text": "$65 from collections. He is available again.",
+        "kind": "business"
+      },
+      {
+        "id": "66ba796b82afeed2beedd6769d83a5a5",
+        "minute": 1440,
+        "life": 1,
+        "title": "Accounts settled",
+        "text": "$47 paid for housing, security and crew.",
+        "kind": "business"
+      },
+      {
+        "id": "997819aab51151d4b66fa545d5d516c0",
+        "minute": 1510,
+        "life": 1,
+        "title": "Time to recover",
+        "text": "Rest restored your health. The city did not stop while you slept.",
+        "kind": "personal"
+      },
+      {
+        "id": "afcd8534017c57673be271550b66a487",
+        "minute": 1510,
+        "life": 1,
+        "title": "Someone at the door",
+        "text": "Another security detail is assigned to your residence. It adds $10 a day to your expenses.",
+        "kind": "personal"
+      },
+      {
+        "id": "4c5889d3a749933bb27564b512610945",
+        "minute": 1540,
+        "life": 1,
+        "title": "A scheduling dispute",
+        "text": "I need you to settle a disagreement between two of our men at The Monarch. They\u2019re arguing over the schedule for a shift\u2014nothing serious, but it\u2019s causing friction. If you can smooth things over and get them to agree on a time, I\u2019ll owe you a favor. This is Bellandi business, so keep it under wraps.",
+        "kind": "story"
+      },
+      {
+        "id": "a05b220923dec4effad9832604564cde",
+        "minute": 1585,
+        "life": 1,
+        "title": "An alliance takes shape",
+        "text": "Bellandi Family appreciates the completed arrangement. Standing improves by 6.",
+        "kind": "politics"
+      },
+      {
+        "id": "83e29f3cc7de5b17fd33c253aeefe13c",
+        "minute": 1585,
+        "life": 1,
+        "title": "A scheduling dispute",
+        "text": "You completed the requested mediation without violence. You pushed the schedule and drew more attention. ($75, respect +5)",
+        "kind": "story"
+      },
+      {
+        "id": "1aabe4a5c905a059941b5f18a417bdb3",
+        "minute": 1620,
+        "life": 1,
+        "title": "Arrived at The Monarch",
+        "text": "The journey took 35 minutes.",
+        "kind": "travel"
+      },
+      {
+        "id": "00cab9a77ea5656142176445023aceaa",
+        "minute": 1620,
+        "life": 1,
+        "title": "An overdue payment",
+        "text": "I need you to collect an overdue payment from a supplier who\u2019s been avoiding us. It\u2019s a quiet matter, but it\u2019s been dragging on for weeks. You\u2019ll find the money locked in a drawer at The Monarch. Just take it and come back. No need for extra trouble, but if you\u2019re pressed for time, I can understand.",
+        "kind": "story"
+      },
+      {
+        "id": "bbcc06e076b2fa2026c4a430086f9200",
+        "minute": 1705,
+        "life": 1,
+        "title": "A family wants a share",
+        "text": "Bellandi Family has delivered a demand concerning Bluebird Laundry.",
+        "kind": "politics"
+      },
+      {
+        "id": "424946fd39a22ea4e62741fa071734a1",
+        "minute": 1705,
+        "life": 1,
+        "title": "Work put on hold",
+        "text": "An overdue payment is paused with 5 minutes left. Resolve the demand, then resume or abandon the job. No reward has been paid.",
+        "kind": "story"
+      },
+      {
+        "id": "bc9124df6d156579035ffcdae7ed381d",
+        "minute": 1705,
+        "life": 1,
+        "title": "A purchased understanding",
+        "text": "You pay $60 to Bellandi Family. The next business demand is postponed for a day; personal threats are unchanged.",
+        "kind": "politics"
+      },
+      {
+        "id": "0180c34fba5e76701115d454d61ad4f5",
+        "minute": 1710,
+        "life": 1,
+        "title": "Police attention catches up",
+        "text": "A detective interrupts the arrangement before its reward is paid.",
+        "kind": "danger"
+      },
+      {
+        "id": "ecf947352637ccbf215d9aa9eb02fdb1",
+        "minute": 1710,
+        "life": 1,
+        "title": "An alliance takes shape",
+        "text": "Bellandi Family appreciates the completed arrangement. Standing improves by 6.",
+        "kind": "politics"
+      },
+      {
+        "id": "9dd80d968b558b97558d8f6f6b83ee99",
+        "minute": 1710,
+        "life": 1,
+        "title": "Too familiar a face",
+        "text": "You collected the agreed payment and reported back. ($130, respect +3)",
+        "kind": "story"
+      },
+      {
+        "id": "fa1a29ff2fe6b4ea79b7d4f63bc43872",
+        "minute": 1755,
+        "life": 1,
+        "title": "A business ceasefire",
+        "text": "Bellandi Family accepts $100. Business demands and sabotage pause until Day 3 05:15. Personal threats and other families remain unaffected.",
+        "kind": "politics"
+      },
+      {
+        "id": "5295c09df32f800d4db2047032736bbc",
+        "minute": 1755,
+        "life": 1,
+        "title": "A demand nobody forgets",
+        "text": "The manager refuses. A Bellandi man watches you leave. You have challenged a powerful family on its own ground.",
+        "kind": "politics"
+      },
+      {
+        "id": "7582533880993b1effee1f3e230c0983",
+        "minute": 1820,
+        "life": 1,
+        "title": "Arrived at Ashbury Court",
+        "text": "The journey took 35 minutes.",
+        "kind": "travel"
+      },
+      {
+        "id": "a8658344145548f2b302a375575628b4",
+        "minute": 1820,
+        "life": 1,
+        "title": "A confidential arrangement",
+        "text": "I need you to deliver a sealed envelope to Vittorio Bellandi at The Monarch. It contains details about a new business arrangement we\u2019ve made with a rival outfit. Discretion is essential\u2014word of this must not get out. If you\u2019d rather avoid drawing attention, take your time. But if you're pressed for time, I can understand.",
+        "kind": "story"
+      },
+      {
+        "id": "0fb1b88909e7ad5d62c964cb515c9228",
+        "minute": 1895,
+        "life": 1,
+        "title": "An alliance takes shape",
+        "text": "Bellandi Family appreciates the completed arrangement. Standing improves by 6.",
+        "kind": "politics"
+      },
+      {
+        "id": "af508542059db005c6e2516670263c30",
+        "minute": 1895,
+        "life": 1,
+        "title": "A confidential arrangement",
+        "text": "You delivered the sealed package and reported back. You took extra time to keep the work discreet. ($60, respect +3)",
+        "kind": "story"
+      },
+      {
+        "id": "94e602e5e87bd78ad71160a02a49c70f",
+        "minute": 1905,
+        "life": 1,
+        "title": "Mara has heard something",
+        "text": "Bellandi Family has people asking where you sleep. You may have very little time.",
+        "kind": "danger"
+      },
+      {
+        "id": "cb076cdc9579ea08c249a5785476a2ad",
+        "minute": 1905,
+        "life": 1,
+        "title": "Time to prepare",
+        "text": "You heed Mara's warning. The threat remains; your next action is yours to choose.",
+        "kind": "intel"
+      },
+      {
+        "id": "d7bb860cab098f1c3404daad76516868",
+        "minute": 1905,
+        "life": 1,
+        "title": "Someone at the door",
+        "text": "Another security detail is assigned to your residence. It adds $10 a day to your expenses.",
+        "kind": "personal"
+      },
+      {
+        "id": "53530157835ab37bd30f0e531ca2f132",
+        "minute": 1995,
+        "life": 1,
+        "title": "Alex Varga is dead",
+        "text": "You did not survive the attack at your residence. Your life ends here. The city continues.",
+        "kind": "death"
+      },
+      {
+        "id": "9192974078527cb31d1e9b6f4eeae963",
+        "minute": 2475,
+        "life": 2,
+        "title": "A stranger arrives",
+        "text": "Nico Ward rents a room at the Mariner. The previous life left its mark on the city.",
+        "kind": "personal"
+      }
+    ],
+    "id": "ba276e06619952ed30a642ccec6eaecd",
+    "income": 0,
+    "known_threats": [],
+    "last_result": {
+      "from_location": "apartment",
+      "to_location": "room",
+      "elapsed": 480,
+      "records": [
+        {
+          "id": "9192974078527cb31d1e9b6f4eeae963",
+          "minute": 2475,
+          "life": 2,
+          "title": "A stranger arrives",
+          "text": "Nico Ward rents a room at the Mariner. The previous life left its mark on the city.",
+          "kind": "personal"
+        }
+      ]
+    },
+    "life": 2,
+    "locations": [
+      {
+        "actions": [
+          {
+            "id": "rest",
+            "label": "Rest for four hours",
+            "minutes": 240,
+            "cost": 0,
+            "disabled": false,
+            "reason": "",
+            "detail": "Recover up to 25 health as you rest. Rivals can act while you sleep.",
+            "target": "room"
+          },
+          {
+            "id": "security",
+            "label": "Hire another security detail",
+            "minutes": 30,
+            "cost": 100,
+            "disabled": true,
+            "reason": "Not enough cash",
+            "detail": "Improves detection and survival at home. Adds $10/day upkeep.",
+            "target": "room"
+          },
+          {
+            "id": "wait",
+            "label": "Let an hour pass",
+            "minutes": 60,
+            "cost": 0,
+            "disabled": false,
+            "reason": "",
+            "detail": "Income, rent, operations and rival plans continue.",
+            "target": "room"
+          }
+        ],
+        "blurb": "A rented room above the waterfront. Thin walls. One stairway. Yours, for now.",
+        "condition": 100,
+        "cost": 0,
+        "district": 0,
+        "id": "room",
+        "income": 0,
+        "locked": false,
+        "name": "The Mariner",
+        "owned": false,
+        "owner": "independent",
+        "type": "home",
+        "x": 220,
+        "y": 205
+      },
+      {
+        "actions": [
+          {
+            "id": "travel",
+            "label": "Visit Saint Agnes",
+            "minutes": 15,
+            "cost": 0,
+            "disabled": false,
+            "reason": "",
+            "detail": "Travel advances the city clock. Known threats may interrupt you.",
+            "target": "bar"
+          }
+        ],
+        "blurb": "Coffee by daylight, whispered arrangements after dark. Your contact keeps the corner booth.",
+        "condition": 100,
+        "cost": 0,
+        "district": 0,
+        "id": "bar",
+        "income": 0,
+        "locked": false,
+        "name": "Saint Agnes",
+        "owned": false,
+        "owner": "independent",
+        "type": "bar",
+        "x": 415,
+        "y": 210
+      },
+      {
+        "actions": [
+          {
+            "id": "travel",
+            "label": "Visit Pier 14",
+            "minutes": 25,
+            "cost": 0,
+            "disabled": false,
+            "reason": "",
+            "detail": "Travel advances the city clock. Known threats may interrupt you.",
+            "target": "docks"
+          }
+        ],
+        "blurb": "Cargo arrives every morning. Honest work and less honest favors both pay cash.",
+        "condition": 100,
+        "cost": 0,
+        "district": 0,
+        "id": "docks",
+        "income": 0,
+        "locked": false,
+        "name": "Pier 14",
+        "owned": false,
+        "owner": "independent",
+        "type": "work",
+        "x": 130,
+        "y": 420
+      },
+      {
+        "actions": [
+          {
+            "id": "travel",
+            "label": "Visit Bluebird Laundry",
+            "minutes": 25,
+            "cost": 0,
+            "disabled": false,
+            "reason": "",
+            "detail": "Travel advances the city clock. Known threats may interrupt you.",
+            "target": "laundry"
+          }
+        ],
+        "blurb": "A neighborhood business seeking protection. A small beginning, if you can honor the arrangement.",
+        "condition": 85,
+        "cost": 180,
+        "district": 0,
+        "id": "laundry",
+        "income": 12,
+        "locked": false,
+        "name": "Bluebird Laundry",
+        "owned": false,
+        "owner": "former:Alex Varga",
+        "type": "racket",
+        "x": 320,
+        "y": 425
+      },
+      {
+        "actions": [
+          {
+            "id": "travel",
+            "label": "Visit The Monarch",
+            "minutes": 45,
+            "cost": 0,
+            "disabled": false,
+            "reason": "",
+            "detail": "Travel advances the city clock. Known threats may interrupt you.",
+            "target": "club"
+          }
+        ],
+        "blurb": "Bellandi men watch the doors. This casino belongs to a family that does not tolerate outsiders making demands.",
+        "condition": 100,
+        "cost": 0,
+        "district": 0,
+        "id": "club",
+        "income": 0,
+        "locked": false,
+        "name": "The Monarch",
+        "owned": false,
+        "owner": "bellandi",
+        "type": "casino",
+        "x": 570,
+        "y": 380
+      },
+      {
+        "actions": [
+          {
+            "id": "travel",
+            "label": "Visit Mercer Exchange",
+            "minutes": 35,
+            "cost": 0,
+            "disabled": false,
+            "reason": "",
+            "detail": "Travel advances the city clock. Known threats may interrupt you.",
+            "target": "market"
+          }
+        ],
+        "blurb": "People sell information here. Its value depends on whom you ask, and who sees you asking.",
+        "condition": 100,
+        "cost": 0,
+        "district": 0,
+        "id": "market",
+        "income": 0,
+        "locked": false,
+        "name": "Mercer Exchange",
+        "owned": false,
+        "owner": "independent",
+        "type": "market",
+        "x": 585,
+        "y": 180
+      },
+      {
+        "actions": [
+          {
+            "id": "travel",
+            "label": "Visit Ashbury Court",
+            "minutes": 50,
+            "cost": 0,
+            "disabled": false,
+            "reason": "",
+            "detail": "Travel advances the city clock. Known threats may interrupt you.",
+            "target": "apartment"
+          }
+        ],
+        "blurb": "A private entrance, a respectable address, and a landlord willing to mind his own business.",
+        "condition": 100,
+        "cost": 180,
+        "district": 1,
+        "id": "apartment",
+        "income": 0,
+        "locked": false,
+        "name": "Ashbury Court",
+        "owned": false,
+        "owner": "independent",
+        "type": "home",
+        "x": 790,
+        "y": 200
+      },
+      {
+        "actions": [
+          {
+            "id": "travel",
+            "label": "Visit Russo Motor Works",
+            "minutes": 65,
+            "cost": 0,
+            "disabled": false,
+            "reason": "",
+            "detail": "Travel advances the city clock. Known threats may interrupt you.",
+            "target": "garage"
+          }
+        ],
+        "blurb": "A working garage at the edge of Russo territory. An investment that requires political tact.",
+        "condition": 100,
+        "cost": 350,
+        "district": 1,
+        "id": "garage",
+        "income": 24,
+        "locked": false,
+        "name": "Russo Motor Works",
+        "owned": false,
+        "owner": "independent",
+        "type": "racket",
+        "x": 800,
+        "y": 405
+      },
+      {
+        "actions": [
+          {
+            "id": "travel",
+            "label": "Visit The Blue Hour",
+            "minutes": 70,
+            "cost": 0,
+            "disabled": false,
+            "reason": "",
+            "detail": "Travel advances the city clock. Known threats may interrupt you.",
+            "target": "casino"
+          }
+        ],
+        "blurb": "A shuttered gambling house. Restore its reputation and the tables could support an entire crew.",
+        "condition": 100,
+        "cost": 850,
+        "district": 1,
+        "id": "casino",
+        "income": 48,
+        "locked": false,
+        "name": "The Blue Hour",
+        "owned": false,
+        "owner": "independent",
+        "type": "casino",
+        "x": 700,
+        "y": 585
+      },
+      {
+        "actions": [
+          {
+            "id": "expand",
+            "label": "Establish contacts across town",
+            "minutes": 90,
+            "cost": 100,
+            "disabled": true,
+            "reason": "Earn 10 respect first",
+            "detail": "Opens the next district. Existing businesses and rivals remain.",
+            "target": "estate"
+          }
+        ],
+        "blurb": "High walls above the city. A statement of success, and a very conspicuous address.",
+        "condition": 100,
+        "cost": 3500,
+        "district": 2,
+        "id": "estate",
+        "income": 0,
+        "locked": true,
+        "name": "Cypress House",
+        "owned": false,
+        "owner": "independent",
+        "type": "home",
+        "x": 930,
+        "y": 95
+      }
+    ],
+    "minute": 2475,
+    "npcs": [
+      {
+        "id": "mara",
+        "name": "Mara Bell",
+        "role": "Fixer",
+        "trust": 0,
+        "voice": "af_heart",
+        "color": "#a48761"
+      },
+      {
+        "id": "leo",
+        "name": "Leo Carver",
+        "role": "Driver",
+        "trust": 0,
+        "voice": "am_michael",
+        "color": "#9ca795"
+      },
+      {
+        "id": "vittorio",
+        "name": "Vittorio Bellandi",
+        "role": "Bellandi boss",
+        "trust": 0,
+        "voice": "bm_george",
+        "color": "#ad7970"
+      },
+      {
+        "id": "elena",
+        "name": "Elena Russo",
+        "role": "Russo boss",
+        "trust": 0,
+        "voice": "bf_emma",
+        "color": "#83989b"
+      },
+      {
+        "id": "harlow",
+        "name": "Detective Harlow",
+        "role": "City detective",
+        "trust": 0,
+        "voice": "bm_lewis",
+        "color": "#7c8791"
+      }
+    ],
+    "opportunity": {
+      "title": "Make your first connection",
+      "detail": "Mara has paid work at Saint Agnes. A small job starts your reputation.",
+      "target": "bar"
+    },
+    "player": {
+      "name": "Nico Ward",
+      "cash": 90,
+      "health": 100,
+      "respect": 0,
+      "heat": 0,
+      "location": "room",
+      "home": "room",
+      "security": 0,
+      "contacts": 0,
+      "crew": [],
+      "alive": true,
+      "earned": 0,
+      "job_count": 0
+    },
+    "revision": 38,
+    "security": 0,
+    "tasks": [],
+    "version": 2
+  },
+  "new_life_private_invariants": {
+    "queued_offers": 0,
+    "business_truces": {},
+    "suspended_job": null,
+    "active_old_life_plots": 0
+  }
+}

@@ -182,7 +182,19 @@ func (w *World) CompleteArrangement(job *Scene) {
 		npc.Trust += 3
 	}
 	w.ResolveBeneficiary(job.Beneficiary)
-	w.Log(job.Title, job.Outcome+fmt.Sprintf(" ($%d, respect +%d)", job.Effect.Reward, job.Effect.Respect), "story")
+	title := job.Title
+	if job.Kind == "police_stop" {
+		// The detective's scene is an interruption, not the arrangement's name.
+		// Older saves may lack a linked memory; avoid inventing a title then.
+		title = "An arrangement completed"
+		for _, memory := range w.Arrangements {
+			if memory.ID == job.JobID && memory.Life == w.Life && memory.Title != "" {
+				title = memory.Title
+				break
+			}
+		}
+	}
+	w.Log(title, job.Outcome+fmt.Sprintf(" ($%d, respect +%d)", job.Effect.Reward, job.Effect.Respect), "story")
 }
 
 func (w *World) ResolveBeneficiary(id string) {
