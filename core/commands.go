@@ -174,12 +174,17 @@ func (w *World) apply(c Command) error {
 		if c.Kind == "travel" {
 			p.Location = "transit"
 			w.Advance(a.Minutes)
-			if p.Alive && w.Event == nil {
+			if p.Alive && w.Minute-oldTime >= a.Minutes {
 				p.Location = target
 				l, _ := PlaceByID(target)
 				w.Log("Arrived at "+l.Name, fmt.Sprintf("The journey took %d minutes.", w.Minute-oldTime), "travel")
 			} else {
 				p.Location = oldLoc
+				if p.Alive {
+					from, _ := PlaceByID(oldLoc)
+					to, _ := PlaceByID(target)
+					w.Log("Journey interrupted", fmt.Sprintf("The journey to %s was interrupted after %d minutes. You remain based at %s; choose your next destination after resolving the situation.", to.Name, w.Minute-oldTime, from.Name), "travel")
+				}
 			}
 		} else {
 			// Hiring/delegating commits arrangements immediately; work rewards require reaching completion.

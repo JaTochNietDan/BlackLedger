@@ -4,8 +4,8 @@ const importance=(record:CityRecord)=>({death:6,danger:5,intel:4,politics:3,stor
 
 /** Keep a consequential action visible when routine accounts settle in the same command. */
 export function OutcomeSummary({world,onLedger}:{world:Snapshot;onLedger:()=>void}){
- const current=world.last_result?.records.filter(r=>r.kind!=='travel')||[];
- const records=current.length?current:[...world.history].reverse().filter(r=>r.kind!=='travel').slice(0,1);
+ const current=world.last_result?.records||[];
+ const records=current.length?current:[...world.history].reverse().slice(0,1);
  if(!records.length)return null;
  const headline=[...records].sort((a,b)=>importance(b)-importance(a))[0];
  const others=records.filter(r=>r.id!==headline.id);
