@@ -106,3 +106,9 @@
 - Found a long-term progression dead end: former organizations permanently occupied the finite businesses after successive deaths. Added an explicit buyout at twice the normal acquisition price for former-organization businesses; ordinary faction property remains unavailable through this action.
 - New people still start with $90 and no inherited ownership. Buying out preserves damage and the business's post-death income, and starts the usual political pressure. Opportunity guidance now recognizes buyout candidates rather than silently skipping them.
 - Regression verifies insufficient funds are rejected, full payment is charged, changed property state persists, and faction property cannot be seized. The full Go suite passes. This is a rules-level verification; broader repeat-life browser pacing remains to be tested.
+
+## Compact viewport guidance
+- Verified the prior goal turn made progress through the paid-buyout implementation and regression tests. Continued with a rendered responsive check.
+- At 980×800 the existing CSS hid next-opportunity guidance. Kept it beside the city heading at compact desktop widths and placed it in its own row below the view controls below 800px.
+- At 390×844 verified the prompt, city illustration, wrapped location controls and latest outcome are visible without horizontal clipping. Property actions stack in one column. At 980×800 verified the restored guidance fits beside the heading.
+- These were read-only inspections of the running campaign, not a mobile gameplay completion test. Temporary browser viewport overrides were reset. Production build passed.
