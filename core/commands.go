@@ -67,7 +67,7 @@ func (w *World) apply(c Command) error {
 		case "attack":
 			if c.Choice == "bargain" {
 				p.Respect = max(0, p.Respect-5)
-				w.Log("A costly reprieve", "The men accept your money and withdraw. This does not make Bellandi your friend.", "danger")
+				w.Log("A costly reprieve", "The men accept your money and withdraw. Their withdrawal does not repair your relationship with the family that sent them.", "danger")
 			} else {
 				base := .12
 				if c.Choice == "escape" {

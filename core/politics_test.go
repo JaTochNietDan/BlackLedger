@@ -254,3 +254,74 @@ func TestGoodRelationsInAllOwnedDistrictsPreservePeace(t *testing.T) {
 		t.Fatal("claim did not resume after standing changed")
 	}
 }
+
+func TestSustainedDefianceEscalatesForEitherFamily(t *testing.T) {
+	for _, actor := range []string{"bellandi", "russo"} {
+		w := pressureWorld()
+		e := &Scene{Actor: actor, Target: "laundry"}
+		if err := w.ResolvePressure(e, "resist"); err != nil {
+			t.Fatal(err)
+		}
+		for _, p := range w.Plots {
+			if p.Kind == "hit" {
+				t.Fatal("first refusal became a personal hit")
+			}
+		}
+		if err := w.ResolvePressure(e, "resist"); err != nil {
+			t.Fatal(err)
+		}
+		hits := 0
+		for _, p := range w.Plots {
+			if p.Kind == "hit" {
+				hits++
+				if p.Actor != actor || p.Due != w.Minute+240 {
+					t.Fatal("wrong personal operation")
+				}
+			}
+		}
+		if hits != 1 {
+			t.Fatal("sustained feud did not escalate")
+		}
+		w.RetaliationFrom(actor)
+		count := 0
+		for _, p := range w.Plots {
+			if p.Kind == "hit" {
+				count++
+			}
+		}
+		if count != 1 {
+			t.Fatal("personal operation duplicated")
+		}
+		data, _ := json.Marshal(w.Public())
+		if strings.Contains(string(data), "\"plots\"") {
+			t.Fatal("private operation leaked")
+		}
+	}
+}
+
+func TestRussoWarningNamesActualFamilyAndCanBeNegotiated(t *testing.T) {
+	w := New(27)
+	w.Player.Contacts = 2
+	w.RetaliationFrom("russo")
+	w.Advance(200)
+	if w.Event == nil || w.Event.Kind != "warning" || !strings.Contains(w.Event.Body, "Russo") || strings.Contains(w.Event.Body, "Bellandi") {
+		t.Fatal("wrong family in warning")
+	}
+	w.Event = nil
+	w.RetaliationFrom("bellandi")
+	if err := w.ResolveAudience(&Scene{Actor: "russo"}, "tribute"); err != nil {
+		t.Fatal(err)
+	}
+	if len(w.Plots) != 1 || w.Plots[0].Actor != "bellandi" {
+		t.Fatal("audience cancelled wrong family's threats")
+	}
+}
+
+func TestFavorCanCreateRussoFeud(t *testing.T) {
+	w := New(27)
+	w.Factions[1].Goodwill = -28
+	w.ResolveBeneficiary("bellandi")
+	if len(w.Plots) != 1 || w.Plots[0].Actor != "russo" || w.Plots[0].Kind != "hit" {
+		t.Fatal("Russo feud has no consequence")
+	}
+}

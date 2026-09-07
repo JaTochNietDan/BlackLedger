@@ -439,13 +439,33 @@ func (w *World) Actions(id string) []Action {
 	add("wait", "Let an hour pass", 60, 0, "", "Income, rent, operations and rival plans continue.")
 	return out
 }
-func (w *World) Retaliation() {
+func (w *World) Retaliation() { w.RetaliationFrom("bellandi") }
+
+// RetaliationFrom commits one active personal operation per family and life.
+func (w *World) RetaliationFrom(actor string) {
+	valid := false
+	for _, f := range w.Factions {
+		if f.ID == actor {
+			valid = true
+		}
+	}
+	if !valid {
+		return
+	}
 	for _, p := range w.Plots {
-		if p.Life == w.Life && p.Kind == "hit" && p.Actor == "bellandi" {
+		if p.Life == w.Life && p.Kind == "hit" && p.Actor == actor {
 			return
 		}
 	}
-	w.Plots = append(w.Plots, Plot{ID: ID(), Kind: "hit", Life: w.Life, Due: w.Minute + 240, Actor: "bellandi", Strength: 5})
+	w.Plots = append(w.Plots, Plot{ID: ID(), Kind: "hit", Life: w.Life, Due: w.Minute + 240, Actor: actor, Strength: 5})
+}
+func (w *World) factionName(id string) string {
+	for _, f := range w.Factions {
+		if f.ID == id {
+			return f.Name
+		}
+	}
+	return "An unidentified family"
 }
 func (w *World) Die(cause string) {
 	p := &w.Player
@@ -552,9 +572,10 @@ func (w *World) Advance(minutes int) {
 			}
 			if plot.Kind == "hit" && !plot.Known && p.Contacts >= 2 && plot.Due-w.Minute <= 90 {
 				plot.Known = true
-				w.Log("Mara has heard something", "Bellandi men have been asking where you sleep. You may have very little time.", "danger")
+				warning := w.factionName(plot.Actor) + " has people asking where you sleep."
+				w.Log("Mara has heard something", warning+" You may have very little time.", "danger")
 				if plot.Due > w.Minute {
-					w.Event = &Scene{ID: "warning-" + plot.ID, Title: "A call worth answering", Body: "Bellandi men have been asking where you sleep. I cannot tell you exactly when they will come. Stop what you are doing and think about where you want to be tonight.", Speaker: "mara", Kind: "warning", Source: "authored", Minute: w.Minute, Choices: []Choice{{ID: "acknowledge", Label: "Put down the phone and prepare", Detail: "Clock stays paused. You can leave, arrange security or seek an audience. The threat remains."}}}
+					w.Event = &Scene{ID: "warning-" + plot.ID, Title: "A call worth answering", Body: warning + " I cannot tell you exactly when they will come. Stop what you are doing and think about where you want to be tonight.", Speaker: "mara", Kind: "warning", Source: "authored", Minute: w.Minute, Choices: []Choice{{ID: "acknowledge", Label: "Put down the phone and prepare", Detail: "Clock stays paused. You can leave, arrange security or seek an audience. The threat remains."}}}
 					return
 				}
 			}

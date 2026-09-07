@@ -43,8 +43,8 @@ func (w *World) BusinessPressure() {
 	rival := w.Factions[1-actor]
 	w.Event = &Scene{ID: ID(), Kind: "business_pressure", Source: "authored", Minute: w.Minute, Speaker: speaker, Actor: f.ID, Target: target.ID, Title: "A claim on your earnings", Body: fmt.Sprintf("“%s is doing business under your name now. My people expect a share. Pay for an understanding, or explain why I should tolerate a competitor.”", target.Name), Choices: []Choice{
 		{ID: "pay", Label: "Pay $60 for an understanding", Cost: 60, Detail: "Improves this family's standing by 12. Postpones the next demand; existing personal threats remain."},
-		{ID: "resist", Label: "Refuse their claim", Detail: "Gain 2 respect; lose 20 standing. The family may retaliate against your business."},
-		{ID: "ally", Label: "Seek backing from " + rival.Name, Cost: 35, Detail: "Pay $35 for an introduction. Gain 12 standing with their rival; lose 12 with this family. Business retaliation remains possible."},
+		{ID: "resist", Label: "Refuse their claim", Detail: "Gain 2 respect; lose 20 standing. The family may retaliate against your business. Repeated defiance can put your life at risk."},
+		{ID: "ally", Label: "Seek backing from " + rival.Name, Cost: 35, Detail: "Pay $35 for an introduction. Gain 12 standing with their rival; lose 12 with this family. Business retaliation remains possible; a deepening feud can also put your life at risk."},
 	}}
 	w.Log("A family wants a share", f.Name+" has delivered a demand concerning "+target.Name+".", "politics")
 }
@@ -81,6 +81,9 @@ func (w *World) ResolvePressure(e *Scene, choice string) error {
 		}
 		if choice == "resist" {
 			w.Log("Taking a side", "You reject "+f.Name+"'s terms. The relationship has worsened.", "politics")
+		}
+		if f.Goodwill <= -40 {
+			w.RetaliationFrom(f.ID)
 		}
 		// A hidden decision is committed now, not invented at the moment of playback.
 		if w.Random() < .75 {
@@ -189,8 +192,8 @@ func (w *World) ResolveBeneficiary(id string) {
 	}
 	// Supporting rivals repeatedly can create a genuine feud, even without direct provocation.
 	for _, f := range w.Factions {
-		if f.ID == "bellandi" && f.Goodwill <= -30 {
-			w.Retaliation()
+		if f.Goodwill <= -30 {
+			w.RetaliationFrom(f.ID)
 		}
 	}
 }
