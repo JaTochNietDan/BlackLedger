@@ -181,3 +181,41 @@ func TestGeneratedFactionWorkHasValidatedPoliticalEffect(t *testing.T) {
 		t.Fatal("abandoned work granted favor")
 	}
 }
+
+func TestAllyPressureReportsBothRelationships(t *testing.T) {
+	w := pressureWorld()
+	w.Advance(30)
+	before := w.Player.Cash
+	next, err := Execute(w, Command{Kind: "choice", Event: w.Event.ID, Choice: "ally", Revision: w.Revision})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if next.Player.Cash != before-35 || next.Factions[0].Goodwill != -12 || next.Factions[1].Goodwill != 12 {
+		t.Fatal("incorrect alliance cost or standing")
+	}
+	record := next.History[len(next.History)-1]
+	for _, phrase := range []string{"Russo Outfit", "Bellandi Family", "+12", "-12", "does not guarantee protection"} {
+		if !strings.Contains(record.Text, phrase) {
+			t.Fatalf("missing political feedback %q: %s", phrase, record.Text)
+		}
+	}
+	if strings.Contains(record.Text, "sabotage") {
+		t.Fatal("private retaliation revealed")
+	}
+}
+
+func TestBookReviewDoesNotAdvanceCity(t *testing.T) {
+	w := pressureWorld()
+	w.Player.Location = "laundry"
+	w.Properties["laundry"].Condition = 85
+	next, err := Execute(w, Command{Kind: "inspect", Target: "laundry", Revision: w.Revision})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if next.Minute != w.Minute || next.Player.Cash != w.Player.Cash || next.Event != nil {
+		t.Fatal("inspection advanced economics or pressure")
+	}
+	if !strings.Contains(next.History[len(next.History)-1].Text, "$11/hour") {
+		t.Fatal("missing actual income")
+	}
+}

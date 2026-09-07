@@ -376,7 +376,7 @@ func (w *World) Actions(id string) []Action {
 	}
 	if id == "laundry" || id == "garage" || id == "casino" {
 		if w.Own(id) {
-			add("inspect", "Meet the manager", 30, 0, "", "Inspect income and repair needs.")
+			add("inspect", "Review the books", 0, 0, "", "Read current income and repair needs without advancing time.")
 			add("repair", "Repair the property", 60, 50, need(w.Properties[id].Condition >= 100, "Already in good condition"), "Restore 40 condition.")
 		} else {
 			req := 6
@@ -656,7 +656,11 @@ func (w *World) ValidateProposal(p Proposal) (*Scene, error) {
 			}
 		}
 		if !found {
-			return nil, fmt.Errorf("unknown beneficiary faction")
+			allowed := []string{""}
+			for _, f := range w.Factions {
+				allowed = append(allowed, f.ID)
+			}
+			return nil, fmt.Errorf("unknown beneficiary faction %q; use exactly one of %q", p.Beneficiary, allowed)
 		}
 	}
 	scene := &Scene{Operation: p.Operation, ID: ID(), Title: p.Title, Beneficiary: p.Beneficiary, Body: p.Body, Speaker: p.Speaker, Kind: "proposal", Source: "local-ai", Minute: w.Minute, Effect: fx, Outcome: map[string]string{"courier": "You delivered the sealed package and reported back.", "mediation": "You completed the requested mediation without violence.", "collection": "You collected the agreed payment and reported back."}[p.Operation], Choices: []Choice{{ID: "accept", Label: map[string]string{"courier": "Deliver the package", "mediation": "Mediate the dispute", "collection": "Collect the payment"}[p.Operation], Detail: fmt.Sprintf("$%d · %d minutes · +%d respect · +%d heat", fx.Reward, fx.Minutes, fx.Respect, fx.Heat) + " · At 15 heat, police may stop completion." + politicalDetail}, {ID: "decline", Label: "Decline the arrangement", Detail: "No cost or time."}}}

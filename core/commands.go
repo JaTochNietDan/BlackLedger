@@ -249,10 +249,11 @@ func (w *World) apply(c Command) error {
 					}
 				case "inspect":
 					l, _ := PlaceByID(target)
-					w.Log("The books are open", fmt.Sprintf("%s: %d%% condition. Income depends on its condition.", l.Name, w.Properties[target].Condition), "business")
+					w.Log("The books are open", fmt.Sprintf("%s: %d%% condition, earning $%d/hour of a possible $%d/hour. Repairs cost $50 and restore up to 40 condition.", l.Name, w.Properties[target].Condition, w.Properties[target].Income*w.Properties[target].Condition/100, w.Properties[target].Income), "business")
 				case "repair":
-					w.Properties[target].Condition = min(100, w.Properties[target].Condition+40)
-					w.Log("Repairs arranged", "The property is restored by 40 condition.", "business")
+					restored := min(40, 100-w.Properties[target].Condition)
+					w.Properties[target].Condition += restored
+					w.Log("Repairs arranged", fmt.Sprintf("The property is restored by %d condition, to %d%%.", restored, w.Properties[target].Condition), "business")
 				case "move_home":
 					p.BestHome = max(p.BestHome, HomeRank(p.Home))
 					if HomeRank(target) > p.BestHome {

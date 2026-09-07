@@ -67,8 +67,11 @@ func (w *World) ResolvePressure(e *Scene, choice string) error {
 			other := &w.Factions[1-actor]
 			other.Goodwill = min(100, other.Goodwill+12)
 			other.Cash += 35
+			w.Log("A rival introduction", fmt.Sprintf("You pay $35 for an introduction to %s. Their standing is now %+d; %s standing is now %+d. This does not guarantee protection.", other.Name, other.Goodwill, f.Name, f.Goodwill), "politics")
 		}
-		w.Log("Taking a side", "You reject "+f.Name+"'s terms. The relationship has worsened.", "politics")
+		if choice == "resist" {
+			w.Log("Taking a side", "You reject "+f.Name+"'s terms. The relationship has worsened.", "politics")
+		}
 		// A hidden decision is committed now, not invented at the moment of playback.
 		if w.Random() < .75 {
 			w.Plots = append(w.Plots, Plot{ID: ID(), Kind: "sabotage", Life: w.Life, Due: w.Minute + 120, Actor: f.ID, Target: e.Target, Strength: 35})

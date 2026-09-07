@@ -169,7 +169,11 @@ func (a *app) generate(snapshot *core.World) error {
 func (a *app) generateAttempt(snapshot *core.World, feedback string) error {
 	operation := snapshot.NextDirectorOperation()
 	connection := snapshot.DirectorConnection()
-	contextData := map[string]any{"validation_feedback": feedback, "required_operation": operation, "required_connection": connection, "recent_arrangements": snapshot.Arrangements, "life": snapshot.Life, "minute": snapshot.Minute, "player": snapshot.Player, "factions": snapshot.Factions, "npcs": snapshot.NPCs, "dead": snapshot.Dead, "places": core.Locations, "properties": snapshot.Properties, "recent_history": snapshot.History[max(0, len(snapshot.History)-12):]}
+	beneficiaries := []string{""}
+	for _, faction := range snapshot.Factions {
+		beneficiaries = append(beneficiaries, faction.ID)
+	}
+	contextData := map[string]any{"allowed_beneficiary_ids": beneficiaries, "current_clock": fmt.Sprintf("Day %d, %02d:%02d", snapshot.Minute/1440+1, snapshot.Minute%1440/60, snapshot.Minute%60), "validation_feedback": feedback, "required_operation": operation, "required_connection": connection, "recent_arrangements": snapshot.Arrangements, "life": snapshot.Life, "minute": snapshot.Minute, "player": snapshot.Player, "factions": snapshot.Factions, "npcs": snapshot.NPCs, "dead": snapshot.Dead, "places": core.Locations, "properties": snapshot.Properties, "recent_history": snapshot.History[max(0, len(snapshot.History)-12):]}
 	b, _ := json.Marshal(contextData)
 	payload, _ := json.Marshal(map[string]any{"model": env("BLACK_LEDGER_MODEL", "qwen3:14b"), "stream": false, "think": false, "format": "json", "messages": []map[string]string{{"role": "system", "content": prompt}, {"role": "user", "content": string(b)}}, "options": map[string]any{"temperature": .8, "num_predict": 700}})
 	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
