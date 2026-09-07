@@ -200,6 +200,9 @@ func (a *app) generateAttempt(snapshot *core.World, feedback string) error {
 	if e = json.Unmarshal([]byte(answer.Message.Content), &proposal); e != nil {
 		return proposalRejected{fmt.Errorf("response must be a complete JSON object matching the proposal schema")}
 	}
+	if err := repeatedProposal(snapshot, proposal); err != nil {
+		return proposalRejected{err}
+	}
 	if connection != nil && (proposal.Speaker != connection.Speaker || proposal.Beneficiary != connection.Beneficiary) {
 		return proposalRejected{fmt.Errorf("director ignored the established contact connection")}
 	}

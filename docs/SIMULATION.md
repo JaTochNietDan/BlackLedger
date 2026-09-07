@@ -30,3 +30,15 @@ The first run uses `-seed` exactly. Later runs add the 32-bit Weyl stride `0x9e3
 Milestone medians are conditional on reaching that milestone; the accompanying reach count is essential. Final cash is not normalized by elapsed game time, so compare it with game minutes and policy behavior. A command limit is not a wall-clock playtime estimate. Automated runs cannot prove 20–30-minute human pacing, dialogue coherence, tension or UI quality.
 
 Recorded live-proposal replay, more nuanced political strategies and long-term balance experiments are follow-up work. The runner currently stops at first death; browser/core tests separately cover new lives and persistent property history.
+
+## Recorded proposal replay
+
+```sh
+go run ./cmd/simulate -runs 100 -steps 160 -director replay -corpus tests/corpora/local-mediation-20260907.json > replay-report.json
+```
+
+The corpus is one JSON array of `core.Proposal` objects, bounded to 128 proposals/2 MiB. Unknown fields, invalid operations/speakers/factions/approaches and trailing JSON are rejected before a campaign starts. The report fingerprints the exact input with SHA-256. At eligible 240-minute preparation boundaries, each proposal is queued once in file order, with normal 30-minute arrival delay and production validation. Exhaustion resumes authored-only play; the corpus does not loop. Per-campaign `replay_queued` exposes how much of it was exercised; a character may die before any replay arrives.
+
+This replays **gameplay payloads**, not the original campaign or the model's reasoning. A story generated in one world may be narratively inappropriate in another. Matching original context, operation/contact briefs and semantic novelty remain separate live-director checks. The same corpus/seed/policy/version reproduces mechanical outcomes; it does not establish story quality. No network or model calls occur in replay mode.
+
+The included local-model sample was generated with qwen3:14b from the earned campaign on 2026-09-07. It repeats a prior garage dispute and is intentionally retained as a known-bad story example, not curated writing. Its bounded gameplay proposal is valid. The production director now rejects a matching recent title or identical offer before queueing and uses its normal bounded correction attempt; replay deliberately tests the payload independently of that contextual novelty gate.

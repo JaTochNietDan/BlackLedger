@@ -39,19 +39,20 @@ type Step struct {
 	Command core.Command `json:"command"`
 }
 type Report struct {
-	Seed       uint32         `json:"seed"`
-	Strategy   string         `json:"strategy"`
-	Director   string         `json:"director"`
-	Commands   int            `json:"commands"`
-	Minutes    int            `json:"game_minutes"`
-	Alive      bool           `json:"alive"`
-	Cash       int            `json:"cash"`
-	Respect    int            `json:"respect"`
-	Milestones map[string]int `json:"milestone_commands"`
-	Actions    map[string]int `json:"action_counts"`
-	Events     map[string]int `json:"event_counts"`
-	Error      string         `json:"error,omitempty"`
-	Trace      []Step         `json:"trace,omitempty"`
+	Seed         uint32         `json:"seed"`
+	Strategy     string         `json:"strategy"`
+	Director     string         `json:"director"`
+	Commands     int            `json:"commands"`
+	Minutes      int            `json:"game_minutes"`
+	Alive        bool           `json:"alive"`
+	Cash         int            `json:"cash"`
+	Respect      int            `json:"respect"`
+	Milestones   map[string]int `json:"milestone_commands"`
+	Actions      map[string]int `json:"action_counts"`
+	Events       map[string]int `json:"event_counts"`
+	Error        string         `json:"error,omitempty"`
+	ReplayQueued int            `json:"replay_queued,omitempty"`
+	Trace        []Step         `json:"trace,omitempty"`
 }
 
 func Public(w *core.World) View {
@@ -177,19 +178,31 @@ func Choose(v View, strategy string) (core.Command, error) {
 	return core.Command{}, fmt.Errorf("no policy action at %s", v.Player.Location)
 }
 func Run(seed uint32, strategy, director string, limit int, trace bool) Report {
+	return RunRecorded(seed, strategy, director, limit, trace, nil)
+}
+
+// RunRecorded consumes each recorded proposal once; exhaustion falls back to authored play.
+func RunRecorded(seed uint32, strategy, director string, limit int, trace bool, corpus []core.Proposal) Report {
 	r := Report{Seed: seed, Strategy: strategy, Director: director, Milestones: map[string]int{}, Actions: map[string]int{}, Events: map[string]int{}}
 	w := core.New(seed)
 	start := w.Minute
 	nextOffer := start + 240
+	cursor := 0
 	for i := 0; i < limit && w.Player.Alive; i++ {
 		// This is a deterministic test provider, not the real AI director. It uses the same validator.
-		if director == "fixture" && w.Minute >= nextOffer && w.Event == nil && len(w.Offers) == 0 {
+		if (director == "fixture" || (director == "replay" && cursor < len(corpus))) && w.Minute >= nextOffer && w.Event == nil && len(w.Offers) == 0 {
 			operation := w.NextDirectorOperation()
 			p := core.Proposal{Title: "Simulation arrangement", Body: "I need help with a discreet neighborhood job.", Speaker: "mara", Operation: operation, Outcome: "The agreed job is complete.", Approaches: []core.Approach{{Method: "careful", Label: "Prepare carefully"}, {Method: "press", Label: "Push the schedule"}}}
+			if director == "replay" {
+				p = corpus[cursor]
+			}
 			scene, err := w.ValidateProposal(p)
 			if err != nil {
 				r.Error = err.Error()
 				break
+			}
+			if director == "replay" {
+				cursor++
 			}
 			w.Offers = append(w.Offers, core.Offer{Ready: w.Minute + 30, Event: scene})
 			nextOffer = w.Minute + 240
@@ -225,6 +238,7 @@ func Run(seed uint32, strategy, director string, limit int, trace bool) Report {
 			}
 		}
 	}
+	r.ReplayQueued = cursor
 	r.Minutes = w.Minute - start
 	r.Cash = w.Player.Cash
 	r.Respect = w.Player.Respect

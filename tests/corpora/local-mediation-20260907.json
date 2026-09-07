@@ -1,0 +1,20 @@
+[
+  {
+    "title": "A Dispute at the Garage",
+    "body": "The Russo Motor Works is having a disagreement between two mechanics over the use of a specific tool. One says the other borrowed it without asking, and the other claims it was left behind. I can\u2019t have this turning into a fight, not with the Bellandi men watching. If you can talk them into splitting the space or sharing the tool, I\u2019ll owe you a favor.",
+    "speaker": "elena",
+    "operation": "mediation",
+    "outcome": "You completed the requested mediation without violence. You pushed the schedule and drew more attention.",
+    "beneficiary": "russo",
+    "approaches": [
+      {
+        "method": "careful",
+        "label": "Check the garage for the tool before negotiating"
+      },
+      {
+        "method": "press",
+        "label": "Push for a prompt agreement to avoid delays"
+      }
+    ]
+  }
+]
