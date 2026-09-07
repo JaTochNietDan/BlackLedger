@@ -12,13 +12,13 @@ import (
 
 func main() {
 	if len(os.Args) < 2 || len(os.Args) > 3 {
-		log.Fatal("usage: go run ./cmd/qa-fixture <new-qa.sqlite3> [police|damage|warning|russo-warning|attack|voice|contact]")
+		log.Fatal("usage: go run ./cmd/qa-fixture <new-qa.sqlite3> [police|damage|warning|russo-warning|attack|voice|contact|paused-job]")
 	}
 	scenario := "police"
 	if len(os.Args) == 3 {
 		scenario = os.Args[2]
 	}
-	if scenario != "police" && scenario != "damage" && scenario != "warning" && scenario != "russo-warning" && scenario != "attack" && scenario != "voice" && scenario != "contact" {
+	if scenario != "police" && scenario != "damage" && scenario != "warning" && scenario != "russo-warning" && scenario != "attack" && scenario != "voice" && scenario != "contact" && scenario != "paused-job" {
 		log.Fatal("unsupported QA scenario")
 	}
 	path := os.Args[1]
@@ -36,6 +36,22 @@ func main() {
 	}
 	defer s.DB.Close()
 	err = s.Change(func(w *core.World) error {
+		if scenario == "paused-job" {
+			w.Player.Cash = 200
+			w.Properties["laundry"].Owner = "player:1"
+			w.NextPressure = w.Minute + 30
+			e, err := w.ValidateProposal(core.Proposal{Location: "bar", Title: "A sealed message", Body: "Deliver a message at Saint Agnes.", Speaker: "mara", Operation: "courier", Outcome: "Delivered."})
+			if err != nil {
+				return err
+			}
+			w.Event = e
+			next, err := core.Execute(w, core.Command{Revision: w.Revision, Kind: "choice", Event: e.ID, Choice: "accept"})
+			if err != nil {
+				return err
+			}
+			*w = *next
+			return nil
+		}
 		if scenario == "contact" {
 			w.Player.Crew = []core.Crew{{ID: "leo", Name: "Leo Carver", Loyalty: 65}}
 			w.Player.Respect = 6

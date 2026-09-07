@@ -158,6 +158,7 @@ type Result struct {
 	Records []Record    `json:"records"`
 }
 type World struct {
+	SuspendedJob   *SuspendedJob        `json:"suspended_job,omitempty"`
 	VisualCues     []VisualCue          `json:"-"`
 	Arrangements   []ArrangementMemory  `json:"arrangements,omitempty"`
 	NextPressure   int                  `json:"next_pressure,omitempty"`
@@ -470,6 +471,7 @@ func (w *World) factionName(id string) string {
 	return "An unidentified family"
 }
 func (w *World) Die(cause string) {
+	w.SuspendedJob = nil
 	p := &w.Player
 	p.Alive = false
 	p.Health = 0
@@ -655,7 +657,7 @@ func (w *World) hasRecord(title string) bool {
 func (w *World) OfferIfReady() {
 	// Leave room to prepare for discovered danger. Hidden plots must not
 	// change offer timing and indirectly reveal themselves.
-	if !w.Player.Alive || w.Event != nil || len(w.KnownThreats()) > 0 {
+	if !w.Player.Alive || w.Event != nil || w.SuspendedJob != nil || len(w.KnownThreats()) > 0 {
 		return
 	}
 	if len(w.Offers) > 0 && w.Minute >= w.Offers[0].Ready {

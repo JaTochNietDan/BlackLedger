@@ -32,6 +32,7 @@ func (w *World) apply(c Command) error {
 		w.Offers = []Offer{}
 		w.Plots = []Plot{}
 		w.BusinessTruces = nil
+		w.SuspendedJob = nil
 		w.NextPressure = 0
 		for i := range w.NPCs {
 			w.NPCs[i].Trust = 0
@@ -110,6 +111,19 @@ func (w *World) apply(c Command) error {
 			if err := w.ResolvePressure(e, c.Choice); err != nil {
 				return err
 			}
+			w.OfferResume()
+		case "resume_job":
+			saved := w.SuspendedJob
+			if saved == nil || saved.Scene == nil {
+				return fmt.Errorf("no suspended arrangement")
+			}
+			w.SuspendedJob = nil
+			if c.Choice == "resume" {
+				w.RunArrangement(saved.Scene, saved.Remaining)
+			} else {
+				w.RememberArrangement(saved.Scene, "abandoned")
+				w.Log("The arrangement abandoned", "You abandon the remaining work. No reward was paid.", "story")
+			}
 		case "police_stop":
 			if c.Choice == "pay" {
 				p.Heat = max(0, p.Heat-10)
@@ -131,18 +145,7 @@ func (w *World) apply(c Command) error {
 				}
 			}
 			if c.Choice == "accept" || hasAlternative {
-				w.RememberArrangement(e, "in_progress")
-				w.Advance(e.Effect.Minutes)
-				if p.Alive && w.Event == nil {
-					if p.Heat+e.Effect.Heat >= 15 {
-						w.PoliceStop(e)
-					} else {
-						w.CompleteArrangement(e)
-					}
-				} else {
-					w.RememberArrangement(e, "interrupted")
-					w.Log("An interrupted arrangement", "The operation could not be completed. No reward was paid.", "story")
-				}
+				w.RunArrangement(e, e.Effect.Minutes)
 			} else {
 				w.RememberArrangement(e, "declined")
 				w.Log("An offer declined", "You decline "+w.NPC(e.Speaker).Name+"'s proposal. No payment changes hands.", "story")

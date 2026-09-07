@@ -25,7 +25,7 @@ The player stores `best_home` for one-time housing-tier progression. Estate owne
 
 ## Contextual approaches in AI offers
 
-A proposal may include up to two `approaches`, each with a `method` and short player-facing `label`. Supported methods are `careful` (+30 minutes, −$15 reward, up to 3 less heat) and `press` (15 fewer minutes, +$20, +5 heat). Unknown/duplicate methods and oversized labels are rejected. Standard acceptance and refusal remain available. The saved scene contains authoritative effects for each offered approach; forged choices are rejected. Police interruptions preserve the selected terms, while another event interrupting the work grants no completion reward or faction credit. Omitted approaches preserve compatibility with existing offers.
+A proposal may include up to two `approaches`, each with a `method` and short player-facing `label`. Supported methods are `careful` (+30 minutes, −$15 reward, up to 3 less heat) and `press` (15 fewer minutes, +$20, +5 heat). Unknown/duplicate methods and oversized labels are rejected. Standard acceptance and refusal remain available. The saved scene contains authoritative effects for each offered approach; forged choices are rejected. Police interruptions preserve the selected terms, while urgent danger interrupting the work grants no completion reward or faction credit. Business demands pause work for a resume-or-abandon decision. Omitted approaches preserve compatibility with existing offers.
 
 ## Director contact progression
 
@@ -44,3 +44,9 @@ Audiences now offer a $100 business ceasefire with the represented family. It la
 `business_truces` is an optional public map of faction ID to active expiry minute. Empty/expired agreements are omitted from that map; private plans are never included. The Families panel shows active terms and the director receives the same public agreement context. This audience option does not authorize arbitrary model-written treaties or territorial divisions.
 
 Routine queued/authored offers wait while discovered current-life threats remain active. They stay saved and become eligible again after the danger clears; hidden plots do not affect this pacing rule. Player-initiated audiences remain available during danger. This changes encounter delivery, not proposal generation or the simulation clock.
+
+## Work paused by business demands
+
+A business demand during an accepted arrangement saves its original scene, selected approach and remaining minutes in `suspended_job`. Resolving the demand opens an authored `resume_job` decision. Resume spends only the remainder, preserving the original reward/heat/standing and applying normal police checks; abandon spends no additional time and grants no reward. Repeated demands can pause the remainder again. A demand exactly at job completion still defers payment until the player chooses resume (zero remaining minutes).
+
+No other activity is committed behind this decision. Routine offers wait while work is suspended. Attacks, urgent warnings and death still fail the operation; this is not a general guarantee of successful work. Death/new life clear suspended work. Older saves without this optional field retain existing behavior. Story memory uses `paused` until resumed or abandoned.
