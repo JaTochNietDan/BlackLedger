@@ -397,3 +397,9 @@
 - The simple reviewer accepted everything (3/7 scored matches). An evidence-first audit found the labeled bad offers but rejected both valid controls and produced one invalid excerpt (4/7 matches, one invalid response). Some matching rejections used incorrect reasons. Neither variant is suitable as a production gate.
 - Added reproducible corpus/results and `--cases` / `--audit` modes; Python compilation and diff checks pass. Raw parsed output is now retained for future invalid responses; the recorded audit predates that last diagnostic improvement. See STORY_REVIEW.md for limitations and next experiments.
 - Confirmed the active task goal matches the visual-handoff scope and clarified current gameplay acceptance priorities in GOAL.md. Keep-awake process remains active.
+
+## Discard drafts prepared against obsolete world facts
+- Revalidate property ownership, speaker identity/affiliation and fresh-contact eligibility inside the save transaction before adding a generated offer. Ordinary clock/cash/damage changes are allowed; completed continuations can survive lower goodwill if their canonical saved result remains unchanged.
+- Stale drafts return a distinct error and do not retry the obsolete snapshot. The background director returns to available, or ready if an earlier offer remains queued. Player actions are preserved. Existing queued offers are not retroactively checked by this change; semantic claims in current dialogue remain a separate unresolved issue.
+- Full `go test -race ./...` passes. Regression tests simulate a property acquisition during the model HTTP request and verify no offer is queued, no purchase is overwritten and no obsolete retry is made; also cover departed/disloyal contacts, changed identity/leadership, legitimate progress and canonical follow-ups.
+- No user server restart or user-save mutation. This source change requires an integrated isolated playtest before claiming it in the running main preview.

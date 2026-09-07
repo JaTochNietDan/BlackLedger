@@ -10,22 +10,7 @@ func directorSpeakers(w *core.World, connection *core.ArrangementMemory) []strin
 	if connection != nil {
 		return []string{connection.Speaker}
 	}
-	eligible := map[string]bool{"mara": true}
-	for _, crew := range w.Player.Crew {
-		if crew.Loyalty >= 30 {
-			eligible[crew.ID] = true
-		}
-	}
-	for _, faction := range w.Factions {
-		if faction.Goodwill < 6 {
-			continue
-		}
-		for _, npc := range w.NPCs {
-			if npc.Name == faction.Leader {
-				eligible[npc.ID] = true
-			}
-		}
-	}
+	eligible := eligibleDirectorSpeakers(w)
 	seen := map[string]int{}
 	order := 0
 	for _, memory := range w.Arrangements {
@@ -59,4 +44,24 @@ func directorSpeakers(w *core.World, connection *core.ArrangementMemory) []strin
 		}
 	}
 	return result
+}
+
+func eligibleDirectorSpeakers(w *core.World) map[string]bool {
+	eligible := map[string]bool{"mara": true}
+	for _, crew := range w.Player.Crew {
+		if crew.Loyalty >= 30 {
+			eligible[crew.ID] = true
+		}
+	}
+	for _, faction := range w.Factions {
+		if faction.Goodwill < 6 {
+			continue
+		}
+		for _, npc := range w.NPCs {
+			if npc.Name == faction.Leader {
+				eligible[npc.ID] = true
+			}
+		}
+	}
+	return eligible
 }

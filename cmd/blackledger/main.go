@@ -143,6 +143,14 @@ func (a *app) prepare() bool {
 				if w.ID == snapshot.ID && w.Life == snapshot.Life {
 					w.Director.Status = "offline"
 					w.Director.Detail = "Local AI unavailable or proposal rejected. Authored play remains available."
+					if errors.Is(e, errDirectorContextChanged) {
+						w.Director.Status = "available"
+						w.Director.Detail = "The situation changed while this encounter was being prepared. A new arrangement can be requested."
+						if len(w.Offers) > 0 {
+							w.Director.Status = "ready"
+							w.Director.Detail = "An earlier encounter is ready. The outdated new draft was discarded."
+						}
+					}
 				}
 				return nil
 			})
@@ -250,6 +258,9 @@ func (a *app) generateAttempt(snapshot *core.World, feedback string) error {
 	return a.s.Change(func(w *core.World) error {
 		if w.ID != snapshot.ID || w.Life != snapshot.Life || !w.Player.Alive {
 			return nil
+		}
+		if err := validateDirectorFreshness(snapshot, w, proposal, connection); err != nil {
+			return err
 		}
 		if err := repeatedProposal(w, proposal); err != nil {
 			return proposalRejected{err}
