@@ -1,0 +1,46 @@
+{
+  "model": "qwen3:14b",
+  "date": "2026-09-07",
+  "context": "Copies of the same earned campaign at Day 2 10:40. Manual quality evaluation, not statistically controlled model benchmarking.",
+  "samples": [
+    {
+      "variant": "exact-duplicate-guard",
+      "minute": 2080,
+      "status": "ready",
+      "offers": [
+        {
+          "title": "A Debt at the Casino",
+          "body": "\u201cThe Blue Hour needs a payment collected discreetly. A bookmaker left a sealed envelope under the counter last night, but the owner is too nervous to collect it himself. I need someone who can take it without drawing attention. You\u2019ve handled quiet jobs before, and I trust you to keep it that way.\u201d",
+          "operation": "collection",
+          "speaker": "mara"
+        }
+      ]
+    },
+    {
+      "variant": "passage-overlap-guard",
+      "minute": 2080,
+      "status": "ready",
+      "offers": [
+        {
+          "title": "A Payment in the Shadows",
+          "body": "\u201cThe Bluebird Laundry has a payment waiting for them, but the owner is too scared to collect it. I need someone who can take it without drawing attention. You\u2019ve done this before, and I trust you to keep it quiet. If you handle this, I\u2019ll make sure the owner gets a better deal next time.\u201d",
+          "operation": "collection",
+          "speaker": "mara"
+        }
+      ]
+    },
+    {
+      "variant": "summarized-older-offers",
+      "minute": 2080,
+      "status": "ready",
+      "offers": [
+        {
+          "title": "A Payment Owed at the Laundry",
+          "body": "I need you to collect a payment owed by a customer at the Bluebird Laundry. They\u2019ve been delaying their payments for weeks, and I can\u2019t afford to let this slide. I don\u2019t want any trouble\u2014just retrieve what\u2019s due and bring it back discreetly. This is a small matter, but it\u2019s important to me.",
+          "operation": "collection",
+          "speaker": "mara"
+        }
+      ]
+    }
+  ]
+}
