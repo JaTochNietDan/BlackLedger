@@ -12,13 +12,13 @@ import (
 
 func main() {
 	if len(os.Args) < 2 || len(os.Args) > 3 {
-		log.Fatal("usage: go run ./cmd/qa-fixture <new-qa.sqlite3> [police|damage|warning|russo-warning|attack|voice]")
+		log.Fatal("usage: go run ./cmd/qa-fixture <new-qa.sqlite3> [police|damage|warning|russo-warning|attack|voice|contact]")
 	}
 	scenario := "police"
 	if len(os.Args) == 3 {
 		scenario = os.Args[2]
 	}
-	if scenario != "police" && scenario != "damage" && scenario != "warning" && scenario != "russo-warning" && scenario != "attack" && scenario != "voice" {
+	if scenario != "police" && scenario != "damage" && scenario != "warning" && scenario != "russo-warning" && scenario != "attack" && scenario != "voice" && scenario != "contact" {
 		log.Fatal("unsupported QA scenario")
 	}
 	path := os.Args[1]
@@ -36,6 +36,12 @@ func main() {
 	}
 	defer s.DB.Close()
 	err = s.Change(func(w *core.World) error {
+		if scenario == "contact" {
+			w.Player.Crew = []core.Crew{{ID: "leo", Name: "Leo Carver", Loyalty: 65}}
+			w.Player.Respect = 6
+			w.Arrangements = []core.ArrangementMemory{{ID: core.ID(), Life: w.Life, Speaker: "mara", Operation: "courier", Status: "declined", Title: "A courier offer declined"}}
+			return nil
+		}
 		if scenario == "attack" {
 			w.Player.Location = "laundry"
 			w.Properties["laundry"].Owner = "player:1"

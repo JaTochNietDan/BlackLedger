@@ -8,11 +8,8 @@ func proposalSchema(w *core.World, operation string, connection *core.Arrangemen
 		return map[string]any{"type": "string", "minLength": min, "maxLength": max}
 	}
 	enum := func(values []string) map[string]any { return map[string]any{"type": "string", "enum": values} }
-	speakers := []string{}
+	speakers := directorSpeakers(w, connection)
 	beneficiaries := []string{""}
-	for _, n := range w.NPCs {
-		speakers = append(speakers, n.ID)
-	}
 	for _, f := range w.Factions {
 		beneficiaries = append(beneficiaries, f.ID)
 	}

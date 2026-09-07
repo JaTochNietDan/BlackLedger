@@ -183,6 +183,7 @@ func (a *app) generateAttempt(snapshot *core.World, feedback string) error {
 		activePrompt = focusedPrompt
 		contextData = focusedContext(snapshot, operation, connection, feedback, beneficiaries)
 	}
+	contextData["allowed_speaker_ids"] = directorSpeakers(snapshot, connection)
 	b, _ := json.Marshal(contextData)
 	payload, _ := json.Marshal(map[string]any{"model": env("BLACK_LEDGER_MODEL", "qwen3:14b"), "stream": false, "think": false, "format": responseFormat, "messages": []map[string]string{{"role": "system", "content": activePrompt}, {"role": "user", "content": string(b)}}, "options": map[string]any{"temperature": .8, "num_predict": 700}})
 	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
@@ -211,6 +212,13 @@ func (a *app) generateAttempt(snapshot *core.World, feedback string) error {
 	}
 	if err := repeatedProposal(snapshot, proposal); err != nil {
 		return proposalRejected{err}
+	}
+	allowedSpeaker := false
+	for _, id := range directorSpeakers(snapshot, connection) {
+		allowedSpeaker = allowedSpeaker || id == proposal.Speaker
+	}
+	if !allowedSpeaker {
+		return proposalRejected{fmt.Errorf("speaker must be one of the available contacts %q", directorSpeakers(snapshot, connection))}
 	}
 	if env("BLACK_LEDGER_DIRECTOR_BRIEF", "full") == "focused" {
 		if err := validateBriefOpening(proposal.Body, jobBrief(snapshot, operation, connection)); err != nil {

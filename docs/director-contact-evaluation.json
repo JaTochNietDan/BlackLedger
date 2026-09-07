@@ -1,0 +1,116 @@
+{
+  "date": "2026-09-07",
+  "model": "qwen3:14b",
+  "mode": "full with structured schema",
+  "scenario": "isolated contact fixture: Leo recruited, prior Mara offer declined",
+  "assessment": "Correct speaker Leo; brings a mediation lead concerning garage books, no false completion of declined job. Russo standing benefit agrees with canonical choice. One sample; not proof of broad coherence or role accuracy. Garage request can be offered before district unlock because abstract jobs currently do not require access to their prose location.",
+  "offer": {
+    "ready": 510,
+    "event": {
+      "operation": "mediation",
+      "alternatives": {
+        "approach:careful": {
+          "reward": 40,
+          "respect": 5,
+          "heat": 0,
+          "minutes": 90
+        },
+        "approach:press": {
+          "reward": 75,
+          "respect": 5,
+          "heat": 5,
+          "minutes": 45
+        }
+      },
+      "beneficiary": "russo",
+      "id": "3918f86ff3987db0576901acd37bef01",
+      "title": "A disagreement over the books",
+      "body": "I\u2019ve been talking to the garage manager. He\u2019s got a problem with the bookkeeper\u2014says the numbers don\u2019t add up. If you can sort this out, the Russo Outfit will see you as a man who keeps things in order. No need for violence, just make sure the books match the cash.",
+      "speaker": "leo",
+      "choices": [
+        {
+          "id": "accept",
+          "label": "Mediate the dispute",
+          "detail": "$55 \u00b7 60 minutes \u00b7 +5 respect \u00b7 +0 heat \u00b7 At 15 heat, police may stop completion. \u00b7 Russo Outfit standing +6; rival standing \u22123.",
+          "cost": 0,
+          "disabled": false
+        },
+        {
+          "id": "approach:careful",
+          "label": "speak quietly to the bookkeeper",
+          "detail": "$40 \u00b7 90 minutes \u00b7 +5 respect \u00b7 +0 heat \u00b7 At 15 heat, police may stop completion. \u00b7 Russo Outfit standing +6; rival standing \u22123.",
+          "cost": 0,
+          "disabled": false
+        },
+        {
+          "id": "approach:press",
+          "label": "challenge the ledger directly",
+          "detail": "$75 \u00b7 45 minutes \u00b7 +5 respect \u00b7 +5 heat \u00b7 At 15 heat, police may stop completion. \u00b7 Russo Outfit standing +6; rival standing \u22123.",
+          "cost": 0,
+          "disabled": false
+        },
+        {
+          "id": "decline",
+          "label": "Decline the arrangement",
+          "detail": "No cost or time.",
+          "cost": 0,
+          "disabled": false
+        }
+      ],
+      "kind": "proposal",
+      "source": "local-ai",
+      "minute": 480,
+      "effect": {
+        "reward": 55,
+        "respect": 5,
+        "heat": 0,
+        "minutes": 60
+      },
+      "outcome": "You completed the requested mediation without violence."
+    }
+  },
+  "browser_result": {
+    "minute": 585,
+    "player": {
+      "name": "Alex Varga",
+      "cash": 135,
+      "health": 100,
+      "respect": 11,
+      "heat": 0,
+      "location": "bar",
+      "home": "room",
+      "security": 0,
+      "contacts": 1,
+      "crew": [
+        {
+          "id": "leo",
+          "name": "Leo Carver",
+          "loyalty": 65
+        }
+      ],
+      "alive": true,
+      "earned": 55,
+      "job_count": 0
+    },
+    "factions": [
+      {
+        "id": "bellandi",
+        "name": "Bellandi Family",
+        "leader": "Vittorio Bellandi",
+        "power": 90,
+        "goodwill": -3,
+        "cash": 8000
+      },
+      {
+        "id": "russo",
+        "name": "Russo Outfit",
+        "leader": "Elena Russo",
+        "power": 58,
+        "goodwill": 6,
+        "cash": 4500
+      }
+    ],
+    "event": null,
+    "method": "Browser: travel to Saint Agnes, coffee, accept generated mediation. No injected state after fixture creation."
+  }
+}

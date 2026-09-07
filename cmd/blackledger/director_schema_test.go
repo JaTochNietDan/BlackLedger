@@ -20,7 +20,7 @@ func TestProposalSchemaRestrictsFollowUpIdentity(t *testing.T) {
 		t.Fatal("arbitrary model fields allowed")
 	}
 	fresh := proposalSchema(w, "mediation", nil)["properties"].(map[string]any)
-	if len(fresh["speaker"].(map[string]any)["enum"].([]string)) != len(w.NPCs) {
-		t.Fatal("fresh speaker choices restricted")
+	if values := fresh["speaker"].(map[string]any)["enum"].([]string); len(values) != 1 || values[0] != "mara" {
+		t.Fatal("newcomer was offered unestablished contacts")
 	}
 }

@@ -15,3 +15,5 @@ Use allowed_beneficiary_ids literally: the empty string means neutral, not "neut
 Only the displayed job reward and standing changes are available. Never promise rent reductions, free housing, protection, property upgrades, new crew, canceled threats, or another future benefit as payment. Do not invent a landlord or owner contrary to properties: a player-owned business belongs to the current player’s organization; describe its staff or manager when appropriate.
 
 Do not promise the location, subject, timing or reward of a future job. The current offer is the only arrangement being proposed.
+
+Use a speaker from allowed_speaker_ids. This list reflects established contacts and recent appearances; the other NPC records are context, not permission to speak as them. A crew member brings a lead to their boss; a family leader requests a favor for their own family. Preserve the current hierarchy and identity when writing the offer.
