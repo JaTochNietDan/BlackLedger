@@ -19,6 +19,9 @@ func proposalSchema(w *core.World, operation string, connection *core.Arrangemen
 	for _, f := range w.Factions {
 		beneficiaries = append(beneficiaries, f.ID)
 	}
+	if len(speakers) == 1 {
+		beneficiaries = speakerBeneficiaries(w, speakers[0])
+	}
 	if connection != nil {
 		speakers = []string{connection.Speaker}
 		beneficiaries = []string{connection.Beneficiary}

@@ -1,0 +1,75 @@
+{
+  "date": "2026-09-07",
+  "model": "qwen3:14b",
+  "mode": "full prompt, structured schema",
+  "scenario": "Isolated leader fixture; Russo standing9, most recent Mara offer declined",
+  "offer": {
+    "ready": 510,
+    "event": {
+      "operation": "mediation",
+      "alternatives": {
+        "approach:careful": {
+          "reward": 40,
+          "respect": 5,
+          "heat": 0,
+          "minutes": 90
+        },
+        "approach:press": {
+          "reward": 75,
+          "respect": 5,
+          "heat": 5,
+          "minutes": 45
+        }
+      },
+      "beneficiary": "russo",
+      "target": "laundry",
+      "id": "cfa6f01a1da568e6adf3298006c00f5c",
+      "title": "A Shift in Schedules",
+      "body": "I need you to settle a disagreement between two of my men over the shift hours at the Bluebird Laundry. One insists on starting at dawn, the other wants to begin after the morning rush. It\u2019s a small thing, but the laundry\u2019s manager is growing impatient. Handle it quietly, and I\u2019ll owe you a favor.",
+      "speaker": "elena",
+      "choices": [
+        {
+          "id": "accept",
+          "label": "Mediate the dispute",
+          "detail": "Bluebird Laundry \u00b7 $55 \u00b7 60 minutes \u00b7 +5 respect \u00b7 +0 heat \u00b7 At 15 heat, police may stop completion. \u00b7 Russo Outfit standing +6; rival standing \u22123.",
+          "cost": 0,
+          "disabled": false
+        },
+        {
+          "id": "approach:careful",
+          "label": "arrange a meeting",
+          "detail": "Bluebird Laundry \u00b7 $40 \u00b7 90 minutes \u00b7 +5 respect \u00b7 +0 heat \u00b7 At 15 heat, police may stop completion. \u00b7 Russo Outfit standing +6; rival standing \u22123.",
+          "cost": 0,
+          "disabled": false
+        },
+        {
+          "id": "approach:press",
+          "label": "push for resolution",
+          "detail": "Bluebird Laundry \u00b7 $75 \u00b7 45 minutes \u00b7 +5 respect \u00b7 +5 heat \u00b7 At 15 heat, police may stop completion. \u00b7 Russo Outfit standing +6; rival standing \u22123.",
+          "cost": 0,
+          "disabled": false
+        },
+        {
+          "id": "decline",
+          "label": "Decline the arrangement",
+          "detail": "No cost or time.",
+          "cost": 0,
+          "disabled": false
+        }
+      ],
+      "kind": "proposal",
+      "source": "local-ai",
+      "minute": 480,
+      "effect": {
+        "reward": 55,
+        "respect": 5,
+        "heat": 0,
+        "minutes": 60
+      },
+      "outcome": "You completed the requested mediation without violence."
+    }
+  },
+  "assessment": "Speaker and beneficiary align. Concrete shift-hours mediation at a valid venue. Owe-you-a-favor wording remains ambiguous: this operation grants the displayed reward and standing, not a separate callable favor. One sample is not proof of broad semantic coherence.",
+  "binary": ".runtime/blackledger-affiliation",
+  "note": "Live sample preceded the later English prompt/script guard; that guard was tested separately."
+}

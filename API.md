@@ -50,3 +50,9 @@ Routine queued/authored offers wait while discovered current-life threats remain
 A business demand during an accepted arrangement saves its original scene, selected approach and remaining minutes in `suspended_job`. Resolving the demand opens an authored `resume_job` decision. Resume spends only the remainder, preserving the original reward/heat/standing and applying normal police checks; abandon spends no additional time and grants no reward. Repeated demands can pause the remainder again. A demand exactly at job completion still defers payment until the player chooses resume (zero remaining minutes).
 
 No other activity is committed behind this decision. Routine offers wait while work is suspended. Attacks, urgent warnings and death still fail the operation; this is not a general guarantee of successful work. Death/new life clear suspended work. Older saves without this optional field retain existing behavior. Story memory uses `paused` until resumed or abandoned.
+
+## Generated speaker affiliation and choice script
+
+For new AI jobs, family leaders must name their own family as beneficiary. Independent contacts and crew may bring neutral or either-family work. The generation context supplies allowed speaker/beneficiary pairings; a single eligible leader also narrows the decoding schema. Server validation rejects contradictory pairings and requests a bounded correction. Existing saved offers retain their terms; an inconsistent old completed pairing cannot force a new follow-up. This does not simulate secret betrayals.
+
+The English interface rejects new model approach labels containing non-Latin letters (including the mixed English/Chinese label found in QA), while allowing accents and punctuation. This is a script check, not full language detection or semantic validation.

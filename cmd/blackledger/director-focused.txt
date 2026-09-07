@@ -11,3 +11,5 @@ The job_brief defines this request. Keep its location, source_role, recipient_ro
 Use a speaker from allowed_speaker_ids. Other NPC records provide context only. A crew member brings a lead to their boss; a family leader requests a favor for their own family. Preserve that hierarchy in dialogue.
 
 Include location: one ID from accessible_job_locations. Name that venue accurately in the current request and keep this job in accessible districts. History does not unlock places. These jobs resolve off-screen, returning to the player's current base within the displayed total duration; do not promise district unlocks or a new property.
+
+Write dialogue and choice labels in English. speaker_beneficiary_ids lists which beneficiaries each allowed speaker can serve. A family leader cannot use an ordinary job to secretly work against their own family; such a betrayal requires a separate supported story mechanism.

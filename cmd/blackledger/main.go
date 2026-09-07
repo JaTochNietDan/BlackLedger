@@ -171,7 +171,7 @@ func (a *app) generate(snapshot *core.World) error {
 }
 func (a *app) generateAttempt(snapshot *core.World, feedback string) error {
 	operation := snapshot.NextDirectorOperation()
-	connection := snapshot.DirectorConnection()
+	connection := directorConnection(snapshot)
 	beneficiaries := []string{""}
 	for _, faction := range snapshot.Factions {
 		beneficiaries = append(beneficiaries, faction.ID)
@@ -185,6 +185,11 @@ func (a *app) generateAttempt(snapshot *core.World, feedback string) error {
 	}
 	contextData["active_business_ceasefires_until_minute"] = snapshot.ActiveBusinessTruces()
 	contextData["allowed_speaker_ids"] = directorSpeakers(snapshot, connection)
+	affiliation := map[string][]string{}
+	for _, speaker := range directorSpeakers(snapshot, connection) {
+		affiliation[speaker] = speakerBeneficiaries(snapshot, speaker)
+	}
+	contextData["speaker_beneficiary_ids"] = affiliation
 	contextData["accessible_job_locations"] = accessibleJobLocations(snapshot)
 	b, _ := json.Marshal(contextData)
 	payload, _ := json.Marshal(map[string]any{"model": env("BLACK_LEDGER_MODEL", "qwen3:14b"), "stream": false, "think": false, "format": responseFormat, "messages": []map[string]string{{"role": "system", "content": activePrompt}, {"role": "user", "content": string(b)}}, "options": map[string]any{"temperature": .8, "num_predict": 700}})
@@ -213,6 +218,12 @@ func (a *app) generateAttempt(snapshot *core.World, feedback string) error {
 		return proposalRejected{fmt.Errorf("response must be a complete JSON object matching the proposal schema")}
 	}
 	if err := repeatedProposal(snapshot, proposal); err != nil {
+		return proposalRejected{err}
+	}
+	if err := validateChoiceScript(proposal); err != nil {
+		return proposalRejected{err}
+	}
+	if err := validateSpeakerBeneficiary(snapshot, proposal.Speaker, proposal.Beneficiary); err != nil {
 		return proposalRejected{err}
 	}
 	if err := validateJobLocation(snapshot, proposal); err != nil {
