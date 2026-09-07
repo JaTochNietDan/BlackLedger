@@ -126,5 +126,43 @@
         514
       ]
     ]
+  },
+  {
+    "id": "market",
+    "name": "Mercer Exchange",
+    "file": "mercer-noir-v1.png",
+    "mask": "mercer-silhouette-v1.svg",
+    "x": 915,
+    "y": 10,
+    "w": 340,
+    "h": 227,
+    "depth": 229,
+    "door": [
+      1116,
+      221
+    ],
+    "info": "A trading house where your contacts can investigate threats.",
+    "walkway": [
+      [
+        1116,
+        221
+      ],
+      [
+        1100,
+        240
+      ],
+      [
+        840,
+        370
+      ],
+      [
+        580,
+        500
+      ],
+      [
+        530,
+        514
+      ]
+    ]
   }
 ]

@@ -1,3 +1,4 @@
+import {pickBuilding} from './hit-test.js';
 // Presentation-only study: no API commands, economy, outcomes, or authoritative clock.
 const embedded=new URLSearchParams(location.search).get('embed')==='1';
 if(embedded)document.body.classList.add('embedded');
@@ -5,7 +6,7 @@ function artFailure(){if(embedded)parent.postMessage({type:'blackledger:art-erro
 window.addEventListener('error',artFailure);window.addEventListener('unhandledrejection',artFailure);
 const canvas=document.querySelector('#city'),ctx=canvas.getContext('2d'),light=document.querySelector('#light'),motion=document.querySelector('#motion'),status=document.querySelector('#status');
 const reduced=matchMedia('(prefers-reduced-motion: reduce)');motion.checked=!reduced.matches;
-const assets={};let t=0,last=0,frame=0,selected='',arrival=null,playerLocation='',journey=null,journeyKey='',propertyState={},sequence=null,sequenceKey='';
+const assets={},hitMasks={};let t=0,last=0,frame=0,selected='',arrival=null,playerLocation='',journey=null,journeyKey='',propertyState={},sequence=null,sequenceKey='';
 const buildings=await fetch('/art/buildings.json').then(r=>{if(!r.ok)throw Error('Building manifest unavailable');return r.json()});
 const bulbs=[[794,699],[818,714],[849,727],[880,738],[913,747],[947,754],[982,757],[1017,755],[1051,750],[1084,742],[1115,730],[1144,716],[1168,701],[1188,683]];
 function line(x1,y1,x2,y2,width,color){ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.lineWidth=width;ctx.strokeStyle=color;ctx.stroke()}
@@ -80,8 +81,13 @@ function wake(){if(frame)cancelAnimationFrame(frame);last=0;frame=requestAnimati
 function resize(){canvas.width=Math.round(canvas.clientWidth*Math.min(devicePixelRatio,2));canvas.height=Math.round(canvas.clientWidth*820/1280*Math.min(devicePixelRatio,2));wake()}
 function inspect(id){selected=id;status.textContent=buildings.find(b=>b.id===id).info;if(embedded)parent.postMessage({type:'blackledger:inspect',location:id},location.origin);wake()}
 document.querySelector('#cafe').onclick=()=>inspect('bar');document.querySelector('#casino').onclick=()=>inspect('club');document.querySelector('#laundry').onclick=()=>inspect('laundry');document.querySelector('#hotel').onclick=()=>inspect('room');light.oninput=wake;motion.onchange=wake;document.querySelector('#arrival').onclick=()=>{if(reduced.matches){status.textContent='Arrival preview skipped because reduced motion is enabled.';return}motion.checked=true;arrival={start:t,reported:false};status.textContent='A car is approaching The Monarch. Preview only; no game time passes.';wake()};document.addEventListener('visibilitychange',wake);reduced.addEventListener('change',()=>{motion.checked=!reduced.matches;wake()});
-canvas.addEventListener('click',e=>{const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)*1280/r.width,y=(e.clientY-r.top)*820/r.height;const b=[...buildings].reverse().find(b=>x>b.x+b.w*.18&&x<b.x+b.w*.82&&y>b.y+b.h*.2&&y<b.y+b.h*.97);if(b)inspect(b.id)});
-try{await Promise.all([...buildings.flatMap(b=>[[b.id,b.file],...(b.damage?[[b.id+':damaged',b.damage.file]]:[])]),['car','sedan-noir-v1.png'],['asphalt','asphalt-noir-v1.png']].map(async([id,file])=>{const img=new Image();img.src='/art/'+file;await img.decode();assets[id]=img}));// Reuse each original sprite's alpha as the damage layer's rendering mask.
+canvas.addEventListener('click',e=>{const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)*1280/r.width,y=(e.clientY-r.top)*820/r.height;const b=pickBuilding(buildings,hitMasks,x,y);if(b)inspect(b.id)});
+try{await Promise.all([...buildings.flatMap(b=>[[b.id,b.file],...(b.mask?[[b.id+':mask',b.mask]]:[]),...(b.damage?[[b.id+':damaged',b.damage.file]]:[])]),['car','sedan-noir-v1.png'],['asphalt','asphalt-noir-v1.png']].map(async([id,file])=>{const img=new Image();img.src='/art/'+file;await img.decode();assets[id]=img}));// Reuse each original sprite's alpha as the damage layer's rendering mask.
+for(const b of buildings){
+ const original=assets[b.id];
+ if(b.mask){const layer=document.createElement('canvas');layer.width=original.width;layer.height=original.height;const surface=layer.getContext('2d');surface.drawImage(original,0,0);surface.globalCompositeOperation='destination-in';surface.drawImage(assets[b.id+':mask'],0,0,layer.width,layer.height);assets[b.id]=layer}
+ const hit=document.createElement('canvas');hit.width=256;hit.height=Math.round(256*original.height/original.width);const hc=hit.getContext('2d',{willReadFrequently:true});hc.drawImage(assets[b.id],0,0,hit.width,hit.height);hitMasks[b.id]=hc.getImageData(0,0,hit.width,hit.height);
+}
 for(const b of buildings){if(!b.damage)continue;const original=assets[b.id],layer=document.createElement('canvas');layer.width=original.width;layer.height=original.height;const surface=layer.getContext('2d');surface.drawImage(assets[b.id+':damaged'],0,0,layer.width,layer.height);surface.globalCompositeOperation='destination-in';surface.drawImage(original,0,0);assets[b.id+':damaged']=layer}
 asphalt=ctx.createPattern(assets.asphalt,'repeat');asphalt.setTransform(new DOMMatrix([.28,.14,-.28,.14,0,0]));new ResizeObserver(resize).observe(canvas);resize();if(embedded)parent.postMessage({type:'blackledger:ready'},location.origin)}catch(e){artFailure();status.className='error';status.textContent='An art asset could not load. Reload this study to retry.'}
 
