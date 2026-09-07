@@ -12,13 +12,13 @@ import (
 
 func main() {
 	if len(os.Args) < 2 || len(os.Args) > 3 {
-		log.Fatal("usage: go run ./cmd/qa-fixture <new-qa.sqlite3> [police|damage|warning|attack]")
+		log.Fatal("usage: go run ./cmd/qa-fixture <new-qa.sqlite3> [police|damage|warning|attack|voice]")
 	}
 	scenario := "police"
 	if len(os.Args) == 3 {
 		scenario = os.Args[2]
 	}
-	if scenario != "police" && scenario != "damage" && scenario != "warning" && scenario != "attack" {
+	if scenario != "police" && scenario != "damage" && scenario != "warning" && scenario != "attack" && scenario != "voice" {
 		log.Fatal("unsupported QA scenario")
 	}
 	path := os.Args[1]
@@ -64,7 +64,12 @@ func main() {
 			return err
 		}
 		scene.Source = "authored"
-		w.Event = scene
+		if scenario == "voice" {
+			w.Offers = append(w.Offers, core.Offer{Ready: w.Minute + 30, Event: scene})
+			w.Director.Status = "ready"
+		} else {
+			w.Event = scene
+		}
 		return nil
 	})
 	if err != nil {

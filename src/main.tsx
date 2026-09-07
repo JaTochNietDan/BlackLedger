@@ -36,6 +36,7 @@ function App(){
  useEffect(()=>{if(!notice)return;const id=setTimeout(()=>setNotice(''),6000);return()=>clearTimeout(id)},[notice]);
  useEffect(()=>{if(world&&!world.player.alive)scene.current?.focus()},[world?.player.alive]);
  useEffect(()=>{stopVoice();if(world?.event){scene.current?.focus();if(voice)speak()}},[world?.event?.id,stopVoice,speak]);
+ useEffect(()=>{if(!voice||world?.event||world?.director.status!=='ready')return;const abort=new AbortController();fetch('/api/speech/prepare',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}',signal:abort.signal}).catch(()=>{});return()=>abort.abort()},[voice,world?.event?.id,world?.director.status]);
  useEffect(()=>{const id=setInterval(async()=>{if(busyRef.current||latest.current?.director.status!=='writing')return;try{const next=await api<Snapshot>('state');setWorld(w=>w&&w.revision===next.revision?{...w,director:next.director}:w)}catch{}},3000);return()=>clearInterval(id)},[]);
  async function prepare(){try{await api('director',{});setWorld(await api<Snapshot>('state'))}catch(err){setNotice((err as Error).message)}}
  async function commit(command:Command){if(!world||busyRef.current||journey||sequence)return;stopVoice();busyRef.current=true;setBusy(true);try{const pending=localStorage.getItem('black-ledger-pending');if(pending){await api('action',JSON.parse(pending));localStorage.removeItem('black-ledger-pending');setWorld(await api<Snapshot>('state'));setNotice('Recovered your previous action. Please choose your next action again.');return}

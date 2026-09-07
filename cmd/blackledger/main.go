@@ -29,10 +29,13 @@ func env(k, d string) string {
 }
 
 type app struct {
-	s      *store.Store
-	ai     sync.Mutex
-	port   string
-	client *http.Client
+	voiceMu    sync.Mutex
+	voiceCache map[string][]byte
+	voiceOrder []string
+	s          *store.Store
+	ai         sync.Mutex
+	port       string
+	client     *http.Client
 }
 
 func reply(w http.ResponseWriter, status int, value any) {
@@ -101,47 +104,9 @@ func (a *app) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 	case "/api/director":
 		reply(w, 200, map[string]bool{"started": a.prepare()})
-	case "/api/speech":
-		var q struct {
-			Event string `json:"event"`
-		}
-		if e := body(r, &q); e != nil {
-			fail(w, 400, e)
-			return
-		}
-		s, e := a.s.Read()
-		if e != nil {
-			fail(w, 500, e)
-			return
-		}
-		if s.Event == nil || q.Event != s.Event.ID {
-			fail(w, 409, fmt.Errorf("conversation ended"))
-			return
-		}
-		person := s.NPC(s.Event.Speaker)
-		if person == nil {
-			fail(w, 409, fmt.Errorf("unknown speaker"))
-			return
-		}
-		payload, _ := json.Marshal(map[string]string{"text": s.Event.Body, "speaker": person.Name, "voice": "warm"})
-		ctx, cancel := context.WithTimeout(r.Context(), 25*time.Second)
-		defer cancel()
-		req, _ := http.NewRequestWithContext(ctx, "POST", env("AFTERLIGHT_DIRECTOR_URL", "http://127.0.0.1:8787")+"/speech", bytes.NewReader(payload))
-		req.Header.Set("Content-Type", "application/json")
-		res, e := a.client.Do(req)
-		if e != nil {
-			fail(w, 503, fmt.Errorf("voice service unavailable; you can continue reading"))
-			return
-		}
-		defer res.Body.Close()
-		data, e := io.ReadAll(io.LimitReader(res.Body, 8000001))
-		if e != nil || res.StatusCode != 200 || len(data) > 8000000 || !bytes.HasPrefix(data, []byte("RIFF")) {
-			fail(w, 503, fmt.Errorf("voice not ready; retry or continue reading"))
-			return
-		}
-		w.Header().Set("Content-Type", "audio/wav")
-		w.Header().Set("Cache-Control", "private, max-age=3600")
-		_, _ = w.Write(data)
+	case "/api/speech", "/api/speech/prepare":
+		a.speech(w, r)
+
 	default:
 		fail(w, 404, fmt.Errorf("not found"))
 	}
