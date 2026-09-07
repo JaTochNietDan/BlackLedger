@@ -13,7 +13,7 @@ func TestDirectorUsesRememberedOutcomeAndRejectsRepeatedOperation(t *testing.T) 
 		t.Run(map[bool]string{false: "correct brief", true: "ignored brief"}[wrong], func(t *testing.T) {
 			a := testApp(t)
 			if err := a.s.Change(func(w *core.World) error {
-				scene, err := w.ValidateProposal(core.Proposal{Title: "An old delivery", Body: "Deliver the venue's booking book.", Speaker: "mara", Operation: "courier", Outcome: "Done."})
+				scene, err := w.ValidateProposal(core.Proposal{Location: "bar", Title: "An old delivery", Body: "Deliver the venue's booking book. At Saint Agnes.", Speaker: "mara", Operation: "courier", Outcome: "Done."})
 				if err != nil {
 					return err
 				}
@@ -51,7 +51,7 @@ func TestDirectorUsesRememberedOutcomeAndRejectsRepeatedOperation(t *testing.T) 
 				if wrong {
 					operation = "courier"
 				}
-				proposal, _ := json.Marshal(core.Proposal{Title: "Shared loading hours", Body: "Negotiate shared loading hours at the laundry.", Speaker: "mara", Operation: operation, Outcome: "Negotiated."})
+				proposal, _ := json.Marshal(core.Proposal{Location: "bar", Title: "Shared loading hours", Body: "Negotiate shared loading hours at the laundry. At Saint Agnes.", Speaker: "mara", Operation: operation, Outcome: "Negotiated."})
 				json.NewEncoder(w).Encode(map[string]any{"message": map[string]string{"content": string(proposal)}})
 			}))
 			defer model.Close()

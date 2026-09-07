@@ -9,6 +9,7 @@ type StoryConnection struct {
 }
 
 type ArrangementMemory struct {
+	Location    string `json:"location,omitempty"`
 	ParentID    string `json:"parent_id,omitempty"`
 	ID          string `json:"id"`
 	Life        int    `json:"life"`
@@ -40,7 +41,7 @@ func (w *World) RememberArrangement(scene *Scene, status string) {
 	if scene.Kind != "proposal" {
 		return
 	}
-	memory := ArrangementMemory{ID: id, Life: w.Life, Minute: w.Minute, Title: scene.Title, Offer: scene.Body, Speaker: scene.Speaker, Operation: scene.Operation, Beneficiary: scene.Beneficiary, Status: status}
+	memory := ArrangementMemory{Location: scene.Target, ID: id, Life: w.Life, Minute: w.Minute, Title: scene.Title, Offer: scene.Body, Speaker: scene.Speaker, Operation: scene.Operation, Beneficiary: scene.Beneficiary, Status: status}
 	if status == "completed" {
 		memory.Result = scene.Outcome
 	}

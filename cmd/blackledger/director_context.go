@@ -39,7 +39,10 @@ func focusedContext(w *core.World, operation string, connection *core.Arrangemen
 	}
 	places := []map[string]any{}
 	for _, l := range core.Locations {
-		if connection != nil && !strings.Contains(strings.ToLower(connection.Offer+" "+connection.Title), strings.ToLower(l.Name)) {
+		if l.District > w.District {
+			continue
+		}
+		if connection != nil && connection.Location != l.ID && !strings.Contains(strings.ToLower(connection.Offer+" "+connection.Title), strings.ToLower(l.Name)) {
 			continue
 		}
 		p := w.Properties[l.ID]

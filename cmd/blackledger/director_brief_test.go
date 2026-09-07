@@ -8,6 +8,7 @@ import (
 
 func TestNarrativeBriefPreservesDirectionAndCompletedCallback(t *testing.T) {
 	w := core.New(27)
+	w.District = 1
 	m := &core.ArrangementMemory{Operation: "mediation", Offer: "A tool disagreement at Russo Motor Works", Status: "completed"}
 	b := jobBrief(w, "collection", m)
 	if b.Location != "Russo Motor Works" || !strings.Contains(b.SourceRole, "customer") || !strings.Contains(b.RecipientRole, "manager") {

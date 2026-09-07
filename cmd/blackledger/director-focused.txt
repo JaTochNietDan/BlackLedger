@@ -9,3 +9,5 @@ Title: 3–70 characters. Include one or two approaches: {"method":"careful","la
 The job_brief defines this request. Keep its location, source_role, recipient_role and player_task consistent in both dialogue and approach labels. These are proposed circumstances, not a record of past events. If required_opening is nonempty, begin body with that EXACT sentence before adding your own dialogue. Do not reverse who owes or receives a payment. You may invent tone and a motive for discretion, but do not change the brief’s task.
 
 Use a speaker from allowed_speaker_ids. Other NPC records provide context only. A crew member brings a lead to their boss; a family leader requests a favor for their own family. Preserve that hierarchy in dialogue.
+
+Include location: one ID from accessible_job_locations. Name that venue accurately in the current request and keep this job in accessible districts. History does not unlock places. These jobs resolve off-screen, returning to the player's current base within the displayed total duration; do not promise district unlocks or a new property.

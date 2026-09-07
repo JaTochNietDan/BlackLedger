@@ -45,6 +45,7 @@ func TestFocusedContextKeepsConnectionAndCorrection(t *testing.T) {
 
 func TestFocusedFollowUpUsesRelevantContactAndCurrentOwnership(t *testing.T) {
 	w := core.New(27)
+	w.District = 1
 	w.Properties["garage"].Owner = "player:1"
 	connection := &core.ArrangementMemory{ID: "job", Life: 1, Speaker: "mara", Title: "A garage dispute", Offer: "Resolve the tool disagreement at Russo Motor Works.", Status: "completed"}
 	c := focusedContext(w, "collection", connection, "", []string{"", "bellandi", "russo"})
@@ -57,7 +58,7 @@ func TestFocusedFollowUpUsesRelevantContactAndCurrentOwnership(t *testing.T) {
 		t.Fatal("follow-up location or ownership wrong")
 	}
 	fresh := focusedContext(w, "mediation", nil, "", []string{"", "bellandi", "russo"})
-	if len(fresh["npcs"].([]map[string]any)) != len(w.NPCs) || len(fresh["places"].([]map[string]any)) != len(core.Locations) {
+	if len(fresh["npcs"].([]map[string]any)) != len(w.NPCs) || len(fresh["places"].([]map[string]any)) != len(accessibleJobLocations(w)) {
 		t.Fatal("fresh requests cannot see the city")
 	}
 }

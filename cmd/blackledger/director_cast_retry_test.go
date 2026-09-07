@@ -17,7 +17,7 @@ func TestDirectorRejectsUnestablishedSpeakerBeforeSaving(t *testing.T) {
 		if calls > 1 {
 			speaker = "mara"
 		}
-		proposal, _ := json.Marshal(core.Proposal{Title: "Shared loading hours", Body: "Let us negotiate shared access to the loading area.", Speaker: speaker, Operation: "mediation", Outcome: "Negotiated access."})
+		proposal, _ := json.Marshal(core.Proposal{Location: "bar", Title: "Shared loading hours", Body: "Let us negotiate shared access to the loading area. At Saint Agnes.", Speaker: speaker, Operation: "mediation", Outcome: "Negotiated access."})
 		json.NewEncoder(w).Encode(map[string]any{"message": map[string]string{"content": string(proposal)}})
 	}))
 	defer model.Close()

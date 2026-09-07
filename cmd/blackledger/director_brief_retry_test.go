@@ -33,7 +33,7 @@ func TestFocusedBriefCorrectionRequiresAcknowledgement(t *testing.T) {
 		if n == 2 {
 			body = "You handled our last mediation without violence. " + body
 		}
-		proposal := core.Proposal{Title: "Customer settlement", Body: body, Speaker: "mara", Operation: "collection", Outcome: "Payment collected."}
+		proposal := core.Proposal{Location: "bar", Title: "Customer settlement", Body: body + " At Saint Agnes.", Speaker: "mara", Operation: "collection", Outcome: "Payment collected."}
 		b, _ := json.Marshal(proposal)
 		json.NewEncoder(w).Encode(map[string]any{"message": map[string]string{"content": string(b)}})
 	}))

@@ -201,7 +201,7 @@ func TestValidation(t *testing.T) {
 			t.Fatal("bad proposal accepted")
 		}
 	}
-	e, err := w.ValidateProposal(Proposal{"Sealed envelope", "Would you deliver this?", "mara", "courier", "Secret future sentence.", "", nil})
+	e, err := w.ValidateProposal(Proposal{"", "Sealed envelope", "Would you deliver this?", "mara", "courier", "Secret future sentence.", "", nil})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -276,7 +276,7 @@ func TestNewPersonDoesNotInheritRelationshipsOrPendingDirector(t *testing.T) {
 
 func TestDirectorCannotInventMechanicalCompletion(t *testing.T) {
 	w := New(27)
-	scene, err := w.ValidateProposal(Proposal{"A payment", "Please collect this payment.", "mara", "collection", "The rival is killed and you own his casino.", "", nil})
+	scene, err := w.ValidateProposal(Proposal{"", "A payment", "Please collect this payment.", "mara", "collection", "The rival is killed and you own his casino.", "", nil})
 	if err != nil {
 		t.Fatal(err)
 	}

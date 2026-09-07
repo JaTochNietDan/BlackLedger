@@ -666,7 +666,7 @@ func (w *World) OfferIfReady() {
 		return
 	}
 	if w.Player.JobCount == 2 && !w.hasRecord("A favor with a price") {
-		e, _ := w.ValidateProposal(Proposal{"A favor with a price", "“A merchant wants a sealed ledger moved before his partners arrive. I would understand if you preferred the ordinary work.”", "mara", "courier", "You moved the ledger. Mara now knows you can handle sensitive work.", "", []Approach{{Method: "careful", Label: "Wait for a quiet route"}, {Method: "press", Label: "Move it before the partners arrive"}}})
+		e, _ := w.ValidateProposal(Proposal{"", "A favor with a price", "“A merchant wants a sealed ledger moved before his partners arrive. I would understand if you preferred the ordinary work.”", "mara", "courier", "You moved the ledger. Mara now knows you can handle sensitive work.", "", []Approach{{Method: "careful", Label: "Wait for a quiet route"}, {Method: "press", Label: "Move it before the partners arrive"}}})
 		e.Source = "authored"
 		w.Event = e
 		w.RememberArrangement(e, "offered")
@@ -680,6 +680,7 @@ type Approach struct {
 }
 
 type Proposal struct {
+	Location    string     `json:"location,omitempty"`
 	Title       string     `json:"title"`
 	Body        string     `json:"body"`
 	Speaker     string     `json:"speaker"`
@@ -690,6 +691,12 @@ type Proposal struct {
 }
 
 func (w *World) ValidateProposal(p Proposal) (*Scene, error) {
+	if p.Location != "" {
+		location, ok := PlaceByID(p.Location)
+		if !ok || location.District > w.District {
+			return nil, fmt.Errorf("job location is not accessible")
+		}
+	}
 	catalog := map[string]Effect{"courier": {75, 3, 3, 45}, "mediation": {55, 5, 0, 60}, "collection": {130, 3, 5, 90}}
 	fx, ok := catalog[p.Operation]
 	if !ok || w.NPC(p.Speaker) == nil {
@@ -715,9 +722,17 @@ func (w *World) ValidateProposal(p Proposal) (*Scene, error) {
 			return nil, fmt.Errorf("unknown beneficiary faction %q; use exactly one of %q", p.Beneficiary, allowed)
 		}
 	}
-	scene := &Scene{Operation: p.Operation, ID: ID(), Title: p.Title, Beneficiary: p.Beneficiary, Body: p.Body, Speaker: p.Speaker, Kind: "proposal", Source: "local-ai", Minute: w.Minute, Effect: fx, Outcome: map[string]string{"courier": "You delivered the sealed package and reported back.", "mediation": "You completed the requested mediation without violence.", "collection": "You collected the agreed payment and reported back."}[p.Operation], Choices: []Choice{{ID: "accept", Label: map[string]string{"courier": "Deliver the package", "mediation": "Mediate the dispute", "collection": "Collect the payment"}[p.Operation], Detail: fmt.Sprintf("$%d · %d minutes · +%d respect · +%d heat", fx.Reward, fx.Minutes, fx.Respect, fx.Heat) + " · At 15 heat, police may stop completion." + politicalDetail}, {ID: "decline", Label: "Decline the arrangement", Detail: "No cost or time."}}}
+	scene := &Scene{Target: p.Location, Operation: p.Operation, ID: ID(), Title: p.Title, Beneficiary: p.Beneficiary, Body: p.Body, Speaker: p.Speaker, Kind: "proposal", Source: "local-ai", Minute: w.Minute, Effect: fx, Outcome: map[string]string{"courier": "You delivered the sealed package and reported back.", "mediation": "You completed the requested mediation without violence.", "collection": "You collected the agreed payment and reported back."}[p.Operation], Choices: []Choice{{ID: "accept", Label: map[string]string{"courier": "Deliver the package", "mediation": "Mediate the dispute", "collection": "Collect the payment"}[p.Operation], Detail: fmt.Sprintf("$%d · %d minutes · +%d respect · +%d heat", fx.Reward, fx.Minutes, fx.Respect, fx.Heat) + " · At 15 heat, police may stop completion." + politicalDetail}, {ID: "decline", Label: "Decline the arrangement", Detail: "No cost or time."}}}
 	if err := addApproaches(scene, p.Approaches, politicalDetail); err != nil {
 		return nil, err
+	}
+	if p.Location != "" {
+		place, _ := PlaceByID(p.Location)
+		for i := range scene.Choices {
+			if scene.Choices[i].ID != "decline" {
+				scene.Choices[i].Detail = place.Name + " · " + scene.Choices[i].Detail
+			}
+		}
 	}
 	return scene, nil
 }

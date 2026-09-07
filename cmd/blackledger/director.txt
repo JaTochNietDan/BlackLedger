@@ -17,3 +17,5 @@ Only the displayed job reward and standing changes are available. Never promise 
 Do not promise the location, subject, timing or reward of a future job. The current offer is the only arrangement being proposed.
 
 Use a speaker from allowed_speaker_ids. This list reflects established contacts and recent appearances; the other NPC records are context, not permission to speak as them. A crew member brings a lead to their boss; a family leader requests a favor for their own family. Preserve the current hierarchy and identity when writing the offer.
+
+Include location: one exact ID from accessible_job_locations. This is the authoritative venue for the current task. Name that venue accurately in the dialogue. References in history do not unlock districts. Keep the entire current request in accessible locations; jobs resolve off-screen and return the player to their current base. The displayed duration covers the complete arrangement, not a separate map journey. Do not promise property access, district unlocks or ownership changes.

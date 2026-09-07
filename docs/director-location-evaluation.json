@@ -1,0 +1,156 @@
+{
+  "date": "2026-09-07",
+  "initial_sample": {
+    "ready": 510,
+    "event": {
+      "operation": "mediation",
+      "alternatives": {
+        "approach:careful": {
+          "reward": 40,
+          "respect": 5,
+          "heat": 0,
+          "minutes": 90
+        },
+        "approach:press": {
+          "reward": 75,
+          "respect": 5,
+          "heat": 5,
+          "minutes": 45
+        }
+      },
+      "beneficiary": "russo",
+      "target": "laundry",
+      "id": "504863ea67ca422e5518c5f025470fce",
+      "title": "A Dispute at the Garage",
+      "body": "I need you to settle a disagreement between two of our men at the garage. They\u2019re arguing over the shift schedule\u2014too many hours overlapping, not enough hands on the tools. If we don\u2019t fix it fast, production grinds to a halt. You\u2019re familiar with the place, and I trust you to keep this under wraps. Let me know how you want to handle it.",
+      "speaker": "leo",
+      "choices": [
+        {
+          "id": "accept",
+          "label": "Mediate the dispute",
+          "detail": "Bluebird Laundry \u00b7 $55 \u00b7 60 minutes \u00b7 +5 respect \u00b7 +0 heat \u00b7 At 15 heat, police may stop completion. \u00b7 Russo Outfit standing +6; rival standing \u22123.",
+          "cost": 0,
+          "disabled": false
+        },
+        {
+          "id": "approach:careful",
+          "label": "Negotiate quietly",
+          "detail": "Bluebird Laundry \u00b7 $40 \u00b7 90 minutes \u00b7 +5 respect \u00b7 +0 heat \u00b7 At 15 heat, police may stop completion. \u00b7 Russo Outfit standing +6; rival standing \u22123.",
+          "cost": 0,
+          "disabled": false
+        },
+        {
+          "id": "approach:press",
+          "label": "Press for results",
+          "detail": "Bluebird Laundry \u00b7 $75 \u00b7 45 minutes \u00b7 +5 respect \u00b7 +5 heat \u00b7 At 15 heat, police may stop completion. \u00b7 Russo Outfit standing +6; rival standing \u22123.",
+          "cost": 0,
+          "disabled": false
+        },
+        {
+          "id": "decline",
+          "label": "Decline the arrangement",
+          "detail": "No cost or time.",
+          "cost": 0,
+          "disabled": false
+        }
+      ],
+      "kind": "proposal",
+      "source": "local-ai",
+      "minute": 480,
+      "effect": {
+        "reward": 55,
+        "respect": 5,
+        "heat": 0,
+        "minutes": 60
+      },
+      "outcome": "You completed the requested mediation without violence."
+    }
+  },
+  "assessment": "Failed semantic alignment: valid laundry ID but dialogue/title describes a garage, without naming the authoritative venue. Added mandatory venue mention validation after this evidence; do not treat typed fields alone as narrative correctness.",
+  "checked_sample": {
+    "ready": 510,
+    "event": {
+      "operation": "mediation",
+      "alternatives": {
+        "approach:careful": {
+          "reward": 40,
+          "respect": 5,
+          "heat": 0,
+          "minutes": 90
+        },
+        "approach:press": {
+          "reward": 75,
+          "respect": 5,
+          "heat": 5,
+          "minutes": 45
+        }
+      },
+      "beneficiary": "russo",
+      "target": "market",
+      "id": "6a815a58c1ff747a5e1db98045f4c381",
+      "title": "A Truce at the Market",
+      "body": "I need you to step in between the Russo Outfit and the Bellandi Family. They\u2019re both trying to claim the Mercer Exchange, and the market\u2019s getting too hot for anyone to handle. If you can get them to split the space, I\u2019ll be in your debt.",
+      "speaker": "leo",
+      "choices": [
+        {
+          "id": "accept",
+          "label": "Mediate the dispute",
+          "detail": "Mercer Exchange \u00b7 $55 \u00b7 60 minutes \u00b7 +5 respect \u00b7 +0 heat \u00b7 At 15 heat, police may stop completion. \u00b7 Russo Outfit standing +6; rival standing \u22123.",
+          "cost": 0,
+          "disabled": false
+        },
+        {
+          "id": "approach:careful",
+          "label": "Speak plainly",
+          "detail": "Mercer Exchange \u00b7 $40 \u00b7 90 minutes \u00b7 +5 respect \u00b7 +0 heat \u00b7 At 15 heat, police may stop completion. \u00b7 Russo Outfit standing +6; rival standing \u22123.",
+          "cost": 0,
+          "disabled": false
+        },
+        {
+          "id": "approach:press",
+          "label": "Make it quick",
+          "detail": "Mercer Exchange \u00b7 $75 \u00b7 45 minutes \u00b7 +5 respect \u00b7 +5 heat \u00b7 At 15 heat, police may stop completion. \u00b7 Russo Outfit standing +6; rival standing \u22123.",
+          "cost": 0,
+          "disabled": false
+        },
+        {
+          "id": "decline",
+          "label": "Decline the arrangement",
+          "detail": "No cost or time.",
+          "cost": 0,
+          "disabled": false
+        }
+      ],
+      "kind": "proposal",
+      "source": "local-ai",
+      "minute": 480,
+      "effect": {
+        "reward": 55,
+        "respect": 5,
+        "heat": 0,
+        "minutes": 60
+      },
+      "outcome": "You completed the requested mediation without violence."
+    }
+  },
+  "checked_assessment": "Location aligns: market ID and Mercer Exchange dialogue. Political scope still overreaches: a proposed split between families is not an implemented territorial agreement; canonical mediation only changes standing. This does not establish full semantic coherence.",
+  "browser_completion": {
+    "minute": 615,
+    "cash": 120,
+    "base": "bar",
+    "memory": {
+      "location": "market",
+      "id": "6a815a58c1ff747a5e1db98045f4c381",
+      "life": 1,
+      "minute": 525,
+      "title": "A Truce at the Market",
+      "offer": "I need you to step in between the Russo Outfit and the Bellandi Family. They\u2019re both trying to claim the Mercer Exchange, and the market\u2019s getting too hot for anyone to handle. If you can get them to split the space, I\u2019ll be in your debt.",
+      "speaker": "leo",
+      "operation": "mediation",
+      "beneficiary": "russo",
+      "status": "completed",
+      "result": "You completed the requested mediation without violence. You took extra time to keep the work discreet."
+    },
+    "checks": "Venue visible in all action terms; careful approach 90 minutes/$40; no browser warnings/errors. No tactical travel or extra time charged."
+  }
+}

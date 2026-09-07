@@ -21,10 +21,15 @@ func jobBrief(w *core.World, operation string, connection *core.ArrangementMemor
 	place, _ := core.PlaceByID(w.Player.Location)
 	if connection != nil {
 		for _, l := range core.Locations {
-			if strings.Contains(strings.ToLower(connection.Offer+" "+connection.Title), strings.ToLower(l.Name)) {
+			if l.District <= w.District && strings.Contains(strings.ToLower(connection.Offer+" "+connection.Title), strings.ToLower(l.Name)) {
 				place = l
 				break
 			}
+		}
+	}
+	if connection != nil && connection.Location != "" {
+		if saved, ok := core.PlaceByID(connection.Location); ok && saved.District <= w.District {
+			place = saved
 		}
 	}
 	b := narrativeBrief{Location: place.Name}

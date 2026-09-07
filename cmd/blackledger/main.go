@@ -184,6 +184,7 @@ func (a *app) generateAttempt(snapshot *core.World, feedback string) error {
 		contextData = focusedContext(snapshot, operation, connection, feedback, beneficiaries)
 	}
 	contextData["allowed_speaker_ids"] = directorSpeakers(snapshot, connection)
+	contextData["accessible_job_locations"] = accessibleJobLocations(snapshot)
 	b, _ := json.Marshal(contextData)
 	payload, _ := json.Marshal(map[string]any{"model": env("BLACK_LEDGER_MODEL", "qwen3:14b"), "stream": false, "think": false, "format": responseFormat, "messages": []map[string]string{{"role": "system", "content": activePrompt}, {"role": "user", "content": string(b)}}, "options": map[string]any{"temperature": .8, "num_predict": 700}})
 	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
@@ -211,6 +212,9 @@ func (a *app) generateAttempt(snapshot *core.World, feedback string) error {
 		return proposalRejected{fmt.Errorf("response must be a complete JSON object matching the proposal schema")}
 	}
 	if err := repeatedProposal(snapshot, proposal); err != nil {
+		return proposalRejected{err}
+	}
+	if err := validateJobLocation(snapshot, proposal); err != nil {
 		return proposalRejected{err}
 	}
 	allowedSpeaker := false

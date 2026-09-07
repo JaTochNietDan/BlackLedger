@@ -52,7 +52,7 @@ func TestDirectorCorrectionIsBoundedAndValidated(t *testing.T) {
 				if (scenario == "corrected" && number == 2) || scenario == "faction-corrected" {
 					label = "Hear both sides first"
 				}
-				proposal, _ := json.Marshal(core.Proposal{Title: "Shared hours", Body: "Help us negotiate the laundry schedule.", Speaker: "mara", Beneficiary: beneficiary, Operation: "mediation", Outcome: "Agreed.", Approaches: []core.Approach{{Method: "careful", Label: label}}})
+				proposal, _ := json.Marshal(core.Proposal{Location: "bar", Title: "Shared hours", Body: "Help us negotiate the laundry schedule. At Saint Agnes.", Speaker: "mara", Beneficiary: beneficiary, Operation: "mediation", Outcome: "Agreed.", Approaches: []core.Approach{{Method: "careful", Label: label}}})
 				json.NewEncoder(w).Encode(map[string]any{"message": map[string]string{"content": string(proposal)}})
 			}))
 			defer model.Close()
