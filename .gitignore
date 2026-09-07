@@ -1,0 +1,6 @@
+__pycache__/
+*.sqlite*
+.runtime/
+node_modules/
+dist/
+blackledger
