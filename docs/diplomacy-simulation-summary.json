@@ -1,0 +1,73 @@
+{
+  "director": "authored",
+  "elapsed_seconds": 6.39603675,
+  "max_commands": 220,
+  "summary": {
+    "diplomat": {
+      "deaths": 0,
+      "errors": 0,
+      "median_final_cash": 20046,
+      "median_game_minutes": 15490,
+      "milestones": {
+        "casino": {
+          "median_commands_when_reached": 61,
+          "reached": 50
+        },
+        "crew": {
+          "median_commands_when_reached": 9,
+          "reached": 50
+        },
+        "garage": {
+          "median_commands_when_reached": 43,
+          "reached": 50
+        },
+        "housing": {
+          "median_commands_when_reached": 30,
+          "reached": 50
+        },
+        "laundry": {
+          "median_commands_when_reached": 6,
+          "reached": 50
+        },
+        "security": {
+          "median_commands_when_reached": 34,
+          "reached": 50
+        }
+      },
+      "runs": 50
+    },
+    "investor": {
+      "deaths": 0,
+      "errors": 0,
+      "median_final_cash": 32220,
+      "median_game_minutes": 21535,
+      "milestones": {
+        "casino": {
+          "median_commands_when_reached": 56,
+          "reached": 50
+        },
+        "crew": {
+          "median_commands_when_reached": 9,
+          "reached": 50
+        },
+        "garage": {
+          "median_commands_when_reached": 41,
+          "reached": 50
+        },
+        "housing": {
+          "median_commands_when_reached": 25,
+          "reached": 50
+        },
+        "laundry": {
+          "median_commands_when_reached": 6,
+          "reached": 50
+        },
+        "security": {
+          "median_commands_when_reached": 29,
+          "reached": 50
+        }
+      },
+      "runs": 50
+    }
+  }
+}

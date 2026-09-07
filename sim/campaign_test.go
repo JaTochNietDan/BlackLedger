@@ -87,3 +87,27 @@ func TestInvestorRepairsCrewLoyaltyUsingPublicActions(t *testing.T) {
 		t.Fatal("policy attempted unaffordable recovery")
 	}
 }
+
+func TestDiplomatMaintainsPublicBusinessAgreements(t *testing.T) {
+	r := Run(27, "diplomat", "authored", 220, false)
+	if r.Error != "" {
+		t.Fatal(r.Error)
+	}
+	if r.Actions["audience"] == 0 || r.Events["audience"] == 0 || r.Milestones["casino"] == 0 {
+		t.Fatal("diplomacy did not coexist with progression", r)
+	}
+	w := core.New(27)
+	w.Player.Cash = 300
+	w.Properties["laundry"].Owner = "player:1"
+	w.Player.Location = "club"
+	v := Public(w)
+	c, err := Choose(v, "diplomat")
+	if err != nil || c.Kind != "audience" {
+		t.Fatal("missing public negotiation decision", c, err)
+	}
+	w.BusinessTruces = map[string]int{"bellandi": w.Minute + 1440}
+	c, err = Choose(Public(w), "diplomat")
+	if err != nil || c.Kind == "audience" {
+		t.Fatal("repeated active agreement purchase", c, err)
+	}
+}

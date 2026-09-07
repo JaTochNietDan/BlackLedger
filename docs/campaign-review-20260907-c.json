@@ -1,0 +1,74 @@
+{
+  "started_utc": "2026-09-07 21:50:40 UTC",
+  "updated_utc": "2026-09-07T21:53:34.656642+00:00",
+  "server": "http://127.0.0.1:8846",
+  "save": ".runtime/campaign-review-20260907-c.sqlite3",
+  "binary": ".runtime/blackledger-business-truce",
+  "status": "in progress; no full duration claim",
+  "method": "Fresh store creation; only browser game actions. No injected state or mid-campaign executable changes.",
+  "checkpoint": {
+    "minute": 745,
+    "player": {
+      "name": "Alex Varga",
+      "cash": 60,
+      "health": 100,
+      "respect": 11,
+      "heat": 0,
+      "location": "laundry",
+      "home": "room",
+      "security": 0,
+      "contacts": 0,
+      "crew": [],
+      "alive": true,
+      "earned": 150,
+      "job_count": 2
+    },
+    "owned": [
+      "laundry"
+    ],
+    "event": {
+      "body": "The Monarch is under new management, and the old arrangements are in question. Vittorio wants the club to remain Bellandi property, but the new owner insists on a different deal. I need you to settle this without a scene. Your presence alone might be enough to remind him who truly holds the keys.",
+      "choices": [
+        {
+          "id": "accept",
+          "label": "Mediate the dispute",
+          "detail": "The Monarch \u00b7 $55 \u00b7 60 minutes \u00b7 +5 respect \u00b7 +0 heat \u00b7 At 15 heat, police may stop completion. \u00b7 Bellandi Family standing +6; rival standing \u22123.",
+          "cost": 0,
+          "disabled": false
+        },
+        {
+          "id": "approach:careful",
+          "label": "negotiate access",
+          "detail": "The Monarch \u00b7 $40 \u00b7 90 minutes \u00b7 +5 respect \u00b7 +0 heat \u00b7 At 15 heat, police may stop completion. \u00b7 Bellandi Family standing +6; rival standing \u22123.",
+          "cost": 0,
+          "disabled": false
+        },
+        {
+          "id": "approach:press",
+          "label": "demand entry",
+          "detail": "The Monarch \u00b7 $75 \u00b7 45 minutes \u00b7 +5 respect \u00b7 +5 heat \u00b7 At 15 heat, police may stop completion. \u00b7 Bellandi Family standing +6; rival standing \u22123.",
+          "cost": 0,
+          "disabled": false
+        },
+        {
+          "id": "decline",
+          "label": "Decline the arrangement",
+          "detail": "No cost or time.",
+          "cost": 0,
+          "disabled": false
+        }
+      ],
+      "connection": null,
+      "id": "32af6542e6b996e969885186225d2a6c",
+      "kind": "proposal",
+      "minute": 745,
+      "source": "local-ai",
+      "speaker": "mara",
+      "title": "A club under dispute"
+    }
+  },
+  "notes": [
+    "Read guide, visited Saint Agnes, two courier shifts, careful authored delivery, travelled and acquired laundry.",
+    "Next: contacts/recruitment and first political demand; continue this save, do not restart."
+  ]
+}

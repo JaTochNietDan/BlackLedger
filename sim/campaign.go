@@ -24,12 +24,13 @@ type Event struct {
 
 // View deliberately excludes plots, RNG, queued offers and private director memory.
 type View struct {
-	Revision  int         `json:"revision"`
-	Minute    int         `json:"minute"`
-	Player    core.Person `json:"player"`
-	Locations []Place     `json:"locations"`
-	Event     *Event      `json:"event"`
-	District  int         `json:"district"`
+	BusinessTruces map[string]int `json:"business_truces"`
+	Revision       int            `json:"revision"`
+	Minute         int            `json:"minute"`
+	Player         core.Person    `json:"player"`
+	Locations      []Place        `json:"locations"`
+	Event          *Event         `json:"event"`
+	District       int            `json:"district"`
 }
 type Step struct {
 	Number  int          `json:"number"`
@@ -91,6 +92,9 @@ func Choose(v View, strategy string) (core.Command, error) {
 		if strategy == "defiant" && v.Event.Kind == "business_pressure" {
 			priorities = []string{"resist"}
 		}
+		if strategy == "diplomat" && v.Event.Kind == "audience" {
+			priorities = []string{"business_truce", "leave"}
+		}
 		if strategy == "reckless" {
 			priorities = []string{"approach:press", "accept", "resist", "defend", "leave", "decline"}
 		}
@@ -128,6 +132,22 @@ func Choose(v View, strategy string) (core.Command, error) {
 	if strategy == "worker" {
 		if c, ok := v.at("docks", "dockwork"); ok {
 			return c, nil
+		}
+	}
+	if strategy == "diplomat" && v.Player.Cash >= 200 {
+		for _, p := range v.Locations {
+			if !p.Owned || p.Income <= 0 {
+				continue
+			}
+			actor, venue := "bellandi", "club"
+			if p.ID == "garage" || p.ID == "casino" {
+				actor, venue = "russo", "garage"
+			}
+			if v.BusinessTruces[actor] <= v.Minute {
+				if c, ok := v.at(venue, "audience"); ok {
+					return c, nil
+				}
+			}
 		}
 	}
 	if len(v.Player.Crew) > 0 && v.Player.Crew[0].Loyalty < 50 {

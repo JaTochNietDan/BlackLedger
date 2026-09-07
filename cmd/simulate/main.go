@@ -50,7 +50,7 @@ func main() {
 	}
 	strategies := strings.Split(*profiles, ",")
 	for _, p := range strategies {
-		if p != "worker" && p != "investor" && p != "reckless" && p != "defiant" {
+		if p != "worker" && p != "investor" && p != "reckless" && p != "defiant" && p != "diplomat" {
 			fmt.Fprintln(os.Stderr, "unknown strategy", p)
 			os.Exit(2)
 		}
