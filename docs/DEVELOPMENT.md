@@ -170,3 +170,9 @@
 - Created an isolated frontend copy with every PNG omitted and a separate save on port 8805. Browser immediately showed the unavailable-art explanation. Used Open address book, traveled to Saint Agnes, and completed a courier: 08:00/$90→09:00/$135, respect 2. The game remained readable and actionable with images absent.
 - Restored PNGs only in that test copy and used Retry artwork. Browser screenshot verified the illustrated street returned at the same 09:00/$135 state. Existing failed sidebar thumbnails need a normal view remount/reload; the retry specifically reloads the street frame.
 - Outstanding acceptance work remains the complete uninterrupted pacing run and visual layout/occlusion polish, including additional district art and clearer actors. Core validation does not substitute for these rendered/playability checks.
+
+## Bounded director correction
+- Formatting/validation mistakes previously discarded an entire generation without a correction attempt. The director now permits one additional generation carrying the validation failure and the same operation/contact constraints. It does not relax validation or execute partial output.
+- Network/provider errors do not retry through this path. A new life or dead player prevents a correction request from being issued after the first failed attempt. Each request retains the existing timeout; no unbounded retry loop was added.
+- HTTP provider-stub tests verify an overlong approach label is corrected into exactly one queued encounter, two invalid responses leave the queue empty, a 503 makes only one provider request, and money/time/revision remain unchanged. The full Go race suite passed.
+- This verifies control flow with deterministic provider responses; no live-model quality improvement is claimed from this pass. The correction may still fail, in which case authored play remains available.

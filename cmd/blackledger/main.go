@@ -7,6 +7,7 @@ import (
 	"context"
 	_ "embed"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -146,10 +147,29 @@ func (a *app) prepare() bool {
 	}()
 	return true
 }
+
+type proposalRejected struct{ error }
+
 func (a *app) generate(snapshot *core.World) error {
+	err := a.generateAttempt(snapshot, "")
+	var rejected proposalRejected
+	if !errors.As(err, &rejected) {
+		return err
+	}
+	current, readErr := a.s.Read()
+	if readErr != nil {
+		return readErr
+	}
+	if current.ID != snapshot.ID || current.Life != snapshot.Life || !current.Player.Alive {
+		return nil
+	}
+	log.Printf("Director correcting rejected proposal: %s", err)
+	return a.generateAttempt(snapshot, "Your last proposal failed validation: "+err.Error()+". Return a corrected complete proposal under the same constraints. Do not mention this correction in character dialogue.")
+}
+func (a *app) generateAttempt(snapshot *core.World, feedback string) error {
 	operation := snapshot.NextDirectorOperation()
 	connection := snapshot.DirectorConnection()
-	contextData := map[string]any{"required_operation": operation, "required_connection": connection, "recent_arrangements": snapshot.Arrangements, "life": snapshot.Life, "minute": snapshot.Minute, "player": snapshot.Player, "factions": snapshot.Factions, "npcs": snapshot.NPCs, "dead": snapshot.Dead, "places": core.Locations, "properties": snapshot.Properties, "recent_history": snapshot.History[max(0, len(snapshot.History)-12):]}
+	contextData := map[string]any{"validation_feedback": feedback, "required_operation": operation, "required_connection": connection, "recent_arrangements": snapshot.Arrangements, "life": snapshot.Life, "minute": snapshot.Minute, "player": snapshot.Player, "factions": snapshot.Factions, "npcs": snapshot.NPCs, "dead": snapshot.Dead, "places": core.Locations, "properties": snapshot.Properties, "recent_history": snapshot.History[max(0, len(snapshot.History)-12):]}
 	b, _ := json.Marshal(contextData)
 	payload, _ := json.Marshal(map[string]any{"model": env("BLACK_LEDGER_MODEL", "qwen3:14b"), "stream": false, "think": false, "format": "json", "messages": []map[string]string{{"role": "system", "content": prompt}, {"role": "user", "content": string(b)}}, "options": map[string]any{"temperature": .8, "num_predict": 700}})
 	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
@@ -174,13 +194,13 @@ func (a *app) generate(snapshot *core.World) error {
 	}
 	var proposal core.Proposal
 	if e = json.Unmarshal([]byte(answer.Message.Content), &proposal); e != nil {
-		return e
+		return proposalRejected{fmt.Errorf("response must be a complete JSON object matching the proposal schema")}
 	}
 	if connection != nil && (proposal.Speaker != connection.Speaker || proposal.Beneficiary != connection.Beneficiary) {
-		return fmt.Errorf("director ignored the established contact connection")
+		return proposalRejected{fmt.Errorf("director ignored the established contact connection")}
 	}
 	if proposal.Operation != operation {
-		return fmt.Errorf("director ignored operation brief: wanted %s", operation)
+		return proposalRejected{fmt.Errorf("director ignored operation brief: wanted %s", operation)}
 	}
 	return a.s.Change(func(w *core.World) error {
 		if w.ID != snapshot.ID || w.Life != snapshot.Life || !w.Player.Alive {
@@ -188,7 +208,7 @@ func (a *app) generate(snapshot *core.World) error {
 		}
 		scene, e := w.ValidateProposal(proposal)
 		if e != nil {
-			return e
+			return proposalRejected{e}
 		}
 		w.Offers = append(w.Offers, core.Offer{Ready: w.Minute + 30, Event: scene})
 		w.Director.Status = "ready"
