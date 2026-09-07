@@ -211,8 +211,13 @@ func (a *app) generateAttempt(snapshot *core.World, feedback string) error {
 	if err := repeatedProposal(snapshot, proposal); err != nil {
 		return proposalRejected{err}
 	}
+	if env("BLACK_LEDGER_DIRECTOR_BRIEF", "full") == "focused" {
+		if err := validateBriefOpening(proposal.Body, jobBrief(snapshot, operation, connection)); err != nil {
+			return proposalRejected{err}
+		}
+	}
 	if connection != nil && (proposal.Speaker != connection.Speaker || proposal.Beneficiary != connection.Beneficiary) {
-		return proposalRejected{fmt.Errorf("director ignored the established contact connection")}
+		return proposalRejected{fmt.Errorf("director ignored the established contact connection: speaker must be %q and beneficiary must be %q (empty means neutral), not speaker %q / beneficiary %q. The job location does not decide allegiance", connection.Speaker, connection.Beneficiary, proposal.Speaker, proposal.Beneficiary)}
 	}
 	if proposal.Operation != operation {
 		return proposalRejected{fmt.Errorf("director ignored operation brief: wanted %s", operation)}

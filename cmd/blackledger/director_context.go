@@ -58,7 +58,7 @@ func focusedContext(w *core.World, operation string, connection *core.Arrangemen
 	if len(recentTitles) > 8 {
 		recentTitles = recentTitles[len(recentTitles)-8:]
 	}
-	return map[string]any{"required_operation": operation, "required_connection": connection,
+	return map[string]any{"job_brief": jobBrief(w, operation, connection), "required_operation": operation, "required_connection": connection,
 		"validation_feedback": feedback, "allowed_beneficiary_ids": beneficiaries,
 		"current_player": w.Player.Name, "current_life": w.Life,
 		"npcs": people, "factions": w.Factions, "places": places, "avoid_recent_titles": recentTitles}
