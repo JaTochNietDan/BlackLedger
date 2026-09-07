@@ -1,0 +1,87 @@
+{
+  "model": "qwen3:4b-instruct",
+  "first_sample_seconds": 8.07,
+  "context": "Same earned campaign Day 2 10:40 used for prior 14B history evaluation. Individual samples; not a statistical benchmark. Second sample removes example labels from prompt.",
+  "samples": [
+    {
+      "variant": "director-4b",
+      "status": "ready",
+      "offers": [
+        {
+          "title": "Retrieve the Late Shift Payment",
+          "body": "The Russo Motor Works manager left a payment in the garage today \u2014 for the late shift at the docks. It\u2019s not on the books, but I know you\u2019re the one who handles those back-end jobs. If you collect it, I\u2019ll make sure the next request comes from the market, where you can move quietly. Don\u2019t let anyone see it\u2019s you.",
+          "choices": [
+            {
+              "id": "accept",
+              "label": "Collect the payment",
+              "detail": "$130 \u00b7 90 minutes \u00b7 +3 respect \u00b7 +5 heat \u00b7 At 15 heat, police may stop completion.",
+              "cost": 0,
+              "disabled": false
+            },
+            {
+              "id": "approach:careful",
+              "label": "Check the route before carrying the package",
+              "detail": "$115 \u00b7 120 minutes \u00b7 +3 respect \u00b7 +2 heat \u00b7 At 15 heat, police may stop completion.",
+              "cost": 0,
+              "disabled": false
+            },
+            {
+              "id": "approach:press",
+              "label": "Push for a prompt agreement",
+              "detail": "$150 \u00b7 75 minutes \u00b7 +3 respect \u00b7 +10 heat \u00b7 At 15 heat, police may stop completion.",
+              "cost": 0,
+              "disabled": false
+            },
+            {
+              "id": "decline",
+              "label": "Decline the arrangement",
+              "detail": "No cost or time.",
+              "cost": 0,
+              "disabled": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "variant": "director-4b-labels",
+      "status": "ready",
+      "offers": [
+        {
+          "title": "Retrieve the Late Payment from Russo Motor Works",
+          "body": "The Russo Motor Works owes a payment for last week\u2019s repairs. I\u2019ve seen the ledger \u2014 it\u2019s been sitting uncollected. The manager says he\u2019s been waiting for someone to take it. If you go now, you\u2019ll get the cash and no one will know. Just collect it and return. No questions, no drama.",
+          "choices": [
+            {
+              "id": "accept",
+              "label": "Collect the payment",
+              "detail": "$130 \u00b7 90 minutes \u00b7 +3 respect \u00b7 +5 heat \u00b7 At 15 heat, police may stop completion.",
+              "cost": 0,
+              "disabled": false
+            },
+            {
+              "id": "approach:careful",
+              "label": "Slow and quiet",
+              "detail": "$115 \u00b7 120 minutes \u00b7 +3 respect \u00b7 +2 heat \u00b7 At 15 heat, police may stop completion.",
+              "cost": 0,
+              "disabled": false
+            },
+            {
+              "id": "approach:press",
+              "label": "Go now, no delay",
+              "detail": "$150 \u00b7 75 minutes \u00b7 +3 respect \u00b7 +10 heat \u00b7 At 15 heat, police may stop completion.",
+              "cost": 0,
+              "disabled": false
+            },
+            {
+              "id": "decline",
+              "label": "Decline the arrangement",
+              "detail": "No cost or time.",
+              "cost": 0,
+              "disabled": false
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
