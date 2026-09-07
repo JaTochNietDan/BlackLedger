@@ -2,7 +2,14 @@ package core
 
 // ArrangementMemory preserves the actual offer separately from authoritative results.
 // An offer's claims are not promoted into facts merely because the director wrote them.
+type StoryConnection struct {
+	ID     string `json:"id"`
+	Title  string `json:"title"`
+	Result string `json:"result"`
+}
+
 type ArrangementMemory struct {
+	ParentID    string `json:"parent_id,omitempty"`
 	ID          string `json:"id"`
 	Life        int    `json:"life"`
 	Minute      int    `json:"minute"`
@@ -36,6 +43,9 @@ func (w *World) RememberArrangement(scene *Scene, status string) {
 	memory := ArrangementMemory{ID: id, Life: w.Life, Minute: w.Minute, Title: scene.Title, Offer: scene.Body, Speaker: scene.Speaker, Operation: scene.Operation, Beneficiary: scene.Beneficiary, Status: status}
 	if status == "completed" {
 		memory.Result = scene.Outcome
+	}
+	if scene.Connection != nil {
+		memory.ParentID = scene.Connection.ID
 	}
 	w.Arrangements = append(w.Arrangements, memory)
 	if len(w.Arrangements) > 24 {
@@ -82,6 +92,23 @@ func (w *World) DirectorConnection() *ArrangementMemory {
 			continue
 		}
 		if m.Status == "completed" {
+			// A follow-up closes this short thread; do not force an endless same-contact chain.
+			if m.ParentID != "" {
+				return nil
+			}
+			for _, other := range w.Arrangements {
+				if other.Life == w.Life && other.ParentID != "" && other.ParentID == m.ID {
+					return nil
+				}
+			}
+			if w.Event != nil && w.Event.Connection != nil && w.Event.Connection.ID == m.ID {
+				return nil
+			}
+			for _, offer := range w.Offers {
+				if offer.Event != nil && offer.Event.Connection != nil && offer.Event.Connection.ID == m.ID {
+					return nil
+				}
+			}
 			copy := *m
 			return &copy
 		}

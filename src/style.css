@@ -33,3 +33,5 @@
 .street-load-state{position:absolute;top:45%;left:8%;right:8%;padding:22px;border:1px solid #85724d;background:#14221ff5;color:#e7d4ad;z-index:4}.street-load-state strong{font:23px var(--serif)}.street-load-state p{font-size:12px;color:var(--muted)}.street-load-state>div{display:flex;gap:8px;flex-wrap:wrap}.street-load-state button{padding:8px 12px;border:1px solid #85724d;background:#303a2b;font-size:12px}
 
 .known-threats{margin:135px 20px 14px;padding:12px 16px;border-left:3px solid var(--red);background:#352a23;color:var(--ink)}.known-threats strong{color:var(--gold)}.known-threats p{font-size:13px;margin:5px 0 9px;max-width:80ch}
+
+.story-connection{border-left:2px solid var(--gold);background:#10191980;padding:10px 14px;margin-top:18px}.story-connection small{display:block;font-size:9px;letter-spacing:1px;color:var(--muted)}.story-connection b{font:18px var(--serif);display:block;margin:4px 0}.story-connection p{font-size:12px;color:var(--muted);margin:0}

@@ -220,6 +220,15 @@ func (a *app) generateAttempt(snapshot *core.World, feedback string) error {
 		if e != nil {
 			return proposalRejected{e}
 		}
+		if connection != nil {
+			// Reference the completed record, never the model's claimed past outcome.
+			for _, m := range w.Arrangements {
+				if m.ID == connection.ID && m.Life == w.Life && m.Status == "completed" {
+					scene.Connection = &core.StoryConnection{ID: m.ID, Title: m.Title, Result: m.Result}
+					break
+				}
+			}
+		}
 		w.Offers = append(w.Offers, core.Offer{Ready: w.Minute + 30, Event: scene})
 		w.Director.Status = "ready"
 		w.Director.Detail = "A local AI encounter is ready. It can arrive after your next activity."

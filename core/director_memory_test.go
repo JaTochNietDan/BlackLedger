@@ -89,3 +89,24 @@ func TestDirectorConnectionRequiresLatestSuccessfulCurrentLifeWork(t *testing.T)
 		t.Fatal("previous person's work assigned to new life")
 	}
 }
+
+func TestFollowUpConnectionDoesNotBecomeEndlessChain(t *testing.T) {
+	w := New(27)
+	w.Arrangements = []ArrangementMemory{{ID: "first", Life: 1, Status: "completed", Speaker: "mara", Title: "Shift agreement", Result: "The mediation was completed."}}
+	if w.DirectorConnection() == nil {
+		t.Fatal("completed job cannot seed follow-up")
+	}
+	next := &Scene{ID: "second", Kind: "proposal", Speaker: "mara", Connection: &StoryConnection{ID: "first", Title: "Shift agreement", Result: "The mediation was completed."}}
+	w.Offers = []Offer{{Event: next}}
+	if w.DirectorConnection() != nil {
+		t.Fatal("queued follow-up did not reserve its parent")
+	}
+	w.Offers = nil
+	w.RememberArrangement(next, "completed")
+	if w.Arrangements[1].ParentID != "first" || w.DirectorConnection() != nil {
+		t.Fatal("follow-up forced another same-contact continuation")
+	}
+	if w.Clone().Arrangements[1].ParentID != "first" {
+		t.Fatal("follow-up link lost on serialization")
+	}
+}

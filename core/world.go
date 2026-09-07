@@ -117,6 +117,7 @@ type Effect struct {
 	Minutes int `json:"minutes"`
 }
 type Scene struct {
+	Connection   *StoryConnection  `json:"connection,omitempty"`
 	Operation    string            `json:"operation,omitempty"`
 	JobID        string            `json:"job_id,omitempty"`
 	Alternatives map[string]Effect `json:"alternatives,omitempty"`
@@ -634,7 +635,7 @@ func (w *World) Public() map[string]any {
 		for i := range choices {
 			choices[i].Disabled = w.Player.Cash < choices[i].Cost
 		}
-		scene = map[string]any{"id": e.ID, "title": e.Title, "body": e.Body, "speaker": e.Speaker, "kind": e.Kind, "source": e.Source, "minute": e.Minute, "choices": choices}
+		scene = map[string]any{"id": e.ID, "title": e.Title, "body": e.Body, "speaker": e.Speaker, "kind": e.Kind, "source": e.Source, "minute": e.Minute, "choices": choices, "connection": e.Connection}
 	}
 	history := w.History
 	if len(history) > 60 {
