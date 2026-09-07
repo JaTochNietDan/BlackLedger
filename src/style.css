@@ -25,3 +25,5 @@
 @media(max-width:800px){.map-key{display:block;position:relative;top:auto;right:auto;left:auto;margin:145px 16px 8px}.next-opportunity{width:100%;max-width:none}.street-scene{padding-top:0;min-height:0;height:clamp(280px,65vw,440px)}.street-scene iframe{height:calc(100% - 66px)}.street-inspect{position:static;transform:none;margin:5px auto;left:auto;bottom:auto;gap:4px}.street-inspect button{padding:5px 6px}.sidebar .actions{grid-template-columns:1fr}}
 
 .replay-scene{margin:0 22px 12px;padding:6px 12px;border:1px solid #69715c;background:#172823;color:#d5bf92;font-size:12px;cursor:pointer}
+
+.life-recap{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid #6d71544d;border-bottom:1px solid #6d71544d;margin:20px 0;padding:14px 0;gap:14px}.life-recap small{display:block;color:#b4b49e;font-size:11px;letter-spacing:.04em}.life-recap b{display:block;font-family:Georgia,serif;font-size:25px;color:#e7cca0;margin-top:5px}.legacy-properties{color:#c4c5af;font-size:12px;line-height:1.6}@media(max-width:550px){.life-recap{gap:8px}.life-recap b{font-size:21px}.life-recap small{font-size:10px}}
