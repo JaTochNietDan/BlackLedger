@@ -20,7 +20,7 @@ Keep source art unchanged. Store footprint and lighting coordinates as metadata 
 
 ## Street assembly study
 
-`/street-study.html` uses café, casino and sedan PNGs with scripted paths and depth sorting. It exercises separate building, ground, actor and light layers. Road art and pedestrian figures are provisional. Building positions, entrance anchors and presentation walkways now live in `public/art/buildings.json`, shared by the live street and React controls. Marquee bulb anchors remain in the renderer. The Mariner and laundry are integrated; market/docks and additional district art remain pending.
+`/street-study.html` uses café, casino and sedan PNGs with scripted paths and depth sorting. It exercises separate building, ground, actor and light layers. Road art and pedestrian figures are provisional. Building positions, entrance anchors and presentation walkways now live in `public/art/buildings.json`, shared by the live street and React controls. Marquee bulb anchors remain in the renderer. The Mariner and laundry are integrated; Mercer Exchange is also integrated with an explicit silhouette mask; docks and additional district art remain pending.
 
 ## Painted character atlas
 

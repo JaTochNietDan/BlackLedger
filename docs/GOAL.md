@@ -1,4 +1,16 @@
-# Current goal and acceptance requirements
+# Current goal and workstream ownership
+
+## User revision — visual production handoff (2026-09-07)
+
+The user has reassigned visual production to Claude or another separate agent. **Codex's ongoing goal is gameplay and player experience:** build and playtest the single-player mafia vertical slice, deepen action-driven progression and consequences, improve AI stories/NPC/faction behavior, maintain reliable saves and optional voices, run headless simulations, and complete a playable 20–30-minute rise-and-consequence campaign. Keep the Mac awake while active work is running.
+
+Codex prepares the visual handoff, maintains the public API, fixes functional UX/gameplay bugs, playtests the whole product and integrates reviewed visual commits. Codex should record visual defects for the visual owner rather than spending subsequent autonomous turns generating art, reskinning screens or tuning rendering. Visual production is a parallel workstream, not a prerequisite that blocks simulation development.
+
+The visual owner handles art assets, illustrated-city rendering, animation, lighting, UI skin and visual layout under `docs/VISUAL_HANDOFF.md`. Functional UI behavior remains part of Codex's remit. Shared-file/API changes need coordination; neither owner may silently break the other's interface.
+
+Handoff deliverables: written brief and examples, acceptance checklist, ready-to-paste agent prompt, isolated `codex/visual-handoff` worktree and safe preview launcher. Preparing the handoff does not mean another agent has started. Whole-game completion remains unproven until integrated behavior has been tested; no requirement is satisfied merely by assigning it to someone else.
+
+The goal controller's original objective is not editable through the available status-only tool. This document records the user's amended scope; do not mark the old goal complete solely to replace its text.
 
 Build and playtest the full Black Ledger single-player mafia vertical slice described in DESIGN.md: a playable 20–30-minute rise from rented housing through contacts, crew and business ownership, into consequential rival incidents; permanent death and new people in a persistent city; validated AI opportunities; reliable transactional saves and optional stable-character speech.
 
@@ -6,7 +18,7 @@ Build and playtest the full Black Ledger single-player mafia vertical slice desc
 
 The user approved a modern 2D isometric city inspired by the visual approach of Gangsters: Organized Crime. Painted noir realism is the core; warm vintage daylight and amber/crimson nightlife are lighting variations. This replaces the schematic cartoon map as the intended visual destination.
 
-Required implementation:
+Visual-agent deliverables (project requirements retained; no longer Codex production tasks):
 - A coherent small neighborhood assembled from reusable illustrated buildings and street pieces, with consistent scale, perspective, anchors and occlusion.
 - Moving cars and pedestrians on authored presentation routes; decorative actors do not require simulation agents.
 - Independent marquee lights, window glow and limited atmospheric effects.
