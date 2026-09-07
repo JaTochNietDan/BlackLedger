@@ -35,3 +35,21 @@
 .known-threats{margin:135px 20px 14px;padding:12px 16px;border-left:3px solid var(--red);background:#352a23;color:var(--ink)}.known-threats strong{color:var(--gold)}.known-threats p{font-size:13px;margin:5px 0 9px;max-width:80ch}
 
 .story-connection{border-left:2px solid var(--gold);background:#10191980;padding:10px 14px;margin-top:18px}.story-connection small{display:block;font-size:9px;letter-spacing:1px;color:var(--muted)}.story-connection b{font:18px var(--serif);display:block;margin:4px 0}.story-connection p{font-size:12px;color:var(--muted);margin:0}
+
+/* Flow layout keeps city controls and intelligence independent of artwork height. */
+.city-header{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"heading opportunity" "views opportunity";gap:10px 16px;padding:18px 22px 14px;align-items:center}
+.city-header .map-heading{position:static;grid-area:heading;pointer-events:auto}
+.city-header .map-heading p,.city-header .chapter-chip{display:none}
+.city-header .map-heading h1{font-size:28px;margin:0}
+.city-header .city-view-switch{position:static;grid-area:views;flex-wrap:wrap}
+.city-header .map-key{position:static;grid-area:opportunity;margin:0;padding:0;display:block;background:none}
+.city-header .map-key:empty{display:none}
+.city-pane .known-threats{margin:0 22px 14px}
+.city-pane .city-stage{flex:0 0 auto}
+.city-pane .street-scene{height:auto;min-height:0;padding:0;display:flex;flex-direction:column}
+.city-pane .street-scene iframe{height:auto;aspect-ratio:1280/820;width:100%;flex:none}
+.city-pane .street-inspect{position:static;transform:none;width:auto;margin:0;padding:8px 12px 12px;flex-wrap:wrap;justify-content:center}
+.city-pane .destination-directory{margin-top:0;height:clamp(320px,calc(100vh - 300px),720px)}
+@media(max-width:800px){.city-header{padding:14px 16px;grid-template-columns:1fr;grid-template-areas:"heading" "views" "opportunity"}.city-pane .known-threats{margin:0 16px 12px}.city-pane .destination-directory{height:auto}.city-header .next-opportunity{max-width:none;width:100%}}
+
+.property-art-pending{display:flex;align-items:center;gap:16px;padding:12px;color:var(--gold)}.property-art-pending svg{width:70px;height:60px;flex:none}.property-art-pending span{font:19px var(--serif);color:var(--muted)}

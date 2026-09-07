@@ -22,7 +22,10 @@ function ground(n){
   const streets=[{a:[-240,210],b:[1520,1090],sidewalk:190,road:142},{a:[-240,910],b:[1520,30],sidewalk:150,road:110}];
   // Both pavements are drawn before either roadway, keeping the junction open.
   for(const road of streets)stroke(road.a,road.b,road.sidewalk,'#777668');
-  for(const road of streets){stroke(road.a,road.b,road.road+4,'#2a302c');stroke(road.a,road.b,road.road,asphalt||'#383f3e')}
+  // Treat crossing roads as one surface: draw all curb outlines before any asphalt.
+  for(const road of streets)stroke(road.a,road.b,road.road+4,'#2a302c');
+  for(const road of streets)stroke(road.a,road.b,road.road,'#383f3e');
+  if(asphalt){g.globalAlpha=.38;for(const road of streets)stroke(road.a,road.b,road.road,asphalt);g.globalAlpha=1}
   // Restrained sidewalk joints, outside the open junction.
   for(let x=-100;x<1300;x+=32){if(x>330&&x<640)continue;stroke([x,.5*x+243],[x-13,.5*x+257],1,'#30352c55');stroke([x,.5*x+403],[x-13,.5*x+417],1,'#30352c55')}
   for(const [x,y] of [[265,462],[720,690],[965,310]]){g.save();g.translate(x,y);g.scale(1,.5);g.fillStyle='#313531';g.beginPath();g.arc(0,0,9,0,Math.PI*2);g.fill();g.strokeStyle='#7d7c6755';g.lineWidth=1;g.stroke();for(let k=-4;k<=4;k+=4)stroke([-5,k],[5,k],1,'#77786866');g.restore()}
@@ -37,8 +40,8 @@ function building(b,n){ctx.save();ctx.filter=`brightness(${1-n*.48})`;ctx.drawIm
  if(b.id==='bar'&&n>0){glow(b.door[0],b.door[1]-24,38,n*.2)}
  if(selected===b.id){ctx.strokeStyle='#eac88b';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(...b.door,26,10,0,0,Math.PI*2);ctx.stroke()}}
 function glow(x,y,r,a){const g=ctx.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,`rgba(255,193,91,${a})`);g.addColorStop(1,'rgba(255,193,91,0)');ctx.fillStyle=g;ctx.fillRect(x-r,y-r,r*2,r*2)}
-function person(x,y,i,n){ctx.save();ctx.translate(x,y);ctx.scale(1.5,1.5);x=0;y=0;ellipse(x+2,y,5,2,'#00000035');const step=Math.sin(t*5+i)*1.8;line(x-1,y-6,x-2-step,y,1.7,'#191f22');line(x+1,y-6,x+2+step,y,1.7,'#191f22');ctx.fillStyle=['#514b40','#453533','#777468','#34454b'][i%4];ctx.fillRect(x-3,y-13,6,8);ellipse(x,y-16,2.3,3,'#b69e7c');ellipse(x,y-18,4,1.3,'#2a2b27');ctx.restore()}
-function car(x,y,n,reverse=false){ctx.save();ellipse(x,y+9,31,10,'#00000035');ctx.filter=`brightness(${1-n*.35})`;ctx.translate(x,y);if(reverse)ctx.scale(-1,1);ctx.drawImage(assets.car,-42,-35,84,56);ctx.restore();if(n>.1)glow(x+29,y+10,28,n*.32)}
+function person(x,y,i,n){ctx.save();ctx.filter=`brightness(${1-n*.48})`;ctx.translate(x,y);ctx.scale(1.5,1.5);x=0;y=0;ellipse(x+2,y,5,2,'#00000035');const step=Math.sin(t*5+i)*1.8;line(x-1,y-6,x-2-step,y,1.7,'#191f22');line(x+1,y-6,x+2+step,y,1.7,'#191f22');ctx.fillStyle=['#514b40','#453533','#777468','#34454b'][i%4];ctx.fillRect(x-3,y-13,6,8);ellipse(x,y-16,2.3,3,'#b69e7c');ellipse(x,y-18,4,1.3,'#2a2b27');ctx.restore()}
+function car(x,y,n,reverse=false){ctx.save();ellipse(x,y+9,31,10,'#00000035');ctx.filter=`brightness(${1-n*.35})`;ctx.translate(x,y);if(reverse)ctx.scale(-1,1);ctx.drawImage(assets.car,-42,-35,84,56);ctx.restore();if(n>.1)glow(x+(reverse?-29:29),y+10,28,n*.32)}
 // Authored pavement routes are presentation metadata, not simulation pathfinding.
 function streetRoute(from,to){
  const a=from?.walkway||[[70,745],[530,514]],b=to.walkway||[to.door];
@@ -89,6 +92,7 @@ for(const b of buildings){
  const hit=document.createElement('canvas');hit.width=256;hit.height=Math.round(256*original.height/original.width);const hc=hit.getContext('2d',{willReadFrequently:true});hc.drawImage(assets[b.id],0,0,hit.width,hit.height);hitMasks[b.id]=hc.getImageData(0,0,hit.width,hit.height);
 }
 for(const b of buildings){if(!b.damage)continue;const original=assets[b.id],layer=document.createElement('canvas');layer.width=original.width;layer.height=original.height;const surface=layer.getContext('2d');surface.drawImage(assets[b.id+':damaged'],0,0,layer.width,layer.height);surface.globalCompositeOperation='destination-in';surface.drawImage(original,0,0);assets[b.id+':damaged']=layer}
-asphalt=ctx.createPattern(assets.asphalt,'repeat');asphalt.setTransform(new DOMMatrix([.28,.14,-.28,.14,0,0]));new ResizeObserver(resize).observe(canvas);resize();if(embedded)parent.postMessage({type:'blackledger:ready'},location.origin)}catch(e){artFailure();status.className='error';status.textContent='An art asset could not load. Reload this study to retry.'}
+// This painted texture is not seamless. Cover the surface once to avoid repeat seams.
+asphalt=ctx.createPattern(assets.asphalt,'no-repeat');asphalt.setTransform(new DOMMatrix([1280/assets.asphalt.width,0,0,820/assets.asphalt.height,0,0]));new ResizeObserver(resize).observe(canvas);resize();if(embedded)parent.postMessage({type:'blackledger:ready'},location.origin)}catch(e){artFailure();status.className='error';status.textContent='An art asset could not load. Reload this study to retry.'}
 
 if(embedded){window.addEventListener('message',e=>{if(e.source!==parent||e.origin!==location.origin||e.data?.type!=='blackledger:presentation')return;const data=e.data;const sceneID=typeof data.sequence?.id==='string'?data.sequence.id:'';if(sceneID!==sequenceKey){sequenceKey=sceneID;sequence=sceneID&&data.sequence.kind==='attack'&&buildings.some(b=>b.id===data.sequence.target)&&!reduced.matches?{target:data.sequence.target,start:performance.now()}:null}if(Array.isArray(data.properties)){propertyState={};for(const p of data.properties){if(buildings.some(b=>b.id===p.id)&&Number.isFinite(p.condition))propertyState[p.id]={condition:Math.max(0,Math.min(100,p.condition))}}}playerLocation=typeof data.position==='string'?data.position:'';const key=data.journey?data.journey.from+'>'+data.journey.to:'';if(key!==journeyKey){journeyKey=key;const from=buildings.find(b=>b.id===data.journey?.from),to=buildings.find(b=>b.id===data.journey?.to);journey=key&&to&&!reduced.matches?{route:streetRoute(from,to),start:performance.now()}:null}selected=buildings.some(b=>b.id===data.selected)?data.selected:'';if(Number.isFinite(data.minute)){const hour=(data.minute%1440)/60;light.value=String(Math.round((hour<6||hour>=20?1:hour<8?(8-hour)/2:hour>17?(hour-17)/3:0)*100))}if(typeof data.motion==='boolean')motion.checked=data.motion&&!reduced.matches;wake()})}
