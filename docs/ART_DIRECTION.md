@@ -20,4 +20,8 @@ Keep source art unchanged. Store footprint and lighting coordinates as metadata 
 
 ## Street assembly study
 
-`/street-study.html` uses café, casino and sedan PNGs with scripted paths and depth sorting. It exercises separate building, ground, actor and light layers. Road art and pedestrian figures are provisional. Building and light anchors currently live in `public/art/street-study.js`; extract a shared asset manifest before integrating the production city renderer.
+`/street-study.html` uses café, casino and sedan PNGs with scripted paths and depth sorting. It exercises separate building, ground, actor and light layers. Road art and pedestrian figures are provisional. Building positions, entrance anchors and presentation walkways now live in `public/art/buildings.json`, shared by the live street and React controls. Marquee bulb anchors remain in the renderer. The Mariner and laundry are integrated; market/docks and additional district art remain pending.
+
+## Painted character atlas
+
+`public/art/cast-noir-v1.png` is a 3 × 2 atlas of square portraits: Mara, Leo, Vittorio / Elena, Harlow, Alex. React selects stable atlas cells by identity; it does not generate faces during play. Future player identities still use the procedural fallback until additional cast art is authored. The raw atlas is preserved without destructive crops.

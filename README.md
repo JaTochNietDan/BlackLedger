@@ -29,3 +29,14 @@ AI: BLACK_LEDGER_OLLAMA (default http://127.0.0.1:11435), BLACK_LEDGER_MODEL (de
 The archived prototype-python folder is a reference implementation, not the active backend. Its original tests run with `python3 -m unittest discover -s prototype-python/tests -v`.
 
 See DESIGN.md, API.md and docs/ARCHITECTURE.md for scope and system boundaries; docs/DEVELOPMENT.md tracks validation.
+
+### Repeatable browser edge case
+
+Create a fresh, isolated police-stop save (the command refuses an existing path):
+
+```sh
+go run ./cmd/qa-fixture .runtime/police-check.sqlite3
+BLACK_LEDGER_PORT=8795 BLACK_LEDGER_DB=.runtime/police-check.sqlite3 go run ./cmd/blackledger
+```
+
+Accept the courier offer, verify its reward remains unpaid at the police stop, and choose whether to pay or abandon. This fixture is separate from normal progression and must not be used as evidence of an earned campaign run.

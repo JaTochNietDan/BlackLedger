@@ -11,7 +11,8 @@ import type {Snapshot,Command,Action,Place} from './types';
 import './style.css';
 const money=(n:number)=>'$'+Math.floor(n).toLocaleString();const time=(m:number)=>`Day ${Math.floor(m/1440)+1} · ${String(Math.floor(m%1440/60)).padStart(2,'0')}:${String(m%60).padStart(2,'0')}`;
 function Icon({id}:{id:string}){return <span aria-hidden="true" dangerouslySetInnerHTML={{__html:icon(id)}}/>}
-function Portrait({id}:{id:string}){return <span aria-hidden="true" dangerouslySetInnerHTML={{__html:portrait(id)}}/>}
+const castPortraits:{[id:string]:[number,number]}={mara:[0,0],leo:[1,0],vittorio:[2,0],elena:[0,1],harlow:[1,1],'Alex Varga':[2,1]};
+function Portrait({id}:{id:string}){const cell=castPortraits[id];return cell?<span aria-hidden="true" className="portrait painted-portrait" style={{backgroundPosition:`${cell[0]*50}% ${cell[1]*100}%`}}/>:<span aria-hidden="true" dangerouslySetInnerHTML={{__html:portrait(id)}}/>}
 class RequestError extends Error{constructor(message:string,public status:number){super(message)}}
 async function api<T>(path:string,payload?:unknown):Promise<T>{const r=await fetch('/api/'+path,payload!==undefined?{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}:{});const data=await r.json();if(!r.ok)throw new RequestError(data.error||'Request failed',r.status);return data}
 function App(){

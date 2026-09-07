@@ -75,3 +75,9 @@
 - Fixed capped-history rollover dropping new presentation records. Added a regression with a full 180-record history.
 - Added The Mariner painted sprite as the fourth neighborhood building. Street presentation now includes a player marker, skippable 2.2-second committed travel along authored pavement waypoints, and a reusable asphalt texture. Ground is cached between lighting changes; crossed streets are drawn as a continuous junction.
 - Current automated verification: Go race suite, frontend voice tests and production build pass. Remaining art work includes market/docks, finished pedestrian art, richer sidewalk dressing and broader viewport QA. Police decisions have regression coverage but still need an observed browser encounter.
+
+## Portraits and police browser verification
+- Added six painted cast portraits in a shared atlas and verified Mara/Alex in the live interface. Other future player identities retain the previous fallback. Compressed the desktop street header to reserve more space for the illustration.
+- Added `cmd/qa-fixture`, which exclusively creates a new isolated police-test save and refuses existing output paths. This is a deterministic QA fixture, not natural campaign progression.
+- Browser fixture: accepted a Russo courier at heat 14; at 08:45 cash remained $90 and respect 0 while Detective Harlow required a choice. Paid $40; cash became $125, respect 3, heat 7, and Russo standing +6. Expanded the additional-outcome disclosure successfully. Separate core tests cover abandonment and duplicate-decision rejection.
+- Day and night street screenshots show the asphalt and continuous junction without browser errors. The small pedestrian art and sparse surroundings still need improvement.
