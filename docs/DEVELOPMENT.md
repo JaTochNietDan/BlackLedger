@@ -36,3 +36,10 @@
 - Created a transparent casino asset and standalone /art-study.html with day/night grading and animated marquee lights.
 - Inspected night presentation in the browser; transparency and bulb placement are usable for the first study. Production street assembly, window masks and moving actors remain pending.
 - Frontend production build passes.
+
+## Animated block and business pressure
+- Added docs/GOAL.md with the user's expanded visual acceptance requirements. The app goal was observed paused; its objective/resume fields cannot be changed with the available goal tool. Implementation continues during the current turn.
+- Added matching transparent café and sedan assets, plus /street-study.html: moving cars, simple pedestrian silhouettes, independent marquee lights, smoke, motion toggle, reduced-motion support, and a scripted car-arrival preview. Rendering suspends when the document is hidden.
+- Browser visual inspection found the initial road overlapped façades; moved traffic and pavements outward. This remains a two-building study, not the integrated gameplay neighborhood. People still use simple procedural silhouettes.
+- Added ownership-driven faction pressure. A scheduled demand pauses action time; paying improves relations, refusal or rival backing can schedule hidden sabotage, and damage reduces property income. Available loyal crew mitigate business damage; home guards do not.
+- Added regression coverage for interruption timing, private schedules, limited tribute protection, hidden sabotage, crew availability, and no demands without a business.

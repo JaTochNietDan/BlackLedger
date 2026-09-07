@@ -17,3 +17,7 @@ Avoid generating a full animation as independent images. Use moving sprites and 
 This is an isolated asset/presentation study. Global image grading is not a complete lighting system; proper window masks, foreground occlusion, street tiles and standardized production dimensions remain to be developed. Do not describe this as a complete modular city.
 
 Keep source art unchanged. Store footprint and lighting coordinates as metadata when integrating production assets. Generated art is never stored only in a user-specific tool cache once referenced by the project.
+
+## Street assembly study
+
+`/street-study.html` uses café, casino and sedan PNGs with scripted paths and depth sorting. It exercises separate building, ground, actor and light layers. Road art and pedestrian figures are provisional. Building and light anchors currently live in `public/art/street-study.js`; extract a shared asset manifest before integrating the production city renderer.
