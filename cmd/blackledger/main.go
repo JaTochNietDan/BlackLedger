@@ -179,7 +179,9 @@ func (a *app) prepare() bool {
 	return true
 }
 func (a *app) generate(snapshot *core.World) error {
-	contextData := map[string]any{"life": snapshot.Life, "minute": snapshot.Minute, "player": snapshot.Player, "factions": snapshot.Factions, "npcs": snapshot.NPCs, "dead": snapshot.Dead, "places": core.Locations, "properties": snapshot.Properties, "recent_history": snapshot.History[max(0, len(snapshot.History)-12):]}
+	operation := snapshot.NextDirectorOperation()
+	connection := snapshot.DirectorConnection()
+	contextData := map[string]any{"required_operation": operation, "required_connection": connection, "recent_arrangements": snapshot.Arrangements, "life": snapshot.Life, "minute": snapshot.Minute, "player": snapshot.Player, "factions": snapshot.Factions, "npcs": snapshot.NPCs, "dead": snapshot.Dead, "places": core.Locations, "properties": snapshot.Properties, "recent_history": snapshot.History[max(0, len(snapshot.History)-12):]}
 	b, _ := json.Marshal(contextData)
 	payload, _ := json.Marshal(map[string]any{"model": env("BLACK_LEDGER_MODEL", "qwen3:14b"), "stream": false, "think": false, "format": "json", "messages": []map[string]string{{"role": "system", "content": prompt}, {"role": "user", "content": string(b)}}, "options": map[string]any{"temperature": .8, "num_predict": 700}})
 	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
@@ -205,6 +207,12 @@ func (a *app) generate(snapshot *core.World) error {
 	var proposal core.Proposal
 	if e = json.Unmarshal([]byte(answer.Message.Content), &proposal); e != nil {
 		return e
+	}
+	if connection != nil && (proposal.Speaker != connection.Speaker || proposal.Beneficiary != connection.Beneficiary) {
+		return fmt.Errorf("director ignored the established contact connection")
+	}
+	if proposal.Operation != operation {
+		return fmt.Errorf("director ignored operation brief: wanted %s", operation)
 	}
 	return a.s.Change(func(w *core.World) error {
 		if w.ID != snapshot.ID || w.Life != snapshot.Life || !w.Player.Alive {

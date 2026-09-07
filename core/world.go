@@ -117,6 +117,8 @@ type Effect struct {
 	Minutes int `json:"minutes"`
 }
 type Scene struct {
+	Operation    string            `json:"operation,omitempty"`
+	JobID        string            `json:"job_id,omitempty"`
 	Alternatives map[string]Effect `json:"alternatives,omitempty"`
 	Beneficiary  string            `json:"beneficiary,omitempty"`
 	Target       string            `json:"target,omitempty"`
@@ -148,6 +150,7 @@ type Result struct {
 	Records []Record `json:"records"`
 }
 type World struct {
+	Arrangements []ArrangementMemory  `json:"arrangements,omitempty"`
 	NextPressure int                  `json:"next_pressure,omitempty"`
 	Version      int                  `json:"version"`
 	ID           string               `json:"id"`
@@ -594,6 +597,8 @@ func (w *World) OfferIfReady() {
 	if len(w.Offers) > 0 && w.Minute >= w.Offers[0].Ready {
 		w.Event = w.Offers[0].Event
 		w.Event.Minute = w.Minute
+		w.RememberArrangement(w.Event, "offered")
+		w.Log(w.Event.Title, w.Event.Body, "story")
 		w.Offers = w.Offers[1:]
 		w.Director.Status = "available"
 		w.Director.Detail = "Ready to prepare another situation."
@@ -603,6 +608,7 @@ func (w *World) OfferIfReady() {
 		e, _ := w.ValidateProposal(Proposal{"A favor with a price", "“A merchant wants a sealed ledger moved before his partners arrive. I would understand if you preferred the ordinary work.”", "mara", "courier", "You moved the ledger. Mara now knows you can handle sensitive work.", "", []Approach{{Method: "careful", Label: "Wait for a quiet route"}, {Method: "press", Label: "Move it before the partners arrive"}}})
 		e.Source = "authored"
 		w.Event = e
+		w.RememberArrangement(e, "offered")
 		w.Log("A favor with a price", "Mara offers more sensitive work.", "story")
 	}
 }
@@ -644,7 +650,7 @@ func (w *World) ValidateProposal(p Proposal) (*Scene, error) {
 			return nil, fmt.Errorf("unknown beneficiary faction")
 		}
 	}
-	scene := &Scene{ID: ID(), Title: p.Title, Beneficiary: p.Beneficiary, Body: p.Body, Speaker: p.Speaker, Kind: "proposal", Source: "local-ai", Minute: w.Minute, Effect: fx, Outcome: map[string]string{"courier": "You delivered the sealed package and reported back.", "mediation": "You completed the requested mediation without violence.", "collection": "You collected the agreed payment and reported back."}[p.Operation], Choices: []Choice{{ID: "accept", Label: map[string]string{"courier": "Deliver the package", "mediation": "Mediate the dispute", "collection": "Collect the payment"}[p.Operation], Detail: fmt.Sprintf("$%d · %d minutes · +%d respect · +%d heat", fx.Reward, fx.Minutes, fx.Respect, fx.Heat) + " · At 15 heat, police may stop completion." + politicalDetail}, {ID: "decline", Label: "Decline the arrangement", Detail: "No cost or time."}}}
+	scene := &Scene{Operation: p.Operation, ID: ID(), Title: p.Title, Beneficiary: p.Beneficiary, Body: p.Body, Speaker: p.Speaker, Kind: "proposal", Source: "local-ai", Minute: w.Minute, Effect: fx, Outcome: map[string]string{"courier": "You delivered the sealed package and reported back.", "mediation": "You completed the requested mediation without violence.", "collection": "You collected the agreed payment and reported back."}[p.Operation], Choices: []Choice{{ID: "accept", Label: map[string]string{"courier": "Deliver the package", "mediation": "Mediate the dispute", "collection": "Collect the payment"}[p.Operation], Detail: fmt.Sprintf("$%d · %d minutes · +%d respect · +%d heat", fx.Reward, fx.Minutes, fx.Respect, fx.Heat) + " · At 15 heat, police may stop completion." + politicalDetail}, {ID: "decline", Label: "Decline the arrangement", Detail: "No cost or time."}}}
 	if err := addApproaches(scene, p.Approaches, politicalDetail); err != nil {
 		return nil, err
 	}

@@ -117,9 +117,11 @@ func (w *World) apply(c Command) error {
 				w.CompleteArrangement(e)
 			} else {
 				p.Heat = max(0, p.Heat-6)
+				w.RememberArrangement(e, "abandoned")
 				w.Log("The arrangement abandoned", "You surrender the package or paperwork and leave without completing the job. No reward was paid. Police attention eases.", "story")
 			}
 		case "proposal":
+			w.RememberArrangement(e, "offered")
 			alternative, hasAlternative := e.Alternatives[c.Choice]
 			if hasAlternative {
 				e.Effect = alternative
@@ -130,6 +132,7 @@ func (w *World) apply(c Command) error {
 				}
 			}
 			if c.Choice == "accept" || hasAlternative {
+				w.RememberArrangement(e, "in_progress")
 				w.Advance(e.Effect.Minutes)
 				if p.Alive && w.Event == nil {
 					if p.Heat+e.Effect.Heat >= 15 {
@@ -138,9 +141,11 @@ func (w *World) apply(c Command) error {
 						w.CompleteArrangement(e)
 					}
 				} else {
+					w.RememberArrangement(e, "interrupted")
 					w.Log("An interrupted arrangement", "The operation could not be completed. No reward was paid.", "story")
 				}
 			} else {
+				w.RememberArrangement(e, "declined")
 				w.Log("An offer declined", "You decline "+w.NPC(e.Speaker).Name+"'s proposal. No payment changes hands.", "story")
 			}
 		}

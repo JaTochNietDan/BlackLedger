@@ -137,13 +137,15 @@ func (w *World) PoliceStop(job *Scene) {
 	if w.NPC("harlow") == nil {
 		w.NPCs = append(w.NPCs, NPC{ID: "harlow", Name: "Detective Harlow", Role: "City detective", Voice: "bm_lewis", Color: "#7c8791"})
 	}
-	w.Event = &Scene{ID: ID(), Kind: "police_stop", Source: "authored", Minute: w.Minute, Speaker: "harlow", Actor: job.Speaker, Beneficiary: job.Beneficiary, Title: "Too familiar a face", Body: "“Your name keeps coming up in the same places. Before you finish this arrangement, we are going to have a conversation. You can settle this inconvenience, or leave the business unfinished.”", Effect: job.Effect, Outcome: job.Outcome, Choices: []Choice{
+	w.RememberArrangement(job, "awaiting_police")
+	w.Event = &Scene{JobID: job.ID, Operation: job.Operation, ID: ID(), Kind: "police_stop", Source: "authored", Minute: w.Minute, Speaker: "harlow", Actor: job.Speaker, Beneficiary: job.Beneficiary, Title: "Too familiar a face", Body: "“Your name keeps coming up in the same places. Before you finish this arrangement, we are going to have a conversation. You can settle this inconvenience, or leave the business unfinished.”", Effect: job.Effect, Outcome: job.Outcome, Choices: []Choice{
 		{ID: "pay", Label: "Pay $40 and finish the job", Cost: 40, Detail: fmt.Sprintf("Receive the agreed $%d reward and reputation afterward. Police attention decreases before this job's heat is applied.", job.Effect.Reward)},
 		{ID: "abandon", Label: "Abandon the arrangement", Detail: "No payment or reward. Lose 6 heat; the work and time already spent are lost."},
 	}}
 	w.Log("Police attention catches up", "A detective interrupts the arrangement before its reward is paid.", "danger")
 }
 func (w *World) CompleteArrangement(job *Scene) {
+	w.RememberArrangement(job, "completed")
 	w.Earn(job.Effect.Reward)
 	w.Player.Respect += job.Effect.Respect
 	w.Player.Heat = min(100, w.Player.Heat+job.Effect.Heat)
