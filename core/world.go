@@ -143,13 +143,21 @@ type Director struct {
 	Detail      string `json:"detail"`
 	LastRequest int    `json:"last_request"`
 }
+type VisualCue struct {
+	ID      string `json:"id"`
+	Kind    string `json:"kind"`
+	Target  string `json:"target"`
+	Caption string `json:"caption"`
+}
 type Result struct {
-	From    string   `json:"from_location"`
-	To      string   `json:"to_location"`
-	Elapsed int      `json:"elapsed"`
-	Records []Record `json:"records"`
+	Cues    []VisualCue `json:"cues,omitempty"`
+	From    string      `json:"from_location"`
+	To      string      `json:"to_location"`
+	Elapsed int         `json:"elapsed"`
+	Records []Record    `json:"records"`
 }
 type World struct {
+	VisualCues   []VisualCue          `json:"-"`
 	Arrangements []ArrangementMemory  `json:"arrangements,omitempty"`
 	NextPressure int                  `json:"next_pressure,omitempty"`
 	Version      int                  `json:"version"`
@@ -453,6 +461,7 @@ func (w *World) Attack(plot Plot) {
 	p := &w.Player
 	if p.Location != p.Home {
 		w.Properties[p.Home].Condition = max(10, w.Properties[p.Home].Condition-45)
+		w.VisualCues = append(w.VisualCues, VisualCue{ID(), "attack", p.Home, "Armed men damaged your residence while you were away."})
 		w.Log("Someone came looking", "You were away. Armed men damaged your residence and left before anyone could identify them.", "danger")
 		return
 	}

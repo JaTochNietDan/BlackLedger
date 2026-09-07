@@ -12,13 +12,13 @@ import (
 
 func main() {
 	if len(os.Args) < 2 || len(os.Args) > 3 {
-		log.Fatal("usage: go run ./cmd/qa-fixture <new-qa.sqlite3> [police|damage|warning]")
+		log.Fatal("usage: go run ./cmd/qa-fixture <new-qa.sqlite3> [police|damage|warning|attack]")
 	}
 	scenario := "police"
 	if len(os.Args) == 3 {
 		scenario = os.Args[2]
 	}
-	if scenario != "police" && scenario != "damage" && scenario != "warning" {
+	if scenario != "police" && scenario != "damage" && scenario != "warning" && scenario != "attack" {
 		log.Fatal("unsupported QA scenario")
 	}
 	path := os.Args[1]
@@ -36,6 +36,12 @@ func main() {
 	}
 	defer s.DB.Close()
 	err = s.Change(func(w *core.World) error {
+		if scenario == "attack" {
+			w.Player.Location = "laundry"
+			w.Properties["laundry"].Owner = "player:1"
+			w.Plots = append(w.Plots, core.Plot{ID: core.ID(), Kind: "sabotage", Life: w.Life, Due: w.Minute + 15, Actor: "bellandi", Target: "laundry", Strength: 35})
+			return nil
+		}
 		if scenario == "warning" {
 			w.Player.Contacts = 2
 			w.Player.Health = 60

@@ -15,6 +15,7 @@ func Execute(original *World, c Command) (*World, error) {
 }
 func (w *World) apply(c Command) error {
 	p := &w.Player
+	w.VisualCues = nil
 	oldTime := w.Minute
 	oldLoc := p.Location
 	previousRecords := make(map[string]bool, len(w.History))
@@ -93,6 +94,13 @@ func (w *World) apply(c Command) error {
 					w.Log("Alive, at a price", fmt.Sprintf("You survive wounded. %d security details are lost. The attackers withdraw.", lost), "danger")
 				}
 			}
+			caption := "The attackers withdraw. You survived the encounter."
+			if !p.Alive {
+				caption = "The attack ended your life."
+			} else if c.Choice == "bargain" {
+				caption = "The attackers accepted payment and withdrew."
+			}
+			w.VisualCues = append(w.VisualCues, VisualCue{ID(), "attack", p.Home, caption})
 		case "audience":
 			if c.Choice == "tribute" {
 				w.Factions[0].Goodwill += 8
@@ -284,6 +292,6 @@ func (w *World) apply(c Command) error {
 			newRecords = append(newRecords, record)
 		}
 	}
-	w.LastResult = &Result{oldLoc, w.Player.Location, w.Minute - oldTime, newRecords}
+	w.LastResult = &Result{From: oldLoc, To: w.Player.Location, Elapsed: w.Minute - oldTime, Records: newRecords, Cues: w.VisualCues}
 	return nil
 }

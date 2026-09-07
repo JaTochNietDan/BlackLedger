@@ -98,6 +98,7 @@ func (w *World) ResolveSabotage(p Plot) {
 	if p.Known {
 		evidence = "This matches the operation your sources uncovered."
 	}
+	w.VisualCues = append(w.VisualCues, VisualCue{ID(), "attack", p.Target, fmt.Sprintf("The attack damaged %s. Condition is now %d%%.", l.Name, prop.Condition)})
 	w.Log("Broken glass at "+l.Name, fmt.Sprintf("An attack damaged the business by %d condition. Income is reduced until repairs are made. %s", damage, evidence), "danger")
 }
 
