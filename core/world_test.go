@@ -215,3 +215,23 @@ func BenchmarkAdvanceCityDay(b *testing.B) {
 		w.Advance(1440)
 	}
 }
+
+func TestScheduledIncomeExact(t *testing.T) {
+	w := New(27)
+	w.Properties["laundry"].Owner = "player:1"
+	cash := w.Player.Cash
+	w.Advance(60)
+	if w.Player.Cash != cash+14 {
+		t.Fatal("hourly income drift")
+	}
+}
+func TestScheduleStopsBeforePostAttackTask(t *testing.T) {
+	w := New(27)
+	w.Player.Security = 1
+	w.Retaliation()
+	w.Tasks = append(w.Tasks, Task{ID(), "Leo", w.Minute + 300})
+	w.Advance(600)
+	if w.Minute != 720 || len(w.Tasks) != 1 {
+		t.Fatal("advanced past player decision")
+	}
+}

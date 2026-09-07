@@ -435,15 +435,30 @@ func (w *World) Attack(plot Plot) {
 }
 func (w *World) Advance(minutes int) {
 	p := &w.Player
-	for i := 0; i < minutes; i++ {
+	end := w.Minute + max(0, minutes)
+	for w.Minute < end {
 		if !p.Alive || w.Event != nil {
 			return
 		}
-		w.Minute++
+		// Jump to the next meaningful boundary; presentation never drives this clock.
+		next := min(end, (w.Minute/1440+1)*1440)
+		for _, task := range w.Tasks {
+			next = min(next, max(w.Minute+1, task.Due))
+		}
+		for _, plot := range w.Plots {
+			if plot.Life == w.Life {
+				next = min(next, max(w.Minute+1, plot.Due))
+				if !plot.Known && p.Contacts >= 2 {
+					next = min(next, max(w.Minute+1, plot.Due-90))
+				}
+			}
+		}
+		elapsed := next - w.Minute
+		w.Minute = next
 		for id, prop := range w.Properties {
 			if w.Own(id) {
-				prop.Carry += float64(prop.Income*prop.Condition) / 6000
-				n := int(prop.Carry)
+				prop.Carry += float64(prop.Income*prop.Condition*elapsed) / 6000
+				n := int(prop.Carry + 1e-9)
 				prop.Carry -= float64(n)
 				w.Earn(n)
 			}
