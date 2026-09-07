@@ -247,3 +247,8 @@
 - Added a $40 bonus action (15 minutes, up to +25 loyalty, capped at 100), available beside delegation in People and current-location actions. Payment and loyalty commit together before time advances, so interruptions do not consume the payment without the bonus.
 - People reports refusal explicitly. Crew do not automatically quit in this implementation; rebuilding loyalty remains possible.
 - Added regression coverage for refusal without state mutation, bonus payment/recovery and resumed assignment, unaffordable/max-loyalty rejection, and capping. Full Go race suite, frontend build, and seven frontend tests pass. This change has not yet received a dedicated browser visual playtest.
+
+## Crew UI and simulation follow-through
+- Browser playtest on an isolated copy of the earned Day 2 campaign verified People displays both actions. Paying the bonus changed loyalty 65→90, clock 10:40→10:55, and cash $155→$125 ($40 expense offset by $10 owned-business income). Main campaign untouched.
+- Investor/defiant public-state policies now prioritize an affordable bonus below 50 loyalty, preserving the ability to protect businesses as well as collect. Added tests for recovery then delegation and unaffordable recovery avoidance. A production midnight-billing test proves missed wages cause assignment refusal. Core/simulation race tests pass.
+- Ran 100 authored campaigns (25 each investor, defiant, worker, reckless; up to 160 commands) after the change. Detailed local report: `.runtime/crew-simulation.json`. These ordinary strategies do not deliberately bankrupt their crew; the focused missed-wages test covers that edge rather than claiming the batch demonstrates it.

@@ -130,6 +130,11 @@ func Choose(v View, strategy string) (core.Command, error) {
 			return c, nil
 		}
 	}
+	if len(v.Player.Crew) > 0 && v.Player.Crew[0].Loyalty < 50 {
+		if c, ok := v.action(v.Player.Location, "crew_bonus"); ok {
+			return c, nil
+		}
+	}
 	if c, ok := v.action(v.Player.Location, "delegate"); ok {
 		return c, nil
 	}

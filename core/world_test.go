@@ -370,3 +370,17 @@ func TestCrewBonusLimits(t *testing.T) {
 		}
 	}
 }
+
+func TestMissedWagesCauseRefusal(t *testing.T) {
+	w := New(27)
+	w.Minute = 1439
+	w.Player.Cash = 0
+	w.Player.Crew = []Crew{{"leo", "Leo", 45}}
+	w.Advance(1)
+	if w.Player.Crew[0].Loyalty != 25 {
+		t.Fatal("unpaid wages did not reduce loyalty")
+	}
+	if _, err := Execute(w, Command{Revision: w.Revision, Kind: "delegate", Target: "room"}); err == nil {
+		t.Fatal("missed wages did not affect assignments")
+	}
+}

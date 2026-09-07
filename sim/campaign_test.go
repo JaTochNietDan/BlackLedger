@@ -65,3 +65,25 @@ func TestDefiantInvestorRefusesPublicBusinessDemand(t *testing.T) {
 		t.Fatal("policies do not distinguish compliance and resistance")
 	}
 }
+
+func TestInvestorRepairsCrewLoyaltyUsingPublicActions(t *testing.T) {
+	w := core.New(27)
+	w.Player.Crew = []core.Crew{{ID: "leo", Name: "Leo", Loyalty: 25}}
+	c, err := Choose(Public(w), "investor")
+	if err != nil || c.Kind != "crew_bonus" {
+		t.Fatalf("investor ignored recoverable crew: %+v %v", c, err)
+	}
+	next, err := core.Execute(w, c)
+	if err != nil {
+		t.Fatal(err)
+	}
+	c, err = Choose(Public(next), "investor")
+	if err != nil || c.Kind != "delegate" {
+		t.Fatalf("investor did not resume collections: %+v %v", c, err)
+	}
+	w.Player.Cash = 0
+	c, err = Choose(Public(w), "investor")
+	if err != nil || c.Kind == "crew_bonus" {
+		t.Fatal("policy attempted unaffordable recovery")
+	}
+}
