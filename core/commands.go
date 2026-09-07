@@ -192,18 +192,7 @@ func (w *World) apply(c Command) error {
 					p.Respect += 2
 					w.Log("Your first associate", "Leo Carver joins you. He expects $12 a day and a boss who keeps their word.", "personal")
 				case "investigate":
-					found := false
-					for i := range w.Plots {
-						if w.Plots[i].Life == w.Life {
-							w.Plots[i].Known = true
-							found = true
-						}
-					}
-					text := "Your sources have no evidence of an active operation against you. This is not a guarantee of safety."
-					if found {
-						text = "Bellandi has commissioned an operation against you. Avoid home, negotiate, or arrange protection."
-					}
-					w.Log("Word on the street", text, "intel")
+					w.Investigate()
 				case "lie_low":
 					p.Heat = max(0, p.Heat-10)
 					w.Log("Out of the spotlight", "You avoid attention for a while.", "personal")

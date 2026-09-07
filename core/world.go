@@ -393,7 +393,7 @@ func (w *World) Actions(id string) []Action {
 }
 func (w *World) Retaliation() {
 	for _, p := range w.Plots {
-		if p.Life == w.Life {
+		if p.Life == w.Life && p.Kind == "hit" && p.Actor == "bellandi" {
 			return
 		}
 	}
@@ -541,7 +541,7 @@ func (w *World) Public() map[string]any {
 	if len(history) > 60 {
 		history = history[len(history)-60:]
 	}
-	return map[string]any{"id": w.ID, "version": w.Version, "revision": w.Revision, "life": w.Life, "minute": w.Minute, "player": w.Player, "district": w.District, "factions": w.Factions, "npcs": w.NPCs, "locations": locs, "event": scene, "history": history, "dead": w.Dead, "tasks": w.Tasks, "director": w.Director, "last_result": w.LastResult, "daily_cost": w.DailyCost(), "income": income, "security": w.Guard()}
+	return map[string]any{"id": w.ID, "version": w.Version, "revision": w.Revision, "life": w.Life, "minute": w.Minute, "player": w.Player, "district": w.District, "factions": w.Factions, "npcs": w.NPCs, "locations": locs, "event": scene, "history": history, "dead": w.Dead, "tasks": w.Tasks, "director": w.Director, "last_result": w.LastResult, "daily_cost": w.DailyCost(), "income": income, "security": w.Guard(), "opportunity": w.NextOpportunity()}
 }
 func (w *World) hasRecord(title string) bool {
 	for _, r := range w.History {

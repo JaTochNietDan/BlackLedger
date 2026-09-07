@@ -20,7 +20,9 @@ AI: BLACK_LEDGER_OLLAMA (default http://127.0.0.1:11435), BLACK_LEDGER_MODEL (de
 
 ## Verify
 
-`go test ./...`
+`go test -race ./...`
+
+`npm test` (speech cancellation and lifetime tests)
 
 `go test ./core -bench=Advance -run='^$' -benchmem`
 

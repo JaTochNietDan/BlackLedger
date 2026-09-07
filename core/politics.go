@@ -94,5 +94,40 @@ func (w *World) ResolveSabotage(p Plot) {
 	prop := w.Properties[p.Target]
 	damage = min(damage, prop.Condition)
 	prop.Condition -= damage
-	w.Log("Broken glass at "+l.Name, fmt.Sprintf("An attack damaged the business by %d condition. Income is reduced until repairs are made. The attackers left no proof of who sent them.", damage), "danger")
+	evidence := "The attackers left no proof of who sent them."
+	if p.Known {
+		evidence = "This matches the operation your sources uncovered."
+	}
+	w.Log("Broken glass at "+l.Name, fmt.Sprintf("An attack damaged the business by %d condition. Income is reduced until repairs are made. %s", damage, evidence), "danger")
+}
+
+// Investigation reveals only actual, still-active plans and identifies their real target.
+func (w *World) Investigate() {
+	found := false
+	for i := range w.Plots {
+		p := &w.Plots[i]
+		if p.Life != w.Life {
+			continue
+		}
+		found = true
+		p.Known = true
+		actor := "An unknown organization"
+		for _, f := range w.Factions {
+			if f.ID == p.Actor {
+				actor = f.Name
+			}
+		}
+		detail := actor + " has commissioned an attack against you. Avoid home, negotiate, or arrange residential protection."
+		if p.Kind == "sabotage" {
+			l, ok := PlaceByID(p.Target)
+			if !ok {
+				continue
+			}
+			detail = actor + " has commissioned an attack on " + l.Name + ". Available loyal crew can limit business damage; home security cannot."
+		}
+		w.Log("Word on the street", detail, "intel")
+	}
+	if !found {
+		w.Log("Word on the street", "Your sources have no evidence of an active operation against you. This is not a guarantee of safety.", "intel")
+	}
 }

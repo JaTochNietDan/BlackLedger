@@ -87,3 +87,37 @@ func TestNoDemandWithoutBusiness(t *testing.T) {
 		t.Fatal("business demand without business")
 	}
 }
+
+func TestBusinessPlotDoesNotPreventPersonalHit(t *testing.T) {
+	w := pressureWorld()
+	w.Plots = []Plot{{ID: ID(), Kind: "sabotage", Life: w.Life, Actor: "russo", Target: "laundry", Due: 900}}
+	w.Retaliation()
+	w.Retaliation()
+	if len(w.Plots) != 2 || w.Plots[1].Kind != "hit" {
+		t.Fatal("different plots incorrectly deduplicated")
+	}
+}
+func TestInvestigationNamesRealActorAndTarget(t *testing.T) {
+	w := pressureWorld()
+	w.Plots = []Plot{{ID: ID(), Kind: "sabotage", Life: w.Life, Actor: "russo", Target: "laundry", Due: 900}}
+	w.Investigate()
+	record := w.History[len(w.History)-1]
+	if !strings.Contains(record.Text, "Russo Outfit") || !strings.Contains(record.Text, "Bluebird Laundry") || strings.Contains(record.Text, "Bellandi") || !w.Plots[0].Known {
+		t.Fatal("investigation invented actor or target")
+	}
+}
+func TestOpportunityDoesNotRevealHiddenPlans(t *testing.T) {
+	w := New(27)
+	before, _ := json.Marshal(w.NextOpportunity())
+	w.Retaliation()
+	after, _ := json.Marshal(w.NextOpportunity())
+	if string(before) != string(after) {
+		t.Fatal("guidance leaked private threat")
+	}
+	w.Player.JobCount = 3
+	w.Properties["laundry"].Owner = "player:1"
+	w.Properties["laundry"].Condition = 65
+	if w.NextOpportunity().Target != "laundry" {
+		t.Fatal("damage has no actionable guidance")
+	}
+}

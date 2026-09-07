@@ -52,3 +52,10 @@
 - The visible QA session on 8792 had additional interactions between observations, so used a separate hidden browser/save for controlled checks.
 - Added a visible condition/repair hint for owned businesses and an ambience pause control to the live street.
 - Still incomplete: full painted neighborhood, detailed pedestrians, committed travel animation inside street view (currently a saved-arrival banner), voice prefetch/cancellation audit, and full timed campaign playtest.
+
+## Political interactions, progression guidance and speech lifecycle
+- Fixed personal-hit deduplication: business sabotage no longer prevents a distinct personal retaliation plot.
+- Investigation now reports the actual faction and target, with different protection advice for a business and residence. Added regression checks for Russo attribution and simultaneous plot types.
+- Added backend-authored optional next-opportunity guidance from public facts; regression verifies it cannot reveal a hidden personal hit. Damaged businesses take priority over expansion suggestions.
+- Extracted voice lifetime/cancellation from the React component into a tested controller. Five Node tests pass for stale responses, character replacement, active cancellation, completion cleanup and unavailable providers. This does not verify subjective voice quality or all browser autoplay behavior.
+- Go race suite and frontend build pass.
