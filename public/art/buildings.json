@@ -1,0 +1,47 @@
+[
+  {
+    "id": "bar",
+    "name": "Saint Agnes",
+    "file": "cafe-noir-v1.png",
+    "x": 70,
+    "y": 35,
+    "w": 630,
+    "h": 420,
+    "depth": 445,
+    "door": [
+      446,
+      443
+    ],
+    "info": "Your neighborhood contact keeps a table here."
+  },
+  {
+    "id": "club",
+    "name": "The Monarch",
+    "file": "casino-noir-v1.png",
+    "x": 490,
+    "y": 230,
+    "w": 630,
+    "h": 420,
+    "depth": 625,
+    "door": [
+      900,
+      625
+    ],
+    "info": "Bellandi territory. Taking an interest here can be dangerous."
+  },
+  {
+    "id": "laundry",
+    "name": "Bluebird Laundry",
+    "file": "laundry-noir-v1.png",
+    "x": 600,
+    "y": 20,
+    "w": 420,
+    "h": 280,
+    "depth": 300,
+    "door": [
+      849,
+      292
+    ],
+    "info": "A small business that can become your first reliable income."
+  }
+]

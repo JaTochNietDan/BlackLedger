@@ -59,3 +59,9 @@
 - Added backend-authored optional next-opportunity guidance from public facts; regression verifies it cannot reveal a hidden personal hit. Damaged businesses take priority over expansion suggestions.
 - Extracted voice lifetime/cancellation from the React component into a tested controller. Five Node tests pass for stale responses, character replacement, active cancellation, completion cleanup and unavailable providers. This does not verify subjective voice quality or all browser autoplay behavior.
 - Go race suite and frontend build pass.
+
+## Complete API campaign and third painted location
+- Full no-cheat HTTP campaign regression passed: 44 committed commands, from initial funds through crew/business ownership, contacts, apartment and security, then feud, death at minute 2400 and a new character. City identity and former-organization property ownership persisted; player money, rank and crew reset. This is automated functional coverage, not a timed human/browser playtest.
+- Injuries now reduce intervention survival odds with bounded minimum/maximum probabilities. Added comparative seeded coverage and reran the campaign/race suite successfully.
+- Added Bluebird Laundry art and shared public/art/buildings.json used by the illustrated renderer, React location controls and selected-object previews.
+- Browser inspection found the laundry initially on the road; adjusted its position to the pavement edge. Increased provisional pedestrian scale relative to vehicles. Surface detail and finished character art are still pending.

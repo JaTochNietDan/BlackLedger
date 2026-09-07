@@ -261,3 +261,26 @@ func TestDirectorCannotInventMechanicalCompletion(t *testing.T) {
 		t.Fatal("operation hidden behind vague choice")
 	}
 }
+
+func TestInjuryReducesAttackSurvival(t *testing.T) {
+	survived := func(health int) int {
+		n := 0
+		for seed := uint32(1); seed < 1000; seed++ {
+			w := New(seed * 97)
+			w.Player.Health = health
+			w.Event = &Scene{ID: "attack", Kind: "attack", Choices: []Choice{{ID: "defend"}}}
+			next, err := Execute(w, Command{Kind: "choice", Event: "attack", Choice: "defend", Revision: 0})
+			if err != nil {
+				t.Fatal(err)
+			}
+			if next.Player.Alive {
+				n++
+			}
+		}
+		return n
+	}
+	healthy, injured := survived(100), survived(25)
+	if healthy <= injured || injured == 0 {
+		t.Fatalf("health has no meaningful bounded effect: healthy %d injured %d", healthy, injured)
+	}
+}

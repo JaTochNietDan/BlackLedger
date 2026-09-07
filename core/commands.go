@@ -67,7 +67,10 @@ func (w *World) apply(c Command) error {
 				if c.Choice == "escape" {
 					base = .5
 				}
-				chance := base + float64(w.Guard())*.16 + float64(p.Contacts)*.04
+				chance := base + float64(w.Guard())*.16 + float64(p.Contacts)*.04 - float64(100-p.Health)*.0025
+				if chance < .05 {
+					chance = .05
+				}
 				if chance > .9 {
 					chance = .9
 				}

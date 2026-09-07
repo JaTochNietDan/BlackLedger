@@ -8,3 +8,5 @@
 .map-heading .chapter-chip{display:none}.city-view-switch{top:110px}.building-art:has(img){height:150px;display:block}.building-art img{height:100%;max-height:100%;object-fit:contain}@media(max-width:800px){.city-view-switch{top:100px}}
 
 .next-opportunity{border:1px solid #666d53;background:#26342cdc;color:#dfc995;text-align:left;padding:8px 12px;max-width:220px;font-size:12px}.next-opportunity small{display:block;color:#a9b49f;font-size:8px;letter-spacing:.12em;margin-bottom:3px}
+
+.street-inspect{flex-wrap:wrap;justify-content:center;width:95%;white-space:normal}.street-inspect button{font-size:10px;padding:6px 8px}
