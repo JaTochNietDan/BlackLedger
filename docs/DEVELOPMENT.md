@@ -149,3 +149,9 @@
 - Traveled from The Mariner to Ashbury Court in the isolated second-life save: 18:05→18:55, cash unchanged at $90. The saved-journey caption appeared, then the normal action buttons became enabled without another command. Directory travel uses a short caption; the street still shows the walking presentation. Restored the temporary viewport override.
 - Build passed; active production JS now measures about 227 kB (72 kB gzip), down from about 469 kB for the main bundle plus renderer chunks. The old study modules remain in source but are no longer in the active import graph. Updated architecture/run documentation to reflect React plus the isolated canvas street.
 - Full city art and the uninterrupted pacing acceptance test remain outstanding. This pass fixes destination usability, not the remaining art coverage.
+
+## Mercer Exchange painted preview
+- Generated a muted 1930s pawn/trading-house storefront matching the existing building camera and material style. The first result included an unwanted explanatory slogan; a second image edit removed it.
+- Both outputs painted a checkerboard rather than delivering alpha. Preserved the selected RGB source unchanged and added an explicit SVG silhouette mask for normal UI compositing. This is not a claim that the source PNG is transparent.
+- Added a separate preview manifest so illustrated directory/property previews can be introduced without inventing unsafe street positions. Mercer Exchange now appears in the address book and selected-location panel; its gameplay location/actions are unchanged. The street still has four landmarks, and Mercer placement requires the pending neighborhood layout pass.
+- Browser screenshot verifies both Mercer previews against the dark UI without an opaque checkerboard rectangle. Production build passed. Source image, silhouette and manifest are stored in the independent repo.
