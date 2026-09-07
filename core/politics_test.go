@@ -121,3 +121,63 @@ func TestOpportunityDoesNotRevealHiddenPlans(t *testing.T) {
 		t.Fatal("damage has no actionable guidance")
 	}
 }
+
+func TestPoliceStopDefersJobRewardUntilDecision(t *testing.T) {
+	for _, decision := range []string{"pay", "abandon"} {
+		t.Run(decision, func(t *testing.T) {
+			w := New(27)
+			w.Player.Heat = 14
+			var err error
+			w.Event, err = w.ValidateProposal(Proposal{"A risky delivery", "Please deliver this sealed package.", "mara", "courier", "Delivered.", ""})
+			if err != nil {
+				t.Fatal(err)
+			}
+			choice(t, &w, "accept")
+			if w.Event == nil || w.Event.Kind != "police_stop" || w.Player.Cash != 90 || w.Minute != 525 || w.Player.Respect != 0 {
+				t.Fatal("police stop failed to defer reward")
+			}
+			oldID := w.Event.ID
+			choice(t, &w, decision)
+			if decision == "pay" && (w.Player.Cash != 125 || w.Player.Respect != 3 || w.Player.Heat != 7) {
+				t.Fatal("paid completion incorrect")
+			}
+			if decision == "abandon" && (w.Player.Cash != 90 || w.Player.Respect != 0 || w.Player.Heat != 8) {
+				t.Fatal("abandoned job paid reward")
+			}
+			if _, err = Execute(w, Command{Kind: "choice", Event: oldID, Choice: decision, Revision: w.Revision}); err == nil {
+				t.Fatal("police choice applied twice")
+			}
+		})
+	}
+}
+
+func TestGeneratedFactionWorkHasValidatedPoliticalEffect(t *testing.T) {
+	w := New(27)
+	if _, err := w.ValidateProposal(Proposal{Title: "A job", Body: "Help them.", Speaker: "mara", Operation: "courier", Outcome: "Done.", Beneficiary: "invented-family"}); err == nil {
+		t.Fatal("unknown faction accepted")
+	}
+	scene, err := w.ValidateProposal(Proposal{Title: "A Russo favor", Body: "Deliver these papers for Russo.", Speaker: "mara", Operation: "courier", Outcome: "Done.", Beneficiary: "russo"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(scene.Choices[0].Detail, "Russo Outfit standing +6") {
+		t.Fatal("political stakes hidden")
+	}
+	w.Event = scene
+	choice(t, &w, "accept")
+	if w.Factions[1].Goodwill != 6 || w.Factions[0].Goodwill != -3 {
+		t.Fatal("completed faction job has no politics")
+	}
+	w.Player.Heat = 14
+	w.Event = scene
+	w.Event.ID = ID()
+	choice(t, &w, "accept")
+	if w.Event == nil || w.Event.Kind != "police_stop" || w.Event.Beneficiary != "russo" {
+		t.Fatal("political context lost on interruption")
+	}
+	before := w.Factions[1].Goodwill
+	choice(t, &w, "abandon")
+	if w.Factions[1].Goodwill != before {
+		t.Fatal("abandoned work granted favor")
+	}
+}

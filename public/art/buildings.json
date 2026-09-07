@@ -12,7 +12,21 @@
       446,
       443
     ],
-    "info": "Your neighborhood contact keeps a table here."
+    "info": "Your neighborhood contact keeps a table here.",
+    "walkway": [
+      [
+        446,
+        443
+      ],
+      [
+        450,
+        474
+      ],
+      [
+        530,
+        514
+      ]
+    ]
   },
   {
     "id": "club",
@@ -27,7 +41,25 @@
       900,
       625
     ],
-    "info": "Bellandi territory. Taking an interest here can be dangerous."
+    "info": "Bellandi territory. Taking an interest here can be dangerous.",
+    "walkway": [
+      [
+        900,
+        625
+      ],
+      [
+        910,
+        697
+      ],
+      [
+        590,
+        537
+      ],
+      [
+        530,
+        514
+      ]
+    ]
   },
   {
     "id": "laundry",
@@ -42,6 +74,53 @@
       849,
       292
     ],
-    "info": "A small business that can become your first reliable income."
+    "info": "A small business that can become your first reliable income.",
+    "walkway": [
+      [
+        849,
+        292
+      ],
+      [
+        825,
+        310
+      ],
+      [
+        580,
+        432
+      ],
+      [
+        530,
+        514
+      ]
+    ]
+  },
+  {
+    "id": "room",
+    "name": "The Mariner",
+    "file": "room-noir-v1.png",
+    "x": -40,
+    "y": 280,
+    "w": 480,
+    "h": 320,
+    "depth": 600,
+    "door": [
+      267,
+      594
+    ],
+    "info": "Your rented room above the waterfront. Thin walls and one stairway.",
+    "walkway": [
+      [
+        267,
+        594
+      ],
+      [
+        315,
+        570
+      ],
+      [
+        530,
+        514
+      ]
+    ]
   }
 ]

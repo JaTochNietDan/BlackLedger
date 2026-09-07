@@ -40,6 +40,25 @@ func TestTravel(t *testing.T) {
 		t.Fatal("bad travel")
 	}
 }
+
+func TestPresentationRecordsSurviveHistoryRollover(t *testing.T) {
+	w := New(27)
+	for i := 0; i < 200; i++ {
+		w.Log("Old record", "Earlier in the campaign", "personal")
+	}
+	act(t, &w, "travel", "bar")
+	if len(w.History) != 180 || len(w.LastResult.Records) == 0 {
+		t.Fatal("history rollover discarded the new command's presentation")
+	}
+	for _, record := range w.LastResult.Records {
+		if record.Title == "Old record" {
+			t.Fatal("old history replayed as a new outcome")
+		}
+	}
+	if w.LastResult.Records[len(w.LastResult.Records)-1].ID != w.History[len(w.History)-1].ID {
+		t.Fatal("latest outcome missing from presentation")
+	}
+}
 func TestUnavailableActions(t *testing.T) {
 	for _, c := range []Command{{Kind: "courier", Target: "bar"}, {Kind: "acquire", Target: "laundry"}, {Kind: "security", Target: "room"}, {Kind: "new_life"}} {
 		w := New(27)
@@ -175,11 +194,11 @@ func TestValidation(t *testing.T) {
 			t.Fatal("bad proposal accepted")
 		}
 	}
-	e, err := w.ValidateProposal(Proposal{"Sealed envelope", "Would you deliver this?", "mara", "courier", "Secret future sentence."})
+	e, err := w.ValidateProposal(Proposal{"Sealed envelope", "Would you deliver this?", "mara", "courier", "Secret future sentence.", ""})
 	if err != nil {
 		t.Fatal(err)
 	}
-	if e.Effect.Reward != 55 {
+	if e.Effect.Reward != 75 {
 		t.Fatal("model owns economics")
 	}
 	w.Event = e
@@ -250,7 +269,7 @@ func TestNewPersonDoesNotInheritRelationshipsOrPendingDirector(t *testing.T) {
 
 func TestDirectorCannotInventMechanicalCompletion(t *testing.T) {
 	w := New(27)
-	scene, err := w.ValidateProposal(Proposal{"A payment", "Please collect this payment.", "mara", "collection", "The rival is killed and you own his casino."})
+	scene, err := w.ValidateProposal(Proposal{"A payment", "Please collect this payment.", "mara", "collection", "The rival is killed and you own his casino.", ""})
 	if err != nil {
 		t.Fatal(err)
 	}

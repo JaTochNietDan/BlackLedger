@@ -116,18 +116,19 @@ type Effect struct {
 	Minutes int `json:"minutes"`
 }
 type Scene struct {
-	Target  string   `json:"target,omitempty"`
-	Actor   string   `json:"actor,omitempty"`
-	ID      string   `json:"id"`
-	Title   string   `json:"title"`
-	Body    string   `json:"body"`
-	Speaker string   `json:"speaker"`
-	Choices []Choice `json:"choices"`
-	Kind    string   `json:"kind"`
-	Source  string   `json:"source"`
-	Minute  int      `json:"minute"`
-	Effect  Effect   `json:"effect"`
-	Outcome string   `json:"outcome"`
+	Beneficiary string   `json:"beneficiary,omitempty"`
+	Target      string   `json:"target,omitempty"`
+	Actor       string   `json:"actor,omitempty"`
+	ID          string   `json:"id"`
+	Title       string   `json:"title"`
+	Body        string   `json:"body"`
+	Speaker     string   `json:"speaker"`
+	Choices     []Choice `json:"choices"`
+	Kind        string   `json:"kind"`
+	Source      string   `json:"source"`
+	Minute      int      `json:"minute"`
+	Effect      Effect   `json:"effect"`
+	Outcome     string   `json:"outcome"`
 }
 type Offer struct {
 	Ready int    `json:"ready"`
@@ -564,7 +565,7 @@ func (w *World) OfferIfReady() {
 		return
 	}
 	if w.Player.JobCount == 2 && !w.hasRecord("A favor with a price") {
-		e, _ := w.ValidateProposal(Proposal{"A favor with a price", "“A merchant wants a sealed ledger moved before his partners arrive. I would understand if you preferred the ordinary work.”", "mara", "courier", "You moved the ledger. Mara now knows you can handle sensitive work."})
+		e, _ := w.ValidateProposal(Proposal{"A favor with a price", "“A merchant wants a sealed ledger moved before his partners arrive. I would understand if you preferred the ordinary work.”", "mara", "courier", "You moved the ledger. Mara now knows you can handle sensitive work.", ""})
 		e.Source = "authored"
 		w.Event = e
 		w.Log("A favor with a price", "Mara offers more sensitive work.", "story")
@@ -572,15 +573,16 @@ func (w *World) OfferIfReady() {
 }
 
 type Proposal struct {
-	Title     string `json:"title"`
-	Body      string `json:"body"`
-	Speaker   string `json:"speaker"`
-	Operation string `json:"operation"`
-	Outcome   string `json:"outcome"`
+	Title       string `json:"title"`
+	Body        string `json:"body"`
+	Speaker     string `json:"speaker"`
+	Operation   string `json:"operation"`
+	Outcome     string `json:"outcome"`
+	Beneficiary string `json:"beneficiary,omitempty"`
 }
 
 func (w *World) ValidateProposal(p Proposal) (*Scene, error) {
-	catalog := map[string]Effect{"courier": {55, 2, 3, 45}, "mediation": {35, 3, 0, 60}, "collection": {70, 1, 5, 90}}
+	catalog := map[string]Effect{"courier": {75, 3, 3, 45}, "mediation": {55, 5, 0, 60}, "collection": {130, 3, 5, 90}}
 	fx, ok := catalog[p.Operation]
 	if !ok || w.NPC(p.Speaker) == nil {
 		return nil, fmt.Errorf("unsupported director operation or speaker")
@@ -588,5 +590,18 @@ func (w *World) ValidateProposal(p Proposal) (*Scene, error) {
 	if len(strings.TrimSpace(p.Title)) < 3 || len(p.Title) > 70 || len(p.Body) < 3 || len(p.Body) > 1200 || len(p.Outcome) < 3 || len(p.Outcome) > 700 {
 		return nil, fmt.Errorf("invalid director text")
 	}
-	return &Scene{ID: ID(), Title: p.Title, Body: p.Body, Speaker: p.Speaker, Kind: "proposal", Source: "local-ai", Minute: w.Minute, Effect: fx, Outcome: map[string]string{"courier": "You delivered the sealed package and reported back.", "mediation": "You completed the requested mediation without violence.", "collection": "You collected the agreed payment and reported back."}[p.Operation], Choices: []Choice{{ID: "accept", Label: map[string]string{"courier": "Deliver the package", "mediation": "Mediate the dispute", "collection": "Collect the payment"}[p.Operation], Detail: fmt.Sprintf("$%d · %d minutes · +%d respect · +%d heat", fx.Reward, fx.Minutes, fx.Respect, fx.Heat)}, {ID: "decline", Label: "Decline the arrangement", Detail: "No cost or time."}}}, nil
+	politicalDetail := ""
+	if p.Beneficiary != "" {
+		found := false
+		for _, f := range w.Factions {
+			if f.ID == p.Beneficiary {
+				found = true
+				politicalDetail = " · " + f.Name + " standing +6; rival standing −3."
+			}
+		}
+		if !found {
+			return nil, fmt.Errorf("unknown beneficiary faction")
+		}
+	}
+	return &Scene{ID: ID(), Title: p.Title, Beneficiary: p.Beneficiary, Body: p.Body, Speaker: p.Speaker, Kind: "proposal", Source: "local-ai", Minute: w.Minute, Effect: fx, Outcome: map[string]string{"courier": "You delivered the sealed package and reported back.", "mediation": "You completed the requested mediation without violence.", "collection": "You collected the agreed payment and reported back."}[p.Operation], Choices: []Choice{{ID: "accept", Label: map[string]string{"courier": "Deliver the package", "mediation": "Mediate the dispute", "collection": "Collect the payment"}[p.Operation], Detail: fmt.Sprintf("$%d · %d minutes · +%d respect · +%d heat", fx.Reward, fx.Minutes, fx.Respect, fx.Heat) + " · At 15 heat, police may stop completion." + politicalDetail}, {ID: "decline", Label: "Decline the arrangement", Detail: "No cost or time."}}}, nil
 }

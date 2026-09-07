@@ -17,7 +17,10 @@ func (w *World) apply(c Command) error {
 	p := &w.Player
 	oldTime := w.Minute
 	oldLoc := p.Location
-	start := len(w.History)
+	previousRecords := make(map[string]bool, len(w.History))
+	for _, record := range w.History {
+		previousRecords[record.ID] = true
+	}
 	if c.Kind == "new_life" {
 		if p.Alive {
 			return fmt.Errorf("this life is still in progress")
@@ -106,15 +109,23 @@ func (w *World) apply(c Command) error {
 			if err := w.ResolvePressure(e, c.Choice); err != nil {
 				return err
 			}
+		case "police_stop":
+			if c.Choice == "pay" {
+				p.Heat = max(0, p.Heat-10)
+				w.CompleteArrangement(e)
+			} else {
+				p.Heat = max(0, p.Heat-6)
+				w.Log("The arrangement abandoned", "You surrender the package or paperwork and leave without completing the job. No reward was paid. Police attention eases.", "story")
+			}
 		case "proposal":
 			if c.Choice == "accept" {
 				w.Advance(e.Effect.Minutes)
 				if p.Alive && w.Event == nil {
-					w.Earn(e.Effect.Reward)
-					p.Respect += e.Effect.Respect
-					p.Heat = min(100, p.Heat+e.Effect.Heat)
-					w.NPC(e.Speaker).Trust += 3
-					w.Log(e.Title, e.Outcome+fmt.Sprintf(" ($%d, respect +%d)", e.Effect.Reward, e.Effect.Respect), "story")
+					if p.Heat+e.Effect.Heat >= 15 {
+						w.PoliceStop(e)
+					} else {
+						w.CompleteArrangement(e)
+					}
 				} else {
 					w.Log("An interrupted arrangement", "The operation could not be completed. No reward was paid.", "story")
 				}
@@ -242,7 +253,14 @@ func (w *World) apply(c Command) error {
 		}
 	}
 	w.Revision++
-	start = min(start, len(w.History))
-	w.LastResult = &Result{oldLoc, w.Player.Location, w.Minute - oldTime, append([]Record{}, w.History[start:]...)}
+	// History is capped. Its old length is not a stable cursor once new entries
+	// evict old ones; identify this command's records by their persistent IDs.
+	newRecords := []Record{}
+	for _, record := range w.History {
+		if !previousRecords[record.ID] {
+			newRecords = append(newRecords, record)
+		}
+	}
+	w.LastResult = &Result{oldLoc, w.Player.Location, w.Minute - oldTime, newRecords}
 	return nil
 }

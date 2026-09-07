@@ -131,3 +131,50 @@ func (w *World) Investigate() {
 		w.Log("Word on the street", "Your sources have no evidence of an active operation against you. This is not a guarantee of safety.", "intel")
 	}
 }
+
+// Sensitive arrangements expose the player to a bounded police decision once heat is high.
+func (w *World) PoliceStop(job *Scene) {
+	if w.NPC("harlow") == nil {
+		w.NPCs = append(w.NPCs, NPC{ID: "harlow", Name: "Detective Harlow", Role: "City detective", Voice: "bm_lewis", Color: "#7c8791"})
+	}
+	w.Event = &Scene{ID: ID(), Kind: "police_stop", Source: "authored", Minute: w.Minute, Speaker: "harlow", Actor: job.Speaker, Beneficiary: job.Beneficiary, Title: "Too familiar a face", Body: "“Your name keeps coming up in the same places. Before you finish this arrangement, we are going to have a conversation. You can settle this inconvenience, or leave the business unfinished.”", Effect: job.Effect, Outcome: job.Outcome, Choices: []Choice{
+		{ID: "pay", Label: "Pay $40 and finish the job", Cost: 40, Detail: fmt.Sprintf("Receive the agreed $%d reward and reputation afterward. Police attention decreases before this job's heat is applied.", job.Effect.Reward)},
+		{ID: "abandon", Label: "Abandon the arrangement", Detail: "No payment or reward. Lose 6 heat; the work and time already spent are lost."},
+	}}
+	w.Log("Police attention catches up", "A detective interrupts the arrangement before its reward is paid.", "danger")
+}
+func (w *World) CompleteArrangement(job *Scene) {
+	w.Earn(job.Effect.Reward)
+	w.Player.Respect += job.Effect.Respect
+	w.Player.Heat = min(100, w.Player.Heat+job.Effect.Heat)
+	speaker := job.Speaker
+	if job.Kind == "police_stop" {
+		speaker = job.Actor
+	}
+	if npc := w.NPC(speaker); npc != nil {
+		npc.Trust += 3
+	}
+	w.ResolveBeneficiary(job.Beneficiary)
+	w.Log(job.Title, job.Outcome+fmt.Sprintf(" ($%d, respect +%d)", job.Effect.Reward, job.Effect.Respect), "story")
+}
+
+func (w *World) ResolveBeneficiary(id string) {
+	if id == "" {
+		return
+	}
+	for i := range w.Factions {
+		f := &w.Factions[i]
+		if f.ID == id {
+			f.Goodwill = min(100, f.Goodwill+6)
+			w.Log("An alliance takes shape", f.Name+" appreciates the completed arrangement. Standing improves by 6.", "politics")
+		} else {
+			f.Goodwill = max(-100, f.Goodwill-3)
+		}
+	}
+	// Supporting rivals repeatedly can create a genuine feud, even without direct provocation.
+	for _, f := range w.Factions {
+		if f.ID == "bellandi" && f.Goodwill <= -30 {
+			w.Retaliation()
+		}
+	}
+}
