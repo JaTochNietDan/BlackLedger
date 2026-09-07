@@ -36,6 +36,17 @@ func Open(path string) (*Store, error) {
 func decode(data string) (*core.World, error) {
 	var w core.World
 	e := json.Unmarshal([]byte(data), &w)
+	if e == nil && w.Version < 2 {
+		w.Player.BestHome = core.HomeRank(w.Player.Home)
+		// In v1, the only way to live at the estate was to buy it, but the
+		// deed was not recorded. Repair that active purchase on load.
+		if w.Player.Alive && w.Player.Home == "estate" {
+			if property := w.Properties["estate"]; property != nil && property.Owner == "independent" {
+				property.Owner = fmt.Sprintf("player:%d", w.Life)
+			}
+		}
+		w.Version = 2
+	}
 	return &w, e
 }
 func (s *Store) Read() (*core.World, error) {

@@ -2,6 +2,7 @@ package store
 
 import (
 	"blackledger/core"
+	"encoding/json"
 	"path/filepath"
 	"testing"
 )
@@ -68,5 +69,35 @@ func TestRejectedPayment(t *testing.T) {
 	w, _ := s.Read()
 	if e == nil || w.Player.Cash != 90 || w.Revision != 0 {
 		t.Fatal("rejected command not atomic")
+	}
+}
+
+func TestLegacyEstatePurchaseMigration(t *testing.T) {
+	w := core.New(27)
+	w.Version = 1
+	w.Player.Home = "estate"
+	w.Player.Location = "estate"
+	bytes, err := json.Marshal(w)
+	if err != nil {
+		t.Fatal(err)
+	}
+	migrated, err := decode(string(bytes))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !migrated.Own("estate") || migrated.Player.BestHome != 2 || migrated.Version != 2 {
+		t.Fatal("legacy purchase was not restored")
+	}
+	if migrated.Player.Cash != w.Player.Cash || migrated.Revision != w.Revision || migrated.Minute != w.Minute {
+		t.Fatal("migration charged or advanced the player")
+	}
+	w.Player.Alive = false
+	bytes, _ = json.Marshal(w)
+	migrated, err = decode(string(bytes))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if migrated.Own("estate") {
+		t.Fatal("migration invented ownership for a dead player")
 	}
 }

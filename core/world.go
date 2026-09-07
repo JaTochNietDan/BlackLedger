@@ -39,6 +39,7 @@ type Person struct {
 	Heat     int    `json:"heat"`
 	Location string `json:"location"`
 	Home     string `json:"home"`
+	BestHome int    `json:"best_home,omitempty"`
 	Security int    `json:"security"`
 	Contacts int    `json:"contacts"`
 	Crew     []Crew `json:"crew"`
@@ -232,7 +233,7 @@ func newPerson(life int) Person {
 	return Person{Name: names[(life-1)%len(names)], Cash: 90, Health: 100, Location: "room", Home: "room", Alive: true, Crew: []Crew{}}
 }
 func New(seed uint32) *World {
-	w := &World{Version: 1, ID: ID(), Life: 1, Minute: 480, RNG: seed, Player: newPerson(1), Properties: map[string]*Property{}, Tasks: []Task{}, Plots: []Plot{}, History: []Record{}, Dead: []Death{}, Offers: []Offer{}, Director: Director{"authored", "Authored opening. Local AI can prepare additional encounters.", -9999}}
+	w := &World{Version: 2, ID: ID(), Life: 1, Minute: 480, RNG: seed, Player: newPerson(1), Properties: map[string]*Property{}, Tasks: []Task{}, Plots: []Plot{}, History: []Record{}, Dead: []Death{}, Offers: []Offer{}, Director: Director{"authored", "Authored opening. Local AI can prepare additional encounters.", -9999}}
 	w.Factions = []Faction{{"bellandi", "Bellandi Family", "Vittorio Bellandi", 90, 0, 8000}, {"russo", "Russo Outfit", "Elena Russo", 58, 0, 4500}}
 	w.NPCs = []NPC{{"mara", "Mara Bell", "Fixer", 10, "af_heart", "#a48761"}, {"leo", "Leo Carver", "Driver", 20, "am_michael", "#9ca795"}, {"vittorio", "Vittorio Bellandi", "Bellandi boss", 0, "bm_george", "#ad7970"}, {"elena", "Elena Russo", "Russo boss", 0, "bf_emma", "#83989b"}}
 	for _, p := range Locations {
@@ -284,6 +285,15 @@ func HomeRent(id string) int {
 		return 90
 	}
 	return 15
+}
+func HomeRank(id string) int {
+	switch id {
+	case "estate":
+		return 2
+	case "apartment":
+		return 1
+	}
+	return 0
 }
 func (w *World) Guard() int {
 	n := w.Player.Security
@@ -374,10 +384,19 @@ func (w *World) Actions(id string) []Action {
 	if l.Type == "home" {
 		if p.Home != id {
 			label := "Rent this apartment"
+			cost, reason := l.Cost, ""
+			if id == "room" {
+				label = "Return to a rented room"
+			}
 			if id == "estate" {
 				label = "Buy this residence"
+				if w.Own(id) {
+					label, cost = "Return to your residence", 0
+				} else if w.Properties[id].Owner != "independent" {
+					reason = "This residence belongs to another organization"
+				}
 			}
-			add("move_home", label, 60, l.Cost, "", fmt.Sprintf("$%d/day upkeep. Moving resets hired security.", HomeRent(id)))
+			add("move_home", label, 60, cost, reason, fmt.Sprintf("$%d/day upkeep. Moving resets hired security. Respect is earned only for a new housing tier.", HomeRent(id)))
 		} else {
 			add("rest", "Rest for four hours", 240, 0, "", "Recover up to 25 health as you rest. Rivals can act while you sleep.")
 			add("security", "Hire another security detail", 30, 100, need(p.Security >= 3, "Maximum security hired"), "Improves detection and survival at home. Adds $10/day upkeep.")
@@ -408,7 +427,9 @@ func (w *World) Die(cause string) {
 	for id, prop := range w.Properties {
 		if w.Own(id) {
 			prop.Owner = "former:" + p.Name
-			prop.Income = max(5, prop.Income-2)
+			if prop.Income > 0 {
+				prop.Income = max(5, prop.Income-2)
+			}
 		}
 	}
 	w.Tasks = []Task{}

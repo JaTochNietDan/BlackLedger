@@ -230,9 +230,16 @@ func (w *World) apply(c Command) error {
 					w.Properties[target].Condition = min(100, w.Properties[target].Condition+40)
 					w.Log("Repairs arranged", "The property is restored by 40 condition.", "business")
 				case "move_home":
+					p.BestHome = max(p.BestHome, HomeRank(p.Home))
+					if HomeRank(target) > p.BestHome {
+						p.Respect += 3
+						p.BestHome = HomeRank(target)
+					}
+					if target == "estate" {
+						w.Properties[target].Owner = fmt.Sprintf("player:%d", w.Life)
+					}
 					p.Home = target
 					p.Security = 0
-					p.Respect += 3
 					l, _ := PlaceByID(target)
 					w.Log("A different view", l.Name+" is now your residence. Hired security must be arranged here.", "personal")
 				case "rest":

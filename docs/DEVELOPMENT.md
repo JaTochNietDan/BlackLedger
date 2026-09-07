@@ -81,3 +81,10 @@
 - Added `cmd/qa-fixture`, which exclusively creates a new isolated police-test save and refuses existing output paths. This is a deterministic QA fixture, not natural campaign progression.
 - Browser fixture: accepted a Russo courier at heat 14; at 08:45 cash remained $90 and respect 0 while Detective Harlow required a choice. Paid $40; cash became $125, respect 3, heat 7, and Russo standing +6. Expanded the additional-outcome disclosure successfully. Separate core tests cover abandonment and duplicate-decision rejection.
 - Day and night street screenshots show the asphalt and continuous junction without browser errors. The small pedestrian art and sparse surroundings still need improvement.
+
+## Housing ownership and progression audit
+- Previous goal turn made concrete progress: committed painted character art, a repeatable police QA fixture, and browser-verified police consequences. No blocker is present.
+- Found estate purchases only changed the address. Purchasing now records the deed; moving away preserves ownership, returning costs no second purchase, and death transfers the residence to the former organization without inventing rental income. A new stranger cannot buy an already occupied residence through the ordinary purchase action.
+- Found repeatable respect rewards from moving between homes. Track the highest housing tier reached in this life; only entering a new tier earns respect. Starting a new life resets that progression.
+- Save schema v2 repairs an active v1 estate purchase on load and initializes housing rank from the saved residence without charging money, changing revision or advancing time. The migration does not invent ownership for dead players.
+- Regression tests cover purchase/return/death/new-life ownership, repeated rental moves, and legacy save migration. Go race suite and frontend production build passed. Owned residences display condition rather than a misleading zero hourly business income.
