@@ -1,0 +1,52 @@
+{
+  "note": "Two exploratory direct Ollama samples. Second brief was revised after inspecting the first; not a controlled benchmark or production-mode evaluation.",
+  "model": "qwen3:14b",
+  "samples": [
+    {
+      "body": {
+        "title": "A Payment to Settle",
+        "body": "You did well with the mediation at the garage, Alex. Now there's something else I need. A certain sum of money was left behind during the dispute\u2014$2,500 in cash. I want it collected from the garage, quietly. No threats, no trouble. Just take it and leave. I'll handle the rest. You're good at this, and I trust you to be careful.",
+        "speaker": "mara",
+        "operation": "collection",
+        "outcome": "The payment is collected from the garage without incident, resolving the financial dispute and reducing further tension between the mechanics.",
+        "beneficiary": "",
+        "approaches": [
+          {
+            "method": "careful",
+            "label": "Search the tool storage area discreetly, ensuring no one is watching, and retrieve the cash without confrontation."
+          },
+          {
+            "method": "press",
+            "label": "Confront one of the mechanics directly and demand the money in a more visible part of the garage."
+          }
+        ]
+      },
+      "wall_seconds": 5.769191958941519,
+      "prompt_tokens": 464,
+      "output_tokens": 223
+    },
+    {
+      "body": {
+        "title": "Garage Payment Request",
+        "body": "You handled the tool dispute well, Alex. Now I need you to collect a payment for garage services. A customer left a deposit for a repair, and it's time to retrieve it. The money is in a locked box under the counter. I don't want any trouble, just get it done quietly. You'll be paid in full for this job.",
+        "speaker": "mara",
+        "operation": "collection",
+        "outcome": "The agreed payment was collected and reported back without incident.",
+        "beneficiary": "",
+        "approaches": [
+          {
+            "method": "careful",
+            "label": "Retrieve the box without drawing attention"
+          },
+          {
+            "method": "press",
+            "label": "Demand the box be handed over directly"
+          }
+        ]
+      },
+      "wall_seconds": 4.472756166942418,
+      "prompt_tokens": 561,
+      "output_tokens": 173
+    }
+  ]
+}
