@@ -25,3 +25,7 @@ Keep source art unchanged. Store footprint and lighting coordinates as metadata 
 ## Painted character atlas
 
 `public/art/cast-noir-v1.png` is a 3 × 2 atlas of square portraits: Mara, Leo, Vittorio / Elena, Harlow, Alex. React selects stable atlas cells by identity; it does not generate faces during play. Future player identities still use the procedural fallback until additional cast art is authored. The raw atlas is preserved without destructive crops.
+
+## Saved building condition
+
+The building manifest supports `damage: {file, below}`. Bluebird Laundry currently switches to its damaged storefront below 70 condition. Both the street and selected-property preview consume the saved public condition. The variant preserves the original footprint by using the intact sprite's alpha as a runtime rendering mask (Canvas destination-in for the street, CSS mask for the preview). Source images remain unmodified. The first generated damage asset had an opaque halo; a second attempted cutout rendered a checkerboard, so neither generated background is trusted as transparency. The original verified alpha defines the displayed silhouette.

@@ -92,7 +92,11 @@
         530,
         514
       ]
-    ]
+    ],
+    "damage": {
+      "file": "laundry-damaged-v1.png",
+      "below": 70
+    }
   },
   {
     "id": "room",

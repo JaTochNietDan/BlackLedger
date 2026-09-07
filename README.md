@@ -40,3 +40,5 @@ BLACK_LEDGER_PORT=8795 BLACK_LEDGER_DB=.runtime/police-check.sqlite3 go run ./cm
 ```
 
 Accept the courier offer, verify its reward remains unpaid at the police stop, and choose whether to pay or abandon. This fixture is separate from normal progression and must not be used as evidence of an earned campaign run.
+
+For damage/repair presentation QA, append `damage` to the fixture command, using another new output file. The fixture starts at the owned laundry with 45 condition and enough money for one repair. Verify the street and sidebar change together after repairing.

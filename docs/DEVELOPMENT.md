@@ -95,3 +95,9 @@
 - The authored opening also introduces both approaches, preserving playable choices without the model.
 - Verified a real qwen3:14b response through a fresh isolated server: Mara proposed a Bellandi delivery with waiting until the club emptied versus approaching during a busy shift. Chose waiting at 09:00; at 10:15 cash rose from $135 to $195, respect 2 to 5, heat remained zero, and Bellandi received +6 standing.
 - Browser inspection found four options overfilled the former narrow dialog. Four-choice scenes now use a wider two-column desktop layout, retaining a single column at compact widths. Visually checked the desktop fixture with all choices and footer visible; no browser errors. Full narrow-viewport and uninterrupted pacing verification remain outstanding.
+
+## Building damage and repair presentation
+- Added a damaged Bluebird Laundry storefront and optional manifest damage variants. Public property conditions are passed through the isolated street adapter; the renderer does not calculate damage or repairs.
+- Browser QA caught an opaque background in the generated variant. A second generated cutout also lacked alpha. Reused the original verified transparent sprite as a runtime mask, preserving its footprint and removing the rectangle in both street and selected-building preview.
+- Extended the isolated fixture tool with `damage`. At 45 condition and $90, the UI showed the damaged storefront and $6/hour. Used the real Repair action: at 09:00 condition was 85, cash $46 (including accrued income), and income $11/hour; both views returned to intact art. Browser error log was empty.
+- Production build and script syntax check pass. This implements one damage variant and the reusable state/asset path; variants for other buildings and broader district art remain unfinished.
