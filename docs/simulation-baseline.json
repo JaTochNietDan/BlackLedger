@@ -1,0 +1,124 @@
+{
+  "authored": {
+    "elapsed_seconds": 8.549038625,
+    "director": "authored",
+    "max_commands": 160,
+    "summary": {
+      "investor": {
+        "deaths": 0,
+        "errors": 0,
+        "median_final_cash": 20609,
+        "median_game_minutes": 14425,
+        "milestones": {
+          "casino": {
+            "median_commands_when_reached": 56,
+            "reached": 100
+          },
+          "crew": {
+            "median_commands_when_reached": 9,
+            "reached": 100
+          },
+          "garage": {
+            "median_commands_when_reached": 41,
+            "reached": 100
+          },
+          "housing": {
+            "median_commands_when_reached": 25,
+            "reached": 100
+          },
+          "laundry": {
+            "median_commands_when_reached": 6,
+            "reached": 100
+          },
+          "security": {
+            "median_commands_when_reached": 29,
+            "reached": 100
+          }
+        },
+        "runs": 100
+      },
+      "reckless": {
+        "deaths": 82,
+        "errors": 0,
+        "median_final_cash": 90,
+        "median_game_minutes": 285,
+        "milestones": {
+          "death": {
+            "median_commands_when_reached": 4,
+            "reached": 82
+          }
+        },
+        "runs": 100
+      },
+      "worker": {
+        "deaths": 0,
+        "errors": 0,
+        "median_final_cash": 10290,
+        "median_game_minutes": 14475,
+        "milestones": {},
+        "runs": 100
+      }
+    }
+  },
+  "fixture": {
+    "elapsed_seconds": 10.61829,
+    "director": "fixture",
+    "max_commands": 160,
+    "summary": {
+      "investor": {
+        "deaths": 0,
+        "errors": 0,
+        "median_final_cash": 23135,
+        "median_game_minutes": 14890,
+        "milestones": {
+          "casino": {
+            "median_commands_when_reached": 45,
+            "reached": 100
+          },
+          "crew": {
+            "median_commands_when_reached": 12,
+            "reached": 100
+          },
+          "garage": {
+            "median_commands_when_reached": 31,
+            "reached": 100
+          },
+          "housing": {
+            "median_commands_when_reached": 23,
+            "reached": 100
+          },
+          "laundry": {
+            "median_commands_when_reached": 6,
+            "reached": 100
+          },
+          "security": {
+            "median_commands_when_reached": 24,
+            "reached": 100
+          }
+        },
+        "runs": 100
+      },
+      "reckless": {
+        "deaths": 82,
+        "errors": 0,
+        "median_final_cash": 90,
+        "median_game_minutes": 285,
+        "milestones": {
+          "death": {
+            "median_commands_when_reached": 4,
+            "reached": 82
+          }
+        },
+        "runs": 100
+      },
+      "worker": {
+        "deaths": 0,
+        "errors": 0,
+        "median_final_cash": 10585,
+        "median_game_minutes": 14675,
+        "milestones": {},
+        "runs": 100
+      }
+    }
+  }
+}
