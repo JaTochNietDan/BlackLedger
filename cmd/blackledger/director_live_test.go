@@ -25,7 +25,7 @@ func TestLiveDirectorScenarios(t *testing.T) {
 	}
 	file.Close()
 	rows := []map[string]any{}
-	report := map[string]any{"model": env("BLACK_LEDGER_MODEL", "qwen3:14b"), "thinking": env("BLACK_LEDGER_DIRECTOR_THINK", "0") == "1", "started_utc": time.Now().UTC(), "method": "Selected scenarios use isolated temporary saves, actual local provider and production generation/validation path. No user campaign access. Prose requires manual assessment; test success is not semantic acceptance."}
+	report := map[string]any{"model": env("BLACK_LEDGER_MODEL", "qwen3:14b"), "brief_mode": env("BLACK_LEDGER_DIRECTOR_BRIEF", "full"), "thinking": env("BLACK_LEDGER_DIRECTOR_THINK", "0") == "1", "started_utc": time.Now().UTC(), "method": "Selected scenarios use isolated temporary saves, actual local provider and production generation/validation path. No user campaign access. Prose requires manual assessment; test success is not semantic acceptance."}
 	writeReport := func() {
 		report["cases"] = rows
 		b, err := json.MarshalIndent(report, "", "  ")
@@ -70,6 +70,7 @@ func TestLiveDirectorScenarios(t *testing.T) {
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
 			a := testApp(t)
+			attempts := captureLiveProvider(t, env("BLACK_LEDGER_OLLAMA", "http://127.0.0.1:11435"))
 			if err := a.s.Change(func(w *core.World) error { tc.prepare(w); return nil }); err != nil {
 				t.Fatal(err)
 			}
@@ -83,6 +84,7 @@ func TestLiveDirectorScenarios(t *testing.T) {
 			start := time.Now()
 			err = a.generate(before)
 			row["seconds"] = time.Since(start).Seconds()
+			row["attempts"] = attempts()
 			after, readErr := a.s.Read()
 			if readErr != nil {
 				t.Fatal(readErr)
