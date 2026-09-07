@@ -29,8 +29,8 @@ func (w *World) NextOpportunity() *Opportunity {
 			owns = true
 		}
 	}
-	if !owns && w.Properties["laundry"].Owner == "independent" {
-		return &Opportunity{"Build a steady income", "Bluebird Laundry needs $180 and 6 respect. Its income grows with game time.", "laundry"}
+	if !owns && w.CanAcquire("laundry") {
+		return &Opportunity{"Build a steady income", "Bluebird Laundry needs 6 respect and capital; buying out a former organization costs more. Its income grows with game time.", "laundry"}
 	}
 	if len(p.Crew) == 0 {
 		return &Opportunity{"Bring someone into the fold", "Leo costs $90 to recruit and $12 a day. He can collect money or protect businesses.", "bar"}
@@ -44,11 +44,11 @@ func (w *World) NextOpportunity() *Opportunity {
 	if p.Home == "room" {
 		return &Opportunity{"Find a safer address", "Ashbury Court costs $180 to rent and $35 a day, with a base level of residential protection.", "apartment"}
 	}
-	if !w.Own("garage") && w.Properties["garage"].Owner == "independent" {
-		return &Opportunity{"Expand your organization", "Russo Motor Works costs $350 and 10 respect. Taking it will affect your standing with Russo.", "garage"}
+	if !w.Own("garage") && w.CanAcquire("garage") {
+		return &Opportunity{"Expand your organization", "Russo Motor Works needs 10 respect and capital; former operators require a buyout. Taking it will affect your standing with Russo.", "garage"}
 	}
-	if !w.Own("casino") && w.Properties["casino"].Owner == "independent" {
-		return &Opportunity{"Open your own casino", "The Blue Hour requires $850 and 20 respect. Build the capital and connections to run it.", "casino"}
+	if !w.Own("casino") && w.CanAcquire("casino") {
+		return &Opportunity{"Open your own casino", "The Blue Hour requires 20 respect and capital; former operators require a buyout. Build the capital and connections to run it.", "casino"}
 	}
 	return &Opportunity{"Keep the organization solvent", "Review income, upkeep and family relationships before your next expansion.", p.Home}
 }

@@ -101,3 +101,8 @@
 - Browser QA caught an opaque background in the generated variant. A second generated cutout also lacked alpha. Reused the original verified transparent sprite as a runtime mask, preserving its footprint and removing the rectangle in both street and selected-building preview.
 - Extended the isolated fixture tool with `damage`. At 45 condition and $90, the UI showed the damaged storefront and $6/hour. Used the real Repair action: at 09:00 condition was 85, cash $46 (including accrued income), and income $11/hour; both views returned to intact art. Browser error log was empty.
 - Production build and script syntax check pass. This implements one damage variant and the reusable state/asset path; variants for other buildings and broader district art remain unfinished.
+
+## Repeat-life business availability
+- Found a long-term progression dead end: former organizations permanently occupied the finite businesses after successive deaths. Added an explicit buyout at twice the normal acquisition price for former-organization businesses; ordinary faction property remains unavailable through this action.
+- New people still start with $90 and no inherited ownership. Buying out preserves damage and the business's post-death income, and starts the usual political pressure. Opportunity guidance now recognizes buyout candidates rather than silently skipping them.
+- Regression verifies insufficient funds are rejected, full payment is charged, changed property state persists, and faction property cannot be seized. The full Go suite passes. This is a rules-level verification; broader repeat-life browser pacing remains to be tested.

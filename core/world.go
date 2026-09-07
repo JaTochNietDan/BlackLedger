@@ -226,6 +226,10 @@ func (w *World) Log(title, text, kind string) {
 		w.History = w.History[len(w.History)-180:]
 	}
 }
+func (w *World) CanAcquire(id string) bool {
+	p := w.Properties[id]
+	return p != nil && (p.Owner == "independent" || strings.HasPrefix(p.Owner, "former:"))
+}
 func (w *World) Own(id string) bool {
 	return w.Properties[id] != nil && w.Properties[id].Owner == fmt.Sprintf("player:%d", w.Life)
 }
@@ -372,14 +376,19 @@ func (w *World) Actions(id string) []Action {
 				req = 20
 			}
 			reason := need(p.Respect < req, fmt.Sprintf("Earn %d respect first", req))
-			if w.Properties[id].Owner != "independent" {
+			if !w.CanAcquire(id) {
 				reason = "This property belongs to another organization"
 			}
 			label := "Establish protection"
 			if id == "casino" {
 				label = "Reopen the casino"
 			}
-			add("acquire", label, 60, l.Cost, reason, fmt.Sprintf("Earn up to $%d/hour. Income accrues automatically; rivals may take notice.", w.Properties[id].Income))
+			cost := l.Cost
+			if strings.HasPrefix(w.Properties[id].Owner, "former:") {
+				cost *= 2
+				label = "Buy out the former organization"
+			}
+			add("acquire", label, 60, cost, reason, fmt.Sprintf("Earn up to $%d/hour. Income accrues automatically; rivals may take notice.", w.Properties[id].Income))
 		}
 	}
 	if l.Type == "home" {
