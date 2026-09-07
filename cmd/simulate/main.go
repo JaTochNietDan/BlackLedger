@@ -15,7 +15,7 @@ func main() {
 	runs := flag.Int("runs", 100, "campaigns per strategy")
 	steps := flag.Int("steps", 200, "maximum commands per campaign")
 	first := flag.Uint("seed", 1, "first simulation seed; later runs use a Weyl stride")
-	profiles := flag.String("strategies", "worker,investor,reckless", "comma-separated player policies")
+	profiles := flag.String("strategies", "worker,investor,defiant,reckless", "comma-separated player policies")
 	director := flag.String("director", "authored", "authored or fixture (no model calls)")
 	trace := flag.Bool("trace", false, "include each pre-command public state and command")
 	flag.Parse()
@@ -29,7 +29,7 @@ func main() {
 	}
 	strategies := strings.Split(*profiles, ",")
 	for _, p := range strategies {
-		if p != "worker" && p != "investor" && p != "reckless" {
+		if p != "worker" && p != "investor" && p != "reckless" && p != "defiant" {
 			fmt.Fprintln(os.Stderr, "unknown strategy", p)
 			os.Exit(2)
 		}

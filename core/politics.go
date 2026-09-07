@@ -7,25 +7,35 @@ import "fmt"
 func (w *World) BusinessPressure() {
 	w.NextPressure = w.Minute + 720
 	var target *Place
+	actor := 0
+	ownsBusiness := false
 	for i := range Locations {
 		l := &Locations[i]
-		if w.Own(l.ID) && w.Properties[l.ID].Income > 0 && (target == nil || w.Properties[l.ID].Income > w.Properties[target.ID].Income) {
-			target = l
+		if !w.Own(l.ID) || w.Properties[l.ID].Income <= 0 {
+			continue
+		}
+		ownsBusiness = true
+		family := 0
+		if l.District > 0 {
+			family = 1
+		}
+		// A local understanding does not suppress another family's territorial claim.
+		if w.Factions[family].Goodwill >= 25 {
+			continue
+		}
+		if target == nil || w.Properties[l.ID].Income > w.Properties[target.ID].Income {
+			target, actor = l, family
 		}
 	}
 	if target == nil {
-		w.NextPressure = 0
+		if !ownsBusiness {
+			w.NextPressure = 0
+		} else {
+			w.Log("An understanding holds", "Your relationships with the families in your business districts keep their demands at bay for now.", "politics")
+		}
 		return
-	}
-	actor := 0
-	if target.District > 0 {
-		actor = 1
 	}
 	f := &w.Factions[actor]
-	if f.Goodwill >= 25 {
-		w.Log("An understanding holds", f.Name+" leaves your businesses alone for now.", "politics")
-		return
-	}
 	speaker := "vittorio"
 	if actor == 1 {
 		speaker = "elena"

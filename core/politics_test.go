@@ -219,3 +219,38 @@ func TestBookReviewDoesNotAdvanceCity(t *testing.T) {
 		t.Fatal("missing actual income")
 	}
 }
+
+func TestFriendlyHighIncomeDistrictDoesNotSilenceHostileFamily(t *testing.T) {
+	w := pressureWorld()
+	w.Properties["casino"].Owner = "player:1"
+	w.Factions[1].Goodwill = 40
+	w.Factions[0].Goodwill = -20
+	w.BusinessPressure()
+	if w.Event == nil || w.Event.Actor != "bellandi" || w.Event.Target != "laundry" {
+		t.Fatal("friendly casino concealed hostile laundry claim")
+	}
+}
+func TestHostileHighIncomeDistrictStillMakesItsOwnClaim(t *testing.T) {
+	w := pressureWorld()
+	w.Properties["casino"].Owner = "player:1"
+	w.Factions[0].Goodwill = 40
+	w.Factions[1].Goodwill = -20
+	w.BusinessPressure()
+	if w.Event == nil || w.Event.Actor != "russo" || w.Event.Target != "casino" {
+		t.Fatal("wrong territorial claimant")
+	}
+}
+func TestGoodRelationsInAllOwnedDistrictsPreservePeace(t *testing.T) {
+	w := pressureWorld()
+	w.Properties["casino"].Owner = "player:1"
+	w.Factions[0].Goodwill, w.Factions[1].Goodwill = 25, 25
+	w.BusinessPressure()
+	if w.Event != nil || len(w.Plots) != 0 || w.NextPressure <= w.Minute {
+		t.Fatal("good relationships must still prevent demands")
+	}
+	w.Factions[0].Goodwill = 24
+	w.Advance(720)
+	if w.Event == nil || w.Event.Actor != "bellandi" {
+		t.Fatal("claim did not resume after standing changed")
+	}
+}

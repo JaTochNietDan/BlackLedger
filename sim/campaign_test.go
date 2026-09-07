@@ -7,7 +7,7 @@ import (
 )
 
 func TestCampaignsAreReproducible(t *testing.T) {
-	for _, strategy := range []string{"worker", "investor", "reckless"} {
+	for _, strategy := range []string{"worker", "investor", "defiant", "reckless"} {
 		for _, director := range []string{"authored", "fixture"} {
 			a, b := Run(27, strategy, director, 100, false), Run(27, strategy, director, 100, false)
 			if a.Error != "" || !reflect.DeepEqual(a, b) {
@@ -48,5 +48,20 @@ func TestPolicyCannotSeePrivateThreatChanges(t *testing.T) {
 	b, _ := Choose(after, "investor")
 	if !reflect.DeepEqual(a, b) {
 		t.Fatal("policy reacted to private threat")
+	}
+}
+
+func TestDefiantInvestorRefusesPublicBusinessDemand(t *testing.T) {
+	v := View{Revision: 3, Event: &Event{ID: "demand", Kind: "business_pressure", Choices: []core.Choice{{ID: "pay"}, {ID: "resist"}}}}
+	compliant, err := Choose(v, "investor")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defiant, err := Choose(v, "defiant")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if compliant.Choice != "pay" || defiant.Choice != "resist" {
+		t.Fatal("policies do not distinguish compliance and resistance")
 	}
 }

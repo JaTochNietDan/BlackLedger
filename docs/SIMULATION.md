@@ -16,6 +16,7 @@ The player policies consume a serialized projection of `World.Public()`, includi
 
 - **worker:** ordinary dock shifts, returning home to recover from injuries. Does not pursue ownership.
 - **investor:** income, crew, contacts, housing/security and three businesses; delegates when available, pays demands, and repairs severely damaged businesses.
+- **defiant:** the same investment priorities, but refuses business demands instead of paying; isolates the consequence of that political stance.
 - **reckless:** challenges Bellandi early, then stays home without buying protection. It deliberately exercises the warned-about lethal opening choice.
 
 These are explicit strategies, not claims that a typical player behaves this way. A strategy bug can distort results: inspect traces before changing game balance. Initial development caught a reckless policy that repeatedly traveled instead of remaining at home and therefore avoided the attack.

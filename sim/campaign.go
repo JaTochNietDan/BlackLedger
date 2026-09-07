@@ -87,6 +87,9 @@ func (v View) at(target, kind string) (core.Command, bool) {
 func Choose(v View, strategy string) (core.Command, error) {
 	if v.Event != nil {
 		priorities := []string{"approach:careful", "accept", "pay", "escape", "acknowledge", "leave", "decline"}
+		if strategy == "defiant" && v.Event.Kind == "business_pressure" {
+			priorities = []string{"resist"}
+		}
 		if strategy == "reckless" {
 			priorities = []string{"approach:press", "accept", "resist", "defend", "leave", "decline"}
 		}
