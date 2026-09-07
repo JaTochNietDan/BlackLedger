@@ -3,4 +3,4 @@ __pycache__/
 .runtime/
 node_modules/
 dist/
-blackledger
+/blackledger
