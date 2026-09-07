@@ -313,3 +313,11 @@
 - Created sibling Git worktree `mafia-game-visuals`, branch `codex/visual-handoff`, at c5700b7. Claude CLI is installed; no agent was launched. Main and visual worktrees are separate and clean.
 - Verified `scripts/run-visual-preview.sh damage` from the new worktree: lockfile dependencies installed, frontend built, fresh isolated damaged-laundry save created, own server running on port 8840. HTTP checks confirmed owned laundry at 45 condition and successful frontend/art responses. Frontend tests pass. User campaign/port 8791 were not used for this fixture.
 - Visual agent delivers commits/evidence for review, not direct merges. Parallel functional changes to shared React shell/types need coordination. The original goal controller text cannot be rewritten using its available status-only tool; project goal documents carry the user's amendment without falsely marking the gameplay objective complete.
+
+## Active gameplay goal and arrival encounters — 2026-09-07
+
+- The goal controller returned no existing goal, so created an active goal with the user's amended gameplay ownership. Visual production remains assigned to a separate agent; the handoff is prepared, not dispatched. Confirmed the existing `caffeinate -di` process is running.
+- Prepared encounters now surface at completed travel boundaries. Previously an offer due during travel remained queued until an unrelated local action. Urgent incidents still take precedence, and delivery consumes neither extra time nor a second command.
+- Added regression tests for already-due and exactly-on-arrival offers, immutable original state, no repeat after declining, and preserving business-pressure incidents ahead of queued offers.
+- Validation: full `go test -race ./...` passed. Fifty authored campaigns (25 investor, 25 defiant; up to 160 commands) completed in 2.03 seconds with zero errors; investor deaths 0/25, defiant 8/25, matching the previous baseline. Authored runs do not validate live-model narrative quality. The arrival change has not yet been deployed to the user's running server; the user's save was not modified.
+- Next: exercise prepared arrival encounters in an isolated browser campaign, then improve narrative continuity and run the complete rise-and-consequence playtest. The overall goal remains active.

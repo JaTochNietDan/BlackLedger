@@ -10,7 +10,7 @@ The visual owner handles art assets, illustrated-city rendering, animation, ligh
 
 Handoff deliverables: written brief and examples, acceptance checklist, ready-to-paste agent prompt, isolated `codex/visual-handoff` worktree and safe preview launcher. Preparing the handoff does not mean another agent has started. Whole-game completion remains unproven until integrated behavior has been tested; no requirement is satisfied merely by assigning it to someone else.
 
-The goal controller's original objective is not editable through the available status-only tool. This document records the user's amended scope; do not mark the old goal complete solely to replace its text.
+The task goal was recreated with this amended scope on 2026-09-07 after the controller reported no existing goal. It is active and matches this ownership split. No unfinished goal was marked complete to replace its text.
 
 Build and playtest the full Black Ledger single-player mafia vertical slice described in DESIGN.md: a playable 20–30-minute rise from rented housing through contacts, crew and business ownership, into consequential rival incidents; permanent death and new people in a persistent city; validated AI opportunities; reliable transactional saves and optional stable-character speech.
 

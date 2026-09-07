@@ -279,7 +279,10 @@ func (w *World) apply(c Command) error {
 				w.Log("A commitment interrupted", "Unspent funds were returned. The arrangement was not completed.", "personal")
 			}
 		}
-		if c.Kind != "travel" && c.Kind != "provoke" && c.Kind != "audience" {
+		// Completed travel is an encounter boundary too. Otherwise a prepared
+		// contact stays silent until the player performs an unrelated local action.
+		// OfferIfReady preserves any urgent incident raised during the journey.
+		if c.Kind != "provoke" && c.Kind != "audience" {
 			w.OfferIfReady()
 		}
 	}
