@@ -33,7 +33,7 @@ func jobBrief(w *core.World, operation string, connection *core.ArrangementMemor
 		b.Premise = "A customer is ready to pay the establishment for its services. This is a new proposed task, not a consequence of an earlier job."
 		b.SourceRole = "the customer who owes payment"
 		b.RecipientRole = "the establishment's manager who is owed payment"
-		b.PlayerTask = "Collect the customer's payment and deliver it to the manager. Do not demand money from the manager."
+		b.PlayerTask = "Collect the customer's payment and deliver it to the manager."
 	case "courier":
 		b.Premise = "The establishment's manager needs a private message carried to the requesting contact."
 		b.SourceRole = "the establishment's manager"

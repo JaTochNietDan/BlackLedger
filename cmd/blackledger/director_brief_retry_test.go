@@ -19,6 +19,15 @@ func TestFocusedBriefCorrectionRequiresAcknowledgement(t *testing.T) {
 	}
 	var calls atomic.Int32
 	model := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var request struct {
+			Format map[string]any `json:"format"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+			t.Error(err)
+		}
+		if request.Format["type"] != "object" {
+			t.Error("focused request omitted response schema")
+		}
 		n := calls.Add(1)
 		body := "Collect a customer's payment and bring it to the manager."
 		if n == 2 {

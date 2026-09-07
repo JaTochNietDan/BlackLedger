@@ -1,0 +1,38 @@
+{
+  "note": "Focused mode with response schema, live production request then browser careful approach and police payment. One sample; task brief subsequently had a copied negative instruction removed.",
+  "arrangement": {
+    "parent_id": "b89befcd647190ad6862986bcbf57701",
+    "id": "1a2751718bfe4a737b66b13dedf91864",
+    "life": 1,
+    "minute": 2160,
+    "title": "A Payment for Repairs",
+    "offer": "You handled our last mediation without violence. Now, a customer has finally come to pay for repairs done at the Russo Motor Works. I need you to collect the payment and deliver it to the manager. Do not demand money from the manager. Just make sure the transaction goes smoothly.",
+    "speaker": "mara",
+    "operation": "collection",
+    "beneficiary": "",
+    "status": "completed",
+    "result": "You collected the agreed payment and reported back. You took extra time to keep the work discreet."
+  },
+  "final_player": {
+    "cash": 347,
+    "health": 100,
+    "respect": 44,
+    "heat": 5
+  },
+  "minute": 2280,
+  "last_result": {
+    "from_location": "bar",
+    "to_location": "bar",
+    "elapsed": 0,
+    "records": [
+      {
+        "id": "41473225ae352430b9b323d80fe4ce8e",
+        "minute": 2280,
+        "life": 1,
+        "title": "Too familiar a face",
+        "text": "You collected the agreed payment and reported back. You took extra time to keep the work discreet. ($115, respect +3)",
+        "kind": "story"
+      }
+    ]
+  }
+}

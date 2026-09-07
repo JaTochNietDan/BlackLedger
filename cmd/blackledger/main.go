@@ -177,13 +177,15 @@ func (a *app) generateAttempt(snapshot *core.World, feedback string) error {
 		beneficiaries = append(beneficiaries, faction.ID)
 	}
 	contextData := map[string]any{"allowed_beneficiary_ids": beneficiaries, "current_clock": fmt.Sprintf("Day %d, %02d:%02d", snapshot.Minute/1440+1, snapshot.Minute%1440/60, snapshot.Minute%60), "validation_feedback": feedback, "required_operation": operation, "required_connection": connection, "recent_arrangements": arrangementBriefs(snapshot), "life": snapshot.Life, "minute": snapshot.Minute, "player": snapshot.Player, "factions": snapshot.Factions, "npcs": snapshot.NPCs, "dead": snapshot.Dead, "places": core.Locations, "properties": snapshot.Properties, "recent_history": recentWorldChanges(snapshot)}
+	var responseFormat any = "json"
 	activePrompt := prompt
 	if env("BLACK_LEDGER_DIRECTOR_BRIEF", "full") == "focused" {
 		activePrompt = focusedPrompt
+		responseFormat = proposalSchema(snapshot, operation, connection)
 		contextData = focusedContext(snapshot, operation, connection, feedback, beneficiaries)
 	}
 	b, _ := json.Marshal(contextData)
-	payload, _ := json.Marshal(map[string]any{"model": env("BLACK_LEDGER_MODEL", "qwen3:14b"), "stream": false, "think": false, "format": "json", "messages": []map[string]string{{"role": "system", "content": activePrompt}, {"role": "user", "content": string(b)}}, "options": map[string]any{"temperature": .8, "num_predict": 700}})
+	payload, _ := json.Marshal(map[string]any{"model": env("BLACK_LEDGER_MODEL", "qwen3:14b"), "stream": false, "think": false, "format": responseFormat, "messages": []map[string]string{{"role": "system", "content": activePrompt}, {"role": "user", "content": string(b)}}, "options": map[string]any{"temperature": .8, "num_predict": 700}})
 	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
 	defer cancel()
 	req, _ := http.NewRequestWithContext(ctx, "POST", env("BLACK_LEDGER_OLLAMA", "http://127.0.0.1:11435")+"/api/chat", bytes.NewReader(payload))
