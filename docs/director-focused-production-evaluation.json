@@ -1,0 +1,153 @@
+{
+  "note": "Two iterative production-server tests on the same earned campaign. Locality improved in the second; neither faithfully acknowledged prior work. Second confuses creditor/debtor roles. Not proof of narrative consistency.",
+  "samples": [
+    {
+      "mode": "focused-full-city",
+      "director": {
+        "status": "ready",
+        "detail": "A local AI encounter is ready. It can arrive after your next activity.",
+        "last_request": 2080
+      },
+      "offer": {
+        "connection": {
+          "id": "b89befcd647190ad6862986bcbf57701",
+          "title": "A Dispute at the Garage",
+          "result": "You completed the requested mediation without violence. You pushed the schedule and drew more attention."
+        },
+        "operation": "collection",
+        "alternatives": {
+          "approach:careful": {
+            "reward": 115,
+            "respect": 3,
+            "heat": 2,
+            "minutes": 120
+          },
+          "approach:press": {
+            "reward": 150,
+            "respect": 3,
+            "heat": 10,
+            "minutes": 75
+          }
+        },
+        "id": "303e6aeaecf3d2da92b02b498b52332b",
+        "title": "A Payment at the Laundry",
+        "body": "The Bluebird Laundry has a payment ready for pickup. It's a quiet arrangement, but I need you to retrieve it without drawing attention. If you're willing to be careful, I'll have the details for you.",
+        "speaker": "mara",
+        "choices": [
+          {
+            "id": "accept",
+            "label": "Collect the payment",
+            "detail": "$130 \u00b7 90 minutes \u00b7 +3 respect \u00b7 +5 heat \u00b7 At 15 heat, police may stop completion.",
+            "cost": 0,
+            "disabled": false
+          },
+          {
+            "id": "approach:careful",
+            "label": "Retrieve the payment discreetly",
+            "detail": "$115 \u00b7 120 minutes \u00b7 +3 respect \u00b7 +2 heat \u00b7 At 15 heat, police may stop completion.",
+            "cost": 0,
+            "disabled": false
+          },
+          {
+            "id": "approach:press",
+            "label": "Pick up the payment quickly and openly",
+            "detail": "$150 \u00b7 75 minutes \u00b7 +3 respect \u00b7 +10 heat \u00b7 At 15 heat, police may stop completion.",
+            "cost": 0,
+            "disabled": false
+          },
+          {
+            "id": "decline",
+            "label": "Decline the arrangement",
+            "detail": "No cost or time.",
+            "cost": 0,
+            "disabled": false
+          }
+        ],
+        "kind": "proposal",
+        "source": "local-ai",
+        "minute": 2080,
+        "effect": {
+          "reward": 130,
+          "respect": 3,
+          "heat": 5,
+          "minutes": 90
+        },
+        "outcome": "You collected the agreed payment and reported back."
+      }
+    },
+    {
+      "mode": "focused-contact-local",
+      "director": {
+        "status": "ready",
+        "detail": "A local AI encounter is ready. It can arrive after your next activity.",
+        "last_request": 2080
+      },
+      "offer": {
+        "connection": {
+          "id": "b89befcd647190ad6862986bcbf57701",
+          "title": "A Dispute at the Garage",
+          "result": "You completed the requested mediation without violence. You pushed the schedule and drew more attention."
+        },
+        "operation": "collection",
+        "alternatives": {
+          "approach:careful": {
+            "reward": 115,
+            "respect": 3,
+            "heat": 2,
+            "minutes": 120
+          },
+          "approach:press": {
+            "reward": 150,
+            "respect": 3,
+            "heat": 10,
+            "minutes": 75
+          }
+        },
+        "id": "948925090878b9f12bf21ab491bba916",
+        "title": "A Payment at the Garage",
+        "body": "The payment for the garage\u2019s recent repairs is still outstanding, and the mechanic expects it today. I can\u2019t have him causing trouble over unpaid work. If you can collect the money discreetly and return here with proof, I\u2019ll be in your debt.",
+        "speaker": "mara",
+        "choices": [
+          {
+            "id": "accept",
+            "label": "Collect the payment",
+            "detail": "$130 \u00b7 90 minutes \u00b7 +3 respect \u00b7 +5 heat \u00b7 At 15 heat, police may stop completion.",
+            "cost": 0,
+            "disabled": false
+          },
+          {
+            "id": "approach:careful",
+            "label": "Speak privately with the mechanic and arrange payment",
+            "detail": "$115 \u00b7 120 minutes \u00b7 +3 respect \u00b7 +2 heat \u00b7 At 15 heat, police may stop completion.",
+            "cost": 0,
+            "disabled": false
+          },
+          {
+            "id": "approach:press",
+            "label": "Confront the mechanic directly and demand the money",
+            "detail": "$150 \u00b7 75 minutes \u00b7 +3 respect \u00b7 +10 heat \u00b7 At 15 heat, police may stop completion.",
+            "cost": 0,
+            "disabled": false
+          },
+          {
+            "id": "decline",
+            "label": "Decline the arrangement",
+            "detail": "No cost or time.",
+            "cost": 0,
+            "disabled": false
+          }
+        ],
+        "kind": "proposal",
+        "source": "local-ai",
+        "minute": 2080,
+        "effect": {
+          "reward": 130,
+          "respect": 3,
+          "heat": 5,
+          "minutes": 90
+        },
+        "outcome": "You collected the agreed payment and reported back."
+      }
+    }
+  ]
+}

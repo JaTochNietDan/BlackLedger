@@ -38,7 +38,26 @@ func TestFocusedContextKeepsConnectionAndCorrection(t *testing.T) {
 	if c["required_connection"] != connection || c["validation_feedback"] != "Correct the speaker" || c["required_operation"] != "collection" {
 		t.Fatal("focused context lost required constraints")
 	}
-	if len(c["recent_arrangements"].([]core.ArrangementMemory)) != 8 || w.Arrangements[0].Offer != "Old prose" {
+	if len(c["avoid_recent_titles"].([]string)) != 8 || w.Arrangements[0].Offer != "Old prose" {
 		t.Fatal("focused history bound or preservation failed")
+	}
+}
+
+func TestFocusedFollowUpUsesRelevantContactAndCurrentOwnership(t *testing.T) {
+	w := core.New(27)
+	w.Properties["garage"].Owner = "player:1"
+	connection := &core.ArrangementMemory{ID: "job", Life: 1, Speaker: "mara", Title: "A garage dispute", Offer: "Resolve the tool disagreement at Russo Motor Works.", Status: "completed"}
+	c := focusedContext(w, "collection", connection, "", []string{"", "bellandi", "russo"})
+	people := c["npcs"].([]map[string]any)
+	places := c["places"].([]map[string]any)
+	if len(people) != 1 || people[0]["id"] != "mara" {
+		t.Fatal("unrelated contacts in follow-up brief")
+	}
+	if len(places) != 1 || places[0]["id"] != "garage" || places[0]["owner"] != "current player's organization" {
+		t.Fatal("follow-up location or ownership wrong")
+	}
+	fresh := focusedContext(w, "mediation", nil, "", []string{"", "bellandi", "russo"})
+	if len(fresh["npcs"].([]map[string]any)) != len(w.NPCs) || len(fresh["places"].([]map[string]any)) != len(core.Locations) {
+		t.Fatal("fresh requests cannot see the city")
 	}
 }
