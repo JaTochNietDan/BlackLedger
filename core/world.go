@@ -429,7 +429,12 @@ func (w *World) Actions(id string) []Action {
 		}
 	}
 	if len(p.Crew) > 0 {
-		add("delegate", "Send Leo on collections", 15, 0, need(len(w.Tasks) > 0, "Leo is already on assignment"), "Completes after 120 game minutes: $65.")
+		reason := need(p.Crew[0].Loyalty < 30, "Leo refuses assignments below 30 loyalty. Pay a bonus to rebuild trust.")
+		if len(w.Tasks) > 0 {
+			reason = "Leo is already on assignment"
+		}
+		add("delegate", "Send Leo on collections", 15, 0, reason, "Completes after 120 game minutes: $65. Requires 30 loyalty.")
+		add("crew_bonus", "Pay Leo a bonus", 15, 40, need(p.Crew[0].Loyalty >= 100, "Loyalty is already at its maximum"), "Restore up to 25 loyalty. Below 30 he refuses collections; at 50 he can help protect businesses when available.")
 	}
 	add("wait", "Let an hour pass", 60, 0, "", "Income, rent, operations and rival plans continue.")
 	return out

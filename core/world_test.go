@@ -330,3 +330,43 @@ func TestWarningAllowsLeavingBeforeHit(t *testing.T) {
 		t.Fatal("leaving after warning did not avoid the home attack")
 	}
 }
+
+func TestCrewLoyaltyRefusalAndBonus(t *testing.T) {
+	w := New(27)
+	w.Player.Crew = []Crew{{"leo", "Leo", 29}}
+	before, _ := json.Marshal(w)
+	if _, err := Execute(w, Command{Revision: w.Revision, Kind: "delegate", Target: "room"}); err == nil {
+		t.Fatal("disloyal crew accepted work")
+	}
+	after, _ := json.Marshal(w)
+	if string(before) != string(after) {
+		t.Fatal("rejected command changed world")
+	}
+	cash := w.Player.Cash
+	act(t, &w, "crew_bonus", "room")
+	if w.Player.Cash != cash-40 || w.Player.Crew[0].Loyalty != 54 {
+		t.Fatal("bonus did not charge and restore loyalty")
+	}
+	act(t, &w, "delegate", "room")
+	if len(w.Tasks) != 1 {
+		t.Fatal("loyal crew did not resume work")
+	}
+}
+
+func TestCrewBonusLimits(t *testing.T) {
+	for _, tc := range []struct {
+		cash, loyalty int
+		allowed       bool
+	}{{39, 20, false}, {90, 100, false}, {90, 90, true}} {
+		w := New(27)
+		w.Player.Cash = tc.cash
+		w.Player.Crew = []Crew{{"leo", "Leo", tc.loyalty}}
+		result, err := Execute(w, Command{Revision: w.Revision, Kind: "crew_bonus", Target: "room"})
+		if (err == nil) != tc.allowed {
+			t.Fatalf("bonus availability: %+v, %v", tc, err)
+		}
+		if tc.allowed && result.Player.Crew[0].Loyalty != 100 {
+			t.Fatal("bonus exceeded loyalty cap")
+		}
+	}
+}

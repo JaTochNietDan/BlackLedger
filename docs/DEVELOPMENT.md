@@ -241,3 +241,9 @@
 - First 4B sample became ready in 8.07 seconds including request/poll overhead. Structurally valid, but copied prompt example labels unrelated to its collection task, promised a future market job, and did not acknowledge the exact completed mediation. It does not establish a story-quality improvement over the recorded 14B samples.
 - Removed illustrative action labels from the director prompt and explicitly prohibited promises about future job location/subject/timing/reward. Second 4B sample stopped copying those examples and did not promise the next job, but used generic labels and invented last-week repairs without a faithful callback. These remain quality limitations, not solved requirements.
 - Saved unedited queued text/choices in `director-model-evaluation.json`. Kept 14B as the default; model selection remains configurable. Focused server tests pass. No gameplay/saves changed in the user campaign during evaluation.
+
+## Crew loyalty and recovery
+- Leo now refuses new collection assignments below 30 loyalty. Existing assignments finish normally. Business protection retains its existing 50-loyalty threshold.
+- Added a $40 bonus action (15 minutes, up to +25 loyalty, capped at 100), available beside delegation in People and current-location actions. Payment and loyalty commit together before time advances, so interruptions do not consume the payment without the bonus.
+- People reports refusal explicitly. Crew do not automatically quit in this implementation; rebuilding loyalty remains possible.
+- Added regression coverage for refusal without state mutation, bonus payment/recovery and resumed assignment, unaffordable/max-loyalty rejection, and capping. Full Go race suite, frontend build, and seven frontend tests pass. This change has not yet received a dedicated browser visual playtest.

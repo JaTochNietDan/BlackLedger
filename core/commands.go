@@ -192,6 +192,10 @@ func (w *World) apply(c Command) error {
 			case "security":
 				p.Security++
 				w.Log("Someone at the door", "Another security detail is assigned to your residence. It adds $10 a day to your expenses.", "personal")
+			case "crew_bonus":
+				before := p.Crew[0].Loyalty
+				p.Crew[0].Loyalty = min(100, before+25)
+				w.Log("A share for Leo", fmt.Sprintf("You paid a $40 bonus. Loyalty rose from %d to %d.", before, p.Crew[0].Loyalty), "personal")
 			case "delegate":
 				w.Tasks = append(w.Tasks, Task{ID(), "Leo · collections", w.Minute + 120})
 				w.Log("Leo heads out", "Collections should be completed in two hours.", "work")
