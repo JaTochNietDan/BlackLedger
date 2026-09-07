@@ -27,6 +27,7 @@ func (w *World) apply(c Command) error {
 		w.Event = nil
 		w.Offers = []Offer{}
 		w.Plots = []Plot{}
+		w.NextPressure = 0
 		for i := range w.NPCs {
 			w.NPCs[i].Trust = 0
 		}
@@ -97,6 +98,10 @@ func (w *World) apply(c Command) error {
 				w.Log("A temporary understanding", "Bellandi accepts the tribute and calls off his current operation against you.", "politics")
 			} else {
 				w.Log("You leave the Monarch", "Nothing was agreed. Existing threats remain.", "personal")
+			}
+		case "business_pressure":
+			if err := w.ResolvePressure(e, c.Choice); err != nil {
+				return err
 			}
 		case "proposal":
 			if c.Choice == "accept" {
@@ -205,6 +210,9 @@ func (w *World) apply(c Command) error {
 				case "audience":
 					w.Event = &Scene{ID: ID(), Title: "A seat across from Bellandi", Body: "“People mistake an open door for an invitation. Tell me you understand the difference.”", Speaker: "vittorio", Kind: "audience", Source: "authored", Minute: w.Minute, Choices: []Choice{{ID: "tribute", Label: "Offer $150 in tribute", Cost: 150, Detail: "Improves relations and cancels his current operation against you."}, {ID: "leave", Label: "Leave without an agreement", Detail: "No payment. Existing threats remain."}}}
 				case "acquire":
+					if w.NextPressure == 0 {
+						w.NextPressure = w.Minute + 180
+					}
 					w.Properties[target].Owner = fmt.Sprintf("player:%d", w.Life)
 					p.Respect += 4
 					l, _ := PlaceByID(target)

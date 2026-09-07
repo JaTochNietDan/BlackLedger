@@ -74,6 +74,7 @@ type Property struct {
 	Carry     float64 `json:"carry"`
 }
 type Plot struct {
+	Target   string `json:"target,omitempty"`
 	ID       string `json:"id"`
 	Kind     string `json:"kind"`
 	Life     int    `json:"life"`
@@ -115,6 +116,8 @@ type Effect struct {
 	Minutes int `json:"minutes"`
 }
 type Scene struct {
+	Target  string   `json:"target,omitempty"`
+	Actor   string   `json:"actor,omitempty"`
 	ID      string   `json:"id"`
 	Title   string   `json:"title"`
 	Body    string   `json:"body"`
@@ -142,25 +145,26 @@ type Result struct {
 	Records []Record `json:"records"`
 }
 type World struct {
-	Version    int                  `json:"version"`
-	ID         string               `json:"id"`
-	Revision   int                  `json:"revision"`
-	Life       int                  `json:"life"`
-	Minute     int                  `json:"minute"`
-	RNG        uint32               `json:"rng"`
-	Player     Person               `json:"player"`
-	District   int                  `json:"district"`
-	Factions   []Faction            `json:"factions"`
-	NPCs       []NPC                `json:"npcs"`
-	Properties map[string]*Property `json:"properties"`
-	Plots      []Plot               `json:"plots"`
-	Tasks      []Task               `json:"tasks"`
-	Event      *Scene               `json:"event"`
-	History    []Record             `json:"history"`
-	Dead       []Death              `json:"dead"`
-	Director   Director             `json:"director"`
-	Offers     []Offer              `json:"offers"`
-	LastResult *Result              `json:"last_result"`
+	NextPressure int                  `json:"next_pressure,omitempty"`
+	Version      int                  `json:"version"`
+	ID           string               `json:"id"`
+	Revision     int                  `json:"revision"`
+	Life         int                  `json:"life"`
+	Minute       int                  `json:"minute"`
+	RNG          uint32               `json:"rng"`
+	Player       Person               `json:"player"`
+	District     int                  `json:"district"`
+	Factions     []Faction            `json:"factions"`
+	NPCs         []NPC                `json:"npcs"`
+	Properties   map[string]*Property `json:"properties"`
+	Plots        []Plot               `json:"plots"`
+	Tasks        []Task               `json:"tasks"`
+	Event        *Scene               `json:"event"`
+	History      []Record             `json:"history"`
+	Dead         []Death              `json:"dead"`
+	Director     Director             `json:"director"`
+	Offers       []Offer              `json:"offers"`
+	LastResult   *Result              `json:"last_result"`
 }
 type Command struct {
 	RequestID string `json:"request_id"`
@@ -393,7 +397,7 @@ func (w *World) Retaliation() {
 			return
 		}
 	}
-	w.Plots = append(w.Plots, Plot{ID(), "hit", w.Life, w.Minute + 240, "bellandi", 5, false})
+	w.Plots = append(w.Plots, Plot{ID: ID(), Kind: "hit", Life: w.Life, Due: w.Minute + 240, Actor: "bellandi", Strength: 5})
 }
 func (w *World) Die(cause string) {
 	p := &w.Player
@@ -442,13 +446,16 @@ func (w *World) Advance(minutes int) {
 		}
 		// Jump to the next meaningful boundary; presentation never drives this clock.
 		next := min(end, (w.Minute/1440+1)*1440)
+		if w.NextPressure > 0 {
+			next = min(next, max(w.Minute+1, w.NextPressure))
+		}
 		for _, task := range w.Tasks {
 			next = min(next, max(w.Minute+1, task.Due))
 		}
 		for _, plot := range w.Plots {
 			if plot.Life == w.Life {
 				next = min(next, max(w.Minute+1, plot.Due))
-				if !plot.Known && p.Contacts >= 2 {
+				if plot.Kind == "hit" && !plot.Known && p.Contacts >= 2 {
 					next = min(next, max(w.Minute+1, plot.Due-90))
 				}
 			}
@@ -492,16 +499,23 @@ func (w *World) Advance(minutes int) {
 			if plot.Life != w.Life {
 				continue
 			}
-			if !plot.Known && p.Contacts >= 2 && plot.Due-w.Minute <= 90 {
+			if plot.Kind == "hit" && !plot.Known && p.Contacts >= 2 && plot.Due-w.Minute <= 90 {
 				plot.Known = true
 				w.Log("Mara has heard something", "Bellandi men have been asking where you sleep. You may have very little time.", "danger")
 			}
 			if plot.Due <= w.Minute {
 				copy := *plot
 				w.Plots = append(w.Plots[:j], w.Plots[j+1:]...)
-				w.Attack(copy)
+				if copy.Kind == "sabotage" {
+					w.ResolveSabotage(copy)
+				} else {
+					w.Attack(copy)
+				}
 				break
 			}
+		}
+		if w.Event == nil && p.Alive && w.NextPressure > 0 && w.Minute >= w.NextPressure {
+			w.BusinessPressure()
 		}
 	}
 }
