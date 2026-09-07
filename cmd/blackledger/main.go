@@ -68,9 +68,12 @@ func (a *app) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			}
 			return
 		}
-		root := env("BLACK_LEDGER_WEB", "web")
-		if _, e := os.Stat(filepath.Join("dist", "index.html")); e == nil {
-			root = "dist"
+		root := os.Getenv("BLACK_LEDGER_WEB")
+		if root == "" {
+			root = "web"
+			if _, e := os.Stat(filepath.Join("dist", "index.html")); e == nil {
+				root = "dist"
+			}
 		}
 		http.FileServer(http.Dir(root)).ServeHTTP(w, r)
 		return
