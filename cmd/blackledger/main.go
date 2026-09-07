@@ -177,11 +177,10 @@ func (a *app) generateAttempt(snapshot *core.World, feedback string) error {
 		beneficiaries = append(beneficiaries, faction.ID)
 	}
 	contextData := map[string]any{"allowed_beneficiary_ids": beneficiaries, "current_clock": fmt.Sprintf("Day %d, %02d:%02d", snapshot.Minute/1440+1, snapshot.Minute%1440/60, snapshot.Minute%60), "validation_feedback": feedback, "required_operation": operation, "required_connection": connection, "recent_arrangements": arrangementBriefs(snapshot), "life": snapshot.Life, "minute": snapshot.Minute, "player": snapshot.Player, "factions": snapshot.Factions, "npcs": snapshot.NPCs, "dead": snapshot.Dead, "places": core.Locations, "properties": snapshot.Properties, "recent_history": recentWorldChanges(snapshot)}
-	var responseFormat any = "json"
+	responseFormat := proposalSchema(snapshot, operation, connection)
 	activePrompt := prompt
 	if env("BLACK_LEDGER_DIRECTOR_BRIEF", "full") == "focused" {
 		activePrompt = focusedPrompt
-		responseFormat = proposalSchema(snapshot, operation, connection)
 		contextData = focusedContext(snapshot, operation, connection, feedback, beneficiaries)
 	}
 	b, _ := json.Marshal(contextData)

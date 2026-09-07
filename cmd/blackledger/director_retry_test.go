@@ -22,11 +22,15 @@ func TestDirectorCorrectionIsBoundedAndValidated(t *testing.T) {
 					return
 				}
 				var input struct {
+					Format   map[string]any `json:"format"`
 					Messages []struct {
 						Content string `json:"content"`
 					} `json:"messages"`
 				}
 				json.NewDecoder(r.Body).Decode(&input)
+				if input.Format["type"] != "object" {
+					t.Error("default director request omitted schema")
+				}
 				if number == 2 && !strings.Contains(input.Messages[1].Content, "failed validation") {
 					t.Error("correction lacked feedback")
 				}

@@ -1,0 +1,135 @@
+[
+  {
+    "mode": "focused fresh after completed follow-up",
+    "offer": {
+      "operation": "courier",
+      "alternatives": {
+        "approach:careful": {
+          "reward": 60,
+          "respect": 3,
+          "heat": 0,
+          "minutes": 75
+        },
+        "approach:press": {
+          "reward": 95,
+          "respect": 3,
+          "heat": 8,
+          "minutes": 30
+        }
+      },
+      "id": "fc45ae662603a11e8bcdaad86297bc93",
+      "title": "A Message for the Boss",
+      "body": "You\u2019ve got a message to deliver, Alex. The manager at Saint Agnes wants it passed along to the contact at The Monarch. It\u2019s sealed, and the contents are none of your concern. Just get it there without raising any flags. You can do this the quiet way or make a show of it\u2014your call.",
+      "speaker": "mara",
+      "choices": [
+        {
+          "id": "accept",
+          "label": "Deliver the package",
+          "detail": "$75 \u00b7 45 minutes \u00b7 +3 respect \u00b7 +3 heat \u00b7 At 15 heat, police may stop completion.",
+          "cost": 0,
+          "disabled": false
+        },
+        {
+          "id": "approach:careful",
+          "label": "Deliver message at the club",
+          "detail": "$60 \u00b7 75 minutes \u00b7 +3 respect \u00b7 +0 heat \u00b7 At 15 heat, police may stop completion.",
+          "cost": 0,
+          "disabled": false
+        },
+        {
+          "id": "approach:press",
+          "label": "Hand it off in public",
+          "detail": "$95 \u00b7 30 minutes \u00b7 +3 respect \u00b7 +8 heat \u00b7 At 15 heat, police may stop completion.",
+          "cost": 0,
+          "disabled": false
+        },
+        {
+          "id": "decline",
+          "label": "Decline the arrangement",
+          "detail": "No cost or time.",
+          "cost": 0,
+          "disabled": false
+        }
+      ],
+      "kind": "proposal",
+      "source": "local-ai",
+      "minute": 2280,
+      "effect": {
+        "reward": 75,
+        "respect": 3,
+        "heat": 3,
+        "minutes": 45
+      },
+      "outcome": "You delivered the sealed package and reported back."
+    }
+  },
+  {
+    "mode": "full prompt with schema",
+    "offer": {
+      "connection": {
+        "id": "b89befcd647190ad6862986bcbf57701",
+        "title": "A Dispute at the Garage",
+        "result": "You completed the requested mediation without violence. You pushed the schedule and drew more attention."
+      },
+      "operation": "collection",
+      "alternatives": {
+        "approach:careful": {
+          "reward": 115,
+          "respect": 3,
+          "heat": 2,
+          "minutes": 120
+        },
+        "approach:press": {
+          "reward": 150,
+          "respect": 3,
+          "heat": 10,
+          "minutes": 75
+        }
+      },
+      "id": "b119f9277d76294eb3ea59668e972eab",
+      "title": "A Payment at the Laundry",
+      "body": "I need you to retrieve a payment left at the Bluebird Laundry. It\u2019s a sealed envelope with a note inside, and I need it back to the person who sent it. This is a quiet matter, and I can\u2019t have any trouble. If you handle it carefully, I\u2019ll make sure you\u2019re well compensated for your time.",
+      "speaker": "mara",
+      "choices": [
+        {
+          "id": "accept",
+          "label": "Collect the payment",
+          "detail": "$130 \u00b7 90 minutes \u00b7 +3 respect \u00b7 +5 heat \u00b7 At 15 heat, police may stop completion.",
+          "cost": 0,
+          "disabled": false
+        },
+        {
+          "id": "approach:careful",
+          "label": "Collect discreetly",
+          "detail": "$115 \u00b7 120 minutes \u00b7 +3 respect \u00b7 +2 heat \u00b7 At 15 heat, police may stop completion.",
+          "cost": 0,
+          "disabled": false
+        },
+        {
+          "id": "approach:press",
+          "label": "Collect quickly",
+          "detail": "$150 \u00b7 75 minutes \u00b7 +3 respect \u00b7 +10 heat \u00b7 At 15 heat, police may stop completion.",
+          "cost": 0,
+          "disabled": false
+        },
+        {
+          "id": "decline",
+          "label": "Decline the arrangement",
+          "detail": "No cost or time.",
+          "cost": 0,
+          "disabled": false
+        }
+      ],
+      "kind": "proposal",
+      "source": "local-ai",
+      "minute": 2080,
+      "effect": {
+        "reward": 130,
+        "respect": 3,
+        "heat": 5,
+        "minutes": 90
+      },
+      "outcome": "You collected the agreed payment and reported back."
+    }
+  }
+]
