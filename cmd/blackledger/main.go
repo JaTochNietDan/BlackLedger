@@ -183,6 +183,7 @@ func (a *app) generateAttempt(snapshot *core.World, feedback string) error {
 		activePrompt = focusedPrompt
 		contextData = focusedContext(snapshot, operation, connection, feedback, beneficiaries)
 	}
+	contextData["active_business_ceasefires_until_minute"] = snapshot.ActiveBusinessTruces()
 	contextData["allowed_speaker_ids"] = directorSpeakers(snapshot, connection)
 	contextData["accessible_job_locations"] = accessibleJobLocations(snapshot)
 	b, _ := json.Marshal(contextData)

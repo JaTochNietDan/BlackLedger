@@ -91,3 +91,5 @@ Assets can be generated with whichever image tools the visual agent actually has
 Commit small coherent changes on the visual branch. Record commit hashes, screenshots, inspected viewport sizes, commands run, remaining defects and any API requests in `docs/VISUAL_DELIVERY.md`. Do not merge into gameplay `main`; Codex will review and integrate selected commits. Rebase only with awareness of shared-file changes. An interface incompatibility should be documented, not hidden behind fake state.
 
 Acceptance: use [VISUAL_ACCEPTANCE.md](VISUAL_ACCEPTANCE.md). A pretty screenshot alone is not sufficient.
+
+Gameplay integration note (2026-09-07): main now adds an optional `business_truces` expiry map to `Snapshot` and a short active-agreement status in each Families card (`src/types.ts`, `src/main.tsx`). Preserve this functional status when integrating visual layout changes; the public API contract is in API.md. No visual-agent worktree files were changed.

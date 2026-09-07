@@ -20,7 +20,7 @@ func (w *World) BusinessPressure() {
 			family = 1
 		}
 		// A local understanding does not suppress another family's territorial claim.
-		if w.Factions[family].Goodwill >= 25 {
+		if w.Factions[family].Goodwill >= 25 || w.BusinessTruces[w.Factions[family].ID] > w.Minute {
 			continue
 		}
 		if target == nil || w.Properties[l.ID].Income > w.Properties[target.ID].Income {
@@ -95,6 +95,9 @@ func (w *World) ResolvePressure(e *Scene, choice string) error {
 	return nil
 }
 func (w *World) ResolveSabotage(p Plot) {
+	if w.BusinessTruces[p.Actor] > w.Minute {
+		return
+	}
 	if !w.Own(p.Target) {
 		return
 	}

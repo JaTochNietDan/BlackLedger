@@ -36,3 +36,9 @@ New AI requests use established contacts: Mara initially; recruited associates w
 New model responses require `location`, an existing place ID in an unlocked district. The schema restricts IDs; server validation requires the selected venue's name in the body and rejects explicit locked venue names in title/body/approaches. This is a bounded consistency check, not a semantic proof of the rest of the story. Core validation also rejects supplied inaccessible locations. Authored and legacy proposals may omit location.
 
 Located proposals store the venue in scene `target` and arrangement memory `location`. Action details display its canonical name. Jobs still resolve off-screen within their quoted total duration and return to the player's current base; they do not teleport the player, unlock districts or grant free property access. Reading and rendering remain independent of simulation time. Saved follow-up briefs prefer structured venue memory over place names inferred from old prose.
+
+## Business ceasefires
+
+Audiences now offer a $100 business ceasefire with the represented family. It lasts 1,440 game minutes from purchase (renewals replace the expiry rather than stacking it), removes that family's pending sabotage, and suppresses its business demands and sabotage while active. Personal hits, other families, goodwill and ownership are unaffected. Payment transfers to the family through the ordinary transactional decision path. Agreements expire at the exact saved minute and are cleared on a new life.
+
+`business_truces` is an optional public map of faction ID to active expiry minute. Empty/expired agreements are omitted from that map; private plans are never included. The Families panel shows active terms and the director receives the same public agreement context. This audience option does not authorize arbitrary model-written treaties or territorial divisions.

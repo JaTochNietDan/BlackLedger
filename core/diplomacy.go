@@ -14,6 +14,7 @@ func (w *World) OpenAudience(location string) {
 	}
 	w.Event = &Scene{ID: ID(), Title: "A seat across from " + surname, Body: body, Speaker: speaker, Actor: actor, Target: location, Kind: "audience", Source: "authored", Minute: w.Minute, Choices: []Choice{
 		{ID: "tribute", Label: "Offer $150 in tribute", Cost: 150, Detail: "Gain 8 standing. Cancels this family's current operations against you; other families and future demands are unchanged."},
+		{ID: "business_truce", Label: "Pay $100 for a business ceasefire", Cost: 100, Detail: "For 24 game hours, this family suspends business demands and sabotage. Cancels its pending sabotage; personal threats, other families and ownership remain unchanged. Renews from now, not cumulatively."},
 		{ID: "work", Label: "Offer to do a favor", Detail: "Hear a paid courier offer for this family. Completion improves their standing and worsens their rival's. Existing threats remain until resolved separately."},
 		{ID: "leave", Label: "Leave without an agreement", Detail: "No payment. Existing threats remain."},
 	}}
@@ -35,6 +36,20 @@ func (w *World) ResolveAudience(e *Scene, choice string) error {
 		return fmt.Errorf("unknown audience family")
 	}
 	switch choice {
+	case "business_truce":
+		if w.BusinessTruces == nil {
+			w.BusinessTruces = map[string]int{}
+		}
+		w.BusinessTruces[actor] = w.Minute + 1440
+		faction.Cash += 100
+		remaining := []Plot{}
+		for _, plot := range w.Plots {
+			if plot.Actor != actor || plot.Kind != "sabotage" {
+				remaining = append(remaining, plot)
+			}
+		}
+		w.Plots = remaining
+		w.Log("A business ceasefire", fmt.Sprintf("%s accepts $100. Business demands and sabotage pause until Day %d %02d:%02d. Personal threats and other families remain unaffected.", faction.Name, (w.Minute+1440)/1440+1, w.Minute%1440/60, w.Minute%60), "politics")
 	case "tribute":
 		faction.Goodwill = min(100, faction.Goodwill+8)
 		faction.Cash += 150
@@ -65,4 +80,18 @@ func (w *World) ResolveAudience(e *Scene, choice string) error {
 		return fmt.Errorf("unknown audience decision")
 	}
 	return nil
+}
+
+// Only current, publicly agreed terms are exposed; private plans stay private.
+func (w *World) ActiveBusinessTruces() map[string]int {
+	active := map[string]int{}
+	if !w.Player.Alive {
+		return active
+	}
+	for actor, until := range w.BusinessTruces {
+		if until > w.Minute {
+			active[actor] = until
+		}
+	}
+	return active
 }

@@ -158,28 +158,29 @@ type Result struct {
 	Records []Record    `json:"records"`
 }
 type World struct {
-	VisualCues   []VisualCue          `json:"-"`
-	Arrangements []ArrangementMemory  `json:"arrangements,omitempty"`
-	NextPressure int                  `json:"next_pressure,omitempty"`
-	Version      int                  `json:"version"`
-	ID           string               `json:"id"`
-	Revision     int                  `json:"revision"`
-	Life         int                  `json:"life"`
-	Minute       int                  `json:"minute"`
-	RNG          uint32               `json:"rng"`
-	Player       Person               `json:"player"`
-	District     int                  `json:"district"`
-	Factions     []Faction            `json:"factions"`
-	NPCs         []NPC                `json:"npcs"`
-	Properties   map[string]*Property `json:"properties"`
-	Plots        []Plot               `json:"plots"`
-	Tasks        []Task               `json:"tasks"`
-	Event        *Scene               `json:"event"`
-	History      []Record             `json:"history"`
-	Dead         []Death              `json:"dead"`
-	Director     Director             `json:"director"`
-	Offers       []Offer              `json:"offers"`
-	LastResult   *Result              `json:"last_result"`
+	VisualCues     []VisualCue          `json:"-"`
+	Arrangements   []ArrangementMemory  `json:"arrangements,omitempty"`
+	NextPressure   int                  `json:"next_pressure,omitempty"`
+	Version        int                  `json:"version"`
+	ID             string               `json:"id"`
+	Revision       int                  `json:"revision"`
+	Life           int                  `json:"life"`
+	Minute         int                  `json:"minute"`
+	RNG            uint32               `json:"rng"`
+	Player         Person               `json:"player"`
+	District       int                  `json:"district"`
+	BusinessTruces map[string]int       `json:"business_truces,omitempty"`
+	Factions       []Faction            `json:"factions"`
+	NPCs           []NPC                `json:"npcs"`
+	Properties     map[string]*Property `json:"properties"`
+	Plots          []Plot               `json:"plots"`
+	Tasks          []Task               `json:"tasks"`
+	Event          *Scene               `json:"event"`
+	History        []Record             `json:"history"`
+	Dead           []Death              `json:"dead"`
+	Director       Director             `json:"director"`
+	Offers         []Offer              `json:"offers"`
+	LastResult     *Result              `json:"last_result"`
 }
 type Command struct {
 	RequestID string `json:"request_id"`
@@ -641,7 +642,7 @@ func (w *World) Public() map[string]any {
 	if len(history) > 60 {
 		history = history[len(history)-60:]
 	}
-	return map[string]any{"id": w.ID, "version": w.Version, "revision": w.Revision, "life": w.Life, "minute": w.Minute, "player": w.Player, "district": w.District, "factions": w.Factions, "npcs": w.NPCs, "locations": locs, "event": scene, "history": history, "dead": w.Dead, "tasks": w.Tasks, "director": w.Director, "last_result": w.LastResult, "daily_cost": w.DailyCost(), "income": income, "security": w.Guard(), "opportunity": w.NextOpportunity(), "known_threats": w.KnownThreats()}
+	return map[string]any{"id": w.ID, "version": w.Version, "revision": w.Revision, "life": w.Life, "minute": w.Minute, "player": w.Player, "district": w.District, "factions": w.Factions, "npcs": w.NPCs, "locations": locs, "event": scene, "history": history, "dead": w.Dead, "tasks": w.Tasks, "director": w.Director, "last_result": w.LastResult, "daily_cost": w.DailyCost(), "income": income, "security": w.Guard(), "opportunity": w.NextOpportunity(), "known_threats": w.KnownThreats(), "business_truces": w.ActiveBusinessTruces()}
 }
 func (w *World) hasRecord(title string) bool {
 	for _, r := range w.History {

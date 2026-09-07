@@ -31,6 +31,7 @@ func (w *World) apply(c Command) error {
 		w.Event = nil
 		w.Offers = []Offer{}
 		w.Plots = []Plot{}
+		w.BusinessTruces = nil
 		w.NextPressure = 0
 		for i := range w.NPCs {
 			w.NPCs[i].Trust = 0
