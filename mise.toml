@@ -1,0 +1,56 @@
+# Tooling for Black Ledger. Everything this repository needs to build and run is
+# pinned here and managed by mise; nothing is expected from Homebrew or from a
+# globally installed runtime.
+#
+#   mise install     # get the toolchain
+#   mise run build   # the whole build, the way CI would do it
+#   mise run verify  # what has to pass before anything is committed
+
+[tools]
+go = "1.23.1"
+node = "20.17.0"
+python = "3.12"
+
+[env]
+# The art tools install into a project-local virtualenv rather than the user's
+# global site-packages. Nothing at runtime depends on it: portraits are
+# generated offline and the game ships the PNGs.
+VIRTUAL_ENV = "{{config_root}}/.venv"
+_.path = ["{{config_root}}/.venv/bin"]
+
+[tasks.build]
+description = "Build the server binary and the production frontend"
+run = ["go build -o .runtime/blackledger ./cmd/blackledger", "npm run build"]
+
+[tasks.verify]
+description = "Everything that has to pass before a commit"
+run = [
+  "gofmt -l core cmd store sim",
+  "go vet ./...",
+  "go test ./... -count=1",
+  "npx tsc --noEmit",
+  "npm run build",
+]
+
+[tasks.race]
+description = "The full race-detector run"
+run = "go test -race ./core/ ./store/ ./sim/ ./cmd/blackledger/ -count=1"
+
+[tasks.simulate]
+description = "Headless campaigns at scale"
+run = "go run ./cmd/simulate"
+
+[tasks.art]
+description = "Set up the offline image toolchain in a project-local venv"
+run = [
+  "python -m venv .venv",
+  ".venv/bin/pip install --quiet --upgrade pip",
+  ".venv/bin/pip install --quiet mflux pillow",
+]
+# FLUX.1-schnell upstream is gated behind an account acceptance, so the weights
+# come from the ungated mflux-community 8-bit quantisation instead. About 17GB,
+# pulled once into the Hugging Face cache.
+
+[tasks.portraits]
+description = "Regenerate the cast's faces (needs `mise run art` first)"
+run = ".venv/bin/python tools/portraits.py public/art 24"
