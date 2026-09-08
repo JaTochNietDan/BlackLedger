@@ -57,7 +57,7 @@ func (w *World) PlaceNote(id string) string {
 	case running && w.Custom(id) < 40:
 		return "The regulars have gone elsewhere"
 	case prop.Income > 0:
-		return fmt.Sprintf("Trading at %d%% of what it could", int(w.Capacity(id)*w.TradeMultiplier(id)*100))
+		return fmt.Sprintf("Trading at %d%% of what it could", int(w.Trading(id)*100))
 	}
 	return ""
 }
@@ -80,4 +80,18 @@ func (w *World) PlaceWarn(id string) bool {
 		(running && prop.Staff < trade.Hands) ||
 		prop.Condition < 60 ||
 		(running && w.Custom(id) < 40)
+}
+
+// Trading is the share of what a place could earn that it is actually earning:
+// how well it is staffed and supplied, how much custom it keeps, and the
+// condition of the building — which the clock uses to scale every dollar and
+// which this figure used to leave out. A laundry knocked down to 60% earned
+// 169 a day where a sound one earned 305, and told the player it was trading
+// at everything it could.
+func (w *World) Trading(id string) float64 {
+	prop := w.Properties[id]
+	if prop == nil {
+		return 0
+	}
+	return w.Capacity(id) * w.TradeMultiplier(id) * float64(prop.Condition) / 100
 }

@@ -87,3 +87,49 @@ func TestEveryAddressCanBeAskedAboutItself(t *testing.T) {
 		}
 	}
 }
+
+// "Trading at 100% of what it could" was measured against staffing, supply and
+// custom — and not against the condition of the building, which the clock uses
+// to scale every dollar the place earns. So a laundry knocked down to 60%
+// earned 169 a day where a sound one earned 305, and told the player it was
+// trading at everything it could. The sentence promises a share of what the
+// place could earn; the number has to be that share.
+func TestWhatAPlaceIsTradingAtIsWhatItActuallyEarns(t *testing.T) {
+	// Gross, not net: the day's rent and wages are the same whatever state the
+	// building is in, so measuring the cash left over would compare the wrong
+	// thing and make a wrecked laundry look worse than it trades.
+	earnings := func(condition int) int {
+		w := New(4)
+		w.Properties["laundry"].Owner = "player:1"
+		w.Properties["laundry"].Condition = condition
+		w.Player.Location = "laundry"
+		before := w.Player.Earned
+		w.Advance(1440)
+		return w.Player.Earned - before
+	}
+	best := earnings(100)
+	if best <= 0 {
+		t.Fatal("a sound laundry earned nothing")
+	}
+	for _, condition := range []int{100, 80, 60, 30} {
+		w := New(4)
+		w.Properties["laundry"].Owner = "player:1"
+		w.Properties["laundry"].Condition = condition
+		w.Player.Location = "laundry"
+
+		claimed := w.Trading("laundry")
+		actual := float64(earnings(condition)) / float64(best)
+		if diff := claimed - actual; diff > .06 || diff < -.06 {
+			t.Errorf("at %d%% condition the place says it trades at %.0f%% and earns %.0f%% of what a sound one does",
+				condition, claimed*100, actual*100)
+		}
+	}
+	// And the words the player reads follow the same number.
+	w := New(4)
+	w.Properties["laundry"].Owner = "player:1"
+	w.Properties["laundry"].Condition = 80
+	w.Player.Location = "laundry"
+	if note := w.PlaceNote("laundry"); contains(note, "100%") {
+		t.Fatalf("a laundry at 80%% condition says %q", note)
+	}
+}

@@ -145,3 +145,18 @@ func TestEveryTopBarFigureHasAnIconOfItsOwn(t *testing.T) {
 		}
 	}
 }
+
+// Two rows of the same panel claimed the same thing about different numbers:
+// "Working at 80%" beside "earns 100% of what it could", where the second was
+// about how many regulars a place keeps and the first about everything. A
+// player reading them together is reading a contradiction. Only one figure in
+// this game answers "of what it could", and it is the one the core computes.
+func TestOnlyOneFigureClaimsToBeWhatAPlaceCouldEarn(t *testing.T) {
+	body, err := os.ReadFile("../../src/main.tsx")
+	if err != nil {
+		t.Skip("no interface sources beside this build")
+	}
+	if n := strings.Count(string(body), "of what it could"); n != 0 {
+		t.Errorf("the property panel claims %d times to say what a place could earn; that sentence belongs to the core's own note", n)
+	}
+}

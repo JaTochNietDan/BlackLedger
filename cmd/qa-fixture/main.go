@@ -12,13 +12,13 @@ import (
 
 func main() {
 	if len(os.Args) < 2 || len(os.Args) > 3 {
-		log.Fatal("usage: go run ./cmd/qa-fixture <new-qa.sqlite3> [police|damage|warning|russo-warning|attack|voice|contact|paused-job|leader|doorman|arrest|debt|herald|killing|dead|offer|audience|street|room|gone|post|round|bereaved|inside|writeoff|writeoff-dead]")
+		log.Fatal("usage: go run ./cmd/qa-fixture <new-qa.sqlite3> [police|damage|warning|russo-warning|attack|voice|contact|paused-job|leader|doorman|arrest|debt|herald|killing|dead|offer|audience|street|room|gone|post|round|bereaved|inside|writeoff|writeoff-dead|worn]")
 	}
 	scenario := "police"
 	if len(os.Args) == 3 {
 		scenario = os.Args[2]
 	}
-	if scenario != "police" && scenario != "damage" && scenario != "warning" && scenario != "russo-warning" && scenario != "attack" && scenario != "voice" && scenario != "contact" && scenario != "paused-job" && scenario != "leader" && scenario != "doorman" && scenario != "arrest" && scenario != "debt" && scenario != "herald" && scenario != "killing" && scenario != "dead" && scenario != "offer" && scenario != "audience" && scenario != "street" && scenario != "room" && scenario != "gone" && scenario != "post" && scenario != "round" && scenario != "bereaved" && scenario != "inside" && scenario != "writeoff" && scenario != "writeoff-dead" {
+	if scenario != "police" && scenario != "damage" && scenario != "warning" && scenario != "russo-warning" && scenario != "attack" && scenario != "voice" && scenario != "contact" && scenario != "paused-job" && scenario != "leader" && scenario != "doorman" && scenario != "arrest" && scenario != "debt" && scenario != "herald" && scenario != "killing" && scenario != "dead" && scenario != "offer" && scenario != "audience" && scenario != "street" && scenario != "room" && scenario != "gone" && scenario != "post" && scenario != "round" && scenario != "bereaved" && scenario != "inside" && scenario != "writeoff" && scenario != "writeoff-dead" && scenario != "worn" {
 		log.Fatal("unsupported QA scenario")
 	}
 	path := os.Args[1]
@@ -36,6 +36,16 @@ func main() {
 	}
 	defer s.DB.Close()
 	err = s.Change(func(w *core.World) error {
+		if scenario == "worn" {
+			// A business of the player's knocked about but still standing, so the
+			// screen has to say what it is really earning rather than what a sound
+			// one would.
+			w.Player.Cash, w.Player.Respect = 4000, 20
+			w.Properties["laundry"].Owner = "player:1"
+			w.Properties["laundry"].Condition = 80
+			w.Player.Location = "laundry"
+			return nil
+		}
 		if scenario == "writeoff" || scenario == "writeoff-dead" {
 			// Money out with a man the city then kills, so the ledger has an
 			// asset that stops existing while the player is looking at it.
