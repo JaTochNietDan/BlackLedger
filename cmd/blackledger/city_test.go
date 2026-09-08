@@ -89,3 +89,27 @@ func TestTheCardViewIsStillReachable(t *testing.T) {
 		t.Fatal("the city view and the card view are not both reachable")
 	}
 }
+
+// The city is drawn on a GPU now, and a renderer that fails to start would
+// leave a blank pane where the city was. Two things have to stay true: the
+// card view remains reachable (checked above), and the addresses remain
+// reachable without a mouse or WebGL at all.
+func TestTheCityCanBeReadWithoutWebGL(t *testing.T) {
+	body, err := os.ReadFile("../../src/CityIso.tsx")
+	if err != nil {
+		t.Skip("no interface sources beside this build")
+	}
+	source := string(body)
+	if !strings.Contains(source, "iso-reader") {
+		t.Error("the city has no text alternative, so a browser without WebGL shows an empty pane")
+	}
+	// Every address, not a selection of them.
+	if !strings.Contains(source, "state.locations.map") {
+		t.Error("the text alternative does not list the city's own addresses")
+	}
+	// The camera must not be reset by an ordinary update: a player who has
+	// zoomed in on the docks should stay there when an hour passes.
+	if strings.Contains(source, "useEffect(frame") {
+		t.Error("the camera is re-framed on every update, which throws away where the player was looking")
+	}
+}

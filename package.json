@@ -10,9 +10,10 @@
     "test": "tsc src/voice.ts src/art.ts --target ES2022 --module ES2022 --outDir .runtime/frontend-test --skipLibCheck && node --test tests/*.test.mjs"
   },
   "dependencies": {
+    "pixi-viewport": "^6.0.3",
+    "pixi.js": "^8.0.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "pixi.js": "^8.0.0"
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
     "@types/react": "^19.0.0",
