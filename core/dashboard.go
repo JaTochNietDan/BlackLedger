@@ -30,7 +30,20 @@ type Stat struct {
 // Dashboard is the top bar, explained.
 func (w *World) Dashboard() []Stat {
 	p := &w.Player
-	out := []Stat{
+	out := []Stat{}
+	// The one thing always on screen said nothing about the one thing that
+	// mattered: six figures identical to a free man's while the player sat in
+	// a cell. What the meaning claims here was measured rather than assumed —
+	// five days inside cost $120 net with two premises running, and paid the
+	// 20 respect the cell's own button promises.
+	if w.Held() {
+		out = append(out, Stat{ID: "held", Label: "Held",
+			Value:   plural(w.DaysLeft(), "day", "days"),
+			Note:    "Ward Street Station",
+			Meaning: "The police have you. The city does not stop for it: your businesses go on earning, your people go on being paid, and the day costs what it costs whether you are there or not.",
+			Warn:    true})
+	}
+	out = append(out, []Stat{
 		{ID: "cash", Label: "Cash on hand", Value: cash(p.Cash),
 			Meaning: fmt.Sprintf("What you can spend today. The day costs $%d whether you earn anything or not.", w.DailyCost()),
 			Warn:    p.Cash < w.DailyCost()},
@@ -44,7 +57,7 @@ func (w *World) Dashboard() []Stat {
 		{ID: "heat", Label: "Attention", Value: itoa(p.Heat),
 			Meaning: fmt.Sprintf("How interested the police are in you specifically. Past %d they come to the door; past %d they take the premises.", RaidThreshold, ForfeitThreshold),
 			Warn:    p.Heat >= RaidThreshold},
-	}
+	}...)
 	if w.Incorporated() {
 		f := w.PlayerOrganization()
 		out = append(out, Stat{ID: "families", Label: "Your organization", Value: itoa(f.Power), Note: f.Name,

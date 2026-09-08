@@ -100,3 +100,48 @@ func TestMoneyIsWrittenTheWayPeopleReadIt(t *testing.T) {
 		}
 	}
 }
+
+// The top bar is the one thing always on screen, and it is where the player
+// looks to know their situation. It said nothing at all about being locked in a
+// cell: six figures, identical to a free man's, while the most important fact
+// about the next five days was two clicks away on another screen.
+func TestTheTopBarSaysWhenThePoliceHaveYou(t *testing.T) {
+	w := New(4)
+	w.Player.Cash, w.Player.Respect = 6000, OrganizationStanding
+	w.Player.Location = "bar"
+	for _, s := range w.Dashboard() {
+		if s.ID == "held" {
+			t.Fatal("a free man is told he is in a cell")
+		}
+	}
+	w.Confine(5, "a still in the back")
+	var held Stat
+	for _, s := range w.Dashboard() {
+		if s.ID == "held" {
+			held = s
+		}
+	}
+	if held.ID == "" {
+		t.Fatal("the police have him and the top bar does not mention it")
+	}
+	if !held.Warn {
+		t.Fatal("being in a cell is not marked as anything to worry about")
+	}
+	if !contains(held.Value, itoa(w.DaysLeft())) {
+		t.Fatalf("it does not say how long: %q", held.Value)
+	}
+	if !contains(held.Note, "Ward Street") {
+		t.Fatalf("it does not say where: %q", held.Note)
+	}
+	// The meaning has to be something measured rather than asserted: the city
+	// does not stop while you are inside.
+	for _, want := range []string{"earning", "paid"} {
+		if !contains(held.Meaning, want) {
+			t.Fatalf("the meaning does not say what keeps running: %q", held.Meaning)
+		}
+	}
+	// And it is the first thing, because it is the first thing that matters.
+	if w.Dashboard()[0].ID != "held" {
+		t.Fatalf("the top bar leads with %q", w.Dashboard()[0].ID)
+	}
+}

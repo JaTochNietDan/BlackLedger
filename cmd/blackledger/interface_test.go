@@ -6,6 +6,8 @@ import (
 	"regexp"
 	"strings"
 	"testing"
+
+	"blackledger/core"
 )
 
 // The interface is meant to stay functional so the game can be play-tested, and
@@ -122,6 +124,24 @@ func TestTheHookGuardKnowsWhichReturnsMatter(t *testing.T) {
 	for _, line := range harmless {
 		if earlyReturn.MatchString(line) {
 			t.Errorf("the guard reports a return that cannot change the hook count: %q", line)
+		}
+	}
+}
+
+// Every figure the core puts in the top bar is drawn with an icon looked up by
+// its id, and an id with no path falls back to the city skyline — so a new stat
+// silently wears the wrong picture. This is the cheapest check that the two
+// sides still agree.
+func TestEveryTopBarFigureHasAnIconOfItsOwn(t *testing.T) {
+	art, err := os.ReadFile("../../src/art.ts")
+	if err != nil {
+		t.Skip("no interface sources beside this build")
+	}
+	w := core.New(4)
+	w.Confine(5, "a still in the back")
+	for _, s := range w.Dashboard() {
+		if !strings.Contains(string(art), s.ID+":'M") {
+			t.Errorf("the top bar shows %q and nothing draws it, so it wears the city skyline", s.ID)
 		}
 	}
 }
