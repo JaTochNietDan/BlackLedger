@@ -26,6 +26,10 @@ func newGoods() []Good {
 	return []Good{
 		{ID: "moonshine", Name: "Moonshine", Unit: "crate", Base: 40, Price: 40, Heat: 1},
 		{ID: "cigarettes", Name: "Untaxed cigarettes", Unit: "case", Base: 22, Price: 22, Heat: 0},
+		// Guns are the dearest thing that comes off a boat and the worst thing
+		// to be found holding. They also have a customer nothing else has: an
+		// organization at war.
+		{ID: "arms", Name: "Crated arms", Unit: "crate", Base: 165, Price: 165, Heat: 3},
 	}
 }
 
@@ -61,9 +65,10 @@ func (w *World) Carrying() int {
 func TradesAt(location, good string) bool {
 	switch location {
 	case "market":
-		return true
+		// Everything but guns, which nobody moves across a public floor.
+		return good != "arms"
 	case "docks":
-		return good == "moonshine"
+		return good == "moonshine" || good == "arms"
 	}
 	return false
 }

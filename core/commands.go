@@ -307,6 +307,14 @@ func (w *World) apply(c Command) error {
 				if err := w.Press(target); err != nil {
 					return err
 				}
+			case "armoury":
+				if err := w.BuildArmoury(target); err != nil {
+					return err
+				}
+			case "stock_arms":
+				if err := w.StockArmoury(); err != nil {
+					return err
+				}
 			case "still":
 				if err := w.BuildStill(target); err != nil {
 					return err
@@ -375,11 +383,11 @@ func (w *World) apply(c Command) error {
 				}
 			case "contract":
 				w.OpenContract()
-			case "buy:moonshine", "buy:cigarettes":
+			case "buy:moonshine", "buy:cigarettes", "buy:arms":
 				if err := w.Buy(strings.TrimPrefix(c.Kind, "buy:")); err != nil {
 					return err
 				}
-			case "sell:moonshine", "sell:cigarettes":
+			case "sell:moonshine", "sell:cigarettes", "sell:arms":
 				if err := w.Sell(strings.TrimPrefix(c.Kind, "sell:")); err != nil {
 					return err
 				}

@@ -128,6 +128,10 @@ type Property struct {
 	// than to whoever lives there. Absent in saves written before that was
 	// possible, which is a place with nothing in it.
 	Comforts []string `json:"comforts,omitempty"`
+	// A room under the floor with crates in it, and how many. Absent
+	// everywhere else and in saves from before there was such a room.
+	Armoury bool `json:"armoury,omitempty"`
+	Crates  int  `json:"crates,omitempty"`
 }
 type Plot struct {
 	Target   string `json:"target,omitempty"`
@@ -665,6 +669,15 @@ func (w *World) Actions(id string) []Action {
 					add("remedy", trade.Remedy, 60, 0, w.RemedyReadiness(id),
 						fmt.Sprintf("$%d. %s %s", trade.RemedyCost, trade.Trouble, trade.RemedyDetail))
 				}
+				if ArmourySite(id) {
+					if prop.Armoury {
+						add("stock_arms", "Put the crates under the floor", 60, 0, w.StockReadiness(),
+							fmt.Sprintf("Moves what you are carrying into the room. %d of %d crates down there, and an organization at war pays $%d apiece for them.", prop.Crates, ArmouryHold, w.ArmsPrice()))
+					} else {
+						add("armoury", "Build a room under the floor", ArmouryMinutes, 0, w.ArmouryReadiness(id),
+							fmt.Sprintf("$%d. Holds %d crates of arms and draws %d attention a day plus one for every %d in it. Organizations at war buy at %d%% of the waterfront price and get stronger for it. A search that finds it takes everything and the premises with it.", ArmouryCost, ArmouryHold, ArmouryHeat, ArmouryCrateHeat, WarPremium))
+					}
+				}
 				if StillSite(id) {
 					if prop.Still {
 						add("dismantle", "Take the still out", 90, 0, w.DismantleReadiness(id),
@@ -923,6 +936,7 @@ func (w *World) Advance(minutes int) {
 			w.ChargeDay()
 			w.DemolitionDay()
 			w.CityHallDay()
+			w.ArmouryDay()
 			w.DressDay()
 			bill := w.DailyCost()
 			if p.Cash >= bill {
@@ -1013,7 +1027,7 @@ func (w *World) Public() map[string]any {
 	if len(history) > 60 {
 		history = history[len(history)-60:]
 	}
-	return map[string]any{"id": w.ID, "version": w.Version, "revision": w.Revision, "life": w.Life, "minute": w.Minute, "player": w.Player, "district": w.District, "factions": w.Factions, "npcs": w.People(), "locations": locs, "event": scene, "history": history, "dead": w.Dead, "tasks": w.Tasks, "director": w.Director, "last_result": w.LastResult, "daily_cost": w.DailyCost(), "income": income, "security": w.Guard(), "opportunity": w.NextOpportunity(), "known_threats": w.KnownThreats(), "business_truces": w.ActiveBusinessTruces(), "conflicts": w.PublicConflicts(), "goods": w.Goods, "arms": w.ArmsDescription(), "appearance": w.AppearanceDescription(), "vehicle": w.VehicleDescription(), "residence": w.ResidenceDescription(), "offshore": map[string]any{"balance": w.Offshore, "reachable": w.Player.Offshore}, "newspaper": w.Edition(), "arrangements": w.PendingArrangements(), "commissions": w.PublicCommissions(), "grudges": w.GrudgeSummary(), "cast": w.Cast(), "retainers": w.RetainerDescription()}
+	return map[string]any{"id": w.ID, "version": w.Version, "revision": w.Revision, "life": w.Life, "minute": w.Minute, "player": w.Player, "district": w.District, "factions": w.Factions, "npcs": w.People(), "locations": locs, "event": scene, "history": history, "dead": w.Dead, "tasks": w.Tasks, "director": w.Director, "last_result": w.LastResult, "daily_cost": w.DailyCost(), "income": income, "security": w.Guard(), "opportunity": w.NextOpportunity(), "known_threats": w.KnownThreats(), "business_truces": w.ActiveBusinessTruces(), "conflicts": w.PublicConflicts(), "goods": w.Goods, "arms": w.ArmsDescription(), "appearance": w.AppearanceDescription(), "vehicle": w.VehicleDescription(), "residence": w.ResidenceDescription(), "offshore": map[string]any{"balance": w.Offshore, "reachable": w.Player.Offshore}, "newspaper": w.Edition(), "arrangements": w.PendingArrangements(), "commissions": w.PublicCommissions(), "grudges": w.GrudgeSummary(), "cast": w.Cast(), "retainers": w.RetainerDescription(), "armoury": w.ArmouryDescription()}
 }
 func (w *World) hasRecord(title string) bool {
 	for _, r := range w.History {

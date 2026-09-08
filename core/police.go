@@ -112,6 +112,13 @@ func (w *World) Raid() {
 		w.LoseCar("They found the false floor and took the car with it.")
 	}
 	seized += w.CellarFound()
+	// A room full of crates is not a fine and not a warning.
+	if place, crates, found := w.ArmouryFound(); found {
+		seized += crates
+		w.Log("They found the room at "+place, fmt.Sprintf("%d crates of arms out through the front door in daylight. There is no version of this that goes away.", crates), "danger")
+		w.Report("police", "ARMS CACHE SEIZED AT "+upper(place),
+			fmt.Sprintf("Officers removed a quantity of firearms from %s. The police describe the find as the largest of its kind this year.", place))
+	}
 	w.SeizeArms()
 	w.SeizeCharges()
 	w.Ruin(20) // being turned out against a wall is hard on good clothes
