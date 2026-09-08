@@ -249,6 +249,10 @@ func (w *World) apply(c Command) error {
 				if err := w.BuyArms(strings.TrimPrefix(c.Kind, "arms:")); err != nil {
 					return err
 				}
+			case "trip:rockridge", "trip:kingsport", "trip:halloway":
+				if err := w.Trip(strings.TrimPrefix(c.Kind, "trip:")); err != nil {
+					return err
+				}
 			case "commission":
 				if err := w.TakeCommission(target); err != nil {
 					return err

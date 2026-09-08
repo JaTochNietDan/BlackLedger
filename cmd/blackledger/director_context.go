@@ -220,6 +220,7 @@ func playerSituation(w *core.World) map[string]any {
 		"drives":           core.VehicleByTier(w.Player.Car).Label,
 		"car_runs":         w.Driving(),
 		"home_fittings":    w.Comforts(w.Player.Home),
+		"can_carry":        w.CarryLimit(),
 	}
 	return situation
 }

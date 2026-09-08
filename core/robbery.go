@@ -141,7 +141,9 @@ func (w *World) robber() *NPC {
 // the clearest signal; so is walking around with a great deal of cash.
 func (w *World) robberyExposure() float64 {
 	exposure := 0.0
-	if carrying := w.Carrying(); carrying > 0 {
+	// Only what is visibly on you. Stock under the floor of a car or down a
+	// cellar is not a reason for anybody in the street to pick you out.
+	if carrying := w.Exposed(); carrying > 0 {
 		exposure += .04 + float64(min(carrying, 40))/400
 	}
 	if w.Player.Cash > 1500 {

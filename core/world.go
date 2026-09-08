@@ -549,6 +549,13 @@ func (w *World) Actions(id string) []Action {
 		}
 		add("bribe", "An understanding with the detective", 45, 0, w.BribeReadiness(),
 			fmt.Sprintf("$%d to Detective Harlow to lose some paperwork. Clears attention now and buys nothing later. Above %d heat nobody will be seen taking it.", w.BribeCost(), BribeCeiling))
+		for _, d := range destinations {
+			// Minutes are zero here because Trip runs the days itself, a day at
+			// a time, so that what happens in the city while the player is
+			// away happens to a city the player is not standing in.
+			add("trip:"+d.ID, "Travel to "+d.Name, 0, 0, w.TripReadiness(d.ID),
+				fmt.Sprintf("%s %s $%d all in and %d days away. The city runs without you: businesses go unwatched, work you promised runs down, and anything arranged for you happens to an empty house. Attention falls %d a day while you are gone.", d.Blurb, d.Purpose, w.TripCost(d.ID), d.Days, d.Relief))
+		}
 		add("contract", "Ask about a name", 30, 0,
 			need(p.Contacts < 1, "Build a contact who will carry this"),
 			"Put a price on somebody. What it costs depends on who they are and who does the work. A failed attempt can be traced back to you.")
