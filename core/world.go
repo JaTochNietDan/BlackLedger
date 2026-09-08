@@ -634,6 +634,18 @@ func (w *World) Actions(id string) []Action {
 				fmt.Sprintf("$%d each today, for $%d.", g.Price, g.Price*held))
 		}
 	}
+	if mark, ok := w.MuggingTarget(id); ok {
+		add("mug", "Take what "+mark.Name+" is carrying", MuggingMinutes, 0, w.MuggingReadiness(id),
+			fmt.Sprintf("About $%d on him. Your standing improves the odds and makes you the man he describes afterwards: above %d presence he can name you. He will hold it against you either way, and so will %s.", w.Pockets(mark), RecognisedAt, w.factionName(mark.Faction)))
+		if hand, ok := w.CrewHands(); ok {
+			reason := w.MuggingReadiness(id)
+			if reason == "" {
+				reason = w.DelegateReadiness()
+			}
+			add("mug:crew", "Send "+hand.Name+" after "+mark.Name, MuggingMinutes, 0, reason,
+				fmt.Sprintf("The same $%d and worse odds, and it is his face rather than yours. %s holds it against him instead.", w.Pockets(mark), mark.Name))
+		}
+	}
 	if prop := w.Properties[id]; prop != nil && prop.Income > 0 && !w.Own(id) && p.Charges > 0 {
 		add("plant", "Put the charge under "+l.Name, PlantMinutes, 0, w.PlantReadiness(id),
 			fmt.Sprintf("Wrecks %s, empties it of stock and staff, and kills somebody who worked there about a third of the time. The owner will know exactly what it was. Going wrong means it goes off with you under it.", l.Name))

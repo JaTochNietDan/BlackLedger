@@ -359,6 +359,18 @@ func (w *World) apply(c Command) error {
 				if err := w.Launder(target); err != nil {
 					return err
 				}
+			case "mug":
+				if err := w.Mug(target, w.OwnHands()); err != nil {
+					return err
+				}
+			case "mug:crew":
+				hand, ok := w.CrewHands()
+				if !ok {
+					return fmt.Errorf("you have nobody to send")
+				}
+				if err := w.Mug(target, hand); err != nil {
+					return err
+				}
 			case "rob:crew":
 				hand, ok := w.CrewHands()
 				if !ok {

@@ -193,7 +193,8 @@ func (w *World) ConsiderRobbery() {
 		w.Player.Respect = max(0, w.Player.Respect-2)
 		return
 	}
-	loss := min(w.Player.Cash, 60+int(w.WorldRandom()*float64(w.Player.Cash)/4))
+	// What is behind the panelling at home is not in a pocket in the street.
+	loss := min(w.Reachable(), 60+int(w.WorldRandom()*float64(w.Reachable())/4))
 	if loss <= 0 {
 		return
 	}
