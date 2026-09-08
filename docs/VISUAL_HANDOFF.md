@@ -100,3 +100,5 @@ The gameplay branch now shows the existing public `known_threats` on Families as
 On boot, the gameplay client now selects the player's current public location, using the directory if it lacks street art. A brand-new person in the starting room is still directed toward Saint Agnes. Preserve this useful reload behavior when replacing navigation. No simulation state is stored in the view.
 
 Functional copy update: Families now titles previous lives "The city before you" and labels a deceased person's cause as a quoted final record. This clarifies the old protagonist's second-person wording; no layout or visual styling changes. Coordinate this small src/main.tsx edit when merging visual work.
+
+Released-preview observation (b74c9a2): city directory is readable in the current in-app pane, but garage/dock cards still use generic placeholder symbols and both the directory/inspector plus outer page show vertical scrolling. Review scroll ownership and compact layouts during visual integration. This observation does not establish compact-device acceptance. Main core is now b74c9a2; consult /api/health for the actual running core rather than assuming it matches HEAD.

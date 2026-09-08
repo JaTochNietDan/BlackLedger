@@ -1,0 +1,43 @@
+{
+  "health": {
+    "build": {
+      "revision": "b74c9a2b2695c10da262b47cbf079f8915fd3d1d",
+      "modified": false
+    },
+    "core": "go",
+    "game": "Black Ledger",
+    "ok": true
+  },
+  "state_unchanged": true,
+  "receipts_unchanged": true,
+  "before": {
+    "backup": "/Users/jatochnietdan/Documents/ChatGPT/Build AI game/mafia-game/.runtime/backups/campaign-before-b74c9a2-20260907.sqlite3",
+    "state_sha256": "767f098761cb5d198d93c75e79470489690be81a843c6ce23adf506d3b382d9d",
+    "receipts_sha256": "194d2c92c7f27ebce909486cea26a7d397c01a599211963f946a3ff550905439",
+    "receipts": 190,
+    "previous_binary": ".runtime/blackledger-schema-default",
+    "release_binary": ".runtime/blackledger-release-b74c9a2",
+    "before_revision": 190
+  },
+  "after": {
+    "revision": 190,
+    "life": 2,
+    "minute": 11365,
+    "player": {
+      "name": "Nico Ward",
+      "cash": 765,
+      "health": 100,
+      "respect": 76,
+      "heat": 9,
+      "location": "garage",
+      "home": "estate",
+      "best_home": 2,
+      "security": 0,
+      "contacts": 0,
+      "crew": [],
+      "alive": true,
+      "earned": 4235,
+      "job_count": 2
+    }
+  }
+}

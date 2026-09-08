@@ -17,7 +17,7 @@ Build and playtest the full Black Ledger single-player mafia vertical slice desc
 ## Current gameplay acceptance priorities
 
 1. Improve narrative correctness without replacing the Go rules with model judgments. The completed 20m18s campaign demonstrated rise, ownership, retaliation and recovery, but failed story-coherence acceptance. The experimental second-model reviewer also failed on real dialogue and remains offline-only.
-2. Verify the integrated gameplay changes in a fresh isolated campaign: arrival encounters, contact variety, located jobs, business ceasefires, danger pacing, resumable interrupted work and stale-draft protection. Passing individual tests is not evidence that the main preview has those changes; its older running server and user save remain separate.
+2. Continue integrated campaign acceptance for arrival encounters, contact variety, located jobs, business ceasefires, danger pacing, resumable interrupted work and stale-draft protection. Main preview now runs verified release b74c9a2 after isolated save-upgrade, ceasefire and interrupted-job checks; its complete saved state and190 receipts were preserved. These targeted checks do not replace a fresh20–30-minute campaign with coherent stories.
 3. Continue public-state headless campaigns and targeted browser playtests for progression, permanent consequences, transactional saves and optional voice behavior. Preserve failure evidence and commit corrections.
 4. Maintain the visual handoff and interface contract. Another visual agent has not yet been launched; preparation is complete, visual production itself is not.
 
