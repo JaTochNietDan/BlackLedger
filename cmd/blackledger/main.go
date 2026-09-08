@@ -272,6 +272,9 @@ func (a *app) generateAttempt(snapshot *core.World, feedback string) error {
 	if err := validateBeneficiaryMention(snapshot, proposal); err != nil {
 		return proposalRejected{err}
 	}
+	if err := validateFactionAttribution(snapshot, proposal); err != nil {
+		return proposalRejected{err}
+	}
 	if err := validateJobLocation(snapshot, proposal); err != nil {
 		return proposalRejected{err}
 	}
