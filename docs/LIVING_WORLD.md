@@ -147,6 +147,8 @@ toward that.
 - We need to build out audio for actions as well, not sure how, can we generate it, can we find free online samples of audio that we need to cover events and ambiance?
 - Interior ambiance, city ambiance etc needs audio as well as all the theater simulations.
 - Image previews of buildings should probably contain their names on them (new ones we made don't right now), names should be on a plaqard as if in real life, stylish and fitting.
+- **Remember the goal is to have a fully drawn out isometric 2D city view with simulations of the living NPCs doing their daily business and going about their actions.**
+- A good idea is probably to have a debug directory of fleshed out theater plays so that they can be reviewed by me. Should be able to click on them and play them out immediately. These can act as quick access samples for me to review and provide feedback upon.
 
 ## Inbox — unsorted ideas
 
@@ -161,5 +163,7 @@ stays here, in the original wording, until it is genuinely implemented — so if
 it is still in this list, it does not exist in the game yet.
 
 - The newspaper right now is like a square, I'd like a more stylized version where it actually looks like a newspaper, think softer edges, make it look like a piece of paper, crinkly, etc. Look to examples of old newspapers for inspriation.
+- Having debug options for a developer and playtester like me is important, whether it be being able to play a range theater scenes out from a menu or simulate other visual actions and whatnot to get an idea of how well it's working and what can be changed or modified. This debug mode should probably run on a separate port and be separate from the main game.
+- The height of the page should be fixed to the viewport, i.e no vertical scrolling the whole page or the main area, only scrolling stuff like actions or other submenus where it makes sense.
 
 Ultiamtely the expectation is that I don't have to think of all of these concepts, you, the agent will think of these too and build them out and playtest and simulate them yourself.

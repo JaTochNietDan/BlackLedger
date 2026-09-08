@@ -1,4 +1,4 @@
-import type {Place,Presence} from './types';
+import type {Place} from './types';
 
 // There is no image model on this machine — Ollama carries only text — so the
 // inside of a building is drawn rather than generated, in the same register as
@@ -17,10 +17,21 @@ function hash(seed: string) { let h = 2166136261; for (const c of seed) { h ^= c
 // says plainly how many more are in there. The roster below is where the whole
 // register lives.
 const marks: [number, number][] = [
-  [148, 338], [260, 344], [372, 336],
-  [204, 312], [316, 308],
-  [100, 306], [420, 302],
+  [128, 352], [260, 356], [392, 350],
+  [190, 318], [330, 314],
+  [70, 310], [452, 306],
 ];
+
+// The same positions as fractions of the frame, for the figures the interface
+// draws in HTML over the painted room. A silhouette with nothing on its head
+// could be anybody; the person you click and the face in the roster have to be
+// visibly the same person.
+export const standingSpots = marks.map(([x, y]) => ({
+  left: (x / 520) * 100,
+  bottom: ((360 - y) / 360) * 100,
+  // Further back is smaller, on the same scale the drawn room used.
+  scale: 0.74 + (y - 306) / 170,
+}));
 
 // StandingRoom is how many people are drawn before the room says "and N more".
 export const StandingRoom = marks.length;
@@ -79,57 +90,19 @@ function room(type: string, seed: number) {
   }
 }
 
-// A figure is a silhouette with a coat and a hat, lit from the front. The only
-// thing that varies is build and stance, from the person's own id, so the same
-// person is always the same shape in the same room.
-function figure(who: Presence, x: number, y: number, selected: boolean, painted = false) {
-  const seed = hash(who.id);
-  const tall = 60 + (seed % 5) * 4;
-  const wide = 17 + (seed % 3) * 2;
-  const hat = seed % 4 !== 0;
-  const lean = ((seed >> 3) % 3) - 1;
-  // In a painted room people read as shapes against the light, not as pale
-  // cut-outs laid on top of it. The colour that says who they are moves to the
-  // rim, where a single hard light would actually catch them.
-  const says = who.yours ? '#d6b77c' : who.sore || who.overdue ? '#c08476' : '#cfc9b6';
-  const tone = painted ? '#0b0d0c' : says;
-  const rim = painted ? says : 'none';
-  return `<g class="figure${selected ? ' picked' : ''}" data-person="${esc(who.id)}" role="button" tabindex="0" aria-label="${esc(who.name)} — ${esc(who.standing)}" transform="translate(${x},${y})">` +
-    `<ellipse cx="0" cy="4" rx="${wide + 4}" ry="6" fill="#0b0a09" opacity=".55"/>` +
-    `<path d="M${-wide} 2q0-${tall * 0.62} ${wide + lean * 2} -${tall * 0.62}q${wide} 0 ${wide} ${tall * 0.62}z" fill="#12100e"/>` +
-    `<path d="M${-wide + 3} 0q0-${tall * 0.58} ${wide + lean * 2 - 3} -${tall * 0.58}q${wide - 3} 0 ${wide - 3} ${tall * 0.58}z" fill="${tone}" opacity="${painted ? '.95' : '.92'}" stroke="${rim}" stroke-width="${painted ? 1.1 : 0}" stroke-opacity=".5"/>` +
-    `<circle cx="${lean}" cy="${-tall * 0.62 - 9}" r="9" fill="${tone}" opacity="${painted ? '.95' : '.92'}" stroke="${rim}" stroke-width="${painted ? 1.1 : 0}" stroke-opacity=".5"/>` +
-    (hat ? `<path d="M${lean - 15} ${-tall * 0.62 - 12}h30l-4-9h-22z" fill="#12100e"/><path d="M${lean - 17} ${-tall * 0.62 - 11}h34v3h-34z" fill="#12100e"/>` : '') +
-    `<circle class="halo" cx="${lean}" cy="${-tall * 0.31}" r="${tall * 0.7}" fill="none"/>` +
-    `<title>${esc(who.name)} — ${esc(who.standing)}</title>` +
-    `</g>`;
-}
-
-// Every address has a painted interior now, generated offline (tools/interiors.py)
+// Every address has a painted interior, generated offline (tools/interiors.py)
 // and shipped as a JPEG. The drawn room below stays as the fallback: a building
 // added tomorrow has somewhere to stand before anybody renders it.
 export const paintedRoom = (id: string) => `/art/rooms/room-${id}-v1.jpg`;
 
-export function interiorSVG(place: Place, people: Presence[], selected: string, painted = false) {
+export function interiorSVG(place: Place, painted = false) {
   const seed = hash(place.id);
-  const shown = people.slice(0, marks.length);
-  // Depth: whoever is further back is smaller and dimmer, so a room of seven
-  // reads as a room rather than as a row of stickers.
-  return `<svg class="interior" viewBox="0 0 520 360" role="group" aria-label="Inside ${esc(place.name)}">` +
+  if (painted) return '';
+  return `<svg class="interior" viewBox="0 0 520 360" role="presentation">` +
     `<defs><radialGradient id="int-${esc(place.id)}" cx=".5" cy=".28" r=".8">` +
     `<stop stop-color="#6b5a3f" stop-opacity=".30"/><stop offset="1" stop-color="#000" stop-opacity=".55"/>` +
     `</radialGradient></defs>` +
-    (painted ? '' : room(place.type, seed)) +
-    shown.map((who, i) => {
-    const depth = .72 + (marks[i][1] - 300) / 200;
-      return `<g transform="translate(${marks[i][0]},${marks[i][1]}) scale(${depth.toFixed(3)}) translate(${-marks[i][0]},${-marks[i][1]})" opacity="${(.62 + depth * .38).toFixed(2)}">` +
-        figure(who, marks[i][0], marks[i][1], who.id === selected, painted) + `</g>`;
-    }).join('') +
-    (painted ? '' : `<rect width="520" height="360" fill="url(#int-${esc(place.id)})" pointer-events="none"/>`) +
-    (people.length > shown.length
-      ? `<g><rect x="330" y="330" width="180" height="22" fill="#0b0f0ecc"/>` +
-        `<text x="500" y="345" text-anchor="end" fill="#c9b98f" font-size="11">` +
-        `and ${people.length - shown.length} more in here</text></g>`
-      : '') +
+    room(place.type, seed) +
+    `<rect width="520" height="360" fill="url(#int-${esc(place.id)})" pointer-events="none"/>` +
     `</svg>`;
 }

@@ -1,7 +1,7 @@
 import {useEffect,useState} from 'react';
 import type {ReactElement} from 'react';
 import type {Action,Place,Presence} from './types';
-import {interiorSVG,paintedRoom,StandingRoom} from './roomart';
+import {interiorSVG,paintedRoom,standingSpots,StandingRoom} from './roomart';
 import {Portrait} from './Portrait';
 
 // Entering a building should open the building, not fill a column. The room is
@@ -54,11 +54,28 @@ export function Interior({place, people, actions, render, onLeave}: {
   const onFloor = [...people].sort((a, b) => worth(a) - worth(b));
 
   return <div className="interior-stage">
-    <div className={'room' + (painted ? ' painted' : '')} onClick={e => {
-      const g = (e.target as Element).closest?.('[data-person]');
-      if (g) setPicked(g.getAttribute('data-person') || '');
-    }} style={painted ? {backgroundImage: `url(${paintedRoom(place.id)})`} : undefined}
-      dangerouslySetInnerHTML={{__html: interiorSVG(place, onFloor, picked, painted)}}/>
+    <div className={'room' + (painted ? ' painted' : '')}
+      style={painted ? {backgroundImage: `url(${paintedRoom(place.id)})`} : undefined}>
+      <div className="room-plate" dangerouslySetInnerHTML={{__html: interiorSVG(place, painted)}}/>
+      {/* The people are drawn over the room in HTML rather than inside the
+          picture, so each one can wear their own face. A silhouette with
+          nothing on its head could be anybody. */}
+      {onFloor.slice(0, standingSpots.length).map((who, i) => {
+        const spot = standingSpots[i];
+        return <button key={who.id}
+          className={'stander' + (who.id === picked ? ' picked' : '') + (who.yours ? ' yours' : '') + (who.overdue || who.sore ? ' sour' : '')}
+          style={{left: `${spot.left}%`, bottom: `${spot.bottom}%`, transform: `translateX(-50%) scale(${spot.scale.toFixed(2)})`}}
+          aria-pressed={who.id === picked}
+          title={`${who.name} — ${who.standing}`}
+          onClick={() => setPicked(who.id === picked ? '' : who.id)}>
+          <Portrait id={who.id} size="small"/>
+          <span className="stander-coat" aria-hidden="true"/>
+          <span className="stander-name">{who.name.split(' ')[0]}</span>
+        </button>;
+      })}
+      {onFloor.length > standingSpots.length &&
+        <span className="room-rest">and {onFloor.length - standingSpots.length} more in here</span>}
+    </div>
 
     <div className="room-people" role="list">
       {people.map(p => <button key={p.id} role="listitem" className={'room-chip' + (p.id === picked ? ' picked' : '') + (p.yours ? ' yours' : '') + (p.overdue || p.sore ? ' sour' : '')}

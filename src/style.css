@@ -144,10 +144,7 @@
 .interior-stage{display:grid;grid-template-columns:minmax(0,1fr) 330px;grid-template-rows:auto 1fr;gap:0;flex:1;min-height:0;background:#0e1413}
 .room{grid-column:1;grid-row:1;background:#0b0f0f;border-bottom:1px solid var(--line)}
 .room .interior{display:block;width:100%;height:auto;max-height:52vh}
-.room .figure{cursor:pointer}
-.room .figure .halo{stroke:transparent;stroke-width:2}
-.room .figure:hover .halo,.room .figure:focus .halo{stroke:#f1d191;opacity:.55}
-.room .figure.picked .halo{stroke:var(--gold);opacity:.9}
+
 .room-people{grid-column:1;grid-row:2;display:flex;flex-wrap:wrap;gap:7px;padding:14px 18px;align-content:flex-start;overflow:auto}
 .room-chip{background:#16211f;border:1px solid var(--line);border-left:2px solid #3f4d44;padding:7px 10px;text-align:left;max-width:210px;position:relative}
 .room-chip.yours{border-left-color:var(--gold)}
@@ -429,3 +426,22 @@
 @media(max-width:800px){.street-run{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}.front-art{height:84px}}
 .front-note{color:#93a58f;font-style:italic;margin-top:2px;white-space:normal;line-height:1.35}
 .front-note.warning{color:var(--red);font-style:normal}
+
+/* The people in a room wear their own faces. A silhouette with nothing on its
+   head could be anybody; the person you click on the floor and the face in the
+   roster have to be visibly the same person. */
+.room{position:relative}
+.room-plate{line-height:0}
+.room-plate .interior{display:block;width:100%;height:auto}
+.room.painted{min-height:280px}
+.stander{position:absolute;background:none;border:0;padding:0;transform-origin:bottom center;display:flex;flex-direction:column;align-items:center;filter:drop-shadow(0 6px 10px #000a)}
+.stander .portrait,.stander .portrait-wrap{width:46px;height:56px;border:1px solid #0d1211;border-bottom:0;display:block}
+.stander .portrait-wrap .portrait{width:46px;height:56px;border:0}
+.stander-coat{display:block;width:66px;height:62px;margin-top:-1px;background:linear-gradient(180deg,#232927,#0b0e0d);clip-path:polygon(30% 0,70% 0,100% 100%,0 100%);border-top:1px solid #333c36}
+.stander.yours .stander-coat{background:linear-gradient(180deg,#3a3020,#16130d);border-top-color:var(--gold)}
+.stander.sour .stander-coat{background:linear-gradient(180deg,#3a221c,#160e0c);border-top-color:#b3705f}
+.stander-name{font:9.5px system-ui;letter-spacing:.05em;color:#cfd3c4;background:#0b0f0ecc;padding:1px 5px;margin-top:3px;opacity:0;transition:opacity .12s}
+.stander:hover .stander-name,.stander:focus-visible .stander-name,.stander.picked .stander-name{opacity:1}
+.stander:hover .portrait,.stander:focus-visible .portrait{border-color:#f1d191}
+.stander.picked .portrait,.stander.picked .portrait-wrap{border-color:var(--gold);box-shadow:0 0 0 2px #d6b77c88}
+.room-rest{position:absolute;right:10px;top:10px;background:#0b0f0ecc;color:#c9b98f;font-size:11px;padding:3px 8px}

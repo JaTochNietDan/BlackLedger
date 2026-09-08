@@ -1224,3 +1224,10 @@
 - **A passer-by only sees what is visible from the street.** Somebody else's casino can be out of stock, short-handed, in trouble and running a still and it reads as nothing at all — but a boarded window is not a secret, so a wrecked building says so whoever owns it. A test holds both halves.
 - Verified in a browser against a copy of the live campaign: twelve fronts, five of them with something to say, two of those flagged — *Visibly in poor repair* at The Mariner, *Wants repair at 55%* at Cypress House.
 - `mise run verify` passes.
+
+## The person you click is the person in the roster
+- The people standing in a room were anonymous silhouettes drawn inside the picture. Every one of them had a painted face two inches below in the roster, and no way to tell which shape was which — so the room was a diagram of how many people were present rather than a picture of who.
+- **The figures moved out of the SVG and into the interface**, which is the only way each can wear its own face. A person on the floor is now their portrait over a coat, sized and dimmed by how far back they stand, named on hover, and clicking them selects the same person the roster does. What was drawn stays drawn: the procedural room is still the fallback under a painted interior that has not been generated.
+- The colour that says what somebody is to you moved to the coat — gold for your own people, red for anybody owed money or holding something — so it still reads at a glance without a legend.
+- Verified in a browser: seven people on the Mercer Exchange floor, seven painted faces, every one inside the frame, *and 11 more in here* said plainly, and clicking Elena Russo on the floor opens Elena Russo in the pane.
+- `mise run verify` passes.
