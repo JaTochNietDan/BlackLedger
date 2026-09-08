@@ -16,6 +16,37 @@ import sys
 from PIL import Image
 
 
+def holed(im) -> int:
+    """Count transparent pixels the background cannot reach.
+
+    The knock-out floods in from the corners, so anything it removes should be
+    connected to the outside. A transparent region enclosed by the building is
+    a bite taken out of the facade — which is exactly what happened to the
+    Bellwether Herald: a dark bay matched the background closely enough that
+    the fill walked into it and left a hole with jagged edges. Nothing in the
+    edge checks below can see that, because the outline is untouched.
+    """
+    w, h = im.size
+    alpha = im.split()[3].load()
+    outside = bytearray(w * h)
+    stack = [(0, 0), (w - 1, 0), (0, h - 1), (w - 1, h - 1)]
+    while stack:
+        x, y = stack.pop()
+        if x < 0 or y < 0 or x >= w or y >= h:
+            continue
+        i = y * w + x
+        if outside[i] or alpha[x, y] >= 20:
+            continue
+        outside[i] = 1
+        stack.extend(((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)))
+    holes = 0
+    for y in range(h):
+        for x in range(w):
+            if alpha[x, y] < 20 and not outside[y * w + x]:
+                holes += 1
+    return holes
+
+
 def suspect(path: str) -> tuple[bool, str]:
     im = Image.open(path).convert("RGBA")
     w, h = im.size
@@ -23,6 +54,9 @@ def suspect(path: str) -> tuple[bool, str]:
     bottom = sum(1 for x in range(w) if px[x, h - 1][3] > 128)
     edges = sum(1 for y in range(h) if px[0, y][3] > 128) + sum(1 for y in range(h) if px[w - 1, y][3] > 128)
     share = bottom / w
+    gaps = holed(im)
+    if gaps > (w * h) * .002:
+        return True, f"{gaps} transparent pixels enclosed by the building: the knock-out bit a hole in it"
     if share > .92:
         return True, f"opaque across {share:.0%} of its bottom edge: a floor, not a footprint"
     if edges > h * .5:

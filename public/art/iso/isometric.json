@@ -106,5 +106,29 @@
   "file": "iso/iso-room-v1.png",
   "w": 614,
   "h": 813
+ },
+ {
+  "id": "row-brick",
+  "file": "iso/iso-row-brick-v1.png",
+  "w": 845,
+  "h": 595
+ },
+ {
+  "id": "row-low",
+  "file": "iso/iso-row-low-v1.png",
+  "w": 768,
+  "h": 758
+ },
+ {
+  "id": "row-mixed",
+  "file": "iso/iso-row-mixed-v1.png",
+  "w": 861,
+  "h": 673
+ },
+ {
+  "id": "row-stone",
+  "file": "iso/iso-row-stone-v1.png",
+  "w": 799,
+  "h": 873
  }
 ]

@@ -30,6 +30,11 @@ const painted = new Map((cutouts as {id: string; file: string; w: number; h: num
 // the twelve so the city is one place. A block with one of these on it is not
 // somewhere the player can go; it is somewhere that exists.
 const FILL = [...painted.keys()].filter(id => id.startsWith('fill-')).sort();
+// The corner blocks. These were asked for as terrace rows with flush ends and
+// came back as buildings bent around a corner — which is not what was wanted
+// and is exactly what a grid city needs at the end of a terrace, so they are
+// used there rather than thrown away or pretended to be rows.
+const CORNERS = [...painted.keys()].filter(id => id.startsWith('row-')).sort();
 const textures = new Map<string, Texture>();
 
 // How far the camera may be pushed. Past these the city either fills the screen
@@ -507,7 +512,11 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight}: {
       // itself, which with six buildings and sixty-odd slots it otherwise does
       // constantly and reads as wallpaper.
       const order = Math.round(slot.at.x * 4 + slot.at.y * 7 + cell.col + cell.row * 2);
-      const which = FILL.length ? FILL[((order % FILL.length) + FILL.length) % FILL.length] : '';
+      // A corner block at the ends of a row, an ordinary building in between —
+      // which is how a street is actually built.
+      const onEnd = slot.end;
+      const set = onEnd && CORNERS.length ? CORNERS : FILL;
+      const which = set.length ? set[((order % set.length) + set.length) % set.length] : '';
       const fillArt = which ? textures.get(which) : undefined;
       const g = new Graphics();
       if (fillArt) {

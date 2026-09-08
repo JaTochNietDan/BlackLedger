@@ -70,6 +70,25 @@ FILLERS = {
 }
 PLACES.update(FILLERS)
 
+# Terrace rows, drawn to stand shoulder to shoulder. Every building above is a
+# detached model carrying its own pavement, which is why the party walls in the
+# city meet unevenly however carefully they are placed. These are rows with
+# flush ends: the join is painted into the picture rather than faked by pushing
+# two models together.
+ROWS = {
+    "row-brick": "a terrace of four joined 1950s brick buildings in a straight row, flush square ends, shared party walls, shopfronts at street level and flats above",
+    "row-stone": "a terrace of four joined stone-faced buildings in a straight row, flush square ends, shared party walls, uniform cornice, regular windows",
+    "row-mixed": "a terrace of four joined buildings of different heights in a straight row, flush square ends, shared party walls, brick and render, awnings over the shops",
+    "row-low": "a terrace of four joined two-storey shops in a straight row, flush square ends, shared party walls, flat roofs, plain frontages",
+}
+PLACES.update(ROWS)
+
+# The signage the model invents is nonsense — a marquee reading CIICATCE, a
+# newspaper office reading NEWSAPWL — because diffusion cannot spell. Asking
+# for "no text" does not stop it, so these are asked for as buildings that
+# genuinely have no signs on them.
+BLANK = ", plain unlettered facade, blank walls, no signs, no billboards, no marquee, no writing anywhere"
+
 # Square, because a cut-out is placed by its footprint and a square keeps the
 # building's own proportions out of the frame's business.
 SIZE = 1024
@@ -133,6 +152,8 @@ def paint(out_dir: str, only: list[str]) -> None:
             continue
         path = os.path.join(out_dir, f"iso-{name}-v1.png")
         prompt = f"{described}, {LOOK}"
+        if name in ROWS or os.environ.get("ISO_BLANK"):
+            prompt += BLANK
         with tempfile.TemporaryDirectory() as tmp:
             raw = os.path.join(tmp, "out.png")
             print(f"painting {name}…", flush=True)

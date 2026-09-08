@@ -484,7 +484,7 @@ export function wires(poles: Vec[]): Segment[] {
 // they are drawn back to front so the party walls read as joins rather than as
 // gaps.
 
-export type Slot = {at: Vec; w: number; d: number; front: boolean};
+export type Slot = {at: Vec; w: number; d: number; front: boolean; end: boolean};
 
 // terrace lays a block's frontage out as slots. The front row faces the street
 // that runs along the near edge; the back row fills the far edge, so a block
@@ -498,14 +498,14 @@ export function terrace(cell: Cell, slots = 3): Slot[] {
     // The near row, along the street the camera looks down.
     out.push({
       at: {x: i.x + PAVE + n * width, y: i.y + i.d - PAVE - depth},
-      w: width, d: depth, front: true,
+      w: width, d: depth, front: true, end: n === 0 || n === slots - 1,
     });
   }
   for (let n = 0; n < slots; n++) {
     // And the far row, backing onto it.
     out.push({
       at: {x: i.x + PAVE + n * width, y: i.y + PAVE},
-      w: width, d: depth, front: false,
+      w: width, d: depth, front: false, end: n === 0 || n === slots - 1,
     });
   }
   return out;
