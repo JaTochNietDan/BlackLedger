@@ -168,14 +168,14 @@ func (w *World) RetainerReadiness(id string) string {
 	if w.Retained(id) {
 		return "That arrangement already stands"
 	}
-	if w.Player.Heat > o.Ceiling {
-		return fmt.Sprintf("Nobody in that building will be seen with you above %d attention", o.Ceiling)
+	if w.Player.Heat > w.OfficialCeiling(o) {
+		return fmt.Sprintf("Nobody in that building will be seen with you above %d attention", w.OfficialCeiling(o))
 	}
 	if w.Presence() < 25 {
 		return "They would not take a call from you"
 	}
-	if w.Player.Cash < o.Opening {
-		return fmt.Sprintf("It takes $%d to open the conversation", o.Opening)
+	if w.Player.Cash < w.OfficialOpening(o) {
+		return fmt.Sprintf("It takes $%d to open the conversation", w.OfficialOpening(o))
 	}
 	return ""
 }
@@ -188,7 +188,7 @@ func (w *World) Retain(id string) error {
 	}
 	w.ensureOfficials()
 	o, _ := OfficialByID(id)
-	if err := w.Pay(o.Opening); err != nil {
+	if err := w.Pay(w.OfficialOpening(o)); err != nil {
 		return err
 	}
 	w.Player.Retainers = append(w.Player.Retainers, id)
@@ -223,7 +223,7 @@ func (w *World) CityHallDay() {
 			continue
 		}
 		o, _ := OfficialByID(id)
-		if w.Player.Heat <= o.Ceiling {
+		if w.Player.Heat <= w.OfficialCeiling(o) {
 			continue
 		}
 		w.EndRetainerQuietly(id)
@@ -278,4 +278,19 @@ func (w *World) RetainerDescription() []map[string]any {
 		})
 	}
 	return out
+}
+
+// OfficialOpening is what an arrangement costs to make, which is more while the
+// city is looking: a man with a career to protect wants more for the risk.
+func (w *World) OfficialOpening(o Official) int {
+	return o.Opening * (100 + w.ScrutinyPremium()) / 100
+}
+
+// OfficialCeiling is the attention past which they will not be seen with
+// anybody, which falls while the city is looking.
+func (w *World) OfficialCeiling(o Official) int {
+	if !w.UnderCrackdown() {
+		return o.Ceiling
+	}
+	return max(20, o.Ceiling-(w.Scrutiny()-ScrutinyCrackdown)-15)
 }

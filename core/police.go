@@ -73,10 +73,10 @@ func upper(s string) string {
 // rises with attention, and having somewhere for them to search is what makes a
 // raid worth their time.
 func (w *World) considerRaid() {
-	if w.Player.Heat < RaidThreshold+w.RaidRelief() || !w.Player.Alive {
+	if w.Player.Heat < RaidThreshold+w.RaidRelief()-w.ScrutinyRaidShift() || !w.Player.Alive {
 		return
 	}
-	chance := float64(w.Player.Heat-RaidThreshold-w.RaidRelief()) / 120
+	chance := float64(w.Player.Heat-RaidThreshold-w.RaidRelief()+w.ScrutinyRaidShift()) / 120
 	if w.WorldRandom() >= chance {
 		return
 	}
