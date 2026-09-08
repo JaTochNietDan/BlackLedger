@@ -1,8 +1,9 @@
 import {useEffect,useState} from 'react';
 import type {ReactElement} from 'react';
-import type {Action,Place,Presence} from './types';
+import type {Action,Place,Presence,Snapshot} from './types';
 import {interiorSVG} from './roomart';
 import {Portrait} from './Portrait';
+import {Outcome} from './Outcome';
 
 // Entering a building should open the building, not fill a column. The room is
 // the screen: the inside of the place, the people standing in it as things you
@@ -20,9 +21,9 @@ const premisesOrder = ['acquire', 'repair', 'hire', 'layoff', 'restock', 'remedy
 
 function rank(id: string) { const at = premisesOrder.indexOf(id); return at < 0 ? premisesOrder.length : at }
 
-export function Interior({place, people, actions, render, onLeave}: {
-  place: Place; people: Presence[]; actions: Action[];
-  render: (a: Action) => ReactElement; onLeave: () => void;
+export function Interior({place, people, actions, world, render, onLeave, onLedger}: {
+  place: Place; people: Presence[]; actions: Action[]; world: Snapshot;
+  render: (a: Action) => ReactElement; onLeave: () => void; onLedger: () => void;
 }) {
   const [picked, setPicked] = useState('');
 
@@ -56,6 +57,7 @@ export function Interior({place, people, actions, render, onLeave}: {
     </div>
 
     <div className="room-work">
+      <Outcome world={world} onLedger={onLedger}/>
       {who ? <section className="picked-person only">
         <header>
           <Portrait id={who.id} size="small"/>

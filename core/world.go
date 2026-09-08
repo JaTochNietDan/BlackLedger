@@ -239,12 +239,27 @@ type VisualCue struct {
 	Target  string `json:"target"`
 	Caption string `json:"caption"`
 }
+
+// Result is what just happened, which is the most important thing on the
+// screen the moment after a player commits to something. It carried the records
+// the command wrote and nothing about the command itself — not what was done,
+// not what it cost — so the interface could only ever show the city's minutes
+// and never the player's decision.
 type Result struct {
-	Cues    []VisualCue `json:"cues,omitempty"`
-	From    string      `json:"from_location"`
-	To      string      `json:"to_location"`
-	Elapsed int         `json:"elapsed"`
-	Records []Record    `json:"records"`
+	Cues []VisualCue `json:"cues,omitempty"`
+	// Action is what the player chose, in their own words, and Kind its id.
+	Action  string   `json:"action,omitempty"`
+	Kind    string   `json:"kind,omitempty"`
+	From    string   `json:"from_location"`
+	To      string   `json:"to_location"`
+	Elapsed int      `json:"elapsed"`
+	Records []Record `json:"records"`
+	// What it cost or paid, measured across the whole command rather than
+	// announced by whichever rule happened to move a number.
+	Cash    int `json:"cash"`
+	Respect int `json:"respect"`
+	Heat    int `json:"heat"`
+	Health  int `json:"health"`
 }
 type World struct {
 	SuspendedJob   *SuspendedJob        `json:"suspended_job,omitempty"`

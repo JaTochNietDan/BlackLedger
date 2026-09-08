@@ -21,6 +21,10 @@ func (w *World) apply(c Command) error {
 	w.VisualCues = nil
 	oldTime := w.Minute
 	oldLoc := p.Location
+	// What the player had before they decided, so the result can say what the
+	// decision actually cost rather than leaving them to diff two screens.
+	wasCash, wasRespect, wasHeat, wasHealth := p.Cash, p.Respect, p.Heat, p.Health
+	chosen := ""
 	previousRecords := make(map[string]bool, len(w.History))
 	for _, record := range w.History {
 		previousRecords[record.ID] = true
@@ -212,6 +216,7 @@ func (w *World) apply(c Command) error {
 		if a.Disabled {
 			return fmt.Errorf("%s", a.Reason)
 		}
+		chosen = a.Label
 		if err := w.Pay(a.Cost); err != nil {
 			return err
 		}
@@ -671,6 +676,14 @@ func (w *World) apply(c Command) error {
 			newRecords = append(newRecords, record)
 		}
 	}
-	w.LastResult = &Result{From: oldLoc, To: w.Player.Location, Elapsed: w.Minute - oldTime, Records: newRecords, Cues: w.VisualCues}
+	w.LastResult = &Result{
+		Action: chosen, Kind: c.Kind,
+		From: oldLoc, To: w.Player.Location, Elapsed: w.Minute - oldTime,
+		Records: newRecords, Cues: w.VisualCues,
+		Cash:    w.Player.Cash - wasCash,
+		Respect: w.Player.Respect - wasRespect,
+		Heat:    w.Player.Heat - wasHeat,
+		Health:  w.Player.Health - wasHealth,
+	}
 	return nil
 }

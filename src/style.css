@@ -201,3 +201,29 @@
    a ragged row of boxes reads as a list that happens to have faces in it. */
 .room-people{display:grid;grid-template-columns:repeat(auto-fill,minmax(186px,1fr));align-content:start}
 .room-chip{max-width:none;width:100%;min-height:52px}
+
+/* The result of an action was a strip along the bottom, below the fold, where
+   a page puts a status bar. It is not a status — it is the answer to the thing
+   the player just decided, and the only reason they pressed the button. It
+   goes at the top of the pane they pressed it in. */
+.outcome-panel{background:linear-gradient(158deg,#25332b,#141d1e);border:1px solid #7d6c45;border-left:3px solid var(--gold);padding:15px 16px 13px;margin:0 0 18px;box-shadow:0 10px 32px #0006}
+.outcome-panel.grave{border-color:#8a5a4d;border-left-color:var(--red);background:linear-gradient(158deg,#33241f,#16100f)}
+.outcome-head .eyebrow{display:block;margin-bottom:3px}
+.outcome-panel.grave .outcome-head .eyebrow{color:var(--red)}
+.outcome-head b{font:20px/1.2 var(--serif);font-weight:400;display:block}
+.outcome-figures{list-style:none;display:flex;flex-wrap:wrap;gap:5px 16px;margin:11px 0 0;padding:9px 0 0;border-top:1px solid #3d4a41}
+.outcome-figures li{display:flex;align-items:baseline;gap:5px}
+.outcome-figures b{font:15px var(--serif);font-weight:400;font-variant-numeric:tabular-nums}
+.outcome-figures li.good b{color:#b8cfa9}
+.outcome-figures li.bad b{color:var(--red)}
+.outcome-figures small{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.outcome-said{margin-top:12px;padding-top:11px;border-top:1px solid #3d4a41}
+.outcome-said b{font:15px var(--serif);font-weight:400;display:block;margin-bottom:3px}
+.outcome-said p{margin:0;font-size:12.5px;line-height:1.55;color:#cfd3c4}
+.outcome-quiet{margin:11px 0 0;font-size:12px;color:var(--muted);font-style:italic}
+.outcome-rest{list-style:none;margin:8px 0 0;padding:0;max-height:230px;overflow:auto}
+.outcome-rest li{border-top:1px solid #33403a;padding:8px 0}
+.outcome-rest li b{display:block;font-size:12px;font-weight:500}
+.outcome-rest li p{margin:2px 0 0;font-size:11.5px;color:var(--muted);line-height:1.5}
+.outcome-rest li.danger b,.outcome-rest li.death b{color:var(--red)}
+.outcome-ledger{margin-top:11px;font-size:11px;padding:5px 9px}
