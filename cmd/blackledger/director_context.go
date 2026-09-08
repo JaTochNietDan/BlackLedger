@@ -115,7 +115,7 @@ func focusedContext(w *core.World, operation string, connection *core.Arrangemen
 		if connection != nil && n.ID != connection.Speaker {
 			continue
 		}
-		people = append(people, map[string]any{"id": n.ID, "name": n.Name, "role": n.Role, "trust": n.Trust})
+		people = append(people, map[string]any{"id": n.ID, "name": n.Name, "role": n.Role, "trust": n.Trust, "temperament": core.TemperamentOf(&n).Label})
 	}
 	places := []map[string]any{}
 	for _, l := range core.Locations {

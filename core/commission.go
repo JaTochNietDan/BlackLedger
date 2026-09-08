@@ -306,6 +306,9 @@ func (w *World) TakeCommission(location string) error {
 		return fmt.Errorf("%s", reason)
 	}
 	c, _ := w.AvailableCommission(location)
+	if giver := w.commissionGiver(location); giver != nil {
+		w.MeetPerson(giver.ID)
+	}
 	w.Commissions = append(w.Commissions, c)
 	w.Log(c.GiverName+" asks for something", fmt.Sprintf("%s $%d and %d standing with %s if it is done inside three days. Failing costs %d.", c.Brief, c.Pay, c.Goodwill, w.factionName(c.PatronID), c.Penalty), "politics")
 	return nil

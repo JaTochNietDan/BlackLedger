@@ -118,7 +118,7 @@ func (w *World) takeFromSomebody(n *NPC) {
 			defence += 10
 		}
 	}
-	if n.Skill*100/(n.Skill+defence) < int(w.WorldRandom()*100) {
+	if w.Poise(n)*100/(w.Poise(n)+defence) < int(w.WorldRandom()*100) {
 		w.Log("Somebody tried it at "+place.Name, fmt.Sprintf("%s went at %s and was turned away.", n.Name, place.Name), "politics")
 		return
 	}
@@ -133,7 +133,7 @@ func (w *World) takeFromSomebody(n *NPC) {
 	}
 
 	take := prop.Income*6 + int(w.WorldRandom()*float64(prop.Income*8))
-	take = take * prop.Condition / 100
+	take = int(float64(take*prop.Condition/100) * TemperamentOf(n).Greed)
 	prop.Condition = max(0, prop.Condition-4)
 	n.Rank = min(RankLieutenant, n.Rank+2)
 
@@ -144,7 +144,7 @@ func (w *World) takeFromSomebody(n *NPC) {
 			stolen := min(w.Holding("moonshine"), 3+int(w.WorldRandom()*8))
 			w.Player.Stock["moonshine"] -= stolen
 			attribution := "Nobody will say who."
-			if w.Reach() >= 2 {
+			if w.Reach() >= 2 || (TemperamentOf(n).ID == "vain" && w.Reach() >= 1) {
 				attribution = "The name that comes back is " + n.Name + "."
 			}
 			w.Log("Crates gone from "+place.Name, fmt.Sprintf("%d crates went out of the back of %s. %s", stolen, place.Name, attribution), "danger")
@@ -155,7 +155,8 @@ func (w *World) takeFromSomebody(n *NPC) {
 		// The player loses the takings themselves, and hears about it.
 		w.Player.Cash = max(0, w.Player.Cash-take)
 		attribution := "Nobody will say who."
-		if w.Reach() >= 2 {
+		// Somebody who wants to be seen doing it is how anybody ever finds out.
+		if w.Reach() >= 2 || (TemperamentOf(n).ID == "vain" && w.Reach() >= 1) {
 			attribution = "The name that comes back is " + n.Name + "."
 		}
 		w.Log("Taken from "+place.Name, fmt.Sprintf("$%d went out of %s while you were elsewhere. %s", take, place.Name, attribution), "danger")

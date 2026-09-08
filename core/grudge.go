@@ -131,9 +131,16 @@ func (w *World) SettleGrudges() {
 		if weight < GrudgeActs {
 			continue
 		}
+		// A loyal person does not move against their own people, whatever they
+		// are owed, which is what makes a succession grudge inside a loyal
+		// organization something that simply festers.
+		if TemperamentOf(holder).Loyal && holder.Faction != "" && holder.Faction == target.Faction {
+			continue
+		}
 		// Wanting it settled is not the same as being the kind of person who
-		// settles things. Ambition is what turns a grievance into a decision.
-		if w.WorldRandom() >= float64(holder.Ambition)/220 {
+		// settles things. Ambition and temperament are what turn a grievance
+		// into a decision.
+		if w.WorldRandom() >= w.Nerve(holder) {
 			continue
 		}
 		w.settle(holder, target, g)
@@ -145,11 +152,12 @@ func (w *World) SettleGrudges() {
 // player faces: skill against skill, with whoever the target answers to
 // counting for something.
 func (w *World) settle(holder, target *NPC, g Grudge) {
-	defence := target.Skill + 10
+	defence := w.Poise(target) + 10
 	if f := w.faction(target.Faction); f != nil {
 		defence += f.Power / 4
 	}
-	odds := float64(holder.Skill) / float64(holder.Skill+defence)
+	attack := w.Poise(holder)
+	odds := float64(attack) / float64(attack+defence)
 
 	// Clear the memory either way: it has been acted on now, and what happens
 	// next is a new thing rather than the old one.
