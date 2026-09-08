@@ -226,6 +226,11 @@ func (w *World) apply(c Command) error {
 					w.Log("Journey interrupted", fmt.Sprintf("The journey to %s was interrupted after %d minutes. You remain based at %s; choose your next destination after resolving the situation.", to.Name, w.Minute-oldTime, from.Name), "travel")
 				}
 			}
+		} else if about, ok := strings.CutPrefix(c.Kind, "enquire:"); ok {
+			if err := w.AskAround(about); err != nil {
+				return err
+			}
+			w.Advance(a.Minutes)
 		} else if person, ok := strings.CutPrefix(c.Kind, "sign:"); ok {
 			if err := w.SignOn(person); err != nil {
 				return err

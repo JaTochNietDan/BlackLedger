@@ -69,6 +69,9 @@ type Person struct {
 	// Standing arrangements with people in the building. Absent in saves from
 	// before there was a building.
 	Retainers []string `json:"retainers,omitempty"`
+	// What the player has asked about lately, and when what they were told
+	// stops being current. Absent in saves from before anybody could ask.
+	Enquiries map[string]int `json:"enquiries,omitempty"`
 	// Whether this person has established that the account abroad is theirs.
 	// Reset with every life, which is what makes inheriting it a decision.
 	Offshore bool `json:"offshore_access,omitempty"`
@@ -560,6 +563,14 @@ func (w *World) Actions(id string) []Action {
 		}
 	case "market":
 		add("investigate", "Ask about threats", 45, 30, "", "Investigate existing threats. Evidence is not a guarantee of safety.")
+		for i := range w.Factions {
+			f := &w.Factions[i]
+			if f.ID == w.PlayerOrganizationID() {
+				continue
+			}
+			add("enquire:"+f.ID, "Ask around about "+f.Name, EnquiryMinutes, 0, w.EnquiryReadiness(f.ID),
+				fmt.Sprintf("$%d in the right pockets. What comes back is current for about a week. You are at %d of 3 on them as it stands.", EnquiryCost, w.Intelligence(f.ID)))
+		}
 		add("lie_low", "Keep a low profile", 120, 15, "", "Lose 10 heat. Time still passes for rivals and businesses.")
 		add("deposit", fmt.Sprintf("Wire $%d out of the city", DepositLot), 45, 0, w.DepositReadiness(),
 			fmt.Sprintf("$%d of it arrives; the arrangement takes %d%%. It survives you, and whoever comes next can reach it if they can afford to.", DepositLot*(100-DepositCut)/100, DepositCut))
@@ -1090,7 +1101,7 @@ func (w *World) Public() map[string]any {
 	if len(history) > 60 {
 		history = history[len(history)-60:]
 	}
-	return map[string]any{"id": w.ID, "version": w.Version, "revision": w.Revision, "life": w.Life, "minute": w.Minute, "player": w.Player, "district": w.District, "factions": w.Factions, "npcs": w.People(), "locations": locs, "event": scene, "history": history, "dead": w.Dead, "tasks": w.Tasks, "director": w.Director, "last_result": w.LastResult, "daily_cost": w.DailyCost(), "income": income, "security": w.Guard(), "opportunity": w.NextOpportunity(), "known_threats": w.KnownThreats(), "business_truces": w.ActiveBusinessTruces(), "conflicts": w.PublicConflicts(), "goods": w.Goods, "arms": w.ArmsDescription(), "appearance": w.AppearanceDescription(), "vehicle": w.VehicleDescription(), "residence": w.ResidenceDescription(), "offshore": map[string]any{"balance": w.Offshore, "reachable": w.Player.Offshore}, "newspaper": w.Edition(), "arrangements": w.PendingArrangements(), "commissions": w.PublicCommissions(), "grudges": w.GrudgeSummary(), "cast": w.Cast(), "retainers": w.RetainerDescription(), "armoury": w.ArmouryDescription(), "population": w.PopulationSummary(), "hand": w.HandDescription(), "roles": w.RoleDescription(), "organization": w.PlayerOrganizationDescription(), "own_people": w.OwnPeopleDescription()}
+	return map[string]any{"id": w.ID, "version": w.Version, "revision": w.Revision, "life": w.Life, "minute": w.Minute, "player": w.Player, "district": w.District, "factions": w.PublicFactions(), "npcs": w.People(), "locations": locs, "event": scene, "history": history, "dead": w.Dead, "tasks": w.Tasks, "director": w.Director, "last_result": w.LastResult, "daily_cost": w.DailyCost(), "income": income, "security": w.Guard(), "opportunity": w.NextOpportunity(), "known_threats": w.KnownThreats(), "business_truces": w.ActiveBusinessTruces(), "conflicts": w.PublicConflicts(), "goods": w.Goods, "arms": w.ArmsDescription(), "appearance": w.AppearanceDescription(), "vehicle": w.VehicleDescription(), "residence": w.ResidenceDescription(), "offshore": map[string]any{"balance": w.Offshore, "reachable": w.Player.Offshore}, "newspaper": w.Edition(), "arrangements": w.PendingArrangements(), "commissions": w.PublicCommissions(), "grudges": w.GrudgeSummary(), "cast": w.Cast(), "retainers": w.RetainerDescription(), "armoury": w.ArmouryDescription(), "population": w.PopulationSummary(), "hand": w.HandDescription(), "roles": w.RoleDescription(), "organization": w.PlayerOrganizationDescription(), "own_people": w.OwnPeopleDescription()}
 }
 func (w *World) hasRecord(title string) bool {
 	for _, r := range w.History {
