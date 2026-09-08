@@ -397,3 +397,20 @@ func (w *World) LoanDescription() []map[string]any {
 	}
 	return out
 }
+
+// WriteOff closes any loan to somebody who has died. LoanDay has always known
+// what to do about a dead debtor, but it runs at midnight, so between a killing
+// and the next morning the books went on counting money that was in the ground
+// — and that window is exactly when a player looks at their books. Called from
+// Kill, so it happens at the moment it becomes true.
+func (w *World) WriteOff(id string) {
+	kept := w.Loans[:0]
+	for _, l := range w.Loans {
+		if l.Life == w.Life && l.Debtor == id {
+			w.Log("Nothing to collect", fmt.Sprintf("$%d went out and whoever was carrying it is not carrying anything now.", l.Principal), "danger")
+			continue
+		}
+		kept = append(kept, l)
+	}
+	w.Loans = kept
+}

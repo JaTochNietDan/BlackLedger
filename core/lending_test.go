@@ -374,3 +374,47 @@ func TestNobodyWithATitleBorrowsFromSomebodyWithout(t *testing.T) {
 		}
 	}
 }
+
+// The books counted money owed by a man who had been shot. LoanDay already
+// knew to write it off — "$249 went out and whoever was carrying it is not
+// carrying anything now" — but it only runs at midnight, so between the
+// killing and the next morning the ledger claimed an asset that was in the
+// ground. That window is exactly when a player looks at their books.
+func TestADebtDiesWithTheManWhoOwedIt(t *testing.T) {
+	w := New(4)
+	w.Player.Cash, w.Player.Respect = 5000, OrganizationStanding
+	w.Player.Location = "bar"
+	var borrower *NPC
+	for i := range w.NPCs {
+		if n := &w.NPCs[i]; !n.Dead && !IsOfficial(n.ID) && w.LendReadiness(n.ID) == "" {
+			borrower = n
+			break
+		}
+	}
+	if borrower == nil {
+		t.Fatal("nobody in this city would borrow")
+	}
+	if err := w.Lend(borrower.ID); err != nil {
+		t.Fatal(err)
+	}
+	if w.Books()["owed"].(int) <= 0 || len(w.Book()) != 1 {
+		t.Fatal("the loan was never on the books")
+	}
+	w.Kill(borrower.ID, "Shot over something else entirely.")
+	if owed := w.Books()["owed"].(int); owed != 0 {
+		t.Fatalf("the books still say $%d is owed by a dead man", owed)
+	}
+	if len(w.Book()) != 0 {
+		t.Fatalf("the loan is still in the book: %+v", w.Book())
+	}
+	// And the player is told, at the moment it stops being true.
+	told := false
+	for _, r := range w.History {
+		if r.Title == "Nothing to collect" {
+			told = true
+		}
+	}
+	if !told {
+		t.Fatal("the money was written off and nobody said so")
+	}
+}

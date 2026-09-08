@@ -205,6 +205,8 @@ func (w *World) Kill(id, cause string) bool {
 			break
 		}
 	}
+	// And whatever they owed is not owed by anybody now.
+	w.WriteOff(person.ID)
 	faction := person.Faction
 	led := ""
 	for i := range w.Factions {
