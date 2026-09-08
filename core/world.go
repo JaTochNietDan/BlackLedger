@@ -233,11 +233,24 @@ type Director struct {
 	Detail      string `json:"detail"`
 	LastRequest int    `json:"last_request"`
 }
+
+// VisualCue is the core saying what a moment looked like and where. It is not
+// choreography — the interface decides how a thing is played — but what
+// happened, to whom, and what the paper will say about it belongs here.
 type VisualCue struct {
 	ID      string `json:"id"`
 	Kind    string `json:"kind"`
 	Target  string `json:"target"`
 	Caption string `json:"caption"`
+	// Headline is what the Herald carries about it, so the paper can arrive
+	// after the scene rather than instead of it.
+	Headline string `json:"headline,omitempty"`
+	// Actors are the people who were in it, by name.
+	Actors []string `json:"actors,omitempty"`
+	// Gravity is how much it is worth stopping for, so the interface never has
+	// to guess which of five things in one command is the one to show.
+	Gravity int `json:"gravity,omitempty"`
+	Minute  int `json:"minute,omitempty"`
 }
 
 // Result is what just happened, which is the most important thing on the
@@ -1125,7 +1138,7 @@ func (w *World) Attack(plot Plot) {
 	p := &w.Player
 	if p.Location != p.Home {
 		w.Properties[p.Home].Condition = max(10, w.Properties[p.Home].Condition-45)
-		w.VisualCues = append(w.VisualCues, VisualCue{ID(), "attack", p.Home, "Armed men damaged your residence while you were away."})
+		w.Witness("attack", p.Home, "Armed men damaged your residence while you were away.", "")
 		w.Log("Someone came looking", "You were away. Armed men damaged your residence and left before anyone could identify them.", "danger")
 		return
 	}

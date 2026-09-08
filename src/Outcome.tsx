@@ -22,7 +22,14 @@ export function Outcome({world, onLedger}: {world: Snapshot; onLedger: () => voi
   const key = (result?.action || '') + world.revision;
   useEffect(() => { if (key !== seen.current) { seen.current = key; setOpen(false) } }, [key]);
 
-  if (!result || (!records.length && !result.action)) return null;
+  // The band keeps its place whether or not anything has happened, so the page
+  // never jumps under the player's hand between one action and the next.
+  if (!result || (!records.length && !result.action)) {
+    return <section className="outcome-band empty" aria-hidden="true">
+      <span className="eyebrow">WHAT YOU DID</span>
+      <b className="outcome-idle">Nothing yet. The clock is paused.</b>
+    </section>;
+  }
 
   const headline = records.length ? [...records].sort((a, b) => weight(b) - weight(a))[0] : null;
   const rest = headline ? records.filter(r => r.id !== headline.id) : [];
@@ -36,26 +43,30 @@ export function Outcome({world, onLedger}: {world: Snapshot; onLedger: () => voi
   if (result.health) moved.push(['health', (result.health > 0 ? '+' : '−') + Math.abs(result.health), result.health < 0]);
   if (result.elapsed) moved.push(['', hours(result.elapsed), false]);
 
-  return <section className={'outcome-panel' + (grave ? ' grave' : '')} role="status" aria-live="polite">
-    <div className="outcome-head">
-      <span className="eyebrow">YOU DID THIS</span>
-      <b>{result.action || 'Time passed'}</b>
+  return <section className={'outcome-band' + (grave ? ' grave' : '') + (open ? ' open' : '')} role="status" aria-live="polite">
+    <div className="outcome-line">
+      <div className="outcome-did">
+        <span className="eyebrow">WHAT YOU DID</span>
+        <b>{result.action || 'Time passed'}</b>
+      </div>
+      {moved.length > 0 && <ul className="outcome-figures">
+        {moved.map(([label, value, bad], i) => <li key={i} className={bad ? 'bad' : 'good'}>
+          <b>{value}</b>{label && <small>{label}</small>}
+        </li>)}
+      </ul>}
+      <div className="outcome-said">
+        {headline
+          ? <><b>{headline.title}</b><span>{headline.text}</span></>
+          : <span className="outcome-quiet">Nothing came of it that anybody wrote down.</span>}
+      </div>
+      <div className="outcome-tools">
+        {rest.length > 0 && <button className="plain" aria-expanded={open} onClick={() => setOpen(o => !o)}>
+          {open ? 'Less' : `+${rest.length} more`}
+        </button>}
+        <button className="plain" onClick={onLedger}>Ledger ↗</button>
+      </div>
     </div>
-    {moved.length > 0 && <ul className="outcome-figures">
-      {moved.map(([label, value, bad], i) => <li key={i} className={bad ? 'bad' : 'good'}>
-        <b>{value}</b>{label && <small>{label}</small>}
-      </li>)}
-    </ul>}
-    {headline
-      ? <div className="outcome-said"><b>{headline.title}</b><p>{headline.text}</p></div>
-      : <p className="outcome-quiet">Nothing came of it that anybody wrote down.</p>}
-    {rest.length > 0 && <>
-      <button className="reveal-blocked" aria-expanded={open} onClick={() => setOpen(o => !o)}>
-        {open ? 'Hide' : 'Show'} {rest.length} other {rest.length === 1 ? 'thing that happened' : 'things that happened'} while you did it
-      </button>
-      {open && <ul className="outcome-rest">{rest.map(r => <li key={r.id} className={r.kind}>
-        <b>{r.title}</b><p>{r.text}</p></li>)}</ul>}
-    </>}
-    <button className="plain outcome-ledger" onClick={onLedger}>The whole ledger ↗</button>
+    {open && rest.length > 0 && <ul className="outcome-rest">{rest.map(r => <li key={r.id} className={r.kind}>
+      <b>{r.title}</b><p>{r.text}</p></li>)}</ul>}
   </section>;
 }

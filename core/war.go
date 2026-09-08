@@ -146,6 +146,7 @@ func (w *World) contestAt(attacker, defender *Faction, weakest string) {
 	if w.WorldRandom() >= odds {
 		attacker.Power = max(10, attacker.Power-2)
 		w.Log("A raid repelled at "+place.Name, fmt.Sprintf("%s moved against %s and was driven off. %s holds the ground.", attacker.Name, place.Name, defender.Name), "politics")
+		w.Witness("gunfight", weakest, fmt.Sprintf("%s came for %s and was driven off. %s still holds it.", attacker.Name, place.Name, defender.Name), "")
 		return
 	}
 	damage := min(prop.Condition, 20+int(w.WorldRandom()*25))
@@ -192,6 +193,8 @@ func (w *World) contestAt(attacker, defender *Faction, weakest string) {
 		w.Log("A holding changes hands", fmt.Sprintf("%s has taken %s from %s. The city notices who could not hold it.", attacker.Name, place.Name, defender.Name), "politics")
 		w.Report("seizure", strings.ToUpper(place.Name)+" CHANGES HANDS",
 			fmt.Sprintf("%s now controls %s, previously held by %s. Neither organization would comment.", attacker.Name, place.Name, defender.Name))
+		w.Witness("seizure", weakest, fmt.Sprintf("%s took %s off %s. Their people were in it by the evening.", attacker.Name, place.Name, defender.Name),
+			strings.ToUpper(place.Name)+" CHANGES HANDS")
 		return
 	}
 	w.Log("Trouble at "+place.Name, fmt.Sprintf("%s struck %s, a holding of %s. Its condition is now %d%%.", attacker.Name, place.Name, defender.Name, prop.Condition), "politics")

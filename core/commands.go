@@ -117,7 +117,7 @@ func (w *World) apply(c Command) error {
 			} else if c.Choice == "bargain" {
 				caption = "The attackers accepted payment and withdrew."
 			}
-			w.VisualCues = append(w.VisualCues, VisualCue{ID(), "attack", p.Home, caption})
+			w.Witness("attack", p.Home, caption, "", w.HolderID("fixer"))
 		case "audience":
 			if err := w.ResolveAudience(e, c.Choice); err != nil {
 				return err

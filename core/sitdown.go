@@ -240,7 +240,7 @@ func (w *World) bloodbath(a, b *Faction) {
 	w.Log("It was never a meeting", body, "danger")
 	w.Report("killing", "SHOOTING AT SAINT AGNES",
 		fmt.Sprintf("Several men were shot at a bar on the waterfront. Police believe a meeting between interests associated with %s and %s was the occasion.", a.Name, b.Name))
-	w.VisualCues = append(w.VisualCues, VisualCue{ID(), "attack", SitdownGround, "A meeting at Saint Agnes ended in gunfire."})
+	w.Witness("gunfight", SitdownGround, "A meeting at Saint Agnes ended in gunfire.", "")
 	if w.Player.Health <= 0 {
 		w.Die("A meeting at Saint Agnes that was never a meeting.")
 	}

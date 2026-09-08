@@ -218,7 +218,7 @@ func (w *World) detonate(id, cause string) {
 	}
 	w.Report("attack", headline,
 		fmt.Sprintf("An explosion at %s is being treated as deliberate. %s Police have appealed for witnesses and say they expect none.", place.Name, body))
-	w.VisualCues = append(w.VisualCues, VisualCue{ID(), "attack", id, fmt.Sprintf("An explosion wrecked %s. Condition is now %d%%.", place.Name, prop.Condition)})
+	w.Witness("explosion", id, fmt.Sprintf("An explosion wrecked %s. Condition is now %d%%.", place.Name, prop.Condition), "EXPLOSION AT "+upper(place.Name))
 }
 
 func max64(a, b float64) float64 {

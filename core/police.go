@@ -171,6 +171,8 @@ func (w *World) search() {
 		w.Log("They took it", fmt.Sprintf("%s is forfeit. A fine of $%d, %d units of stock gone, and the business is no longer yours.", place.Name, fine, seized), "danger")
 		w.Report("police", "AUTHORITIES SEIZE "+upper(place.Name),
 			fmt.Sprintf("%s has been seized following an investigation into its accounts. The premises are closed pending proceedings.", place.Name))
+		w.Witness("seizure", target, fmt.Sprintf("%s is forfeit. They put a notice on the door and kept the keys.", place.Name),
+			"AUTHORITIES SEIZE "+upper(place.Name), w.HolderID("detective"))
 		return
 	}
 
@@ -179,6 +181,8 @@ func (w *World) search() {
 	w.Log("Turned over at "+place.Name, fmt.Sprintf("A fine of $%d, %d units of stock gone, and %s was left in a state. They will be back if nothing changes.", fine, seized, place.Name), "danger")
 	w.Report("police", "RAID AT "+upper(place.Name),
 		fmt.Sprintf("Officers searched %s this morning. No charges have yet been brought.", place.Name))
+	w.Witness("raid", target, fmt.Sprintf("They came through the front of %s in daylight. A fine of $%d and %d units gone.", place.Name, fine, seized),
+		"RAID AT "+upper(place.Name), w.HolderID("detective"))
 }
 
 // BribeCost is what a detective wants to lose the paperwork. It rises with what

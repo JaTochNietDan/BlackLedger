@@ -202,28 +202,52 @@
 .room-people{display:grid;grid-template-columns:repeat(auto-fill,minmax(186px,1fr));align-content:start}
 .room-chip{max-width:none;width:100%;min-height:52px}
 
-/* The result of an action was a strip along the bottom, below the fold, where
-   a page puts a status bar. It is not a status — it is the answer to the thing
-   the player just decided, and the only reason they pressed the button. It
-   goes at the top of the pane they pressed it in. */
-.outcome-panel{background:linear-gradient(158deg,#25332b,#141d1e);border:1px solid #7d6c45;border-left:3px solid var(--gold);padding:15px 16px 13px;margin:0 0 18px;box-shadow:0 10px 32px #0006}
-.outcome-panel.grave{border-color:#8a5a4d;border-left-color:var(--red);background:linear-gradient(158deg,#33241f,#16100f)}
-.outcome-head .eyebrow{display:block;margin-bottom:3px}
-.outcome-panel.grave .outcome-head .eyebrow{color:var(--red)}
-.outcome-head b{font:20px/1.2 var(--serif);font-weight:400;display:block}
-.outcome-figures{list-style:none;display:flex;flex-wrap:wrap;gap:5px 16px;margin:11px 0 0;padding:9px 0 0;border-top:1px solid #3d4a41}
-.outcome-figures li{display:flex;align-items:baseline;gap:5px}
+/* The result of an action belongs somewhere reserved and always visible, not
+   at the top of whichever pane happened to be under the player's hand. A band
+   directly under the top bar keeps its place whether or not anything has just
+   happened, so the page never jumps between one action and the next. */
+.outcome-band{border-bottom:1px solid var(--line);background:#131e1e;padding:9px 26px;min-height:58px;display:flex;flex-direction:column;justify-content:center}
+.outcome-band.empty{background:#111b1b}
+.outcome-band.empty .outcome-idle{font:13px var(--serif);font-weight:400;color:var(--muted)}
+.outcome-band.grave{background:linear-gradient(90deg,#2b1c18,#131e1e 60%);border-bottom-color:#7d5044}
+.outcome-line{display:flex;align-items:center;gap:22px}
+.outcome-did{flex:none;max-width:230px;border-left:2px solid var(--gold);padding-left:11px}
+.outcome-band.grave .outcome-did{border-left-color:var(--red)}
+.outcome-did .eyebrow{display:block;line-height:1.3}
+.outcome-did b{font:16px/1.2 var(--serif);font-weight:400;display:block}
+.outcome-figures{list-style:none;display:flex;flex-wrap:wrap;gap:3px 14px;margin:0;padding:0;flex:none}
+.outcome-figures li{display:flex;align-items:baseline;gap:4px}
 .outcome-figures b{font:15px var(--serif);font-weight:400;font-variant-numeric:tabular-nums}
 .outcome-figures li.good b{color:#b8cfa9}
 .outcome-figures li.bad b{color:var(--red)}
-.outcome-figures small{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
-.outcome-said{margin-top:12px;padding-top:11px;border-top:1px solid #3d4a41}
-.outcome-said b{font:15px var(--serif);font-weight:400;display:block;margin-bottom:3px}
-.outcome-said p{margin:0;font-size:12.5px;line-height:1.55;color:#cfd3c4}
-.outcome-quiet{margin:11px 0 0;font-size:12px;color:var(--muted);font-style:italic}
-.outcome-rest{list-style:none;margin:8px 0 0;padding:0;max-height:230px;overflow:auto}
-.outcome-rest li{border-top:1px solid #33403a;padding:8px 0}
+.outcome-figures small{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.outcome-said{flex:1;min-width:0;border-left:1px solid var(--line);padding-left:20px}
+.outcome-said b{font:13px var(--serif);font-weight:400;display:block;line-height:1.3}
+.outcome-said span{display:block;font-size:11.5px;color:var(--muted);line-height:1.4;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.outcome-band.open .outcome-said span{white-space:normal}
+.outcome-quiet{font-style:italic}
+.outcome-tools{flex:none;display:flex;gap:7px}
+.outcome-tools .plain{font-size:11px;padding:5px 9px}
+.outcome-rest{list-style:none;margin:9px 0 2px;padding:0 0 0 11px;max-height:210px;overflow:auto;border-left:2px solid var(--line)}
+.outcome-rest li{border-top:1px solid #263028;padding:7px 0}
+.outcome-rest li:first-child{border-top:0}
 .outcome-rest li b{display:block;font-size:12px;font-weight:500}
 .outcome-rest li p{margin:2px 0 0;font-size:11.5px;color:var(--muted);line-height:1.5}
 .outcome-rest li.danger b,.outcome-rest li.death b{color:var(--red)}
-.outcome-ledger{margin-top:11px;font-size:11px;padding:5px 9px}
+@media(max-width:1100px){.outcome-line{flex-wrap:wrap;gap:8px 16px}.outcome-said{flex-basis:100%;border-left:0;padding-left:0}}
+
+/* The loudest moments arrived as a paragraph in a list. This is where they are
+   played: the camera goes to the building, the thing happens, and the Herald
+   headline comes up after the scene rather than instead of it. */
+.theatre{position:absolute;inset:0;z-index:6;background:#050808f2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:22px}
+.theatre-where{text-align:center}
+.theatre-where b{display:block;font:26px var(--serif);font-weight:400;margin-top:2px}
+.theatre-frame{width:min(620px,92%);border:1px solid #2c3733;box-shadow:0 20px 70px #000a}
+.theatre-stage{display:block;width:100%;height:auto}
+.theatre-caption{max-width:600px;text-align:center;margin:0;font:14px/1.6 var(--serif);color:#d8d3c2}
+.theatre-actors{margin:0;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+.theatre-paper{margin-top:6px;background:#e6e1d2;color:#12110e;padding:10px 18px;max-width:620px;text-align:center;border:2px solid #12110e}
+.theatre-paper small{display:block;font:9px system-ui;letter-spacing:.2em;color:#4a463c}
+.theatre-paper b{font:700 20px/1.15 var(--serif);display:block;margin-top:3px}
+.theatre-done{margin-top:4px}
+@media(prefers-reduced-motion:reduce){.theatre-frame{display:none}}
