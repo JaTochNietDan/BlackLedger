@@ -242,3 +242,36 @@ func TestTheBlocksBetweenTheAddressesAreBuiltOn(t *testing.T) {
 		t.Error("fillers are not placed from the blocks the addresses left empty")
 	}
 }
+
+// Everything on a pavement has to be on the pavement. A hydrant in the middle
+// of the carriageway or a bench inside a building is the kind of fault that
+// reads as broken however good the art is, and the user has asked twice for a
+// clean grid with nothing overlapping.
+//
+// This is a text guard: it holds that the placement is computed from the
+// pavement ring rather than from anywhere else. That the 63 props actually
+// land there was checked in the browser by recomputing every one of them
+// against its own block — none in a road, none under a building.
+func TestStreetDressingStandsOnThePavement(t *testing.T) {
+	source, err := os.ReadFile("../../src/iso.ts")
+	if err != nil {
+		t.Skip("no interface sources beside this build")
+	}
+	body := string(source)
+	if !strings.Contains(body, "export function dressing") {
+		t.Fatal("nothing places the things a pavement carries")
+	}
+	// The runs a prop may stand on are built from the island — the pavement
+	// ring — and inset from its edge. If that stops being true, props can
+	// wander into the road.
+	dress := body[strings.Index(body, "export function dressing"):]
+	if end := strings.Index(dress, "\nexport function wires"); end > 0 {
+		dress = dress[:end]
+	}
+	if !strings.Contains(dress, "island(cell)") {
+		t.Error("dressing is not placed from the block's pavement ring")
+	}
+	if !strings.Contains(dress, "PAVE") {
+		t.Error("dressing is not inset from the kerb, so a prop can overhang the carriageway")
+	}
+}

@@ -2,7 +2,7 @@ import {useEffect, useRef} from 'react';
 import {Application, Assets, Container, Graphics, Sprite, Text, Texture, TextStyle} from 'pixi.js';
 import {Viewport} from 'pixi-viewport';
 import type {Snapshot} from './types';
-import {along, blockFor, BLOCK, bounds, carriageways, distance, faces, fillers, fillerShape, grid, island, kerbside, lampPosts, middle, mix, nightness, PAVE, plot, project, ROAD, size, TILE, walk} from './iso';
+import {along, blockFor, BLOCK, bounds, carriageways, distance, dressing, faces, fillers, fillerShape, grid, island, kerbside, lampPosts, middle, mix, nightness, PAVE, plot, project, ROAD, size, TILE, walk, wires} from './iso';
 import type {Cell, Vec} from './iso';
 import cutouts from '../public/art/iso/isometric.json';
 import type {Spotlight} from './CityStreet';
@@ -83,11 +83,66 @@ function shade(colour: number, by: number): number {
   return (r << 16) | (g << 8) | b;
 }
 
+// The things a pavement carries. Each is a few boxes in tile space, through
+// the same projection as everything else, because anything drawn in screen
+// space stops agreeing with the angle the moment the camera moves.
+function prop(kind: string, dark: number, facing: number): Graphics {
+  const g = new Graphics();
+  // A contact shadow first, under everything. Without one a prop reads as a
+  // shape floating over the pavement rather than as an object standing on it —
+  // the first hydrant looked like a red cube hanging in the street.
+  if (kind !== 'pole') g.ellipse(0, 1, 5.5, 2).fill({color: 0x000000, alpha: .3 + .12 * dark});
+  else g.ellipse(0, 1, 4, 1.6).fill({color: 0x000000, alpha: .35 + .12 * dark});
+  const solid = (w: number, d: number, h: number, top: number, left: number, right: number, base = 0, dx = 0, dy = 0) => {
+    const f = faces({x: -w / 2 + dx, y: -d / 2 + dy}, {w, d, h, base});
+    g.poly(f.left.flatMap(v => [v.x, v.y])).fill(left);
+    g.poly(f.right.flatMap(v => [v.x, v.y])).fill(right);
+    g.poly(f.top.flatMap(v => [v.x, v.y])).fill(top);
+  };
+  switch (kind) {
+    case 'hydrant': {
+      // Oxide red, not pillar-box: everything else in this city is a muted
+      // olive or umber, and a bright hydrant was the only saturated thing on
+      // the street, which made it read as a bug rather than as a hydrant.
+      const paint = mix(0x6e3a2c, 0x412219, dark);
+      solid(.065, .065, .10, mix(0x84493a, 0x4e2a20, dark), mix(0x5e2a20, 0x3c1a14, dark), paint);
+      solid(.10, .036, .022, paint, mix(0x5e2a20, 0x3c1a14, dark), paint, .07);   // the arms
+      break;
+    }
+    case 'mailbox': {
+      const paint = mix(0x2f4a3c, 0x1b2b23, dark);
+      solid(.095, .08, .16, mix(0x3d5c4b, 0x22362c, dark), mix(0x1f3227, 0x121d17, dark), paint);
+      break;
+    }
+    case 'bin': {
+      solid(.08, .08, .11, mix(0x4a4b43, 0x24261f, dark), mix(0x2a2b25, 0x14150f, dark), mix(0x3a3b33, 0x1c1e18, dark));
+      break;
+    }
+    case 'bench': {
+      const wood = mix(0x5a4632, 0x2e2419, dark);
+      solid(.25, .065, .03, wood, mix(0x33281c, 0x1a140e, dark), mix(0x453626, 0x231b13, dark), .045);
+      solid(.25, .022, .065, wood, mix(0x33281c, 0x1a140e, dark), mix(0x453626, 0x231b13, dark), .075, 0, -.022);
+      break;
+    }
+    case 'pole': {
+      const timber = mix(0x4a3f31, 0x241f18, dark);
+      solid(.07, .07, 1.35, mix(0x5c5040, 0x2c261e, dark), mix(0x2e271f, 0x171310, dark), timber);
+      // The crossarm the wires run off.
+      const top = project({x: 0, y: 0});
+      g.rect(top.x - 11, top.y - 1.35 * TILE.h - 4, 22, 2).fill(timber);
+      g.rect(top.x - 11, top.y - 1.35 * TILE.h - 12, 22, 2).fill(timber);
+      break;
+    }
+  }
+  void facing;
+  return g;
+}
+
 // A person in the street, small enough to belong to a building and clear
 // enough to be seen: a coat, a collar and a head. Deliberately not a portrait —
 // at the scale a whole city is drawn at, a face is four pixels of mud, and this
 // reads as somebody standing there.
-function figure(colour: number, yours: boolean, walking: boolean): Graphics {
+function figure(colour: number, yours: boolean, walking: boolean, you = false): Graphics {
   const g = new Graphics();
   const h = 17;
   // The coat: narrow at the shoulders, flaring to the pavement.
@@ -101,7 +156,13 @@ function figure(colour: number, yours: boolean, walking: boolean): Graphics {
   g.poly([-2.9, -h + 1.4, 2.9, -h + 1.4, 2.2, -h - 1.9, -2.2, -h - 1.9]).fill(0x24272a);
   g.ellipse(0, .6, 5.4, 1.7).fill({color: 0x000000, alpha: .32});  // and a shadow to stand in
   if (yours) g.circle(0, -h - 5.2, 1.7).fill(0xd6b77c);            // yours are marked
-  if (walking) g.poly([-6.6, -1.2, -4.2, -1.2, -5.4, .8]).fill({color: 0xd6b77c, alpha: .5});
+  // And the player is not one of yours: a ring on the ground under them, so
+  // they can be found in a crowd without reading a name.
+  if (you) {
+    g.ellipse(0, 1, 8.5, 3).stroke({width: 1.6, color: 0xd6b77c, alpha: .85});
+    g.circle(0, -h - 5.2, 2.2).fill(0xf0d6a0);
+  }
+  void walking;
   return g;
 }
 
@@ -393,6 +454,33 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight}: {
     }
     layer.addChild(glow, posts);
 
+    // What the pavements carry, and the wires overhead.
+    const clutter = new Container();
+    const poles: {x: number; y: number}[] = [];
+    for (let col = 0; col < size.cols; col++) {
+      for (let row = 0; row < size.rows; row++) {
+        for (const item of dressing({col, row})) {
+          const p = project(item.at);
+          const g = prop(item.kind, dark, item.facing);
+          g.position.set(p.x, p.y);
+          clutter.addChild(g);
+          if (item.kind === 'pole') poles.push(item.at);
+        }
+      }
+    }
+    // The wires: strung block to block, sagging the way a wire does.
+    const strung = new Graphics();
+    for (const span of wires(poles)) {
+      const a = project(span.a), b = project(span.b);
+      const lift = 1.35 * TILE.h + 8;
+      strung.moveTo(a.x, a.y - lift)
+        .quadraticCurveTo((a.x + b.x) / 2, (a.y + b.y) / 2 - lift + 9, b.x, b.y - lift);
+      strung.moveTo(a.x, a.y - lift + 8)
+        .quadraticCurveTo((a.x + b.x) / 2, (a.y + b.y) / 2 - lift + 17, b.x, b.y - lift + 8);
+    }
+    strung.stroke({width: 1, color: mix(0x4a4f48, 0x15191a, dark), alpha: .75});
+    layer.addChild(clutter, strung);
+
     // The blocks nobody lives on. Without these the grid is a scatter of
     // twelve models with holes between them; with them it is a city that
     // happens to have twelve addresses worth knowing. Deliberately plainer
@@ -594,22 +682,43 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight}: {
       const crowd = p.people || [];
       const island_ = island(cell);
       crowd.slice(0, 12).forEach((who, i) => {
-        // Along the pavement in front of the building, and into a second row
-        // when the first is full.
+        // People stand in twos and threes, not in a line. The gap between one
+        // knot and the next is what makes a pavement read as people rather
+        // than as a row of pegs — an even spacing looked like a fence.
         const of = Math.min(crowd.length, 12), per = Math.min(of, 5);
-        const across_ = per <= 1 ? .5 : .12 + (i % per) / (per - 1) * .76;
-        const rank = Math.floor(i / per);
+        const knot = Math.floor(i / 2), inKnot = i % 2;
+        const wobble = ((i * 2654435761) % 1000) / 1000;
+        const across_ = Math.min(.9, Math.max(.08,
+          .10 + (knot % 3) * .31 + inKnot * .055 + wobble * .05));
+        const rank = Math.floor(i / per) + (wobble > .7 ? 1 : 0);
         const spot = project({
           x: island_.x + island_.w * across_,
-          y: island_.y + island_.d - PAVE * (.42 + rank * .55),
+          y: island_.y + island_.d - PAVE * (.36 + rank * .5 + wobble * .18),
         });
         const g = figure(who.yours ? 0x4a4432 : 0x23262a, !!who.yours, false);
+        // Half of them turned the other way, so a knot of people looks like a
+        // conversation rather than a queue.
+        if (inKnot === 1) g.scale.x = -1;
         g.position.set(spot.x, spot.y);
         g.eventMode = 'static';
         g.cursor = 'pointer';
         g.on('pointertap', () => pick.current(p.id));
         group.addChild(g);
       });
+
+      // And the player, standing at whatever address they are at. They are not
+      // in the room's list — the core keeps them apart from the city's own
+      // people — so without this the one figure that matters most is the only
+      // one not on the map.
+      if (p.id === here && state.player.alive) {
+        const you = figure(0x2f3a2c, false, false, true);
+        const at_ = project({
+          x: island_.x + island_.w * .5,
+          y: island_.y + island_.d - PAVE * .18,
+        });
+        you.position.set(at_.x, at_.y);
+        group.addChild(you);
+      }
 
       layer.addChild(group);
     }
@@ -621,8 +730,13 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight}: {
       const from = cells.get(j.from_id), to = cells.get(j.to_id);
       if (!from || !to) continue;
       // Along the streets, not through the buildings.
-      const spot = project(along(walk(from, to), j.progress));
+      const path = walk(from, to);
+      const spot = project(along(path, j.progress));
+      // Which way they are pointing: from where they were a moment ago to
+      // where they are now, so a figure faces its own direction of travel.
+      const behind = project(along(path, Math.max(0, j.progress - .04)));
       const g = figure(j.yours ? 0x4a4432 : 0x23262a, !!j.yours, true);
+      if (spot.x < behind.x) g.scale.x = -1;
       g.position.set(spot.x, spot.y);
       layer.addChild(g);
 

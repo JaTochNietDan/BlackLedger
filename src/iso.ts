@@ -421,3 +421,68 @@ export function fillerShape(cell: Cell): {h: number; inset: number; kind: number
   // distance.
   return {h: .55 + r(3) * .85, inset: .34 + r(11) * .2, kind: Math.floor(r(19) * 3), art: r(7)};
 }
+
+// ---------------------------------------------------------------------------
+// What is on the pavement.
+//
+// A street with nothing on it but lamps reads as a model of a street. These are
+// the things a 1950s pavement actually carried: a hydrant at the kerb, a
+// mailbox on the corner, a bin, a bench, a telegraph pole with wires running
+// off it. They are placed on the pavement ring only — never in the road, never
+// under a building — so nothing can end up somewhere it could not stand.
+
+export type Prop = {kind: 'hydrant' | 'mailbox' | 'bin' | 'bench' | 'pole'; at: Vec; facing: number};
+
+// dressing is what one block carries, decided by where the block is so the same
+// corner has the same hydrant every time the city is drawn.
+export function dressing(cell: Cell): Prop[] {
+  const i = island(cell);
+  let h = ((cell.col * 2246822519) ^ (cell.row * 3266489917)) >>> 0;
+  const next = () => { h = (h * 1664525 + 1013904223) >>> 0; return h / 4294967296 };
+  const out: Prop[] = [];
+
+  // The pavement ring, as four runs a prop can stand on. Kept a little inside
+  // the kerb so nothing overhangs the carriageway.
+  const inset = PAVE * .42;
+  const runs: {from: Vec; to: Vec; facing: number}[] = [
+    {from: {x: i.x + inset, y: i.y + inset}, to: {x: i.x + i.w - inset, y: i.y + inset}, facing: -1},
+    {from: {x: i.x + inset, y: i.y + i.d - inset}, to: {x: i.x + i.w - inset, y: i.y + i.d - inset}, facing: 1},
+    {from: {x: i.x + inset, y: i.y + inset}, to: {x: i.x + inset, y: i.y + i.d - inset}, facing: -1},
+    {from: {x: i.x + i.w - inset, y: i.y + inset}, to: {x: i.x + i.w - inset, y: i.y + i.d - inset}, facing: 1},
+  ];
+
+  const kinds: Prop['kind'][] = ['hydrant', 'mailbox', 'bin', 'bench'];
+  for (const run of runs) {
+    // Most stretches of pavement carry nothing. A prop on every one reads as
+    // a catalogue rather than as a street.
+    if (next() > .62) continue;
+    const at = between(run.from, run.to, .2 + next() * .6);
+    out.push({kind: kinds[Math.floor(next() * kinds.length)], at, facing: run.facing});
+  }
+
+  // A telegraph pole on one corner of some blocks, which is what the wires
+  // hang from.
+  if (next() < .55) {
+    out.push({kind: 'pole', at: {x: i.x + inset * .6, y: i.y + i.d - inset * .6}, facing: 1});
+  }
+  return out;
+}
+
+// The wires: strung between the poles of neighbouring blocks, down the line of
+// the street rather than across the city at random.
+export function wires(poles: Vec[]): Segment[] {
+  const out: Segment[] = [];
+  for (const a of poles) {
+    for (const b of poles) {
+      if (a === b) continue;
+      const dx = Math.abs(a.x - b.x), dy = Math.abs(a.y - b.y);
+      // One block apart, in line: that is a span. Anything else is not.
+      const spanX = dy < .2 && dx > BLOCK - .4 && dx < BLOCK + .4;
+      const spanY = dx < .2 && dy > BLOCK - .4 && dy < BLOCK + .4;
+      if (!spanX && !spanY) continue;
+      if (a.x > b.x || (a.x === b.x && a.y > b.y)) continue;   // once per pair
+      out.push({a, b});
+    }
+  }
+  return out;
+}
