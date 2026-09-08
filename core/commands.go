@@ -205,9 +205,18 @@ func (w *World) apply(c Command) error {
 				w.Log("Leo heads out", "Collections should be completed in two hours.", "work")
 			case "provoke":
 				p.Respect++
-				w.Factions[0].Goodwill -= 35
-				w.Retaliation()
+				holder := w.PropertyHolder(target)
+				if f := w.FactionByID(holder); f != nil {
+					f.Goodwill = max(-100, f.Goodwill-35)
+					w.RetaliationFrom(f.ID)
+				} else {
+					w.Retaliation()
+				}
 				w.Log("A demand nobody forgets", "The manager refuses. A Bellandi man watches you leave. You have challenged a powerful family on its own ground.", "politics")
+			case "incite":
+				if err := w.Incite(target); err != nil {
+					return err
+				}
 			case "sabotage":
 				// Resolved before the clock moves, so a fatal attempt cannot also
 				// collect the time and income of the hours it never survived.
@@ -249,12 +258,16 @@ func (w *World) apply(c Command) error {
 					if w.NextPressure == 0 {
 						w.NextPressure = w.Minute + 180
 					}
+					priorOwner := w.Properties[target].Owner
 					w.Properties[target].Owner = fmt.Sprintf("player:%d", w.Life)
 					p.Respect += 4
 					l, _ := PlaceByID(target)
 					w.Log("A foothold in the city", l.Name+" now produces income for you. Earnings accrue as game time passes.", "business")
-					if target == "garage" {
-						w.Factions[1].Goodwill -= 10
+					// Taking premises in a family's district is noticed by them.
+					if previous := priorOwner; previous != "" && previous != "independent" {
+						if f := w.FactionByID(previous); f != nil {
+							f.Goodwill = max(-100, f.Goodwill-10)
+						}
 					}
 				case "inspect":
 					l, _ := PlaceByID(target)

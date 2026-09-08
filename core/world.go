@@ -171,12 +171,14 @@ type World struct {
 	Life           int                  `json:"life"`
 	Minute         int                  `json:"minute"`
 	RNG            uint32               `json:"rng"`
+	WorldRNG       uint32               `json:"world_rng,omitempty"`
 	Player         Person               `json:"player"`
 	District       int                  `json:"district"`
 	BusinessTruces map[string]int       `json:"business_truces,omitempty"`
 	Factions       []Faction            `json:"factions"`
 	NPCs           []NPC                `json:"npcs"`
 	Properties     map[string]*Property `json:"properties"`
+	Conflicts      []Conflict           `json:"conflicts,omitempty"`
 	Plots          []Plot               `json:"plots"`
 	Tasks          []Task               `json:"tasks"`
 	Event          *Scene               `json:"event"`
@@ -237,6 +239,18 @@ func (w *World) Random() float64 {
 	w.RNG = 1664525*w.RNG + 1013904223
 	return float64(w.RNG) / 4294967296
 }
+
+// WorldRandom draws from a stream reserved for events the player is not party
+// to, so families quarrelling off-screen cannot shift the odds of a decision the
+// player is making. Saves written before this stream existed start it from the
+// campaign seed.
+func (w *World) WorldRandom() float64 {
+	if w.WorldRNG == 0 {
+		w.WorldRNG = w.RNG ^ 0x9e3779b9
+	}
+	w.WorldRNG = 1664525*w.WorldRNG + 1013904223
+	return float64(w.WorldRNG) / 4294967296
+}
 func (w *World) Log(title, text, kind string) {
 	w.History = append(w.History, Record{ID(), w.Minute, w.Life, title, text, kind})
 	if len(w.History) > 180 {
@@ -261,10 +275,12 @@ func New(seed uint32) *World {
 	for _, p := range Locations {
 		owner := "independent"
 		switch p.ID {
-		case "club":
+		case "club", "docks":
 			owner = "bellandi"
-		case "market":
-			// Russo needs holdings of its own, or only one family can be pressured.
+		case "market", "bar":
+			// Russo needs holdings of its own, or only one family can be
+			// pressured. Two each also means a war costs ground before it costs
+			// an organization its existence.
 			owner = "russo"
 		}
 		income := 0
@@ -279,9 +295,15 @@ func New(seed uint32) *World {
 			income = 30
 		case "market":
 			income = 18
+		case "docks":
+			income = 22
+		case "bar":
+			income = 12
 		}
 		w.Properties[p.ID] = &Property{owner, 100, income, 0}
 	}
+	// The two established families are already rivals when the player arrives.
+	w.Antagonize("bellandi", "russo", 50)
 	w.Log("A room. A name. No protection.", "Mara Bell left word at Saint Agnes: there is work, if you can be discreet. Your room costs $15 each midnight.", "personal")
 	return w
 }
@@ -393,6 +415,10 @@ func (w *World) Actions(id string) []Action {
 	if f, ok := w.SabotageTarget(id); ok {
 		add("sabotage", "Move against "+f.Name, 90, 0, w.SabotageReadiness(id),
 			fmt.Sprintf("Send your crew against %s. Damages the property, weakens %s and costs you standing with them. They will retaliate, and a failed attempt injures you.", l.Name, f.Name))
+		if rival := w.Rival(f.ID); rival != nil {
+			add("incite", "Point "+f.Name+" at "+rival.Name, 45, 25, w.InciteReadiness(id),
+				fmt.Sprintf("Spend $25 on the right conversations so %s believes %s moved against them. Hardens their quarrel and can start a war you are not part of. A story that does not hold up costs you standing with %s.", f.Name, rival.Name, f.Name))
+		}
 	}
 	if id == "laundry" || id == "garage" || id == "casino" {
 		if w.Own(id) {
@@ -535,7 +561,7 @@ func (w *World) Advance(minutes int) {
 			return
 		}
 		// Jump to the next meaningful boundary; presentation never drives this clock.
-		next := min(end, (w.Minute/1440+1)*1440)
+		next := min(end, (w.Minute/720+1)*720)
 		if w.NextPressure > 0 {
 			next = min(next, max(w.Minute+1, w.NextPressure))
 		}
@@ -568,6 +594,10 @@ func (w *World) Advance(minutes int) {
 			} else {
 				j++
 			}
+		}
+		// Organizations reconsider each other twice a day; their books settle once.
+		if w.Minute%720 == 0 {
+			w.FactionTurn()
 		}
 		if w.Minute%1440 == 0 {
 			w.FamilyDay()
@@ -646,7 +676,7 @@ func (w *World) Public() map[string]any {
 		if w.Own(l.ID) {
 			income += float64(prop.Income*prop.Condition) / 100
 		}
-		locs = append(locs, map[string]any{"id": l.ID, "name": l.Name, "type": l.Type, "district": l.District, "x": l.X, "y": l.Y, "cost": l.Cost, "blurb": l.Blurb, "owner": prop.Owner, "condition": prop.Condition, "income": prop.Income, "owned": w.Own(l.ID), "locked": l.District > w.District, "actions": w.Actions(l.ID)})
+		locs = append(locs, map[string]any{"id": l.ID, "name": l.Name, "type": l.Type, "district": l.District, "x": l.X, "y": l.Y, "cost": l.Cost, "blurb": l.Blurb, "owner": prop.Owner, "holder": w.HolderName(l.ID), "condition": prop.Condition, "income": prop.Income, "owned": w.Own(l.ID), "locked": l.District > w.District, "actions": w.Actions(l.ID)})
 	}
 	var scene any = nil
 	if e := w.Event; e != nil {
@@ -660,7 +690,7 @@ func (w *World) Public() map[string]any {
 	if len(history) > 60 {
 		history = history[len(history)-60:]
 	}
-	return map[string]any{"id": w.ID, "version": w.Version, "revision": w.Revision, "life": w.Life, "minute": w.Minute, "player": w.Player, "district": w.District, "factions": w.Factions, "npcs": w.NPCs, "locations": locs, "event": scene, "history": history, "dead": w.Dead, "tasks": w.Tasks, "director": w.Director, "last_result": w.LastResult, "daily_cost": w.DailyCost(), "income": income, "security": w.Guard(), "opportunity": w.NextOpportunity(), "known_threats": w.KnownThreats(), "business_truces": w.ActiveBusinessTruces()}
+	return map[string]any{"id": w.ID, "version": w.Version, "revision": w.Revision, "life": w.Life, "minute": w.Minute, "player": w.Player, "district": w.District, "factions": w.Factions, "npcs": w.NPCs, "locations": locs, "event": scene, "history": history, "dead": w.Dead, "tasks": w.Tasks, "director": w.Director, "last_result": w.LastResult, "daily_cost": w.DailyCost(), "income": income, "security": w.Guard(), "opportunity": w.NextOpportunity(), "known_threats": w.KnownThreats(), "business_truces": w.ActiveBusinessTruces(), "conflicts": w.PublicConflicts()}
 }
 func (w *World) hasRecord(title string) bool {
 	for _, r := range w.History {

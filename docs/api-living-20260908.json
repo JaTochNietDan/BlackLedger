@@ -1,0 +1,33 @@
+{
+ "base": "http://127.0.0.1:8870",
+ "steps_taken": 200,
+ "idempotency": "replayed request returned the same committed state",
+ "stale_revision": "HTTP 409: {\"error\":\"the city has changed; refresh before deciding\"}\n",
+ "final": {
+  "alive": true,
+  "cash": 1280,
+  "heat": 0,
+  "life": 1,
+  "minute": 6960,
+  "owned": [
+   "laundry",
+   "garage",
+   "casino"
+  ],
+  "respect": 26
+ },
+ "invariant_failures": null,
+ "command_counts": {
+  "acquire": 3,
+  "choice": 5,
+  "contact": 5,
+  "courier": 3,
+  "crew_bonus": 3,
+  "delegate": 44,
+  "expand": 2,
+  "move_home": 12,
+  "recruit": 1,
+  "security": 27,
+  "travel": 95
+ }
+}

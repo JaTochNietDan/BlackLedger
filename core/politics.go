@@ -40,7 +40,10 @@ func (w *World) BusinessPressure() {
 	if actor == 1 {
 		speaker = "elena"
 	}
-	rival := w.Factions[1-actor]
+	rival := w.Rival(f.ID)
+	if rival == nil {
+		rival = f
+	}
 	w.Event = &Scene{ID: ID(), Kind: "business_pressure", Source: "authored", Minute: w.Minute, Speaker: speaker, Actor: f.ID, Target: target.ID, Title: "A claim on your earnings", Body: fmt.Sprintf("“%s is doing business under your name now. My people expect a share. Pay for an understanding, or explain why I should tolerate a competitor.”", target.Name), Choices: []Choice{
 		{ID: "pay", Label: "Pay $60 for an understanding", Cost: 60, Detail: "Improves this family's standing by 12. Postpones the next demand; existing personal threats remain."},
 		{ID: "resist", Label: "Refuse their claim", Detail: "Gain 2 respect; lose 20 standing. The family may retaliate against your business. Repeated defiance can put your life at risk."},
@@ -74,10 +77,16 @@ func (w *World) ResolvePressure(e *Scene, choice string) error {
 			f.Goodwill = max(-100, f.Goodwill-20)
 		} else {
 			f.Goodwill = max(-100, f.Goodwill-12)
-			other := &w.Factions[1-actor]
+			other := w.Rival(f.ID)
+			if other == nil {
+				other = f
+			}
 			other.Goodwill = min(100, other.Goodwill+12)
 			other.Cash += 35
-			w.Log("A rival introduction", fmt.Sprintf("You pay $35 for an introduction to %s. Their standing is now %+d; %s standing is now %+d. This does not guarantee protection.", other.Name, other.Goodwill, f.Name, f.Goodwill), "politics")
+			// Being seen to take one family's side against another is exactly
+			// the kind of thing that turns a standing quarrel into a war.
+			w.Antagonize(f.ID, other.ID, 12)
+			w.Log("A rival introduction", fmt.Sprintf("You pay $35 for an introduction to %s. Their standing is now %+d; %s standing is now %+d. This does not guarantee protection, and %s will hear who you went to.", other.Name, other.Goodwill, f.Name, f.Goodwill, f.Name), "politics")
 		}
 		if choice == "resist" {
 			w.Log("Taking a side", "You reject "+f.Name+"'s terms. The relationship has worsened.", "politics")

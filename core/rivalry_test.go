@@ -33,7 +33,7 @@ func TestFamiliesHoldPropertyBothSidesCanLose(t *testing.T) {
 	if _, ok := w.SabotageTarget("laundry"); ok {
 		t.Fatal("the player's own business was offered as a sabotage target")
 	}
-	if _, ok := w.SabotageTarget("bar"); ok {
+	if _, ok := w.SabotageTarget("garage"); ok {
 		t.Fatal("an independent property was offered as a sabotage target")
 	}
 }
@@ -191,5 +191,80 @@ func TestDamagedHoldingsEarnTheirFamilyLess(t *testing.T) {
 	damaged.FamilyDay()
 	if whole.faction("bellandi").Cash-before <= damaged.faction("bellandi").Cash-damagedBefore {
 		t.Fatal("condition did not affect what a family collects")
+	}
+}
+
+func TestIncitingARivalryNeedsContactsAndStanding(t *testing.T) {
+	w := New(11)
+	w.Player.Location = "club"
+	if w.InciteReadiness("club") == "" {
+		t.Fatal("a newcomer with no network could set two families against each other")
+	}
+	if err := w.Incite("club"); err == nil {
+		t.Fatal("the command ignored a requirement the action reports")
+	}
+	w.Player.Contacts = 2
+	w.Player.Respect = 8
+	if reason := w.InciteReadiness("club"); reason != "" {
+		t.Fatal("a connected player was still refused:", reason)
+	}
+	// The action carries the same reason the command would give.
+	w.Player.Contacts = 0
+	for _, a := range w.Actions("club") {
+		if a.ID == "incite" && (!a.Disabled || a.Reason == "") {
+			t.Fatal("the interface offered an incitement the rules would refuse")
+		}
+	}
+}
+
+func TestSuccessfulIncitementHardensTheOtherQuarrel(t *testing.T) {
+	var w *World
+	for seed := 1; seed <= 200; seed++ {
+		probe := New(uint32(seed))
+		probe.Player.Contacts, probe.Player.Respect = 2, 8
+		if probe.Random() >= .25 { // the branch where the story holds
+			w = New(uint32(seed))
+			w.Player.Contacts, w.Player.Respect = 2, 8
+			break
+		}
+	}
+	if w == nil {
+		t.Skip("no succeeding seed found")
+	}
+	w.Player.Location = "club"
+	before := w.Conflict("bellandi", "russo").Hostility
+	if err := w.Incite("club"); err != nil {
+		t.Fatal(err)
+	}
+	if got := w.Conflict("bellandi", "russo").Hostility; got <= before {
+		t.Fatalf("the quarrel did not harden: %d -> %d", before, got)
+	}
+	// Pointing one family at another is not free of attention.
+	if w.Player.Heat == 0 {
+		t.Fatal("incitement drew no attention at all")
+	}
+}
+
+func TestOnlyVisibleQuarrelsAreReported(t *testing.T) {
+	w := New(12)
+	// Established families start uneasy but not yet newsworthy at war.
+	for _, c := range w.PublicConflicts() {
+		if c.State == "cold" {
+			t.Fatal("cold relations were reported as news")
+		}
+		if len(c.Between) != 2 || c.Between[0] == "" {
+			t.Fatal("a reported quarrel did not name both organizations")
+		}
+	}
+	w.Antagonize("bellandi", "russo", 100)
+	w.Conflict("bellandi", "russo").State = "war"
+	found := false
+	for _, c := range w.PublicConflicts() {
+		if c.State == "war" {
+			found = true
+		}
+	}
+	if !found {
+		t.Fatal("an open war was not visible to the city")
 	}
 }

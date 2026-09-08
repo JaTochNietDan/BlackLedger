@@ -156,3 +156,49 @@ func (w *World) Sabotage(id string) error {
 	w.RetaliationFrom(f.ID)
 	return nil
 }
+
+// InciteReadiness explains why a rivalry cannot be stoked, or returns "".
+// Working two organizations against each other needs contacts who will carry a
+// story and a rival worth pointing at.
+func (w *World) InciteReadiness(id string) string {
+	f, ok := w.SabotageTarget(id)
+	if !ok {
+		return "No rival organization holds this property"
+	}
+	if w.Rival(f.ID) == nil {
+		return "There is no other organization to point them at"
+	}
+	if w.Player.Contacts < 2 {
+		return "Build an information network first"
+	}
+	if w.Player.Respect < 8 {
+		return "Earn 8 respect first"
+	}
+	return ""
+}
+
+// Incite spends money and standing to make one organization believe another
+// moved against it. It commits a real change to their quarrel; whether that
+// becomes a war is decided by the same rules that govern every other feud.
+func (w *World) Incite(id string) error {
+	if reason := w.InciteReadiness(id); reason != "" {
+		return fmt.Errorf("%s", reason)
+	}
+	f, _ := w.SabotageTarget(id)
+	other := w.Rival(f.ID)
+	place, _ := PlaceByID(id)
+
+	// A story that does not hold up comes back to the person who told it.
+	if w.Random() < .25 {
+		f.Goodwill = max(-100, f.Goodwill-15)
+		w.Player.Heat = min(100, w.Player.Heat+6)
+		w.Log("A story that did not hold", fmt.Sprintf("Your word against %s did not survive scrutiny at %s. %s knows where it came from.", other.Name, place.Name, f.Name), "danger")
+		return nil
+	}
+	w.Antagonize(f.ID, other.ID, 18)
+	w.Player.Heat = min(100, w.Player.Heat+3)
+	w.Player.Respect++
+	c := w.Conflict(f.ID, other.ID)
+	w.Log("A word in the right ear", fmt.Sprintf("You leave %s believing %s moved against them. Their quarrel is now %s.", f.Name, other.Name, c.State), "politics")
+	return nil
+}
