@@ -79,6 +79,16 @@ func (a *app) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				root = "dist"
 			}
 		}
+		// The page itself must never be cached. Its script tag names a hashed
+		// bundle, so a browser holding yesterday's HTML asks for a file that no
+		// longer exists and shows nothing at all — which is how a fixed build
+		// can stay broken for a player who did nothing wrong. The hashed assets
+		// beside it are safe to keep for ever, because their names change.
+		if path := r.URL.Path; path == "/" || strings.HasSuffix(path, ".html") {
+			w.Header().Set("Cache-Control", "no-store, must-revalidate")
+		} else if strings.HasPrefix(path, "/assets/") {
+			w.Header().Set("Cache-Control", "public, max-age=31536000, immutable")
+		}
 		http.FileServer(http.Dir(root)).ServeHTTP(w, r)
 		return
 	}
