@@ -213,3 +213,108 @@ func TestEverybodyInThisCityIsDoingSomething(t *testing.T) {
 	}
 	t.Logf("%d people placed across the city, %d distinguishable things being done", checked, len(said))
 }
+
+// The People screen rendered every living soul as an identical card in whatever
+// order the save happened to hold them: fifty of them, four screens of
+// scrolling, with the man who works for you indistinguishable from a docker he
+// has never met.
+
+func TestTheCityIsOrderedByWhoMattersToYou(t *testing.T) {
+	w, member := testator(t)
+	w.Populate()
+	w.Player.Cash, w.Player.Respect, w.District = 60000, 200, 2
+	w.Player.Crew = []Crew{{ID: "leo", Name: "Leo Carver", Loyalty: 70}}
+
+	// Somebody who owes, and somebody carrying a grudge.
+	var debtor, sore *NPC
+	for _, n := range w.Civilians() {
+		if IsOfficial(n.ID) || w.isRoleHolder(n) || n.ID == member.ID {
+			continue
+		}
+		w.Player.Location = n.Location
+		if debtor == nil && w.LendReadiness(n.ID) == "" && w.Lend(n.ID) == nil {
+			debtor = n
+			continue
+		}
+		if sore == nil {
+			w.Aggrieve(n.ID, 40, "what was done to them over money")
+			sore = n
+		}
+		if debtor != nil && sore != nil {
+			break
+		}
+	}
+	if debtor == nil || sore == nil {
+		t.Skip("could not set up a debtor and somebody aggrieved")
+	}
+
+	everyone := w.Everyone()
+	if len(everyone) != len(w.People()) {
+		t.Fatalf("the city holds %d living people and the screen shows %d", len(w.People()), len(everyone))
+	}
+	seen := map[string]bool{}
+	for _, p := range everyone {
+		if seen[p.ID] {
+			t.Fatalf("%s is listed twice", p.Name)
+		}
+		seen[p.ID] = true
+		if p.Because == "" || p.Standing == "" || p.Doing == "" {
+			t.Fatalf("%s is listed as %q / %q / %q", p.Name, p.Because, p.Standing, p.Doing)
+		}
+		if p.WhereID != "" && p.Where == "" {
+			t.Fatalf("%s is at %q, which has no name", p.Name, p.WhereID)
+		}
+	}
+
+	// Grouped by why they matter, best first, and never the other way round.
+	order := []string{"yours", "crew", "owes", "sore", "job", "organization", "street"}
+	at := map[string]int{}
+	for i, k := range order {
+		at[k] = i
+	}
+	worst := -1
+	for _, p := range everyone {
+		if at[p.Because] < worst {
+			t.Fatalf("%s (%s) is listed after a %s", p.Name, p.Because, order[worst])
+		}
+		if at[p.Because] > worst {
+			worst = at[p.Because]
+		}
+	}
+	if everyone[0].ID != member.ID {
+		t.Fatalf("the first person in the city is %s (%s), not the man who works for you", everyone[0].Name, everyone[0].Because)
+	}
+	// The man who owes money says so, and the one carrying something says that.
+	for _, p := range everyone {
+		if p.ID == debtor.ID && p.Because != "owes" {
+			t.Fatalf("the debtor is listed as %q", p.Because)
+		}
+		if p.ID == sore.ID && p.Because != "sore" {
+			t.Fatalf("the man carrying a grudge is listed as %q", p.Because)
+		}
+	}
+	t.Logf("%d people, grouped: the first is %s (%s), the last is %s (%s)",
+		len(everyone), everyone[0].Name, everyone[0].Because,
+		everyone[len(everyone)-1].Name, everyone[len(everyone)-1].Because)
+}
+
+func TestTheCityScreenTellsYouNothingAboutAStranger(t *testing.T) {
+	w, _ := testator(t)
+	w.Populate()
+	strangers := 0
+	for _, p := range w.Everyone() {
+		if p.Known {
+			continue
+		}
+		strangers++
+		if p.Temperament != "" || p.Trust != 0 || p.Sore != 0 {
+			t.Fatalf("%s is a stranger and the screen reads their character", p.Name)
+		}
+		if p.Standing == "" || p.Doing == "" {
+			t.Fatal("a stranger has no visible standing at all, which makes them furniture")
+		}
+	}
+	if strangers == 0 {
+		t.Skip("everybody in this city is known")
+	}
+}

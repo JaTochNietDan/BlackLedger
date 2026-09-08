@@ -312,3 +312,25 @@
    scrolls the answers, and let wide screens set them in two columns. */
 .scene .choices{max-height:min(46vh,430px);overflow:auto;padding-right:4px}
 @media(min-width:900px){.scene .choices{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* The People screen: the people in your life first, the rest of the city
+   folded behind them, and a search across all of it. */
+.people-controls{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:22px 0 6px}
+.people-controls input{flex:1;min-width:210px;max-width:340px;background:#101a19;border:1px solid var(--line);color:var(--ink);font:13px system-ui;padding:9px 12px;border-radius:2px}
+.people-controls input::placeholder{color:#6f7d72}
+.people-filters{display:flex;flex-wrap:wrap;gap:6px}
+.people-filters button{background:#16211f;border:1px solid var(--line);color:var(--muted);font-size:11px;padding:6px 10px;border-radius:2px}
+.people-filters button[aria-pressed="true"]{border-color:var(--gold);color:var(--gold);background:#25332c}
+.people-filters i{font-style:normal;opacity:.65;margin-left:4px}
+.people-group{margin-top:26px}
+.people-group h2{display:flex;align-items:baseline;gap:11px;font:20px var(--serif);font-weight:400;margin:0 0 12px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+.people-group h2 span{font:11px system-ui;color:var(--muted);flex:1}
+.people-group h2 i{font-style:normal;font-size:12px;color:var(--gold)}
+.person-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));gap:12px}
+.person-card{display:flex;gap:12px;background:#152020;border:1px solid var(--line);border-left:2px solid #3f4d44;padding:12px}
+.person-card.yours{border-left-color:var(--gold)}
+.person-card.sour{border-left-color:#8a5a4d}
+.person-of{min-width:0}
+.person-of b{font:16px var(--serif);font-weight:400;display:block;line-height:1.25}
+.person-of small{display:block;font-size:10.5px;color:var(--muted);line-height:1.45}
+.person-of .doing{color:#93a58f;font-style:italic}

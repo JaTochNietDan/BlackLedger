@@ -38,6 +38,13 @@ type Presence struct {
 	// Doing is what this person is actually doing right now, in a few words.
 	// The city has always known; it has never been asked.
 	Doing string `json:"doing,omitempty"`
+	// Where they are, for anything looking at the city rather than at one room.
+	Where   string `json:"where,omitempty"`
+	WhereID string `json:"where_id,omitempty"`
+	// Why this person is worth the player's attention, in the order the
+	// interface should group them: "yours", "crew", "owes", "sore", "job",
+	// "organization", or "street".
+	Because string `json:"because,omitempty"`
 }
 
 // standingOf is the single line under somebody's name: the most important true
@@ -141,33 +148,96 @@ func (w *World) doingNow(n *NPC) string {
 	return "Getting on with the day at " + where
 }
 
+// because is the reason this person is on the player's screen at all, which is
+// also the order they should be read in. A city of fifty people rendered as
+// fifty identical cards is a register; grouped by why they matter, it is a
+// list of the people in your life and then everybody else.
+func (w *World) because(n *NPC) string {
+	switch {
+	case n.Faction == w.PlayerOrganizationID():
+		return "yours"
+	case len(w.Player.Crew) > 0 && w.Player.Crew[0].ID == n.ID:
+		return "crew"
+	case w.LoanTo(n.ID) != nil:
+		return "owes"
+	case n.Sore > 0:
+		return "sore"
+	case IsOfficial(n.ID) || w.isRoleHolder(n) || n.Rank >= RankLeader:
+		return "job"
+	case n.Faction != "":
+		return "organization"
+	}
+	return "street"
+}
+
+var becauseOrder = map[string]int{
+	"yours": 0, "crew": 1, "owes": 2, "sore": 3, "job": 4, "organization": 5, "street": 6,
+}
+
+// see builds what the player is allowed to know about somebody, wherever they
+// are being looked at from.
+func (w *World) see(n *NPC) Presence {
+	known := w.Known(n)
+	p := Presence{
+		ID: n.ID, Name: n.Name, Role: n.Role,
+		Standing: w.standingOf(n), Doing: w.doingNow(n),
+		Yours:   n.Faction == w.PlayerOrganizationID(),
+		Known:   known,
+		Because: w.because(n),
+		WhereID: n.Location,
+	}
+	if place, ok := PlaceByID(n.Location); ok {
+		p.Where = place.Name
+	}
+	if known {
+		p.Faction = w.factionName(n.Faction)
+		p.Trust, p.Sore = n.Trust, n.Sore
+		p.Temperament = TemperamentOf(n).Label
+	}
+	if l := w.LoanTo(n.ID); l != nil {
+		p.Owes, p.Overdue = l.Owed, l.Missed > 0
+	}
+	return p
+}
+
+// Everyone is the whole city, ordered by why each person matters to the player.
+// The People screen used to render every living soul as an identical card in
+// whatever order the save happened to hold them — fifty of them, four screens
+// of scrolling, with the man who works for you indistinguishable from a docker
+// he has never met.
+func (w *World) Everyone() []Presence {
+	out := []Presence{}
+	for i := range w.NPCs {
+		if n := &w.NPCs[i]; !n.Dead {
+			out = append(out, w.see(n))
+		}
+	}
+	rank := func(p Presence) int {
+		at, ok := becauseOrder[p.Because]
+		if !ok {
+			return len(becauseOrder)
+		}
+		return at
+	}
+	for i := range out {
+		for j := i + 1; j < len(out); j++ {
+			if a, b := rank(out[j]), rank(out[i]); a < b || (a == b && out[j].Owes > out[i].Owes) {
+				out[i], out[j] = out[j], out[i]
+			}
+		}
+	}
+	return out
+}
+
 // PeopleHere is everybody standing where the player is, in the order a person
 // would notice them: their own first, then the people they know, then whoever
 // else is in the room.
 func (w *World) PeopleHere(id string) []Presence {
 	out := []Presence{}
 	for i := range w.NPCs {
-		n := &w.NPCs[i]
-		if n.Dead || n.Location != id {
-			continue
+		if n := &w.NPCs[i]; !n.Dead && n.Location == id {
+			out = append(out, w.see(n))
 		}
-		known := w.Known(n)
-		p := Presence{
-			ID: n.ID, Name: n.Name, Role: n.Role,
-			Standing: w.standingOf(n),
-			Yours:    n.Faction == w.PlayerOrganizationID(),
-			Known:    known,
-		}
-		p.Doing = w.doingNow(n)
-		if known {
-			p.Faction = w.factionName(n.Faction)
-			p.Trust, p.Sore = n.Trust, n.Sore
-			p.Temperament = TemperamentOf(n).Label
-		}
-		if l := w.LoanTo(n.ID); l != nil {
-			p.Owes, p.Overdue = l.Owed, l.Missed > 0
-		}
-		out = append(out, p)
 	}
 	// Yours first, then anybody who owes you, then people you know.
 	rank := func(p Presence) int {
