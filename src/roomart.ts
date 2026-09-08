@@ -17,9 +17,9 @@ function hash(seed: string) { let h = 2166136261; for (const c of seed) { h ^= c
 // says plainly how many more are in there. The roster below is where the whole
 // register lives.
 const marks: [number, number][] = [
-  [150, 302], [258, 308], [368, 300],
-  [206, 262], [312, 258],
-  [104, 254], [414, 250],
+  [148, 338], [260, 344], [372, 336],
+  [204, 312], [316, 308],
+  [100, 306], [420, 302],
 ];
 
 // StandingRoom is how many people are drawn before the room says "and N more".
@@ -82,25 +82,35 @@ function room(type: string, seed: number) {
 // A figure is a silhouette with a coat and a hat, lit from the front. The only
 // thing that varies is build and stance, from the person's own id, so the same
 // person is always the same shape in the same room.
-function figure(who: Presence, x: number, y: number, selected: boolean) {
+function figure(who: Presence, x: number, y: number, selected: boolean, painted = false) {
   const seed = hash(who.id);
   const tall = 60 + (seed % 5) * 4;
   const wide = 17 + (seed % 3) * 2;
   const hat = seed % 4 !== 0;
   const lean = ((seed >> 3) % 3) - 1;
-  const tone = who.yours ? '#d6b77c' : who.sore || who.overdue ? '#c08476' : '#cfc9b6';
+  // In a painted room people read as shapes against the light, not as pale
+  // cut-outs laid on top of it. The colour that says who they are moves to the
+  // rim, where a single hard light would actually catch them.
+  const says = who.yours ? '#d6b77c' : who.sore || who.overdue ? '#c08476' : '#cfc9b6';
+  const tone = painted ? '#0b0d0c' : says;
+  const rim = painted ? says : 'none';
   return `<g class="figure${selected ? ' picked' : ''}" data-person="${esc(who.id)}" role="button" tabindex="0" aria-label="${esc(who.name)} — ${esc(who.standing)}" transform="translate(${x},${y})">` +
     `<ellipse cx="0" cy="4" rx="${wide + 4}" ry="6" fill="#0b0a09" opacity=".55"/>` +
     `<path d="M${-wide} 2q0-${tall * 0.62} ${wide + lean * 2} -${tall * 0.62}q${wide} 0 ${wide} ${tall * 0.62}z" fill="#12100e"/>` +
-    `<path d="M${-wide + 3} 0q0-${tall * 0.58} ${wide + lean * 2 - 3} -${tall * 0.58}q${wide - 3} 0 ${wide - 3} ${tall * 0.58}z" fill="${tone}" opacity=".92"/>` +
-    `<circle cx="${lean}" cy="${-tall * 0.62 - 9}" r="9" fill="${tone}" opacity=".92"/>` +
+    `<path d="M${-wide + 3} 0q0-${tall * 0.58} ${wide + lean * 2 - 3} -${tall * 0.58}q${wide - 3} 0 ${wide - 3} ${tall * 0.58}z" fill="${tone}" opacity="${painted ? '.95' : '.92'}" stroke="${rim}" stroke-width="${painted ? 1.1 : 0}" stroke-opacity=".5"/>` +
+    `<circle cx="${lean}" cy="${-tall * 0.62 - 9}" r="9" fill="${tone}" opacity="${painted ? '.95' : '.92'}" stroke="${rim}" stroke-width="${painted ? 1.1 : 0}" stroke-opacity=".5"/>` +
     (hat ? `<path d="M${lean - 15} ${-tall * 0.62 - 12}h30l-4-9h-22z" fill="#12100e"/><path d="M${lean - 17} ${-tall * 0.62 - 11}h34v3h-34z" fill="#12100e"/>` : '') +
     `<circle class="halo" cx="${lean}" cy="${-tall * 0.31}" r="${tall * 0.7}" fill="none"/>` +
     `<title>${esc(who.name)} — ${esc(who.standing)}</title>` +
     `</g>`;
 }
 
-export function interiorSVG(place: Place, people: Presence[], selected: string) {
+// Every address has a painted interior now, generated offline (tools/interiors.py)
+// and shipped as a JPEG. The drawn room below stays as the fallback: a building
+// added tomorrow has somewhere to stand before anybody renders it.
+export const paintedRoom = (id: string) => `/art/rooms/room-${id}-v1.jpg`;
+
+export function interiorSVG(place: Place, people: Presence[], selected: string, painted = false) {
   const seed = hash(place.id);
   const shown = people.slice(0, marks.length);
   // Depth: whoever is further back is smaller and dimmer, so a room of seven
@@ -109,13 +119,13 @@ export function interiorSVG(place: Place, people: Presence[], selected: string) 
     `<defs><radialGradient id="int-${esc(place.id)}" cx=".5" cy=".28" r=".8">` +
     `<stop stop-color="#6b5a3f" stop-opacity=".30"/><stop offset="1" stop-color="#000" stop-opacity=".55"/>` +
     `</radialGradient></defs>` +
-    room(place.type, seed) +
+    (painted ? '' : room(place.type, seed)) +
     shown.map((who, i) => {
-      const depth = .72 + (marks[i][1] - 250) / 200;
+    const depth = .72 + (marks[i][1] - 300) / 200;
       return `<g transform="translate(${marks[i][0]},${marks[i][1]}) scale(${depth.toFixed(3)}) translate(${-marks[i][0]},${-marks[i][1]})" opacity="${(.62 + depth * .38).toFixed(2)}">` +
-        figure(who, marks[i][0], marks[i][1], who.id === selected) + `</g>`;
+        figure(who, marks[i][0], marks[i][1], who.id === selected, painted) + `</g>`;
     }).join('') +
-    `<rect width="520" height="360" fill="url(#int-${esc(place.id)})" pointer-events="none"/>` +
+    (painted ? '' : `<rect width="520" height="360" fill="url(#int-${esc(place.id)})" pointer-events="none"/>`) +
     (people.length > shown.length
       ? `<g><rect x="330" y="330" width="180" height="22" fill="#0b0f0ecc"/>` +
         `<text x="500" y="345" text-anchor="end" fill="#c9b98f" font-size="11">` +

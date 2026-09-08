@@ -54,3 +54,7 @@ run = [
 [tasks.portraits]
 description = "Regenerate the cast's faces (needs `mise run art` first)"
 run = ".venv/bin/python tools/portraits.py public/art 24"
+
+[tasks.interiors]
+description = "Regenerate the inside of every building (needs `mise run art` first)"
+run = ".venv/bin/python tools/interiors.py public/art/rooms"

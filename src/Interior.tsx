@@ -1,7 +1,7 @@
 import {useEffect,useState} from 'react';
 import type {ReactElement} from 'react';
 import type {Action,Place,Presence} from './types';
-import {interiorSVG,StandingRoom} from './roomart';
+import {interiorSVG,paintedRoom,StandingRoom} from './roomart';
 import {Portrait} from './Portrait';
 
 // Entering a building should open the building, not fill a column. The room is
@@ -25,6 +25,15 @@ export function Interior({place, people, actions, render, onLeave}: {
   render: (a: Action) => ReactElement; onLeave: () => void;
 }) {
   const [picked, setPicked] = useState('');
+  // The painted interior is a backdrop, not a dependency: if it is missing the
+  // drawn room takes its place rather than leaving a hole.
+  const [painted, setPainted] = useState(false);
+  useEffect(() => {
+    setPainted(false);
+    const img = new Image();
+    img.onload = () => setPainted(true);
+    img.src = paintedRoom(place.id);
+  }, [place.id]);
 
   // Whoever the player was talking to may walk out, be arrested, or die.
   useEffect(() => { if (picked && !people.some(p => p.id === picked)) setPicked('') }, [people, picked]);
@@ -45,10 +54,11 @@ export function Interior({place, people, actions, render, onLeave}: {
   const onFloor = [...people].sort((a, b) => worth(a) - worth(b));
 
   return <div className="interior-stage">
-    <div className="room" onClick={e => {
+    <div className={'room' + (painted ? ' painted' : '')} onClick={e => {
       const g = (e.target as Element).closest?.('[data-person]');
       if (g) setPicked(g.getAttribute('data-person') || '');
-    }} dangerouslySetInnerHTML={{__html: interiorSVG(place, onFloor, picked)}}/>
+    }} style={painted ? {backgroundImage: `url(${paintedRoom(place.id)})`} : undefined}
+      dangerouslySetInnerHTML={{__html: interiorSVG(place, onFloor, picked, painted)}}/>
 
     <div className="room-people" role="list">
       {people.map(p => <button key={p.id} role="listitem" className={'room-chip' + (p.id === picked ? ' picked' : '') + (p.yours ? ' yours' : '') + (p.overdue || p.sore ? ' sour' : '')}
