@@ -61,3 +61,10 @@
 .headline-notice p{margin:0 0 8px;color:#c6bda8}
 .rail button.has-news{position:relative}
 .news-count{position:absolute;top:6px;right:10px;min-width:16px;height:16px;line-height:16px;padding:0 4px;border-radius:8px;background:#b04a3a;color:#fff;font-size:10px;font-style:normal;text-align:center}
+
+/* The Herald's pictures: a coarse block beside the story, the way a press this
+   old would have set it. */
+.press-story { display: flex; gap: 14px; align-items: flex-start; }
+.press-cut { flex: 0 0 112px; line-height: 0; }
+.press-cut .press-plate { width: 112px; height: 80px; display: block; }
+@media (max-width: 640px) { .press-story { flex-direction: column; } }

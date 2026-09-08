@@ -49,7 +49,7 @@ func (w *World) Edition() []map[string]any {
 		}
 		out = append(out, map[string]any{
 			"id": s.ID, "headline": s.Headline, "body": s.Body,
-			"kind": s.Kind, "minute": s.Minute,
+			"kind": s.Kind, "minute": s.Minute, "subject": w.SubjectOf(s),
 			"day": s.Minute/1440 + 1, "time": fmt.Sprintf("%02d:%02d", s.Minute%1440/60, s.Minute%60),
 		})
 	}

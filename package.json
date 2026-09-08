@@ -7,7 +7,7 @@
     "dev": "vite --host 127.0.0.1",
     "build": "tsc --noEmit && vite build",
     "check": "tsc --noEmit",
-    "test": "tsc src/voice.ts --target ES2022 --module ES2022 --outDir .runtime/frontend-test --skipLibCheck && node --test tests/*.test.mjs"
+    "test": "tsc src/voice.ts src/art.ts --target ES2022 --module ES2022 --outDir .runtime/frontend-test --skipLibCheck && node --test tests/*.test.mjs"
   },
   "dependencies": {
     "react": "^19.0.0",
