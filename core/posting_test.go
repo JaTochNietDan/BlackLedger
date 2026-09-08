@@ -8,6 +8,21 @@ func doorman(t *testing.T) (*World, *NPC) {
 	return w, member
 }
 
+// postAndArrive puts somebody on a door and waits for them to walk there.
+// Posting stopped being instant when the city's people started having to walk
+// places: the door is worth nothing until somebody is standing in it, which is
+// the point of these tests rather than a detail of them.
+func postAndArrive(t *testing.T, w *World, id string) {
+	t.Helper()
+	if err := w.Post(id); err != nil {
+		t.Fatal(err)
+	}
+	if n := w.NPC(w.Properties[id].Posted); n != nil && w.Travelling(n) {
+		w.Minute = n.Arrives
+		w.Arrivals()
+	}
+}
+
 func TestNobodyStandsOnADoorThatIsNotYours(t *testing.T) {
 	w, _ := doorman(t)
 	for _, id := range []string{"club", "market", "room"} {
@@ -22,9 +37,7 @@ func TestNobodyStandsOnADoorThatIsNotYours(t *testing.T) {
 
 func TestAManCanOnlyBeInOnePlace(t *testing.T) {
 	w, member := doorman(t)
-	if err := w.Post("laundry"); err != nil {
-		t.Fatal(err)
-	}
+	postAndArrive(t, w, "laundry")
 	if posted := w.PostedAt("laundry"); posted == nil || posted.ID != member.ID {
 		t.Fatal("nobody was on the door")
 	}
@@ -76,7 +89,7 @@ func TestAManOnTheDoorIsWorthSomethingAgainstARaid(t *testing.T) {
 	if w.PostingDefenceAt("laundry") != 0 {
 		t.Fatal("an empty door was worth something")
 	}
-	w.Post("laundry")
+	postAndArrive(t, w, "laundry")
 	worth := w.PostingDefenceAt("laundry")
 	if worth <= PostingDefence {
 		t.Fatalf("a man on the door was worth %d", worth)
@@ -94,7 +107,7 @@ func TestAManOnTheDoorIsWorthSomethingAgainstARaid(t *testing.T) {
 			probe, _ := doorman(t)
 			probe.WorldRNG = seed * 2654435761
 			if post {
-				probe.Post("laundry")
+				postAndArrive(t, probe, "laundry")
 			}
 			attacker := &probe.Factions[0]
 			attacker.Power = 80
@@ -122,7 +135,7 @@ func TestAManOnTheDoorTurnsAwayTheStreet(t *testing.T) {
 			w.WorldRNG = seed * 2654435761
 			w.Properties["laundry"].Income = 30
 			if post {
-				w.Post("laundry")
+				postAndArrive(t, w, "laundry")
 			}
 			cash := w.Player.Cash
 			var thief *NPC
@@ -157,9 +170,7 @@ func TestTheManOnTheDoorIsTheOneWhoPaysForIt(t *testing.T) {
 	for seed := uint32(1); seed <= runs; seed++ {
 		w, member := doorman(t)
 		w.WorldRNG = seed * 2654435761
-		if err := w.Post("laundry"); err != nil {
-			t.Fatal(err)
-		}
+		postAndArrive(t, w, "laundry")
 		attacker := &w.Factions[0]
 		attacker.Power = 100
 		w.contestAt(attacker, w.PlayerOrganization(), "laundry")

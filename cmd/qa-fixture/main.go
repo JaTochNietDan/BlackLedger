@@ -12,13 +12,13 @@ import (
 
 func main() {
 	if len(os.Args) < 2 || len(os.Args) > 3 {
-		log.Fatal("usage: go run ./cmd/qa-fixture <new-qa.sqlite3> [police|damage|warning|russo-warning|attack|voice|contact|paused-job|leader|doorman|arrest|debt|herald|killing|dead|offer|audience|street|room|gone]")
+		log.Fatal("usage: go run ./cmd/qa-fixture <new-qa.sqlite3> [police|damage|warning|russo-warning|attack|voice|contact|paused-job|leader|doorman|arrest|debt|herald|killing|dead|offer|audience|street|room|gone|post]")
 	}
 	scenario := "police"
 	if len(os.Args) == 3 {
 		scenario = os.Args[2]
 	}
-	if scenario != "police" && scenario != "damage" && scenario != "warning" && scenario != "russo-warning" && scenario != "attack" && scenario != "voice" && scenario != "contact" && scenario != "paused-job" && scenario != "leader" && scenario != "doorman" && scenario != "arrest" && scenario != "debt" && scenario != "herald" && scenario != "killing" && scenario != "dead" && scenario != "offer" && scenario != "audience" && scenario != "street" && scenario != "room" && scenario != "gone" {
+	if scenario != "police" && scenario != "damage" && scenario != "warning" && scenario != "russo-warning" && scenario != "attack" && scenario != "voice" && scenario != "contact" && scenario != "paused-job" && scenario != "leader" && scenario != "doorman" && scenario != "arrest" && scenario != "debt" && scenario != "herald" && scenario != "killing" && scenario != "dead" && scenario != "offer" && scenario != "audience" && scenario != "street" && scenario != "room" && scenario != "gone" && scenario != "post" {
 		log.Fatal("unsupported QA scenario")
 	}
 	path := os.Args[1]
@@ -36,6 +36,28 @@ func main() {
 	}
 	defer s.DB.Close()
 	err = s.Change(func(w *core.World) error {
+		if scenario == "post" {
+			// The player standing in their own laundry with their one man across
+			// the city, so putting him on the door is a journey he has to make.
+			w.Player.Cash, w.Player.Respect, w.Player.Contacts = 9000, core.OrganizationStanding, 3
+			w.Properties["laundry"].Owner = "player:1"
+			w.Properties["garage"].Owner = "player:1"
+			w.OrganizationDay()
+			for _, n := range w.Civilians() {
+				if core.IsOfficial(n.ID) {
+					continue
+				}
+				w.Player.Location = n.Location
+				if w.SignOn(n.ID) == nil {
+					break
+				}
+			}
+			for _, n := range w.OwnPeople() {
+				n.Location = "club" // the far side of the district
+			}
+			w.Player.Location = "laundry"
+			return nil
+		}
 		if scenario == "gone" {
 			// The player standing in the bar with somebody they deal with, five
 			// minutes short of the half-day when she is due somewhere else. One

@@ -960,8 +960,24 @@ func (w *World) Actions(id string) []Action {
 					add("unpost", "Take "+posted.Name+" off the door", PostingMinutes, 0, "",
 						fmt.Sprintf("Worth %d against anybody coming for %s while they are on it.", w.PostingDefenceAt(id), l.Name))
 				} else {
-					add("post", "Put somebody on the door", PostingMinutes, 0, w.PostReadiness(id),
-						fmt.Sprintf("Your most reliable person, standing here. Worth about %d against anybody coming for it, and turns away most of what the street tries. They are also the one standing in it when somebody does come.", PostingDefence+15))
+					// What it costs is part of what it is: whoever goes has to
+					// walk there, and the door is worth nothing until they
+					// arrive. The button used to say "standing here" and quote
+					// a figure that would not be true for another half hour.
+					detail := fmt.Sprintf("Your most reliable person. Worth about %d against anybody coming for it once they are standing in it, and turns away most of what the street tries. They are also the one standing in it when somebody does come.", PostingDefence+15)
+					if free := w.Unposted(); len(free) > 0 {
+						best := free[0]
+						for _, n := range free {
+							if n.Trust > best.Trust {
+								best = n
+							}
+						}
+						if best.Location != id {
+							detail = fmt.Sprintf("%s is at %s, %d minutes away. The door is worth nothing until they get there. %s",
+								best.Name, placeName(best.Location), TravelMinutes(best.Location, id), detail)
+						}
+					}
+					add("post", "Put somebody on the door", PostingMinutes, 0, w.PostReadiness(id), detail)
 				}
 			}
 			add("repair", "Repair the property", 60, 50, need(w.Properties[id].Condition >= 100, "Already in good condition"), "Restore 40 condition.")

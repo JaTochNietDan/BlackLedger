@@ -58,7 +58,8 @@ func (w *World) Unposted() []*NPC {
 // they are worth, and how much they mean it.
 func (w *World) PostingDefenceAt(id string) int {
 	n := w.PostedAt(id)
-	if n == nil {
+	// Somebody still on their way to the door is not on the door.
+	if n == nil || w.Travelling(n) {
 		return 0
 	}
 	return PostingDefence + w.Poise(n)/4 + n.Trust/10
@@ -94,9 +95,21 @@ func (w *World) Post(id string) error {
 		}
 	}
 	w.Properties[id].Posted = best.ID
-	best.Location = id
 	place, _ := PlaceByID(id)
-	w.Log(best.Name+" is on the door at "+place.Name, fmt.Sprintf("Somewhere to stand and something to do. %s is harder to walk into now, and they are the one standing in it when somebody comes.", place.Name), "business")
+	if best.Location == id {
+		w.Log(best.Name+" is on the door at "+place.Name, fmt.Sprintf("Somewhere to stand and something to do. %s is harder to walk into now, and they are the one standing in it when somebody comes.", place.Name), "business")
+		return nil
+	}
+	// Everybody else in this city walks. The player's own people used to be the
+	// only ones who could be in two places in the same minute, and the door was
+	// defended from the moment of the decision rather than from the moment
+	// somebody was standing in it.
+	best.Heading = id
+	best.Errand = "sent to stand on the door at " + place.Name
+	best.Arrives = w.Minute + TravelMinutes(best.Location, id)
+	w.noticed(best, true)
+	w.Log(best.Name+" is sent to the door at "+place.Name,
+		fmt.Sprintf("It is %d minutes across the city. Until they get there the door is exactly as easy to walk into as it was.", best.Arrives-w.Minute), "business")
 	return nil
 }
 
@@ -118,10 +131,18 @@ func (w *World) PostingDescription(id string) map[string]any {
 	if n == nil {
 		return nil
 	}
-	return map[string]any{
+	out := map[string]any{
 		"id": n.ID, "name": n.Name, "trust": n.Trust,
 		"worth": w.PostingDefenceAt(id),
 	}
+	// Naming somebody on a door they have not reached tells the player the
+	// place is held when it is not, which is exactly the moment they would
+	// stop worrying about it.
+	if w.Travelling(n) {
+		out["coming"] = true
+		out["minutes"] = max(1, n.Arrives-w.Minute)
+	}
+	return out
 }
 
 // StoodInIt is whoever a raid on a place reaches first. Somebody on the door
