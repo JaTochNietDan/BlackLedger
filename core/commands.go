@@ -265,6 +265,14 @@ func (w *World) apply(c Command) error {
 				if err := w.Fit(target, strings.TrimPrefix(c.Kind, "fit:")); err != nil {
 					return err
 				}
+			case "retain:commissioner", "retain:mayor":
+				if err := w.Retain(strings.TrimPrefix(c.Kind, "retain:")); err != nil {
+					return err
+				}
+			case "release:commissioner", "release:mayor":
+				if err := w.EndRetainer(strings.TrimPrefix(c.Kind, "release:")); err != nil {
+					return err
+				}
 			case "charge":
 				if err := w.BuyCharge(); err != nil {
 					return err

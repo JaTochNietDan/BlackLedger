@@ -189,6 +189,12 @@ func (w *World) Kill(id, cause string) bool {
 		}
 	}
 	w.Log(person.Name+" is dead", cause+" "+describeStanding(person, w)+".", "danger")
+	// A man with a title is not a soldier, and the city does not treat him
+	// like one.
+	if _, official := OfficialByID(person.ID); official {
+		w.OfficialKilled(person.ID)
+		return true
+	}
 	// The paper reports a killing without knowing who arranged it.
 	headline := strings.ToUpper(person.Name) + " FOUND DEAD"
 	if person.Rank >= RankLieutenant {

@@ -66,6 +66,9 @@ type Person struct {
 	CarWear int `json:"car_wear,omitempty"`
 	// Explosives in hand. Absent in saves from before anybody could buy any.
 	Charges int `json:"charges,omitempty"`
+	// Standing arrangements with people in the building. Absent in saves from
+	// before there was a building.
+	Retainers []string `json:"retainers,omitempty"`
 	// Whether this person has established that the account abroad is theirs.
 	// Reset with every life, which is what makes inheriting it a decision.
 	Offshore bool `json:"offshore_access,omitempty"`
@@ -381,6 +384,7 @@ func New(seed uint32) *World {
 	}
 	// Each organization is people, not a name and a number. These are the ones
 	// who would step up if the person above them died.
+	w.ensureOfficials()
 	for _, f := range []string{"bellandi", "russo"} {
 		w.AddMember(f, "Lieutenant", RankLieutenant, w.homeOf(f))
 		w.AddMember(f, "Soldier", RankSoldier, w.homeOf(f))
@@ -462,7 +466,7 @@ func (w *World) Guard() int {
 	return n
 }
 func (w *World) DailyCost() int {
-	return HomeRent(w.Player.Home) + 10*w.Player.Security + 12*len(w.Player.Crew) + w.Wages() + w.CarUpkeep() + w.ComfortUpkeep()
+	return HomeRent(w.Player.Home) + 10*w.Player.Security + 12*len(w.Player.Crew) + w.Wages() + w.CarUpkeep() + w.ComfortUpkeep() + w.RetainerCost()
 }
 func TravelMinutes(a, b string) int {
 	x, _ := PlaceByID(a)
@@ -561,6 +565,15 @@ func (w *World) Actions(id string) []Action {
 			}
 			add("dress", "Be measured for "+lowerFirst(next.Label), 60, 0, w.DressReadiness(),
 				fmt.Sprintf("$%d. %s Worth %d presence while it is kept, and it wears. %s", next.Cost, next.Detail, next.Presence, notice))
+		}
+		for _, o := range officials {
+			if w.Retained(o.ID) {
+				add("release:"+o.ID, "Stop paying "+o.Name, 30, 0, "",
+					fmt.Sprintf("Ends the arrangement and the $%d a day. Opening it again costs the opening payment over.", o.Retainer))
+				continue
+			}
+			add("retain:"+o.ID, "An arrangement with "+o.Name, OfficialMinutes, 0, w.RetainerReadiness(o.ID),
+				fmt.Sprintf("$%d to open and $%d a day after. %s He cuts you loose above %d attention and keeps the opening payment.", o.Opening, o.Retainer, o.Detail, o.Ceiling))
 		}
 		add("bribe", "An understanding with the detective", 45, 0, w.BribeReadiness(),
 			fmt.Sprintf("$%d to Detective Harlow to lose some paperwork. Clears attention now and buys nothing later. Above %d heat nobody will be seen taking it.", w.BribeCost(), BribeCeiling))
@@ -856,7 +869,7 @@ func (w *World) Advance(minutes int) {
 		w.Minute = next
 		for id, prop := range w.Properties {
 			if w.Own(id) {
-				prop.Carry += float64(prop.Income*prop.Condition*elapsed) * operatingMode(prop.Mode).Take * w.Capacity(id) / 6000
+				prop.Carry += float64(prop.Income*prop.Condition*elapsed) * operatingMode(prop.Mode).Take * w.Capacity(id) * (1 + w.LicenceTake()) / 6000
 				n := int(prop.Carry + 1e-9)
 				prop.Carry -= float64(n)
 				w.Earn(n)
@@ -893,6 +906,7 @@ func (w *World) Advance(minutes int) {
 			w.CarDay()
 			w.ChargeDay()
 			w.DemolitionDay()
+			w.CityHallDay()
 			w.DressDay()
 			bill := w.DailyCost()
 			if p.Cash >= bill {
@@ -983,7 +997,7 @@ func (w *World) Public() map[string]any {
 	if len(history) > 60 {
 		history = history[len(history)-60:]
 	}
-	return map[string]any{"id": w.ID, "version": w.Version, "revision": w.Revision, "life": w.Life, "minute": w.Minute, "player": w.Player, "district": w.District, "factions": w.Factions, "npcs": w.People(), "locations": locs, "event": scene, "history": history, "dead": w.Dead, "tasks": w.Tasks, "director": w.Director, "last_result": w.LastResult, "daily_cost": w.DailyCost(), "income": income, "security": w.Guard(), "opportunity": w.NextOpportunity(), "known_threats": w.KnownThreats(), "business_truces": w.ActiveBusinessTruces(), "conflicts": w.PublicConflicts(), "goods": w.Goods, "arms": w.ArmsDescription(), "appearance": w.AppearanceDescription(), "vehicle": w.VehicleDescription(), "residence": w.ResidenceDescription(), "offshore": map[string]any{"balance": w.Offshore, "reachable": w.Player.Offshore}, "newspaper": w.Edition(), "arrangements": w.PendingArrangements(), "commissions": w.PublicCommissions(), "grudges": w.GrudgeSummary(), "cast": w.Cast()}
+	return map[string]any{"id": w.ID, "version": w.Version, "revision": w.Revision, "life": w.Life, "minute": w.Minute, "player": w.Player, "district": w.District, "factions": w.Factions, "npcs": w.People(), "locations": locs, "event": scene, "history": history, "dead": w.Dead, "tasks": w.Tasks, "director": w.Director, "last_result": w.LastResult, "daily_cost": w.DailyCost(), "income": income, "security": w.Guard(), "opportunity": w.NextOpportunity(), "known_threats": w.KnownThreats(), "business_truces": w.ActiveBusinessTruces(), "conflicts": w.PublicConflicts(), "goods": w.Goods, "arms": w.ArmsDescription(), "appearance": w.AppearanceDescription(), "vehicle": w.VehicleDescription(), "residence": w.ResidenceDescription(), "offshore": map[string]any{"balance": w.Offshore, "reachable": w.Player.Offshore}, "newspaper": w.Edition(), "arrangements": w.PendingArrangements(), "commissions": w.PublicCommissions(), "grudges": w.GrudgeSummary(), "cast": w.Cast(), "retainers": w.RetainerDescription()}
 }
 func (w *World) hasRecord(title string) bool {
 	for _, r := range w.History {

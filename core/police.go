@@ -73,10 +73,10 @@ func upper(s string) string {
 // rises with attention, and having somewhere for them to search is what makes a
 // raid worth their time.
 func (w *World) considerRaid() {
-	if w.Player.Heat < RaidThreshold || !w.Player.Alive {
+	if w.Player.Heat < RaidThreshold+w.RaidRelief() || !w.Player.Alive {
 		return
 	}
-	chance := float64(w.Player.Heat-RaidThreshold) / 120
+	chance := float64(w.Player.Heat-RaidThreshold-w.RaidRelief()) / 120
 	if w.WorldRandom() >= chance {
 		return
 	}
@@ -139,7 +139,9 @@ func (w *World) Raid() {
 
 	place, _ := PlaceByID(target)
 	prop := w.Properties[target]
-	if w.Player.Heat >= ForfeitThreshold {
+	// Nothing is forfeited while a commissioner is being paid to lose the
+	// paperwork that would forfeit it.
+	if w.Player.Heat >= ForfeitThreshold && w.RaidRelief() == 0 {
 		prop.Owner = "independent"
 		prop.Mode = ""
 		w.Player.Heat = max(0, w.Player.Heat-30)

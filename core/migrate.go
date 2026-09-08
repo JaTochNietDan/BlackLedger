@@ -98,6 +98,9 @@ func (w *World) MigrateLivingWorld() {
 		}
 	}
 
+	// A campaign begun before there was anybody in the building gets them now.
+	w.ensureOfficials()
+
 	// A campaign that already had a car is driving one in working order.
 	if w.Player.Car > 0 && w.Player.CarWear == 0 {
 		w.Player.CarWear = 100

@@ -28,7 +28,7 @@ func (w *World) PeopleDay() {
 	// first.
 	for i := range w.NPCs {
 		n := &w.NPCs[i]
-		if n.Dead || n.Faction == "" || n.Rank < RankLieutenant || n.Rank >= RankLeader || n.Ambition < 60 {
+		if n.Dead || n.Faction == "" || n.Rank < RankLieutenant || n.Rank >= RankLeader || n.Ambition < 60 || IsOfficial(n.ID) {
 			continue
 		}
 		if members := w.Members(n.Faction); len(members) > 0 && members[0].ID != n.ID {
@@ -37,8 +37,9 @@ func (w *World) PeopleDay() {
 	}
 	for i := range w.NPCs {
 		n := &w.NPCs[i]
-		if n.Dead || n.Rank >= RankLeader {
-			continue // whoever is at the top has people for this
+		if n.Dead || n.Rank >= RankLeader || IsOfficial(n.ID) {
+			continue // whoever is at the top has people for this, and so does
+			// anybody with a title
 		}
 		if w.WorldRandom() >= dailyAmbition(n) {
 			continue
