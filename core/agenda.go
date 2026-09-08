@@ -123,6 +123,15 @@ func (w *World) takeFromSomebody(n *NPC) {
 		return
 	}
 
+	// Whoever answers for the place remembers who came for it. This is where
+	// most of the city's private history starts.
+	for i := range w.NPCs {
+		if keeper := &w.NPCs[i]; !keeper.Dead && keeper.ID != n.ID && keeper.Location == target && keeper.Rank >= RankSoldier {
+			w.Resent(keeper.ID, n.ID, 22, "what happened at "+place.Name)
+			break
+		}
+	}
+
 	take := prop.Income*6 + int(w.WorldRandom()*float64(prop.Income*8))
 	take = take * prop.Condition / 100
 	prop.Condition = max(0, prop.Condition-4)

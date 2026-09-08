@@ -221,6 +221,7 @@ func playerSituation(w *core.World) map[string]any {
 		"car_runs":         w.Driving(),
 		"home_fittings":    w.Comforts(w.Player.Home),
 		"can_carry":        w.CarryLimit(),
+		"bad_blood":        w.GrudgeSummary(),
 	}
 	return situation
 }

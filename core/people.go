@@ -211,6 +211,12 @@ func describeStanding(n *NPC, w *World) string {
 		return "They answered to nobody"
 	}
 	if f := w.faction(n.Faction); f != nil {
+		// A successor's role already carries the organization's name, so
+		// appending it again produced "Head of the Russo Outfit of Russo
+		// Outfit" in the Herald.
+		if strings.Contains(n.Role, f.Name) {
+			return "They were " + n.Role
+		}
 		return "They were " + n.Role + " of " + f.Name
 	}
 	return "They were " + n.Role
@@ -241,6 +247,15 @@ func (w *World) Succeed(faction string) {
 	w.Log(successor.Name+" takes over "+f.Name,
 		fmt.Sprintf("With %s gone, %s now leads %s. The organization is weaker while the change settles.", previous, successor.Name, f.Name),
 		"politics")
+	// Somebody who thought it should have been them now has a reason of their
+	// own, which is how an orderly succession stops being orderly.
+	for _, peer := range members[1:] {
+		if peer.Dead || peer.Rank < RankLieutenant {
+			continue
+		}
+		w.Resent(peer.ID, successor.ID, 28, "being passed over when "+previous+" died")
+		break
+	}
 }
 
 // casualty picks who dies when violence reaches an organization. The people
