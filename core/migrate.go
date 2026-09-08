@@ -8,7 +8,7 @@ package core
 // to somebody.
 
 // SaveVersion is the shape the current build writes.
-const SaveVersion = 3
+const SaveVersion = 4
 
 // seedHoldings is the property each established family holds in a new city.
 var seedHoldings = map[string][]string{
@@ -86,5 +86,11 @@ func (w *World) MigrateLivingWorld() {
 	// The established families were already rivals before any of this existed.
 	if len(w.Conflicts) == 0 && len(w.Factions) >= 2 {
 		w.Antagonize(w.Factions[0].ID, w.Factions[1].ID, 50)
+	}
+
+	// The underground trade has always been there; the campaign just could not
+	// see it. Prices start at their reference so nobody inherits a windfall.
+	if len(w.Goods) == 0 {
+		w.Goods = newGoods()
 	}
 }

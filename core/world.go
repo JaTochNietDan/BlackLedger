@@ -46,6 +46,9 @@ type Person struct {
 	Alive    bool   `json:"alive"`
 	Earned   int    `json:"earned"`
 	JobCount int    `json:"job_count"`
+	// What the player is carrying. Absent in saves written before the trade
+	// existed, which is the same as carrying nothing.
+	Stock map[string]int `json:"stock,omitempty"`
 }
 type Crew struct {
 	ID      string `json:"id"`
@@ -191,6 +194,7 @@ type World struct {
 	NPCs           []NPC                `json:"npcs"`
 	Properties     map[string]*Property `json:"properties"`
 	Conflicts      []Conflict           `json:"conflicts,omitempty"`
+	Goods          []Good               `json:"goods,omitempty"`
 	Plots          []Plot               `json:"plots"`
 	Tasks          []Task               `json:"tasks"`
 	Event          *Scene               `json:"event"`
@@ -325,6 +329,7 @@ func New(seed uint32) *World {
 		w.AddMember(f, "Lieutenant", RankLieutenant, w.homeOf(f))
 		w.AddMember(f, "Soldier", RankSoldier, w.homeOf(f))
 	}
+	w.Goods = newGoods()
 	// The two established families are already rivals when the player arrives.
 	w.Antagonize("bellandi", "russo", 50)
 	w.Log("A room. A name. No protection.", "Mara Bell left word at Saint Agnes: there is work, if you can be discreet. Your room costs $15 each midnight.", "personal")
@@ -434,6 +439,19 @@ func (w *World) Actions(id string) []Action {
 	case "club":
 		add("audience", "Request an audience", 45, 0, "", "Discuss your standing with the Bellandi family.")
 		add("provoke", "Demand protection money", 30, 0, "", "EXTREME RISK. Bellandi owns this casino. Challenging him can bring lethal retaliation.")
+	}
+	for _, g := range w.Goods {
+		if !TradesAt(id, g.ID) {
+			continue
+		}
+		add("buy:"+g.ID, fmt.Sprintf("Buy %d %ss of %s", Lot, g.Unit, g.Name), 30, g.Price*Lot,
+			w.TradeReadiness(g.ID, "buy"),
+			fmt.Sprintf("$%d each today. Holding stock draws police attention every day until it is sold, and can be taken from you.", g.Price))
+		if held := w.Holding(g.ID); held > 0 {
+			add("sell:"+g.ID, fmt.Sprintf("Sell %d %ss of %s", held, g.Unit, g.Name), 30, 0,
+				w.TradeReadiness(g.ID, "sell"),
+				fmt.Sprintf("$%d each today, for $%d.", g.Price, g.Price*held))
+		}
 	}
 	if f, ok := w.SabotageTarget(id); ok {
 		add("sabotage", "Move against "+f.Name, 90, 0, w.SabotageReadiness(id),
@@ -631,10 +649,12 @@ func (w *World) Advance(minutes int) {
 		// Organizations reconsider each other twice a day; their books settle once.
 		if w.Minute%720 == 0 {
 			w.FactionTurn()
+			w.MarketPrices()
 		}
 		if w.Minute%1440 == 0 {
 			w.FamilyDay()
 			w.BusinessDay()
+			w.ContrabandDay()
 			bill := w.DailyCost()
 			if p.Cash >= bill {
 				p.Cash -= bill
@@ -724,7 +744,7 @@ func (w *World) Public() map[string]any {
 	if len(history) > 60 {
 		history = history[len(history)-60:]
 	}
-	return map[string]any{"id": w.ID, "version": w.Version, "revision": w.Revision, "life": w.Life, "minute": w.Minute, "player": w.Player, "district": w.District, "factions": w.Factions, "npcs": w.People(), "locations": locs, "event": scene, "history": history, "dead": w.Dead, "tasks": w.Tasks, "director": w.Director, "last_result": w.LastResult, "daily_cost": w.DailyCost(), "income": income, "security": w.Guard(), "opportunity": w.NextOpportunity(), "known_threats": w.KnownThreats(), "business_truces": w.ActiveBusinessTruces(), "conflicts": w.PublicConflicts()}
+	return map[string]any{"id": w.ID, "version": w.Version, "revision": w.Revision, "life": w.Life, "minute": w.Minute, "player": w.Player, "district": w.District, "factions": w.Factions, "npcs": w.People(), "locations": locs, "event": scene, "history": history, "dead": w.Dead, "tasks": w.Tasks, "director": w.Director, "last_result": w.LastResult, "daily_cost": w.DailyCost(), "income": income, "security": w.Guard(), "opportunity": w.NextOpportunity(), "known_threats": w.KnownThreats(), "business_truces": w.ActiveBusinessTruces(), "conflicts": w.PublicConflicts(), "goods": w.Goods}
 }
 func (w *World) hasRecord(title string) bool {
 	for _, r := range w.History {

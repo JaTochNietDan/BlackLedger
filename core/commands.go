@@ -128,6 +128,9 @@ func (w *World) apply(c Command) error {
 				w.Log("The arrangement abandoned", "You abandon the remaining work. No reward was paid.", "story")
 			}
 		case "police_stop":
+			// A search finds whatever is being carried, whichever way the stop
+			// is settled. This is what makes moving goods quickly matter.
+			w.Seize("A detective searched you during the stop.")
 			if c.Choice == "pay" {
 				p.Heat = max(0, p.Heat-10)
 				w.CompleteArrangement(e)
@@ -216,6 +219,14 @@ func (w *World) apply(c Command) error {
 					w.Retaliation()
 				}
 				w.Log("A demand nobody forgets", "The manager refuses. A Bellandi man watches you leave. You have challenged a powerful family on its own ground.", "politics")
+			case "buy:moonshine", "buy:cigarettes":
+				if err := w.Buy(strings.TrimPrefix(c.Kind, "buy:")); err != nil {
+					return err
+				}
+			case "sell:moonshine", "sell:cigarettes":
+				if err := w.Sell(strings.TrimPrefix(c.Kind, "sell:")); err != nil {
+					return err
+				}
 			case "operate:clean", "operate:standard", "operate:hard":
 				if err := w.SetMode(target, strings.TrimPrefix(c.Kind, "operate:")); err != nil {
 					return err
