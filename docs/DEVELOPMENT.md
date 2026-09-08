@@ -816,3 +816,13 @@
 - Verified over the HTTP stack against a fresh isolated save: a campaign opened both arrangements at the exchange, watched its daily bill go from $15 to $120, found both listed as not outbid, and ended one to take the bill back to $60.
 - Full `go test -race ./...`, `go vet`, `gofmt`, `tsc`, the production build and `cmd/simulate` pass.
 - Save version 9 puts them into a campaign that began before there was anybody in that building. The first restart of the live game reported an empty cast, because migration only runs when the stored version is behind: adding people to the world is not enough on its own.
+
+## Whose hands were on it
+- Every violent thing the player could do, they had to do standing there. A man with a crew does not do that, and the reason he has a crew is so he does not have to. Robbery and sabotage now each come in two forms, and the same rules resolve both.
+- **Your own hands** bring your standing, your gun and your armour to it. `HandEdge` is presence over 400 plus the weapon edge, which is what the odds were built on all along. All of the risk is yours: the beating, the ruined suit, the damaged car, and the death.
+- **Somebody sent** brings their loyalty to it and nothing of your name — loyalty over 500, less eight points, which is meaningfully worse. In exchange the player takes no physical risk at all, draws six less police attention because somebody else was the man described, and earns a fifth of the standing, because a man who sends people is respected less than a man who goes. That last part is most of why anybody goes.
+- The risk does not disappear, it moves. A job that goes wrong costs the man who was sent 25 loyalty, and a job that goes badly wrong kills him: 81 times in 400 measured, and never for a setback below the threshold. He then goes through `Kill` like anybody else, so his death reaches the Herald and the city's records rather than quietly emptying a slice.
+- Measured across 500 robberies at the same casino: going yourself takes $86,522, earns 446 standing, draws 6,385 attention and hurts you 277 times. Sending Leo takes $61,272, earns 157 standing, draws 3,715 attention, hurts you never, and costs you Leo 24 times.
+- Nobody goes out on this kind of errand below 40 loyalty or while already on an assignment, and both forms refuse for the reasons that apply to both — a player who can barely stand is offered neither.
+- Verified over the HTTP stack against a fresh isolated save: a campaign recruited Leo, was offered both forms at The Monarch with the trade stated in each, sent him, and came away $271 up, one standing, four attention and entirely unhurt.
+- Full `go test -race ./...`, `go vet`, `gofmt`, `tsc`, the production build and `cmd/simulate` pass.

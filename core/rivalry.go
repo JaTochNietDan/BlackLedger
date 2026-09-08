@@ -110,8 +110,11 @@ func (w *World) SabotageReadiness(id string) string {
 
 // sabotageChance is the probability the attack lands. A stronger family is
 // harder to reach; a loyal crew and a known name help.
-func (w *World) sabotageChance(f *Faction) float64 {
-	chance := .35 + float64(w.Player.Crew[0].Loyalty)/400 + float64(min(w.Player.Respect, 100))/500 - float64(f.Power)/300 + w.WeaponEdge()
+func (w *World) sabotageChance(f *Faction, hand Hand) float64 {
+	chance := .35 + w.HandEdge(hand) - float64(f.Power)/300
+	if !hand.Crew {
+		chance += float64(w.Player.Crew[0].Loyalty) / 400
+	}
 	if chance > .85 {
 		chance = .85
 	}
@@ -123,9 +126,17 @@ func (w *World) sabotageChance(f *Faction) float64 {
 
 // Sabotage resolves a player attack on a rival holding. It commits a result
 // immediately; nothing here is left for presentation to decide.
-func (w *World) Sabotage(id string) error {
+func (w *World) Sabotage(id string) error { return w.SabotageBy(id, w.OwnHands()) }
+
+// SabotageBy is the same attack whoever carries it out.
+func (w *World) SabotageBy(id string, hand Hand) error {
 	if reason := w.SabotageReadiness(id); reason != "" {
 		return fmt.Errorf("%s", reason)
+	}
+	if hand.Crew {
+		if reason := w.DelegateReadiness(); reason != "" {
+			return fmt.Errorf("%s", reason)
+		}
 	}
 	f, _ := w.SabotageTarget(id)
 	place, ok := PlaceByID(id)
@@ -135,15 +146,18 @@ func (w *World) Sabotage(id string) error {
 	prop := w.Properties[id]
 	crew := w.Player.Crew[0].Name
 
-	if w.Random() >= w.sabotageChance(f) {
+	if w.Random() >= w.sabotageChance(f, hand) {
 		// Turned away. The family learns who came for them either way.
-		injury := w.Absorb(12 + int(w.Random()*18))
-		w.Ruin(30)
-		w.Damage(15)
-		w.Player.Health = max(0, w.Player.Health-injury)
-		w.Player.Heat = min(100, w.Player.Heat+12)
+		injury := 12 + int(w.Random()*18)
+		health := w.Player.Health
+		w.HandHurt(hand, injury, "move against "+place.Name)
+		w.Player.Heat = min(100, w.Player.Heat+w.HandHeat(hand, 12))
 		f.Goodwill = max(-100, f.Goodwill-20)
-		w.Log("Turned away at "+place.Name, fmt.Sprintf("%s men were waiting. You and %s left without reaching anything, and you were hurt (-%d health). %s knows who came.", f.Name, crew, injury, f.Leader), "danger")
+		if hand.Crew {
+			w.Log("Turned away at "+place.Name, fmt.Sprintf("%s men were waiting. %s went in without you and came back with nothing. %s knows who sent him.", f.Name, hand.Name, f.Leader), "danger")
+		} else {
+			w.Log("Turned away at "+place.Name, fmt.Sprintf("%s men were waiting. You and %s left without reaching anything, and you were hurt (-%d health). %s knows who came.", f.Name, crew, health-w.Player.Health, f.Leader), "danger")
+		}
 		w.RetaliationFrom(f.ID)
 		if w.Player.Health <= 0 {
 			w.Die("An attack on " + place.Name + " went wrong.")
@@ -158,8 +172,8 @@ func (w *World) Sabotage(id string) error {
 	f.Power = max(10, f.Power-lostPower)
 	f.Cash = max(0, f.Cash-damage*20)
 	f.Goodwill = max(-100, f.Goodwill-30)
-	w.Player.Respect += 4
-	w.Player.Heat = min(100, w.Player.Heat+8)
+	w.Player.Respect += w.HandRespectFor(hand, 4)
+	w.Player.Heat = min(100, w.Player.Heat+w.HandHeat(hand, 8))
 	w.VisualCues = append(w.VisualCues, VisualCue{ID(), "attack", id, fmt.Sprintf("Your crew damaged %s. Condition is now %d%%.", place.Name, prop.Condition)})
 	w.Report("attack", "DAMAGE AT "+strings.ToUpper(place.Name),
 		w.unattributed(place.Name, fmt.Sprintf("%s, an establishment associated with %s, was attacked overnight.", place.Name, f.Name)))

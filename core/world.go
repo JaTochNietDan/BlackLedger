@@ -604,8 +604,16 @@ func (w *World) Actions(id string) []Action {
 			fmt.Sprintf("$%d to clear up to %d police attention through %s. Wears the premises, and the books need a day between rounds.", w.LaunderFee(id), w.launderCapacity(id), l.Name))
 	}
 	if prop := w.Properties[id]; prop != nil && prop.Income > 0 && !w.Own(id) {
-		add("rob", "Take the day's cash", 45, 0, w.RobberyReadiness(id),
-			fmt.Sprintf("Walk out with what is in the till at %s. A haul, police attention, and an owner who will work out who would dare. Going wrong means a beating.", l.Name))
+		add("rob", "Take the day's cash yourself", 45, 0, w.RobberyReadiness(id),
+			fmt.Sprintf("Walk out with what is in the till at %s. Your standing and whatever you are carrying improve the odds. A haul, police attention, and an owner who will work out who would dare. Going wrong means a beating, and it is yours.", l.Name))
+		if hand, ok := w.CrewHands(); ok {
+			reason := w.RobberyReadiness(id)
+			if reason == "" {
+				reason = w.DelegateReadiness()
+			}
+			add("rob:crew", "Send "+hand.Name+" for the till", 45, 0, reason,
+				fmt.Sprintf("The same money and worse odds, because he brings his loyalty to it and not your name. %d less police attention on you and a fifth of the standing. Going wrong costs him %d loyalty, and sometimes more than that.", HandHeatRelief, HandLoyaltyCost))
+		}
 	}
 	for _, g := range w.Goods {
 		if !TradesAt(id, g.ID) {
@@ -627,7 +635,15 @@ func (w *World) Actions(id string) []Action {
 			fmt.Sprintf("Wrecks %s, empties it of stock and staff, and kills somebody who worked there about a third of the time. The owner will know exactly what it was. Going wrong means it goes off with you under it.", l.Name))
 	}
 	if f, ok := w.SabotageTarget(id); ok {
-		add("sabotage", "Move against "+f.Name, 90, 0, w.SabotageReadiness(id),
+		if hand, ok := w.CrewHands(); ok {
+			reason := w.SabotageReadiness(id)
+			if reason == "" {
+				reason = w.DelegateReadiness()
+			}
+			add("sabotage:crew", "Send "+hand.Name+" against "+l.Name, 90, 0, reason,
+				fmt.Sprintf("The same damage to %s and worse odds. %d less attention on you and a fifth of the standing. Turned away, he takes the beating and %d loyalty, and sometimes he does not come back.", f.Name, HandHeatRelief, HandLoyaltyCost))
+		}
+		add("sabotage", "Move against "+f.Name+" yourself", 90, 0, w.SabotageReadiness(id),
 			fmt.Sprintf("Send your crew against %s. Damages the property, weakens %s and costs you standing with them. They will retaliate, and a failed attempt injures you.", l.Name, f.Name))
 		if rival := w.Rival(f.ID); rival != nil {
 			add("incite", "Point "+f.Name+" at "+rival.Name, 45, 25, w.InciteReadiness(id),

@@ -351,6 +351,24 @@ func (w *World) apply(c Command) error {
 				if err := w.Launder(target); err != nil {
 					return err
 				}
+			case "rob:crew":
+				hand, ok := w.CrewHands()
+				if !ok {
+					return fmt.Errorf("you have nobody to send")
+				}
+				if err := w.RobBy(target, hand); err != nil {
+					return err
+				}
+			case "sabotage:crew":
+				hand, ok := w.CrewHands()
+				if !ok {
+					return fmt.Errorf("you have nobody to send")
+				}
+				// Resolved before the clock moves, like the version the player
+				// carries out themselves.
+				if err := w.SabotageBy(target, hand); err != nil {
+					return err
+				}
 			case "rob":
 				if err := w.Rob(target); err != nil {
 					return err

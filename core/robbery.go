@@ -29,10 +29,10 @@ func (w *World) RobberyReadiness(id string) string {
 
 // robberyOdds. A crew helps, a reputation helps, and premises belonging to a
 // strong organization are watched.
-func (w *World) robberyOdds(id string) float64 {
-	odds := .5 + float64(min(w.Presence(), 100))/400 + w.WeaponEdge()
-	if len(w.Player.Crew) > 0 && w.Player.Crew[0].Loyalty >= 40 && len(w.Tasks) == 0 {
-		odds += .15
+func (w *World) robberyOdds(id string, hand Hand) float64 {
+	odds := .5 + w.HandEdge(hand)
+	if !hand.Crew && len(w.Player.Crew) > 0 && w.Player.Crew[0].Loyalty >= 40 && len(w.Tasks) == 0 {
+		odds += .15 // somebody at your shoulder
 	}
 	if f := w.faction(w.Properties[id].Owner); f != nil {
 		odds -= float64(f.Power) / 300
@@ -46,10 +46,19 @@ func (w *World) robberyOdds(id string) float64 {
 	return odds
 }
 
-// Rob takes the day's cash out of premises the player does not own.
-func (w *World) Rob(id string) error {
+// Rob takes the day's cash out of premises the player does not own, by the
+// player's own hands.
+func (w *World) Rob(id string) error { return w.RobBy(id, w.OwnHands()) }
+
+// RobBy is the same robbery whoever is standing there.
+func (w *World) RobBy(id string, hand Hand) error {
 	if reason := w.RobberyReadiness(id); reason != "" {
 		return fmt.Errorf("%s", reason)
+	}
+	if hand.Crew {
+		if reason := w.DelegateReadiness(); reason != "" {
+			return fmt.Errorf("%s", reason)
+		}
 	}
 	prop := w.Properties[id]
 	place, ok := PlaceByID(id)
@@ -58,17 +67,20 @@ func (w *World) Rob(id string) error {
 	}
 	owner := w.faction(prop.Owner)
 
-	if w.Random() >= w.robberyOdds(id) {
-		injury := w.Absorb(10 + int(w.Random()*20))
-		w.Ruin(30)
-		w.Damage(15)
-		w.Player.Health = max(0, w.Player.Health-injury)
-		w.Player.Heat = min(100, w.Player.Heat+15)
+	if w.Random() >= w.robberyOdds(id, hand) {
+		injury := 10 + int(w.Random()*20)
+		health := w.Player.Health
+		w.HandHurt(hand, injury, "take the till at "+place.Name)
+		w.Player.Heat = min(100, w.Player.Heat+w.HandHeat(hand, 15))
 		if owner != nil {
 			owner.Goodwill = max(-100, owner.Goodwill-15)
 			w.RetaliationFrom(owner.ID)
 		}
-		w.Log("It went wrong at "+place.Name, fmt.Sprintf("Somebody was waiting, or somebody shouted. You left with nothing and took a beating for it (-%d health).", injury), "danger")
+		if !hand.Crew {
+			w.Log("It went wrong at "+place.Name, fmt.Sprintf("Somebody was waiting, or somebody shouted. You left with nothing and took a beating for it (-%d health).", health-w.Player.Health), "danger")
+		} else {
+			w.Log("It went wrong at "+place.Name, fmt.Sprintf("Somebody was waiting. %s left with nothing, and you were not there to be seen.", hand.Name), "danger")
+		}
 		if w.Player.Health <= 0 {
 			w.Die("A robbery at " + place.Name + " went wrong.")
 		}
@@ -78,12 +90,12 @@ func (w *World) Rob(id string) error {
 	take := prop.Income*8 + int(w.Random()*float64(prop.Income*10))
 	take = take * prop.Condition / 100
 	w.Earn(take)
-	w.Player.Heat = min(100, w.Player.Heat+10)
-	w.Player.Respect += 2
+	w.Player.Heat = min(100, w.Player.Heat+w.HandHeat(hand, 10))
+	w.Player.Respect += w.HandRespectFor(hand, 2)
 	prop.Condition = max(0, prop.Condition-5)
 	// A car outside is a thing witnesses describe, so driving to a robbery
 	// makes it that much easier to work out who did it.
-	if trail := w.CarTrail(); trail > 0 {
+	if trail := w.CarTrail(); trail > 0 && !hand.Crew {
 		w.Player.Heat = min(100, w.Player.Heat+trail*4)
 		w.Log("Somebody described the car", fmt.Sprintf("A %s was parked where it had no business being. Attention is now %d.", lowerFirst(VehicleByTier(w.Player.Car).Label), w.Player.Heat), "danger")
 	}

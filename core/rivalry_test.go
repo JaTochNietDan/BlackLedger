@@ -77,7 +77,7 @@ func TestSuccessfulSabotageCostsTheFamilyRealStanding(t *testing.T) {
 	for tries := 0; tries < 200; tries++ {
 		probe := readyAttacker(t)
 		probe.RNG = uint32(tries + 1)
-		if probe.Random() < probe.sabotageChance(probe.faction("bellandi")) {
+		if probe.Random() < probe.sabotageChance(probe.faction("bellandi"), probe.OwnHands()) {
 			w = readyAttacker(t)
 			w.RNG = uint32(tries + 1)
 			break
@@ -119,7 +119,7 @@ func TestFailedSabotageInjuresWithoutDamagingTheHolding(t *testing.T) {
 	for tries := 0; tries < 400; tries++ {
 		probe := readyAttacker(t)
 		probe.RNG = uint32(tries + 1)
-		if probe.Random() >= probe.sabotageChance(probe.faction("bellandi")) {
+		if probe.Random() >= probe.sabotageChance(probe.faction("bellandi"), probe.OwnHands()) {
 			w = readyAttacker(t)
 			w.RNG = uint32(tries + 1)
 			break

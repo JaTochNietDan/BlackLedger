@@ -36,7 +36,7 @@ func TestASuccessfulRobberyPaysAndIsNoticed(t *testing.T) {
 	for seed := uint32(1); seed <= 200; seed++ {
 		probe := robberWorld(t)
 		probe.RNG = seed
-		if probe.Random() < probe.robberyOdds("club") {
+		if probe.Random() < probe.robberyOdds("club", probe.OwnHands()) {
 			w = robberWorld(t)
 			w.RNG = seed
 			break
@@ -79,7 +79,7 @@ func TestAFailedRobberyHurts(t *testing.T) {
 	for seed := uint32(1); seed <= 400; seed++ {
 		probe := robberWorld(t)
 		probe.RNG = seed
-		if probe.Random() >= probe.robberyOdds("club") {
+		if probe.Random() >= probe.robberyOdds("club", probe.OwnHands()) {
 			w = robberWorld(t)
 			w.RNG = seed
 			break

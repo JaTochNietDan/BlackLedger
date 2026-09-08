@@ -53,7 +53,7 @@ var ventures = []string{
 	"operate:hard", "operate:clean", "operate:standard", "inspect", "investigate", "lie_low",
 	"dress", "press", "bankroll", "draw", "car", "service",
 	"fit:door", "fit:telephone", "fit:safe", "fit:cellar", "commission",
-	"trip:rockridge", "trip:kingsport", "trip:halloway", "charge", "plant", "sitdown", "retain:commissioner", "retain:mayor",
+	"trip:rockridge", "trip:kingsport", "trip:halloway", "charge", "plant", "sitdown", "retain:commissioner", "retain:mayor", "rob:crew", "sabotage:crew",
 }
 
 var choicePreference = []string{"approach:careful", "accept", "pay", "escape", "acknowledge", "listen", "leave", "decline"}

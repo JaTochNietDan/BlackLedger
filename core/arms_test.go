@@ -80,13 +80,13 @@ func TestAWeaponShiftsOddsWithoutGuaranteeingAnything(t *testing.T) {
 		w.Player.Crew = []Crew{{ID: "leo", Name: "Leo Carver", Loyalty: 80}}
 		w.Player.Location = "club"
 	}
-	if carrying.robberyOdds("club") <= unarmed.robberyOdds("club") {
+	if carrying.robberyOdds("club", carrying.OwnHands()) <= unarmed.robberyOdds("club", unarmed.OwnHands()) {
 		t.Fatal("being armed did not improve the odds of a robbery")
 	}
-	if carrying.sabotageChance(carrying.faction("bellandi")) <= unarmed.sabotageChance(unarmed.faction("bellandi")) {
+	if carrying.sabotageChance(carrying.faction("bellandi"), carrying.OwnHands()) <= unarmed.sabotageChance(unarmed.faction("bellandi"), unarmed.OwnHands()) {
 		t.Fatal("being armed did not improve the odds of an attack")
 	}
-	if carrying.robberyOdds("club") >= 1 {
+	if carrying.robberyOdds("club", carrying.OwnHands()) >= 1 {
 		t.Fatal("a weapon made a robbery certain")
 	}
 }

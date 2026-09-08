@@ -18,7 +18,7 @@ func TestThePaperPrintsWhatTheCityCanSee(t *testing.T) {
 	for seed := uint32(1); seed <= 200; seed++ {
 		probe := New(51)
 		probe.Player.Location, probe.Player.Respect, probe.RNG = "club", 40, seed
-		if probe.Random() < probe.robberyOdds("club") {
+		if probe.Random() < probe.robberyOdds("club", probe.OwnHands()) {
 			w.RNG = seed
 			break
 		}
@@ -87,7 +87,7 @@ func TestThePlayersOwnCrimesAreReportedWithoutTheirName(t *testing.T) {
 	for seed := uint32(1); seed <= 300; seed++ {
 		probe := New(57)
 		probe.Player.Location, probe.Player.Respect, probe.RNG = "club", 40, seed
-		if probe.Random() < probe.robberyOdds("club") {
+		if probe.Random() < probe.robberyOdds("club", probe.OwnHands()) {
 			w = New(57)
 			w.Player.Location, w.Player.Respect, w.RNG = "club", 40, seed
 			break
