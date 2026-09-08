@@ -1,0 +1,31 @@
+{
+  "started_utc": "2026-09-08T00:14:39.199118+00:00",
+  "status": "in_progress",
+  "source": "8cf80b6 plus removal of two instructional sentences from mediation brief",
+  "model": "qwen3.5:35b-a3b",
+  "mode": "focused, non-thinking",
+  "save": ".runtime/focused-campaign-20260907.sqlite3",
+  "method": "Fresh isolated browser campaign; no hidden plots inspected for decisions; elapsed includes reading and QA notes. No outcome rerolls.",
+  "checkpoints": [
+    {
+      "stage": "start",
+      "minute": 480,
+      "player": {
+        "name": "Alex Varga",
+        "cash": 90,
+        "health": 100,
+        "respect": 0,
+        "heat": 0,
+        "location": "room",
+        "home": "room",
+        "security": 0,
+        "contacts": 0,
+        "crew": [],
+        "alive": true,
+        "earned": 0,
+        "job_count": 0
+      }
+    }
+  ],
+  "story_reviews": []
+}
