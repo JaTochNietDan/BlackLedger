@@ -7,6 +7,8 @@ func gambler(t *testing.T) *World {
 	w := New(71)
 	w.Player.Location = "club"
 	w.Player.Cash = 5000
+	// Somebody the room will seat: the door is tested in the appearance suite.
+	w.Player.Respect = HighTableStanding
 	return w
 }
 

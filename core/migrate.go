@@ -8,7 +8,7 @@ package core
 // to somebody.
 
 // SaveVersion is the shape the current build writes.
-const SaveVersion = 5
+const SaveVersion = 6
 
 // seedHoldings is the property each established family holds in a new city.
 var seedHoldings = map[string][]string{
@@ -81,6 +81,12 @@ func (w *World) MigrateLivingWorld() {
 		if n.Voice == "" {
 			n.Voice = w.voiceFor(n.Name)
 		}
+	}
+
+	// A campaign that already had a suit before clothes could wear out is
+	// wearing it in good order, not in rags.
+	if w.Player.Dress > 0 && w.Player.DressWear == 0 {
+		w.Player.DressWear = 100
 	}
 
 	// The established families were already rivals before any of this existed.

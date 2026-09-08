@@ -56,6 +56,10 @@ type Person struct {
 	// carrying nothing.
 	Weapon int `json:"weapon,omitempty"`
 	Armour int `json:"armour,omitempty"`
+	// How the player is dressed, and how well kept it is. Absent in saves
+	// written before clothes existed, which is working clothes in good order.
+	Dress     int `json:"dress,omitempty"`
+	DressWear int `json:"dress_wear,omitempty"`
 	// Whether this person has established that the account abroad is theirs.
 	// Reset with every life, which is what makes inheriting it a decision.
 	Offshore bool `json:"offshore_access,omitempty"`
@@ -480,6 +484,14 @@ func (w *World) Actions(id string) []Action {
 			fmt.Sprintf("$%d in papers and a journey. Only worth it if there is enough out there to be worth reaching.", AccessCost))
 		add("withdraw", "Bring it all home", 45, 0, w.WithdrawReadiness(),
 			fmt.Sprintf("Brings $%d back into the city, where it can be taken from you.", w.Offshore))
+		if next, ok := nextAttire(p.Dress); ok {
+			notice := "Nobody official looks twice at it."
+			if next.Notice > 0 {
+				notice = fmt.Sprintf("Dressing above your visible means draws %d police attention a day.", next.Notice)
+			}
+			add("dress", "Be measured for "+lowerFirst(next.Label), 60, 0, w.DressReadiness(),
+				fmt.Sprintf("$%d. %s Worth %d presence while it is kept, and it wears. %s", next.Cost, next.Detail, next.Presence, notice))
+		}
 		add("bribe", "An understanding with the detective", 45, 0, w.BribeReadiness(),
 			fmt.Sprintf("$%d to Detective Harlow to lose some paperwork. Clears attention now and buys nothing later. Above %d heat nobody will be seen taking it.", w.BribeCost(), BribeCeiling))
 		add("contract", "Ask about a name", 30, 0,
@@ -612,6 +624,14 @@ func (w *World) Actions(id string) []Action {
 			}
 		}
 	}
+	if w.PressPlace(id) {
+		fee := w.PressFee(id)
+		detail := fmt.Sprintf("$%d. Restores up to 45 condition, currently %d of 100.", fee, w.DressCondition())
+		if fee == 0 {
+			detail = fmt.Sprintf("Your own people, at no charge. Restores up to 45 condition, currently %d of 100.", w.DressCondition())
+		}
+		add("press", "Have your clothes cleaned and pressed", PressMinutes, 0, w.PressReadiness(id), detail)
+	}
 	if len(p.Crew) > 0 {
 		reason := need(p.Crew[0].Loyalty < 30, "Leo refuses assignments below 30 loyalty. Pay a bonus to rebuild trust.")
 		if len(w.Tasks) > 0 {
@@ -690,6 +710,7 @@ func (w *World) Attack(plot Plot) {
 		w.Die("An attack at your residence caught you without warning or protection.")
 	} else {
 		p.Health = max(1, p.Health-w.Absorb(65))
+		w.Ruin(55)
 		worn := "Nobody warned you."
 		if p.Armour > 0 {
 			worn = "What you were wearing took the worst of it."
@@ -759,6 +780,7 @@ func (w *World) Advance(minutes int) {
 			w.PeopleDay()
 			w.OperationsDay()
 			w.StillDay()
+			w.DressDay()
 			bill := w.DailyCost()
 			if p.Cash >= bill {
 				p.Cash -= bill
@@ -848,7 +870,7 @@ func (w *World) Public() map[string]any {
 	if len(history) > 60 {
 		history = history[len(history)-60:]
 	}
-	return map[string]any{"id": w.ID, "version": w.Version, "revision": w.Revision, "life": w.Life, "minute": w.Minute, "player": w.Player, "district": w.District, "factions": w.Factions, "npcs": w.People(), "locations": locs, "event": scene, "history": history, "dead": w.Dead, "tasks": w.Tasks, "director": w.Director, "last_result": w.LastResult, "daily_cost": w.DailyCost(), "income": income, "security": w.Guard(), "opportunity": w.NextOpportunity(), "known_threats": w.KnownThreats(), "business_truces": w.ActiveBusinessTruces(), "conflicts": w.PublicConflicts(), "goods": w.Goods, "arms": w.ArmsDescription(), "offshore": map[string]any{"balance": w.Offshore, "reachable": w.Player.Offshore}, "newspaper": w.Edition(), "arrangements": w.PendingArrangements()}
+	return map[string]any{"id": w.ID, "version": w.Version, "revision": w.Revision, "life": w.Life, "minute": w.Minute, "player": w.Player, "district": w.District, "factions": w.Factions, "npcs": w.People(), "locations": locs, "event": scene, "history": history, "dead": w.Dead, "tasks": w.Tasks, "director": w.Director, "last_result": w.LastResult, "daily_cost": w.DailyCost(), "income": income, "security": w.Guard(), "opportunity": w.NextOpportunity(), "known_threats": w.KnownThreats(), "business_truces": w.ActiveBusinessTruces(), "conflicts": w.PublicConflicts(), "goods": w.Goods, "arms": w.ArmsDescription(), "appearance": w.AppearanceDescription(), "offshore": map[string]any{"balance": w.Offshore, "reachable": w.Player.Offshore}, "newspaper": w.Edition(), "arrangements": w.PendingArrangements()}
 }
 func (w *World) hasRecord(title string) bool {
 	for _, r := range w.History {

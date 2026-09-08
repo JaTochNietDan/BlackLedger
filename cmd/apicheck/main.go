@@ -51,6 +51,7 @@ var ventures = []string{
 	"play:small", "play:high", "buy:moonshine", "buy:cigarettes",
 	"sell:moonshine", "sell:cigarettes", "arms:weapon", "arms:armour",
 	"operate:hard", "operate:clean", "operate:standard", "inspect", "investigate", "lie_low",
+	"dress", "press",
 }
 
 var choicePreference = []string{"approach:careful", "accept", "pay", "escape", "acknowledge", "leave", "decline"}

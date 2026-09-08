@@ -100,6 +100,7 @@ func (w *World) Raid() {
 
 	seized := w.Seize("The police came with a warrant.")
 	w.SeizeArms()
+	w.Ruin(20) // being turned out against a wall is hard on good clothes
 	still, foundStill := w.StillFound()
 	fine := min(w.Player.Cash, 150+w.Player.Heat*12)
 	if foundStill {

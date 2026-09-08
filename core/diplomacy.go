@@ -13,7 +13,7 @@ func (w *World) OpenAudience(location string) {
 		body = "“You are doing business near my people. We can settle our differences, or you can show me that an arrangement with you is worth something.”"
 	}
 	w.Event = &Scene{ID: ID(), Title: "A seat across from " + surname, Body: body, Speaker: speaker, Actor: actor, Target: location, Kind: "audience", Source: "authored", Minute: w.Minute, Choices: []Choice{
-		{ID: "tribute", Label: "Offer $150 in tribute", Cost: 150, Detail: "Gain 8 standing. Cancels this family's current operations against you; other families and future demands are unchanged."},
+		{ID: "tribute", Label: "Offer $150 in tribute", Cost: 150, Detail: fmt.Sprintf("Gain %d standing; how you are dressed is part of what they are willing to grant. Cancels this family's current operations against you; other families and future demands are unchanged.", 8+w.Standing()/4)},
 		{ID: "business_truce", Label: "Pay $100 for a business ceasefire", Cost: 100, Detail: "For 24 game hours, this family suspends business demands and sabotage. Cancels its pending sabotage; personal threats, other families and ownership remain unchanged. Renews from now, not cumulatively."},
 		{ID: "work", Label: "Offer to do a favor", Detail: "Hear a paid courier offer for this family. Completion improves their standing and worsens their rival's. Existing threats remain until resolved separately."},
 		{ID: "leave", Label: "Leave without an agreement", Detail: "No payment. Existing threats remain."},
@@ -51,7 +51,10 @@ func (w *World) ResolveAudience(e *Scene, choice string) error {
 		w.Plots = remaining
 		w.Log("A business ceasefire", fmt.Sprintf("%s accepts $100. Business demands and sabotage pause until Day %d %02d:%02d. Personal threats and other families remain unaffected.", faction.Name, (w.Minute+1440)/1440+1, w.Minute%1440/60, w.Minute%60), "politics")
 	case "tribute":
-		faction.Goodwill = min(100, faction.Goodwill+8)
+		// The same money, taken more seriously from somebody who looks like
+		// they have more of it.
+		gained := 8 + w.Standing()/4
+		faction.Goodwill = min(100, faction.Goodwill+gained)
 		faction.Cash += 150
 		remaining := []Plot{}
 		for _, p := range w.Plots {

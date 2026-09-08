@@ -138,6 +138,7 @@ func (w *World) Sabotage(id string) error {
 	if w.Random() >= w.sabotageChance(f) {
 		// Turned away. The family learns who came for them either way.
 		injury := w.Absorb(12 + int(w.Random()*18))
+		w.Ruin(30)
 		w.Player.Health = max(0, w.Player.Health-injury)
 		w.Player.Heat = min(100, w.Player.Heat+12)
 		f.Goodwill = max(-100, f.Goodwill-20)

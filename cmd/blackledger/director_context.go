@@ -209,6 +209,8 @@ func playerSituation(w *core.World) map[string]any {
 		"police_attention": w.Player.Heat,
 		"carrying_units":   w.Carrying(),
 		"armed":            w.Player.Weapon > 0,
+		"dressed":          core.AttireByTier(w.Player.Dress).Label,
+		"looks_kept":       w.DressCondition() >= core.Shabby,
 	}
 	return situation
 }

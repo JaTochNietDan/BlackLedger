@@ -30,7 +30,7 @@ func (w *World) RobberyReadiness(id string) string {
 // robberyOdds. A crew helps, a reputation helps, and premises belonging to a
 // strong organization are watched.
 func (w *World) robberyOdds(id string) float64 {
-	odds := .5 + float64(min(w.Player.Respect, 100))/400 + w.WeaponEdge()
+	odds := .5 + float64(min(w.Presence(), 100))/400 + w.WeaponEdge()
 	if len(w.Player.Crew) > 0 && w.Player.Crew[0].Loyalty >= 40 && len(w.Tasks) == 0 {
 		odds += .15
 	}
@@ -60,6 +60,7 @@ func (w *World) Rob(id string) error {
 
 	if w.Random() >= w.robberyOdds(id) {
 		injury := w.Absorb(10 + int(w.Random()*20))
+		w.Ruin(30)
 		w.Player.Health = max(0, w.Player.Health-injury)
 		w.Player.Heat = min(100, w.Player.Heat+15)
 		if owner != nil {

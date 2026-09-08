@@ -20,6 +20,12 @@ var tableStakes = []Stake{
 	{ID: "high", Label: "Play the high tables", Amount: 300},
 }
 
+// HighTableStanding is what a room wants to see before it lets somebody sit
+// down with real money: what they have done, or what they are wearing, or
+// enough of both. A tailored suit alone is very nearly the price of entry,
+// which is the point of owning one.
+const HighTableStanding = 14
+
 func tableStake(id string) (Stake, bool) {
 	for _, s := range tableStakes {
 		if s.ID == id {
@@ -45,6 +51,9 @@ func (w *World) TableReadiness(id string, stake Stake) string {
 	}
 	if w.Properties[id] != nil && w.Properties[id].Condition < 30 {
 		return "The room is in no state to run games"
+	}
+	if stake.ID == "high" && w.Presence() < HighTableStanding {
+		return "The floor manager looks at you and seats you nowhere near that table"
 	}
 	if w.Player.Cash < stake.Amount {
 		return "Not enough cash"
