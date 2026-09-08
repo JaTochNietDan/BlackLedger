@@ -394,21 +394,6 @@ export function distance(at: Vec, extent: {cols: number; rows: number}): number 
   return deepest <= 0 ? 0 : 1 - Math.min(1, (at.x + at.y) / deepest);
 }
 
-// The blocks nobody lives on. A city with holes in it reads as a scatter of
-// models; these are the buildings between the addresses that matter — never
-// named, never clickable, and deliberately plainer than anything the player
-// can walk into.
-export function fillers(taken: Map<string, Cell>, extent: {cols: number; rows: number}): Cell[] {
-  const used = new Set([...taken.values()].map(c => `${c.col},${c.row}`));
-  const out: Cell[] = [];
-  for (let col = 0; col < extent.cols; col++) {
-    for (let row = 0; row < extent.rows; row++) {
-      if (!used.has(`${col},${row}`)) out.push({col, row});
-    }
-  }
-  return out;
-}
-
 // A filler's shape, decided by where it stands so the same block is the same
 // building every time the city is drawn.
 export function fillerShape(cell: Cell): {h: number; inset: number; kind: number; art: number} {
@@ -486,3 +471,46 @@ export function wires(poles: Vec[]): Segment[] {
   }
   return out;
 }
+
+// ---------------------------------------------------------------------------
+// Terraces.
+//
+// One building standing in the middle of its block, with pavement on all four
+// sides, is an office park. A city block is a terrace: buildings shoulder to
+// shoulder along the frontage, sharing walls, with the yards behind them.
+//
+// So a block is a row of slots along its street frontage. The address that
+// belongs to the block takes a slot and ordinary buildings take the rest, and
+// they are drawn back to front so the party walls read as joins rather than as
+// gaps.
+
+export type Slot = {at: Vec; w: number; d: number; front: boolean};
+
+// terrace lays a block's frontage out as slots. The front row faces the street
+// that runs along the near edge; the back row fills the far edge, so a block
+// reads as built-up rather than as one building with a lawn.
+export function terrace(cell: Cell, slots = 3): Slot[] {
+  const i = island(cell);
+  const depth = (i.d - PAVE * 2) * .46;          // how far back a row reaches
+  const width = (i.w - PAVE * 2) / slots;
+  const out: Slot[] = [];
+  for (let n = 0; n < slots; n++) {
+    // The near row, along the street the camera looks down.
+    out.push({
+      at: {x: i.x + PAVE + n * width, y: i.y + i.d - PAVE - depth},
+      w: width, d: depth, front: true,
+    });
+  }
+  for (let n = 0; n < slots; n++) {
+    // And the far row, backing onto it.
+    out.push({
+      at: {x: i.x + PAVE + n * width, y: i.y + PAVE},
+      w: width, d: depth, front: false,
+    });
+  }
+  return out;
+}
+
+// Which slot an address takes: the middle of the near row, so the building the
+// player came to see faces the street and is never hidden behind another.
+export const addressSlot = (slots = 3) => Math.floor(slots / 2);

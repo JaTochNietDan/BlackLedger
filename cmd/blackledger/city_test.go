@@ -233,13 +233,21 @@ func TestTheBlocksBetweenTheAddressesAreBuiltOn(t *testing.T) {
 	if fillers < 4 {
 		t.Errorf("only %d filler buildings; a city needs more variety than that", fillers)
 	}
-	// And a filler must never be mistaken for somewhere the player can go.
+	// A block is a terrace: the address takes one slot on the frontage and
+	// ordinary buildings take the rest, shoulder to shoulder. This replaces an
+	// assertion that fillers went on the blocks the addresses left empty —
+	// true of the older model, where each address stood alone in the middle of
+	// its block with pavement on all four sides, which read as an office park
+	// rather than as a city.
 	source, err := os.ReadFile("../../src/CityIso.tsx")
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !strings.Contains(string(source), "fillers(cells, size)") {
-		t.Error("fillers are not placed from the blocks the addresses left empty")
+	if !strings.Contains(string(source), "terrace({col, row}, SLOTS)") {
+		t.Error("blocks are not laid out as terraces, so buildings do not stand next to each other")
+	}
+	if !strings.Contains(string(source), "addressAt.has(key)") {
+		t.Error("nothing keeps a filler out of the slot an address builds on")
 	}
 }
 
