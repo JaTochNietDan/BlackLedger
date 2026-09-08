@@ -63,6 +63,10 @@ run = ".venv/bin/python tools/scenes.py public/art/scenes"
 description = "Paint the buildings that have no exterior (needs `mise run art` first)"
 run = ".venv/bin/python tools/exteriors.py public/art/fronts"
 
+[tasks.isometric]
+description = "Paint every address as an isometric cut-out for the city view (needs `mise run art`)"
+run = ".venv/bin/python -c \"import sys;sys.path.insert(0,'tools');import isometric;isometric.paint('public/art/iso',sys.argv[1:])\""
+
 [tasks.interiors]
 description = "Regenerate the inside of every building (needs `mise run art` first)"
 run = ".venv/bin/python tools/interiors.py public/art/rooms"

@@ -1,0 +1,74 @@
+[
+ {
+  "id": "apartment",
+  "file": "iso/iso-apartment-v1.png",
+  "w": 764,
+  "h": 874
+ },
+ {
+  "id": "bar",
+  "file": "iso/iso-bar-v1.png",
+  "w": 740,
+  "h": 780
+ },
+ {
+  "id": "casino",
+  "file": "iso/iso-casino-v1.png",
+  "w": 791,
+  "h": 724
+ },
+ {
+  "id": "club",
+  "file": "iso/iso-club-v1.png",
+  "w": 747,
+  "h": 806
+ },
+ {
+  "id": "docks",
+  "file": "iso/iso-docks-v1.png",
+  "w": 914,
+  "h": 628
+ },
+ {
+  "id": "estate",
+  "file": "iso/iso-estate-v1.png",
+  "w": 924,
+  "h": 726
+ },
+ {
+  "id": "garage",
+  "file": "iso/iso-garage-v1.png",
+  "w": 868,
+  "h": 762
+ },
+ {
+  "id": "herald",
+  "file": "iso/iso-herald-v1.png",
+  "w": 657,
+  "h": 797
+ },
+ {
+  "id": "laundry",
+  "file": "iso/iso-laundry-v1.png",
+  "w": 827,
+  "h": 747
+ },
+ {
+  "id": "market",
+  "file": "iso/iso-market-v1.png",
+  "w": 914,
+  "h": 790
+ },
+ {
+  "id": "precinct",
+  "file": "iso/iso-precinct-v1.png",
+  "w": 802,
+  "h": 753
+ },
+ {
+  "id": "room",
+  "file": "iso/iso-room-v1.png",
+  "w": 614,
+  "h": 813
+ }
+]

@@ -1,8 +1,9 @@
 import {useEffect, useRef} from 'react';
-import {Application, Container, Graphics, Text, TextStyle} from 'pixi.js';
+import {Application, Assets, Container, Graphics, Sprite, Text, Texture, TextStyle} from 'pixi.js';
 import {Viewport} from 'pixi-viewport';
 import type {Snapshot} from './types';
 import {blockFor, depth, faces, plan, project, size, TILE} from './iso';
+import cutouts from '../public/art/iso/isometric.json';
 import type {Spotlight} from './CityStreet';
 
 // The city, drawn as a city, on a GPU.
@@ -19,6 +20,12 @@ import type {Spotlight} from './CityStreet';
 // who is inside it still come from the core.
 
 const COLOUR = (hex: string) => parseInt(hex.slice(1), 16);
+
+// The painted cut-outs, by address. A building with one is drawn as itself; a
+// building without one is drawn as the blocked-out solid it was before, so
+// adding an address tomorrow puts a shape on the map rather than a hole.
+const painted = new Map((cutouts as {id: string; file: string; w: number; h: number}[]).map(c => [c.id, c]));
+const textures = new Map<string, Texture>();
 
 // How far the camera may be pushed. Past these the city either fills the screen
 // with one roof or shrinks into the middle of an empty field.
@@ -67,6 +74,12 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight}: {
       blocks.current = layer;
       draw();
       frame();
+      // Then the painted city, once the pictures are in. Until they land the
+      // blocked-out solids stand in, which is why the first draw happens above
+      // rather than waiting on a network.
+      Promise.all([...painted.values()].map(async c => {
+        try { textures.set(c.id, await Assets.load('/art/' + c.file)) } catch { /* it keeps its block */ }
+      })).then(() => { if (!dead) { draw(); frame() } });
     }).catch(() => { /* the card view is still there; see TestTheCardViewIsStillReachable */ });
 
     const onResize = () => frame();
@@ -130,23 +143,47 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight}: {
         project(at), project({x: at.x + block.w, y: at.y}),
         project({x: at.x + block.w, y: at.y + block.d}), project({x: at.x, y: at.y + block.d}),
       ];
-      plot.poly(corners.flatMap(c => [c.x, c.y]))
-        .fill(lit ? 0x2a2f23 : 0x1b2422)
-        .stroke({width: p.id === selected ? 2.5 : 1.5, color: lit || p.id === selected ? 0xd6b77c : p.owned ? 0x8f7849 : 0x232e2b});
-      group.addChild(plot);
-
-      // The building, one box at a time, so a piece of it can be replaced.
-      for (const part of block.parts) {
-        const f = faces(at, part);
-        const g = new Graphics();
-        g.poly(f.left.flatMap(v => [v.x, v.y])).fill(COLOUR(part.left));
-        g.poly(f.right.flatMap(v => [v.x, v.y])).fill(COLOUR(part.right));
-        g.poly(f.top.flatMap(v => [v.x, v.y])).fill(COLOUR(part.top));
-        group.addChild(g);
+      const hasArt = textures.has(p.id);
+      const marked = lit || p.id === selected || p.id === here || p.owned;
+      // A painted building brings its own pavement with it, so the drawn plot
+      // is only wanted under a blocked-out one — or under any of them when
+      // there is something to say about the ground.
+      if (!hasArt || marked) {
+        plot.poly(corners.flatMap(c => [c.x, c.y]))
+          .fill(hasArt ? {color: lit ? 0xd6b77c : 0x000000, alpha: lit ? .12 : 0} : lit ? 0x2a2f23 : 0x1b2422)
+          .stroke({width: p.id === selected ? 2.5 : 1.5, color: lit || p.id === selected ? 0xd6b77c : p.owned ? 0x8f7849 : 0x232e2b});
+        group.addChild(plot);
       }
 
-      const tallest = Math.max(...block.parts.map(q => (q.base || 0) + q.h));
       const centre = project({x: at.x + block.w / 2, y: at.y + block.d / 2});
+      // How wide this plot is on screen, which is what a cut-out has to match:
+      // the picture is scaled to the ground it stands on, never to itself.
+      const across = (block.w + block.d) * (TILE.w / 2);
+      let tallest = Math.max(...block.parts.map(q => (q.base || 0) + q.h));
+
+      const texture = textures.get(p.id);
+      if (texture) {
+        const art = new Sprite(texture);
+        art.anchor.set(.5, 1);
+        art.scale.set(across / texture.width);
+        // Its feet go on the front corner of the plot, where the near edges
+        // meet, so the building stands on its own ground rather than floating
+        // over the middle of it.
+        const foot = project({x: at.x + block.w, y: at.y + block.d});
+        art.position.set(centre.x, foot.y);
+        group.addChild(art);
+        tallest = (art.height / TILE.h) * .6;
+      } else {
+        // The building, one box at a time, so a piece of it can be replaced.
+        for (const part of block.parts) {
+          const f = faces(at, part);
+          const g = new Graphics();
+          g.poly(f.left.flatMap(v => [v.x, v.y])).fill(COLOUR(part.left));
+          g.poly(f.right.flatMap(v => [v.x, v.y])).fill(COLOUR(part.right));
+          g.poly(f.top.flatMap(v => [v.x, v.y])).fill(COLOUR(part.top));
+          group.addChild(g);
+        }
+      }
       const name = new Text({
         text: p.name,
         style: new TextStyle({

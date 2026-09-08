@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"os"
 	"regexp"
 	"strconv"
@@ -111,5 +112,36 @@ func TestTheCityCanBeReadWithoutWebGL(t *testing.T) {
 	// zoomed in on the docks should stay there when an hour passes.
 	if strings.Contains(source, "useEffect(frame") {
 		t.Error("the camera is re-framed on every update, which throws away where the player was looking")
+	}
+}
+
+// Every address must have a painted cut-out. A missing one falls back to a
+// flat-shaded solid, which is correct behaviour and looks like a bug sitting
+// next to eleven painted buildings.
+func TestEveryAddressIsPainted(t *testing.T) {
+	body, err := os.ReadFile("../../public/art/iso/isometric.json")
+	if err != nil {
+		t.Skip("no isometric art beside this build")
+	}
+	var painted []struct {
+		ID   string `json:"id"`
+		File string `json:"file"`
+	}
+	if err := json.Unmarshal(body, &painted); err != nil {
+		t.Fatalf("the manifest does not parse: %v", err)
+	}
+	have := map[string]string{}
+	for _, p := range painted {
+		have[p.ID] = p.File
+	}
+	for _, l := range core.Locations {
+		file, ok := have[l.ID]
+		if !ok {
+			t.Errorf("%s has no isometric cut-out, so it stands on the map as a blocked-out solid", l.Name)
+			continue
+		}
+		if _, err := os.Stat("../../public/art/" + file); err != nil {
+			t.Errorf("%s is in the manifest as %s and the file is not there", l.Name, file)
+		}
 	}
 }
