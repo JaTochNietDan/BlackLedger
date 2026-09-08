@@ -535,3 +535,9 @@
 .room-traffic p{margin:0;font-size:12px;color:#c9cfc4;display:flex;gap:8px;align-items:baseline}
 .room-traffic i{font-style:normal;color:var(--gold);font-size:13px}
 .room-traffic .left i{color:#9ca99f}
+
+/* Somebody who is not at the address their record names. The People screen was
+   confidently wrong about where they were; the least it can do is show that it
+   is now telling you something different. */
+.person-card.walking .doing{color:var(--gold)}
+.on-street{font-style:normal;margin-right:6px}

@@ -31,7 +31,14 @@ type Presence struct {
 	// Yours is whether they answer to the player, Known whether the player has
 	// any reason to know their name at all.
 	Yours bool `json:"yours,omitempty"`
-	Known bool `json:"known,omitempty"`
+	// Walking is somebody who is between two addresses right now. Where and
+	// WhereID then name where they are *going*, because that is the only place
+	// they could be met: reaching a man in the street is not something this
+	// game models, and pointing the player at the door he walked out of sends
+	// them across the city to an empty room.
+	Walking bool `json:"walking,omitempty"`
+	Minutes int  `json:"minutes,omitempty"`
+	Known   bool `json:"known,omitempty"`
 	// Temperament and Manner are what the player has learned of their
 	// character; empty for a stranger.
 	Temperament string `json:"temperament,omitempty"`
@@ -100,6 +107,19 @@ func (w *World) doingNow(n *NPC) string {
 		where = place.Name
 	}
 	switch {
+	case w.Travelling(n):
+		// Said before anything else: a man on the street is not on a door, not
+		// on duty, and not behind a desk, whatever his job is.
+		if to, ok := PlaceByID(n.Heading); ok {
+			out := "Walking to " + to.Name + ", " + itoa(max(1, n.Arrives-w.Minute)) + " minutes out"
+			// The errand usually names the same building, and saying it twice
+			// in one line reads as a stutter rather than as a reason.
+			if n.Errand != "" && !containsName(n.Errand, to.Name) {
+				out += " — " + n.Errand
+			}
+			return out
+		}
+		return "Somewhere on the street"
 	case w.Inside(n):
 		return "Held at Ward Street Station"
 	case w.postedWhere(n.ID) != "":
@@ -188,6 +208,12 @@ func (w *World) see(n *NPC) Presence {
 	}
 	if place, ok := PlaceByID(n.Location); ok {
 		p.Where = place.Name
+	}
+	if w.Travelling(n) {
+		if to, ok := PlaceByID(n.Heading); ok {
+			p.Walking, p.WhereID, p.Where = true, n.Heading, "On the way to "+to.Name
+			p.Minutes = max(1, n.Arrives-w.Minute)
+		}
 	}
 	if known {
 		p.Faction = w.factionName(n.Faction)

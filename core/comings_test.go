@@ -88,3 +88,93 @@ func TestWhatHappenedInTheRoomIsReportedWithTheAction(t *testing.T) {
 		}
 	}
 }
+
+// The People screen reads a person's address straight off their record, and a
+// person out walking keeps the address they set off from until they arrive. So
+// the screen said Mara Bell was at Saint Agnes while she was somewhere on the
+// way to the laundry, and a player could spend forty minutes crossing the city
+// to a room she was not in. An interface that is confidently wrong about where
+// somebody is, is worse than one that says nothing.
+func TestSomebodyOutWalkingIsNotReportedAsBeingSomewhere(t *testing.T) {
+	w := New(4)
+	n := w.NPC("mara")
+	n.Role, n.Location = "Runs Bluebird Laundry", "bar"
+	w.SetOut()
+
+	var her Presence
+	for _, p := range w.Everyone() {
+		if p.ID == n.ID {
+			her = p
+		}
+	}
+	if her.ID == "" {
+		t.Fatal("she is not in the city at all")
+	}
+	if !her.Walking {
+		t.Fatal("she is on the street and the city says she is standing somewhere")
+	}
+	if her.Where == "Saint Agnes" {
+		t.Fatal("she is reported at the address she walked out of")
+	}
+	// Where the player is pointed has to be somewhere they could meet her, and
+	// the only such place is where she is going.
+	if her.WhereID != "laundry" {
+		t.Fatalf("the player is pointed at %q, where she is not and is not going", her.WhereID)
+	}
+	if her.Minutes <= 0 || her.Doing == "" {
+		t.Fatalf("she is %d minutes out, doing %q", her.Minutes, her.Doing)
+	}
+	for _, word := range []string{"Bluebird Laundry"} {
+		if !contains(her.Doing, word) {
+			t.Fatalf("what she is doing does not say where she is going: %q", her.Doing)
+		}
+	}
+}
+
+// And once she gets there the report goes back to being ordinary.
+func TestArrivingPutsSomebodyBackInARoom(t *testing.T) {
+	w := New(4)
+	n := w.NPC("mara")
+	n.Role, n.Location = "Runs Bluebird Laundry", "bar"
+	w.SetOut()
+	w.Minute = n.Arrives
+	w.Arrivals()
+	for _, p := range w.Everyone() {
+		if p.ID == n.ID {
+			if p.Walking || p.Where != "Bluebird Laundry" {
+				t.Fatalf("she has arrived and is reported as %+v", p)
+			}
+			return
+		}
+	}
+	t.Fatal("she vanished on arrival")
+}
+
+// The other half of the same lie: an action offered against somebody who has
+// walked out. Buying a coffee for a man who is halfway across the city is not
+// something the player should be able to press.
+func TestYouCannotDealWithSomebodyWhoHasWalkedOut(t *testing.T) {
+	w := New(4)
+	w.Player.Location = "bar"
+	n := w.NPC("mara")
+	before := 0
+	for _, a := range w.Actions("bar") {
+		if a.Subject == n.ID && !a.Disabled {
+			before++
+		}
+	}
+	if before == 0 {
+		t.Fatal("there was nothing to do with her in the first place")
+	}
+	// Send her somewhere; she is now on the street, not in the bar.
+	n.Role = "Runs Bluebird Laundry"
+	w.SetOut()
+	if !w.Travelling(n) {
+		t.Fatal("she did not set off")
+	}
+	for _, a := range w.Actions("bar") {
+		if a.Subject == n.ID && !a.Disabled {
+			t.Fatalf("%q is offered against somebody who is out on the street", a.Label)
+		}
+	}
+}

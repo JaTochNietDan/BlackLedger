@@ -1124,6 +1124,26 @@ func (w *World) Actions(id string) []Action {
 			fmt.Sprintf("%s $%d, %d respect and %d standing with %s. Three days. Failing costs %d standing with them.", offer.Brief, offer.Pay, offer.Respect, offer.Goodwill, w.factionName(offer.PatronID), offer.Penalty))
 	}
 	add("wait", "Let an hour pass", 60, 0, "", "Income, rent, operations and rival plans continue.")
+	// One rule, applied once, over everything aimed at a person: somebody out
+	// on the street is not here to be dealt with. Every action about a person
+	// is written at the place it belongs to and none of them checked whether
+	// the person was still standing in it, so the player could buy a coffee for
+	// a woman who was halfway across the city. Doing it here rather than at
+	// forty call sites means the next action about a person cannot forget.
+	for i := range out {
+		if out[i].Subject == "" || out[i].Disabled {
+			continue
+		}
+		n := w.NPC(out[i].Subject)
+		if !w.Travelling(n) {
+			continue
+		}
+		out[i].Disabled = true
+		out[i].Reason = n.Name + " is out on the street"
+		if to, ok := PlaceByID(n.Heading); ok {
+			out[i].Reason += ", walking to " + to.Name + " — " + itoa(max(1, n.Arrives-w.Minute)) + " minutes out"
+		}
+	}
 	return out
 }
 func (w *World) Retaliation() { w.RetaliationFrom("bellandi") }

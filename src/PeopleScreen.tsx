@@ -21,12 +21,12 @@ const groups: [string, string, string][] = [
 const money = (n: number) => '$' + Math.floor(n).toLocaleString();
 
 function Card({who}: {who: Presence}) {
-  return <article className={'person-card' + (who.yours ? ' yours' : '') + (who.overdue || who.sore ? ' sour' : '')}>
+  return <article className={'person-card' + (who.yours ? ' yours' : '') + (who.overdue || who.sore ? ' sour' : '') + (who.walking ? ' walking' : '')}>
     <Portrait id={who.id} size="small"/>
     <div className="person-of">
       <b>{who.name}</b>
       <small>{who.standing}{who.temperament ? ` · ${who.temperament}` : ''}</small>
-      <small className="doing">{who.doing}</small>
+      <small className="doing">{who.walking && <i className="on-street" aria-hidden="true">↗</i>}{who.doing}</small>
       {(who.owes || who.sore || (who.known && who.trust !== undefined)) &&
         <small className={who.overdue || who.sore ? 'warning' : 'subtle'}>
           {[who.owes ? `owes ${money(who.owes)}${who.overdue ? ' · overdue' : ''}` : '',

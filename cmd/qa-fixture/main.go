@@ -12,13 +12,13 @@ import (
 
 func main() {
 	if len(os.Args) < 2 || len(os.Args) > 3 {
-		log.Fatal("usage: go run ./cmd/qa-fixture <new-qa.sqlite3> [police|damage|warning|russo-warning|attack|voice|contact|paused-job|leader|doorman|arrest|debt|herald|killing|dead|offer|audience|street|room]")
+		log.Fatal("usage: go run ./cmd/qa-fixture <new-qa.sqlite3> [police|damage|warning|russo-warning|attack|voice|contact|paused-job|leader|doorman|arrest|debt|herald|killing|dead|offer|audience|street|room|gone]")
 	}
 	scenario := "police"
 	if len(os.Args) == 3 {
 		scenario = os.Args[2]
 	}
-	if scenario != "police" && scenario != "damage" && scenario != "warning" && scenario != "russo-warning" && scenario != "attack" && scenario != "voice" && scenario != "contact" && scenario != "paused-job" && scenario != "leader" && scenario != "doorman" && scenario != "arrest" && scenario != "debt" && scenario != "herald" && scenario != "killing" && scenario != "dead" && scenario != "offer" && scenario != "audience" && scenario != "street" && scenario != "room" {
+	if scenario != "police" && scenario != "damage" && scenario != "warning" && scenario != "russo-warning" && scenario != "attack" && scenario != "voice" && scenario != "contact" && scenario != "paused-job" && scenario != "leader" && scenario != "doorman" && scenario != "arrest" && scenario != "debt" && scenario != "herald" && scenario != "killing" && scenario != "dead" && scenario != "offer" && scenario != "audience" && scenario != "street" && scenario != "room" && scenario != "gone" {
 		log.Fatal("unsupported QA scenario")
 	}
 	path := os.Args[1]
@@ -36,6 +36,18 @@ func main() {
 	}
 	defer s.DB.Close()
 	err = s.Change(func(w *core.World) error {
+		if scenario == "gone" {
+			// The player standing in the bar with somebody they deal with, five
+			// minutes short of the half-day when she is due somewhere else. One
+			// action and she is out on the street rather than across the table.
+			w.Player.Cash, w.Player.Respect = 4000, 30
+			w.Player.Location = "bar"
+			if m := w.NPC("mara"); m != nil {
+				m.Location, m.Role = "bar", "Runs Russo Motor Works"
+			}
+			w.Minute = 715
+			return nil
+		}
 		if scenario == "room" {
 			// The player standing inside a business while somebody walks out of it
 			// on an errand, so the room has traffic to remark on.
@@ -48,6 +60,11 @@ func main() {
 				return fmt.Errorf("nobody to move")
 			}
 			n.Location = "laundry"
+			// Mara stands at the bar with an errand of her own, so the player can
+			// watch somebody they were dealing with become unreachable.
+			if m := w.NPC("mara"); m != nil {
+				m.Role = "Runs Russo Motor Works"
+			}
 			// Five minutes short of midday: the city's people set off on the
 			// half-day, so any ordinary action reaches it.
 			w.Minute = 715
