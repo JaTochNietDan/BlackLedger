@@ -555,3 +555,21 @@
 .walker-figure .painted-portrait{border-color:#8c7c56}
 .walker-figure.yours .walker-tag{color:var(--gold)}
 @media(prefers-reduced-motion:reduce){.walker-figure{transition:none}}
+
+/* The city, drawn as a city. The blocks are SVG so a piece of one can be
+   replaced without touching the rest, and so the whole thing scales to any
+   window without a canvas loop. */
+.city-iso{position:relative;flex:1;min-height:0;display:flex;background:#0d1413}
+.city-iso svg{width:100%;height:100%;display:block}
+.iso-plot{fill:#1b2422;stroke:#232e2b;stroke-width:1.5}
+.iso-plot.lit{fill:#2a2f23;stroke:var(--gold)}
+.iso-block{cursor:pointer}
+.iso-block polygon{transition:opacity .12s}
+.iso-block:hover polygon,.iso-block.picked polygon{opacity:1}
+.iso-block.picked .iso-plot{stroke:var(--gold);stroke-width:2.5}
+.iso-block.here .iso-plot{fill:#2b3327;stroke:#c2a86a}
+.iso-block.owned .iso-plot{stroke:#8f7849}
+.iso-block.shut polygon{opacity:.42}
+.iso-name{font:11px system-ui;fill:#cfd4c6;paint-order:stroke;stroke:#0d1413;stroke-width:3.5px;stroke-linejoin:round;pointer-events:none}
+.iso-block.picked .iso-name,.iso-block.here .iso-name{fill:var(--gold)}
+.city-iso .iso-block.shut .iso-name{fill:#8b9187}
