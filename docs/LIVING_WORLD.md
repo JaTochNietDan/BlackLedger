@@ -114,6 +114,18 @@ on screen doing the actions that they are actually doing and when a major event
 occurs, the camera is taken there and we see it played out with a news headline 
 appearing just after it plays out.
 
+It's also ok if we want to start using another model, local or online to generate
+images as long as they fit our asthetic. If we don't have a local model you can
+download one and experiment with using it to generate images as necessary to flesh
+out the UI.
+
+As we did with the entering a business thing and cleaning up the view there I want 
+you to focus on user friendliness issues like this and really clean it up.
+
+You have to have the mindset of a player in terms of trying to make it easy to understand
+and not make any one interface too busy and overwhelming while still having all that
+complexity built into it.
+
 ## Inbox — unsorted ideas
 
 This section belongs to the user. Add anything here in any form: a mechanic, a

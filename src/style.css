@@ -251,3 +251,20 @@
 .theatre-paper b{font:700 20px/1.15 var(--serif);display:block;margin-top:3px}
 .theatre-done{margin-top:4px}
 @media(prefers-reduced-motion:reduce){.theatre-frame{display:none}}
+
+/* The paper is an archive of issues now, one a day, and you can walk back
+   through them — including into a predecessor's era, which is the premise of a
+   city that remembers. */
+.issue-bar{display:flex;align-items:center;gap:12px;margin-top:20px;padding-bottom:12px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.issue-which{flex:1;min-width:140px;text-align:center}
+.issue-which b{display:block;font:17px var(--serif);font-weight:400}
+.issue-which small{display:block;font-size:11px;color:var(--muted)}
+.issue-bar .plain{white-space:nowrap}
+.issue-bar .plain:disabled{opacity:.35}
+.issue-index{list-style:none;margin:14px 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px;max-height:320px;overflow:auto}
+.issue-index .plain{width:100%;text-align:left;padding:9px 11px;border-color:var(--line)}
+.issue-index .plain.picked{border-color:var(--gold);background:#25332c}
+.issue-index .plain.past-life{border-left:2px solid #7a6a8a}
+.issue-index b{display:block;font:14px var(--serif);font-weight:400}
+.issue-index small{display:block;font-size:10px;color:var(--muted)}
+.past-life-note{margin:14px 0 0;font:italic 12px var(--serif);color:#a99cb5;border-left:2px solid #7a6a8a;padding-left:11px}

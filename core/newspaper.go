@@ -20,9 +20,13 @@ type Story struct {
 	Kind     string `json:"kind"`
 }
 
-// newsCapacity bounds the archive. A campaign runs for weeks of game time and
-// the paper is a recent record, not a complete one.
-const newsCapacity = 60
+// newsCapacity bounds the archive. Measured: a city at war files a little over
+// half a story a day, so sixty was about three months — enough for one life and
+// nothing at all across several. A player who can read back through the paper
+// is reading the history of the city rather than a rolling status, and this
+// game is explicitly about a city that remembers, so the archive is worth the
+// bytes: at roughly a quarter of a kilobyte a story this is some sixty of them.
+const newsCapacity = 240
 
 // Report files a story. Callers pass what the city could observe, which is why
 // the wording differs from the private record written to the player's history.
@@ -36,22 +40,76 @@ func (w *World) Report(kind, headline, body string) {
 	}
 }
 
-// Edition is the paper as it stands, most recent first, with the day each story
-// ran. Only the current life's stories are printed: a new person picks up a
-// paper that has been running the whole time, but the archive they can read
-// starts when they arrive.
+// story is one piece of copy, set the way the paper would set it.
+func (w *World) story(s Story) map[string]any {
+	return map[string]any{
+		"id": s.ID, "headline": s.Headline, "body": s.Body,
+		"kind": s.Kind, "minute": s.Minute, "subject": w.SubjectOf(s),
+		"standfirst": w.standfirst(s), "byline": deskFor(s.Kind), "dateline": Dateline(s.Minute),
+		"day": s.Minute/1440 + 1, "time": fmt.Sprintf("%02d:%02d", s.Minute%1440/60, s.Minute%60),
+		"weight": scrutinyWeight[s.Kind],
+	}
+}
+
+// Edition is today's paper, most recent first. Kept because plenty of things
+// only ever want the front of the paper.
 func (w *World) Edition() []map[string]any {
 	out := []map[string]any{}
 	for i := len(w.News) - 1; i >= 0; i-- {
-		s := w.News[i]
-		if s.Life != w.Life {
-			continue
+		if s := w.News[i]; s.Life == w.Life {
+			out = append(out, w.story(s))
+		}
+	}
+	return out
+}
+
+// Editions is the paper as an archive rather than a rolling list: one issue a
+// day, newest first, every life the save still remembers. A previous
+// protagonist's era is readable, which is the whole premise of a city that
+// remembers — the player who comes next inherits the news as well as the
+// streets.
+//
+// Within an issue the lead is the biggest story of that day rather than the
+// latest, by the same weighting the city uses to decide how hard it is looking.
+// A shop changing hands does not lead over a killing because it happened at
+// four in the afternoon.
+func (w *World) Editions() []map[string]any {
+	type issue struct {
+		day, life int
+		stories   []Story
+	}
+	order := []*issue{}
+	byDay := map[int]*issue{}
+	for _, s := range w.News {
+		day := s.Minute/1440 + 1
+		key := s.Life*100000 + day
+		if byDay[key] == nil {
+			byDay[key] = &issue{day: day, life: s.Life}
+			order = append(order, byDay[key])
+		}
+		byDay[key].stories = append(byDay[key].stories, s)
+	}
+	out := []map[string]any{}
+	for i := len(order) - 1; i >= 0; i-- {
+		in := order[i]
+		// The biggest story of the day leads, then the rest as they came.
+		sorted := append([]Story{}, in.stories...)
+		for a := range sorted {
+			for b := a + 1; b < len(sorted); b++ {
+				if scrutinyWeight[sorted[b].Kind] > scrutinyWeight[sorted[a].Kind] {
+					sorted[a], sorted[b] = sorted[b], sorted[a]
+				}
+			}
+		}
+		stories := []map[string]any{}
+		for _, s := range sorted {
+			stories = append(stories, w.story(s))
 		}
 		out = append(out, map[string]any{
-			"id": s.ID, "headline": s.Headline, "body": s.Body,
-			"kind": s.Kind, "minute": s.Minute, "subject": w.SubjectOf(s),
-			"standfirst": w.standfirst(s), "byline": deskFor(s.Kind), "dateline": Dateline(s.Minute),
-			"day": s.Minute/1440 + 1, "time": fmt.Sprintf("%02d:%02d", s.Minute%1440/60, s.Minute%60),
+			"day": in.day, "life": in.life, "dateline": Dateline((in.day - 1) * 1440),
+			"stories": stories, "count": len(stories),
+			"current": in.life == w.Life && in.day == w.Minute/1440+1,
+			"mine":    in.life == w.Life,
 		})
 	}
 	return out
@@ -126,6 +184,8 @@ func deskFor(kind string) string {
 		return "By our courts correspondent"
 	case "business":
 		return "By our commercial editor"
+	case "civic":
+		return "By our municipal correspondent"
 	case "collapse":
 		return "By our municipal correspondent"
 	}
@@ -160,6 +220,8 @@ func (w *World) standfirst(s Story) string {
 		return fmt.Sprintf("Trade at %s is said to be steady. Rivals in the district were not available for comment.", where)
 	case "collapse":
 		return "The city says the matter is closed. Those who worked there have not been told where to apply."
+	case "civic":
+		return "Compiled from the district returns. The Herald prints them whether or not anything else happened."
 	case "arrest":
 		return "The accused was not represented. The department would not say how the name came to it."
 	case "attempt":
