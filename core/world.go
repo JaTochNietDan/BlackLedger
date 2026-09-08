@@ -246,16 +246,19 @@ type World struct {
 	Commissions []Commission `json:"commissions,omitempty"`
 	// What people in this city hold against each other. Absent in saves from
 	// before anybody remembered anything.
-	Grudges    []Grudge `json:"grudges,omitempty"`
-	News       []Story  `json:"news,omitempty"`
-	Plots      []Plot   `json:"plots"`
-	Tasks      []Task   `json:"tasks"`
-	Event      *Scene   `json:"event"`
-	History    []Record `json:"history"`
-	Dead       []Death  `json:"dead"`
-	Director   Director `json:"director"`
-	Offers     []Offer  `json:"offers"`
-	LastResult *Result  `json:"last_result"`
+	Grudges []Grudge `json:"grudges,omitempty"`
+	// A hand on the table that has not been settled. Absent whenever nobody is
+	// sitting at one, which is nearly always.
+	Hand       *TableHand `json:"hand,omitempty"`
+	News       []Story    `json:"news,omitempty"`
+	Plots      []Plot     `json:"plots"`
+	Tasks      []Task     `json:"tasks"`
+	Event      *Scene     `json:"event"`
+	History    []Record   `json:"history"`
+	Dead       []Death    `json:"dead"`
+	Director   Director   `json:"director"`
+	Offers     []Offer    `json:"offers"`
+	LastResult *Result    `json:"last_result"`
 }
 type Command struct {
 	RequestID string `json:"request_id"`
@@ -592,12 +595,22 @@ func (w *World) Actions(id string) []Action {
 		add("audience", "Request an audience", 45, 0, "", "Discuss your standing with the Bellandi family.")
 		add("provoke", "Demand protection money", 30, 0, "", "EXTREME RISK. Bellandi owns this casino. Challenging him can bring lethal retaliation.")
 	}
+	if w.Hand != nil && !w.Hand.Done && w.Hand.Place == id {
+		add("hit", "Take another card", 5, 0, "",
+			fmt.Sprintf("You are showing %d and the dealer is showing %d. Over %d and it is finished.", w.Hand.Player, w.Hand.Dealer, Bust))
+		add("stand", "Stand on "+fmt.Sprint(w.Hand.Player), 5, 0, "",
+			fmt.Sprintf("The dealer draws to %d and stands on %d. A tie gives your money back.", DealerStands-1, DealerStands))
+	}
 	if HasTables(id) && !w.Own(id) {
 		for _, stake := range tableStakes {
 			// Cost is zero here because Play charges the stake itself; declaring
 			// it would have the command layer charge it a second time.
-			add("play:"+stake.ID, stake.Label, 60, 0, w.TableReadiness(id, stake),
-				fmt.Sprintf("Stake $%d against the house. The house holds the edge, and winning heavily in somebody else's room is noticed.", stake.Amount))
+			reason := w.TableReadiness(id, stake)
+			if reason == "" && w.Hand != nil && !w.Hand.Done {
+				reason = "There is a hand on the table already"
+			}
+			add("play:"+stake.ID, stake.Label, 60, 0, reason,
+				fmt.Sprintf("Stake $%d and play it out a card at a time. The dealer draws to %d and stands on %d, a tie gives your money back, and going over is finished before the dealer plays at all.", stake.Amount, DealerStands-1, DealerStands))
 		}
 	}
 	if place, ok := PlaceByID(id); ok && place.Type == "racket" && w.Own(id) {
@@ -1038,7 +1051,7 @@ func (w *World) Public() map[string]any {
 	if len(history) > 60 {
 		history = history[len(history)-60:]
 	}
-	return map[string]any{"id": w.ID, "version": w.Version, "revision": w.Revision, "life": w.Life, "minute": w.Minute, "player": w.Player, "district": w.District, "factions": w.Factions, "npcs": w.People(), "locations": locs, "event": scene, "history": history, "dead": w.Dead, "tasks": w.Tasks, "director": w.Director, "last_result": w.LastResult, "daily_cost": w.DailyCost(), "income": income, "security": w.Guard(), "opportunity": w.NextOpportunity(), "known_threats": w.KnownThreats(), "business_truces": w.ActiveBusinessTruces(), "conflicts": w.PublicConflicts(), "goods": w.Goods, "arms": w.ArmsDescription(), "appearance": w.AppearanceDescription(), "vehicle": w.VehicleDescription(), "residence": w.ResidenceDescription(), "offshore": map[string]any{"balance": w.Offshore, "reachable": w.Player.Offshore}, "newspaper": w.Edition(), "arrangements": w.PendingArrangements(), "commissions": w.PublicCommissions(), "grudges": w.GrudgeSummary(), "cast": w.Cast(), "retainers": w.RetainerDescription(), "armoury": w.ArmouryDescription(), "population": w.PopulationSummary()}
+	return map[string]any{"id": w.ID, "version": w.Version, "revision": w.Revision, "life": w.Life, "minute": w.Minute, "player": w.Player, "district": w.District, "factions": w.Factions, "npcs": w.People(), "locations": locs, "event": scene, "history": history, "dead": w.Dead, "tasks": w.Tasks, "director": w.Director, "last_result": w.LastResult, "daily_cost": w.DailyCost(), "income": income, "security": w.Guard(), "opportunity": w.NextOpportunity(), "known_threats": w.KnownThreats(), "business_truces": w.ActiveBusinessTruces(), "conflicts": w.PublicConflicts(), "goods": w.Goods, "arms": w.ArmsDescription(), "appearance": w.AppearanceDescription(), "vehicle": w.VehicleDescription(), "residence": w.ResidenceDescription(), "offshore": map[string]any{"balance": w.Offshore, "reachable": w.Player.Offshore}, "newspaper": w.Edition(), "arrangements": w.PendingArrangements(), "commissions": w.PublicCommissions(), "grudges": w.GrudgeSummary(), "cast": w.Cast(), "retainers": w.RetainerDescription(), "armoury": w.ArmouryDescription(), "population": w.PopulationSummary(), "hand": w.HandDescription()}
 }
 func (w *World) hasRecord(title string) bool {
 	for _, r := range w.History {

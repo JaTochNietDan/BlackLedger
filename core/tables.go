@@ -101,22 +101,28 @@ func (w *World) Play(id, stakeID string) error {
 	if house != nil {
 		house.Cash = max(0, house.Cash-net)
 	}
+	w.tableAftermath(place.Name, house, net, stake.Amount)
+	return nil
+}
+
+// tableAftermath is what the room does about how the night went. The same for
+// one hand and for a session, because the room does not care which it was.
+func (w *World) tableAftermath(place string, house *Faction, net, staked int) {
 	switch {
-	case net > stake.Amount*2:
+	case net > staked*2:
 		// Winning heavily at somebody's tables is noticed by the somebody.
 		w.Player.Heat = min(100, w.Player.Heat+3)
 		if house != nil {
 			house.Goodwill = max(-100, house.Goodwill-8)
-			w.Log("A good night at "+place.Name, fmt.Sprintf("You walk out $%d up. The floor manager watched you do it, and %s does not enjoy losing in its own room.", net, house.Name), "politics")
-			return nil
+			w.Log("A good night at "+place, fmt.Sprintf("You walk out $%d up. The floor manager watched you do it, and %s does not enjoy losing in its own room.", net, house.Name), "politics")
+			return
 		}
-		w.Log("A good night at "+place.Name, fmt.Sprintf("You walk out $%d up. Nights like this are remembered.", net), "business")
+		w.Log("A good night at "+place, fmt.Sprintf("You walk out $%d up. Nights like this are remembered.", net), "business")
 	case net > 0:
-		w.Log("A quiet win at "+place.Name, fmt.Sprintf("You leave $%d ahead. Nobody looks twice.", net), "business")
+		w.Log("A quiet win at "+place, fmt.Sprintf("You leave $%d ahead. Nobody looks twice.", net), "business")
 	case net == 0:
-		w.Log("An even night at "+place.Name, "You leave with what you brought, which is more than most manage.", "business")
+		w.Log("An even night at "+place, "You leave with what you brought, which is more than most manage.", "business")
 	default:
-		w.Log("The house takes it at "+place.Name, fmt.Sprintf("You lose $%d. The tables do not care who you are.", -net), "business")
+		w.Log("The house takes it at "+place, fmt.Sprintf("You lose $%d. The tables do not care who you are.", -net), "business")
 	}
-	return nil
 }

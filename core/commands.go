@@ -248,7 +248,15 @@ func (w *World) apply(c Command) error {
 				}
 				w.Log("A demand nobody forgets", "The manager refuses. A Bellandi man watches you leave. You have challenged a powerful family on its own ground.", "politics")
 			case "play:small", "play:high":
-				if err := w.Play(target, strings.TrimPrefix(c.Kind, "play:")); err != nil {
+				if err := w.Deal(target, strings.TrimPrefix(c.Kind, "play:")); err != nil {
+					return err
+				}
+			case "hit":
+				if err := w.DrawCard(); err != nil {
+					return err
+				}
+			case "stand":
+				if err := w.Stand(); err != nil {
 					return err
 				}
 			case "arms:weapon", "arms:armour":

@@ -119,15 +119,8 @@ into `docs/DEVELOPMENT.md` once they are actually built and tested. An entry
 stays here, in the original wording, until it is genuinely implemented — so if
 it is still in this list, it does not exist in the game yet.
 
-- Playable casino games
-- Every noteable character can be killed
 - All named characters (living NPCs) are dynamic people who live somewhere and their own people that have their own agendas and stuff (meaning the fixers, etc). No character is a fixed character that cannot die or something. They might be gone and replaced by another. All of that is dynamic and living. Everything that you do, that can happen to you, can happen to them and be done by them.
-- Not all situations that occur have answers that are clear to the user, sometimes there is a feud that we didn't know about.
 - Ownable businesses really need to have character to them and almost mini-simulation games within them. Casinos need to be micro managed, laundromats, etc. Money isn't easy to come by, it requires work and smart play.
-- Perhaps a system in which some money can be preserved by funneling off to an offshore swiss account and can be accessed by new start players, maybe money deposited in there comes at large cost. Maybe accessing this as a new start is difficult and requires some capital to be able to fly there or something and access it.
-- Hitmen could be hired discreetly to take out anyone in the game but they can be expensive depending on who you're targeting, and they can fail and/or captured and interogated to find out who hired them which would land the heat back on you. More expensive hitmen are better at their job. The hitmen can also be used against you in the same way, it's not a one way street.
-- Moonshine, drugs etc are a part of the game with underground trade and whatnot, fluctuating prices, sabotage, etc. An example could be being able to own a moonshine business that can produce it and then sell it on the market but that could be attacked, have parts stolen by other living NPCs etc.
-- The point is that nobody involved in the world is actually some unnamed NPC, it all is a living NPC that you are dealing with, someone that you know of, know their face, know them over time etc or know of their name (or not, lower living NPC that you have not had any interaction with and don't know of)
 - A function I remember from an old mafia game was that world events would appear as news stories in a simulated news paper, maybe we can copy that and iterate on it, that was very cool. They usually had a headline with some details underneath. A newspaper with a breakdown of recent world events or major events with a headline, a black and white low res picture of some representation of the event or something would be really cool.
 
 Ultiamtely the expectation is that I don't have to think of all of these concepts, you, the agent will think of these too and build them out and playtest and simulate them yourself.
