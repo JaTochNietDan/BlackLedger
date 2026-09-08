@@ -9,7 +9,17 @@ import type {Snapshot,Record as CityRecord} from './types';
 
 const weight = (r: CityRecord) => ({death: 6, danger: 5, intel: 4, politics: 3, story: 2, personal: 1}[r.kind] ?? 0);
 const money = (n: number) => (n < 0 ? '−' : '+') + '$' + Math.abs(n).toLocaleString();
-const hours = (m: number) => m >= 120 ? `${Math.round(m / 60)} hours` : m >= 60 ? `${Math.floor(m / 60)}h ${m % 60}m` : `${m} min`;
+// How long something took, in the units a person would use for it. Sitting out
+// a sentence the game itself calls "Do the 5 days" was reported as "120 hours",
+// which is true and tells the player nothing: past a day, days are the unit.
+const hours = (m: number) => {
+  if (m >= 1440) {
+    const days = Math.floor(m / 1440), rest = Math.round((m % 1440) / 60);
+    const said = days === 1 ? '1 day' : `${days} days`;
+    return rest ? `${said} ${rest}h` : said;
+  }
+  return m >= 120 ? `${Math.round(m / 60)} hours` : m >= 60 ? `${Math.floor(m / 60)}h ${m % 60}m` : `${m} min`;
+};
 
 export function Outcome({world, onLedger}: {world: Snapshot; onLedger: () => void}) {
   const result = world.last_result;

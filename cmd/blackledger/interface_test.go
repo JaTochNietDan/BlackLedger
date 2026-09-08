@@ -160,3 +160,18 @@ func TestOnlyOneFigureClaimsToBeWhatAPlaceCouldEarn(t *testing.T) {
 		t.Errorf("the property panel claims %d times to say what a place could earn; that sentence belongs to the core's own note", n)
 	}
 }
+
+// The result band reports how long a decision took. Sitting out a sentence the
+// game itself calls "Do the 5 days" was reported as "120 hours" — true, and it
+// tells the player nothing. This is a text guard only; that the band actually
+// reads "5 days" was checked in a browser, because a regular expression cannot
+// tell you what a player sees.
+func TestTheResultBandCanCountInDays(t *testing.T) {
+	body, err := os.ReadFile("../../src/Outcome.tsx")
+	if err != nil {
+		t.Skip("no interface sources beside this build")
+	}
+	if !strings.Contains(string(body), "1440") {
+		t.Error("the result band has no idea what a day is, so a five-day sentence reads in hours")
+	}
+}
