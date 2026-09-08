@@ -170,3 +170,34 @@
 .workspace.inside .interior-stage{grid-template-columns:minmax(0,1fr) 400px}
 .workspace.inside .room .interior{max-height:58vh}
 @media(min-width:1600px){.workspace.inside .interior-stage{grid-template-columns:minmax(0,1fr) 460px}}
+
+/* A list of names is a list. A list of faces is a room. */
+.portrait-tiny,.portrait-wrap.portrait-tiny{width:30px;height:36px;flex:none;display:block}
+.portrait-wrap.portrait-tiny .portrait{width:30px;height:36px;display:block}
+.portrait-small,.portrait-wrap.portrait-small{width:46px;height:56px;flex:none;display:block}
+.portrait-wrap.portrait-small .portrait{width:46px;height:56px;display:block}
+.room-chip{display:flex;align-items:center;gap:9px}
+.room-chip .chip-name{min-width:0}
+.room-chip .chip-name b{display:block;font:13px var(--serif);font-weight:400;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.room-chip .chip-name small{display:block;font-size:10px;color:var(--muted);line-height:1.35;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.picked-person header{display:flex;align-items:flex-start;gap:12px}
+.picked-person .picked-who{min-width:0}
+/* The painted faces were scoped to .person, so they were blank anywhere else —
+   including the room, which is the one place a face is most worth having. The
+   sprite sheet belongs to the portrait, not to the container it sits in. */
+.painted-portrait{background-image:url('/art/cast-noir-v1.png');background-size:300% 200%;background-repeat:no-repeat;border:1px solid #665d43}
+.portrait-tiny.painted-portrait{width:30px;height:36px}
+.portrait-small.painted-portrait{width:46px;height:56px}
+
+/* A person's pane is theirs alone: everything you can do with them and nothing
+   else, because a list that mixes "collect what she owes" with "restock the
+   laundry" is asking the player to do the sorting. The building's own work is
+   what the pane holds when nobody is picked. */
+.picked-person.only{border-bottom:0;margin-bottom:0;padding-bottom:0}
+.picked-person .step-away{display:block;width:100%;margin:12px 0 4px;text-align:left;color:var(--muted)}
+.picked-person .step-away:hover{color:var(--gold)}
+
+/* Every chip the same size, whatever the name. A grid of faces reads as a room;
+   a ragged row of boxes reads as a list that happens to have faces in it. */
+.room-people{display:grid;grid-template-columns:repeat(auto-fill,minmax(186px,1fr));align-content:start}
+.room-chip{max-width:none;width:100%;min-height:52px}
