@@ -57,7 +57,7 @@ func (w *World) PlaceNote(id string) string {
 	case running && w.Custom(id) < 40:
 		return "The regulars have gone elsewhere"
 	case prop.Income > 0:
-		return fmt.Sprintf("Trading at %d%% of what it could", int(w.Trading(id)*100))
+		return fmt.Sprintf("Trading at %d%% of an ordinary day", int(w.Trading(id)*100))
 	}
 	return ""
 }
@@ -82,12 +82,18 @@ func (w *World) PlaceWarn(id string) bool {
 		(running && w.Custom(id) < 40)
 }
 
-// Trading is the share of what a place could earn that it is actually earning:
+// Trading is what a place is earning against an ordinary day at it:
 // how well it is staffed and supplied, how much custom it keeps, and the
 // condition of the building — which the clock uses to scale every dollar and
 // which this figure used to leave out. A laundry knocked down to 60% earned
 // 169 a day where a sound one earned 305, and told the player it was trading
 // at everything it could.
+//
+// It is deliberately not a share of a maximum. A place with more regulars than
+// usual earns more than an ordinary day, and the live campaign duly read
+// "Trading at 102% of what it could" — a percentage of a ceiling, above the
+// ceiling. The baseline is an ordinary day, and beating it is the point of
+// keeping custom.
 func (w *World) Trading(id string) float64 {
 	prop := w.Properties[id]
 	if prop == nil {

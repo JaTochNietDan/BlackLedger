@@ -132,4 +132,14 @@ func TestWhatAPlaceIsTradingAtIsWhatItActuallyEarns(t *testing.T) {
 	if note := w.PlaceNote("laundry"); contains(note, "100%") {
 		t.Fatalf("a laundry at 80%% condition says %q", note)
 	}
+	// And the sentence must not describe the number as a share of a maximum,
+	// because strong custom carries a place past an ordinary day.
+	w.Properties["laundry"].Condition = 100
+	w.ShiftCustom("laundry", "a good week", 40)
+	if w.Trading("laundry") <= 1 {
+		t.Skip("custom no longer lifts a place past an ordinary day")
+	}
+	if note := w.PlaceNote("laundry"); contains(note, "of what it could") {
+		t.Fatalf("a place doing better than usual reports a percentage of a ceiling, above the ceiling: %q", note)
+	}
 }
