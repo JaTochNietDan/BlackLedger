@@ -65,7 +65,7 @@ func (w *World) CoupAftermath(f *Faction, winner, loser *NPC) {
 			if m.Dead || m.ID == winner.ID || m.Rank >= RankLeader {
 				continue
 			}
-			w.Kill(m.ID, fmt.Sprintf("Dealt with in %s after %s took it.", f.Name, winner.Name))
+			w.KillBy(m.ID, winner, fmt.Sprintf("They had backed the wrong man when %s took %s.", winner.Name, f.Name))
 			f.Power = max(10, f.Power-4)
 			break
 		}
@@ -132,7 +132,7 @@ func (w *World) InternalMove(f *Faction) bool {
 		w.Log("A move against "+leader.Name,
 			fmt.Sprintf("%s has taken %s's place at the head of %s by force. The organization is divided and bleeding.", challenger.Name, leader.Name, f.Name),
 			"politics")
-		w.Kill(leader.ID, challenger.Name+" moved against them from inside "+f.Name+".")
+		w.KillBy(leader.ID, challenger, challenger.Name+" moved against them from inside "+f.Name+".")
 		f.Power = max(10, f.Power-12)
 		w.CoupAftermath(f, challenger, leader)
 		return true
@@ -140,7 +140,7 @@ func (w *World) InternalMove(f *Faction) bool {
 	w.Log("A move that failed",
 		fmt.Sprintf("%s tried to take %s from %s and did not survive it. The people who backed them are being counted.", challenger.Name, f.Name, leader.Name),
 		"politics")
-	w.Kill(challenger.ID, "They moved against "+leader.Name+" and lost.")
+	w.KillBy(challenger.ID, leader, "They had moved against "+leader.Name+" and lost.")
 	f.Power = max(10, f.Power-5)
 	w.CoupAftermath(f, leader, challenger)
 	return true

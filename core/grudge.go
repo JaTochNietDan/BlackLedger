@@ -166,7 +166,7 @@ func (w *World) settle(holder, target *NPC, g Grudge) {
 	if w.WorldRandom() >= odds {
 		// It went wrong, which is how the wrong person ends up dead.
 		if w.WorldRandom() < .3 {
-			w.Kill(holder.ID, fmt.Sprintf("%s went after %s and did not come back.", holder.Name, target.Name))
+			w.KillBy(holder.ID, target, fmt.Sprintf("They had gone after %s over %s.", target.Name, g.Because))
 			w.hostility(target, holder, 6)
 			return
 		}
@@ -176,7 +176,7 @@ func (w *World) settle(holder, target *NPC, g Grudge) {
 		return
 	}
 
-	w.Kill(target.ID, fmt.Sprintf("%s was killed over %s.", target.Name, g.Because))
+	w.KillBy(target.ID, holder, fmt.Sprintf("It was over %s.", g.Because))
 	// Whoever the dead answered to now has a reason of their own, and if the
 	// two belong to different organizations the city has a new quarrel.
 	w.hostility(holder, target, 14)

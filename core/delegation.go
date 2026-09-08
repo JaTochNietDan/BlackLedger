@@ -89,7 +89,7 @@ func (w *World) HandHurt(hand Hand, injury int, what string) {
 		name := member.Name
 		w.Player.Crew = w.Player.Crew[:0]
 		if n := w.NPC(member.ID); n != nil {
-			w.Kill(n.ID, fmt.Sprintf("Killed doing %s for somebody else.", what))
+			w.KillBy(n.ID, nil, fmt.Sprintf("They had gone to %s for somebody else.", what))
 		} else {
 			w.Log(name+" did not come back", fmt.Sprintf("You sent him to %s and somebody was waiting. There is nobody to send now.", what), "danger")
 		}

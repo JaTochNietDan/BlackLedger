@@ -164,31 +164,20 @@ func (w *World) Commission(target, tier string) error {
 	return nil
 }
 
-// killingMethods describe how it was done, chosen by where the person was.
-// The detail is the point: a hit that is only a number is not a story.
-var killingMethods = map[string][]string{
-	"bar":       {"Shot twice at the counter of %s, in front of everyone and nobody.", "Stabbed in the passage behind %s and left where the bins are."},
-	"club":      {"Shot in the doorway of %s while the band kept playing.", "Beaten to death in the office above %s."},
-	"market":    {"Shot at the loading doors of %s, early, before the traders came.", "Found under a tarpaulin at %s with a wire still around their throat."},
-	"docks":     {"Went into the water off %s with their pockets full of chain.", "Shot on the quay at %s and rolled off it."},
-	"laundry":   {"Held under in a press at %s until they stopped.", "Shot through the window of %s from a car that did not stop."},
-	"garage":    {"Crushed under a car at %s that was not on a jack by accident.", "Shot in the pit at %s, twice, close."},
-	"casino":    {"Shot on the steps of %s, walking out with a good night behind them.", "Found in a service corridor at %s, no marks worth reporting."},
-	"apartment": {"Shot on their own landing at %s.", "Strangled in the stairwell of %s."},
-	"estate":    {"Shot on the drive at %s, getting out of the car.", "Found in the grounds of %s two days later."},
-	"room":      {"Shot through the door of their room at %s.", "Smothered in their bed at %s."},
-}
-
-func (w *World) killingMethod(person *NPC) string {
-	place, ok := PlaceByID(person.Location)
-	if !ok {
-		return "Killed in the street, and the street said nothing about it."
+// killingMethod is how a commissioned killing was done. The manner comes from
+// the same place every other death in this city gets it; what the tier adds is
+// how much of a mess was left behind, which is most of what the fee buys.
+func (w *World) killingMethod(person *NPC, tier Tier) string {
+	manner := w.Manner(person, nil)
+	switch tier.ID {
+	case "cheap":
+		return manner + " Whoever did it left a great deal behind them."
+	case "professional":
+		return manner + " Whoever did it had done it before."
+	case "specialist":
+		return manner + " There is nothing to find and there was never going to be."
 	}
-	options := killingMethods[person.Location]
-	if len(options) == 0 {
-		return fmt.Sprintf("Killed near %s, quickly, by somebody who left.", place.Name)
-	}
-	return fmt.Sprintf(options[int(w.WorldRandom()*float64(len(options)))%len(options)], place.Name)
+	return manner
 }
 
 // ResolveContracts settles every commissioned killing whose moment has come.
@@ -227,7 +216,7 @@ func (w *World) resolveContract(c Contract) {
 	}
 
 	if w.WorldRandom() < odds {
-		method := w.killingMethod(person)
+		method := w.killingMethod(person, tier)
 		w.Kill(c.Target, method)
 		if c.Payer == "player" {
 			w.Player.Heat = min(100, w.Player.Heat+6)

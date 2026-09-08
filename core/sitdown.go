@@ -209,11 +209,11 @@ func (w *World) bloodbath(a, b *Faction) {
 	}
 	// Both sides lose people. Whoever planned it loses fewer.
 	if victim := w.casualty(b.ID); victim != nil {
-		w.Kill(victim.ID, fmt.Sprintf("Shot at Saint Agnes when a meeting between %s and %s went the way somebody had already decided.", a.Name, b.Name))
+		w.KillBy(victim.ID, nil, fmt.Sprintf("A meeting between %s and %s went the way somebody had already decided.", a.Name, b.Name))
 	}
 	if w.WorldRandom() < .5 {
 		if victim := w.casualty(a.ID); victim != nil {
-			w.Kill(victim.ID, "Shot at Saint Agnes in the same room, on the same evening.")
+			w.KillBy(victim.ID, nil, "The same room, the same evening.")
 		}
 	}
 

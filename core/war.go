@@ -126,7 +126,7 @@ func (w *World) contest(attacker, defender *Faction) {
 	// A raid reaches people, not only premises.
 	if w.WorldRandom() < .18 {
 		if victim := w.casualty(defender.ID); victim != nil {
-			w.Kill(victim.ID, fmt.Sprintf("Killed at %s when %s came for it.", place.Name, attacker.Name))
+			w.KillBy(victim.ID, nil, fmt.Sprintf("%s had come for %s.", attacker.Name, place.Name))
 		}
 	}
 

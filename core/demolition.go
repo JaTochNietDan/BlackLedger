@@ -194,13 +194,13 @@ func (w *World) detonate(id, cause string) {
 		if owner != nil {
 			if victim := w.casualty(owner.ID); victim != nil {
 				killed = victim.Name
-				w.Kill(victim.ID, fmt.Sprintf("Killed at %s when a charge went off under it.", place.Name))
+				w.Kill(victim.ID, fmt.Sprintf("%s was inside %s when a charge went off under it, %s.", victim.Name, place.Name, hourOf(w.Minute)))
 			}
 		} else {
 			for i := range w.NPCs {
 				if n := &w.NPCs[i]; !n.Dead && n.Location == id {
 					killed = n.Name
-					w.Kill(n.ID, fmt.Sprintf("Killed at %s when a charge went off under it.", place.Name))
+					w.Kill(n.ID, fmt.Sprintf("%s was inside %s when a charge went off under it, %s.", n.Name, place.Name, hourOf(w.Minute)))
 					break
 				}
 			}

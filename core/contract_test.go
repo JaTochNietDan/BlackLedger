@@ -159,7 +159,8 @@ func TestAKillingIsDescribedByWhereItHappened(t *testing.T) {
 	w := New(19)
 	seen := map[string]bool{}
 	for i := 0; i < 40; i++ {
-		seen[w.killingMethod(w.NPC("vittorio"))] = true
+		tier, _ := contractTier("professional")
+		seen[w.killingMethod(w.NPC("vittorio"), tier)] = true
 	}
 	if len(seen) < 2 {
 		t.Fatal("every killing at the same place reads identically")
