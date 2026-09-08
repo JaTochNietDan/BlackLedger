@@ -1,6 +1,6 @@
 import {useState} from 'react';
 import type {Snapshot} from './types';
-import {paintedAsset,paintedMask} from './cityAssets';
+import {paintedAsset,paintedFront,paintedMask} from './cityAssets';
 import {Portrait} from './Portrait';
 
 const districts=['Old Harbor','Ashbury','The Heights'];
@@ -23,7 +23,7 @@ export function CityDirectory({state,selected,onSelect}:{state:Snapshot;selected
    const asset=paintedAsset(p.id,p.condition),mask=paintedMask(p.id);
    const owner=p.owned?'Your organization':p.owner.startsWith('former:')?p.owner.slice(7)+'’s survivors':state.factions.find(f=>f.id===p.owner)?.name||'Independent';
    return <button key={p.id} className={'destination-card'+(p.locked?' locked-destination':'')} aria-pressed={selected===p.id} onClick={()=>onSelect(p.id)}>
-    <span className="destination-image" aria-hidden="true">{asset?<img src={asset} alt="" style={mask?{maskImage:`url(${mask})`,maskSize:'contain',maskPosition:'center',maskRepeat:'no-repeat'}:undefined}/>:<svg viewBox="0 0 80 64"><path d="M12 56V22L40 8l28 14v34H12Zm18 0V38h20v18M22 27h7m22 0h7M22 34h7m22 0h7M8 57h64" fill="none" stroke="currentColor" strokeWidth="2"/></svg>}</span>
+    <span className={'destination-image'+(paintedFront(p.id)?' street-front':'')} aria-hidden="true">{asset?<img src={asset} alt="" style={mask?{maskImage:`url(${mask})`,maskSize:'contain',maskPosition:'center',maskRepeat:'no-repeat'}:undefined}/>:<svg viewBox="0 0 80 64"><path d="M12 56V22L40 8l28 14v34H12Zm18 0V38h20v18M22 27h7m22 0h7M22 34h7m22 0h7M8 57h64" fill="none" stroke="currentColor" strokeWidth="2"/></svg>}</span>
     <span className="destination-copy"><small>{districts[p.district]||'New district'} · {p.type}</small><strong>{p.name}</strong><span className={p.owned?'owned-label':''}>{owner}</span><span className="destination-status">{p.locked?'District not yet open':p.id===state.player.location?'You are here':p.id===state.player.home?'Your residence':'Inspect destination →'}{p.condition<100&&` · ${p.condition}% condition`}</span>
     {!p.locked&&!!p.people?.length&&<span className="who-is-here">
      <span className="who-faces">{p.people.slice(0,FACES).map(w=><Portrait key={w.id} id={w.id} size="tiny"/>)}</span>

@@ -1,0 +1,63 @@
+"""Paint the outside of the buildings that have none.
+
+Five addresses were painted by hand for the street study. The other seven —
+the docks, the apartment block, the garage, the Blue Hour, Cypress House, Ward
+Street Station and the Herald — showed a wireframe box in the address book,
+which made half the city look unfinished.
+
+Same contract as the other art tools: generated offline, shipped as files,
+nothing at runtime depends on a model. Run through mise:
+
+    mise run art        # once
+    mise run exteriors
+"""
+import os
+import subprocess
+import sys
+import tempfile
+
+from PIL import Image
+
+LOOK = (
+    "1950s American city building exterior, film noir, oil painting on board, "
+    "three-quarter view from across the street, overcast evening, single warm "
+    "light in the windows, dark umber and olive palette, muted and desaturated, "
+    "visible brushwork, no people, no cars, no text or signage lettering, "
+    "painted by a mid-century illustrator"
+)
+
+FRONTS = {
+    "docks": "a waterfront cargo shed and pier, corrugated roof, timber piles, cranes behind",
+    "apartment": "a respectable four-storey apartment block, stone stoop, iron railings, bay windows",
+    "garage": "a motor repair garage on a corner, wide roller door, flat roof, brick front",
+    "casino": "a discreet two-storey gambling club, awning over the door, shuttered upper windows",
+    "estate": "a large house set back behind a wall, gables, tall chimneys, gravel drive",
+    "precinct": "a grey stone police station, heavy steps, lamp either side of the door, barred windows",
+    "herald": "a three-storey newspaper building, tall printing hall windows, loading bay at street level",
+}
+
+W, H = 768, 512
+
+
+def generate(prompt, seed, path):
+    subprocess.run([
+        os.path.join(os.path.dirname(sys.executable), "mflux-generate"),
+        "--model", "mflux-community/flux-1-schnell-mflux-q8", "--base-model", "schnell",
+        "--steps", "4", "--height", str(H), "--width", str(W),
+        "--seed", str(seed), "--no-metadata", "--output", path, "--prompt", prompt,
+    ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+
+def main(out_dir):
+    os.makedirs(out_dir, exist_ok=True)
+    work = tempfile.mkdtemp(prefix="fronts-")
+    for i, (place, what) in enumerate(sorted(FRONTS.items())):
+        raw = os.path.join(work, f"{place}.png")
+        generate(f"{what}, {LOOK}", 7000 + i * 17, raw)
+        out = os.path.join(out_dir, f"front-{place}-v1.jpg")
+        Image.open(raw).convert("RGB").save(out, quality=82, optimize=True)
+        print(f"  {i + 1}/{len(FRONTS)} {place} -> {out}", flush=True)
+
+
+if __name__ == "__main__":
+    main(sys.argv[1] if len(sys.argv) > 1 else "public/art/fronts")

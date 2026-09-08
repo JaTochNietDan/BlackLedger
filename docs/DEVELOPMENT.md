@@ -1148,3 +1148,9 @@
 - **The figures had to change to survive the backdrop.** Pale shapes that read fine on a flat stage floated on top of a painting like stickers. Against a painted room a person is a silhouette with the light catching one edge, so the colour that says who they are — gold for your own, red for anybody owed money or holding something — moved to the rim where a hard light would actually catch it, and they stand lower, on the floor of the picture rather than in the middle of the air.
 - Verified in a browser: the Mercer Exchange as a glass-roofed hall with seven people standing in it, and the roster of eighteen underneath.
 - `mise run verify` passes.
+
+## The seven addresses nobody had painted
+- Five buildings were painted by hand for the street study. The other seven — the docks, the apartment block, the garage, the Blue Hour, Cypress House, Ward Street Station and the Herald — showed a wireframe box in the address book, which made half the city look unfinished. Two of those seven were places this project added itself and never went back to.
+- All seven have a painted front now (`tools/exteriors.py`, `mise run exteriors`), 396KB for the set. Every card in the address book carries a picture; **no wireframes and no broken images**, checked in the browser rather than assumed.
+- **The two kinds of picture are now drawn differently on purpose.** A hand-painted cut-out is a model of a building and sits inside its frame; a generated street view is a picture taken from across the road and fills it. Squeezing the second into a frame built for the first made Pier 14 look like a mistake rather than a photograph, so street views fill their frame and take a gradient at the foot of the large version. The wireframe stays as the last resort, so a building added tomorrow still has a card rather than a hole.
+- `mise run verify` passes.

@@ -293,3 +293,12 @@
    paints it. */
 .room.painted{background-size:cover;background-position:center;background-repeat:no-repeat}
 .room.painted .interior{background:linear-gradient(180deg,#0a0d0d55,#0a0d0d18 40%,#0a0d0daa)}
+
+/* Two kinds of building picture, drawn differently on purpose. A cut-out is a
+   model of a building and sits inside its frame; a street view is a picture
+   taken from across the road and fills it. Squeezing the second into a frame
+   built for the first made half the city look like a mistake. */
+.destination-image.street-front,.building-art.street-front{background:#0d1211}
+.destination-image.street-front img,.building-art.street-front img{object-fit:cover;width:100%;height:100%}
+.building-art.street-front{position:relative}
+.building-art.street-front::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#0a0f0e00 45%,#0a0f0ecc)}
