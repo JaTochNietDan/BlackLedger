@@ -399,3 +399,31 @@
    reads as a state rather than as a number above a sentence. */
 .stat small i{display:block;font-style:normal;color:#8b9585;font-size:9.5px;letter-spacing:.04em;text-transform:none}
 .stat[title]{cursor:help}
+
+/* Every address in the city, painted, in the district it stands in, with the
+   people who are actually in it and the hour of the day on it. */
+.city-street{flex:1;min-height:0;overflow:auto;padding:18px 22px 8px;background:#0f1614}
+.street-block{margin-bottom:22px}
+.street-block h3{display:flex;align-items:baseline;gap:12px;font:12px system-ui;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);font-weight:500;margin:0 0 10px;padding-bottom:7px;border-bottom:1px solid var(--line)}
+.street-block h3 span{letter-spacing:0;text-transform:none;font-size:11px;color:var(--muted)}
+.street-block.locked{opacity:.45}
+.street-run{display:grid;grid-template-columns:repeat(auto-fill,minmax(178px,1fr));gap:12px}
+.street-front{position:relative;background:#131d1c;border:1px solid var(--line);padding:0;overflow:hidden;text-align:left;display:block}
+.street-front.owned{border-color:#7d6b45}
+.street-front.picked{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold) inset}
+.street-front.here{border-color:#9fb096}
+.front-art{display:block;position:relative;height:104px;background:#0b1211;overflow:hidden}
+.front-art img{width:100%;height:100%;object-fit:cover;display:block}
+.street-front.cutout .front-art img{object-fit:contain;padding:6px}
+.front-lit{position:absolute;inset:0;background:linear-gradient(180deg,#0a1a2800,#050c14);opacity:calc(var(--night)*.72);pointer-events:none}
+.front-blank{display:block;height:100%;background:repeating-linear-gradient(45deg,#16211f,#16211f 6px,#1a2624 6px,#1a2624 12px)}
+.front-plate{display:block;padding:9px 10px 10px}
+.front-plate b{display:block;font:14px var(--serif);font-weight:400;line-height:1.25;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.front-plate small{display:block;font-size:10px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.front-who{display:flex;align-items:center;gap:0;margin-top:7px}
+.front-who>*{margin-right:-8px;border:1px solid #0f1614}
+.front-who i{margin-left:14px;font-style:normal;font-size:10px;color:var(--muted)}
+.front-here{position:absolute;top:7px;right:7px;background:#101b19e6;border:1px solid #9fb096;color:#cfe0c6;font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:3px 6px}
+.street-note{font-size:11px;color:var(--muted);margin:4px 0 0}
+.street-note a{color:var(--gold)}
+@media(max-width:800px){.street-run{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}.front-art{height:84px}}

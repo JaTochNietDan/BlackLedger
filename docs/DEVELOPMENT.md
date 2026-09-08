@@ -1209,3 +1209,11 @@
 - **A regression the browser caught.** Moving money formatting into the core dropped the thousands separator the interface used to add: `$3778`. The core writes sums the way people read them now, with a test over seven cases.
 - **The theatre holds for as long as the moment is worth.** It played a robbery and a killing for exactly the same 2.6 seconds. The city already knew one was worth more than the other — `Gravity` has ordered these since the theatre was built — so a killing now holds 4.7 seconds, an explosion 4.4, a robbery 2.4, and anything nobody has classified 1.8. Bounded so nothing is too short to read or outstays its welcome.
 - `mise run verify` passes.
+
+## The whole city, not one block of it
+- The street view showed **five buildings**. The city has twelve, and two of the seven it left out — Ward Street Station and the Bellwether Herald — were places this project added itself and never went back to. Half the city was reachable only through the address book, and a view called *the street* quietly told the player the rest of it was not there.
+- **The city view is every address now**, painted, grouped into the district it stands in, each carrying who is actually in it as faces and a count, and lit by the hour the clock says — the same 1440-minute day everything else runs on, so the fronts darken through the evening without the interface deciding anything. *You are here* is marked, districts you have not opened are dimmed and say so, and double-clicking the one you are standing in steps inside.
+- The animated Old Harbor block is not thrown away. It was always one block of a city with three, and it is linked from the foot of the view for anybody who wants to look at it; the component that embedded it as though it were the whole city is gone.
+- **Three guards so the art cannot fall behind the city again.** Every address must have a picture, every address must have an interior to stand in, and every moment the theatre can play must have a plate — each failing with the `mise` task that fixes it. These are what stop the next location being added with a wireframe box, which is exactly how five of twelve happened.
+- Verified in a browser: three districts, twelve fronts, twelve pictures, no blanks and no broken images.
+- `mise run verify` passes.

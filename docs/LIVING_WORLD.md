@@ -140,6 +140,10 @@ We want that map view of all the buildings and city to actually show the living 
 their actions throughout the day as well. That's the ultimate goal, so we should be working
 toward that.
 
+- When playing theater the events should be somewhat gruesome and bloody and intense, this is an adult game
+- City should have ambience, some effects like smoke and lighting etc to make it feel alive
+- Interiors of buildings should have the same treatment, lots of ambiance
+
 ## Inbox — unsorted ideas
 
 This section belongs to the user. Add anything here in any form: a mechanic, a
