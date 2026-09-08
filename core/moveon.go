@@ -60,6 +60,9 @@ func (w *World) MoveOnReadiness(id string) string {
 	if w.Player.Health < 40 {
 		return "You are in no condition for this"
 	}
+	if w.Allied(holder.ID) {
+		return "You stand with them. Break that first"
+	}
 	_ = holder
 	return ""
 }

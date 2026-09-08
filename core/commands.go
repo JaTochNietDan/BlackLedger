@@ -40,6 +40,7 @@ func (w *World) apply(c Command) error {
 		// this they linger in the save forever, filtered out but never removed.
 		w.Contracts = nil
 		w.Commissions = nil
+		w.Pacts = nil
 		w.BusinessTruces = nil
 		w.SuspendedJob = nil
 		w.NextPressure = 0
@@ -226,6 +227,20 @@ func (w *World) apply(c Command) error {
 					w.Log("Journey interrupted", fmt.Sprintf("The journey to %s was interrupted after %d minutes. You remain based at %s; choose your next destination after resolving the situation.", to.Name, w.Minute-oldTime, from.Name), "travel")
 				}
 			}
+		} else if with, ok := strings.CutPrefix(c.Kind, "pact:"); ok {
+			if err := w.MakePact(with); err != nil {
+				return err
+			}
+			w.Advance(a.Minutes)
+		} else if with, ok := strings.CutPrefix(c.Kind, "break:"); ok {
+			if !w.Allied(with) {
+				return fmt.Errorf("you have no understanding with them")
+			}
+			w.BreakPact(with, "You ended it. Nobody forgets which side did that.")
+			if f := w.faction(with); f != nil {
+				f.Goodwill = max(-100, f.Goodwill-20)
+			}
+			w.Advance(a.Minutes)
 		} else if about, ok := strings.CutPrefix(c.Kind, "enquire:"); ok {
 			if err := w.AskAround(about); err != nil {
 				return err

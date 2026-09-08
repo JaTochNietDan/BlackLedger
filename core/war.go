@@ -112,6 +112,23 @@ func (w *World) contestAt(attacker, defender *Faction, weakest string) {
 	if prop == nil || prop.Owner != defender.ID {
 		return
 	}
+	// Nobody moves on somebody they stand with, in either direction.
+	if w.Allied(attacker.ID) && defender.ID == w.PlayerOrganizationID() {
+		return
+	}
+	if w.Allied(defender.ID) && attacker.ID == w.PlayerOrganizationID() {
+		return
+	}
+	// And somebody who stands with the player may turn up at the door.
+	if defender.ID == w.PlayerOrganizationID() {
+		if ally, answered := w.AllyAnswers(attacker); answered {
+			place, _ := PlaceByID(weakest)
+			attacker.Power = max(10, attacker.Power-3)
+			w.Antagonize(attacker.ID, ally.ID, 6)
+			w.Log(ally.Name+" was already there", fmt.Sprintf("%s came for %s and found people who were not yours waiting in it. They left without it.", attacker.Name, place.Name), "politics")
+			return
+		}
+	}
 	place, ok := PlaceByID(weakest)
 	if !ok {
 		return

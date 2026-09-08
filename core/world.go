@@ -255,6 +255,9 @@ type World struct {
 	// What people in this city hold against each other. Absent in saves from
 	// before anybody remembered anything.
 	Grudges []Grudge `json:"grudges,omitempty"`
+	// Understandings the player has with organizations. Tied to one
+	// protagonist: nobody inherits somebody else's friends.
+	Pacts []Pact `json:"pacts,omitempty"`
 	// A hand on the table that has not been settled. Absent whenever nobody is
 	// sitting at one, which is nearly always.
 	Hand       *TableHand `json:"hand,omitempty"`
@@ -478,7 +481,7 @@ func (w *World) Guard() int {
 	return n
 }
 func (w *World) DailyCost() int {
-	return HomeRent(w.Player.Home) + 10*w.Player.Security + 12*len(w.Player.Crew) + w.Wages() + w.CarUpkeep() + w.ComfortUpkeep() + w.RetainerCost() + w.MemberWages()
+	return HomeRent(w.Player.Home) + 10*w.Player.Security + 12*len(w.Player.Crew) + w.Wages() + w.CarUpkeep() + w.ComfortUpkeep() + w.RetainerCost() + w.MemberWages() + w.PactCost()
 }
 func TravelMinutes(a, b string) int {
 	x, _ := PlaceByID(a)
@@ -603,6 +606,19 @@ func (w *World) Actions(id string) []Action {
 			// away happens to a city the player is not standing in.
 			add("trip:"+d.ID, "Travel to "+d.Name, 0, 0, w.TripReadiness(d.ID),
 				fmt.Sprintf("%s %s $%d all in and %d days away. The city runs without you: businesses go unwatched, work you promised runs down, and anything arranged for you happens to an empty house. Attention falls %d a day while you are gone.", d.Blurb, d.Purpose, w.TripCost(d.ID), d.Days, d.Relief))
+		}
+		for i := range w.Factions {
+			f := &w.Factions[i]
+			if f.ID == w.PlayerOrganizationID() {
+				continue
+			}
+			if w.Allied(f.ID) {
+				add("break:"+f.ID, "End the understanding with "+f.Name, 30, 0, "",
+					fmt.Sprintf("Stops the $%d a day and the quarrels that come with it. They will remember that you did it first.", PactTribute))
+				continue
+			}
+			add("pact:"+f.ID, "Reach an understanding with "+f.Name, PactMinutes, 0, w.PactReadiness(f.ID),
+				fmt.Sprintf("$%d to open and $%d a day. Neither of you moves on the other, they may answer when somebody comes for you, and every quarrel of theirs becomes yours.", PactOpening, PactTribute))
 		}
 		add("contract", "Ask about a name", 30, 0,
 			need(p.Contacts < 1, "Build a contact who will carry this"),
@@ -1010,6 +1026,7 @@ func (w *World) Advance(minutes int) {
 			w.OrderDay()
 			w.OrganizationDay()
 			w.OwnPeopleDay()
+			w.PactDay()
 			w.PrunePeople()
 			w.DressDay()
 			bill := w.DailyCost()
@@ -1101,7 +1118,7 @@ func (w *World) Public() map[string]any {
 	if len(history) > 60 {
 		history = history[len(history)-60:]
 	}
-	return map[string]any{"id": w.ID, "version": w.Version, "revision": w.Revision, "life": w.Life, "minute": w.Minute, "player": w.Player, "district": w.District, "factions": w.PublicFactions(), "npcs": w.People(), "locations": locs, "event": scene, "history": history, "dead": w.Dead, "tasks": w.Tasks, "director": w.Director, "last_result": w.LastResult, "daily_cost": w.DailyCost(), "income": income, "security": w.Guard(), "opportunity": w.NextOpportunity(), "known_threats": w.KnownThreats(), "business_truces": w.ActiveBusinessTruces(), "conflicts": w.PublicConflicts(), "goods": w.Goods, "arms": w.ArmsDescription(), "appearance": w.AppearanceDescription(), "vehicle": w.VehicleDescription(), "residence": w.ResidenceDescription(), "offshore": map[string]any{"balance": w.Offshore, "reachable": w.Player.Offshore}, "newspaper": w.Edition(), "arrangements": w.PendingArrangements(), "commissions": w.PublicCommissions(), "grudges": w.GrudgeSummary(), "cast": w.Cast(), "retainers": w.RetainerDescription(), "armoury": w.ArmouryDescription(), "population": w.PopulationSummary(), "hand": w.HandDescription(), "roles": w.RoleDescription(), "organization": w.PlayerOrganizationDescription(), "own_people": w.OwnPeopleDescription()}
+	return map[string]any{"id": w.ID, "version": w.Version, "revision": w.Revision, "life": w.Life, "minute": w.Minute, "player": w.Player, "district": w.District, "factions": w.PublicFactions(), "npcs": w.People(), "locations": locs, "event": scene, "history": history, "dead": w.Dead, "tasks": w.Tasks, "director": w.Director, "last_result": w.LastResult, "daily_cost": w.DailyCost(), "income": income, "security": w.Guard(), "opportunity": w.NextOpportunity(), "known_threats": w.KnownThreats(), "business_truces": w.ActiveBusinessTruces(), "conflicts": w.PublicConflicts(), "goods": w.Goods, "arms": w.ArmsDescription(), "appearance": w.AppearanceDescription(), "vehicle": w.VehicleDescription(), "residence": w.ResidenceDescription(), "offshore": map[string]any{"balance": w.Offshore, "reachable": w.Player.Offshore}, "newspaper": w.Edition(), "arrangements": w.PendingArrangements(), "commissions": w.PublicCommissions(), "grudges": w.GrudgeSummary(), "cast": w.Cast(), "retainers": w.RetainerDescription(), "armoury": w.ArmouryDescription(), "population": w.PopulationSummary(), "hand": w.HandDescription(), "roles": w.RoleDescription(), "organization": w.PlayerOrganizationDescription(), "own_people": w.OwnPeopleDescription(), "pacts": w.PactDescription()}
 }
 func (w *World) hasRecord(title string) bool {
 	for _, r := range w.History {
