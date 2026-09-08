@@ -208,6 +208,12 @@ func (w *World) apply(c Command) error {
 				w.Factions[0].Goodwill -= 35
 				w.Retaliation()
 				w.Log("A demand nobody forgets", "The manager refuses. A Bellandi man watches you leave. You have challenged a powerful family on its own ground.", "politics")
+			case "sabotage":
+				// Resolved before the clock moves, so a fatal attempt cannot also
+				// collect the time and income of the hours it never survived.
+				if err := w.Sabotage(target); err != nil {
+					return err
+				}
 			}
 			w.Advance(a.Minutes)
 			if p.Alive && w.Event == nil {

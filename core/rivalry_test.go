@@ -1,0 +1,195 @@
+package core
+
+import (
+	"fmt"
+	"testing"
+)
+
+// readyAttacker is a player who meets every published requirement for moving
+// against a family, so tests exercise the outcome rather than the gate.
+func readyAttacker(t *testing.T) *World {
+	t.Helper()
+	w := New(7)
+	w.Player.Respect = 20
+	w.Player.Crew = []Crew{{ID: "leo", Name: "Leo Carver", Loyalty: 80}}
+	w.Player.Location = "club"
+	return w
+}
+
+func TestFamiliesHoldPropertyBothSidesCanLose(t *testing.T) {
+	w := New(1)
+	bellandi := w.FamilyHoldings("bellandi")
+	russo := w.FamilyHoldings("russo")
+	if len(bellandi) == 0 || len(russo) == 0 {
+		t.Fatalf("each family needs holdings to be pressured: bellandi=%v russo=%v", bellandi, russo)
+	}
+	for _, id := range append(append([]string{}, bellandi...), russo...) {
+		if w.Properties[id].Income <= 0 {
+			t.Fatalf("%s is a holding with no income, so damaging it would cost its family nothing", id)
+		}
+	}
+	// The player's own property is never a sabotage target.
+	w.Properties["laundry"].Owner = fmt.Sprintf("player:%d", w.Life)
+	if _, ok := w.SabotageTarget("laundry"); ok {
+		t.Fatal("the player's own business was offered as a sabotage target")
+	}
+	if _, ok := w.SabotageTarget("bar"); ok {
+		t.Fatal("an independent property was offered as a sabotage target")
+	}
+}
+
+func TestSabotageRequirementsAreStatedBeforeTheyAreEnforced(t *testing.T) {
+	w := New(2)
+	w.Player.Location = "club"
+	if w.SabotageReadiness("club") == "" {
+		t.Fatal("a new arrival should not be able to move against a family")
+	}
+	if err := w.Sabotage("club"); err == nil {
+		t.Fatal("the command ignored a requirement the action reports")
+	}
+	w.Player.Respect = 20
+	if reason := w.SabotageReadiness("club"); reason == "" {
+		t.Fatal("respect alone should not be enough without crew")
+	}
+	w.Player.Crew = []Crew{{ID: "leo", Name: "Leo Carver", Loyalty: 20}}
+	if reason := w.SabotageReadiness("club"); reason == "" {
+		t.Fatal("disloyal crew should refuse this work")
+	}
+	w.Player.Crew[0].Loyalty = 80
+	if reason := w.SabotageReadiness("club"); reason != "" {
+		t.Fatal("a prepared player was still refused:", reason)
+	}
+	// The offered action carries the same reason the command would give.
+	w.Player.Crew[0].Loyalty = 20
+	for _, a := range w.Actions("club") {
+		if a.ID == "sabotage" && (!a.Disabled || a.Reason == "") {
+			t.Fatal("the interface offered an attack the rules would refuse")
+		}
+	}
+}
+
+func TestSuccessfulSabotageCostsTheFamilyRealStanding(t *testing.T) {
+	w := readyAttacker(t)
+	before := *w.faction("bellandi")
+	condition := w.Properties["club"].Condition
+	// Force the success branch regardless of seed.
+	w.RNG = 1
+	for tries := 0; tries < 200; tries++ {
+		probe := readyAttacker(t)
+		probe.RNG = uint32(tries + 1)
+		if probe.Random() < probe.sabotageChance(probe.faction("bellandi")) {
+			w = readyAttacker(t)
+			w.RNG = uint32(tries + 1)
+			break
+		}
+	}
+	if err := w.Sabotage("club"); err != nil {
+		t.Fatal(err)
+	}
+	after := w.faction("bellandi")
+	if w.Properties["club"].Condition >= condition {
+		t.Fatal("a landed attack left the property undamaged")
+	}
+	if after.Power >= before.Power {
+		t.Fatalf("family power did not fall: %d -> %d", before.Power, after.Power)
+	}
+	if after.Cash >= before.Cash {
+		t.Fatalf("family cash did not fall: %d -> %d", before.Cash, after.Cash)
+	}
+	if after.Goodwill >= before.Goodwill {
+		t.Fatal("attacking a family did not worsen standing with them")
+	}
+	if w.Player.Respect <= 20 {
+		t.Fatal("a landed attack earned no respect")
+	}
+	// The family answers. A hit is scheduled but never exposed publicly here.
+	answered := false
+	for _, plot := range w.Plots {
+		if plot.Actor == "bellandi" && plot.Life == w.Life {
+			answered = true
+		}
+	}
+	if !answered {
+		t.Fatal("the family did not answer an attack on its own holding")
+	}
+}
+
+func TestFailedSabotageInjuresWithoutDamagingTheHolding(t *testing.T) {
+	var w *World
+	for tries := 0; tries < 400; tries++ {
+		probe := readyAttacker(t)
+		probe.RNG = uint32(tries + 1)
+		if probe.Random() >= probe.sabotageChance(probe.faction("bellandi")) {
+			w = readyAttacker(t)
+			w.RNG = uint32(tries + 1)
+			break
+		}
+	}
+	if w == nil {
+		t.Skip("no failing seed found in range")
+	}
+	condition, health := w.Properties["club"].Condition, w.Player.Health
+	goodwill := w.faction("bellandi").Goodwill
+	if err := w.Sabotage("club"); err != nil {
+		t.Fatal(err)
+	}
+	if w.Properties["club"].Condition != condition {
+		t.Fatal("a turned-away attack still damaged the property")
+	}
+	if w.Player.Health >= health {
+		t.Fatal("a turned-away attack cost the player nothing")
+	}
+	if w.faction("bellandi").Goodwill >= goodwill {
+		t.Fatal("a failed attack left the family's opinion unchanged")
+	}
+	// Being seen trying is enough to be answered.
+	answered := false
+	for _, plot := range w.Plots {
+		if plot.Actor == "bellandi" && plot.Life == w.Life {
+			answered = true
+		}
+	}
+	if !answered {
+		t.Fatal("the family did not answer an attempted attack")
+	}
+}
+
+func TestFamiliesRebuildTheirHoldingsOverDays(t *testing.T) {
+	w := New(3)
+	f := w.faction("russo")
+	f.Peak = 58
+	holding := w.FamilyHoldings("russo")[0]
+	w.Properties[holding].Condition = 20
+	f.Power = 20
+	cash := f.Cash
+
+	w.FamilyDay()
+	if w.Properties[holding].Condition <= 20 {
+		t.Fatal("a damaged holding was never repaired by its owner")
+	}
+	if f.Cash <= cash {
+		t.Fatal("a family collected nothing from its holdings")
+	}
+
+	for day := 0; day < 40; day++ {
+		w.FamilyDay()
+	}
+	if w.Properties[holding].Condition != 100 {
+		t.Fatalf("holding never returned to full condition: %d", w.Properties[holding].Condition)
+	}
+	if f.Power != 58 {
+		t.Fatalf("power did not recover to its peak: %d", f.Power)
+	}
+}
+
+func TestDamagedHoldingsEarnTheirFamilyLess(t *testing.T) {
+	whole, damaged := New(4), New(4)
+	holding := whole.FamilyHoldings("bellandi")[0]
+	damaged.Properties[holding].Condition = 40
+	before, damagedBefore := whole.faction("bellandi").Cash, damaged.faction("bellandi").Cash
+	whole.FamilyDay()
+	damaged.FamilyDay()
+	if whole.faction("bellandi").Cash-before <= damaged.faction("bellandi").Cash-damagedBefore {
+		t.Fatal("condition did not affect what a family collects")
+	}
+}

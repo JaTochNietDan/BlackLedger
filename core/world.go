@@ -67,6 +67,9 @@ type Faction struct {
 	Power    int    `json:"power"`
 	Goodwill int    `json:"goodwill"`
 	Cash     int    `json:"cash"`
+	// Peak is the strength this family recovers toward once its holdings are
+	// repaired. Saves written before families held property carry no peak.
+	Peak int `json:"peak,omitempty"`
 }
 type Property struct {
 	Owner     string  `json:"owner"`
@@ -253,12 +256,16 @@ func newPerson(life int) Person {
 }
 func New(seed uint32) *World {
 	w := &World{Version: 2, ID: ID(), Life: 1, Minute: 480, RNG: seed, Player: newPerson(1), Properties: map[string]*Property{}, Tasks: []Task{}, Plots: []Plot{}, History: []Record{}, Dead: []Death{}, Offers: []Offer{}, Director: Director{"authored", "Authored opening. Local AI can prepare additional encounters.", -9999}}
-	w.Factions = []Faction{{"bellandi", "Bellandi Family", "Vittorio Bellandi", 90, 0, 8000}, {"russo", "Russo Outfit", "Elena Russo", 58, 0, 4500}}
+	w.Factions = []Faction{{"bellandi", "Bellandi Family", "Vittorio Bellandi", 90, 0, 8000, 90}, {"russo", "Russo Outfit", "Elena Russo", 58, 0, 4500, 58}}
 	w.NPCs = []NPC{{"mara", "Mara Bell", "Fixer", 10, "af_heart", "#a48761"}, {"leo", "Leo Carver", "Driver", 20, "am_michael", "#9ca795"}, {"vittorio", "Vittorio Bellandi", "Bellandi boss", 0, "bm_george", "#ad7970"}, {"elena", "Elena Russo", "Russo boss", 0, "bf_emma", "#83989b"}}
 	for _, p := range Locations {
 		owner := "independent"
-		if p.ID == "club" {
+		switch p.ID {
+		case "club":
 			owner = "bellandi"
+		case "market":
+			// Russo needs holdings of its own, or only one family can be pressured.
+			owner = "russo"
 		}
 		income := 0
 		switch p.ID {
@@ -268,6 +275,10 @@ func New(seed uint32) *World {
 			income = 24
 		case "casino":
 			income = 48
+		case "club":
+			income = 30
+		case "market":
+			income = 18
 		}
 		w.Properties[p.ID] = &Property{owner, 100, income, 0}
 	}
@@ -378,6 +389,10 @@ func (w *World) Actions(id string) []Action {
 	case "club":
 		add("audience", "Request an audience", 45, 0, "", "Discuss your standing with the Bellandi family.")
 		add("provoke", "Demand protection money", 30, 0, "", "EXTREME RISK. Bellandi owns this casino. Challenging him can bring lethal retaliation.")
+	}
+	if f, ok := w.SabotageTarget(id); ok {
+		add("sabotage", "Move against "+f.Name, 90, 0, w.SabotageReadiness(id),
+			fmt.Sprintf("Send your crew against %s. Damages the property, weakens %s and costs you standing with them. They will retaliate, and a failed attempt injures you.", l.Name, f.Name))
 	}
 	if id == "laundry" || id == "garage" || id == "casino" {
 		if w.Own(id) {
@@ -555,6 +570,7 @@ func (w *World) Advance(minutes int) {
 			}
 		}
 		if w.Minute%1440 == 0 {
+			w.FamilyDay()
 			bill := w.DailyCost()
 			if p.Cash >= bill {
 				p.Cash -= bill
