@@ -179,6 +179,15 @@ type Plot struct {
 	Strength int    `json:"strength"`
 	Known    bool   `json:"known"`
 }
+
+// TaskHome remembers where somebody was standing when they were sent to do
+// something, so the city can put them back rather than leaving them wherever
+// the work happened to be.
+type TaskHome struct {
+	Task   string `json:"task"`
+	Person string `json:"person"`
+	Where  string `json:"where"`
+}
 type Task struct {
 	ID   string `json:"id"`
 	Name string `json:"name"`
@@ -364,10 +373,12 @@ type World struct {
 	Attention int `json:"attention,omitempty"`
 	// A hand on the table that has not been settled. Absent whenever nobody is
 	// sitting at one, which is nearly always.
-	Hand       *TableHand `json:"hand,omitempty"`
-	News       []Story    `json:"news,omitempty"`
-	Plots      []Plot     `json:"plots"`
-	Tasks      []Task     `json:"tasks"`
+	Hand  *TableHand `json:"hand,omitempty"`
+	News  []Story    `json:"news,omitempty"`
+	Plots []Plot     `json:"plots"`
+	Tasks []Task     `json:"tasks"`
+	// Where the people doing those tasks were standing when they were sent.
+	Homes      []TaskHome `json:"homes,omitempty"`
 	Event      *Scene     `json:"event"`
 	History    []Record   `json:"history"`
 	Dead       []Death    `json:"dead"`
@@ -1130,7 +1141,14 @@ func (w *World) Actions(id string) []Action {
 		if len(w.Tasks) > 0 {
 			reason = "Leo is already on assignment"
 		}
-		add("delegate", "Send Leo on collections", 15, 0, reason, "Completes after 120 game minutes: $65. Requires 30 loyalty.")
+		round := w.CollectionRound()
+		roundPlace, _ := PlaceByID(round)
+		collecting := fmt.Sprintf("Two hours of doors at %s: $%d. Requires 30 loyalty.", roundPlace.Name, CollectionPay)
+		if n := w.NPC(p.Crew[0].ID); n != nil && n.Location != round {
+			collecting = fmt.Sprintf("%s walks to %s — %d minutes — and is not here while he is doing it. Two hours of doors: $%d. Requires 30 loyalty.",
+				n.Name, roundPlace.Name, TravelMinutes(n.Location, round), CollectionPay)
+		}
+		add("delegate", "Send Leo on collections", 15, 0, reason, collecting)
 		about(p.Crew[0].ID)
 		add("crew_bonus", "Pay Leo a bonus", 15, 40, need(p.Crew[0].Loyalty >= 100, "Loyalty is already at its maximum"), "Restore up to 25 loyalty. Below 30 he refuses collections; at 50 he can help protect businesses when available.")
 		about(p.Crew[0].ID)
@@ -1287,15 +1305,7 @@ func (w *World) Advance(minutes int) {
 				w.Earn(n)
 			}
 		}
-		for j := 0; j < len(w.Tasks); {
-			if w.Tasks[j].Due <= w.Minute {
-				w.Earn(65)
-				w.Log("Leo returns", "$65 from collections. He is available again.", "business")
-				w.Tasks = append(w.Tasks[:j], w.Tasks[j+1:]...)
-			} else {
-				j++
-			}
-		}
+		w.settleTasks()
 		// Organizations reconsider each other twice a day; their books settle once.
 		if w.Minute%720 == 0 {
 			w.FactionTurn()

@@ -320,8 +320,7 @@ func (w *World) apply(c Command) error {
 				p.Crew[0].Loyalty = min(100, before+25)
 				w.Log("A share for Leo", fmt.Sprintf("You paid a $40 bonus. Loyalty rose from %d to %d.", before, p.Crew[0].Loyalty), "personal")
 			case "delegate":
-				w.Tasks = append(w.Tasks, Task{ID(), "Leo · collections", w.Minute + 120})
-				w.Log("Leo heads out", "Collections should be completed in two hours.", "work")
+				w.SendOnCollections()
 			case "provoke":
 				p.Respect++
 				holder := w.PropertyHolder(target)

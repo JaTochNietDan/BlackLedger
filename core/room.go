@@ -122,6 +122,11 @@ func (w *World) doingNow(n *NPC) string {
 		return "Somewhere on the street"
 	case w.Inside(n):
 		return "Held at Ward Street Station"
+	case w.onARound(n.ID):
+		// What he is actually doing outranks what his job is called. He read as
+		// "Driver, on duty at Bluebird Laundry" while he was standing in it
+		// collecting, which is his title rather than his afternoon.
+		return "Collecting at " + where
 	case w.postedWhere(n.ID) != "":
 		return "Standing on the door at " + w.postedWhere(n.ID)
 	case IsOfficial(n.ID):
