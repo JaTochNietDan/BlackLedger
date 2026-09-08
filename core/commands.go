@@ -29,6 +29,8 @@ func (w *World) apply(c Command) error {
 		if p.Alive {
 			return fmt.Errorf("this life is still in progress")
 		}
+		// Whatever the city had started calling them dies with them.
+		w.Dissolve(w.PlayerOrganizationID())
 		w.Life++
 		w.Player = newPerson(w.Life)
 		w.Event = nil

@@ -47,6 +47,14 @@ func peak(f *Faction) int {
 func (w *World) FamilyDay() {
 	for i := range w.Factions {
 		f := &w.Factions[i]
+		// The player's own organization is run by the player: its premises are
+		// repaired when they pay for it, its money is their money, and its
+		// strength is whatever their holdings and name are worth today. Letting
+		// this loop have it would have quietly repaired their businesses for
+		// free every morning.
+		if f.ID == w.PlayerOrganizationID() {
+			continue
+		}
 		income, condition, count := 0, 0, 0
 		for _, id := range w.FamilyHoldings(f.ID) {
 			prop := w.Properties[id]

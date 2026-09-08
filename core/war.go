@@ -123,10 +123,26 @@ func (w *World) contest(attacker, defender *Faction) {
 	prop.Condition -= damage
 	defender.Power = max(10, defender.Power-max(2, damage/5))
 	defender.Cash = max(0, defender.Cash-damage*15)
+	// The player's organization is the player: money taken off it comes out of
+	// their pocket, not out of a number that is rewritten every morning.
+	if defender.ID == w.PlayerOrganizationID() {
+		w.Player.Cash = max(0, w.Player.Cash-damage*15)
+		w.ShiftCustom(weakest, "Somebody came through the front of it", -6)
+	}
 	// A raid reaches people, not only premises.
 	if w.WorldRandom() < .18 {
 		if victim := w.casualty(defender.ID); victim != nil {
 			w.KillBy(victim.ID, nil, fmt.Sprintf("%s had come for %s.", attacker.Name, place.Name))
+		} else if defender.ID == w.PlayerOrganizationID() && len(w.Player.Crew) > 0 {
+			// Whoever stands with the player is who a raid reaches, because
+			// they have no soldiers of their own to lose.
+			member := w.Player.Crew[0]
+			w.Player.Crew = w.Player.Crew[:0]
+			if n := w.NPC(member.ID); n != nil {
+				w.KillBy(n.ID, nil, fmt.Sprintf("%s had come for %s.", attacker.Name, place.Name))
+			} else {
+				w.Log(member.Name+" did not come out of it", fmt.Sprintf("%s came for %s and %s was standing in it.", attacker.Name, place.Name, member.Name), "danger")
+			}
 		}
 	}
 
@@ -199,6 +215,12 @@ func (w *World) dissolve() {
 	kept := w.Factions[:0]
 	gone := map[string]bool{}
 	for _, f := range w.Factions {
+		// The player's organization ends when the player does, not when a bad
+		// month leaves them holding nothing.
+		if f.ID == w.PlayerOrganizationID() {
+			kept = append(kept, f)
+			continue
+		}
 		if len(w.FamilyHoldings(f.ID)) == 0 && f.Power <= 15 && len(w.Factions)-len(gone) > 2 {
 			gone[f.ID] = true
 			w.Log("An organization ends", f.Name+" no longer holds anything worth defending. What remains of it answers to someone else now.", "politics")
