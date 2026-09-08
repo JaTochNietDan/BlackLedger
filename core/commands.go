@@ -114,6 +114,10 @@ func (w *World) apply(c Command) error {
 			if err := w.ResolveAudience(e, c.Choice); err != nil {
 				return err
 			}
+		case "sitdown":
+			if err := w.ResolveSitdown(e, c.Choice); err != nil {
+				return err
+			}
 		case "contract":
 			if c.Choice == "leave" {
 				w.Log("No name given", "You let the conversation end without saying anything worth repeating.", "personal")
@@ -396,6 +400,12 @@ func (w *World) apply(c Command) error {
 				case "lie_low":
 					p.Heat = max(0, p.Heat-10)
 					w.Log("Out of the spotlight", "You avoid attention for a while.", "personal")
+				case "sitdown":
+					// Opened after the clock moves, like an audience, so the
+					// evening actually costs the evening.
+					if err := w.CallSitdown(); err != nil {
+						return err
+					}
 				case "audience":
 					w.OpenAudience(target)
 				case "acquire":

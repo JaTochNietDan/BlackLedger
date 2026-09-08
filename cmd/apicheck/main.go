@@ -53,10 +53,10 @@ var ventures = []string{
 	"operate:hard", "operate:clean", "operate:standard", "inspect", "investigate", "lie_low",
 	"dress", "press", "bankroll", "draw", "car", "service",
 	"fit:door", "fit:telephone", "fit:safe", "fit:cellar", "commission",
-	"trip:rockridge", "trip:kingsport", "trip:halloway", "charge", "plant",
+	"trip:rockridge", "trip:kingsport", "trip:halloway", "charge", "plant", "sitdown",
 }
 
-var choicePreference = []string{"approach:careful", "accept", "pay", "escape", "acknowledge", "leave", "decline"}
+var choicePreference = []string{"approach:careful", "accept", "pay", "escape", "acknowledge", "listen", "leave", "decline"}
 
 // Multi-step events need their own preference or the policy always takes the
 // exit: "leave" is offered at every step of arranging a contract.

@@ -504,6 +504,14 @@ func (w *World) Actions(id string) []Action {
 	case "bar":
 		add("courier", "Carry a discreet envelope", 45, 0, "", "Earn $45 and 2 respect. A reliable introduction to the neighborhood.")
 		add("contact", "Buy Mara a coffee", 30, 10, need(p.Contacts >= 5, "Your information network is fully developed"), "Build trust and an information network. Contacts may warn you of trouble.")
+		if q, ok := w.OpenQuarrel(); ok {
+			warning := "You would be standing between them."
+			if q.Suspected {
+				warning = "Somebody has already told you that one of them is not coming to talk."
+			}
+			add("sitdown", "Call "+q.A.Name+" and "+q.B.Name+" to a room", SitdownMinutes, 0, w.SitdownReadiness(),
+				fmt.Sprintf("$%d for the room and the guarantees, paid whether or not anybody agrees to anything. The only thing in this city that ends a war without either side losing it. %s", SitdownFee, warning))
+		}
 		reason := need(p.Respect < 6, "Earn 6 respect first")
 		if len(p.Crew) > 0 {
 			reason = "Leo is already in your crew"
