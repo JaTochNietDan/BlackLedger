@@ -37,6 +37,7 @@ func (w *World) apply(c Command) error {
 		// Arrangements the dead protagonist paid for die with them. Without
 		// this they linger in the save forever, filtered out but never removed.
 		w.Contracts = nil
+		w.Commissions = nil
 		w.BusinessTruces = nil
 		w.SuspendedJob = nil
 		w.NextPressure = 0
@@ -246,6 +247,10 @@ func (w *World) apply(c Command) error {
 				}
 			case "arms:weapon", "arms:armour":
 				if err := w.BuyArms(strings.TrimPrefix(c.Kind, "arms:")); err != nil {
+					return err
+				}
+			case "commission":
+				if err := w.TakeCommission(target); err != nil {
 					return err
 				}
 			case "fit:door", "fit:telephone", "fit:safe", "fit:cellar":

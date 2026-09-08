@@ -136,7 +136,6 @@ it is still in this list, it does not exist in the game yet.
 - Hits, kills, robberies etc can happen to anyone, not just major people in leadership. It can happen to any living NPC.
 - There should be plenty of these "Living NPCs" that you discover and get to know over time, these living NPCs as always, every piece of the simulation applies to them and anything can happen to them, with them, from them etc.
 - The point is that nobody involved in the world is actually some unnamed NPC, it all is a living NPC that you are dealing with, someone that you know of, know their face, know them over time etc or know of their name (or not, lower living NPC that you have not had any interaction with and don't know of)
-- We could spice up the game and give player more purpose with contracts (missions, quests) to carry out
 - Underground arms market businesses and systems around that
 - A function I remember from an old mafia game was that world events would appear as news stories in a simulated news paper, maybe we can copy that and iterate on it, that was very cool. They usually had a headline with some details underneath. A newspaper with a breakdown of recent world events or major events with a headline, a black and white low res picture of some representation of the event or something would be really cool.
 - Each living NPC should have their own style, portrait and behaviors, ambitions and whatnot. Flesh that out properly. Each one should also have a unique voice as per our existing voice system that stays with them.
