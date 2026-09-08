@@ -100,8 +100,18 @@ func (w *World) Raid() {
 
 	seized := w.Seize("The police came with a warrant.")
 	w.SeizeArms()
+	still, foundStill := w.StillFound()
 	fine := min(w.Player.Cash, 150+w.Player.Heat*12)
+	if foundStill {
+		// Finding a still is what turns a search into a case.
+		fine = min(w.Player.Cash, fine*2+400)
+	}
 	w.Player.Cash -= fine
+	if foundStill {
+		w.Log("They found the still at "+still, fmt.Sprintf("Copper and pipe out through the front door in daylight. A fine of $%d and they will be back.", fine), "danger")
+		w.Report("police", "STILL SEIZED AT "+upper(still),
+			fmt.Sprintf("Officers dismantled an illegal still at %s. A prosecution is said to be likely.", still))
+	}
 
 	if target == "" {
 		w.Player.Heat = max(0, w.Player.Heat-15)

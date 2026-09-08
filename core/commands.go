@@ -248,6 +248,14 @@ func (w *World) apply(c Command) error {
 				if err := w.BuyArms(strings.TrimPrefix(c.Kind, "arms:")); err != nil {
 					return err
 				}
+			case "still":
+				if err := w.BuildStill(target); err != nil {
+					return err
+				}
+			case "dismantle":
+				if err := w.Dismantle(target); err != nil {
+					return err
+				}
 			case "hire":
 				if err := w.Hire(target); err != nil {
 					return err

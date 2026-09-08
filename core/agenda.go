@@ -129,6 +129,20 @@ func (w *World) takeFromSomebody(n *NPC) {
 	n.Rank = min(RankLieutenant, n.Rank+2)
 
 	if w.Own(target) {
+		// Somewhere with a still has something better than a till, and the
+		// people who rob premises know what it is worth.
+		if prop.Still && w.Holding("moonshine") > 0 {
+			stolen := min(w.Holding("moonshine"), 3+int(w.WorldRandom()*8))
+			w.Player.Stock["moonshine"] -= stolen
+			attribution := "Nobody will say who."
+			if w.Player.Contacts >= 2 {
+				attribution = "The name that comes back is " + n.Name + "."
+			}
+			w.Log("Crates gone from "+place.Name, fmt.Sprintf("%d crates went out of the back of %s. %s", stolen, place.Name, attribution), "danger")
+			w.Report("robbery", "THEFT AT "+upper(place.Name),
+				w.unattributed(place.Name, fmt.Sprintf("Goods were taken from %s overnight.", place.Name)))
+			return
+		}
 		// The player loses the takings themselves, and hears about it.
 		w.Player.Cash = max(0, w.Player.Cash-take)
 		attribution := "Nobody will say who."

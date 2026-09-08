@@ -107,6 +107,7 @@ type Property struct {
 	Staff   int  `json:"staff,omitempty"`
 	Supply  int  `json:"supply,omitempty"`
 	Trouble bool `json:"trouble,omitempty"`
+	Still   bool `json:"still,omitempty"`
 }
 type Plot struct {
 	Target   string `json:"target,omitempty"`
@@ -542,6 +543,15 @@ func (w *World) Actions(id string) []Action {
 					add("remedy", trade.Remedy, 60, 0, w.RemedyReadiness(id),
 						fmt.Sprintf("$%d. %s %s", trade.RemedyCost, trade.Trouble, trade.RemedyDetail))
 				}
+				if StillSite(id) {
+					if prop.Still {
+						add("dismantle", "Take the still out", 90, 0, w.DismantleReadiness(id),
+							fmt.Sprintf("Ends production of about %d crates a day and the attention that comes with it.", w.StillOutput(id)))
+					} else {
+						add("still", "Set up a still in the back", StillMinutes, 0, w.StillReadiness(id),
+							fmt.Sprintf("$%d. Produces moonshine you can sell, draws %d attention a day on top of what the stock draws, and a search that finds it costs far more than one that does not.", StillCost, StillHeat))
+					}
+				}
 			}
 			if w.Properties[id].Income > 0 {
 				current := w.Mode(id)
@@ -748,6 +758,7 @@ func (w *World) Advance(minutes int) {
 			w.PoliceDay()
 			w.PeopleDay()
 			w.OperationsDay()
+			w.StillDay()
 			bill := w.DailyCost()
 			if p.Cash >= bill {
 				p.Cash -= bill
