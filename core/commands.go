@@ -41,6 +41,7 @@ func (w *World) apply(c Command) error {
 		w.Contracts = nil
 		w.Commissions = nil
 		w.Pacts = nil
+		w.Player.Serves, w.Player.Service = "", 0
 		w.BusinessTruces = nil
 		w.SuspendedJob = nil
 		w.NextPressure = 0
@@ -227,6 +228,11 @@ func (w *World) apply(c Command) error {
 					w.Log("Journey interrupted", fmt.Sprintf("The journey to %s was interrupted after %d minutes. You remain based at %s; choose your next destination after resolving the situation.", to.Name, w.Minute-oldTime, from.Name), "travel")
 				}
 			}
+		} else if id, ok := strings.CutPrefix(c.Kind, "serve:"); ok {
+			if err := w.Serve(id); err != nil {
+				return err
+			}
+			w.Advance(a.Minutes)
 		} else if with, ok := strings.CutPrefix(c.Kind, "pact:"); ok {
 			if err := w.MakePact(with); err != nil {
 				return err
@@ -381,6 +387,10 @@ func (w *World) apply(c Command) error {
 				}
 			case "layoff":
 				if err := w.LayOff(target); err != nil {
+					return err
+				}
+			case "leave_service":
+				if err := w.LeaveService(); err != nil {
 					return err
 				}
 			case "order":

@@ -120,6 +120,7 @@ func (w *World) SettleCommissions() {
 			}
 			w.Earn(c.Pay)
 			w.Player.Respect += c.Respect
+			w.ServeWork(c.PatronID)
 			if f := w.faction(c.PatronID); f != nil {
 				f.Goodwill = min(100, f.Goodwill+c.Goodwill)
 				w.Log("Settled with "+f.Name, fmt.Sprintf("%s asked and it was done. $%d, %d respect, and %s thinks better of you by %d.", c.GiverName, c.Pay, c.Respect, f.Name, c.Goodwill), "politics")

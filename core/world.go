@@ -72,6 +72,10 @@ type Person struct {
 	// What the player has asked about lately, and when what they were told
 	// stops being current. Absent in saves from before anybody could ask.
 	Enquiries map[string]int `json:"enquiries,omitempty"`
+	// Whose organization the player answers to, and how much work they have
+	// done for them. Absent for somebody who answers to nobody.
+	Serves  string `json:"serves,omitempty"`
+	Service int    `json:"service,omitempty"`
 	// Whether this person has established that the account abroad is theirs.
 	// Reset with every life, which is what makes inheriting it a decision.
 	Offshore bool `json:"offshore_access,omitempty"`
@@ -792,6 +796,19 @@ func (w *World) Actions(id string) []Action {
 			add("acquire", label, 60, cost, reason, fmt.Sprintf("Earn up to $%d/hour. Income accrues automatically; rivals may take notice.", w.Properties[id].Income))
 		}
 	}
+	for i := range w.Factions {
+		f := &w.Factions[i]
+		if f.ID == w.PlayerOrganizationID() || w.homeOf(f.ID) != id {
+			continue
+		}
+		if w.Player.Serves == f.ID {
+			add("leave_service", "Stop answering to "+f.Name, ServiceMinutes, 0, "",
+				fmt.Sprintf("You are a %s of theirs on $%d a day. Walking out costs %d standing with them and they will answer it.", lowerFirst(w.ServiceTitle()), w.ServicePay(), LeavingCost))
+			continue
+		}
+		add("serve:"+f.ID, "Go to work for "+f.Name, ServiceMinutes, 0, w.ServeReadiness(f.ID),
+			fmt.Sprintf("$%d a day and a place to stand, rising to a share of what they take. Their quarrels become yours, and nobody comes up through somebody else's organization while they have one of their own.", SoldierWage))
+	}
 	if l.Type == "home" {
 		if p.Home != id {
 			label := "Rent this apartment"
@@ -1036,6 +1053,7 @@ func (w *World) Advance(minutes int) {
 			w.OrganizationDay()
 			w.OwnPeopleDay()
 			w.PactDay()
+			w.ServiceDay()
 			w.PrunePeople()
 			w.DressDay()
 			bill := w.DailyCost()
@@ -1127,7 +1145,7 @@ func (w *World) Public() map[string]any {
 	if len(history) > 60 {
 		history = history[len(history)-60:]
 	}
-	return map[string]any{"id": w.ID, "version": w.Version, "revision": w.Revision, "life": w.Life, "minute": w.Minute, "player": w.Player, "district": w.District, "factions": w.PublicFactions(), "npcs": w.People(), "locations": locs, "event": scene, "history": history, "dead": w.Dead, "tasks": w.Tasks, "director": w.Director, "last_result": w.LastResult, "daily_cost": w.DailyCost(), "income": income, "security": w.Guard(), "opportunity": w.NextOpportunity(), "known_threats": w.KnownThreats(), "business_truces": w.ActiveBusinessTruces(), "conflicts": w.PublicConflicts(), "goods": w.Goods, "arms": w.ArmsDescription(), "appearance": w.AppearanceDescription(), "vehicle": w.VehicleDescription(), "residence": w.ResidenceDescription(), "offshore": map[string]any{"balance": w.Offshore, "reachable": w.Player.Offshore}, "newspaper": w.Edition(), "arrangements": w.PendingArrangements(), "commissions": w.PublicCommissions(), "grudges": w.GrudgeSummary(), "cast": w.Cast(), "retainers": w.RetainerDescription(), "armoury": w.ArmouryDescription(), "population": w.PopulationSummary(), "hand": w.HandDescription(), "roles": w.RoleDescription(), "organization": w.PlayerOrganizationDescription(), "own_people": w.OwnPeopleDescription(), "pacts": w.PactDescription()}
+	return map[string]any{"id": w.ID, "version": w.Version, "revision": w.Revision, "life": w.Life, "minute": w.Minute, "player": w.Player, "district": w.District, "factions": w.PublicFactions(), "npcs": w.People(), "locations": locs, "event": scene, "history": history, "dead": w.Dead, "tasks": w.Tasks, "director": w.Director, "last_result": w.LastResult, "daily_cost": w.DailyCost(), "income": income, "security": w.Guard(), "opportunity": w.NextOpportunity(), "known_threats": w.KnownThreats(), "business_truces": w.ActiveBusinessTruces(), "conflicts": w.PublicConflicts(), "goods": w.Goods, "arms": w.ArmsDescription(), "appearance": w.AppearanceDescription(), "vehicle": w.VehicleDescription(), "residence": w.ResidenceDescription(), "offshore": map[string]any{"balance": w.Offshore, "reachable": w.Player.Offshore}, "newspaper": w.Edition(), "arrangements": w.PendingArrangements(), "commissions": w.PublicCommissions(), "grudges": w.GrudgeSummary(), "cast": w.Cast(), "retainers": w.RetainerDescription(), "armoury": w.ArmouryDescription(), "population": w.PopulationSummary(), "hand": w.HandDescription(), "roles": w.RoleDescription(), "organization": w.PlayerOrganizationDescription(), "own_people": w.OwnPeopleDescription(), "pacts": w.PactDescription(), "service": w.ServiceDescription()}
 }
 func (w *World) hasRecord(title string) bool {
 	for _, r := range w.History {

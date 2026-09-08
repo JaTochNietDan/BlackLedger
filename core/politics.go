@@ -200,6 +200,9 @@ func (w *World) CompleteArrangement(job *Scene) {
 		npc.Trust += 3
 	}
 	w.ResolveBeneficiary(job.Beneficiary)
+	// Work done for whoever the player answers to is the only way anybody
+	// comes up inside an organization.
+	w.ServeWork(job.Beneficiary)
 	title := job.Title
 	if job.Kind == "police_stop" {
 		// The detective's scene is an interruption, not the arrangement's name.

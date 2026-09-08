@@ -37,6 +37,10 @@ func (w *World) Incorporated() bool { return w.PlayerOrganization() != nil }
 // OrganizationReady reports whether the player is big enough to be filed with
 // the others.
 func (w *World) OrganizationReady() bool {
+	// Nobody starts their own thing while they are still somebody's soldier.
+	if w.Player.Serves != "" {
+		return false
+	}
 	return len(w.FamilyHoldings(w.PlayerOrganizationID())) >= OrganizationHoldings &&
 		w.Player.Respect >= OrganizationStanding
 }
