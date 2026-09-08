@@ -266,6 +266,28 @@ func (w *World) apply(c Command) error {
 				return err
 			}
 			w.Advance(a.Minutes)
+		} else if person, ok := strings.CutPrefix(c.Kind, "lend:"); ok {
+			if err := w.Lend(person); err != nil {
+				return err
+			}
+			w.Advance(a.Minutes)
+		} else if person, ok := strings.CutPrefix(c.Kind, "lean:"); ok {
+			// Resolved before the clock moves, like sabotage: a collection that
+			// goes wrong must not also collect the hours it never survived.
+			if err := w.Lean(person); err != nil {
+				return err
+			}
+			w.Advance(a.Minutes)
+		} else if person, ok := strings.CutPrefix(c.Kind, "extend:"); ok {
+			if err := w.Extend(person); err != nil {
+				return err
+			}
+			w.Advance(a.Minutes)
+		} else if person, ok := strings.CutPrefix(c.Kind, "forgive:"); ok {
+			if err := w.Forgive(person); err != nil {
+				return err
+			}
+			w.Advance(a.Minutes)
 		} else if person, ok := strings.CutPrefix(c.Kind, "bail:"); ok {
 			if err := w.Bail(person); err != nil {
 				return err

@@ -108,6 +108,11 @@ type NPC struct {
 	// When the police let this one go. Absent for anybody who is not inside,
 	// which is everybody in a save written before anybody could be taken in.
 	Held int `json:"held,omitempty"`
+	// What this person holds against the player personally. Grudges are
+	// between people in the city and deliberately do not reach the protagonist;
+	// this is the one number that does.
+	Sore   int    `json:"sore,omitempty"`
+	SoreAt string `json:"sore_at,omitempty"`
 }
 type Faction struct {
 	ID       string `json:"id"`
@@ -272,6 +277,9 @@ type World struct {
 	// Understandings the player has with organizations. Tied to one
 	// protagonist: nobody inherits somebody else's friends.
 	Pacts []Pact `json:"pacts,omitempty"`
+	// Money out with somebody's name on it. Tied to one protagonist, because a
+	// debt is owed to a man and not to an address.
+	Loans []Loan `json:"loans,omitempty"`
 	// How hard the city as a whole is looking, which is nobody's attention in
 	// particular and everybody's problem. Absent in older saves, which is a
 	// city that has not been counting.
@@ -929,6 +937,40 @@ func (w *World) Actions(id string) []Action {
 			fmt.Sprintf("$%d up front and $%d a day. Adds to what your organization is worth in a fight, stands in front of what comes at you, and can decide one morning that it is not worth it.", SigningCost, MemberWage))
 		break
 	}
+	// Money out with a name on it, and what to do about it when the name stops
+	// being able to pay. Anybody who already owes you is always listed; new
+	// lending is capped, because a room of fifteen strangers rendered as
+	// fifteen identical buttons is not a choice, it is a wall.
+	offers := 0
+	for i := range w.NPCs {
+		n := &w.NPCs[i]
+		if n.Dead || n.Location != id || IsOfficial(n.ID) {
+			continue
+		}
+		if l := w.LoanTo(n.ID); l != nil {
+			days := (l.Due - w.Minute + 1439) / 1440
+			state := fmt.Sprintf("$%d due in %d days.", l.Owed, days)
+			if l.Missed > 0 {
+				state = fmt.Sprintf("$%d overdue, missed %d times.", l.Owed, l.Missed)
+			}
+			add("lean:"+n.ID, "Collect from "+n.Name, LeanMinutes, 0, w.LeanReadiness(n.ID),
+				fmt.Sprintf("%s About %d%% of getting most of it. Costs %d attention, %d respect gained, and somebody who remembers it for as long as they live.",
+					state, int(w.LeanOdds(n)*100), LeanHeat, LeanRespect))
+			add("extend:"+n.ID, "Give "+n.Name+" another week", 30, 0, w.ExtendReadiness(n.ID),
+				fmt.Sprintf("%s Becomes $%d, due in %d days. They are grateful today and further from paying it than they were this morning.",
+					state, l.Owed+int(float64(l.Owed)*ExtendRate), LoanTermDays))
+			add("forgive:"+n.ID, "Write off what "+n.Name+" owes", 15, 0, w.ForgiveReadiness(n.ID),
+				fmt.Sprintf("%s Costs the money and %d respect. Buys the one thing money cannot: somebody who knows exactly what that was worth.", state, ForgiveRespect))
+			continue
+		}
+		if reason := w.LendReadiness(n.ID); (reason == "" || w.Known(n)) && offers < LendOffers {
+			offers++
+			size := w.LoanSize(n)
+			add("lend:"+n.ID, "Lend "+n.Name+" money", LendMinutes, 0, reason,
+				fmt.Sprintf("$%d out, $%d back inside %d days. If they cannot pay, what you do about it is the decision, and the street will hear which way you went.",
+					size, size+int(float64(size)*LoanRate), LoanTermDays))
+		}
+	}
 	if len(p.Crew) > 0 {
 		reason := need(p.Crew[0].Loyalty < 30, "Leo refuses assignments below 30 loyalty. Pay a bonus to rebuild trust.")
 		if len(w.Tasks) > 0 {
@@ -1090,6 +1132,7 @@ func (w *World) Advance(minutes int) {
 			w.ContrabandDay()
 			w.PoliceDay()
 			w.CustodyDay()
+			w.LoanDay()
 			w.PeopleDay()
 			w.GrudgeDay()
 			w.SettleGrudges()
@@ -1201,7 +1244,7 @@ func (w *World) Public() map[string]any {
 	if len(history) > 60 {
 		history = history[len(history)-60:]
 	}
-	return map[string]any{"id": w.ID, "version": w.Version, "revision": w.Revision, "life": w.Life, "minute": w.Minute, "player": w.Player, "district": w.District, "factions": w.PublicFactions(), "npcs": w.People(), "locations": locs, "event": scene, "history": history, "dead": w.Dead, "tasks": w.Tasks, "director": w.Director, "last_result": w.LastResult, "daily_cost": w.DailyCost(), "income": income, "security": w.Guard(), "opportunity": w.NextOpportunity(), "known_threats": w.KnownThreats(), "business_truces": w.ActiveBusinessTruces(), "conflicts": w.PublicConflicts(), "goods": w.Goods, "arms": w.ArmsDescription(), "appearance": w.AppearanceDescription(), "vehicle": w.VehicleDescription(), "residence": w.ResidenceDescription(), "offshore": map[string]any{"balance": w.Offshore, "reachable": w.Player.Offshore}, "newspaper": w.Edition(), "arrangements": w.PendingArrangements(), "commissions": w.PublicCommissions(), "grudges": w.GrudgeSummary(), "cast": w.Cast(), "retainers": w.RetainerDescription(), "armoury": w.ArmouryDescription(), "population": w.PopulationSummary(), "hand": w.HandDescription(), "roles": w.RoleDescription(), "organization": w.PlayerOrganizationDescription(), "own_people": w.OwnPeopleDescription(), "pacts": w.PactDescription(), "service": w.ServiceDescription(), "city": w.ScrutinyDescription()}
+	return map[string]any{"id": w.ID, "version": w.Version, "revision": w.Revision, "life": w.Life, "minute": w.Minute, "player": w.Player, "district": w.District, "factions": w.PublicFactions(), "npcs": w.People(), "locations": locs, "event": scene, "history": history, "dead": w.Dead, "tasks": w.Tasks, "director": w.Director, "last_result": w.LastResult, "daily_cost": w.DailyCost(), "income": income, "security": w.Guard(), "opportunity": w.NextOpportunity(), "known_threats": w.KnownThreats(), "business_truces": w.ActiveBusinessTruces(), "conflicts": w.PublicConflicts(), "goods": w.Goods, "arms": w.ArmsDescription(), "appearance": w.AppearanceDescription(), "vehicle": w.VehicleDescription(), "residence": w.ResidenceDescription(), "offshore": map[string]any{"balance": w.Offshore, "reachable": w.Player.Offshore}, "newspaper": w.Edition(), "arrangements": w.PendingArrangements(), "commissions": w.PublicCommissions(), "grudges": w.GrudgeSummary(), "cast": w.Cast(), "retainers": w.RetainerDescription(), "armoury": w.ArmouryDescription(), "population": w.PopulationSummary(), "hand": w.HandDescription(), "roles": w.RoleDescription(), "organization": w.PlayerOrganizationDescription(), "own_people": w.OwnPeopleDescription(), "pacts": w.PactDescription(), "book": w.LoanDescription(), "service": w.ServiceDescription(), "city": w.ScrutinyDescription()}
 }
 func (w *World) hasRecord(title string) bool {
 	for _, r := range w.History {

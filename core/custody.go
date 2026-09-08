@@ -168,7 +168,7 @@ func (w *World) ResolveArrest(e *Scene, choice string) error {
 				other.Trust = max(0, other.Trust-FallGuyTrust)
 			}
 		}
-		w.Resent(n.ID, "", 60, "being handed to the police at the door")
+		w.Aggrieve(n.ID, 60, "being handed to the police at the door")
 		p.Respect = max(0, p.Respect-8)
 		w.Player.Heat = max(0, w.Player.Heat-20)
 		w.Log(n.Name+" goes instead", fmt.Sprintf("%s answers for what was in the building and is gone %d days. Everybody who works for you heard about it before morning.", n.Name, days), "danger")
@@ -324,11 +324,7 @@ func (w *World) Bail(id string) error {
 	}
 	n.Held = 0
 	n.Trust = min(100, n.Trust+18)
-	for i := range w.Grudges {
-		if g := &w.Grudges[i]; g.Holder == n.ID && g.Against == "" {
-			g.Weight = max(0, g.Weight-40)
-		}
-	}
+	n.Sore = max(0, n.Sore-40)
 	w.Log(n.Name+" comes out", fmt.Sprintf("$%d for the %d days still on him. He walks out knowing exactly who paid it.", days*BailDaily, days), "personal")
 	return nil
 }

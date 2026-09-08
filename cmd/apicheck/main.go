@@ -34,6 +34,10 @@ var progression = []string{"repair", "delegate", "acquire", "recruit", "contact"
 // destination is available.
 var earning = []string{"courier", "dockwork"}
 
+// Work that names the person it is done to. These cannot be listed by id, so
+// the harness matches them by prefix.
+var named = []string{"lend:", "lean:", "extend:", "forgive:", "bail:", "sign:", "share:"}
+
 // Actions the core accepts without standing at the target location.
 var remote = []string{"expand"}
 
@@ -55,7 +59,8 @@ var ventures = []string{
 	"dress", "press", "bankroll", "draw", "car", "service",
 	"fit:door", "fit:telephone", "fit:safe", "fit:cellar", "commission",
 	"trip:rockridge", "trip:kingsport", "trip:halloway", "charge", "plant", "sitdown", "retain:commissioner", "retain:mayor", "rob:crew", "sabotage:crew", "armoury", "stock_arms", "buy:arms", "sell:arms", "mug", "mug:crew", "hit", "stand", "order", "post", "unpost", "sit_out", "lawyer", "talk",
-	// Signing somebody on names them, so the harness cannot list it by id.
+	// Signing somebody on and lending them money both name them, so the
+	// harness cannot list those by id.
 }
 
 var choicePreference = []string{"approach:careful", "accept", "pay", "escape", "acknowledge", "listen", "leave", "decline"}
@@ -276,6 +281,18 @@ func pick(s *snapshot, visited map[string]int, tried map[string]int, turn int) (
 			want := ventures[(turn/2+offset)%len(ventures)]
 			if a, ok := available[want]; ok {
 				return command{Kind: want, Target: targetOr(a, s)}, true
+			}
+		}
+	}
+	// Some work names the person it is done to, so the harness cannot list it
+	// by id. Take the first available action carrying one of these prefixes,
+	// which is how lending, collecting and bailing get exercised at all.
+	if turn%3 == 0 {
+		for _, prefix := range named {
+			for id, a := range available {
+				if strings.HasPrefix(id, prefix) {
+					return command{Kind: id, Target: targetOr(a, s)}, true
+				}
 			}
 		}
 	}

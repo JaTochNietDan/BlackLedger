@@ -12,13 +12,13 @@ import (
 
 func main() {
 	if len(os.Args) < 2 || len(os.Args) > 3 {
-		log.Fatal("usage: go run ./cmd/qa-fixture <new-qa.sqlite3> [police|damage|warning|russo-warning|attack|voice|contact|paused-job|leader|doorman|arrest]")
+		log.Fatal("usage: go run ./cmd/qa-fixture <new-qa.sqlite3> [police|damage|warning|russo-warning|attack|voice|contact|paused-job|leader|doorman|arrest|debt]")
 	}
 	scenario := "police"
 	if len(os.Args) == 3 {
 		scenario = os.Args[2]
 	}
-	if scenario != "police" && scenario != "damage" && scenario != "warning" && scenario != "russo-warning" && scenario != "attack" && scenario != "voice" && scenario != "contact" && scenario != "paused-job" && scenario != "leader" && scenario != "doorman" && scenario != "arrest" {
+	if scenario != "police" && scenario != "damage" && scenario != "warning" && scenario != "russo-warning" && scenario != "attack" && scenario != "voice" && scenario != "contact" && scenario != "paused-job" && scenario != "leader" && scenario != "doorman" && scenario != "arrest" && scenario != "debt" {
 		log.Fatal("unsupported QA scenario")
 	}
 	path := os.Args[1]
@@ -50,6 +50,29 @@ func main() {
 				return err
 			}
 			*w = *next
+			return nil
+		}
+		if scenario == "debt" {
+			// Money already out with a name on it, overdue, and the man who owes
+			// it standing in front of you.
+			w.Player.Cash, w.Player.Respect = 40000, 80
+			w.District = 2
+			for _, n := range w.Civilians() {
+				if core.IsOfficial(n.ID) {
+					continue
+				}
+				w.Player.Location = n.Location
+				n.Rank, n.Faction = core.RankLieutenant, "bellandi"
+				if w.Lend(n.ID) != nil {
+					n.Rank, n.Faction = 0, ""
+					continue
+				}
+				// His position collapses while he is carrying it.
+				n.Rank, n.Faction, n.Skill = 0, "", 5
+				w.Minute = w.LoanTo(n.ID).Due
+				w.LoanDay()
+				break
+			}
 			return nil
 		}
 		if scenario == "arrest" {

@@ -60,6 +60,42 @@ func (w *World) Resent(holder, against string, weight int, because string) {
 	w.trimGrudges()
 }
 
+// Aggrieve is the one thing in this city somebody can hold against the player.
+// Grudges are between people and deliberately stop at the protagonist, because
+// the player's answer to an organization is goodwill and their answer to a
+// crewman is loyalty. Neither of those reaches a docker who was put against a
+// wall over $200, and until this he had no way to feel anything about it.
+//
+// What it does is make him the one who comes for you. Nothing announces itself;
+// it arrives as an ordinary robbery in the street with a name attached.
+func (w *World) Aggrieve(id string, weight int, because string) {
+	n := w.NPC(id)
+	if n == nil || n.Dead || weight <= 0 {
+		return
+	}
+	n.Sore = min(GrudgeCap, n.Sore+weight)
+	n.SoreAt = because
+}
+
+// SoreAt is everybody carrying something against the player, worst first, so
+// anything that wants to know who would move against them can ask.
+func (w *World) Aggrieved() []*NPC {
+	out := []*NPC{}
+	for i := range w.NPCs {
+		if n := &w.NPCs[i]; !n.Dead && n.Sore > 0 {
+			out = append(out, n)
+		}
+	}
+	for i := range out {
+		for j := i + 1; j < len(out); j++ {
+			if out[j].Sore > out[i].Sore {
+				out[i], out[j] = out[j], out[i]
+			}
+		}
+	}
+	return out
+}
+
 // trimGrudges keeps the save bounded by forgetting the lightest first, which is
 // also the most human way to lose a grievance.
 func (w *World) trimGrudges() {
@@ -78,6 +114,16 @@ func (w *World) trimGrudges() {
 // entirely. Called before anybody acts, so a grudge settled today was still
 // heavy this morning.
 func (w *World) GrudgeDay() {
+	// What somebody holds against the player fades the same way, and a little
+	// slower, because it was personal.
+	for i := range w.NPCs {
+		if n := &w.NPCs[i]; n.Sore > 0 {
+			n.Sore--
+			if n.Sore == 0 {
+				n.SoreAt = ""
+			}
+		}
+	}
 	kept := w.Grudges[:0]
 	for _, g := range w.Grudges {
 		if w.NPC(g.Holder) == nil || w.NPC(g.Against) == nil {

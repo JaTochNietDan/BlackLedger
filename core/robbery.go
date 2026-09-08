@@ -136,7 +136,9 @@ func (w *World) robber() *NPC {
 	}
 	weights, total := make([]int, len(candidates)), 0
 	for i, n := range candidates {
-		weights[i] = max(1, n.Ambition+RankLeader-n.Rank)
+		// Somebody who has a reason is likelier than somebody who merely has
+		// an opportunity. This is how a collection in the street comes back.
+		weights[i] = max(1, n.Ambition+RankLeader-n.Rank+n.Sore*3)
 		total += weights[i]
 	}
 	roll := int(w.WorldRandom() * float64(total))
