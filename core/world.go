@@ -1147,6 +1147,8 @@ func operationLabel(operation string) string {
 		"courier": "Deliver the package", "mediation": "Mediate the dispute", "collection": "Collect the payment",
 		"escort": "Travel with it", "warning": "Deliver the message", "recovery": "Get it out", "settlement": "Settle the matter",
 		"supply": "Fetch what it needs", "distribution": "Move the stock on",
+		"consignment": "Hand the crates over", "grievance": "Put yourself between them",
+		"obligation": "Get it finished", "warning_off": "Have the conversation",
 	}
 	if label, ok := labels[operation]; ok {
 		return label
@@ -1165,6 +1167,10 @@ func operationOutcome(operation string) string {
 		"settlement":   "You put the matter in front of the new leadership and settled it.",
 		"supply":       "You brought back what the business needed.",
 		"distribution": "You moved the stock across the city and handed it over.",
+		"consignment":  "You handed the crates over away from your own premises and took the money for them.",
+		"grievance":    "You stood between the two of them long enough for it to stop being about tonight.",
+		"obligation":   "You finished what you had promised somebody and were seen to finish it.",
+		"warning_off":  "You had the conversation, and they know you know.",
 	}
 	if outcome, ok := outcomes[operation]; ok {
 		return outcome

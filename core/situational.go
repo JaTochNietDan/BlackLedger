@@ -73,6 +73,53 @@ func (w *World) SituationalOperations() []SituationalOperation {
 		})
 	}
 
+	// A room full of crates and a war outside is a situation nobody has to be
+	// told about twice.
+	if _, ok := w.TheArmoury(); ok && w.Stocked() > 0 {
+		if buyers := w.buyers(); len(buyers) > 0 {
+			out = append(out, SituationalOperation{
+				ID:     "consignment",
+				Effect: Effect{Reward: 240, Respect: 4, Heat: 9, Minutes: 90},
+				Because: fmt.Sprintf("%s is fighting and you are sitting on %d crates. They would rather not send anybody to a laundry in daylight.",
+					buyers[0].Name, w.Stocked()),
+			})
+		}
+	}
+
+	// Two people the player knows, one of whom has been carrying something
+	// against the other for weeks. Somebody would rather it did not go the way
+	// it is going.
+	if holder, target, because, ok := w.liveGrievance(); ok {
+		out = append(out, SituationalOperation{
+			ID:      "grievance",
+			Effect:  Effect{Reward: 130, Respect: 7, Heat: 2, Minutes: 75},
+			Because: fmt.Sprintf("%s has not forgiven %s for %s, and it is far enough along that somebody is going to get hurt over it.", holder, target, because),
+		})
+	}
+
+	// Work the player has already promised somebody, which is the most
+	// pressing thing in their life and the easiest thing for a contact to
+	// mention.
+	if live := w.Live(); len(live) > 0 {
+		c := live[0]
+		out = append(out, SituationalOperation{
+			ID:     "obligation",
+			Effect: Effect{Reward: 150, Respect: 3, Heat: 4, Minutes: 60},
+			Because: fmt.Sprintf("%s asked you for something on behalf of %s and the time for it is running out. %s",
+				c.GiverName, w.factionName(c.PatronID), w.Progress(c)),
+		})
+	}
+
+	// An organization that has stopped talking about the player and started
+	// deciding about them.
+	if f, ok := w.dangerousEnemy(); ok {
+		out = append(out, SituationalOperation{
+			ID:      "warning_off",
+			Effect:  Effect{Reward: 175, Respect: 6, Heat: 5, Minutes: 75},
+			Because: fmt.Sprintf("%s has stopped complaining about you, which is worse than complaining. Somebody who talks to them thinks it is worth one conversation.", f.Name),
+		})
+	}
+
 	// A death at the top of an organization leaves arrangements that were only
 	// ever held together by the person who is gone.
 	if name, organization, ok := w.recentLeadershipChange(); ok {
@@ -95,6 +142,10 @@ func SituationalEffects() map[string]Effect {
 		"settlement":   {Reward: 140, Respect: 6, Heat: 3, Minutes: 75},
 		"supply":       {Reward: 95, Respect: 4, Heat: 3, Minutes: 60},
 		"distribution": {Reward: 175, Respect: 5, Heat: 7, Minutes: 75},
+		"consignment":  {Reward: 240, Respect: 4, Heat: 9, Minutes: 90},
+		"grievance":    {Reward: 130, Respect: 7, Heat: 2, Minutes: 75},
+		"obligation":   {Reward: 150, Respect: 3, Heat: 4, Minutes: 60},
+		"warning_off":  {Reward: 175, Respect: 6, Heat: 5, Minutes: 75},
 	}
 }
 
@@ -152,3 +203,37 @@ func (w *World) recentLeadershipChange() (string, string, bool) {
 	}
 	return "", "", false
 }
+
+// liveGrievance finds a quarrel between two people the player has reason to
+// know about, which is what makes it something a contact would mention.
+func (w *World) liveGrievance() (string, string, string, bool) {
+	if w.Reach() < 2 {
+		return "", "", "", false
+	}
+	for _, g := range w.Grudges {
+		if g.Weight < GrudgeActs-15 {
+			continue
+		}
+		holder, target := w.NPC(g.Holder), w.NPC(g.Against)
+		if holder == nil || target == nil || holder.Dead || target.Dead {
+			continue
+		}
+		return holder.Name, target.Name, g.Because, true
+	}
+	return "", "", "", false
+}
+
+// dangerousEnemy is an organization whose standing with the player has passed
+// the point where they stop sending messages.
+func (w *World) dangerousEnemy() (*Faction, bool) {
+	for i := range w.Factions {
+		if f := &w.Factions[i]; f.Goodwill <= -55 {
+			return f, true
+		}
+	}
+	return nil, false
+}
+
+// PublicFactionName is an organization's name, for anything outside the core
+// that needs to say who somebody answers to.
+func (w *World) PublicFactionName(id string) string { return w.factionName(id) }

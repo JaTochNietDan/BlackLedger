@@ -222,6 +222,24 @@ func playerSituation(w *core.World) map[string]any {
 		"home_fittings":    w.Comforts(w.Player.Home),
 		"can_carry":        w.CarryLimit(),
 		"bad_blood":        w.GrudgeSummary(),
+		"owed":             commissionBriefs(w),
+		"under_the_floor":  w.ArmouryDescription(),
+		"people_in_city":   w.PopulationSummary(),
 	}
 	return situation
+}
+
+// commissionBriefs is the work the player has already promised somebody, in the
+// terms it was promised in, so a contact can mention a deadline the player is
+// actually living under.
+func commissionBriefs(w *core.World) []map[string]any {
+	out := []map[string]any{}
+	for _, c := range w.Live() {
+		out = append(out, map[string]any{
+			"asked_by": c.GiverName, "for": w.PublicFactionName(c.PatronID),
+			"brief": c.Brief, "progress": w.Progress(c),
+			"hours_left": (c.Due - w.Minute) / 60,
+		})
+	}
+	return out
 }

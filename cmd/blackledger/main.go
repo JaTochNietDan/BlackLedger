@@ -203,6 +203,11 @@ func (a *app) generateAttempt(snapshot *core.World, feedback string) error {
 	contextData["player_situation"] = playerSituation(snapshot)
 	contextData["city_conflicts"] = cityConflicts(snapshot)
 	contextData["organization_holdings"] = organizationHoldings(snapshot)
+	// The brief was only ever sent on the focused prompt, and the default is
+	// the full one — so in the live game nothing had ever told the model what
+	// an operation is. It wrote a story about collecting a debt when the game
+	// had asked for crates to be handed over, because nothing said otherwise.
+	contextData["job_brief"] = jobBrief(snapshot, operation, connection)
 	b, _ := json.Marshal(contextData)
 	// Experimental opt-in: reasoning shares the bounded generation budget with
 	// the final JSON. Requests remain asynchronous and bounded; structural

@@ -57,6 +57,12 @@ func jobBrief(w *core.World, operation string, connection *core.ArrangementMemor
 		b.SourceRole = "the establishment's manager"
 		b.RecipientRole = "the contact requesting this job"
 		b.PlayerTask = "Carry the manager's sealed message to the requesting contact without exposing its contents."
+		// This had no constraints at all, which a coverage test found: nothing
+		// stopped a courier scene from deciding what was in the envelope.
+		b.Constraints = []string{
+			"Do not say what the message contains.",
+			"Do not decide how it is received or what follows from it.",
+		}
 	case "mediation":
 		b.Premise = "Two staff members disagree about how to share access to a work area."
 		b.PlayerTask = "Hear both staff members and negotiate shared access without violence."
@@ -91,6 +97,46 @@ func jobBrief(w *core.World, operation string, connection *core.ArrangementMemor
 		b.RecipientRole = "whoever is minding the business"
 		b.PlayerTask = "Collect what the business needs and get it back there."
 		b.Constraints = []string{"Do not change what the business holds; the delivery is the job, not its result."}
+	case "consignment":
+		b.Premise = "An organization that is fighting somebody wants what the player has under their floor, and does not want to be seen at the premises collecting it."
+		b.SourceRole = "the player, who has the crates"
+		b.RecipientRole = "somebody sent by the organization that wants them"
+		b.PlayerTask = "Take the crates somewhere else and hand them over there."
+		b.Constraints = []string{
+			"The organization named in exists_because is buying, so it is the beneficiary of this work. Set it as the beneficiary rather than describing the people involved as unaffiliated.",
+			"Do not name a price, a quantity or a buyer beyond what the supplied fact states.",
+			"Do not decide the outcome of the war, or say which side wins anything.",
+			"Do not describe the crates being used.",
+		}
+	case "grievance":
+		b.Premise = "Two people the player knows have a quarrel far enough along that somebody is going to get hurt, and a third person would rather it stopped."
+		b.SourceRole = "whoever wants it stopped"
+		b.RecipientRole = "the two who are quarrelling"
+		b.PlayerTask = "Stand between them long enough for it to stop being about tonight."
+		b.Constraints = []string{
+			"Do not resolve the quarrel or decide that either of them gives it up.",
+			"Do not invent what either of them did beyond the supplied fact.",
+			"Nobody dies in this conversation.",
+		}
+	case "obligation":
+		b.Premise = "The player promised somebody something and the time for it is running out. A contact has heard about it and mentions it."
+		b.SourceRole = "the contact who has heard"
+		b.RecipientRole = "whoever the player promised"
+		b.PlayerTask = "Get the promised work finished and be seen to finish it."
+		b.Constraints = []string{
+			"Do not restate the terms of the promise beyond the supplied fact.",
+			"Do not decide whether it was finished in time.",
+		}
+	case "warning_off":
+		b.Premise = "An organization has stopped complaining about the player, which is worse than complaining, and somebody who talks to them thinks one conversation is worth having."
+		b.SourceRole = "whoever still talks to both sides"
+		b.RecipientRole = "somebody in the organization that has stopped talking"
+		b.PlayerTask = "Have the conversation, in person, and leave."
+		b.Constraints = []string{
+			"Nobody speaks for the organization that has stopped talking, so this work earns no family standing and has no beneficiary. Describe the people involved without giving them a family.",
+			"Do not threaten a specific act of violence or name a consequence the rules have not committed.",
+			"Do not decide how the organization answers, or whether they call anything off.",
+		}
 	case "distribution":
 		b.Premise = "Stock is sitting where it should not be sitting and has to be moved on to somebody who will take it."
 		b.SourceRole = "whoever is holding it"
