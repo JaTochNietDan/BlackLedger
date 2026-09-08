@@ -156,3 +156,22 @@ export function faces(origin: Vec, part: Part) {
 }
 
 export const points = (vs: Vec[]) => vs.map(v => `${v.x.toFixed(1)},${v.y.toFixed(1)}`).join(' ');
+
+// Where a person stands on a plot. People gather at the front corner of a
+// building rather than in the middle of its roof, and spread along the pavement
+// so a crowded address reads as a crowd instead of one figure.
+export function standing(at: Vec, block: {w: number; d: number}, i: number, of: number): Vec {
+  const spread = Math.min(of, 6);
+  const along = spread <= 1 ? .5 : .15 + (i % spread) / (spread - 1) * .7;
+  const rank = Math.floor(i / spread);          // a second row behind the first
+  return {x: at.x + block.w * along, y: at.y + block.d + .22 + rank * .28};
+}
+
+// The door of a building, which is where a journey starts and ends: the near
+// corner of its plot, on the pavement.
+export const door = (at: Vec, block: {w: number; d: number}): Vec =>
+  ({x: at.x + block.w / 2, y: at.y + block.d + .25});
+
+// Somewhere along a walk between two doors.
+export const between = (a: Vec, b: Vec, t: number): Vec =>
+  ({x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t});

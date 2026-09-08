@@ -2,7 +2,7 @@ import {useEffect, useRef} from 'react';
 import {Application, Assets, Container, Graphics, Sprite, Text, Texture, TextStyle} from 'pixi.js';
 import {Viewport} from 'pixi-viewport';
 import type {Snapshot} from './types';
-import {blockFor, depth, faces, plan, project, size, TILE} from './iso';
+import {between, blockFor, depth, door, faces, plan, project, size, standing, TILE} from './iso';
 import cutouts from '../public/art/iso/isometric.json';
 import type {Spotlight} from './CityStreet';
 
@@ -30,6 +30,28 @@ const textures = new Map<string, Texture>();
 // How far the camera may be pushed. Past these the city either fills the screen
 // with one roof or shrinks into the middle of an empty field.
 const ZOOM = {min: .45, max: 2.6};
+
+// A person in the street, small enough to belong to a building and clear
+// enough to be seen: a coat, a collar and a head. Deliberately not a portrait —
+// at the scale a whole city is drawn at, a face is four pixels of mud, and this
+// reads as somebody standing there.
+function figure(colour: number, yours: boolean, walking: boolean): Graphics {
+  const g = new Graphics();
+  const h = 17;
+  // The coat: narrow at the shoulders, flaring to the pavement.
+  g.poly([-3.6, -h + 5, 3.6, -h + 5, 5.2, 0, -5.2, 0]).fill(colour);
+  // A collar catching the light, so the figure has a front.
+  g.poly([-3.6, -h + 5, 3.6, -h + 5, 2.4, -h + 8.5, -2.4, -h + 8.5]).fill(0xd8cfb4, .5);
+  g.circle(0, -h + 2.6, 3.1).fill(0xc9a98a);          // the head
+  // A hat, because it is 1950 and because without one a small figure reads as
+  // a pin rather than as a man.
+  g.ellipse(0, -h + 1.4, 5, 1.5).fill(0x1b1d1f);
+  g.poly([-2.9, -h + 1.4, 2.9, -h + 1.4, 2.2, -h - 1.9, -2.2, -h - 1.9]).fill(0x24272a);
+  g.ellipse(0, .6, 5.4, 1.7).fill({color: 0x000000, alpha: .32});  // and a shadow to stand in
+  if (yours) g.circle(0, -h - 5.2, 1.7).fill(0xd6b77c);            // yours are marked
+  if (walking) g.poly([-6.6, -1.2, -4.2, -1.2, -5.4, .8]).fill({color: 0xd6b77c, alpha: .5});
+  return g;
+}
 
 export function CityIso({state, selected, onSelect, onEnter, spotlight}: {
   state: Snapshot; selected: string; onSelect: (id: string) => void; onEnter: () => void;
@@ -197,7 +219,47 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight}: {
       name.resolution = 2;
       group.addChild(name);
 
+      // Whoever is standing here, on the pavement in front of the building.
+      const crowd = p.people || [];
+      crowd.slice(0, 12).forEach((who, i) => {
+        const spot = project(standing(at, block, i, Math.min(crowd.length, 12)));
+        const g = figure(who.yours ? 0x4a4432 : 0x23262a, !!who.yours, false);
+        g.position.set(spot.x, spot.y);
+        g.eventMode = 'static';
+        g.cursor = 'pointer';
+        g.on('pointertap', () => pick.current(p.id));
+        group.addChild(g);
+      });
+
       layer.addChild(group);
+    }
+
+    // And the people crossing the city, drawn last so they pass in front of
+    // the buildings they are walking between. Where they are comes from the
+    // core: it knows the two addresses and how far along the walk they are.
+    for (const j of state.street || []) {
+      const from = state.locations.find(l => l.id === j.from_id);
+      const to = state.locations.find(l => l.id === j.to_id);
+      if (!from || !to) continue;
+      const a = door(plan(from.x, from.y), blockFor(from.type));
+      const b = door(plan(to.x, to.y), blockFor(to.type));
+      const spot = project(between(a, b, Math.min(1, Math.max(0, j.progress))));
+      const g = figure(j.yours ? 0x4a4432 : 0x23262a, !!j.yours, true);
+      g.position.set(spot.x, spot.y);
+      layer.addChild(g);
+
+      const tag = new Text({
+        text: j.name.split(' ')[0],
+        style: new TextStyle({
+          fontFamily: 'system-ui, sans-serif', fontSize: 10,
+          fill: j.yours ? 0xd6b77c : 0xb9c0b2,
+          stroke: {color: 0x0d1413, width: 3, join: 'round'},
+        }),
+      });
+      tag.anchor.set(.5, 1);
+      tag.position.set(spot.x, spot.y - 20);
+      tag.resolution = 2;
+      layer.addChild(tag);
     }
   }
 
