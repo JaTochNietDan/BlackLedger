@@ -139,7 +139,12 @@ export function blockFor(type: string): Block {
 // faces returns the three visible sides of a part as screen polygons, in the
 // order they must be drawn. A box is only ever seen from one corner, so three
 // faces is the whole of it.
-export function faces(origin: Vec, part: Part) {
+// Solid is the geometry of a box and nothing else. faces only ever needed the
+// shape, so a car — whose colours are numbers because Pixi wants numbers —
+// goes through the same projection as a building whose colours are strings.
+export type Solid = {dx?: number; dy?: number; w: number; d: number; h: number; base?: number};
+
+export function faces(origin: Vec, part: Solid) {
   const bx = origin.x + (part.dx || 0), by = origin.y + (part.dy || 0);
   const base = part.base || 0;
   const lift = (v: Vec, up: number) => ({x: v.x, y: v.y - up * TILE.h});
@@ -182,3 +187,172 @@ export const roof = (at: Vec, block: {w: number; d: number}, height: number): Ve
   const c = project({x: at.x + block.w / 2, y: at.y + block.d / 2});
   return {x: c.x, y: c.y - height};
 };
+
+// ---------------------------------------------------------------------------
+// The streets.
+//
+// The city was twelve buildings standing in the dark, and the first attempt at
+// roads joined every building to its nearest neighbours with L-shaped paths.
+// That produced a web: streets at every angle of approach, laid over each
+// other, meeting nothing squarely. A city is a grid.
+//
+// So the ground is a grid, and the buildings are placed on it. The addresses
+// keep their own coordinates as the source of where they belong — the core's
+// x and y decide which block a building gets — but the blocks themselves are
+// regular, the roads run the full width and height of the city, and every
+// corner is square. Bellwether's own coordinates fall into a six by four grid
+// with no two addresses wanting the same block, which is why this works
+// without moving anything by hand.
+
+// BLOCK is the pitch from one street to the next; ROAD is how much of that is
+// carriageway; PAVE is the footway inside each block, between kerb and wall.
+export const BLOCK = 3.6;
+export const ROAD = 1.0;
+export const PAVE = .42;
+
+export type Cell = {col: number; row: number};
+export type Rect = {x: number; y: number; w: number; d: number};
+export type Segment = {a: Vec; b: Vec};
+
+// island is the ground inside one block: everything that is not carriageway.
+export const island = (c: Cell): Rect => ({
+  x: c.col * BLOCK + ROAD / 2, y: c.row * BLOCK + ROAD / 2,
+  w: BLOCK - ROAD, d: BLOCK - ROAD,
+});
+
+// plot is where the building itself stands, set back from the kerb by the
+// width of the pavement on every side.
+export const plot = (c: Cell): Rect => {
+  const i = island(c);
+  return {x: i.x + PAVE, y: i.y + PAVE, w: i.w - PAVE * 2, d: i.d - PAVE * 2};
+};
+
+// The middle of a block, which is where a building is centred and where
+// anybody standing at that address is standing.
+export const middle = (c: Cell): Vec => {
+  const i = island(c);
+  return {x: i.x + i.w / 2, y: i.y + i.d / 2};
+};
+
+// grid puts every address in a block. Which block comes from the address's own
+// coordinates, so the city keeps its shape: the docks stay west, Cypress House
+// stays north-east. Two addresses that want the same block push apart rather
+// than stacking, though Bellwether as it stands never needs it.
+export function grid(places: {id: string; x: number; y: number}[]): Map<string, Cell> {
+  const tiles = places.map(p => ({id: p.id, ...plan(p.x, p.y)}));
+  const minX = Math.min(...tiles.map(t => t.x)), minY = Math.min(...tiles.map(t => t.y));
+  const taken = new Map<string, string>();
+  const out = new Map<string, Cell>();
+  for (const t of tiles.sort((a, b) => (a.x + a.y) - (b.x + b.y))) {
+    let cell = {col: Math.round((t.x - minX) / BLOCK), row: Math.round((t.y - minY) / BLOCK)};
+    // If somebody is already there, step outwards until a block is free.
+    for (let ring = 1; taken.has(`${cell.col},${cell.row}`) && ring < 6; ring++) {
+      const around = [{col: cell.col + ring, row: cell.row}, {col: cell.col, row: cell.row + ring},
+                      {col: cell.col - ring, row: cell.row}, {col: cell.col, row: cell.row - ring}];
+      const free = around.find(c => c.col >= 0 && c.row >= 0 && !taken.has(`${c.col},${c.row}`));
+      if (free) cell = free;
+    }
+    taken.set(`${cell.col},${cell.row}`, t.id);
+    out.set(t.id, cell);
+  }
+  return out;
+}
+
+// The extent of the city in blocks, which is what the roads have to span.
+export function bounds(cells: Map<string, Cell>): {cols: number; rows: number} {
+  let cols = 0, rows = 0;
+  for (const c of cells.values()) { cols = Math.max(cols, c.col); rows = Math.max(rows, c.row) }
+  return {cols: cols + 1, rows: rows + 1};
+}
+
+// The carriageways, running the full width and height of the city so every
+// junction is square and no street stops in the middle of nowhere.
+export function carriageways({cols, rows}: {cols: number; rows: number}): Segment[] {
+  const out: Segment[] = [];
+  const right = cols * BLOCK, bottom = rows * BLOCK;
+  for (let col = 0; col <= cols; col++) {
+    const x = col * BLOCK;
+    out.push({a: {x, y: 0}, b: {x, y: bottom}});
+  }
+  for (let row = 0; row <= rows; row++) {
+    const y = row * BLOCK;
+    out.push({a: {x: 0, y}, b: {x: right, y}});
+  }
+  return out;
+}
+
+// A walk from one address to another, along the streets rather than through
+// the buildings: out of the block to the nearest corner, along one axis, then
+// the other, and in again.
+export function walk(from: Cell, to: Cell): Vec[] {
+  const start = middle(from), end = middle(to);
+  // The junction lines this walk uses: the street on the near side of each.
+  const lane = (a: number, b: number) => (a <= b ? Math.max(a, b) * 0 + (a + 1) * BLOCK - BLOCK : a * BLOCK);
+  const outX = from.col <= to.col ? (from.col + 1) * BLOCK : from.col * BLOCK;
+  const inY = to.row <= from.row ? (to.row + 1) * BLOCK : to.row * BLOCK;
+  void lane;
+  return [
+    start,
+    {x: outX, y: start.y},          // out to the street
+    {x: outX, y: inY},              // along it
+    {x: end.x, y: inY},             // round the corner
+    end,                            // and in
+  ];
+}
+
+// along is a point some fraction of the way through a set of waypoints,
+// measured by distance rather than by how many corners there are — so somebody
+// crossing a long street does not sprint the last leg.
+export function along(path: Vec[], t: number): Vec {
+  if (path.length === 0) return {x: 0, y: 0};
+  if (path.length === 1) return path[0];
+  const legs = [];
+  let total = 0;
+  for (let i = 0; i + 1 < path.length; i++) {
+    const d = Math.hypot(path[i + 1].x - path[i].x, path[i + 1].y - path[i].y);
+    legs.push(d); total += d;
+  }
+  if (total === 0) return path[0];
+  let want = Math.min(1, Math.max(0, t)) * total;
+  for (let i = 0; i < legs.length; i++) {
+    if (want <= legs[i] || i === legs.length - 1) {
+      const f = legs[i] === 0 ? 0 : Math.min(1, want / legs[i]);
+      return between(path[i], path[i + 1], f);
+    }
+    want -= legs[i];
+  }
+  return path[path.length - 1];
+}
+
+// The lamps stand at the corners of every block, which is where a city puts
+// them and which keeps them square to the grid.
+export function lampPosts({cols, rows}: {cols: number; rows: number}): Vec[] {
+  const out: Vec[] = [];
+  for (let col = 0; col <= cols; col++) {
+    for (let row = 0; row <= rows; row++) {
+      out.push({x: col * BLOCK + ROAD / 2 + .1, y: row * BLOCK + ROAD / 2 + .1});
+    }
+  }
+  return out;
+}
+
+// Where the cars stand: along the kerb of a block, parked rather than driving.
+// The clock is stopped between actions, and a car moving while time is not
+// would be the view inventing something the simulation has not spent.
+export function kerbside(cell: Cell, seed: number): {at: Vec; horizontal: boolean; facing: number}[] {
+  const i = island(cell);
+  let h = ((cell.col * 73856093) ^ (cell.row * 19349663) ^ seed) >>> 0;
+  const next = () => { h = (h * 1664525 + 1013904223) >>> 0; return h / 4294967296 };
+  const out: {at: Vec; horizontal: boolean; facing: number}[] = [];
+  const slots = 3;
+  for (let n = 0; n < slots; n++) {
+    if (next() > .5) continue;
+    const f = (n + .5) / slots;
+    if (next() < .5) {
+      out.push({at: {x: i.x + i.w * f, y: i.y - ROAD * .28}, horizontal: true, facing: next() < .5 ? 1 : -1});
+    } else {
+      out.push({at: {x: i.x - ROAD * .28, y: i.y + i.d * f}, horizontal: false, facing: next() < .5 ? 1 : -1});
+    }
+  }
+  return out;
+}

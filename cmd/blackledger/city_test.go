@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"math"
 	"os"
 	"regexp"
 	"strconv"
@@ -17,65 +18,65 @@ import (
 // the first version did it twice, putting The Mariner and Saint Agnes through
 // the Bellwether Herald.
 //
-// This reads the footprint table and the spacing straight out of the renderer
-// and checks them against the city's own coordinates. It is deliberately loud
-// when it cannot parse them: a guard that quietly finds nothing to check is
-// worse than no guard.
+// These read the grid's own constants straight out of the renderer and check
+// them against the city's coordinates. They are deliberately loud when they
+// cannot parse them: a guard that quietly finds nothing to check is worse than
+// no guard.
 
 var (
-	cellSize  = regexp.MustCompile(`export const CELL = ([0-9.]+);`)
-	footprint = regexp.MustCompile(`(?m)^\s+([a-z]+): \[([0-9.]+), ([0-9.]+)\],`)
+	blockPitch = regexp.MustCompile(`export const BLOCK = ([0-9.]+);`)
+	cellSize   = regexp.MustCompile(`export const CELL = ([0-9.]+);`)
 )
 
-func TestNoTwoBuildingsStandOnTheSameGround(t *testing.T) {
+// The city is laid out on a grid: every address gets a block, the streets run
+// the full width and height, and no two buildings can share ground because no
+// two can have the same block.
+//
+// This replaces a test that checked the addresses' raw coordinates against a
+// table of footprints. That was the right test when buildings stood wherever
+// their coordinates put them and could overlap; it stopped meaning anything
+// when the grid started deciding placement, and a test that cannot fail is
+// worse than no test. What matters now is that every address gets its own
+// block, which is exactly what the renderer computes.
+func TestEveryAddressGetsItsOwnBlock(t *testing.T) {
 	source, err := os.ReadFile("../../src/iso.ts")
 	if err != nil {
 		t.Skip("no interface sources beside this build")
 	}
 	body := string(source)
-
+	pitch := blockPitch.FindStringSubmatch(body)
 	cellMatch := cellSize.FindStringSubmatch(body)
-	if cellMatch == nil {
-		t.Fatal("the renderer no longer states a CELL, so nothing here can be checked")
+	if pitch == nil || cellMatch == nil {
+		t.Fatal("the renderer no longer states BLOCK and CELL, so nothing here can be checked")
 	}
-	cell, err := strconv.ParseFloat(cellMatch[1], 64)
-	if err != nil || cell <= 0 {
-		t.Fatalf("CELL reads %q", cellMatch[1])
-	}
-
-	table := map[string][2]float64{}
-	for _, m := range footprint.FindAllStringSubmatch(body, -1) {
-		w, _ := strconv.ParseFloat(m[2], 64)
-		d, _ := strconv.ParseFloat(m[3], 64)
-		table[m[1]] = [2]float64{w, d}
-	}
-	if len(table) < 7 {
-		t.Fatalf("only %d footprints were found in the renderer; the table has moved or been renamed", len(table))
+	block, err1 := strconv.ParseFloat(pitch[1], 64)
+	cell, err2 := strconv.ParseFloat(cellMatch[1], 64)
+	if err1 != nil || err2 != nil || block <= 0 || cell <= 0 {
+		t.Fatalf("BLOCK reads %q and CELL reads %q", pitch[1], cellMatch[1])
 	}
 
-	// Every kind of place the city actually contains must be drawn deliberately
-	// rather than falling back to a house.
+	// The same binning the renderer does: an address's own coordinates decide
+	// which block it gets, so the city keeps its shape.
+	minX, minY := math.Inf(1), math.Inf(1)
 	for _, l := range core.Locations {
-		if _, ok := table[l.Type]; !ok {
-			t.Errorf("%s is a %q and nothing in the renderer draws one", l.Name, l.Type)
-		}
+		minX = math.Min(minX, float64(l.X)/cell)
+		minY = math.Min(minY, float64(l.Y)/cell)
 	}
-
-	sizeOf := func(kind string) [2]float64 {
-		if s, ok := table[kind]; ok {
-			return s
+	taken := map[[2]int]string{}
+	for _, l := range core.Locations {
+		at := [2]int{
+			int(math.Round((float64(l.X)/cell - minX) / block)),
+			int(math.Round((float64(l.Y)/cell - minY) / block)),
 		}
-		return table["home"]
+		if other, clash := taken[at]; clash {
+			t.Errorf("%s and %s both want block %d,%d — one of them will be pushed off its own coordinates",
+				other, l.Name, at[0], at[1])
+			continue
+		}
+		taken[at] = l.Name
 	}
-	for i, a := range core.Locations {
-		for _, b := range core.Locations[i+1:] {
-			as, bs := sizeOf(a.Type), sizeOf(b.Type)
-			ax, ay := float64(a.X)/cell, float64(a.Y)/cell
-			bx, by := float64(b.X)/cell, float64(b.Y)/cell
-			if ax < bx+bs[0] && bx < ax+as[0] && ay < by+bs[1] && by < ay+as[1] {
-				t.Errorf("%s and %s stand on the same ground at CELL %g", a.Name, b.Name, cell)
-			}
-		}
+	if len(taken) != len(core.Locations) {
+		t.Errorf("%d addresses went into %d blocks", len(core.Locations), len(taken))
 	}
 }
 

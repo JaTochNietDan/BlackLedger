@@ -2,7 +2,8 @@ import {useEffect, useRef} from 'react';
 import {Application, Assets, Container, Graphics, Sprite, Text, Texture, TextStyle} from 'pixi.js';
 import {Viewport} from 'pixi-viewport';
 import type {Snapshot} from './types';
-import {between, blockFor, depth, door, faces, plan, project, size, standing, TILE} from './iso';
+import {along, blockFor, BLOCK, bounds, carriageways, faces, grid, island, kerbside, lampPosts, middle, PAVE, plot, project, ROAD, size, TILE, walk} from './iso';
+import type {Cell, Vec} from './iso';
 import cutouts from '../public/art/iso/isometric.json';
 import type {Spotlight} from './CityStreet';
 
@@ -30,6 +31,53 @@ const textures = new Map<string, Texture>();
 // How far the camera may be pushed. Past these the city either fills the screen
 // with one roof or shrinks into the middle of an empty field.
 const ZOOM = {min: .45, max: 2.6};
+
+// A car at the kerb, built the same way a building is: small boxes in tile
+// space, drawn through the same projection. The first version was drawn by
+// hand in screen space and read as a smear at any zoom, because nothing about
+// it agreed with the angle everything else is at.
+//
+// The silhouette is what says 1950 — a long bonnet, an upright cabin set back,
+// a short boot — not detail, which disappears at the size a city is drawn at.
+function car(colour: number, along: boolean): Graphics {
+  const g = new Graphics();
+  const L = .62, W = .30;                     // length and width, in tiles
+  const dark = shade(colour, .55), light = shade(colour, 1.45);
+
+  // Laid out along x, then mirrored by the caller for the other street.
+  const body = [
+    {dx: 0, dy: 0, w: L, d: W, h: .11, base: .015, top: colour, left: dark, right: shade(colour, .8)},
+    {dx: L * .26, dy: -.005, w: L * .42, d: W + .01, h: .10, base: .125,
+     top: light, left: shade(colour, .5), right: shade(colour, .7)},
+  ];
+  for (const part of body) {
+    const f = faces({x: -L / 2, y: -W / 2}, part);
+    g.poly(f.left.flatMap(v => [v.x, v.y])).fill(part.left);
+    g.poly(f.right.flatMap(v => [v.x, v.y])).fill(part.right);
+    g.poly(f.top.flatMap(v => [v.x, v.y])).fill(part.top);
+  }
+  // Wheels: dark ellipses tucked under each end, which is what stops it
+  // floating over the road.
+  for (const at of [-L * .3, L * .28]) {
+    const w = project({x: at, y: W / 2});
+    g.ellipse(w.x, w.y + 1, 3.6, 1.9).fill(0x0d0f10);
+  }
+  // Headlights, and only a hint of what they throw.
+  const nose = project({x: -L / 2, y: 0});
+  g.circle(nose.x + 2, nose.y - 5, 1.4).fill({color: 0xf6e6bb, alpha: .9});
+  g.poly([nose.x, nose.y - 5, nose.x - 16, nose.y - 9, nose.x - 16, nose.y + 3])
+    .fill({color: 0xf0d6a0, alpha: .05});
+  void along;
+  return g;
+}
+
+// A colour lightened or darkened, so one paint job gives a whole car.
+function shade(colour: number, by: number): number {
+  const r = Math.min(255, Math.round(((colour >> 16) & 255) * by));
+  const g = Math.min(255, Math.round(((colour >> 8) & 255) * by));
+  const b = Math.min(255, Math.round((colour & 255) * by));
+  return (r << 16) | (g << 8) | b;
+}
 
 // A person in the street, small enough to belong to a building and clear
 // enough to be seen: a coat, a collar and a head. Deliberately not a portrait —
@@ -208,9 +256,8 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight}: {
     if (!wasLooking.current) {
       wasLooking.current = {x: viewport.center.x, y: viewport.center.y, scale: viewport.scale.x};
     }
-    const block = blockFor(place.type);
-    const at = plan(place.x, place.y);
-    const c = project({x: at.x + block.w / 2, y: at.y + block.d / 2});
+    const cell = grid(state.locations).get(place.id) || {col: 0, row: 0};
+    const c = project(middle(cell));
     viewport.animate({
       time: 620, position: {x: c.x, y: c.y - 60},
       scale: Math.min(ZOOM.max, Math.max(1.25, viewport.scale.x)), ease: 'easeInOutSine',
@@ -241,10 +288,10 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight}: {
     if (!spotlight) return;
     const place = state.locations.find(l => l.id === spotlight.id);
     if (!place) return;
-    const block = blockFor(place.type);
-    const at = plan(place.x, place.y);
-    const across = (block.w + block.d) * (TILE.w / 2);
-    const centre = project({x: at.x + block.w / 2, y: at.y + block.d / 2});
+    const cell = grid(state.locations).get(place.id) || {col: 0, row: 0};
+    const ground = plot(cell);
+    const across = (ground.w + ground.d) * (TILE.w / 2);
+    const centre = project(middle(cell));
     const art = textures.get(place.id);
     // Over the roof when the building is painted, over the middle of the plot
     // when it is still a blocked-out solid.
@@ -260,13 +307,111 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight}: {
     layer.removeChildren().forEach(c => c.destroy({children: true}));
 
     const here = state.player.location;
+    const cells = grid(state.locations);
+    const size = bounds(cells);
+
+    // The ground: one slab under the whole city, so nothing floats and the
+    // roads are cut out of something rather than laid on nothing.
+    const earth = new Graphics();
+    const far = {x: size.cols * BLOCK, y: size.rows * BLOCK};
+    const corners = [{x: -.6, y: -.6}, {x: far.x + .6, y: -.6}, {x: far.x + .6, y: far.y + .6}, {x: -.6, y: far.y + .6}]
+      .map(project);
+    earth.poly(corners.flatMap(c => [c.x, c.y])).fill(0x141a1a);
+    layer.addChild(earth);
+
+    // The carriageways, full width and height, so every junction is square.
+    const road = new Graphics();
+    for (const way of carriageways(size)) {
+      const horizontal = Math.abs(way.b.y - way.a.y) < .001;
+      const pad = horizontal ? {x: 0, y: ROAD / 2} : {x: ROAD / 2, y: 0};
+      const box = [
+        {x: way.a.x - pad.x, y: way.a.y - pad.y}, {x: way.b.x + pad.x, y: way.a.y - pad.y},
+        {x: way.b.x + pad.x, y: way.b.y + pad.y}, {x: way.a.x - pad.x, y: way.b.y + pad.y},
+      ].map(project);
+      road.poly(box.flatMap(c => [c.x, c.y])).fill(0x1a1f20);
+    }
+    layer.addChild(road);
+
+    // The pavements: the footway inside each block, between kerb and wall,
+    // drawn as the island with the building's plot cut out of the middle.
+    const pave = new Graphics();
+    const kerb = new Graphics();
+    for (const cell of cells.values()) {
+      const i = island(cell);
+      const outer = [{x: i.x, y: i.y}, {x: i.x + i.w, y: i.y}, {x: i.x + i.w, y: i.y + i.d}, {x: i.x, y: i.y + i.d}]
+        .map(project);
+      pave.poly(outer.flatMap(c => [c.x, c.y])).fill(0x2a302e);
+      kerb.poly(outer.flatMap(c => [c.x, c.y])).stroke({width: 1.6, color: 0x39423d, alpha: .95});
+      // The join between pavement and building, a shade darker so the plot
+      // reads as ground the building sits on rather than as more pavement.
+      const b = plot(cell);
+      const inner = [{x: b.x, y: b.y}, {x: b.x + b.w, y: b.y}, {x: b.x + b.w, y: b.y + b.d}, {x: b.x, y: b.y + b.d}]
+        .map(project);
+      pave.poly(inner.flatMap(c => [c.x, c.y])).fill(0x232927);
+    }
+    layer.addChild(pave, kerb);
+
+    // A broken line down the middle of every carriageway.
+    const paint = new Graphics();
+    for (const way of carriageways(size)) {
+      const length = Math.hypot(way.b.x - way.a.x, way.b.y - way.a.y);
+      const dashes = Math.max(2, Math.round(length / .5));
+      for (let i = 0; i < dashes; i += 2) {
+        const from = project({x: way.a.x + (way.b.x - way.a.x) * (i / dashes), y: way.a.y + (way.b.y - way.a.y) * (i / dashes)});
+        const to = project({x: way.a.x + (way.b.x - way.a.x) * ((i + .6) / dashes), y: way.a.y + (way.b.y - way.a.y) * ((i + .6) / dashes)});
+        paint.moveTo(from.x, from.y).lineTo(to.x, to.y);
+      }
+    }
+    paint.stroke({width: 1.3, color: 0x6d6a52, alpha: .35});
+    layer.addChild(paint);
+
+    // The lamps, at every corner of every block, and the pools they throw.
+    const glow = new Graphics();
+    const posts = new Graphics();
+    for (const foot of lampPosts(size)) {
+      const p = project(foot);
+      glow.ellipse(p.x, p.y, TILE.w * .40, TILE.h * .40).fill({color: 0xd9b678, alpha: .09});
+      glow.ellipse(p.x, p.y, TILE.w * .21, TILE.h * .21).fill({color: 0xf0d6a0, alpha: .08});
+      const H = 32;
+      posts.poly([p.x - 1.4, p.y, p.x + 1.4, p.y, p.x + .8, p.y - H, p.x - .8, p.y - H]).fill(0x1b1f21);
+      posts.ellipse(p.x, p.y, 3.2, 1.3).fill(0x14171a);
+      posts.rect(p.x - .8, p.y - H - 1, 5, 1.3).fill(0x1b1f21);
+      const lx = p.x + 4.4, ly = p.y - H + 1;
+      posts.poly([lx - 2.2, ly, lx + 2.2, ly, lx + 1.4, ly + 4.8, lx - 1.4, ly + 4.8]).fill({color: 0xf3dcae, alpha: .92});
+      posts.poly([lx - 2.6, ly - 1.3, lx + 2.6, ly - 1.3, lx + 2.2, ly, lx - 2.2, ly]).fill(0x22262a);
+      glow.poly([lx, ly + 4, lx + 12, p.y + 3, lx - 12, p.y + 3]).fill({color: 0xf0d6a0, alpha: .06});
+    }
+    layer.addChild(glow, posts);
+
+    // The traffic, such as it is: cars at the kerb, in the drab colours a
+    // 1950s street actually held rather than a paintbox.
+    const PAINT = [0x2b3038, 0x3a3129, 0x27302c, 0x40342c, 0x1f2429, 0x4a3b2e];
+    const cars = new Container();
+    let colour = 0;
+    for (const cell of cells.values()) {
+      for (const spot of kerbside(cell, 91)) {
+        const p = project(spot.at);
+        const c = car(PAINT[colour++ % PAINT.length], spot.horizontal);
+        c.position.set(p.x, p.y);
+        // A car sits along the kerb it is parked at; in this projection that
+        // means mirroring the long axis for a street running the other way.
+        if (!spot.horizontal) c.scale.x = -1;
+        cars.addChild(c);
+      }
+    }
+    layer.addChild(cars);
     const placed = state.locations.map(p => {
-      const block = blockFor(p.type);
-      const at = plan(p.x, p.y);
-      return {p, block, at, d: depth({x: at.x + block.w / 2, y: at.y + block.d / 2})};
+      const cell = cells.get(p.id) || {col: 0, row: 0};
+      const ground = plot(cell);
+      // The block decides the footprint now, not the kind of building: every
+      // plot on the grid is the same size, which is what keeps the streets
+      // straight. What a place is still decides how it is drawn.
+      const block = {...blockFor(p.type), w: ground.w, d: ground.d};
+      const at = {x: ground.x, y: ground.y};
+      return {p, cell, block, at, d: at.x + block.w / 2 + at.y + block.d / 2};
     }).sort((a, b) => a.d - b.d);
 
-    for (const {p, block, at} of placed) {
+    for (const {p, cell, block, at} of placed) {
       const lit = spotlight?.id === p.id;
       const shut = p.district > state.district;
       const group = new Container();
@@ -340,8 +485,17 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight}: {
 
       // Whoever is standing here, on the pavement in front of the building.
       const crowd = p.people || [];
+      const island_ = island(cell);
       crowd.slice(0, 12).forEach((who, i) => {
-        const spot = project(standing(at, block, i, Math.min(crowd.length, 12)));
+        // Along the pavement in front of the building, and into a second row
+        // when the first is full.
+        const of = Math.min(crowd.length, 12), per = Math.min(of, 5);
+        const across_ = per <= 1 ? .5 : .12 + (i % per) / (per - 1) * .76;
+        const rank = Math.floor(i / per);
+        const spot = project({
+          x: island_.x + island_.w * across_,
+          y: island_.y + island_.d - PAVE * (.42 + rank * .55),
+        });
         const g = figure(who.yours ? 0x4a4432 : 0x23262a, !!who.yours, false);
         g.position.set(spot.x, spot.y);
         g.eventMode = 'static';
@@ -357,12 +511,10 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight}: {
     // the buildings they are walking between. Where they are comes from the
     // core: it knows the two addresses and how far along the walk they are.
     for (const j of state.street || []) {
-      const from = state.locations.find(l => l.id === j.from_id);
-      const to = state.locations.find(l => l.id === j.to_id);
+      const from = cells.get(j.from_id), to = cells.get(j.to_id);
       if (!from || !to) continue;
-      const a = door(plan(from.x, from.y), blockFor(from.type));
-      const b = door(plan(to.x, to.y), blockFor(to.type));
-      const spot = project(between(a, b, Math.min(1, Math.max(0, j.progress))));
+      // Along the streets, not through the buildings.
+      const spot = project(along(walk(from, to), j.progress));
       const g = figure(j.yours ? 0x4a4432 : 0x23262a, !!j.yours, true);
       g.position.set(spot.x, spot.y);
       layer.addChild(g);
