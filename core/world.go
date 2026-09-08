@@ -112,6 +112,9 @@ type Property struct {
 	Supply  int  `json:"supply,omitempty"`
 	Trouble bool `json:"trouble,omitempty"`
 	Still   bool `json:"still,omitempty"`
+	// What is behind the tables at a casino. Absent everywhere else, and in
+	// saves written before a room ran a float of its own.
+	Bankroll int `json:"bankroll,omitempty"`
 }
 type Plot struct {
 	Target   string `json:"target,omitempty"`
@@ -338,7 +341,10 @@ func New(seed uint32) *World {
 		case "garage":
 			income = 24
 		case "casino":
-			income = 48
+			// The floor take only: the bar, the door and the rooms upstairs.
+			// What the tables make is decided every night by the float behind
+			// them, in CasinoDay, rather than accruing by the hour.
+			income = 18
 		case "club":
 			income = 30
 		case "market":
@@ -565,6 +571,13 @@ func (w *World) Actions(id string) []Action {
 					}
 				}
 			}
+			if HasBankroll(id) {
+				prop := w.Properties[id]
+				add("bankroll", "Put money behind the tables", 45, 0, w.BankrollReadiness(id),
+					fmt.Sprintf("$%d into the float, currently $%d. %s The house keeps roughly %d%% of what crosses the tables over a season and loses on plenty of single nights. A house that cannot pay a winner is finished as a room worth playing in.", BankrollLot, prop.Bankroll, coverage(w.NightHandleAt(id)), HouseEdge))
+				add("draw", "Take money off the tables", 45, 0, w.DrawReadiness(id),
+					fmt.Sprintf("$%d out of the $%d float and into your hands. It is the only way this room's winnings reach you, and every lot taken is action it can no longer attract.", BankrollLot, prop.Bankroll))
+			}
 			if w.Properties[id].Income > 0 {
 				current := w.Mode(id)
 				for _, m := range operatingModes {
@@ -780,6 +793,7 @@ func (w *World) Advance(minutes int) {
 			w.PeopleDay()
 			w.OperationsDay()
 			w.StillDay()
+			w.CasinoDay()
 			w.DressDay()
 			bill := w.DailyCost()
 			if p.Cash >= bill {
@@ -856,7 +870,7 @@ func (w *World) Public() map[string]any {
 		if w.Own(l.ID) {
 			income += float64(prop.Income*prop.Condition) / 100
 		}
-		locs = append(locs, map[string]any{"id": l.ID, "name": l.Name, "type": l.Type, "district": l.District, "x": l.X, "y": l.Y, "cost": l.Cost, "blurb": l.Blurb, "owner": prop.Owner, "holder": w.HolderName(l.ID), "staff": prop.Staff, "supply": prop.Supply, "trouble": prop.Trouble, "capacity": w.Capacity(l.ID), "condition": prop.Condition, "income": prop.Income, "owned": w.Own(l.ID), "locked": l.District > w.District, "actions": w.Actions(l.ID)})
+		locs = append(locs, map[string]any{"id": l.ID, "name": l.Name, "type": l.Type, "district": l.District, "x": l.X, "y": l.Y, "cost": l.Cost, "blurb": l.Blurb, "owner": prop.Owner, "holder": w.HolderName(l.ID), "staff": prop.Staff, "supply": prop.Supply, "trouble": prop.Trouble, "still": prop.Still, "bankroll": prop.Bankroll, "handle": w.NightHandleAt(l.ID), "capacity": w.Capacity(l.ID), "condition": prop.Condition, "income": prop.Income, "owned": w.Own(l.ID), "locked": l.District > w.District, "actions": w.Actions(l.ID)})
 	}
 	var scene any = nil
 	if e := w.Event; e != nil {

@@ -1,6 +1,6 @@
 export interface VisualCue {id:string;kind:string;target:string;caption:string}
 export interface Action {id:string;label:string;minutes:number;cost:number;disabled:boolean;reason:string;detail:string;target:string}
-export interface Place {still?:boolean;staff?:number;supply?:number;trouble?:boolean;capacity?:number;holder?:string;id:string;name:string;type:string;district:number;x:number;y:number;cost:number;blurb:string;owner:string;condition:number;income:number;owned:boolean;locked:boolean;actions:Action[]}
+export interface Place {bankroll?:number;handle?:number;still?:boolean;staff?:number;supply?:number;trouble?:boolean;capacity?:number;holder?:string;id:string;name:string;type:string;district:number;x:number;y:number;cost:number;blurb:string;owner:string;condition:number;income:number;owned:boolean;locked:boolean;actions:Action[]}
 export interface Person {stock?:{[good:string]:number};earned?:number;name:string;cash:number;health:number;respect:number;heat:number;location:string;home:string;security:number;contacts:number;crew:{id:string;name:string;loyalty:number}[];alive:boolean;job_count:number}
 export interface NPC {id:string;name:string;role:string;trust:number;voice:string;color:string}
 export interface Event {connection?:{id:string;title:string;result:string}|null;id:string;title:string;body:string;speaker:string;kind:string;source:string;minute:number;choices:{id:string;label:string;detail:string;cost:number;disabled:boolean}[]}

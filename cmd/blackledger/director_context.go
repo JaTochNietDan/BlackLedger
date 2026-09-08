@@ -202,6 +202,12 @@ func playerSituation(w *core.World) map[string]any {
 				entry["trouble"] = trade.Trouble
 			}
 		}
+		if core.HasBankroll(l.ID) {
+			entry["behind_the_tables"] = fmt.Sprintf("$%d", prop.Bankroll)
+			if prop.Bankroll < core.BankrollFull/2 {
+				entry["trouble"] = "The float is thin enough that the serious money drinks elsewhere."
+			}
+		}
 		businesses = append(businesses, entry)
 	}
 	situation := map[string]any{

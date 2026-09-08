@@ -8,7 +8,7 @@ package core
 // to somebody.
 
 // SaveVersion is the shape the current build writes.
-const SaveVersion = 6
+const SaveVersion = 7
 
 // seedHoldings is the property each established family holds in a new city.
 var seedHoldings = map[string][]string{
@@ -80,6 +80,21 @@ func (w *World) MigrateLivingWorld() {
 		}
 		if n.Voice == "" {
 			n.Voice = w.voiceFor(n.Name)
+		}
+	}
+
+	// The casino's hourly number used to include the tables. Now the tables are
+	// run every night off their own float, so the hourly number is the floor
+	// take alone and an existing campaign is corrected to match.
+	if prop := w.Properties["casino"]; prop != nil && prop.Income > 18 {
+		prop.Income = 18
+	}
+
+	// A casino somebody already owned always had money behind its tables; the
+	// campaign simply could not see it. Enough to run, not enough to relax.
+	for _, l := range Locations {
+		if HasBankroll(l.ID) && w.Own(l.ID) && w.Properties[l.ID].Bankroll == 0 {
+			w.Properties[l.ID].Bankroll = BankrollLot * 2
 		}
 	}
 

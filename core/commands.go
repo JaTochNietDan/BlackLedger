@@ -248,6 +248,14 @@ func (w *World) apply(c Command) error {
 				if err := w.BuyArms(strings.TrimPrefix(c.Kind, "arms:")); err != nil {
 					return err
 				}
+			case "bankroll":
+				if err := w.Bankroll(target); err != nil {
+					return err
+				}
+			case "draw":
+				if err := w.Draw(target); err != nil {
+					return err
+				}
 			case "dress":
 				if err := w.BuyAttire(); err != nil {
 					return err
