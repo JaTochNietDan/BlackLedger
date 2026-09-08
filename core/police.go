@@ -111,13 +111,16 @@ func (w *World) Raid() {
 		seized += hidden
 		w.LoseCar("They found the false floor and took the car with it.")
 	}
+	seized += w.CellarFound()
 	w.SeizeArms()
 	w.Ruin(20) // being turned out against a wall is hard on good clothes
 	still, foundStill := w.StillFound()
-	fine := min(w.Player.Cash, 150+w.Player.Heat*12)
+	// A fine takes what it can reach. Money behind the panelling is not money
+	// anybody can point at.
+	fine := min(w.Reachable(), 150+w.Player.Heat*12)
 	if foundStill {
 		// Finding a still is what turns a search into a case.
-		fine = min(w.Player.Cash, fine*2+400)
+		fine = min(w.Reachable(), fine*2+400)
 	}
 	w.Player.Cash -= fine
 	if foundStill {
@@ -182,7 +185,7 @@ func (w *World) Bribe() error {
 	if err := w.Pay(cost); err != nil {
 		return err
 	}
-	cleared := min(w.Player.Heat, 12+w.Player.Contacts*3)
+	cleared := min(w.Player.Heat, 12+w.Reach()*3)
 	w.Player.Heat = max(0, w.Player.Heat-cleared)
 	if npc := w.NPC("harlow"); npc != nil {
 		npc.Trust += 2

@@ -219,6 +219,7 @@ func playerSituation(w *core.World) map[string]any {
 		"looks_kept":       w.DressCondition() >= core.Shabby,
 		"drives":           core.VehicleByTier(w.Player.Car).Label,
 		"car_runs":         w.Driving(),
+		"home_fittings":    w.Comforts(w.Player.Home),
 	}
 	return situation
 }

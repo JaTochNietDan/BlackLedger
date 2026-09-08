@@ -98,10 +98,16 @@ func (w *World) Journey(from, to string) int {
 // Concealed is how much stock a search will not find, because it is under the
 // floor of something parked two streets away.
 func (w *World) Concealed() int {
-	if !w.Driving() {
-		return 0
+	hidden := 0
+	if w.Driving() {
+		hidden += VehicleByTier(w.Player.Car).Compartment
 	}
-	return VehicleByTier(w.Player.Car).Compartment
+	// A dry cellar under the place you live hides the same way a false floor
+	// does, right up until somebody serves a warrant on the place you live.
+	if w.Fitted("cellar") {
+		hidden += CellarHold
+	}
+	return hidden
 }
 
 // Exposed is the stock that is not hidden: what draws attention every day and

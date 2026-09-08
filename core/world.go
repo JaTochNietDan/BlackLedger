@@ -119,6 +119,10 @@ type Property struct {
 	// What is behind the tables at a casino. Absent everywhere else, and in
 	// saves written before a room ran a float of its own.
 	Bankroll int `json:"bankroll,omitempty"`
+	// What has been fitted to a residence. It belongs to the building rather
+	// than to whoever lives there. Absent in saves written before that was
+	// possible, which is a place with nothing in it.
+	Comforts []string `json:"comforts,omitempty"`
 }
 type Plot struct {
 	Target   string `json:"target,omitempty"`
@@ -419,7 +423,11 @@ func HomeRank(id string) int {
 	}
 	return 0
 }
-func (w *World) Guard() int {
+
+// Watchers is the people who could raise an alarm: hired security, and whoever
+// is around a better address. A door cannot shout, which is why it is not
+// counted here.
+func (w *World) Watchers() int {
 	n := w.Player.Security
 	switch w.Player.Home {
 	case "apartment":
@@ -429,8 +437,24 @@ func (w *World) Guard() int {
 	}
 	return n
 }
+
+// Guard is everything standing between the player and somebody at the door:
+// the people, and what the building itself does.
+func (w *World) Guard() int {
+	n := w.Player.Security
+	if w.Fitted("door") {
+		n++
+	}
+	switch w.Player.Home {
+	case "apartment":
+		n++
+	case "estate":
+		n += 2
+	}
+	return n
+}
 func (w *World) DailyCost() int {
-	return HomeRent(w.Player.Home) + 10*w.Player.Security + 12*len(w.Player.Crew) + w.Wages() + w.CarUpkeep()
+	return HomeRent(w.Player.Home) + 10*w.Player.Security + 12*len(w.Player.Crew) + w.Wages() + w.CarUpkeep() + w.ComfortUpkeep()
 }
 func TravelMinutes(a, b string) int {
 	x, _ := PlaceByID(a)
@@ -650,10 +674,23 @@ func (w *World) Actions(id string) []Action {
 					reason = "This residence belongs to another organization"
 				}
 			}
-			add("move_home", label, 60, cost, reason, fmt.Sprintf("$%d/day upkeep. Moving resets hired security. Respect is earned only for a new housing tier.", HomeRent(id)))
+			leaving := ""
+			if fitted := w.Comforts(p.Home); len(fitted) > 0 {
+				labels := []string{}
+				for _, f := range fitted {
+					c, _ := ComfortByID(f)
+					labels = append(labels, lowerFirst(c.Label))
+				}
+				leaving = " You would be leaving " + joinNames(labels) + " behind."
+			}
+			add("move_home", label, 60, cost, reason, fmt.Sprintf("$%d/day upkeep. Moving resets hired security. Respect is earned only for a new housing tier.%s", HomeRent(id), leaving))
 		} else {
 			add("rest", "Rest for four hours", 240, 0, "", "Recover up to 25 health as you rest. Rivals can act while you sleep.")
 			add("security", "Hire another security detail", 30, 100, need(p.Security >= 3, "Maximum security hired"), "Improves detection and survival at home. Adds $10/day upkeep.")
+			for _, c := range comforts {
+				add("fit:"+c.ID, "Fit "+lowerFirst(c.Label), c.Minutes, 0, w.FitReadiness(id, c.ID),
+					fmt.Sprintf("$%d, then $%d a day. %s It stays with the building if you move out.", c.Cost, c.Upkeep, c.Detail))
+			}
 			if w.Properties[id].Condition < 100 {
 				add("repair", "Repair the residence", 60, 50, "", "Restore 40 condition.")
 			}
@@ -732,7 +769,7 @@ func (w *World) Attack(plot Plot) {
 		w.Log("Someone came looking", "You were away. Armed men damaged your residence and left before anyone could identify them.", "danger")
 		return
 	}
-	if plot.Known || w.Guard() > 0 || p.Contacts >= 2 {
+	if plot.Known || w.Watchers() > 0 || w.Reach() >= 2 {
 		home, _ := PlaceByID(p.Home)
 		body := "A car stops outside " + home.Name + ". "
 		if w.Guard() > 0 {
@@ -741,7 +778,7 @@ func (w *World) Attack(plot Plot) {
 			body += "A contact calls: leave by the back, now."
 		}
 		w.Event = &Scene{ID: "attack-" + plot.ID, Title: "Headlights outside", Body: body + " You have moments to act.", Speaker: "mara", Kind: "attack", Source: "authored", Minute: w.Minute, Choices: []Choice{{ID: "escape", Label: "Leave through the rear", Detail: "A chance to escape. Security and contacts help; injuries reduce your odds."}, {ID: "defend", Label: "Hold the entrance", Detail: "Rely on your security. Injuries and a weak defense can be fatal."}, {ID: "bargain", Label: "Offer $180 to stand down", Cost: 180, Detail: "Money may settle this incident, but your standing suffers."}}}
-	} else if w.Random() < .78-float64(p.Armour)*.09 {
+	} else if w.Random() < .78-float64(p.Armour)*.09-w.doorProtection() {
 		w.Die("An attack at your residence caught you without warning or protection.")
 	} else {
 		p.Health = max(1, p.Health-w.Absorb(65))
@@ -777,7 +814,7 @@ func (w *World) Advance(minutes int) {
 		for _, plot := range w.Plots {
 			if plot.Life == w.Life {
 				next = min(next, max(w.Minute+1, plot.Due))
-				if plot.Kind == "hit" && !plot.Known && p.Contacts >= 2 {
+				if plot.Kind == "hit" && !plot.Known && w.Reach() >= 2 {
 					next = min(next, max(w.Minute+1, plot.Due-90))
 				}
 			}
@@ -838,7 +875,7 @@ func (w *World) Advance(minutes int) {
 			if plot.Life != w.Life {
 				continue
 			}
-			if plot.Kind == "hit" && !plot.Known && p.Contacts >= 2 && plot.Due-w.Minute <= 90 {
+			if plot.Kind == "hit" && !plot.Known && w.Reach() >= 2 && plot.Due-w.Minute <= 90 {
 				plot.Known = true
 				warning := w.factionName(plot.Actor) + " has people asking where you sleep."
 				w.Log("Mara has heard something", warning+" You may have very little time.", "danger")
@@ -908,7 +945,7 @@ func (w *World) Public() map[string]any {
 	if len(history) > 60 {
 		history = history[len(history)-60:]
 	}
-	return map[string]any{"id": w.ID, "version": w.Version, "revision": w.Revision, "life": w.Life, "minute": w.Minute, "player": w.Player, "district": w.District, "factions": w.Factions, "npcs": w.People(), "locations": locs, "event": scene, "history": history, "dead": w.Dead, "tasks": w.Tasks, "director": w.Director, "last_result": w.LastResult, "daily_cost": w.DailyCost(), "income": income, "security": w.Guard(), "opportunity": w.NextOpportunity(), "known_threats": w.KnownThreats(), "business_truces": w.ActiveBusinessTruces(), "conflicts": w.PublicConflicts(), "goods": w.Goods, "arms": w.ArmsDescription(), "appearance": w.AppearanceDescription(), "vehicle": w.VehicleDescription(), "offshore": map[string]any{"balance": w.Offshore, "reachable": w.Player.Offshore}, "newspaper": w.Edition(), "arrangements": w.PendingArrangements()}
+	return map[string]any{"id": w.ID, "version": w.Version, "revision": w.Revision, "life": w.Life, "minute": w.Minute, "player": w.Player, "district": w.District, "factions": w.Factions, "npcs": w.People(), "locations": locs, "event": scene, "history": history, "dead": w.Dead, "tasks": w.Tasks, "director": w.Director, "last_result": w.LastResult, "daily_cost": w.DailyCost(), "income": income, "security": w.Guard(), "opportunity": w.NextOpportunity(), "known_threats": w.KnownThreats(), "business_truces": w.ActiveBusinessTruces(), "conflicts": w.PublicConflicts(), "goods": w.Goods, "arms": w.ArmsDescription(), "appearance": w.AppearanceDescription(), "vehicle": w.VehicleDescription(), "residence": w.ResidenceDescription(), "offshore": map[string]any{"balance": w.Offshore, "reachable": w.Player.Offshore}, "newspaper": w.Edition(), "arrangements": w.PendingArrangements()}
 }
 func (w *World) hasRecord(title string) bool {
 	for _, r := range w.History {

@@ -170,7 +170,7 @@ func (w *World) ConsiderRobbery() {
 		return
 	}
 	attribution := "You never saw a face worth describing."
-	if w.Player.Contacts >= 2 {
+	if w.Reach() >= 2 {
 		attribution = fmt.Sprintf("It takes a day and a few questions, but the name that comes back is %s.", thief.Name)
 	}
 

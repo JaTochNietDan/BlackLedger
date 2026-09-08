@@ -248,6 +248,10 @@ func (w *World) apply(c Command) error {
 				if err := w.BuyArms(strings.TrimPrefix(c.Kind, "arms:")); err != nil {
 					return err
 				}
+			case "fit:door", "fit:telephone", "fit:safe", "fit:cellar":
+				if err := w.Fit(target, strings.TrimPrefix(c.Kind, "fit:")); err != nil {
+					return err
+				}
 			case "car":
 				if err := w.BuyVehicle(); err != nil {
 					return err

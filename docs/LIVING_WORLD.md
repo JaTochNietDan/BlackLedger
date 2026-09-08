@@ -121,8 +121,6 @@ it is still in this list, it does not exist in the game yet.
 
 - Playable casino games
 - Other cities that can be flown to
-- Ownable houses/apartments that have their own perks
-- Customizable houses/apartments
 - Every noteable character can be killed
 - All named characters (living NPCs) are dynamic people who live somewhere and their own people that have their own agendas and stuff (meaning the fixers, etc). No character is a fixed character that cannot die or something. They might be gone and replaced by another. All of that is dynamic and living. Everything that you do, that can happen to you, can happen to them and be done by them.
 - Stuff can happen, i.e people can be shot and killed while traversing the map, it happens, there are reasons and motives though and that is important to be coherent and logical.

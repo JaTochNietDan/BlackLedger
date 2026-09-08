@@ -179,7 +179,7 @@ func (w *World) InciteReadiness(id string) string {
 	if w.Rival(f.ID) == nil {
 		return "There is no other organization to point them at"
 	}
-	if w.Player.Contacts < 2 {
+	if w.Reach() < 2 {
 		return "Build an information network first"
 	}
 	if w.Player.Respect < 8 {

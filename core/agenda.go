@@ -135,7 +135,7 @@ func (w *World) takeFromSomebody(n *NPC) {
 			stolen := min(w.Holding("moonshine"), 3+int(w.WorldRandom()*8))
 			w.Player.Stock["moonshine"] -= stolen
 			attribution := "Nobody will say who."
-			if w.Player.Contacts >= 2 {
+			if w.Reach() >= 2 {
 				attribution = "The name that comes back is " + n.Name + "."
 			}
 			w.Log("Crates gone from "+place.Name, fmt.Sprintf("%d crates went out of the back of %s. %s", stolen, place.Name, attribution), "danger")
@@ -146,7 +146,7 @@ func (w *World) takeFromSomebody(n *NPC) {
 		// The player loses the takings themselves, and hears about it.
 		w.Player.Cash = max(0, w.Player.Cash-take)
 		attribution := "Nobody will say who."
-		if w.Player.Contacts >= 2 {
+		if w.Reach() >= 2 {
 			attribution = "The name that comes back is " + n.Name + "."
 		}
 		w.Log("Taken from "+place.Name, fmt.Sprintf("$%d went out of %s while you were elsewhere. %s", take, place.Name, attribution), "danger")
