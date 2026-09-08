@@ -57,20 +57,23 @@ export function CityStreet({state, selected, onSelect, onEnter}: {
               <span className="front-plate">
                 <b>{p.name}</b>
                 <small>{p.owned ? 'Yours' : p.holder || 'Independent'}</small>
+                {p.id !== here && !shut && <small className="front-travel">{p.travel_note}</small>}
                 {p.note && <small className={'front-note' + (p.note_warn ? ' warning' : '')}>{p.note}</small>}
                 {!!people.length && <span className="front-who">
                   {people.slice(0, FACES).map(w => <Portrait key={w.id} id={w.id} size="tiny"/>)}
                   <i>{people.length}</i>
                 </span>}
               </span>
-              {p.id === here && <span className="front-here">You are here</span>}
+              {p.id === here
+                ? <span className="front-here">You are here</span>
+                : !shut && <span className="front-away">{p.away} min</span>}
             </button>;
           })}
         </div>
       </section>;
     })}
     <p className="street-note">
-      Pick an address to inspect it. You can only step inside the one you are standing in.
+      Pick an address to inspect it, and see what the journey costs before you commit to it. You can only step inside the one you are standing in.
       {' '}<a href="/street-study.html" target="_blank" rel="noreferrer">See the Old Harbor block painted →</a>
     </p>
   </div>;

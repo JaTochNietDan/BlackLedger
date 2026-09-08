@@ -1231,3 +1231,11 @@
 - The colour that says what somebody is to you moved to the coat — gold for your own people, red for anybody owed money or holding something — so it still reads at a glance without a legend.
 - Verified in a browser: seven people on the Mercer Exchange floor, seven painted faces, every one inside the frame, *and 11 more in here* said plainly, and clicking Elena Russo on the floor opens Elena Russo in the pane.
 - `mise run verify` passes.
+
+## What the journey costs, before you commit to it
+- Twelve addresses on one screen and no sense of how far any of them was. A place across town and one on the next corner looked identical, and the journey time only appeared **after** the place had been selected and the travel action read — which is to say, after the player had already decided where they were going. The clock is the scarcest thing in this game, and a cost belongs on the thing it is a cost of.
+- Every address now carries how long it takes to get there from where the player is standing, **by whatever they actually travel by**, in minutes and in the words somebody who lives here would use: *Round the corner*, *A short walk*, *The other side of the district*, *Across town*, *The far side of the city*. A test holds that twelve addresses read as at least three different distances, or the words say nothing.
+- Somebody with a car sees what the car is buying them: *35 min driving, 52 on foot*. A test proves a car never makes a journey longer and makes at least one shorter — and that distance follows where the player is standing rather than being a fixed table, by walking them across the city and measuring the same trip in reverse.
+- **A misleading field name found on the way.** `Player.CarWear` is the car's *condition*, not its wear: zero is a wreck and a hundred is a car that runs. The first version of the test set it to zero to mean "no wear" and got a car that would not start. Noted where it will be read next.
+- On the live campaign, standing at Mercer Exchange: Saint Agnes round the corner at 15 minutes, The Monarch a short walk at 20, Pier 14 the other side of the district at 60.
+- `mise run verify` passes.

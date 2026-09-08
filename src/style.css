@@ -445,3 +445,8 @@
 .stander:hover .portrait,.stander:focus-visible .portrait{border-color:#f1d191}
 .stander.picked .portrait,.stander.picked .portrait-wrap{border-color:var(--gold);box-shadow:0 0 0 2px #d6b77c88}
 .room-rest{position:absolute;right:10px;top:10px;background:#0b0f0ecc;color:#c9b98f;font-size:11px;padding:3px 8px}
+/* What the journey costs, before the player commits to it. The clock is the
+   scarcest thing in this game, so the cost belongs on the thing it buys. */
+.front-away{position:absolute;top:7px;right:7px;background:#0b0f0ecc;border:1px solid #3d4a41;color:#b6c0ad;font-size:9.5px;letter-spacing:.06em;padding:3px 6px}
+.front-travel{color:#8fa0b0;margin-top:2px}
+.street-front.here .front-travel{display:none}
