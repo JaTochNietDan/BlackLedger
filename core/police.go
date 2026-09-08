@@ -113,6 +113,7 @@ func (w *World) Raid() {
 	}
 	seized += w.CellarFound()
 	w.SeizeArms()
+	w.SeizeCharges()
 	w.Ruin(20) // being turned out against a wall is hard on good clothes
 	still, foundStill := w.StillFound()
 	// A fine takes what it can reach. Money behind the panelling is not money

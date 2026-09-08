@@ -62,3 +62,14 @@ func (w *World) Edition() []map[string]any {
 func (w *World) unattributed(place string, what string) string {
 	return fmt.Sprintf("%s Police have made no arrest and are appealing for anyone who saw the incident at %s.", what, place)
 }
+
+// hasNewsKind reports whether the paper has carried a story of a kind this
+// life, which is what a test can ask without reaching into the wording.
+func (w *World) hasNewsKind(kind string) bool {
+	for _, s := range w.News {
+		if s.Life == w.Life && s.Kind == kind {
+			return true
+		}
+	}
+	return false
+}

@@ -109,7 +109,8 @@ func (w *World) SeizeArms() bool {
 // ArmsDescription is what the player is currently carrying, for the interface.
 func (w *World) ArmsDescription() map[string]any {
 	return map[string]any{
-		"weapon": weapons[min(w.Player.Weapon, len(weapons)-1)].Label,
-		"armour": armour[min(w.Player.Armour, len(armour)-1)].Label,
+		"weapon":  weapons[min(w.Player.Weapon, len(weapons)-1)].Label,
+		"armour":  armour[min(w.Player.Armour, len(armour)-1)].Label,
+		"charges": w.Player.Charges,
 	}
 }

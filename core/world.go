@@ -64,6 +64,8 @@ type Person struct {
 	// before there were cars, which is walking.
 	Car     int `json:"car,omitempty"`
 	CarWear int `json:"car_wear,omitempty"`
+	// Explosives in hand. Absent in saves from before anybody could buy any.
+	Charges int `json:"charges,omitempty"`
 	// Whether this person has established that the account abroad is theirs.
 	// Reset with every life, which is what makes inheriting it a decision.
 	Offshore bool `json:"offshore_access,omitempty"`
@@ -529,6 +531,8 @@ func (w *World) Actions(id string) []Action {
 			add("arms:weapon", "Buy "+next.Label, 45, 0, w.ArmsReadiness("weapon"),
 				fmt.Sprintf("$%d. %s Improves your odds when violence is your idea. A search takes it.", next.Cost, next.Detail))
 		}
+		add("charge", "Buy a charge off a boat", ChargeMinutes, 0, w.ChargeReadiness(),
+			fmt.Sprintf("$%d. Not a message: a declaration. Wrecks a business outright, kills whoever was standing in it about a third of the time, and cannot be mistaken for anything else. Draws %d police attention a day while you hold it, and a search that finds it is a prosecution rather than a fine.", ChargeCost, ChargeHeat))
 		if next, ok := nextArmament(armour, p.Armour); ok {
 			add("arms:armour", "Buy "+next.Label, 45, 0, w.ArmsReadiness("armour"),
 				fmt.Sprintf("$%d. %s Reduces what a beating costs you. A search takes it.", next.Cost, next.Detail))
@@ -596,6 +600,10 @@ func (w *World) Actions(id string) []Action {
 				w.TradeReadiness(g.ID, "sell"),
 				fmt.Sprintf("$%d each today, for $%d.", g.Price, g.Price*held))
 		}
+	}
+	if prop := w.Properties[id]; prop != nil && prop.Income > 0 && !w.Own(id) && p.Charges > 0 {
+		add("plant", "Put the charge under "+l.Name, PlantMinutes, 0, w.PlantReadiness(id),
+			fmt.Sprintf("Wrecks %s, empties it of stock and staff, and kills somebody who worked there about a third of the time. The owner will know exactly what it was. Going wrong means it goes off with you under it.", l.Name))
 	}
 	if f, ok := w.SabotageTarget(id); ok {
 		add("sabotage", "Move against "+f.Name, 90, 0, w.SabotageReadiness(id),
@@ -875,6 +883,8 @@ func (w *World) Advance(minutes int) {
 			w.StillDay()
 			w.CasinoDay()
 			w.CarDay()
+			w.ChargeDay()
+			w.DemolitionDay()
 			w.DressDay()
 			bill := w.DailyCost()
 			if p.Cash >= bill {

@@ -261,6 +261,16 @@ func (w *World) apply(c Command) error {
 				if err := w.Fit(target, strings.TrimPrefix(c.Kind, "fit:")); err != nil {
 					return err
 				}
+			case "charge":
+				if err := w.BuyCharge(); err != nil {
+					return err
+				}
+			case "plant":
+				// Resolved before the clock moves, so a charge that kills the
+				// player cannot also collect the hours it never survived.
+				if err := w.Plant(target); err != nil {
+					return err
+				}
 			case "car":
 				if err := w.BuyVehicle(); err != nil {
 					return err
