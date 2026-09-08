@@ -68,3 +68,19 @@ Generated titles, spoken bodies and approach labels reject explicit monetary amo
 If the model explicitly reports response-token exhaustion (`done_reason: length`), generation fails without a correction request at the same budget. No offer or gameplay action is committed. This is a provider failure, distinct from a complete response rejected for invalid story fields.
 
 `GET /api/health` also returns `build: {revision, modified}` for the running Go binary. Revision is the embedded Git commit when available; otherwise `unknown`. Modified is null when unavailable. This identifies the core binary, not the independently served frontend bundle.
+
+## Relationship, voice, rank, title and attribution checks on generated offers
+
+Five further checks run before a generated offer is queued. Each rejects the draft and requests the same single bounded correction used by the existing lexical guards; repeated failure queues no offer and leaves the clock, cash and campaign unchanged. None of them rewrites prose, and none revalidates offers that are already saved.
+
+A speaker may only claim prior dealings with the player if the save records an arrangement between that speaker and the current life. A declined arrangement counts, because being turned down is still a shared past; a previous protagonist's record never does, so a new person after death is addressed as a stranger. This covers returning greetings, summons back to a place, appeals to a previous occasion, assumed routines and claimed track records, in the title, body and approach labels.
+
+Dialogue must stay inside the city. References to the player as a game role, to the cast, or to the brief itself are rejected, including asides that exclude the listener from the cast. The job brief now carries its restrictions in `constraints_never_spoken` rather than inside the fields the model dramatizes, and the focused prompt states that field is never quoted or referred to.
+
+The player holds no rank in an established family, so dialogue attaching a family rank to the player's name or to "you" is rejected. This targets a speaker transferring their own rank to the listener.
+
+A scene title must exist and must not merely repeat one of the offer's approach labels, so the scene keeps a heading distinct from its actions.
+
+A family may be named freely, but a job's own people and premises may not be attributed to a family that is neither the offer's beneficiary nor the recorded owner of the job's location. Faction words come from the family name and both parts of the leader's name. Ownership is read from saved state, so a property changing hands changes what may be said about it. This prevents neutral work, which moves no goodwill, from implying family standing.
+
+These are lexical and relational checks against saved state. They are not semantic verification of motive, plot or history. Public DTOs, saved memories, hidden plans and outcome authority are unchanged.
