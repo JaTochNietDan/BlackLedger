@@ -182,3 +182,68 @@ func TestTheFirstStepQuotesTheFirstJob(t *testing.T) {
 			CourierPay, CourierRespect, next.Player.Cash-cash, next.Player.Respect-respect)
 	}
 }
+
+// The guide's whole promise is that it asks the game the same question the
+// buttons ask, so it cannot tell the player something the rules do not. It
+// asked the readiness functions directly, and those answer about a rule rather
+// than about the player's situation — so a man locked in a cell at Ward Street
+// Station was told he could carry envelopes at Saint Agnes and buy premises,
+// while the action list correctly offered him three things: sit it out, pay a
+// lawyer, or name somebody.
+func TestTheGuideKnowsWhenYouAreInACell(t *testing.T) {
+	w := New(4)
+	w.Player.Cash, w.Player.Respect = 6000, OrganizationStanding
+	w.Player.Location = "bar"
+	before := 0
+	for _, s := range w.Guide() {
+		if s.Open {
+			before++
+		}
+	}
+	if before == 0 {
+		t.Fatal("nothing was open to a free man with money")
+	}
+	w.Confine(5, "a still in the back")
+	if !w.Held() {
+		t.Fatal("he was not confined")
+	}
+	for _, s := range w.Guide() {
+		if s.Open {
+			t.Errorf("%q is offered to a man in a cell", s.Title)
+		}
+		if !s.Done && s.Reason == "" {
+			t.Errorf("%q is closed and says nothing about why", s.Title)
+		}
+	}
+	// And it says the one thing that is true, in the words the game uses.
+	closed := w.Guide()[0].Reason
+	if !contains(closed, "Ward Street") {
+		t.Fatalf("the guide does not say where he is: %q", closed)
+	}
+	// Let him out and put him back where he was — released at the station, a
+	// man cannot lend money to somebody who is at the bar, which is the rules
+	// working rather than the guide failing.
+	w.Player.HeldUntil = 0
+	w.Player.Location = "bar"
+	open := 0
+	for _, s := range w.Guide() {
+		if s.Open {
+			open++
+		}
+	}
+	if open != before {
+		t.Fatalf("released, %d things are open where %d were before", open, before)
+	}
+}
+
+// And a guide for somebody who is dead is a guide to nothing.
+func TestTheGuideKnowsWhenYouAreDead(t *testing.T) {
+	w := New(4)
+	w.Player.Cash = 6000
+	w.Die("Shot on the steps of the Monarch.")
+	for _, s := range w.Guide() {
+		if s.Open {
+			t.Errorf("%q is offered to somebody who is dead", s.Title)
+		}
+	}
+}

@@ -61,7 +61,26 @@ func (w *World) Guide() []Step {
 		}
 	}
 
+	// Before any rule is asked: can this player act at all? The readiness
+	// functions answer about a rule — whether a still can be built, whether
+	// somebody would take a loan — and know nothing about where the player is
+	// or whether they are alive. So a man locked in a cell was told he could
+	// carry envelopes across town, while the buttons beside him offered three
+	// things: sit it out, pay a lawyer, or name somebody. The guide's whole
+	// promise is that it cannot say what the rules do not, and this is the one
+	// question the rules ask first.
+	stopped := ""
+	switch {
+	case !p.Alive:
+		stopped = "This life is over"
+	case w.Held():
+		stopped = fmt.Sprintf("You are being held at Ward Street Station, %s", plural(w.DaysLeft(), "day to go", "days to go"))
+	}
+
 	step := func(title, what, reason string, done bool) Step {
+		if stopped != "" {
+			return Step{Title: title, What: what, Open: false, Reason: stopped, Done: done}
+		}
 		return Step{Title: title, What: what, Open: reason == "" && !done, Reason: reason, Done: done}
 	}
 
