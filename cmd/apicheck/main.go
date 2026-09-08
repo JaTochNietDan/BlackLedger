@@ -20,6 +20,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -40,7 +41,49 @@ var remote = []string{"expand"}
 // cannot settle in the starting room paying rent.
 var idle = []string{"rest", "wait"}
 
+// Ventures are the risky, optional systems: they are never required to make
+// progress, so a policy that only climbs the ladder never touches them. Mixed
+// in deliberately, because an untried system is an unverified one.
+var ventures = []string{
+	"launder", "bribe", "rob", "sabotage", "incite", "contract",
+	"play:small", "play:high", "buy:moonshine", "buy:cigarettes",
+	"sell:moonshine", "sell:cigarettes", "arms:weapon", "arms:armour",
+	"operate:hard", "operate:clean", "operate:standard", "inspect", "investigate", "lie_low",
+}
+
 var choicePreference = []string{"approach:careful", "accept", "pay", "escape", "acknowledge", "leave", "decline"}
+
+// Multi-step events need their own preference or the policy always takes the
+// exit: "leave" is offered at every step of arranging a contract.
+func eventChoice(s *snapshot, turn int) (string, bool) {
+	open := []string{}
+	for _, c := range s.Event.Choices {
+		if !c.Disabled {
+			open = append(open, c.ID)
+		}
+	}
+	if len(open) == 0 {
+		return "", false
+	}
+	committing := []string{}
+	for _, id := range open {
+		if strings.HasPrefix(id, "mark:") || strings.HasPrefix(id, "hire:") {
+			committing = append(committing, id)
+		}
+	}
+	// Follow an arrangement through often enough to exercise it, but not always.
+	if len(committing) > 0 && turn%3 != 0 {
+		return committing[turn%len(committing)], true
+	}
+	for _, want := range choicePreference {
+		for _, id := range open {
+			if id == want {
+				return id, true
+			}
+		}
+	}
+	return open[0], true
+}
 
 type action struct {
 	ID       string `json:"id"`
@@ -194,27 +237,41 @@ func destination(s *snapshot, visited map[string]int) string {
 	return best
 }
 
-func pick(s *snapshot, visited map[string]int) (command, bool) {
+func targetOr(a action, s *snapshot) string {
+	if a.Target != "" {
+		return a.Target
+	}
+	return s.Player.Location
+}
+
+func pick(s *snapshot, visited map[string]int, tried map[string]int, turn int) (command, bool) {
 	if s.Event != nil {
-		open := map[string]bool{}
-		for _, c := range s.Event.Choices {
-			if !c.Disabled {
-				open[c.ID] = true
-			}
+		choice, ok := eventChoice(s, turn)
+		if !ok {
+			return command{}, false
 		}
-		for _, want := range choicePreference {
-			if open[want] {
-				return command{Kind: "choice", Event: s.Event.ID, Choice: want}, true
-			}
-		}
-		for _, c := range s.Event.Choices {
-			if !c.Disabled {
-				return command{Kind: "choice", Event: s.Event.ID, Choice: c.ID}, true
-			}
-		}
-		return command{}, false
+		return command{Kind: "choice", Event: s.Event.ID, Choice: choice}, true
 	}
 	available := here(s)
+	// Prefer a system this run has not exercised yet: an untried system is an
+	// unverified one, and coverage is the point of the harness. Fall back to
+	// rotating through the rest so behaviour is still varied.
+	if turn%2 == 0 {
+		for _, want := range ventures {
+			if tried[want] > 0 {
+				continue
+			}
+			if a, ok := available[want]; ok {
+				return command{Kind: want, Target: targetOr(a, s)}, true
+			}
+		}
+		for offset := 0; offset < len(ventures); offset++ {
+			want := ventures[(turn/2+offset)%len(ventures)]
+			if a, ok := available[want]; ok {
+				return command{Kind: want, Target: targetOr(a, s)}, true
+			}
+		}
+	}
 	take := func(names []string) (command, bool) {
 		for _, want := range names {
 			if a, ok := available[want]; ok {
@@ -282,6 +339,7 @@ type report struct {
 	Final       any            `json:"final"`
 	Failures    []failure      `json:"invariant_failures"`
 	Kinds       map[string]int `json:"command_counts"`
+	Untried     []string       `json:"never_tried,omitempty"`
 }
 
 func main() {
@@ -306,7 +364,7 @@ func main() {
 	checkedReplay, checkedConflict := false, false
 
 	for step := 1; step <= *steps; step++ {
-		cmd, ok := pick(s, visited)
+		cmd, ok := pick(s, visited, rep.Kinds, step)
 		if !s.Player.Alive {
 			cmd, ok = command{Kind: "new_life"}, true
 		}
@@ -413,6 +471,19 @@ func main() {
 	fmt.Printf("%d commands %v\n", rep.StepsTaken, rep.Final)
 	fmt.Println("idempotency:", rep.Idempotency)
 	fmt.Println("stale revision:", rep.Conflict)
+	// Coverage is part of the result. A clean run that never tried a system has
+	// not tested it, and saying so is the difference between evidence and noise.
+	untried := []string{}
+	for _, venture := range ventures {
+		if rep.Kinds[venture] == 0 {
+			untried = append(untried, venture)
+		}
+	}
+	rep.Untried = untried
+	fmt.Printf("exercised %d kinds of command: %v\n", len(rep.Kinds), rep.Kinds)
+	if len(untried) > 0 {
+		fmt.Printf("never tried (%d): %v\n", len(untried), untried)
+	}
 	if len(rep.Failures) > 0 {
 		fmt.Printf("%d invariant failure(s):\n", len(rep.Failures))
 		for _, f := range rep.Failures {

@@ -48,8 +48,15 @@ func TestCommissioningTakesTheMoneyAndCommitsNothingYet(t *testing.T) {
 	if err := w.Commission("vittorio", "professional"); err != nil {
 		t.Fatal(err)
 	}
-	if w.Player.Cash != cash-fee {
-		t.Fatalf("fee was not taken: cash %d, expected %d", w.Player.Cash, cash-fee)
+	// The fee is charged by the choice that reaches Commission, carrying it as
+	// its cost, so booking one here leaves cash alone. Charging in both places
+	// took the money twice and refused any arrangement the player could only
+	// just afford.
+	if w.Player.Cash != cash {
+		t.Fatalf("Commission charged the fee a second time: cash %d, expected %d", w.Player.Cash, cash)
+	}
+	if w.Contracts[0].Fee != fee {
+		t.Fatalf("the contract recorded a fee of %d, expected %d", w.Contracts[0].Fee, fee)
 	}
 	if len(w.Contracts) != 1 {
 		t.Fatal("no contract was booked")
@@ -62,12 +69,8 @@ func TestCommissioningTakesTheMoneyAndCommitsNothingYet(t *testing.T) {
 	}
 	// A name that cannot be reached is refused, and costs nothing.
 	w.Kill("elena", "Something else.")
-	before := w.Player.Cash
 	if err := w.Commission("elena", "professional"); err == nil {
 		t.Fatal("commissioned a killing of somebody already dead")
-	}
-	if w.Player.Cash != before {
-		t.Fatal("a refused commission still took the money")
 	}
 	if err := w.Commission("vittorio", "nobody-like-that"); err == nil {
 		t.Fatal("hired a class of person who does not exist")
@@ -299,5 +302,52 @@ func TestAResolutionThePlayerPaidForSaysSo(t *testing.T) {
 		if !found {
 			t.Fatalf("no outcome ever reported %q to the player", want.phrase)
 		}
+	}
+}
+
+// A price is charged exactly once. The command layer pays what an action or a
+// choice declares, so a handler that also pays takes it twice and refuses
+// anything the player could only just afford.
+func TestNothingIsChargedTwice(t *testing.T) {
+	for _, probe := range []struct {
+		name    string
+		place   string
+		prepare func(*World)
+		kind    string
+	}{
+		{"arms", "docks", func(w *World) { w.Player.Cash = 240 }, "arms:weapon"},
+		{"tables", "club", func(w *World) { w.Player.Cash = 60 }, "play:small"},
+		{"bribe", "market", func(w *World) { w.Player.Cash = 100000; w.Player.Heat = 20 }, "bribe"},
+		{"contraband", "market", func(w *World) { w.Player.Cash = 210 }, "buy:moonshine"},
+		{"launder", "laundry", func(w *World) {
+			w.Properties["laundry"].Owner = "player:1"
+			w.Player.Cash, w.Player.Heat = 100000, 30
+		}, "launder"},
+	} {
+		t.Run(probe.name, func(t *testing.T) {
+			w := New(307)
+			probe.prepare(w)
+			w.Player.Location = probe.place
+			var offered *Action
+			for _, a := range w.Actions(probe.place) {
+				if a.ID == probe.kind {
+					copy := a
+					offered = &copy
+				}
+			}
+			if offered == nil {
+				t.Fatalf("%s was not offered at %s", probe.kind, probe.place)
+			}
+			if offered.Disabled {
+				t.Fatalf("%s was refused before it could be tried: %s", probe.kind, offered.Reason)
+			}
+			next, err := Execute(w, Command{Revision: w.Revision, Kind: probe.kind, Target: probe.place})
+			if err != nil {
+				t.Fatalf("an affordable %s was refused: %v", probe.kind, err)
+			}
+			if next.Player.Cash < 0 {
+				t.Fatal("the player was charged into debt")
+			}
+		})
 	}
 }

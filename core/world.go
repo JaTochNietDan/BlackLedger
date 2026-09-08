@@ -443,18 +443,18 @@ func (w *World) Actions(id string) []Action {
 	case "docks":
 		add("dockwork", "Work the night cargo", 90, 0, "", "Earn $75 and 1 respect. Small chance of a work injury.")
 		if next, ok := nextArmament(weapons, p.Weapon); ok {
-			add("arms:weapon", "Buy "+next.Label, 45, next.Cost, w.ArmsReadiness("weapon"),
-				next.Detail+" Improves your odds when violence is your idea. A search takes it.")
+			add("arms:weapon", "Buy "+next.Label, 45, 0, w.ArmsReadiness("weapon"),
+				fmt.Sprintf("$%d. %s Improves your odds when violence is your idea. A search takes it.", next.Cost, next.Detail))
 		}
 		if next, ok := nextArmament(armour, p.Armour); ok {
-			add("arms:armour", "Buy "+next.Label, 45, next.Cost, w.ArmsReadiness("armour"),
-				next.Detail+" Reduces what a beating costs you. A search takes it.")
+			add("arms:armour", "Buy "+next.Label, 45, 0, w.ArmsReadiness("armour"),
+				fmt.Sprintf("$%d. %s Reduces what a beating costs you. A search takes it.", next.Cost, next.Detail))
 		}
 	case "market":
 		add("investigate", "Ask about threats", 45, 30, "", "Investigate existing threats. Evidence is not a guarantee of safety.")
 		add("lie_low", "Keep a low profile", 120, 15, "", "Lose 10 heat. Time still passes for rivals and businesses.")
-		add("bribe", "An understanding with the detective", 45, w.BribeCost(), w.BribeReadiness(),
-			fmt.Sprintf("Pay Detective Harlow to lose some paperwork. Clears attention now and buys nothing later. Above %d heat nobody will be seen taking it.", BribeCeiling))
+		add("bribe", "An understanding with the detective", 45, 0, w.BribeReadiness(),
+			fmt.Sprintf("$%d to Detective Harlow to lose some paperwork. Clears attention now and buys nothing later. Above %d heat nobody will be seen taking it.", w.BribeCost(), BribeCeiling))
 		add("contract", "Ask about a name", 30, 0,
 			need(p.Contacts < 1, "Build a contact who will carry this"),
 			"Put a price on somebody. What it costs depends on who they are and who does the work. A failed attempt can be traced back to you.")
@@ -464,13 +464,15 @@ func (w *World) Actions(id string) []Action {
 	}
 	if HasTables(id) && !w.Own(id) {
 		for _, stake := range tableStakes {
-			add("play:"+stake.ID, stake.Label, 60, stake.Amount, w.TableReadiness(id, stake),
+			// Cost is zero here because Play charges the stake itself; declaring
+			// it would have the command layer charge it a second time.
+			add("play:"+stake.ID, stake.Label, 60, 0, w.TableReadiness(id, stake),
 				fmt.Sprintf("Stake $%d against the house. The house holds the edge, and winning heavily in somebody else's room is noticed.", stake.Amount))
 		}
 	}
 	if place, ok := PlaceByID(id); ok && place.Type == "racket" && w.Own(id) {
-		add("launder", "Run takings through the books", 90, w.LaunderFee(id), w.LaunderReadiness(id),
-			fmt.Sprintf("Clear up to %d police attention through %s. Costs a cut, wears the premises, and the books need a day between rounds.", w.launderCapacity(id), l.Name))
+		add("launder", "Run takings through the books", 90, 0, w.LaunderReadiness(id),
+			fmt.Sprintf("$%d to clear up to %d police attention through %s. Wears the premises, and the books need a day between rounds.", w.LaunderFee(id), w.launderCapacity(id), l.Name))
 	}
 	if prop := w.Properties[id]; prop != nil && prop.Income > 0 && !w.Own(id) {
 		add("rob", "Take the day's cash", 45, 0, w.RobberyReadiness(id),
@@ -480,9 +482,11 @@ func (w *World) Actions(id string) []Action {
 		if !TradesAt(id, g.ID) {
 			continue
 		}
-		add("buy:"+g.ID, fmt.Sprintf("Buy %d %ss of %s", Lot, g.Unit, g.Name), 30, g.Price*Lot,
+		// Cost is zero because Buy charges the lot itself; declaring it would
+		// have the command layer charge it a second time.
+		add("buy:"+g.ID, fmt.Sprintf("Buy %d %ss of %s", Lot, g.Unit, g.Name), 30, 0,
 			w.TradeReadiness(g.ID, "buy"),
-			fmt.Sprintf("$%d each today. Holding stock draws police attention every day until it is sold, and can be taken from you.", g.Price))
+			fmt.Sprintf("$%d for the lot, at $%d each today. Holding stock draws police attention every day until it is sold, and can be taken from you.", g.Price*Lot, g.Price))
 		if held := w.Holding(g.ID); held > 0 {
 			add("sell:"+g.ID, fmt.Sprintf("Sell %d %ss of %s", held, g.Unit, g.Name), 30, 0,
 				w.TradeReadiness(g.ID, "sell"),

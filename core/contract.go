@@ -152,10 +152,9 @@ func (w *World) Commission(target, tier string) error {
 	if !ok {
 		return fmt.Errorf("nobody like that is available")
 	}
+	// The fee is charged by the choice that reached here, which carries it as
+	// its cost. Charging again here would take it twice.
 	fee := w.ContractPrice(target, t)
-	if err := w.Pay(fee); err != nil {
-		return err
-	}
 	w.Contracts = append(w.Contracts, Contract{
 		ID: ID(), Life: w.Life, Target: target, Tier: tier, Payer: "player",
 		Due: w.Minute + 180 + int(w.Random()*600), Fee: fee,
