@@ -35,6 +35,9 @@ type Presence struct {
 	// Temperament and Manner are what the player has learned of their
 	// character; empty for a stranger.
 	Temperament string `json:"temperament,omitempty"`
+	// Doing is what this person is actually doing right now, in a few words.
+	// The city has always known; it has never been asked.
+	Doing string `json:"doing,omitempty"`
 }
 
 // standingOf is the single line under somebody's name: the most important true
@@ -79,6 +82,65 @@ func (w *World) postedWhere(id string) string {
 	return ""
 }
 
+// doingNow is what somebody is actually doing at this moment, read out of the
+// same state everything else is read out of. The ultimate shape of this game is
+// a city the player can watch, and a city you can watch is one where every
+// person on the screen is visibly occupied with something true.
+func (w *World) doingNow(n *NPC) string {
+	place, known := PlaceByID(n.Location)
+	where := "the district"
+	if known {
+		where = place.Name
+	}
+	switch {
+	case w.Inside(n):
+		return "Held at Ward Street Station"
+	case w.postedWhere(n.ID) != "":
+		return "Standing on the door at " + w.postedWhere(n.ID)
+	case IsOfficial(n.ID):
+		if w.Retained(n.ID) {
+			return "Taking your money and answering your calls"
+		}
+		return "Working, and expensive to interrupt"
+	case w.isRoleHolder(n):
+		return n.Role + ", on duty at " + where
+	}
+	// Somebody who runs premises is at work in them.
+	for _, l := range Locations {
+		if prop := w.Properties[l.ID]; prop != nil && l.ID == n.Location && prop.Income > 0 {
+			if prop.Owner == n.Faction && n.Rank >= RankSoldier {
+				return "Running " + l.Name
+			}
+			if n.Faction != "" && prop.Owner == n.Faction {
+				return "Working for " + w.factionName(n.Faction) + " at " + l.Name
+			}
+		}
+	}
+	if l := w.LoanTo(n.ID); l != nil {
+		if l.Missed > 0 {
+			return "Avoiding you, and not doing it well"
+		}
+		return "Carrying money that is yours"
+	}
+	if n.Sore >= 30 {
+		return "Nursing something they hold against you"
+	}
+	switch {
+	case n.Faction == w.PlayerOrganizationID():
+		return "Waiting to be given something to do"
+	case n.Rank >= RankLeader:
+		return "Holding court at " + where
+	case n.Faction != "":
+		if w.fighting(n.Faction) != nil {
+			return "Armed, and expecting trouble"
+		}
+		return "About " + w.factionName(n.Faction) + " business"
+	case n.Ambition >= 70:
+		return "Looking for a way up"
+	}
+	return "Getting on with the day at " + where
+}
+
 // PeopleHere is everybody standing where the player is, in the order a person
 // would notice them: their own first, then the people they know, then whoever
 // else is in the room.
@@ -96,6 +158,7 @@ func (w *World) PeopleHere(id string) []Presence {
 			Yours:    n.Faction == w.PlayerOrganizationID(),
 			Known:    known,
 		}
+		p.Doing = w.doingNow(n)
 		if known {
 			p.Faction = w.factionName(n.Faction)
 			p.Trust, p.Sore = n.Trust, n.Sore

@@ -1,6 +1,6 @@
 export interface VisualCue {id:string;kind:string;target:string;caption:string;headline?:string;actors?:string[];gravity?:number;minute?:number}
 export interface Action {group:string;subject?:string;id:string;label:string;minutes:number;cost:number;disabled:boolean;reason:string;detail:string;target:string}
-export interface Presence {id:string;name:string;role?:string;faction?:string;standing:string;trust?:number;sore?:number;owes?:number;overdue?:boolean;yours?:boolean;known?:boolean;temperament?:string}
+export interface Presence {id:string;name:string;role?:string;faction?:string;standing:string;doing?:string;trust?:number;sore?:number;owes?:number;overdue?:boolean;yours?:boolean;known?:boolean;temperament?:string}
 export interface Place {people?:Presence[];trade?:{custom:number;multiplier:number;order:boolean;order_pays:number}|null;bankroll?:number;handle?:number;still?:boolean;staff?:number;supply?:number;trouble?:boolean;capacity?:number;holder?:string;id:string;name:string;type:string;district:number;x:number;y:number;cost:number;blurb:string;owner:string;condition:number;income:number;owned:boolean;locked:boolean;actions:Action[]}
 export interface Person {stock?:{[good:string]:number};earned?:number;name:string;cash:number;health:number;respect:number;heat:number;location:string;home:string;security:number;contacts:number;crew:{id:string;name:string;loyalty:number}[];alive:boolean;job_count:number}
 export interface NPC {id:string;name:string;role:string;trust:number;voice:string;color:string}

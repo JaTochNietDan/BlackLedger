@@ -1,7 +1,7 @@
 import {useEffect,useState} from 'react';
 import type {ReactElement} from 'react';
 import type {Action,Place,Presence} from './types';
-import {interiorSVG} from './roomart';
+import {interiorSVG,StandingRoom} from './roomart';
 import {Portrait} from './Portrait';
 
 // Entering a building should open the building, not fill a column. The room is
@@ -39,11 +39,16 @@ export function Interior({place, people, actions, render, onLeave}: {
   const theirs = personal.filter(a => a.subject === picked);
   const withSomething = new Set(personal.map(a => a.subject!));
 
+  // The floor shows the people the player has something to do with first, then
+  // the ones they know. Everybody else is in the roster below and in the count.
+  const worth = (p: Presence) => (personal.some(a => a.subject === p.id && !a.disabled) ? 0 : p.yours ? 1 : p.owes || p.sore ? 2 : p.known ? 3 : 4);
+  const onFloor = [...people].sort((a, b) => worth(a) - worth(b));
+
   return <div className="interior-stage">
     <div className="room" onClick={e => {
       const g = (e.target as Element).closest?.('[data-person]');
       if (g) setPicked(g.getAttribute('data-person') || '');
-    }} dangerouslySetInnerHTML={{__html: interiorSVG(place, people, picked)}}/>
+    }} dangerouslySetInnerHTML={{__html: interiorSVG(place, onFloor, picked)}}/>
 
     <div className="room-people" role="list">
       {people.map(p => <button key={p.id} role="listitem" className={'room-chip' + (p.id === picked ? ' picked' : '') + (p.yours ? ' yours' : '') + (p.overdue || p.sore ? ' sour' : '')}

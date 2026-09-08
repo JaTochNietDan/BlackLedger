@@ -268,3 +268,13 @@
 .issue-index b{display:block;font:14px var(--serif);font-weight:400}
 .issue-index small{display:block;font-size:10px;color:var(--muted)}
 .past-life-note{margin:14px 0 0;font:italic 12px var(--serif);color:#a99cb5;border-left:2px solid #7a6a8a;padding-left:11px}
+
+/* The address book listed buildings and never said who was in them, so a city
+   of fifty people read as ten empty addresses. A few faces and a count is
+   enough to see the place is inhabited; the register belongs inside. */
+.who-is-here{display:block;margin-top:9px;padding-top:8px;border-top:1px solid var(--line)}
+.who-faces{display:flex;gap:-4px;margin-bottom:4px}
+.who-faces>*{margin-right:-7px;border:1px solid #101817;border-radius:1px}
+.who-faces>*:last-child{margin-right:0}
+.who-is-here small{display:block;font-size:10px;color:var(--muted);line-height:1.4}
+.who-is-here .who-doing{color:#93a58f;font-style:italic;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}

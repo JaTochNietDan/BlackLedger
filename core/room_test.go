@@ -1,6 +1,9 @@
 package core
 
-import "testing"
+import (
+	"strings"
+	"testing"
+)
 
 // Half of what a player does anywhere is done to somebody standing there. These
 // guard the two halves of making that legible: the core says who each action is
@@ -152,4 +155,61 @@ func indexByte(s string, b byte) int {
 		}
 	}
 	return -1
+}
+
+// The ultimate shape of this game is a city the player can watch, and a city
+// you can watch is one where every person on the screen is visibly occupied
+// with something true.
+
+func TestEverybodyInThisCityIsDoingSomething(t *testing.T) {
+	w, member := testator(t)
+	w.District = 2
+	w.Player.Cash = 40000
+	w.ensureOfficials()
+	blank, checked := []string{}, 0
+	for _, l := range Locations {
+		for _, p := range w.PeopleHere(l.ID) {
+			checked++
+			if p.Doing == "" {
+				blank = append(blank, p.Name+" at "+l.ID)
+			}
+		}
+	}
+	if checked < 20 {
+		t.Fatalf("only %d people were placed anywhere; this is not measuring what it claims to", checked)
+	}
+	if len(blank) > 0 {
+		t.Fatalf("people standing about doing nothing the city can name: %v", blank)
+	}
+
+	// And it is not the same sentence for everybody, or it says nothing.
+	said := map[string]bool{}
+	for _, l := range Locations {
+		for _, p := range w.PeopleHere(l.ID) {
+			said[p.Doing] = true
+		}
+	}
+	if len(said) < 4 {
+		t.Fatalf("%d people are doing %d distinguishable things", checked, len(said))
+	}
+
+	// What somebody is doing follows what is true of them, not their name.
+	w.Player.Location = "laundry"
+	if err := w.Post("laundry"); err != nil {
+		t.Fatal(err)
+	}
+	for _, p := range w.PeopleHere("laundry") {
+		if p.ID == member.ID && !strings.Contains(p.Doing, "door") {
+			t.Fatalf("a man put on the door is %q", p.Doing)
+		}
+	}
+	member.Held = w.Minute + 3*1440
+	for _, l := range Locations {
+		for _, p := range w.PeopleHere(l.ID) {
+			if p.ID == member.ID && !strings.Contains(p.Doing, "Ward Street") {
+				t.Fatalf("a man the police are holding is %q", p.Doing)
+			}
+		}
+	}
+	t.Logf("%d people placed across the city, %d distinguishable things being done", checked, len(said))
 }

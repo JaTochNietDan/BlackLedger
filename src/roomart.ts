@@ -10,13 +10,20 @@ const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp
 
 function hash(seed: string) { let h = 2166136261; for (const c of seed) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619) } return Math.abs(h) }
 
-// Where people stand in a room, in the order they are noticed. Away from the
-// front so the figures never crowd the door the player came in through.
+// Where people stand in a room. Eighteen figures on one floor is a crowd nobody
+// can read: they overlap, the back row is hidden behind the front, and the
+// building itself disappears. So the room shows the handful who matter — the
+// ones the player has business with, ordered as the core ordered them — and
+// says plainly how many more are in there. The roster below is where the whole
+// register lives.
 const marks: [number, number][] = [
-  [232, 300], [318, 312], [150, 306], [400, 296], [86, 292],
-  [268, 268], [352, 262], [190, 264], [432, 258], [120, 258],
-  [300, 238], [216, 236], [386, 232], [156, 230], [456, 228],
+  [150, 302], [258, 308], [368, 300],
+  [206, 262], [312, 258],
+  [104, 254], [414, 250],
 ];
+
+// StandingRoom is how many people are drawn before the room says "and N more".
+export const StandingRoom = marks.length;
 
 // Each kind of room is a back wall, a floor, and two or three pieces of
 // furniture that say what the place is for.
@@ -96,15 +103,23 @@ function figure(who: Presence, x: number, y: number, selected: boolean) {
 export function interiorSVG(place: Place, people: Presence[], selected: string) {
   const seed = hash(place.id);
   const shown = people.slice(0, marks.length);
+  // Depth: whoever is further back is smaller and dimmer, so a room of seven
+  // reads as a room rather than as a row of stickers.
   return `<svg class="interior" viewBox="0 0 520 360" role="group" aria-label="Inside ${esc(place.name)}">` +
     `<defs><radialGradient id="int-${esc(place.id)}" cx=".5" cy=".28" r=".8">` +
     `<stop stop-color="#6b5a3f" stop-opacity=".30"/><stop offset="1" stop-color="#000" stop-opacity=".55"/>` +
     `</radialGradient></defs>` +
     room(place.type, seed) +
-    shown.map((who, i) => figure(who, marks[i][0], marks[i][1], who.id === selected)).join('') +
+    shown.map((who, i) => {
+      const depth = .72 + (marks[i][1] - 250) / 200;
+      return `<g transform="translate(${marks[i][0]},${marks[i][1]}) scale(${depth.toFixed(3)}) translate(${-marks[i][0]},${-marks[i][1]})" opacity="${(.62 + depth * .38).toFixed(2)}">` +
+        figure(who, marks[i][0], marks[i][1], who.id === selected) + `</g>`;
+    }).join('') +
     `<rect width="520" height="360" fill="url(#int-${esc(place.id)})" pointer-events="none"/>` +
     (people.length > shown.length
-      ? `<text x="500" y="348" text-anchor="end" fill="#9aa090" font-size="10">and ${people.length - shown.length} more</text>`
+      ? `<g><rect x="330" y="330" width="180" height="22" fill="#0b0f0ecc"/>` +
+        `<text x="500" y="345" text-anchor="end" fill="#c9b98f" font-size="11">` +
+        `and ${people.length - shown.length} more in here</text></g>`
       : '') +
     `</svg>`;
 }
