@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"regexp"
+	"strings"
 	"testing"
 
 	"blackledger/core"
@@ -102,5 +104,38 @@ func TestEveryMomentTheTheatreCanPlayHasAPlate(t *testing.T) {
 	}
 	if len(missing) > 0 {
 		t.Fatalf("moments with no plate: %v. Run `mise run scenes`.", missing)
+	}
+}
+
+// The stated goal for a loud moment is that "the camera is taken there" — to
+// the building it happened in, on the city view, with the headline afterwards.
+// The theatre instead washed the whole city out to near-black and drew its own
+// picture on top, which is the camera being taken *away* from the city.
+//
+// These are text guards on the interface sources, the same cheap kind that
+// caught the hook below an early return. They fail if the theatre goes back to
+// covering the city, or if the street stops being able to spotlight one address.
+func TestTheCameraGoesToTheBuildingRatherThanOverTheCity(t *testing.T) {
+	css, err := os.ReadFile("../../src/style.css")
+	if err != nil {
+		t.Skip("no stylesheet beside this build")
+	}
+	rule := regexp.MustCompile(`\.theatre\{[^}]*\}`)
+	found := rule.FindString(string(css))
+	if found == "" {
+		t.Fatal("the theatre has no styling at all")
+	}
+	// An opaque wash over the whole city view is the thing being prevented.
+	if strings.Contains(found, "inset:0") && !strings.Contains(found, "pointer-events:none") {
+		t.Fatalf("the theatre covers the whole city and swallows its clicks: %s", found)
+	}
+	street, err := os.ReadFile("../../src/CityStreet.tsx")
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, want := range []string{"spotlight", "lit"} {
+		if !strings.Contains(string(street), want) {
+			t.Fatalf("the street cannot single out one address: no %q", want)
+		}
 	}
 }

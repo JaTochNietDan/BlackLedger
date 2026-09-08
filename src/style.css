@@ -236,7 +236,8 @@
 /* The loudest moments arrived as a paragraph in a list. This is where they are
    played: the camera goes to the building, the thing happens, and the Herald
    headline comes up after the scene rather than instead of it. */
-.theatre{position:absolute;inset:0;z-index:6;background:#050808f2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:22px}
+.theatre{position:absolute;left:0;right:0;bottom:0;z-index:6;pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:8px;padding:18px 22px 22px;background:linear-gradient(transparent,#060a0ae8 42%)}
+.theatre>*{pointer-events:auto}
 .theatre-where{text-align:center}
 .theatre-where b{display:block;font:26px var(--serif);font-weight:400;margin-top:2px}
 .theatre-frame{width:min(620px,92%);border:1px solid #2c3733;box-shadow:0 20px 70px #000a}
@@ -511,3 +512,14 @@
 .walker-track{display:block;position:relative;height:2px;background:#2b3730;margin-top:7px;width:190px;max-width:100%}
 .walker-track i{position:absolute;top:-2px;width:6px;height:6px;background:var(--gold);transform:translateX(-50%)}
 .walker.yours b{color:var(--gold)}
+
+/* The camera on the city. The street dims around the address a moment happened
+   at and that one front is lit; the theatre is a band along the bottom saying
+   what a camera cannot, rather than a curtain drawn over the city. */
+.city-street.watching .street-front{opacity:.28;filter:saturate(.5)}
+.city-street.watching .street-front.lit{opacity:1;filter:none;border-color:var(--gold);box-shadow:0 0 0 1px var(--gold),0 0 60px #d6b77c40}
+.street-front .front-art{position:relative;transition:transform .05s linear}
+.front-flash{position:absolute;inset:0;z-index:2;mix-blend-mode:screen;pointer-events:none}
+.theatre-plate{width:min(420px,70%);height:96px;background-size:cover;background-position:center;border:1px solid #2c3733}
+.theatre-caption{text-shadow:0 2px 14px #000}
+@media(prefers-reduced-motion:reduce){.city-street.watching .street-front{opacity:1;filter:none}.front-flash{display:none}}
