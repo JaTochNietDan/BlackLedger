@@ -53,3 +53,11 @@
 @media(max-width:800px){.city-header{padding:14px 16px;grid-template-columns:1fr;grid-template-areas:"heading" "views" "opportunity"}.city-pane .known-threats{margin:0 16px 12px}.city-pane .destination-directory{height:auto}.city-header .next-opportunity{max-width:none;width:100%}}
 
 .property-art-pending{display:flex;align-items:center;gap:16px;padding:12px;color:var(--gold)}.property-art-pending svg{width:70px;height:60px;flex:none}.property-art-pending span{font:19px var(--serif);color:var(--muted)}
+
+/* A new headline should announce itself rather than wait to be found. */
+.headline-notice{margin:0 0 18px;padding:14px 16px;border:1px solid #6f6448;border-left:4px solid #b99a4e;background:#241f18}
+.headline-notice small{display:block;letter-spacing:.14em;color:#a2946d;font-size:11px}
+.headline-notice strong{display:block;margin:6px 0 4px;font-size:19px;letter-spacing:.02em}
+.headline-notice p{margin:0 0 8px;color:#c6bda8}
+.rail button.has-news{position:relative}
+.news-count{position:absolute;top:6px;right:10px;min-width:16px;height:16px;line-height:16px;padding:0 4px;border-radius:8px;background:#b04a3a;color:#fff;font-size:10px;font-style:normal;text-align:center}

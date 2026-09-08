@@ -240,3 +240,64 @@ func TestAnOrganizationWillNotSpendMoneyItDoesNotHave(t *testing.T) {
 		}
 	}
 }
+
+func TestThePlayerCanSeeWhatTheyPaidFor(t *testing.T) {
+	w := buyer(t)
+	if len(w.PendingArrangements()) != 0 {
+		t.Fatal("arrangements existed before any were made")
+	}
+	if err := w.Commission("vittorio", "professional"); err != nil {
+		t.Fatal(err)
+	}
+	pending := w.PendingArrangements()
+	if len(pending) != 1 {
+		t.Fatalf("the player cannot see the arrangement they paid for: %d listed", len(pending))
+	}
+	if pending[0]["target"] != "Vittorio Bellandi" {
+		t.Fatal("the arrangement does not name who it is for")
+	}
+	if pending[0]["paid"].(int) <= 0 {
+		t.Fatal("the arrangement does not say what it cost")
+	}
+	// When it is due is never revealed.
+	for key := range pending[0] {
+		if key == "due" || key == "minute" {
+			t.Fatal("the player was told exactly when it happens")
+		}
+	}
+	// Somebody else's arrangement is not the player's business.
+	w.Contracts = append(w.Contracts, Contract{ID: ID(), Life: w.Life, Target: "elena", Tier: "cheap", Payer: "bellandi", Due: w.Minute + 100})
+	if len(w.PendingArrangements()) != 1 {
+		t.Fatal("a faction's arrangement was shown to the player")
+	}
+	// It clears once it resolves.
+	w.Contracts[0].Due = w.Minute
+	w.ResolveContracts()
+	for _, a := range w.PendingArrangements() {
+		if a["target"] == "Vittorio Bellandi" {
+			t.Fatal("a settled arrangement is still listed as pending")
+		}
+	}
+}
+
+func TestAResolutionThePlayerPaidForSaysSo(t *testing.T) {
+	for _, want := range []struct{ tier, phrase string }{{"specialist", "Your arrangement is settled"}, {"cheap", "Your arrangement failed"}} {
+		found := false
+		for seed := uint32(1); seed <= 400 && !found; seed++ {
+			w := New(seed)
+			w.Contracts = []Contract{{ID: ID(), Life: w.Life, Target: "vittorio", Tier: want.tier, Payer: "player", Fee: 900, Due: w.Minute}}
+			w.ResolveContracts()
+			for _, r := range w.History {
+				if r.Title == want.phrase {
+					found = true
+					if !contains(r.Text, "900") {
+						t.Fatalf("%q did not say what it cost: %q", want.phrase, r.Text)
+					}
+				}
+			}
+		}
+		if !found {
+			t.Fatalf("no outcome ever reported %q to the player", want.phrase)
+		}
+	}
+}

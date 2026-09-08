@@ -1,6 +1,9 @@
 package core
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 // A name and a price. Anyone alive in this city can be killed, and the same
 // arrangement works against the player: a contract is a plot like any other,
@@ -225,16 +228,32 @@ func (w *World) resolveContract(c Contract) {
 	}
 
 	if w.WorldRandom() < odds {
-		w.Kill(c.Target, w.killingMethod(person))
+		method := w.killingMethod(person)
+		w.Kill(c.Target, method)
 		if c.Payer == "player" {
 			w.Player.Heat = min(100, w.Player.Heat+6)
 			w.Player.Respect += 3
+			w.Log("Your arrangement is settled",
+				fmt.Sprintf("The %s you paid $%d for reached %s. %s Nobody has connected it to you yet.",
+					strings.ToLower(tier.Label), c.Fee, person.Name, method), "danger")
 		}
 		return
 	}
 
+	// A shot that misses is still a shooting. The city reports the attempt
+	// without knowing who arranged it.
+	w.Report("attempt", "ATTEMPT ON THE LIFE OF "+strings.ToUpper(person.Name),
+		fmt.Sprintf("%s survived an attack near %s. Police describe the assault as targeted and say no arrest has been made.",
+			person.Name, w.placeName(person.Location)))
+
 	// It failed. Whether it comes back to whoever paid is the real risk.
-	w.Log("An attempt that failed", fmt.Sprintf("Someone went for %s and did not finish it. %s knows they are worth killing now.", person.Name, person.Name), "danger")
+	if c.Payer == "player" {
+		w.Log("Your arrangement failed",
+			fmt.Sprintf("The %s you paid $%d to reach %s did not finish it. %s is alive and now knows somebody wants them dead.",
+				strings.ToLower(tier.Label), c.Fee, person.Name, person.Name), "danger")
+	} else {
+		w.Log("An attempt that failed", fmt.Sprintf("Someone went for %s and did not finish it. %s knows they are worth killing now.", person.Name, person.Name), "danger")
+	}
 	if w.WorldRandom() >= tier.Capture {
 		return // they got away, and said nothing
 	}
@@ -243,6 +262,8 @@ func (w *World) resolveContract(c Contract) {
 	}
 	// Taken alive, and questioned.
 	w.Player.Heat = min(100, w.Player.Heat+25)
+	w.Report("arrest", "ARREST AFTER ATTACK ON "+strings.ToUpper(person.Name),
+		"A man taken at the scene is said to be assisting police with their enquiries. Sources suggest he has given a name.")
 	if f := w.faction(person.Faction); f != nil {
 		f.Goodwill = max(-100, f.Goodwill-45)
 		w.RetaliationFrom(f.ID)
@@ -296,4 +317,35 @@ func (w *World) ConsiderFactionContracts() {
 			return // one arrangement at a time
 		}
 	}
+}
+
+// PendingArrangements is what the player has paid for and not yet seen the end
+// of. They know the name; they do not know when, and they never see anyone
+// else's arrangements.
+func (w *World) PendingArrangements() []map[string]any {
+	out := []map[string]any{}
+	for _, c := range w.Contracts {
+		if c.Payer != "player" || c.Life != w.Life {
+			continue
+		}
+		person := w.NPC(c.Target)
+		if person == nil {
+			continue
+		}
+		tier, _ := contractTier(c.Tier)
+		out = append(out, map[string]any{
+			"target": person.Name,
+			"hired":  tier.Label,
+			"paid":   c.Fee,
+			"status": "Arranged. It happens when it happens.",
+		})
+	}
+	return out
+}
+
+func (w *World) placeName(id string) string {
+	if place, ok := PlaceByID(id); ok {
+		return place.Name
+	}
+	return "the waterfront"
 }

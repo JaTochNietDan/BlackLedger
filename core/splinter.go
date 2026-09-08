@@ -1,6 +1,9 @@
 package core
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 // An organization is only as loyal as its prospects. A family that has been
 // beaten down, or that is bleeding into a war it is not winning, gives the
@@ -124,5 +127,7 @@ func (w *World) Splinter(parent *Faction) bool {
 	}
 	w.Log("A family splits", fmt.Sprintf("%s has broken away from %s, taking %s. %s leads them, and %s wants it back.",
 		name, parent.Name, place.Name, leader, parent.Name), "politics")
+	w.Report("split", "SPLIT IN "+strings.ToUpper(parent.Name),
+		fmt.Sprintf("A faction led by %s has broken from %s and taken control of %s. Observers expect the dispute to be settled outside the courts.", leader, parent.Name, place.Name))
 	return true
 }

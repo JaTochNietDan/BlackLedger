@@ -34,6 +34,9 @@ func (w *World) apply(c Command) error {
 		w.Event = nil
 		w.Offers = []Offer{}
 		w.Plots = []Plot{}
+		// Arrangements the dead protagonist paid for die with them. Without
+		// this they linger in the save forever, filtered out but never removed.
+		w.Contracts = nil
 		w.BusinessTruces = nil
 		w.SuspendedJob = nil
 		w.NextPressure = 0

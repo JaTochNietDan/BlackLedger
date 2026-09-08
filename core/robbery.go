@@ -1,6 +1,9 @@
 package core
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 // Taking something that is not yours, by hand, in the open. It is the crudest
 // money in the city and the least deniable: a robbery is witnessed, and whoever
@@ -81,9 +84,13 @@ func (w *World) Rob(id string) error {
 		owner.Goodwill = max(-100, owner.Goodwill-25)
 		w.RetaliationFrom(owner.ID)
 		w.Log("Taken from "+place.Name, fmt.Sprintf("$%d out of %s. %s will not need long to work out who would dare.", take, place.Name, owner.Name), "politics")
+		w.Report("robbery", "ROBBERY AT "+strings.ToUpper(place.Name),
+			w.unattributed(place.Name, fmt.Sprintf("A substantial sum was taken from %s, an establishment associated with %s.", place.Name, owner.Name)))
 		return nil
 	}
 	w.Log("Taken from "+place.Name, fmt.Sprintf("$%d out of the till at %s. Nobody there answers to anyone who will come looking.", take, place.Name), "business")
+	w.Report("robbery", "ROBBERY AT "+strings.ToUpper(place.Name),
+		w.unattributed(place.Name, fmt.Sprintf("The day's takings were taken from %s.", place.Name)))
 	return nil
 }
 

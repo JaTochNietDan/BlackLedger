@@ -1,6 +1,9 @@
 package core
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 // Families hold property, and those holdings are the only thing a rival can
 // actually take from them. Power used to be an inert display number; it is now
@@ -152,6 +155,8 @@ func (w *World) Sabotage(id string) error {
 	w.Player.Respect += 4
 	w.Player.Heat = min(100, w.Player.Heat+8)
 	w.VisualCues = append(w.VisualCues, VisualCue{ID(), "attack", id, fmt.Sprintf("Your crew damaged %s. Condition is now %d%%.", place.Name, prop.Condition)})
+	w.Report("attack", "DAMAGE AT "+strings.ToUpper(place.Name),
+		w.unattributed(place.Name, fmt.Sprintf("%s, an establishment associated with %s, was attacked overnight.", place.Name, f.Name)))
 	w.Log("A message to "+f.Name, fmt.Sprintf("You and %s damaged %s by %d condition. %s standing falls to %+d and their strength to %d. They will answer this.", crew, place.Name, damage, f.Name, f.Goodwill, f.Power), "politics")
 	w.RetaliationFrom(f.ID)
 	return nil

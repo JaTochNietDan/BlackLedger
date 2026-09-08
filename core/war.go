@@ -140,6 +140,8 @@ func (w *World) contest(attacker, defender *Faction) {
 			c.Hostility = min(100, c.Hostility+10)
 		}
 		w.Log("A holding changes hands", fmt.Sprintf("%s has taken %s from %s. The city notices who could not hold it.", attacker.Name, place.Name, defender.Name), "politics")
+		w.Report("seizure", strings.ToUpper(place.Name)+" CHANGES HANDS",
+			fmt.Sprintf("%s now controls %s, previously held by %s. Neither organization would comment.", attacker.Name, place.Name, defender.Name))
 		return
 	}
 	w.Log("Trouble at "+place.Name, fmt.Sprintf("%s struck %s, a holding of %s. Its condition is now %d%%.", attacker.Name, place.Name, defender.Name, prop.Condition), "politics")
@@ -200,6 +202,8 @@ func (w *World) dissolve() {
 		if len(w.FamilyHoldings(f.ID)) == 0 && f.Power <= 15 && len(w.Factions)-len(gone) > 2 {
 			gone[f.ID] = true
 			w.Log("An organization ends", f.Name+" no longer holds anything worth defending. What remains of it answers to someone else now.", "politics")
+			w.Report("collapse", "END OF "+strings.ToUpper(f.Name),
+				fmt.Sprintf("%s has ceased to operate as an organization. Its remaining interests have been absorbed by others.", f.Name))
 			continue
 		}
 		kept = append(kept, f)
@@ -266,6 +270,8 @@ func (w *World) FactionTurn() {
 				switch c.State {
 				case "war":
 					w.Log("Open war in the city", fmt.Sprintf("%s and %s are now at war. Their quarrel is not yours, but the city will feel it.", a.Name, b.Name), "politics")
+					w.Report("war", "OPEN WAR ON THE WATERFRONT",
+						fmt.Sprintf("Violence between %s and %s has escalated beyond the usual. Businesses in the affected districts are advised that the police cannot guarantee protection.", a.Name, b.Name))
 				case "feud":
 					w.Log("A quarrel hardens", fmt.Sprintf("%s and %s are no longer on speaking terms.", a.Name, b.Name), "politics")
 				case "cold":

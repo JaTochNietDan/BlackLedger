@@ -196,6 +196,7 @@ type World struct {
 	Conflicts      []Conflict           `json:"conflicts,omitempty"`
 	Goods          []Good               `json:"goods,omitempty"`
 	Contracts      []Contract           `json:"contracts,omitempty"`
+	News           []Story              `json:"news,omitempty"`
 	Plots          []Plot               `json:"plots"`
 	Tasks          []Task               `json:"tasks"`
 	Event          *Scene               `json:"event"`
@@ -759,7 +760,7 @@ func (w *World) Public() map[string]any {
 	if len(history) > 60 {
 		history = history[len(history)-60:]
 	}
-	return map[string]any{"id": w.ID, "version": w.Version, "revision": w.Revision, "life": w.Life, "minute": w.Minute, "player": w.Player, "district": w.District, "factions": w.Factions, "npcs": w.People(), "locations": locs, "event": scene, "history": history, "dead": w.Dead, "tasks": w.Tasks, "director": w.Director, "last_result": w.LastResult, "daily_cost": w.DailyCost(), "income": income, "security": w.Guard(), "opportunity": w.NextOpportunity(), "known_threats": w.KnownThreats(), "business_truces": w.ActiveBusinessTruces(), "conflicts": w.PublicConflicts(), "goods": w.Goods}
+	return map[string]any{"id": w.ID, "version": w.Version, "revision": w.Revision, "life": w.Life, "minute": w.Minute, "player": w.Player, "district": w.District, "factions": w.Factions, "npcs": w.People(), "locations": locs, "event": scene, "history": history, "dead": w.Dead, "tasks": w.Tasks, "director": w.Director, "last_result": w.LastResult, "daily_cost": w.DailyCost(), "income": income, "security": w.Guard(), "opportunity": w.NextOpportunity(), "known_threats": w.KnownThreats(), "business_truces": w.ActiveBusinessTruces(), "conflicts": w.PublicConflicts(), "goods": w.Goods, "newspaper": w.Edition(), "arrangements": w.PendingArrangements()}
 }
 func (w *World) hasRecord(title string) bool {
 	for _, r := range w.History {

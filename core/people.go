@@ -189,6 +189,12 @@ func (w *World) Kill(id, cause string) bool {
 		}
 	}
 	w.Log(person.Name+" is dead", cause+" "+describeStanding(person, w)+".", "danger")
+	// The paper reports a killing without knowing who arranged it.
+	headline := strings.ToUpper(person.Name) + " FOUND DEAD"
+	if person.Rank >= RankLieutenant {
+		headline = strings.ToUpper(person.Name) + " KILLED"
+	}
+	w.Report("killing", headline, cause+" "+describeStanding(person, w)+". Police say enquiries are continuing.")
 	if led != "" {
 		w.Succeed(led)
 	} else if faction != "" {
