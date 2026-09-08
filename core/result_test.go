@@ -104,3 +104,28 @@ func TestEveryOrdinaryActionReportsItself(t *testing.T) {
 	}
 	t.Logf("%d ordinary actions taken, every one of them named in its own result", tried)
 }
+
+// A new life is not a decision with a price. The deltas are computed across a
+// change of protagonist, so a rich man dying and a pauper waking up read as
+// though the pauper had just lost eight thousand dollars and every ounce of
+// standing they had. Nobody lost anything: they are two different people.
+func TestBeginningAgainIsNotReportedAsALoss(t *testing.T) {
+	w := New(1)
+	w.Player.Cash, w.Player.Respect = 9000, 70
+	w.Die("Shot on the steps of the Monarch.")
+	next, err := Execute(w, Command{Revision: w.Revision, RequestID: ID(), Kind: "new_life"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	r := next.LastResult
+	if r == nil {
+		t.Fatal("nothing was reported")
+	}
+	if r.Cash != 0 || r.Respect != 0 || r.Heat != 0 || r.Health != 0 {
+		t.Fatalf("waking up as somebody else reported $%d, %d respect, %d attention and %d health",
+			r.Cash, r.Respect, r.Heat, r.Health)
+	}
+	if r.Kind != "new_life" || len(r.Records) == 0 {
+		t.Fatalf("the arrival was filed as %q with %d records", r.Kind, len(r.Records))
+	}
+}

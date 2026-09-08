@@ -685,5 +685,13 @@ func (w *World) apply(c Command) error {
 		Heat:    w.Player.Heat - wasHeat,
 		Health:  w.Player.Health - wasHealth,
 	}
+	if c.Kind == "new_life" {
+		// These deltas are measured across two different people. Reporting them
+		// tells a man who has just arrived in the city with ninety dollars that
+		// he lost nine thousand, which happened to somebody else and is not a
+		// price he paid for anything.
+		w.LastResult.Cash, w.LastResult.Respect = 0, 0
+		w.LastResult.Heat, w.LastResult.Health = 0, 0
+	}
 	return nil
 }

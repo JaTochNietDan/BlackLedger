@@ -57,7 +57,9 @@ func (w *World) Inherit() string {
 	w.Log(successor.Name+" is running it now", fmt.Sprintf("Everything that answered to %s answers to %s by the end of the week, under a name %s never chose. They hold %d of the premises and rather less of the strength.", w.Player.Name, successor.Name, w.Player.Name, len(holdings)), "politics")
 	w.Report("politics", upper(name)+" TAKE OVER WHAT IS LEFT",
 		fmt.Sprintf("Interests formerly associated with %s are understood to have passed to %s. Associates describe the transition as orderly.", w.Player.Name, successor.Name))
-	return successor.Name
+	// The id, not the name: whatever asks what became of this needs something
+	// it can look the organization up by.
+	return id
 }
 
 // orphan releases people whose organization no longer exists, so nobody is left

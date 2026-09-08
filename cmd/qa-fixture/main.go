@@ -12,13 +12,13 @@ import (
 
 func main() {
 	if len(os.Args) < 2 || len(os.Args) > 3 {
-		log.Fatal("usage: go run ./cmd/qa-fixture <new-qa.sqlite3> [police|damage|warning|russo-warning|attack|voice|contact|paused-job|leader|doorman|arrest|debt|herald|killing]")
+		log.Fatal("usage: go run ./cmd/qa-fixture <new-qa.sqlite3> [police|damage|warning|russo-warning|attack|voice|contact|paused-job|leader|doorman|arrest|debt|herald|killing|dead]")
 	}
 	scenario := "police"
 	if len(os.Args) == 3 {
 		scenario = os.Args[2]
 	}
-	if scenario != "police" && scenario != "damage" && scenario != "warning" && scenario != "russo-warning" && scenario != "attack" && scenario != "voice" && scenario != "contact" && scenario != "paused-job" && scenario != "leader" && scenario != "doorman" && scenario != "arrest" && scenario != "debt" && scenario != "herald" && scenario != "killing" {
+	if scenario != "police" && scenario != "damage" && scenario != "warning" && scenario != "russo-warning" && scenario != "attack" && scenario != "voice" && scenario != "contact" && scenario != "paused-job" && scenario != "leader" && scenario != "doorman" && scenario != "arrest" && scenario != "debt" && scenario != "herald" && scenario != "killing" && scenario != "dead" {
 		log.Fatal("unsupported QA scenario")
 	}
 	path := os.Args[1]
@@ -50,6 +50,29 @@ func main() {
 				return err
 			}
 			*w = *next
+			return nil
+		}
+		if scenario == "dead" {
+			// A protagonist who built something, with people to leave it to, so
+			// the death screen has an estate to report rather than a rule.
+			w.Player.Cash, w.Player.Respect, w.Player.Contacts = 9000, core.OrganizationStanding+40, 3
+			w.Player.Earned = 44000
+			w.Properties["laundry"].Owner = "player:1"
+			w.Properties["garage"].Owner = "player:1"
+			w.OrganizationDay()
+			for _, n := range w.Civilians() {
+				if core.IsOfficial(n.ID) {
+					continue
+				}
+				w.Player.Location = n.Location
+				if w.SignOn(n.ID) == nil {
+					break
+				}
+			}
+			w.Minute += 9 * 1440
+			w.Report("killing", "A MAN IS FOUND AT PIER 14", "Police say enquiries are continuing.")
+			w.Report("police", "RAID AT BLUEBIRD LAUNDRY", "Officers searched the premises.")
+			w.Die("Shot outside the Bluebird, in front of two people who will not say so.")
 			return nil
 		}
 		if scenario == "killing" {
