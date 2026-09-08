@@ -235,7 +235,8 @@ func (w *World) Everyone() []Presence {
 func (w *World) PeopleHere(id string) []Presence {
 	out := []Presence{}
 	for i := range w.NPCs {
-		if n := &w.NPCs[i]; !n.Dead && n.Location == id {
+		// Somebody on the street between two addresses is in neither of them.
+		if n := &w.NPCs[i]; !n.Dead && n.Location == id && !w.Travelling(n) {
 			out = append(out, w.see(n))
 		}
 	}

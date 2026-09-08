@@ -31,7 +31,25 @@ export function CityStreet({state, selected, onSelect, onEnter}: {
   const dark = night(state.minute);
   const here = state.player.location;
 
+  const street = state.street || [];
+
   return <div className="city-street" style={{'--night': dark.toFixed(2)} as React.CSSProperties}>
+    {/* Who is out there. People in this city used to stand at one address for
+        life; this is the only place you can watch one of them cross it. */}
+    {!!street.length && <section className="street-out" aria-label="People on the street">
+      <h3>OUT ON THE STREET</h3>
+      <div className="street-out-run">
+        {street.map(j => <div className={'walker' + (j.yours ? ' yours' : '')} key={j.id}>
+          <Portrait id={j.id} size="tiny"/>
+          <div>
+            <b>{j.name}</b>
+            <small>{j.from} <i>→</i> {j.to}</small>
+            <small className="walker-why">{j.because} · {j.minutes} min out</small>
+            <span className="walker-track"><i style={{left: (j.progress * 100).toFixed(0) + '%'}}/></span>
+          </div>
+        </div>)}
+      </div>
+    </section>}
     {districts.map((name, d) => {
       const places = state.locations.filter(p => p.district === d);
       if (!places.length) return null;

@@ -12,13 +12,13 @@ import (
 
 func main() {
 	if len(os.Args) < 2 || len(os.Args) > 3 {
-		log.Fatal("usage: go run ./cmd/qa-fixture <new-qa.sqlite3> [police|damage|warning|russo-warning|attack|voice|contact|paused-job|leader|doorman|arrest|debt|herald|killing|dead|offer|audience]")
+		log.Fatal("usage: go run ./cmd/qa-fixture <new-qa.sqlite3> [police|damage|warning|russo-warning|attack|voice|contact|paused-job|leader|doorman|arrest|debt|herald|killing|dead|offer|audience|street]")
 	}
 	scenario := "police"
 	if len(os.Args) == 3 {
 		scenario = os.Args[2]
 	}
-	if scenario != "police" && scenario != "damage" && scenario != "warning" && scenario != "russo-warning" && scenario != "attack" && scenario != "voice" && scenario != "contact" && scenario != "paused-job" && scenario != "leader" && scenario != "doorman" && scenario != "arrest" && scenario != "debt" && scenario != "herald" && scenario != "killing" && scenario != "dead" && scenario != "offer" && scenario != "audience" {
+	if scenario != "police" && scenario != "damage" && scenario != "warning" && scenario != "russo-warning" && scenario != "attack" && scenario != "voice" && scenario != "contact" && scenario != "paused-job" && scenario != "leader" && scenario != "doorman" && scenario != "arrest" && scenario != "debt" && scenario != "herald" && scenario != "killing" && scenario != "dead" && scenario != "offer" && scenario != "audience" && scenario != "street" {
 		log.Fatal("unsupported QA scenario")
 	}
 	path := os.Args[1]
@@ -36,6 +36,26 @@ func main() {
 	}
 	defer s.DB.Close()
 	err = s.Change(func(w *core.World) error {
+		if scenario == "street" {
+			// Ground changing hands is what puts people on the street, so this
+			// takes a holding off one family and gives it to the other, then lets
+			// the city set off and catches it part way through the walk.
+			w.Player.Cash, w.Player.Respect = 3000, 30
+			w.Player.Location = "bar"
+			w.SetOut()
+			for i := 0; i < 6; i++ {
+				w.Minute += 720
+				w.Arrivals()
+				w.SetOut()
+			}
+			w.Properties["club"].Owner = "russo"
+			w.Properties["laundry"].Owner = "bellandi"
+			w.Minute += 720
+			w.SetOut()
+			w.Minute += 10 // caught part way across the city
+			w.Arrivals()
+			return nil
+		}
 		if scenario == "audience" {
 			// A family across the table asking for money the player does not have,
 			// so the refused choices have to say why themselves.
