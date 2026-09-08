@@ -36,7 +36,7 @@ var earning = []string{"courier", "dockwork"}
 
 // Work that names the person it is done to. These cannot be listed by id, so
 // the harness matches them by prefix.
-var named = []string{"lend:", "lean:", "extend:", "forgive:", "bail:", "sign:", "share:"}
+var named = []string{"lend:", "lean:", "extend:", "forgive:", "bail:", "sign:", "share:", "smear:"}
 
 // Actions the core accepts without standing at the target location.
 var remote = []string{"expand"}
@@ -58,7 +58,7 @@ var ventures = []string{
 	"operate:hard", "operate:clean", "operate:standard", "inspect", "investigate", "lie_low",
 	"dress", "press", "bankroll", "draw", "car", "service",
 	"fit:door", "fit:telephone", "fit:safe", "fit:cellar", "commission",
-	"trip:rockridge", "trip:kingsport", "trip:halloway", "charge", "plant", "sitdown", "retain:commissioner", "retain:mayor", "rob:crew", "sabotage:crew", "armoury", "stock_arms", "buy:arms", "sell:arms", "mug", "mug:crew", "hit", "stand", "order", "post", "unpost", "sit_out", "lawyer", "talk",
+	"trip:rockridge", "trip:kingsport", "trip:halloway", "charge", "plant", "sitdown", "retain:commissioner", "retain:mayor", "retain:editor", "spike", "puff", "rob:crew", "sabotage:crew", "armoury", "stock_arms", "buy:arms", "sell:arms", "mug", "mug:crew", "hit", "stand", "order", "post", "unpost", "sit_out", "lawyer", "talk",
 	// Signing somebody on and lending them money both name them, so the
 	// harness cannot list those by id.
 }

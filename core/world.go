@@ -80,6 +80,9 @@ type Person struct {
 	// anybody who is not inside.
 	HeldUntil int    `json:"held_until,omitempty"`
 	HeldFor   string `json:"held_for,omitempty"`
+	// When the paper last carried something the player put there. Absent for
+	// anybody who has never been able to.
+	LastPress int `json:"last_press,omitempty"`
 	// Whether this person has established that the account abroad is theirs.
 	// Reset with every life, which is what makes inheriting it a decision.
 	Offshore bool `json:"offshore_access,omitempty"`
@@ -614,6 +617,35 @@ func (w *World) Actions(id string) []Action {
 			add("arms:armour", "Buy "+next.Label, 45, 0, w.ArmsReadiness("armour"),
 				fmt.Sprintf("$%d. %s Reduces what a beating costs you. A search takes it.", next.Cost, next.Detail))
 		}
+	case "herald":
+		for _, o := range officials {
+			if o.Place() != id {
+				continue
+			}
+			if w.Retained(o.ID) {
+				add("release:"+o.ID, "Stop paying "+o.Name, 30, 0, "",
+					fmt.Sprintf("Ends the arrangement and the $%d a day. Opening it again costs the opening payment over.", o.Retainer))
+			} else {
+				add("retain:"+o.ID, "An arrangement with "+o.Name, OfficialMinutes, 0, w.RetainerReadiness(o.ID),
+					fmt.Sprintf("$%d to open and $%d a day after. %s He cuts you loose above %d attention and keeps the opening payment.", w.OfficialOpening(o), o.Retainer, o.Detail, w.OfficialCeiling(o)))
+			}
+		}
+		spikeable := "Nothing in today's paper is about you."
+		if n := len(w.Spikeable()); n > 0 {
+			spikeable = fmt.Sprintf("%d stories in today's paper are about you or about the police.", n)
+		}
+		add("spike", "Pull a story", SpikeMinutes, 0, w.SpikeReadiness(),
+			fmt.Sprintf("%s The worst of them does not run, and the city's interest in it goes with it. About one time in seven somebody in that building notices and the arrangement is over.", spikeable))
+		add("puff", "A paragraph about a local businessman", PuffMinutes, 0, w.PuffReadiness(),
+			fmt.Sprintf("$%d for %d respect and %d off what the police think. The cheapest standing in this city and the only kind nobody was hurt for.", PuffCost, PuffRespect, PuffHeat))
+		for i := range w.Factions {
+			f := &w.Factions[i]
+			if f.ID == w.PlayerOrganizationID() {
+				continue
+			}
+			add("smear:"+f.ID, "Run something about "+f.Name, SmearMinutes, 0, w.SmearReadiness(f.ID),
+				fmt.Sprintf("$%d. Every one of their places loses %d trade and the organization loses %d strength. A paper full of crime is a paper full of crime whoever it is about, so the whole city gets harder — and about one time in five they find out who paid for it.", SmearCost, SmearCustom, SmearPower))
+		}
 	case "market":
 		add("investigate", "Ask about threats", 45, 30, "", "Investigate existing threats. Evidence is not a guarantee of safety.")
 		for i := range w.Factions {
@@ -640,6 +672,9 @@ func (w *World) Actions(id string) []Action {
 				fmt.Sprintf("$%d. %s Worth %d presence while it is kept, and it wears. %s", next.Cost, next.Detail, next.Presence, notice))
 		}
 		for _, o := range officials {
+			if o.Place() != id {
+				continue // a man is arranged with where he actually is
+			}
 			if w.Retained(o.ID) {
 				add("release:"+o.ID, "Stop paying "+o.Name, 30, 0, "",
 					fmt.Sprintf("Ends the arrangement and the $%d a day. Opening it again costs the opening payment over.", o.Retainer))
@@ -1244,7 +1279,7 @@ func (w *World) Public() map[string]any {
 	if len(history) > 60 {
 		history = history[len(history)-60:]
 	}
-	return map[string]any{"id": w.ID, "version": w.Version, "revision": w.Revision, "life": w.Life, "minute": w.Minute, "player": w.Player, "district": w.District, "factions": w.PublicFactions(), "npcs": w.People(), "locations": locs, "event": scene, "history": history, "dead": w.Dead, "tasks": w.Tasks, "director": w.Director, "last_result": w.LastResult, "daily_cost": w.DailyCost(), "income": income, "security": w.Guard(), "opportunity": w.NextOpportunity(), "known_threats": w.KnownThreats(), "business_truces": w.ActiveBusinessTruces(), "conflicts": w.PublicConflicts(), "goods": w.Goods, "arms": w.ArmsDescription(), "appearance": w.AppearanceDescription(), "vehicle": w.VehicleDescription(), "residence": w.ResidenceDescription(), "offshore": map[string]any{"balance": w.Offshore, "reachable": w.Player.Offshore}, "newspaper": w.Edition(), "arrangements": w.PendingArrangements(), "commissions": w.PublicCommissions(), "grudges": w.GrudgeSummary(), "cast": w.Cast(), "retainers": w.RetainerDescription(), "armoury": w.ArmouryDescription(), "population": w.PopulationSummary(), "hand": w.HandDescription(), "roles": w.RoleDescription(), "organization": w.PlayerOrganizationDescription(), "own_people": w.OwnPeopleDescription(), "pacts": w.PactDescription(), "book": w.LoanDescription(), "service": w.ServiceDescription(), "city": w.ScrutinyDescription()}
+	return map[string]any{"id": w.ID, "version": w.Version, "revision": w.Revision, "life": w.Life, "minute": w.Minute, "player": w.Player, "district": w.District, "factions": w.PublicFactions(), "npcs": w.People(), "locations": locs, "event": scene, "history": history, "dead": w.Dead, "tasks": w.Tasks, "director": w.Director, "last_result": w.LastResult, "daily_cost": w.DailyCost(), "income": income, "security": w.Guard(), "opportunity": w.NextOpportunity(), "known_threats": w.KnownThreats(), "business_truces": w.ActiveBusinessTruces(), "conflicts": w.PublicConflicts(), "goods": w.Goods, "arms": w.ArmsDescription(), "appearance": w.AppearanceDescription(), "vehicle": w.VehicleDescription(), "residence": w.ResidenceDescription(), "offshore": map[string]any{"balance": w.Offshore, "reachable": w.Player.Offshore}, "newspaper": w.Edition(), "arrangements": w.PendingArrangements(), "commissions": w.PublicCommissions(), "grudges": w.GrudgeSummary(), "cast": w.Cast(), "retainers": w.RetainerDescription(), "armoury": w.ArmouryDescription(), "population": w.PopulationSummary(), "hand": w.HandDescription(), "roles": w.RoleDescription(), "organization": w.PlayerOrganizationDescription(), "own_people": w.OwnPeopleDescription(), "pacts": w.PactDescription(), "book": w.LoanDescription(), "press": w.PressDescription(), "service": w.ServiceDescription(), "city": w.ScrutinyDescription()}
 }
 func (w *World) hasRecord(title string) bool {
 	for _, r := range w.History {

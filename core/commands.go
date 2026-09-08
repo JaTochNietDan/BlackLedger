@@ -266,6 +266,11 @@ func (w *World) apply(c Command) error {
 				return err
 			}
 			w.Advance(a.Minutes)
+		} else if org, ok := strings.CutPrefix(c.Kind, "smear:"); ok {
+			if err := w.Smear(org); err != nil {
+				return err
+			}
+			w.Advance(a.Minutes)
 		} else if person, ok := strings.CutPrefix(c.Kind, "lend:"); ok {
 			if err := w.Lend(person); err != nil {
 				return err
@@ -354,11 +359,19 @@ func (w *World) apply(c Command) error {
 				// are handled by prefix below. Listed so the switch reads as
 				// the full set of what the player can do.
 				return fmt.Errorf("who?")
-			case "retain:commissioner", "retain:mayor":
+			case "spike":
+				if err := w.Spike(); err != nil {
+					return err
+				}
+			case "puff":
+				if err := w.Puff(); err != nil {
+					return err
+				}
+			case "retain:commissioner", "retain:mayor", "retain:editor":
 				if err := w.Retain(strings.TrimPrefix(c.Kind, "retain:")); err != nil {
 					return err
 				}
-			case "release:commissioner", "release:mayor":
+			case "release:commissioner", "release:mayor", "release:editor":
 				if err := w.EndRetainer(strings.TrimPrefix(c.Kind, "release:")); err != nil {
 					return err
 				}

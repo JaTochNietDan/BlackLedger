@@ -12,13 +12,13 @@ import (
 
 func main() {
 	if len(os.Args) < 2 || len(os.Args) > 3 {
-		log.Fatal("usage: go run ./cmd/qa-fixture <new-qa.sqlite3> [police|damage|warning|russo-warning|attack|voice|contact|paused-job|leader|doorman|arrest|debt]")
+		log.Fatal("usage: go run ./cmd/qa-fixture <new-qa.sqlite3> [police|damage|warning|russo-warning|attack|voice|contact|paused-job|leader|doorman|arrest|debt|herald]")
 	}
 	scenario := "police"
 	if len(os.Args) == 3 {
 		scenario = os.Args[2]
 	}
-	if scenario != "police" && scenario != "damage" && scenario != "warning" && scenario != "russo-warning" && scenario != "attack" && scenario != "voice" && scenario != "contact" && scenario != "paused-job" && scenario != "leader" && scenario != "doorman" && scenario != "arrest" && scenario != "debt" {
+	if scenario != "police" && scenario != "damage" && scenario != "warning" && scenario != "russo-warning" && scenario != "attack" && scenario != "voice" && scenario != "contact" && scenario != "paused-job" && scenario != "leader" && scenario != "doorman" && scenario != "arrest" && scenario != "debt" && scenario != "herald" {
 		log.Fatal("unsupported QA scenario")
 	}
 	path := os.Args[1]
@@ -50,6 +50,17 @@ func main() {
 				return err
 			}
 			*w = *next
+			return nil
+		}
+		if scenario == "herald" {
+			// A campaign standing at the paper with a raid in this morning's
+			// edition and the money to do something about it.
+			w.Player.Cash, w.Player.Respect = 25000, 60
+			w.Properties["laundry"].Owner = "player:1"
+			w.Player.Location = core.HeraldPlace
+			w.Player.Heat = 35
+			w.Attention = 45
+			w.Report("police", "RAID AT BLUEBIRD LAUNDRY", "Officers searched the premises this morning. No charges have yet been brought.")
 			return nil
 		}
 		if scenario == "debt" {

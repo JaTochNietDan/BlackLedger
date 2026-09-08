@@ -108,5 +108,15 @@
     "y": 95,
     "cost": 0,
     "blurb": "Grey stone and a desk sergeant who has seen everybody. Nothing here is for sale and everything here is for trade."
+  },
+  {
+    "id": "herald",
+    "name": "The Bellwether Herald",
+    "type": "civic",
+    "district": 0,
+    "x": 300,
+    "y": 120,
+    "cost": 0,
+    "blurb": "Three floors of typewriters and one man on the top one who decides what the city read this morning."
   }
 ]

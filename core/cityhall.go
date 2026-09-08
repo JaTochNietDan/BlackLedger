@@ -24,6 +24,9 @@ type Official struct {
 	// Ceiling is the police attention past which they will not be seen with
 	// the player at any price.
 	Ceiling int
+	// Where they are found. Empty means the building, which is where most of
+	// them are; a man who decides what the city reads is at his own desk.
+	Where string
 }
 
 var officials = []Official{
@@ -33,6 +36,9 @@ var officials = []Official{
 	{ID: "mayor", Name: "Mayor Ellis Crane", Role: "Mayor of Bellwether",
 		Detail:   "Licences, inspections and the right words in the right rooms. Every business of yours earns a fifth more while he is paid.",
 		Retainer: 60, Opening: 1400, Ceiling: 65},
+	{ID: "editor", Name: "Editor Sam Rourke", Role: "Editor of the Bellwether Herald",
+		Detail:   "What the city read this morning. Stories about you can be pulled before they run, stories about anybody else can be arranged, and either is a thing somebody at that paper knows about you.",
+		Retainer: 38, Opening: 700, Ceiling: 72, Where: HeraldPlace},
 }
 
 const (
@@ -82,7 +88,7 @@ func (w *World) ensureOfficials() {
 		}
 		w.NPCs = append(w.NPCs, NPC{
 			ID: o.ID, Name: o.Name, Role: o.Role, Voice: w.voiceFor(o.Name),
-			Color: "#7c8791", Location: CityHall, Rank: RankLieutenant,
+			Color: "#7c8791", Location: o.Place(), Rank: RankLieutenant,
 			Ambition: 55, Skill: 30,
 		})
 	}
@@ -153,13 +159,21 @@ func (w *World) LicenceTake() float64 {
 	return 0
 }
 
+// Place is where an official is found. Most of them are in the building.
+func (o Official) Place() string {
+	if o.Where != "" {
+		return o.Where
+	}
+	return CityHall
+}
+
 // RetainerReadiness explains why an arrangement cannot be made, or returns "".
 func (w *World) RetainerReadiness(id string) string {
 	o, ok := OfficialByID(id)
 	if !ok {
 		return "There is nobody of that description"
 	}
-	if w.Player.Location != CityHall {
+	if w.Player.Location != o.Place() {
 		return "This is not arranged here"
 	}
 	if n := w.NPC(id); n != nil && n.Dead {
