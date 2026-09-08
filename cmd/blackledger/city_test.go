@@ -145,3 +145,34 @@ func TestEveryAddressIsPainted(t *testing.T) {
 		}
 	}
 }
+
+// A moment happens in the city now rather than in a modal over it: the camera
+// goes to the address the core named and the effect plays over that building.
+// Two things have to stay true, and both are cheap to check in text.
+func TestMomentsPlayInTheCityAndGiveTheCameraBack(t *testing.T) {
+	body, err := os.ReadFile("../../src/CityIso.tsx")
+	if err != nil {
+		t.Skip("no interface sources beside this build")
+	}
+	source := string(body)
+	// Every kind of moment the core can witness must be drawn as something.
+	// core/witness.go is the authority on what those are.
+	witness, err := os.ReadFile("../../core/witness.go")
+	if err != nil {
+		t.Fatal(err)
+	}
+	kinds := regexp.MustCompile(`"([a-z]+)": \d`).FindAllStringSubmatch(string(witness), -1)
+	if len(kinds) < 6 {
+		t.Fatalf("only %d kinds of moment were found in witness.go; the table has moved", len(kinds))
+	}
+	for _, k := range kinds {
+		if !strings.Contains(source, `'`+k[1]+`'`) {
+			t.Errorf("the city draws nothing for a %q, so the loudest thing that can happen there is silent", k[1])
+		}
+	}
+	// And the camera has to be given back: a player who was looking at the
+	// docks should not be left staring at a rooftop across town.
+	if !strings.Contains(source, "wasLooking") {
+		t.Error("the camera is taken to a moment and never returned to where the player had it")
+	}
+}

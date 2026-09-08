@@ -25,8 +25,13 @@ export const scenePlate = (kind: string) => `/art/scenes/scene-${kind}-v1.jpg`;
 // lights the real one, and what is left here is what a camera cannot say:
 // the caption, who was in it, and the headline afterwards.
 
-export function Theatre({cue, place, onDone, onProgress}: {
+export function Theatre({cue, place, onDone, onProgress, plate = true}: {
   cue: VisualCue; place: Place; onDone: () => void;
+  // Whether to show the painted plate for this kind of moment. In the city
+  // view the building it happened at is on screen behind this band, so a stock
+  // picture of a police station in front of the actual police station is one
+  // picture too many.
+  plate?: boolean;
   // How far through the moment is, reported outward every frame so the street
   // can light the building while it happens.
   onProgress?: (t: number) => void;
@@ -64,7 +69,7 @@ export function Theatre({cue, place, onDone, onProgress}: {
     </div>
     {/* The painted plate for this kind of moment, when there is one, small and
         beside the caption rather than instead of the city. */}
-    {painted && <div className="theatre-plate" style={{backgroundImage: `url(${scenePlate(cue.kind)})`}}/>}
+    {plate && painted && <div className="theatre-plate" style={{backgroundImage: `url(${scenePlate(cue.kind)})`}}/>}
     <p className="theatre-caption">{cue.caption}</p>
     {!!cue.actors?.length && <div className="theatre-cast">
       {/* The core names who was in it. A scene about somebody that cannot show

@@ -175,3 +175,10 @@ export const door = (at: Vec, block: {w: number; d: number}): Vec =>
 // Somewhere along a walk between two doors.
 export const between = (a: Vec, b: Vec, t: number): Vec =>
   ({x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t});
+
+// The roof of a block, which is where a moment happens: an explosion goes off
+// above a building, not on the pavement in front of it.
+export const roof = (at: Vec, block: {w: number; d: number}, height: number): Vec => {
+  const c = project({x: at.x + block.w / 2, y: at.y + block.d / 2});
+  return {x: c.x, y: c.y - height};
+};

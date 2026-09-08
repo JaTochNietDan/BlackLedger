@@ -53,6 +53,66 @@ function figure(colour: number, yours: boolean, walking: boolean): Graphics {
   return g;
 }
 
+// What a moment looks like over the building it happened at. Only light and
+// shape: the city underneath is a painting, and drawing a body or a car on top
+// of it reads as a sticker where a flash reads as something happening.
+//
+// t runs 0 to 1 across the moment. Nothing here decides anything — the core
+// committed the event and named the address; this is what it looked like.
+function moment(kind: string, t: number, across: number): Graphics {
+  const g = new Graphics();
+  const ease = 1 - t;
+  switch (kind) {
+    case 'explosion': {
+      const r = t < .28 ? t * across * 2.6 : across * .73 - (t - .28) * across * .5;
+      if (r > 0) {
+        g.circle(0, 0, r).fill({color: 0xffcf7a, alpha: Math.max(0, .8 - t)});
+        g.circle(0, 0, r * 1.55).fill({color: 0xc4531f, alpha: Math.max(0, .35 - t * .45)});
+      }
+      if (t > .3) {
+        // Debris thrown out and falling: the only moment with anything solid
+        // in it, because an explosion without pieces is a lamp.
+        for (let i = 0; i < 11; i++) {
+          const a = i * 2.1, fly = (t - .3) * across * 1.5;
+          g.rect(Math.cos(a) * fly, Math.sin(a) * fly * .55 + (t - .3) * (t - .3) * 260, 5, 4)
+            .fill({color: 0x14100d, alpha: ease});
+        }
+      }
+      break;
+    }
+    case 'killing':
+    case 'gunfight': {
+      // Muzzle flashes, a few, close together, then nothing.
+      if (t < .5 && Math.floor(t * 16) % 2 === 0) {
+        const n = Math.floor(t * 16), x = (n % 3 - 1) * across * .12;
+        g.circle(x, 0, across * .035).fill({color: 0xffe6a8, alpha: .95});
+        g.circle(x, 0, across * .2).fill({color: 0xffe6a8, alpha: .16});
+      }
+      break;
+    }
+    case 'raid':
+    case 'arrest': {
+      // A lamp turning over on a car at the kerb, sweeping the front.
+      const swing = Math.sin(t * 26) * across * .3;
+      g.poly([0, 0, swing + across * .34, across * .3, swing - across * .1, across * .3])
+        .fill({color: 0xe0705c, alpha: .22});
+      g.circle(0, 0, across * .05).fill({color: 0xe0705c, alpha: .55 + Math.sin(t * 26) * .35});
+      break;
+    }
+    case 'seizure':
+    case 'attack':
+    case 'robbery':
+    default: {
+      // Something happened here: a hard ring that opens once and fades, which
+      // is enough for a robbery and not so much that it reads as a fire.
+      const r = across * (.18 + t * .5);
+      g.circle(0, 0, r).stroke({width: 3, color: 0xd6b77c, alpha: Math.max(0, .7 - t)});
+      break;
+    }
+  }
+  return g;
+}
+
 export function CityIso({state, selected, onSelect, onEnter, spotlight}: {
   state: Snapshot; selected: string; onSelect: (id: string) => void; onEnter: () => void;
   spotlight?: Spotlight | null;
@@ -61,6 +121,10 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight}: {
   const app = useRef<Application | null>(null);
   const view = useRef<Viewport | null>(null);
   const blocks = useRef<Container | null>(null);
+  const effects = useRef<Container | null>(null);
+  // Where the camera was before a moment took it somewhere, so it can be given
+  // back afterwards rather than leaving the player looking at a rooftop.
+  const wasLooking = useRef<{x: number; y: number; scale: number} | null>(null);
   // The handlers change on every render; the scene is built once, so it reads
   // them through a box rather than closing over a stale one.
   const pick = useRef(onSelect); pick.current = onSelect;
@@ -94,6 +158,9 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight}: {
       const layer = new Container();
       viewport.addChild(layer);
       blocks.current = layer;
+      const above = new Container();
+      viewport.addChild(above);
+      effects.current = above;
       draw();
       frame();
       // Then the painted city, once the pictures are in. Until they land the
@@ -118,7 +185,37 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight}: {
   // Redraw the city whenever the world moves. The camera is untouched: a player
   // who has zoomed in on the docks does not want to be thrown back out because
   // an hour passed.
-  useEffect(draw, [state.revision, state.minute, selected, spotlight?.id, spotlight?.t]);
+  // Deliberately not spotlight.t: the moment animates in its own layer, and
+  // rebuilding twelve buildings sixty times a second to redraw a fireball that
+  // is not in them is work for nothing.
+  useEffect(draw, [state.revision, state.minute, selected, spotlight?.id]);
+
+  // When a moment starts, take the camera to the building it happened at and
+  // remember where the player was looking so it can be given back.
+  useEffect(() => {
+    const viewport = view.current;
+    if (!viewport) return;
+    if (!spotlight) {
+      const back = wasLooking.current;
+      if (back) {
+        wasLooking.current = null;
+        viewport.animate({time: 520, position: {x: back.x, y: back.y}, scale: back.scale, ease: 'easeInOutSine'});
+      }
+      return;
+    }
+    const place = state.locations.find(l => l.id === spotlight.id);
+    if (!place) return;
+    if (!wasLooking.current) {
+      wasLooking.current = {x: viewport.center.x, y: viewport.center.y, scale: viewport.scale.x};
+    }
+    const block = blockFor(place.type);
+    const at = plan(place.x, place.y);
+    const c = project({x: at.x + block.w / 2, y: at.y + block.d / 2});
+    viewport.animate({
+      time: 620, position: {x: c.x, y: c.y - 60},
+      scale: Math.min(ZOOM.max, Math.max(1.25, viewport.scale.x)), ease: 'easeInOutSine',
+    });
+  }, [spotlight?.id]);
 
   // frame points the camera at the whole city, once, from the size of what was
   // actually drawn rather than from a guessed world rectangle. Called on the
@@ -134,6 +231,28 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight}: {
     viewport.setZoom(Math.max(ZOOM.min, Math.min(ZOOM.max, scale)), true);
     viewport.moveCenter(b.x + b.width / 2, b.y + b.height / 2);
   }
+
+  // The moment itself, redrawn every frame it is playing. Kept out of the city
+  // layer so the whole city is not rebuilt sixty times a second for it.
+  useEffect(() => {
+    const above = effects.current;
+    if (!above) return;
+    above.removeChildren().forEach(c => c.destroy({children: true}));
+    if (!spotlight) return;
+    const place = state.locations.find(l => l.id === spotlight.id);
+    if (!place) return;
+    const block = blockFor(place.type);
+    const at = plan(place.x, place.y);
+    const across = (block.w + block.d) * (TILE.w / 2);
+    const centre = project({x: at.x + block.w / 2, y: at.y + block.d / 2});
+    const art = textures.get(place.id);
+    // Over the roof when the building is painted, over the middle of the plot
+    // when it is still a blocked-out solid.
+    const up = art ? (art.height * (across / art.width)) * .62 : 60;
+    const g = moment(spotlight.kind, spotlight.t, across);
+    g.position.set(centre.x, centre.y - (up || 60));
+    above.addChild(g);
+  }, [spotlight?.id, spotlight?.kind, spotlight?.t]);
 
   function draw() {
     const layer = blocks.current;
