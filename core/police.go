@@ -73,7 +73,7 @@ func upper(s string) string {
 // rises with attention, and having somewhere for them to search is what makes a
 // raid worth their time.
 func (w *World) considerRaid() {
-	if w.Player.Heat < RaidThreshold+w.RaidRelief()-w.ScrutinyRaidShift() || !w.Player.Alive {
+	if w.Player.Heat < RaidThreshold+w.RaidRelief()-w.ScrutinyRaidShift() || !w.Player.Alive || w.Held() {
 		return
 	}
 	chance := float64(w.Player.Heat-RaidThreshold-w.RaidRelief()+w.ScrutinyRaidShift()) / 120
@@ -83,9 +83,21 @@ func (w *World) considerRaid() {
 	w.Raid()
 }
 
-// Raid is the visit. They take what is carried, they fine what they can prove,
-// and past a point they take the premises the money came through.
+// Raid is the visit: the search, and then what they do with what it turned up.
+// Confiscation and a charge are not alternatives — they take the still and then
+// somebody answers for it — so the weight of the evidence is read before the
+// search removes it, and the arrest is the last thing that happens.
 func (w *World) Raid() {
+	weight, because := w.Charge()
+	w.search()
+	// Somebody retaining a commissioner has already bought the outcome of this,
+	// which is what makes that arrangement worth its price.
+	if weight >= ChargeMinimum && w.RaidRelief() == 0 && w.Player.Alive && !w.Held() && w.Event == nil {
+		w.Take(weight, because)
+	}
+}
+
+func (w *World) search() {
 	// The premises they search is the one earning the most for the player.
 	var target string
 	for _, l := range Locations {

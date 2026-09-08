@@ -76,6 +76,10 @@ type Person struct {
 	// done for them. Absent for somebody who answers to nobody.
 	Serves  string `json:"serves,omitempty"`
 	Service int    `json:"service,omitempty"`
+	// When the police let go, and what they took them in for. Absent for
+	// anybody who is not inside.
+	HeldUntil int    `json:"held_until,omitempty"`
+	HeldFor   string `json:"held_for,omitempty"`
 	// Whether this person has established that the account abroad is theirs.
 	// Reset with every life, which is what makes inheriting it a decision.
 	Offshore bool `json:"offshore_access,omitempty"`
@@ -101,6 +105,9 @@ type NPC struct {
 	Ambition int    `json:"ambition,omitempty"`
 	Skill    int    `json:"skill,omitempty"`
 	Dead     bool   `json:"dead,omitempty"`
+	// When the police let this one go. Absent for anybody who is not inside,
+	// which is everybody in a save written before anybody could be taken in.
+	Held int `json:"held,omitempty"`
 }
 type Faction struct {
 	ID       string `json:"id"`
@@ -518,6 +525,21 @@ func (w *World) Actions(id string) []Action {
 		}
 		return ""
 	}
+	// Inside, there are three ways out and no fourth. Everywhere else on the
+	// map offers nothing, because a man in a cell cannot go to any of it.
+	if w.Held() {
+		if l.ID != "precinct" {
+			return out
+		}
+		days := w.DaysLeft()
+		add("sit_out", fmt.Sprintf("Do the %d days", days), 0, 0, "",
+			fmt.Sprintf("The city runs without you and hands you the books afterwards. Worth %d respect for not saying anything.", days*ServedRespect))
+		add("lawyer", fmt.Sprintf("Pay somebody who knows the clerks ($%d)", w.LawyerFee()), 90, 0, w.LawyerReadiness(),
+			fmt.Sprintf("$%d a day for what is left of it. You walk out today having earned nothing and lost nothing but the money.", LawyerDaily))
+		add("talk", "Explain who else was involved", 60, 0, "",
+			fmt.Sprintf("Out the same afternoon. Costs %d respect, %d standing with every organization in the city, and everybody who works for you.", TalkedRespect, TalkedGoodwill))
+		return out
+	}
 	if l.District > w.District {
 		add("expand", "Establish contacts across town", 90, 100, need(p.Respect < 10, "Earn 10 respect first"), "Opens the next district. Existing businesses and rivals remain.")
 		return out
@@ -531,6 +553,15 @@ func (w *World) Actions(id string) []Action {
 		return out
 	}
 	switch id {
+	case "precinct":
+		for _, n := range w.OwnPeople() {
+			if !w.Inside(n) {
+				continue
+			}
+			days := (n.Held - w.Minute + 1439) / 1440
+			add("bail:"+n.ID, "Bail out "+n.Name, 60, days*BailDaily, "",
+				fmt.Sprintf("$%d for the %d days still on him. He comes out owing you, which is not the same as being grateful.", days*BailDaily, days))
+		}
 	case "bar":
 		add("courier", "Carry a discreet envelope", 45, 0, "", "Earn $45 and 2 respect. A reliable introduction to the neighborhood.")
 		add("contact", "Buy Mara a coffee", 30, 10, need(p.Contacts >= 5, "Your information network is fully developed"), "Build trust and an information network. Contacts may warn you of trouble.")
@@ -1030,7 +1061,7 @@ func (w *World) Advance(minutes int) {
 		w.Minute = next
 		for id, prop := range w.Properties {
 			if w.Own(id) {
-				prop.Carry += float64(prop.Income*prop.Condition*elapsed) * operatingMode(prop.Mode).Take * w.Capacity(id) * w.TradeMultiplier(id) * (1 + w.LicenceTake()) / 6000
+				prop.Carry += float64(prop.Income*prop.Condition*elapsed) * operatingMode(prop.Mode).Take * w.Capacity(id) * w.TradeMultiplier(id) * (1 + w.LicenceTake()) * w.CollectionShare(id) / 6000
 				n := int(prop.Carry + 1e-9)
 				prop.Carry -= float64(n)
 				w.Earn(n)
@@ -1058,6 +1089,7 @@ func (w *World) Advance(minutes int) {
 			w.BusinessDay()
 			w.ContrabandDay()
 			w.PoliceDay()
+			w.CustodyDay()
 			w.PeopleDay()
 			w.GrudgeDay()
 			w.SettleGrudges()
@@ -1182,7 +1214,8 @@ func (w *World) hasRecord(title string) bool {
 func (w *World) OfferIfReady() {
 	// Leave room to prepare for discovered danger. Hidden plots must not
 	// change offer timing and indirectly reveal themselves.
-	if !w.Player.Alive || w.Event != nil || w.SuspendedJob != nil || len(w.KnownThreats()) > 0 {
+	// Nobody brings work to a man in a cell.
+	if !w.Player.Alive || w.Held() || w.Event != nil || w.SuspendedJob != nil || len(w.KnownThreats()) > 0 {
 		return
 	}
 	if len(w.Offers) > 0 && w.Minute >= w.Offers[0].Ready {

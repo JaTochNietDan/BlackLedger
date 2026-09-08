@@ -21,6 +21,10 @@ import "fmt"
 // Nobody is a he or a she in these. The city does not know and it does not
 // need to.
 var mannerByPlace = map[string][]string{
+	"precinct": {"found in a cell in the morning, hanged with a shirt the desk sergeant had signed for",
+		"beaten in a corridor between two rooms nobody keeps a book for",
+		"shot on the steps outside, walking out on bail with the paperwork still in hand",
+		"taken ill in custody, according to a doctor who saw them once"},
 	"bar": {"shot twice at the counter, in front of everyone and nobody",
 		"stabbed in the passage behind the building and left where the bins are",
 		"held down over a table until the room emptied",

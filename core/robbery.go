@@ -175,6 +175,11 @@ func (w *World) robberyExposure() float64 {
 // Whether they learn who did it depends on whether they built anyone who would
 // tell them.
 func (w *World) ConsiderRobbery() {
+	// Nobody is robbed in the street while the police are holding them. The one
+	// thing a cell is good for.
+	if w.Held() {
+		return
+	}
 	exposure := w.robberyExposure()
 	if exposure <= 0 || w.WorldRandom() >= exposure {
 		return

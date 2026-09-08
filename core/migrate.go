@@ -8,7 +8,7 @@ package core
 // to somebody.
 
 // SaveVersion is the shape the current build writes.
-const SaveVersion = 12
+const SaveVersion = 13
 
 // seedHoldings is the property each established family holds in a new city.
 var seedHoldings = map[string][]string{
@@ -132,6 +132,15 @@ func (w *World) MigrateLivingWorld() {
 	for _, good := range newGoods() {
 		if w.Good(good.ID) == nil {
 			w.Goods = append(w.Goods, good)
+		}
+	}
+
+	// A place added to the city after a campaign began has no record in it at
+	// all, and everything that walks the location list would find nil where a
+	// property should be. Anything new starts unowned and in good order.
+	for _, l := range Locations {
+		if w.Properties[l.ID] == nil {
+			w.Properties[l.ID] = &Property{Owner: "independent", Condition: 100}
 		}
 	}
 

@@ -122,6 +122,10 @@ func (w *World) apply(c Command) error {
 			if err := w.ResolveSitdown(e, c.Choice); err != nil {
 				return err
 			}
+		case "arrest":
+			if err := w.ResolveArrest(e, c.Choice); err != nil {
+				return err
+			}
 		case "contract":
 			if c.Choice == "leave" {
 				w.Log("No name given", "You let the conversation end without saying anything worth repeating.", "personal")
@@ -259,6 +263,11 @@ func (w *World) apply(c Command) error {
 			w.Advance(a.Minutes)
 		} else if person, ok := strings.CutPrefix(c.Kind, "share:"); ok {
 			if err := w.PayShare(person); err != nil {
+				return err
+			}
+			w.Advance(a.Minutes)
+		} else if person, ok := strings.CutPrefix(c.Kind, "bail:"); ok {
+			if err := w.Bail(person); err != nil {
 				return err
 			}
 			w.Advance(a.Minutes)
@@ -561,6 +570,18 @@ func (w *World) apply(c Command) error {
 				case "inspect":
 					l, _ := PlaceByID(target)
 					w.Log("The books are open", fmt.Sprintf("%s: %d%% condition, earning $%d/hour of a possible $%d/hour. Repairs cost $50 and restore up to 40 condition.", l.Name, w.Properties[target].Condition, w.Properties[target].Income*w.Properties[target].Condition/100, w.Properties[target].Income), "business")
+				case "sit_out":
+					if err := w.SitOut(); err != nil {
+						return err
+					}
+				case "lawyer":
+					if err := w.Lawyer(); err != nil {
+						return err
+					}
+				case "talk":
+					if err := w.Talk(); err != nil {
+						return err
+					}
 				case "post":
 					if err := w.Post(target); err != nil {
 						return err

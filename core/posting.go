@@ -28,7 +28,7 @@ func (w *World) PostedAt(id string) *NPC {
 		return nil
 	}
 	n := w.NPC(prop.Posted)
-	if n == nil || n.Dead || n.Faction != w.PlayerOrganizationID() {
+	if n == nil || n.Dead || w.Inside(n) || n.Faction != w.PlayerOrganizationID() {
 		prop.Posted = ""
 		return nil
 	}
@@ -46,7 +46,8 @@ func (w *World) Unposted() []*NPC {
 	}
 	out := []*NPC{}
 	for _, n := range w.OwnPeople() {
-		if !posted[n.ID] {
+		// Somebody the police are holding is not standing anywhere.
+		if !posted[n.ID] && !w.Inside(n) {
 			out = append(out, n)
 		}
 	}
