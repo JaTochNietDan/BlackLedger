@@ -101,7 +101,17 @@ func (w *World) contest(attacker, defender *Faction) {
 			weakest = id
 		}
 	}
+	w.contestAt(attacker, defender, weakest)
+}
+
+// contestAt is the same raid against a named holding. The city always goes for
+// the weakest thing somebody holds; the player picks, which is the only
+// difference between what they can do and what is done to them.
+func (w *World) contestAt(attacker, defender *Faction, weakest string) {
 	prop := w.Properties[weakest]
+	if prop == nil || prop.Owner != defender.ID {
+		return
+	}
 	place, ok := PlaceByID(weakest)
 	if !ok {
 		return

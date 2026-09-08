@@ -447,6 +447,13 @@ func (w *World) apply(c Command) error {
 				if err := w.Incite(target); err != nil {
 					return err
 				}
+			case "move":
+				// Resolved before the clock moves, like sabotage, so a move
+				// that kills the player cannot also collect the hours it never
+				// survived.
+				if err := w.MoveOn(target); err != nil {
+					return err
+				}
 			case "sabotage":
 				// Resolved before the clock moves, so a fatal attempt cannot also
 				// collect the time and income of the hours it never survived.

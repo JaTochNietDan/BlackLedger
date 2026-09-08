@@ -665,6 +665,10 @@ func (w *World) Actions(id string) []Action {
 		add("plant", "Put the charge under "+l.Name, PlantMinutes, 0, w.PlantReadiness(id),
 			fmt.Sprintf("Wrecks %s, empties it of stock and staff, and kills somebody who worked there about a third of the time. The owner will know exactly what it was. Going wrong means it goes off with you under it.", l.Name))
 	}
+	if holder, ok := w.MoveTarget(id); ok {
+		add("move", "Move on "+l.Name, MoveMinutes, 0, w.MoveOnReadiness(id),
+			fmt.Sprintf("Commit your organization against %s. Your strength against theirs decides it, and a holding they cannot defend becomes yours. Driven off, it costs you somebody who went with you. Draws %d police attention and hardens the quarrel.", holder.Name, MoveHeat))
+	}
 	if f, ok := w.SabotageTarget(id); ok {
 		if hand, ok := w.CrewHands(); ok {
 			reason := w.SabotageReadiness(id)

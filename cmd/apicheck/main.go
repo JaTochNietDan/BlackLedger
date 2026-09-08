@@ -45,7 +45,7 @@ var idle = []string{"rest", "wait"}
 // progress, so a policy that only climbs the ladder never touches them. Mixed
 // in deliberately, because an untried system is an unverified one.
 var ventures = []string{
-	"launder", "bribe", "rob", "sabotage", "incite", "contract",
+	"launder", "bribe", "rob", "sabotage", "move", "incite", "contract",
 	"deposit", "offshore_access", "withdraw",
 	"hire", "restock", "remedy", "layoff", "still", "dismantle",
 	"play:small", "play:high", "buy:moonshine", "buy:cigarettes",
