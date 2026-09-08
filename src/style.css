@@ -302,3 +302,7 @@
 .destination-image.street-front img,.building-art.street-front img{object-fit:cover;width:100%;height:100%}
 .building-art.street-front{position:relative}
 .building-art.street-front::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#0a0f0e00 45%,#0a0f0ecc)}
+/* A painted plate under the theatre. What moves is still drawn on top of it —
+   the flash, the bloom, the lamp — so the animation is still the truth of the
+   event and only what it is painted on has changed. */
+.theatre-frame.painted{background-size:cover;background-position:center;background-repeat:no-repeat}

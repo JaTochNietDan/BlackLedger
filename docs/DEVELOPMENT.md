@@ -1154,3 +1154,11 @@
 - All seven have a painted front now (`tools/exteriors.py`, `mise run exteriors`), 396KB for the set. Every card in the address book carries a picture; **no wireframes and no broken images**, checked in the browser rather than assumed.
 - **The two kinds of picture are now drawn differently on purpose.** A hand-painted cut-out is a model of a building and sits inside its frame; a generated street view is a picture taken from across the road and fills it. Squeezing the second into a frame built for the first made Pier 14 look like a mistake rather than a photograph, so street views fill their frame and take a gradient at the foot of the large version. The wireframe stays as the last resort, so a building added tomorrow still has a card rather than a hole.
 - `mise run verify` passes.
+
+## The moments, painted
+- The theatre took the player to the building where something happened and showed it as a black box and a few animated shapes. Enough to say *where*, not enough to make anybody look.
+- **Eight painted plates now**, one a kind — a body under a sheet on a wet pavement, the blown-out front of a building, police cars at a kerb with torch beams into a doorway, a shuttered shopfront with a notice on the door. 512KB for the set. They are the aftermath or the middle of the thing, framed wide, with **nobody identifiable in them**, because the people who were actually there are the city's business and not the picture's.
+- **What moves is still drawn, and had to change.** The plate already contains the body, the onlookers and the cars; drawing another one on top of it reads as a sticker. So on a painted plate the overlay adds only *light* — the muzzle flash with a bloom around it, the explosion's heat, a police lamp sweeping the street and washing the whole frame. The drawn building and its debris remain for any kind nobody has painted, so an event added tomorrow still plays.
+- Verified in a browser against a fresh isolated fixture: an attack on the Bluebird played on `scene-attack-v1.jpg` with the caption and the result band beneath it.
+- The city's art is 24MB all in: two dozen faces, twelve interiors, seven fronts, eight event plates and the hand-painted originals.
+- `mise run verify` passes.
