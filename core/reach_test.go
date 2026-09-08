@@ -80,3 +80,49 @@ func TestYouCannotRecruitAManWhoIsDead(t *testing.T) {
 	}
 	t.Fatal("recruiting is not offered at the bar at all")
 }
+
+// The delegated jobs — rob, mug, sabotage — are aimed at a place, and the man
+// who does them is named nowhere in the action's id. So the sweep that asks
+// whether a subject is reachable never saw them, and a player could send
+// somebody out of a police cell to rob a business while the police were still
+// holding him. The one shared readiness function they all use never asked.
+func TestYouCannotSendAManFromACellToDoAJob(t *testing.T) {
+	w, leo := crewman(t)
+	w.Player.Cash = 3000
+	if w.DelegateReadiness() != "" {
+		t.Fatalf("he could not be sent in the first place: %q", w.DelegateReadiness())
+	}
+	leo.Held = w.Minute + 2880
+	reason := w.DelegateReadiness()
+	if reason == "" {
+		t.Fatal("a man the police are holding was available to send")
+	}
+	if !contains(reason, "held") {
+		t.Fatalf("the refusal does not say where he is: %q", reason)
+	}
+	for _, a := range w.Actions(w.Player.Location) {
+		switch a.ID {
+		case "rob:crew", "mug:crew", "sabotage:crew":
+			if !a.Disabled {
+				t.Fatalf("%q sends a man who is in a cell", a.Label)
+			}
+		}
+	}
+	// And when they let him out he is available again.
+	leo.Held = 0
+	if w.DelegateReadiness() != "" {
+		t.Fatalf("he was released and is still unavailable: %q", w.DelegateReadiness())
+	}
+}
+
+// The same question, for the same reason, about a man who is out walking.
+func TestYouCannotSendAManWhoIsAlreadyCrossingTheCity(t *testing.T) {
+	w, leo := crewman(t)
+	w.Player.Cash = 3000
+	leo.Heading, leo.Arrives, leo.Errand = "club", w.Minute+30, "somewhere of his own"
+	if reason := w.DelegateReadiness(); reason == "" {
+		t.Fatal("a man on the street was available to send")
+	} else if !contains(reason, "street") {
+		t.Fatalf("the refusal does not say he is out: %q", reason)
+	}
+}

@@ -55,6 +55,12 @@ func (w *World) DelegateReadiness() string {
 	if len(w.Tasks) > 0 {
 		return w.Player.Crew[0].Name + " is already on assignment"
 	}
+	// The jobs this gates are aimed at a place, and the man who does them is
+	// named nowhere in their ids, so the sweep that asks whether a subject can
+	// be reached never saw them. Ask here, where all of them pass.
+	if reason := w.OutOfReach(w.Player.Crew[0].ID); reason != "" {
+		return reason
+	}
 	if w.Player.Crew[0].Loyalty < HandLoyalty {
 		return fmt.Sprintf("%s will not do this below %d loyalty", w.Player.Crew[0].Name, HandLoyalty)
 	}
