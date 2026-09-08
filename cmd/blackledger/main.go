@@ -200,6 +200,7 @@ func (a *app) generateAttempt(snapshot *core.World, feedback string) error {
 	}
 	contextData["speaker_beneficiary_ids"] = affiliation
 	contextData["accessible_job_locations"] = accessibleJobLocations(snapshot)
+	contextData["player_situation"] = playerSituation(snapshot)
 	contextData["city_conflicts"] = cityConflicts(snapshot)
 	contextData["organization_holdings"] = organizationHoldings(snapshot)
 	b, _ := json.Marshal(contextData)

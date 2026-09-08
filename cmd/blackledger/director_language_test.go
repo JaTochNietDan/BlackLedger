@@ -62,3 +62,32 @@ func TestEveryApproachNeedsALabelThePlayerCanPress(t *testing.T) {
 		t.Fatal("ordinary approach labels rejected:", err)
 	}
 }
+
+func TestAnApproachLabelDoesNotStopMidPhrase(t *testing.T) {
+	// Observed live: the model wrote up to the 45-character limit and the label
+	// was cut at "Drive directly to the exchange and hand it to".
+	for _, label := range []string{
+		"Drive directly to the exchange and hand it to",
+		"Wait for the buyer and",
+		"Take it round the",
+		"Leave it with a",
+	} {
+		t.Run(label, func(t *testing.T) {
+			if validateApproachLabels(core.Proposal{Approaches: []core.Approach{{Method: "careful", Label: label}}}) == nil {
+				t.Fatal("a label stopping mid-phrase was accepted")
+			}
+		})
+	}
+	for _, label := range []string{
+		"Use the back entrance",
+		"Hand it over quietly",
+		"Drive it across town",
+		"Wait until after dark.",
+	} {
+		t.Run("clean/"+label, func(t *testing.T) {
+			if err := validateApproachLabels(core.Proposal{Approaches: []core.Approach{{Method: "careful", Label: label}}}); err != nil {
+				t.Fatal("a finished label was rejected:", err)
+			}
+		})
+	}
+}

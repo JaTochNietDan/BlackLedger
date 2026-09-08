@@ -53,6 +53,26 @@ func (w *World) SituationalOperations() []SituationalOperation {
 		})
 	}
 
+	// A business short of what it runs on needs somebody to fetch it, and a
+	// business in trouble needs somebody who can deal with that kind of thing.
+	if place, need, ok := w.businessNeed(); ok {
+		out = append(out, SituationalOperation{
+			ID:      "supply",
+			Effect:  Effect{Reward: 95, Respect: 4, Heat: 3, Minutes: 60},
+			Because: fmt.Sprintf("%s is %s, and somebody has to go and get what it needs.", place, need),
+		})
+	}
+
+	// Stock that has to move is the most ordinary reason in this city for
+	// somebody to be asked to carry something.
+	if held := w.Carrying(); held >= 10 {
+		out = append(out, SituationalOperation{
+			ID:      "distribution",
+			Effect:  Effect{Reward: 175, Respect: 5, Heat: 7, Minutes: 75},
+			Because: fmt.Sprintf("There are %d units of stock sitting where they should not be sitting, and every day they sit there is a day somebody could find them.", held),
+		})
+	}
+
 	// A death at the top of an organization leaves arrangements that were only
 	// ever held together by the person who is gone.
 	if name, organization, ok := w.recentLeadershipChange(); ok {
@@ -69,11 +89,34 @@ func (w *World) SituationalOperations() []SituationalOperation {
 // merged into the ordinary catalog when a proposal is validated.
 func SituationalEffects() map[string]Effect {
 	return map[string]Effect{
-		"escort":     {Reward: 165, Respect: 6, Heat: 4, Minutes: 90},
-		"warning":    {Reward: 110, Respect: 7, Heat: 8, Minutes: 60},
-		"recovery":   {Reward: 150, Respect: 5, Heat: 6, Minutes: 75},
-		"settlement": {Reward: 140, Respect: 6, Heat: 3, Minutes: 75},
+		"escort":       {Reward: 165, Respect: 6, Heat: 4, Minutes: 90},
+		"warning":      {Reward: 110, Respect: 7, Heat: 8, Minutes: 60},
+		"recovery":     {Reward: 150, Respect: 5, Heat: 6, Minutes: 75},
+		"settlement":   {Reward: 140, Respect: 6, Heat: 3, Minutes: 75},
+		"supply":       {Reward: 95, Respect: 4, Heat: 3, Minutes: 60},
+		"distribution": {Reward: 175, Respect: 5, Heat: 7, Minutes: 75},
 	}
+}
+
+// businessNeed finds a business of the player's that is short of something,
+// naming the place and what is wrong with it in words a character could say.
+func (w *World) businessNeed() (string, string, bool) {
+	for _, l := range Locations {
+		prop := w.Properties[l.ID]
+		trade, running := TradeOf(l.ID)
+		if !running || prop == nil || !w.Own(l.ID) {
+			continue
+		}
+		switch {
+		case prop.Supply == 0:
+			return l.Name, "out of " + trade.Supplies, true
+		case prop.Trouble:
+			return l.Name, "not running properly", true
+		case prop.Staff < trade.Hands:
+			return l.Name, "short-handed", true
+		}
+	}
+	return "", "", false
 }
 
 // recentSeizure finds ground that changed hands within the last few days, from

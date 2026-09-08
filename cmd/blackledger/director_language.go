@@ -24,10 +24,24 @@ func validateChoiceScript(p core.Proposal) error {
 // An approach is a button the player presses. A blank one is unpressable and
 // reads as a missing option; observed live on qwen3.5:35b-a3b, which returned an
 // empty first label.
+// danglingEnds are words a finished phrase does not end on. A label written up
+// to the length limit gets cut mid-sentence, which reads as a broken button:
+// observed live as "Drive directly to the exchange and hand it to".
+var danglingEnds = map[string]bool{
+	"to": true, "and": true, "the": true, "a": true, "an": true, "at": true,
+	"with": true, "for": true, "of": true, "in": true, "on": true, "from": true,
+	"into": true, "by": true, "or": true, "then": true,
+}
+
 func validateApproachLabels(p core.Proposal) error {
 	for _, a := range p.Approaches {
-		if len(strings.TrimSpace(a.Label)) < 4 {
+		label := strings.TrimSpace(a.Label)
+		if len(label) < 4 {
 			return fmt.Errorf("approach %q has no usable label; give every approach a short phrase naming how the player would do it", a.Method)
+		}
+		words := strings.Fields(strings.Trim(label, ".,;:!?"))
+		if last := strings.ToLower(words[len(words)-1]); danglingEnds[last] {
+			return fmt.Errorf("approach label %q stops mid-phrase on %q; write a short complete phrase of a few words that fits well inside the length limit", label, last)
 		}
 	}
 	return nil

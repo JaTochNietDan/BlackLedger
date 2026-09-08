@@ -956,6 +956,7 @@ func operationLabel(operation string) string {
 	labels := map[string]string{
 		"courier": "Deliver the package", "mediation": "Mediate the dispute", "collection": "Collect the payment",
 		"escort": "Travel with it", "warning": "Deliver the message", "recovery": "Get it out", "settlement": "Settle the matter",
+		"supply": "Fetch what it needs", "distribution": "Move the stock on",
 	}
 	if label, ok := labels[operation]; ok {
 		return label
@@ -965,13 +966,15 @@ func operationLabel(operation string) string {
 
 func operationOutcome(operation string) string {
 	outcomes := map[string]string{
-		"courier":    "You delivered the sealed package and reported back.",
-		"mediation":  "You completed the requested mediation without violence.",
-		"collection": "You collected the agreed payment and reported back.",
-		"escort":     "You saw it across the city and handed it over intact.",
-		"warning":    "You delivered the message in person and walked out.",
-		"recovery":   "You got it out without a confrontation.",
-		"settlement": "You put the matter in front of the new leadership and settled it.",
+		"courier":      "You delivered the sealed package and reported back.",
+		"mediation":    "You completed the requested mediation without violence.",
+		"collection":   "You collected the agreed payment and reported back.",
+		"escort":       "You saw it across the city and handed it over intact.",
+		"warning":      "You delivered the message in person and walked out.",
+		"recovery":     "You got it out without a confrontation.",
+		"settlement":   "You put the matter in front of the new leadership and settled it.",
+		"supply":       "You brought back what the business needed.",
+		"distribution": "You moved the stock across the city and handed it over.",
 	}
 	if outcome, ok := outcomes[operation]; ok {
 		return outcome

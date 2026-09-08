@@ -143,3 +143,57 @@ func TestEveryOperationHasWordsForItsButtonAndItsLedger(t *testing.T) {
 		t.Fatal("an unknown operation rendered a blank button")
 	}
 }
+
+func TestABusinessInTroubleIsAReasonForWork(t *testing.T) {
+	w := New(811)
+	w.Properties["laundry"].Owner = "player:1"
+	if w.hasSituational("supply") {
+		t.Fatal("a business running properly generated work for itself")
+	}
+	w.Properties["laundry"].Supply = 0
+	if !w.hasSituational("supply") {
+		t.Fatal("a business out of supplies generated no work")
+	}
+	because := w.becauseOf("supply")
+	if !strings.Contains(because, "Bluebird Laundry") || !strings.Contains(because, "soap") {
+		t.Fatalf("the reason does not say what is wrong or where: %q", because)
+	}
+	// A business somebody else owns is not the player's problem to solve.
+	other := New(813)
+	other.Properties["laundry"].Supply = 0
+	if other.hasSituational("supply") {
+		t.Fatal("a business the player does not own generated work for them")
+	}
+}
+
+func TestStockThatHasToMoveIsAReasonForWork(t *testing.T) {
+	w := New(817)
+	if w.hasSituational("distribution") {
+		t.Fatal("an empty pocket generated distribution work")
+	}
+	w.Player.Stock = map[string]int{"moonshine": 20}
+	if !w.hasSituational("distribution") {
+		t.Fatal("twenty crates generated no reason to move anything")
+	}
+	if !strings.Contains(w.becauseOf("distribution"), "20") {
+		t.Fatalf("the reason does not say how much: %q", w.becauseOf("distribution"))
+	}
+}
+
+func (w *World) hasSituational(id string) bool {
+	for _, s := range w.SituationalOperations() {
+		if s.ID == id {
+			return true
+		}
+	}
+	return false
+}
+
+func (w *World) becauseOf(id string) string {
+	for _, s := range w.SituationalOperations() {
+		if s.ID == id {
+			return s.Because
+		}
+	}
+	return ""
+}

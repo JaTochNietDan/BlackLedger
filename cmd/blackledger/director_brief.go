@@ -85,6 +85,21 @@ func jobBrief(w *core.World, operation string, connection *core.ArrangementMemor
 		b.RecipientRole = "whoever holds the place now"
 		b.PlayerTask = "Get it out without a confrontation."
 		b.Constraints = []string{"Do not transfer the property itself or change who holds it."}
+	case "supply":
+		b.Premise = "A business is short of what it runs on, and a delivery has to be fetched and brought back."
+		b.SourceRole = "the supplier who has what is needed"
+		b.RecipientRole = "whoever is minding the business"
+		b.PlayerTask = "Collect what the business needs and get it back there."
+		b.Constraints = []string{"Do not change what the business holds; the delivery is the job, not its result."}
+	case "distribution":
+		b.Premise = "Stock is sitting where it should not be sitting and has to be moved on to somebody who will take it."
+		b.SourceRole = "whoever is holding it"
+		b.RecipientRole = "the buyer waiting at the other end"
+		b.PlayerTask = "Move the stock across the city and hand it over."
+		b.Constraints = []string{
+			"Do not name a price or a quantity; the terms are not yours to set.",
+			"Do not decide whether the police are waiting.",
+		}
 	case "settlement":
 		b.Premise = "An arrangement made with somebody who is gone has to be settled with whoever replaced them."
 		b.SourceRole = "the party owed the arrangement"

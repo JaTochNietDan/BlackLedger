@@ -176,3 +176,39 @@ func organizationHoldings(w *core.World) map[string][]string {
 	}
 	return out
 }
+
+// playerSituation is what a contact would plausibly know about how the player
+// is placed: what they run, how it is going, what they are holding and how much
+// attention they have. All of it is already public in the projection; this
+// gathers it so a speaker can refer to it without inventing anything.
+func playerSituation(w *core.World) map[string]any {
+	businesses := []map[string]any{}
+	for _, l := range core.Locations {
+		prop := w.Properties[l.ID]
+		if prop == nil || !w.Own(l.ID) || prop.Income <= 0 {
+			continue
+		}
+		entry := map[string]any{
+			"place":      l.Name,
+			"working_at": fmt.Sprintf("%d%%", int(w.Capacity(l.ID)*100)),
+			"condition":  prop.Condition,
+		}
+		if trade, running := core.TradeOf(l.ID); running {
+			entry["staff"] = fmt.Sprintf("%d of %d", prop.Staff, trade.Hands)
+			if prop.Supply == 0 {
+				entry["short_of"] = trade.Supplies
+			}
+			if prop.Trouble {
+				entry["trouble"] = trade.Trouble
+			}
+		}
+		businesses = append(businesses, entry)
+	}
+	situation := map[string]any{
+		"businesses":       businesses,
+		"police_attention": w.Player.Heat,
+		"carrying_units":   w.Carrying(),
+		"armed":            w.Player.Weapon > 0,
+	}
+	return situation
+}
