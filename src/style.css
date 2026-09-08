@@ -115,3 +115,24 @@
 .paper .cut .press-plate{width:100%;height:auto;display:block;border:1px solid #1b1a16}
 .paper .cut figcaption{font:9px system-ui;letter-spacing:.1em;text-transform:uppercase;color:#6b6455;padding-top:4px;line-height:1.3}
 .paper .nothing{font:italic 14px var(--serif);color:#4a463c;text-align:center;padding:34px 0}
+
+/* The people in the room, each with their own work under their own name. A
+   card rather than a heading, because who somebody is — what they think of
+   you, what they owe, what they hold against you — is the thing the decision
+   is actually about. */
+.people-here{margin-top:20px}
+.presence{background:#141f1e;border:1px solid var(--line);border-left:2px solid #3f4d44;padding:12px 13px;margin-bottom:10px}
+.presence.yours{border-left-color:var(--gold)}
+.presence.sour{border-left-color:#8a5a4d}
+.presence header{display:flex;align-items:flex-start;gap:11px}
+.presence header b{font:16px var(--serif);font-weight:400;display:block;line-height:1.25}
+.presence header small{display:block;font-size:10.5px;color:var(--muted);line-height:1.45}
+.presence header small.warning{color:var(--red)}
+.presence .actions{margin-top:10px;gap:7px}
+.presence .action{padding:9px 11px;background:#1a2725}
+.presence .reveal-blocked{margin-top:6px}
+.presence .nothing-here{margin-top:6px}
+.bystanders{list-style:none;margin:8px 0 0;padding:0;columns:2;column-gap:14px}
+.bystanders li{break-inside:avoid;font-size:11px;padding:3px 0;color:var(--muted)}
+.bystanders li b{display:block;color:var(--ink);font-weight:400;font-size:12px}
+@media(max-width:800px){.bystanders{columns:1}}

@@ -312,7 +312,12 @@ type Action struct {
 	// Group is what this action is for, so the interface can offer ninety of
 	// them in an order a person can navigate. Set by the core, never guessed
 	// by the presentation.
-	Group    string `json:"group"`
+	Group string `json:"group"`
+	// Subject is whose name this action is about, when it is about somebody
+	// standing here rather than about the premises. Lending a man money is not
+	// the same kind of thing as repairing a roof, and a list that shows them
+	// as two identical cards has thrown away what the player needs to decide.
+	Subject  string `json:"subject,omitempty"`
 	ID       string `json:"id"`
 	Label    string `json:"label"`
 	Minutes  int    `json:"minutes"`
@@ -532,7 +537,22 @@ func (w *World) Actions(id string) []Action {
 		if reason == "" && p.Cash < cost {
 			reason = "Not enough cash"
 		}
-		out = append(out, Action{GroupOf(id), id, label, minutes, cost, reason != "", reason, detail, l.ID})
+		// Most work aimed at a person carries their id after the colon, so the
+		// core already knows who it is about without anybody restating it.
+		subject := ""
+		if at := strings.IndexByte(id, ':'); at >= 0 {
+			if who := id[at+1:]; w.NPC(who) != nil {
+				subject = who
+			}
+		}
+		out = append(out, Action{GroupOf(id), subject, id, label, minutes, cost, reason != "", reason, detail, l.ID})
+	}
+	// about names the person the action just added is aimed at, for the ones
+	// that put a name in the label rather than in the id.
+	about := func(who string) {
+		if len(out) > 0 {
+			out[len(out)-1].Subject = who
+		}
 	}
 	need := func(b bool, s string) string {
 		if b {
@@ -580,6 +600,7 @@ func (w *World) Actions(id string) []Action {
 	case "bar":
 		add("courier", "Carry a discreet envelope", 45, 0, "", "Earn $45 and 2 respect. A reliable introduction to the neighborhood.")
 		add("contact", "Buy Mara a coffee", 30, 10, need(p.Contacts >= 5, "Your information network is fully developed"), "Build trust and an information network. Contacts may warn you of trouble.")
+		about(w.HolderID("fixer"))
 		if q, ok := w.OpenQuarrel(); ok {
 			warning := "You would be standing between them."
 			if q.Suspected {
@@ -593,6 +614,7 @@ func (w *World) Actions(id string) []Action {
 			reason = "Leo is already in your crew"
 		}
 		add("recruit", "Recruit Leo Carver", 30, 90, reason, "A driver and collector. $12 daily wages; loyalty matters.")
+		about(w.HolderID("driver"))
 	case "garage":
 		add("audience", "Request an audience with Russo", 45, 0, "", "Discuss your standing with the Russo Outfit.")
 		if next, ok := nextVehicle(p.Car); ok {
@@ -768,6 +790,7 @@ func (w *World) Actions(id string) []Action {
 	if mark, ok := w.MuggingTarget(id); ok {
 		add("mug", "Take what "+mark.Name+" is carrying", MuggingMinutes, 0, w.MuggingReadiness(id),
 			fmt.Sprintf("About $%d on him. Your standing improves the odds and makes you the man he describes afterwards: above %d presence he can name you. He will hold it against you either way, and so will %s.", w.Pockets(mark), RecognisedAt, w.factionName(mark.Faction)))
+		about(mark.ID)
 		if hand, ok := w.CrewHands(); ok {
 			reason := w.MuggingReadiness(id)
 			if reason == "" {
@@ -775,6 +798,7 @@ func (w *World) Actions(id string) []Action {
 			}
 			add("mug:crew", "Send "+hand.Name+" after "+mark.Name, MuggingMinutes, 0, reason,
 				fmt.Sprintf("The same $%d and worse odds, and it is his face rather than yours. %s holds it against him instead.", w.Pockets(mark), mark.Name))
+			about(mark.ID)
 		}
 	}
 	if prop := w.Properties[id]; prop != nil && prop.Income > 0 && !w.Own(id) && p.Charges > 0 {
@@ -1016,7 +1040,9 @@ func (w *World) Actions(id string) []Action {
 			reason = "Leo is already on assignment"
 		}
 		add("delegate", "Send Leo on collections", 15, 0, reason, "Completes after 120 game minutes: $65. Requires 30 loyalty.")
+		about(p.Crew[0].ID)
 		add("crew_bonus", "Pay Leo a bonus", 15, 40, need(p.Crew[0].Loyalty >= 100, "Loyalty is already at its maximum"), "Restore up to 25 loyalty. Below 30 he refuses collections; at 50 he can help protect businesses when available.")
+		about(p.Crew[0].ID)
 	}
 	if offer, ok := w.AvailableCommission(id); ok {
 		add("commission", "Hear what "+offer.GiverName+" wants", 30, 0, w.CommissionReadiness(id),
@@ -1269,7 +1295,7 @@ func (w *World) Public() map[string]any {
 		if w.Own(l.ID) {
 			income += float64(prop.Income*prop.Condition) / 100
 		}
-		locs = append(locs, map[string]any{"id": l.ID, "name": l.Name, "type": l.Type, "district": l.District, "x": l.X, "y": l.Y, "cost": l.Cost, "blurb": l.Blurb, "owner": prop.Owner, "holder": w.HolderName(l.ID), "staff": prop.Staff, "supply": prop.Supply, "trouble": prop.Trouble, "trade": w.CustomDescription(l.ID), "posted": w.PostingDescription(l.ID), "still": prop.Still, "bankroll": prop.Bankroll, "handle": w.NightHandleAt(l.ID), "capacity": w.Capacity(l.ID), "condition": prop.Condition, "income": prop.Income, "owned": w.Own(l.ID), "locked": l.District > w.District, "actions": w.Actions(l.ID)})
+		locs = append(locs, map[string]any{"id": l.ID, "name": l.Name, "type": l.Type, "district": l.District, "x": l.X, "y": l.Y, "cost": l.Cost, "blurb": l.Blurb, "owner": prop.Owner, "holder": w.HolderName(l.ID), "staff": prop.Staff, "supply": prop.Supply, "trouble": prop.Trouble, "trade": w.CustomDescription(l.ID), "posted": w.PostingDescription(l.ID), "people": w.PeopleHere(l.ID), "still": prop.Still, "bankroll": prop.Bankroll, "handle": w.NightHandleAt(l.ID), "capacity": w.Capacity(l.ID), "condition": prop.Condition, "income": prop.Income, "owned": w.Own(l.ID), "locked": l.District > w.District, "actions": w.Actions(l.ID)})
 	}
 	var scene any = nil
 	if e := w.Event; e != nil {
