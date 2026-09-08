@@ -189,3 +189,49 @@ func TestADeadProtagonistsArrangementsDieWithThem(t *testing.T) {
 		t.Fatalf("%d contracts survived the person who paid for them", len(next.Contracts))
 	}
 }
+
+// A headline on its own reads like a log line. Every kind of story the city can
+// file gets a standfirst and a desk that filed it, or the paper prints a line
+// that says nothing.
+func TestEveryKindOfStoryIsSetLikeANewspaper(t *testing.T) {
+	kinds := []string{"police", "politics", "robbery", "business", "killing", "attack",
+		"war", "seizure", "split", "recovery", "collapse", "attempt", "arrest"}
+	w := proprietor(t)
+	generic := 0
+	for _, kind := range kinds {
+		w.Report(kind, "SOMETHING HAPPENED AT BLUEBIRD LAUNDRY", "A thing occurred.")
+		s := w.News[len(w.News)-1]
+		stand, desk := w.standfirst(s), deskFor(kind)
+		if stand == "" || desk == "" {
+			t.Fatalf("%q was filed with standfirst %q and byline %q", kind, stand, desk)
+		}
+		if stand == "The Herald understands the position remains unchanged." {
+			generic++
+			t.Errorf("%q falls through to the generic standfirst", kind)
+		}
+		if desk == "Staff report" {
+			t.Errorf("%q was filed by nobody in particular", kind)
+		}
+	}
+	if generic > 0 {
+		t.Fatalf("%d of %d story kinds have nothing to say under the headline", generic, len(kinds))
+	}
+}
+
+func TestThePaperCarriesADate(t *testing.T) {
+	if got := Dateline(480); got != "Tuesday, March 3, 1953" {
+		t.Fatalf("day one is %q", got)
+	}
+	// It advances a day at a time and rolls over the end of a month.
+	if got := Dateline(29 * 1440); got != "Wednesday, April 1, 1953" {
+		t.Fatalf("day thirty is %q", got)
+	}
+	seen := map[string]bool{}
+	for day := 0; day < 200; day++ {
+		d := Dateline(day * 1440)
+		if d == "" || seen[d] {
+			t.Fatalf("day %d reads %q", day, d)
+		}
+		seen[d] = true
+	}
+}

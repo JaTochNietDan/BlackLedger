@@ -309,6 +309,10 @@ type Command struct {
 	Choice    string `json:"choice"`
 }
 type Action struct {
+	// Group is what this action is for, so the interface can offer ninety of
+	// them in an order a person can navigate. Set by the core, never guessed
+	// by the presentation.
+	Group    string `json:"group"`
 	ID       string `json:"id"`
 	Label    string `json:"label"`
 	Minutes  int    `json:"minutes"`
@@ -528,7 +532,7 @@ func (w *World) Actions(id string) []Action {
 		if reason == "" && p.Cash < cost {
 			reason = "Not enough cash"
 		}
-		out = append(out, Action{id, label, minutes, cost, reason != "", reason, detail, l.ID})
+		out = append(out, Action{GroupOf(id), id, label, minutes, cost, reason != "", reason, detail, l.ID})
 	}
 	need := func(b bool, s string) string {
 		if b {

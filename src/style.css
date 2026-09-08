@@ -68,3 +68,50 @@
 .press-cut { flex: 0 0 112px; line-height: 0; }
 .press-cut .press-plate { width: 112px; height: 80px; display: block; }
 @media (max-width: 640px) { .press-story { flex-direction: column; } }
+
+/* The sidebar is now a grouped, searchable menu rather than one long column.
+   Ninety actions in whatever order the core built them is a wall; headed
+   sections with the unavailable ones folded away is something a person can
+   navigate while a clock is paused waiting for them. */
+.action-list{margin-top:16px}
+.action-search{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.action-search input{flex:1;min-width:0;background:#101a19;border:1px solid var(--line);color:var(--ink);font:12px system-ui;padding:8px 10px;border-radius:2px}
+.action-search input::placeholder{color:#6f7d72}
+.action-search input:focus-visible{outline:2px solid var(--gold);outline-offset:1px}
+.action-search small{color:var(--muted);font-size:10px;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
+.action-group{margin-top:18px}
+.action-group h4{margin:0 0 9px;font:11px system-ui;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);font-weight:500;display:flex;align-items:baseline;gap:9px;border-bottom:1px solid var(--line);padding-bottom:7px}
+.action-group h4 span{font-size:10px;letter-spacing:0;text-transform:none;color:var(--muted);font-weight:400}
+.actions.lead{margin-top:10px}
+.actions.blocked{margin-top:8px;opacity:.72}
+.reveal-blocked{background:none;border:0;border-bottom:1px dotted #55635a;color:var(--muted);font-size:11px;padding:5px 0;margin-top:8px}
+.reveal-blocked:hover{color:var(--gold);background:none}
+.nothing-here{color:var(--muted);font-size:11px;margin:4px 0 0;font-style:italic}
+@media(max-width:800px){.action-group h4{flex-direction:column;gap:2px}}
+
+/* The Herald should look like a paper somebody left on a table in 1953, not a
+   list of cards. Two columns, a rule under the masthead, a dateline, drop caps
+   on the lead story and the body set in the serif the rest of the game reserves
+   for headings. */
+.paper{background:#e6e1d2;color:#1b1a16;padding:30px 34px 38px;margin-top:22px;box-shadow:0 18px 60px #0007;max-width:1080px;
+  background-image:radial-gradient(#0000000d 1px,transparent 1px);background-size:3px 3px}
+.paper .masthead{text-align:center;border-bottom:3px double #1b1a16;padding-bottom:12px}
+.paper .masthead h1{font:700 46px/1 var(--serif);letter-spacing:.02em;margin:0;color:#12110e}
+.paper .masthead .rule{display:flex;justify-content:space-between;font:10px system-ui;letter-spacing:.18em;text-transform:uppercase;color:#4a463c;border-top:1px solid #1b1a16;margin-top:11px;padding-top:7px}
+.paper .columns{column-count:2;column-gap:30px;column-rule:1px solid #b6ae9a;margin-top:20px}
+@media(max-width:900px){.paper .columns{column-count:1}.paper .masthead h1{font-size:32px}}
+.paper article{break-inside:avoid;margin:0 0 22px;padding-bottom:18px;border-bottom:1px solid #c3bba6}
+.paper article:last-child{border-bottom:0}
+.paper h2{font:700 21px/1.15 var(--serif);margin:0 0 5px;color:#12110e;text-wrap:balance}
+.paper .standfirst{font:italic 13px/1.5 var(--serif);color:#4a463c;margin:0 0 8px}
+.paper .byline{font:9px system-ui;letter-spacing:.16em;text-transform:uppercase;color:#6b6455;margin:0 0 7px}
+.paper p.body{font:13.5px/1.62 var(--serif);margin:0;color:#22211c;hyphens:auto}
+.paper .lead{column-span:all;border-bottom:1px solid #1b1a16;padding-bottom:16px;margin-bottom:18px}
+.paper .lead h2{font-size:33px;line-height:1.06;letter-spacing:-.01em}
+.paper .lead .standfirst{font-size:15px}
+.paper .lead p.body:first-letter{float:left;font:600 46px/.82 var(--serif);padding:3px 8px 0 0;color:#12110e}
+.paper .cut{float:right;width:104px;margin:0 0 8px 12px;line-height:0;filter:grayscale(1) contrast(1.15)}
+.paper .lead .cut{width:180px;margin-left:20px}
+.paper .cut .press-plate{width:100%;height:auto;display:block;border:1px solid #1b1a16}
+.paper .cut figcaption{font:9px system-ui;letter-spacing:.1em;text-transform:uppercase;color:#6b6455;padding-top:4px;line-height:1.3}
+.paper .nothing{font:italic 14px var(--serif);color:#4a463c;text-align:center;padding:34px 0}
