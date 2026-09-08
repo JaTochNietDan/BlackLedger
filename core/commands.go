@@ -248,6 +248,22 @@ func (w *World) apply(c Command) error {
 				if err := w.BuyArms(strings.TrimPrefix(c.Kind, "arms:")); err != nil {
 					return err
 				}
+			case "hire":
+				if err := w.Hire(target); err != nil {
+					return err
+				}
+			case "layoff":
+				if err := w.LayOff(target); err != nil {
+					return err
+				}
+			case "restock":
+				if err := w.Restock(target); err != nil {
+					return err
+				}
+			case "remedy":
+				if err := w.Remedy(target); err != nil {
+					return err
+				}
 			case "deposit":
 				if err := w.Deposit(); err != nil {
 					return err
@@ -333,6 +349,14 @@ func (w *World) apply(c Command) error {
 					}
 					priorOwner := w.Properties[target].Owner
 					w.Properties[target].Owner = fmt.Sprintf("player:%d", w.Life)
+					// A business is bought as a going concern: the people
+					// working it and what it runs on come with it. Keeping them
+					// is the player's problem from here.
+					if trade, running := TradeOf(target); running {
+						prop := w.Properties[target]
+						prop.Staff = max(prop.Staff, trade.Hands)
+						prop.Supply = max(prop.Supply, trade.RestockAmount)
+					}
 					p.Respect += 4
 					l, _ := PlaceByID(target)
 					w.Log("A foothold in the city", l.Name+" now produces income for you. Earnings accrue as game time passes.", "business")

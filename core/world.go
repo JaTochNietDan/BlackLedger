@@ -101,6 +101,12 @@ type Property struct {
 	// How the business is run. Empty means the ordinary way, so saves written
 	// before this was a decision keep earning exactly what they earned.
 	Mode string `json:"mode,omitempty"`
+	// The inside of a business: who works it, what it runs on, and whether
+	// something has gone wrong. Absent in older saves, which read as a business
+	// nobody has staffed yet.
+	Staff   int  `json:"staff,omitempty"`
+	Supply  int  `json:"supply,omitempty"`
+	Trouble bool `json:"trouble,omitempty"`
 }
 type Plot struct {
 	Target   string `json:"target,omitempty"`
@@ -337,7 +343,14 @@ func New(seed uint32) *World {
 		case "bar":
 			income = 12
 		}
-		w.Properties[p.ID] = &Property{Owner: owner, Condition: 100, Income: income}
+		property := &Property{Owner: owner, Condition: 100, Income: income}
+		// A trading business is already running before anybody buys it: it has
+		// people working it and something to work with. Ownership changes who
+		// answers for that, not whether it exists.
+		if trade, running := TradeOf(p.ID); running {
+			property.Staff, property.Supply = trade.Hands, trade.RestockAmount
+		}
+		w.Properties[p.ID] = property
 	}
 	// Each organization is people, not a name and a number. These are the ones
 	// who would step up if the person above them died.
@@ -402,7 +415,7 @@ func (w *World) Guard() int {
 	return n
 }
 func (w *World) DailyCost() int {
-	return HomeRent(w.Player.Home) + 10*w.Player.Security + 12*len(w.Player.Crew)
+	return HomeRent(w.Player.Home) + 10*w.Player.Security + 12*len(w.Player.Crew) + w.Wages()
 }
 func TravelMinutes(a, b string) int {
 	x, _ := PlaceByID(a)
@@ -517,6 +530,19 @@ func (w *World) Actions(id string) []Action {
 	if id == "laundry" || id == "garage" || id == "casino" {
 		if w.Own(id) {
 			add("inspect", "Review the books", 0, 0, "", "Read current income and repair needs without advancing time.")
+			if trade, running := TradeOf(id); running {
+				prop := w.Properties[id]
+				add("hire", "Take somebody on", 45, 0, w.HireReadiness(id),
+					fmt.Sprintf("%d of %d positions filled. A week's wages up front at $%d a day after. Short-handed, it earns less and attracts trouble.", prop.Staff, trade.Hands, trade.Wage))
+				add("layoff", "Let somebody go", 30, 0, w.LayOffReadiness(id),
+					fmt.Sprintf("Cuts $%d a day from the wage bill and what the place can handle.", trade.Wage))
+				add("restock", "Buy "+trade.Supplies, 45, 0, w.RestockReadiness(id),
+					fmt.Sprintf("$%d. Currently %d left; a business out of %s barely trades.", trade.Restock, prop.Supply, trade.Supplies))
+				if prop.Trouble {
+					add("remedy", trade.Remedy, 60, 0, w.RemedyReadiness(id),
+						fmt.Sprintf("$%d. %s %s", trade.RemedyCost, trade.Trouble, trade.RemedyDetail))
+				}
+			}
 			if w.Properties[id].Income > 0 {
 				current := w.Mode(id)
 				for _, m := range operatingModes {
@@ -693,7 +719,7 @@ func (w *World) Advance(minutes int) {
 		w.Minute = next
 		for id, prop := range w.Properties {
 			if w.Own(id) {
-				prop.Carry += float64(prop.Income*prop.Condition*elapsed) * operatingMode(prop.Mode).Take / 6000
+				prop.Carry += float64(prop.Income*prop.Condition*elapsed) * operatingMode(prop.Mode).Take * w.Capacity(id) / 6000
 				n := int(prop.Carry + 1e-9)
 				prop.Carry -= float64(n)
 				w.Earn(n)
@@ -721,6 +747,7 @@ func (w *World) Advance(minutes int) {
 			w.ContrabandDay()
 			w.PoliceDay()
 			w.PeopleDay()
+			w.OperationsDay()
 			bill := w.DailyCost()
 			if p.Cash >= bill {
 				p.Cash -= bill
@@ -796,7 +823,7 @@ func (w *World) Public() map[string]any {
 		if w.Own(l.ID) {
 			income += float64(prop.Income*prop.Condition) / 100
 		}
-		locs = append(locs, map[string]any{"id": l.ID, "name": l.Name, "type": l.Type, "district": l.District, "x": l.X, "y": l.Y, "cost": l.Cost, "blurb": l.Blurb, "owner": prop.Owner, "holder": w.HolderName(l.ID), "condition": prop.Condition, "income": prop.Income, "owned": w.Own(l.ID), "locked": l.District > w.District, "actions": w.Actions(l.ID)})
+		locs = append(locs, map[string]any{"id": l.ID, "name": l.Name, "type": l.Type, "district": l.District, "x": l.X, "y": l.Y, "cost": l.Cost, "blurb": l.Blurb, "owner": prop.Owner, "holder": w.HolderName(l.ID), "staff": prop.Staff, "supply": prop.Supply, "trouble": prop.Trouble, "capacity": w.Capacity(l.ID), "condition": prop.Condition, "income": prop.Income, "owned": w.Own(l.ID), "locked": l.District > w.District, "actions": w.Actions(l.ID)})
 	}
 	var scene any = nil
 	if e := w.Event; e != nil {

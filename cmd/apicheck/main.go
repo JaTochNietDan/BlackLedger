@@ -47,6 +47,7 @@ var idle = []string{"rest", "wait"}
 var ventures = []string{
 	"launder", "bribe", "rob", "sabotage", "incite", "contract",
 	"deposit", "offshore_access", "withdraw",
+	"hire", "restock", "remedy", "layoff",
 	"play:small", "play:high", "buy:moonshine", "buy:cigarettes",
 	"sell:moonshine", "sell:cigarettes", "arms:weapon", "arms:armour",
 	"operate:hard", "operate:clean", "operate:standard", "inspect", "investigate", "lie_low",

@@ -50,6 +50,21 @@ func TestSkimmingPaysOnlyIfTheAttentionIsManaged(t *testing.T) {
 						w.Player.Cash -= 50
 						w.Properties["laundry"].Condition = min(100, w.Properties["laundry"].Condition+40)
 					}
+					// Managing a business now means running it as well as
+					// laundering through it: keeping it stocked, keeping it
+					// staffed, and dealing with what goes wrong inside it.
+					for _, id := range []string{"laundry", "garage"} {
+						w.Player.Location = id
+						if w.RestockReadiness(id) == "" && w.Properties[id].Supply < 15 {
+							_ = w.Restock(id)
+						}
+						if w.RemedyReadiness(id) == "" {
+							_ = w.Remedy(id)
+						}
+						if w.HireReadiness(id) == "" {
+							_ = w.Hire(id)
+						}
+					}
 				}
 			}
 			total.cash += w.Player.Cash - start
