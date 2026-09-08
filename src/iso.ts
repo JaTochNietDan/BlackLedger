@@ -514,3 +514,39 @@ export function terrace(cell: Cell, slots = 3): Slot[] {
 // Which slot an address takes: the middle of the near row, so the building the
 // player came to see faces the street and is never hidden behind another.
 export const addressSlot = (slots = 3) => Math.floor(slots / 2);
+
+// ---------------------------------------------------------------------------
+// What is painted on the road.
+//
+// An empty carriageway with a dashed centre line is a diagram of a road. What
+// makes it a street is the paint at the junctions: the bars of a crossing, the
+// stop line a car waits behind. All of it is laid on the grid, so it lines up
+// with the kerbs by construction rather than by being nudged.
+
+export type Marking = {kind: 'crossing' | 'stop'; at: Vec; along: Vec; width: number};
+
+// Crossings go across the carriageway on the approach to a junction, and stop
+// lines sit just behind them. Both are placed from the block grid, so every
+// junction in the city is marked the same way.
+export function markings({cols, rows}: {cols: number; rows: number}): Marking[] {
+  const out: Marking[] = [];
+  const back = ROAD * .62;                    // how far from the centre of the junction
+  for (let col = 0; col <= cols; col++) {
+    for (let row = 0; row <= rows; row++) {
+      const x = col * BLOCK, y = row * BLOCK;
+      // Only where two carriageways actually meet.
+      const hasEast = col < cols, hasSouth = row < rows;
+      if (hasSouth) {
+        // Crossing the north-south street, on the south side of the junction.
+        out.push({kind: 'crossing', at: {x, y: y + back}, along: {x: 1, y: 0}, width: ROAD});
+        out.push({kind: 'stop', at: {x, y: y + back + .16}, along: {x: 1, y: 0}, width: ROAD});
+      }
+      if (hasEast) {
+        // And the east-west street, on the east side.
+        out.push({kind: 'crossing', at: {x: x + back, y}, along: {x: 0, y: 1}, width: ROAD});
+        out.push({kind: 'stop', at: {x: x + back + .16, y}, along: {x: 0, y: 1}, width: ROAD});
+      }
+    }
+  }
+  return out;
+}

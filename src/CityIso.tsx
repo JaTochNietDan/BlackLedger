@@ -2,7 +2,7 @@ import {useEffect, useRef} from 'react';
 import {Application, Assets, Container, Graphics, Sprite, Text, Texture, TextStyle} from 'pixi.js';
 import {Viewport} from 'pixi-viewport';
 import type {Snapshot} from './types';
-import {addressSlot, along, blockFor, BLOCK, bounds, carriageways, distance, dressing, faces, fillerShape, grid, island, kerbside, lampPosts, middle, mix, nightness, PAVE, plot, project, ROAD, size, terrace, TILE, walk, wires} from './iso';
+import {addressSlot, along, blockFor, BLOCK, bounds, carriageways, distance, dressing, faces, fillerShape, grid, island, kerbside, lampPosts, markings, middle, mix, nightness, PAVE, plot, project, ROAD, size, terrace, TILE, walk, wires} from './iso';
 import type {Cell, Vec} from './iso';
 import cutouts from '../public/art/iso/isometric.json';
 import type {Spotlight} from './CityStreet';
@@ -436,7 +436,44 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight}: {
       }
     }
     paint.stroke({width: 1.3, color: 0x6d6a52, alpha: .35});
-    layer.addChild(paint);
+
+    // The paint at the junctions: the bars of a crossing and the line a car
+    // waits behind. Laid from the same grid as the kerbs, so it lines up by
+    // construction rather than by being nudged into place.
+    const road_paint = new Graphics();
+    for (const mark of markings(size)) {
+      const across = {x: -mark.along.y, y: mark.along.x};   // square to the street
+      if (mark.kind === 'crossing') {
+        const bars = 5;
+        for (let i = 0; i < bars; i++) {
+          const t = (i + .5) / bars - .5;
+          const centre = {
+            x: mark.at.x + across.x * t * mark.width * .82,
+            y: mark.at.y + across.y * t * mark.width * .82,
+          };
+          const half = .085, long = .30;
+          const corners = [
+            {x: centre.x - across.x * half - mark.along.x * long, y: centre.y - across.y * half - mark.along.y * long},
+            {x: centre.x + across.x * half - mark.along.x * long, y: centre.y + across.y * half - mark.along.y * long},
+            {x: centre.x + across.x * half + mark.along.x * long, y: centre.y + across.y * half + mark.along.y * long},
+            {x: centre.x - across.x * half + mark.along.x * long, y: centre.y - across.y * half + mark.along.y * long},
+          ].map(project);
+          road_paint.poly(corners.flatMap(c => [c.x, c.y]));
+        }
+      } else {
+        const half = mark.width * .44, thick = .05;
+        const corners = [
+          {x: mark.at.x - across.x * half - mark.along.x * thick, y: mark.at.y - across.y * half - mark.along.y * thick},
+          {x: mark.at.x + across.x * half - mark.along.x * thick, y: mark.at.y + across.y * half - mark.along.y * thick},
+          {x: mark.at.x + across.x * half + mark.along.x * thick, y: mark.at.y + across.y * half + mark.along.y * thick},
+          {x: mark.at.x - across.x * half + mark.along.x * thick, y: mark.at.y - across.y * half + mark.along.y * thick},
+        ].map(project);
+        road_paint.poly(corners.flatMap(c => [c.x, c.y]));
+      }
+    }
+    // Worn paint, not fresh: it has been on the road a while.
+    road_paint.fill({color: mix(0xd8d2b8, 0x9a957f, .35 + dark * .3), alpha: .34});
+    layer.addChild(paint, road_paint);
 
     // The lamps, at every corner of every block, and the pools they throw.
     const glow = new Graphics();
