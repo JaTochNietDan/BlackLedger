@@ -1239,3 +1239,11 @@
 - **A misleading field name found on the way.** `Player.CarWear` is the car's *condition*, not its wear: zero is a wreck and a hundred is a car that runs. The first version of the test set it to zero to mean "no wear" and got a car that would not start. Noted where it will be read next.
 - On the live campaign, standing at Mercer Exchange: Saint Agnes round the corner at 15 minutes, The Monarch a short walk at 20, Pier 14 the other side of the district at 60.
 - `mise run verify` passes.
+
+## The people the scene is about
+- The theatre named who was in a moment and then drew nobody: the cue carried *Detective Harlow* as a string and the scene put the words under the picture. **A scene about somebody that cannot show them is a scene about nobody.**
+- A cue's actors carry their **ids** alongside their names now, because a face is drawn from an id. The theatre shows them under the plate: the arrest is Ward Street Station, the caption, Detective Harlow's face, and then the Herald headline. A test holds that every name a cue carries resolves to a person the city can find and draw — a cue naming somebody who does not exist would fail rather than rendering a blank square.
+- **What the scene deliberately does not show.** A killing names its victim and nobody else. The city knows who arranged it and the paper is careful never to print that; showing the killer's face in the theatre would leak exactly what the newspaper is written to withhold. The scene stops where the paper stops.
+- An anonymous event still names nobody, which is correct: a window put in at the Bluebird by people who left no proof shows the plate, the caption, and no faces at all. Verified both ways in a browser.
+- A `killing` fixture was added for QA, and finding that a fixture-time killing produces no scene taught something worth writing down: **`VisualCues` is `json:"-"`**, so a cue only exists inside the command that made it. A fixture can set up the state that will cause a moment, never the moment itself.
+- `mise run verify` passes.

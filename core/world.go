@@ -237,6 +237,12 @@ type Director struct {
 // VisualCue is the core saying what a moment looked like and where. It is not
 // choreography — the interface decides how a thing is played — but what
 // happened, to whom, and what the paper will say about it belongs here.
+// CueActor is somebody who was in a moment.
+type CueActor struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+}
+
 type VisualCue struct {
 	ID      string `json:"id"`
 	Kind    string `json:"kind"`
@@ -245,8 +251,10 @@ type VisualCue struct {
 	// Headline is what the Herald carries about it, so the paper can arrive
 	// after the scene rather than instead of it.
 	Headline string `json:"headline,omitempty"`
-	// Actors are the people who were in it, by name.
-	Actors []string `json:"actors,omitempty"`
+	// Actors are the people who were in it. Their ids travel with their names
+	// because a face is drawn from an id, and a scene about somebody that
+	// cannot show them is a scene about nobody.
+	Actors []CueActor `json:"actors,omitempty"`
 	// Gravity is how much it is worth stopping for, so the interface never has
 	// to guess which of five things in one command is the one to show.
 	Gravity int `json:"gravity,omitempty"`

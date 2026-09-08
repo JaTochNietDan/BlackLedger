@@ -43,10 +43,10 @@ func (w *World) Witness(kind, place, caption, headline string, actors ...string)
 		// to drop it than to send the interface somewhere that does not exist.
 		return
 	}
-	named := []string{}
+	named := []CueActor{}
 	for _, id := range actors {
 		if n := w.NPC(id); n != nil {
-			named = append(named, n.Name)
+			named = append(named, CueActor{ID: n.ID, Name: n.Name})
 		}
 	}
 	w.VisualCues = append(w.VisualCues, VisualCue{

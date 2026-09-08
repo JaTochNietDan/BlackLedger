@@ -48,8 +48,12 @@ func TestAKillingIsSomethingYouSee(t *testing.T) {
 	if !found {
 		t.Fatalf("the scene promises %q and the paper never carried it", cue.Headline)
 	}
-	if len(cue.Actors) == 0 || cue.Actors[0] != victim.Name {
+	if len(cue.Actors) == 0 || cue.Actors[0].Name != victim.Name {
 		t.Fatalf("the scene is about %v", cue.Actors)
+	}
+	// The face has to be drawable, which means the id travels with the name.
+	if cue.Actors[0].ID != victim.ID || w.NPC(cue.Actors[0].ID) == nil {
+		t.Fatalf("the scene names %q with id %q, which draws nobody", cue.Actors[0].Name, cue.Actors[0].ID)
 	}
 }
 
@@ -134,4 +138,37 @@ func TestAKillingIsHeldLongerThanARobbery(t *testing.T) {
 			t.Fatalf("%q is held for %dms", kind, h)
 		}
 	}
+}
+
+func TestAnybodyAMomentNamesCanBeDrawn(t *testing.T) {
+	// A scene about somebody that cannot show them is a scene about nobody, so
+	// every name a cue carries must resolve to a person the city holds.
+	w, _ := testator(t)
+	w.Populate()
+	w.VisualCues = nil
+	w.Player.Heat = 60
+	w.search()
+	if victim := w.NPC("mara"); victim != nil {
+		victim.Location = "bar"
+		w.Kill(victim.ID, "Shot twice at the counter.")
+	}
+	w.Player.Location = "laundry"
+	w.Confine(3, "a still")
+
+	named := 0
+	for _, cue := range w.VisualCues {
+		for _, a := range cue.Actors {
+			named++
+			if a.ID == "" || a.Name == "" {
+				t.Fatalf("a %q names %+v", cue.Kind, a)
+			}
+			if n := w.NPC(a.ID); n == nil || n.Name != a.Name {
+				t.Fatalf("a %q names %q as %q, which the city cannot find", cue.Kind, a.ID, a.Name)
+			}
+		}
+	}
+	if named == 0 {
+		t.Fatal("a raid, a killing and an arrest named nobody between them")
+	}
+	t.Logf("%d cues naming %d people, every one of them drawable", len(w.VisualCues), named)
 }

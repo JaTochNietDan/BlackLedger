@@ -1,5 +1,6 @@
 import {useEffect,useState} from 'react';
 import type {Place,VisualCue} from './types';
+import {Portrait} from './Portrait';
 
 // The loudest moments of a campaign arrived as a paragraph in a list, and the
 // paper reported them the next morning to a player who never saw them. This is
@@ -121,7 +122,14 @@ export function Theatre({cue, place, onDone}: {cue: VisualCue; place: Place; onD
       style={painted ? {backgroundImage: `url(${scenePlate(cue.kind)})`} : undefined}
       dangerouslySetInnerHTML={{__html: stage(cue.kind, place, t, painted)}}/>
     <p className="theatre-caption">{cue.caption}</p>
-    {!!cue.actors?.length && <p className="theatre-actors">{cue.actors.join(' · ')}</p>}
+    {!!cue.actors?.length && <div className="theatre-cast">
+      {/* The core names who was in it. A scene about somebody that cannot show
+          them is a scene about nobody. */}
+      {cue.actors.map(a => <span key={a.id} className="theatre-face">
+        <Portrait id={a.id} size="small"/>
+        <small>{a.name}</small>
+      </span>)}
+    </div>}
     {paper && cue.headline && <div className="theatre-paper">
       <small>THE BELLWETHER HERALD</small>
       <b>{cue.headline}</b>

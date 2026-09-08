@@ -12,13 +12,13 @@ import (
 
 func main() {
 	if len(os.Args) < 2 || len(os.Args) > 3 {
-		log.Fatal("usage: go run ./cmd/qa-fixture <new-qa.sqlite3> [police|damage|warning|russo-warning|attack|voice|contact|paused-job|leader|doorman|arrest|debt|herald]")
+		log.Fatal("usage: go run ./cmd/qa-fixture <new-qa.sqlite3> [police|damage|warning|russo-warning|attack|voice|contact|paused-job|leader|doorman|arrest|debt|herald|killing]")
 	}
 	scenario := "police"
 	if len(os.Args) == 3 {
 		scenario = os.Args[2]
 	}
-	if scenario != "police" && scenario != "damage" && scenario != "warning" && scenario != "russo-warning" && scenario != "attack" && scenario != "voice" && scenario != "contact" && scenario != "paused-job" && scenario != "leader" && scenario != "doorman" && scenario != "arrest" && scenario != "debt" && scenario != "herald" {
+	if scenario != "police" && scenario != "damage" && scenario != "warning" && scenario != "russo-warning" && scenario != "attack" && scenario != "voice" && scenario != "contact" && scenario != "paused-job" && scenario != "leader" && scenario != "doorman" && scenario != "arrest" && scenario != "debt" && scenario != "herald" && scenario != "killing" {
 		log.Fatal("unsupported QA scenario")
 	}
 	path := os.Args[1]
@@ -50,6 +50,21 @@ func main() {
 				return err
 			}
 			*w = *next
+			return nil
+		}
+		if scenario == "killing" {
+			// Somebody the player knows, dead where they stood, so the theatre
+			// has a face to show and a headline to follow it.
+			w.Player.Cash, w.Player.Respect = 6000, 40
+			w.Properties["laundry"].Owner = "player:1"
+			w.Player.Location = "bar"
+			victim := w.NPC("mara")
+			if victim == nil {
+				return fmt.Errorf("nobody to lose")
+			}
+			victim.Location = "bar"
+			w.VisualCues = nil
+			w.Kill(victim.ID, "Shot twice at the counter, in front of everyone and nobody.")
 			return nil
 		}
 		if scenario == "herald" {
