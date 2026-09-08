@@ -684,7 +684,8 @@ func (w *World) Actions(id string) []Action {
 				fmt.Sprintf("$%d for the %d days still on him. He comes out owing you, which is not the same as being grateful.", days*BailDaily, days))
 		}
 	case "bar":
-		add("courier", "Carry a discreet envelope", 45, 0, "", "Earn $45 and 2 respect. A reliable introduction to the neighborhood.")
+		add("courier", "Carry a discreet envelope", CourierMinutes, 0, "",
+			fmt.Sprintf("Earn $%d and %d respect. A reliable introduction to the neighborhood.", CourierPay, CourierRespect))
 		add("contact", "Buy Mara a coffee", 30, 10, need(p.Contacts >= 5, "Your information network is fully developed"), "Build trust and an information network. Contacts may warn you of trouble.")
 		about(w.HolderID("fixer"))
 		if q, ok := w.OpenQuarrel(); ok {

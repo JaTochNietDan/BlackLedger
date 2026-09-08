@@ -66,7 +66,7 @@ func (w *World) Guide() []Step {
 	}
 
 	steps := []Step{
-		step("Somewhere to start", "Carry envelopes at Saint Agnes for $45 and two respect. It costs nothing but the hour.",
+		step("Somewhere to start", fmt.Sprintf("Carry envelopes at Saint Agnes for $%d and %d respect. It costs nothing but the hour.", CourierPay, CourierRespect),
 			"", p.JobCount > 0),
 		step("Somebody who knows people", "Buy Mara a coffee. Contacts are how you hear that somebody is coming before they arrive.",
 			need(p.Contacts >= 5, "Your information network is fully developed"), p.Contacts > 1),
@@ -76,7 +76,7 @@ func (w *World) Guide() []Step {
 			w.incorporationReason(), w.Incorporated()),
 		step("People who answer to you", "Sign somebody on. They add to what you are worth in a fight and stand in front of what comes at you.",
 			firstOpenPerson(w, w.SignOnReadiness), len(w.OwnPeople()) > 0),
-		step("Somebody on the door", "One of your people, standing at a business. Harder to rob, harder to take, and they are the one standing in it when somebody comes.",
+		step("Somebody on the door", "One of your people, standing at a business. Harder to rob, harder to take, and they are the one standing in it when somebody comes. They have to walk there first, and the door is worth nothing until they arrive.",
 			firstOpen(w.PostReadiness), w.anyPosted()),
 		step("Money on the street", fmt.Sprintf("Lend at %d%% over %d days. It is the oldest business this trade has.", int(LoanRate*100), LoanTermDays),
 			firstOpenPerson(w, w.LendReadiness), len(w.Book()) > 0),
@@ -99,10 +99,11 @@ func (w *World) Guide() []Step {
 func GuideRules() []string {
 	return []string{
 		"The clock only moves when you commit to something. Reading, inspecting and choosing cost nothing.",
-		"Attention is public and so are the thresholds. Past 45 the police come to the door; past 80 they take the premises.",
+		fmt.Sprintf("Attention is public and so are the thresholds. Past %d the police come to the door; past %d they take the premises.", RaidThreshold, ForfeitThreshold),
 		"The city does not scale to you. An organization at ninety strength will kill you on your first day if you give it a reason.",
 		"Death is permanent. What you built passes to the strongest of your own people and becomes an organization you can deal with, or fight.",
 		"Everything anybody in this city does is done by the same rules you use. There is no separate arithmetic for them.",
+		"People are not furniture. They walk between buildings on their own errands, and anybody out on the street is not at the address they left and cannot be dealt with until they arrive — including your own, when you send them somewhere.",
 	}
 }
 

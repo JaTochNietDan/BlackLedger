@@ -1,6 +1,9 @@
 package core
 
-import "testing"
+import (
+	"strings"
+	"testing"
+)
 
 // The Guide was prose written when this game had eight actions, and it rotted:
 // it still told the player that autonomous family politics was future work, in
@@ -91,5 +94,91 @@ func TestTheRulesAreShortAndTrue(t *testing.T) {
 		if len(r) < 30 {
 			t.Fatalf("a rule reads %q", r)
 		}
+	}
+}
+
+// The rules are the one part of the guide that is written down once rather
+// than answered by the game, so they are the one part that can rot silently.
+// Every number in them is a constant somewhere; if the constant moves and the
+// sentence does not, the guide is lying to a new player about the only
+// thresholds this game promises are public.
+func TestTheRulesQuoteNumbersTheGameStillUses(t *testing.T) {
+	joined := strings.Join(GuideRules(), " ")
+	for _, quoted := range []struct {
+		what  string
+		value int
+	}{
+		{"the attention at which the police come to the door", RaidThreshold},
+		{"the attention at which they take the premises", ForfeitThreshold},
+	} {
+		if !strings.Contains(joined, itoa(quoted.value)) {
+			t.Errorf("the rules no longer mention %s (%d): %q", quoted.what, quoted.value, joined)
+		}
+	}
+	// And no number appears in them that is not one of the game's own.
+	real := map[string]bool{itoa(RaidThreshold): true, itoa(ForfeitThreshold): true, "90": true}
+	for _, r := range GuideRules() {
+		for i := 0; i < len(r); i++ {
+			if r[i] < '0' || r[i] > '9' {
+				continue
+			}
+			j := i
+			for j < len(r) && r[j] >= '0' && r[j] <= '9' {
+				j++
+			}
+			if !real[r[i:j]] {
+				t.Errorf("the rules quote %q, which is not a threshold this game uses: %q", r[i:j], r)
+			}
+			i = j
+		}
+	}
+}
+
+// A new player has to be told that the city keeps its own hours. People walk
+// between buildings now, and somebody who reads the rules and then travels
+// across town to a room the screen named will find it empty.
+func TestTheRulesSayThatPeopleMove(t *testing.T) {
+	joined := strings.ToLower(strings.Join(GuideRules(), " "))
+	for _, want := range []string{"walk", "street"} {
+		if !strings.Contains(joined, want) {
+			t.Fatalf("the rules never mention %q, in a game where the city walks around: %q", want, joined)
+		}
+	}
+}
+
+// The first thing a new player is told has to be what the first thing a new
+// player does actually pays. The figure used to be a literal in four places —
+// the payment, the log line, the button and this sentence — beside an
+// unrelated 45 for how long the job takes.
+func TestTheFirstStepQuotesTheFirstJob(t *testing.T) {
+	w := New(4)
+	w.Player.Location = "bar"
+	var button Action
+	for _, a := range w.Actions("bar") {
+		if a.ID == "courier" {
+			button = a
+		}
+	}
+	if button.ID == "" {
+		t.Fatal("the first job is not offered at the bar")
+	}
+	opening := w.Guide()[0]
+	for _, want := range []string{itoa(CourierPay), itoa(CourierRespect)} {
+		if !strings.Contains(opening.What, want) {
+			t.Errorf("the guide's opening step does not mention %q: %q", want, opening.What)
+		}
+		if !strings.Contains(button.Detail, want) {
+			t.Errorf("the button does not mention %q: %q", want, button.Detail)
+		}
+	}
+	// And doing it pays what both of them said.
+	cash, respect := w.Player.Cash, w.Player.Respect
+	next, err := Execute(w, Command{RequestID: ID(), Revision: w.Revision, Kind: "courier", Target: "bar"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if next.Player.Cash-cash != CourierPay || next.Player.Respect-respect != CourierRespect {
+		t.Fatalf("the guide promises $%d and %d respect; the job paid $%d and %d",
+			CourierPay, CourierRespect, next.Player.Cash-cash, next.Player.Respect-respect)
 	}
 }

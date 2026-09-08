@@ -118,3 +118,15 @@ func (w *World) onARound(id string) bool {
 	}
 	return false
 }
+
+const (
+	// CourierPay and CourierRespect are what the first job in the game is
+	// worth. The figure lived as a literal in four places — the payment, the
+	// log line, the button and the guide — beside an unrelated 45 for how long
+	// it takes, which is the shape of a number that eventually stops agreeing
+	// with itself.
+	CourierPay     = 45
+	CourierRespect = 2
+	// CourierMinutes is how long it takes, which is a different 45.
+	CourierMinutes = 45
+)

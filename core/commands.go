@@ -550,10 +550,10 @@ func (w *World) apply(c Command) error {
 			if p.Alive && w.Event == nil {
 				switch c.Kind {
 				case "courier":
-					w.Earn(45)
-					p.Respect += 2
+					w.Earn(CourierPay)
+					p.Respect += CourierRespect
 					p.JobCount++
-					w.Log("Envelope delivered", "Mara pays $45. A small favor, completed without questions.", "work")
+					w.Log("Envelope delivered", fmt.Sprintf("Mara pays $%d. A small favor, completed without questions.", CourierPay), "work")
 				case "dockwork":
 					w.Earn(75)
 					p.Respect++
