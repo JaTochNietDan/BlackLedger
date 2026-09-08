@@ -12,13 +12,13 @@ import (
 
 func main() {
 	if len(os.Args) < 2 || len(os.Args) > 3 {
-		log.Fatal("usage: go run ./cmd/qa-fixture <new-qa.sqlite3> [police|damage|warning|russo-warning|attack|voice|contact|paused-job|leader]")
+		log.Fatal("usage: go run ./cmd/qa-fixture <new-qa.sqlite3> [police|damage|warning|russo-warning|attack|voice|contact|paused-job|leader|doorman]")
 	}
 	scenario := "police"
 	if len(os.Args) == 3 {
 		scenario = os.Args[2]
 	}
-	if scenario != "police" && scenario != "damage" && scenario != "warning" && scenario != "russo-warning" && scenario != "attack" && scenario != "voice" && scenario != "contact" && scenario != "paused-job" && scenario != "leader" {
+	if scenario != "police" && scenario != "damage" && scenario != "warning" && scenario != "russo-warning" && scenario != "attack" && scenario != "voice" && scenario != "contact" && scenario != "paused-job" && scenario != "leader" && scenario != "doorman" {
 		log.Fatal("unsupported QA scenario")
 	}
 	path := os.Args[1]
@@ -50,6 +50,27 @@ func main() {
 				return err
 			}
 			*w = *next
+			return nil
+		}
+		if scenario == "doorman" {
+			// A campaign that owns premises and has people of its own, which is
+			// the only state in which anybody can be put on a door.
+			w.Player.Cash = 5000
+			w.Player.Respect, w.Player.Contacts = core.OrganizationStanding, 3
+			w.Properties["laundry"].Owner = "player:1"
+			w.Properties["garage"].Owner = "player:1"
+			w.Player.Location = "laundry"
+			w.OrganizationDay()
+			for _, n := range w.Civilians() {
+				if core.IsOfficial(n.ID) {
+					continue
+				}
+				w.Player.Location = n.Location
+				if w.SignOn(n.ID) == nil {
+					break
+				}
+			}
+			w.Player.Location = "laundry"
 			return nil
 		}
 		if scenario == "leader" {

@@ -193,7 +193,7 @@ func (w *World) takeFromSomebody(n *NPC) {
 		defence += f.Power / 3
 	}
 	if w.Own(target) {
-		defence += w.Guard() * 8
+		defence += w.Guard()*8 + w.PostingDefenceAt(target)*2
 		if len(w.Player.Crew) > 0 && w.Player.Crew[0].Loyalty >= 40 {
 			defence += 10
 		}

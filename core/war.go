@@ -134,7 +134,9 @@ func (w *World) contestAt(attacker, defender *Faction, weakest string) {
 		return
 	}
 	// Strength decides the odds; a weakened defender loses ground faster.
-	odds := .35 + float64(attacker.Power-defender.Power)/200
+	// A man standing on the door is the difference between a place that is
+	// walked into and a place that has to be taken.
+	odds := .35 + float64(attacker.Power-defender.Power-w.PostingDefenceAt(weakest))/200
 	if odds < .1 {
 		odds = .1
 	}
@@ -158,7 +160,12 @@ func (w *World) contestAt(attacker, defender *Faction, weakest string) {
 	}
 	// A raid reaches people, not only premises.
 	if w.WorldRandom() < .18 {
-		if victim := w.casualty(defender.ID); victim != nil {
+		// Whoever is on the door is the one standing in it: the first thing a
+		// raid reaches, which is the price of what they are worth.
+		if victim := w.StoodInIt(weakest); victim != nil && victim.Faction == defender.ID {
+			w.Properties[weakest].Posted = ""
+			w.KillBy(victim.ID, nil, fmt.Sprintf("%s had come for %s and %s was on the door.", attacker.Name, place.Name, victim.Name))
+		} else if victim := w.casualty(defender.ID); victim != nil {
 			w.KillBy(victim.ID, nil, fmt.Sprintf("%s had come for %s.", attacker.Name, place.Name))
 		} else if defender.ID == w.PlayerOrganizationID() && len(w.Player.Crew) > 0 {
 			// Whoever stands with the player is who a raid reaches, because

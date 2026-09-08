@@ -561,6 +561,14 @@ func (w *World) apply(c Command) error {
 				case "inspect":
 					l, _ := PlaceByID(target)
 					w.Log("The books are open", fmt.Sprintf("%s: %d%% condition, earning $%d/hour of a possible $%d/hour. Repairs cost $50 and restore up to 40 condition.", l.Name, w.Properties[target].Condition, w.Properties[target].Income*w.Properties[target].Condition/100, w.Properties[target].Income), "business")
+				case "post":
+					if err := w.Post(target); err != nil {
+						return err
+					}
+				case "unpost":
+					if err := w.Unpost(target); err != nil {
+						return err
+					}
 				case "repair":
 					restored := min(40, 100-w.Properties[target].Condition)
 					w.Properties[target].Condition += restored

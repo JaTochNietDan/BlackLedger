@@ -144,6 +144,9 @@ type Property struct {
 	// business had an outside as well as an inside.
 	Custom int  `json:"custom,omitempty"`
 	Order  bool `json:"order,omitempty"`
+	// Whoever answers to the player and is standing on this door. Absent
+	// everywhere nobody is.
+	Posted string `json:"posted,omitempty"`
 }
 type Plot struct {
 	Target   string `json:"target,omitempty"`
@@ -775,6 +778,15 @@ func (w *World) Actions(id string) []Action {
 					add("operate:"+m.ID, m.Label, 0, 0, reason, m.Detail)
 				}
 			}
+			if w.Properties[id].Income > 0 {
+				if posted := w.PostedAt(id); posted != nil {
+					add("unpost", "Take "+posted.Name+" off the door", PostingMinutes, 0, "",
+						fmt.Sprintf("Worth %d against anybody coming for %s while they are on it.", w.PostingDefenceAt(id), l.Name))
+				} else {
+					add("post", "Put somebody on the door", PostingMinutes, 0, w.PostReadiness(id),
+						fmt.Sprintf("Your most reliable person, standing here. Worth about %d against anybody coming for it, and turns away most of what the street tries. They are also the one standing in it when somebody does come.", PostingDefence+15))
+				}
+			}
 			add("repair", "Repair the property", 60, 50, need(w.Properties[id].Condition >= 100, "Already in good condition"), "Restore 40 condition.")
 		} else {
 			req := 6
@@ -1143,7 +1155,7 @@ func (w *World) Public() map[string]any {
 		if w.Own(l.ID) {
 			income += float64(prop.Income*prop.Condition) / 100
 		}
-		locs = append(locs, map[string]any{"id": l.ID, "name": l.Name, "type": l.Type, "district": l.District, "x": l.X, "y": l.Y, "cost": l.Cost, "blurb": l.Blurb, "owner": prop.Owner, "holder": w.HolderName(l.ID), "staff": prop.Staff, "supply": prop.Supply, "trouble": prop.Trouble, "trade": w.CustomDescription(l.ID), "still": prop.Still, "bankroll": prop.Bankroll, "handle": w.NightHandleAt(l.ID), "capacity": w.Capacity(l.ID), "condition": prop.Condition, "income": prop.Income, "owned": w.Own(l.ID), "locked": l.District > w.District, "actions": w.Actions(l.ID)})
+		locs = append(locs, map[string]any{"id": l.ID, "name": l.Name, "type": l.Type, "district": l.District, "x": l.X, "y": l.Y, "cost": l.Cost, "blurb": l.Blurb, "owner": prop.Owner, "holder": w.HolderName(l.ID), "staff": prop.Staff, "supply": prop.Supply, "trouble": prop.Trouble, "trade": w.CustomDescription(l.ID), "posted": w.PostingDescription(l.ID), "still": prop.Still, "bankroll": prop.Bankroll, "handle": w.NightHandleAt(l.ID), "capacity": w.Capacity(l.ID), "condition": prop.Condition, "income": prop.Income, "owned": w.Own(l.ID), "locked": l.District > w.District, "actions": w.Actions(l.ID)})
 	}
 	var scene any = nil
 	if e := w.Event; e != nil {
