@@ -195,6 +195,7 @@ type World struct {
 	Properties     map[string]*Property `json:"properties"`
 	Conflicts      []Conflict           `json:"conflicts,omitempty"`
 	Goods          []Good               `json:"goods,omitempty"`
+	Contracts      []Contract           `json:"contracts,omitempty"`
 	Plots          []Plot               `json:"plots"`
 	Tasks          []Task               `json:"tasks"`
 	Event          *Scene               `json:"event"`
@@ -436,6 +437,9 @@ func (w *World) Actions(id string) []Action {
 	case "market":
 		add("investigate", "Ask about threats", 45, 30, "", "Investigate existing threats. Evidence is not a guarantee of safety.")
 		add("lie_low", "Keep a low profile", 120, 15, "", "Lose 10 heat. Time still passes for rivals and businesses.")
+		add("contract", "Ask about a name", 30, 0,
+			need(p.Contacts < 1, "Build a contact who will carry this"),
+			"Put a price on somebody. What it costs depends on who they are and who does the work. A failed attempt can be traced back to you.")
 	case "club":
 		add("audience", "Request an audience", 45, 0, "", "Discuss your standing with the Bellandi family.")
 		add("provoke", "Demand protection money", 30, 0, "", "EXTREME RISK. Bellandi owns this casino. Challenging him can bring lethal retaliation.")
@@ -619,6 +623,11 @@ func (w *World) Advance(minutes int) {
 		for _, task := range w.Tasks {
 			next = min(next, max(w.Minute+1, task.Due))
 		}
+		for _, contract := range w.Contracts {
+			if contract.Life == w.Life {
+				next = min(next, max(w.Minute+1, contract.Due))
+			}
+		}
 		for _, plot := range w.Plots {
 			if plot.Life == w.Life {
 				next = min(next, max(w.Minute+1, plot.Due))
@@ -651,6 +660,7 @@ func (w *World) Advance(minutes int) {
 			w.FactionTurn()
 			w.MarketPrices()
 		}
+		w.ResolveContracts()
 		if w.Minute%1440 == 0 {
 			w.FamilyDay()
 			w.BusinessDay()

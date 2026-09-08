@@ -115,31 +115,41 @@ func TestMigrationDoesNotChargeOrAdvanceThePlayer(t *testing.T) {
 }
 
 func TestAMigratedCampaignCanActuallyFightAWar(t *testing.T) {
-	w := legacyWorld()
-	w.MigrateLivingWorld()
-	w.Antagonize("bellandi", "russo", 100)
-	seizures := 0
-	for day := 0; day < 120; day++ {
-		before := map[string]string{}
-		for id, prop := range w.Properties {
-			before[id] = prop.Owner
-		}
-		w.Minute += 720
-		w.FactionTurn()
-		w.Minute += 720
-		w.FactionTurn()
-		w.FamilyDay()
-		for id, prop := range w.Properties {
-			if before[id] != prop.Owner {
-				seizures++
+	// Measured across seeds rather than one: a single campaign may legitimately
+	// stalemate, and tying the assertion to one random stream makes the test
+	// fail whenever an unrelated system draws from it.
+	seizures, kept := 0, 0
+	for seed := 0; seed < 40; seed++ {
+		w := legacyWorld()
+		w.RNG, w.WorldRNG = uint32(seed*7919+1), uint32(seed*104729+1)
+		w.MigrateLivingWorld()
+		w.Antagonize("bellandi", "russo", 100)
+		for day := 0; day < 120; day++ {
+			before := map[string]string{}
+			for id, prop := range w.Properties {
+				before[id] = prop.Owner
 			}
+			w.Minute += 720
+			w.FactionTurn()
+			w.Minute += 720
+			w.FactionTurn()
+			w.FamilyDay()
+			for id, prop := range w.Properties {
+				if before[id] != prop.Owner {
+					seizures++
+				}
+			}
+		}
+		// The player's own holdings are never spoils of a war between families.
+		if w.Own("estate") {
+			kept++
 		}
 	}
 	if seizures == 0 {
-		t.Fatal("a migrated city fought for four months and nothing ever changed hands")
+		t.Fatal("forty migrated cities fought for four months and nothing ever changed hands")
 	}
-	// The player's own holdings are not spoils of a war between families.
-	if !w.Own("estate") {
-		t.Fatal("a war between families took the player's residence")
+	if kept != 40 {
+		t.Fatalf("a war between families took the player's residence in %d of 40 cities", 40-kept)
 	}
+	t.Logf("across 40 migrated cities at war: %d holdings changed hands", seizures)
 }

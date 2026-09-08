@@ -229,6 +229,7 @@ func (w *World) dissolve() {
 func (w *World) FactionTurn() {
 	w.dissolve()
 	w.considerSplinters()
+	w.ConsiderFactionContracts()
 	for i := range w.Factions {
 		for j := i + 1; j < len(w.Factions); j++ {
 			a, b := &w.Factions[i], &w.Factions[j]

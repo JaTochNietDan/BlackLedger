@@ -110,6 +110,24 @@ func (w *World) apply(c Command) error {
 			if err := w.ResolveAudience(e, c.Choice); err != nil {
 				return err
 			}
+		case "contract":
+			if c.Choice == "leave" {
+				w.Log("No name given", "You let the conversation end without saying anything worth repeating.", "personal")
+				break
+			}
+			if err := w.openContractTerms(strings.TrimPrefix(c.Choice, "mark:")); err != nil {
+				return err
+			}
+			// The terms are the next decision, not a committed outcome.
+			return nil
+		case "contract_terms":
+			if c.Choice == "leave" {
+				w.Log("Nothing was agreed", "You leave the name where it was.", "personal")
+				break
+			}
+			if err := w.Commission(e.Target, strings.TrimPrefix(c.Choice, "hire:")); err != nil {
+				return err
+			}
 		case "business_pressure":
 			if err := w.ResolvePressure(e, c.Choice); err != nil {
 				return err
@@ -219,6 +237,8 @@ func (w *World) apply(c Command) error {
 					w.Retaliation()
 				}
 				w.Log("A demand nobody forgets", "The manager refuses. A Bellandi man watches you leave. You have challenged a powerful family on its own ground.", "politics")
+			case "contract":
+				w.OpenContract()
 			case "buy:moonshine", "buy:cigarettes":
 				if err := w.Buy(strings.TrimPrefix(c.Kind, "buy:")); err != nil {
 					return err
