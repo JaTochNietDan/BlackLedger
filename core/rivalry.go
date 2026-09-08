@@ -181,6 +181,8 @@ func (w *World) SabotageBy(id string, hand Hand) error {
 	f.Cash = max(0, f.Cash-damage*20)
 	f.Goodwill = max(-100, f.Goodwill-30)
 	w.Player.Respect += w.HandRespectFor(hand, 4)
+	// Harm done to somebody's enemy is work done for them.
+	w.ServeAgainst(f.ID)
 	w.Player.Heat = min(100, w.Player.Heat+w.HandHeat(hand, 8))
 	w.VisualCues = append(w.VisualCues, VisualCue{ID(), "attack", id, fmt.Sprintf("Your crew damaged %s. Condition is now %d%%.", place.Name, prop.Condition)})
 	w.Report("attack", "DAMAGE AT "+strings.ToUpper(place.Name),

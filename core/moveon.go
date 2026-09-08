@@ -83,6 +83,7 @@ func (w *World) MoveOn(id string) error {
 	w.contestAt(me, holder, id)
 	w.Player.Heat = min(100, w.Player.Heat+MoveHeat)
 	holder.Goodwill = max(-100, holder.Goodwill-25)
+	w.ServeAgainst(holder.ID)
 	if c := w.Conflict(holder.ID, w.PlayerOrganizationID()); c != nil {
 		w.Antagonize(holder.ID, w.PlayerOrganizationID(), 12)
 	}

@@ -139,6 +139,21 @@ func (w *World) LeaveService() error {
 	return nil
 }
 
+// ServeAgainst credits work done against somebody whoever the player answers to
+// is at odds with. Harm done to their enemies is work done for them, which is
+// the only way most people in this business ever come up: an arrangement with a
+// beneficiary is not something everybody is ever offered.
+func (w *World) ServeAgainst(id string) {
+	if w.Player.Serves == "" || id == "" || id == w.Player.Serves {
+		return
+	}
+	c := w.Conflict(w.Player.Serves, id)
+	if c == nil || c.State == "cold" {
+		return
+	}
+	w.ServeWork(w.Player.Serves)
+}
+
 // ServeWork records a piece of work done for whoever the player answers to,
 // which is the only way anybody comes up.
 func (w *World) ServeWork(beneficiary string) {

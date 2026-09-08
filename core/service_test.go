@@ -164,3 +164,34 @@ func TestNobodyInheritsAJob(t *testing.T) {
 		t.Fatal("the next arrival woke up working for somebody")
 	}
 }
+
+// Most people are never offered an arrangement with a beneficiary. Harm done to
+// somebody's enemies has to count, or coming up is a path only the lucky find.
+func TestHarmToTheirEnemiesIsWorkForThem(t *testing.T) {
+	w, f := recruit(t)
+	w.Serve(f.ID)
+	other := w.Factions[1].ID
+	before := w.Player.Service
+
+	// Somebody they are on civil terms with is not an enemy.
+	if c := w.Conflict(f.ID, other); c != nil {
+		c.Hostility, c.State = 5, "cold"
+	}
+	w.ServeAgainst(other)
+	if w.Player.Service != before {
+		t.Fatal("harm to somebody they get on with counted as work")
+	}
+
+	if c := w.Conflict(f.ID, other); c != nil {
+		c.Hostility, c.State = 70, "war"
+	}
+	w.ServeAgainst(other)
+	if w.Player.Service != before+1 {
+		t.Fatal("harm to somebody they are at war with counted as nothing")
+	}
+	// And harm to themselves is not work for them.
+	w.ServeAgainst(f.ID)
+	if w.Player.Service != before+1 {
+		t.Fatal("attacking your own organization counted as work for it")
+	}
+}

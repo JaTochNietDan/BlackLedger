@@ -389,6 +389,12 @@ func (w *World) apply(c Command) error {
 				if err := w.LayOff(target); err != nil {
 					return err
 				}
+			case "takeover":
+				// Resolved before the clock moves: a man who does not survive
+				// it does not collect the evening.
+				if err := w.TakeOver(); err != nil {
+					return err
+				}
 			case "leave_service":
 				if err := w.LeaveService(); err != nil {
 					return err

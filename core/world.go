@@ -809,6 +809,13 @@ func (w *World) Actions(id string) []Action {
 		add("serve:"+f.ID, "Go to work for "+f.Name, ServiceMinutes, 0, w.ServeReadiness(f.ID),
 			fmt.Sprintf("$%d a day and a place to stand, rising to a share of what they take. Their quarrels become yours, and nobody comes up through somebody else's organization while they have one of their own.", SoldierWage))
 	}
+	if w.Player.Serves != "" {
+		if leader := w.Leader(w.Player.Serves); leader != nil && leader.Location == id {
+			f := w.faction(w.Player.Serves)
+			add("takeover", "Move on "+leader.Name, TakeoverMinutes, 0, w.TakeoverReadiness(),
+				fmt.Sprintf("Everything %s has becomes yours: the premises, the people who stay, and every quarrel the name was in. He is not an easy man to be in a room with, and if he is expecting it you are not one of theirs any more, if you are anything.", f.Name))
+		}
+	}
 	if l.Type == "home" {
 		if p.Home != id {
 			label := "Rent this apartment"
