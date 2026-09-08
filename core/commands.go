@@ -244,6 +244,10 @@ func (w *World) apply(c Command) error {
 				if err := w.Play(target, strings.TrimPrefix(c.Kind, "play:")); err != nil {
 					return err
 				}
+			case "bribe":
+				if err := w.Bribe(); err != nil {
+					return err
+				}
 			case "launder":
 				if err := w.Launder(target); err != nil {
 					return err

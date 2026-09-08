@@ -441,6 +441,8 @@ func (w *World) Actions(id string) []Action {
 	case "market":
 		add("investigate", "Ask about threats", 45, 30, "", "Investigate existing threats. Evidence is not a guarantee of safety.")
 		add("lie_low", "Keep a low profile", 120, 15, "", "Lose 10 heat. Time still passes for rivals and businesses.")
+		add("bribe", "An understanding with the detective", 45, w.BribeCost(), w.BribeReadiness(),
+			fmt.Sprintf("Pay Detective Harlow to lose some paperwork. Clears attention now and buys nothing later. Above %d heat nobody will be seen taking it.", BribeCeiling))
 		add("contract", "Ask about a name", 30, 0,
 			need(p.Contacts < 1, "Build a contact who will carry this"),
 			"Put a price on somebody. What it costs depends on who they are and who does the work. A failed attempt can be traced back to you.")
@@ -684,6 +686,7 @@ func (w *World) Advance(minutes int) {
 			w.FamilyDay()
 			w.BusinessDay()
 			w.ContrabandDay()
+			w.PoliceDay()
 			bill := w.DailyCost()
 			if p.Cash >= bill {
 				p.Cash -= bill

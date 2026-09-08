@@ -33,7 +33,7 @@ var operatingModes = []OperatingMode{
 		Take:   1, Heat: 0, Wear: 0, Notice: 0},
 	{ID: "hard", Label: "Skim what it will bear",
 		Detail: "Half again the money, police attention every day, premises that need regular repair, and earnings a family may decide are worth a share.",
-		Take:   1.5, Heat: 1, Wear: 1, Notice: 2},
+		Take:   1.5, Heat: 3, Wear: 1, Notice: 2},
 }
 
 func operatingMode(id string) OperatingMode {

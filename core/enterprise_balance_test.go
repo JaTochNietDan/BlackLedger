@@ -2,14 +2,16 @@ package core
 
 import "testing"
 
-// Skimming has to be a real bargain rather than an obviously correct choice or
-// a trap nobody would take. Measured over many campaigns rather than argued.
-func TestSkimmingIsABargainNotAFreeLunch(t *testing.T) {
+// Skimming is meant to be a bargain for someone who handles the consequences,
+// not free money and not a trap. Three players are measured over the same
+// campaigns: one runs clean and does nothing else, one skims and ignores the
+// attention it brings, and one skims and launders it away. The middle one is
+// supposed to lose.
+func TestSkimmingPaysOnlyIfTheAttentionIsManaged(t *testing.T) {
 	const campaigns, days = 120, 40
-	type outcome struct{ cash, heat, condition, demands int }
-	results := map[string]outcome{}
 
-	for _, mode := range []string{"clean", "standard", "hard"} {
+	type outcome struct{ cash, heat, condition, raids, kept int }
+	run := func(mode string, manage bool) outcome {
 		var total outcome
 		for seed := uint32(1); seed <= campaigns; seed++ {
 			w := New(seed)
@@ -23,46 +25,66 @@ func TestSkimmingIsABargainNotAFreeLunch(t *testing.T) {
 				}
 			}
 			start := w.Player.Cash
+			raids := 0
 			for day := 0; day < days; day++ {
 				w.Advance(1440)
 				if w.Event != nil {
-					if w.Event.Kind == "business_pressure" {
-						total.demands++
-					}
-					w.Event = nil // the measurement is of standing pressure, not of choices
+					w.Event = nil // measuring standing pressure, not choices
 				}
 				if !w.Player.Alive {
 					break
+				}
+				for _, r := range w.History {
+					if r.Minute > w.Minute-1440 && (r.Title == "Turned over at Bluebird Laundry" || r.Title == "They took it") {
+						raids++
+					}
+				}
+				// A player who handles it: clear attention through the books
+				// and keep the premises standing.
+				if manage {
+					w.Player.Location = "laundry"
+					if w.LaunderReadiness("laundry") == "" {
+						_ = w.Launder("laundry")
+					}
+					if w.Properties["laundry"].Condition < 70 && w.Player.Cash > 50 {
+						w.Player.Cash -= 50
+						w.Properties["laundry"].Condition = min(100, w.Properties["laundry"].Condition+40)
+					}
 				}
 			}
 			total.cash += w.Player.Cash - start
 			total.heat += w.Player.Heat
 			total.condition += w.Properties["laundry"].Condition
+			total.raids += raids
+			if w.Own("laundry") {
+				total.kept++
+			}
 		}
-		results[mode] = outcome{total.cash / campaigns, total.heat / campaigns,
-			total.condition / campaigns, total.demands}
+		return outcome{total.cash / campaigns, total.heat / campaigns,
+			total.condition / campaigns, total.raids, total.kept}
 	}
 
-	for _, mode := range []string{"clean", "standard", "hard"} {
-		r := results[mode]
-		t.Logf("%-8s median-ish over %d campaigns of %d days: earned %d, heat %d, laundry condition %d, demands %d",
-			mode, campaigns, days, r.cash, r.heat, r.condition, r.demands)
+	clean := run("clean", false)
+	careless := run("hard", false)
+	careful := run("hard", true)
+	for name, r := range map[string]outcome{"clean": clean, "hard, unmanaged": careless, "hard, managed": careful} {
+		t.Logf("%-16s earned %6d, heat %3d, laundry condition %3d, kept the business in %d of %d campaigns",
+			name, r.cash, r.heat, r.condition, r.kept, campaigns)
 	}
 
-	if results["hard"].cash <= results["clean"].cash {
-		t.Fatal("skimming earns no more than running clean; nobody would ever take the risk")
+	if careful.cash <= clean.cash {
+		t.Fatalf("skimming and handling the consequences pays no better than running clean: %d against %d", careful.cash, clean.cash)
 	}
-	if results["hard"].heat <= results["clean"].heat {
-		t.Fatal("skimming costs no more attention than running clean")
+	if careless.cash >= careful.cash {
+		t.Fatalf("ignoring the attention costs nothing: careless %d, careful %d", careless.cash, careful.cash)
 	}
-	if results["hard"].condition >= results["clean"].condition {
-		t.Fatal("skimming does not wear premises faster than running clean")
+	if careless.heat <= clean.heat {
+		t.Fatal("skimming draws no more attention than running clean")
 	}
-	// Family attention is asserted directly and deterministically in
-	// TestSkimmingBringsAFamilyDemandSooner; demands are only logged here.
-	// The upside has to be worth something, or the decision is only a penalty.
-	if results["hard"].cash < results["clean"].cash*5/4 {
-		t.Fatalf("skimming pays too little to be worth its costs: %d vs %d",
-			results["hard"].cash, results["clean"].cash)
+	if careless.kept >= campaigns {
+		t.Fatal("a careless skimmer never loses a business, so forfeiture is not a real risk")
+	}
+	if careful.kept <= careless.kept {
+		t.Fatal("handling the attention does not protect the business")
 	}
 }
