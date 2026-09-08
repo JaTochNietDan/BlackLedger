@@ -28,6 +28,13 @@ var gravity = map[string]int{
 // Gravity is what a kind of moment is worth stopping for.
 func Gravity(kind string) int { return gravity[kind] }
 
+// Hold is how long the theatre should stay on a moment, in milliseconds. A
+// robbery and a killing were played for exactly the same two and a half
+// seconds; the city already knew one was worth more than the other.
+func Hold(kind string) int {
+	return 1800 + Gravity(kind)*320
+}
+
 // Witness records that something worth seeing happened somewhere. Callers pass
 // the place it happened in, the words for it, and whoever was standing in it.
 func (w *World) Witness(kind, place, caption, headline string, actors ...string) {

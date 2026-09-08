@@ -196,15 +196,3 @@ func TestTheCastIsOnlyPeopleYouKnow(t *testing.T) {
 		t.Fatal("building a network taught the player nothing about anybody")
 	}
 }
-
-func itoa(n int) string {
-	if n == 0 {
-		return "0"
-	}
-	out := ""
-	for n > 0 {
-		out = string(rune('0'+n%10)) + out
-		n /= 10
-	}
-	return out
-}

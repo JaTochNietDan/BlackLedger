@@ -86,16 +86,22 @@ func (w *World) ScrutinyPremium() int {
 }
 
 // ScrutinyDescription is the city's temperature, for the interface.
-func (w *World) ScrutinyDescription() map[string]any {
-	state := "ordinary"
+// scrutinyWord is the word for the city's temperature, in one place so the top
+// bar, the ordinary edition of the paper and this description cannot disagree.
+func (w *World) scrutinyWord() string {
 	switch {
 	case w.Scrutiny() >= 85:
-		state = "every door in the city"
+		return "every door in the city"
 	case w.UnderCrackdown():
-		state = "a crackdown"
+		return "a crackdown"
 	case w.Scrutiny() >= 30:
-		state = "watchful"
+		return "watchful"
 	}
+	return "ordinary"
+}
+
+func (w *World) ScrutinyDescription() map[string]any {
+	state := w.scrutinyWord()
 	return map[string]any{
 		"scrutiny": w.Scrutiny(), "state": state,
 		"crackdown": w.UnderCrackdown(), "premium": w.ScrutinyPremium(),

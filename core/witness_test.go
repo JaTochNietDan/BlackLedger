@@ -116,3 +116,22 @@ func TestNothingHappensSomewhereThatDoesNotExist(t *testing.T) {
 		t.Fatalf("out of three things the city picked %q", cue.Kind)
 	}
 }
+
+// The theatre played a robbery and a killing for exactly the same two and a
+// half seconds. The city already knows how much a moment is worth stopping
+// for; the interface simply never asked.
+
+func TestAKillingIsHeldLongerThanARobbery(t *testing.T) {
+	if Hold("killing") <= Hold("robbery") {
+		t.Fatalf("a killing is held %dms and a robbery %dms", Hold("killing"), Hold("robbery"))
+	}
+	if Hold("explosion") <= Hold("attack") {
+		t.Fatal("an explosion is not held longer than a broken window")
+	}
+	// Nothing is so short it cannot be read, and nothing outstays its welcome.
+	for _, kind := range []string{"killing", "explosion", "gunfight", "raid", "seizure", "arrest", "attack", "robbery", "something-new"} {
+		if h := Hold(kind); h < 1500 || h > 6000 {
+			t.Fatalf("%q is held for %dms", kind, h)
+		}
+	}
+}

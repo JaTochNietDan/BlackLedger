@@ -395,3 +395,7 @@
 .guide-steps small.ready{color:var(--gold)}
 .guide-rules{max-width:760px;padding-left:18px}
 .guide-rules li{margin-bottom:11px;font-size:13.5px;line-height:1.6;color:#c6ccbc}
+/* Each figure in the top bar can say what it means, and the city's temperature
+   reads as a state rather than as a number above a sentence. */
+.stat small i{display:block;font-style:normal;color:#8b9585;font-size:9.5px;letter-spacing:.04em;text-transform:none}
+.stat[title]{cursor:help}

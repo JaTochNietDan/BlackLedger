@@ -1200,3 +1200,12 @@
 - Beneath it, the five rules that genuinely do not change, which are the only part of a guide safe to write down once.
 - On the live campaign: five done, five open, two shut with their reasons.
 - `mise run verify` passes.
+
+## Eight figures that never said what they meant
+- The top bar grew a stat at a time to eight of them and never once explained any. A new player reads *PRESENCE 253* and has no way to learn what it does short of dying of it. Worse, the city's temperature was drawn as a number above the words *"The city is ordinary"*, which parses as two ordinary cities.
+- **The explanations belong in the core, because they are about rules and they contain the thresholds.** Written as copy in the front end they would rot exactly the way the Guide rotted. `Dashboard` reports each figure with its label, its value, and a sentence carrying the real numbers — *"Past 45 they come to the door; past 80 they take the premises"*, *"Past 60 the police stop waiting and raids begin up to 20 attention sooner, for everybody"*. A test fails if any explanation stops containing its own constant.
+- Every figure now says whether it is currently worth worrying about, so low health and high attention colour themselves rather than waiting to be noticed, and a healthy solvent player is warned about nothing.
+- The city reads as a state with its number beside it, in **the same word the city description already uses** — a test holds the two together, because the bar saying *ordinary* while the city said *watchful* is exactly the kind of drift nobody notices.
+- **A regression the browser caught.** Moving money formatting into the core dropped the thousands separator the interface used to add: `$3778`. The core writes sums the way people read them now, with a test over seven cases.
+- **The theatre holds for as long as the moment is worth.** It played a robbery and a killing for exactly the same 2.6 seconds. The city already knew one was worth more than the other — `Gravity` has ordered these since the theatre was built — so a killing now holds 4.7 seconds, an explosion 4.4, a robbery 2.4, and anything nobody has classified 1.8. Bounded so nothing is too short to read or outstays its welcome.
+- `mise run verify` passes.

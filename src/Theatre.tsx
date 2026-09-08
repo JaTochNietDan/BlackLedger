@@ -10,7 +10,9 @@ import type {Place,VisualCue} from './types';
 // Nothing here decides anything. The core already committed the event; this
 // only shows what it looked like.
 
-const beats = 2600;
+// How long to hold. The city says what a moment is worth stopping for, so a
+// killing is not played for the same two and a half seconds as a robbery.
+const hold = (cue: VisualCue) => 1800 + (cue.gravity || 0) * 320;
 
 export const scenePlate = (kind: string) => `/art/scenes/scene-${kind}-v1.jpg`;
 
@@ -102,7 +104,7 @@ export function Theatre({cue, place, onDone}: {cue: VisualCue; place: Place; onD
     const start = performance.now();
     let frame = 0;
     const step = (now: number) => {
-      const at = Math.min(1, (now - start) / beats);
+      const at = Math.min(1, (now - start) / hold(cue));
       setT(at);
       if (at < 1) frame = requestAnimationFrame(step); else setPaper(true);
     };
