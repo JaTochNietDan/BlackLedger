@@ -71,17 +71,55 @@ func (w *World) ContractPrice(target string, tier Tier) int {
 
 // ContractTargets are the people the player could put a price on: everyone
 // alive except themselves and their own crew.
+// ContractTargets is who the player could put a name on. It used to be
+// everybody alive except their own crew, which in a city of fifty rendered as
+// fifty identical rows in a single scene — a wall rather than a decision, and
+// a wall that included a laundress the player has never heard of.
+//
+// A name is something you have a reason to say. So it is the people this
+// protagonist actually knows, plus anybody who has given them a reason
+// whether they know them or not: somebody carrying a grudge against them,
+// somebody who owes them and has stopped paying. Their own people are never on
+// it — that is what dismissing somebody is for.
+//
+// Ordered by how much reason there is, so the name the player is most likely
+// to be thinking of is the first one they read.
 func (w *World) ContractTargets() []*NPC {
+	reason := func(n *NPC) int {
+		switch {
+		case n.Sore >= 30:
+			return 0 // they have made themselves a problem
+		case w.LoanTo(n.ID) != nil && w.LoanTo(n.ID).Missed > 0:
+			return 1 // they owe you and have stopped answering
+		case n.Rank >= RankLeader:
+			return 2 // everybody knows who runs things
+		case IsOfficial(n.ID) || w.isRoleHolder(n):
+			return 3
+		case w.Known(n):
+			return 4
+		}
+		return -1
+	}
 	out := []*NPC{}
 	for _, n := range w.People() {
+		if n.Faction == w.PlayerOrganizationID() {
+			continue // not your own people
+		}
 		own := false
 		for _, c := range w.Player.Crew {
 			if c.ID == n.ID {
 				own = true
 			}
 		}
-		if !own {
+		if !own && reason(n) >= 0 {
 			out = append(out, n)
+		}
+	}
+	for i := range out {
+		for j := i + 1; j < len(out); j++ {
+			if reason(out[j]) < reason(out[i]) {
+				out[i], out[j] = out[j], out[i]
+			}
 		}
 	}
 	return out

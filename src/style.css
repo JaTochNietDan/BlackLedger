@@ -306,3 +306,9 @@
    the flash, the bloom, the lamp — so the animation is still the truth of the
    event and only what it is painted on has changed. */
 .theatre-frame.painted{background-size:cover;background-position:center;background-repeat:no-repeat}
+
+/* A scene that offers a long list is still a decision, not a form. Cap the
+   height so the question and the speaker stay on screen while the reader
+   scrolls the answers, and let wide screens set them in two columns. */
+.scene .choices{max-height:min(46vh,430px);overflow:auto;padding-right:4px}
+@media(min-width:900px){.scene .choices{grid-template-columns:repeat(2,minmax(0,1fr))}}

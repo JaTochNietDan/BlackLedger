@@ -1162,3 +1162,10 @@
 - Verified in a browser against a fresh isolated fixture: an attack on the Bluebird played on `scene-attack-v1.jpg` with the caption and the result band beneath it.
 - The city's art is 24MB all in: two dozen faces, twelve interiors, seven fronts, eight event plates and the hand-painted originals.
 - `mise run verify` passes.
+
+## Fifty names is not a decision
+- Opening the People screen on the live campaign turned up something worse in front of it: **the scene that asks for a name offered every living person in the city except the player's own crew.** Fifty rows, identical, in one modal — a wall rather than a decision, and a wall that included a laundress the protagonist had never heard of. The numbering rendered them "09", "010", "011", because it was a literal zero and an index rather than a padded number.
+- **A name is something you have a reason to say.** The list is now the people this protagonist actually knows, plus anybody who has given them a reason whether they know them or not: somebody carrying a grudge against them, somebody who owes them and has stopped paying. Their own people are never on it — that is what dismissing somebody is for. It is ordered by how much reason there is, so the name the player is most likely to be thinking of is the first one they read.
+- Measured on the live campaign: **fifty names became twenty-four**, led by the two family heads, then the fixer, the driver, the commissioner, the mayor, the detective and the editor. A test holds the shape — never more than half the city, never the player's own, never a complete stranger — and proves the ordering by giving a stranger a grudge and watching them become the first name offered.
+- The scene itself now caps its list so the question and the speaker stay on screen while the answers scroll, and sets them in two columns on a wide screen. The numbering is padded.
+- `mise run verify` passes, and `cmd/apicheck` ran 220 commands over 69 kinds against a fresh fixture with no invariant failures.

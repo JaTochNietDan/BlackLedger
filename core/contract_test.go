@@ -352,3 +352,73 @@ func TestNothingIsChargedTwice(t *testing.T) {
 		})
 	}
 }
+
+// Naming somebody used to offer every living person in the city except the
+// player's own crew: in a city of fifty that rendered as fifty identical rows
+// in one scene, including a laundress the player had never heard of. A name is
+// something you have a reason to say.
+
+func TestYouCanOnlyNameSomebodyYouHaveAReasonToName(t *testing.T) {
+	w, member := testator(t)
+	w.Populate()
+	all := len(w.People())
+	if all < 20 {
+		t.Fatalf("only %d people in the city; this is not measuring what it claims to", all)
+	}
+	targets := w.ContractTargets()
+	if len(targets) == 0 {
+		t.Fatal("there is nobody in this city the player could name")
+	}
+	if len(targets) >= all/2 {
+		t.Fatalf("%d of %d people are on the list, which is still a wall", len(targets), all)
+	}
+
+	named := map[string]bool{}
+	for _, n := range targets {
+		named[n.ID] = true
+		if n.Faction == w.PlayerOrganizationID() {
+			t.Fatalf("%s works for the player and is on the list", n.Name)
+		}
+	}
+	// Somebody the player has never had a reason to hear of is not on it.
+	stranger := ""
+	for _, n := range w.Civilians() {
+		if !w.Known(n) && n.Sore == 0 && !IsOfficial(n.ID) && !w.isRoleHolder(n) && n.Rank < RankLeader {
+			stranger = n.ID
+			break
+		}
+	}
+	if stranger == "" {
+		t.Skip("everybody in this city is known")
+	}
+	if named[stranger] {
+		t.Fatal("a complete stranger can have a price put on them")
+	}
+
+	// But give that stranger a reason and they are the first name on the list.
+	w.Aggrieve(stranger, 45, "what was done to them over money")
+	targets = w.ContractTargets()
+	if len(targets) == 0 || targets[0].ID != stranger {
+		got := "nobody"
+		if len(targets) > 0 {
+			got = targets[0].Name
+		}
+		t.Fatalf("the first name offered is %s, not the man carrying something against the player", got)
+	}
+	_ = member
+}
+
+func TestTheHeadsOfOrganizationsAreAlwaysNameable(t *testing.T) {
+	w := proprietor(t)
+	targets := map[string]bool{}
+	for _, n := range w.ContractTargets() {
+		targets[n.ID] = true
+	}
+	for _, f := range w.Factions {
+		for _, n := range w.People() {
+			if n.Name == f.Leader && !targets[n.ID] {
+				t.Fatalf("%s runs %s and cannot be named", n.Name, f.Name)
+			}
+		}
+	}
+}
