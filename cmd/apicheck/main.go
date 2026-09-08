@@ -46,6 +46,7 @@ var idle = []string{"rest", "wait"}
 // in deliberately, because an untried system is an unverified one.
 var ventures = []string{
 	"launder", "bribe", "rob", "sabotage", "incite", "contract",
+	"deposit", "offshore_access", "withdraw",
 	"play:small", "play:high", "buy:moonshine", "buy:cigarettes",
 	"sell:moonshine", "sell:cigarettes", "arms:weapon", "arms:armour",
 	"operate:hard", "operate:clean", "operate:standard", "inspect", "investigate", "lie_low",

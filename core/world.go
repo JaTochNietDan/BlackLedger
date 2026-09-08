@@ -56,6 +56,9 @@ type Person struct {
 	// carrying nothing.
 	Weapon int `json:"weapon,omitempty"`
 	Armour int `json:"armour,omitempty"`
+	// Whether this person has established that the account abroad is theirs.
+	// Reset with every life, which is what makes inheriting it a decision.
+	Offshore bool `json:"offshore_access,omitempty"`
 }
 type Crew struct {
 	ID      string `json:"id"`
@@ -202,16 +205,20 @@ type World struct {
 	Properties     map[string]*Property `json:"properties"`
 	Conflicts      []Conflict           `json:"conflicts,omitempty"`
 	Goods          []Good               `json:"goods,omitempty"`
-	Contracts      []Contract           `json:"contracts,omitempty"`
-	News           []Story              `json:"news,omitempty"`
-	Plots          []Plot               `json:"plots"`
-	Tasks          []Task               `json:"tasks"`
-	Event          *Scene               `json:"event"`
-	History        []Record             `json:"history"`
-	Dead           []Death              `json:"dead"`
-	Director       Director             `json:"director"`
-	Offers         []Offer              `json:"offers"`
-	LastResult     *Result              `json:"last_result"`
+	// Money sent out of the city. Deliberately on the world rather than the
+	// player, because it outlives them; new_life resets the player and leaves
+	// this standing.
+	Offshore   int        `json:"offshore,omitempty"`
+	Contracts  []Contract `json:"contracts,omitempty"`
+	News       []Story    `json:"news,omitempty"`
+	Plots      []Plot     `json:"plots"`
+	Tasks      []Task     `json:"tasks"`
+	Event      *Scene     `json:"event"`
+	History    []Record   `json:"history"`
+	Dead       []Death    `json:"dead"`
+	Director   Director   `json:"director"`
+	Offers     []Offer    `json:"offers"`
+	LastResult *Result    `json:"last_result"`
 }
 type Command struct {
 	RequestID string `json:"request_id"`
@@ -453,6 +460,12 @@ func (w *World) Actions(id string) []Action {
 	case "market":
 		add("investigate", "Ask about threats", 45, 30, "", "Investigate existing threats. Evidence is not a guarantee of safety.")
 		add("lie_low", "Keep a low profile", 120, 15, "", "Lose 10 heat. Time still passes for rivals and businesses.")
+		add("deposit", fmt.Sprintf("Wire $%d out of the city", DepositLot), 45, 0, w.DepositReadiness(),
+			fmt.Sprintf("$%d of it arrives; the arrangement takes %d%%. It survives you, and whoever comes next can reach it if they can afford to.", DepositLot*(100-DepositCut)/100, DepositCut))
+		add("offshore_access", "Establish that the account is yours", AccessMinutes, 0, w.AccessReadiness(),
+			fmt.Sprintf("$%d in papers and a journey. Only worth it if there is enough out there to be worth reaching.", AccessCost))
+		add("withdraw", "Bring it all home", 45, 0, w.WithdrawReadiness(),
+			fmt.Sprintf("Brings $%d back into the city, where it can be taken from you.", w.Offshore))
 		add("bribe", "An understanding with the detective", 45, 0, w.BribeReadiness(),
 			fmt.Sprintf("$%d to Detective Harlow to lose some paperwork. Clears attention now and buys nothing later. Above %d heat nobody will be seen taking it.", w.BribeCost(), BribeCeiling))
 		add("contract", "Ask about a name", 30, 0,
@@ -796,7 +809,7 @@ func (w *World) Public() map[string]any {
 	if len(history) > 60 {
 		history = history[len(history)-60:]
 	}
-	return map[string]any{"id": w.ID, "version": w.Version, "revision": w.Revision, "life": w.Life, "minute": w.Minute, "player": w.Player, "district": w.District, "factions": w.Factions, "npcs": w.People(), "locations": locs, "event": scene, "history": history, "dead": w.Dead, "tasks": w.Tasks, "director": w.Director, "last_result": w.LastResult, "daily_cost": w.DailyCost(), "income": income, "security": w.Guard(), "opportunity": w.NextOpportunity(), "known_threats": w.KnownThreats(), "business_truces": w.ActiveBusinessTruces(), "conflicts": w.PublicConflicts(), "goods": w.Goods, "arms": w.ArmsDescription(), "newspaper": w.Edition(), "arrangements": w.PendingArrangements()}
+	return map[string]any{"id": w.ID, "version": w.Version, "revision": w.Revision, "life": w.Life, "minute": w.Minute, "player": w.Player, "district": w.District, "factions": w.Factions, "npcs": w.People(), "locations": locs, "event": scene, "history": history, "dead": w.Dead, "tasks": w.Tasks, "director": w.Director, "last_result": w.LastResult, "daily_cost": w.DailyCost(), "income": income, "security": w.Guard(), "opportunity": w.NextOpportunity(), "known_threats": w.KnownThreats(), "business_truces": w.ActiveBusinessTruces(), "conflicts": w.PublicConflicts(), "goods": w.Goods, "arms": w.ArmsDescription(), "offshore": map[string]any{"balance": w.Offshore, "reachable": w.Player.Offshore}, "newspaper": w.Edition(), "arrangements": w.PendingArrangements()}
 }
 func (w *World) hasRecord(title string) bool {
 	for _, r := range w.History {

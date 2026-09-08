@@ -248,6 +248,18 @@ func (w *World) apply(c Command) error {
 				if err := w.BuyArms(strings.TrimPrefix(c.Kind, "arms:")); err != nil {
 					return err
 				}
+			case "deposit":
+				if err := w.Deposit(); err != nil {
+					return err
+				}
+			case "offshore_access":
+				if err := w.EstablishAccess(); err != nil {
+					return err
+				}
+			case "withdraw":
+				if err := w.Withdraw(); err != nil {
+					return err
+				}
 			case "bribe":
 				if err := w.Bribe(); err != nil {
 					return err
