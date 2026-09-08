@@ -15,6 +15,10 @@ type narrativeBrief struct {
 	SourceRole    string `json:"source_role,omitempty"`
 	RecipientRole string `json:"recipient_role,omitempty"`
 	Opening       string `json:"required_opening,omitempty"`
+	// Situation is the committed state of the city around this request: a war
+	// the speaker's organization is fighting, or ground it recently lost. It is
+	// context to write from, not an outcome to decide.
+	Situation string `json:"current_situation,omitempty"`
 	// Constraints belong in their own field because the model dramatizes the
 	// premise and task. Observed on qwen3.5:35b-a3b: a leader recited the cast
 	// restriction aloud as "Neither is you, but the tension threatens our
@@ -58,6 +62,7 @@ func jobBrief(w *core.World, operation string, connection *core.ArrangementMemor
 			"This job collects no money and delivers no package.",
 		}
 	}
+	b.Situation = briefSituation(w, connection)
 	if connection != nil {
 		// A factual spoken acknowledgement that does not promote the old offer's
 		// unverified claims into accomplished events.
@@ -79,4 +84,35 @@ func validateBriefOpening(body string, brief narrativeBrief) error {
 		return fmt.Errorf("body must begin with this exact factual acknowledgement: %s Then describe the new task using the supplied source and recipient roles", opening)
 	}
 	return nil
+}
+
+// briefSituation describes the pressure the requesting side is actually under,
+// drawn from committed conflict state. An organization fighting a war has fewer
+// people to spare, which is a reason for work to exist at all.
+func briefSituation(w *core.World, connection *core.ArrangementMemory) string {
+	organization := ""
+	if connection != nil {
+		organization = connection.Beneficiary
+	}
+	parts := []string{}
+	for _, c := range w.PublicConflicts() {
+		if c.State != "war" && c.State != "feud" {
+			continue
+		}
+		state := "is at war with"
+		if c.State == "feud" {
+			state = "is feuding with"
+		}
+		parts = append(parts, fmt.Sprintf("%s %s %s", c.Between[0], state, c.Between[1]))
+	}
+	if len(parts) == 0 {
+		return ""
+	}
+	prefix := "The city's standing quarrels: "
+	if organization != "" {
+		if f := w.FactionByID(organization); f != nil {
+			prefix = f.Name + " is asking while the city stands like this: "
+		}
+	}
+	return prefix + strings.Join(parts, "; ") + ". Use this only as the situation the request happens inside. Do not narrate its outcome or invent a new one."
 }

@@ -112,13 +112,22 @@ it is still in this list, it does not exist in the game yet.
 - Ownable houses/apartments that have their own perks
 - Customizable houses/apartments
 - Every noteable character can be killed
-- All noteable characters are dynamic people who live somewhere and their own people that have their own agendas and stuff (meaning the fixers, etc). No character is a fixed character that cannot die or something. They might be gone and replaced by another. All of that is dynamic and living.
+- All named characters (living NPCs) are dynamic people who live somewhere and their own people that have their own agendas and stuff (meaning the fixers, etc). No character is a fixed character that cannot die or something. They might be gone and replaced by another. All of that is dynamic and living. Everything that you do, that can happen to you, can happen to them and be done by them.
 - Stuff can happen, i.e people can be shot and killed while traversing the map, it happens, there are reasons and motives though and that is important to be coherent and logical.
 - Not all situations that occur have answers that are clear to the user, sometimes there is a feud that we didn't know about.
 - The player can outfit their character with different clothes and whatnot to gain respect and status, and use armor/weapons for better survivability in conflict
 - Ownable businesses really need to have character to them and almost mini-simulation games within them. Casinos need to be micro managed, laundromats, etc. Money isn't easy to come by, it requires work and smart play.
 - Perhaps a system in which some money can be preserved by funneling off to an offshore swiss account and can be accessed by new start players, maybe money deposited in there comes at large cost.
 - Factions can have internal drama, i.e someone at top is taken out by lower members in a bid to take over but causes internal conflict which causes a lot of drama and bloodshed and weakens the family etc and could have it under new leadership or spawn spinoff factions at some point.
-
+- Hitmen could be hired discreetly to take out anyone in the game but they can be expensive depending on who you're targeting, and they can fail and/or captured and interogated to find out who hired them which would land the heat back on you. More expensive hitmen are better at their job. The hitmen can also be used against you in the same way, it's not a one way street.
+- How killings and/or hits and whatnot are carried out should be explained in detail, especially if they are hits, i.e stabbed in the bar, shot in the head in the street, run over by a car, any manner of options and possibilities that the AI director can come up with.
+- Businesses could be sabotagd, bombed etc to weaken them and their owning family.
+- Moonshine, drugs etc are a part of the game with underground trade and whatnot, fluctuating prices, sabotage, etc. An example could be being able to own a moonshine business that can produce it and then sell it on the market but that could be attacked, have parts stolen by other living NPCs etc.
+- Robberies should be a functionality, robbing businesses, people, cars, houses, etc, including living NPCs robbing you. As with everything in this game, it goes both ways, this is a living world and nobody is unique.
+- Hits, kills, robberies etc can happen to anyone, not just major people in leadership. It can happen to any living NPC.
+- There should be plenty of these "Living NPCs" that you discover and get to know over time, these living NPCs as always, every piece of the simulation applies to them and anything can happen to them, with them, from them etc.
+- The point is that nobody involved in the world is actually some unnamed NPC, it all is a living NPC that you are dealing with, someone that you know of, know their face, know them over time etc or know of their name (or not, lower living NPC that you have not had any interaction with and don't know of)
+- We could spice up the game and give player more purpose with contracts (missions, quests) to carry out
+- Underground arms market businesses and systems around that
 
 Ultiamtely the expectation is that I don't have to think of all of these concepts, you, the agent will think of these too and build them out and playtest and simulate them yourself.

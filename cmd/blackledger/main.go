@@ -200,6 +200,8 @@ func (a *app) generateAttempt(snapshot *core.World, feedback string) error {
 	}
 	contextData["speaker_beneficiary_ids"] = affiliation
 	contextData["accessible_job_locations"] = accessibleJobLocations(snapshot)
+	contextData["city_conflicts"] = cityConflicts(snapshot)
+	contextData["organization_holdings"] = organizationHoldings(snapshot)
 	b, _ := json.Marshal(contextData)
 	// Experimental opt-in: reasoning shares the bounded generation budget with
 	// the final JSON. Requests remain asynchronous and bounded; structural

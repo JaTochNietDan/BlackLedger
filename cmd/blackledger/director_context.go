@@ -146,3 +146,33 @@ func focusedContext(w *core.World, operation string, connection *core.Arrangemen
 		"current_player": w.Player.Name, "current_life": w.Life,
 		"npcs": people, "factions": w.Factions, "places": places, "avoid_recent_titles": recentTitles}
 }
+
+// The city's own quarrels are ordinary generation context. The director may
+// narrate a war, a breakaway or a seizure the simulation actually committed; it
+// may not invent one, and the existing guards still check every claim it makes
+// about who owns what and who serves whom.
+func cityConflicts(w *core.World) []map[string]any {
+	out := []map[string]any{}
+	for _, c := range w.PublicConflicts() {
+		out = append(out, map[string]any{
+			"between": c.Between, "state": c.State, "since_minute": c.Since,
+		})
+	}
+	return out
+}
+
+// organizationHoldings reports what each organization currently holds, by the
+// names a character would use aloud.
+func organizationHoldings(w *core.World) map[string][]string {
+	out := map[string][]string{}
+	for _, f := range w.Factions {
+		places := []string{}
+		for _, id := range w.FamilyHoldings(f.ID) {
+			if place, ok := core.PlaceByID(id); ok {
+				places = append(places, place.Name)
+			}
+		}
+		out[f.Name] = places
+	}
+	return out
+}
