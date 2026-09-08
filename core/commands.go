@@ -237,6 +237,10 @@ func (w *World) apply(c Command) error {
 					w.Retaliation()
 				}
 				w.Log("A demand nobody forgets", "The manager refuses. A Bellandi man watches you leave. You have challenged a powerful family on its own ground.", "politics")
+			case "rob":
+				if err := w.Rob(target); err != nil {
+					return err
+				}
 			case "contract":
 				w.OpenContract()
 			case "buy:moonshine", "buy:cigarettes":

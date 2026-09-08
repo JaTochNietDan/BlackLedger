@@ -444,6 +444,10 @@ func (w *World) Actions(id string) []Action {
 		add("audience", "Request an audience", 45, 0, "", "Discuss your standing with the Bellandi family.")
 		add("provoke", "Demand protection money", 30, 0, "", "EXTREME RISK. Bellandi owns this casino. Challenging him can bring lethal retaliation.")
 	}
+	if prop := w.Properties[id]; prop != nil && prop.Income > 0 && !w.Own(id) {
+		add("rob", "Take the day's cash", 45, 0, w.RobberyReadiness(id),
+			fmt.Sprintf("Walk out with what is in the till at %s. A haul, police attention, and an owner who will work out who would dare. Going wrong means a beating.", l.Name))
+	}
 	for _, g := range w.Goods {
 		if !TradesAt(id, g.ID) {
 			continue
@@ -659,6 +663,7 @@ func (w *World) Advance(minutes int) {
 		if w.Minute%720 == 0 {
 			w.FactionTurn()
 			w.MarketPrices()
+			w.ConsiderRobbery()
 		}
 		w.ResolveContracts()
 		if w.Minute%1440 == 0 {
