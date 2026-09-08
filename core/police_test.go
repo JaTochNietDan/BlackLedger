@@ -75,7 +75,10 @@ func TestPastAPointTheyTakeTheBusiness(t *testing.T) {
 
 func TestTheyOnlyComeWhenThereIsEnoughToComeFor(t *testing.T) {
 	quiet, loud := 0, 0
-	for seed := uint32(1); seed <= 400; seed++ {
+	for i := uint32(1); i <= 400; i++ {
+		// Consecutive seeds give this generator nearly identical first draws,
+		// so stride them or the measured rate is an artifact of the seed.
+		seed := i * 2654435761
 		low := watched(t, RaidThreshold-10)
 		low.WorldRNG = seed
 		before := low.Player.Cash

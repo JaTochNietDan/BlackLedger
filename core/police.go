@@ -99,6 +99,7 @@ func (w *World) Raid() {
 	}
 
 	seized := w.Seize("The police came with a warrant.")
+	w.SeizeArms()
 	fine := min(w.Player.Cash, 150+w.Player.Heat*12)
 	w.Player.Cash -= fine
 

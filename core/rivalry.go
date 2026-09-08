@@ -107,7 +107,7 @@ func (w *World) SabotageReadiness(id string) string {
 // sabotageChance is the probability the attack lands. A stronger family is
 // harder to reach; a loyal crew and a known name help.
 func (w *World) sabotageChance(f *Faction) float64 {
-	chance := .35 + float64(w.Player.Crew[0].Loyalty)/400 + float64(min(w.Player.Respect, 100))/500 - float64(f.Power)/300
+	chance := .35 + float64(w.Player.Crew[0].Loyalty)/400 + float64(min(w.Player.Respect, 100))/500 - float64(f.Power)/300 + w.WeaponEdge()
 	if chance > .85 {
 		chance = .85
 	}
@@ -133,7 +133,7 @@ func (w *World) Sabotage(id string) error {
 
 	if w.Random() >= w.sabotageChance(f) {
 		// Turned away. The family learns who came for them either way.
-		injury := 12 + int(w.Random()*18)
+		injury := w.Absorb(12 + int(w.Random()*18))
 		w.Player.Health = max(0, w.Player.Health-injury)
 		w.Player.Heat = min(100, w.Player.Heat+12)
 		f.Goodwill = max(-100, f.Goodwill-20)

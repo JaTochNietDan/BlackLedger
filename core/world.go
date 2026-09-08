@@ -52,6 +52,10 @@ type Person struct {
 	// When the books last absorbed a round. Absent in older saves, which is the
 	// same as never having done it.
 	LastLaunder int `json:"last_launder,omitempty"`
+	// What the player is carrying. Absent in older saves, which is the same as
+	// carrying nothing.
+	Weapon int `json:"weapon,omitempty"`
+	Armour int `json:"armour,omitempty"`
 }
 type Crew struct {
 	ID      string `json:"id"`
@@ -438,6 +442,14 @@ func (w *World) Actions(id string) []Action {
 		add("audience", "Request an audience with Russo", 45, 0, "", "Discuss your standing with the Russo Outfit.")
 	case "docks":
 		add("dockwork", "Work the night cargo", 90, 0, "", "Earn $75 and 1 respect. Small chance of a work injury.")
+		if next, ok := nextArmament(weapons, p.Weapon); ok {
+			add("arms:weapon", "Buy "+next.Label, 45, next.Cost, w.ArmsReadiness("weapon"),
+				next.Detail+" Improves your odds when violence is your idea. A search takes it.")
+		}
+		if next, ok := nextArmament(armour, p.Armour); ok {
+			add("arms:armour", "Buy "+next.Label, 45, next.Cost, w.ArmsReadiness("armour"),
+				next.Detail+" Reduces what a beating costs you. A search takes it.")
+		}
 	case "market":
 		add("investigate", "Ask about threats", 45, 30, "", "Investigate existing threats. Evidence is not a guarantee of safety.")
 		add("lie_low", "Keep a low profile", 120, 15, "", "Lose 10 heat. Time still passes for rivals and businesses.")
@@ -621,11 +633,15 @@ func (w *World) Attack(plot Plot) {
 			body += "A contact calls: leave by the back, now."
 		}
 		w.Event = &Scene{ID: "attack-" + plot.ID, Title: "Headlights outside", Body: body + " You have moments to act.", Speaker: "mara", Kind: "attack", Source: "authored", Minute: w.Minute, Choices: []Choice{{ID: "escape", Label: "Leave through the rear", Detail: "A chance to escape. Security and contacts help; injuries reduce your odds."}, {ID: "defend", Label: "Hold the entrance", Detail: "Rely on your security. Injuries and a weak defense can be fatal."}, {ID: "bargain", Label: "Offer $180 to stand down", Cost: 180, Detail: "Money may settle this incident, but your standing suffers."}}}
-	} else if w.Random() < .78 {
+	} else if w.Random() < .78-float64(p.Armour)*.09 {
 		w.Die("An attack at your residence caught you without warning or protection.")
 	} else {
-		p.Health = max(1, p.Health-65)
-		w.Log("You survived by inches", "The attackers leave you wounded. Nobody warned you. You need rest and protection.", "danger")
+		p.Health = max(1, p.Health-w.Absorb(65))
+		worn := "Nobody warned you."
+		if p.Armour > 0 {
+			worn = "What you were wearing took the worst of it."
+		}
+		w.Log("You survived by inches", "The attackers leave you wounded. "+worn+" You need rest and protection.", "danger")
 	}
 }
 func (w *World) Advance(minutes int) {
@@ -776,7 +792,7 @@ func (w *World) Public() map[string]any {
 	if len(history) > 60 {
 		history = history[len(history)-60:]
 	}
-	return map[string]any{"id": w.ID, "version": w.Version, "revision": w.Revision, "life": w.Life, "minute": w.Minute, "player": w.Player, "district": w.District, "factions": w.Factions, "npcs": w.People(), "locations": locs, "event": scene, "history": history, "dead": w.Dead, "tasks": w.Tasks, "director": w.Director, "last_result": w.LastResult, "daily_cost": w.DailyCost(), "income": income, "security": w.Guard(), "opportunity": w.NextOpportunity(), "known_threats": w.KnownThreats(), "business_truces": w.ActiveBusinessTruces(), "conflicts": w.PublicConflicts(), "goods": w.Goods, "newspaper": w.Edition(), "arrangements": w.PendingArrangements()}
+	return map[string]any{"id": w.ID, "version": w.Version, "revision": w.Revision, "life": w.Life, "minute": w.Minute, "player": w.Player, "district": w.District, "factions": w.Factions, "npcs": w.People(), "locations": locs, "event": scene, "history": history, "dead": w.Dead, "tasks": w.Tasks, "director": w.Director, "last_result": w.LastResult, "daily_cost": w.DailyCost(), "income": income, "security": w.Guard(), "opportunity": w.NextOpportunity(), "known_threats": w.KnownThreats(), "business_truces": w.ActiveBusinessTruces(), "conflicts": w.PublicConflicts(), "goods": w.Goods, "arms": w.ArmsDescription(), "newspaper": w.Edition(), "arrangements": w.PendingArrangements()}
 }
 func (w *World) hasRecord(title string) bool {
 	for _, r := range w.History {

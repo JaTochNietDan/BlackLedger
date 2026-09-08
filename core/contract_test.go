@@ -105,8 +105,8 @@ func TestAContractIsNeverVisibleToThePlayer(t *testing.T) {
 func TestABetterHitmanSucceedsMoreOften(t *testing.T) {
 	rates := map[string]int{}
 	for _, tier := range []string{"cheap", "specialist"} {
-		for seed := uint32(1); seed <= 300; seed++ {
-			w := New(seed)
+		for i := uint32(1); i <= 300; i++ {
+			w := New(i * 2654435761)
 			w.Player.Cash = 100000
 			w.Contracts = []Contract{{ID: ID(), Life: w.Life, Target: "vittorio", Tier: tier, Payer: "player", Due: w.Minute}}
 			w.ResolveContracts()
@@ -129,8 +129,8 @@ func TestABetterHitmanSucceedsMoreOften(t *testing.T) {
 
 func TestAFailedAttemptCanBeTracedBack(t *testing.T) {
 	traced, escaped := 0, 0
-	for seed := uint32(1); seed <= 400; seed++ {
-		w := New(seed)
+	for i := uint32(1); i <= 400; i++ {
+		w := New(i * 2654435761)
 		w.Contracts = []Contract{{ID: ID(), Life: w.Life, Target: "vittorio", Tier: "cheap", Payer: "player", Due: w.Minute}}
 		heat, goodwill := w.Player.Heat, w.faction("bellandi").Goodwill
 		w.ResolveContracts()
@@ -186,8 +186,8 @@ func TestKillingALeaderThroughAContractStillPromotesSomebody(t *testing.T) {
 
 func TestOrganizationsBuyTheSameServiceThePlayerCan(t *testing.T) {
 	booked, killed := 0, 0
-	for seed := uint32(1); seed <= 300; seed++ {
-		w := New(seed)
+	for i := uint32(1); i <= 300; i++ {
+		w := New(i * 2654435761)
 		w.Antagonize("bellandi", "russo", 100)
 		if w.Conflict("bellandi", "russo").State != "war" {
 			t.Fatal("the test world is not at war")

@@ -102,8 +102,8 @@ func TestAFailedRobberyHurts(t *testing.T) {
 
 func TestTheCityRobsThePlayerBack(t *testing.T) {
 	robbed, named, anonymous := 0, 0, 0
-	for seed := uint32(1); seed <= 400; seed++ {
-		w := New(seed)
+	for i := uint32(1); i <= 400; i++ {
+		w := New(i * 2654435761)
 		w.Player.Cash = 4000
 		w.Player.Stock = map[string]int{"moonshine": 20}
 		w.Player.Contacts = 0
@@ -114,8 +114,8 @@ func TestTheCityRobsThePlayerBack(t *testing.T) {
 			anonymous++
 		}
 	}
-	for seed := uint32(1); seed <= 400; seed++ {
-		w := New(seed)
+	for i := uint32(1); i <= 400; i++ {
+		w := New(i * 2654435761)
 		w.Player.Cash = 4000
 		w.Player.Stock = map[string]int{"moonshine": 20}
 		w.Player.Contacts = 3
