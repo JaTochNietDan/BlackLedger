@@ -20,8 +20,14 @@ import (
 // early return in a component is the specific mistake that cost days of play.
 
 var (
-	hookCall     = regexp.MustCompile(`\buse(State|Effect|Memo|Callback|Ref|Reducer|Context|LayoutEffect)\s*\(`)
-	earlyReturn  = regexp.MustCompile(`^\s*if\s*\(.*\)\s*return\s`)
+	hookCall = regexp.MustCompile(`\buse(State|Effect|Memo|Callback|Ref|Reducer|Context|LayoutEffect)\s*\(`)
+	// Only a return in the component's own body can change how many hooks run.
+	// This first matched any depth, so `if (!from || !to) return [];` six
+	// spaces deep inside a callback was read as an early return and every hook
+	// after it reported. A guard that cries wolf gets reformatted around rather
+	// than obeyed, so it is pinned to the one or two spaces of indentation a
+	// component body uses in this codebase.
+	earlyReturn  = regexp.MustCompile(`^ {1,2}if\s*\(.*\)\s*return\s`)
 	componentTop = regexp.MustCompile(`^(export\s+)?function\s+[A-Z]`)
 )
 
@@ -92,5 +98,30 @@ func TestEverySettingTheGameObeysCanBeChanged(t *testing.T) {
 			continue
 		}
 		t.Errorf("%s obeys %q and nothing in the interface can set it: the player cannot change a setting the game is using", where, name)
+	}
+}
+
+// The guard above is a regular expression doing a parser's job, so its
+// precision is worth testing directly: it has to keep catching the shape that
+// broke the game and stop reporting the shape that cannot.
+func TestTheHookGuardKnowsWhichReturnsMatter(t *testing.T) {
+	dangerous := []string{
+		` if(!world)return <div className="loading">BLACK LEDGER</div>;`,
+		`  if (!place) return null;`,
+	}
+	harmless := []string{
+		`      if (!from || !to) return [];`,
+		`    if (matchMedia('(prefers-reduced-motion: reduce)').matches) { setPaper(true); return }`,
+		`        if (!ok) return errand{}, false`,
+	}
+	for _, line := range dangerous {
+		if !earlyReturn.MatchString(line) {
+			t.Errorf("the guard no longer sees a component's own early return: %q", line)
+		}
+	}
+	for _, line := range harmless {
+		if earlyReturn.MatchString(line) {
+			t.Errorf("the guard reports a return that cannot change the hook count: %q", line)
+		}
 	}
 }

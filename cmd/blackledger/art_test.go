@@ -139,3 +139,34 @@ func TestTheCameraGoesToTheBuildingRatherThanOverTheCity(t *testing.T) {
 		}
 	}
 }
+
+// People cross the city over real time, and the street only listed them in a
+// band: names and minutes, in a box, above a picture of the city they were
+// supposedly walking through. The last piece of the living city is seeing them
+// on it — placed between the two fronts according to how far along they are.
+func TestWalkersAreDrawnOnTheStreetAndNotOnlyListed(t *testing.T) {
+	street, err := os.ReadFile("../../src/CityStreet.tsx")
+	if err != nil {
+		t.Skip("no interface sources beside this build")
+	}
+	body := string(street)
+	for _, want := range []string{"walker-figure", "getBoundingClientRect", "progress"} {
+		if !strings.Contains(body, want) {
+			t.Fatalf("the street cannot place a walker between two addresses: no %q", want)
+		}
+	}
+	css, err := os.ReadFile("../../src/style.css")
+	if err != nil {
+		t.Fatal(err)
+	}
+	rule := regexp.MustCompile(`\.walker-figure\{[^}]*\}`)
+	found := rule.FindString(string(css))
+	if found == "" {
+		t.Fatal("a walker on the street has no styling")
+	}
+	// Positioned against the street rather than sitting in the flow, or it is
+	// a list item again with a different name.
+	if !strings.Contains(found, "position:absolute") {
+		t.Fatalf("a walker is not placed on the street: %s", found)
+	}
+}

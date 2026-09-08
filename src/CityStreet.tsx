@@ -1,6 +1,6 @@
 import type {Snapshot} from './types';
 import {paintedAsset,paintedFront} from './cityAssets';
-import {useEffect} from 'react';
+import {useEffect,useLayoutEffect,useRef,useState} from 'react';
 import {Portrait} from './Portrait';
 
 // The street view showed five buildings. The city has twelve, and two of the
@@ -56,6 +56,39 @@ export function CityStreet({state, selected, onSelect, onEnter, spotlight}: {
 
   const street = state.street || [];
 
+  // Where each walker stands on the screen: between the front they left and
+  // the front they are going to, as far along as they actually are. The fronts
+  // are laid out by the browser across three district blocks, so the only
+  // honest source for the two ends of a journey is where they were actually
+  // drawn. Positions are recomputed when the walkers change and when the
+  // window does; nothing animates between actions, because nothing moves
+  // between actions — the clock is stopped.
+  const stage = useRef<HTMLDivElement | null>(null);
+  const [figures, setFigures] = useState<{id: string; name: string; left: number; top: number; yours?: boolean}[]>([]);
+  const place = () => {
+    const box = stage.current?.getBoundingClientRect();
+    if (!box) return;
+    setFigures(street.flatMap(j => {
+      const from = stage.current!.querySelector(`[data-place="${j.from_id}"]`);
+      const to = stage.current!.querySelector(`[data-place="${j.to_id}"]`);
+      if (!from || !to) return [];
+      const a = from.getBoundingClientRect(), b = to.getBoundingClientRect();
+      const at = Math.min(1, Math.max(0, j.progress));
+      // Along the line between the two doorways, which is the bottom middle of
+      // each front rather than its centre: people walk on the pavement.
+      const ax = a.left + a.width / 2, ay = a.bottom;
+      const bx = b.left + b.width / 2, by = b.bottom;
+      return [{id: j.id, name: j.name, yours: j.yours,
+        left: ax + (bx - ax) * at - box.left,
+        top: ay + (by - ay) * at - box.top}];
+    }));
+  };
+  useLayoutEffect(place, [state.minute, state.revision, street.length]);
+  useEffect(() => {
+    window.addEventListener('resize', place);
+    return () => window.removeEventListener('resize', place);
+  });
+
   // Bring the address the camera is on into view, once per moment.
   useEffect(() => {
     if (!spotlight) return;
@@ -63,8 +96,14 @@ export function CityStreet({state, selected, onSelect, onEnter, spotlight}: {
       ?.scrollIntoView({block: 'center', behavior: 'smooth'});
   }, [spotlight?.id]);
 
-  return <div className={'city-street' + (spotlight ? ' watching' : '')}
+  return <div ref={stage} className={'city-street' + (spotlight ? ' watching' : '')}
     style={{'--night': dark.toFixed(2)} as React.CSSProperties}>
+    {/* The people actually crossing the city, on the city. */}
+    {figures.map(f => <div key={f.id} className={'walker-figure' + (f.yours ? ' yours' : '')}
+      style={{left: f.left + 'px', top: f.top + 'px'}} title={f.name}>
+      <Portrait id={f.id} size="tiny"/>
+      <b className="walker-tag">{f.name.split(' ')[0]}</b>
+    </div>)}
     {/* Who is out there. People in this city used to stand at one address for
         life; this is the only place you can watch one of them cross it. */}
     {!!street.length && <section className="street-out" aria-label="People on the street">

@@ -541,3 +541,17 @@
    is now telling you something different. */
 .person-card.walking .doing{color:var(--gold)}
 .on-street{font-style:normal;margin-right:6px}
+
+/* Somebody crossing the city, drawn on it. Placed between the two doorways by
+   how far along they are — they do not glide, because between one action and
+   the next the clock is stopped and nobody is moving. */
+.city-street{position:relative}
+.walker-figure{position:absolute;z-index:4;transform:translate(-50%,-50%);pointer-events:none;
+  display:flex;flex-direction:column;align-items:center;gap:2px;filter:drop-shadow(0 3px 8px #000b)}
+/* The label, and only the label: Portrait renders a <span>, so styling
+   `.walker-figure span` painted a background over the face itself and the
+   shorthand reset the portrait's own image to none. */
+.walker-tag{font-size:9px;font-weight:400;letter-spacing:.04em;color:#e6dcc2;background:#0d1413d9;padding:1px 5px;white-space:nowrap}
+.walker-figure .painted-portrait{border-color:#8c7c56}
+.walker-figure.yours .walker-tag{color:var(--gold)}
+@media(prefers-reduced-motion:reduce){.walker-figure{transition:none}}
