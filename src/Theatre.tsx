@@ -1,6 +1,7 @@
 import {useEffect,useState} from 'react';
 import type {Place,VisualCue} from './types';
 import {Portrait} from './Portrait';
+import {playMoment} from './sound';
 
 // The loudest moments of a campaign arrived as a paragraph in a list, and the
 // paper reported them the next morning to a player who never saw them. This is
@@ -47,6 +48,10 @@ export function Theatre({cue, place, onDone, onProgress, plate = true}: {
     img.onload = () => setPainted(true);
     img.src = scenePlate(cue.kind);
   }, [cue.kind]);
+
+  // The noise the city makes, once, at the top of the moment — not on every
+  // frame, and not again when the same moment is replayed mid-flight.
+  useEffect(() => { playMoment(cue.kind) }, [cue.id]);
 
   useEffect(() => {
     if (matchMedia('(prefers-reduced-motion: reduce)').matches) { setPaper(true); onProgress?.(1); return }

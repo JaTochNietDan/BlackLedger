@@ -176,3 +176,27 @@ func TestMomentsPlayInTheCityAndGiveTheCameraBack(t *testing.T) {
 		t.Error("the camera is taken to a moment and never returned to where the player had it")
 	}
 }
+
+// Every kind of moment the city can witness makes a noise. A kind nobody has
+// scored falls through to a dull knock rather than silence, because silence
+// reads as a bug — but the loud ones have to be scored deliberately.
+func TestTheLoudMomentsAreScored(t *testing.T) {
+	body, err := os.ReadFile("../../src/sound.ts")
+	if err != nil {
+		t.Skip("no interface sources beside this build")
+	}
+	source := string(body)
+	for _, loud := range []string{"explosion", "killing", "gunfight", "raid", "arrest"} {
+		if !strings.Contains(source, `'`+loud+`'`) {
+			t.Errorf("a %q makes whatever the fallback makes, which is a knock", loud)
+		}
+	}
+	// It has to be possible to turn off, and it has to default to on rather
+	// than to a browser exception in a private window.
+	if !strings.Contains(source, "black-ledger-sound") {
+		t.Error("the sound cannot be turned off")
+	}
+	if !strings.Contains(source, "catch { return true }") {
+		t.Error("a browser that refuses local storage silences the city instead of defaulting to on")
+	}
+}
