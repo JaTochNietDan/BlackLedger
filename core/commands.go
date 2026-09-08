@@ -1,6 +1,9 @@
 package core
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 // Execute validates and applies a command to a copy: rejected commands never partially mutate state.
 func Execute(original *World, c Command) (*World, error) {
@@ -213,6 +216,10 @@ func (w *World) apply(c Command) error {
 					w.Retaliation()
 				}
 				w.Log("A demand nobody forgets", "The manager refuses. A Bellandi man watches you leave. You have challenged a powerful family on its own ground.", "politics")
+			case "operate:clean", "operate:standard", "operate:hard":
+				if err := w.SetMode(target, strings.TrimPrefix(c.Kind, "operate:")); err != nil {
+					return err
+				}
 			case "incite":
 				if err := w.Incite(target); err != nil {
 					return err

@@ -5,7 +5,11 @@ import "fmt"
 // BusinessPressure is an authored political decision grounded in current ownership.
 // The schedule is private; the player sees only the delivered demand.
 func (w *World) BusinessPressure() {
-	w.NextPressure = w.Minute + 720
+	// A business visibly skimming invites attention sooner; one run clean and
+	// quiet buys time. Notice is a standing consequence of how the player runs
+	// what they own, not a hidden roll.
+	interval := 720 - 90*w.SkimNotice()
+	w.NextPressure = w.Minute + max(240, min(1440, interval))
 	var target *Place
 	actor := 0
 	ownsBusiness := false
@@ -23,7 +27,13 @@ func (w *World) BusinessPressure() {
 		if w.Factions[family].Goodwill >= 25 || w.BusinessTruces[w.Factions[family].ID] > w.Minute {
 			continue
 		}
-		if target == nil || w.Properties[l.ID].Income > w.Properties[target.ID].Income {
+		// The premises worth demanding a share of are the ones visibly earning.
+		weight := int(float64(w.Properties[l.ID].Income) * operatingMode(w.Properties[l.ID].Mode).Take)
+		best := 0
+		if target != nil {
+			best = int(float64(w.Properties[target.ID].Income) * operatingMode(w.Properties[target.ID].Mode).Take)
+		}
+		if target == nil || weight > best {
 			target, actor = l, family
 		}
 	}

@@ -85,6 +85,9 @@ type Property struct {
 	Condition int     `json:"condition"`
 	Income    int     `json:"income"`
 	Carry     float64 `json:"carry"`
+	// How the business is run. Empty means the ordinary way, so saves written
+	// before this was a decision keep earning exactly what they earned.
+	Mode string `json:"mode,omitempty"`
 }
 type Plot struct {
 	Target   string `json:"target,omitempty"`
@@ -314,7 +317,7 @@ func New(seed uint32) *World {
 		case "bar":
 			income = 12
 		}
-		w.Properties[p.ID] = &Property{owner, 100, income, 0}
+		w.Properties[p.ID] = &Property{Owner: owner, Condition: 100, Income: income}
 	}
 	// Each organization is people, not a name and a number. These are the ones
 	// who would step up if the person above them died.
@@ -443,6 +446,16 @@ func (w *World) Actions(id string) []Action {
 	if id == "laundry" || id == "garage" || id == "casino" {
 		if w.Own(id) {
 			add("inspect", "Review the books", 0, 0, "", "Read current income and repair needs without advancing time.")
+			if w.Properties[id].Income > 0 {
+				current := w.Mode(id)
+				for _, m := range operatingModes {
+					reason := ""
+					if m.ID == current.ID {
+						reason = "Already run this way"
+					}
+					add("operate:"+m.ID, m.Label, 0, 0, reason, m.Detail)
+				}
+			}
 			add("repair", "Repair the property", 60, 50, need(w.Properties[id].Condition >= 100, "Already in good condition"), "Restore 40 condition.")
 		} else {
 			req := 6
@@ -600,7 +613,7 @@ func (w *World) Advance(minutes int) {
 		w.Minute = next
 		for id, prop := range w.Properties {
 			if w.Own(id) {
-				prop.Carry += float64(prop.Income*prop.Condition*elapsed) / 6000
+				prop.Carry += float64(prop.Income*prop.Condition*elapsed) * operatingMode(prop.Mode).Take / 6000
 				n := int(prop.Carry + 1e-9)
 				prop.Carry -= float64(n)
 				w.Earn(n)
@@ -621,6 +634,7 @@ func (w *World) Advance(minutes int) {
 		}
 		if w.Minute%1440 == 0 {
 			w.FamilyDay()
+			w.BusinessDay()
 			bill := w.DailyCost()
 			if p.Cash >= bill {
 				p.Cash -= bill
