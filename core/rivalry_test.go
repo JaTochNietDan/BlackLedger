@@ -268,3 +268,81 @@ func TestOnlyVisibleQuarrelsAreReported(t *testing.T) {
 		t.Fatal("an open war was not visible to the city")
 	}
 }
+
+func TestAnOrganizationHoldingNothingLosesItsStrength(t *testing.T) {
+	// Observed in a 1500-command campaign: Russo held nothing, had no income
+	// and no cash, and still sat at power 58, because a landless organization
+	// recovered toward the strength it had when it still owned property.
+	w := New(401)
+	f := w.faction("russo")
+	f.Peak, f.Power = 58, 58
+	for _, id := range w.FamilyHoldings("russo") {
+		w.Properties[id].Owner = "independent"
+	}
+	before := f.Power
+	w.FamilyDay()
+	if w.faction("russo").Power >= before {
+		t.Fatalf("an organization holding nothing kept its strength: %d", w.faction("russo").Power)
+	}
+	for day := 0; day < 30; day++ {
+		w.FamilyDay()
+	}
+	if w.faction("russo").Power > 15 {
+		t.Fatalf("a landless organization is still strong after a month: %d", w.faction("russo").Power)
+	}
+	// And it earns nothing, because it has nothing to earn from.
+	if w.faction("russo").Cash != 4500 {
+		t.Fatalf("an organization with no holdings collected money: %d", w.faction("russo").Cash)
+	}
+}
+
+func TestAnOrganizationWithPeopleCanFindSomewhereToStartAgain(t *testing.T) {
+	recovered := 0
+	for i := uint32(1); i <= 200; i++ {
+		w := New(i * 2654435761)
+		f := w.faction("russo")
+		for _, id := range w.FamilyHoldings("russo") {
+			w.Properties[id].Owner = "independent"
+		}
+		f.Power = 40
+		for turn := 0; turn < 40 && len(w.FamilyHoldings("russo")) == 0; turn++ {
+			w.considerReestablish()
+		}
+		if len(w.FamilyHoldings("russo")) > 0 {
+			recovered++
+		}
+	}
+	t.Logf("of 200 landless organizations with people and strength, %d found somewhere to start again", recovered)
+	if recovered == 0 {
+		t.Fatal("an organization with people and strength can never recover any ground")
+	}
+}
+
+func TestRecoveryNeverTakesWhatSomebodyHolds(t *testing.T) {
+	w := New(403)
+	w.Properties["laundry"].Owner = "player:1"
+	w.Properties["garage"].Owner = "former:Alex Varga"
+	w.Properties["garage"].Income = 24
+	f := w.faction("russo")
+	for _, id := range w.FamilyHoldings("russo") {
+		w.Properties[id].Owner = "independent"
+	}
+	f.Power = 40
+	for turn := 0; turn < 400; turn++ {
+		w.considerReestablish()
+	}
+	if !w.Own("laundry") {
+		t.Fatal("an organization took the player's business to re-establish itself")
+	}
+	for _, f := range w.Factions {
+		for _, id := range w.FamilyHoldings(f.ID) {
+			if w.Properties[id].Owner != f.ID {
+				t.Fatal("holdings and ownership disagree")
+			}
+		}
+	}
+	// Bellandi's own premises are not available to Russo either.
+	if w.Properties["club"].Owner != "bellandi" {
+		t.Fatalf("a rival's holding was taken by re-establishment: club is %q", w.Properties["club"].Owner)
+	}
+}

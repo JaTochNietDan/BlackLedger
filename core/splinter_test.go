@@ -116,3 +116,32 @@ func TestAnOrganizationHoldingNothingEventuallyEnds(t *testing.T) {
 		}
 	}
 }
+
+func TestAFamilyWithNobodyLeftToFightFractures(t *testing.T) {
+	// Observed in a 1500-command campaign: Bellandi ended holding everything at
+	// full strength with Russo reduced to a shell, and nothing further could
+	// happen in that city.
+	w := New(419)
+	for _, id := range w.FamilyHoldings("russo") {
+		w.Properties[id].Owner = "bellandi"
+	}
+	f := w.faction("bellandi")
+	f.Power = peak(f) // healthy, and at peace
+	if !w.splinterReady(f) {
+		t.Fatal("a family that owns the whole city has no reason to fracture")
+	}
+	if !w.Splinter(f) {
+		t.Fatal("an unopposed family did not fracture")
+	}
+	born := w.Factions[len(w.Factions)-1]
+	if len(w.FamilyHoldings(born.ID)) == 0 {
+		t.Fatal("the breakaway took no ground")
+	}
+	// And a healthy family with a live rival still holds together.
+	rivals := New(421)
+	healthy := rivals.faction("bellandi")
+	healthy.Power = peak(healthy)
+	if rivals.splinterReady(healthy) {
+		t.Fatal("a healthy family with a living rival fractured anyway")
+	}
+}

@@ -76,7 +76,16 @@ func (w *World) splinterReady(f *Faction) bool {
 			fighting = true
 		}
 	}
-	return weakened || fighting
+	// An organization with nobody left to fight fractures from the inside.
+	// Without this a city that ends in one family owning everything stays that
+	// way, and nothing further can happen in it.
+	unopposed := true
+	for _, other := range w.Factions {
+		if other.ID != f.ID && len(w.FamilyHoldings(other.ID)) > 0 {
+			unopposed = false
+		}
+	}
+	return weakened || fighting || unopposed
 }
 
 // Splinter breaks a new organization out of an existing one, taking a holding

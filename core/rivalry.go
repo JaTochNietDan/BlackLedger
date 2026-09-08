@@ -58,10 +58,14 @@ func (w *World) FamilyDay() {
 			}
 		}
 		f.Cash = max(0, f.Cash+income*24)
-		target := peak(f)
-		if count > 0 {
-			target = peak(f) * condition / (100 * count)
+		// Strength comes from holdings. An organization that holds nothing has
+		// nothing to draw on and fades, rather than recovering to the strength
+		// it had when it still owned half the waterfront.
+		if count == 0 {
+			f.Power = max(0, f.Power-4)
+			continue
 		}
+		target := peak(f) * condition / (100 * count)
 		switch {
 		case f.Power < target:
 			f.Power = min(target, f.Power+2)

@@ -1,0 +1,52 @@
+{
+ "base": "http://127.0.0.1:8915",
+ "steps_taken": 1500,
+ "idempotency": "replayed request returned the same committed state",
+ "stale_revision": "HTTP 409: {\"error\":\"the city has changed; refresh before deciding\"}\n",
+ "final": {
+  "alive": true,
+  "cash": 153,
+  "heat": 85,
+  "life": 6,
+  "minute": 52432,
+  "owned": [
+   "laundry"
+  ],
+  "respect": 22
+ },
+ "invariant_failures": null,
+ "command_counts": {
+  "acquire": 10,
+  "arms:armour": 2,
+  "arms:weapon": 1,
+  "buy:cigarettes": 5,
+  "buy:moonshine": 7,
+  "choice": 72,
+  "contact": 34,
+  "contract": 6,
+  "courier": 16,
+  "crew_bonus": 23,
+  "delegate": 301,
+  "expand": 2,
+  "incite": 140,
+  "inspect": 2,
+  "investigate": 24,
+  "launder": 1,
+  "lie_low": 7,
+  "move_home": 42,
+  "new_life": 5,
+  "operate:clean": 7,
+  "operate:hard": 10,
+  "operate:standard": 3,
+  "play:high": 1,
+  "play:small": 38,
+  "recruit": 6,
+  "repair": 33,
+  "rob": 32,
+  "sabotage": 14,
+  "security": 58,
+  "sell:cigarettes": 2,
+  "sell:moonshine": 5,
+  "travel": 591
+ }
+}

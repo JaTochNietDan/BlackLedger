@@ -228,10 +228,49 @@ func (w *World) dissolve() {
 	w.Plots = plots
 }
 
+// considerReestablish gives an organization that still has people but no ground
+// a way back: it moves onto premises nobody is holding. Without this a city can
+// settle permanently into one family owning everything, with the loser present
+// in name and incapable of ever acting again.
+func (w *World) considerReestablish() {
+	for i := range w.Factions {
+		f := &w.Factions[i]
+		// People are what makes a comeback possible, not strength: an
+		// organization reduced to nothing still has members who want somewhere
+		// to work. Requiring strength first left beaten families permanently
+		// inert, which locked the city into one family owning everything.
+		if len(w.FamilyHoldings(f.ID)) > 0 || len(w.Members(f.ID)) == 0 {
+			continue
+		}
+		if w.WorldRandom() >= .12 {
+			continue
+		}
+		for _, l := range Locations {
+			prop := w.Properties[l.ID]
+			// Only premises that trade and that no living person holds: never
+			// the player's, and never another organization's.
+			if prop == nil || prop.Income <= 0 || w.Own(l.ID) || w.faction(prop.Owner) != nil {
+				continue
+			}
+			if !strings.HasPrefix(prop.Owner, "former:") && prop.Owner != "independent" {
+				continue
+			}
+			prop.Owner = f.ID
+			prop.Condition = max(prop.Condition, 40)
+			f.Power = min(peak(f), f.Power+8)
+			w.Log("They are back on their feet", fmt.Sprintf("%s has taken over %s. An organization with nothing left has found somewhere to start again.", f.Name, l.Name), "politics")
+			w.Report("recovery", upper(f.Name)+" MOVES INTO "+upper(l.Name),
+				fmt.Sprintf("%s has taken over the running of %s, which had been standing without an owner.", f.Name, l.Name))
+			return
+		}
+	}
+}
+
 // FactionTurn advances relations between organizations once per day. Ambition,
 // weakness and proximity move hostility; open war produces raids and seizures.
 func (w *World) FactionTurn() {
 	w.dissolve()
+	w.considerReestablish()
 	w.considerSplinters()
 	w.ConsiderFactionContracts()
 	for i := range w.Factions {
