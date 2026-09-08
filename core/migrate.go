@@ -8,7 +8,7 @@ package core
 // to somebody.
 
 // SaveVersion is the shape the current build writes.
-const SaveVersion = 9
+const SaveVersion = 10
 
 // seedHoldings is the property each established family holds in a new city.
 var seedHoldings = map[string][]string{
@@ -121,6 +121,14 @@ func (w *World) MigrateLivingWorld() {
 	// see it. Prices start at their reference so nobody inherits a windfall.
 	if len(w.Goods) == 0 {
 		w.Goods = newGoods()
+	}
+	// A good added after a campaign began is missing from it entirely, and a
+	// market the player cannot see is a market that does not exist. Anything
+	// new starts at its reference price so nobody inherits a windfall.
+	for _, good := range newGoods() {
+		if w.Good(good.ID) == nil {
+			w.Goods = append(w.Goods, good)
+		}
 	}
 
 	// Businesses acquired before they had an inside were working concerns all
