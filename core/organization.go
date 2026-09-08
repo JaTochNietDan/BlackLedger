@@ -54,6 +54,10 @@ func (w *World) PlayerStrength() int {
 	for _, c := range w.Player.Crew {
 		strength += c.Loyalty / 8
 	}
+	// And whoever answers to you, weighted by whether they mean it.
+	for _, n := range w.OwnPeople() {
+		strength += 4 + n.Trust/20
+	}
 	return min(100, strength)
 }
 

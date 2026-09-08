@@ -54,6 +54,7 @@ var ventures = []string{
 	"dress", "press", "bankroll", "draw", "car", "service",
 	"fit:door", "fit:telephone", "fit:safe", "fit:cellar", "commission",
 	"trip:rockridge", "trip:kingsport", "trip:halloway", "charge", "plant", "sitdown", "retain:commissioner", "retain:mayor", "rob:crew", "sabotage:crew", "armoury", "stock_arms", "buy:arms", "sell:arms", "mug", "mug:crew", "hit", "stand", "order",
+	// Signing somebody on names them, so the harness cannot list it by id.
 }
 
 var choicePreference = []string{"approach:careful", "accept", "pay", "escape", "acknowledge", "listen", "leave", "decline"}

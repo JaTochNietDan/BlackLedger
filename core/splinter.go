@@ -65,6 +65,11 @@ func (w *World) splinterReady(f *Faction) bool {
 	if len(w.Factions) >= maxOrganizations {
 		return false
 	}
+	// Somebody walking out on the player takes a business rather than founding
+	// a family, which is one path rather than two doing the same thing.
+	if f.ID == w.PlayerOrganizationID() {
+		return false
+	}
 	holdings := w.FamilyHoldings(f.ID)
 	if len(holdings) < 2 {
 		return false // nobody walks away with the last thing the family owns

@@ -88,6 +88,12 @@ func (w *World) CoupAftermath(f *Faction, winner, loser *NPC) {
 // everybody afterwards now all come from the same place the rest of the city's
 // history does.
 func (w *World) InternalMove(f *Faction) bool {
+	// The player's organization has no leader inside it to move on: the leader
+	// is the player. Somebody who has had enough of them defects instead, which
+	// OwnPeopleDay handles.
+	if f.ID == w.PlayerOrganizationID() {
+		return false
+	}
 	members := w.Members(f.ID)
 	if len(members) < 2 {
 		return false

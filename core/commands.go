@@ -226,6 +226,21 @@ func (w *World) apply(c Command) error {
 					w.Log("Journey interrupted", fmt.Sprintf("The journey to %s was interrupted after %d minutes. You remain based at %s; choose your next destination after resolving the situation.", to.Name, w.Minute-oldTime, from.Name), "travel")
 				}
 			}
+		} else if person, ok := strings.CutPrefix(c.Kind, "sign:"); ok {
+			if err := w.SignOn(person); err != nil {
+				return err
+			}
+			w.Advance(a.Minutes)
+		} else if person, ok := strings.CutPrefix(c.Kind, "share:"); ok {
+			if err := w.PayShare(person); err != nil {
+				return err
+			}
+			w.Advance(a.Minutes)
+		} else if person, ok := strings.CutPrefix(c.Kind, "dismiss:"); ok {
+			if err := w.LetGo(person); err != nil {
+				return err
+			}
+			w.Advance(a.Minutes)
 		} else {
 			// Hiring/delegating commits arrangements immediately; work rewards require reaching completion.
 			switch c.Kind {
@@ -277,6 +292,11 @@ func (w *World) apply(c Command) error {
 				if err := w.Fit(target, strings.TrimPrefix(c.Kind, "fit:")); err != nil {
 					return err
 				}
+			case "sign", "share", "dismiss":
+				// Never reached: these carry a person's id after the colon and
+				// are handled by prefix below. Listed so the switch reads as
+				// the full set of what the player can do.
+				return fmt.Errorf("who?")
 			case "retain:commissioner", "retain:mayor":
 				if err := w.Retain(strings.TrimPrefix(c.Kind, "retain:")); err != nil {
 					return err
