@@ -4,3 +4,7 @@ __pycache__/
 node_modules/
 dist/
 /blackledger
+
+# Local AI/voice runtime: private Ollama build, ~39GB model blobs, TTS venv and
+# audio sources. Reinstallable; never committed.
+.tools/

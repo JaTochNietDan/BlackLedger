@@ -1,4 +1,4 @@
-You are taking ownership of the visual presentation of Black Ledger, a single-player browser mafia game. Work in the `mafia-game-visuals` Git worktree on `codex/visual-handoff`.
+You are taking ownership of the visual presentation of Black Ledger, a single-player browser mafia game. Work in the `black-ledger-visuals` Git worktree on `codex/visual-handoff`.
 
 Read `docs/VISUAL_HANDOFF.md`, `docs/VISUAL_ACCEPTANCE.md`, `docs/ART_DIRECTION.md`, `API.md`, and `src/types.ts`. Inspect the actual reference images and running preview before editing. Start it with `./scripts/run-visual-preview.sh damage` on port 8840. The preview uses its own staged save; never use or modify the user's campaign on port 8791.
 

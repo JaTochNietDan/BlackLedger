@@ -30,6 +30,7 @@ First finish one convincing block before producing many assets:
 - Make night windows, lamps and signs feel attached to the architecture. Use per-asset anchors/masks rather than arbitrary screen-space glows. Night brightness must apply to people and vehicles too.
 - Improve consistent UI skin, hierarchy, portraits and compact iconography. Preserve legibility of prices, durations and consequences. Do not hide critical stakes to reduce text.
 - Expand the portrait cast: the 3×2 painted atlas is Mara/Leo/Vittorio, Elena/Harlow/Alex. Later player identities currently use a fallback.
+  Confirmed defect (2026-09-07): `castPortraits` in `src/main.tsx` keys five NPCs by lowercase role id but keys the player by the literal name `'Alex Varga'`, while `Portrait` is called with `p.name`. The protagonist pool in `core/world.go` is Alex Varga, Nico Ward, Frankie Vale, Sam Costa, Jamie Moretti, Robin Hale, so five of six protagonists can never match a painted cell. Because permadeath is the core loop, the painted player portrait is unreachable for every life after the first; the reported live campaign (Nico Ward, life 2) renders the procedural SVG. All six atlas cells are already spent, so the fix needs additional painted faces plus a larger sheet and manifest/CSS change, not just a key rename. Do not resolve this by pointing every protagonist at Alex's cell: Alex persists as a distinct dead person in the city history, so sharing a face would misrepresent identity.
 
 Recent header/framing fixes put controls in normal flow, the street iframe at the canvas aspect ratio, and the property placeholder on a neutral architectural symbol. Check these rather than restoring old absolute offsets. CSS has accumulated overrides and deserves careful consolidation, with before/after screenshots.
 
@@ -51,7 +52,7 @@ No external publication, purchases, backend migration, user-save modification or
 
 ## Preview safely
 
-Use the prepared `codex/visual-handoff` worktree, not the gameplay checkout. Its location is beside `mafia-game`, named `mafia-game-visuals`.
+Use the prepared `codex/visual-handoff` worktree, not the gameplay checkout. Its location is beside `black-ledger`, named `black-ledger-visuals` (both under `~/Workarea`).
 
 ```sh
 ./scripts/run-visual-preview.sh damage
