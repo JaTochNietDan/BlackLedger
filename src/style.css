@@ -464,3 +464,23 @@
 .legacy-press{margin:16px 0 0;border-left:2px solid #5c5340;padding-left:13px}
 .legacy-press small{display:block;font:9.5px system-ui;letter-spacing:.2em;color:var(--gold);margin-bottom:5px}
 .legacy-press b{display:block;font:700 14px var(--serif);color:#cfc9b6;line-height:1.35;margin-bottom:3px}
+
+/* Settings. Each row is one decision: what it does on the left in the words the
+   game would use, the control on the right, always in the same place. */
+.settings{display:flex;flex-direction:column;gap:2px;max-width:760px;border:1px solid var(--line);background:var(--panel)}
+.setting{display:flex;align-items:flex-start;justify-content:space-between;gap:28px;padding:22px 24px;border-bottom:1px solid var(--line)}
+.setting:last-child{border-bottom:none}
+.setting h3{margin:0 0 6px;font-size:15px;letter-spacing:.02em}
+.setting p{margin:0;font-size:13px;line-height:1.6;color:var(--muted);max-width:52ch}
+.setting p+p{margin-top:8px}
+.setting>div{flex:1}
+.setting-note{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);white-space:nowrap;padding-top:4px}
+.toggle{flex:none;display:inline-flex;align-items:center;gap:10px;min-width:118px;justify-content:flex-start;
+  background:transparent;border:1px solid var(--line);color:var(--muted);padding:8px 14px;cursor:pointer;
+  font:inherit;font-size:11px;letter-spacing:.14em;text-transform:uppercase}
+.toggle i{width:28px;height:14px;border:1px solid var(--line);position:relative;display:block}
+.toggle i::after{content:'';position:absolute;top:1px;left:1px;width:10px;height:10px;background:var(--muted);transition:left .12s ease}
+.toggle.on{color:var(--ink);border-color:var(--gold)}
+.toggle.on i{border-color:var(--gold)}
+.toggle.on i::after{left:15px;background:var(--gold)}
+.toggle:hover{border-color:var(--gold)}

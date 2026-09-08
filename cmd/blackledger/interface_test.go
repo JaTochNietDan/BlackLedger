@@ -49,3 +49,48 @@ func TestNoHookIsWrittenBelowAnEarlyReturn(t *testing.T) {
 		}
 	}
 }
+
+// A preference the game obeys and the player cannot reach is worse than no
+// preference at all: the behaviour is there, somebody's browser is deciding it,
+// and the only way to change it is to open developer tools. `black-ledger-motion`
+// gated the theatre — a modal that holds the screen for several seconds after a
+// killing — and nothing in the interface had ever written it.
+//
+// The rule: every stored preference the interface reads must also be written
+// somewhere the player can click. Keys the game only uses as scratch storage
+// (a pending request being retried, how much of the paper has been read) are
+// not preferences and are exempt by name.
+func TestEverySettingTheGameObeysCanBeChanged(t *testing.T) {
+	files, err := filepath.Glob("../../src/*.tsx")
+	if err != nil || len(files) == 0 {
+		t.Skip("no interface sources beside this build")
+	}
+	notAPreference := map[string]bool{
+		"black-ledger-pending":   true, // a command being replayed after a refresh
+		"black-ledger-news-seen": true, // how far through the paper the reader is
+	}
+	read, written := map[string]string{}, map[string]bool{}
+	key := regexp.MustCompile(`localStorage\.(getItem|setItem|removeItem)\('(black-ledger-[a-z-]+)'`)
+	for _, file := range files {
+		body, err := os.ReadFile(file)
+		if err != nil {
+			t.Fatal(err)
+		}
+		for _, m := range key.FindAllStringSubmatch(string(body), -1) {
+			if m[1] == "getItem" {
+				read[m[2]] = filepath.Base(file)
+				continue
+			}
+			written[m[2]] = true
+		}
+	}
+	if len(read) == 0 {
+		t.Fatal("no stored preferences were found at all, which means this guard is not reading the sources")
+	}
+	for name, where := range read {
+		if notAPreference[name] || written[name] {
+			continue
+		}
+		t.Errorf("%s obeys %q and nothing in the interface can set it: the player cannot change a setting the game is using", where, name)
+	}
+}
