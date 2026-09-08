@@ -98,3 +98,5 @@ Gameplay integration note (2026-09-07): main now adds an optional `business_truc
 The gameplay branch now shows the existing public `known_threats` on Families as well as City, alongside business-ceasefire terms. Preserve that warning when restyling; standing alone does not cancel a reported hit. People resolves family-leader affiliation from the supplied factions and labels Harlow as a city authority. These are small `src/main.tsx` changes; no art or API schema changed.
 
 On boot, the gameplay client now selects the player's current public location, using the directory if it lacks street art. A brand-new person in the starting room is still directed toward Saint Agnes. Preserve this useful reload behavior when replacing navigation. No simulation state is stored in the view.
+
+Functional copy update: Families now titles previous lives "The city before you" and labels a deceased person's cause as a quoted final record. This clarifies the old protagonist's second-person wording; no layout or visual styling changes. Coordinate this small src/main.tsx edit when merging visual work.

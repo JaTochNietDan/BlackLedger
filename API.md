@@ -66,3 +66,5 @@ Director input now attributes memory to its historical participant. Current-pers
 Generated titles, spoken bodies and approach labels reject explicit monetary amounts, durations and recognizable deadline phrases before queuing. A failed draft receives at most one correction; repeated failure leaves the campaign clock/cash unchanged and queues no invalid offer. These lexical checks are not complete semantic verification. Authored choice details still supply actual terms; existing saved offers are not rewritten.
 
 If the model explicitly reports response-token exhaustion (`done_reason: length`), generation fails without a correction request at the same budget. No offer or gameplay action is committed. This is a provider failure, distinct from a complete response rejected for invalid story fields.
+
+`GET /api/health` also returns `build: {revision, modified}` for the running Go binary. Revision is the embedded Git commit when available; otherwise `unknown`. Modified is null when unavailable. This identifies the core binary, not the independently served frontend bundle.

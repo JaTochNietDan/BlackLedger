@@ -61,7 +61,7 @@ func (a *app) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		switch r.URL.Path {
 		case "/api/health":
-			reply(w, 200, map[string]any{"ok": true, "game": "Black Ledger", "core": "go"})
+			reply(w, 200, map[string]any{"ok": true, "game": "Black Ledger", "core": "go", "build": runningBuild})
 			return
 		case "/api/state":
 			s, e := a.s.Read()

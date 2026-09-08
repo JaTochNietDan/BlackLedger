@@ -1,0 +1,79 @@
+{
+  "qa_core_revision": "41a554f",
+  "purpose": "Latest accumulated gameplay integration and read-only source-save upgrade check; QA commands applied only to copies/fixtures. Not a fresh20-minute campaign.",
+  "baseline": {
+    "id": "75eb7be978af4ce7940f15f9969e83e4",
+    "revision": 190,
+    "life": 2,
+    "minute": 11365,
+    "player": {
+      "name": "Nico Ward",
+      "cash": 765,
+      "health": 100,
+      "respect": 76,
+      "heat": 9,
+      "location": "garage",
+      "home": "estate",
+      "best_home": 2,
+      "security": 0,
+      "contacts": 0,
+      "crew": [],
+      "alive": true,
+      "earned": 4235,
+      "job_count": 2
+    }
+  },
+  "initial_upgrade": {
+    "preserved": [
+      "id",
+      "revision",
+      "life",
+      "minute",
+      "player",
+      "factions",
+      "dead",
+      "locations",
+      "event"
+    ],
+    "added_public_fields": [
+      "business_truces"
+    ]
+  },
+  "ceasefire_after_browser_purchase_reload": {
+    "minute": 11410,
+    "cash": 665,
+    "truce": {
+      "russo": 12850
+    },
+    "checks": [
+      "45-minute audience",
+      "100-dollar payment",
+      "unchanged standing",
+      "agreement visible after reload"
+    ]
+  },
+  "paused_job_after_browser_resume": {
+    "minute": 525,
+    "cash": 225,
+    "respect": 3,
+    "heat": 3,
+    "checks": [
+      "demand resolved for60",
+      "reload preserves15-minute remainder",
+      "resume reaches08:45",
+      "original sealed-message title in ledger",
+      "single75-dollar job reward"
+    ]
+  },
+  "verification": [
+    "Go race suite passed",
+    "seven frontend tests passed",
+    "TypeScript and Vite build passed",
+    "no browser warning/error in upgraded-copy tab"
+  ],
+  "remaining": [
+    "Narrative coherence fails recent live-model suites",
+    "Compact viewport acceptance not yet verified",
+    "Full new campaign acceptance remains separate from this upgrade smoke test"
+  ]
+}
