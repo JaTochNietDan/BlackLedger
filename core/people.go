@@ -286,37 +286,7 @@ func (w *World) casualty(faction string) *NPC {
 // ConsiderInternalMove gives an ambitious deputy in a failing organization a
 // reason to take it for themselves. It is the same violence as any other, done
 // by people the city already knows, and it can fail.
-func (w *World) ConsiderInternalMove(f *Faction) bool {
-	if f.Power > peak(f)*3/5 {
-		return false // nobody moves on a leader who is still winning
-	}
-	members := w.Members(f.ID)
-	if len(members) < 2 {
-		return false
-	}
-	leader, challenger := members[0], members[1]
-	if challenger.Rank < RankLieutenant || challenger.Ambition < 65 {
-		return false
-	}
-	odds := .35 + float64(challenger.Skill-leader.Skill)/200 + float64(challenger.Ambition)/400
-	if odds < .15 {
-		odds = .15
-	}
-	if odds > .8 {
-		odds = .8
-	}
-	if w.WorldRandom() < odds {
-		w.Log("A move against "+leader.Name,
-			fmt.Sprintf("%s has taken %s's place at the head of %s by force. The organization is divided and bleeding.", challenger.Name, leader.Name, f.Name),
-			"politics")
-		w.Kill(leader.ID, challenger.Name+" moved against them from inside "+f.Name+".")
-		f.Power = max(10, f.Power-12)
-		return true
-	}
-	w.Log("A move that failed",
-		fmt.Sprintf("%s tried to take %s from %s and did not survive it. The people who backed them are being counted.", challenger.Name, f.Name, leader.Name),
-		"politics")
-	w.Kill(challenger.ID, "They moved against "+leader.Name+" and lost.")
-	f.Power = max(10, f.Power-5)
-	return true
-}
+// ConsiderInternalMove is the older name for what InternalMove now does. Kept
+// so that anything still calling it gets the current behaviour rather than the
+// version without an aftermath.
+func (w *World) ConsiderInternalMove(f *Faction) bool { return w.InternalMove(f) }

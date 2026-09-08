@@ -21,6 +21,20 @@ func dailyAmbition(n *NPC) float64 {
 // PeopleDay gives every living person one chance a day to pursue what they
 // want. Called from the clock, so it happens whether or not anyone is watching.
 func (w *World) PeopleDay() {
+	// Somebody ambitious inside an organization spends every day looking at the
+	// person above them. Two a day against one a day of forgetting means it
+	// takes about a month and a half to become a reason, which is the only
+	// source of grievance in this city that does not need somebody to have died
+	// first.
+	for i := range w.NPCs {
+		n := &w.NPCs[i]
+		if n.Dead || n.Faction == "" || n.Rank < RankLieutenant || n.Rank >= RankLeader || n.Ambition < 60 {
+			continue
+		}
+		if members := w.Members(n.Faction); len(members) > 0 && members[0].ID != n.ID {
+			w.Resent(n.ID, members[0].ID, 2, "standing in the way of what they want")
+		}
+	}
 	for i := range w.NPCs {
 		n := &w.NPCs[i]
 		if n.Dead || n.Rank >= RankLeader {

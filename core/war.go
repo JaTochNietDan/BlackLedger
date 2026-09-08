@@ -183,7 +183,7 @@ func (w *World) considerSplinters() {
 	for i := 0; i < len(w.Factions); i++ {
 		// A failing organization may lose its leader to the person below them
 		// before it ever loses anyone to a rival.
-		if w.WorldRandom() < 0.03 && w.ConsiderInternalMove(&w.Factions[i]) {
+		if w.movedThisDay(&w.Factions[i]) {
 			return
 		}
 		if w.WorldRandom() < 0.05 && w.Splinter(&w.Factions[i]) {
