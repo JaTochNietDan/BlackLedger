@@ -214,6 +214,8 @@ func (w *World) apply(c Command) error {
 				p.Location = target
 				l, _ := PlaceByID(target)
 				w.Log("Arrived at "+l.Name, fmt.Sprintf("The journey took %d minutes.", w.Minute-oldTime), "travel")
+				// What the city was doing while the player was crossing it.
+				w.PassThrough(oldLoc, target)
 			} else {
 				p.Location = oldLoc
 				if p.Alive {

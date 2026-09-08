@@ -122,7 +122,6 @@ it is still in this list, it does not exist in the game yet.
 - Playable casino games
 - Every noteable character can be killed
 - All named characters (living NPCs) are dynamic people who live somewhere and their own people that have their own agendas and stuff (meaning the fixers, etc). No character is a fixed character that cannot die or something. They might be gone and replaced by another. All of that is dynamic and living. Everything that you do, that can happen to you, can happen to them and be done by them.
-- Stuff can happen, i.e people can be shot and killed while traversing the map, it happens, there are reasons and motives though and that is important to be coherent and logical.
 - Not all situations that occur have answers that are clear to the user, sometimes there is a feud that we didn't know about.
 - Ownable businesses really need to have character to them and almost mini-simulation games within them. Casinos need to be micro managed, laundromats, etc. Money isn't easy to come by, it requires work and smart play.
 - Perhaps a system in which some money can be preserved by funneling off to an offshore swiss account and can be accessed by new start players, maybe money deposited in there comes at large cost. Maybe accessing this as a new start is difficult and requires some capital to be able to fly there or something and access it.
