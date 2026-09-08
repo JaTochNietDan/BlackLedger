@@ -445,7 +445,9 @@ func (w *World) apply(c Command) error {
 					w.Log("Cargo shifted", "$75 for a long shift on Pier 14.", "work")
 				case "contact":
 					p.Contacts = min(5, p.Contacts+1)
-					w.NPC("mara").Trust += 5
+					if fixer := w.Holder("fixer"); fixer != nil {
+						fixer.Trust += 5
+					}
 					w.Log("A useful conversation", "Mara will keep an ear open. Your information network improves.", "personal")
 				case "recruit":
 					p.Crew = append(p.Crew, Crew{"leo", "Leo Carver", 65})

@@ -70,7 +70,10 @@ func (w *World) AddCivilian() *NPC {
 func (w *World) Civilians() []*NPC {
 	out := []*NPC{}
 	for _, n := range w.People() {
-		if n.Faction == "" && !IsOfficial(n.ID) && !w.isCrew(n.ID) {
+		// Somebody doing one of the city's jobs is not loose on the street:
+		// no family recruits the detective, and nothing replaces the fixer
+		// with the fixer.
+		if n.Faction == "" && !IsOfficial(n.ID) && !w.isCrew(n.ID) && !w.isRoleHolder(n) {
 			out = append(out, n)
 		}
 	}
@@ -83,7 +86,7 @@ func (w *World) isCrew(id string) bool {
 			return true
 		}
 	}
-	return id == "mara" || id == "leo"
+	return false
 }
 
 // Populate brings the city up to strength: every organization to its size, and
@@ -93,6 +96,10 @@ func (w *World) Populate() {
 	for i := range w.Factions {
 		w.fillOut(&w.Factions[i], FamilySize)
 	}
+	// Jobs are filled before the street is counted, because filling one takes
+	// somebody off the street — doing it the other way round meant the city
+	// grew by one every time it was counted.
+	w.FillRoles()
 	for len(w.Civilians()) < StreetCount && len(w.NPCs) < MaxPeople {
 		if w.AddCivilian() == nil {
 			break
@@ -185,6 +192,9 @@ func (w *World) PrunePeople() {
 // referenced reports whether anything still needs this person to exist.
 func (w *World) referenced(id string) bool {
 	if w.isCrew(id) || IsOfficial(id) {
+		return true
+	}
+	if n := w.NPC(id); n != nil && w.isRoleHolder(n) {
 		return true
 	}
 	for _, c := range w.Contracts {

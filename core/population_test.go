@@ -125,9 +125,10 @@ func TestTheDeadAreForgottenOnlyWhenNothingNeedsThem(t *testing.T) {
 	if w.NPC(victim) != nil {
 		t.Fatal("a dead person nothing referred to was kept")
 	}
-	// The record of the death survives them.
-	if w.isCrew("leo") != true {
-		t.Fatal("the player's own people are not protected from pruning")
+	// Somebody doing one of the city's jobs is kept whatever else is true,
+	// because a scene that speaks through them needs them to exist.
+	if fixer := w.Holder("fixer"); fixer == nil || !w.referenced(fixer.ID) {
+		t.Fatal("the fixer was not protected from pruning")
 	}
 }
 

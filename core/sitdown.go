@@ -118,7 +118,7 @@ func (w *World) CallSitdown() error {
 	if q.Suspected {
 		body = fmt.Sprintf("“%s and %s, in the same room, because you asked. One of them brought more men than the room needs, and Mara caught your eye on the way in.”", q.A.Name, q.B.Name)
 	}
-	speaker := "mara"
+	speaker := w.HolderID("fixer")
 	w.Event = &Scene{
 		ID: ID(), Title: "A room nobody wanted to be in", Body: body,
 		Speaker: speaker, Actor: q.A.ID, Target: q.B.ID, Kind: "sitdown",

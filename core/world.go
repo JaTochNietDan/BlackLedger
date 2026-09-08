@@ -874,7 +874,7 @@ func (w *World) Attack(plot Plot) {
 		} else {
 			body += "A contact calls: leave by the back, now."
 		}
-		w.Event = &Scene{ID: "attack-" + plot.ID, Title: "Headlights outside", Body: body + " You have moments to act.", Speaker: "mara", Kind: "attack", Source: "authored", Minute: w.Minute, Choices: []Choice{{ID: "escape", Label: "Leave through the rear", Detail: "A chance to escape. Security and contacts help; injuries reduce your odds."}, {ID: "defend", Label: "Hold the entrance", Detail: "Rely on your security. Injuries and a weak defense can be fatal."}, {ID: "bargain", Label: "Offer $180 to stand down", Cost: 180, Detail: "Money may settle this incident, but your standing suffers."}}}
+		w.Event = &Scene{ID: "attack-" + plot.ID, Title: "Headlights outside", Body: body + " You have moments to act.", Speaker: w.HolderID("fixer"), Kind: "attack", Source: "authored", Minute: w.Minute, Choices: []Choice{{ID: "escape", Label: "Leave through the rear", Detail: "A chance to escape. Security and contacts help; injuries reduce your odds."}, {ID: "defend", Label: "Hold the entrance", Detail: "Rely on your security. Injuries and a weak defense can be fatal."}, {ID: "bargain", Label: "Offer $180 to stand down", Cost: 180, Detail: "Money may settle this incident, but your standing suffers."}}}
 	} else if w.Random() < .78-float64(p.Armour)*.09-w.doorProtection() {
 		w.Die("An attack at your residence caught you without warning or protection.")
 	} else {
@@ -960,6 +960,7 @@ func (w *World) Advance(minutes int) {
 			w.CityHallDay()
 			w.ArmouryDay()
 			w.RecruitDay()
+			w.FillRoles()
 			w.PrunePeople()
 			w.DressDay()
 			bill := w.DailyCost()
@@ -986,7 +987,7 @@ func (w *World) Advance(minutes int) {
 				warning := w.factionName(plot.Actor) + " has people asking where you sleep."
 				w.Log("Mara has heard something", warning+" You may have very little time.", "danger")
 				if plot.Due > w.Minute {
-					w.Event = &Scene{ID: "warning-" + plot.ID, Title: "A call worth answering", Body: warning + " I cannot tell you exactly when they will come. Stop what you are doing and think about where you want to be tonight.", Speaker: "mara", Kind: "warning", Source: "authored", Minute: w.Minute, Choices: []Choice{{ID: "acknowledge", Label: "Put down the phone and prepare", Detail: "Clock stays paused. You can leave, arrange security or seek an audience. The threat remains."}}}
+					w.Event = &Scene{ID: "warning-" + plot.ID, Title: "A call worth answering", Body: warning + " I cannot tell you exactly when they will come. Stop what you are doing and think about where you want to be tonight.", Speaker: w.HolderID("fixer"), Kind: "warning", Source: "authored", Minute: w.Minute, Choices: []Choice{{ID: "acknowledge", Label: "Put down the phone and prepare", Detail: "Clock stays paused. You can leave, arrange security or seek an audience. The threat remains."}}}
 					return
 				}
 			}
@@ -1051,7 +1052,7 @@ func (w *World) Public() map[string]any {
 	if len(history) > 60 {
 		history = history[len(history)-60:]
 	}
-	return map[string]any{"id": w.ID, "version": w.Version, "revision": w.Revision, "life": w.Life, "minute": w.Minute, "player": w.Player, "district": w.District, "factions": w.Factions, "npcs": w.People(), "locations": locs, "event": scene, "history": history, "dead": w.Dead, "tasks": w.Tasks, "director": w.Director, "last_result": w.LastResult, "daily_cost": w.DailyCost(), "income": income, "security": w.Guard(), "opportunity": w.NextOpportunity(), "known_threats": w.KnownThreats(), "business_truces": w.ActiveBusinessTruces(), "conflicts": w.PublicConflicts(), "goods": w.Goods, "arms": w.ArmsDescription(), "appearance": w.AppearanceDescription(), "vehicle": w.VehicleDescription(), "residence": w.ResidenceDescription(), "offshore": map[string]any{"balance": w.Offshore, "reachable": w.Player.Offshore}, "newspaper": w.Edition(), "arrangements": w.PendingArrangements(), "commissions": w.PublicCommissions(), "grudges": w.GrudgeSummary(), "cast": w.Cast(), "retainers": w.RetainerDescription(), "armoury": w.ArmouryDescription(), "population": w.PopulationSummary(), "hand": w.HandDescription()}
+	return map[string]any{"id": w.ID, "version": w.Version, "revision": w.Revision, "life": w.Life, "minute": w.Minute, "player": w.Player, "district": w.District, "factions": w.Factions, "npcs": w.People(), "locations": locs, "event": scene, "history": history, "dead": w.Dead, "tasks": w.Tasks, "director": w.Director, "last_result": w.LastResult, "daily_cost": w.DailyCost(), "income": income, "security": w.Guard(), "opportunity": w.NextOpportunity(), "known_threats": w.KnownThreats(), "business_truces": w.ActiveBusinessTruces(), "conflicts": w.PublicConflicts(), "goods": w.Goods, "arms": w.ArmsDescription(), "appearance": w.AppearanceDescription(), "vehicle": w.VehicleDescription(), "residence": w.ResidenceDescription(), "offshore": map[string]any{"balance": w.Offshore, "reachable": w.Player.Offshore}, "newspaper": w.Edition(), "arrangements": w.PendingArrangements(), "commissions": w.PublicCommissions(), "grudges": w.GrudgeSummary(), "cast": w.Cast(), "retainers": w.RetainerDescription(), "armoury": w.ArmouryDescription(), "population": w.PopulationSummary(), "hand": w.HandDescription(), "roles": w.RoleDescription()}
 }
 func (w *World) hasRecord(title string) bool {
 	for _, r := range w.History {
@@ -1078,7 +1079,7 @@ func (w *World) OfferIfReady() {
 		return
 	}
 	if w.Player.JobCount == 2 && !w.hasRecord("A favor with a price") {
-		e, _ := w.ValidateProposal(Proposal{"", "A favor with a price", "“A merchant wants a sealed ledger moved before his partners arrive. I would understand if you preferred the ordinary work.”", "mara", "courier", "You moved the ledger. Mara now knows you can handle sensitive work.", "", []Approach{{Method: "careful", Label: "Wait for a quiet route"}, {Method: "press", Label: "Move it before the partners arrive"}}})
+		e, _ := w.ValidateProposal(Proposal{"", "A favor with a price", "“A merchant wants a sealed ledger moved before his partners arrive. I would understand if you preferred the ordinary work.”", w.HolderID("fixer"), "courier", "You moved the ledger. Mara now knows you can handle sensitive work.", "", []Approach{{Method: "careful", Label: "Wait for a quiet route"}, {Method: "press", Label: "Move it before the partners arrive"}}})
 		e.Source = "authored"
 		w.Event = e
 		w.RememberArrangement(e, "offered")

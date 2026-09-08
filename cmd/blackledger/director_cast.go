@@ -49,8 +49,9 @@ func directorSpeakers(w *core.World, connection *core.ArrangementMemory) []strin
 func eligibleDirectorSpeakers(w *core.World) map[string]bool {
 	eligible := map[string]bool{}
 	// A contact who is dead is not available, however established they were.
-	if mara := w.NPC("mara"); mara != nil && !mara.Dead {
-		eligible["mara"] = true
+	// Whoever is doing the fixer's job, which is not always the same person.
+	if fixer := w.Holder("fixer"); fixer != nil {
+		eligible[fixer.ID] = true
 	}
 	for _, crew := range w.Player.Crew {
 		if crew.Loyalty >= 30 {

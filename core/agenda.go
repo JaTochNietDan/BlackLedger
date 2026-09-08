@@ -69,7 +69,60 @@ func (w *World) pursue(n *NPC) {
 			return
 		}
 	}
+	// Or somebody standing next to them, which is the only thing in this city
+	// that ever reaches the people who are not in an organization and do not
+	// run premises — the fixer, the driver, the detective. Without it they were
+	// immortal by omission rather than by design.
+	if w.WorldRandom() < .3 && w.takeFromAPerson(n) {
+		return
+	}
 	w.takeFromSomebody(n)
+}
+
+// takeFromAPerson is one of the city's own people robbing another in the
+// street, by the same arithmetic the player faces. It reports whether anything
+// happened.
+func (w *World) takeFromAPerson(n *NPC) bool {
+	var mark *NPC
+	for i := range w.NPCs {
+		other := &w.NPCs[i]
+		if other.Dead || other.ID == n.ID || other.Location != n.Location {
+			continue
+		}
+		if other.Faction != "" && other.Faction == n.Faction {
+			continue // not your own people
+		}
+		if IsOfficial(other.ID) {
+			continue // a man with a title is not robbed in the street
+		}
+		mark = other
+		break
+	}
+	if mark == nil {
+		return false
+	}
+	purse := w.Pockets(mark)
+	if purse < 40 {
+		return false
+	}
+	place, _ := PlaceByID(n.Location)
+	defence := w.Poise(mark) + 15
+	if f := w.faction(mark.Faction); f != nil {
+		defence += f.Power / 3
+	}
+	if w.Poise(n)*100/(w.Poise(n)+defence) < int(w.WorldRandom()*100) {
+		w.Resent(mark.ID, n.ID, 25, "what was tried at "+place.Name)
+		w.Log("Somebody tried it at "+place.Name, fmt.Sprintf("%s went at %s in the street and came off worse.", n.Name, mark.Name), "politics")
+		return true
+	}
+	if f := w.faction(mark.Faction); f != nil {
+		f.Cash = max(0, f.Cash-purse/2)
+	}
+	w.Resent(mark.ID, n.ID, 40, "being robbed at "+place.Name)
+	w.Log("Robbed in the street", fmt.Sprintf("%s took $%d off %s near %s.", n.Name, purse, mark.Name, place.Name), "politics")
+	w.Report("robbery", "ROBBERY IN "+upper(place.Name),
+		w.unattributed(place.Name, fmt.Sprintf("A man was robbed near %s. Police have asked anybody who saw it to come forward.", place.Name)))
+	return true
 }
 
 // claimPremises is how an unaffiliated person stops being nobody: they take

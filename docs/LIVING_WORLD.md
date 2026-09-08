@@ -119,7 +119,6 @@ into `docs/DEVELOPMENT.md` once they are actually built and tested. An entry
 stays here, in the original wording, until it is genuinely implemented — so if
 it is still in this list, it does not exist in the game yet.
 
-- All named characters (living NPCs) are dynamic people who live somewhere and their own people that have their own agendas and stuff (meaning the fixers, etc). No character is a fixed character that cannot die or something. They might be gone and replaced by another. All of that is dynamic and living. Everything that you do, that can happen to you, can happen to them and be done by them.
 - Ownable businesses really need to have character to them and almost mini-simulation games within them. Casinos need to be micro managed, laundromats, etc. Money isn't easy to come by, it requires work and smart play.
 
 Ultiamtely the expectation is that I don't have to think of all of these concepts, you, the agent will think of these too and build them out and playtest and simulate them yourself.

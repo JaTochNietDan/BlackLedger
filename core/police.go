@@ -197,7 +197,7 @@ func (w *World) Bribe() error {
 	}
 	cleared := min(w.Player.Heat, 12+w.Reach()*3)
 	w.Player.Heat = max(0, w.Player.Heat-cleared)
-	if npc := w.NPC("harlow"); npc != nil {
+	if npc := w.Holder("detective"); npc != nil {
 		npc.Trust += 2
 	}
 	w.Log("An understanding with the detective", fmt.Sprintf("$%d, and a file goes to the bottom of a pile. Attention falls by %d, to %d. This does not buy the next one.", cost, cleared, w.Player.Heat), "personal")

@@ -66,7 +66,7 @@ func OfficialByID(id string) (Official, bool) {
 // and they can be killed — but they do not go out at night taking tills.
 func IsOfficial(id string) bool {
 	_, ok := OfficialByID(id)
-	return ok || id == "harlow"
+	return ok
 }
 
 // Officials is everybody who can be reached, for the interface.

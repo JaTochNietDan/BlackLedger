@@ -111,7 +111,7 @@ func (w *World) OpenContract() {
 		ID: ID(), Kind: "contract", Source: "authored", Minute: w.Minute,
 		Title:   "A name, and what it costs",
 		Body:    "“Everyone in this city is a price. Say a name and I will tell you what it takes. After that it is not your arrangement any more, and it is not mine either.”",
-		Speaker: "mara", Choices: choices,
+		Speaker: w.HolderID("fixer"), Choices: choices,
 	}
 }
 
@@ -133,7 +133,7 @@ func (w *World) openContractTerms(target string) error {
 	choices = append(choices, Choice{ID: "leave", Label: "Think about it", Detail: "No money changes hands and no name is passed on."})
 	w.Event = &Scene{
 		ID: ID(), Kind: "contract_terms", Source: "authored", Minute: w.Minute,
-		Target: target, Speaker: "mara",
+		Target: target, Speaker: w.HolderID("fixer"),
 		Title:   "What it takes to reach " + person.Name,
 		Body:    fmt.Sprintf("“%s. That can be arranged. Who does it decides what it costs, and what happens if it goes wrong.”", person.Name),
 		Choices: choices,

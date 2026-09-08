@@ -178,11 +178,10 @@ func (w *World) Investigate() {
 
 // Sensitive arrangements expose the player to a bounded police decision once heat is high.
 func (w *World) PoliceStop(job *Scene) {
-	if w.NPC("harlow") == nil {
-		w.NPCs = append(w.NPCs, NPC{ID: "harlow", Name: "Detective Harlow", Role: "City detective", Voice: "bm_lewis", Color: "#7c8791"})
-	}
+	// Whoever has the caseload this week. FillRoles guarantees somebody does.
+	w.FillRoles()
 	w.RememberArrangement(job, "awaiting_police")
-	w.Event = &Scene{JobID: job.ID, Operation: job.Operation, ID: ID(), Kind: "police_stop", Source: "authored", Minute: w.Minute, Speaker: "harlow", Actor: job.Speaker, Beneficiary: job.Beneficiary, Title: "Too familiar a face", Body: "“Your name keeps coming up in the same places. Before you finish this arrangement, we are going to have a conversation. You can settle this inconvenience, or leave the business unfinished.”", Effect: job.Effect, Outcome: job.Outcome, Choices: []Choice{
+	w.Event = &Scene{JobID: job.ID, Operation: job.Operation, ID: ID(), Kind: "police_stop", Source: "authored", Minute: w.Minute, Speaker: w.HolderID("detective"), Actor: job.Speaker, Beneficiary: job.Beneficiary, Title: "Too familiar a face", Body: "“Your name keeps coming up in the same places. Before you finish this arrangement, we are going to have a conversation. You can settle this inconvenience, or leave the business unfinished.”", Effect: job.Effect, Outcome: job.Outcome, Choices: []Choice{
 		{ID: "pay", Label: "Pay $40 and finish the job", Cost: 40, Detail: fmt.Sprintf("Receive the agreed $%d reward and reputation afterward. Police attention decreases before this job's heat is applied.", job.Effect.Reward)},
 		{ID: "abandon", Label: "Abandon the arrangement", Detail: "No payment or reward. Lose 6 heat; the work and time already spent are lost."},
 	}}
