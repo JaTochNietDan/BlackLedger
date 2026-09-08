@@ -427,3 +427,5 @@
 .street-note{font-size:11px;color:var(--muted);margin:4px 0 0}
 .street-note a{color:var(--gold)}
 @media(max-width:800px){.street-run{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}.front-art{height:84px}}
+.front-note{color:#93a58f;font-style:italic;margin-top:2px;white-space:normal;line-height:1.35}
+.front-note.warning{color:var(--red);font-style:normal}

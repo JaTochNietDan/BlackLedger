@@ -143,6 +143,10 @@ toward that.
 - When playing theater the events should be somewhat gruesome and bloody and intense, this is an adult game
 - City should have ambience, some effects like smoke and lighting etc to make it feel alive
 - Interiors of buildings should have the same treatment, lots of ambiance
+- When playing casino games or taking extra special actions in interiors that should have a special interface, not just rely on that giant action menu. For example right now you're playing a game of blackjack and there's a bunch of other stuff displayed in there, that's all bad design. We need to clean that up and also have the game actually displayed, show the dealer, show the hands being played etc. Simulate that out. You should be able to determine how much you play with as well.
+- We need to build out audio for actions as well, not sure how, can we generate it, can we find free online samples of audio that we need to cover events and ambiance?
+- Interior ambiance, city ambiance etc needs audio as well as all the theater simulations.
+- Image previews of buildings should probably contain their names on them (new ones we made don't right now), names should be on a plaqard as if in real life, stylish and fitting.
 
 ## Inbox — unsorted ideas
 
@@ -156,5 +160,6 @@ into `docs/DEVELOPMENT.md` once they are actually built and tested. An entry
 stays here, in the original wording, until it is genuinely implemented — so if
 it is still in this list, it does not exist in the game yet.
 
+- The newspaper right now is like a square, I'd like a more stylized version where it actually looks like a newspaper, think softer edges, make it look like a piece of paper, crinkly, etc. Look to examples of old newspapers for inspriation.
 
 Ultiamtely the expectation is that I don't have to think of all of these concepts, you, the agent will think of these too and build them out and playtest and simulate them yourself.

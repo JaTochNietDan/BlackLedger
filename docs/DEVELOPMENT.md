@@ -1217,3 +1217,10 @@
 - **Three guards so the art cannot fall behind the city again.** Every address must have a picture, every address must have an interior to stand in, and every moment the theatre can play must have a plate — each failing with the `mise` task that fixes it. These are what stop the next location being added with a wireframe box, which is exactly how five of twelve happened.
 - Verified in a browser: three districts, twelve fronts, twelve pictures, no blanks and no broken images.
 - `mise run verify` passes.
+
+## What each place is doing, and one door instead of two
+- **Two views onto the same twelve addresses.** Once the city view showed every address with its people, the address book was a second door to the same room: the same places, the same faces, one of them painted and one of them a list. The address book is gone and its district headings live on in the city view, which is the only city screen now. One toggle instead of two, and one fewer thing to learn.
+- **A place says what it is doing.** The city knew that one address was out of soap, one had a press broken, one had a still running in the back and one had a man on the door, and showed none of it. Six badges on a card would be a wall again, so a place gets the same discipline the people got: **one line, the most important true thing about it right now**, in the order a proprietor would worry — the police can take it, trouble, out of supplies, short-handed, wants repair, a still running, somebody on the door, the regulars have gone, and otherwise how well it is trading.
+- **A passer-by only sees what is visible from the street.** Somebody else's casino can be out of stock, short-handed, in trouble and running a still and it reads as nothing at all — but a boarded window is not a secret, so a wrecked building says so whoever owns it. A test holds both halves.
+- Verified in a browser against a copy of the live campaign: twelve fronts, five of them with something to say, two of those flagged — *Visibly in poor repair* at The Mariner, *Wants repair at 55%* at Cypress House.
+- `mise run verify` passes.

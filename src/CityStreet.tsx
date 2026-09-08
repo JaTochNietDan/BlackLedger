@@ -57,6 +57,7 @@ export function CityStreet({state, selected, onSelect, onEnter}: {
               <span className="front-plate">
                 <b>{p.name}</b>
                 <small>{p.owned ? 'Yours' : p.holder || 'Independent'}</small>
+                {p.note && <small className={'front-note' + (p.note_warn ? ' warning' : '')}>{p.note}</small>}
                 {!!people.length && <span className="front-who">
                   {people.slice(0, FACES).map(w => <Portrait key={w.id} id={w.id} size="tiny"/>)}
                   <i>{people.length}</i>
