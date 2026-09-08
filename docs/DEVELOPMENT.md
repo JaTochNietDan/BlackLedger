@@ -1192,3 +1192,11 @@
 - A section beneath says who is fighting whom and since which day, out of the conflicts the city already tracks.
 - On the live campaign: *Nico Ward's people · 100 of a hundred · $4,202 · 3 people · 4 holdings · Bluebird Laundry, Russo Motor Works, The Blue Hour, Cypress House · at war with Russo Outfit*, then the Bellandi Family who think well of you and the Russo Outfit who are hostile, and the two wars beneath.
 - `mise run verify` passes.
+
+## A guide that cannot rot
+- The Guide was prose written when this game had eight actions, and it had rotted into something actively misleading. It still told the player that *"broader autonomous family politics"* was future work — in a build where two families fight their own wars, hold ground, run coups and collapse entirely. It described death wrongly, saying what you built "becomes independent", when a protagonist's estate now passes to the strongest of their own people as an organization the next one can deal with or fight. It mentioned none of the twenty-odd systems added since. **A guide that misdescribes the game is worse than no guide.**
+- So it is not prose about the game any more. It is **the game reporting on itself**: twelve things a player might be doing, each answered by the same readiness function that answers the button. Somewhere to start, somebody who knows people, premises, a name of your own, people who answer to you, somebody on the door, money on the street, a still, somebody in the building, an understanding, somebody else's ladder, the chair. Each is open, done, or refused **in the game's own words** — *Nobody is taking anybody on*, *You answer to nobody*.
+- It cannot go stale, and a test proves it: change the world and the guide changes with it. A new arrival is told to buy premises; a man with two businesses is not; put somebody on a door and the guide has noticed by the next read. Another test holds that no step is ever blank — closed without a reason is a screen that says nothing.
+- Beneath it, the five rules that genuinely do not change, which are the only part of a guide safe to write down once.
+- On the live campaign: five done, five open, two shut with their reasons.
+- `mise run verify` passes.
