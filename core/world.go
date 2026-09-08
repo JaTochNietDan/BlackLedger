@@ -720,6 +720,7 @@ func (w *World) Advance(minutes int) {
 			w.BusinessDay()
 			w.ContrabandDay()
 			w.PoliceDay()
+			w.PeopleDay()
 			bill := w.DailyCost()
 			if p.Cash >= bill {
 				p.Cash -= bill
