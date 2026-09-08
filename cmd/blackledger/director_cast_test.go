@@ -43,3 +43,45 @@ func TestDirectorContactRecencyIgnoresPreviousLives(t *testing.T) {
 		t.Fatal(got)
 	}
 }
+
+func TestTheDirectorDoesNotSpeakThroughTheDead(t *testing.T) {
+	w := core.New(21)
+	w.Factions[0].Goodwill = 40 // the Bellandi leader would otherwise be eligible
+	before := eligibleDirectorSpeakers(w)
+	if !before["vittorio"] {
+		t.Fatal("a living family leader with standing was not eligible")
+	}
+	w.Kill("vittorio", "Shot leaving the club.")
+	after := eligibleDirectorSpeakers(w)
+	if after["vittorio"] {
+		t.Fatal("a dead leader is still offered as a speaker")
+	}
+	for _, id := range directorSpeakers(w, nil) {
+		if npc := w.NPC(id); npc == nil || npc.Dead {
+			t.Fatal("the speaker list contains someone who is dead:", id)
+		}
+	}
+	// Their successor can speak in their place.
+	w.Factions[0].Goodwill = 40
+	successor := w.Factions[0].Leader
+	found := false
+	for id := range eligibleDirectorSpeakers(w) {
+		if npc := w.NPC(id); npc != nil && npc.Name == successor {
+			found = true
+		}
+	}
+	if !found {
+		t.Fatal("the new head of the family cannot speak for it")
+	}
+}
+
+func TestMaraCanDieAndStopsBeingAvailable(t *testing.T) {
+	w := core.New(22)
+	if !eligibleDirectorSpeakers(w)["mara"] {
+		t.Fatal("the starting contact was not eligible")
+	}
+	w.Kill("mara", "Found behind Saint Agnes.")
+	if eligibleDirectorSpeakers(w)["mara"] {
+		t.Fatal("a dead fixer is still taking work")
+	}
+}

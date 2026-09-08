@@ -32,7 +32,7 @@ func directorSpeakers(w *core.World, connection *core.ArrangementMemory) []strin
 	result := []string{}
 	oldest := order + 1
 	for _, npc := range w.NPCs {
-		if !eligible[npc.ID] {
+		if !eligible[npc.ID] || npc.Dead {
 			continue
 		}
 		if seen[npc.ID] < oldest {
@@ -47,7 +47,11 @@ func directorSpeakers(w *core.World, connection *core.ArrangementMemory) []strin
 }
 
 func eligibleDirectorSpeakers(w *core.World) map[string]bool {
-	eligible := map[string]bool{"mara": true}
+	eligible := map[string]bool{}
+	// A contact who is dead is not available, however established they were.
+	if mara := w.NPC("mara"); mara != nil && !mara.Dead {
+		eligible["mara"] = true
+	}
 	for _, crew := range w.Player.Crew {
 		if crew.Loyalty >= 30 {
 			eligible[crew.ID] = true
@@ -58,7 +62,7 @@ func eligibleDirectorSpeakers(w *core.World) map[string]bool {
 			continue
 		}
 		for _, npc := range w.NPCs {
-			if npc.Name == faction.Leader {
+			if npc.Name == faction.Leader && !npc.Dead {
 				eligible[npc.ID] = true
 			}
 		}

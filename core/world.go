@@ -59,6 +59,15 @@ type NPC struct {
 	Trust int    `json:"trust"`
 	Voice string `json:"voice"`
 	Color string `json:"color"`
+	// Everyone with a name is a participant in the city, not scenery. Dead
+	// rather than Alive so that saves written before people could die read back
+	// as living.
+	Faction  string `json:"faction,omitempty"`
+	Location string `json:"location,omitempty"`
+	Rank     int    `json:"rank,omitempty"`
+	Ambition int    `json:"ambition,omitempty"`
+	Skill    int    `json:"skill,omitempty"`
+	Dead     bool   `json:"dead,omitempty"`
 }
 type Faction struct {
 	ID       string `json:"id"`
@@ -271,7 +280,12 @@ func newPerson(life int) Person {
 func New(seed uint32) *World {
 	w := &World{Version: 2, ID: ID(), Life: 1, Minute: 480, RNG: seed, Player: newPerson(1), Properties: map[string]*Property{}, Tasks: []Task{}, Plots: []Plot{}, History: []Record{}, Dead: []Death{}, Offers: []Offer{}, Director: Director{"authored", "Authored opening. Local AI can prepare additional encounters.", -9999}}
 	w.Factions = []Faction{{"bellandi", "Bellandi Family", "Vittorio Bellandi", 90, 0, 8000, 90}, {"russo", "Russo Outfit", "Elena Russo", 58, 0, 4500, 58}}
-	w.NPCs = []NPC{{"mara", "Mara Bell", "Fixer", 10, "af_heart", "#a48761"}, {"leo", "Leo Carver", "Driver", 20, "am_michael", "#9ca795"}, {"vittorio", "Vittorio Bellandi", "Bellandi boss", 0, "bm_george", "#ad7970"}, {"elena", "Elena Russo", "Russo boss", 0, "bf_emma", "#83989b"}}
+	w.NPCs = []NPC{
+		{ID: "mara", Name: "Mara Bell", Role: "Fixer", Trust: 10, Voice: "af_heart", Color: "#a48761", Location: "bar", Rank: RankAssociate, Ambition: 45, Skill: 60},
+		{ID: "leo", Name: "Leo Carver", Role: "Driver", Trust: 20, Voice: "am_michael", Color: "#9ca795", Location: "bar", Rank: RankAssociate, Ambition: 35, Skill: 45},
+		{ID: "vittorio", Name: "Vittorio Bellandi", Role: "Head of the Bellandi Family", Voice: "bm_george", Color: "#ad7970", Faction: "bellandi", Location: "club", Rank: RankLeader, Ambition: 70, Skill: 80},
+		{ID: "elena", Name: "Elena Russo", Role: "Head of the Russo Outfit", Voice: "bf_emma", Color: "#83989b", Faction: "russo", Location: "market", Rank: RankLeader, Ambition: 75, Skill: 72},
+	}
 	for _, p := range Locations {
 		owner := "independent"
 		switch p.ID {
@@ -301,6 +315,12 @@ func New(seed uint32) *World {
 			income = 12
 		}
 		w.Properties[p.ID] = &Property{owner, 100, income, 0}
+	}
+	// Each organization is people, not a name and a number. These are the ones
+	// who would step up if the person above them died.
+	for _, f := range []string{"bellandi", "russo"} {
+		w.AddMember(f, "Lieutenant", RankLieutenant, w.homeOf(f))
+		w.AddMember(f, "Soldier", RankSoldier, w.homeOf(f))
 	}
 	// The two established families are already rivals when the player arrives.
 	w.Antagonize("bellandi", "russo", 50)
@@ -690,7 +710,7 @@ func (w *World) Public() map[string]any {
 	if len(history) > 60 {
 		history = history[len(history)-60:]
 	}
-	return map[string]any{"id": w.ID, "version": w.Version, "revision": w.Revision, "life": w.Life, "minute": w.Minute, "player": w.Player, "district": w.District, "factions": w.Factions, "npcs": w.NPCs, "locations": locs, "event": scene, "history": history, "dead": w.Dead, "tasks": w.Tasks, "director": w.Director, "last_result": w.LastResult, "daily_cost": w.DailyCost(), "income": income, "security": w.Guard(), "opportunity": w.NextOpportunity(), "known_threats": w.KnownThreats(), "business_truces": w.ActiveBusinessTruces(), "conflicts": w.PublicConflicts()}
+	return map[string]any{"id": w.ID, "version": w.Version, "revision": w.Revision, "life": w.Life, "minute": w.Minute, "player": w.Player, "district": w.District, "factions": w.Factions, "npcs": w.People(), "locations": locs, "event": scene, "history": history, "dead": w.Dead, "tasks": w.Tasks, "director": w.Director, "last_result": w.LastResult, "daily_cost": w.DailyCost(), "income": income, "security": w.Guard(), "opportunity": w.NextOpportunity(), "known_threats": w.KnownThreats(), "business_truces": w.ActiveBusinessTruces(), "conflicts": w.PublicConflicts()}
 }
 func (w *World) hasRecord(title string) bool {
 	for _, r := range w.History {

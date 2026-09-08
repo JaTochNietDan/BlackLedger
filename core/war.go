@@ -123,6 +123,12 @@ func (w *World) contest(attacker, defender *Faction) {
 	prop.Condition -= damage
 	defender.Power = max(10, defender.Power-max(2, damage/5))
 	defender.Cash = max(0, defender.Cash-damage*15)
+	// A raid reaches people, not only premises.
+	if w.WorldRandom() < .18 {
+		if victim := w.casualty(defender.ID); victim != nil {
+			w.Kill(victim.ID, fmt.Sprintf("Killed at %s when %s came for it.", place.Name, attacker.Name))
+		}
+	}
 
 	// A holding that can no longer be defended changes hands.
 	if prop.Condition <= 15 && attacker.Power > defender.Power {
@@ -152,6 +158,11 @@ func (w *World) Antagonize(a, b string, amount int) {
 // advanced so a new organization takes part in the same turn it is created.
 func (w *World) considerSplinters() {
 	for i := 0; i < len(w.Factions); i++ {
+		// A failing organization may lose its leader to the person below them
+		// before it ever loses anyone to a rival.
+		if w.WorldRandom() < 0.03 && w.ConsiderInternalMove(&w.Factions[i]) {
+			return
+		}
 		if w.WorldRandom() < 0.05 && w.Splinter(&w.Factions[i]) {
 			return // one upheaval at a time
 		}

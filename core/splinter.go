@@ -108,7 +108,11 @@ func (w *World) Splinter(parent *Faction) bool {
 	w.Factions = append(w.Factions, Faction{ID: id, Name: name, Leader: leader,
 		Power: strength, Goodwill: 0, Cash: money, Peak: strength})
 	// The new leader is a person the city can deal with and the director can speak through.
-	w.NPCs = append(w.NPCs, NPC{ID: id, Name: leader, Role: "Head of " + name, Trust: 0, Voice: "am_michael", Color: "#8d7f6a"})
+	w.NPCs = append(w.NPCs, NPC{ID: id, Name: leader, Role: "Head of " + name, Trust: 0,
+		Voice: w.voiceFor(leader), Color: "#8d7f6a", Faction: id,
+		Location: taken, Rank: RankLeader, Ambition: 60 + int(w.WorldRandom()*40), Skill: 40 + int(w.WorldRandom()*50)})
+	// A breakaway takes people with it, not only ground.
+	w.AddMember(id, "Lieutenant", RankLieutenant, taken)
 
 	// A breakaway is a betrayal and starts hotter than any ordinary quarrel,
 	// but not already at war: the parent has to decide whether it can afford
