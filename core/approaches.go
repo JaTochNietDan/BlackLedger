@@ -6,7 +6,7 @@ import (
 )
 
 // The director authors contextual labels, but cannot set costs or outcomes.
-func addApproaches(scene *Scene, proposals []Approach, politicalDetail string) error {
+func addApproaches(scene *Scene, proposals []Approach) error {
 	if len(proposals) > 2 {
 		return fmt.Errorf("too many proposed approaches")
 	}
@@ -34,7 +34,7 @@ func addApproaches(scene *Scene, proposals []Approach, politicalDetail string) e
 			return fmt.Errorf("unsupported approach")
 		}
 		scene.Alternatives[id] = fx
-		choice := Choice{ID: id, Label: label, Detail: fmt.Sprintf("$%d · %d minutes · +%d respect · +%d heat · At 15 heat, police may stop completion.", fx.Reward, fx.Minutes, fx.Respect, fx.Heat) + politicalDetail}
+		choice := Choice{ID: id, Label: label}.terms(fx)
 		// Keep refusal last, after every actionable way to handle the job.
 		last := len(scene.Choices) - 1
 		scene.Choices = append(scene.Choices[:last], choice, scene.Choices[last])

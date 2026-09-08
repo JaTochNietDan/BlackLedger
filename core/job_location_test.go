@@ -21,10 +21,10 @@ func TestJobLocationIsValidatedDisplayedAndRemembered(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	for _, c := range scene.Choices {
-		if c.ID != "decline" && !strings.HasPrefix(c.Detail, "Bluebird Laundry · ") {
-			t.Fatal("missing displayed venue")
-		}
+	// The venue is a condition of the job rather than of any one way of doing
+	// it, so it is stated once above the choices instead of on each of them.
+	if !strings.HasPrefix(scene.Conditions, "Bluebird Laundry · ") {
+		t.Fatalf("missing displayed venue: %q", scene.Conditions)
 	}
 	w.Event = scene
 	w.RememberArrangement(scene, "offered")

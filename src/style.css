@@ -484,3 +484,15 @@
 .toggle.on i{border-color:var(--gold)}
 .toggle.on i::after{left:15px;background:var(--gold)}
 .toggle:hover{border-color:var(--gold)}
+
+/* The scene. What is on offer, what each way of doing it costs, and what holds
+   however it is done — in that order, and each figure where the eye can compare
+   it with the same figure on the button below. */
+.scene-conditions{margin:20px 0 0;padding:11px 14px;border-left:2px solid var(--gold);background:#1a2622;font-size:12px;color:var(--muted);line-height:1.6}
+.scene-conditions small{display:block;font-size:9px;letter-spacing:.18em;color:var(--gold);margin-bottom:4px}
+.scene .choices .action{align-items:flex-start}
+.scene .choices .action strong{font-size:15px;font-family:var(--serif);font-weight:400}
+.terms{display:flex;flex-wrap:wrap;gap:14px;margin-top:7px}
+.terms b{font-size:12px;font-weight:500;color:var(--gold);font-variant-numeric:tabular-nums;white-space:nowrap}
+.terms b.cost{color:var(--red)}
+.scene .desc.refused{color:var(--red);margin-top:6px}

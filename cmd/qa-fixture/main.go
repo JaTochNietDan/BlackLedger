@@ -12,13 +12,13 @@ import (
 
 func main() {
 	if len(os.Args) < 2 || len(os.Args) > 3 {
-		log.Fatal("usage: go run ./cmd/qa-fixture <new-qa.sqlite3> [police|damage|warning|russo-warning|attack|voice|contact|paused-job|leader|doorman|arrest|debt|herald|killing|dead]")
+		log.Fatal("usage: go run ./cmd/qa-fixture <new-qa.sqlite3> [police|damage|warning|russo-warning|attack|voice|contact|paused-job|leader|doorman|arrest|debt|herald|killing|dead|offer|audience]")
 	}
 	scenario := "police"
 	if len(os.Args) == 3 {
 		scenario = os.Args[2]
 	}
-	if scenario != "police" && scenario != "damage" && scenario != "warning" && scenario != "russo-warning" && scenario != "attack" && scenario != "voice" && scenario != "contact" && scenario != "paused-job" && scenario != "leader" && scenario != "doorman" && scenario != "arrest" && scenario != "debt" && scenario != "herald" && scenario != "killing" && scenario != "dead" {
+	if scenario != "police" && scenario != "damage" && scenario != "warning" && scenario != "russo-warning" && scenario != "attack" && scenario != "voice" && scenario != "contact" && scenario != "paused-job" && scenario != "leader" && scenario != "doorman" && scenario != "arrest" && scenario != "debt" && scenario != "herald" && scenario != "killing" && scenario != "dead" && scenario != "offer" && scenario != "audience" {
 		log.Fatal("unsupported QA scenario")
 	}
 	path := os.Args[1]
@@ -36,6 +36,29 @@ func main() {
 	}
 	defer s.DB.Close()
 	err = s.Change(func(w *core.World) error {
+		if scenario == "audience" {
+			// A family across the table asking for money the player does not have,
+			// so the refused choices have to say why themselves.
+			w.Player.Cash, w.Player.Respect = 40, 20
+			w.Player.Location = "laundry"
+			w.OpenAudience("laundry")
+			return nil
+		}
+		if scenario == "offer" {
+			// A job on the table with two ways of doing it, which is the whole
+			// reason the scene modal exists: a comparison.
+			w.Player.Cash, w.Player.Respect = 900, 25
+			w.Player.Location = "bar"
+			e, err := w.ValidateProposal(core.Proposal{Location: "bar", Title: "A ledger before dawn",
+				Body:    "Move the ledger out of the office before the merchant's partners come looking for it. Nobody wants a conversation about where it went.",
+				Speaker: "mara", Operation: "courier", Outcome: "Delivered.", Beneficiary: "russo",
+				Approaches: []core.Approach{{Method: "careful", Label: "Wait for the street to clear"}, {Method: "press", Label: "Make the delivery before closing"}}})
+			if err != nil {
+				return err
+			}
+			w.Event = e
+			return nil
+		}
 		if scenario == "paused-job" {
 			w.Player.Cash = 200
 			w.Properties["laundry"].Owner = "player:1"

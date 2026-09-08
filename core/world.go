@@ -197,12 +197,32 @@ type Death struct {
 	Estate string `json:"estate,omitempty"`
 }
 type Choice struct {
-	ID       string `json:"id"`
-	Label    string `json:"label"`
-	Detail   string `json:"detail"`
-	Cost     int    `json:"cost"`
+	ID     string `json:"id"`
+	Label  string `json:"label"`
+	Detail string `json:"detail"`
+	Cost   int    `json:"cost"`
+	// The terms of this way of doing the job, as figures rather than as prose.
+	// A scene exists to make the player compare two or three approaches, and a
+	// run-on sentence is the one form those numbers cannot be compared in.
+	// Whatever is here must be what the command will actually apply.
+	Pay     int `json:"pay,omitempty"`
+	Minutes int `json:"minutes,omitempty"`
+	Respect int `json:"respect,omitempty"`
+	Heat    int `json:"heat,omitempty"`
+	// Reason is why this cannot be taken, in the city's words. Only the core
+	// knows; the interface used to guess and say "Not enough cash" for every
+	// refusal it was shown.
+	Reason   string `json:"reason,omitempty"`
 	Disabled bool   `json:"disabled"`
 }
+
+// terms puts an effect's figures on a choice, so the button quotes the price
+// the job will pay rather than a sentence written beside it.
+func (c Choice) terms(fx Effect) Choice {
+	c.Pay, c.Minutes, c.Respect, c.Heat = fx.Reward, fx.Minutes, fx.Respect, fx.Heat
+	return c
+}
+
 type Effect struct {
 	Reward  int `json:"reward"`
 	Respect int `json:"respect"`
@@ -222,11 +242,15 @@ type Scene struct {
 	Body         string            `json:"body"`
 	Speaker      string            `json:"speaker"`
 	Choices      []Choice          `json:"choices"`
-	Kind         string            `json:"kind"`
-	Source       string            `json:"source"`
-	Minute       int               `json:"minute"`
-	Effect       Effect            `json:"effect"`
-	Outcome      string            `json:"outcome"`
+	// Conditions are what holds however the job is done — where it is, what
+	// the police do at 15 heat, who gains standing by it. Said once, above the
+	// choices, rather than copied onto each of them.
+	Conditions string `json:"conditions,omitempty"`
+	Kind       string `json:"kind"`
+	Source     string `json:"source"`
+	Minute     int    `json:"minute"`
+	Effect     Effect `json:"effect"`
+	Outcome    string `json:"outcome"`
 }
 type Offer struct {
 	Ready int    `json:"ready"`
@@ -1345,8 +1369,12 @@ func (w *World) Public() map[string]any {
 		choices := append([]Choice{}, e.Choices...)
 		for i := range choices {
 			choices[i].Disabled = w.Player.Cash < choices[i].Cost
+			choices[i].Reason = ""
+			if choices[i].Disabled {
+				choices[i].Reason = "Not enough cash: this takes " + cash(choices[i].Cost) + " and you are holding " + cash(w.Player.Cash)
+			}
 		}
-		scene = map[string]any{"id": e.ID, "title": e.Title, "body": e.Body, "speaker": e.Speaker, "kind": e.Kind, "source": e.Source, "minute": e.Minute, "choices": choices, "connection": e.Connection}
+		scene = map[string]any{"id": e.ID, "title": e.Title, "body": e.Body, "speaker": e.Speaker, "kind": e.Kind, "source": e.Source, "minute": e.Minute, "choices": choices, "connection": e.Connection, "conditions": e.Conditions}
 	}
 	history := w.History
 	if len(history) > 60 {
@@ -1439,17 +1467,14 @@ func (w *World) ValidateProposal(p Proposal) (*Scene, error) {
 			return nil, fmt.Errorf("unknown beneficiary faction %q; use exactly one of %q", p.Beneficiary, allowed)
 		}
 	}
-	scene := &Scene{Target: p.Location, Operation: p.Operation, ID: ID(), Title: p.Title, Beneficiary: p.Beneficiary, Body: p.Body, Speaker: p.Speaker, Kind: "proposal", Source: "local-ai", Minute: w.Minute, Effect: fx, Outcome: operationOutcome(p.Operation), Choices: []Choice{{ID: "accept", Label: operationLabel(p.Operation), Detail: fmt.Sprintf("$%d · %d minutes · +%d respect · +%d heat", fx.Reward, fx.Minutes, fx.Respect, fx.Heat) + " · At 15 heat, police may stop completion." + politicalDetail}, {ID: "decline", Label: "Decline the arrangement", Detail: "No cost or time."}}}
-	if err := addApproaches(scene, p.Approaches, politicalDetail); err != nil {
+	scene := &Scene{Target: p.Location, Operation: p.Operation, ID: ID(), Title: p.Title, Beneficiary: p.Beneficiary, Body: p.Body, Speaker: p.Speaker, Kind: "proposal", Source: "local-ai", Minute: w.Minute, Effect: fx, Outcome: operationOutcome(p.Operation), Choices: []Choice{Choice{ID: "accept", Label: operationLabel(p.Operation)}.terms(fx), {ID: "decline", Label: "Decline the arrangement", Detail: "No cost or time."}}}
+	scene.Conditions = "At 15 heat, police may stop completion." + politicalDetail
+	if err := addApproaches(scene, p.Approaches); err != nil {
 		return nil, err
 	}
 	if p.Location != "" {
 		place, _ := PlaceByID(p.Location)
-		for i := range scene.Choices {
-			if scene.Choices[i].ID != "decline" {
-				scene.Choices[i].Detail = place.Name + " · " + scene.Choices[i].Detail
-			}
-		}
+		scene.Conditions = place.Name + " · " + scene.Conditions
 	}
 	return scene, nil
 }

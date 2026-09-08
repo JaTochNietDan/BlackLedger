@@ -164,8 +164,10 @@ func TestGeneratedFactionWorkHasValidatedPoliticalEffect(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !strings.Contains(scene.Choices[0].Detail, "Russo Outfit standing +6") {
-		t.Fatal("political stakes hidden")
+	// Who gains by the job holds however it is done, so it is stated with the
+	// scene's other conditions rather than repeated on every button.
+	if !strings.Contains(scene.Conditions, "Russo Outfit standing +6") {
+		t.Fatalf("political stakes hidden: %q", scene.Conditions)
 	}
 	w.Event = scene
 	choice(t, &w, "accept")
