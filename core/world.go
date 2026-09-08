@@ -132,6 +132,11 @@ type Property struct {
 	// everywhere else and in saves from before there was such a room.
 	Armoury bool `json:"armoury,omitempty"`
 	Crates  int  `json:"crates,omitempty"`
+	// The legitimate trade a place has built up, and whether somebody
+	// respectable has standing work with it. Absent in saves written before a
+	// business had an outside as well as an inside.
+	Custom int  `json:"custom,omitempty"`
+	Order  bool `json:"order,omitempty"`
 }
 type Plot struct {
 	Target   string `json:"target,omitempty"`
@@ -685,6 +690,10 @@ func (w *World) Actions(id string) []Action {
 					fmt.Sprintf("%d of %d positions filled. A week's wages up front at $%d a day after. Short-handed, it earns less and attracts trouble.", prop.Staff, trade.Hands, trade.Wage))
 				add("layoff", "Let somebody go", 30, 0, w.LayOffReadiness(id),
 					fmt.Sprintf("Cuts $%d a day from the wage bill and what the place can handle.", trade.Wage))
+				if !prop.Order {
+					add("order", "Take on a standing order", 60, 0, w.OrderReadiness(id),
+						fmt.Sprintf("$%d a day from somebody respectable, for as long as %s keeps working at %d%%. It needs %d%% trade before anybody offers one, and losing it costs %d trade on top of the money.", OrderBonus, l.Name, int(OrderCapacity*100), OrderCustom, OrderLoss))
+				}
 				add("restock", "Buy "+trade.Supplies, 45, 0, w.RestockReadiness(id),
 					fmt.Sprintf("$%d. Currently %d left; a business out of %s barely trades.", trade.Restock, prop.Supply, trade.Supplies))
 				if prop.Trouble {
@@ -920,7 +929,7 @@ func (w *World) Advance(minutes int) {
 		w.Minute = next
 		for id, prop := range w.Properties {
 			if w.Own(id) {
-				prop.Carry += float64(prop.Income*prop.Condition*elapsed) * operatingMode(prop.Mode).Take * w.Capacity(id) * (1 + w.LicenceTake()) / 6000
+				prop.Carry += float64(prop.Income*prop.Condition*elapsed) * operatingMode(prop.Mode).Take * w.Capacity(id) * w.TradeMultiplier(id) * (1 + w.LicenceTake()) / 6000
 				n := int(prop.Carry + 1e-9)
 				prop.Carry -= float64(n)
 				w.Earn(n)
@@ -961,6 +970,8 @@ func (w *World) Advance(minutes int) {
 			w.ArmouryDay()
 			w.RecruitDay()
 			w.FillRoles()
+			w.CustomDay()
+			w.OrderDay()
 			w.PrunePeople()
 			w.DressDay()
 			bill := w.DailyCost()
@@ -1038,7 +1049,7 @@ func (w *World) Public() map[string]any {
 		if w.Own(l.ID) {
 			income += float64(prop.Income*prop.Condition) / 100
 		}
-		locs = append(locs, map[string]any{"id": l.ID, "name": l.Name, "type": l.Type, "district": l.District, "x": l.X, "y": l.Y, "cost": l.Cost, "blurb": l.Blurb, "owner": prop.Owner, "holder": w.HolderName(l.ID), "staff": prop.Staff, "supply": prop.Supply, "trouble": prop.Trouble, "still": prop.Still, "bankroll": prop.Bankroll, "handle": w.NightHandleAt(l.ID), "capacity": w.Capacity(l.ID), "condition": prop.Condition, "income": prop.Income, "owned": w.Own(l.ID), "locked": l.District > w.District, "actions": w.Actions(l.ID)})
+		locs = append(locs, map[string]any{"id": l.ID, "name": l.Name, "type": l.Type, "district": l.District, "x": l.X, "y": l.Y, "cost": l.Cost, "blurb": l.Blurb, "owner": prop.Owner, "holder": w.HolderName(l.ID), "staff": prop.Staff, "supply": prop.Supply, "trouble": prop.Trouble, "trade": w.CustomDescription(l.ID), "still": prop.Still, "bankroll": prop.Bankroll, "handle": w.NightHandleAt(l.ID), "capacity": w.Capacity(l.ID), "condition": prop.Condition, "income": prop.Income, "owned": w.Own(l.ID), "locked": l.District > w.District, "actions": w.Actions(l.ID)})
 	}
 	var scene any = nil
 	if e := w.Event; e != nil {

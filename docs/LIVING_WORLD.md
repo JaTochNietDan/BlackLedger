@@ -119,6 +119,5 @@ into `docs/DEVELOPMENT.md` once they are actually built and tested. An entry
 stays here, in the original wording, until it is genuinely implemented — so if
 it is still in this list, it does not exist in the game yet.
 
-- Ownable businesses really need to have character to them and almost mini-simulation games within them. Casinos need to be micro managed, laundromats, etc. Money isn't easy to come by, it requires work and smart play.
 
 Ultiamtely the expectation is that I don't have to think of all of these concepts, you, the agent will think of these too and build them out and playtest and simulate them yourself.

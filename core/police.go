@@ -111,6 +111,10 @@ func (w *World) Raid() {
 		seized += hidden
 		w.LoseCar("They found the false floor and took the car with it.")
 	}
+	// A search in daylight is the end of a shop's standing with the street.
+	if target != "" {
+		w.ShiftCustom(target, "The police came through the front door in daylight", -CustomRaidLoss)
+	}
 	seized += w.CellarFound()
 	// A room full of crates is not a fine and not a warning.
 	if place, crates, found := w.ArmouryFound(); found {

@@ -341,6 +341,10 @@ func (w *World) apply(c Command) error {
 				if err := w.LayOff(target); err != nil {
 					return err
 				}
+			case "order":
+				if err := w.TakeOrder(target); err != nil {
+					return err
+				}
 			case "restock":
 				if err := w.Restock(target); err != nil {
 					return err

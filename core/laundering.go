@@ -70,8 +70,11 @@ func (w *World) Launder(id string) error {
 	w.Player.LastLaunder = w.Minute
 	prop := w.Properties[id]
 	prop.Condition = max(0, prop.Condition-3)
+	// The machines are always busy and the regulars go somewhere else. This is
+	// what using a shop for something it is not costs the shop.
+	w.ShiftCustom(id, "The books have been used for something else once too often", -CustomLaunderLoss)
 	place, _ := PlaceByID(id)
-	w.Log("The books absorb it", fmt.Sprintf("$%d through %s. Police attention falls by %d, to %d. The premises take a little more wear each time.",
-		fee, place.Name, cleared, w.Player.Heat), "business")
+	w.Log("The books absorb it", fmt.Sprintf("$%d through %s. Police attention falls by %d, to %d. The premises take a little more wear each time, and trade at %s is down to %d%%.",
+		fee, place.Name, cleared, w.Player.Heat, place.Name, w.Custom(id)), "business")
 	return nil
 }
