@@ -1,0 +1,318 @@
+{
+  "brief_mode": "focused",
+  "cases": [
+    {
+      "allowed_speakers": [
+        "leo"
+      ],
+      "attempts": [
+        {
+          "content": "{\n  \"approaches\": [\n    {\n      \"label\": \"Listen to both sides quietly\",\n      \"method\": \"careful\"\n    }\n  ],\n  \"beneficiary\": \"\",\n  \"body\": \"Alex, I heard Mara's offer at Saint Agnes didn't pan out. Right now, two staff members at The Mariner are arguing over who gets to use the back storage area. They aren't talking like grown men and it risks a scene that hurts everyone. I need you to step in, hear what both of them have to say, and work out a fair arrangement so they can share the space without throwing punches or breaking anything.\",\n  \"location\": \"room\",\n  \"operation\": \"mediation\",\n  \"outcome\": \"The dispute is settled peacefully and the report is delivered.\",\n  \"speaker\": \"leo\",\n  \"title\": \"Resolve the storage argument\"\n}",
+          "done_reason": "stop",
+          "eval_count": 196,
+          "eval_duration": 7371052000,
+          "http_status": 200,
+          "load_duration": 15876667583,
+          "prompt_eval_count": 1595,
+          "request_sha256": "609c4b1eb76a17e1e37cc1779b5e50fbd3146ffebbb6486d739af82a4999b0b5",
+          "seconds": 26.182019125,
+          "total_duration": 26180342333
+        }
+      ],
+      "factions": [
+        {
+          "id": "bellandi",
+          "name": "Bellandi Family",
+          "leader": "Vittorio Bellandi",
+          "power": 90,
+          "goodwill": 0,
+          "cash": 8000
+        },
+        {
+          "id": "russo",
+          "name": "Russo Outfit",
+          "leader": "Elena Russo",
+          "power": 58,
+          "goodwill": 0,
+          "cash": 4500
+        }
+      ],
+      "life": 1,
+      "name": "crew_after_declined_delivery",
+      "offers": [
+        {
+          "ready": 510,
+          "event": {
+            "operation": "mediation",
+            "alternatives": {
+              "approach:careful": {
+                "reward": 40,
+                "respect": 5,
+                "heat": 0,
+                "minutes": 90
+              }
+            },
+            "target": "room",
+            "id": "fd8fb9e7aa1b8412001a017fe6514823",
+            "title": "Resolve the storage argument",
+            "body": "Alex, I heard Mara's offer at Saint Agnes didn't pan out. Right now, two staff members at The Mariner are arguing over who gets to use the back storage area. They aren't talking like grown men and it risks a scene that hurts everyone. I need you to step in, hear what both of them have to say, and work out a fair arrangement so they can share the space without throwing punches or breaking anything.",
+            "speaker": "leo",
+            "choices": [
+              {
+                "id": "accept",
+                "label": "Mediate the dispute",
+                "detail": "The Mariner · $55 · 60 minutes · +5 respect · +0 heat · At 15 heat, police may stop completion.",
+                "cost": 0,
+                "disabled": false
+              },
+              {
+                "id": "approach:careful",
+                "label": "Listen to both sides quietly",
+                "detail": "The Mariner · $40 · 90 minutes · +5 respect · +0 heat · At 15 heat, police may stop completion.",
+                "cost": 0,
+                "disabled": false
+              },
+              {
+                "id": "decline",
+                "label": "Decline the arrangement",
+                "detail": "No cost or time.",
+                "cost": 0,
+                "disabled": false
+              }
+            ],
+            "kind": "proposal",
+            "source": "local-ai",
+            "minute": 480,
+            "effect": {
+              "reward": 55,
+              "respect": 5,
+              "heat": 0,
+              "minutes": 60
+            },
+            "outcome": "You completed the requested mediation without violence."
+          }
+        }
+      ],
+      "operation": "mediation",
+      "player": {
+        "name": "Alex Varga",
+        "cash": 90,
+        "health": 100,
+        "respect": 6,
+        "heat": 0,
+        "location": "room",
+        "home": "room",
+        "security": 0,
+        "contacts": 0,
+        "crew": [
+          {
+            "id": "leo",
+            "name": "Leo Carver",
+            "loyalty": 65
+          }
+        ],
+        "alive": true,
+        "earned": 0,
+        "job_count": 0
+      },
+      "previous_arrangements": [
+        {
+          "id": "170cf72084c63f59bac26d1c466214af",
+          "life": 1,
+          "minute": 0,
+          "title": "A delivery declined",
+          "offer": "Carry a sealed envelope.",
+          "speaker": "mara",
+          "operation": "courier",
+          "beneficiary": "",
+          "status": "declined"
+        }
+      ],
+      "properties": {
+        "apartment": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 0,
+          "carry": 0
+        },
+        "bar": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 0,
+          "carry": 0
+        },
+        "casino": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 48,
+          "carry": 0
+        },
+        "club": {
+          "owner": "bellandi",
+          "condition": 100,
+          "income": 0,
+          "carry": 0
+        },
+        "docks": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 0,
+          "carry": 0
+        },
+        "estate": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 0,
+          "carry": 0
+        },
+        "garage": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 24,
+          "carry": 0
+        },
+        "laundry": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 14,
+          "carry": 0
+        },
+        "market": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 0,
+          "carry": 0
+        },
+        "room": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 0,
+          "carry": 0
+        }
+      },
+      "seconds": 26.18503475,
+      "status": "ready"
+    },
+    {
+      "allowed_speakers": [
+        "elena"
+      ],
+      "factions": [
+        {
+          "id": "bellandi",
+          "name": "Bellandi Family",
+          "leader": "Vittorio Bellandi",
+          "power": 90,
+          "goodwill": 0,
+          "cash": 8000
+        },
+        {
+          "id": "russo",
+          "name": "Russo Outfit",
+          "leader": "Elena Russo",
+          "power": 58,
+          "goodwill": 9,
+          "cash": 4500
+        }
+      ],
+      "life": 1,
+      "name": "leader_new_request",
+      "operation": "mediation",
+      "player": {
+        "name": "Alex Varga",
+        "cash": 90,
+        "health": 100,
+        "respect": 0,
+        "heat": 0,
+        "location": "room",
+        "home": "room",
+        "security": 0,
+        "contacts": 0,
+        "crew": [],
+        "alive": true,
+        "earned": 0,
+        "job_count": 0
+      },
+      "previous_arrangements": [
+        {
+          "id": "869c7eac7b3624347596a84d639a03fa",
+          "life": 1,
+          "minute": 0,
+          "title": "A refused introduction",
+          "offer": "",
+          "speaker": "mara",
+          "operation": "courier",
+          "beneficiary": "",
+          "status": "declined"
+        }
+      ],
+      "properties": {
+        "apartment": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 0,
+          "carry": 0
+        },
+        "bar": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 0,
+          "carry": 0
+        },
+        "casino": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 48,
+          "carry": 0
+        },
+        "club": {
+          "owner": "bellandi",
+          "condition": 100,
+          "income": 0,
+          "carry": 0
+        },
+        "docks": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 0,
+          "carry": 0
+        },
+        "estate": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 0,
+          "carry": 0
+        },
+        "garage": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 24,
+          "carry": 0
+        },
+        "laundry": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 14,
+          "carry": 0
+        },
+        "market": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 0,
+          "carry": 0
+        },
+        "room": {
+          "owner": "independent",
+          "condition": 100,
+          "income": 0,
+          "carry": 0
+        }
+      },
+      "status": "writing"
+    }
+  ],
+  "method": "Selected scenarios use isolated temporary saves, actual local provider and production generation/validation path. No user campaign access. Prose requires manual assessment; test success is not semantic acceptance.",
+  "model": "qwen3.5:35b-a3b",
+  "started_utc": "2026-09-08T02:37:35.137618Z",
+  "thinking": false
+}

@@ -19,3 +19,19 @@ func validateChoiceScript(p core.Proposal) error {
 	}
 	return nil
 }
+
+// A title names the situation the player is looking at; an approach label names
+// one way to act on it. Reusing the label as the title leaves the scene with no
+// heading of its own and makes the offer list read as a row of duplicate verbs.
+func validateSceneTitle(p core.Proposal) error {
+	title := normalizedOffer(p.Title)
+	if title == "" {
+		return fmt.Errorf("give the scene a short title naming the situation and its place")
+	}
+	for _, a := range p.Approaches {
+		if title == normalizedOffer(a.Label) {
+			return fmt.Errorf("title %q repeats the approach label %q; title the situation and where it is happening, and keep the action wording in the approach", p.Title, a.Label)
+		}
+	}
+	return nil
+}

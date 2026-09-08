@@ -251,7 +251,19 @@ func (a *app) generateAttempt(snapshot *core.World, feedback string) error {
 	if err := validateChoiceScript(proposal); err != nil {
 		return proposalRejected{err}
 	}
+	if err := validateSceneTitle(proposal); err != nil {
+		return proposalRejected{err}
+	}
 	if err := validateSpokenTerms(proposal); err != nil {
+		return proposalRejected{err}
+	}
+	if err := validateInWorldVoice(proposal); err != nil {
+		return proposalRejected{err}
+	}
+	if err := validatePlayerRole(snapshot, proposal); err != nil {
+		return proposalRejected{err}
+	}
+	if err := validateEarnedFamiliarity(snapshot, proposal); err != nil {
 		return proposalRejected{err}
 	}
 	if err := validateSpeakerBeneficiary(snapshot, proposal.Speaker, proposal.Beneficiary); err != nil {

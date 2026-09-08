@@ -15,6 +15,11 @@ type narrativeBrief struct {
 	SourceRole    string `json:"source_role,omitempty"`
 	RecipientRole string `json:"recipient_role,omitempty"`
 	Opening       string `json:"required_opening,omitempty"`
+	// Constraints belong in their own field because the model dramatizes the
+	// premise and task. Observed on qwen3.5:35b-a3b: a leader recited the cast
+	// restriction aloud as "Neither is you, but the tension threatens our
+	// operations". These bound what may be written; they are never spoken.
+	Constraints []string `json:"constraints_never_spoken,omitempty"`
 }
 
 func jobBrief(w *core.World, operation string, connection *core.ArrangementMemory) narrativeBrief {
@@ -35,18 +40,23 @@ func jobBrief(w *core.World, operation string, connection *core.ArrangementMemor
 	b := narrativeBrief{Location: place.Name}
 	switch operation {
 	case "collection":
-		b.Premise = "A customer is ready to pay the establishment for its services. This is a new proposed task, not a consequence of an earlier job."
+		b.Premise = "A customer is ready to pay the establishment for its services."
 		b.SourceRole = "the customer who owes payment"
 		b.RecipientRole = "the establishment's manager who is owed payment"
 		b.PlayerTask = "Collect the customer's payment and deliver it to the manager."
+		b.Constraints = []string{"This is a new proposed task, not a consequence of an earlier job."}
 	case "courier":
 		b.Premise = "The establishment's manager needs a private message carried to the requesting contact."
 		b.SourceRole = "the establishment's manager"
-		b.RecipientRole = "the NPC requesting this job"
+		b.RecipientRole = "the contact requesting this job"
 		b.PlayerTask = "Carry the manager's sealed message to the requesting contact without exposing its contents."
 	case "mediation":
-		b.Premise = "Two staff members disagree about how to share access to a work area. Neither is the player or a new named character."
-		b.PlayerTask = "Hear both staff members and negotiate shared access without violence. Do not collect money or deliver a package."
+		b.Premise = "Two staff members disagree about how to share access to a work area."
+		b.PlayerTask = "Hear both staff members and negotiate shared access without violence."
+		b.Constraints = []string{
+			"The two staff members are neither the listener nor any newly named character.",
+			"This job collects no money and delivers no package.",
+		}
 	}
 	if connection != nil {
 		// A factual spoken acknowledgement that does not promote the old offer's
