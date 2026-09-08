@@ -334,3 +334,24 @@
 .person-of b{font:16px var(--serif);font-weight:400;display:block;line-height:1.25}
 .person-of small{display:block;font-size:10.5px;color:var(--muted);line-height:1.45}
 .person-of .doing{color:#93a58f;font-style:italic}
+
+/* The books: what comes in, what goes out, and what each of the nine things
+   the day charges for is actually made of. */
+.books{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:26px;margin:22px 0 30px;align-items:start}
+.books-figures{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px}
+.books-figures>div{background:#152020;border:1px solid var(--line);padding:13px 14px}
+.books-figures span{display:block;font:10px system-ui;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.books-figures b{display:block;font:23px var(--serif);font-weight:400;font-variant-numeric:tabular-nums;margin:3px 0 2px}
+.books-figures b.good{color:#b8cfa9}
+.books-figures b.bad{color:var(--red)}
+.books-figures small{font-size:10.5px;color:var(--muted);line-height:1.4;display:block}
+.books-lines h2{font-size:19px;margin:0 0 10px}
+.books-lines ul{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+.books-lines li{display:grid;grid-template-columns:1fr auto;align-items:baseline;gap:10px;padding:8px 0;border-bottom:1px solid #222c27}
+.books-lines li b{font-weight:400;font-size:13px}
+.books-lines li small{grid-column:1;font-size:10.5px;color:var(--muted);margin-top:-4px}
+.books-lines li i{grid-row:1;grid-column:2;font-style:normal;font-variant-numeric:tabular-nums;color:var(--red)}
+.books-lines li.total{border-bottom:0;border-top:1px solid var(--line);margin-top:4px}
+.books-lines li.total b,.books-lines li.total i{font:16px var(--serif);color:var(--ink)}
+.log-day{font:12px system-ui;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin:22px 0 2px;font-weight:500}
+@media(max-width:1000px){.books{grid-template-columns:1fr}}

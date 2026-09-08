@@ -126,6 +126,20 @@ You have to have the mindset of a player in terms of trying to make it easy to u
 and not make any one interface too busy and overwhelming while still having all that
 complexity built into it.
 
+Remember that a big goal here is to flesh out the city and have it fully simulated
+and animated. We want to see a scene of someone sabotaging a building with an explosion
+or committing arson (when we add that mechanic) with fire etc and we want sounds to go
+with it. We also want to have all the buildings represented in the city at any one time.
+For now we can try our best to create the buildings with our image gen but if it's not
+ultra up to scratch that's ok as long as we can regen them to have more detail. In order
+to ensure that they are regeneratable we probably need to account for accurately regenerating
+and keeping the same size. Maybe reskinning more so than regenerating so the new skin can
+add higher textured detail if that makes sense.
+
+We want that map view of all the buildings and city to actually show the living NPCs and
+their actions throughout the day as well. That's the ultimate goal, so we should be working
+toward that.
+
 ## Inbox — unsorted ideas
 
 This section belongs to the user. Add anything here in any form: a mechanic, a

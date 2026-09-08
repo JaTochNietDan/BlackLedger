@@ -1177,3 +1177,10 @@
 - A stranger still gives nothing away — no temperament, no trust, no grudge — but always has a standing and something they are doing, because a person with neither is furniture. Tests hold both: everybody appears exactly once, in group order, with the man who works for you first; and a stranger's character is never on display.
 - **A stale scene the fix cannot reach.** `w.Event` is persisted with its choices baked in, so the live campaign is still holding a fifty-name contract scene generated before the previous iteration's fix. It renders once more as it was written; every scene opened after it is built by the new rule.
 - `mise run verify` passes.
+
+## What am I worth and what is this costing me
+- The Ledger answered its own question with two figures and sixty rows of undifferentiated history — **4.9 screens of scrolling**. `DailyCost` added nine things together and returned one number, so a player losing money had to guess which of the nine it was.
+- **The books are the core's arithmetic, not the interface's.** `Books` reports what comes in a day and what goes out, broken into lines that say what each is made of — *Staff, 11 hands across your premises, $97* — plus what is on hand, what a fine cannot reach, what is out on the street against what is due back, and what is outside the city. A test holds the two things that make it trustworthy: **the lines add to the total, and the total is the number the clock actually charges**. Nothing that costs nothing is listed, because a page of zeroes is noise.
+- The history is searchable and filterable by kind, grouped under the day it happened, showing the last twelve with the rest behind a line that says how many. **4.9 screens became 1.7.**
+- On the live campaign it reads: coming in $1,140 a day from 4 businesses, going out $206, net $934, $3,778 on hand and all of it reachable — then rent, security, crew, staff and your own people, adding to $206.
+- `mise run verify` passes.
