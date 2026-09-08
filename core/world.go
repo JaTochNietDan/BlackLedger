@@ -907,6 +907,14 @@ func (w *World) Die(cause string) {
 	p.Alive = false
 	p.Health = 0
 	w.Dead = append(w.Dead, Death{p.Name, w.Minute, w.Life, cause})
+	// What they built outlives them if anybody was left to hold it. Whoever
+	// takes it over keeps the premises, so this runs before the estate claims
+	// anything.
+	inherited := ""
+	if w.Incorporated() {
+		inherited = w.Inherit()
+	}
+	w.orphan(w.PlayerOrganizationID())
 	for id, prop := range w.Properties {
 		if w.Own(id) {
 			prop.Owner = "former:" + p.Name
@@ -915,6 +923,7 @@ func (w *World) Die(cause string) {
 			}
 		}
 	}
+	_ = inherited
 	w.Tasks = []Task{}
 	w.Event = nil
 	w.Log(p.Name+" is dead", cause+" Your life ends here. The city continues.", "death")
