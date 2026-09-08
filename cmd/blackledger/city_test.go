@@ -201,3 +201,44 @@ func TestTheLoudMomentsAreScored(t *testing.T) {
 		t.Error("a browser that refuses local storage silences the city instead of defaulting to on")
 	}
 }
+
+// The blocks between the addresses have buildings on them. Without those the
+// grid is twelve models with holes between them; with a flat grey box on each
+// it is worse, because a placeholder reads as a mistake rather than as
+// distance. These have to be real painted cut-outs like everything else.
+func TestTheBlocksBetweenTheAddressesAreBuiltOn(t *testing.T) {
+	body, err := os.ReadFile("../../public/art/iso/isometric.json")
+	if err != nil {
+		t.Skip("no isometric art beside this build")
+	}
+	var painted []struct {
+		ID   string `json:"id"`
+		File string `json:"file"`
+	}
+	if err := json.Unmarshal(body, &painted); err != nil {
+		t.Fatalf("the manifest does not parse: %v", err)
+	}
+	fillers := 0
+	for _, p := range painted {
+		if !strings.HasPrefix(p.ID, "fill-") {
+			continue
+		}
+		fillers++
+		if _, err := os.Stat("../../public/art/" + p.File); err != nil {
+			t.Errorf("%s is in the manifest and the file is not there", p.ID)
+		}
+	}
+	// Enough of them that a row of blocks does not read as the same building
+	// repeated, which is its own kind of placeholder.
+	if fillers < 4 {
+		t.Errorf("only %d filler buildings; a city needs more variety than that", fillers)
+	}
+	// And a filler must never be mistaken for somewhere the player can go.
+	source, err := os.ReadFile("../../src/CityIso.tsx")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(string(source), "fillers(cells, size)") {
+		t.Error("fillers are not placed from the blocks the addresses left empty")
+	}
+}

@@ -2,7 +2,7 @@ import {useEffect, useRef} from 'react';
 import {Application, Assets, Container, Graphics, Sprite, Text, Texture, TextStyle} from 'pixi.js';
 import {Viewport} from 'pixi-viewport';
 import type {Snapshot} from './types';
-import {along, blockFor, BLOCK, bounds, carriageways, faces, grid, island, kerbside, lampPosts, middle, PAVE, plot, project, ROAD, size, TILE, walk} from './iso';
+import {along, blockFor, BLOCK, bounds, carriageways, distance, faces, fillers, fillerShape, grid, island, kerbside, lampPosts, middle, mix, nightness, PAVE, plot, project, ROAD, size, TILE, walk} from './iso';
 import type {Cell, Vec} from './iso';
 import cutouts from '../public/art/iso/isometric.json';
 import type {Spotlight} from './CityStreet';
@@ -26,6 +26,10 @@ const COLOUR = (hex: string) => parseInt(hex.slice(1), 16);
 // building without one is drawn as the blocked-out solid it was before, so
 // adding an address tomorrow puts a shape on the map rather than a hole.
 const painted = new Map((cutouts as {id: string; file: string; w: number; h: number}[]).map(c => [c.id, c]));
+// The ordinary buildings between the addresses, painted in the same light as
+// the twelve so the city is one place. A block with one of these on it is not
+// somewhere the player can go; it is somewhere that exists.
+const FILL = [...painted.keys()].filter(id => id.startsWith('fill-')).sort();
 const textures = new Map<string, Texture>();
 
 // How far the camera may be pushed. Past these the city either fills the screen
@@ -309,6 +313,9 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight}: {
     const here = state.player.location;
     const cells = grid(state.locations);
     const size = bounds(cells);
+    // How dark it is, from the clock the core keeps. Everything below reads
+    // this one number rather than deciding for itself what time it is.
+    const dark = nightness(state.minute);
 
     // The ground: one slab under the whole city, so nothing floats and the
     // roads are cut out of something rather than laid on nothing.
@@ -316,7 +323,7 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight}: {
     const far = {x: size.cols * BLOCK, y: size.rows * BLOCK};
     const corners = [{x: -.6, y: -.6}, {x: far.x + .6, y: -.6}, {x: far.x + .6, y: far.y + .6}, {x: -.6, y: far.y + .6}]
       .map(project);
-    earth.poly(corners.flatMap(c => [c.x, c.y])).fill(0x141a1a);
+    earth.poly(corners.flatMap(c => [c.x, c.y])).fill(mix(0x2a2f2c, 0x0f1416, dark));
     layer.addChild(earth);
 
     // The carriageways, full width and height, so every junction is square.
@@ -328,7 +335,7 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight}: {
         {x: way.a.x - pad.x, y: way.a.y - pad.y}, {x: way.b.x + pad.x, y: way.a.y - pad.y},
         {x: way.b.x + pad.x, y: way.b.y + pad.y}, {x: way.a.x - pad.x, y: way.b.y + pad.y},
       ].map(project);
-      road.poly(box.flatMap(c => [c.x, c.y])).fill(0x1a1f20);
+      road.poly(box.flatMap(c => [c.x, c.y])).fill(mix(0x333a38, 0x161b1c, dark));
     }
     layer.addChild(road);
 
@@ -340,14 +347,14 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight}: {
       const i = island(cell);
       const outer = [{x: i.x, y: i.y}, {x: i.x + i.w, y: i.y}, {x: i.x + i.w, y: i.y + i.d}, {x: i.x, y: i.y + i.d}]
         .map(project);
-      pave.poly(outer.flatMap(c => [c.x, c.y])).fill(0x2a302e);
-      kerb.poly(outer.flatMap(c => [c.x, c.y])).stroke({width: 1.6, color: 0x39423d, alpha: .95});
+      pave.poly(outer.flatMap(c => [c.x, c.y])).fill(mix(0x4a514c, 0x252b29, dark));
+      kerb.poly(outer.flatMap(c => [c.x, c.y])).stroke({width: 1.6, color: mix(0x5d675f, 0x323b36, dark), alpha: .95});
       // The join between pavement and building, a shade darker so the plot
       // reads as ground the building sits on rather than as more pavement.
       const b = plot(cell);
       const inner = [{x: b.x, y: b.y}, {x: b.x + b.w, y: b.y}, {x: b.x + b.w, y: b.y + b.d}, {x: b.x, y: b.y + b.d}]
         .map(project);
-      pave.poly(inner.flatMap(c => [c.x, c.y])).fill(0x232927);
+      pave.poly(inner.flatMap(c => [c.x, c.y])).fill(mix(0x3e443f, 0x1e2422, dark));
     }
     layer.addChild(pave, kerb);
 
@@ -370,18 +377,100 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight}: {
     const posts = new Graphics();
     for (const foot of lampPosts(size)) {
       const p = project(foot);
-      glow.ellipse(p.x, p.y, TILE.w * .40, TILE.h * .40).fill({color: 0xd9b678, alpha: .09});
-      glow.ellipse(p.x, p.y, TILE.w * .21, TILE.h * .21).fill({color: 0xf0d6a0, alpha: .08});
+      // A lamp burning at noon is the surest sign nothing is looking at the
+      // clock, so the pools it throws come up as the light goes down.
+      glow.ellipse(p.x, p.y, TILE.w * .40, TILE.h * .40).fill({color: 0xd9b678, alpha: .11 * dark});
+      glow.ellipse(p.x, p.y, TILE.w * .21, TILE.h * .21).fill({color: 0xf0d6a0, alpha: .10 * dark});
       const H = 32;
       posts.poly([p.x - 1.4, p.y, p.x + 1.4, p.y, p.x + .8, p.y - H, p.x - .8, p.y - H]).fill(0x1b1f21);
       posts.ellipse(p.x, p.y, 3.2, 1.3).fill(0x14171a);
       posts.rect(p.x - .8, p.y - H - 1, 5, 1.3).fill(0x1b1f21);
       const lx = p.x + 4.4, ly = p.y - H + 1;
-      posts.poly([lx - 2.2, ly, lx + 2.2, ly, lx + 1.4, ly + 4.8, lx - 1.4, ly + 4.8]).fill({color: 0xf3dcae, alpha: .92});
+      posts.poly([lx - 2.2, ly, lx + 2.2, ly, lx + 1.4, ly + 4.8, lx - 1.4, ly + 4.8])
+        .fill({color: mix(0x8b8778, 0xf3dcae, dark), alpha: .3 + .62 * dark});
       posts.poly([lx - 2.6, ly - 1.3, lx + 2.6, ly - 1.3, lx + 2.2, ly, lx - 2.2, ly]).fill(0x22262a);
-      glow.poly([lx, ly + 4, lx + 12, p.y + 3, lx - 12, p.y + 3]).fill({color: 0xf0d6a0, alpha: .06});
+      glow.poly([lx, ly + 4, lx + 12, p.y + 3, lx - 12, p.y + 3]).fill({color: 0xf0d6a0, alpha: .07 * dark});
     }
     layer.addChild(glow, posts);
+
+    // The blocks nobody lives on. Without these the grid is a scatter of
+    // twelve models with holes between them; with them it is a city that
+    // happens to have twelve addresses worth knowing. Deliberately plainer
+    // than anything the player can walk into: no name, no plot, no click.
+    const filler = new Container();
+    for (const cell of fillers(cells, size)) {
+      const shape = fillerShape(cell);
+      const ground = plot(cell);
+      const inset = shape.inset;
+      const at = {x: ground.x + inset, y: ground.y + inset};
+      const w = ground.w - inset * 2, d = ground.d - inset * 2;
+      const wall = mix(0x555c53, 0x232a2a, dark);
+      const parts = [
+        {w, d, h: shape.h, top: mix(0x6a7168, 0x2c3433, dark), left: mix(0x3c423c, 0x171d1e, dark), right: wall},
+        // A parapet, a water tank or a stair head, so the roofline varies.
+        shape.kind === 0
+          ? {dx: w * .18, dy: d * .18, w: w * .3, d: d * .3, h: .28, base: shape.h,
+             top: mix(0x5c6359, 0x252c2b, dark), left: mix(0x343a35, 0x141a1b, dark), right: mix(0x474e46, 0x1d2424, dark)}
+          : shape.kind === 1
+          ? {dx: -.04, dy: -.04, w: w + .08, d: d + .08, h: .1, base: shape.h,
+             top: mix(0x4a514a, 0x1f2626, dark), left: mix(0x2f352f, 0x121819, dark), right: mix(0x3b423b, 0x191f20, dark)}
+          : {dx: w * .62, dy: d * .2, w: w * .22, d: d * .22, h: .5, base: shape.h,
+             top: mix(0x585f55, 0x232a2a, dark), left: mix(0x32382f, 0x131919, dark), right: mix(0x424940, 0x1b2222, dark)},
+      ];
+      // A painted filler where one has loaded; the drawn solid otherwise, so
+      // the block is never empty while the pictures are still arriving.
+      const which = FILL.length ? FILL[Math.floor(shape.art * FILL.length) % FILL.length] : '';
+      const fillArt = which ? textures.get(which) : undefined;
+      const g = new Graphics();
+      if (fillArt) {
+        const across = (ground.w + ground.d) * (TILE.w / 2) * .82;
+        const art = new Sprite(fillArt);
+        art.anchor.set(.5, 1);
+        art.scale.set(across / fillArt.width);
+        const foot = project({x: ground.x + ground.w, y: ground.y + ground.d});
+        const mid = project({x: ground.x + ground.w / 2, y: ground.y + ground.d / 2});
+        art.position.set(mid.x, foot.y);
+        // Held back from the twelve: darker and a little cooler, so an address
+        // the player can walk into always reads first.
+        art.tint = mix(0xbfc4bd, 0x6f7a80, .35 + dark * .3);
+        g.addChild(art);
+      } else {
+        for (const part of parts) {
+          const f = faces(at, part);
+          g.poly(f.left.flatMap(v => [v.x, v.y])).fill(part.left);
+          g.poly(f.right.flatMap(v => [v.x, v.y])).fill(part.right);
+          g.poly(f.top.flatMap(v => [v.x, v.y])).fill(part.top);
+        }
+      }
+      // Windows in rows down both visible faces, some of them lit. Without
+      // these a filler is a slab; with them it is a building somebody lives
+      // in, which is the whole point of putting it there.
+      const rows = fillArt ? 0 : Math.max(2, Math.round(shape.h * 3.4));
+      const front = project({x: at.x, y: at.y + d});
+      const rightEdge = project({x: at.x + w, y: at.y + d});
+      const leftEdge = project({x: at.x, y: at.y});
+      for (let row = 0; row < rows; row++) {
+        const up = (shape.h * (row + .65) / rows) * TILE.h;
+        for (let col = 0; col < 3; col++) {
+          const f = (col + .5) / 3;
+          const seed = (cell.col * 31 + cell.row * 17 + row * 7 + col * 13) % 9;
+          const on = dark > .15 && seed % 3 !== 0;
+          const paneR = {x: front.x + (rightEdge.x - front.x) * f, y: front.y + (rightEdge.y - front.y) * f - up};
+          const paneL = {x: front.x + (leftEdge.x - front.x) * f, y: front.y + (leftEdge.y - front.y) * f - up};
+          const glassOn = mix(0xb9c3b6, 0xe8c184, dark);
+          const glassOff = mix(0x39423d, 0x151b1c, dark);
+          g.poly([paneR.x - 2, paneR.y - 3.4, paneR.x + 2, paneR.y - 2.2, paneR.x + 2, paneR.y + 1.6, paneR.x - 2, paneR.y + .4])
+            .fill({color: on ? glassOn : glassOff, alpha: on ? .5 + .35 * dark : .8});
+          g.poly([paneL.x - 2, paneL.y - 2.2, paneL.x + 2, paneL.y - 3.4, paneL.x + 2, paneL.y + .4, paneL.x - 2, paneL.y + 1.6])
+            .fill({color: on ? glassOn : glassOff, alpha: on ? .42 + .3 * dark : .75});
+        }
+      }
+      // Haze: the far side of the city is a suggestion, the near side is not.
+      const away = distance({x: at.x, y: at.y}, size);
+      g.alpha = 1 - away * .35 * (0.35 + dark * .65);
+      filler.addChild(g);
+    }
+    layer.addChild(filler);
 
     // The traffic, such as it is: cars at the kerb, in the drab colours a
     // 1950s street actually held rather than a paintbox.
@@ -418,27 +507,45 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight}: {
       group.eventMode = 'static';
       group.cursor = 'pointer';
       group.on('pointertap', () => pick.current(p.id));
-      group.on('pointerover', () => { group.alpha = 1 });
-      group.on('pointerout', () => { group.alpha = shut ? .45 : 1 });
+      // Hover lifts a building out of the haze; leaving puts it back where it
+      // was rather than at full brightness, which would have left every
+      // building the mouse crossed permanently nearer than the rest.
+      group.on('pointerover', () => { group.alpha = Math.min(1, group.alpha + .25) });
+      group.on('pointerout', () => { group.alpha = resting });
       if (p.id === here) group.on('pointertap', () => { if (p.id === here) enter.current() });
-      group.alpha = shut ? .45 : 1;
+      const away = distance(at, size);
+      const resting = (shut ? .45 : 1) * (1 - away * .22 * (0.3 + dark * .7));
+      group.alpha = resting;
 
       // The ground it stands on, so nothing floats.
-      const plot = new Graphics();
+      const ground = new Graphics();
       const corners = [
         project(at), project({x: at.x + block.w, y: at.y}),
         project({x: at.x + block.w, y: at.y + block.d}), project({x: at.x, y: at.y + block.d}),
       ];
+      // What the windows throw on the pavement. A painted building is full of
+      // lit windows and stood in a pool of nothing; this is the light getting
+      // out of it.
+      if (dark > .1) {
+        const centreNow = project(middle(cell));
+        const spill = new Graphics();
+        spill.ellipse(centreNow.x, centreNow.y + TILE.h * .35, TILE.w * .78, TILE.h * .78)
+          .fill({color: 0xe8bf82, alpha: .07 * dark});
+        spill.ellipse(centreNow.x, centreNow.y + TILE.h * .3, TILE.w * .45, TILE.h * .45)
+          .fill({color: 0xf2d3a0, alpha: .06 * dark});
+        group.addChild(spill);
+      }
+
       const hasArt = textures.has(p.id);
       const marked = lit || p.id === selected || p.id === here || p.owned;
       // A painted building brings its own pavement with it, so the drawn plot
       // is only wanted under a blocked-out one — or under any of them when
       // there is something to say about the ground.
       if (!hasArt || marked) {
-        plot.poly(corners.flatMap(c => [c.x, c.y]))
+        ground.poly(corners.flatMap(c => [c.x, c.y]))
           .fill(hasArt ? {color: lit ? 0xd6b77c : 0x000000, alpha: lit ? .12 : 0} : lit ? 0x2a2f23 : 0x1b2422)
           .stroke({width: p.id === selected ? 2.5 : 1.5, color: lit || p.id === selected ? 0xd6b77c : p.owned ? 0x8f7849 : 0x232e2b});
-        group.addChild(plot);
+        group.addChild(ground);
       }
 
       const centre = project({x: at.x + block.w / 2, y: at.y + block.d / 2});

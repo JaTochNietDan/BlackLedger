@@ -55,6 +55,21 @@ PLACES = {
     "herald": "a three-storey newspaper building, tall printing hall windows, loading bay, roof water tank",
 }
 
+# The blocks between the addresses that matter. A city with holes in it reads
+# as a scatter of models, and a hole filled with a flat grey box reads as a
+# placeholder — which is worse, because it looks like a mistake rather than
+# like distance. These are ordinary buildings, deliberately plainer than the
+# twelve, painted in the same light so they belong to the same city.
+FILLERS = {
+    "fill-tenement": "a plain five-storey brick tenement, flat roof, fire escape, rows of small windows",
+    "fill-warehouse": "a low brick warehouse, shallow pitched roof, loading doors, few windows",
+    "fill-terrace": "a row of three joined two-storey shopfronts, awnings, flats above",
+    "fill-office": "a narrow four-storey office block, stone facing, regular windows, parapet",
+    "fill-works": "a small industrial works, sawtooth roof, brick walls, a short chimney",
+    "fill-corner": "a corner building of three storeys, chamfered corner entrance, shop below flats",
+}
+PLACES.update(FILLERS)
+
 # Square, because a cut-out is placed by its footprint and a square keeps the
 # building's own proportions out of the frame's business.
 SIZE = 1024

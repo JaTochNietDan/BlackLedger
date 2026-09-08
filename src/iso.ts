@@ -356,3 +356,68 @@ export function kerbside(cell: Cell, seed: number): {at: Vec; horizontal: boolea
   }
   return out;
 }
+
+// ---------------------------------------------------------------------------
+// The light.
+//
+// The city was lit the same at noon and at three in the morning, which made it
+// a diagram. The clock is the core's, so the light is the core's too: how dark
+// it is comes from the hour the world says it is, and everything else — how
+// much the windows spill, whether the lamps are burning, how far the haze
+// reaches — follows from that one number.
+
+// nightness runs 0 at midday to 1 in the small hours, with the turn happening
+// over the hour or so that dusk actually takes.
+export function nightness(minute: number): number {
+  const hour = (minute % 1440) / 60;
+  if (hour < 4.5 || hour >= 20.5) return 1;
+  if (hour < 6.5) return (6.5 - hour) / 2;
+  if (hour > 18.5) return (hour - 18.5) / 2;
+  return 0;
+}
+
+// mix blends two packed colours, which is how the ground goes from grey stone
+// at noon to blue-black at night without a second palette.
+export function mix(a: number, b: number, t: number): number {
+  const f = Math.min(1, Math.max(0, t));
+  const r = Math.round(((a >> 16) & 255) * (1 - f) + ((b >> 16) & 255) * f);
+  const g = Math.round(((a >> 8) & 255) * (1 - f) + ((b >> 8) & 255) * f);
+  const c = Math.round((a & 255) * (1 - f) + (b & 255) * f);
+  return (r << 16) | (g << 8) | c;
+}
+
+// How far back in the picture something is, as 0 (nearest) to 1 (furthest).
+// Used to lay haze over the far blocks: in a city at night the next street is
+// clear and the one after it is a suggestion.
+export function distance(at: Vec, extent: {cols: number; rows: number}): number {
+  const deepest = (extent.cols + extent.rows) * BLOCK;
+  return deepest <= 0 ? 0 : 1 - Math.min(1, (at.x + at.y) / deepest);
+}
+
+// The blocks nobody lives on. A city with holes in it reads as a scatter of
+// models; these are the buildings between the addresses that matter — never
+// named, never clickable, and deliberately plainer than anything the player
+// can walk into.
+export function fillers(taken: Map<string, Cell>, extent: {cols: number; rows: number}): Cell[] {
+  const used = new Set([...taken.values()].map(c => `${c.col},${c.row}`));
+  const out: Cell[] = [];
+  for (let col = 0; col < extent.cols; col++) {
+    for (let row = 0; row < extent.rows; row++) {
+      if (!used.has(`${col},${row}`)) out.push({col, row});
+    }
+  }
+  return out;
+}
+
+// A filler's shape, decided by where it stands so the same block is the same
+// building every time the city is drawn.
+export function fillerShape(cell: Cell): {h: number; inset: number; kind: number; art: number} {
+  let h = ((cell.col * 374761393) ^ (cell.row * 668265263)) >>> 0;
+  h = (h ^ (h >> 13)) * 1274126177 >>> 0;
+  const r = (n: number) => ((h >> n) & 255) / 255;
+  // Shorter and set further back than the addresses that matter. A filler the
+  // same size as the Monarch competes with it, and the first version — a plain
+  // grey box filling its whole plot — read as a mistake rather than as
+  // distance.
+  return {h: .55 + r(3) * .85, inset: .34 + r(11) * .2, kind: Math.floor(r(19) * 3), art: r(7)};
+}

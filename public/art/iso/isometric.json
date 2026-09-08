@@ -36,6 +36,42 @@
   "h": 726
  },
  {
+  "id": "fill-corner",
+  "file": "iso/iso-fill-corner-v1.png",
+  "w": 687,
+  "h": 806
+ },
+ {
+  "id": "fill-office",
+  "file": "iso/iso-fill-office-v1.png",
+  "w": 640,
+  "h": 817
+ },
+ {
+  "id": "fill-tenement",
+  "file": "iso/iso-fill-tenement-v1.png",
+  "w": 707,
+  "h": 855
+ },
+ {
+  "id": "fill-terrace",
+  "file": "iso/iso-fill-terrace-v1.png",
+  "w": 782,
+  "h": 460
+ },
+ {
+  "id": "fill-warehouse",
+  "file": "iso/iso-fill-warehouse-v1.png",
+  "w": 879,
+  "h": 645
+ },
+ {
+  "id": "fill-works",
+  "file": "iso/iso-fill-works-v1.png",
+  "w": 698,
+  "h": 657
+ },
+ {
   "id": "garage",
   "file": "iso/iso-garage-v1.png",
   "w": 868,
