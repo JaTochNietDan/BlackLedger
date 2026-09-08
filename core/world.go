@@ -700,8 +700,23 @@ func (w *World) Actions(id string) []Action {
 		if len(p.Crew) > 0 {
 			reason = "Leo is already in your crew"
 		}
-		add("recruit", "Recruit Leo Carver", 30, 90, reason, "A driver and collector. $12 daily wages; loyalty matters.")
-		about(w.HolderID("driver"))
+		// The button named Leo Carver whatever had happened to him. Nobody
+		// holds a job for ever in this city: when the man who drives is dead
+		// the role goes to somebody else by the end of the week, and until it
+		// does there is nobody to hire. Naming whoever actually drives makes
+		// this an action about a person, so the same question is asked of it
+		// as of everything else aimed at one — which is what stops it
+		// offering to recruit a corpse.
+		driver := w.HolderID("driver")
+		if driver == "" {
+			driver = "leo"
+		}
+		hand := "Leo Carver"
+		if n := w.NPC(driver); n != nil {
+			hand = n.Name
+		}
+		add("recruit", "Recruit "+hand, 30, 90, reason, "A driver and collector. $12 daily wages; loyalty matters.")
+		about(driver)
 	case "garage":
 		add("audience", "Request an audience with Russo", 45, 0, "", "Discuss your standing with the Russo Outfit.")
 		if next, ok := nextVehicle(p.Car); ok {
@@ -1169,14 +1184,8 @@ func (w *World) Actions(id string) []Action {
 		if out[i].Subject == "" || out[i].Disabled {
 			continue
 		}
-		n := w.NPC(out[i].Subject)
-		if !w.Travelling(n) {
-			continue
-		}
-		out[i].Disabled = true
-		out[i].Reason = n.Name + " is out on the street"
-		if to, ok := PlaceByID(n.Heading); ok {
-			out[i].Reason += ", walking to " + to.Name + " — " + itoa(max(1, n.Arrives-w.Minute)) + " minutes out"
+		if reason := w.OutOfReach(out[i].Subject); reason != "" {
+			out[i].Disabled, out[i].Reason = true, reason
 		}
 	}
 	return out

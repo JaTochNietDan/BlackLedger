@@ -12,13 +12,13 @@ import (
 
 func main() {
 	if len(os.Args) < 2 || len(os.Args) > 3 {
-		log.Fatal("usage: go run ./cmd/qa-fixture <new-qa.sqlite3> [police|damage|warning|russo-warning|attack|voice|contact|paused-job|leader|doorman|arrest|debt|herald|killing|dead|offer|audience|street|room|gone|post|round]")
+		log.Fatal("usage: go run ./cmd/qa-fixture <new-qa.sqlite3> [police|damage|warning|russo-warning|attack|voice|contact|paused-job|leader|doorman|arrest|debt|herald|killing|dead|offer|audience|street|room|gone|post|round|bereaved]")
 	}
 	scenario := "police"
 	if len(os.Args) == 3 {
 		scenario = os.Args[2]
 	}
-	if scenario != "police" && scenario != "damage" && scenario != "warning" && scenario != "russo-warning" && scenario != "attack" && scenario != "voice" && scenario != "contact" && scenario != "paused-job" && scenario != "leader" && scenario != "doorman" && scenario != "arrest" && scenario != "debt" && scenario != "herald" && scenario != "killing" && scenario != "dead" && scenario != "offer" && scenario != "audience" && scenario != "street" && scenario != "room" && scenario != "gone" && scenario != "post" && scenario != "round" {
+	if scenario != "police" && scenario != "damage" && scenario != "warning" && scenario != "russo-warning" && scenario != "attack" && scenario != "voice" && scenario != "contact" && scenario != "paused-job" && scenario != "leader" && scenario != "doorman" && scenario != "arrest" && scenario != "debt" && scenario != "herald" && scenario != "killing" && scenario != "dead" && scenario != "offer" && scenario != "audience" && scenario != "street" && scenario != "room" && scenario != "gone" && scenario != "post" && scenario != "round" && scenario != "bereaved" {
 		log.Fatal("unsupported QA scenario")
 	}
 	path := os.Args[1]
@@ -36,6 +36,20 @@ func main() {
 	}
 	defer s.DB.Close()
 	err = s.Change(func(w *core.World) error {
+		if scenario == "bereaved" {
+			// A crew member the player recruited and the city then killed, which
+			// used to leave him on the books, offered work and paid for.
+			w.Player.Cash, w.Player.Respect = 2500, 20
+			w.Player.Location = "bar"
+			next, err := core.Execute(w, core.Command{RequestID: core.ID(), Revision: w.Revision, Kind: "recruit", Target: "bar"})
+			if err != nil {
+				return err
+			}
+			*w = *next
+			w.Player.Location = "bar"
+			w.Kill(w.Player.Crew[0].ID, "Shot twice outside the Mariner, over nothing anybody will name.")
+			return nil
+		}
 		if scenario == "round" {
 			// A crew member at the bar and a laundry of the player's across the
 			// district, so sending him on collections is a walk to watch.

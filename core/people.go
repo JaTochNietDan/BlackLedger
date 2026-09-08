@@ -195,6 +195,16 @@ func (w *World) Kill(id, cause string) bool {
 		return false
 	}
 	person.Dead = true
+	// Somebody who is dead is not on anybody's books. The player's crew list
+	// kept them: the buttons went on offering them work, the organization went
+	// on counting them, and a man who had been shot the day before could be
+	// sent out on collections.
+	for i := range w.Player.Crew {
+		if w.Player.Crew[i].ID == person.ID {
+			w.Player.Crew = append(w.Player.Crew[:i], w.Player.Crew[i+1:]...)
+			break
+		}
+	}
 	faction := person.Faction
 	led := ""
 	for i := range w.Factions {
