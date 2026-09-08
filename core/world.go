@@ -49,6 +49,9 @@ type Person struct {
 	// What the player is carrying. Absent in saves written before the trade
 	// existed, which is the same as carrying nothing.
 	Stock map[string]int `json:"stock,omitempty"`
+	// When the books last absorbed a round. Absent in older saves, which is the
+	// same as never having done it.
+	LastLaunder int `json:"last_launder,omitempty"`
 }
 type Crew struct {
 	ID      string `json:"id"`
@@ -444,6 +447,16 @@ func (w *World) Actions(id string) []Action {
 	case "club":
 		add("audience", "Request an audience", 45, 0, "", "Discuss your standing with the Bellandi family.")
 		add("provoke", "Demand protection money", 30, 0, "", "EXTREME RISK. Bellandi owns this casino. Challenging him can bring lethal retaliation.")
+	}
+	if HasTables(id) && !w.Own(id) {
+		for _, stake := range tableStakes {
+			add("play:"+stake.ID, stake.Label, 60, stake.Amount, w.TableReadiness(id, stake),
+				fmt.Sprintf("Stake $%d against the house. The house holds the edge, and winning heavily in somebody else's room is noticed.", stake.Amount))
+		}
+	}
+	if place, ok := PlaceByID(id); ok && place.Type == "racket" && w.Own(id) {
+		add("launder", "Run takings through the books", 90, w.LaunderFee(id), w.LaunderReadiness(id),
+			fmt.Sprintf("Clear up to %d police attention through %s. Costs a cut, wears the premises, and the books need a day between rounds.", w.launderCapacity(id), l.Name))
 	}
 	if prop := w.Properties[id]; prop != nil && prop.Income > 0 && !w.Own(id) {
 		add("rob", "Take the day's cash", 45, 0, w.RobberyReadiness(id),
