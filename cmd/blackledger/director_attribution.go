@@ -17,10 +17,22 @@ import (
 // place the work happens in.
 var attributedParty = `(?:staff|men|crew|people|workers?|employees?|soldiers?|associates?|guys|boys)`
 
+// Organizations formed during play are named things like "the Falcone Crew", so
+// the distinctive part is neither reliably the first word nor the last. Articles
+// and the words every organization shares carry no identity, and matching on
+// them would reject ordinary lines like "the men are arguing".
+var genericOrganizationWords = map[string]bool{
+	"the": true, "a": true, "an": true, "of": true,
+	"family": true, "outfit": true, "crew": true, "combine": true,
+	"syndicate": true, "company": true, "brothers": true, "sons": true,
+}
+
 func factionWords(f core.Faction) []string {
 	words := []string{}
-	if first := strings.Fields(f.Name); len(first) > 0 {
-		words = append(words, first[0])
+	for _, part := range strings.Fields(f.Name) {
+		if !genericOrganizationWords[strings.ToLower(part)] {
+			words = append(words, part)
+		}
 	}
 	// A leader stands for their family, by either name: "Russo's men" and
 	// "Vittorio's people" both hand the job's people to the Bellandi.

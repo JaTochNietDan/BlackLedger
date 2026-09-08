@@ -147,9 +147,56 @@ func (w *World) Antagonize(a, b string, amount int) {
 	}
 }
 
+// considerSplinters gives weakened or embattled organizations a chance to lose
+// people who would rather run their own operation. Checked before relations are
+// advanced so a new organization takes part in the same turn it is created.
+func (w *World) considerSplinters() {
+	for i := 0; i < len(w.Factions); i++ {
+		if w.WorldRandom() < 0.05 && w.Splinter(&w.Factions[i]) {
+			return // one upheaval at a time
+		}
+	}
+}
+
+// dissolve removes organizations that hold nothing and have no strength left to
+// take anything back. Their quarrels go with them; the people who led them
+// remain in the city as ordinary names.
+func (w *World) dissolve() {
+	kept := w.Factions[:0]
+	gone := map[string]bool{}
+	for _, f := range w.Factions {
+		if len(w.FamilyHoldings(f.ID)) == 0 && f.Power <= 15 && len(w.Factions)-len(gone) > 2 {
+			gone[f.ID] = true
+			w.Log("An organization ends", f.Name+" no longer holds anything worth defending. What remains of it answers to someone else now.", "politics")
+			continue
+		}
+		kept = append(kept, f)
+	}
+	if len(gone) == 0 {
+		return
+	}
+	w.Factions = kept
+	conflicts := w.Conflicts[:0]
+	for _, c := range w.Conflicts {
+		if !gone[c.A] && !gone[c.B] {
+			conflicts = append(conflicts, c)
+		}
+	}
+	w.Conflicts = conflicts
+	plots := w.Plots[:0]
+	for _, p := range w.Plots {
+		if !gone[p.Actor] {
+			plots = append(plots, p)
+		}
+	}
+	w.Plots = plots
+}
+
 // FactionTurn advances relations between organizations once per day. Ambition,
 // weakness and proximity move hostility; open war produces raids and seizures.
 func (w *World) FactionTurn() {
+	w.dissolve()
+	w.considerSplinters()
 	for i := range w.Factions {
 		for j := i + 1; j < len(w.Factions); j++ {
 			a, b := &w.Factions[i], &w.Factions[j]

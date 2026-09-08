@@ -100,3 +100,29 @@ func TestTheLiveStoreroomOfferIsRejected(t *testing.T) {
 		t.Fatal("player role rejected a good offer:", err)
 	}
 }
+
+func TestOrganizationsNamedDuringPlayDoNotMatchOrdinaryWords(t *testing.T) {
+	// Splinters are named like "the Falcone Crew". Taking the first word would
+	// make the guard match "the men" and reject most ordinary dialogue.
+	w := attributionWorld("independent")
+	w.Factions = append(w.Factions, core.Faction{ID: "splinter-Falcone", Name: "the Falcone Crew", Leader: "Sal Falcone"})
+	for _, text := range []string{
+		"The men are arguing over the loading bay.",
+		"Two of the staff cannot agree.",
+		"A crew of dockhands is waiting.",
+		"The company keeps its own books.",
+	} {
+		t.Run("clean/"+text, func(t *testing.T) {
+			if err := validateFactionAttribution(w, core.Proposal{Location: "bar", Body: text}); err != nil {
+				t.Fatal("ordinary dialogue rejected because of an organization's name:", err)
+			}
+		})
+	}
+	// The distinctive part of the name still identifies it.
+	if validateFactionAttribution(w, core.Proposal{Location: "bar", Body: "Two Falcone men are blocking the door."}) == nil {
+		t.Fatal("a new organization's own people were not recognised")
+	}
+	if validateFactionAttribution(w, core.Proposal{Location: "bar", Body: "Sal's people want this settled."}) == nil {
+		t.Fatal("a new organization's leader did not identify it")
+	}
+}

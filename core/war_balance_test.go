@@ -10,6 +10,7 @@ import "testing"
 func TestCityConflictStaysVaried(t *testing.T) {
 	const campaigns, days = 200, 180
 	sawWar, seizures, wiped := 0, 0, 0
+	emptied, grew, born := 0, 0, 0
 	warBy := map[int]int{15: 0, 30: 0}
 	for seed := 1; seed <= campaigns; seed++ {
 		w := New(uint32(seed))
@@ -45,14 +46,24 @@ func TestCityConflictStaysVaried(t *testing.T) {
 				}
 			}
 		}
+		viable := 0
 		for _, f := range w.Factions {
-			if len(w.FamilyHoldings(f.ID)) == 0 {
+			if len(w.FamilyHoldings(f.ID)) > 0 {
+				viable++
+			} else {
 				wiped++
 			}
 		}
+		if viable < 2 {
+			emptied++
+		}
+		if len(w.Factions) > 2 {
+			grew++
+		}
+		born += len(w.Factions) - 2
 	}
-	t.Logf("%d campaigns over %d days: war in %d, by day15=%d day30=%d, seizures=%d, organizations wiped out=%d",
-		campaigns, days, sawWar, warBy[15], warBy[30], seizures, wiped)
+	t.Logf("%d campaigns over %d days: war in %d, by day15=%d day30=%d, seizures=%d, holding nothing=%d, new organizations=%d in %d campaigns, cities left with fewer than two organizations=%d",
+		campaigns, days, sawWar, warBy[15], warBy[30], seizures, wiped, born, grew, emptied)
 
 	if sawWar < campaigns/10 {
 		t.Fatalf("the city almost never goes to war (%d of %d); nothing happens without the player", sawWar, campaigns)
@@ -66,7 +77,11 @@ func TestCityConflictStaysVaried(t *testing.T) {
 	if seizures == 0 {
 		t.Fatal("wars never change who holds anything, so they cost nobody ground")
 	}
-	if wiped > campaigns/2 {
-		t.Fatalf("organizations are annihilated too readily (%d); the city empties out", wiped)
+	// Organizations failing is the point; a city with nobody left in it is not.
+	if emptied > campaigns/10 {
+		t.Fatalf("%d of %d cities ended with fewer than two organizations holding anything", emptied, campaigns)
+	}
+	if born == 0 {
+		t.Fatal("no organization was ever created; the city can only shrink")
 	}
 }
