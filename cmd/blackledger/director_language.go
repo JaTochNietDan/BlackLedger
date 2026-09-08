@@ -3,6 +3,7 @@ package main
 import (
 	"blackledger/core"
 	"fmt"
+	"strings"
 	"unicode"
 )
 
@@ -15,6 +16,18 @@ func validateChoiceScript(p core.Proposal) error {
 			if unicode.IsLetter(r) && !unicode.In(r, unicode.Latin) {
 				return fmt.Errorf("write approach labels in English using Latin-script text; replace the mixed-script label %q", a.Label)
 			}
+		}
+	}
+	return nil
+}
+
+// An approach is a button the player presses. A blank one is unpressable and
+// reads as a missing option; observed live on qwen3.5:35b-a3b, which returned an
+// empty first label.
+func validateApproachLabels(p core.Proposal) error {
+	for _, a := range p.Approaches {
+		if len(strings.TrimSpace(a.Label)) < 4 {
+			return fmt.Errorf("approach %q has no usable label; give every approach a short phrase naming how the player would do it", a.Method)
 		}
 	}
 	return nil

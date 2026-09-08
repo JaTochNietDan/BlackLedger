@@ -81,6 +81,17 @@ func (w *World) NextDirectorOperation() string {
 			selected = operation
 		}
 	}
+	// Work that only exists because of something the city did takes precedence
+	// over an errand, but only when it is the least recently told story. A war
+	// should not produce nothing but escorts.
+	// Situational work wins a tie. Without this the ordinary rotation always
+	// holds the tie on a fresh campaign, so a city already at war could never
+	// lead with a war story.
+	for _, situational := range w.SituationalOperations() {
+		if seen[situational.ID] <= seen[selected] {
+			selected = situational.ID
+		}
+	}
 	return selected
 }
 

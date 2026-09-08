@@ -256,6 +256,12 @@ func (a *app) generateAttempt(snapshot *core.World, feedback string) error {
 	if err := validateSceneTitle(proposal); err != nil {
 		return proposalRejected{err}
 	}
+	if err := validateApproachLabels(proposal); err != nil {
+		return proposalRejected{err}
+	}
+	if err := validateSituationalGrounding(snapshot, proposal); err != nil {
+		return proposalRejected{err}
+	}
 	if err := validateSpokenTerms(proposal); err != nil {
 		return proposalRejected{err}
 	}

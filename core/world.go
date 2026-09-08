@@ -851,6 +851,9 @@ func (w *World) ValidateProposal(p Proposal) (*Scene, error) {
 		}
 	}
 	catalog := map[string]Effect{"courier": {75, 3, 3, 45}, "mediation": {55, 5, 0, 60}, "collection": {130, 3, 5, 90}}
+	for id, effect := range SituationalEffects() {
+		catalog[id] = effect
+	}
 	fx, ok := catalog[p.Operation]
 	if !ok || w.NPC(p.Speaker) == nil {
 		return nil, fmt.Errorf("unsupported director operation or speaker")
@@ -875,7 +878,7 @@ func (w *World) ValidateProposal(p Proposal) (*Scene, error) {
 			return nil, fmt.Errorf("unknown beneficiary faction %q; use exactly one of %q", p.Beneficiary, allowed)
 		}
 	}
-	scene := &Scene{Target: p.Location, Operation: p.Operation, ID: ID(), Title: p.Title, Beneficiary: p.Beneficiary, Body: p.Body, Speaker: p.Speaker, Kind: "proposal", Source: "local-ai", Minute: w.Minute, Effect: fx, Outcome: map[string]string{"courier": "You delivered the sealed package and reported back.", "mediation": "You completed the requested mediation without violence.", "collection": "You collected the agreed payment and reported back."}[p.Operation], Choices: []Choice{{ID: "accept", Label: map[string]string{"courier": "Deliver the package", "mediation": "Mediate the dispute", "collection": "Collect the payment"}[p.Operation], Detail: fmt.Sprintf("$%d · %d minutes · +%d respect · +%d heat", fx.Reward, fx.Minutes, fx.Respect, fx.Heat) + " · At 15 heat, police may stop completion." + politicalDetail}, {ID: "decline", Label: "Decline the arrangement", Detail: "No cost or time."}}}
+	scene := &Scene{Target: p.Location, Operation: p.Operation, ID: ID(), Title: p.Title, Beneficiary: p.Beneficiary, Body: p.Body, Speaker: p.Speaker, Kind: "proposal", Source: "local-ai", Minute: w.Minute, Effect: fx, Outcome: operationOutcome(p.Operation), Choices: []Choice{{ID: "accept", Label: operationLabel(p.Operation), Detail: fmt.Sprintf("$%d · %d minutes · +%d respect · +%d heat", fx.Reward, fx.Minutes, fx.Respect, fx.Heat) + " · At 15 heat, police may stop completion." + politicalDetail}, {ID: "decline", Label: "Decline the arrangement", Detail: "No cost or time."}}}
 	if err := addApproaches(scene, p.Approaches, politicalDetail); err != nil {
 		return nil, err
 	}
@@ -888,4 +891,34 @@ func (w *World) ValidateProposal(p Proposal) (*Scene, error) {
 		}
 	}
 	return scene, nil
+}
+
+// Every operation needs words for the button the player presses and for what
+// the ledger records afterwards. A missing entry rendered as an unpressable
+// blank choice when the conflict-derived operations were added.
+func operationLabel(operation string) string {
+	labels := map[string]string{
+		"courier": "Deliver the package", "mediation": "Mediate the dispute", "collection": "Collect the payment",
+		"escort": "Travel with it", "warning": "Deliver the message", "recovery": "Get it out", "settlement": "Settle the matter",
+	}
+	if label, ok := labels[operation]; ok {
+		return label
+	}
+	return "Take the work"
+}
+
+func operationOutcome(operation string) string {
+	outcomes := map[string]string{
+		"courier":    "You delivered the sealed package and reported back.",
+		"mediation":  "You completed the requested mediation without violence.",
+		"collection": "You collected the agreed payment and reported back.",
+		"escort":     "You saw it across the city and handed it over intact.",
+		"warning":    "You delivered the message in person and walked out.",
+		"recovery":   "You got it out without a confrontation.",
+		"settlement": "You put the matter in front of the new leadership and settled it.",
+	}
+	if outcome, ok := outcomes[operation]; ok {
+		return outcome
+	}
+	return "You completed the arrangement."
 }

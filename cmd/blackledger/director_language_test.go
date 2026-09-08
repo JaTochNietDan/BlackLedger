@@ -42,3 +42,23 @@ func TestSceneTitleNamesTheSituationRatherThanRepeatingAChoice(t *testing.T) {
 		}
 	}
 }
+
+func TestEveryApproachNeedsALabelThePlayerCanPress(t *testing.T) {
+	// Observed live on qwen3.5:35b-a3b: a war-derived offer came back with an
+	// empty first approach label, which renders as an unpressable button.
+	if validateApproachLabels(core.Proposal{Approaches: []core.Approach{{Method: "careful", Label: ""}}}) == nil {
+		t.Fatal("an empty approach label was accepted")
+	}
+	if validateApproachLabels(core.Proposal{Approaches: []core.Approach{{Method: "press", Label: "  "}}}) == nil {
+		t.Fatal("a whitespace approach label was accepted")
+	}
+	if validateApproachLabels(core.Proposal{Approaches: []core.Approach{{Method: "press", Label: "Go"}}}) == nil {
+		t.Fatal("a label too short to read was accepted")
+	}
+	if err := validateApproachLabels(core.Proposal{Approaches: []core.Approach{
+		{Method: "careful", Label: "Speak with him quietly"},
+		{Method: "press", Label: "Walk in and make it clear"},
+	}}); err != nil {
+		t.Fatal("ordinary approach labels rejected:", err)
+	}
+}
