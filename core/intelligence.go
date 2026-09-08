@@ -114,6 +114,41 @@ type PublicFaction struct {
 	// Knowledge is how much of this is worth trusting, from nothing to
 	// everything, so the interface can say so.
 	Knowledge int `json:"knowledge"`
+	// LeaderID is who to draw, once anybody will name them.
+	LeaderID string `json:"leader_id,omitempty"`
+	// Holdings is the ground they are standing on, by name. Premises are the
+	// most public thing an organization has: anybody can walk past them.
+	Holdings []string `json:"holdings,omitempty"`
+	// Members is how many people answer to them, and Seats the number of those
+	// the player could actually put a name to.
+	Members, Known int `json:"-"`
+	People         int `json:"people,omitempty"`
+	// Fighting is who they are at war or at odds with, in words.
+	Fighting []string `json:"fighting,omitempty"`
+	// Standing is what their goodwill means, said plainly.
+	Standing string `json:"standing,omitempty"`
+	// Yours is whether this is the player's own organization.
+	Yours bool `json:"yours,omitempty"`
+}
+
+// standingWith puts a number nobody can read into words anybody can. The screen
+// said "+45" and "-63" and left the player to work out what either meant.
+func standingWith(goodwill int) string {
+	switch {
+	case goodwill <= -70:
+		return "They have decided about you"
+	case goodwill <= -35:
+		return "Hostile"
+	case goodwill < -10:
+		return "They do not like you"
+	case goodwill <= 10:
+		return "They have no opinion of you"
+	case goodwill < 35:
+		return "Cordial"
+	case goodwill < 70:
+		return "They think well of you"
+	}
+	return "You are as good as one of theirs"
 }
 
 // PublicFactions is every organization as the player can see it.
@@ -138,6 +173,49 @@ func (w *World) PublicFactions() []PublicFaction {
 		if level >= 3 {
 			entry.Cash = f.Cash
 			entry.Money = fmt.Sprintf("$%d", f.Cash)
+		}
+		// Premises are the most public thing an organization has: anybody can
+		// walk past them, so they need no informant.
+		for _, id := range w.FamilyHoldings(f.ID) {
+			if place, ok := PlaceByID(id); ok {
+				entry.Holdings = append(entry.Holdings, place.Name)
+			}
+		}
+		entry.Yours = f.ID == w.PlayerOrganizationID()
+		entry.Standing = standingWith(f.Goodwill)
+		if entry.Yours {
+			entry.Standing = "Yours"
+		}
+		if level >= 1 {
+			for _, n := range w.People() {
+				if n.Name == f.Leader {
+					entry.LeaderID = n.ID
+				}
+			}
+		}
+		// How many people answer to them is a thing you need somebody inside
+		// to count, but that there is a quarrel at all is public.
+		if level >= 2 {
+			entry.People = len(w.Members(f.ID))
+		}
+		for _, c := range w.Conflicts {
+			if c.State != "war" && c.State != "feud" {
+				continue
+			}
+			other := ""
+			if c.A == f.ID {
+				other = c.B
+			} else if c.B == f.ID {
+				other = c.A
+			}
+			if other == "" {
+				continue
+			}
+			word := "at war with "
+			if c.State == "feud" {
+				word = "at odds with "
+			}
+			entry.Fighting = append(entry.Fighting, word+w.factionName(other))
 		}
 		out = append(out, entry)
 	}

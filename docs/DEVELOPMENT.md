@@ -1184,3 +1184,11 @@
 - The history is searchable and filterable by kind, grouped under the day it happened, showing the last twelve with the rest behind a line that says how many. **4.9 screens became 1.7.**
 - On the live campaign it reads: coming in $1,140 a day from 4 businesses, going out $206, net $934, $3,778 on hand and all of it reachable — then rent, security, crew, staff and your own people, adding to $206.
 - `mise run verify` passes.
+
+## The organizations, said plainly
+- Families was the opposite problem to the other screens: not a wall but a thin one. Three cards, each carrying a strength, a money word and **a bare number for standing — "+45", "−63" — with nothing saying what either meant**, nothing about what any organization holds, and nothing about who is fighting whom. All of it was already in the city and simply never asked for.
+- An organization now reports what it holds by name — premises are the most public thing it has, so they need no informant — who it is at war or at odds with, what its number means in words (*Hostile*, *They think well of you*, *You are as good as one of theirs*), and its leader's face. **How many people answer to it still needs somebody inside**, which a test enforces: what you cannot count, you are not told.
+- The player's own organization is listed first and says *Yours* rather than reporting a number about how much it likes itself. Its card carries the player's own face, because its leader is the player, who is not one of the city's people and has no id to draw from.
+- A section beneath says who is fighting whom and since which day, out of the conflicts the city already tracks.
+- On the live campaign: *Nico Ward's people · 100 of a hundred · $4,202 · 3 people · 4 holdings · Bluebird Laundry, Russo Motor Works, The Blue Hour, Cypress House · at war with Russo Outfit*, then the Bellandi Family who think well of you and the Russo Outfit who are hostile, and the two wars beneath.
+- `mise run verify` passes.

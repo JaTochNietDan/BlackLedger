@@ -355,3 +355,27 @@
 .books-lines li.total b,.books-lines li.total i{font:16px var(--serif);color:var(--ink)}
 .log-day{font:12px system-ui;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin:22px 0 2px;font-weight:500}
 @media(max-width:1000px){.books{grid-template-columns:1fr}}
+
+/* The organizations: what they hold, who they are fighting, and what their
+   number actually means. */
+.family-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));gap:16px;margin-bottom:26px}
+.family-card{background:#152020;border:1px solid var(--line);border-top:2px solid #3f4d44;padding:16px}
+.family-card.yours{border-top-color:var(--gold)}
+.family-card.hostile{border-top-color:#8a5a4d}
+.family-card.warm{border-top-color:#7d9470}
+.family-card header{display:flex;gap:13px;align-items:flex-start}
+.family-card header b{font:19px var(--serif);font-weight:400;display:block;line-height:1.2}
+.family-card header small{display:block;font-size:11px;color:var(--muted);line-height:1.5}
+.family-facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(78px,1fr));gap:10px;margin:14px 0 0;padding-top:12px;border-top:1px solid var(--line)}
+.family-facts span{display:block;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.family-facts b{font-weight:400;font-size:13px}
+.family-ground{margin:12px 0 0;font-size:11.5px;color:var(--muted);line-height:1.5}
+.family-ground span{color:var(--gold);letter-spacing:.12em;text-transform:uppercase;font-size:9.5px;display:block}
+.family-fighting{margin:8px 0 0;font-size:11.5px;color:var(--red)}
+.family-note{margin:8px 0 0;font-size:11.5px;color:#9fb096;font-style:italic}
+.family-card .plain{margin-top:13px}
+.conflict-list{list-style:none;padding:0;margin:0 0 20px;max-width:640px}
+.conflict-list li{display:flex;justify-content:space-between;gap:14px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13px}
+.conflict-list li b{font-weight:400;font-family:var(--serif);font-size:15px}
+.conflict-list li span{color:var(--muted);font-size:11.5px;white-space:nowrap}
+.conflict-list li.war b{color:var(--red)}

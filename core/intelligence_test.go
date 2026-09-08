@@ -142,3 +142,79 @@ func TestYouAlwaysKnowWhatTheyThinkOfYouAndYourOwnBooks(t *testing.T) {
 		t.Fatal("the player had to ask around about themselves")
 	}
 }
+
+// The Families screen showed a strength, a money word and a bare number for
+// standing — "+45", "-63" — and left the player to work out what any of it
+// meant. What an organization holds, who it is fighting and what its number
+// means are all things the city already knew.
+
+func TestAnOrganizationSaysWhatItHoldsAndWhoItIsFighting(t *testing.T) {
+	w, _ := testator(t)
+	w.Antagonize("bellandi", "russo", 90)
+	for i := range w.Conflicts {
+		w.Conflicts[i].State = "war"
+	}
+	seen := 0
+	for _, f := range w.PublicFactions() {
+		if f.Standing == "" {
+			t.Fatalf("%s has no standing anybody can read", f.Name)
+		}
+		if len(w.FamilyHoldings(f.ID)) > 0 && len(f.Holdings) == 0 {
+			t.Fatalf("%s holds ground and the screen shows none of it", f.Name)
+		}
+		if f.ID == "bellandi" || f.ID == "russo" {
+			if len(f.Fighting) == 0 {
+				t.Fatalf("%s is at war and the screen does not say so", f.Name)
+			}
+			seen++
+		}
+	}
+	if seen != 2 {
+		t.Fatalf("%d of the two families at war were reported", seen)
+	}
+
+	// The player's own organization says so rather than reporting a number
+	// about how much it likes itself.
+	own := false
+	for _, f := range w.PublicFactions() {
+		if f.ID == w.PlayerOrganizationID() {
+			own = true
+			if !f.Yours || f.Standing != "Yours" {
+				t.Fatalf("the player's own organization reads %q", f.Standing)
+			}
+		}
+	}
+	if !own {
+		t.Fatal("the player's own organization is not on the screen")
+	}
+}
+
+func TestStandingIsSaidInWordsNotNumbers(t *testing.T) {
+	for _, c := range []struct {
+		goodwill int
+		want     string
+	}{{-90, "They have decided about you"}, {-50, "Hostile"}, {-20, "They do not like you"},
+		{0, "They have no opinion of you"}, {20, "Cordial"}, {50, "They think well of you"},
+		{90, "You are as good as one of theirs"}} {
+		if got := standingWith(c.goodwill); got != c.want {
+			t.Errorf("%d reads %q, expected %q", c.goodwill, got, c.want)
+		}
+	}
+}
+
+func TestWhatYouCannotCountYouAreNotTold(t *testing.T) {
+	// Counting somebody's people needs an informant. Their premises do not.
+	w := proprietor(t)
+	w.Player.Enquiries = nil
+	for _, f := range w.PublicFactions() {
+		if f.Knowledge >= 2 {
+			continue
+		}
+		if f.People != 0 {
+			t.Fatalf("%s reports %d people without anybody inside", f.Name, f.People)
+		}
+		if len(w.FamilyHoldings(f.ID)) > 0 && len(f.Holdings) == 0 {
+			t.Fatalf("%s holds premises anybody could walk past and they are hidden", f.Name)
+		}
+	}
+}
