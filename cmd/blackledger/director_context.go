@@ -217,6 +217,8 @@ func playerSituation(w *core.World) map[string]any {
 		"armed":            w.Player.Weapon > 0,
 		"dressed":          core.AttireByTier(w.Player.Dress).Label,
 		"looks_kept":       w.DressCondition() >= core.Shabby,
+		"drives":           core.VehicleByTier(w.Player.Car).Label,
+		"car_runs":         w.Driving(),
 	}
 	return situation
 }

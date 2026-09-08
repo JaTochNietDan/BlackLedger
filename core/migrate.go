@@ -8,7 +8,7 @@ package core
 // to somebody.
 
 // SaveVersion is the shape the current build writes.
-const SaveVersion = 7
+const SaveVersion = 8
 
 // seedHoldings is the property each established family holds in a new city.
 var seedHoldings = map[string][]string{
@@ -96,6 +96,11 @@ func (w *World) MigrateLivingWorld() {
 		if HasBankroll(l.ID) && w.Own(l.ID) && w.Properties[l.ID].Bankroll == 0 {
 			w.Properties[l.ID].Bankroll = BankrollLot * 2
 		}
+	}
+
+	// A campaign that already had a car is driving one in working order.
+	if w.Player.Car > 0 && w.Player.CarWear == 0 {
+		w.Player.CarWear = 100
 	}
 
 	// A campaign that already had a suit before clothes could wear out is

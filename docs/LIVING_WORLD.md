@@ -120,7 +120,6 @@ stays here, in the original wording, until it is genuinely implemented — so if
 it is still in this list, it does not exist in the game yet.
 
 - Playable casino games
-- Ownable vehicles to traverse faster
 - Other cities that can be flown to
 - Ownable houses/apartments that have their own perks
 - Customizable houses/apartments

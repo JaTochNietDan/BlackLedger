@@ -97,9 +97,20 @@ func (w *World) MarketPrices() {
 // ContrabandDay applies what carrying goods costs. Attention accrues for as
 // long as the stock is held, which is what makes moving it quickly the point.
 func (w *World) ContrabandDay() {
-	heat := 0
+	// Only what is not under the floor of a car draws attention. A false floor
+	// is the difference between holding stock and being seen to hold it.
+	exposed := w.Exposed()
+	if exposed == 0 {
+		return
+	}
+	heat, counted := 0, 0
 	for _, g := range w.Goods {
-		heat += g.Heat * w.Holding(g.ID)
+		held := min(w.Holding(g.ID), exposed-counted)
+		if held <= 0 {
+			continue
+		}
+		counted += held
+		heat += g.Heat * held
 	}
 	if heat == 0 {
 		return
@@ -168,11 +179,19 @@ func (w *World) Sell(good string) error {
 // Seize takes contraband out of the player's hands, for a stated reason. The
 // same call serves a police search and a robbery.
 func (w *World) Seize(reason string) int {
+	// A search turns out the premises and the person. What is under the floor
+	// of a car parked two streets away is not there to be found.
+	remaining := w.Exposed()
 	lost := 0
 	for _, g := range w.Goods {
-		lost += w.Holding(g.ID)
+		take := min(w.Holding(g.ID), remaining)
+		if take <= 0 {
+			continue
+		}
+		remaining -= take
+		lost += take
 		if w.Player.Stock != nil {
-			w.Player.Stock[g.ID] = 0
+			w.Player.Stock[g.ID] -= take
 		}
 	}
 	if lost > 0 {

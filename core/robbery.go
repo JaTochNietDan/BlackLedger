@@ -61,6 +61,7 @@ func (w *World) Rob(id string) error {
 	if w.Random() >= w.robberyOdds(id) {
 		injury := w.Absorb(10 + int(w.Random()*20))
 		w.Ruin(30)
+		w.Damage(15)
 		w.Player.Health = max(0, w.Player.Health-injury)
 		w.Player.Heat = min(100, w.Player.Heat+15)
 		if owner != nil {
@@ -80,9 +81,15 @@ func (w *World) Rob(id string) error {
 	w.Player.Heat = min(100, w.Player.Heat+10)
 	w.Player.Respect += 2
 	prop.Condition = max(0, prop.Condition-5)
+	// A car outside is a thing witnesses describe, so driving to a robbery
+	// makes it that much easier to work out who did it.
+	if trail := w.CarTrail(); trail > 0 {
+		w.Player.Heat = min(100, w.Player.Heat+trail*4)
+		w.Log("Somebody described the car", fmt.Sprintf("A %s was parked where it had no business being. Attention is now %d.", lowerFirst(VehicleByTier(w.Player.Car).Label), w.Player.Heat), "danger")
+	}
 	if owner != nil {
 		owner.Cash = max(0, owner.Cash-take)
-		owner.Goodwill = max(-100, owner.Goodwill-25)
+		owner.Goodwill = max(-100, owner.Goodwill-25-w.CarTrail()*3)
 		w.RetaliationFrom(owner.ID)
 		w.Log("Taken from "+place.Name, fmt.Sprintf("$%d out of %s. %s will not need long to work out who would dare.", take, place.Name, owner.Name), "politics")
 		w.Report("robbery", "ROBBERY AT "+strings.ToUpper(place.Name),

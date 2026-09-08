@@ -99,6 +99,18 @@ func (w *World) Raid() {
 	}
 
 	seized := w.Seize("The police came with a warrant.")
+	// A car is registered to somebody, and a warrant that turns up a false
+	// floor takes the car with what is in it.
+	if w.Concealed() > 0 && w.Carrying() > 0 && w.WorldRandom() < .35 {
+		hidden := w.Carrying()
+		for _, g := range w.Goods {
+			if w.Player.Stock != nil {
+				w.Player.Stock[g.ID] = 0
+			}
+		}
+		seized += hidden
+		w.LoseCar("They found the false floor and took the car with it.")
+	}
 	w.SeizeArms()
 	w.Ruin(20) // being turned out against a wall is hard on good clothes
 	still, foundStill := w.StillFound()
