@@ -19,6 +19,7 @@ func Execute(original *World, c Command) (*World, error) {
 func (w *World) apply(c Command) error {
 	p := &w.Player
 	w.VisualCues = nil
+	w.Comings = nil
 	oldTime := w.Minute
 	oldLoc := p.Location
 	// What the player had before they decided, so the result can say what the
@@ -679,7 +680,7 @@ func (w *World) apply(c Command) error {
 	w.LastResult = &Result{
 		Action: chosen, Kind: c.Kind,
 		From: oldLoc, To: w.Player.Location, Elapsed: w.Minute - oldTime,
-		Records: newRecords, Cues: w.VisualCues,
+		Records: newRecords, Cues: w.VisualCues, Comings: w.Comings,
 		Cash:    w.Player.Cash - wasCash,
 		Respect: w.Player.Respect - wasRespect,
 		Heat:    w.Player.Heat - wasHeat,

@@ -12,13 +12,13 @@ import (
 
 func main() {
 	if len(os.Args) < 2 || len(os.Args) > 3 {
-		log.Fatal("usage: go run ./cmd/qa-fixture <new-qa.sqlite3> [police|damage|warning|russo-warning|attack|voice|contact|paused-job|leader|doorman|arrest|debt|herald|killing|dead|offer|audience|street]")
+		log.Fatal("usage: go run ./cmd/qa-fixture <new-qa.sqlite3> [police|damage|warning|russo-warning|attack|voice|contact|paused-job|leader|doorman|arrest|debt|herald|killing|dead|offer|audience|street|room]")
 	}
 	scenario := "police"
 	if len(os.Args) == 3 {
 		scenario = os.Args[2]
 	}
-	if scenario != "police" && scenario != "damage" && scenario != "warning" && scenario != "russo-warning" && scenario != "attack" && scenario != "voice" && scenario != "contact" && scenario != "paused-job" && scenario != "leader" && scenario != "doorman" && scenario != "arrest" && scenario != "debt" && scenario != "herald" && scenario != "killing" && scenario != "dead" && scenario != "offer" && scenario != "audience" && scenario != "street" {
+	if scenario != "police" && scenario != "damage" && scenario != "warning" && scenario != "russo-warning" && scenario != "attack" && scenario != "voice" && scenario != "contact" && scenario != "paused-job" && scenario != "leader" && scenario != "doorman" && scenario != "arrest" && scenario != "debt" && scenario != "herald" && scenario != "killing" && scenario != "dead" && scenario != "offer" && scenario != "audience" && scenario != "street" && scenario != "room" {
 		log.Fatal("unsupported QA scenario")
 	}
 	path := os.Args[1]
@@ -36,6 +36,23 @@ func main() {
 	}
 	defer s.DB.Close()
 	err = s.Change(func(w *core.World) error {
+		if scenario == "room" {
+			// The player standing inside a business while somebody walks out of it
+			// on an errand, so the room has traffic to remark on.
+			w.Player.Cash, w.Player.Respect = 4000, 30
+			w.Properties["laundry"].Owner = "player:1"
+			w.Player.Location = "laundry"
+			// Somebody standing in the laundry who is due somewhere else.
+			n := w.NPC("leo")
+			if n == nil {
+				return fmt.Errorf("nobody to move")
+			}
+			n.Location = "laundry"
+			// Five minutes short of midday: the city's people set off on the
+			// half-day, so any ordinary action reaches it.
+			w.Minute = 715
+			return nil
+		}
 		if scenario == "street" {
 			// Ground changing hands is what puts people on the street, so this
 			// takes a holding off one family and gives it to the other, then lets

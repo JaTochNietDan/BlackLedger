@@ -1,6 +1,6 @@
 import {useEffect,useState} from 'react';
 import type {ReactElement} from 'react';
-import type {Action,Place,Presence} from './types';
+import type {Action,Coming,Place,Presence} from './types';
 import {interiorSVG,paintedRoom,standingSpots,StandingRoom} from './roomart';
 import {Portrait} from './Portrait';
 
@@ -20,9 +20,14 @@ const premisesOrder = ['acquire', 'repair', 'hire', 'layoff', 'restock', 'remedy
 
 function rank(id: string) { const at = premisesOrder.indexOf(id); return at < 0 ? premisesOrder.length : at }
 
-export function Interior({place, people, actions, render, onLeave}: {
+export function Interior({place, people, actions, render, onLeave, comings}: {
   place: Place; people: Presence[]; actions: Action[];
   render: (a: Action) => ReactElement; onLeave: () => void;
+  // Who walked in or out while the player was standing here. People move
+  // between buildings now, and until this the room's roster simply changed
+  // behind their back: somebody they had been talking to was gone, and
+  // somebody they had never seen was in the list with no explanation.
+  comings?: Coming[];
 }) {
   const [picked, setPicked] = useState('');
   // The painted interior is a backdrop, not a dependency: if it is missing the
@@ -53,7 +58,14 @@ export function Interior({place, people, actions, render, onLeave}: {
   const worth = (p: Presence) => (personal.some(a => a.subject === p.id && !a.disabled) ? 0 : p.yours ? 1 : p.owes || p.sore ? 2 : p.known ? 3 : 4);
   const onFloor = [...people].sort((a, b) => worth(a) - worth(b));
 
+  const traffic = (comings || []).filter(c => c.where === place.id);
+
   return <div className="interior-stage">
+    {!!traffic.length && <div className="room-traffic" role="status">
+      {traffic.map(c => <p key={c.id + String(c.leaving)} className={c.leaving ? 'left' : 'came'}>
+        <i aria-hidden="true">{c.leaving ? '←' : '→'}</i>{c.note}
+      </p>)}
+    </div>}
     <div className={'room' + (painted ? ' painted' : '')}
       style={painted ? {backgroundImage: `url(${paintedRoom(place.id)})`} : undefined}>
       <div className="room-plate" dangerouslySetInnerHTML={{__html: interiorSVG(place, painted)}}/>

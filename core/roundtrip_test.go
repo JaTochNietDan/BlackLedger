@@ -56,6 +56,7 @@ func distinctive(v reflect.Value, seed *int) {
 // omitted lists fields that deliberately do not survive a save, with the reason.
 var omitted = map[string]string{
 	"VisualCues": "presentation for one response, never stored",
+	"Comings":    "who walked in or out during one command, never stored",
 }
 
 func TestEveryFieldOfTheWorldSurvivesBeingWrittenDown(t *testing.T) {

@@ -15,6 +15,50 @@ import "fmt"
 //
 // Journeys are on foot. Nobody in this city but the player has a car.
 
+// Coming is somebody arriving in or leaving the room the player is standing in.
+// Everything else in this city happens at a distance and is read about; this is
+// the one thing that happens in front of them.
+type Coming struct {
+	ID      string `json:"id"`
+	Name    string `json:"name"`
+	Where   string `json:"where"`
+	To      string `json:"to,omitempty"`
+	Leaving bool   `json:"leaving,omitempty"`
+	Note    string `json:"note"`
+}
+
+// noticed records a coming or going, but only where the player can see it. A
+// room they are not in changes without remark, which is what a room they are
+// not in does.
+func (w *World) noticed(n *NPC, leaving bool) {
+	if !w.Player.Alive || n.Dead {
+		return
+	}
+	// Either way this is where they now stand: SetOut leaves Location at the
+	// door they walked out of, and Arrivals has already put them down.
+	at := n.Location
+	if at != w.Player.Location {
+		return
+	}
+	here, _ := PlaceByID(at)
+	c := Coming{ID: n.ID, Name: n.Name, Where: at, Leaving: leaving}
+	if leaving {
+		to, ok := PlaceByID(n.Heading)
+		if !ok {
+			return
+		}
+		c.To = to.Name
+		c.Note = n.Name + " leaves " + here.Name
+		if n.Errand != "" {
+			c.Note += ", " + n.Errand
+		}
+		c.Note += "."
+	} else {
+		c.Note = n.Name + " comes in."
+	}
+	w.Comings = append(w.Comings, c)
+}
+
 // Journeying is one person between two addresses, for anybody who needs to
 // draw the street or say what is happening on it.
 type Journeying struct {
@@ -122,6 +166,7 @@ func (w *World) SetOut() {
 		n.Heading = where.where
 		n.Errand = where.because
 		n.Arrives = w.Minute + TravelMinutes(n.Location, where.where)
+		w.noticed(n, true)
 	}
 }
 
@@ -143,6 +188,7 @@ func (w *World) Arrivals() {
 		}
 		n.Location = n.Heading
 		n.Heading, n.Arrives, n.Errand = "", 0, ""
+		w.noticed(n, false)
 	}
 }
 

@@ -302,6 +302,8 @@ type VisualCue struct {
 // and never the player's decision.
 type Result struct {
 	Cues []VisualCue `json:"cues,omitempty"`
+	// Who came into or left the room while this was being done.
+	Comings []Coming `json:"comings,omitempty"`
 	// Action is what the player chose, in their own words, and Kind its id.
 	Action  string   `json:"action,omitempty"`
 	Kind    string   `json:"kind,omitempty"`
@@ -317,8 +319,11 @@ type Result struct {
 	Health  int `json:"health"`
 }
 type World struct {
-	SuspendedJob   *SuspendedJob        `json:"suspended_job,omitempty"`
-	VisualCues     []VisualCue          `json:"-"`
+	SuspendedJob *SuspendedJob `json:"suspended_job,omitempty"`
+	VisualCues   []VisualCue   `json:"-"`
+	// What walked in or out of the room the player is standing in during this
+	// command. Like VisualCues, it belongs to the command rather than the save.
+	Comings        []Coming             `json:"-"`
 	Arrangements   []ArrangementMemory  `json:"arrangements,omitempty"`
 	NextPressure   int                  `json:"next_pressure,omitempty"`
 	Version        int                  `json:"version"`

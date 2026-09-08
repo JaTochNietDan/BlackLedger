@@ -523,3 +523,15 @@
 .theatre-plate{width:min(420px,70%);height:96px;background-size:cover;background-position:center;border:1px solid #2c3733}
 .theatre-caption{text-shadow:0 2px 14px #000}
 @media(prefers-reduced-motion:reduce){.city-street.watching .street-front{opacity:1;filter:none}.front-flash{display:none}}
+
+/* Who came and went while the player was standing here. Quiet, above the room,
+   gone with the next action — a room that changes without remark is a list
+   changing behind your back rather than a place you are standing in. */
+/* The stage is an explicitly placed grid, so this has to claim the room's own
+   cell: auto-placement put it a thousand pixels below the fold, present in the
+   page and invisible to the player. */
+.room-traffic{grid-column:1;grid-row:1;align-self:start;justify-self:start;z-index:3;margin:14px 0 0 16px;
+  display:flex;flex-direction:column;gap:3px;padding:9px 13px;background:#0c1211e8;border-left:2px solid var(--gold);max-width:min(460px,60%)}
+.room-traffic p{margin:0;font-size:12px;color:#c9cfc4;display:flex;gap:8px;align-items:baseline}
+.room-traffic i{font-style:normal;color:var(--gold);font-size:13px}
+.room-traffic .left i{color:#9ca99f}
