@@ -94,6 +94,12 @@ sidebar as soon as the rules offer it, with its cost, duration and the reason it
 is unavailable. That is enough to play and to test. Visual production is a
 separate workstream and is not a prerequisite for any of the above.
 
+For examples new locations and buildings can be added but as with the current way
+we're doing things, they can just be items in a list with a brief description and
+explanation and the visuals of that building don't actually have to be fleshed out.
+
+It just needs to be easily interactable with for the purposes of me playtesting.
+
 ## Inbox — unsorted ideas
 
 This section belongs to the user. Add anything here in any form: a mechanic, a
@@ -131,5 +137,6 @@ it is still in this list, it does not exist in the game yet.
 - Underground arms market businesses and systems around that
 - A function I remember from an old mafia game was that world events would appear as news stories in a simulated news paper, maybe we can copy that and iterate on it, that was very cool. They usually had a headline with some details underneath. A newspaper with a breakdown of recent world events or major events with a headline, a black and white low res picture of some representation of the event or something would be really cool.
 - Each living NPC should have their own style, portrait and behaviors, ambitions and whatnot. Flesh that out properly. Each one should also have a unique voice as per our existing voice system that stays with them.
+- Some living NPCs are not part of the mafia but are part of the city, like mayors and police chiefs etc. We have some of that already. As the rule goes, even they can be killed and those should have consequences. A mayor being killed would be huge news and have consequence. I'm sure as well a mayor in this city is likely corrupt and probably offers stuff to the mafia members all the time.
 
 Ultiamtely the expectation is that I don't have to think of all of these concepts, you, the agent will think of these too and build them out and playtest and simulate them yourself.

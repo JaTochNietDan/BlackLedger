@@ -1,6 +1,9 @@
 package core
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 // Nobody in this city is scenery. Everyone with a name has an organization, a
 // place they are usually found, a standing inside that organization, and a life
@@ -17,8 +20,11 @@ const (
 
 // firstNames and surnames generate the city's ordinary people. A name is drawn
 // once and then belongs to that person for as long as they live.
-var peopleFirstNames = []string{"Gio", "Nina", "Aldo", "Perla", "Emil", "Rosa",
-	"Ivo", "Greta", "Luca", "Mirela", "Anton", "Sofia", "Piet", "Dora"}
+// Kept apart so a character is not given a voice that contradicts how the rest
+// of the city refers to them.
+var mensFirstNames = []string{"Gio", "Aldo", "Emil", "Ivo", "Luca", "Anton", "Piet"}
+
+var womensFirstNames = []string{"Nina", "Perla", "Rosa", "Greta", "Mirela", "Sofia", "Dora"}
 
 var peopleSurnames = []string{"Costa", "Varga", "Lenz", "Moreau", "Sabbatini",
 	"Novak", "Hale", "Duarte", "Weiss", "Petrov", "Ferro", "Blum"}
@@ -26,10 +32,11 @@ var peopleSurnames = []string{"Costa", "Varga", "Lenz", "Moreau", "Sabbatini",
 // A voice belongs to a person for as long as they live, so a character the
 // player has heard before sounds the same the next time they speak. Drawn from
 // the voices the local synthesis service already provides.
-var peopleVoices = []string{"af_alloy", "af_aoede", "af_bella", "af_jessica",
-	"af_kore", "af_nicole", "af_nova", "af_river", "af_sarah",
-	"am_echo", "am_eric", "am_fenrir", "am_liam", "am_onyx", "am_puck",
-	"bf_alice", "bf_isabella"}
+var womensVoices = []string{"af_alloy", "af_aoede", "af_bella", "af_jessica",
+	"af_kore", "af_nicole", "af_nova", "af_river", "af_sarah", "bf_alice", "bf_isabella"}
+
+var mensVoices = []string{"am_echo", "am_eric", "am_fenrir", "am_liam",
+	"am_onyx", "am_puck", "bm_daniel", "bm_fable"}
 
 // voiceFor picks a voice no living person is already using, so two characters
 // in a scene are never the same voice. It falls back to a stable choice once
@@ -41,6 +48,13 @@ func (w *World) voiceFor(name string) string {
 			taken[n.Voice] = true
 		}
 	}
+	pool := mensVoices
+	first, _, _ := strings.Cut(name, " ")
+	for _, womans := range womensFirstNames {
+		if strings.EqualFold(first, womans) {
+			pool = womensVoices
+		}
+	}
 	sum := 0
 	for _, r := range name {
 		sum = sum*31 + int(r)
@@ -48,13 +62,13 @@ func (w *World) voiceFor(name string) string {
 	if sum < 0 {
 		sum = -sum
 	}
-	for offset := 0; offset < len(peopleVoices); offset++ {
-		candidate := peopleVoices[(sum+offset)%len(peopleVoices)]
+	for offset := 0; offset < len(pool); offset++ {
+		candidate := pool[(sum+offset)%len(pool)]
 		if !taken[candidate] {
 			return candidate
 		}
 	}
-	return peopleVoices[sum%len(peopleVoices)]
+	return pool[sum%len(pool)]
 }
 
 // Living reports whether a person is still in the city.
@@ -110,7 +124,11 @@ func (w *World) personName(name string) bool {
 // newPersonName draws an unused name from the reserved world stream.
 func (w *World) newPersonName() (string, bool) {
 	for attempt := 0; attempt < 60; attempt++ {
-		name := peopleFirstNames[int(w.WorldRandom()*float64(len(peopleFirstNames)))%len(peopleFirstNames)] +
+		names := mensFirstNames
+		if w.WorldRandom() < .5 {
+			names = womensFirstNames
+		}
+		name := names[int(w.WorldRandom()*float64(len(names)))%len(names)] +
 			" " + peopleSurnames[int(w.WorldRandom()*float64(len(peopleSurnames)))%len(peopleSurnames)]
 		if !w.personName(name) {
 			return name, true

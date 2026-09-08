@@ -278,7 +278,7 @@ func newPerson(life int) Person {
 	return Person{Name: names[(life-1)%len(names)], Cash: 90, Health: 100, Location: "room", Home: "room", Alive: true, Crew: []Crew{}}
 }
 func New(seed uint32) *World {
-	w := &World{Version: 2, ID: ID(), Life: 1, Minute: 480, RNG: seed, Player: newPerson(1), Properties: map[string]*Property{}, Tasks: []Task{}, Plots: []Plot{}, History: []Record{}, Dead: []Death{}, Offers: []Offer{}, Director: Director{"authored", "Authored opening. Local AI can prepare additional encounters.", -9999}}
+	w := &World{Version: SaveVersion, ID: ID(), Life: 1, Minute: 480, RNG: seed, Player: newPerson(1), Properties: map[string]*Property{}, Tasks: []Task{}, Plots: []Plot{}, History: []Record{}, Dead: []Death{}, Offers: []Offer{}, Director: Director{"authored", "Authored opening. Local AI can prepare additional encounters.", -9999}}
 	w.Factions = []Faction{{"bellandi", "Bellandi Family", "Vittorio Bellandi", 90, 0, 8000, 90}, {"russo", "Russo Outfit", "Elena Russo", 58, 0, 4500, 58}}
 	w.NPCs = []NPC{
 		{ID: "mara", Name: "Mara Bell", Role: "Fixer", Trust: 10, Voice: "af_heart", Color: "#a48761", Location: "bar", Rank: RankAssociate, Ambition: 45, Skill: 60},

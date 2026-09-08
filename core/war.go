@@ -145,11 +145,32 @@ func (w *World) contest(attacker, defender *Faction) {
 	w.Log("Trouble at "+place.Name, fmt.Sprintf("%s struck %s, a holding of %s. Its condition is now %d%%.", attacker.Name, place.Name, defender.Name, prop.Condition), "politics")
 }
 
+// classify names the state a quarrel is in. It is harder to enter a war than to
+// leave one, so a conflict that has crossed the line does not flicker back the
+// moment hostility dips.
+func classify(c *Conflict) string {
+	switch {
+	case c.Hostility >= warAt, c.State == "war" && c.Hostility >= warEndsAt:
+		return "war"
+	case c.Hostility >= feudAt, c.State == "feud" && c.Hostility >= feudEndsAt:
+		return "feud"
+	}
+	return "cold"
+}
+
 // Antagonize records that two organizations have been set against each other,
-// whether by their own actions or by someone playing one against the other.
+// whether by their own actions or by someone playing one against the other. The
+// recorded state follows immediately, so hostility and state never disagree
+// between one turn and the next.
 func (w *World) Antagonize(a, b string, amount int) {
-	if c := w.Conflict(a, b); c != nil {
-		c.Hostility = min(100, max(0, c.Hostility+amount))
+	c := w.Conflict(a, b)
+	if c == nil {
+		return
+	}
+	c.Hostility = min(100, max(0, c.Hostility+amount))
+	if state := classify(c); state != c.State {
+		c.State = state
+		c.Since = w.Minute
 	}
 }
 
@@ -237,18 +258,8 @@ func (w *World) FactionTurn() {
 			}
 			c.Hostility = min(100, max(0, c.Hostility+drift))
 
-			// Hysteresis: a war is easier to stay in than to enter. Without it a
-			// quarrel crossing the threshold flickers back the same day and
-			// never costs anyone ground.
 			previous := c.State
-			switch {
-			case c.Hostility >= warAt, previous == "war" && c.Hostility >= warEndsAt:
-				c.State = "war"
-			case c.Hostility >= feudAt, previous == "feud" && c.Hostility >= feudEndsAt:
-				c.State = "feud"
-			default:
-				c.State = "cold"
-			}
+			c.State = classify(c)
 			if c.State != previous {
 				c.Since = w.Minute
 				switch c.State {

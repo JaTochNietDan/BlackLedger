@@ -85,7 +85,7 @@ func TestLegacyEstatePurchaseMigration(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !migrated.Own("estate") || migrated.Player.BestHome != 2 || migrated.Version != 2 {
+	if !migrated.Own("estate") || migrated.Player.BestHome != 2 || migrated.Version != core.SaveVersion {
 		t.Fatal("legacy purchase was not restored")
 	}
 	if migrated.Player.Cash != w.Player.Cash || migrated.Revision != w.Revision || migrated.Minute != w.Minute {

@@ -47,6 +47,11 @@ func decode(data string) (*core.World, error) {
 		}
 		w.Version = 2
 	}
+	if e == nil && w.Version < core.SaveVersion {
+		// Campaigns begun before the city had holdings, people and quarrels.
+		w.MigrateLivingWorld()
+		w.Version = core.SaveVersion
+	}
 	return &w, e
 }
 func (s *Store) Read() (*core.World, error) {

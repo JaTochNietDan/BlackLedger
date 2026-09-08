@@ -211,3 +211,58 @@ func TestABreakawayBringsItsOwnPeople(t *testing.T) {
 		t.Fatal("the new leader has no voice")
 	}
 }
+
+func TestVoicesMatchHowPeopleAreNamed(t *testing.T) {
+	womens := map[string]bool{}
+	for _, v := range womensVoices {
+		womens[v] = true
+	}
+	mens := map[string]bool{}
+	for _, v := range mensVoices {
+		mens[v] = true
+	}
+	checked := 0
+	for seed := uint32(1); seed <= 60; seed++ {
+		w := New(seed)
+		for i := 0; i < 4; i++ {
+			w.AddMember("bellandi", "Soldier", RankSoldier, "club")
+		}
+		for _, n := range w.People() {
+			first := n.Name
+			if idx := len(first); idx > 0 {
+				for j, r := range n.Name {
+					if r == ' ' {
+						first = n.Name[:j]
+						break
+					}
+				}
+			}
+			feminine := false
+			for _, name := range womensFirstNames {
+				if name == first {
+					feminine = true
+				}
+			}
+			masculine := false
+			for _, name := range mensFirstNames {
+				if name == first {
+					masculine = true
+				}
+			}
+			if !feminine && !masculine {
+				continue // the authored cast keeps its original casting
+			}
+			checked++
+			if feminine && !womens[n.Voice] {
+				t.Fatalf("%s was given %s", n.Name, n.Voice)
+			}
+			if masculine && !mens[n.Voice] {
+				t.Fatalf("%s was given %s", n.Name, n.Voice)
+			}
+		}
+	}
+	if checked == 0 {
+		t.Fatal("no generated person was checked")
+	}
+	t.Logf("checked %d generated people", checked)
+}
