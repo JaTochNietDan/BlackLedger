@@ -3,25 +3,35 @@ package core
 import "testing"
 
 func TestPeopleActOnTheirOwnAmbition(t *testing.T) {
-	acted := 0
-	for i := uint32(1); i <= 300; i++ {
+	// This once asked whether any city was ever silent for twenty days. In a
+	// city of eight that was a fair question; in a city of thirty-five it is
+	// not, because a city where nothing happens anywhere for three weeks is a
+	// dead one. What matters now is the rate: enough that the player reads
+	// something most weeks, and not so much that the history is a ledger of
+	// strangers robbing each other.
+	const cities, days = 300, 20
+	incidents, quiet := 0, 0
+	for i := uint32(1); i <= cities; i++ {
 		w := New(i * 2654435761)
 		before := len(w.History)
-		for day := 0; day < 20; day++ {
+		for day := 0; day < days; day++ {
 			w.Minute += 1440
 			w.PeopleDay()
 		}
-		if len(w.History) > before {
-			acted++
+		got := len(w.History) - before
+		incidents += got
+		if got == 0 {
+			quiet++
 		}
 	}
-	t.Logf("of 300 cities over 20 days, %d saw somebody act on their own account", acted)
-	if acted == 0 {
+	perWeek := float64(incidents) / float64(cities) / float64(days) * 7
+	if incidents == 0 {
 		t.Fatal("nobody in the city ever does anything of their own")
 	}
-	if acted == 300 {
-		t.Fatal("something happens in every city every time, which is not a city, it is a treadmill")
+	if perWeek < 1 || perWeek > 8 {
+		t.Fatalf("a city produces %.1f incidents a week of its own", perWeek)
 	}
+	t.Logf("%d cities over %d days: %.1f incidents a week each, and %d cities that stayed silent throughout", cities, days, perWeek, quiet)
 }
 
 func TestTheOneAtTheTopDoesNotDoThisPersonally(t *testing.T) {

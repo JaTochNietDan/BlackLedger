@@ -73,8 +73,18 @@ func (w *World) Poise(n *NPC) int {
 // Known reports whether the player has any reason to know who somebody is.
 // Trust is built by dealing with them; anybody at the head of an organization
 // is a name everybody knows.
+// A network of contacts is worth the people your contacts would talk about,
+// which is the people who matter in this business. It is not worth every
+// laundress and docker in a city of sixty — the first build made a player with
+// five contacts know all sixty of them, which is not knowing anybody.
 func (w *World) Known(n *NPC) bool {
-	return n != nil && (n.Trust > 0 || n.Rank >= RankLeader || w.Reach() >= 3)
+	if n == nil {
+		return false
+	}
+	if n.Trust > 0 || n.Rank >= RankLeader || IsOfficial(n.ID) {
+		return true
+	}
+	return w.Reach() >= 3 && n.Faction != ""
 }
 
 // Dossier is everything the player has actually learned about somebody, built

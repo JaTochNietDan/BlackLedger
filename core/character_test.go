@@ -126,7 +126,9 @@ func TestAStrangerIsAStranger(t *testing.T) {
 	w.Player.Contacts = 0
 	var soldier *NPC
 	for _, n := range w.People() {
-		if n.Rank < RankLeader && n.Trust == 0 {
+		// Anybody with a title is a name everybody knows, like the head of an
+		// organization, so a genuine stranger is neither.
+		if n.Rank < RankLeader && n.Trust == 0 && !IsOfficial(n.ID) {
 			soldier = n
 			break
 		}

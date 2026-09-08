@@ -22,12 +22,26 @@ const (
 // once and then belongs to that person for as long as they live.
 // Kept apart so a character is not given a voice that contradicts how the rest
 // of the city refers to them.
-var mensFirstNames = []string{"Gio", "Aldo", "Emil", "Ivo", "Luca", "Anton", "Piet"}
+// A city of hundreds needs enough names for hundreds. Fourteen first names and
+// twelve surnames gave 168 combinations, which is a hard ceiling on how many
+// people this city could ever contain — and newPersonName gives up after sixty
+// attempts, so it started failing long before that.
+var mensFirstNames = []string{"Gio", "Aldo", "Emil", "Ivo", "Luca", "Anton", "Piet",
+	"Bruno", "Cesare", "Dante", "Ennio", "Fausto", "Gustav", "Hugo", "Igor",
+	"Janos", "Karel", "Lorenz", "Marek", "Nico", "Otto", "Pavel", "Rudi",
+	"Sandor", "Tomas", "Ugo", "Valter", "Wim", "Zoltan", "Bela"}
 
-var womensFirstNames = []string{"Nina", "Perla", "Rosa", "Greta", "Mirela", "Sofia", "Dora"}
+var womensFirstNames = []string{"Nina", "Perla", "Rosa", "Greta", "Mirela", "Sofia", "Dora",
+	"Alma", "Bianca", "Clara", "Dita", "Elsa", "Franca", "Gina", "Hedda",
+	"Ilona", "Jelena", "Katia", "Lidia", "Magda", "Nadia", "Olga", "Pia",
+	"Renata", "Stella", "Tilda", "Ursa", "Vera", "Wanda", "Zora"}
 
 var peopleSurnames = []string{"Costa", "Varga", "Lenz", "Moreau", "Sabbatini",
-	"Novak", "Hale", "Duarte", "Weiss", "Petrov", "Ferro", "Blum"}
+	"Novak", "Hale", "Duarte", "Weiss", "Petrov", "Ferro", "Blum",
+	"Aldini", "Berger", "Corvi", "Draga", "Esposito", "Falk", "Gruber",
+	"Havel", "Iordan", "Janssen", "Kovac", "Lombardi", "Mraz", "Nagy",
+	"Olsen", "Palma", "Quintero", "Rossi", "Steiner", "Toth", "Ulmann",
+	"Vance", "Wolf", "Zanetti", "Bassi", "Cerny", "Doyle", "Erdos"}
 
 // A voice belongs to a person for as long as they live, so a character the
 // player has heard before sounds the same the next time they speak. Drawn from

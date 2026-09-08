@@ -18,6 +18,18 @@ func dailyAmbition(n *NPC) float64 {
 	return float64(n.Ambition) / 1400
 }
 
+// cityPace scales each person's chance by how many people there are, so that
+// filling the streets makes the city deeper rather than four times busier. A
+// city of eight and a city of thirty-five produce roughly the same number of
+// incidents a week; what changes is who they happen to.
+func (w *World) cityPace() float64 {
+	living := len(w.People())
+	if living <= 8 {
+		return 1
+	}
+	return 8 / float64(living)
+}
+
 // PeopleDay gives every living person one chance a day to pursue what they
 // want. Called from the clock, so it happens whether or not anyone is watching.
 func (w *World) PeopleDay() {
@@ -41,7 +53,7 @@ func (w *World) PeopleDay() {
 			continue // whoever is at the top has people for this, and so does
 			// anybody with a title
 		}
-		if w.WorldRandom() >= dailyAmbition(n) {
+		if w.WorldRandom() >= dailyAmbition(n)*w.cityPace() {
 			continue
 		}
 		w.pursue(n)
