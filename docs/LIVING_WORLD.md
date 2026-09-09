@@ -88,75 +88,11 @@ make sense read back as a story.
 
 ## Interface
 
-Focus heavily on building out and hydrating the interface, cleaning it up and
-making finding stuff way more intuitive and user friendly. We want to be able
-to find all of the actions easily and understand how everything links together.
-
-**Remember the goal is to have a fully drawn out isometric 2D city view with simulations of the living NPCs doing their daily business and going about their actions.**
-Focus heavily on fleshing this out. We should make it as dynamic and buildable and
-switchable as possible, probably focusing on something like building out stuff in
-simple blocks and ensuring that it is as modular as possible to allow future changes
-and expansions. This whole visual simulation should be showing all of the actions
-and whatnot of the living NPCs as they occur. Ideally in the future we'd even see
-a top level explosion on a building in the case of an arson, or a murder happen
-in the street in that view instead of having to explicitly see the theater play.
-
-Remember that a big goal here is to flesh out the city and have it fully simulated
-and animated. We want to see a scene of someone sabotaging a building with an explosion
-or committing arson (when we add that mechanic) with fire etc and we want sounds to go
-with it. We also want to have all the buildings represented in the city at any one time.
-For now we can try our best to create the buildings with our image gen but if it's not
-ultra up to scratch that's ok as long as we can regen them to have more detail. In order
-to ensure that they are regeneratable we probably need to account for accurately regenerating
-and keeping the same size. Maybe reskinning more so than regenerating so the new skin can
-add higher textured detail if that makes sense.
-
-We want that map view of all the buildings and city to actually show the living NPCs and
-their actions throughout the day as well. That's the ultimate goal, so we should be working
-toward that.
-
-We also want some effort put into styling it appropriately and fleshing out
-all of the pictures of the people etc. Maybe we can use a local image gen model
-to flesh out people's portraits. We want to work on stuff like the newspaper to
-make it look like an actual 1950s or whatnot newspaper that suits the time and
-maybe hydrate the text on it a bit more to make it sound like a real news headline
-with some subtext.
-
-I expect you to be able to intuit what the right thing to do here is for the user
-experience and makes the game better to play as the interface that we use is crucial.
-
-I would also love to start seeing some of the in-game effects simulated on screen,
-like gang hits, assassinations, explosions etc displaying in the simulation when
-these events occur would be the ultimate goal and something we should start working
-toward if we can.
-
-Maybe we can hook into and utilize another model if we want image generation that
-you cannot do or something like that to flesh out the city. The ultimate goal
-would be to have the entire city living, with all of the living NPCs being displayed
-on screen doing the actions that they are actually doing and when a major event 
-occurs, the camera is taken there and we see it played out with a news headline 
-appearing just after it plays out.
-
-It's also ok if we want to start using another model, local or online to generate
-images as long as they fit our asthetic. If we don't have a local model you can
-download one and experiment with using it to generate images as necessary to flesh
-out the UI.
-
-As we did with the entering a business thing and cleaning up the view there I want 
-you to focus on user friendliness issues like this and really clean it up.
-
-You have to have the mindset of a player in terms of trying to make it easy to understand
-and not make any one interface too busy and overwhelming while still having all that
-complexity built into it.
-
-- When playing theater the events should be somewhat gruesome and bloody and intense, this is an adult game
-- City should have ambience, some effects like smoke and lighting etc to make it feel alive
-- Interiors of buildings should have the same treatment, lots of ambiance
-- When playing casino games or taking extra special actions in interiors that should have a special interface, not just rely on that giant action menu. For example right now you're playing a game of blackjack and there's a bunch of other stuff displayed in there, that's all bad design. We need to clean that up and also have the game actually displayed, show the dealer, show the hands being played etc. Simulate that out. You should be able to determine how much you play with as well.
-- We need to build out audio for actions as well, not sure how, can we generate it, can we find free online samples of audio that we need to cover events and ambiance?
-- Interior ambiance, city ambiance etc needs audio as well as all the theater simulations.
-- Image previews of buildings should probably contain their names on them (new ones we made don't right now), names should be on a plaqard as if in real life, stylish and fitting.
-- A good idea is probably to have a debug directory of fleshed out theater plays so that they can be reviewed by me. Should be able to click on them and play them out immediately. These can act as quick access samples for me to review and provide feedback upon.
+- Intuitive for player to find stuff
+- Avoid overcrowding interface with tons of information
+- Avoid scrolling if possible by focusing on better design principles
+- Don't allow main viewport to scroll, only sub areas like the actions bar when necessary
+- Use icons where possible to save text space and have more recognizable icons for common actions that you can start to recognize efficiently
 
 ## Inbox — unsorted ideas
 

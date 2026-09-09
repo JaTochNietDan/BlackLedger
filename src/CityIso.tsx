@@ -1,5 +1,5 @@
 import {useEffect, useRef} from 'react';
-import {Application, Assets, Container, Graphics, Sprite, Text, Texture, TextStyle} from 'pixi.js';
+import {Application, Assets, Container, Graphics, Matrix, Sprite, Text, Texture, TextStyle} from 'pixi.js';
 import {Viewport} from 'pixi-viewport';
 import type {Snapshot} from './types';
 import {addressSlot, along, awnings, blockFor, BLOCK, bounds, carriageways, distance, dressing, faces, goldenness, grid, island, kerbside, lampPosts, markings, middle, mix, nightness, PAVE, plot, project, ROAD, size, rails, sleepers, terrace, TILE, trolleyAvenue, TROLLEY_GAUGE, vents, walk, wires} from './iso';
@@ -29,6 +29,40 @@ import type {Layout} from './layout';
 type Cutout = {id: string; file: string; w: number; h: number; anchor?: number[]; base?: number};
 const painted = new Map((cutouts as Cutout[]).map(c => [c.id, c]));
 
+// The ground the city is laid on. Photographs of a surface rather than
+// pictures of a road: the shape of every carriageway, pavement and kerb is
+// still computed from the grid, so the junctions stay square and the crossings
+// still line up with the kerbs. Only the material is art.
+//
+// How much ground one repeat of a texture covers, in tile units. Set per
+// surface because a paving flag and a patch of asphalt are not the same size,
+// and because a texture repeating too fast reads as fabric.
+// The pavement strip is PAVE — 0.42 of a tile — wide, so a repeat of three
+// flags has to be well under half a tile or a single flag comes out wider than
+// the footway it is paving, which is what the first attempt did.
+const GROUND: {id: string; file: string; span: number}[] = [
+  {id: 'asphalt', file: '/art/ground/asphalt.jpg', span: 1.5},
+  {id: 'pavement', file: '/art/ground/pavement.jpg', span: .62},
+  {id: 'kerb', file: '/art/ground/kerb.jpg', span: .4},
+  {id: 'cobbles', file: '/art/ground/cobbles.jpg', span: .55},
+];
+
+// Read back by id so the numbers above are the only place they live.
+const spanOf = (id: string) => GROUND.find(g => g.id === id)?.span ?? 1;
+
+// A texture laid flat in the ground plane rather than pasted over the screen.
+//
+// One tile unit east projects to (TILE.w/2, TILE.h/2) and one tile unit south
+// to (-TILE.w/2, TILE.h/2), so mapping the texture's own axes onto those two
+// vectors puts it on the ground the city is drawn on. Without this the surface
+// reads as wallpaper hung behind the city — the give-away is that it does not
+// turn the corner at a junction.
+function laid(texture: Texture, span: number): Matrix {
+  const px = texture.width / span;                 // texture pixels per tile unit
+  return new Matrix(TILE.w / (2 * px), TILE.h / (2 * px),
+                    -TILE.w / (2 * px), TILE.h / (2 * px), 0, 0);
+}
+
 // Where a cut-out's building actually stands inside its own picture.
 //
 // The city used to assume all three of these: that the base is centred in the
@@ -57,6 +91,7 @@ const FILL = [...painted.keys()].filter(id => id.startsWith('fill-')).sort();
 // used there rather than thrown away or pretended to be rows.
 const CORNERS = [...painted.keys()].filter(id => id.startsWith('row-')).sort();
 const textures = new Map<string, Texture>();
+const ground = new Map<string, Texture>();
 
 // How far the camera may be pushed. Past these the city either fills the screen
 // with one roof or shrinks into the middle of an empty field.
@@ -311,9 +346,21 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight,
       // Then the painted city, once the pictures are in. Until they land the
       // blocked-out solids stand in, which is why the first draw happens above
       // rather than waiting on a network.
-      Promise.all([...painted.values()].map(async c => {
-        try { textures.set(c.id, await Assets.load('/art/' + c.file)) } catch { /* it keeps its block */ }
-      })).then(() => { if (!dead) { draw(); frame() } });
+      Promise.all([
+        ...[...painted.values()].map(async c => {
+          try { textures.set(c.id, await Assets.load('/art/' + c.file)) } catch { /* it keeps its block */ }
+        }),
+        // The ground goes on the same errand. A missing one is not an error:
+        // that surface stays the flat colour it has always been, so the city
+        // draws with whatever has arrived.
+        ...GROUND.map(async g => {
+          try {
+            const tex: Texture = await Assets.load(g.file);
+            tex.source.addressMode = 'repeat';
+            ground.set(g.id, tex);
+          } catch { /* the flat colour stands */ }
+        }),
+      ]).then(() => { if (!dead) { draw(); frame() } });
     }).catch(() => { /* the card view is still there; see TestTheCardViewIsStillReachable */ });
 
     const onResize = () => frame();
@@ -439,6 +486,13 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight,
     earth.poly(corners.flatMap(c => [c.x, c.y])).fill(sunlit(mix(0x565c50, 0x0f1416, dark)));
     layer.addChild(earth);
 
+    // Which avenue carries the streetcar, so its carriageway can be cobbled
+    // and its centre line left unpainted — the track is what is down the middle
+    // of that one.
+    const avenue = trolleyAvenue(size) * BLOCK;
+    const onTrolley = (way: {a: {x: number}; b: {x: number}}) =>
+      Math.abs(way.a.x - avenue) < .001 && Math.abs(way.b.x - avenue) < .001;
+
     // The carriageways, full width and height, so every junction is square.
     const road = new Graphics();
     for (const way of carriageways(size)) {
@@ -448,7 +502,11 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight,
         {x: way.a.x - pad.x, y: way.a.y - pad.y}, {x: way.b.x + pad.x, y: way.a.y - pad.y},
         {x: way.b.x + pad.x, y: way.b.y + pad.y}, {x: way.a.x - pad.x, y: way.b.y + pad.y},
       ].map(project);
-      road.poly(box.flatMap(c => [c.x, c.y])).fill(tarmac(mix(0x4b514e, 0x161b1c, dark)));
+      const surface = onTrolley(way) ? ground.get('cobbles') : ground.get('asphalt');
+      const shade = tarmac(mix(0x4b514e, 0x161b1c, dark));
+      road.poly(box.flatMap(c => [c.x, c.y])).fill(surface
+        ? {texture: surface, matrix: laid(surface, spanOf(onTrolley(way) ? 'cobbles' : 'asphalt')), color: shade}
+        : shade);
     }
     layer.addChild(road);
 
@@ -460,21 +518,33 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight,
       const i = island(cell);
       const outer = [{x: i.x, y: i.y}, {x: i.x + i.w, y: i.y}, {x: i.x + i.w, y: i.y + i.d}, {x: i.x, y: i.y + i.d}]
         .map(project);
-      pave.poly(outer.flatMap(c => [c.x, c.y])).fill(sunlit(mix(0x7c8175, 0x252b29, dark)));
-      kerb.poly(outer.flatMap(c => [c.x, c.y])).stroke({width: 1.6, color: mix(0x939a8b, 0x323b36, dark), alpha: .95});
+      const flags = ground.get('pavement');
+      const stone = sunlit(mix(0x7c8175, 0x252b29, dark));
+      pave.poly(outer.flatMap(c => [c.x, c.y])).fill(flags
+        ? {texture: flags, matrix: laid(flags, spanOf('pavement')), color: stone}
+        : stone);
+      const edging = ground.get('kerb');
+      const edge = mix(0x939a8b, 0x323b36, dark);
+      kerb.poly(outer.flatMap(c => [c.x, c.y])).stroke(edging
+        ? {width: 2.2, texture: edging, matrix: laid(edging, spanOf('kerb')), color: edge, alpha: .95}
+        : {width: 1.6, color: edge, alpha: .95});
       // The join between pavement and building, a shade darker so the plot
       // reads as ground the building sits on rather than as more pavement.
       const b = plot(cell);
       const inner = [{x: b.x, y: b.y}, {x: b.x + b.w, y: b.y}, {x: b.x + b.w, y: b.y + b.d}, {x: b.x, y: b.y + b.d}]
         .map(project);
-      pave.poly(inner.flatMap(c => [c.x, c.y])).fill(sunlit(mix(0x6c7266, 0x1e2422, dark)));
+      // The join between pavement and plot keeps the same flags a shade darker,
+      // so it reads as the same ground rather than as a different material.
+      const joint = sunlit(mix(0x6c7266, 0x1e2422, dark));
+      pave.poly(inner.flatMap(c => [c.x, c.y])).fill(flags
+        ? {texture: flags, matrix: laid(flags, spanOf('pavement')), color: joint}
+        : joint);
     }
     layer.addChild(pave, kerb);
 
     // A broken line down the middle of every carriageway — except the one the
     // trolley runs down, where the track is what is down the middle.
     const paint = new Graphics();
-    const avenue = trolleyAvenue(size) * BLOCK;
     for (const way of carriageways(size)) {
       if (Math.abs(way.a.x - avenue) < .001 && Math.abs(way.b.x - avenue) < .001) continue;
       const length = Math.hypot(way.b.x - way.a.x, way.b.y - way.a.y);
