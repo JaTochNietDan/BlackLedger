@@ -1110,27 +1110,15 @@ func (w *World) Actions(id string) []Action {
 			}
 			add("repair", "Repair the property", 60, 50, need(w.Properties[id].Condition >= 100, "Already in good condition"), "Restore 40 condition.")
 		} else {
-			req := 6
-			if id == "garage" {
-				req = 10
-			}
-			if id == "casino" {
-				req = 20
-			}
-			reason := need(p.Respect < req, fmt.Sprintf("Earn %d respect first", req))
-			if !w.CanAcquire(id) {
-				reason = "This property belongs to another organization"
-			}
 			label := "Establish protection"
 			if id == "casino" {
 				label = "Reopen the casino"
 			}
-			cost := l.Cost
+			cost := AcquisitionCost(w, id)
 			if strings.HasPrefix(w.Properties[id].Owner, "former:") {
-				cost *= 2
 				label = "Buy out the former organization"
 			}
-			add("acquire", label, 60, cost, reason, fmt.Sprintf("Earn up to $%d/hour. Income accrues automatically; rivals may take notice.", w.Properties[id].Income))
+			add("acquire", label, 60, cost, w.AcquireReadiness(id), fmt.Sprintf("Earn up to $%d/hour. Income accrues automatically; rivals may take notice.", w.Properties[id].Income))
 		}
 	}
 	for i := range w.Factions {
@@ -1739,4 +1727,55 @@ func operationOutcome(operation string) string {
 // only way to reach the mechanic was to post the command directly.
 func reachesTheUnreachable(id string) bool {
 	return strings.HasPrefix(id, "bail:")
+}
+
+// AcquisitionCost is what taking a premises costs. Buying out what is left of a
+// dead organization costs twice what an unclaimed door does.
+func AcquisitionCost(w *World, id string) int {
+	place, ok := PlaceByID(id)
+	if !ok {
+		return 0
+	}
+	if prop := w.Properties[id]; prop != nil && strings.HasPrefix(prop.Owner, "former:") {
+		return place.Cost * 2
+	}
+	return place.Cost
+}
+
+// AcquireReadiness explains why a premises cannot be taken, or returns "".
+//
+// This used to have no function of its own: the button computed the standing
+// requirement inline and let the generic cost check add "Not enough cash", and
+// the guide page — which promises it "asks the game the same question the
+// buttons ask" — kept its own copy that knew about respect and not about money.
+// So a player with $51 and 33 respect was told premises were available now
+// while every door in the city said "Not enough cash".
+func (w *World) AcquireReadiness(id string) string {
+	// Only somewhere that earns is for sale. A rented room, the station and the
+	// newspaper are not premises anybody takes over, and the button is not
+	// offered there — so neither is this, or the guide would count a door
+	// nobody can walk through as an opportunity.
+	if prop := w.Properties[id]; prop == nil || prop.Income <= 0 {
+		return "There is nothing here to take over"
+	}
+	if w.Own(id) {
+		return "This is already yours"
+	}
+	if !w.CanAcquire(id) {
+		return "This property belongs to another organization"
+	}
+	req := 6
+	switch id {
+	case "garage":
+		req = 10
+	case "casino":
+		req = 20
+	}
+	if w.Player.Respect < req {
+		return fmt.Sprintf("Earn %d respect first", req)
+	}
+	if cost := AcquisitionCost(w, id); w.Player.Cash < cost {
+		return "Not enough cash"
+	}
+	return ""
 }

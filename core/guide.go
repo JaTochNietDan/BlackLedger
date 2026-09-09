@@ -40,15 +40,11 @@ func need(blocked bool, reason string) string {
 // returns the friendliest answer: empty if it can be done somewhere, otherwise
 // the reason given where it came closest to being possible.
 func firstOpen(check func(string) string) string {
-	reason := "There is nowhere in this city for that yet"
+	reasons := []string{}
 	for _, l := range Locations {
-		if r := check(l.ID); r == "" {
-			return ""
-		} else if len(r) < len(reason) {
-			reason = r
-		}
+		reasons = append(reasons, check(l.ID))
 	}
-	return reason
+	return shortest("There is nowhere in this city for that yet", reasons)
 }
 
 // Guide is where the player stands, in the order these things usually happen.
@@ -90,7 +86,7 @@ func (w *World) Guide() []Step {
 		step("Somebody who knows people", "Buy Mara a coffee. Contacts are how you hear that somebody is coming before they arrive.",
 			need(p.Contacts >= 5, "Your information network is fully developed"), p.Contacts > 1),
 		step("Premises of your own", "A business earns while you are elsewhere, and is the only income that does.",
-			need(owned == 0 && p.Respect < PremisesRespect, fmt.Sprintf("Earn %d respect first", PremisesRespect)), owned > 0),
+			w.acquisitionReason(), owned > 0),
 		step("A name of your own", fmt.Sprintf("%s premises and %d respect and the city files you with the families.", upper1(spelled(OrganizationHoldings)), OrganizationStanding),
 			w.incorporationReason(), w.Incorporated()),
 		step("People who answer to you", "Sign somebody on. They add to what you are worth in a fight and stand in front of what comes at you.",
@@ -141,15 +137,11 @@ func (w *World) incorporationReason() string {
 }
 
 func firstOpenPerson(w *World, check func(string) string) string {
-	reason := "There is nobody in this city for that yet"
+	reasons := []string{}
 	for _, n := range w.People() {
-		if r := check(n.ID); r == "" {
-			return ""
-		} else if len(r) < len(reason) {
-			reason = r
-		}
+		reasons = append(reasons, check(n.ID))
 	}
-	return reason
+	return shortest("There is nobody in this city for that yet", reasons)
 }
 
 func (w *World) anyPosted() bool {
@@ -171,37 +163,67 @@ func (w *World) anyStill() bool {
 }
 
 func (w *World) anyRetainerReason() string {
-	reason := "Nobody in that building will take a call from you"
+	reasons := []string{}
 	for _, o := range officials {
-		if r := w.RetainerReadiness(o.ID); r == "" {
-			return ""
-		} else if len(r) < len(reason) {
-			reason = r
-		}
+		reasons = append(reasons, w.RetainerReadiness(o.ID))
 	}
-	return reason
+	return shortest("Nobody in that building will take a call from you", reasons)
 }
 
 func (w *World) anyPactReason() string {
-	reason := "There is nobody to reach an understanding with"
+	reasons := []string{}
 	for i := range w.Factions {
-		if r := w.PactReadiness(w.Factions[i].ID); r == "" {
-			return ""
-		} else if len(r) < len(reason) {
-			reason = r
-		}
+		reasons = append(reasons, w.PactReadiness(w.Factions[i].ID))
 	}
-	return reason
+	return shortest("There is nobody to reach an understanding with", reasons)
 }
 
 func (w *World) anyServiceReason() string {
-	reason := "Nobody is taking anybody on"
+	reasons := []string{}
 	for i := range w.Factions {
-		if r := w.ServeReadiness(w.Factions[i].ID); r == "" {
+		reasons = append(reasons, w.ServeReadiness(w.Factions[i].ID))
+	}
+	return shortest("Nobody is taking anybody on", reasons)
+}
+
+// shortest is how the guide reports on a set of candidates: the briefest real
+// refusal any of them gave, and the fallback only when there was nothing to
+// ask about at all.
+//
+// Each of these used to seed the search with its fallback sentence and then
+// keep the shortest string. The fallbacks are short, so they beat every real
+// reason: the guide told a player with no organization "There is nobody in
+// this city for that yet" while the buttons in front of them said "Nobody
+// signs on with one person. They sign on with something that has a name."
+// That is exactly what the page promises it cannot do.
+func shortest(nothing string, reasons []string) string {
+	best := ""
+	for _, r := range reasons {
+		if r == "" {
 			return ""
-		} else if len(r) < len(reason) {
-			reason = r
+		}
+		if best == "" || len(r) < len(best) {
+			best = r
 		}
 	}
-	return reason
+	if best == "" {
+		return nothing
+	}
+	return best
+}
+
+// acquisitionReason is the premises step's refusal. It asks the same question
+// the button asks, but only of the places that are businesses at all: a rented
+// room and the police station both refuse, and "There is nothing here to take
+// over" is a sentence about a place, which the guide is not standing in.
+func (w *World) acquisitionReason() string {
+	reasons := []string{}
+	for i := range Locations {
+		id := Locations[i].ID
+		if prop := w.Properties[id]; prop == nil || prop.Income <= 0 {
+			continue
+		}
+		reasons = append(reasons, w.AcquireReadiness(id))
+	}
+	return shortest("There is nothing in this city to take over yet", reasons)
 }

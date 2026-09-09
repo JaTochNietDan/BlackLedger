@@ -4166,3 +4166,58 @@ forward", and the second body then repeated the same appeal. It reads like a
 template because it is one. Giving the paper more ways to say this is a writing
 task, not a correction, and it is worth doing deliberately rather than in
 passing.
+
+## The guide page makes a promise, so test the promise
+
+The guide opens by describing itself: "This page is not written down anywhere.
+It asks the game the same question the buttons ask, so it cannot tell you
+something the rules do not." That is a claim about the code, and it is testable.
+It was false in two ways.
+
+**It offered what every button refused.** With $51 and 33 respect, the guide
+said "Premises of your own — You can do this now", and every door in the city
+said "Not enough cash". The step re-derived its own gate from respect alone,
+because acquiring premises was the one action with no readiness function: the
+button computed the standing requirement inline and let the generic cost check
+add the refusal. So the guide could not ask the same question, and invented a
+worse one. `AcquireReadiness` now exists and both use it.
+
+**It preferred its own words to the game's.** Each of the five searches the
+guide runs — over people, places, families, officials — reports the briefest
+refusal any candidate gave, and each was seeded with a sentence for the case
+where there are no candidates at all. Those sentences are short, so they won
+against every real reason. A player with no organization was told "There is
+nobody in this city for that yet" while the buttons in front of them said
+"Nobody signs on with one person. They sign on with something that has a name."
+One helper now holds all five, and the invented sentence appears only when there
+was genuinely nothing to ask.
+
+Seventeenth near-miss, and it was my test rather than the game. My first version
+of the second check required every guide refusal to be a sentence some button
+was showing. That is stricter than the promise: the guide quotes readiness
+functions, and a lending refusal like "That conversation happens in person" is a
+real rule that no button ever displays, because lending is only offered for
+somebody already in the room. I rewrote the test to state what was actually
+wrong — the invented sentence must not beat a real one — rather than bending the
+game to a standard I had made up.
+
+A second thing I introduced and then corrected by reading: the new guard reads
+"There is nothing here to take over", which is a sentence about a place. At page
+level the guide is not standing anywhere, and on a save where every earning
+premises was owned it surfaced as the shortest reason. The premises step now
+asks only of places that are businesses, and reads "This property belongs to
+another organization".
+
+Evidence: `core/guide_promise_test.go` states both halves. Reverting either fix
+fails its own test — putting the re-derived premises gate back reproduces the
+"$51 and it says you can do this now" fault exactly, and letting the fallback
+compete again reproduces the invented sentence. Read over HTTP against a save
+driven to day 31. `mise run verify` and `npm test` green (34 tests), `mise run
+simulate` unchanged at defiant 52 / investor 0 / reckless 82 / worker 0, 0
+errors.
+
+Checked and clean this pass, recorded so they are not redone: the guide states
+no total of its own, so there is no arithmetic to reconcile there; the market
+lists three goods with a price and a reference price each and nothing that
+sums; and the district names in the view are not a copy of a core table — core
+has no such table, it names them in prose.
