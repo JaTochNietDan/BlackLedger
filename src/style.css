@@ -997,3 +997,20 @@ body{height:100%;overflow:hidden;margin:0;background:var(--bg);color:var(--ink);
 .person-card .actions.compact .action{min-height:0;padding:8px 10px}
 .person-card .actions.compact .action .desc{display:none}
 .person-card .actions.compact .action .meta{margin-top:3px}
+
+/* The ball. It rides the rim and drops into the pocket the core spun; the only
+   thing this decides is how long it takes to get there. */
+.wheel-ball{position:absolute;top:50%;left:50%;width:9px;height:9px;margin:-4.5px 0 0 -4.5px;
+  border-radius:50%;background:radial-gradient(circle at 32% 30%,#fffdf4,#c2b394 70%,#8d8168);
+  box-shadow:0 1px 3px #000a;z-index:3;
+  transform:rotate(var(--ball,0deg)) translateY(-80px);
+  transition:transform 2400ms cubic-bezier(.16,.62,.18,1)}
+.wheel-face.falling .wheel-rim{animation:rimturn 2400ms cubic-bezier(.16,.62,.18,1)}
+@keyframes rimturn{from{transform:rotate(0deg)}to{transform:rotate(-140deg)}}
+/* What this wheel has done, newest first: a record of what the core spun. */
+.wheel-run{display:flex;gap:5px;flex-wrap:wrap;justify-content:center;margin:8px 0 0}
+.ran{font-size:10px;line-height:1;padding:4px 5px;border-radius:2px;min-width:18px;text-align:center}
+.ran.red{background:#8e2b2b;color:#f6ece0}
+.ran.black{background:#1d1d1d;color:#e8e0d2}
+.ran.green{background:#1f6b45;color:#f0f6ee}
+@media(prefers-reduced-motion:reduce){.wheel-ball{transition:none}.wheel-face.falling .wheel-rim{animation:none}}

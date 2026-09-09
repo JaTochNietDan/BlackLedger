@@ -111,7 +111,7 @@ export function Casino({place, actions, people, hand, wheel, cash, money, revisi
                   {stakes('play:').every(a => a.disabled) && <p className="felt-refused">{stakes('play:')[0]?.reason}</p>}
                 </div>}
               </div>
-            : <Wheel wheel={wheel} money={money}
+            : <Wheel wheel={wheel} money={money} turn={revision}
                      stakes={stakes('wheel:').filter(a => !a.disabled).map(a => ({id: a.id.slice(6), amount: a.asks ?? 0}))}
                      spin={(stake, bet) => act({kind: 'wheel:' + stake, choice: bet})}/>}
         </div>

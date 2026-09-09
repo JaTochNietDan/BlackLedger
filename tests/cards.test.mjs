@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {pipOf, isRedSuit, knownCard, clothRows, clothColour, outsideBets, wheelOrder, wheelAngle} from '../.runtime/frontend-test/cards.js';
+import {pipOf, isRedSuit, knownCard, clothRows, clothColour, outsideBets, wheelOrder, wheelAngle, ballAngle} from '../.runtime/frontend-test/cards.js';
 
 test('every suit the core deals has a pip and a colour', () => {
   for (const suit of ['spades', 'hearts', 'diamonds', 'clubs']) {
@@ -71,4 +71,24 @@ test('a pocket sits somewhere on the face and the nought sits at the top', () =>
   assert.equal(wheelAngle(0), 0);
   assert.ok(wheelAngle(26) > 0 && wheelAngle(26) < 360);
   assert.equal(wheelAngle(99), 0);
+});
+
+test('the ball always travels forward and stops on the pocket the core chose', () => {
+  // The wheel used to snap: the pocket the core picked was simply outlined. The
+  // ball goes round to it now, and the one thing the animation must never do is
+  // land anywhere but on the number the core actually spun.
+  const turns = 4;
+  for (const [from, pocket] of [[0, 26], [37.5, 0], [1440, 32], [-15, 3], [123.4, 15]]) {
+    const to = ballAngle(from, pocket, turns);
+    assert.ok(to > from, `the ball went backwards from ${from} to ${to}`);
+    assert.ok(to - from >= turns * 360, `the ball barely moved: ${to - from} degrees`);
+    assert.ok(to - from < (turns + 1) * 360, `the ball spun for ever: ${to - from} degrees`);
+    const settled = ((to % 360) + 360) % 360;
+    const want = wheelAngle(pocket);
+    assert.ok(Math.abs(settled - want) < 0.001, `settled at ${settled}, the pocket is at ${want}`);
+  }
+});
+
+test('a wheel nobody has spun yet does not move the ball', () => {
+  assert.equal(ballAngle(500, 0, 0), 500);
 });

@@ -1,5 +1,5 @@
-import {useState} from 'react';
-import {Card, pipOf, isRedSuit, knownCard, clothRows, clothColour, outsideBets, wheelAngle, wheelOrder} from './cards';
+import {useEffect, useRef, useState} from 'react';
+import {Card, pipOf, isRedSuit, knownCard, clothRows, clothColour, outsideBets, ballAngle, wheelAngle, wheelOrder} from './cards';
 
 // The tables, drawn as tables. Blackjack was two numbers in a sentence and
 // roulette was a button; both are games somebody sits down to play, and a game
@@ -72,29 +72,68 @@ export function CardTable({hand, money, act}:{hand:HandState; money:(n:number)=>
 // The wheel and the cloth. Choosing a bet is a decision, so it is made here and
 // sent with the spin; the core is still the only thing that decides where the
 // ball lands.
-export function Wheel({wheel, stakes, money, spin}:{
+// How long the ball is in the air, and how many turns it makes getting there.
+// Nothing about the outcome: the core spun the pocket before this component was
+// told anything, and the animation only takes its time arriving at it.
+const FALL = 2400, TURNS = 4;
+
+export function Wheel({wheel, stakes, money, spin, turn = 0}:{
   wheel:WheelState; stakes:{id:string; amount:number}[]; money:(n:number)=>string;
   spin:(stakeID:string, bet:string)=>void;
+  // The world's revision, so a spin is animated once — and so two spins that
+  // land in the same pocket are still two spins.
+  turn?:number;
 }) {
   const [bet, setBet] = useState('red');
-  const landed = wheel.spun ? wheel.pocket ?? 0 : null;
+  const [ball, setBall] = useState(0);
+  const [falling, setFalling] = useState(false);
+  // Every pocket this sitting has seen, newest first. The view is remembering
+  // what the core told it, which is what the board of numbers over a real wheel
+  // is: a record, not a prediction.
+  const [run, setRun] = useState<number[]>([]);
+  const seen = useRef(-1);
+
+  useEffect(() => {
+    if (!wheel.spun || turn === seen.current) return;
+    seen.current = turn;
+    const pocket = wheel.pocket ?? 0;
+    const quiet = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    setBall(b => ballAngle(b, pocket, quiet ? 0 : TURNS));
+    setRun(r => [pocket, ...r].slice(0, 14));
+    if (quiet) return;
+    setFalling(true);
+    const done = setTimeout(() => setFalling(false), FALL);
+    return () => clearTimeout(done);
+  }, [turn, wheel.spun, wheel.pocket]);
+
+  // While it is in the air the room does not know either. The number is the
+  // core's from the moment it was spun; this only holds it back until the ball
+  // is in the pocket, the way the table does.
+  const landed = wheel.spun && !falling ? wheel.pocket ?? 0 : null;
   return (
     <div className="felt wheel-felt">
-      <div className="wheel-face" style={{['--drop' as string]: `${landed === null ? 0 : wheelAngle(landed)}deg`}}>
+      <div className={'wheel-face' + (falling ? ' falling' : '')}>
         <div className="wheel-rim">
           {wheelOrder.map(n => (
             <span key={n} className={'pocket ' + clothColour(n) + (landed === n ? ' landed' : '')}
                   style={{['--at' as string]: `${wheelAngle(n)}deg`}}>{n}</span>
           ))}
         </div>
+        {/* The ball rides the rim and drops into the pocket the core spun. */}
+        <span className="wheel-ball" aria-hidden="true" style={{['--ball' as string]: `${ball}deg`,
+          transitionDuration: `${FALL}ms`}}/>
         <div className="wheel-hub">
           {landed === null
-            ? <small>Nothing spun yet</small>
+            ? <small>{falling ? 'Round it goes' : 'Nothing spun yet'}</small>
             : <><b className={clothColour(landed)}>{landed}</b><small>{wheel.colour}</small></>}
         </div>
       </div>
 
-      {wheel.spun && (
+      {run.length > 0 && <div className="wheel-run" aria-label="What this wheel has done">
+        {run.map((n, i) => <span key={i} className={'ran ' + clothColour(n)}>{n}</span>)}
+      </div>}
+
+      {wheel.spun && landed !== null && (
         <p className={'felt-result' + (wheel.won ? ' won' : '')}>
           {wheel.bet} at {money(wheel.stake ?? 0)} — {wheel.won ? `paid ${wheel.pays} to 1` : 'gone'}
         </p>

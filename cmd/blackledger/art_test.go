@@ -332,3 +332,32 @@ func TestANameYouKnowCanBeDealtWithOrFound(t *testing.T) {
 		t.Error("the people screen is not given the work available where the player is standing")
 	}
 }
+
+// The wheel now takes its time arriving at the pocket, which is the one place a
+// view could quietly start deciding things. Nothing that draws a game is
+// allowed to roll for anything: the core spins the wheel and deals the cards,
+// and the felt only arranges what it was told. Camera shake and noise elsewhere
+// are presentation; a number on a table is a fact.
+func TestNothingThatDrawsAGameRollsForAnything(t *testing.T) {
+	for _, name := range []string{"Tables.tsx", "Casino.tsx", "cards.ts"} {
+		source, err := os.ReadFile("../../src/" + name)
+		if err != nil {
+			t.Skipf("no %s beside this build", name)
+		}
+		if strings.Contains(string(source), "Math.random") {
+			t.Errorf("%s rolls for something; the core owns every number on a table", name)
+		}
+	}
+	tables, err := os.ReadFile("../../src/Tables.tsx")
+	if err != nil {
+		t.Skip("no tables beside this build")
+	}
+	s := string(tables)
+	if !strings.Contains(s, "wheel.pocket ?? 0") {
+		t.Error("the pocket the ball lands in is not the one the core spun")
+	}
+	// And the ball has to travel to it rather than appear in it.
+	if !strings.Contains(s, "ballAngle(b, pocket") {
+		t.Error("the ball no longer goes round to the pocket")
+	}
+}

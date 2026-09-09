@@ -64,3 +64,19 @@ export const wheelAngle = (pocket:number) => {
   const at = wheelOrder.indexOf(pocket);
   return at < 0 ? 0 : at * (360 / wheelOrder.length);
 };
+
+/**
+ * Where the ball ends up on the face, in degrees, given where it is now and the
+ * pocket the CORE spun. It always travels forward — a ball that jumps backwards
+ * to save half a turn is a ball nobody believes — and it always settles exactly
+ * on that pocket's own angle, because the animation is not allowed to decide
+ * anything. Turns is how many whole revolutions it makes on the way; zero means
+ * do not move it at all, which is what a wheel nobody has spun looks like.
+ */
+export function ballAngle(from: number, pocket: number, turns: number) {
+  if (turns <= 0) return from;
+  const target = wheelAngle(pocket);
+  const now = ((from % 360) + 360) % 360;
+  const forward = ((target - now) % 360 + 360) % 360;
+  return from + turns * 360 + forward;
+}
