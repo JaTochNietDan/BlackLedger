@@ -158,6 +158,10 @@ type Faction struct {
 	// simulation constantly and the player had no way to feel any of it without
 	// opening a screen and comparing numbers to numbers they did not write down.
 	Reported int `json:"reported,omitempty"`
+	// Whether this family failed to pay its people yesterday. Absent in saves
+	// written before a family had a bill at all, which reads as a family that
+	// met it — and for those saves that is true, because there was none.
+	Short int `json:"short,omitempty"`
 }
 type Property struct {
 	Owner     string  `json:"owner"`

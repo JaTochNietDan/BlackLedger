@@ -279,20 +279,37 @@ func TestAnOrganizationHoldingNothingLosesItsStrength(t *testing.T) {
 	for _, id := range w.FamilyHoldings("russo") {
 		w.Properties[id].Owner = "independent"
 	}
-	before := f.Power
+	// This used to fade on a timer, four points a day from the morning the last
+	// business went. It does not any more, and the change is deliberate: an
+	// organization with money in the safe holds together for exactly as long as
+	// the money lasts, and comes apart at the first payday it cannot meet. The
+	// rule the test was written for still holds — a landless family loses its
+	// strength — but the money is now the reason rather than the calendar.
+	before, reserves := f.Power, f.Cash
 	w.FamilyDay()
-	if w.faction("russo").Power >= before {
-		t.Fatalf("an organization holding nothing kept its strength: %d", w.faction("russo").Power)
+	if w.faction("russo").Power != before {
+		t.Fatalf("an organization that paid everybody in full lost strength anyway: %d from %d", w.faction("russo").Power, before)
 	}
+	if w.faction("russo").Cash >= reserves {
+		t.Fatalf("an organization with no income did not spend anything on wages: %d from %d", w.faction("russo").Cash, reserves)
+	}
+	worst := 0
 	for day := 0; day < 30; day++ {
 		w.FamilyDay()
+		worst = max(worst, w.faction("russo").Short)
 	}
 	if w.faction("russo").Power > 15 {
 		t.Fatalf("a landless organization is still strong after a month: %d", w.faction("russo").Power)
 	}
-	// And it earns nothing, because it has nothing to earn from.
-	if w.faction("russo").Cash != 4500 {
+	// And it earned nothing all month, because it had nothing to earn from:
+	// everything it had is gone on wages it could not keep meeting.
+	if w.faction("russo").Cash != 0 {
 		t.Fatalf("an organization with no holdings collected money: %d", w.faction("russo").Cash)
+	}
+	// Read as the worst run rather than as today: an operation that has come
+	// apart to nobody costs nothing to run, so it is not short any more.
+	if worst == 0 {
+		t.Fatal("an organization that ran out of money never once missed a payday")
 	}
 }
 

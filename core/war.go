@@ -169,16 +169,16 @@ func (w *World) contestAt(attacker, defender *Faction, weakest string) {
 		// raid reaches, which is the price of what they are worth.
 		if victim := w.StoodInIt(weakest); victim != nil && victim.Faction == defender.ID {
 			w.Properties[weakest].Posted = ""
-			w.KillBy(victim.ID, nil, fmt.Sprintf("%s had come for %s and %s was on the door.", attacker.Name, place.Name, victim.Name))
+			w.KillBy(victim.ID, nil, fmt.Sprintf("%s had come for %s and %s was on the door.", Leads(attacker.Name), place.Name, victim.Name))
 		} else if victim := w.casualty(defender.ID); victim != nil {
-			w.KillBy(victim.ID, nil, fmt.Sprintf("%s had come for %s.", attacker.Name, place.Name))
+			w.KillBy(victim.ID, nil, fmt.Sprintf("%s had come for %s.", Leads(attacker.Name), place.Name))
 		} else if defender.ID == w.PlayerOrganizationID() && len(w.Player.Crew) > 0 {
 			// Whoever stands with the player is who a raid reaches, because
 			// they have no soldiers of their own to lose.
 			member := w.Player.Crew[0]
 			w.Player.Crew = w.Player.Crew[:0]
 			if n := w.NPC(member.ID); n != nil {
-				w.KillBy(n.ID, nil, fmt.Sprintf("%s had come for %s.", attacker.Name, place.Name))
+				w.KillBy(n.ID, nil, fmt.Sprintf("%s had come for %s.", Leads(attacker.Name), place.Name))
 			} else {
 				w.Log(member.Name+" did not come out of it", fmt.Sprintf("%s came for %s and %s was standing in it.", attacker.Name, place.Name, member.Name), "danger")
 			}
@@ -378,7 +378,7 @@ func (w *World) FactionTurn() {
 				c.Since = w.Minute
 				switch c.State {
 				case "war":
-					w.Log("Open war in the city", fmt.Sprintf("%s and %s are now at war. Their quarrel is not yours, but the city will feel it.", a.Name, b.Name), "politics")
+					w.Log("Open war in the city", fmt.Sprintf("%s and %s are now at war. Their quarrel is not yours, but the city will feel it.", Leads(a.Name), b.Name), "politics")
 					// Named. Every war in the city used to be reported under the
 					// same headline, so a player who read the paper twice could
 					// not tell that the second one was a different war.

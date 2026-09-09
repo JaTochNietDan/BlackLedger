@@ -111,7 +111,7 @@ func (w *World) doingNow(n *NPC) string {
 		// Said before anything else: a man on the street is not on a door, not
 		// on duty, and not behind a desk, whatever his job is.
 		if to, ok := PlaceByID(n.Heading); ok {
-			out := "Walking to " + to.Name + ", " + itoa(max(1, n.Arrives-w.Minute)) + " minutes out"
+			out := "Walking to " + to.Name + ", " + counted(max(1, n.Arrives-w.Minute), "minute", "minutes") + " out"
 			// The errand usually names the same building, and saying it twice
 			// in one line reads as a stutter rather than as a reason.
 			if n.Errand != "" && !containsName(n.Errand, to.Name) {

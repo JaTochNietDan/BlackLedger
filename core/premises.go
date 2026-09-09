@@ -51,7 +51,7 @@ func (w *World) PlaceNote(id string) string {
 		return "A still running in the back"
 	case w.PostedAt(id) != nil && w.Travelling(w.PostedAt(id)):
 		n := w.PostedAt(id)
-		return n.Name + " is on the way, " + itoa(max(1, n.Arrives-w.Minute)) + " minutes out"
+		return n.Name + " is on the way, " + counted(max(1, n.Arrives-w.Minute), "minute", "minutes") + " out"
 	case w.PostedAt(id) != nil:
 		return w.PostedAt(id).Name + " is on the door"
 	case running && w.Custom(id) < 40:

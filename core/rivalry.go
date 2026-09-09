@@ -56,29 +56,82 @@ func (w *World) FamilyDay() {
 			continue
 		}
 		income, condition, count := 0, 0, 0
+		damaged := []*Property{}
 		for _, id := range w.FamilyHoldings(f.ID) {
 			prop := w.Properties[id]
 			count++
 			condition += prop.Condition
 			income += prop.Income * prop.Condition / 100
 			if prop.Condition < 100 {
-				prop.Condition = min(100, prop.Condition+8)
+				damaged = append(damaged, prop)
 			}
 		}
-		f.Cash = max(0, f.Cash+income*24)
+		// What the day costs them. Everybody who answers to a family is paid
+		// what the game already says answering to somebody pays, and the
+		// repairs that used to happen for free every morning are now bought.
+		// Without this a family only ever got richer: no organization in the
+		// city had an outgoing of any kind, so after a year the poorest of
+		// them held sixty thousand dollars and none had ever been short.
+		// Power is the game's own measure of how big an operation is, and a
+		// family of ninety runs far more people than the handful who happen to
+		// have names. Paying only the named ones would have made a family of
+		// ninety and a family of ten cost the same to run.
+		wages := f.Power * FamilyWage
+		f.Cash += income * 24
+		f.Cash -= wages
+		if f.Cash < 0 {
+			// The bill is met as far as it goes and the rest is owed to the
+			// people, who notice. Money never goes below nothing, and the
+			// count is of consecutive days, so a family that misses one week
+			// reads differently from one that missed a payday once.
+			f.Short++
+			f.Cash = 0
+		} else {
+			f.Short = 0
+		}
+		// Repairs are what a family does with what is left, in the order the
+		// holdings come, and a family with nothing spare watches its property
+		// go down instead.
+		for _, prop := range damaged {
+			cost := min(FamilyRepair, 100-prop.Condition) * FamilyRepairCost
+			if f.Cash < cost {
+				continue
+			}
+			f.Cash -= cost
+			prop.Condition = min(100, prop.Condition+FamilyRepair)
+		}
 		// Strength comes from holdings. An organization that holds nothing has
 		// nothing to draw on and fades, rather than recovering to the strength
 		// it had when it still owned half the waterfront.
-		if count == 0 {
-			f.Power = max(0, f.Power-4)
-			continue
+		//
+		// It used to fade on a timer, four points a day, and that ran faster
+		// than its money did: a family stripped of every business shrank to
+		// nothing without ever once failing to pay anybody. Starving a family
+		// was not a way to beat it, because the fading was not caused by the
+		// money at all. Now an empty family is worth nothing to work toward and
+		// gets there the same way everybody else does — by running out.
+		// A family with nothing left to earn from holds together for exactly as
+		// long as its money does. That is the whole of the starvation story: it
+		// is not the losing of the businesses that breaks them, it is the
+		// payday they cannot meet afterwards.
+		target := f.Power
+		if count > 0 {
+			target = peak(f) * condition / (100 * count)
 		}
-		target := peak(f) * condition / (100 * count)
+		// People who are not paid do not stay to be told why. A family that
+		// cannot meet its wages shrinks toward what it can actually afford,
+		// which is the floor its holdings will carry, and the longer it goes on
+		// the faster they go.
+		leaving := 2
+		if f.Short > 0 {
+			target = min(target, income*24/max(1, FamilyWage))
+			leaving = 2 + min(f.Short, MostWhoLeaveAtOnce)
+		}
 		switch {
 		case f.Power < target:
 			f.Power = min(target, f.Power+2)
 		case f.Power > target:
-			f.Power = max(target, f.Power-2)
+			f.Power = max(target, f.Power-leaving)
 		}
 	}
 }
@@ -237,3 +290,18 @@ func (w *World) Incite(id string) error {
 	w.Log("A word in the right ear", fmt.Sprintf("You leave %s believing %s moved against them. Their quarrel is now %s.", f.Name, other.Name, c.State), "politics")
 	return nil
 }
+
+const (
+	// FamilyRepair is how much condition a family buys back on one holding in
+	// a day, and FamilyRepairCost is what each point of it costs them. Both
+	// used to be free: the morning put eight points back on every damaged
+	// property in the city and took nothing for it.
+	FamilyRepair     = 8
+	FamilyRepairCost = 9
+	// FamilyWage is what one point of an organization's strength costs to keep
+	// on the street for a day.
+	FamilyWage = 8
+	// MostWhoLeaveAtOnce caps how fast an unpaid organization comes apart, so
+	// a long bad run is a decline and not a disappearance.
+	MostWhoLeaveAtOnce = 6
+)

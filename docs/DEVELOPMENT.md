@@ -4490,3 +4490,77 @@ that city, so it is checked by reading and not by the test.
 Evidence: `core/double_charge_test.go`, `core/asks_test.go`. `mise run verify`
 and `npm test` green at 34, `mise run simulate` unchanged at defiant 52 /
 investor 0 / reckless 82 / worker 0, 0 errors, cash 7122 / 14019 / 90 / 12360.
+
+## Families had money and no bills
+
+From the inbox: track what people and families are worth, and let it drive what
+they do. The first question was whether family money was a number worth
+deciding from. It was not.
+
+Families collected from their holdings every morning and paid for nothing. Over
+a simulated year not one organization in the city was ever short of anything:
+
+| day | poorest family | median | richest |
+| --- | --- | --- | --- |
+| 30 | $3,869 | $26,100 | $45,440 |
+| 120 | $14,745 | $86,400 | $153,938 |
+| 400 | $62,223 | $232,094 | $547,077 |
+
+So "a family with little money" was a state the world could not reach, and a
+director keyed to wealth would have been reading a number that only ever went
+up.
+
+A family now pays for its day. Wages go by strength rather than by the handful
+of people who happen to have names, because a family of ninety runs more than
+nine people, and paying only the named ones would have made a family of ninety
+and a family of ten cost the same. Repairs are bought rather than granted: the
+morning used to put eight points of condition back on every damaged property in
+the city and take nothing for it. Poverty is now reachable, and between one and
+four families are short at any time.
+
+The starvation attack, tested end to end, did not work. A family stripped of
+every business faded on a timer at four points a day, and that ran faster than
+its money did, so it shrank to nothing without ever failing to pay anybody. The
+losing of the businesses was never the cause of anything. An organization now
+holds together for exactly as long as its money lasts and comes apart at the
+first payday it cannot meet:
+
+| what was done to them | after | strength | worst run short |
+| --- | --- | --- | --- |
+| left alone | $8,912 | 70 | none |
+| every business taken | $0 | 0 | 11 days |
+| wrecked once | $10,678 | 70 | none |
+| wrecked every week | $40 | 12 | 5 days |
+
+A single wrecking is absorbed: they buy the damage back over about a fortnight.
+That is measured against a control family run through the same weeks untouched,
+because comparing them to their own past only says the year went on.
+
+I changed an existing test rather than the code it guarded, which needs saying.
+It asserted that a landless family loses strength on the first morning. It does
+not any more, deliberately: with money in the safe it holds together, and the
+money is now the reason it comes apart rather than the calendar. The rule the
+test was written for still holds, and the test still checks it, one month later
+instead of one morning.
+
+Two prose bugs surfaced that had nothing to do with money. Different families
+now survive, so names the seeded cities never produced reached sentences that
+had never seen them: "the Duarte Brothers had come for The Monarch" opened three
+death notices and a war declaration in lower case, and a man a minute away was
+"1 minutes out" in three places. Both helpers already existed and neither was
+being called. That is the fifth time a name the world invented has broken prose
+written for the names it ships with.
+
+Scope: the balance simulation is unchanged at defiant 52 / investor 0 / reckless
+82 / worker 0 with identical median cash, and that is not evidence the change is
+harmless. Those campaigns run seven to thirteen game days. Family finances take
+about a month to say anything, so the simulation is too short to see this at
+all. The evidence for the change is the probe and the starvation tests, not the
+baseline holding still.
+
+Individual people still have no money. Mugging invents a purse from the family's
+cash at the moment somebody is robbed rather than taking what a person actually
+has. That is the next slice.
+
+Evidence: `core/family_money_test.go`, `core/starve_test.go`,
+`core/money_probe_test.go`. `mise run verify` and `npm test` green at 34.

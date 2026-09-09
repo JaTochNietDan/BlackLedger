@@ -27,7 +27,7 @@ func (w *World) OutOfReach(id string) string {
 	if w.Travelling(n) {
 		out := n.Name + " is out on the street"
 		if to, ok := PlaceByID(n.Heading); ok {
-			out += ", walking to " + to.Name + " — " + itoa(max(1, n.Arrives-w.Minute)) + " minutes out"
+			out += ", walking to " + to.Name + " — " + counted(max(1, n.Arrives-w.Minute), "minute", "minutes") + " out"
 		}
 		return out
 	}
