@@ -3613,3 +3613,55 @@ Bela Havel a bonus", and "Bela Havel refuses assignments below 30 loyalty".
 Thirteenth near-miss, and the first where I nearly published a wrong correction
 rather than a wrong fault. Reading a label and an effect signature was not
 enough; the failure text was where the truth was.
+
+## The city counts out loud, so make the noun follow the number
+
+Two things this pass, and the first one is a negative result that closes a
+question I carried forward.
+
+**The empty laundry was an artefact, not a hole.** Reading rooms on a driven
+save, the laundry once returned no actions at all, not even the option to wait.
+Hunting it directly — travelling at random and flagging any state where the
+player's own room came back empty — reproduced it in twenty-seven moves and
+explained it: a scene had opened during the journey, and while a scene is open
+every room in the city correctly returns nothing, exactly as the death modal
+does. My reading script checked for an open scene at the start of each room and
+the scene opened in the middle of one.
+
+The interrupted journey itself is handled honestly, which I checked because a
+travel that returns success without moving the player is the shape of a lie. It
+is not one. The result carries `from_location` and `to_location` both set to
+where the player still stands, and the ledger entry reads "The journey to Mercer
+Exchange was interrupted after 25 minutes. You remain based at Cypress House."
+That also closes the travel banner, one of the two screens I had never read.
+Fourteenth near-miss.
+
+**Then the detail text of every action, side by side — eighty-four of them,
+across all twelve rooms.** The labels had been read this way; the descriptions
+had not, and the last real bug lived in one. This pass found the city counting
+out loud and getting it wrong. Three buttons at the casino read "$164 due in 1
+days", and the Herald read "1 stories in today's paper are about you or about
+the police" — the noun wrong and the verb with it.
+
+`counted` joins the grammar helpers in `core/names.go`, which are all keyed to
+code rather than to save state for the reason established earlier tonight: a
+fact about a word stored in a save means old campaigns keep old wording. Four
+sites use it now, and the Herald agrees its verb as well.
+
+Evidence: `core/counted_test.go` states three properties. The helper agrees at
+zero, one, two and twenty-one; nothing the player can read in any room puts a
+plural noun after a one, scanned across 168 actions in a world holding a loan
+due tomorrow; and the Herald says one story is about you and two stories are.
+All failed before the fix, and re-breaking both sites fails them again. Verified
+over HTTP on the save that showed the fault: the three casino buttons now read
+"$164 due in 1 day". `mise run verify` and `npm test` green, `mise run simulate`
+unchanged at defiant 52 / investor 0 / reckless 82 / worker 0, 0 errors.
+
+Found in the same reading and not fixed, recorded so it is not lost. Three
+descriptions quote figures of zero: a loan the player cannot afford to make
+reads "$0 out, $0 back inside 7 days", bringing money home with no account reads
+"Brings $0 back into the city", and servicing a car the player does not own
+reads "currently 0 of 100". All three are disabled with refusals that already
+explain the situation, so nobody is misled about what they can do — but a
+description of a transaction that cannot happen should not quote its terms as
+zero. That is the next slice in this pass.

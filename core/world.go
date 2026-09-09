@@ -822,7 +822,14 @@ func (w *World) Actions(id string) []Action {
 		}
 		spikeable := "Nothing in today's paper is about you."
 		if n := len(w.Spikeable()); n > 0 {
-			spikeable = fmt.Sprintf("%d stories in today's paper are about you or about the police.", n)
+			// One story is about you; two stories are. The noun and the verb
+			// both have to follow the number.
+			is := "are"
+			if n == 1 {
+				is = "is"
+			}
+			spikeable = fmt.Sprintf("%s in today's paper %s about you or about the police.",
+				upper1(counted(n, "story", "stories")), is)
 		}
 		add("spike", "Pull a story", SpikeMinutes, 0, w.SpikeReadiness(),
 			fmt.Sprintf("%s The worst of them does not run, and the city's interest in it goes with it. About one time in seven somebody in that building notices and the arrangement is over.", spikeable))
@@ -1211,16 +1218,16 @@ func (w *World) Actions(id string) []Action {
 		}
 		if l := w.LoanTo(n.ID); l != nil {
 			days := (l.Due - w.Minute + 1439) / 1440
-			state := fmt.Sprintf("$%d due in %d days.", l.Owed, days)
+			state := fmt.Sprintf("$%d due in %s.", l.Owed, counted(days, "day", "days"))
 			if l.Missed > 0 {
-				state = fmt.Sprintf("$%d overdue, missed %d times.", l.Owed, l.Missed)
+				state = fmt.Sprintf("$%d overdue, missed %s.", l.Owed, counted(l.Missed, "time", "times"))
 			}
 			add("lean:"+n.ID, "Collect from "+n.Name, LeanMinutes, 0, w.LeanReadiness(n.ID),
 				fmt.Sprintf("%s About %d%% of getting most of it. Costs %d attention, %d respect gained, and somebody who remembers it for as long as they live.",
 					state, int(w.LeanOdds(n)*100), LeanHeat, LeanRespect))
 			add("extend:"+n.ID, "Give "+n.Name+" another week", 30, 0, w.ExtendReadiness(n.ID),
-				fmt.Sprintf("%s Becomes $%d, due in %d days. They are grateful today and further from paying it than they were this morning.",
-					state, l.Owed+int(float64(l.Owed)*ExtendRate), LoanTermDays))
+				fmt.Sprintf("%s Becomes $%d, due in %s. They are grateful today and further from paying it than they were this morning.",
+					state, l.Owed+int(float64(l.Owed)*ExtendRate), counted(LoanTermDays, "day", "days")))
 			add("forgive:"+n.ID, "Write off what "+n.Name+" owes", 15, 0, w.ForgiveReadiness(n.ID),
 				fmt.Sprintf("%s Costs the money and %d respect. Buys the one thing money cannot: somebody who knows exactly what that was worth.", state, ForgiveRespect))
 			continue
@@ -1229,8 +1236,8 @@ func (w *World) Actions(id string) []Action {
 			offers++
 			size := w.LoanSize(n)
 			add("lend:"+n.ID, "Lend "+n.Name+" money", LendMinutes, 0, reason,
-				fmt.Sprintf("$%d out, $%d back inside %d days. If they cannot pay, what you do about it is the decision, and the street will hear which way you went.",
-					size, size+int(float64(size)*LoanRate), LoanTermDays))
+				fmt.Sprintf("$%d out, $%d back inside %s. If they cannot pay, what you do about it is the decision, and the street will hear which way you went.",
+					size, size+int(float64(size)*LoanRate), counted(LoanTermDays, "day", "days")))
 		}
 	}
 	if len(p.Crew) > 0 {

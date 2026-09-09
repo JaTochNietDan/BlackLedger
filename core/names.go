@@ -86,3 +86,14 @@ func withArticle(job string) string {
 	}
 	return article(job) + " " + job
 }
+
+// counted agrees a noun with the number in front of it. The city was printing
+// "$164 due in 1 days" on three buttons at the casino and "1 stories in today's
+// paper are about you" at the Herald. Everything else here is keyed to code
+// rather than to save state, and so is this: nothing about a count is stored.
+func counted(n int, singular, plural string) string {
+	if n == 1 {
+		return "1 " + singular
+	}
+	return fmt.Sprintf("%d %s", n, plural)
+}
