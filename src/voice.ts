@@ -23,3 +23,17 @@ export class VoicePlayer {
   await player.play();if(token!==this.epoch){player.pause();return}this.deps.status(SPEAKING);
  }catch(err){if(token!==this.epoch)return;if(this.playing){this.playing.pause();this.playing.dispose();this.playing=null}if((err as Error).name!=='AbortError'){this.deps.status(RETRY);this.deps.unavailable()}}}
 }
+
+/**
+ * Who a scene is attributed to, or null when the city has nobody by that name.
+ *
+ * The scene panel resolved its speaker with `npcs.find(...)||npcs[0]`, so an id
+ * the city did not know became whoever happened to be first in the list — a
+ * real person, with their portrait, name and job, saying something they never
+ * said. Core is the only source of truth for who spoke; when it does not name
+ * somebody the view has to say nothing rather than name somebody itself.
+ */
+export function speakerOf<T extends {id:string}>(people:readonly T[], id:string|undefined):T|null{
+ if(!id)return null;
+ return people.find(n=>n.id===id)??null;
+}

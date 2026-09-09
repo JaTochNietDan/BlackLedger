@@ -3384,3 +3384,27 @@ fallback from a missing speaker to `world.npcs[0]`. Core no longer emits one, so
 nothing reaches it today, but a fallback that turns "nobody said this" into "a
 specific real person said this" is the wrong shape for a game whose core is the
 only source of truth.
+
+## A scene nobody said is attributed to nobody
+
+The previous slice guarded core against emitting a scene with no speaker, and
+noted the reason: the view resolved its speaker with
+`world.npcs.find(...)||world.npcs[0]`. An id the city did not know became
+whoever happened to be first in the list — a real person, with their portrait,
+their name and their job, delivering a family's terms they never set. Core is
+the only source of truth for who spoke. A fallback that turns "nobody said this"
+into "this specific person said this" is the view inventing a fact.
+
+`speakerOf` in `src/voice.ts` returns the person or null, and the scene panel
+renders the attribution block only when there is somebody to attribute it to.
+The body, the choices and the voice control are unchanged: an unattributed scene
+still plays, it just does not borrow a face.
+
+Evidence: a test in `tests/voice.test.mjs` asserts null for an unknown id, an
+empty id, a missing id and an empty city. Re-adding the `??people[0]` fallback
+makes it fail — confirmed, not assumed. Read in a browser against the forced
+succession save from the previous slice: the audience at the club renders "A
+seat across from Bellandi" with Rosa Marchetti's portrait, name and job above
+the body, and the two choices the player cannot afford carry their own refusals
+("Not enough cash: this takes $150 and you are holding $75"). `mise run verify`
+green, `npm test` 25 pass 0 fail.

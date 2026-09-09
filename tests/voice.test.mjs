@@ -1,5 +1,5 @@
 import {test} from 'node:test';import assert from 'node:assert/strict';
-import {VoicePlayer, speaking, IDLE} from '../.runtime/frontend-test/voice.js';
+import {VoicePlayer, speaking, speakerOf, IDLE} from '../.runtime/frontend-test/voice.js';
 const deferred=()=>{let resolve,reject;const promise=new Promise((a,b)=>{resolve=a;reject=b});return {promise,resolve,reject}};
 function setup(load){const handles=[],states=[];let errors=0;const voice=new VoicePlayer({load,audio(){const h={plays:0,pauses:0,disposed:0,play:async()=>{h.plays++},pause:()=>h.pauses++,dispose:()=>h.disposed++,onEnded:f=>h.end=f};handles.push(h);return h},status:s=>states.push(s),unavailable:()=>errors++});return {voice,handles,states,errors:()=>errors}}
 test('late voice after decision never creates or plays audio',async()=>{const pending=deferred();let signal;const s=setup((id,sig)=>{signal=sig;return pending.promise});const play=s.voice.speak('old');s.voice.stop();assert.equal(signal.aborted,true);pending.resolve(new Blob());await play;assert.equal(s.handles.length,0);assert.equal(s.states.at(-1),'Read aloud')});
@@ -21,4 +21,15 @@ test('the stop control appears only while there is something to stop',async()=>{
  const t=setup(async()=>{throw Error('offline')});
  await t.voice.speak('event');
  assert.equal(speaking(t.states.at(-1)),false,'stop offered after the voice failed');
+});
+
+test('a scene is attributed to nobody rather than to the wrong person',()=>{
+ // The panel fell back to the first person in the city, so an unknown speaker
+ // borrowed Mara Bell's face, name and job to deliver a family's terms.
+ const city=[{id:'mara',name:'Mara Bell'},{id:'leo',name:'Leo Carver'}];
+ assert.equal(speakerOf(city,'leo').name,'Leo Carver');
+ assert.equal(speakerOf(city,'nobody-by-that-name'),null);
+ assert.equal(speakerOf(city,''),null);
+ assert.equal(speakerOf(city,undefined),null);
+ assert.equal(speakerOf([],'mara'),null);
 });
