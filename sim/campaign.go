@@ -53,7 +53,141 @@ type Report struct {
 	Events       map[string]int `json:"event_counts"`
 	Error        string         `json:"error,omitempty"`
 	ReplayQueued int            `json:"replay_queued,omitempty"`
-	Trace        []Step         `json:"trace,omitempty"`
+	// What the city did on its own while this run was happening.
+	//
+	// docs/LIVING_WORLD.md asks for exactly these and they did not exist: a
+	// simulation reporting only deaths and cash cannot say whether the living
+	// world is alive or whether every campaign plays out the same way. A system
+	// is not finished because it runs; it is finished when a long simulation
+	// shows it producing varied outcomes.
+	World WorldMeasures `json:"world"`
+	Trace []Step        `json:"trace,omitempty"`
+}
+
+// WorldMeasures counts the things the city did that the player did not do.
+type WorldMeasures struct {
+	// Conflicts that reached the state "war" during this run.
+	WarsStarted int `json:"wars_started"`
+	// Of those, the ones the player's organization was no party to.
+	WarsElsewhere int `json:"wars_elsewhere"`
+	// Premises whose owner changed. Between other organizations only: the
+	// player buying a laundry is the player playing, not the city moving.
+	HoldingsChangedHands int `json:"holdings_changed_hands"`
+	// Organizations that came into existence and that stopped existing. Not
+	// counting the player's own: naming your outfit is you playing.
+	FactionsCreated   int `json:"factions_created"`
+	FactionsDestroyed int `json:"factions_destroyed"`
+	// Commands after which the player was worse off — health or a holding —
+	// while a war they were no party to was running. This is the closest thing
+	// to "affected by a conflict it had no part in" that can be counted
+	// honestly: it does not prove the war caused the harm, only that the player
+	// was taking damage while somebody else's war was on.
+	HurtDuringOthersWar int `json:"hurt_during_others_war"`
+}
+
+// watcher remembers enough of the city to notice what changed between two
+// commands. Nothing here reads the player's own actions: the question is what
+// the city did while the player was doing something else.
+type watcher struct {
+	wars     map[string]bool
+	owners   map[string]string
+	factions map[string]bool
+	health   int
+	holdings int
+}
+
+func watch(w *core.World) *watcher {
+	m := &watcher{wars: map[string]bool{}, owners: map[string]string{}, factions: map[string]bool{}}
+	m.note(w)
+	m.health = w.Player.Health
+	m.holdings = owned(w)
+	return m
+}
+
+func (m *watcher) note(w *core.World) {
+	for _, c := range w.Conflicts {
+		if c.State == "war" {
+			m.wars[c.A+"|"+c.B] = true
+		}
+	}
+	for _, l := range core.Locations {
+		if prop := w.Properties[l.ID]; prop != nil {
+			m.owners[l.ID] = prop.Owner
+		}
+	}
+	for i := range w.Factions {
+		m.factions[w.Factions[i].ID] = true
+	}
+}
+
+func owned(w *core.World) int {
+	n := 0
+	for _, l := range core.Locations {
+		if w.Own(l.ID) {
+			n++
+		}
+	}
+	return n
+}
+
+// changed folds one command's worth of city movement into the measures.
+func (m *watcher) changed(w *core.World, into *WorldMeasures) {
+	player := w.PlayerOrganizationID()
+	elsewhere := false
+	for _, c := range w.Conflicts {
+		if c.State != "war" {
+			continue
+		}
+		key := c.A + "|" + c.B
+		if !m.wars[key] {
+			into.WarsStarted++
+			if c.A != player && c.B != player {
+				into.WarsElsewhere++
+			}
+		}
+		if c.A != player && c.B != player {
+			elsewhere = true
+		}
+	}
+	for _, l := range core.Locations {
+		prop := w.Properties[l.ID]
+		if prop == nil {
+			continue
+		}
+		was, had := m.owners[l.ID]
+		// Only movement between other organizations counts. The player taking
+		// premises is the player playing.
+		if had && was != prop.Owner && was != player && prop.Owner != player {
+			into.HoldingsChangedHands++
+		}
+	}
+	// The player naming their own organization is the player playing, not the
+	// city making a new family. Counting it made this read as one new
+	// organization per campaign for the strategies that form one, and almost
+	// none for the strategies that do not — which says something about the
+	// strategies and nothing at all about the city.
+	live := map[string]bool{}
+	for i := range w.Factions {
+		id := w.Factions[i].ID
+		live[id] = true
+		if !m.factions[id] && id != player {
+			into.FactionsCreated++
+		}
+	}
+	for id := range m.factions {
+		if !live[id] && id != player {
+			into.FactionsDestroyed++
+		}
+	}
+	if elsewhere && (w.Player.Health < m.health || owned(w) < m.holdings) {
+		into.HurtDuringOthersWar++
+	}
+	m.wars = map[string]bool{}
+	m.owners = map[string]string{}
+	m.factions = map[string]bool{}
+	m.note(w)
+	m.health = w.Player.Health
+	m.holdings = owned(w)
 }
 
 func Public(w *core.World) View {
@@ -210,6 +344,7 @@ func Run(seed uint32, strategy, director string, limit int, trace bool) Report {
 func RunRecorded(seed uint32, strategy, director string, limit int, trace bool, corpus []core.Proposal) Report {
 	r := Report{Seed: seed, Strategy: strategy, Director: director, Milestones: map[string]int{}, Actions: map[string]int{}, Events: map[string]int{}}
 	w := core.New(seed)
+	eyes := watch(w)
 	start := w.Minute
 	nextOffer := start + 240
 	cursor := 0
@@ -255,6 +390,7 @@ func RunRecorded(seed uint32, strategy, director string, limit int, trace bool, 
 		}
 		r.Actions[c.Kind]++
 		w = n
+		eyes.changed(w, &r.World)
 		r.Commands++
 		marks := map[string]bool{"crew": len(w.Player.Crew) > 0, "laundry": w.Own("laundry"), "garage": w.Own("garage"), "casino": w.Own("casino"), "housing": w.Player.Home != "room", "security": w.Player.Security > 0, "death": !w.Player.Alive}
 		for name, done := range marks {

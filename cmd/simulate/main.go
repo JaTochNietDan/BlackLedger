@@ -89,12 +89,46 @@ func main() {
 		}
 		sort.Ints(cash)
 		sort.Ints(minutes)
+		// What the city did on its own. Reported as totals across the runs and
+		// as how many runs saw any of it at all, because a living world that
+		// produces one war in a hundred campaigns is not a living world — the
+		// total alone would hide that.
+		city := map[string]any{}
+		{
+			type measure struct {
+				total, runsWith int
+			}
+			m := map[string]*measure{}
+			add := func(name string, n int) {
+				if m[name] == nil {
+					m[name] = &measure{}
+				}
+				m[name].total += n
+				if n > 0 {
+					m[name].runsWith++
+				}
+			}
+			for _, r := range reports {
+				if r.Strategy != p {
+					continue
+				}
+				add("wars_started", r.World.WarsStarted)
+				add("wars_elsewhere", r.World.WarsElsewhere)
+				add("holdings_changed_hands", r.World.HoldingsChangedHands)
+				add("factions_created", r.World.FactionsCreated)
+				add("factions_destroyed", r.World.FactionsDestroyed)
+				add("hurt_during_others_war", r.World.HurtDuringOthersWar)
+			}
+			for name, v := range m {
+				city[name] = map[string]any{"total": v.total, "runs_with_any": v.runsWith}
+			}
+		}
 		ms := map[string]any{}
 		for k, values := range milestones {
 			sort.Ints(values)
 			ms[k] = map[string]any{"reached": len(values), "median_commands_when_reached": values[len(values)/2]}
 		}
-		summaries[p] = map[string]any{"runs": *runs, "deaths": deaths, "errors": errors, "median_final_cash": cash[len(cash)/2], "median_game_minutes": minutes[len(minutes)/2], "milestones": ms}
+		summaries[p] = map[string]any{"runs": *runs, "deaths": deaths, "errors": errors, "median_final_cash": cash[len(cash)/2], "median_game_minutes": minutes[len(minutes)/2], "milestones": ms, "city": city}
 	}
 	out := map[string]any{"corpus_sha256": corpusHash, "corpus_proposals": len(corpus), "elapsed_seconds": time.Since(start).Seconds(), "director": *director, "max_commands": *steps, "summary": summaries, "campaigns": reports}
 	enc := json.NewEncoder(os.Stdout)

@@ -1721,3 +1721,22 @@
 - **A QA fault of mine, worth writing down.** A fresh copy of a save kept showing the *previous* run's obituaries: copying `foo.sqlite3` while leaving a stale `foo.sqlite3-wal` beside it replays the old write-ahead log over the new copy. Delete the `-wal` and `-shm` with it. I nearly recorded the old wording as a live bug in the new code.
 - Verified in a browser on an isolated day-23 save: a front page carrying *SPLIT IN RUSSO OUTFIT*, then OBITUARIES centred under a rule for **VITTORIO BELLANDI** — *"They were Bellandi boss. Those who had business with them had it at The Monarch."* — then the city page below it. The weather brief in that same issue had been rewritten by the director, so all three layers of the paper were visible at once. No console errors.
 - `mise run verify` passes, `npm test` 23/23, `cmd/apicheck` reports no invariant failures, 100 runs unchanged: defiant 58 / investor 0 / reckless 82 / worker 0, 0 errors.
+
+## Measuring whether the living world is actually alive
+- `docs/LIVING_WORLD.md` asks for these by name and they did not exist: *wars started, holdings changed hands, factions created and destroyed, and how often a run is affected by a conflict it had no part in*. A simulation reporting only deaths and cash cannot say whether layers 2, 3 and 4 do anything — and the same document sets the bar: a system is finished when a long simulation shows it producing varied, non-degenerate outcomes.
+- `cmd/simulate` now reports a `city` block per strategy: each measure as a total **and** as how many runs saw any of it at all, because a world producing one war in a hundred campaigns is not a living world and the total alone would hide that.
+- **The first version of the measure lied, and the shape of the lie is the useful part.** It counted about one new organization per campaign for the strategies that form one and almost none for the others — a number about the strategies, not the city. It was counting the player naming their own outfit as the city making a new family. Excluded now, and the test holds it: the player's organization forming or dissolving is the player playing, and the player taking premises is not the city moving them.
+- **What 400 campaigns actually show**, and it is not what the document intends:
+
+| | total | runs with any, of 400 |
+|---|---|---|
+| wars started | 52 | **43** |
+| wars the player was no party to | 33 | 25 |
+| holdings changed hands between families | 34 | 24 |
+| organizations created | 40 | 36 |
+| organizations destroyed | 5 | **4** |
+| player hurt during somebody else's war | 58 | 12 |
+
+- Read plainly: **a war starts in about one campaign in nine, and an organization is destroyed in one campaign in a hundred.** The layers are not broken — they fire, and they vary by strategy in ways that make sense, with `defiant` seeing eleven wars of which *none* were between other families, while `investor` and `worker` mostly watch other people's. But the city is sparse: nine campaigns in ten never see it do anything to itself.
+- That is a finding, not a fix. Making the city more active is a balance change and deserves its own slice with before-and-after numbers, which is what this measure now makes possible. **The baseline is recorded above.**
+- `mise run verify` passes, `npm test` 23/23. Balance unchanged: this only observes — defiant 58 / investor 0 / reckless 82 / worker 0, 0 errors, exactly as before.
