@@ -13,7 +13,14 @@ func operator(t *testing.T) *World {
 
 func TestABusinessComesAsAGoingConcern(t *testing.T) {
 	w := New(703)
-	for id, trade := range trades {
+	// Over the addresses rather than the trade table: a trade belongs to a kind
+	// of business now, and "cabs" is not a place anybody can stand in.
+	for _, l := range Locations {
+		if l.Kind == "" {
+			continue
+		}
+		id := l.ID
+		trade, _ := TradeOf(id)
 		prop := w.Properties[id]
 		if prop.Staff != trade.Hands {
 			t.Fatalf("%s starts with %d of %d positions filled", id, prop.Staff, trade.Hands)

@@ -68,11 +68,36 @@ var trades = map[string]Trade{
 		Trouble: "A driver has been talking to somebody at Ward Street and the yard knows it.",
 		Remedy:  "Find out which driver", RemedyDetail: "One driver off the books, and the runs are quiet again.", RemedyCost: 240,
 	},
+	"burlesque": {
+		Hands: 7, Wage: 10, Drain: 9, Restock: 260, RestockAmount: 45, Supplies: "the bar and the wardrobe",
+		Trouble: "Somebody from outside is leaning on the dancers for a cut of what they take.",
+		Remedy:  "Have a word with whoever is standing at the stage door",
+		RemedyDetail: "The cut stops and the room keeps its own money.", RemedyCost: 190,
+	},
+	"cabs": {
+		Hands: 8, Wage: 9, Drain: 10, Restock: 280, RestockAmount: 50, Supplies: "fuel and tyres",
+		Trouble: "Two cars are off the road and the dispatcher is turning work away.",
+		Remedy:  "Get the cars back on the road", RemedyDetail: "Both back out by the evening shift.", RemedyCost: 200,
+	},
 }
 
-// TradeOf reports how a place runs, and whether it runs at all.
+// TradeOf reports how a place runs, and whether it runs at all. It asks the
+// address what kind of business it is and looks the rules up by that, so a city
+// with three laundries in it has three laundries and not three sets of rules
+// that happen to agree today.
 func TradeOf(id string) (Trade, bool) {
-	t, ok := trades[id]
+	place, ok := PlaceByID(id)
+	if !ok || place.Kind == "" {
+		return Trade{}, false
+	}
+	t, ok := trades[place.Kind]
+	return t, ok
+}
+
+// TradeOfKind reports the rules for a kind of business directly, for anything
+// asking about the kind rather than about an address.
+func TradeOfKind(kind string) (Trade, bool) {
+	t, ok := trades[kind]
 	return t, ok
 }
 

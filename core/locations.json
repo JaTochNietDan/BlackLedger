@@ -37,7 +37,8 @@
   "x": 320,
   "y": 425,
   "cost": 180,
-  "blurb": "A neighborhood business seeking protection. A small beginning, if you can honor the arrangement."
+  "blurb": "A neighborhood business seeking protection. A small beginning, if you can honor the arrangement.",
+  "kind": "laundry"
  },
  {
   "id": "club",
@@ -77,7 +78,8 @@
   "x": 800,
   "y": 405,
   "cost": 350,
-  "blurb": "A working garage at the edge of Russo territory. An investment that requires political tact."
+  "blurb": "A working garage at the edge of Russo territory. An investment that requires political tact.",
+  "kind": "garage"
  },
  {
   "id": "casino",
@@ -87,7 +89,8 @@
   "x": 700,
   "y": 585,
   "cost": 850,
-  "blurb": "A shuttered gambling house. Restore its reputation and the tables could support an entire crew."
+  "blurb": "A shuttered gambling house. Restore its reputation and the tables could support an entire crew.",
+  "kind": "casino"
  },
  {
   "id": "estate",
@@ -127,7 +130,8 @@
   "x": 476,
   "y": 441,
   "cost": 260,
-  "blurb": "A family restaurant with a back room nobody books. The kitchen pays for itself; the room is worth more."
+  "blurb": "A family restaurant with a back room nobody books. The kitchen pays for itself; the room is worth more.",
+  "kind": "restaurant"
  },
  {
   "id": "poolhall",
@@ -137,7 +141,8 @@
   "x": 180,
   "y": 540,
   "cost": 220,
-  "blurb": "Six tables and a payphone that rings at the same hour every night. Somebody is running a book on it already."
+  "blurb": "Six tables and a payphone that rings at the same hour every night. Somebody is running a book on it already.",
+  "kind": "poolhall"
  },
  {
   "id": "butcher",
@@ -147,7 +152,8 @@
   "x": 994,
   "y": 268,
   "cost": 420,
-  "blurb": "A cold room, a van, and a licence to move refrigerated goods across the river at any hour."
+  "blurb": "A cold room, a van, and a licence to move refrigerated goods across the river at any hour.",
+  "kind": "butcher"
  },
  {
   "id": "haulage",
@@ -157,6 +163,51 @@
   "x": 560,
   "y": 690,
   "cost": 980,
-  "blurb": "Four trucks and a yard. Whatever leaves this city on wheels leaves on somebody's timetable."
+  "blurb": "Four trucks and a yard. Whatever leaves this city on wheels leaves on somebody's timetable.",
+  "kind": "haulage"
+ },
+ {
+  "id": "goldenlily",
+  "name": "The Golden Lily",
+  "type": "casino",
+  "kind": "casino",
+  "district": 1,
+  "x": 648,
+  "y": 268,
+  "cost": 760,
+  "blurb": "A second house across the river, quieter than the Blue Hour and harder to get into. The same game, a different room."
+ },
+ {
+  "id": "steamworks",
+  "name": "Ordway Steam Laundry",
+  "type": "racket",
+  "kind": "laundry",
+  "district": 1,
+  "x": 130,
+  "y": 268,
+  "cost": 240,
+  "blurb": "A bigger laundry than the Bluebird, on a street that never asks what is in the vans."
+ },
+ {
+  "id": "burlesque",
+  "name": "The Paper Moon",
+  "type": "burlesque",
+  "kind": "burlesque",
+  "district": 1,
+  "x": 821,
+  "y": 613,
+  "cost": 700,
+  "blurb": "A revue bar with a stage, a late licence and a room upstairs. What is worth having here is who comes through the door."
+ },
+ {
+  "id": "cabstand",
+  "name": "Vance Cab Company",
+  "type": "work",
+  "kind": "cabs",
+  "district": 2,
+  "x": 303,
+  "y": 613,
+  "cost": 540,
+  "blurb": "Eleven cars and a dispatcher who knows where everybody went. A cab is a business and it is also a pair of eyes."
  }
 ]

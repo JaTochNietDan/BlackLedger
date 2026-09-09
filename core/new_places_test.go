@@ -70,9 +70,11 @@ func TestEveryEarningPlaceHasItsIncomeInOneTable(t *testing.T) {
 			t.Errorf("%s earns %d in a new city and the table says %d", l.ID, prop.Income, PlaceIncome[l.ID])
 		}
 	}
-	for id := range trades {
-		if PlaceIncome[id] <= 0 {
-			t.Errorf("%s is a trading business that earns nothing", id)
+	// Every ADDRESS that runs a business earns something. The trade table is
+	// keyed by kind now, and a kind does not have takings — an address does.
+	for _, l := range Locations {
+		if l.Kind != "" && PlaceIncome[l.ID] <= 0 {
+			t.Errorf("%s is a %s and earns nothing", l.ID, l.Kind)
 		}
 	}
 }

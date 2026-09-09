@@ -22,9 +22,19 @@ func init() {
 }
 
 type Place struct {
-	ID       string `json:"id"`
-	Name     string `json:"name"`
-	Type     string `json:"type"`
+	ID   string `json:"id"`
+	Name string `json:"name"`
+	// Type is how a room is drawn and what kind of place it is to stand in.
+	// Kind is what business is run there, and it is what a trade belongs to:
+	// how many hands it needs, what it runs on, and what goes wrong in it.
+	//
+	// They are separate because a trade used to be keyed by street address, so
+	// the city could hold exactly one laundry and one casino — a second would
+	// have needed its own copy of the same rules, and the two would have
+	// drifted apart the first time either was touched. Empty on anything
+	// nobody runs a business out of.
+	Type string `json:"type"`
+	Kind string `json:"kind,omitempty"`
 	District int    `json:"district"`
 	X        int    `json:"x"`
 	Y        int    `json:"y"`
@@ -1844,4 +1854,9 @@ var PlaceIncome = map[string]int{
 	"laundry": 14, "garage": 24, "casino": 18, "club": 30,
 	"market": 18, "docks": 22, "bar": 12,
 	"restaurant": 20, "poolhall": 16, "butcher": 28, "haulage": 40,
+	// A second house and a second laundry: the same kind of business, their own
+	// takings, because what an address earns belongs to the address and not to
+	// the kind. The Golden Lily is quieter than the Blue Hour and the Ordway is
+	// bigger than the Bluebird.
+	"goldenlily": 15, "steamworks": 19, "burlesque": 26, "cabstand": 32,
 }

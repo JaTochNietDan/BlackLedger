@@ -36,7 +36,14 @@ const (
 
 // ArmourySite reports whether a business can hide a room like this. A casino
 // floor cannot: too many people, and the wrong ones.
-func ArmourySite(id string) bool { return id == "laundry" || id == "garage" }
+// ArmourySite reports whether a room under this business could hold crates. It
+// asks what kind of business it is: a laundry or a garage, wherever in the city
+// they happen to be, rather than the two addresses that were the only ones when
+// this was written.
+func ArmourySite(id string) bool {
+	place, ok := PlaceByID(id)
+	return ok && (place.Kind == "laundry" || place.Kind == "garage")
+}
 
 // TheArmoury finds the player's armoury, if they have one.
 func (w *World) TheArmoury() (string, bool) {

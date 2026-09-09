@@ -145,13 +145,22 @@ func (w *World) BuyAttire() error {
 // PressPlace reports whether clothes can be put right here: your own home, or a
 // laundry, which is the one thing a laundry is actually for.
 func (w *World) PressPlace(id string) bool {
-	return id == w.Player.Home || (id == "laundry" && w.Own(id))
+	return id == w.Player.Home || w.PressAtOwnPlace(id)
+}
+
+// PressAtOwnPlace reports whether this is a laundry of the player's. It asks
+// what KIND of business the address is, because the city can hold more than one
+// laundry and a rule written about "the laundry" would have been a rule about
+// one street corner.
+func (w *World) PressAtOwnPlace(id string) bool {
+	place, ok := PlaceByID(id)
+	return ok && place.Kind == "laundry" && w.Own(id)
 }
 
 // PressFee is nothing at a laundry of your own. It is the only return the
 // player ever gets on that business that is not money.
 func (w *World) PressFee(id string) int {
-	if id == "laundry" && w.Own(id) {
+	if w.PressAtOwnPlace(id) {
 		return 0
 	}
 	return PressCost

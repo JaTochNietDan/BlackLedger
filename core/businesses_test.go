@@ -9,18 +9,28 @@ import "testing"
 // whole table rather than over the four, so a fifth cannot be added without it.
 
 func TestEveryTradeInTheCityCanActuallyBeRun(t *testing.T) {
-	if len(trades) < 7 {
-		t.Fatalf("the city has %d trades, so this is testing less than it was written for", len(trades))
+	if len(trades) < 9 {
+		t.Fatalf("the city knows %d kinds of business, so this is testing less than it was written for", len(trades))
 	}
-	for id := range trades {
-		place, ok := PlaceByID(id)
-		if !ok {
-			t.Errorf("%s has a trade and is not a place in the city", id)
+	// Over the addresses, not over the trade table. A trade belongs to a KIND
+	// of business now, and several addresses can share one, so walking the
+	// table asks about "cabs" rather than about the cab company on Ordway
+	// Street. The property is still that every business in the city can be
+	// run — there are simply more of them than there are kinds.
+	for _, l := range Locations {
+		if l.Kind == "" {
 			continue
 		}
-		trade, _ := TradeOf(id)
+		id := l.ID
+		place := l
+		trade, running := TradeOf(id)
+		if !running {
+			t.Errorf("%s is a %s and has no trade", id, l.Kind)
+			continue
+		}
 		w := New(97)
 		w.District = 2
+		_ = place
 		w.Player.Cash, w.Player.Respect, w.Player.Health = 40000, 200, 100
 		prop := w.Properties[id]
 		if prop == nil {

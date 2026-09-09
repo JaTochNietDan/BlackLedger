@@ -5040,3 +5040,53 @@ More families reach that state now, which is why it surfaced today.
 
 Evidence: `core/orphans_test.go`, and both calls verified by removing them. All
 gates green, `npm test` 41.
+
+## A business belongs to a kind, so the city can hold two of them
+
+From the inbox: multiple casinos, multiples of businesses, strip clubs. The
+first of those was not a content change. A business's trade — how many hands it
+needs, what it runs on, what goes wrong in it — was keyed by street address, so
+the city could hold exactly one laundry and exactly one casino. A second would
+have needed its own copy of the same rules under a different key, and the two
+would have drifted apart the first time either was touched.
+
+An address now says what kind of business it is, and the trade belongs to the
+kind. What an address *earns* stays with the address, because that is genuinely
+a fact about the premises: the Golden Lily is quieter than the Blue Hour and the
+Ordway is bigger than the Bluebird.
+
+Four new addresses, and for the first time two of them are second helpings
+rather than new kinds: a second gambling house, a second laundry, a revue bar
+where somebody outside is leaning on the dancers for a cut, and a cab company
+with two cars off the road. The city has twenty addresses now and eleven ownable
+businesses across nine kinds.
+
+The sweep for rules written about an address where they meant a kind was the
+real work. Two were live: a crate room could be built under one laundry and not
+under the other, and the player's own laundry would press their clothes for
+nothing while the second one would not. Both are about kinds now, and both fail
+when reverted to an address.
+
+Three tests walked the trade table as though its keys were places, which stopped
+being true. They walk the addresses instead. That is the same property asked of
+the thing that now owns it — there are more businesses in the city than there
+are kinds of business — and it is a test change rather than a code change, so it
+is recorded as one.
+
+Guards caught four things without help: four addresses with no painted front,
+four with no interior, four with no ways of dying, and one line of mine that
+walked somebody out "between two men" in a game that records nobody's gender.
+
+| | before | after |
+| --- | --- | --- |
+| addresses | 16 | 20 |
+| ownable businesses | 7 | 11 |
+| kinds of business | 7 | 9 |
+| kinds with more than one address | 0 | 2 |
+
+`mise run simulate` is unchanged at defiant 51 / investor 0 / reckless 82 /
+worker 0, with two medians moving by tens of dollars. Still to come from this
+inbox entry: many more people living in the city, and more ways a business
+touches the simulation.
+
+Evidence: `core/kinds_test.go`. All gates green, `npm test` 41.
