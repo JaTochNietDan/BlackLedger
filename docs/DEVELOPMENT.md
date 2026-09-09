@@ -5398,3 +5398,38 @@ somewhere to come from — and once cars are taken, stolen parts have a seller a
 a garage has a reason to want more of it happening.
 
 Evidence: `core/citycars_test.go`.
+
+## A car in pieces is four links in one act
+
+From the inbox: people steal car parts and sell them to garages, and a garage
+does better when there is more of it about. Both halves needed a car that
+belonged to somebody, which the city got last slice.
+
+Taking a car apart now does four things at once, which is the point. Whoever
+drove it is walking. The parts have a buyer and pay $95 a tier, half again with
+a garage of your own to take them to rather than selling them on at whatever is
+offered. Every garage in the city picks up trade, because more cars going to
+pieces is more work about. And the person you did it to holds it against you
+personally, so a man who lost his car is a man who comes looking later.
+
+The forecourt closes the circle without anything new being written: he is
+somebody who would drive and has none, so in a week or two he buys another and
+the lot takes its quarter.
+
+Two things I got right by reading rather than guessing. A garage doing better
+needed no new counter — `Custom` already multiplies a place's earnings and is
+capped, so this cannot run away. And my first version made the owner resent
+whoever was standing there rather than the player: `Resent` records a grudge
+between two people in the city, and `Aggrieve` is the one that reaches the
+protagonist. The test caught it as a grudge of zero.
+
+Four breaks verified, including the command not being wired, which is the seam
+that has caught me more often than any other.
+
+Balance unchanged in every figure. The simulated strategies never strip a car,
+so this is invisible to them, and that is expected rather than reassuring.
+
+Not built: a scrapyard, and the city taking cars off each other in raids. A raid
+already reaches the people standing at a place, so the second is a short step.
+
+Evidence: `core/parts_test.go`, `core/parts.go`.

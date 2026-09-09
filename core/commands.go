@@ -513,6 +513,10 @@ func (w *World) apply(c Command) error {
 				if err := w.Launder(target); err != nil {
 					return err
 				}
+			case "strip":
+				if err := w.StripCar(p.Location); err != nil {
+					return err
+				}
 			case "mug":
 				if err := w.Mug(target, w.OwnHands()); err != nil {
 					return err

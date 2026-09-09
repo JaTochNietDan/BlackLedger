@@ -1050,6 +1050,10 @@ func (w *World) Actions(id string) []Action {
 				fmt.Sprintf("$%d each today, for $%d.", g.Price, g.Price*held))
 		}
 	}
+	if mark, ok := w.StripTarget(id); ok {
+		add("strip", "Take "+mark.Name+"'s car apart", 60, 0, w.StripReadiness(id),
+			fmt.Sprintf("$%d for what comes off it. They will be walking, and they will know by morning that it was somebody. Every garage in the city has more work the more of this there is.", w.PartsWorth(mark)))
+	}
 	if mark, ok := w.MuggingTarget(id); ok {
 		// People carry their own money now, so somebody can genuinely have
 		// nothing — a man whose family has missed payday for a month. "About
