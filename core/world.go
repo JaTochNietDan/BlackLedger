@@ -739,8 +739,11 @@ func (w *World) Actions(id string) []Action {
 				continue
 			}
 			days := (n.Held - w.Minute + 1439) / 1440
+			// The ledger entry this writes has always counted correctly; the
+			// description beside it said "for the 1 days still on them".
 			add("bail:"+n.ID, "Bail out "+n.Name, 60, days*BailDaily, "",
-				fmt.Sprintf("$%d for the %d days still on them. They come out owing you, which is not the same as being grateful.", days*BailDaily, days))
+				fmt.Sprintf("$%d for the %s still on them. They come out owing you, which is not the same as being grateful.",
+					days*BailDaily, plainly(days, "day", counted(days, "day", "days"))))
 		}
 	case "bar":
 		add("courier", "Carry a discreet envelope", CourierMinutes, 0, "",
@@ -1294,7 +1297,7 @@ func (w *World) Actions(id string) []Action {
 	// a woman who was halfway across the city. Doing it here rather than at
 	// forty call sites means the next action about a person cannot forget.
 	for i := range out {
-		if out[i].Subject == "" || out[i].Disabled {
+		if out[i].Subject == "" || out[i].Disabled || reachesTheUnreachable(out[i].ID) {
 			continue
 		}
 		if reason := w.OutOfReach(out[i].Subject); reason != "" {
@@ -1724,4 +1727,16 @@ func operationOutcome(operation string) string {
 		return outcome
 	}
 	return "You completed the arrangement."
+}
+
+// reachesTheUnreachable is the one exception to the rule above: an action whose
+// whole premise is that the person cannot be dealt with in the ordinary way.
+//
+// Bailing somebody out is not a conversation with them. It is a conversation
+// with a clerk about them, and it exists precisely because they are in a cell.
+// The sweep disabled it for the reason it is offered — "Otto Reiss is being
+// held at Ward Street Station" — so the button could never be pressed, and the
+// only way to reach the mechanic was to post the command directly.
+func reachesTheUnreachable(id string) bool {
+	return strings.HasPrefix(id, "bail:")
 }

@@ -3914,3 +3914,46 @@ untouched, checked against six name shapes and end to end by leaving a seeded
 family, or every campaign's two openers would be mangled to fix the ones the
 world invents. `mise run verify` and `npm test` green, `mise run simulate`
 unchanged at defiant 52 / investor 0 / reckless 82 / worker 0, 0 errors.
+
+## Bailing somebody out is not a conversation with them
+
+The prose sweeps had gone quiet, so I went back to the actions whose label, gate
+and effect had never been read together. Bail was the first, and it could never
+be used.
+
+There is one rule in the action list, applied once over everything aimed at a
+person: somebody who cannot be dealt with is not offered. Its own comment
+explains why it lives in one place — "doing it here rather than at forty call
+sites means the next action about a person cannot forget" — and it is right
+about that. It stops the player sending a man on collections from a police cell,
+which is a fault this project has fixed before.
+
+Bail is the one action that exists *because* the person is in a cell. The sweep
+saw an action aimed at somebody in custody and disabled it with "Otto Reiss is
+being held at Ward Street Station", which is the reason the button is offered.
+So the button was dead in every campaign, and the only way to reach the mechanic
+at all was to post the command directly to the API, which is how I had
+"verified" custody earlier tonight without noticing the button never worked.
+
+The rule now has exactly one exception, named and commented, and a test holds it
+to one action wide: everything else aimed at a man in a cell stays refused, four
+of four in the check.
+
+The same audit found the smaller thing beside it. The ledger entry bail writes
+has always counted correctly — "for the day still on them" — while the button's
+description said "for the 1 days still on them". The effect knew better than the
+label, which is the reverse of the split I had been looking for all night.
+
+Evidence: `core/bail_test.go` states that bail is offered when it can be paid,
+refused on the button when it cannot, counts one day as one day, and reaches
+into a cell where nothing else does. Each fails when its fix is reverted, checked
+one at a time. Verified over HTTP on a save driven to day 28 with one of the
+player's people held for two days: the precinct offered "Bail out Otto Reiss",
+"$640 for the 2 days still on them", the command took $640, and he walked out.
+`mise run verify` and `npm test` green, `mise run simulate` unchanged at defiant
+52 / investor 0 / reckless 82 / worker 0, 0 errors.
+
+Correcting my own record: bail appears in this document's list of things
+verified by hand over HTTP. That was true of the command and not of the button,
+and I did not check the difference at the time. Posting a command directly is
+not evidence that a player can reach it.
