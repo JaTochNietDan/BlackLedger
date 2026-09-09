@@ -6,6 +6,15 @@ import type {Snapshot,Record as CityRecord} from './types';
 // job is to answer "what am I worth and what is this costing me". The core now
 // adds the books up; this reads them, and turns the history into something a
 // person can search rather than a wall they scroll past.
+//
+// The underground market has since moved out to a page of its own. A price is
+// not an account — it is a reason to go somewhere — and somebody checking
+// whether moonshine is worth moving today is not doing bookkeeping. What is
+// left here is what the player owes, owns and earns, and what they did.
+//
+// The breakdown of the day's costs stays, because that is genuinely owed money,
+// but it folds away: it is the detail behind a figure that is already on the
+// page twice, and open by default it pushed the history below the fold.
 
 const money = (n: number) => (n < 0 ? '−$' : '$') + Math.abs(Math.floor(n)).toLocaleString();
 const time = (m: number) => `Day ${Math.floor(m / 1440) + 1} · ${String(Math.floor(m % 1440 / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
@@ -49,8 +58,8 @@ export function LedgerScreen({world}: {world: Snapshot}) {
         {b.lent > 0 && <div><span>Out on the street</span><b>{money(b.lent)}</b><small>{money(b.owed)} due back</small></div>}
         {b.offshore > 0 && <div><span>Outside the city</span><b>{money(b.offshore)}</b><small>survives you</small></div>}
       </div>
-      <div className="books-lines">
-        <h2>What the day costs</h2>
+      <details className="books-lines">
+        <summary>What the {money(b.costs)} a day is</summary>
         <ul>
           {b.lines.map(l => <li key={l.label}>
             <b>{l.label}</b>
@@ -59,18 +68,8 @@ export function LedgerScreen({world}: {world: Snapshot}) {
           </li>)}
           <li className="total"><b>Every day</b><i>{money(b.costs)}</i></li>
         </ul>
-      </div>
+      </details>
     </div>}
-
-    {!!world.goods?.length && <>
-      <h2>The underground market</h2>
-      <p className="subtle">Prices move on their own. Buying and selling happens at Mercer Exchange, and the waterfront deals in moonshine. Stock draws police attention every day you hold it.</p>
-      <div className="fact-grid">{world.goods.map(g => <div key={g.id}>
-        <span>{g.name}</span>
-        <b className={g.price > g.base ? 'warning' : ''}>{money(g.price)} / {g.unit}</b>
-        <small>{world.player.stock?.[g.id] ? `carrying ${world.player.stock[g.id]}` : 'none held'} · usually {money(g.base)}</small>
-      </div>)}</div>
-    </>}
 
     <h2>What happened</h2>
     <div className="people-controls">

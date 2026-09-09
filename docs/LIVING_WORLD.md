@@ -106,6 +106,8 @@ into `docs/DEVELOPMENT.md` once they are actually built and tested. An entry
 stays here, in the original wording, until it is genuinely implemented — so if
 it is still in this list, it does not exist in the game yet.
 
-- Separating more stuff out of the ledger and whatnot probably makes sense. Like the underground market probably doesn't belong in there. Not sure if the daily cost belongs in there either. Needs refinement.
+*Empty. Everything that was here has been built and is written up in
+`docs/DEVELOPMENT.md`.*
+
 
 Ultiamtely the expectation is that I don't have to think of all of these concepts, you, the agent will think of these too and build them out and playtest and simulate them yourself.
