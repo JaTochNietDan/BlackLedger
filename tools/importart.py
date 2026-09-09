@@ -36,7 +36,16 @@ SKEW = 0.22
 
 
 def edges(im: Image.Image) -> tuple[float, float]:
-    """The slope of each base edge, out from the lowest point of the building."""
+    """The slope of each base edge, out from the bottom of the building.
+
+    The bottom of a building is not always a point. A period corner shop is
+    usually chamfered — the corner cut off flat to make room for the door —
+    so the silhouette bottoms out along a run rather than at a single pixel.
+    Fitting a slope from the middle of that flat run averages the flat in and
+    reports a shallow edge that is not there: it rejected a picture whose
+    projection was in fact correct. So the flat is found first and the fit
+    starts beyond it.
+    """
     al = im.getchannel("A").load()
     w, h = im.size
     low = []
@@ -49,17 +58,18 @@ def edges(im: Image.Image) -> tuple[float, float]:
         low.append(y)
     solid = [x for x, y in enumerate(low) if y is not None]
     deepest = max(low[x] for x in solid)
-    flat = [x for x in solid if low[x] == deepest]
-    cx = (flat[0] + flat[-1]) // 2
+    flat = [x for x in solid if low[x] >= deepest - 1]
+    left_foot, right_foot = flat[0], flat[-1]
 
-    def slope(step: int) -> float:
+    def slope(start: int, step: int) -> float:
         xs, ys = [], []
-        for k in range(15, 200):
-            x = cx + step * k
+        base_y = low[start]
+        for k in range(4, 220):
+            x = start + step * k
             if not (0 <= x < w) or low[x] is None:
                 break
             xs.append(k)
-            ys.append(deepest - low[x])
+            ys.append(base_y - low[x])
         if len(xs) < 30:
             return float("nan")
         n = len(xs)
@@ -68,30 +78,47 @@ def edges(im: Image.Image) -> tuple[float, float]:
         sxy = sum(a * b for a, b in zip(xs, ys))
         return (n * sxy - sx * sy) / (n * sxx - sx * sx)
 
-    return slope(-1), slope(1)
+    return slope(left_foot, -1), slope(right_foot, 1)
+
+
+def framed(path: str) -> list[str]:
+    """Whether the building has air around it — asked BEFORE the field comes off.
+
+    knock_out() crops to what it finds, so asking this afterwards always says
+    the building fills the frame. That is exactly what it did say, about a
+    picture with wide clear margins on all four sides.
+    """
+    im = Image.open(path).convert("RGB")
+    w, h = im.size
+    field = im.getpixel((0, 0))
+
+    def background(px) -> bool:
+        return all(abs(px[i] - field[i]) <= 42 for i in range(3))
+
+    edges_hit = []
+    if any(not background(im.getpixel((0, y))) for y in range(h)):
+        edges_hit.append("left")
+    if any(not background(im.getpixel((w - 1, y))) for y in range(h)):
+        edges_hit.append("right")
+    if any(not background(im.getpixel((x, 0))) for x in range(w)):
+        edges_hit.append("top")
+    if any(not background(im.getpixel((x, h - 1))) for x in range(w)):
+        edges_hit.append("bottom")
+    if not edges_hit:
+        return []
+    return [f"the building runs off the {', '.join(edges_hit)} of its own frame. "
+            "It has been cropped, and what is missing at the bottom is the corner "
+            "of its base — the one part the city needs in order to stand it on its "
+            "own feet. Ask for the whole building inside the frame with clear air "
+            "around it."]
 
 
 def check(path: str) -> list[str]:
     """Everything wrong with this picture, in words that say what to do."""
     im = Image.open(path).convert("RGBA")
-    w, h = im.size
-    box = im.getchannel("A").point(lambda v: 255 if v >= ALPHA else 0).getbbox()
-    if not box:
+    if not im.getchannel("A").point(lambda v: 255 if v >= ALPHA else 0).getbbox():
         return ["the picture is empty"]
     faults = []
-
-    touching = []
-    if box[0] < MARGIN: touching.append("left")
-    if box[1] < MARGIN: touching.append("top")
-    if box[2] > w - MARGIN: touching.append("right")
-    if box[3] > h - MARGIN: touching.append("bottom")
-    if touching:
-        faults.append(
-            f"the building runs off the {', '.join(touching)} of its own frame. "
-            "It has been cropped, and what is missing at the bottom is the corner "
-            "of its base — the one part the city needs in order to stand it on its "
-            "own feet. Ask for the whole building inside the frame with clear air "
-            "around it.")
 
     left, right = edges(im)
     if left == left and right == right:                  # not NaN
@@ -110,8 +137,11 @@ def check(path: str) -> list[str]:
 def bring_in(source: str, place: str, out_dir: str = "public/art/iso") -> bool:
     target = os.path.join(out_dir, f"iso-{place}-v2.png")
     shutil.copy(source, target)
+    # Margins are asked about while the picture still has its background, since
+    # taking the background off crops away the very thing being measured.
+    faults = framed(target)
     knock_out(target)                                    # the flat field comes off
-    faults = check(target)
+    faults += check(target)
     if faults:
         os.remove(target)
         print(f"not imported: {os.path.basename(source)}")
