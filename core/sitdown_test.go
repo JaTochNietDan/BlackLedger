@@ -232,3 +232,50 @@ func TestTheFeeIsPaidWhateverHappens(t *testing.T) {
 		t.Fatal("leaving refunded the room")
 	}
 }
+
+// Read out of a real save after a sitdown went wrong: "At The Monarch, late,
+// with the city quiet: Ennio Zanetti was knifed in the crowd. A meeting
+// between Bellandi Family and Russo Outfit went the way somebody had already
+// decided." The meeting was at Saint Agnes. Casualties are drawn from anywhere
+// in the organization and the paper reports a death where the person was
+// standing, so the city named a room three streets from the one the player was
+// sitting in.
+func TestWhoeverDiesAtASitdownDiedInTheRoom(t *testing.T) {
+	w := mediator(t, 95, true) // hostile, and one side led by somebody who does not wait
+	for i := range w.NPCs {
+		if w.NPCs[i].Location == SitdownGround {
+			w.NPCs[i].Location = "club" // nobody starts in the room
+		}
+	}
+	if q, ok := w.OpenQuarrel(); !ok || !q.Trap {
+		t.Fatal("this fixture is not a trap, so it proves nothing about one")
+	}
+	before := map[string]bool{}
+	for i := range w.NPCs {
+		before[w.NPCs[i].ID] = w.NPCs[i].Dead
+	}
+	if err := w.CallSitdown(); err != nil {
+		t.Fatal(err)
+	}
+	if w.Event == nil {
+		t.Fatal("no sitdown scene")
+	}
+	next, err := Execute(w, Command{RequestID: ID(), Revision: w.Revision, Kind: "choice", Event: w.Event.ID, Choice: w.Event.Choices[0].ID})
+	if err != nil {
+		t.Skip("this room did not turn: " + err.Error())
+	}
+	w = next
+	died := 0
+	for i := range w.NPCs {
+		n := &w.NPCs[i]
+		if n.Dead && !before[n.ID] {
+			died++
+			if n.Location != SitdownGround {
+				t.Fatalf("%s was killed at the meeting and the city says they died at %q", n.Name, n.Location)
+			}
+		}
+	}
+	if died == 0 {
+		t.Fatal("a trapped room turned and nobody in it died, so this proves nothing")
+	}
+}

@@ -201,6 +201,13 @@ func (w *World) ResolveSitdown(e *Scene, choice string) error {
 	return fmt.Errorf("nothing was said")
 }
 
+// attend puts somebody in the room the meeting is in. Whoever dies at a
+// sitdown came to it.
+func (w *World) attend(n *NPC) {
+	n.Location = SitdownGround
+	n.Heading, n.Arrives, n.Errand, n.Sets = "", 0, "", 0
+}
+
 // bloodbath is the evening going the way one side always intended. The player
 // is standing between them when it does.
 func (w *World) bloodbath(a, b *Faction) {
@@ -208,11 +215,20 @@ func (w *World) bloodbath(a, b *Faction) {
 		w.Antagonize(a.ID, b.ID, 25)
 	}
 	// Both sides lose people. Whoever planned it loses fewer.
+	//
+	// They are put in the room before they are killed in it. A casualty is
+	// drawn from anywhere in the organization, and the paper reports a death
+	// where the person was standing — so the city carried "At The Monarch:
+	// Ennio Zanetti was knifed in the crowd. A meeting between Bellandi Family
+	// and Russo Outfit went the way somebody had already decided", naming a
+	// room three streets from the one the player was sitting in.
 	if victim := w.casualty(b.ID); victim != nil {
+		w.attend(victim)
 		w.KillBy(victim.ID, nil, fmt.Sprintf("A meeting between %s and %s went the way somebody had already decided.", a.Name, b.Name))
 	}
 	if w.WorldRandom() < .5 {
 		if victim := w.casualty(a.ID); victim != nil {
+			w.attend(victim)
 			w.KillBy(victim.ID, nil, "The same room, the same evening.")
 		}
 	}

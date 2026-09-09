@@ -2685,3 +2685,64 @@ Evidence: `deposit`, `offshore_access`, `withdraw`, `launder`, `still`,
 `restock`, `inspect` and `dismantle` all driven through the API, the inheritance
 verified across a real death, twelve clean apicheck runs, `mise run verify` and
 `npm test` green.
+
+## The room nobody wanted to be in
+
+The sitdown is the last big system nothing had driven over HTTP, and the only
+thing in the game that can end a war without either side losing it. I forced a
+war, gave the player standing with both families, and drove all four choices and
+both kinds of evening.
+
+It works, and it is the best-designed thing in here. The scene tells you which
+evening you are in before you commit, if somebody warned you:
+
+```
+hostility 20  "Bellandi Family and Russo Outfit, in the same room, because you
+               asked. Nobody has said anything yet."
+hostility 90  "...One of them brought more people than the room needs, and Mara
+               caught your eye on the way in."
+```
+
+All four choices resolve differently and all four read well. Pressing a room
+that came to talk ends the war outright — `It is settled: they shook on it in
+front of you, which means it holds as long as you do` — and the conflict list
+came back empty. Pressing a room that did not:
+
+```
+It was never a meeting: Somebody stood up before anybody had finished a
+sentence. You went out through the kitchen with 45 less health than you came
+in with.
+```
+
+**One fault, and it took reading the line next to the one I was checking.** The
+paper carried this:
+
+```
+At The Monarch, late, with the city quiet: Ennio Zanetti was knifed in the
+crowd. A meeting between Bellandi Family and Russo Outfit went the way
+somebody had already decided.
+```
+
+The meeting was at Saint Agnes. Casualties are drawn from anywhere in the
+organization, and the city reports a death where the person was standing, so
+somebody killed at a sitdown was reported dying three streets away — in a room
+the player could see they were not in.
+
+Whoever dies at a sitdown came to it, so they are put in the room before they
+are killed in it. The killing description is chosen from the location too, so
+the fix corrected the prose as well:
+
+```
+At Saint Agnes, late, with the city quiet: Ennio Zanetti was held down over a
+table until the room emptied.
+```
+
+**The test refused to be vacuous twice.** My first version skipped when the room
+did not turn, which proves nothing, so it now asserts the fixture is a trap
+before it starts and fails if nobody dies. Then I broke the fix to check the
+test caught it, and it named the person and the wrong room.
+
+Evidence: all four choices and both evenings driven through the API, one
+property in `core/sitdown_test.go` proven to fail when the fix is removed,
+twelve clean apicheck runs, `mise run verify` and `npm test` green, `mise run
+simulate` unchanged at 52 / 0 / 82 / 0.
