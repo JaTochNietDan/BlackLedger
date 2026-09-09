@@ -75,7 +75,7 @@ func (w *World) story(s Story) map[string]any {
 		"kind": s.Kind, "minute": s.Minute, "subject": w.SubjectOf(s),
 		"standfirst": w.standfirst(s), "byline": deskFor(s.Kind), "dateline": Dateline(s.Minute),
 		"day": s.Minute/1440 + 1, "time": fmt.Sprintf("%02d:%02d", s.Minute%1440/60, s.Minute%60),
-		"weight": scrutinyWeight[s.Kind],
+		"weight": Newsworthiness(s.Kind),
 	}
 }
 
@@ -98,9 +98,13 @@ func (w *World) Edition() []map[string]any {
 // streets.
 //
 // Within an issue the lead is the biggest story of that day rather than the
-// latest, by the same weighting the city uses to decide how hard it is looking.
-// A shop changing hands does not lead over a killing because it happened at
-// four in the afternoon.
+// latest. A shop changing hands does not lead over a killing because it
+// happened at four in the afternoon.
+//
+// Ranked by Newsworthiness rather than by what a story costs in police
+// attention. Those were the same map, and it does not cover half the kinds the
+// paper files: an arrest, an attempt on somebody's life and a family splitting
+// all scored zero, so none of them could ever lead an edition.
 func (w *World) Editions() []map[string]any {
 	type issue struct {
 		day, life int
@@ -124,7 +128,7 @@ func (w *World) Editions() []map[string]any {
 		sorted := append([]Story{}, in.stories...)
 		for a := range sorted {
 			for b := a + 1; b < len(sorted); b++ {
-				if scrutinyWeight[sorted[b].Kind] > scrutinyWeight[sorted[a].Kind] {
+				if Newsworthiness(sorted[b].Kind) > Newsworthiness(sorted[a].Kind) {
 					sorted[a], sorted[b] = sorted[b], sorted[a]
 				}
 			}
