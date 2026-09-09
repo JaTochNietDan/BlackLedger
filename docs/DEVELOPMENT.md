@@ -4041,3 +4041,43 @@ the only person who matters.
 
 `mise run verify` and `npm test` green, `mise run simulate` unchanged at defiant
 52 / investor 0 / reckless 82 / worker 0, 0 errors.
+
+## A card that drops a column rather than admitting it does not know
+
+Second reading of the Families screen. Each card lays out four figures —
+strength, money, people, ground — and two of the five had three. The People cell
+was simply not there.
+
+Strength and money already degrade properly. With nobody inside a family they
+read "not much"; with nobody to ask at all they read "nobody will say". People
+did not degrade, it vanished, so the same ignorance was expressed two different
+ways on one card and the reader saw a table whose columns change from row to
+row. It also could not tell two things apart: a family the player knows well
+that has nobody left looked exactly like a family they know nothing about.
+
+The people figure now behaves like the other two. Nobody to ask reads "nobody
+will say", an impression reads "a handful", "a fair few" or "a great many", and
+somebody inside gives the count — including "nobody left" when that is the count.
+
+A crowd gets its own words rather than borrowing the money scale. My first
+version reused `roughly`, and eight people came out as "as much as anybody",
+which is a strange thing to say about eight people.
+
+Fifteenth near-miss, and this one nearly reached the write-up. I read the
+screen, saw two cards missing the People column, checked the API and found
+`people` absent for exactly those two, and concluded those families had nobody
+left. They had eight and two. The field is omitted below the knowledge level
+that reveals it, and the count was never zero. The fix is the same either way —
+a column that disappears is the fault — but the reason I would have published
+was wrong.
+
+Also checked on that screen and correct, so it is not chased again: every
+declared quarrel is reciprocated. Bellandi lists four, and each of the four
+lists Bellandi back, with "at war" and "at odds" matching on both sides.
+
+Evidence: `core/families_card_test.go` states that every card carries a people
+figure at every knowledge level, that a family with nobody left does not read
+like a family nobody will discuss, and that the crowd words are not the money
+words. All fail when the change is reverted. Read on screen against a save
+driven to day 32. `mise run verify` and `npm test` green, `mise run simulate`
+unchanged at defiant 52 / investor 0 / reckless 82 / worker 0, 0 errors.

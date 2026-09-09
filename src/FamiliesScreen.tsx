@@ -31,7 +31,7 @@ export function FamiliesScreen({world, onMeet}: {world: Snapshot; onMeet: (id: s
       <div className="family-facts">
         <div><span>Strength</span><b>{f.strength}</b></div>
         <div><span>Money</span><b>{f.money}</b></div>
-        {!!f.people && <div><span>People</span><b>{f.people}</b></div>}
+        <div><span>People</span><b>{f.hands}</b></div>
         <div><span>Ground</span><b>{f.holdings?.length || 0}</b></div>
       </div>
 

@@ -83,6 +83,21 @@ func (w *World) AskAround(id string) error {
 
 // roughly describes a number the way somebody passing it on would, which is
 // what the player gets before they know anybody worth knowing.
+// handful describes a headcount without counting it. roughly's words are made
+// for money and strength — "as much as anybody" is a strange thing to say about
+// eight people — so the impression of a crowd gets its own.
+func handful(n int) string {
+	switch {
+	case n == 0:
+		return "nobody worth naming"
+	case n < 4:
+		return "a handful"
+	case n < 8:
+		return "a fair few"
+	}
+	return "a great many"
+}
+
 func roughly(n int) string {
 	switch {
 	case n < 25:
@@ -111,6 +126,11 @@ type PublicFaction struct {
 	Cash     int    `json:"cash"`
 	Strength string `json:"strength"`
 	Money    string `json:"money"`
+	// Hands is the people figure said the way strength and money are said. It
+	// used to be only the number, dropped when it was zero, so a card lost a
+	// column rather than admitting it did not know — and a family with nobody
+	// left read exactly like a family nobody would talk about.
+	Hands string `json:"hands"`
 	// Knowledge is how much of this is worth trusting, from nothing to
 	// everything, so the interface can say so.
 	Knowledge int `json:"knowledge"`
@@ -195,8 +215,16 @@ func (w *World) PublicFactions() []PublicFaction {
 		}
 		// How many people answer to them is a thing you need somebody inside
 		// to count, but that there is a quarrel at all is public.
+		entry.Hands = "nobody will say"
+		if level >= 1 {
+			entry.Hands = handful(len(w.Members(f.ID)))
+		}
 		if level >= 2 {
 			entry.People = len(w.Members(f.ID))
+			entry.Hands = counted(entry.People, "person", "people")
+			if entry.People == 0 {
+				entry.Hands = "nobody left"
+			}
 		}
 		for _, c := range w.Conflicts {
 			if c.State != "war" && c.State != "feud" {
