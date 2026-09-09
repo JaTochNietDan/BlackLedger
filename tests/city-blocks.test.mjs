@@ -10,7 +10,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {roomLight} from '../.runtime/frontend-test/roomart.js';
-import {BLOCK, PAVE, ROAD, addressSlot, awnings, goldenness, island, nightness, rails, sleepers, terrace, trolleyAvenue, TROLLEY_GAUGE, vents} from '../.runtime/frontend-test/iso.js';
+import {BLOCK, PAVE, ROAD, addressSlot, awnings, goldenness, island, nightness, rails, reach, ReachCeiling, sleepers, terrace, trolleyAvenue, TROLLEY_GAUGE, vents} from '../.runtime/frontend-test/iso.js';
 
 const SLOTS = 2;                 // must match CityIso.tsx
 
@@ -198,4 +198,37 @@ test('the room takes its light from the same clock as the city', () => {
   assert.ok(dawn.gold > .95 && dawn.dark > 0, 'dawn is not a warm half-light');
   assert.ok(dawn.wash.includes('196,124,58'), 'no low sun comes through the window at dawn');
   assert.ok(!noon.wash.includes('196,124,58'), 'the noon room has a sunset in it');
+});
+
+// No moment may cover more of the city than the block it happens on.
+//
+// The explosion was drawn at 2.6 times the width of its own plot for months.
+// That was survivable when the city was three rows of cards and absurd once it
+// became a grid: a building going up put a fireball over four blocks and the
+// neighbours' roofs, and a moment that covers everything stops telling the
+// player where to look. Nobody saw it until it was held still.
+test('a moment never covers more than the block it happens on', () => {
+  for (const kind of ['explosion', 'killing', 'gunfight', 'raid', 'arrest',
+                      'seizure', 'attack', 'robbery']) {
+    let widest = 0, when = 0;
+    for (let i = 0; i <= 100; i++) {
+      const t = i / 100;
+      const r = reach(kind, t);
+      assert.ok(r >= 0, `${kind} reaches backwards at t=${t}`);
+      if (r > widest) { widest = r; when = t }
+    }
+    assert.ok(widest <= ReachCeiling,
+      `${kind} reaches ${widest.toFixed(2)} of a block at t=${when.toFixed(2)}, past the ${ReachCeiling} ceiling`);
+    assert.ok(widest > .05, `${kind} is too small to see at any point (${widest.toFixed(3)})`);
+  }
+});
+
+test('an explosion is the biggest thing that happens and a shot is the smallest', () => {
+  const peak = kind => Math.max(...Array.from({length: 101}, (_, i) => reach(kind, i / 100)));
+  assert.ok(peak('explosion') > peak('raid'), 'a raid covers more ground than an explosion');
+  assert.ok(peak('raid') > peak('killing'), 'a muzzle flash covers more ground than a police lamp');
+  // And it opens and shuts rather than staying open: a moment that never
+  // shrinks is a stain on the map, not a moment.
+  assert.ok(reach('explosion', 1) < reach('explosion', .28),
+    'the explosion never comes back down');
 });

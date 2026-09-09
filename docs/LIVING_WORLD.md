@@ -109,5 +109,4 @@ it is still in this list, it does not exist in the game yet.
 *Empty. Everything that was here has been built and is written up in
 `docs/DEVELOPMENT.md`.*
 
-
 Ultiamtely the expectation is that I don't have to think of all of these concepts, you, the agent will think of these too and build them out and playtest and simulate them yourself.

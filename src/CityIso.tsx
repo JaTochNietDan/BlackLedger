@@ -2,7 +2,7 @@ import {useEffect, useRef} from 'react';
 import {Application, Assets, Container, Graphics, Matrix, Sprite, Text, Texture, TextStyle} from 'pixi.js';
 import {Viewport} from 'pixi-viewport';
 import type {Snapshot} from './types';
-import {addressSlot, along, awnings, blockFor, BLOCK, bounds, carriageways, distance, dressing, faces, goldenness, grid, island, kerbside, lampPosts, markings, middle, mix, nightness, PAVE, plot, project, ROAD, size, rails, sleepers, terrace, TILE, trolleyAvenue, TROLLEY_GAUGE, vents, walk, wires} from './iso';
+import {addressSlot, along, awnings, blockFor, BLOCK, bounds, carriageways, distance, dressing, faces, goldenness, grid, island, kerbside, lampPosts, liftOf, markings, middle, mix, nightness, PAVE, plot, project, reach, ROAD, size, rails, sleepers, terrace, TILE, trolleyAvenue, TROLLEY_GAUGE, vents, walk, wires} from './iso';
 import type {Cell, Vec} from './iso';
 import cutouts from '../public/art/iso/isometric.json';
 import type {Spotlight} from './CityStreet';
@@ -92,6 +92,11 @@ const FILL = [...painted.keys()].filter(id => id.startsWith('fill-')).sort();
 const CORNERS = [...painted.keys()].filter(id => id.startsWith('row-')).sort();
 const textures = new Map<string, Texture>();
 const ground = new Map<string, Texture>();
+
+// How many buildings stand along one frontage. Module level because the moment
+// layer has to place a moment on the same ground the building was drawn on, and
+// the two disagreeing is exactly the bug this is here to stop.
+const SLOTS = 2;
 
 // How far the camera may be pushed. Past these the city either fills the screen
 // with one roof or shrinks into the middle of an empty field.
@@ -238,7 +243,7 @@ function moment(kind: string, t: number, across: number): Graphics {
   const ease = 1 - t;
   switch (kind) {
     case 'explosion': {
-      const r = t < .28 ? t * across * 2.6 : across * .73 - (t - .28) * across * .5;
+      const r = reach('explosion', t) / 1.55 * across;
       if (r > 0) {
         g.circle(0, 0, r).fill({color: 0xffcf7a, alpha: Math.max(0, .8 - t)});
         g.circle(0, 0, r * 1.55).fill({color: 0xc4531f, alpha: Math.max(0, .35 - t * .45)});
@@ -247,7 +252,7 @@ function moment(kind: string, t: number, across: number): Graphics {
         // Debris thrown out and falling: the only moment with anything solid
         // in it, because an explosion without pieces is a lamp.
         for (let i = 0; i < 11; i++) {
-          const a = i * 2.1, fly = (t - .3) * across * 1.5;
+          const a = i * 2.1, fly = (t - .3) * across * .62;
           g.rect(Math.cos(a) * fly, Math.sin(a) * fly * .55 + (t - .3) * (t - .3) * 260, 5, 4)
             .fill({color: 0x14100d, alpha: ease});
         }
@@ -257,20 +262,29 @@ function moment(kind: string, t: number, across: number): Graphics {
     case 'killing':
     case 'gunfight': {
       // Muzzle flashes, a few, close together, then nothing.
+      // Held still in the workshop, the old flash turned out to be a three
+      // pixel dot at sixteen per cent alpha: it was drawing correctly and was
+      // simply too small to see, which is the same as not existing. A shot at
+      // this distance is a hard white point and a wash of light on the wall
+      // behind it.
       if (t < .5 && Math.floor(t * 16) % 2 === 0) {
-        const n = Math.floor(t * 16), x = (n % 3 - 1) * across * .12;
-        g.circle(x, 0, across * .035).fill({color: 0xffe6a8, alpha: .95});
-        g.circle(x, 0, across * .2).fill({color: 0xffe6a8, alpha: .16});
+        const n = Math.floor(t * 16), x = (n % 3 - 1) * across * .09;
+        g.circle(x, 0, reach(kind, t) * across).fill({color: 0xffe6a8, alpha: .3});
+        g.circle(x, 0, across * .075).fill({color: 0xfff3d2, alpha: .95});
+        g.circle(x, 0, across * .028).fill({color: 0xffffff, alpha: 1});
       }
       break;
     }
     case 'raid':
     case 'arrest': {
       // A lamp turning over on a car at the kerb, sweeping the front.
-      const swing = Math.sin(t * 26) * across * .3;
-      g.poly([0, 0, swing + across * .34, across * .3, swing - across * .1, across * .3])
-        .fill({color: 0xe0705c, alpha: .22});
-      g.circle(0, 0, across * .05).fill({color: 0xe0705c, alpha: .55 + Math.sin(t * 26) * .35});
+      // Same lesson as the muzzle flash: these were tuned when a plot was three
+      // times the size it is now, so what was a lamp became a speck.
+      const swing = Math.sin(t * 26) * across * .2;
+      g.poly([0, 0, swing + across * .26, across * .3, swing - across * .08, across * .3])
+        .fill({color: 0xe0705c, alpha: .34});
+      g.circle(0, 0, reach(kind, t) * across * .5).fill({color: 0xe0705c, alpha: .2});
+      g.circle(0, 0, across * .085).fill({color: 0xf3a08c, alpha: .5 + Math.sin(t * 26) * .3});
       break;
     }
     case 'seizure':
@@ -279,8 +293,9 @@ function moment(kind: string, t: number, across: number): Graphics {
     default: {
       // Something happened here: a hard ring that opens once and fades, which
       // is enough for a robbery and not so much that it reads as a fire.
-      const r = across * (.18 + t * .5);
-      g.circle(0, 0, r).stroke({width: 3, color: 0xd6b77c, alpha: Math.max(0, .7 - t)});
+      const r = reach(kind, t) * across;
+      g.circle(0, 0, r).stroke({width: 4, color: 0xd6b77c, alpha: Math.max(0, .85 - t)});
+      g.circle(0, 0, r * .55).fill({color: 0xd6b77c, alpha: Math.max(0, .16 - t * .16)});
       break;
     }
   }
@@ -434,15 +449,22 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight,
     const place = state.locations.find(l => l.id === spotlight.id);
     if (!place) return;
     const cell = grid(state.locations).get(place.id) || {col: 0, row: 0};
-    const ground = plot(cell);
-    const across = (ground.w + ground.d) * (TILE.w / 2);
-    const centre = project(middle(cell));
+    // The building's own slot, not the middle of its block. An address stands
+    // on the front-left slot of a terrace, so a moment drawn at the block's
+    // centre happened half a block behind the building it was meant to be
+    // happening at — visible the moment it was held still.
+    const slot = terrace(cell, SLOTS)[addressSlot(SLOTS)];
+    const across = (slot.w + slot.d) * (TILE.w / 2);
+    const centre = project({x: slot.at.x + slot.w / 2, y: slot.at.y + slot.d / 2});
     const art = textures.get(place.id);
-    // Over the roof when the building is painted, over the middle of the plot
-    // when it is still a blocked-out solid.
-    const up = art ? (art.height * (across / art.width)) * .62 : 60;
+    // Where up the building it happens. Everything used to be drawn above the
+    // roof, which is right for an explosion and wrong for every other moment in
+    // the game: a man shot on the pavement was being played in the air over the
+    // chimney, and with a tall building in the frame the moment left the
+    // building altogether.
+    const tall = art ? art.height * (across / art.width) : 90;
     const g = moment(spotlight.kind, spotlight.t, across);
-    g.position.set(centre.x, centre.y - (up || 60));
+    g.position.set(centre.x, centre.y - tall * liftOf(spotlight.kind));
     above.addChild(g);
   }, [spotlight?.id, spotlight?.kind, spotlight?.t]);
 
@@ -745,7 +767,6 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight,
     // terrace: the address takes one frontage slot and ordinary buildings take
     // the rest, shoulder to shoulder, so the city is built up rather than
     // twelve models in twelve fields.
-    const SLOTS = 2;
     const filler = new Container();
     const rows: {cell: Cell; slot: ReturnType<typeof terrace>[number]; index: number; depth: number}[] = [];
     const addressAt = new Map<string, string>();      // "col,row,index" -> id

@@ -699,3 +699,72 @@ export function sleepers(size: {cols: number; rows: number}): Segment[] {
   }
   return out;
 }
+
+// ---------------------------------------------------------------------------
+// How big a moment is.
+//
+// The drawing of a moment lives in the view, but how far it reaches across the
+// city is geometry, and geometry is checkable. It is here so it can be.
+//
+// This was got badly wrong once and nobody saw it for months: the explosion was
+// drawn at 2.6 times the width of the plot it happened on, which was survivable
+// when the city was three rows of cards and absurd once it became a real grid —
+// a building going up put a fireball across four blocks and the neighbours'
+// roofs. It was only found by holding the moment still in the workshop, because
+// four seconds is not long enough to see what a thing is actually doing.
+
+// reach is how far a moment extends from the point it happens, as a multiple of
+// the plot it happens on, at the instant t of its playing.
+//
+// The numbers also have to keep their order: an explosion is the loudest thing
+// that happens in this game and a shot is the quietest, so a first retune that
+// left a police lamp covering more ground than a building going up was wrong in
+// a way the ceiling alone would not have caught. The test holds the order.
+export function reach(kind: string, t: number): number {
+  switch (kind) {
+    case 'explosion': {
+      // Out fast, then falling back. The outer bloom is the widest part of any
+      // moment in the game, so it is what the ceiling below is measured against.
+      const core = t < .28 ? t * 1.3 : .364 - (t - .28) * .34;
+      return Math.max(0, core * 1.55);
+    }
+    case 'killing':
+    case 'gunfight':
+      return .2;                       // a muzzle flash and its halo
+    case 'raid':
+    case 'arrest':
+      return .34;                      // a lamp sweeping the front of a building
+    default:
+      return .18 + t * .34;            // a ring that opens once
+  }
+}
+
+// ReachCeiling is the most any moment may cover. A moment wider than the block
+// it happens on stops saying "here" and starts saying "everywhere", and the
+// whole point of a moment is that the player knows where to look.
+export const ReachCeiling = .6;
+
+
+// How far up a building a moment happens.
+//
+// Everything was drawn above the roof, which is where an explosion belongs and
+// nowhere else. A man shot on the pavement, a police lamp sweeping a doorway
+// and a robbery at a till were all being played in the air over the chimney,
+// and with a tall building in the frame the moment left the building entirely.
+//
+// Returned as a fraction of the building's own height, so a four storey
+// tenement and a two storey shop both get it in the right place.
+export function liftOf(kind: string): number {
+  switch (kind) {
+    case 'explosion':
+      return .55;                      // inside it, about halfway up
+    case 'killing':
+    case 'gunfight':
+      return .1;                       // street level, where people are shot
+    case 'raid':
+    case 'arrest':
+      return .14;                      // a lamp on a car at the kerb
+    default:
+      return .08;                      // a door, a till, a pair of hands
+  }
+}
