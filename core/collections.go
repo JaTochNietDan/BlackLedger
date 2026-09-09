@@ -45,7 +45,7 @@ func (w *World) SendOnCollections() {
 	place, _ := PlaceByID(round)
 	// Where he was standing, so the round can send him back to it.
 	home := n.Location
-	w.Tasks = append(w.Tasks, Task{ID(), "Leo · collections", w.Minute + CollectionMinutes})
+	w.Tasks = append(w.Tasks, Task{ID(), n.Name + " · collections", w.Minute + CollectionMinutes})
 	w.Homes = append(w.Homes, TaskHome{Task: w.Tasks[len(w.Tasks)-1].ID, Person: n.ID, Where: home})
 	if round == n.Location {
 		w.Log(n.Name+" starts the round", fmt.Sprintf("They are already at %s. Two hours of doors.", place.Name), "work")
@@ -83,7 +83,7 @@ func (w *World) sendHome(task string) {
 		w.Homes = append(w.Homes[:i], w.Homes[i+1:]...)
 		n := w.NPC(home.Person)
 		if n == nil || n.Dead || home.Where == "" {
-			w.Log("Leo returns", fmt.Sprintf("$%d from collections. They are available again.", CollectionPay), "business")
+			w.Log("The round is finished", fmt.Sprintf("$%d from collections.", CollectionPay), "business")
 			return
 		}
 		if n.Location == home.Where || w.Travelling(n) {
@@ -98,7 +98,7 @@ func (w *World) sendHome(task string) {
 		w.Log(n.Name+" starts back", fmt.Sprintf("$%d from collections, and %d minutes back to %s.", CollectionPay, n.Arrives-w.Minute, place.Name), "business")
 		return
 	}
-	w.Log("Leo returns", fmt.Sprintf("$%d from collections. They are available again.", CollectionPay), "business")
+	w.Log("The round is finished", fmt.Sprintf("$%d from collections.", CollectionPay), "business")
 }
 
 const (

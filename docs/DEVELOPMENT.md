@@ -3558,3 +3558,58 @@ premises it hits — "Move against Russo Outfit yourself" beside "Send Leo Carve
 against Russo Motor Works" — so a player cannot tell from the labels whether the
 two do the same thing. Both are worth settling, and settling them is a choice
 about what these actions are, not a correction.
+
+## One crew, one name, and a button that said it sent somebody it did not
+
+Reading the last six rooms side by side — market, laundry, herald, apartment,
+room, estate — turned up two things in a single room, and one of them corrected
+a fix I had just made.
+
+**The crew was two people.** On a driven save the market showed "Send Bela Havel
+for the till", "Send Bela Havel after Elena Russo" and "Send Bela Havel against
+Mercer Exchange", and directly beside them "Send Leo on collections", "Pay Leo a
+bonus", and a refusal reading "Leo refuses assignments below 30 loyalty". Bela
+Havel was the crew. Leo Carver was a name written into the strings. Three
+buttons in that block ask the city through `CrewHands`, and one line of the
+collections description already reads `n.Name`; four others did not. Fixing the
+hire to take whoever actually drives is what made this visible — before that,
+the crew was always Leo, so the hardcoding never showed. Three more sites
+carried it: the task list read "Leo · collections", and two ledger entries read
+"Leo returns". Those two only fire when the person is gone, so they now say "The
+round is finished" rather than naming somebody who is not there. The opening
+opportunity named Leo too, and now names whoever drives.
+
+**A button said it sent somebody it did not, and my first correction was also
+wrong.** `sabotage` was labelled "Move against Bellandi Family yourself" and
+described as "Send your crew against The Monarch" — the other button. I read the
+label, the "a failed attempt injures you" clause, and `Sabotage` calling
+`SabotageBy` with `OwnHands`, concluded the player goes alone, and rewrote the
+description to say so. That was wrong. `SabotageReadiness` requires a crew on
+both halves and refuses on their loyalty on both, `sabotageChance` reads that
+loyalty on both, and the failure text settles it: this half says "You and Leo
+left without reaching anything" while the other says the crew "went in without
+you". The player never goes alone. The difference is whether they go at all. The
+description now reads "Go in with your crew", and the test I wrote had to be
+narrowed with it — forbidding "your crew" in the self description would have
+been forbidding the truth.
+
+The pair also now names the same target on both halves. Robbery and mugging each
+name one subject on both sides — the till, the person — so the player reads them
+as one choice about who carries it out. Sabotage named the family on one and the
+premises on the other, which reads as two different acts. Both name the premises
+now; the family is still in the description, where the other two pairs keep the
+same kind of detail.
+
+Evidence: `core/own_hands_test.go` holds three properties. Fifteen self-and-crew
+pairs are checked across the whole city and only sabotage failed; both halves
+must name the same target; and one crew must be called by one name. All three
+failed before the fixes with the exact strings above, and re-breaking the code
+fails them again. Verified over HTTP on the save that showed the fault: with
+Bela Havel in the crew, the room reads "Send Bela Havel on collections", "Pay
+Bela Havel a bonus", and "Bela Havel refuses assignments below 30 loyalty".
+`mise run verify` and `npm test` green, `mise run simulate` unchanged at defiant
+52 / investor 0 / reckless 82 / worker 0, 0 errors.
+
+Thirteenth near-miss, and the first where I nearly published a wrong correction
+rather than a wrong fault. Reading a label and an effect signature was not
+enough; the failure text was where the truth was.

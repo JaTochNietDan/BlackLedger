@@ -995,8 +995,14 @@ func (w *World) Actions(id string) []Action {
 			add("sabotage:crew", "Send "+hand.Name+" against "+l.Name, 90, 0, reason,
 				fmt.Sprintf("The same damage to %s and worse odds. %d less attention on you and a fifth of the standing. Turned away, they take the beating and %d loyalty, and sometimes they do not come back.", f.Name, HandHeatRelief, HandLoyaltyCost))
 		}
-		add("sabotage", "Move against "+f.Name+" yourself", 90, 0, w.SabotageReadiness(id),
-			fmt.Sprintf("Send your crew against %s. Damages the property, weakens %s and costs you standing with them. They will retaliate, and a failed attempt injures you.", l.Name, f.Name))
+		// The difference between these two buttons is whether you are there,
+		// not whether the crew is: SabotageReadiness requires a crew either
+		// way, the odds read their loyalty either way, and the failure text
+		// says "You and Leo left without reaching anything" here against
+		// "went in without you" beside it. The description said "Send your
+		// crew", which is the other button.
+		add("sabotage", "Move against "+l.Name+" yourself", 90, 0, w.SabotageReadiness(id),
+			fmt.Sprintf("Go in with your crew against %s. Damages the property, weakens %s and costs you standing with them. They will retaliate, and a failed attempt injures you.", l.Name, f.Name))
 		if rival := w.Rival(f.ID); rival != nil {
 			add("incite", "Point "+f.Name+" at "+rival.Name, 45, 25, w.InciteReadiness(id),
 				fmt.Sprintf("Spend $25 on the right conversations so %s believes %s moved against them. Hardens their quarrel and can start a war you are not part of. A story that does not hold up costs you standing with %s.", f.Name, rival.Name, f.Name))
@@ -1228,9 +1234,16 @@ func (w *World) Actions(id string) []Action {
 		}
 	}
 	if len(p.Crew) > 0 {
-		reason := need(p.Crew[0].Loyalty < 30, "Leo refuses assignments below 30 loyalty. Pay a bonus to rebuild trust.")
+		// Whoever is actually on the books. Three buttons in this same block
+		// named them by asking — rob:crew, mug:crew and sabotage:crew all use
+		// CrewHands, and the collections description below already reads
+		// n.Name — while these four had "Leo" written into the string. Once
+		// hiring started naming whoever drives, one room called one crew Bela
+		// Havel three times and Leo three times.
+		hand := p.Crew[0].Name
+		reason := need(p.Crew[0].Loyalty < 30, hand+" refuses assignments below 30 loyalty. Pay a bonus to rebuild trust.")
 		if len(w.Tasks) > 0 {
-			reason = "Leo is already on assignment"
+			reason = hand + " is already on assignment"
 		}
 		round := w.CollectionRound()
 		roundPlace, _ := PlaceByID(round)
@@ -1239,9 +1252,9 @@ func (w *World) Actions(id string) []Action {
 			collecting = fmt.Sprintf("%s walks to %s — %d minutes — and is not here while they are doing it. Two hours of doors: $%d. Requires 30 loyalty.",
 				n.Name, roundPlace.Name, TravelMinutes(n.Location, round), CollectionPay)
 		}
-		add("delegate", "Send Leo on collections", 15, 0, reason, collecting)
+		add("delegate", "Send "+hand+" on collections", 15, 0, reason, collecting)
 		about(p.Crew[0].ID)
-		add("crew_bonus", "Pay Leo a bonus", 15, 40, need(p.Crew[0].Loyalty >= 100, "Loyalty is already at its maximum"), "Restore up to 25 loyalty. Below 30 they refuse collections; at 50 they can help protect businesses when available.")
+		add("crew_bonus", "Pay "+hand+" a bonus", 15, 40, need(p.Crew[0].Loyalty >= 100, "Loyalty is already at its maximum"), "Restore up to 25 loyalty. Below 30 they refuse collections; at 50 they can help protect businesses when available.")
 		about(p.Crew[0].ID)
 	}
 	if offer, ok := w.AvailableCommission(id); ok {
