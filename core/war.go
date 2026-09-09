@@ -156,11 +156,11 @@ func (w *World) contestAt(attacker, defender *Faction, weakest string) {
 	damage := min(prop.Condition, 20+int(w.WorldRandom()*25))
 	prop.Condition -= damage
 	defender.Power = max(10, defender.Power-max(2, damage/5))
-	defender.Cash = max(0, defender.Cash-damage*15)
+	defender.Cash = max(0, defender.Cash-damage*RaidTakes)
 	// The player's organization is the player: money taken off it comes out of
 	// their pocket, not out of a number that is rewritten every morning.
 	if defender.ID == w.PlayerOrganizationID() {
-		w.Player.Cash = max(0, w.Player.Cash-damage*15)
+		w.Player.Cash = max(0, w.Player.Cash-damage*RaidTakes)
 		w.ShiftCustom(weakest, "Somebody came through the front of it", -6)
 	}
 	// A raid reaches people, not only premises.
@@ -503,3 +503,12 @@ func (w *World) howItEnded(a, b *Faction) string {
 	}
 	return fmt.Sprintf("%s and %s have stopped short of destroying each other. Both are smaller than they were, and both are still here.", Leads(a.Name), b.Name)
 }
+
+// RaidTakes is what a point of damage to a building costs whoever owns it, in
+// money. One number, because the game tells the player "everything anybody in
+// this city does is done by the same rules you use — there is no separate
+// arithmetic for them", and this was two: an attack by the player took twenty
+// a point off the family that owned the place, and a family's raid took
+// fifteen. Measured over four hundred attacks each, that was $689 against $483,
+// thirty percent apart and in the player's favour.
+const RaidTakes = 15

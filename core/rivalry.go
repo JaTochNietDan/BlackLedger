@@ -178,7 +178,7 @@ func (w *World) SabotageBy(id string, hand Hand) error {
 	prop.Condition -= damage
 	lostPower := max(2, damage/5)
 	f.Power = max(10, f.Power-lostPower)
-	f.Cash = max(0, f.Cash-damage*20)
+	f.Cash = max(0, f.Cash-damage*RaidTakes)
 	f.Goodwill = max(-100, f.Goodwill-30)
 	w.Player.Respect += w.HandRespectFor(hand, 4)
 	// Harm done to somebody's enemy is work done for them.

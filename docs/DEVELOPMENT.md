@@ -4272,3 +4272,50 @@ street rule move. `mise run verify` and `npm test` green (34 tests), `mise run
 simulate` unchanged at defiant 52 / investor 0 / reckless 82 / worker 0, 0
 errors. Verified over HTTP on a driven save: the three trips report 2,880, 4,320
 and 5,760 minutes away where they used to report nothing.
+
+## The player was taking a third more than anybody else
+
+Fourth of the six rules the game prints about itself: "Everything anybody in
+this city does is done by the same rules you use. There is no separate
+arithmetic for them."
+
+The randomness is deliberately two streams, one reserved for events the player
+is not party to so that families quarrelling off-screen cannot shift the odds of
+a decision being made. That is separate randomness for a stated reason, and it
+is right. The arithmetic is a different question, and it was two functions: a
+family moving on a rival runs `contestAt`, the player moving on the same
+premises runs `SabotageBy`.
+
+Measured over four hundred attacks each, on identical premises:
+
+| what an attack costs | by the player | by a family |
+| --- | --- | --- |
+| condition off the building | 34.6 | 32.6 |
+| money off the family | $689 | $483 |
+
+Six percent apart on the damage, which is two similar formulas drawing similar
+numbers. Thirty percent apart on the money, because they used different
+constants — twenty a point when the player did it, fifteen when anybody else
+did. The player was taking a third more out of a family than the city could take
+out of anybody, which is exactly the privilege the rule says does not exist.
+
+One constant now, named, at the city's figure rather than the player's. The
+money figures are 6% apart, which is the damage difference and nothing else.
+
+The balance did not move. `mise run simulate` is unchanged at defiant 52 /
+investor 0 / reckless 82 / worker 0, 0 errors, and the long horizon over eighty
+campaigns is identical on every measure: 112 wars started, 74 elsewhere, 52
+holdings changed hands, 39 families created, 21 destroyed, 268 hurt in somebody
+else's war. That is what should happen — the constant governs what the player's
+own sabotage takes, and the simulated strategies rarely reach for it.
+
+Evidence: `core/same_arithmetic_test.go` measures both and fails when either
+constant is put back — restoring the twenty reproduces "30% apart" exactly.
+
+A flaw in my own check, recorded because it is the kind that hides: the first
+version of the comparison found the larger of the two figures inside an `else`,
+so it was skipped whenever the family's figure was the larger. It could only
+fail in one direction, and it happened to be the direction that was green.
+Breaking it again does not fail now, because with the fix in place both figures
+are close either way — so the flaw is latent rather than visible, and the
+arithmetic is tested directly instead of pretending otherwise.
