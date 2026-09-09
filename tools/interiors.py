@@ -46,6 +46,8 @@ ROOMS = {
     "steamworks": "a commercial laundry floor, rows of washing machines and mangles, steam, drying racks on rails",
     "burlesque": "a revue bar interior, a small stage with a curtain, round tables, bar along one wall, footlights",
     "cabstand": "a taxi dispatch office, a wall of hooks and route cards, a radio set on the counter, cabs through the window",
+    "dealer": "a car showroom interior, two cars on a polished floor, a salesman's desk, wide window onto the forecourt",
+    "archway": "a repair shop inside a brick railway arch, an inspection pit, tools on the wall, a car up on blocks",
     "poolhall": "a billiard hall, three tables under low hanging lamps, cue racks on the wall, a payphone in the corner",
     "butcher": "a butcher shop interior, marble counter, hooks and rails, a heavy cold room door at the back",
     "haulage": "a haulage yard office, a wall of route boards and keys, a counter, trucks visible through the window",

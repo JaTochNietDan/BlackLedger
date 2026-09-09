@@ -169,9 +169,28 @@ func (w *World) CarDay() {
 	w.Damage(CarWear)
 }
 
-// CarSource is where cars change hands: a motor works, which is the one place
-// in this city that has any.
-func CarSource(id string) bool { return id == "garage" }
+// CarSource is where cars change hands: a forecourt. It used to be the motor
+// works, and the comment above it said "the one place in this city that has
+// any" — which was true of a city with one garage and nowhere to buy a car.
+// A garage repairs what you already have; a dealer is where it came from.
+func CarSource(id string) bool {
+	place, ok := PlaceByID(id)
+	return ok && place.Kind == "dealer"
+}
+
+// CarWorkshop is where a car is worked on: a garage. This used to be CarSource,
+// the same function that answered where cars were SOLD — one question doing two
+// jobs, which nobody noticed while the answer to both was "the garage". Moving
+// sales to a forecourt moved servicing with it, and a motor works could no
+// longer touch a car.
+func CarWorkshop(id string) bool {
+	place, ok := PlaceByID(id)
+	return ok && place.Kind == "garage"
+}
+
+// DealerMargin is the share of a car's price that stays with the forecourt
+// rather than going wherever cars come from. It is what a lot is worth holding.
+const DealerMargin = 25
 
 // CarReadiness explains why the next car cannot be bought, or returns "".
 func (w *World) CarReadiness() string {
@@ -195,8 +214,22 @@ func (w *World) BuyVehicle() error {
 		return fmt.Errorf("%s", reason)
 	}
 	next, _ := nextVehicle(w.Player.Car)
-	if err := w.Pay(next.Cost); err != nil {
+	// A car is sold by somebody. The forecourt keeps its margin, and if the
+	// player holds the lot they are buying from themselves — the margin never
+	// leaves their pocket, so the car costs them less.
+	lot := w.Properties[w.Player.Location]
+	margin := next.Cost * DealerMargin / 100
+	price := next.Cost
+	if w.Own(w.Player.Location) {
+		price -= margin
+	}
+	if err := w.Pay(price); err != nil {
 		return err
+	}
+	if lot != nil && !w.Own(w.Player.Location) {
+		if house := w.faction(lot.Owner); house != nil {
+			house.Cash += margin
+		}
 	}
 	w.Player.Car, w.Player.CarWear = next.Tier, 100
 	w.Log("Off the lot at Russo Motor Works", fmt.Sprintf("%s, $%d. $%d a day to keep on the road. %s", next.Label, next.Cost, w.CarUpkeep(), next.Detail), "personal")
@@ -205,7 +238,7 @@ func (w *World) BuyVehicle() error {
 
 // ServiceReadiness explains why a car cannot be worked on, or returns "".
 func (w *World) ServiceReadiness(id string) string {
-	if !CarSource(id) {
+	if !CarWorkshop(id) {
 		return "Nobody works on cars here"
 	}
 	if w.Player.Car == 0 {

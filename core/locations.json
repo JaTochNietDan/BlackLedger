@@ -209,5 +209,27 @@
   "y": 613,
   "cost": 540,
   "blurb": "Eleven cars and a dispatcher who knows where everybody went. A cab is a business and it is also a pair of eyes."
+ },
+ {
+  "id": "dealer",
+  "name": "Ferris Motor Sales",
+  "type": "work",
+  "kind": "dealer",
+  "district": 1,
+  "x": 130,
+  "y": 95,
+  "cost": 880,
+  "blurb": "A lot with a dozen cars on it and a man who knows what everybody in this city drives. Every car in Bellwether came off somebody's forecourt."
+ },
+ {
+  "id": "archway",
+  "name": "Archway Motor Repairs",
+  "type": "racket",
+  "kind": "garage",
+  "district": 2,
+  "x": 130,
+  "y": 786,
+  "cost": 390,
+  "blurb": "A second yard, under the viaduct, where nobody asks what came in on the back of the truck."
  }
 ]

@@ -5314,3 +5314,44 @@ counts as owning a casino, and breaking `OwnsKind` fails that immediately.
 
 Evidence: `core/hides_test.go`, two breaks verified and one honestly reported as
 unprovable until the city has a second garage.
+
+## Cars come from somewhere now
+
+From the inbox: a dealership the player and the city both buy from, so the city
+links to itself. A car came from nowhere. The player pressed a button at the
+motor works, the money left their pocket, and a car existed. Nobody sold it and
+nobody was paid for it.
+
+There is a forecourt now, and a second motor works under the viaduct. Buying a
+car happens at the forecourt, and a quarter of the price stays with whoever
+holds it: a family that owns the lot takes $155 on a sale, and a player who owns
+it buys at $465 rather than $620, because the margin never leaves their pocket.
+
+Twenty-two addresses, thirteen ownable businesses, ten kinds.
+
+The change found a fault of the kind that only shows when a world grows. One
+function answered two questions — where a car is SOLD and where a car is WORKED
+ON — and nobody noticed while the answer to both was the motor works. Moving
+sales to a forecourt moved servicing with them, and a garage could no longer
+touch a car. Two questions, two functions, and its own comment had been telling
+me for months: "a motor works, which is the one place in this city that has
+any", which was true of a city with nowhere to buy a car.
+
+Last slice I recorded that the `OwnsKind("garage")` fix was latent and could not
+be caught failing, because the city had one garage and "the garage" and "any
+garage" were the same thing. It has two now, so both garage rules are checked on
+each of them alone, and both fail when reverted. That debt is paid.
+
+Three existing tests were repointed with the reason: they bought cars at the
+motor works, which was the rule, and the rule moved. One was renamed to say what
+it now guards.
+
+Balance unchanged in every figure, which is expected — those campaigns rarely
+buy a car at all, let alone own the lot.
+
+Not built, and it is the half the inbox actually asked for: people in this city
+still do not own cars. Nobody buys one, nobody loses one, and the forecourt has
+no customers but the player. `LoseCar` exists for the player alone. That is the
+next slice and it is where the link becomes real.
+
+Evidence: `core/dealer_test.go`, four breaks verified.

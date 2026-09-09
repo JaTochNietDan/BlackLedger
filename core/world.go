@@ -1862,4 +1862,7 @@ var PlaceIncome = map[string]int{
 	// the kind. The Golden Lily is quieter than the Blue Hour and the Ordway is
 	// bigger than the Bluebird.
 	"goldenlily": 15, "steamworks": 19, "burlesque": 26, "cabstand": 32,
+	// A forecourt earns steadily on servicing and part-exchange; the money in
+	// it is the cars, and that is settled when one is sold.
+	"dealer": 22, "archway": 21,
 }

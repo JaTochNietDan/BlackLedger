@@ -8,17 +8,22 @@ import (
 func driver(t *testing.T) *World {
 	t.Helper()
 	w := New(53)
-	w.Player.Location = "garage"
+	// The forecourt, not the motor works. Cars used to be bought at the garage
+	// because it was the only place in the city that had any; the city has a
+	// dealership now, and a garage repairs what you already have.
+	w.Player.Location = "dealer"
 	w.Player.Cash = 20000
 	return w
 }
 
-func TestCarsAreSoldAtTheMotorWorksAndNowhereElse(t *testing.T) {
+// Renamed and repointed with the rule it guards: this asserted that the motor
+// works sold cars, which was true of a city that had no forecourt in it.
+func TestCarsAreSoldAtTheForecourtAndNowhereElse(t *testing.T) {
 	w := driver(t)
 	if w.CarReadiness() != "" {
-		t.Fatal("the motor works refused to sell:", w.CarReadiness())
+		t.Fatal("the forecourt refused to sell:", w.CarReadiness())
 	}
-	for _, elsewhere := range []string{"bar", "market", "docks", "room"} {
+	for _, elsewhere := range []string{"bar", "market", "docks", "room", "garage"} {
 		w.Player.Location = elsewhere
 		if w.CarReadiness() == "" {
 			t.Fatalf("%s was selling cars", elsewhere)

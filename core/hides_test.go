@@ -106,18 +106,26 @@ func TestOwningAnyOneOfAKindCountsAsOwningThatKind(t *testing.T) {
 	if proved == 0 {
 		t.Fatal("no kind has two addresses, so this proves nothing")
 	}
-	// The garage rule itself, as far as one garage allows: owning it is cheaper
-	// than owning nothing.
-	w := New(53)
-	w.District = 2
-	w.Player.Cash, w.Player.Respect, w.Player.Car = 40000, 200, 1
-	full := w.CarUpkeep()
+	// The garage rule itself. Last slice this could not be caught failing,
+	// because the city had one garage and "the garage" and "any garage" were
+	// the same thing. There are two now, so it is checked on EACH of them
+	// ALONE — owning only the second one has to be enough.
+	garages := 0
 	for _, l := range Locations {
-		if l.Kind == "garage" {
-			w.Properties[l.ID].Owner = "player:1"
+		if l.Kind != "garage" {
+			continue
+		}
+		garages++
+		w := New(53)
+		w.District = 2
+		w.Player.Cash, w.Player.Respect, w.Player.Car = 40000, 200, 1
+		full := w.CarUpkeep()
+		w.Properties[l.ID].Owner = "player:1"
+		if w.CarUpkeep() >= full {
+			t.Errorf("owning %s alone costs %d a day against %d owning none", l.ID, w.CarUpkeep(), full)
 		}
 	}
-	if w.CarUpkeep() >= full {
-		t.Errorf("a garage of your own costs %d a day against %d owning none", w.CarUpkeep(), full)
+	if garages < 2 {
+		t.Errorf("the city has %d garages, so this is still not provable", garages)
 	}
 }
