@@ -248,3 +248,32 @@ func TestTheColumnBesideTheMapDoesNotRepeatTheRoom(t *testing.T) {
 		t.Error("a place across the city lost its own panel")
 	}
 }
+
+// "Feels like the action boxes should be consistently sized." They were sized by
+// their own words: a card with a long sentence in it was taller than the one
+// beside it, and the two grids in a section (what you can do, and what you
+// cannot) settled on two different heights. Every card in a room is one size.
+func TestEveryActionCardInARoomIsTheSameSize(t *testing.T) {
+	css, err := os.ReadFile("../../src/style.css")
+	if err != nil {
+		t.Skip("no stylesheet beside this build")
+	}
+	sheet := string(css)
+	grid := regexp.MustCompile(`\.actions\.compact\{[^}]*\}`).FindString(sheet)
+	if !strings.Contains(grid, "grid-auto-rows:1fr") {
+		t.Errorf("rows are sized by their own contents, so cards differ between rows: %s", grid)
+	}
+	if !strings.Contains(grid, "align-items:stretch") {
+		t.Errorf("cards do not fill the height of their row: %s", grid)
+	}
+	card := regexp.MustCompile(`\.actions\.compact \.action\{[^}]*\}`).FindString(sheet)
+	if !strings.Contains(card, "min-height:") {
+		t.Errorf("a card has no floor to its height, so a short one and a long one differ: %s", card)
+	}
+	// The clamp is what keeps one wordy card from setting the height of every
+	// card in the room.
+	desc := regexp.MustCompile(`\.actions\.compact \.action \.desc\{[^}]*\}`).FindString(sheet)
+	if !strings.Contains(desc, "line-clamp") {
+		t.Errorf("the detail is unbounded: %s", desc)
+	}
+}

@@ -934,11 +934,19 @@ body{height:100%;overflow:hidden;margin:0;background:var(--bg);color:var(--ink);
 /* Work laid out across the room rather than down a column. A card says what it
    is, what it costs and enough of why in three lines; the rest is on the card's
    own tooltip rather than in the middle of the next decision. */
-.actions.compact{display:grid;grid-template-columns:repeat(auto-fill,minmax(238px,1fr));gap:10px;align-items:stretch}
+/* Every card the same size. Auto rows of 1fr make each row as tall as the
+   tallest card in the whole grid rather than the tallest in its own row, and
+   stretch fills that height, so a section reads as a grid instead of as a
+   ragged column of different-sized boxes. The clamp on the detail is what
+   keeps that shared height from being set by one wordy card. */
+.actions.compact{display:grid;grid-template-columns:repeat(auto-fill,minmax(238px,1fr));gap:10px;
+  align-items:stretch;grid-auto-rows:1fr}
+.actions.compact .action{display:flex;flex-direction:column;min-height:118px}
+
 .actions.compact .action{padding:10px 12px}
 .actions.compact .action strong{font-size:13px;line-height:1.35}
 .actions.compact .action .meta{gap:10px;margin-top:4px;font-size:10.5px}
-.actions.compact .action .desc{margin-top:5px;font-size:11px;line-height:1.45;
+.actions.compact .action .desc{margin-top:auto;padding-top:5px;font-size:11px;line-height:1.45;
   display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .actions.compact.blocked .action{opacity:.62}
 .room-work .action-group{margin-bottom:18px}
@@ -949,7 +957,8 @@ body{height:100%;overflow:hidden;margin:0;background:var(--bg);color:var(--ink);
 .work-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:14px}
 .work-head .room-hint{margin:0}
 .room-work .leave-room{display:none}
-.room-work .picked-person .actions{display:grid;grid-template-columns:repeat(auto-fill,minmax(238px,1fr));gap:10px}
+.room-work .picked-person .actions{display:grid;grid-template-columns:repeat(auto-fill,minmax(238px,1fr));gap:10px;align-items:stretch;grid-auto-rows:1fr}
+.room-work .picked-person .action{display:flex;flex-direction:column;min-height:118px}
 
 /* Inside, the screen is about the room, not about the city: the standing
    heading and the opportunity card are the outside talking. What the room needs
