@@ -163,7 +163,18 @@ func (a *app) prepare() bool {
 			_ = a.s.Change(func(w *core.World) error {
 				if w.ID == snapshot.ID && w.Life == snapshot.Life {
 					w.Director.Status = "offline"
-					w.Director.Detail = "Local AI unavailable or proposal rejected. Authored play remains available."
+					w.Director.Detail = "The local model could not be reached. Authored play is unaffected."
+					// A draft the validator turned down is not an outage. The
+					// model answered; what it wrote could not be let into the
+					// game. The status said "offline" for both, which is the
+					// wrong thing to tell anybody and, worse, stopped the
+					// director trying again — a single repeated title ended
+					// the AI for the rest of the campaign.
+					var refused proposalRejected
+					if errors.As(e, &refused) {
+						w.Director.Status = "available"
+						w.Director.Detail = "The last draft was turned down: " + firstSentence(refused.Error()) + " You can ask for another."
+					}
 					if errors.Is(e, errDirectorContextChanged) {
 						w.Director.Status = "available"
 						w.Director.Detail = "The situation changed while this encounter was being prepared. A new arrangement can be requested."
@@ -181,6 +192,22 @@ func (a *app) prepare() bool {
 }
 
 type proposalRejected struct{ error }
+
+// firstSentence keeps a validator's reason short enough to sit in a status
+// line. The reasons are written for the model and run on for a paragraph.
+func firstSentence(reason string) string {
+	if i := strings.IndexAny(reason, ";"); i > 0 {
+		reason = reason[:i]
+	}
+	reason = strings.TrimSpace(reason)
+	if reason == "" {
+		return "no reason was given."
+	}
+	if !strings.HasSuffix(reason, ".") {
+		reason += "."
+	}
+	return strings.ToUpper(reason[:1]) + reason[1:]
+}
 
 func (a *app) generate(snapshot *core.World) error {
 	err := a.generateAttempt(snapshot, "")

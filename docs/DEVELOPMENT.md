@@ -2510,3 +2510,59 @@ Evidence: the path driven end to end through the API, three new properties, a
 fresh forty-day campaign with zero gendered stories and zero gendered ledger
 records, fifteen clean apicheck runs, `mise run verify` and `npm test` green,
 `mise run simulate` unchanged at 52 / 0 / 82 / 0.
+
+## Reading what the model writes
+
+The director's scenes are the one part of the prose a model writes rather than
+the code, and nobody had read a batch of them. I drove a save with Ollama
+running and read what came back.
+
+They are good. This is the whole of one, as the player gets it:
+
+```
+A supply mission for Bluebird Laundry
+"The Bellandi Family needs soap and coal for Bluebird Laundry, and I need you
+to fetch it. This isn't just about keeping the business running — it's about
+keeping our people employed and our reputation intact."
+  Bluebird Laundry · At 15 heat, police may stop completion.
+  Bellandi Family standing +6; rival standing −3.
+    Fetch what it needs          $95 · 60 min · +4 respect · +3 heat
+    Negotiate with the supplier  $80 · 90 min · +4 respect
+    Demand the delivery         $115 · 45 min · +4 respect · +8 heat
+    Decline the arrangement      No cost or time
+```
+
+The model wrote the situation and the three labels. Every figure beside them
+came from the core, and the three approaches are genuinely different bargains.
+
+**A negative result, and the fourth time this week I nearly filed a bug from a
+partial dump.** My first read printed only each choice's `detail`, saw it empty
+on the AI scenes, and I was ready to call it a hole in the game's own principle
+that no cost should be hidden. It is not. The terms are carried as figures
+rather than prose, deliberately, with the reason written down beside the struct:
+"a scene exists to make the player compare two or three approaches, and a run-on
+sentence is the one form those numbers cannot be compared in." The view renders
+them as a row. Checking the payload and the renderer before concluding took two
+minutes and saved a wrong fix.
+
+**One real bug, and it is a bad one.** The validator turned a draft down for
+repeating an earlier arrangement, the retry repeated it again, and the game set
+the director to `offline` with "Local AI unavailable or proposal rejected."
+
+Two different situations behind one word, and the wrong one of the two: the
+model was running and answering. Worse, `offline` is terminal — nothing asks
+again. A single repeated title ended the AI for the rest of the campaign. My own
+reading script then ran to **day 147 with no scenes at all** and I assumed the
+model was broken.
+
+A refused draft now leaves the director available and says what was refused, in
+one sentence rather than the paragraph the validator writes for the model.
+`offline` is reserved for a model that could not be reached.
+
+Verified both ways against real behaviour rather than only in a test: a live
+request still comes back ready, and pointing `BLACK_LEDGER_OLLAMA` at a dead
+port gives "The local model could not be reached. Authored play is unaffected."
+
+Evidence: two properties in `cmd/blackledger/director_status_test.go`, both
+branches driven live, twelve clean apicheck runs, `mise run verify` and `npm
+test` green, `mise run simulate` unchanged at 52 / 0 / 82 / 0.
