@@ -36,23 +36,38 @@ type Trade struct {
 	// asked what kind of ROOM it was rather than what was run in it, so a
 	// casino — the best front there is — could not launder a dollar.
 	Cover int
+	// Watched is how much this trade slows the city forgetting you. A revue bar
+	// with a late licence and a gambling house are watched in a way a laundry
+	// is not. It is called Watched rather than Notice because an operating mode
+	// already has a Notice and it means something else — what a family notices
+	// about your takings.
+	//
+	// It makes forgetting LESS FREQUENT rather than smaller, and both halves of
+	// that are arithmetic rather than taste. Attention fades one point a day
+	// and a hard-run business generates three, so anything that ADDS attention
+	// climbs without limit — a player who bought a burlesque and did nothing
+	// else would lose it inside a month with no way to stop it. And anything
+	// that made the daily fade BIGGER would absorb skimming, which the fade is
+	// deliberately too slow to do. Cooling every second or fourth night instead
+	// leaves the rate right for a clean owner and slower for a watched one.
+	Watched int
 }
 
 var trades = map[string]Trade{
 	"laundry": {
 		Hands: 3, Wage: 6, Drain: 5, Restock: 90, RestockAmount: 40, Supplies: "soap and coal",
 		Trouble: "A press has broken and the back room is standing idle.",
-		Remedy:  "Repair the press", RemedyDetail: "Gets the back room working again.", RemedyCost: 120, Cover: 18,
+		Remedy:  "Repair the press", RemedyDetail: "Gets the back room working again.", RemedyCost: 120, Cover: 18, Watched: 0,
 	},
 	"garage": {
 		Hands: 3, Wage: 8, Drain: 6, Restock: 130, RestockAmount: 40, Supplies: "parts",
 		Trouble: "Parts are walking out of the store faster than they are booked in.",
-		Remedy:  "Find out who is taking the parts", RemedyDetail: "Stops the losses and puts somebody out of a job.", RemedyCost: 90, Cover: 9,
+		Remedy:  "Find out who is taking the parts", RemedyDetail: "Stops the losses and puts somebody out of a job.", RemedyCost: 90, Cover: 9, Watched: 0,
 	},
 	"casino": {
 		Hands: 5, Wage: 11, Drain: 9, Restock: 240, RestockAmount: 45, Supplies: "a float at the tables",
 		Trouble: "A dealer is working with somebody on the floor and the tables are losing.",
-		Remedy:  "Deal with the dealer", RemedyDetail: "Ends the arrangement, one way or another.", RemedyCost: 160, Cover: 20,
+		Remedy:  "Deal with the dealer", RemedyDetail: "Ends the arrangement, one way or another.", RemedyCost: 160, Cover: 20, Watched: 3,
 	},
 	// What goes wrong at a laundry is not what goes wrong at a casino, and it
 	// is not what goes wrong at a restaurant either. Each of these has its own
@@ -61,33 +76,33 @@ var trades = map[string]Trade{
 	"restaurant": {
 		Hands: 4, Wage: 7, Drain: 7, Restock: 150, RestockAmount: 45, Supplies: "the week's food order",
 		Trouble: "The kitchen failed an inspection and the dining room is half empty.",
-		Remedy:  "Put the kitchen right", RemedyDetail: "New fittings and a word with the inspector.", RemedyCost: 170, Cover: 16,
+		Remedy:  "Put the kitchen right", RemedyDetail: "New fittings and a word with the inspector.", RemedyCost: 170, Cover: 16, Watched: 1,
 	},
 	"poolhall": {
 		Hands: 2, Wage: 5, Drain: 4, Restock: 70, RestockAmount: 40, Supplies: "cloth, chalk and drink",
 		Trouble: "Somebody is running their own book out of the back and taking the room's money with it.",
-		Remedy:  "Put the outside book out", RemedyDetail: "The room takes its own bets again.", RemedyCost: 110, Cover: 11,
+		Remedy:  "Put the outside book out", RemedyDetail: "The room takes its own bets again.", RemedyCost: 110, Cover: 11, Watched: 2,
 	},
 	"butcher": {
 		Hands: 3, Wage: 9, Drain: 8, Restock: 200, RestockAmount: 45, Supplies: "stock and ice",
 		Trouble: "The cold room failed overnight and a week of stock went with it.",
-		Remedy:  "Get the cold room running", RemedyDetail: "An engineer, and the stock replaced.", RemedyCost: 210, Cover: 8,
+		Remedy:  "Get the cold room running", RemedyDetail: "An engineer, and the stock replaced.", RemedyCost: 210, Cover: 8, Watched: 0,
 	},
 	"haulage": {
 		Hands: 6, Wage: 12, Drain: 11, Restock: 320, RestockAmount: 50, Supplies: "fuel and parts",
 		Trouble: "A driver has been talking to somebody at Ward Street and the yard knows it.",
-		Remedy:  "Find out which driver", RemedyDetail: "One driver off the books, and the runs are quiet again.", RemedyCost: 240, Cover: 6,
+		Remedy:  "Find out which driver", RemedyDetail: "One driver off the books, and the runs are quiet again.", RemedyCost: 240, Cover: 6, Watched: 1,
 	},
 	"burlesque": {
 		Hands: 7, Wage: 10, Drain: 9, Restock: 260, RestockAmount: 45, Supplies: "the bar and the wardrobe",
 		Trouble: "Somebody from outside is leaning on the dancers for a cut of what they take.",
 		Remedy:  "Have a word with whoever is standing at the stage door",
-		RemedyDetail: "The cut stops and the room keeps its own money.", RemedyCost: 190, Cover: 14,
+		RemedyDetail: "The cut stops and the room keeps its own money.", RemedyCost: 190, Cover: 14, Watched: 3,
 	},
 	"cabs": {
 		Hands: 8, Wage: 9, Drain: 10, Restock: 280, RestockAmount: 50, Supplies: "fuel and tyres",
 		Trouble: "Two cars are off the road and the dispatcher is turning work away.",
-		Remedy:  "Get the cars back on the road", RemedyDetail: "Both back out by the evening shift.", RemedyCost: 200, Cover: 7,
+		Remedy:  "Get the cars back on the road", RemedyDetail: "Both back out by the evening shift.", RemedyCost: 200, Cover: 7, Watched: 1,
 	},
 }
 

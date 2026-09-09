@@ -14,7 +14,11 @@ func watched(t *testing.T, heat int) *World {
 func TestAttentionFadesWhenNothingIsAdded(t *testing.T) {
 	w := watched(t, 20)
 	w.PoliceDay()
-	if w.Player.Heat != 20-CoolOff {
+	// The constant was a flat CoolOff for everybody. How much a person is
+	// forgotten now depends on what they are known to own, so this asks the
+	// world rather than a number: a player holding nothing watched gets the
+	// base rate.
+	if w.Player.Heat != 20-w.CoolOff() {
 		t.Fatalf("attention did not fade: %d", w.Player.Heat)
 	}
 	// It never goes below nothing.
@@ -25,7 +29,7 @@ func TestAttentionFadesWhenNothingIsAdded(t *testing.T) {
 	}
 	// Fading is slower than a hard-run business generates, or the operating
 	// decision would cost nothing.
-	if CoolOff >= operatingMode("hard").Heat {
+	if BaseCool >= operatingMode("hard").Heat {
 		t.Fatal("a skimmed business generates less attention than fades in a day")
 	}
 }

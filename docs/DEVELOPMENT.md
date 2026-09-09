@@ -5218,3 +5218,51 @@ easier to clear for a player who owns the right business and harder for one who
 does not, which is the point.
 
 Evidence: `core/cover_test.go`, four breaks verified. All gates green.
+
+## What you own decides how fast the city forgets you
+
+The companion to what a business hides: what it costs you to be seen owning it.
+A business was pure upside once bought — takings, and now cover — and what a
+place *is* never cost the owner anything.
+
+A revue bar with a late licence and a gambling house are watched in a way a
+laundry is not. Attention now fades every night for somebody the city has no
+standing reason to watch, and every second or fourth night for somebody who owns
+the rooms people are seen going into. Over twenty nights, a laundry lets twenty
+points fade and a revue bar five.
+
+The shape of it was forced by arithmetic twice over, and both are worth writing
+down because the obvious designs are both wrong.
+
+It cannot be attention ADDED each day. Attention fades one point a day, so
+anything adding more than that climbs without limit: past forty-five the police
+arrive, past eighty they take the premises, and somebody who bought a burlesque
+and did nothing else would lose it inside a month with no way to stop it. That
+is the unbounded-figure fault, and I would have shipped it if I had not checked
+the decay rate before picking numbers.
+
+Nor can the nightly fade simply be made BIGGER for clean owners. I tried that
+first — a base of three, reduced by what you own — and an existing test caught
+it immediately: the fade is deliberately slower than a hard-run business
+generates, so a base of three would absorb skimming and make the operating
+decision free. Fading less OFTEN leaves the rate exactly right for a clean owner
+and slower for a watched one.
+
+The measurement was worthless the first time. I called the day ten times without
+advancing the clock, and since cooling happens on the Nth night, that was the
+same night ten times: it reported no difference at all between a laundry and a
+revue bar. That is the fourth harness this month that measured itself.
+
+One naming note. An operating mode already has a `Notice`, meaning what a family
+notices about your takings, so the trade's field is `Watched`. Two fields named
+Notice meaning different things in the same package is a fault waiting to be
+written.
+
+The attention guard still holds: a careless skimmer keeps the business in 116 of
+120 campaigns rather than all 120, so forfeiture is still a real risk. `mise run
+simulate` is unchanged in every figure, which is expected — those campaigns run
+seven to thirteen days and rarely own a watched business at all.
+
+Evidence: `core/notice_test.go`, two breaks verified. One existing test changed
+with the reason: it compared against a flat constant and now asks the world what
+tonight's fade is, because that is no longer the same for everybody.

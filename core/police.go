@@ -22,16 +22,51 @@ const (
 	BribeCeiling = 70
 )
 
-// CoolOff is the attention that fades in a day when nothing new is added. It is
-// deliberately slower than what a hard-run business generates, so choosing to
-// skim still costs attention rather than being quietly absorbed.
-const CoolOff = 1
+// BaseCool is the attention that fades in a day for somebody the city has no
+// standing reason to watch. It is deliberately slower than what a hard-run
+// business generates, so choosing to skim still costs attention rather than
+// being quietly absorbed.
+//
+// It was one, flat, for everybody. What a person is known to own now decides
+// how much of it they actually get: see Trade.Notice.
+const BaseCool = 1
+
+// Watched is how closely the city keeps an eye on the player, from what they
+// are known to own. Nothing watched is nothing to explain.
+func (w *World) Watched() int {
+	watched := 0
+	for _, l := range Locations {
+		if !w.Own(l.ID) {
+			continue
+		}
+		if trade, runs := TradeOf(l.ID); runs {
+			watched += trade.Watched
+		}
+	}
+	return watched
+}
+
+// CoolOff is how much attention fades tonight. A person the city has no
+// standing reason to watch is forgotten a little every night; somebody who owns
+// the rooms people are seen going into is forgotten every second or fourth
+// night instead.
+//
+// Less OFTEN rather than less MUCH, deliberately. Making the nightly fade
+// bigger would absorb the attention a skimmed business generates, which it is
+// meant to be too slow to do; making it a daily addition would climb past the
+// point where the police take the premises with no way to stop it.
+func (w *World) CoolOff() int {
+	if night := w.Minute / 1440; night%(1+w.Watched()) != 0 {
+		return 0
+	}
+	return BaseCool
+}
 
 // PoliceDay fades attention and decides whether anyone gets a visit. Runs once
 // a game day alongside the other books.
 func (w *World) PoliceDay() {
 	if w.Player.Heat > 0 {
-		w.Player.Heat = max(0, w.Player.Heat-CoolOff)
+		w.Player.Heat = max(0, w.Player.Heat-w.CoolOff())
 	}
 	// Organizations draw attention too, and a war is the loudest thing in the
 	// city. This is the same pressure the player feels, applied to them.
