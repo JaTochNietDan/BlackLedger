@@ -54,6 +54,10 @@ func decode(data string) (*core.World, error) {
 		// be gated like one: adding four addresses crashed every save already
 		// at the current version, because nothing had bumped the number.
 		w.SettleNewPlaces()
+		// And the people who would drive. A save written before the city had
+		// cars in it reads as a city where nobody ever did, and the forecourt
+		// would have no customers in it for the rest of the campaign.
+		w.SettleCars()
 	}
 	if e == nil && w.Version < core.SaveVersion {
 		// Campaigns begun before the city had holdings, people and quarrels.

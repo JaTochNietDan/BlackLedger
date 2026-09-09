@@ -5355,3 +5355,46 @@ no customers but the player. `LoseCar` exists for the player alone. That is the
 next slice and it is where the link becomes real.
 
 Evidence: `core/dealer_test.go`, four breaks verified.
+
+## The city drives
+
+Both car entries in the inbox stand on one thing that did not exist: nobody in
+this city owned a car but the player. The forecourt had exactly one customer,
+there was no car to steal parts from, and a garage had nothing to repair. That
+is why this slice is the foundation and not the feature.
+
+People own cars now, and who drives is who could afford to. Fifteen of
+eighty-six on day one: every official, and everybody from soldier upward.
+Nine of nine people of standing drive and none of the sixty-five on the street
+do, which is what a 1950s city looks like.
+
+And the forecourt has customers. Somebody who would drive, has none and can
+afford one buys, and whoever holds the lot takes the same quarter the player
+pays — the same transaction seen from the other side. One sale a day at most,
+because a city where everybody replaces a car on the same morning is a city
+where nothing was ever taken from anybody.
+
+Two things I built deliberately that are worth naming.
+
+A car carries the minute it was got, not just a tier. Without it the settling
+pass cannot tell somebody who never had a car from somebody whose car was taken
+last night, and would quietly hand the second one a replacement. That is tested:
+take a driver's car away, settle the city, and they are still walking.
+
+And the repair runs on every load, like the one for new addresses. A campaign
+that predates cars would otherwise have no driver in it for the rest of its
+life, and the forecourt would sell nothing forever.
+
+Three breaks verified, and all three are seams that have caught me before: the
+day not calling the trade, the margin never reaching the lot's owner, and
+everybody in the city driving.
+
+Balance unchanged in every figure. Those campaigns are seven to thirteen days
+and this is a slow trade.
+
+Next, and now possible for the first time: cars being taken and wrecked. A raid
+already reaches the people at a place, so the demand the inbox asks for has
+somewhere to come from — and once cars are taken, stolen parts have a seller and
+a garage has a reason to want more of it happening.
+
+Evidence: `core/citycars_test.go`.

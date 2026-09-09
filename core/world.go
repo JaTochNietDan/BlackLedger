@@ -155,6 +155,15 @@ type NPC struct {
 	// reads as nothing — Pockets settles a person who has never been paid onto
 	// what their standing would carry, so an old save behaves as it did.
 	Purse int `json:"purse,omitempty"`
+	// What they drive, as a tier, and nothing if they walk. The player was the
+	// only person in this city who owned a car, which meant the forecourt had
+	// one customer, nothing could be stolen off anybody, and a garage had
+	// nothing to repair. Absent in saves written before the city drove.
+	Car int `json:"car,omitempty"`
+	// The minute they got it, so somebody who has never had a car can be told
+	// from somebody whose car was taken. Without it, settling a city would
+	// quietly hand a replacement to anybody who had just lost one.
+	Drove int `json:"drove,omitempty"`
 	// The minute this person was last paid. It exists so that having nothing
 	// can be told from never having been given anything: a man robbed down to
 	// nothing must not be quietly refilled by the same pass that settles a
@@ -616,6 +625,7 @@ func New(seed uint32) *World {
 	// The two established families are already rivals when the player arrives.
 	w.Antagonize("bellandi", "russo", 50)
 	w.SettlePurses()
+	w.SettleCars()
 	w.Log("A room. A name. No protection.", "Mara Bell left word at Saint Agnes: there is work, if you can be discreet. Your room costs $15 each midnight.", "personal")
 	return w
 }
@@ -1507,6 +1517,7 @@ func (w *World) Advance(minutes int) {
 			w.StillDay()
 			w.CasinoDay()
 			w.CarDay()
+			w.CarTrade()
 			w.ChargeDay()
 			w.DemolitionDay()
 			w.CityHallDay()

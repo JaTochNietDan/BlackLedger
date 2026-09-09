@@ -304,3 +304,73 @@ func (w *World) VehicleDescription() map[string]any {
 		"running":   w.Driving(),
 	}
 }
+
+// DrivesAt is the standing at which somebody in this city keeps a car. Below it
+// they walk and take the streetcar like everybody else.
+const DrivesAt = RankSoldier
+
+// WouldDrive reports whether this person is somebody who would keep a car: what
+// they are worth, and what they are. A family lieutenant drives. Somebody
+// mending nets at the docks does not, however long they save.
+func (w *World) WouldDrive(n *NPC) bool {
+	if n == nil || n.Dead {
+		return false
+	}
+	if IsOfficial(n.ID) {
+		return true // a man with a title and an arrangement has a car
+	}
+	return n.Rank >= DrivesAt
+}
+
+// SettleCars puts a car under the people who would have one. It runs when a
+// city is made and again when one is loaded, so a save written before the city
+// drove reads as a city that always did — and it only ever settles somebody who
+// has never had one, so it cannot quietly replace a car that was taken.
+func (w *World) SettleCars() {
+	for i := range w.NPCs {
+		n := &w.NPCs[i]
+		if n.Dead || n.Car != 0 || n.Drove != 0 || !w.WouldDrive(n) {
+			continue
+		}
+		n.Car, n.Drove = 1+n.Rank/RankLieutenant, max(1, w.Minute)
+	}
+}
+
+// CarTrade is the city buying cars. Somebody who would drive, has none and can
+// afford one goes to a forecourt and buys, and whoever holds that forecourt
+// takes the margin — the same margin the player pays, because it is the same
+// transaction seen from the other side.
+//
+// It is one sale a day at most. A city where everybody replaces a car on the
+// same morning is a city where nothing was ever taken from anybody.
+func (w *World) CarTrade() {
+	lot := ""
+	for _, l := range Locations {
+		if l.Kind == "dealer" && w.Properties[l.ID] != nil {
+			lot = l.ID
+			break
+		}
+	}
+	if lot == "" {
+		return
+	}
+	price := VehicleByTier(1).Cost
+	for i := range w.NPCs {
+		n := &w.NPCs[i]
+		if n.Dead || n.Car != 0 || !w.WouldDrive(n) || n.Purse < price {
+			continue
+		}
+		n.Purse -= price
+		n.Car, n.Drove = 1, max(1, w.Minute)
+		if house := w.faction(w.Properties[lot].Owner); house != nil {
+			house.Cash += price * DealerMargin / 100
+		}
+		if w.Own(lot) {
+			w.Earn(price * DealerMargin / 100)
+			place, _ := PlaceByID(lot)
+			w.Log("A car sold at "+place.Name, fmt.Sprintf("%s bought one off the lot. $%d of it is yours.",
+				n.Name, price*DealerMargin/100), "business")
+		}
+		return
+	}
+}
