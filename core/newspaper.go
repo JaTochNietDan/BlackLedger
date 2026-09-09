@@ -214,6 +214,8 @@ func deskFor(kind string) string {
 		return "By our commercial editor"
 	case "civic":
 		return "By our municipal correspondent"
+	case "obituary":
+		return "Obituaries"
 	case "collapse":
 		return "By our municipal correspondent"
 	}

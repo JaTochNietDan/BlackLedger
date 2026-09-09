@@ -195,6 +195,7 @@ func (w *World) Kill(id, cause string) bool {
 		return false
 	}
 	person.Dead = true
+	person.DiedAt = w.Minute
 	// Somebody who is dead is not on anybody's books. The player's crew list
 	// kept them: the buttons went on offering them work, the organization went
 	// on counting them, and a man who had been shot the day before could be

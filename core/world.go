@@ -108,6 +108,11 @@ type NPC struct {
 	Ambition int    `json:"ambition,omitempty"`
 	Skill    int    `json:"skill,omitempty"`
 	Dead     bool   `json:"dead,omitempty"`
+	// When they died, and whether the paper has carried an obituary yet. The
+	// city recorded that somebody was dead and never when, so nothing could ask
+	// "who died yesterday" — which is the question a paper asks every morning.
+	DiedAt     int  `json:"died_at,omitempty"`
+	Remembered bool `json:"remembered,omitempty"`
 	// When the police let this one go. Absent for anybody who is not inside,
 	// which is everybody in a save written before anybody could be taken in.
 	Held int `json:"held,omitempty"`
@@ -210,6 +215,10 @@ type Death struct {
 	// to hold it. What became of what a person built is part of the record of
 	// their death; it used to be worked out and thrown away.
 	Estate string `json:"estate,omitempty"`
+	// Whether the paper has already carried an obituary. One column, the
+	// morning after, and never again — a paper that runs the same obituary
+	// every day is a paper nobody believes.
+	Remembered bool `json:"remembered,omitempty"`
 }
 type Choice struct {
 	ID     string `json:"id"`
@@ -1352,6 +1361,7 @@ func (w *World) Advance(minutes int) {
 			w.OwnPeopleDay()
 			w.PactDay()
 			w.ServiceDay()
+			w.ObituaryDay()
 			w.CityPageDay()
 			w.ScrutinyDay()
 			w.CivicDay()

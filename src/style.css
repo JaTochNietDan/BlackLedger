@@ -783,3 +783,13 @@ body{height:100%;overflow:hidden;margin:0;background:var(--bg);color:var(--ink);
 .books-lines summary{cursor:pointer;font:11px system-ui;letter-spacing:.16em;
   text-transform:uppercase;color:var(--gold);padding:6px 0}
 .books-lines summary::marker{color:var(--muted)}
+
+/* Obituaries. The only part of the paper that is about a person rather than an
+   event, so it is set like one: a rule above, the name in small capitals, the
+   copy narrower than the news, and no picture. */
+.paper .obituaries{margin-top:4px;border-top:1px solid #1b1a16;padding-top:13px}
+.paper .obituaries h3{font:700 11px system-ui;letter-spacing:.22em;text-transform:uppercase;
+  color:#4a463c;margin:0 0 11px;text-align:center}
+.paper .obituaries article{max-width:520px;margin:0 auto 14px;text-align:center}
+.paper .obituaries h4{font:400 20px var(--serif);letter-spacing:.07em;color:#12110e;margin:0 0 5px}
+.paper .obituaries p{font:italic 13px/1.6 var(--serif);color:#2a2822;margin:0}

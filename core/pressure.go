@@ -34,8 +34,11 @@ var scrutinyWeight = map[string]int{
 	"killing": 14, "attack": 12, "war": 8, "police": 6,
 	"seizure": 4, "robbery": 3, "collapse": 3, "politics": 2, "business": 0,
 	// A column about the price of coal is not a reason for anybody to look
-	// harder at anybody. The ordinary edition costs the city nothing.
-	"civic": 0,
+	// harder at anybody. The ordinary edition costs the city nothing. Nor does
+	// an obituary: the killing it follows was reported yesterday and was
+	// counted then, and counting the death twice would have the city look
+	// hardest at the people who are mourned most.
+	"civic": 0, "obituary": 0,
 }
 
 // Scrutiny is how hard the city is looking, from nothing to everything.
