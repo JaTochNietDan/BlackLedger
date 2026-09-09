@@ -1,6 +1,9 @@
 package core
 
-import "testing"
+import (
+	"strings"
+	"testing"
+)
 
 // mediator builds a city with a quarrel bad enough to need somebody, and a
 // player the two sides would come for.
@@ -277,5 +280,61 @@ func TestWhoeverDiesAtASitdownDiedInTheRoom(t *testing.T) {
 	}
 	if died == 0 {
 		t.Fatal("a trapped room turned and nobody in it died, so this proves nothing")
+	}
+}
+
+// Found by cmd/apicheck, twice in twenty-two runs against a fresh save:
+//
+//	HTTP 409 on sitdown: "Doyle Crew would not sit in a room you arranged.
+//	They think of you at -26 and it takes -25."
+//
+// The game listed the action as available and then refused the command. The
+// room takes an evening and the clock is advanced before it opens, so three
+// hours passed between the check that enabled the button and the check that ran
+// it, and one point of drift in that time refused a player who had already
+// committed.
+//
+// Three guesses at the cause reproduced nothing across seven hundred attempts.
+// Making the refusal name the family and the figure found it in one run — the
+// families were sitting exactly on the boundary, which no fixture had put them
+// on.
+func TestAnAgreedMeetingIsNotCalledOffByOnePoint(t *testing.T) {
+	w := mediator(t, 40, false)
+	w.Player.Cash, w.Player.Respect = 5000, 60
+	q, ok := w.OpenQuarrel()
+	if !ok {
+		t.Fatal("no quarrel to sit over")
+	}
+	// Exactly welcome, the way the failing save was.
+	q.A.Goodwill, q.B.Goodwill = SitdownWelcome, SitdownWelcome
+	if reason := w.SitdownReadiness(); reason != "" {
+		t.Fatalf("the button was not offered: %s", reason)
+	}
+	agreed, _ := w.OpenQuarrel()
+	// The three hours pass and one of them thinks a point less of the player.
+	q.B.Goodwill = SitdownWelcome - 1
+	if reason := w.SitdownReadiness(); reason == "" {
+		t.Fatal("this fixture no longer refuses, so it proves nothing")
+	}
+	if err := w.CallSitdownAs(agreed); err != nil {
+		t.Fatalf("the meeting the player paid for was called off: %v", err)
+	}
+	if w.Event == nil || w.Event.Kind != "sitdown" {
+		t.Fatal("no room opened")
+	}
+}
+
+// And the refusal, when it is a refusal, says which door is shut.
+func TestARefusedMeetingNamesWhoWouldNotCome(t *testing.T) {
+	w := mediator(t, 40, false)
+	w.Player.Cash, w.Player.Respect = 5000, 60
+	q, _ := w.OpenQuarrel()
+	q.B.Goodwill = SitdownWelcome - 1
+	reason := w.SitdownReadiness()
+	if !strings.Contains(reason, q.B.Name) {
+		t.Fatalf("the refusal does not say who: %q", reason)
+	}
+	if !strings.Contains(reason, "-26") {
+		t.Fatalf("the refusal does not say by how much: %q", reason)
 	}
 }

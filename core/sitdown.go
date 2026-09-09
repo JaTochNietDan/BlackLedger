@@ -27,6 +27,9 @@ const (
 	// TrapHostility is the hostility above which somebody in the room is not
 	// there to talk.
 	TrapHostility = 62
+	// SitdownWelcome is the standing below which an organization will not come
+	// to a room the player arranged.
+	SitdownWelcome = -25
 )
 
 // Quarrel is a pair of organizations that are not speaking, and what the player
@@ -93,8 +96,14 @@ func (w *World) SitdownReadiness() string {
 	if w.Presence() < SitdownStanding {
 		return fmt.Sprintf("Neither of them would cross the street for you. You need %d presence", SitdownStanding)
 	}
-	if q.A.Goodwill < -25 || q.B.Goodwill < -25 {
-		return "One of them would not sit in a room you arranged"
+	// Naming who, and by how much. "One of them" cannot tell the player which
+	// door is shut, and when this refusal turned up on an action the game had
+	// just offered as available, it could not tell me either.
+	if q.A.Goodwill < SitdownWelcome {
+		return fmt.Sprintf("%s would not sit in a room you arranged. They think of you at %+d and it takes %+d", q.A.Name, q.A.Goodwill, SitdownWelcome)
+	}
+	if q.B.Goodwill < SitdownWelcome {
+		return fmt.Sprintf("%s would not sit in a room you arranged. They think of you at %+d and it takes %+d", q.B.Name, q.B.Goodwill, SitdownWelcome)
 	}
 	if w.Player.Cash < SitdownFee {
 		return fmt.Sprintf("The room and the guarantees cost $%d", SitdownFee)
@@ -110,6 +119,30 @@ func (w *World) CallSitdown() error {
 		return fmt.Errorf("%s", reason)
 	}
 	q, _ := w.OpenQuarrel()
+	return w.openSitdown(q)
+}
+
+// CallSitdownAs opens the meeting that was agreed to, whatever the three hours
+// since did to anybody's opinion.
+//
+// The room takes an evening, and the clock is advanced before it opens so that
+// the evening costs the evening. That left three hours between the check that
+// enabled the button and the check that ran the command, and an organization
+// whose standing drifted one point in between was refused after the player had
+// committed. Found by cmd/apicheck, twice in twenty-two runs: "Doyle Crew would
+// not sit in a room you arranged. They think of you at -26 and it takes -25."
+//
+// Three guesses at the cause failed to reproduce it before the refusal was made
+// to name the family and the figure, at which point it said so itself. The room
+// was arranged when they were willing; they came.
+func (w *World) CallSitdownAs(q Quarrel) error {
+	if q.A == nil || q.B == nil {
+		return fmt.Errorf("there is nobody left to bring")
+	}
+	return w.openSitdown(q)
+}
+
+func (w *World) openSitdown(q Quarrel) error {
 	if err := w.Pay(SitdownFee); err != nil {
 		return err
 	}

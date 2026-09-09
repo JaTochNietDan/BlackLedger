@@ -218,6 +218,12 @@ func (w *World) apply(c Command) error {
 			return fmt.Errorf("%s", a.Reason)
 		}
 		chosen = a.Label
+		// Whose evening this is, decided before the clock moves. See
+		// CallSitdownAs.
+		var agreed Quarrel
+		if c.Kind == "sitdown" {
+			agreed, _ = w.OpenQuarrel()
+		}
 		if err := w.Pay(a.Cost); err != nil {
 			return err
 		}
@@ -578,8 +584,9 @@ func (w *World) apply(c Command) error {
 					w.Log("Out of the spotlight", "You avoid attention for a while.", "personal")
 				case "sitdown":
 					// Opened after the clock moves, like an audience, so the
-					// evening actually costs the evening.
-					if err := w.CallSitdown(); err != nil {
+					// evening actually costs the evening — but the meeting is
+					// the one that was agreed before those hours passed.
+					if err := w.CallSitdownAs(agreed); err != nil {
 						return err
 					}
 				case "audience":

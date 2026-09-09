@@ -2991,3 +2991,54 @@ those three hours. Both hypotheses are ruled out, and I am not shipping a fix
 for a cause I have not found. Recorded here with the reproduction that does
 work: drive a fresh save with twenty-two `apicheck` runs and watch for a 409 on
 `sitdown`.
+
+## The meeting that was called off after the player had paid for it
+
+Yesterday I recorded a bug I could not find. `cmd/apicheck` reported, twice in
+twenty-two runs against a fresh save:
+
+```
+HTTP 409 on sitdown: "One of them would not sit in a room you arranged"
+```
+
+The game listed the action as available and then refused the command, which
+breaks the rule the whole interface runs on: the reason a thing cannot be done
+is knowable before you commit to it.
+
+**Three guesses failed, across seven hundred attempts.** Goodwill drifting
+during the three hours the room takes: four hundred sitdowns in a single-quarrel
+fixture, never refused. The worst quarrel changing under the player: three
+hundred with a second quarrel whose family would not sit, never once. And a
+third I had not noticed was impossible — my fixture starts at minute 480, so a
+180-minute advance never crosses the twelve-hour boundary where organizations
+reconsider each other, and could not have reproduced anything.
+
+**Then I stopped guessing and made the refusal say which door was shut.** One
+run:
+
+```
+Doyle Crew would not sit in a room you arranged.
+They think of you at -26 and it takes -25.
+```
+
+One point. The families in the failing save were sitting exactly on the
+boundary, which no fixture had put them on, and something in those three hours
+moved one of them a single point. The first hypothesis was right; my test could
+never have produced the value it needed.
+
+This is the third time tonight that a message which could not tell two cases
+apart was itself the bug. The director said "offline" for a model that was
+answering; the city page said "refused" without saying by which rule; and this
+said "one of them" when it knew the name and the number.
+
+The room is arranged when the player commits and the guarantees are paid. Three
+hours later it opens, and the meeting that opens is the one that was agreed:
+`CallSitdownAs` takes the quarrel captured before the clock moved. The evening
+still costs the evening, which was the point of advancing first.
+
+**Verified with the instrument that found it.** Sixty-six `apicheck` runs across
+three fresh saves, where twenty-two used to produce two failures: clean. Two
+properties in `core/sitdown_test.go`, one holding that an agreed meeting is not
+called off by a point, one holding that a real refusal names the family and the
+figure. `mise run verify`, `npm test` green, `mise run simulate` unchanged at
+52 / 0 / 82 / 0.
