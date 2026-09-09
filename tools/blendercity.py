@@ -80,6 +80,9 @@ def camera() -> None:
     scene.render.resolution_x = SIZE
     scene.render.resolution_y = SIZE
     scene.render.film_transparent = True
+    scene.eevee.use_raytracing = True
+    scene.eevee.ray_tracing_options.use_denoise = True
+    scene.eevee.use_shadows = True
     scene.render.image_settings.file_format = "PNG"
     scene.render.image_settings.color_mode = "RGBA"
 
@@ -162,9 +165,11 @@ TEXTURES = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__
                         "art", "textures")
 
 # How much wall one tile of a texture covers, in Blender units. One storey is
-# 0.42, so 0.34 puts roughly one course-and-a-bit of brick per floor — set once
-# here so brick is the same size on every building in the city.
-TILE_SIZE = 0.34
+# 0.42, so this puts about five tiles per floor. It was 0.34 first, which is
+# one tile a floor, and every brick came out a foot tall and the sills came out
+# as breeze blocks. Texture scale is the difference between a material and a
+# pattern.
+TILE_SIZE = 0.085
 
 
 def _image(name: str):
@@ -211,10 +216,12 @@ def surface(name: str, rgb: tuple[float, float, float], rough: float = 0.85,
         tex.extension = "REPEAT"
         # Tinted by the palette, so one brick texture serves a whole street of
         # different-coloured buildings rather than needing one per colourway.
+        grey = tree.nodes.new("ShaderNodeHueSaturation")
+        grey.inputs["Saturation"].default_value = 0.35
         mix = tree.nodes.new("ShaderNodeMixRGB")
         mix.blend_type = "MULTIPLY"
-        mix.inputs["Fac"].default_value = 1.0
-        mix.inputs["Color2"].default_value = (*[c * 1.9 for c in rgb], 1)
+        mix.inputs["Fac"].default_value = 0.85
+        mix.inputs["Color2"].default_value = (*[min(1.0, c * 2.5) for c in rgb], 1)
         # A little relief from the same image, which is most of what makes a
         # flat texture stop looking like a decal.
         bump = tree.nodes.new("ShaderNodeBump")
@@ -222,7 +229,8 @@ def surface(name: str, rgb: tuple[float, float, float], rough: float = 0.85,
 
         tree.links.new(mapping.inputs["Vector"], coord.outputs["Object"])
         tree.links.new(tex.inputs["Vector"], mapping.outputs["Vector"])
-        tree.links.new(mix.inputs["Color1"], tex.outputs["Color"])
+        tree.links.new(grey.inputs["Color"], tex.outputs["Color"])
+        tree.links.new(mix.inputs["Color1"], grey.outputs["Color"])
         tree.links.new(bsdf.inputs["Base Color"], mix.outputs["Color"])
         tree.links.new(bump.inputs["Height"], tex.outputs["Color"])
         tree.links.new(bsdf.inputs["Normal"], bump.outputs["Normal"])
@@ -261,8 +269,8 @@ def tenement(width: float, depth: float, storeys: int, *, palette: dict,
 
     wall = surface("wall", palette["wall"], 0.9, texture="brick")
     upper = surface("upper", tuple(c * 1.14 for c in palette["wall"]), 0.9, texture="brick")
-    trim = surface("trim", palette["trim"], 0.7, texture="stone", repeat=1.6)
-    roof = surface("roof", palette["roof"], 0.95, texture="roof", repeat=2.2)
+    trim = surface("trim", palette["trim"], 0.55)
+    roof = surface("roof", palette["roof"], 0.95, texture="roof", repeat=0.8)
     glass = surface("glass", (0.055, 0.065, 0.075), 0.25)
     warm = surface("warm", palette["glow"], 0.4, emit=palette["glow"])
 
@@ -271,7 +279,7 @@ def tenement(width: float, depth: float, storeys: int, *, palette: dict,
     # makes a model read as a box.
     block("shell", (0, 0, 0), (width, depth, height), upper)
     block("base", (0, 0, 0), (width * 1.004, depth * 1.004, ground),
-          surface("stall", palette["stall"], 0.8, texture="render", repeat=1.3))
+          surface("stall", palette["stall"], 0.75, texture="render", repeat=0.7))
 
     # The shopfront: panes between piers, with a blank fascia over them. The
     # fascia is deliberately empty — the sign belongs to the renderer, which
@@ -344,7 +352,7 @@ def tenement(width: float, depth: float, storeys: int, *, palette: dict,
         block("coping", (0, 0, height + 0.075), (width * 1.04, depth * 1.04, 0.014), roof)
     if chimney:
         block("chimney", (width * 0.2, depth * 0.22, height), (0.1, 0.1, 0.26),
-              surface("stack", palette["stack"], 0.95, texture="brick", repeat=0.55))
+              surface("stack", palette["stack"], 0.95, texture="brick", repeat=1.0))
         block("pot", (width * 0.2, depth * 0.22, height + 0.26), (0.115, 0.115, 0.03), trim)
 
 
