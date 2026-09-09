@@ -109,7 +109,7 @@ body{height:100%;overflow:hidden;margin:0;background:var(--bg);color:var(--ink);
    list of cards. Two columns, a rule under the masthead, a dateline, drop caps
    on the lead story and the body set in the serif the rest of the game reserves
    for headings. */
-.paper{background:#e6e1d2;color:#1b1a16;padding:30px 34px 38px;margin-top:22px;box-shadow:0 18px 60px #0007;max-width:1080px;
+.paper{color:#1b1a16;padding:30px 34px 38px;max-width:1080px;
   background-image:radial-gradient(#0000000d 1px,transparent 1px);background-size:3px 3px}
 .paper .masthead{text-align:center;border-bottom:3px double #1b1a16;padding-bottom:12px}
 .paper .masthead h1{font:700 46px/1 var(--serif);letter-spacing:.02em;margin:0;color:#12110e}
@@ -645,3 +645,71 @@ body{height:100%;overflow:hidden;margin:0;background:var(--bg);color:var(--ink);
 .map-editor footer{display:flex;flex-direction:column;gap:5px;margin-top:auto;padding-top:8px;
   border-top:1px solid var(--line)}
 .map-editor footer small{font-size:10px;color:var(--muted);line-height:1.4}
+
+
+/* ---------------------------------------------------------------------------
+   The Herald as a piece of paper.
+
+   From the inbox: the paper was a rectangle of flat colour. What makes newsprint
+   look like newsprint is not the typography, which was already right — it is
+   that the sheet has a surface, an edge that was cut by hand, and the memory of
+   having been folded. All three are drawn here rather than photographed, so
+   they cost nothing to load and scale to any size of issue.
+
+   The edge is a mask and the shadow is on the wrapper, because CSS applies a
+   filter before a mask: a drop-shadow on the same element would be cast by the
+   rectangle the mask cut away.
+
+   The displacement was 9 first and read as torn rather than trimmed. Newsprint
+   is cut, badly, on a machine that has been cutting all night — the edge wanders
+   by a millimetre, it is not ripped. */
+
+.paper-sheet{
+  max-width:1080px;margin:22px auto 0;
+  /* Two shadows: a tight one for the sheet sitting on the desk, and a wide
+     soft one for the room it is sitting in. */
+  filter:drop-shadow(0 2px 3px rgba(0,0,0,.45)) drop-shadow(0 18px 44px rgba(0,0,0,.5));
+}
+
+.paper{
+  /* Layered from the top down: the creases, the foxing, the fibre, the stock.
+     Newsprint is not one colour — it is a warm grey that goes browner towards
+     the edges where it has been handled. */
+  background-image:
+    /* the long fold down the middle of the page, and the half fold across it */
+    linear-gradient(90deg,transparent calc(50% - 26px),rgba(90,78,54,.09) calc(50% - 9px),
+      rgba(255,252,244,.5) 50%,rgba(90,78,54,.10) calc(50% + 9px),transparent calc(50% + 26px)),
+    linear-gradient(180deg,transparent calc(50% - 30px),rgba(90,78,54,.05) calc(50% - 10px),
+      rgba(255,252,244,.35) 50%,rgba(90,78,54,.06) calc(50% + 10px),transparent calc(50% + 30px)),
+    /* handled edges, browner than the middle */
+    radial-gradient(140% 100% at 50% 45%,transparent 52%,rgba(120,96,58,.16) 88%,rgba(104,80,46,.3) 100%),
+    /* the fibre of the stock itself */
+    var(--newsprint),
+    linear-gradient(#e8e3d4,#e3ddcc);
+  background-size:auto,auto,auto,190px 190px,auto;
+  /* An edge cut by hand rather than by a guillotine. Turbulence displaces the
+     sheet's own outline, so no two runs of the paper have the same edge and
+     none of them is straight. */
+  -webkit-mask-image:var(--deckle);
+  mask-image:var(--deckle);
+  -webkit-mask-size:100% 100%;
+  mask-size:100% 100%;
+}
+
+/* The fibre. Fractal noise at low contrast — enough to break up a flat fill,
+   not enough to read as texture on top of 13px type. */
+:root{
+  --newsprint:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='190' height='190'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.42 0 0 0 0 0.38 0 0 0 0 0.28 0 0 0 0.055 0'/></filter><rect width='190' height='190' filter='url(%23n)'/></svg>");
+  --deckle:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='800' preserveAspectRatio='none'><filter id='t'><feTurbulence type='fractalNoise' baseFrequency='0.022 0.03' numOctaves='2' seed='7'/><feDisplacementMap in='SourceGraphic' scale='5' xChannelSelector='R' yChannelSelector='G'/></filter><rect x='5' y='5' width='590' height='790' fill='white' filter='url(%23t)'/></svg>");
+}
+
+/* The masthead sits on newsprint now, so its rules are ink rather than a
+   border on a panel. */
+.paper .masthead h1{text-shadow:0 0 1px rgba(20,18,12,.28)}
+.paper p.body,.paper h2{text-shadow:0 0 .6px rgba(24,22,16,.18)}
+
+@media(prefers-reduced-motion:no-preference){
+  /* A sheet of paper does not lie perfectly flat. A fraction of a degree is
+     enough to say so and not enough to make the type feel crooked. */
+  .paper-sheet{transform:rotate(-.22deg)}
+}

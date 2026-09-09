@@ -16,7 +16,9 @@ export function Herald({world}: {world: Snapshot}) {
   // parked on an old issue they were only browsing.
   useEffect(() => { setAt(0) }, [issues[0]?.day, issues[0]?.count]);
 
-  if (!issues.length) return <div className="paper"><p className="nothing">No edition has gone to press yet.</p></div>;
+  if (!issues.length) return <div className="paper-sheet"><div className="paper">
+    <p className="nothing">No edition has gone to press yet.</p>
+  </div></div>;
 
   const issue = issues[Math.min(at, issues.length - 1)];
   const older = at < issues.length - 1;
@@ -51,6 +53,11 @@ export function Herald({world}: {world: Snapshot}) {
       This issue was printed before you arrived in Bellwether. The city was already running.
     </p>}
 
+    {/* The sheet and the print are two elements on purpose. The ragged edge is
+        a mask on the paper, and a mask is applied after a filter, so a shadow
+        on the same element would be cast by the rectangle the mask cut away
+        rather than by the torn edge. The shadow belongs to the wrapper. */}
+    <div className="paper-sheet">
     <div className="paper">
       <div className="masthead">
         <h1>The Bellwether Herald</h1>
@@ -71,6 +78,7 @@ export function Herald({world}: {world: Snapshot}) {
           <p className="body">{s.body}</p>
         </article>)}
       </div>
+    </div>
     </div>
   </>;
 }
