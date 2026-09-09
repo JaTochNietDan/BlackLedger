@@ -18,6 +18,11 @@ type Story struct {
 	Headline string `json:"headline"`
 	Body     string `json:"body"`
 	Kind     string `json:"kind"`
+	// Set once a brief has been through the director, whether or not the
+	// rewrite was accepted. A refusal is as final as an acceptance: asking the
+	// same model the same question again gets the same answer, and the paper is
+	// not going to sit there re-asking about Tuesday's weather forever.
+	Polished bool `json:"polished,omitempty"`
 }
 
 // newsCapacity bounds the archive. Measured: a city at war files a little over

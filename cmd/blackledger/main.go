@@ -124,6 +124,11 @@ func (a *app) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			fail(w, 409, e)
 		} else {
 			reply(w, 200, out)
+			// The day may have turned and filed a city page. Offer one brief to
+			// the model, in the background, at most one at a time. Nothing waits
+			// on it and nothing breaks if it never answers: the brief already
+			// says what the facts say.
+			go a.polish()
 		}
 	case "/api/director":
 		reply(w, 200, map[string]bool{"started": a.prepare()})
