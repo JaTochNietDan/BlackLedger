@@ -13,8 +13,13 @@ import (
 var splinterSurnames = []string{"Falcone", "Serra", "Marchetti", "Delano", "Kovac",
 	"Brenner", "Alcaraz", "Vance", "Doyle", "Rizzo", "Lindqvist", "Amato"}
 
-var splinterForms = []string{"the %s Crew", "the %s Combine", "%s Brothers",
-	"the %s Syndicate", "the %s Company"}
+// No article. The seeded families are "Bellandi Family" and "Russo Outfit", and
+// a splinter that carried "the " in its own name started every sentence it
+// began in lower case — in the paper, in the ledger, and in the warning that
+// somebody is asking where you sleep. Leads still repairs the names that older
+// saves already hold.
+var splinterForms = []string{"%s Crew", "%s Combine", "%s Brothers",
+	"%s Syndicate", "%s Company"}
 
 var splinterFirstNames = []string{"Sal", "Renata", "Tomas", "Ida", "Bruno", "Vera",
 	"Otto", "Cleo", "Marco", "Dita"}
@@ -139,8 +144,8 @@ func (w *World) Splinter(parent *Faction) bool {
 		c.State = "feud"
 		c.Since = w.Minute
 	}
-	w.Log("A family splits", fmt.Sprintf("%s has broken away from %s, taking %s. %s leads them, and %s wants it back.",
-		name, parent.Name, place.Name, leader, parent.Name), "politics")
+	w.Log("A family splits", fmt.Sprintf("%s %s broken away from %s, taking %s. %s leads them, and %s wants it back.",
+		Leads(name), Agree(name, "has", "have"), parent.Name, place.Name, leader, parent.Name), "politics")
 	w.Report("split", "SPLIT IN "+strings.ToUpper(parent.Name),
 		fmt.Sprintf("A faction led by %s has broken from %s and taken control of %s. Observers expect the dispute to be settled outside the courts.", leader, parent.Name, place.Name))
 	return true

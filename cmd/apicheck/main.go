@@ -143,6 +143,76 @@ type snapshot struct {
 		ID       string `json:"id"`
 		Goodwill int    `json:"goodwill"`
 	} `json:"factions"`
+	History []struct {
+		Title string `json:"title"`
+		Text  string `json:"text"`
+	} `json:"history"`
+	Editions []struct {
+		Day      int    `json:"day"`
+		Dateline string `json:"dateline"`
+		Stories  []struct {
+			Headline string `json:"headline"`
+			Body     string `json:"body"`
+		} `json:"stories"`
+	} `json:"editions"`
+}
+
+// The prose is assembled at runtime from names, roles and prices, and no test
+// sees the sentence that comes out. Every copy fault found so far was found by
+// reading a real save's output: a splinter's name carrying its own lower-case
+// article into the start of a sentence, a plural organization name taking a
+// singular verb, a role with no article, the Sunday page under a Monday
+// dateline. These are the patterns, checked against everything the player and
+// the reader actually see.
+var badCopy = []struct{ pattern, why string }{
+	{"people has ", "a plural organization name took a singular verb"},
+	{"people is ", "a plural organization name took a singular verb"},
+	{"people was ", "a plural organization name took a singular verb"},
+	{"people holds ", "a plural organization name took a singular verb"},
+	{"arms is ", "a plural good took a singular verb"},
+	{"cigarettes is ", "a plural good took a singular verb"},
+	{"They were Lieutenant", "a role was used without an article"},
+	{"They were Soldier", "a role was used without an article"},
+	{"They were  ", "a role was empty and left a hole"},
+	{"come forward. Police", "the police line was printed twice"},
+}
+
+// readable checks everything the city has written down.
+func readable(s *snapshot, fail func(int, string, ...any)) {
+	check := func(where, text string) {
+		if text != "" && strings.ToLower(text[:1]) == text[:1] && strings.ToUpper(text[:1]) != text[:1] {
+			fail(0, "%s begins in lower case: %q", where, first(text, 60))
+		}
+		for _, bad := range badCopy {
+			if strings.Contains(text, bad.pattern) {
+				fail(0, "%s: %s (%q)", where, bad.why, first(text, 80))
+			}
+		}
+	}
+	for _, r := range s.History {
+		check("a ledger record", r.Title)
+		check("a ledger record", r.Text)
+	}
+	days := map[int]int{}
+	for _, e := range s.Editions {
+		days[e.Day]++
+		if days[e.Day] > 1 {
+			fail(0, "the paper printed day %d twice, both %s", e.Day, e.Dateline)
+		}
+		for _, story := range e.Stories {
+			check("a story", story.Body)
+			if strings.Contains(story.Headline, "SUNDAY") && !strings.Contains(e.Dateline, "Sunday") {
+				fail(0, "the Sunday page ran under %q", e.Dateline)
+			}
+		}
+	}
+}
+
+func first(text string, n int) string {
+	if len(text) <= n {
+		return text
+	}
+	return text[:n] + "…"
 }
 
 type command struct {
@@ -477,6 +547,9 @@ func main() {
 	}
 
 	final, _ := c.state()
+	if final != nil {
+		readable(final, fail)
+	}
 	owned := []string{}
 	for _, p := range final.Locations {
 		if p.Owned {

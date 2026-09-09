@@ -1858,3 +1858,36 @@ check — a QA save driven eight days forward and every sentence of all eighteen
 issues scanned for the five patterns, plus any body starting in lower case:
 zero. `mise run verify` and `npm test` pass, `mise run simulate` unchanged at
 58 / 0 / 82 / 0, 0 errors.
+
+## The prose is now checked by the thing that drives the game
+
+Fixing the paper's grammar by hand found the same faults again in the ledger,
+which the player reads far more often: "the Lindqvist Combine no longer holds
+anything worth defending", "Cesare Ferro's people moved against Saint Agnes and
+was driven off". Fixing those found a third site — the warning that a family
+"has people asking where you sleep". At that point the pattern was the point:
+the fault is not in any one sentence, it is that nothing checks the sentences.
+
+Two things came out of it.
+
+`cmd/apicheck` now reads everything the city has written down. After a run it
+scans every ledger record and every story in every issue for a body beginning in
+lower case, a plural organization name with a singular verb, a plural good with
+a singular verb, a role used without an article, a doubled police line, a day
+printed twice, and a Sunday page under a weekday dateline. Copy faults are
+invariant failures now, reported with the sentence, and every future run checks
+them for free. This is the right home for it: the faults only exist in assembled
+prose, and apicheck is the only thing that assembles prose from real play.
+
+And the root cause turned out to be one line. Splinter names were minted as
+"the %s Crew" while every seeded family is "Bellandi Family" or "Russo Outfit",
+so a splinter carried an article into the start of any sentence it began.
+Removing the article from `splinterForms` fixes every site at once and always
+will. `Leads` stays, because saves written before tonight still hold the old
+names and the player still reads those records.
+
+Evidence: fourteen `apicheck` runs against a fresh campaign, zero invariant
+failures. Run against a save written by the older build, the same check reports
+two — correctly, because those sentences are still in that player's ledger.
+`mise run verify`, `npm test` and `mise run simulate` unchanged at 58 / 0 / 82 /
+0, 0 errors.

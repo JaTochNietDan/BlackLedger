@@ -101,3 +101,20 @@ func TestEveryPlaceThatSaysWhatSomebodyWasSaysItInEnglish(t *testing.T) {
 		t.Fatalf("somebody with no role reads as %q", got)
 	}
 }
+
+// A splinter's name used to carry its own article, so every sentence it began
+// started in lower case. Three separate sites were fixed one at a time before
+// it was obvious that the name was the fault.
+
+func TestASplinterIsNamedLikeEveryOtherFamily(t *testing.T) {
+	for _, form := range splinterForms {
+		if strings.HasPrefix(form, "the ") {
+			t.Fatalf("a splinter would be named %q, which no sentence can begin with", form)
+		}
+	}
+	// Saves written before tonight still hold the old names, so the repair
+	// has to stay.
+	if Leads("the Rizzo Crew") != "The Rizzo Crew" {
+		t.Fatal("an old save's name can still begin a sentence in lower case")
+	}
+}

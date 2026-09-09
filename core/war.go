@@ -145,8 +145,12 @@ func (w *World) contestAt(attacker, defender *Faction, weakest string) {
 	}
 	if w.WorldRandom() >= odds {
 		attacker.Power = max(10, attacker.Power-2)
-		w.Log("A raid repelled at "+place.Name, fmt.Sprintf("%s moved against %s and was driven off. %s holds the ground.", attacker.Name, place.Name, defender.Name), "politics")
-		w.Witness("gunfight", weakest, fmt.Sprintf("%s came for %s and was driven off. %s still holds it.", attacker.Name, place.Name, defender.Name), "")
+		w.Log("A raid repelled at "+place.Name, fmt.Sprintf("%s moved against %s and %s driven off. %s %s the ground.",
+			Leads(attacker.Name), place.Name, Agree(attacker.Name, "was", "were"),
+			Leads(defender.Name), Agree(defender.Name, "holds", "hold")), "politics")
+		w.Witness("gunfight", weakest, fmt.Sprintf("%s came for %s and %s driven off. %s still %s it.",
+			Leads(attacker.Name), place.Name, Agree(attacker.Name, "was", "were"),
+			Leads(defender.Name), Agree(defender.Name, "holds", "hold")), "")
 		return
 	}
 	damage := min(prop.Condition, 20+int(w.WorldRandom()*25))
@@ -261,7 +265,8 @@ func (w *World) dissolve() {
 		}
 		if len(w.FamilyHoldings(f.ID)) == 0 && f.Power <= 15 && len(w.Factions)-len(gone) > 2 {
 			gone[f.ID] = true
-			w.Log("An organization ends", f.Name+" no longer holds anything worth defending. What remains of it answers to someone else now.", "politics")
+			w.Log("An organization ends", fmt.Sprintf("%s no longer %s anything worth defending. What remains of it answers to someone else now.",
+				Leads(f.Name), Agree(f.Name, "holds", "hold")), "politics")
 			w.Report("collapse", "END OF "+strings.ToUpper(f.Name),
 				fmt.Sprintf("%s %s ceased to operate as an organization. Its remaining interests have been absorbed by others.",
 					Leads(f.Name), Agree(f.Name, "has", "have")))
