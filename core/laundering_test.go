@@ -62,10 +62,26 @@ func TestOnlyYourOwnCashBusinessLaunders(t *testing.T) {
 	if err := w.Launder("laundry"); err == nil {
 		t.Fatal("the command ignored ownership")
 	}
-	// A casino is not a laundry.
+	// This used to say "a casino is not a laundry" and refuse one. That was
+	// the room type talking: laundering asked what KIND OF ROOM a place was
+	// rather than what trade was run in it, and a casino is the best cash
+	// front in any city — it is most of the reason anybody owns one. A casino
+	// launders now, and less well than a laundry, which is the real rule.
+	//
+	// What has to stay refused is a place that runs no business at all.
 	w.Properties["casino"].Owner = "player:1"
-	if w.LaunderReadiness("casino") == "" {
-		t.Fatal("a casino was treated as a cash-handling front")
+	if w.LaunderReadiness("casino") != "" {
+		t.Fatalf("a casino of the player's own was refused its own books: %q", w.LaunderReadiness("casino"))
+	}
+	// And it absorbs more than a laundry does, because more loose cash crosses
+	// a casino floor in a night than a laundry sees in a week. That is what
+	// the eight hundred and fifty dollars buys.
+	if w.launderCapacity("casino") <= w.launderCapacity("laundry") {
+		t.Errorf("a casino absorbs %d and a laundry %d", w.launderCapacity("casino"), w.launderCapacity("laundry"))
+	}
+	w.Properties["room"].Owner = "player:1"
+	if w.LaunderReadiness("room") == "" {
+		t.Fatal("a rented room with no trade in it was treated as a cash-handling front")
 	}
 	// Nothing to clean is nothing to do.
 	w.Properties["laundry"].Owner = "player:1"

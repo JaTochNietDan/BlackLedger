@@ -17,10 +17,13 @@ const LaunderCooldown = 1440
 // scaled by the state of the premises.
 func (w *World) launderCapacity(id string) int {
 	prop := w.Properties[id]
-	if prop == nil {
+	trade, runs := TradeOf(id)
+	if prop == nil || !runs {
 		return 0
 	}
-	return max(0, 14*prop.Condition/100)
+	// What the trade is worth as a front, and how well the place is kept. Both
+	// matter: a laundry with a caved-in roof explains nothing either.
+	return max(0, trade.Cover*prop.Condition/100)
 }
 
 // LaunderFee is the cut taken to make the paperwork hold. Clearing more costs
@@ -36,8 +39,10 @@ func (w *World) LaunderFee(id string) int {
 
 // LaunderReadiness explains why the books cannot take it, or returns "".
 func (w *World) LaunderReadiness(id string) string {
-	place, ok := PlaceByID(id)
-	if !ok || place.Type != "racket" || !w.Own(id) {
+	// What is run here, not what kind of room it is. Asking the room meant a
+	// casino could not put its own takings through its own books, which is
+	// most of the reason anybody owns one.
+	if trade, runs := TradeOf(id); !runs || trade.Cover <= 0 || !w.Own(id) {
 		return "You need a business of your own that handles cash"
 	}
 	if w.Properties[id].Condition < 40 {

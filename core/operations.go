@@ -26,23 +26,33 @@ type Trade struct {
 	Trouble, Remedy, RemedyDetail string
 	// RemedyCost is what putting it right costs.
 	RemedyCost int
+	// Cover is how much police attention a day's books can absorb. It is the
+	// one thing a business is worth beyond its takings, and it is a fact about
+	// the TRADE rather than the premises: a laundry is where the word comes
+	// from, a casino handles more loose cash than anywhere else in the city,
+	// and a yard full of trucks explains very little.
+	//
+	// Every business used to absorb the same fourteen points, and the gate
+	// asked what kind of ROOM it was rather than what was run in it, so a
+	// casino — the best front there is — could not launder a dollar.
+	Cover int
 }
 
 var trades = map[string]Trade{
 	"laundry": {
 		Hands: 3, Wage: 6, Drain: 5, Restock: 90, RestockAmount: 40, Supplies: "soap and coal",
 		Trouble: "A press has broken and the back room is standing idle.",
-		Remedy:  "Repair the press", RemedyDetail: "Gets the back room working again.", RemedyCost: 120,
+		Remedy:  "Repair the press", RemedyDetail: "Gets the back room working again.", RemedyCost: 120, Cover: 18,
 	},
 	"garage": {
 		Hands: 3, Wage: 8, Drain: 6, Restock: 130, RestockAmount: 40, Supplies: "parts",
 		Trouble: "Parts are walking out of the store faster than they are booked in.",
-		Remedy:  "Find out who is taking the parts", RemedyDetail: "Stops the losses and puts somebody out of a job.", RemedyCost: 90,
+		Remedy:  "Find out who is taking the parts", RemedyDetail: "Stops the losses and puts somebody out of a job.", RemedyCost: 90, Cover: 9,
 	},
 	"casino": {
 		Hands: 5, Wage: 11, Drain: 9, Restock: 240, RestockAmount: 45, Supplies: "a float at the tables",
 		Trouble: "A dealer is working with somebody on the floor and the tables are losing.",
-		Remedy:  "Deal with the dealer", RemedyDetail: "Ends the arrangement, one way or another.", RemedyCost: 160,
+		Remedy:  "Deal with the dealer", RemedyDetail: "Ends the arrangement, one way or another.", RemedyCost: 160, Cover: 20,
 	},
 	// What goes wrong at a laundry is not what goes wrong at a casino, and it
 	// is not what goes wrong at a restaurant either. Each of these has its own
@@ -51,33 +61,33 @@ var trades = map[string]Trade{
 	"restaurant": {
 		Hands: 4, Wage: 7, Drain: 7, Restock: 150, RestockAmount: 45, Supplies: "the week's food order",
 		Trouble: "The kitchen failed an inspection and the dining room is half empty.",
-		Remedy:  "Put the kitchen right", RemedyDetail: "New fittings and a word with the inspector.", RemedyCost: 170,
+		Remedy:  "Put the kitchen right", RemedyDetail: "New fittings and a word with the inspector.", RemedyCost: 170, Cover: 16,
 	},
 	"poolhall": {
 		Hands: 2, Wage: 5, Drain: 4, Restock: 70, RestockAmount: 40, Supplies: "cloth, chalk and drink",
 		Trouble: "Somebody is running their own book out of the back and taking the room's money with it.",
-		Remedy:  "Put the outside book out", RemedyDetail: "The room takes its own bets again.", RemedyCost: 110,
+		Remedy:  "Put the outside book out", RemedyDetail: "The room takes its own bets again.", RemedyCost: 110, Cover: 11,
 	},
 	"butcher": {
 		Hands: 3, Wage: 9, Drain: 8, Restock: 200, RestockAmount: 45, Supplies: "stock and ice",
 		Trouble: "The cold room failed overnight and a week of stock went with it.",
-		Remedy:  "Get the cold room running", RemedyDetail: "An engineer, and the stock replaced.", RemedyCost: 210,
+		Remedy:  "Get the cold room running", RemedyDetail: "An engineer, and the stock replaced.", RemedyCost: 210, Cover: 8,
 	},
 	"haulage": {
 		Hands: 6, Wage: 12, Drain: 11, Restock: 320, RestockAmount: 50, Supplies: "fuel and parts",
 		Trouble: "A driver has been talking to somebody at Ward Street and the yard knows it.",
-		Remedy:  "Find out which driver", RemedyDetail: "One driver off the books, and the runs are quiet again.", RemedyCost: 240,
+		Remedy:  "Find out which driver", RemedyDetail: "One driver off the books, and the runs are quiet again.", RemedyCost: 240, Cover: 6,
 	},
 	"burlesque": {
 		Hands: 7, Wage: 10, Drain: 9, Restock: 260, RestockAmount: 45, Supplies: "the bar and the wardrobe",
 		Trouble: "Somebody from outside is leaning on the dancers for a cut of what they take.",
 		Remedy:  "Have a word with whoever is standing at the stage door",
-		RemedyDetail: "The cut stops and the room keeps its own money.", RemedyCost: 190,
+		RemedyDetail: "The cut stops and the room keeps its own money.", RemedyCost: 190, Cover: 14,
 	},
 	"cabs": {
 		Hands: 8, Wage: 9, Drain: 10, Restock: 280, RestockAmount: 50, Supplies: "fuel and tyres",
 		Trouble: "Two cars are off the road and the dispatcher is turning work away.",
-		Remedy:  "Get the cars back on the road", RemedyDetail: "Both back out by the evening shift.", RemedyCost: 200,
+		Remedy:  "Get the cars back on the road", RemedyDetail: "Both back out by the evening shift.", RemedyCost: 200, Cover: 7,
 	},
 }
 

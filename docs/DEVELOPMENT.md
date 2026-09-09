@@ -5169,3 +5169,52 @@ night.
 
 Evidence: `core/population_places_test.go`, verified by reverting to the random
 draw. All gates green, `npm test` 41.
+
+## What a business is worth beyond its takings
+
+The last part of the inbox entry: how businesses interact with the city
+simulation. A trade decided what a business cost and what went wrong in it, and
+nothing else, so owning a cab company was owning a butcher with different words.
+
+A trade now says what it is worth as a front. Laundering absorbed exactly
+fourteen points of police attention whatever the player owned, scaled by
+condition and nothing else. It is the trade's number now: a laundry is where the
+word comes from and absorbs eighteen, a casino handles more loose cash in a
+night than a laundry sees in a week and absorbs twenty, a yard full of trucks
+explains six.
+
+The better find was underneath it. The gate asked what KIND OF ROOM a place was
+rather than what trade was run in it, so a casino could not launder a dollar —
+and a casino is most of the reason anybody owns one. That was two gates, not
+one: the readiness function and the button that leads to it, written separately
+and both asking the room. Fixing the readiness alone would have left the player
+refused a button the rules said they could press, and never told why. There is a
+test over every address that asks whether the button is offered exactly where
+the trade allows it.
+
+| the front | absorbs, in good condition |
+| --- | --- |
+| casino | 20 |
+| laundry | 18 |
+| restaurant | 16 |
+| burlesque | 14 |
+| poolhall | 11 |
+| garage | 9 |
+| butcher | 8 |
+| cabs | 7 |
+| haulage | 6 |
+
+Two test changes, both recorded. An existing test asserted "a casino is not a
+laundry" and refused one; that was the room type talking, and it now asserts
+what survives — a rival's premises are not your books, a rented room with no
+trade in it is not a front, and a casino absorbs more than a laundry. And I
+wrote that last clause backwards first, asserting the laundry was better, then
+corrected it against the design rather than the other way round.
+
+The balance moved and it should: `mise run simulate` gives defiant $7,223
+against $7,122 and worker $12,510 against $12,384, with the investor down $209.
+Deaths are unchanged at 51 / 0 / 82 / 0 and there are no errors. Attention is
+easier to clear for a player who owns the right business and harder for one who
+does not, which is the point.
+
+Evidence: `core/cover_test.go`, four breaks verified. All gates green.

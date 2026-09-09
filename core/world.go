@@ -1006,7 +1006,10 @@ func (w *World) Actions(id string) []Action {
 				fmt.Sprintf("Thirty-seven pockets and one of them is the nought, which belongs to the house and takes every bet on the outside. A number pays %d to 1, red or black and odd or even pay even money, a dozen pays 2 to 1. Every one of those is the true price, and the nought is the whole of the room's advantage.", 35))
 		}
 	}
-	if place, ok := PlaceByID(id); ok && place.Type == "racket" && w.Own(id) {
+	// The trade, not the kind of room. The readiness function asks what is run
+	// here; this asked what the room looked like, so a casino of the player's
+	// own was refused a button it would have been allowed to press.
+	if trade, runs := TradeOf(id); runs && trade.Cover > 0 && w.Own(id) {
 		asks("launder", "Run takings through the books", 90, w.LaunderFee(id), w.LaunderReadiness(id),
 			fmt.Sprintf("$%d to clear up to %d police attention through %s. Wears the premises, and the books need a day between rounds.", w.LaunderFee(id), w.launderCapacity(id), l.Name))
 	}
