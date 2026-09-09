@@ -9,6 +9,7 @@
 
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import {roomLight} from '../.runtime/frontend-test/roomart.js';
 import {BLOCK, PAVE, ROAD, addressSlot, awnings, goldenness, island, nightness, rails, sleepers, terrace, trolleyAvenue, TROLLEY_GAUGE, vents} from '../.runtime/frontend-test/iso.js';
 
 const SLOTS = 2;                 // must match CityIso.tsx
@@ -179,4 +180,22 @@ test('the trolley runs down the middle of a street, not over the kerb', () => {
     assert.ok(centre <= i.x || centre >= i.x + i.w,
       `the trolley runs through block ${JSON.stringify(cell)}`);
   }
+});
+
+// The room inside a building is lit from the same clock as the street outside.
+// Before this, stepping in at three in the morning found the room the player
+// would have found at noon, and the inside stopped being the same place.
+test('the room takes its light from the same clock as the city', () => {
+  const at = (h, m = 0) => h * 60 + m;
+  const noon = roomLight(at(12)), small = roomLight(at(3)), dawn = roomLight(at(6, 12));
+  assert.equal(noon.dark, nightness(at(12)), 'the room disagrees with the street about the hour');
+  assert.equal(small.dark, nightness(at(3)));
+  assert.equal(dawn.gold, goldenness(at(6, 12)));
+  // Noon is the room as painted; the small hours take most of it.
+  assert.ok(noon.wash.includes('rgba(8,13,18,0.000)'), 'noon is being darkened');
+  assert.ok(small.dark === 1 && small.wash.includes('0.460'), 'the small hours are not dark');
+  // Dawn is dark AND warm, which is the whole distinction.
+  assert.ok(dawn.gold > .95 && dawn.dark > 0, 'dawn is not a warm half-light');
+  assert.ok(dawn.wash.includes('196,124,58'), 'no low sun comes through the window at dawn');
+  assert.ok(!noon.wash.includes('196,124,58'), 'the noon room has a sunset in it');
 });

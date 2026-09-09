@@ -1,7 +1,7 @@
 import {useEffect,useState} from 'react';
 import type {ReactElement} from 'react';
 import type {Action,Coming,Place,Presence} from './types';
-import {interiorSVG,paintedRoom,standingSpots,StandingRoom} from './roomart';
+import {interiorSVG,paintedRoom,roomLight,standingSpots,StandingRoom} from './roomart';
 import {Portrait} from './Portrait';
 
 // Entering a building should open the building, not fill a column. The room is
@@ -20,9 +20,13 @@ const premisesOrder = ['acquire', 'repair', 'hire', 'layoff', 'restock', 'remedy
 
 function rank(id: string) { const at = premisesOrder.indexOf(id); return at < 0 ? premisesOrder.length : at }
 
-export function Interior({place, people, actions, render, onLeave, comings}: {
+export function Interior({place, people, actions, render, onLeave, comings, minute}: {
   place: Place; people: Presence[]; actions: Action[];
   render: (a: Action) => ReactElement; onLeave: () => void;
+  // The hour, from the core's own clock — the same number the city outside is
+  // lit from, so the inside and the outside are the same place at the same
+  // time of day rather than two pictures that happen to share a save.
+  minute: number;
   // Who walked in or out while the player was standing here. People move
   // between buildings now, and until this the room's roster simply changed
   // behind their back: somebody they had been talking to was gone, and
@@ -69,6 +73,8 @@ export function Interior({place, people, actions, render, onLeave, comings}: {
     <div className={'room' + (painted ? ' painted' : '')}
       style={painted ? {backgroundImage: `url(${paintedRoom(place.id)})`} : undefined}>
       <div className="room-plate" dangerouslySetInnerHTML={{__html: interiorSVG(place, painted)}}/>
+      {/* The hour, laid over the backdrop rather than baked into it. */}
+      <span className="room-light" aria-hidden="true" style={{background: roomLight(minute).wash}}/>
       {/* The people are drawn over the room in HTML rather than inside the
           picture, so each one can wear their own face. A silhouette with
           nothing on its head could be anybody. */}

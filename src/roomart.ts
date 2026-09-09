@@ -106,3 +106,42 @@ export function interiorSVG(place: Place, painted = false) {
     `<rect width="520" height="360" fill="url(#int-${esc(place.id)})" pointer-events="none"/>` +
     `</svg>`;
 }
+
+// ---------------------------------------------------------------------------
+// The light inside.
+//
+// The city outside knows what hour it is: the ground, the lamps, the window
+// spill and the haze all come off one number from the core's own clock. The
+// room did not, so stepping inside at three in the morning put the player in
+// the same evenly lit room they would have found at noon, and the inside and
+// the outside stopped being the same place.
+//
+// This is the same two functions the city uses, read the same way. It returns
+// what to lay over the room rather than drawing anything, so the backdrop —
+// painted or drawn — is untouched underneath.
+
+// The extension is explicit because this module is compiled and run directly
+// by the frontend tests under plain node, which will not guess it. Vite
+// resolves it the same either way.
+import {goldenness, nightness} from './iso.js';
+
+export type RoomLight = {
+  dark: number;     // how much of the room the night has taken
+  gold: number;     // how warm what light there is comes in
+  wash: string;     // a CSS gradient to lay over the backdrop
+};
+
+export function roomLight(minute: number): RoomLight {
+  const dark = nightness(minute), gold = goldenness(minute);
+  // At night the room is not uniformly dark: there is a lamp somewhere and the
+  // corners go first. At dawn and dusk the light is low and comes in warm from
+  // one side, which is a window rather than a lamp.
+  const pool = `radial-gradient(120% 90% at 46% 34%,
+     rgba(${Math.round(228 - gold * 12)},${Math.round(196 + gold * 8)},${Math.round(150 - gold * 40)},${(0.05 + dark * 0.13).toFixed(3)}) 0%,
+     rgba(0,0,0,0) 62%)`;
+  const window = gold > 0
+    ? `linear-gradient(102deg, rgba(196,124,58,${(gold * 0.17).toFixed(3)}) 0%, rgba(196,124,58,0) 46%)`
+    : '';
+  const night = `linear-gradient(rgba(8,13,18,${(dark * 0.46).toFixed(3)}), rgba(6,10,14,${(dark * 0.58).toFixed(3)}))`;
+  return {dark, gold, wash: [pool, window, night].filter(Boolean).join(', ')};
+}

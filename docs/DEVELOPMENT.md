@@ -1590,3 +1590,11 @@
 - **Proved it renders and lands where the geometry says**: rails filled magenta and photographed — one straight track down one avenue, corner to corner, between the blocks and through the junctions, partly occluded by the buildings in front of it, which is the depth sort behaving. Then restored to polished-steel grey, a little brighter at night because a rail head that is used is the one thing in a dark street that catches light.
 - Verified in a browser at 12:12: the double line with its ties reads as track in the avenue beside Saint Agnes. No console errors.
 - `mise run verify` passes, `npm test` 20/20, `cmd/apicheck` reports no invariant failures.
+
+## The room now knows what time it is
+- The Interior had not been touched since the city was rebuilt, and the clearest way it had come loose was this: the city outside reads one number off the core's clock for its ground, lamps, window spill and haze, and the room read nothing. Stepping inside at three in the morning put the player in the room they would have found at noon.
+- `roomLight(minute)` in `roomart.ts` imports **the same `nightness` and `goldenness` the city uses** — not a second copy of the rule — and returns a wash to lay over the backdrop: a lamp pool that deepens as the night does, a low warm light through a window at the two turns of the day, and a flat darkening that is zero at noon. The backdrop itself, painted or drawn, is untouched underneath.
+- The test asserts the agreement rather than the appearance: the room's darkness *equals* `nightness` at the same minute and its warmth equals `goldenness`, noon adds no darkening at all, and dawn is dark and warm at once while noon has no sunset in it.
+- Verified in a browser on two isolated saves: Saint Agnes at **03:10** is a dark room with a lamp pool over the table; at **12:12** it is the painted room with barely a wash on it. No console errors.
+- **What this does not do**, since the loop note called the Interior "disconnected": the room is still a painted 4:3 backdrop in a different register from the isometric city, and the figures on it are still portraits on cones. Sharing the clock is one real connection, not the whole of one. Saying otherwise would be dressing it up.
+- `mise run verify` passes, `npm test` 21/21, `cmd/apicheck` reports no invariant failures.

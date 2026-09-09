@@ -142,7 +142,11 @@
    whoever you picked. */
 .city-view-switch .enter{border-color:#8f7849;color:var(--gold)}
 .interior-stage{display:grid;grid-template-columns:minmax(0,1fr) 330px;grid-template-rows:auto 1fr;gap:0;flex:1;min-height:0;background:#0e1413}
-.room{grid-column:1;grid-row:1;background:#0b0f0f;border-bottom:1px solid var(--line)}
+.room{grid-column:1;grid-row:1;background:#0b0f0f;border-bottom:1px solid var(--line);position:relative}
+/* The hour of the day, over the backdrop and under the people: a room at three
+   in the morning is not the room at noon. */
+.room-light{position:absolute;inset:0;pointer-events:none;z-index:1}
+.room .stander{z-index:2}
 .room .interior{display:block;width:100%;height:auto;max-height:52vh}
 
 .room-people{grid-column:1;grid-row:2;display:flex;flex-wrap:wrap;gap:7px;padding:14px 18px;align-content:flex-start;overflow:auto}
