@@ -4125,3 +4125,44 @@ Also checked on that screen and correct: the books add up, income nought against
 costs of thirty-two, itemised as rent fifteen, crew twelve and the house five.
 `mise run verify` and `npm test` green (29 tests), `mise run simulate` unchanged
 at defiant 52 / investor 0 / reckless 82 / worker 0, 0 errors.
+
+## Seventeen promised, six delivered, eleven struck off unread
+
+The arithmetic check, fourth time, now on the Herald. The badge on the rail read
+17. The button read "Read the paper (17)". Opening it showed "Today's edition ·
+Friday, April 3, 1953 · 6 stories", and the page held exactly six. The other
+eleven were the issues from the two days before.
+
+Worse than the mismatch: opening the paper marked the newest story as seen, and
+the count was computed as that story's position in the list — so all seventeen
+became read while six were on screen. Eleven stories were struck off without
+ever being shown.
+
+It also grows without bound. The list is every story of the current life, so a
+campaign at day four hundred would open with a badge in the hundreds, which is
+not a number anybody can act on.
+
+The count is now what opening the paper will actually show: the stories in the
+latest issue the player has not seen. The archive is untouched and still one
+click away behind "All 32 issues" — it is the prompt that had to be honest. The
+button says "Read today's paper (6)".
+
+Evidence: `src/paper.ts` holds the count and `tests/paper.test.mjs` states five
+properties, including the one that was broken — a story from an older issue must
+not mark today read. Restoring the whole-life count fails two of them. Read on
+screen against a save driven to day 32, with the seen-marker cleared first so
+the paper was genuinely unread: the button offered six and the issue held six.
+`mise run verify` and `npm test` green (34 tests), `mise run simulate` unchanged
+at defiant 52 / investor 0 / reckless 82 / worker 0, 0 errors.
+
+Checked on the way past and correct, so it is not chased again: the Ledger's
+seven filter chips still sum exactly to its sixty entries, and three successive
+repair entries reconcile — restored by 40 to 50%, by 40 to 90%, by 10 to 100%.
+
+One thing read and left alone, because it is a judgement rather than a fault.
+Two robbery stories ran side by side with the same standfirst, "The proprietor
+of X declined to be photographed. Officers have asked witnesses to come
+forward", and the second body then repeated the same appeal. It reads like a
+template because it is one. Giving the paper more ways to say this is a writing
+task, not a correction, and it is worth doing deliberately rather than in
+passing.
