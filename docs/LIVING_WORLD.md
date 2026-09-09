@@ -106,7 +106,10 @@ into `docs/DEVELOPMENT.md` once they are actually built and tested. An entry
 stays here, in the original wording, until it is genuinely implemented — so if
 it is still in this list, it does not exist in the game yet.
 
-*Empty. Everything that was here has been built and is written up in
-`docs/DEVELOPMENT.md`.*
+Remember we can also have multiple casinos, and multiples of businesses. We can
+also do strip clubs, as is very typical of mafia life. Keep fleshing out
+businesses and expanding them and adding more and how they interact with the
+city simulation and remember we want to really have a lot of characters living
+in this city
 
 Ultiamtely the expectation is that I don't have to think of all of these concepts, you, the agent will think of these too and build them out and playtest and simulate them yourself.
