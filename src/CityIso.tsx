@@ -2,7 +2,7 @@ import {useEffect, useRef} from 'react';
 import {Application, Assets, Container, Graphics, Sprite, Text, Texture, TextStyle} from 'pixi.js';
 import {Viewport} from 'pixi-viewport';
 import type {Snapshot} from './types';
-import {addressSlot, along, awnings, blockFor, BLOCK, bounds, carriageways, distance, dressing, faces, fillerShape, goldenness, grid, island, kerbside, lampPosts, markings, middle, mix, nightness, PAVE, plot, project, ROAD, size, terrace, TILE, walk, wires} from './iso';
+import {addressSlot, along, awnings, blockFor, BLOCK, bounds, carriageways, distance, dressing, faces, fillerShape, goldenness, grid, island, kerbside, lampPosts, markings, middle, mix, nightness, PAVE, plot, project, ROAD, size, terrace, TILE, vents, walk, wires} from './iso';
 import type {Cell, Vec} from './iso';
 import cutouts from '../public/art/iso/isometric.json';
 import type {Spotlight} from './CityStreet';
@@ -576,6 +576,35 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight}: {
       return g;
     };
 
+    // Smoke off a chimney, steam off a grate. Still, not animated: the clock
+    // is stopped between actions and nothing in this city moves on its own. A
+    // plume in a photograph is a still shape, and it is the thing that says
+    // somebody is in there.
+    const plume = (v: ReturnType<typeof vents>[number]) => {
+      const g = new Graphics();
+      const foot = project(v.at);
+      // Many small overlapping puffs, not a few big ones. Six evenly spaced
+      // ellipses stack into a column of visible grey rings — a drill bit, not
+      // smoke. What reads as smoke is enough of them that no single edge shows,
+      // each one nudged off the centre line so the column is ragged.
+      const puffs = v.kind === 'chimney' ? 20 : 12;
+      const rise = v.kind === 'chimney' ? 1.9 : .7;
+      let h = Math.abs(Math.round(v.at.x * 733 + v.at.y * 971)) >>> 0;
+      const next = () => { h = (h * 1664525 + 1013904223) >>> 0; return h / 4294967296 };
+      for (let k = 0; k < puffs; k++) {
+        const t = (k + 1) / puffs;
+        const up = (v.height + t * rise) * TILE.h;
+        // Widening as it goes, and faster near the top where it is losing its
+        // shape rather than holding a column.
+        const wide = v.size * TILE.w * .05 * (1 + t * t * 3.4 + t);
+        const wobble = (next() - .5) * wide * .55;
+        g.ellipse(foot.x + v.drift * t * t * TILE.w * .5 + wobble,
+                  foot.y - up + (next() - .5) * wide * .3, wide, wide * .66)
+          .fill({color: mix(0xb9bdb8, 0x8b9296, dark), alpha: (1 - t) * (v.kind === 'chimney' ? .085 : .07)});
+      }
+      return g;
+    };
+
     // Every slot in every block that the addresses do not take. A block is a
     // terrace: the address takes one frontage slot and ordinary buildings take
     // the rest, shoulder to shoulder, so the city is built up rather than
@@ -585,10 +614,12 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight}: {
     const rows: {cell: Cell; slot: ReturnType<typeof terrace>[number]; depth: number}[] = [];
     const addressAt = new Map<string, string>();      // "col,row,index" -> id
     const hung = new Map<string, ReturnType<typeof awnings>>();
+    const smoking = new Map<string, ReturnType<typeof vents>>();
     for (const [id, cell] of cells) addressAt.set(`${cell.col},${cell.row},${addressSlot(SLOTS)}`, id);
     for (let col = 0; col < size.cols; col++) {
       for (let row = 0; row < size.rows; row++) {
         hung.set(`${col},${row}`, awnings({col, row}, SLOTS));
+        smoking.set(`${col},${row}`, vents({col, row}, SLOTS));
         terrace({col, row}, SLOTS).forEach((slot, index) => {
           const key = `${col},${row},${index}`;
           if (slot.front && addressAt.has(key)) return;   // the address builds here
@@ -597,6 +628,12 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight}: {
       }
     }
     rows.sort((a, b) => a.depth - b.depth);
+    // The frontmost slot of each block, which is where its plumes are hung.
+    const nearest = new Map<string, number>();
+    for (const r of rows) {
+      const key = `${r.cell.col},${r.cell.row}`;
+      nearest.set(key, Math.max(nearest.get(key) ?? -Infinity, r.depth));
+    }
     for (const {cell, slot} of rows) {
       const shape = fillerShape({col: cell.col * 7 + Math.round(slot.at.x * 3), row: cell.row * 5 + Math.round(slot.at.y * 3)});
       // Which building this is. Stepping through the set by position rather
@@ -650,6 +687,11 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight}: {
         const shop = canopy(a);
         shop.alpha = g.alpha;
         filler.addChild(shop);
+      }
+      // The block's plumes go down after its nearest building, so smoke stands
+      // over its own roofs and still passes behind anything in front of it.
+      if (nearest.get(`${cell.col},${cell.row}`) === slot.at.x + slot.w / 2 + slot.at.y + slot.d / 2) {
+        for (const v of smoking.get(`${cell.col},${cell.row}`) || []) filler.addChild(plume(v));
       }
     }
     layer.addChild(filler);

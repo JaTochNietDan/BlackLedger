@@ -9,7 +9,7 @@
 
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {BLOCK, PAVE, ROAD, addressSlot, awnings, goldenness, island, nightness, terrace} from '../.runtime/frontend-test/iso.js';
+import {BLOCK, PAVE, ROAD, addressSlot, awnings, goldenness, island, nightness, terrace, vents} from '../.runtime/frontend-test/iso.js';
 
 const SLOTS = 2;                 // must match CityIso.tsx
 
@@ -116,4 +116,37 @@ test('the light is warm at the turns of the day and nowhere else', () => {
   assert.ok(goldenness(at(5, 30)) > goldenness(at(3)), 'dawn is no warmer than 3am');
   // It wraps with the clock rather than running off the end of a day.
   assert.equal(goldenness(at(6, 12)), goldenness(at(6, 12) + 1440 * 9));
+});
+
+// What a block gives off stands on the block, not in the traffic.
+test('smoke comes off a roof and steam off a pavement', () => {
+  let chimneys = 0, grates = 0;
+  for (const cell of cells) {
+    const i = island(cell);
+    const found = vents(cell, SLOTS);
+    assert.ok(found.length <= 1, 'a block gives off one thing at most');
+    for (const v of found) {
+      assert.ok(v.at.x >= i.x && v.at.x <= i.x + i.w && v.at.y >= i.y && v.at.y <= i.y + i.d,
+        'a vent is off its own block');
+      if (v.kind === 'chimney') {
+        chimneys++;
+        // A chimney stands on a building rather than in the yard behind it.
+        const on = terrace(cell, SLOTS).some(s =>
+          v.at.x >= s.at.x && v.at.x <= s.at.x + s.w && v.at.y >= s.at.y && v.at.y <= s.at.y + s.d);
+        assert.ok(on, 'a chimney is not standing on a roof');
+        assert.ok(v.height > 1, 'smoke starts below the rooftops');
+      } else {
+        grates++;
+        // A grate is in the pavement: on the block, outside every building.
+        const inside = terrace(cell, SLOTS).some(s =>
+          v.at.x >= s.at.x && v.at.x <= s.at.x + s.w && v.at.y >= s.at.y && v.at.y <= s.at.y + s.d);
+        assert.ok(!inside, 'a grate is under a building');
+        assert.equal(v.height, 0, 'steam starts above the pavement');
+      }
+    }
+  }
+  assert.ok(chimneys > 5, `only ${chimneys} chimneys in the whole city`);
+  assert.ok(grates > 0, 'no steam anywhere');
+  // And most of the city gives off nothing: every roof smoking is a foundry.
+  assert.ok(chimneys + grates < cells.length * .7, 'the whole city is smoking');
 });

@@ -615,3 +615,47 @@ export function goldenness(minute: number): number {
   const near = (peak: number) => Math.max(0, 1 - Math.abs(hour - peak) / 1.75);
   return Math.min(1, Math.max(near(6.2), near(19.2)));
 }
+
+// ---------------------------------------------------------------------------
+// What the city gives off.
+//
+// A still city is a model of a city. It cannot be fixed with animation — the
+// clock is stopped between actions and nothing may move on its own — but a
+// chimney with smoke standing over it and a grate with steam coming off it are
+// both *still* things in a photograph, and they are what tells you the place is
+// occupied. So they are placed here, deterministically, and drawn as shapes
+// rather than as particles.
+
+export type Vent = {at: Vec; kind: 'chimney' | 'grate'; height: number; drift: number; size: number};
+
+// vents gives what a block gives off: smoke from a chimney on the roof of one
+// of its buildings, steam from a grate in the pavement outside. Never both from
+// the same block, and most blocks give off nothing — a city where every roof
+// smokes is a foundry.
+export function vents(cell: Cell, slots = 2): Vent[] {
+  let h = ((cell.col * 2654435761) ^ (cell.row * 40503) ^ 0x9e3779b9) >>> 0;
+  const next = () => { h = (h * 1664525 + 1013904223) >>> 0; return h / 4294967296 };
+  const out: Vent[] = [];
+  const rows = terrace(cell, slots);
+  if (next() < .42) {
+    // A chimney, standing on the back of one of the roofs. Set back from the
+    // street edge so the smoke rises behind the parapet rather than in front
+    // of the building's own face.
+    const slot = rows[Math.floor(next() * rows.length)];
+    out.push({
+      at: {x: slot.at.x + slot.w * (.3 + next() * .4), y: slot.at.y + slot.d * .3},
+      kind: 'chimney',
+      height: 1.5 + next() * .9,        // where the smoke starts, above the ground
+      drift: (next() - .5) * .9,        // which way the wind has it
+      size: .8 + next() * .5,
+    });
+  } else if (next() < .3) {
+    // Or a grate in the pavement, which is the same idea at ankle height.
+    const i = island(cell);
+    out.push({
+      at: {x: i.x + PAVE * .5 + next() * (i.w - PAVE), y: i.y + i.d - PAVE * .5},
+      kind: 'grate', height: 0, drift: (next() - .5) * .5, size: .55 + next() * .4,
+    });
+  }
+  return out;
+}
