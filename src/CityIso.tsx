@@ -25,7 +25,27 @@ const COLOUR = (hex: string) => parseInt(hex.slice(1), 16);
 // The painted cut-outs, by address. A building with one is drawn as itself; a
 // building without one is drawn as the blocked-out solid it was before, so
 // adding an address tomorrow puts a shape on the map rather than a hole.
-const painted = new Map((cutouts as {id: string; file: string; w: number; h: number}[]).map(c => [c.id, c]));
+type Cutout = {id: string; file: string; w: number; h: number; anchor?: number[]; base?: number};
+const painted = new Map((cutouts as Cutout[]).map(c => [c.id, c]));
+
+// Where a cut-out's building actually stands inside its own picture.
+//
+// The city used to assume all three of these: that the base is centred in the
+// image, that the bottom edge of the image is the near corner of that base, and
+// that the image is as wide as the base. None of them is true of a generated
+// picture — the model leaves whatever air it likes around the building and the
+// widest thing in the frame is usually a cornice — so good art came out
+// misaligned: sunk into the pavement, shoved off its plot, or scaled to its own
+// overhang. tools/fitiso.py measures the footprint and writes it into the
+// manifest; this reads it, and falls back to the old assumption for any
+// cut-out that has not been measured yet.
+const feet = (id: string, texture: Texture) => {
+  const cut = painted.get(id);
+  return {
+    anchor: cut?.anchor ?? [.5, 1],
+    base: cut?.base ?? texture.width,
+  };
+};
 // The ordinary buildings between the addresses, painted in the same light as
 // the twelve so the city is one place. A block with one of these on it is not
 // somewhere the player can go; it is somewhere that exists.
@@ -695,11 +715,11 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight}: {
         // broken.
         const across = (slot.w + slot.d) * (TILE.w / 2);
         const art = new Sprite(fillArt);
-        art.anchor.set(.5, 1);
-        art.scale.set(across / fillArt.width);
+        const fit = feet(which, fillArt);
+        art.anchor.set(fit.anchor[0], fit.anchor[1]);
+        art.scale.set(across / fit.base);
         const foot = project({x: slot.at.x + slot.w, y: slot.at.y + slot.d});
-        const mid = project({x: slot.at.x + slot.w / 2, y: slot.at.y + slot.d / 2});
-        art.position.set(mid.x, foot.y);
+        art.position.set(foot.x, foot.y);
         // Tone varies between neighbours; proportions do not. Scaling the
         // height alone squashed and stretched buildings that were drawn
         // correctly, which is its own artefact on top of the overlapping.
@@ -820,13 +840,15 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight}: {
       const texture = textures.get(p.id);
       if (texture) {
         const art = new Sprite(texture);
-        art.anchor.set(.5, 1);
-        art.scale.set(across / texture.width);
-        // Its feet go on the front corner of the plot, where the near edges
-        // meet, so the building stands on its own ground rather than floating
-        // over the middle of it.
+        const fit = feet(p.id, texture);
+        art.anchor.set(fit.anchor[0], fit.anchor[1]);
+        // Scaled so the building's own ground matches the ground it is given,
+        // rather than so its picture matches the plot's width.
+        art.scale.set(across / fit.base);
+        // And stood on the near corner of the plot, which is the point the
+        // anchor above names — the corner of the building's own base.
         const foot = project({x: at.x + block.w, y: at.y + block.d});
-        art.position.set(centre.x, foot.y);
+        art.position.set(foot.x, foot.y);
         group.addChild(art);
         tallest = (art.height / TILE.h) * .6;
       } else {
