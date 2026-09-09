@@ -140,3 +140,23 @@ func TestAHiredHandIsNamedInASentence(t *testing.T) {
 		}
 	}
 }
+
+// Read out of a real save while driving the arms loop: "5 crates of Crated arms
+// for $1100, at $220 each." The market lists a good by a name fit for a price
+// board, and that name cannot follow a count of units.
+func TestAGoodReadsCorrectlyAfterACount(t *testing.T) {
+	w := New(17)
+	for _, g := range w.Goods {
+		line := "5 " + g.Unit + "s of " + g.InBulk()
+		if strings.Contains(line, "of Crated") || strings.Contains(line, "of Untaxed") ||
+			strings.Contains(line, "of Moonshine") {
+			t.Fatalf("the ledger reads %q", line)
+		}
+		if g.InBulk() == "" {
+			t.Fatalf("%q has no form fit to follow a count", g.Name)
+		}
+	}
+	if got := w.Good("arms").InBulk(); got != "arms" {
+		t.Fatalf("crated arms read as %q after a count", got)
+	}
+}

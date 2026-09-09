@@ -24,6 +24,27 @@ type Good struct {
 // "Crated arms is fetching more than it did" forever.
 var pluralGoods = map[string]bool{"cigarettes": true, "arms": true}
 
+// bulkGoods is how each good reads after a count of units. The market lists
+// "Crated arms", which is right on a price board and wrong in a sentence: the
+// ledger read "5 crates of Crated arms for $1100". Like pluralGoods this is a
+// fact about the word and is deliberately not stored in the save — the first
+// version of it was a field on Good, and every campaign begun before tonight
+// went on reading "5 crates of crated arms" because the saved struct had no
+// such field. That is the second time this exact mistake has been made.
+var bulkGoods = map[string]string{
+	"moonshine":  "moonshine",
+	"cigarettes": "untaxed cigarettes",
+	"arms":       "arms",
+}
+
+// InBulk is how the good reads after a count of units: "5 crates of arms".
+func (g Good) InBulk() string {
+	if b, ok := bulkGoods[g.ID]; ok {
+		return b
+	}
+	return lowerFirst(g.Name)
+}
+
 // Agrees picks the verb form that goes with this good's name.
 func (g Good) Agrees(singular, plural string) string {
 	if pluralGoods[g.ID] {
@@ -175,7 +196,7 @@ func (w *World) Buy(good string) error {
 	w.Player.Stock[good] += Lot
 	w.Player.Heat = min(100, w.Player.Heat+1)
 	w.Log("A quiet purchase", fmt.Sprintf("%d %ss of %s for $%d, at $%d each. Holding stock draws attention until it is sold.",
-		Lot, g.Unit, g.Name, cost, g.Price), "business")
+		Lot, g.Unit, g.InBulk(), cost, g.Price), "business")
 	return nil
 }
 
@@ -191,7 +212,7 @@ func (w *World) Sell(good string) error {
 	w.Player.Stock[good] = 0
 	w.Earn(takings)
 	w.Log("The goods move on", fmt.Sprintf("%d %ss of %s sold for $%d, at $%d each.",
-		held, g.Unit, g.Name, takings, g.Price), "business")
+		held, g.Unit, g.InBulk(), takings, g.Price), "business")
 	return nil
 }
 

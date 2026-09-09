@@ -2251,3 +2251,53 @@ runs, `mise run verify` and `npm test` green, `mise run simulate` unchanged at
 53 / 0 / 82 / 0. Six existing tests in that file were filing their stories at
 the same minute as the return and had to advance the clock the way real play
 does — the exclusion is at both ends, and they were leaning on neither.
+
+## The arms loop, driven end to end
+
+The armoury is the most profitable system in the game and the most dangerous,
+and no part of it had ever been exercised over HTTP. `armoury`, `buy:arms`,
+`stock_arms` and `sell:arms` were all in the harness's untried list. I forced a
+save into a state where the player owned the laundry with money in hand, and
+drove the whole loop through the API by hand.
+
+It works, and the shape of it is right:
+
+```
+A room under Bluebird Laundry: $1200 of brick, board and a door that locks
+from the outside.
+A quiet purchase: 5 crates of arms for $1100, at $220 each.
+Crates under Bluebird Laundry: 20 crates off your back and into the room.
+Somebody came to Bluebird Laundry: Bellandi Family took 2 crates and left
+$1230. They are 39 strong now, and there are 18 crates left under the floor.
+Falcone Crew took 3 crates and left $1845.
+Rizzo Crew took 2 crates and left $1230.
+```
+
+Bought at $220, sold at $615, seven crates gone in one day, and attention up
+from four to seven. That is the system doing exactly what its own comment says
+it should. Selling is passive by design — the wars come to the door — which is
+why `sell:arms` never appears at the armoury; it is the ordinary waterfront sale
+of what the player is carrying, and it works too.
+
+**Two copy faults found by reading the screen while doing it.**
+
+The sidebar read `5 families buying` as `5 at war`, when two were at war and
+three were merely feuding. The number was honest — a feuding family buys — and
+the word was not.
+
+And the ledger read `5 crates of Crated arms for $1100`. The market lists a good
+by a name fit for a price board, and that name cannot follow a count of units.
+
+**I fixed the second one wrong, in exactly the way I had already written down
+tonight not to.** My first version put the sentence form in a field on `Good`,
+which is stored in the save — so every campaign begun before tonight kept
+reading "5 crates of crated arms", because its saved goods had no such field. I
+had hit this on the plural names hours earlier, documented it as "a fact about
+the word, not the market", and then did it again. It is keyed by id now, and the
+test loads a good with the old name to prove an old save reads correctly.
+
+`cmd/apicheck` scans for the price-board names after a unit count.
+
+Evidence: the loop driven end to end through the API against a forced save, one
+new property in `core/copy_test.go`, twelve clean apicheck runs, `mise run
+verify` and `npm test` green, `mise run simulate` unchanged at 53 / 0 / 82 / 0.

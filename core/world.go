@@ -912,11 +912,11 @@ func (w *World) Actions(id string) []Action {
 		}
 		// Cost is zero because Buy charges the lot itself; declaring it would
 		// have the command layer charge it a second time.
-		add("buy:"+g.ID, fmt.Sprintf("Buy %d %ss of %s", Lot, g.Unit, g.Name), 30, 0,
+		add("buy:"+g.ID, fmt.Sprintf("Buy %d %ss of %s", Lot, g.Unit, g.InBulk()), 30, 0,
 			w.TradeReadiness(g.ID, "buy"),
 			fmt.Sprintf("$%d for the lot, at $%d each today. Holding stock draws police attention every day until it is sold, and can be taken from you.", g.Price*Lot, g.Price))
 		if held := w.Holding(g.ID); held > 0 {
-			add("sell:"+g.ID, fmt.Sprintf("Sell %d %ss of %s", held, g.Unit, g.Name), 30, 0,
+			add("sell:"+g.ID, fmt.Sprintf("Sell %d %ss of %s", held, g.Unit, g.InBulk()), 30, 0,
 				w.TradeReadiness(g.ID, "sell"),
 				fmt.Sprintf("$%d each today, for $%d.", g.Price, g.Price*held))
 		}

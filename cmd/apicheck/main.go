@@ -183,6 +183,11 @@ var badCopy = []struct{ pattern, why string }{
 	{"The someone ", "a label written for a button was spliced into a sentence"},
 	{"The The ", "an article was added to a phrase that had one"},
 	{" a a ", "an article was doubled"},
+	// "5 crates of Crated arms for $1100." The market lists a good by a name
+	// fit for a price board, and the ledger put it after a count of units.
+	{"crates of Crated", "a good's price-board name was used after a unit count"},
+	{"cases of Untaxed", "a good's price-board name was used after a unit count"},
+	{"crates of Moonshine", "a good's price-board name was used after a unit count"},
 }
 
 // singularOne catches "Whatever was arranged for you happened 1 times to a
