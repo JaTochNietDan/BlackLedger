@@ -3119,3 +3119,49 @@ the report instead of in a state nobody can get back.
 Evidence: one property in `cmd/apicheck/copy_test.go`, proven to fail when the
 capture is removed, fourteen clean apicheck runs, `mise run verify` and `npm
 test` green, `mise run simulate` unchanged at 52 / 0 / 82 / 0.
+
+## Reading two screens nobody had opened
+
+The Market and Settings screens had never been looked at. The Market is clean:
+three goods, each with the price, how far it has moved from usual, what is held,
+and where it trades. Nothing to fix.
+
+The Settings screen verified a fix and then showed me a fault I had put there
+myself this morning.
+
+**The verification.** The live save was still displaying `Local AI unavailable
+or proposal rejected` — the message replaced hours ago, kept because the
+director's detail is stored state and that campaign had not asked since. Pressing
+*Prepare an encounter* replaced it, and the new behaviour worked end to end in
+the browser for the first time: the status came back **available** rather than
+the terminal `offline`, with a reason and an invitation to try again. That fix
+had only ever been checked over HTTP.
+
+**The fault.** What it actually said was:
+
+```
+The last draft was turned down: This work exists only because of a committed
+event, and the dialogue never refers to it. You can ask for another.
+```
+
+That is the validator's own prose, written to instruct a model, shown verbatim
+to a person who cannot act on it. I piped it there this morning while fixing the
+message above it.
+
+The distinction that matters to a player is the one the status already carries:
+the model could not be reached, or it answered and what it wrote could not be
+let in. Which rule caught it is a developer's question, and it is already in the
+server log — where the last five faults were found. The screen says what
+happened in the game's voice now, and the log keeps the detail.
+
+**And the test I wrote for it was case-blind.** It scanned the player-facing
+line for words like "proposal" and "dialogue", but `firstSentence` capitalises,
+so restoring the old message left the test green. Lower-casing before the scan
+makes it fail properly: *"the player is shown the validator's own words"*. Two
+ticks ago the break did not compile; this time it compiled and the check was
+looking for the wrong string. Confirming the break applies is not the same as
+confirming the check can see it.
+
+Evidence: `cmd/blackledger/director_status_test.go`, proven to fail when the
+validator's words are restored, twelve clean apicheck runs, `mise run verify`
+and `npm test` green, `mise run simulate` unchanged at 52 / 0 / 82 / 0.

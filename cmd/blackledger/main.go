@@ -173,7 +173,7 @@ func (a *app) prepare() bool {
 					var refused proposalRejected
 					if errors.As(e, &refused) {
 						w.Director.Status = "available"
-						w.Director.Detail = "The last draft was turned down: " + firstSentence(refused.Error()) + " You can ask for another."
+						w.Director.Detail = refusalNote(refused.Error())
 					}
 					if errors.Is(e, errDirectorContextChanged) {
 						w.Director.Status = "available"
@@ -192,6 +192,24 @@ func (a *app) prepare() bool {
 }
 
 type proposalRejected struct{ error }
+
+// refusalNote is what the player is told when a draft is turned down.
+//
+// The first version of this put the validator's own words on the Settings
+// screen, and reading that screen in a browser is how the mistake was caught:
+// "The last draft was turned down: This work exists only because of a committed
+// event, and the dialogue never refers to it." That is prose written to
+// instruct a model, shown verbatim to a person who cannot act on it.
+//
+// The distinction that matters to a player is the one the status already
+// carries — the model could not be reached, or it answered and what it wrote
+// could not be let in. The exact rule is a developer's question, and it is
+// already in the server log, where the last five faults were found. So the
+// screen says what happened in the game's own voice and the log keeps the
+// detail.
+func refusalNote(string) string {
+	return "The last draft did not pass the checks that keep the story truthful. You can ask for another."
+}
 
 // firstSentence keeps a validator's reason short enough to sit in a status
 // line. The reasons are written for the model and run on for a paragraph.
