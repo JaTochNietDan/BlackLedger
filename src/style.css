@@ -162,15 +162,20 @@ body{height:100%;overflow:hidden;margin:0;background:var(--bg);color:var(--ink);
    of the place, the people in it as things to click, and the work under
    whoever you picked. */
 .city-view-switch .enter{border-color:#8f7849;color:var(--gold)}
-.interior-stage{display:grid;grid-template-columns:minmax(0,1fr) 330px;grid-template-rows:auto 1fr;gap:0;flex:1;min-height:0;background:#0e1413}
+/* The room reads top to bottom: the place, who is in it, then what you can do.
+   The work used to be a 330px column beside the picture, which turned a room
+   with twenty-six things to do in it into ten feet of scrolling in a slot the
+   width of a receipt. Below the picture it has the whole width to lay out in,
+   and what fits on one screen roughly quadruples. */
+.interior-stage{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto 1fr;gap:0;flex:1;min-height:0;background:#0e1413}
 .room{grid-column:1;grid-row:1;background:#0b0f0f;border-bottom:1px solid var(--line);position:relative}
 /* The hour of the day, over the backdrop and under the people: a room at three
    in the morning is not the room at noon. */
 .room-light{position:absolute;inset:0;pointer-events:none;z-index:1}
 .room .stander{z-index:2}
-.room .interior{display:block;width:100%;height:auto;max-height:52vh}
+.room .interior{display:block;width:100%;height:auto;max-height:38vh}
 
-.room-people{grid-column:1;grid-row:2;display:flex;flex-wrap:wrap;gap:7px;padding:14px 18px;align-content:flex-start;overflow:auto}
+.room-people{grid-column:1;grid-row:2;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:7px;padding:14px 18px;align-content:flex-start;overflow:auto}
 .room-chip{background:#16211f;border:1px solid var(--line);border-left:2px solid #3f4d44;padding:7px 10px;text-align:left;max-width:210px;position:relative}
 .room-chip.yours{border-left-color:var(--gold)}
 .room-chip.sour{border-left-color:#8a5a4d}
@@ -178,7 +183,7 @@ body{height:100%;overflow:hidden;margin:0;background:var(--bg);color:var(--ink);
 .room-chip b{display:block;font:13px var(--serif);font-weight:400}
 .room-chip small{display:block;font-size:10px;color:var(--muted);line-height:1.35}
 .room-chip i{position:absolute;top:4px;right:7px;color:var(--gold);font-style:normal}
-.room-work{grid-column:2;grid-row:1/3;border-left:1px solid var(--line);background:var(--panel);padding:18px;overflow:auto;min-height:0}
+.room-work{grid-column:1;grid-row:3;background:var(--panel);padding:16px 22px 26px;overflow:auto;min-height:0}
 .picked-person{border-bottom:1px solid var(--line);padding-bottom:16px;margin-bottom:6px}
 .picked-person header b{font:19px var(--serif);font-weight:400;display:block}
 .picked-person header small{display:block;font-size:11px;color:var(--muted)}
@@ -186,12 +191,12 @@ body{height:100%;overflow:hidden;margin:0;background:var(--bg);color:var(--ink);
 .picked-person .actions{margin-top:12px}
 .room-hint{color:var(--muted);font-size:12px;font-style:italic;margin:0 0 8px}
 .leave-room{margin-top:20px;width:100%}
-@media(max-width:1100px){.interior-stage{grid-template-columns:1fr;grid-template-rows:auto auto auto}.room-work{grid-column:1;grid-row:3;border-left:0;border-top:1px solid var(--line);max-height:none}}
+
 /* Inside, the room is the whole screen. The sidebar would only repeat it. */
 .workspace.inside{grid-template-columns:minmax(0,1fr)}
-.workspace.inside .interior-stage{grid-template-columns:minmax(0,1fr) 400px}
-.workspace.inside .room .interior{max-height:58vh}
-@media(min-width:1600px){.workspace.inside .interior-stage{grid-template-columns:minmax(0,1fr) 460px}}
+.workspace.inside .interior-stage{grid-template-columns:minmax(0,1fr)}
+.workspace.inside .room .interior{max-height:42vh}
+
 
 /* A list of names is a list. A list of faces is a room. */
 .portrait-tiny,.portrait-wrap.portrait-tiny{width:30px;height:36px;flex:none;display:block}
@@ -925,3 +930,45 @@ body{height:100%;overflow:hidden;margin:0;background:var(--bg);color:var(--ink);
 .anywhere-strip h4 span{display:block;margin-top:4px;letter-spacing:0;text-transform:none;font-size:11px;color:var(--muted)}
 .anywhere-strip .actions{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
 .family-card .actions{margin-top:12px}
+
+/* Work laid out across the room rather than down a column. A card says what it
+   is, what it costs and enough of why in three lines; the rest is on the card's
+   own tooltip rather than in the middle of the next decision. */
+.actions.compact{display:grid;grid-template-columns:repeat(auto-fill,minmax(238px,1fr));gap:10px;align-items:stretch}
+.actions.compact .action{padding:10px 12px}
+.actions.compact .action strong{font-size:13px;line-height:1.35}
+.actions.compact .action .meta{gap:10px;margin-top:4px;font-size:10.5px}
+.actions.compact .action .desc{margin-top:5px;font-size:11px;line-height:1.45;
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.actions.compact.blocked .action{opacity:.62}
+.room-work .action-group{margin-bottom:18px}
+.room-work .action-group h4{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin:0 0 10px;
+  font:12px system-ui;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);
+  border-bottom:1px solid var(--line);padding-bottom:8px}
+.room-work .action-group h4 span{letter-spacing:0;text-transform:none;font-size:11px;color:var(--muted)}
+.work-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:14px}
+.work-head .room-hint{margin:0}
+.room-work .leave-room{display:none}
+.room-work .picked-person .actions{display:grid;grid-template-columns:repeat(auto-fill,minmax(238px,1fr));gap:10px}
+
+/* Inside, the screen is about the room, not about the city: the standing
+   heading and the opportunity card are the outside talking. What the room needs
+   on screen at once is the place, who is in it, and the first row of work. */
+.workspace.inside .map-heading,.workspace.inside .city-header .map-key{display:none}
+.workspace.inside .city-header{padding:10px 22px}
+.workspace.inside .room{--fig:.66;height:clamp(150px,26vh,230px);min-height:0;max-height:none;
+  overflow:hidden;background-size:cover;background-position:center}
+.workspace.inside .room.painted{min-height:0}
+.workspace.inside .room-plate{position:absolute;inset:0}
+.workspace.inside .room-plate .interior{height:100%;width:100%;object-fit:cover}
+.workspace.inside .stander-shadow{width:52px;height:9px;bottom:9px}
+.workspace.inside .room-chip{min-height:0}
+.workspace.inside .room-people{padding:9px 18px;gap:6px}
+.workspace.inside .room-chip{padding:5px 8px;max-width:180px}
+.workspace.inside .room-chip small{display:none}
+.work-head{align-items:flex-start;flex-wrap:wrap}
+.work-search{display:flex;gap:8px;align-items:center;margin-left:auto}
+.work-search input{background:#101b19;border:1px solid var(--line);color:var(--ink);padding:7px 10px;font:12px system-ui;min-width:220px}
+.here-instead{margin-top:18px}
+.here-instead .action{padding:14px 15px}
+.here-instead p{margin-top:10px}

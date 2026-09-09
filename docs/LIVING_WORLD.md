@@ -145,4 +145,9 @@ the UX around it, not every action should be located in the action pane of these
 buildings. You need to think through what the right place for this stuff is and
 right context.
 
+We should also focus on cleaning up that massive action bar, I think it'd be
+better to display actions below the interior render when inside a building or
+something like that. I want you to experiment, think it through and really clean
+it up
+
 Ultiamtely the expectation is that I don't have to think of all of these concepts, you, the agent will think of these too and build them out and playtest and simulate them yourself.

@@ -203,3 +203,48 @@ func TestEveryColumnInsideTheWorkspaceCanBeScrolled(t *testing.T) {
 		}
 	}
 }
+
+// "It'd be better to display actions below the interior render when inside a
+// building." The work used to be a 330px column beside the picture, so a room
+// with twenty-six things to do in it was ten feet of scrolling in a slot the
+// width of a receipt. Below the picture it has the whole width, and the cards
+// lay out across it instead of down it.
+func TestTheWorkInARoomSitsUnderThePictureAndAcross(t *testing.T) {
+	css, err := os.ReadFile("../../src/style.css")
+	if err != nil {
+		t.Skip("no stylesheet beside this build")
+	}
+	sheet := string(css)
+	stage := regexp.MustCompile(`\.interior-stage\{[^}]*\}`).FindString(sheet)
+	if stage == "" {
+		t.Fatal("the room has no layout at all")
+	}
+	if !strings.Contains(stage, "grid-template-columns:minmax(0,1fr);") {
+		t.Errorf("the room still puts the work in a column beside the picture: %s", stage)
+	}
+	work := regexp.MustCompile(`\.room-work\{[^}]*\}`).FindString(sheet)
+	if !strings.Contains(work, "grid-row:3") || !strings.Contains(work, "grid-column:1") {
+		t.Errorf("the work is not the row under the picture: %s", work)
+	}
+	compact := regexp.MustCompile(`\.actions\.compact\{[^}]*\}`).FindString(sheet)
+	if !strings.Contains(compact, "repeat(auto-fill") {
+		t.Errorf("the cards do not lay out across the room: %s", compact)
+	}
+}
+
+// And the column beside the map stops repeating the room. Two copies of the
+// same twenty-six cards is how the list got long enough to complain about.
+func TestTheColumnBesideTheMapDoesNotRepeatTheRoom(t *testing.T) {
+	source, err := os.ReadFile("../../src/main.tsx")
+	if err != nil {
+		t.Skip("no interface beside this build")
+	}
+	main := string(source)
+	if !strings.Contains(main, "here-instead") {
+		t.Error("standing in a place, the column beside the map offers no way into the room")
+	}
+	// The full list is still what a place you are NOT standing in gets.
+	if !strings.Contains(main, "<ActionList actions={l.actions}") {
+		t.Error("a place across the city lost its own panel")
+	}
+}

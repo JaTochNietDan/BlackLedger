@@ -1,7 +1,8 @@
 import {useEffect,useState} from 'react';
 import type {ReactElement} from 'react';
-import type {Action,Coming,Place,Presence} from './types';
+import type {Action,Coming,Group,Place,Presence} from './types';
 import {interiorSVG,paintedRoom,roomLight,standingSpots,StandingRoom} from './roomart';
+import {placeActions} from './grouping';
 import {Portrait} from './Portrait';
 
 // Entering a building should open the building, not fill a column. The room is
@@ -20,13 +21,42 @@ const premisesOrder = ['acquire', 'repair', 'hire', 'layoff', 'restock', 'remedy
 
 function rank(id: string) { const at = premisesOrder.indexOf(id); return at < 0 ? premisesOrder.length : at }
 
-export function Interior({place, people, actions, render, onLeave, onTables, comings, minute}: {
+
+// One heading and the work under it. What cannot be done yet is folded away:
+// a room where eleven of the twenty-six cards are greyed out is a room where
+// the player reads eleven refusals to find the two things they can do.
+function Work({title, blurb, actions, render}: {
+  title: string; blurb: string; actions: Action[]; render: (a: Action) => ReactElement;
+}) {
+  const [open, setOpen] = useState(false);
+  const ready = actions.filter(a => !a.disabled);
+  const blocked = actions.filter(a => a.disabled);
+  if (actions.length === 0) return null;
+  return <section className="action-group">
+    <h4>{title}<span>{blurb}</span></h4>
+    {ready.length > 0
+      ? <div className="actions compact">{ready.map(render)}</div>
+      : <p className="nothing-here">Nothing here you can do right now.</p>}
+    {blocked.length > 0 && <>
+      <button className="reveal-blocked" aria-expanded={open} onClick={() => setOpen(o => !o)}>
+        {open ? 'Hide' : 'Show'} {blocked.length} you cannot do yet
+      </button>
+      {open && <div className="actions compact blocked">{blocked.map(render)}</div>}
+    </>}
+  </section>;
+}
+
+export function Interior({place, people, actions, render, onLeave, onTables, groups, comings, minute}: {
   place: Place; people: Presence[]; actions: Action[];
   render: (a: Action) => ReactElement; onLeave: () => void;
   // A room with tables in it offers one way in and the tables take the screen.
   // The cards and the wheel are not premises work to be listed between hiring
   // and restocking: they are a place you sit down.
   onTables?: () => void;
+  // The core's own ordering of what work is for. Without it the room had one
+  // heading called "everything else here" with fifteen cards under it, which is
+  // a list, not an order.
+  groups?: Group[];
   // The hour, from the core's own clock — the same number the city outside is
   // lit from, so the inside and the outside are the same place at the same
   // time of day rather than two pictures that happen to share a save.
@@ -38,6 +68,9 @@ export function Interior({place, people, actions, render, onLeave, onTables, com
   comings?: Coming[];
 }) {
   const [picked, setPicked] = useState('');
+  // The sidebar's action search came in here with the work. A room with
+  // twenty-six things in it needs a way to find one by name.
+  const [query, setQuery] = useState('');
   // The painted interior is a backdrop, not a dependency: if it is missing the
   // drawn room takes its place rather than leaving a hole.
   const [painted, setPainted] = useState(false);
@@ -52,10 +85,13 @@ export function Interior({place, people, actions, render, onLeave, onTables, com
   useEffect(() => { if (picked && !people.some(p => p.id === picked)) setPicked('') }, [people, picked]);
 
   const inRoom = new Set(people.map(p => p.id));
-  const personal = actions.filter(a => a.subject && inRoom.has(a.subject));
-  const premises = actions.filter(a => !personal.includes(a) && a.group === 'business')
+  const needle = query.trim().toLowerCase();
+  const found = actions.filter(a => !needle ||
+    (a.label + ' ' + a.detail + ' ' + a.reason).toLowerCase().includes(needle));
+  const personal = found.filter(a => a.subject && inRoom.has(a.subject));
+  const premises = found.filter(a => !personal.includes(a) && a.group === 'business')
     .sort((a, b) => rank(a.id) - rank(b.id));
-  const elsewhere = actions.filter(a => !personal.includes(a) && a.group !== 'business');
+  const elsewhere = found.filter(a => !personal.includes(a) && a.group !== 'business');
 
   const who = people.find(p => p.id === picked);
   const theirs = personal.filter(a => a.subject === picked);
@@ -91,7 +127,11 @@ export function Interior({place, people, actions, render, onLeave, onTables, com
           className={'stander' + (who.id === picked ? ' picked' : '') + (who.yours ? ' yours' : '') + (who.overdue || who.sore ? ' sour' : '')}
           style={{
             left: `${spot.left}%`, bottom: `${spot.bottom}%`,
-            transform: `translateX(-50%) scale(${spot.scale.toFixed(2)})`,
+            // The figures are sized against the room they are standing in. When
+            // the picture is cropped down to make space for the work below it,
+            // everybody in it comes down by the same factor rather than growing
+            // into a room half their height.
+            transform: `translateX(-50%) scale(calc(var(--fig, 1) * ${spot.scale.toFixed(2)}))`,
             // A person standing in a dark room is dark. The wash over the
             // backdrop used to go under the figures, so at three in the morning
             // the room went dark and everybody in it stayed lit like a shop
@@ -144,22 +184,28 @@ export function Interior({place, people, actions, render, onLeave, onTables, com
         {theirs.length ? <div className="actions">{theirs.map(render)}</div>
           : <p className="nothing-here">There is nothing to do with them here.</p>}
       </section> : <>
-        <p className="room-hint">Pick somebody in the room to deal with them, or use the building itself.</p>
+        <div className="work-head">
+          <p className="room-hint">Pick somebody in the room to deal with them, or use the building itself.</p>
+          <div className="work-search">
+            <input type="search" value={query} placeholder={`Search ${actions.length} things to do here…`}
+              aria-label="Search what you can do in this room" onChange={e => setQuery(e.target.value)}/>
+            <button className="plain" onClick={onLeave}>← Back to the street</button>
+          </div>
+        </div>
+        {needle && found.length === 0 && <p className="nothing-here">Nothing here matches “{query}”.</p>}
 
         {onTables && <button className="action primary sit-down-here" onClick={onTables}>
           <span><strong>Sit down at the tables</strong>
           <span className="desc">The cards and the wheel, played out at the table until you get up.</span></span>
         </button>}
 
-        {premises.length > 0 && <section className="action-group">
-          <h4>These premises<span>The same work, in the same order, in every building</span></h4>
-          <div className="actions">{premises.map(render)}</div>
-        </section>}
+        <Work title="These premises" blurb="The same work, in the same order, in every building"
+              actions={premises} render={render}/>
 
-        {elsewhere.length > 0 && <section className="action-group">
-          <h4>Everything else here<span>Work, standing, money and leaving</span></h4>
-          <div className="actions">{elsewhere.map(render)}</div>
-        </section>}
+        {/* Everything that is not the premises, in the order the core says the
+            work is for, rather than one heading with fifteen cards under it. */}
+        {placeActions(groups?.length ? groups : [{id: 'work', title: 'Everything else here', blurb: 'Work, standing, money and leaving'}], elsewhere)
+          .map(g => <Work key={g.id} title={g.title} blurb={g.blurb} actions={g.mine} render={render}/>)}
 
         <button className="plain leave-room" onClick={onLeave}>← Back to the street</button>
       </>}
