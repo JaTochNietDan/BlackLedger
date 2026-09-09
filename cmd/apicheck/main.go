@@ -168,10 +168,6 @@ type snapshot struct {
 // dateline. These are the patterns, checked against everything the player and
 // the reader actually see.
 var badCopy = []struct{ pattern, why string }{
-	{"people has ", "a plural organization name took a singular verb"},
-	{"people is ", "a plural organization name took a singular verb"},
-	{"people was ", "a plural organization name took a singular verb"},
-	{"people holds ", "a plural organization name took a singular verb"},
 	{"arms is ", "a plural good took a singular verb"},
 	{"cigarettes is ", "a plural good took a singular verb"},
 	{"They were Lieutenant", "a role was used without an article"},
@@ -192,6 +188,14 @@ var badCopy = []struct{ pattern, why string }{
 // singularOne catches "Whatever was arranged for you happened 1 times to a
 // locked door". The boundary matters: without it "11 people in here" was
 // reported as a fault, and a check that cries wolf is worse than no check.
+// pluralSubject catches "Franca Sabbatini's people has people asking where you
+// sleep". It is anchored at a sentence start and refuses to cross a comma or
+// the words that introduce a second party, because "Violence between Brenner
+// Company and Franca Sabbatini's people has escalated" is correct English and
+// a plain substring reported it as a fault four times in fifteen runs. A check
+// that misses something is worth more than one that cries wolf.
+var pluralSubject = regexp.MustCompile(`(^|\. )[A-Z][A-Za-z']*(\s[A-Z][A-Za-z']*)*'s people (has|is|was|holds) `)
+
 var singularOne = regexp.MustCompile(`(^|[^0-9])1 (times|days|people|stories|others|minutes|crates|men)\b`)
 
 // readable checks everything the city has written down.
@@ -204,6 +208,9 @@ func readable(s *snapshot, fail func(int, string, ...any)) {
 			if strings.Contains(text, bad.pattern) {
 				fail(0, "%s: %s (%q)", where, bad.why, first(text, 80))
 			}
+		}
+		if pluralSubject.MatchString(text) {
+			fail(0, "%s: a plural organization name took a singular verb (%q)", where, first(text, 80))
 		}
 		if singularOne.MatchString(text) {
 			fail(0, "%s: a count of one took a plural noun (%q)", where, first(text, 80))
@@ -351,6 +358,18 @@ func targetOr(a action, s *snapshot) string {
 	return s.Player.Location
 }
 
+// Staying on your feet. Measured over fifteen runs of eighty commands: the
+// harness reached life fourteen, and twelve of its thirteen deaths were the
+// same line — "Caught on the street by somebody else's war". It travelled
+// relentlessly looking for systems it had not tried, at any health, through
+// any war, and died before it ever accumulated the money or the standing that
+// half the game is gated behind. A dead harness verifies nothing, and a player
+// who is hurt goes home rather than walking across town.
+const (
+	restBelow   = 55
+	lieLowAbove = 85
+)
+
 func pick(s *snapshot, visited map[string]int, tried map[string]int, turn int) (command, bool) {
 	if s.Event != nil {
 		choice, ok := eventChoice(s, turn)
@@ -360,6 +379,19 @@ func pick(s *snapshot, visited map[string]int, tried map[string]int, turn int) (
 		return command{Kind: "choice", Event: s.Event.ID, Choice: choice}, true
 	}
 	available := here(s)
+	// Before anything else, do not die. This is not timidity: it is the only
+	// way the expensive half of the game is ever reached, and it costs nothing
+	// in coverage because resting is itself a command.
+	if s.Player.Health < restBelow {
+		if a, ok := available["rest"]; ok {
+			return command{Kind: "rest", Target: targetOr(a, s)}, true
+		}
+	}
+	if s.Player.Heat > lieLowAbove {
+		if a, ok := available["lie_low"]; ok {
+			return command{Kind: "lie_low", Target: targetOr(a, s)}, true
+		}
+	}
 	// Prefer a system this run has not exercised yet: an untried system is an
 	// unverified one, and coverage is the point of the harness. Fall back to
 	// rotating through the rest so behaviour is still varied.
@@ -625,7 +657,8 @@ func main() {
 		}
 	}
 	rep.Final = map[string]any{"life": final.Life, "minute": final.Minute, "cash": final.Player.Cash,
-		"respect": final.Player.Respect, "heat": final.Player.Heat, "alive": final.Player.Alive, "owned": owned}
+		"respect": final.Player.Respect, "heat": final.Player.Heat, "health": final.Player.Health,
+		"alive": final.Player.Alive, "owned": owned}
 
 	// Coverage is part of the result. A clean run that never tried a system has
 	// not tested it, and saying so is the difference between evidence and noise.

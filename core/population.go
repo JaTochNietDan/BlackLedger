@@ -161,7 +161,12 @@ func (w *World) RecruitDay() {
 		}
 		pick.Faction, pick.Rank, pick.Role = f.ID, RankSoldier, "Soldier"
 		pick.Location = w.homeOf(f.ID)
-		w.Log(pick.Name+" signs on with "+f.Name, fmt.Sprintf("They were %s a week ago. %s is short of people and not asking many questions.", lowerFirst(roleOrNobody(pick)), f.Name), "politics")
+		was := lowerFirst(roleOrNobody(pick))
+		if pick.Role != "" {
+			was = article(was) + " " + was
+		}
+		w.Log(pick.Name+" signs on with "+f.Name, fmt.Sprintf("They were %s a week ago. %s %s short of people and not asking many questions.",
+			was, Leads(f.Name), Agree(f.Name, "is", "are")), "politics")
 	}
 }
 

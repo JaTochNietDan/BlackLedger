@@ -1406,7 +1406,8 @@ func (w *World) Advance(minutes int) {
 			}
 			if plot.Kind == "hit" && !plot.Known && w.Reach() >= 2 && plot.Due-w.Minute <= 90 {
 				plot.Known = true
-				warning := w.factionName(plot.Actor) + " has people asking where you sleep."
+				actor := w.factionName(plot.Actor)
+				warning := fmt.Sprintf("%s %s people asking where you sleep.", Leads(actor), Agree(actor, "has", "have"))
 				w.Log("Mara has heard something", warning+" You may have very little time.", "danger")
 				if plot.Due > w.Minute {
 					w.Event = &Scene{ID: "warning-" + plot.ID, Title: "A call worth answering", Body: warning + " I cannot tell you exactly when they will come. Stop what you are doing and think about where you want to be tonight.", Speaker: w.HolderID("fixer"), Kind: "warning", Source: "authored", Minute: w.Minute, Choices: []Choice{{ID: "acknowledge", Label: "Put down the phone and prepare", Detail: "Clock stays paused. You can leave, arrange security or seek an audience. The threat remains."}}}

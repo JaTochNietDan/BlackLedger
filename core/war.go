@@ -194,7 +194,8 @@ func (w *World) contestAt(attacker, defender *Faction, weakest string) {
 		if c := w.Conflict(attacker.ID, defender.ID); c != nil {
 			c.Hostility = min(100, c.Hostility+10)
 		}
-		w.Log("A holding changes hands", fmt.Sprintf("%s has taken %s from %s. The city notices who could not hold it.", attacker.Name, place.Name, defender.Name), "politics")
+		w.Log("A holding changes hands", fmt.Sprintf("%s %s taken %s from %s. The city notices who could not hold it.",
+			Leads(attacker.Name), Agree(attacker.Name, "has", "have"), place.Name, defender.Name), "politics")
 		w.Report("seizure", strings.ToUpper(place.Name)+" CHANGES HANDS",
 			fmt.Sprintf("%s now controls %s, previously held by %s. Neither organization would comment.",
 				Leads(attacker.Name), place.Name, defender.Name))

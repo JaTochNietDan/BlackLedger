@@ -2133,3 +2133,60 @@ precisely is worth more than the vague version I published yesterday.
 
 `mise run verify`, `npm test` green, `mise run simulate` unchanged at
 53 / 0 / 82 / 0.
+
+## A harness that stays on its feet
+
+The measurement first, because last time I guessed and was wrong. Fifteen runs
+of eighty commands each, and I printed what state the player was actually left
+in: the harness had reached **life fourteen**. It was dying every run or two and
+starting again from nothing. Cash never passed $400, respect never passed 40,
+heat pegged at 100 repeatedly, and it owned a laundry twice and nothing else.
+
+Then I asked the game what killed it. Thirteen deaths, and **twelve carried the
+same line: "Caught on the street by somebody else's war."** It travelled
+relentlessly looking for systems it had not tried, at any health, through any
+war. `travel` was its most-used command by a factor of two.
+
+So the reason half the game was unverified was not that those systems are
+expensive. It is that the harness never lived long enough to afford anything.
+
+Two lines fix it: rest when below 55 health, lie low when above 85 attention.
+That is not timidity, and it costs nothing in coverage — resting is itself a
+command, and a player who is hurt goes home rather than walking across town.
+
+| across 15 runs | before | after |
+|---|---|---|
+| lives used (deaths) | 14 | 5 |
+| kinds exercised | 47 | 66 |
+| best cash reached | ~$400 | $1091 |
+| best respect reached | 38 | 102 |
+| premises owned | a laundry, twice | laundry, garage, casino |
+
+**Then it found four real bugs, which is the entire point.** Living long enough
+to own a casino and name an organization put the harness into sentences nothing
+had ever produced before, and the copy scan caught all of them: "Franca
+Sabbatini's people has people asking where you sleep", "Franca Sabbatini's
+people has taken Saint Agnes from Falcone Crew", "Franca Sabbatini's people is
+short of people", and — in the same line — "They were soldier a week ago", the
+missing-article fault in a fourth site. All four are the same two helpers
+applied: `Leads` and `Agree`, and `article`.
+
+**And a fault in the checker, for the second time tonight.** Four of the twelve
+reports were "Violence between Brenner Company and Franca Sabbatini's people has
+escalated beyond the usual", which is correct English — the subject is the
+violence, not the people. The rule was a plain substring. It is now anchored at
+a sentence start and refuses to cross a comma or a second party, so it catches
+the fault and leaves the correct sentence alone.
+
+Both copy rules now have their own test in `cmd/apicheck`, with the sentences
+they wrongly reported written down as cases. A check that cries wolf gets
+ignored, and an ignored check is worse than none.
+
+Fifteen runs after the fixes: 66 kinds exercised, zero invariant failures.
+`mise run verify`, `npm test` green, `mise run simulate` unchanged at
+53 / 0 / 82 / 0 — the harness changes touch nothing the game does.
+
+Still unverified over HTTP, and honestly so: 19 systems behind wealth or
+standing even a surviving harness does not reach, and 12 that never appear
+because it never enters the state, `lawyer` wanting an arrest and `sell:arms`
+wanting arms in the ground among them.
