@@ -1567,3 +1567,10 @@
 - **An observation, not a claim of progress:** midday still reads as overcast rather than as daylight. That is the day palette itself and it is older than this change — `goldenness` is 0 at noon so nothing here touched it. Recorded rather than quietly adjusted.
 - QA note: the clock was moved by patching the `minute` field of the state JSON in a **copy** of the fixture save, never the live campaign. Nothing in the core was changed to make the view testable.
 - `mise run verify` passes, `npm test` 18/18, `cmd/apicheck` reports no invariant failures.
+
+## Midday that reads as midday
+- Recorded last iteration and fixed here: noon looked like an overcast dusk. The day ends of the palette were nearly as dark as the night ends — ground `0x2a2f2c`, pavement `0x4a514c` — the painted buildings were greyed by 30% even at noon, and the depth haze was a third as thick at midday as it is at midnight.
+- Only the **day** ends moved: ground, carriageway, pavement, kerb and the plot join all lightened, the buildings' grey wash at noon cut from .30 to .10, and the haze at noon from .35 to .16 of its night depth.
+- **Night is arithmetically untouched**, not just eyeballed as unchanged: every one of these is `mix(day, night, dark)` with the night argument the same as before, and both rebalanced pairs sum to the same value at `dark = 1` — `.3 + .28` and `.1 + .48` are both .58, `.35 + .65` and `.16 + .84` are both 1. There is nothing to re-verify at 03:10 because the code takes the identical branch.
+- Verified in a browser at 12:12 on an isolated save, at two zooms: pale stone pavements, crossings and stop lines legible against dark asphalt, awnings visible over the shopfronts, blocks reading as separate. No console errors.
+- Still true and still art rather than lighting: several cut-outs have their windows painted lit, so a few buildings glow at noon. That wants regeneration, not a tint.

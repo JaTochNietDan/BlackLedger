@@ -401,7 +401,7 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight}: {
     const far = {x: size.cols * BLOCK, y: size.rows * BLOCK};
     const corners = [{x: -.6, y: -.6}, {x: far.x + .6, y: -.6}, {x: far.x + .6, y: far.y + .6}, {x: -.6, y: far.y + .6}]
       .map(project);
-    earth.poly(corners.flatMap(c => [c.x, c.y])).fill(sunlit(mix(0x2a2f2c, 0x0f1416, dark)));
+    earth.poly(corners.flatMap(c => [c.x, c.y])).fill(sunlit(mix(0x565c50, 0x0f1416, dark)));
     layer.addChild(earth);
 
     // The carriageways, full width and height, so every junction is square.
@@ -413,7 +413,7 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight}: {
         {x: way.a.x - pad.x, y: way.a.y - pad.y}, {x: way.b.x + pad.x, y: way.a.y - pad.y},
         {x: way.b.x + pad.x, y: way.b.y + pad.y}, {x: way.a.x - pad.x, y: way.b.y + pad.y},
       ].map(project);
-      road.poly(box.flatMap(c => [c.x, c.y])).fill(tarmac(mix(0x333a38, 0x161b1c, dark)));
+      road.poly(box.flatMap(c => [c.x, c.y])).fill(tarmac(mix(0x4b514e, 0x161b1c, dark)));
     }
     layer.addChild(road);
 
@@ -425,14 +425,14 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight}: {
       const i = island(cell);
       const outer = [{x: i.x, y: i.y}, {x: i.x + i.w, y: i.y}, {x: i.x + i.w, y: i.y + i.d}, {x: i.x, y: i.y + i.d}]
         .map(project);
-      pave.poly(outer.flatMap(c => [c.x, c.y])).fill(sunlit(mix(0x4a514c, 0x252b29, dark)));
-      kerb.poly(outer.flatMap(c => [c.x, c.y])).stroke({width: 1.6, color: mix(0x5d675f, 0x323b36, dark), alpha: .95});
+      pave.poly(outer.flatMap(c => [c.x, c.y])).fill(sunlit(mix(0x7c8175, 0x252b29, dark)));
+      kerb.poly(outer.flatMap(c => [c.x, c.y])).stroke({width: 1.6, color: mix(0x939a8b, 0x323b36, dark), alpha: .95});
       // The join between pavement and building, a shade darker so the plot
       // reads as ground the building sits on rather than as more pavement.
       const b = plot(cell);
       const inner = [{x: b.x, y: b.y}, {x: b.x + b.w, y: b.y}, {x: b.x + b.w, y: b.y + b.d}, {x: b.x, y: b.y + b.d}]
         .map(project);
-      pave.poly(inner.flatMap(c => [c.x, c.y])).fill(sunlit(mix(0x3e443f, 0x1e2422, dark)));
+      pave.poly(inner.flatMap(c => [c.x, c.y])).fill(sunlit(mix(0x6c7266, 0x1e2422, dark)));
     }
     layer.addChild(pave, kerb);
 
@@ -629,7 +629,7 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight}: {
         // height alone squashed and stretched buildings that were drawn
         // correctly, which is its own artefact on top of the overlapping.
         const warmth = ((order * 37) % 7) / 7;
-        art.tint = mix(mix(0xc6c2b6, 0xb2bcc0, warmth), 0x6f7a80, .3 + dark * .28);
+        art.tint = mix(mix(0xd8d4c6, 0xc4ced2, warmth), 0x6f7a80, .1 + dark * .48);
         g.addChild(art);
       } else {
         const inset = .04;
@@ -641,7 +641,7 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight}: {
         g.poly(f.top.flatMap(v => [v.x, v.y])).fill(mix(0x6a7168, 0x2c3433, dark));
       }
       const away = distance(slot.at, size);
-      g.alpha = 1 - away * .35 * (0.35 + dark * .65);
+      g.alpha = 1 - away * .35 * (0.16 + dark * .84);
       filler.addChild(g);
       // And the canvas over its shopfront, drawn straight after the building it
       // hangs on so it can never end up behind it.
@@ -696,7 +696,7 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight}: {
       group.on('pointerout', () => { group.alpha = resting });
       if (p.id === here) group.on('pointertap', () => { if (p.id === here) enter.current() });
       const away = distance(at, size);
-      const resting = (shut ? .45 : 1) * (1 - away * .22 * (0.3 + dark * .7));
+      const resting = (shut ? .45 : 1) * (1 - away * .22 * (0.14 + dark * .86));
       group.alpha = resting;
 
       // The ground it stands on, so nothing floats.
