@@ -71,6 +71,9 @@ func (a *app) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				reply(w, 200, s.Public())
 			}
 			return
+		case "/api/layout":
+			readLayout(w)
+			return
 		}
 		root := os.Getenv("BLACK_LEDGER_WEB")
 		if root == "" {
@@ -107,6 +110,9 @@ func (a *app) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	r.Body = http.MaxBytesReader(w, r.Body, 12000)
 	switch r.URL.Path {
+	case "/api/layout":
+		writeLayout(w, r)
+		return
 	case "/api/action":
 		var c core.Command
 		if e := body(r, &c); e != nil {

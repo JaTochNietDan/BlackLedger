@@ -608,3 +608,24 @@
 .iso-name{font:11px system-ui;fill:#cfd4c6;paint-order:stroke;stroke:#0d1413;stroke-width:3.5px;stroke-linejoin:round;pointer-events:none}
 .iso-block.picked .iso-name,.iso-block.here .iso-name{fill:var(--gold)}
 .city-iso .iso-block.shut .iso-name{fill:#8b9187}
+
+/* Arranging the map. A panel over the corner of the city rather than beside
+   it: the map is the interface, and shrinking the map to make room for a list
+   of sprite names would be the wrong way round. */
+.map-editor{position:absolute;top:10px;right:10px;width:280px;max-height:calc(100% - 20px);
+  display:flex;flex-direction:column;gap:8px;padding:12px;overflow:auto;
+  background:#0e1413ee;border:1px solid var(--line);z-index:5}
+.map-editor header{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.map-editor h4{margin:0;font:13px var(--serif);font-weight:400;color:var(--ink)}
+.map-editor .nothing-here{font-size:11px;line-height:1.5;color:var(--muted);margin:0}
+.editor-slot{margin:0;font-size:11px;color:var(--muted)}
+.editor-slot b{color:var(--ink);font-weight:400}
+.editor-sprites{display:flex;flex-wrap:wrap;gap:4px}
+.editor-sprites .sprite{font:10px system-ui;padding:4px 7px;background:#16211f;
+  border:1px solid var(--line);color:var(--muted);cursor:pointer}
+.editor-sprites .sprite:hover{border-color:#8f7849;color:var(--ink)}
+.editor-sprites .sprite.picked{background:#25332c;border-color:var(--gold);color:var(--ink)}
+.editor-nudge{margin:0;font-size:10px;color:var(--muted)}
+.map-editor footer{display:flex;flex-direction:column;gap:5px;margin-top:auto;padding-top:8px;
+  border-top:1px solid var(--line)}
+.map-editor footer small{font-size:10px;color:var(--muted);line-height:1.4}

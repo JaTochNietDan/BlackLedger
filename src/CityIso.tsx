@@ -6,6 +6,8 @@ import {addressSlot, along, awnings, blockFor, BLOCK, bounds, carriageways, dist
 import type {Cell, Vec} from './iso';
 import cutouts from '../public/art/iso/isometric.json';
 import type {Spotlight} from './CityStreet';
+import {EMPTY, slotKey} from './layout';
+import type {Layout} from './layout';
 
 // The city, drawn as a city, on a GPU.
 //
@@ -251,9 +253,14 @@ function moment(kind: string, t: number, across: number): Graphics {
   return g;
 }
 
-export function CityIso({state, selected, onSelect, onEnter, spotlight}: {
+export function CityIso({state, selected, onSelect, onEnter, spotlight,
+                         layout = EMPTY, editing = false, slot: chosen = '', onSlot}: {
   state: Snapshot; selected: string; onSelect: (id: string) => void; onEnter: () => void;
   spotlight?: Spotlight | null;
+  // The arrangement, and whether it is being arranged. The city draws itself
+  // the same way either way; editing only adds something to click on.
+  layout?: Layout; editing?: boolean; slot?: string;
+  onSlot?: (key: string) => void;
 }) {
   const host = useRef<HTMLDivElement>(null);
   const app = useRef<Application | null>(null);
@@ -267,6 +274,7 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight}: {
   // them through a box rather than closing over a stale one.
   const pick = useRef(onSelect); pick.current = onSelect;
   const enter = useRef(onEnter); enter.current = onEnter;
+  const takeSlot = useRef(onSlot); takeSlot.current = onSlot;
 
   // Build the renderer once. Rebuilding it on every state change would throw
   // away the camera the player had set, which is the whole point of having one.
@@ -326,7 +334,8 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight}: {
   // Deliberately not spotlight.t: the moment animates in its own layer, and
   // rebuilding twelve buildings sixty times a second to redraw a fireball that
   // is not in them is work for nothing.
-  useEffect(draw, [state.revision, state.minute, selected, spotlight?.id]);
+  useEffect(draw, [state.revision, state.minute, selected, spotlight?.id,
+                   editing, chosen, JSON.stringify(layout.slots)]);
 
   // When a moment starts, take the camera to the building it happened at and
   // remember where the player was looking so it can be given back.
@@ -669,7 +678,7 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight}: {
     // twelve models in twelve fields.
     const SLOTS = 2;
     const filler = new Container();
-    const rows: {cell: Cell; slot: ReturnType<typeof terrace>[number]; depth: number}[] = [];
+    const rows: {cell: Cell; slot: ReturnType<typeof terrace>[number]; index: number; depth: number}[] = [];
     const addressAt = new Map<string, string>();      // "col,row,index" -> id
     const hung = new Map<string, ReturnType<typeof awnings>>();
     const smoking = new Map<string, ReturnType<typeof vents>>();
@@ -681,7 +690,8 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight}: {
         terrace({col, row}, SLOTS).forEach((slot, index) => {
           const key = `${col},${row},${index}`;
           if (slot.front && addressAt.has(key)) return;   // the address builds here
-          rows.push({cell: {col, row}, slot, depth: slot.at.x + slot.w / 2 + slot.at.y + slot.d / 2});
+          rows.push({cell: {col, row}, slot, index,
+                     depth: slot.at.x + slot.w / 2 + slot.at.y + slot.d / 2});
         });
       }
     }
@@ -692,7 +702,7 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight}: {
       const key = `${r.cell.col},${r.cell.row}`;
       nearest.set(key, Math.max(nearest.get(key) ?? -Infinity, r.depth));
     }
-    for (const {cell, slot} of rows) {
+    for (const {cell, slot, index} of rows) {
       const shape = fillerShape({col: cell.col * 7 + Math.round(slot.at.x * 3), row: cell.row * 5 + Math.round(slot.at.y * 3)});
       // Which building this is. Stepping through the set by position rather
       // than picking at random stops the same picture landing next door to
@@ -703,7 +713,13 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight}: {
       // which is how a street is actually built.
       const onEnd = slot.end;
       const set = onEnd && CORNERS.length ? CORNERS : FILL;
-      const which = set.length ? set[((order % set.length) + set.length) % set.length] : '';
+      const automatic = set.length ? set[((order % set.length) + set.length) % set.length] : '';
+      // What has been put here by hand wins over what the city would have
+      // chosen for itself, and a slot cleared by hand stays cleared rather
+      // than quietly filling itself in again.
+      const key = slotKey(cell.col, cell.row, index);
+      const placed = layout.slots[key];
+      const which = placed ? placed.sprite : automatic;
       const fillArt = which ? textures.get(which) : undefined;
       const g = new Graphics();
       if (fillArt) {
@@ -719,7 +735,7 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight}: {
         art.anchor.set(fit.anchor[0], fit.anchor[1]);
         art.scale.set(across / fit.base);
         const foot = project({x: slot.at.x + slot.w, y: slot.at.y + slot.d});
-        art.position.set(foot.x, foot.y);
+        art.position.set(foot.x + (placed?.dx || 0), foot.y + (placed?.dy || 0));
         // Tone varies between neighbours; proportions do not. Scaling the
         // height alone squashed and stretched buildings that were drawn
         // correctly, which is its own artefact on top of the overlapping.
@@ -837,10 +853,13 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight}: {
       const across = (block.w + block.d) * (TILE.w / 2);
       let tallest = Math.max(...block.parts.map(q => (q.base || 0) + q.h));
 
-      const texture = textures.get(p.id);
+      const addressKey = slotKey(cell.col, cell.row, addressSlot(SLOTS));
+      const chosenHere = layout.slots[addressKey];
+      const spriteId = chosenHere ? chosenHere.sprite : p.id;
+      const texture = spriteId ? textures.get(spriteId) : undefined;
       if (texture) {
         const art = new Sprite(texture);
-        const fit = feet(p.id, texture);
+        const fit = feet(spriteId, texture);
         art.anchor.set(fit.anchor[0], fit.anchor[1]);
         // Scaled so the building's own ground matches the ground it is given,
         // rather than so its picture matches the plot's width.
@@ -848,7 +867,7 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight}: {
         // And stood on the near corner of the plot, which is the point the
         // anchor above names — the corner of the building's own base.
         const foot = project({x: at.x + block.w, y: at.y + block.d});
-        art.position.set(foot.x, foot.y);
+        art.position.set(foot.x + (chosenHere?.dx || 0), foot.y + (chosenHere?.dy || 0));
         group.addChild(art);
         tallest = (art.height / TILE.h) * .6;
       } else {
@@ -949,6 +968,42 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight}: {
       tag.position.set(spot.x, spot.y - 20);
       tag.resolution = 2;
       layer.addChild(tag);
+    }
+
+    // ---------------------------------------------------------------------
+    // Arranging the city.
+    //
+    // Only when it is being arranged: a diamond over every slot's ground, so
+    // there is something to click that is the ground itself rather than the
+    // picture standing on it. Clicking the picture would be worse than it
+    // sounds — a building overlaps its neighbours' ground by design, so the
+    // sprite under the pointer is often not the one whose slot you meant.
+    if (editing) {
+      const marks = new Graphics();
+      const label = new Container();
+      for (let col = 0; col < size.cols; col++) {
+        for (let row = 0; row < size.rows; row++) {
+          terrace({col, row}, SLOTS).forEach((slot, index) => {
+            const key = slotKey(col, row, index);
+            const corners = [
+              {x: slot.at.x, y: slot.at.y},
+              {x: slot.at.x + slot.w, y: slot.at.y},
+              {x: slot.at.x + slot.w, y: slot.at.y + slot.d},
+              {x: slot.at.x, y: slot.at.y + slot.d},
+            ].map(project);
+            const here = key === chosen;
+            const face = new Graphics();
+            face.poly(corners.flatMap(c => [c.x, c.y]))
+              .fill({color: here ? 0xd6b77c : 0x7fd4ff, alpha: here ? .3 : .07})
+              .stroke({width: here ? 2.5 : 1, color: here ? 0xf1d191 : 0x7fd4ff, alpha: here ? 1 : .5});
+            face.eventMode = 'static';
+            face.cursor = 'pointer';
+            face.on('pointertap', (e) => { e.stopPropagation(); takeSlot.current?.(key) });
+            marks.addChild(face);
+          });
+        }
+      }
+      layer.addChild(marks, label);
     }
   }
 
