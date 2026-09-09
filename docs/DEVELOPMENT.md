@@ -5090,3 +5090,45 @@ inbox entry: many more people living in the city, and more ways a business
 touches the simulation.
 
 Evidence: `core/kinds_test.go`. All gates green, `npm test` 41.
+
+## Half the city had nobody in it
+
+From the inbox: a lot more characters living here. The number was the wrong
+thing to look at first. The street trades — the people who are not in this
+business and live here anyway — name the address each of them works at, and that
+list was written when the city had ten addresses. It has twenty. Eight of them
+had nobody in them at all: a butcher with no butcher, a cab company with no
+drivers, a revue bar with nobody on the stage.
+
+So the city is inhabited before it is enlarged. Twenty-three new trades across
+those eight addresses, and the street is sixty-two people rather than
+twenty-six, which is roughly one for each way there is to make a living here.
+That was always what the number meant.
+
+| | before | after |
+| --- | --- | --- |
+| people per city, day 30 | 53 | 87 |
+| people per city, day 400 | 119 | 170 |
+| addresses with nobody working there | 8 of 20 | 0 |
+| ways to make a living | 26 | 49 |
+
+Nobody shares a name with anybody else in a city of eighty-eight, and every city
+reaches the street it means to have — both tested, because naming somebody is
+sixty attempts at a random pairing and running out is silent: the city would
+simply be smaller than it intended and nothing would say so.
+
+Two guards fired. One of my new trades was a delivery boy and another a cold
+store man, in a game that records nobody's gender. And the check on how many
+people are on the street at once was written as "more than twelve, which is most
+of the city" when the city held about fifty. Twelve stopped meaning a quarter of
+anybody. It is a proportion now, which is what its own message always claimed it
+was — a test change, and recorded as one.
+
+The costs, measured rather than assumed. The core suite went from 45 seconds to
+94: the prose scans read every passage the city writes, and a city with seventy
+per cent more people in it writes more. The state the interface reads is 80KB.
+The busiest room holds twenty people at once, and the room list already hides
+bystanders behind a count, but I have not looked at a crowded room in the
+browser yet and am not claiming it reads well.
+
+Evidence: `core/population_places_test.go`. All gates green, `npm test` 41.

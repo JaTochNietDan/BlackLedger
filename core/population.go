@@ -17,11 +17,16 @@ const (
 	FamilySize = 9
 	// SplinterSize is what a new organization starts with and works up from.
 	SplinterSize = 4
-	// StreetCount is how many people in this city answer to nobody.
-	StreetCount = 26
+	// StreetCount is how many people in this city answer to nobody. It was
+	// twenty-six, which was one for every street trade when there were
+	// twenty-six of them and ten addresses. There are twenty addresses now and
+	// the list is longer, so this is longer with it: a city is as inhabited as
+	// the number of people with somewhere to be.
+	StreetCount = 62
 	// MaxPeople bounds the save. The city recruits from the street rather than
-	// inventing people, so this is a ceiling nothing normally approaches.
-	MaxPeople = 200
+	// inventing people, so this is a ceiling nothing normally approaches — but
+	// it approached it once the street was filled out, so it is higher.
+	MaxPeople = 400
 	// RecruitChance is how often an understrength organization takes somebody
 	// on, per day.
 	RecruitChance = .25
@@ -42,6 +47,17 @@ var streetTrades = []struct{ role, place string }{
 	{"Caretaker", "apartment"}, {"Nurse", "apartment"},
 	{"Groundsman", "estate"}, {"Housekeeper", "estate"},
 	{"Newspaperman", "market"}, {"Photographer", "bar"},
+	// The addresses added since this list was written. Half the city had
+	// nobody in it: a butcher with no butcher, a cab company with no drivers,
+	// a revue bar with nobody on the stage. A city is inhabited or it is a set.
+	{"Waiter", "restaurant"}, {"Cook", "restaurant"}, {"Cellarman", "restaurant"},
+	{"Marker", "poolhall"}, {"Table hand", "poolhall"},
+	{"Boner", "butcher"}, {"Delivery hand", "butcher"}, {"Cold store hand", "butcher"},
+	{"Loader", "haulage"}, {"Long-haul driver", "haulage"}, {"Yard clerk", "haulage"},
+	{"Croupier", "goldenlily"}, {"Cashier", "goldenlily"}, {"Doorkeeper", "goldenlily"},
+	{"Presser", "steamworks"}, {"Van driver", "steamworks"}, {"Sorter", "steamworks"},
+	{"Dancer", "burlesque"}, {"Stage hand", "burlesque"}, {"Bandleader", "burlesque"},
+	{"Dispatcher", "cabstand"}, {"Night driver", "cabstand"}, {"Fitter", "cabstand"},
 }
 
 // AddCivilian puts somebody in the city who answers to nobody.

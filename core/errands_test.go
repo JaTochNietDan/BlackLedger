@@ -161,9 +161,10 @@ func TestYouDoNotSetOutAfterSomebodyWhoIsAlreadyWalking(t *testing.T) {
 // nobody ever does. Twenty seeds, three weeks each, counting how often the
 // street has somebody on it and how many journeys finish.
 func TestTheCityWalksWithoutBeingAlwaysInMotion(t *testing.T) {
-	journeys, sampled, occupied, mostAtOnce := 0, 0, 0, 0
+	journeys, sampled, occupied, mostAtOnce, crowd := 0, 0, 0, 0, 0
 	for seed := 0; seed < 20; seed++ {
 		w := New(uint32(seed) * 2654435761)
+		crowd = max(crowd, len(w.People()))
 		heading := map[string]string{}
 		for day := 0; day < 21; day++ {
 			for step := 0; step < 8; step++ {
@@ -214,8 +215,16 @@ func TestTheCityWalksWithoutBeingAlwaysInMotion(t *testing.T) {
 	if share > .9 {
 		t.Fatalf("somebody is on the street %.0f%% of the time: the city is permanently in motion", share*100)
 	}
-	if mostAtOnce > 12 {
-		t.Fatalf("%d people were out on the street at once, which is most of the city", mostAtOnce)
+	// A share of the city, not a count. This was "more than twelve", written
+	// when the city held about fifty people, and it meant "a quarter of them".
+	// The city holds nearly ninety now and twelve stopped meaning that: the
+	// figure was a proportion all along, and the message beside it said so.
+	if crowd == 0 {
+		t.Fatal("nobody lives here")
+	}
+	if share := float64(mostAtOnce) / float64(crowd); share > .25 {
+		t.Fatalf("%d of %d people were out on the street at once, which is %.0f%% of the city",
+			mostAtOnce, crowd, share*100)
 	}
 }
 
