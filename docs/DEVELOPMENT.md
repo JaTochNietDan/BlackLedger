@@ -3518,3 +3518,43 @@ almost certainly never run in any campaign anybody has played, and the crash is
 reachable only in a campaign far longer than any I have driven. The reference
 list was incomplete either way, which is the reason to fix it; the severity is
 not what it first looked like.
+
+## A refusal that knows where the hand is should say so
+
+Read the six rooms I had never read side by side, driven to day 18 on a fresh
+save: garage, docks, market, club, precinct, casino. The pair that did not agree
+was the tables. The club and the casino both refused to deal, both with the same
+sentence — "There is a hand on the table already" — and only one of them offered
+anything to do about it. The hand was at the club, so the club showed "Take
+another card" and "Stand on 12" beside its refusal. The casino showed the
+refusal alone, and did not say where the hand was, while the world had been
+storing the room on the hand the whole time.
+
+The refusal now carries it: "There is a hand of yours still on the table at The
+Monarch" when the player is somewhere else, and "You are in the middle of a
+hand" where the controls to finish it are already on screen.
+
+Evidence: `core/table_elsewhere_test.go` states both halves and failed before the
+fix with "the refusal does not say where the hand is". Re-broken afterwards to
+confirm the check can see it. Verified over HTTP on the day-18 save that showed
+the problem: standing in The Blue Hour, the small tables refuse with "There is a
+hand of yours still on the table at The Monarch". `mise run verify` and `npm
+test` green.
+
+Qualifying this honestly, because the browser said something the API did not.
+The player was not without the information. Reading the same save on screen, the
+player card in the sidebar already read "At the tables in The Monarch: showing
+12, dealer shows 10, $50 down". So this is two parts of one screen disagreeing
+about how much they will tell you, not a fact the game was withholding. The
+refusal is where a player looks to find out why a button will not work, and it
+now agrees with the card above it.
+
+Also noted while reading, and deliberately not changed, because they are
+questions about design rather than faults. The crew is named inconsistently
+across one room: `rob:crew` reads "Send Leo Carver for the till" while
+`delegate` reads "Send Leo on collections" and `crew_bonus` reads "Pay Leo a
+bonus". And `sabotage` names the family it hurts while `sabotage:crew` names the
+premises it hits — "Move against Russo Outfit yourself" beside "Send Leo Carver
+against Russo Motor Works" — so a player cannot tell from the labels whether the
+two do the same thing. Both are worth settling, and settling them is a choice
+about what these actions are, not a correction.

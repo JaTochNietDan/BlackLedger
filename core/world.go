@@ -914,7 +914,20 @@ func (w *World) Actions(id string) []Action {
 			// it would have the command layer charge it a second time.
 			reason := w.TableReadiness(id, stake)
 			if reason == "" && w.Hand != nil && !w.Hand.Done {
-				reason = "There is a hand on the table already"
+				// Where the hand is, the buttons to play it are right beside
+				// this and the refusal needs to say nothing more. Anywhere
+				// else, the refusal is all the player gets: reading the casino
+				// and the club side by side, both said "There is a hand on the
+				// table already" and only one of them offered anything to do
+				// about it. The room was on the hand the whole time.
+				reason = "You are in the middle of a hand"
+				if w.Hand.Place != id {
+					where := w.Hand.Place
+					if place, ok := PlaceByID(w.Hand.Place); ok {
+						where = place.Name
+					}
+					reason = "There is a hand of yours still on the table at " + where
+				}
 			}
 			add("play:"+stake.ID, stake.Label, 60, 0, reason,
 				fmt.Sprintf("Stake $%d and play it out a card at a time. The dealer draws to %d and stands on %d, a tie gives your money back, and going over is finished before the dealer plays at all.", stake.Amount, DealerStands-1, DealerStands))
