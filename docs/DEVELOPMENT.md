@@ -3957,3 +3957,46 @@ Correcting my own record: bail appears in this document's list of things
 verified by hand over HTTP. That was true of the command and not of the button,
 and I did not check the difference at the time. Posting a command directly is
 not evidence that a player can reach it.
+
+## Which buttons can never be pressed
+
+Bail was dead in every campaign and nothing failed, because no test ever asked
+the obvious question of it: is there any state at all in which this button is
+live? `core/reachable_test.go` asks that of every button the game can produce.
+
+It builds cities in six conditions — a rich established player with a crew, an
+organization and somebody of theirs in a cell; the same city aged two thousand
+half-hours; a beginner with just enough standing to open the next district;
+somebody serving a family; nobody's man who is well thought of everywhere; and a
+proprietor with the press and the police on a retainer, short-handed premises,
+the police interested in him, and money abroad he has not yet reached. Across
+five seeds it records every action id offered and every id offered *enabled*,
+and reports anything that appears only in the first list.
+
+The first run named twenty-seven kinds that were never live. Sixteen of those
+were my fixtures rather than the game, and building the right state cleared
+them one at a time. Two of those corrections are worth recording because I had
+the game's own rules wrong: a retainer is held by the **role**, not by the
+person in it, so storing the editor's id retains nobody and the whole newspaper
+went on refusing; and a business the player takes over arrives fully staffed, so
+hiring is correctly refused until somebody leaves.
+
+Seventy-eight kinds are now confirmed pressable, including every action this
+document had listed as never reached in play — bail, bribe, charge, move,
+remedy, leaving a family's service, and the trip upriver among them. Four
+remain, and each was read and explains itself with a real condition rather than
+a fault: a takeover needs the family weak and you in the room with its leader,
+a pact needs standing the sweep's player has not earned with that particular
+family, and two are per-family variants whose base form is live.
+
+The regression is the point. Sixteen of the hardest-to-reach buttons are named
+in the test and must stay live; reverting last slice's bail fix makes it fail
+with "bail:* is offered 5 times and never live: no state in this sweep can press
+it", which is what should have happened months ago. `mise run verify` and `npm
+test` green, `mise run simulate` unchanged at defiant 52 / investor 0 / reckless
+82 / worker 0, 0 errors.
+
+Recording the shape plainly, because it is the seventh this audit has produced
+and the only one that hides in what a test does *not* ask: a button offered and
+never live looks exactly like a button correctly refused, and only counting
+across many states tells them apart.
