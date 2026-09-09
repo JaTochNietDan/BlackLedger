@@ -9,3 +9,4 @@ dist/
 # audio sources. Reinstallable; never committed.
 .tools/
 .venv/
+.venv-blender/
