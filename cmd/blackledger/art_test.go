@@ -305,3 +305,30 @@ func TestPlayerWorkHasSomewhereToBe(t *testing.T) {
 		t.Error("the room panel no longer leaves the player's own work out")
 	}
 }
+
+// The screen that lists everybody in the city was a list you read and then went
+// hunting on a map for: a man owes you money and is overdue, and the card said
+// so and offered nothing. A name you can deal with now carries the work on its
+// own card, and a name you cannot carries the address they are standing at.
+func TestANameYouKnowCanBeDealtWithOrFound(t *testing.T) {
+	screen, err := os.ReadFile("../../src/PeopleScreen.tsx")
+	if err != nil {
+		t.Skip("no interface beside this build")
+	}
+	s := string(screen)
+	if !strings.Contains(s, "a.subject === who.id") {
+		t.Error("a person's card does not carry the work the core says is about them")
+	}
+	if !strings.Contains(s, "find-them") {
+		t.Error("a person standing somewhere else cannot be reached from their card")
+	}
+	main, err := os.ReadFile("../../src/main.tsx")
+	if err != nil {
+		t.Fatal(err)
+	}
+	// The work has to come from where the player actually is, or the card is
+	// offering something the command layer will refuse.
+	if !strings.Contains(string(main), "at={p.location} here={(w.locations.find(l=>l.id===p.location)?.actions||[]).filter(a=>!!a.subject)}") {
+		t.Error("the people screen is not given the work available where the player is standing")
+	}
+}

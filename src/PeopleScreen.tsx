@@ -21,7 +21,17 @@ const groups: [string, string, string][] = [
 
 const money = (n: number) => '$' + Math.floor(n).toLocaleString();
 
-function Card({who}: {who: Presence}) {
+// What can be done with somebody, and where they are if the answer is nothing.
+// The screen listed four hundred people and offered no way to act on any of
+// them: you read that a man owes you money and overdue, and then went looking
+// for him on a map. The city knows where everybody is standing, so the card
+// says it and takes you there.
+function Card({who, at, actions, render, onFind}: {
+  who: Presence; at?: string; actions?: Action[];
+  render?: (a: Action) => ReactElement; onFind?: (place: string) => void;
+}) {
+  const theirs = (actions || []).filter(a => a.subject === who.id);
+  const here = !!at && who.where_id === at && !who.walking;
   return <article className={'person-card' + (who.yours ? ' yours' : '') + (who.overdue || who.sore ? ' sour' : '') + (who.walking ? ' walking' : '')}>
     <Portrait id={who.id} size="small"/>
     <div className="person-of">
@@ -35,11 +45,26 @@ function Card({who}: {who: Presence}) {
             who.sore ? `holds ${who.sore} against you` : ''].filter(Boolean).join(' · ')}
         </small>}
     </div>
+    {!!render && (here
+      ? theirs.length > 0
+        ? <div className="actions compact person-work">{theirs.map(render)}</div>
+        : <p className="nothing-here">They are here, and there is nothing to do with them.</p>
+      : !!onFind && !!who.where_id && <button className="plain find-them"
+          onClick={() => onFind(who.where_id!)}>
+          {who.walking ? 'Meet them at' : 'Find them at'} {who.where?.replace('On the way to ', '') || 'their address'} ↗
+        </button>)}
   </article>;
 }
 
-export function PeopleScreen({world, actions = [], render}: {
+export function PeopleScreen({world, actions = [], here = [], at, onFind, render}: {
   world: Snapshot;
+  // What the room the player is standing in offers about the people in it, so
+  // a name they can actually deal with says so on its own card.
+  here?: Action[];
+  at?: string;
+  // Where somebody is, taken up: the screen used to be a list you read and
+  // then went hunting on a map for.
+  onFind?: (place: string) => void;
   // Work about people rather than about a building: putting a price on a name,
   // asking what is being said. It used to be printed at the exchange, which
   // meant crossing the city to reach a decision about somebody who was never
@@ -103,7 +128,7 @@ export function PeopleScreen({world, actions = [], render}: {
           ? <button className="reveal-blocked" onClick={() => setOpenStreet(true)}>
               Show {s.people.length} more people in Bellwether
             </button>
-          : <div className="person-grid">{s.people.map(p => <Card key={p.id} who={p}/>)}</div>}
+          : <div className="person-grid">{s.people.map(p => <Card key={p.id} who={p} at={at} actions={here} render={render} onFind={onFind}/>)}</div>}
       </section>;
     })}
 
