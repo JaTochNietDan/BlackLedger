@@ -364,7 +364,15 @@ func pick(s *snapshot, visited map[string]int, tried map[string]int, turn int) (
 	// unverified one, and coverage is the point of the harness. Fall back to
 	// rotating through the rest so behaviour is still varied.
 	if turn%2 == 0 {
-		for _, want := range ventures {
+		// Start the scan at a different place each turn. Reading the coverage
+		// report showed ten ventures that were offered, enabled, and never
+		// taken in fifteen runs — including all three trips out of the city.
+		// The scan began at the top of the list every time, so an untried
+		// venture near the front won every turn and anything late in the list
+		// was starved no matter how often the game offered it.
+		start := turn % len(ventures)
+		for offset := 0; offset < len(ventures); offset++ {
+			want := ventures[(start+offset)%len(ventures)]
 			if tried[want] > 0 {
 				continue
 			}
@@ -450,6 +458,19 @@ type failure struct {
 	Problem string `json:"problem"`
 }
 
+// blocked is why a venture was never exercised. A coverage list that says only
+// "never tried" cannot tell the difference between a system the harness chose
+// not to reach and one the game never offered it — and those want opposite
+// fixes. This separates them: a venture the player was never even shown is a
+// reachability problem, one shown but always greyed out is a wealth or state
+// problem, and one offered and enabled but not taken is the harness's fault.
+type blocked struct {
+	Venture string `json:"venture"`
+	Why     string `json:"why"`
+	// Reason is the game's own explanation, when it gave one.
+	Reason string `json:"reason,omitempty"`
+}
+
 type report struct {
 	Base        string         `json:"base"`
 	StepsTaken  int            `json:"steps_taken"`
@@ -459,6 +480,7 @@ type report struct {
 	Failures    []failure      `json:"invariant_failures"`
 	Kinds       map[string]int `json:"command_counts"`
 	Untried     []string       `json:"never_tried,omitempty"`
+	Blocked     []blocked      `json:"why_never_tried,omitempty"`
 }
 
 func main() {
@@ -480,6 +502,26 @@ func main() {
 		rep.Failures = append(rep.Failures, failure{Step: step, Problem: fmt.Sprintf(format, args...)})
 	}
 	visited := map[string]int{}
+	// What the game put in front of the player, and whether it was greyed out.
+	offered, enabled, greyed := map[string]bool{}, map[string]bool{}, map[string]string{}
+	note := func(s *snapshot) {
+		if s == nil {
+			return
+		}
+		for _, p := range s.Locations {
+			for _, a := range p.Actions {
+				offered[a.ID] = true
+				if a.Disabled {
+					if _, seen := greyed[a.ID]; !seen {
+						greyed[a.ID] = a.Reason
+					}
+				} else {
+					enabled[a.ID] = true
+				}
+			}
+		}
+	}
+	note(s)
 	checkedReplay, checkedConflict := false, false
 
 	for step := 1; step <= *steps; step++ {
@@ -568,6 +610,7 @@ func main() {
 				step, cmd.Kind, next.Minute/1440+1, next.Minute%1440/60, next.Minute%60,
 				next.Player.Cash, next.Player.Respect, next.Player.Heat, next.Player.Health)
 		}
+		note(next)
 		s = next
 	}
 
@@ -584,6 +627,29 @@ func main() {
 	rep.Final = map[string]any{"life": final.Life, "minute": final.Minute, "cash": final.Player.Cash,
 		"respect": final.Player.Respect, "heat": final.Player.Heat, "alive": final.Player.Alive, "owned": owned}
 
+	// Coverage is part of the result. A clean run that never tried a system has
+	// not tested it, and saying so is the difference between evidence and noise.
+	// This has to happen before the report is written: it was computed after,
+	// so every JSON report ever produced carried an empty coverage list while
+	// the terminal showed the real one.
+	untried := []string{}
+	for _, venture := range ventures {
+		if rep.Kinds[venture] == 0 {
+			untried = append(untried, venture)
+		}
+	}
+	rep.Untried = untried
+	for _, venture := range untried {
+		switch {
+		case !offered[venture]:
+			rep.Blocked = append(rep.Blocked, blocked{Venture: venture, Why: "never appeared in any location's action list"})
+		case !enabled[venture]:
+			rep.Blocked = append(rep.Blocked, blocked{Venture: venture, Why: "offered but always out of reach", Reason: greyed[venture]})
+		default:
+			rep.Blocked = append(rep.Blocked, blocked{Venture: venture, Why: "offered and available, and the harness never took it"})
+		}
+	}
+
 	if *out != "" {
 		b, _ := json.MarshalIndent(rep, "", " ")
 		if err := os.WriteFile(*out, append(b, '\n'), 0600); err != nil {
@@ -593,15 +659,6 @@ func main() {
 	fmt.Printf("%d commands %v\n", rep.StepsTaken, rep.Final)
 	fmt.Println("idempotency:", rep.Idempotency)
 	fmt.Println("stale revision:", rep.Conflict)
-	// Coverage is part of the result. A clean run that never tried a system has
-	// not tested it, and saying so is the difference between evidence and noise.
-	untried := []string{}
-	for _, venture := range ventures {
-		if rep.Kinds[venture] == 0 {
-			untried = append(untried, venture)
-		}
-	}
-	rep.Untried = untried
 	fmt.Printf("exercised %d kinds of command: %v\n", len(rep.Kinds), rep.Kinds)
 	if len(untried) > 0 {
 		fmt.Printf("never tried (%d): %v\n", len(untried), untried)

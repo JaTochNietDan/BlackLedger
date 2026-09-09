@@ -2079,3 +2079,57 @@ trips through the HTTP API by hand.
 Evidence: seven properties in `core/away_test.go`, fourteen clean apicheck runs,
 `mise run verify` and `npm test` green, `mise run simulate` unchanged at
 53 / 0 / 82 / 0.
+
+## What the harness never sees, and a correction
+
+Last night I wrote that `cmd/apicheck` never takes a trip "because the fare is
+out of reach at the cash its play reaches." **That was wrong.** I had not
+checked; I inferred it from having seen a disabled trip button next to $80. The
+game's own recorded reason, across fifteen runs, is `You are in no condition to
+travel` — the harness plays recklessly, ends up hurt, and health is what stops
+it. In several runs the trip was offered *and enabled* and the harness simply
+did not take it, for a reason that turned out to be its own.
+
+Chasing that down turned up three things.
+
+**A bug that made every JSON report useless.** The coverage list was computed
+after the report was written to disk, so `never_tried` was empty in every report
+file ever produced while the terminal printed the real one. Anyone reading the
+reports rather than watching the run would have concluded coverage was perfect.
+
+**A coverage list that could not tell you anything.** "56 never tried" does not
+distinguish a system the game never offered from one it offered and greyed out
+from one it offered, enabled, and the harness walked past — and those want
+opposite fixes. The report now separates them and carries the game's own reason
+for the greying:
+
+| why a venture went untried in 15 runs | before | after |
+|---|---|---|
+| offered, enabled, and never taken | 10 | 8 |
+| offered but always out of reach | 31 | 27 |
+| never appeared in any action list | 15 | 13 |
+| kinds exercised at least once | 39 | 47 |
+
+**And a real defect in the harness, which that split found.** The driver already
+preferred an untried venture over a repeat — but it scanned the venture list
+from the top every single turn, so an untried venture near the front won every
+time and anything late in the list was starved no matter how often the game
+offered it. All three trips are near the end. The scan now starts at a different
+point each turn.
+
+That took kinds exercised from 39 to 47 across fifteen runs, and moved eight
+systems out of the untried list, `lie_low`, `hire`, `mug:crew`, `arms:armour`,
+`buy:cigarettes` and both operating modes among them. Fifteen runs, zero
+invariant failures, so nothing newly exercised was broken.
+
+What is left is honest and not a harness problem. Twenty-seven systems are gated
+behind wealth or standing the harness's play never reaches — `car`, `still`,
+`armoury`, the three retainers, both service contracts, the safe and the cellar.
+Thirteen more never appear at all because they need a state it never gets into:
+`bankroll` and `draw` want a casino, `sell:arms` wants arms in the ground,
+`lawyer` wants an arrest, `unpost` wants somebody posted. Those are the expensive
+half of the game and they are still unverified over the HTTP stack. Saying so
+precisely is worth more than the vague version I published yesterday.
+
+`mise run verify`, `npm test` green, `mise run simulate` unchanged at
+53 / 0 / 82 / 0.
