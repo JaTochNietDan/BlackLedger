@@ -574,9 +574,19 @@ func (w *World) apply(c Command) error {
 					}
 					w.Log("A useful conversation", "Mara will keep an ear open. Your information network improves.", "personal")
 				case "recruit":
-					p.Crew = append(p.Crew, Crew{"leo", "Leo Carver", 65})
+					// Whoever drives. The label and the readiness check were
+					// taught this when it turned out the button was naming a
+					// corpse; the effect was not, and went on appending a
+					// hardcoded Leo Carver. A campaign that outlived him hired
+					// a man it had already buried, and the same room then
+					// refused to delegate to him because he was dead.
+					hand := w.Holder("driver")
+					if hand == nil {
+						return fmt.Errorf("there is nobody driving in this city")
+					}
+					p.Crew = append(p.Crew, Crew{hand.ID, hand.Name, 65})
 					p.Respect += 2
-					w.Log("Your first associate", "Leo Carver joins you. They expect $12 a day and a boss who keeps their word.", "personal")
+					w.Log("Your first associate", hand.Name+" joins you. They expect $12 a day and a boss who keeps their word.", "personal")
 				case "investigate":
 					w.Investigate()
 				case "lie_low":

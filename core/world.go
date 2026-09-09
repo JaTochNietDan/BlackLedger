@@ -757,7 +757,10 @@ func (w *World) Actions(id string) []Action {
 		}
 		reason := need(p.Respect < PremisesRespect, fmt.Sprintf("Earn %d respect first", PremisesRespect))
 		if len(p.Crew) > 0 {
-			reason = "Leo is already in your crew"
+			// Name the man on the books. "Leo is already in your crew" was
+			// printed whoever was actually on them, which is how a crew of one
+			// dead Leo Carver went unread for fifty-eight days.
+			reason = p.Crew[0].Name + " is already in your crew"
 		}
 		// The button named Leo Carver whatever had happened to him. Nobody
 		// holds a job for ever in this city: when the man who drives is dead

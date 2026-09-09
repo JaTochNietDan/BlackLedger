@@ -3293,3 +3293,42 @@ record carries the game's premise ("A room. A name. No protection.") and the
 City screen does not show it, because the clock has not moved and the banner
 correctly reads "Nothing yet. The clock is paused." Where the premise line
 belongs is a design decision, not a bug.
+
+## Hire the person the button named
+
+Twelve apicheck runs against one save reached day 58 and stopped teaching me
+anything: the last five runs spent 53, 73, 68, 60 and 76 of their eighty
+commands on `courier`, standing in the same bar. Reading that room's action list
+is what found this. Two refusals sat next to each other and contradicted each
+other. `delegate` was disabled because "Leo Carver is dead". `recruit` was
+disabled because "Leo is already in your crew". Both cannot be true, and killing
+a man takes him off the crew list, so he had been hired after he died.
+
+The recruit button had already been taught that nobody drives forever. Its label
+names whoever holds the job, and the reachability sweep is asked about that same
+person, which is what stops it offering to hire a corpse. The effect was never
+taught: it appended a hardcoded `Crew{"leo", "Leo Carver", 65}` whatever the
+button said. So once the city gave the wheel to somebody else — which it does on
+the daily tick, by design — the label offered the new driver, the gate cleared
+the new driver, and the game put dead Leo Carver on the books. The refusal beside
+it was hardcoded the same way and printed Leo's name over whoever was actually
+in the crew, which is how a crew of one dead man went unread for fifty-eight
+days.
+
+Both now name the person. `recruit` hires `w.Holder("driver")` and refuses if
+nobody drives; the crew refusal prints the name of whoever is on the books.
+
+Evidence: `core/recruit_dead_test.go` states the property that the person hired
+is the person the button named, and failed before the fix with the exact shape
+of the bug — "the button offered Zoltan Esposito and the game hired Leo Carver
+(leo)". Verified over HTTP on the day-58 save that produced the fault: with Leo
+dead and the crew emptied, the bar offered "Recruit Ugo Lenz", the command hired
+Ugo Lenz, the refusal then read "Ugo Lenz is already in your crew", and
+`delegate` came back enabled. `mise run verify` and `npm test` green, `mise run
+simulate` unchanged at defiant 52 / investor 0 / reckless 82 / worker 0, 0
+errors.
+
+Recorded and not fixed, because it is the harness and not the game: apicheck
+checks `earning` before travel, so a late campaign standing in a room that
+offers `courier` forever never leaves it. That is why coverage collapsed. It is
+also why the fault was found, so the ordering stays for now.
