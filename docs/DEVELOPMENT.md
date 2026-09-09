@@ -4813,3 +4813,49 @@ The store test loads a campaign at the current version with an address struck
 out and asks whether it comes back. Both breaks now fail.
 
 Evidence: `core/new_places_test.go`, `store/store_test.go`.
+
+## A wheel, and an edge that can be stated rather than tuned
+
+From the inbox: a proper game of roulette or blackjack rather than text buttons.
+Blackjack mechanics already existed and are good. Roulette did not exist
+anywhere — no wheel, no bets, no payouts, nothing in the core and nothing in the
+view. Core is the only source of truth, so the wheel is built and tested before
+anything is drawn.
+
+The two games are worth having side by side because they are opposite. A hand of
+cards is a decision the player keeps making. A spin is one decision made before
+anything happens and then nothing to do about it.
+
+The important part is the edge. Every payout is the true one: a number pays 35
+to 1 against 36 other pockets, red pays even against eighteen others, a dozen
+pays 2 to 1. Nothing is shaded to make the house win. The whole advantage is the
+nought, which is neither colour, neither odd nor even, and in no dozen, so it
+takes every bet on the outside of the cloth.
+
+That makes the fairness measurable rather than asserted. Walk every bet over
+every pocket exactly once: each returns 36 for 37 staked. The same for all of
+them, which is what tells you nothing has been tuned. Three deliberate breaks
+fail it — letting red take the nought, paying a dozen even money, and paying a
+winner without returning the stake.
+
+The red pockets are written out rather than computed. They are not every other
+number and there is no arithmetic that produces them.
+
+Two seams needed testing beyond the function. The bet rides on the command's
+choice field, not its target: target names the room and is what the action
+lookup searches, so a bet put there would send the game looking for a wheel in a
+place called red. And the world sent the interface a hand and no wheel, so a
+spin happened and nothing outside the ledger could say what the ball did.
+
+Verified over HTTP on a driven save, not only in tests. Eleven spins across
+every kind of bet, money moving the right way each time, and the colours
+matching the real layout: four black, one red, eight black.
+
+One thing I cannot explain and am not claiming. In the first run, the response
+to the very first spin carried no wheel while the eight after it did. Three
+deliberate repeats did not reproduce it. I have not established a cause.
+
+Next: the table itself, for both games — cards, felt and a wheel.
+
+Evidence: `core/roulette.go`, `core/roulette_test.go`. All gates green,
+`npm test` 34.

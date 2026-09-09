@@ -276,6 +276,21 @@ func (w *World) apply(c Command) error {
 				return err
 			}
 			w.Advance(a.Minutes)
+		} else if stakeID, ok := strings.CutPrefix(c.Kind, "wheel:"); ok {
+			// Resolved before the clock moves, like the rest of the tables:
+			// the ball drops and the money settles in one go, so the hours
+			// cannot land between the spin and being paid for it.
+			// The bet rides on Choice, not Target: Target names the room and is
+			// what the action lookup above searches, so putting "red" in it
+			// would look for a wheel in a place called red and find nothing.
+			bet := c.Choice
+			if bet == "" {
+				bet = "red"
+			}
+			if err := w.PlayWheel(p.Location, bet, stakeID); err != nil {
+				return err
+			}
+			w.Advance(a.Minutes)
 		} else if person, ok := strings.CutPrefix(c.Kind, "sign:"); ok {
 			if err := w.SignOn(person); err != nil {
 				return err
