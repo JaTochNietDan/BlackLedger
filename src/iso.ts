@@ -550,3 +550,55 @@ export function markings({cols, rows}: {cols: number; rows: number}): Marking[] 
   }
   return out;
 }
+
+// ---------------------------------------------------------------------------
+// Awnings.
+//
+// A shopfront in 1950 has canvas over it. It is the cheapest thing that turns a
+// wall with windows in it into a place of business, and it is the one piece of
+// a building that belongs to the street rather than to the block: it hangs out
+// over the pavement, which is why it is drawn here from the terrace geometry
+// rather than painted into the art.
+//
+// The rule is the same one the props follow: an awning may reach out over the
+// pavement and it may never reach the road. Its projection is a fraction of
+// PAVE, so that holds by construction rather than by being checked.
+
+export type Awning = {
+  at: Vec;          // the corner of the canopy against the wall
+  w: number;        // how much of the frontage it covers
+  reach: number;    // how far out over the pavement it hangs
+  h: number;        // the height of its back edge, at the top of the shopfront
+  drop: number;     // how much lower the front edge is, so rain runs off it
+  stripes: number;  // bands of canvas across it
+  tone: number;     // which of the awning colours this one is
+};
+
+// How far an awning may hang out over the pavement. Well inside the kerb: the
+// props already sit at PAVE * .42 and nothing may overhang the carriageway.
+const REACH = PAVE * .5;
+
+// awnings gives the canopies on a block's street frontage. Only the front row
+// has them — the back row faces the yards — and only some of the shopfronts,
+// because a canopy on every one reads as a parade of market stalls.
+export function awnings(cell: Cell, slots = 2): Awning[] {
+  let h = ((cell.col * 374761393) ^ (cell.row * 668265263) ^ 0x5bf03635) >>> 0;
+  const next = () => { h = (h * 1664525 + 1013904223) >>> 0; return h / 4294967296 };
+  const out: Awning[] = [];
+  for (const slot of terrace(cell, slots)) {
+    if (!slot.front) continue;
+    if (next() > .58) continue;
+    // Not the whole frontage: a shopfront sits between the doorways, so the
+    // canvas stops short of the party walls at either end.
+    const w = slot.w * (.5 + next() * .22);
+    const at = {x: slot.at.x + (slot.w - w) / 2, y: slot.at.y + slot.d};
+    out.push({
+      at, w, reach: REACH,
+      h: .3 + next() * .06,
+      drop: .05 + next() * .03,
+      stripes: 4 + Math.floor(next() * 4),
+      tone: Math.floor(next() * 4),
+    });
+  }
+  return out;
+}

@@ -9,7 +9,7 @@
 
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {BLOCK, PAVE, ROAD, addressSlot, island, terrace} from '../.runtime/frontend-test/iso.js';
+import {BLOCK, PAVE, ROAD, addressSlot, awnings, island, terrace} from '../.runtime/frontend-test/iso.js';
 
 const SLOTS = 2;                 // must match CityIso.tsx
 
@@ -66,4 +66,38 @@ test('the geometry the city is drawn from is the geometry tested here', () => {
   assert.equal(BLOCK, 3.6);
   assert.equal(ROAD, 1);
   assert.equal(PAVE, .42);
+});
+
+// The awnings hang over the pavement and never over the road, and never over
+// each other. Same rule the props follow, checked the same way.
+test('an awning hangs over its own pavement and no further', () => {
+  let found = 0;
+  for (const cell of cells) {
+    const i = island(cell);
+    for (const a of awnings(cell, SLOTS)) {
+      found++;
+      // Out from the wall, it stops inside the kerb.
+      assert.ok(a.at.y + a.reach <= i.y + i.d + 1e-9,
+        `awning on ${JSON.stringify(cell)} reaches the road`);
+      // Along the wall, it stays inside its own shopfront.
+      const slot = terrace(cell, SLOTS).filter(s => s.front)
+        .find(s => a.at.x >= s.at.x - 1e-9 && a.at.x + a.w <= s.at.x + s.w + 1e-9);
+      assert.ok(slot, `awning on ${JSON.stringify(cell)} spans more than one building`);
+      // And it hangs off the wall it belongs to rather than floating.
+      assert.ok(Math.abs(a.at.y - (slot.at.y + slot.d)) < 1e-9, 'awning is not against its wall');
+      assert.ok(a.h > a.drop, 'awning front edge is below the pavement');
+    }
+  }
+  assert.ok(found > 8, `only ${found} awnings in the whole city`);
+});
+
+test('two awnings never overlap', () => {
+  const all = cells.flatMap(c => awnings(c, SLOTS));
+  for (let i = 0; i < all.length; i++)
+    for (let j = i + 1; j < all.length; j++) {
+      const a = all[i], b = all[j];
+      const x = Math.min(a.at.x + a.w, b.at.x + b.w) - Math.max(a.at.x, b.at.x);
+      const y = Math.min(a.at.y + a.reach, b.at.y + b.reach) - Math.max(a.at.y, b.at.y);
+      assert.ok(!(x > 1e-9 && y > 1e-9), 'two awnings occupy the same air');
+    }
 });

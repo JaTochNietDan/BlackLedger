@@ -2,7 +2,7 @@ import {useEffect, useRef} from 'react';
 import {Application, Assets, Container, Graphics, Sprite, Text, Texture, TextStyle} from 'pixi.js';
 import {Viewport} from 'pixi-viewport';
 import type {Snapshot} from './types';
-import {addressSlot, along, blockFor, BLOCK, bounds, carriageways, distance, dressing, faces, fillerShape, grid, island, kerbside, lampPosts, markings, middle, mix, nightness, PAVE, plot, project, ROAD, size, terrace, TILE, walk, wires} from './iso';
+import {addressSlot, along, awnings, blockFor, BLOCK, bounds, carriageways, distance, dressing, faces, fillerShape, grid, island, kerbside, lampPosts, markings, middle, mix, nightness, PAVE, plot, project, ROAD, size, terrace, TILE, walk, wires} from './iso';
 import type {Cell, Vec} from './iso';
 import cutouts from '../public/art/iso/isometric.json';
 import type {Spotlight} from './CityStreet';
@@ -523,6 +523,47 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight}: {
     strung.stroke({width: 1, color: mix(0x4a4f48, 0x15191a, dark), alpha: .75});
     layer.addChild(clutter, strung);
 
+    // A canvas awning over a shopfront, hanging out over the pavement. Drawn
+    // from the terrace geometry rather than painted into the art, because it
+    // belongs to the street: it is the one part of a building that reaches
+    // past its own wall.
+    const CANVAS = [[0x2f4436, 0xd8cdb4], [0x6b2f2c, 0xd8cdb4],
+                    [0x8a6a2c, 0xe0d5bb], [0x2c3d55, 0xd2c9b2]];
+    const canopy = (a: ReturnType<typeof awnings>[number]) => {
+      const g = new Graphics();
+      const lift = (v: Vec, up: number) => ({x: v.x, y: v.y - up * TILE.h});
+      const [band, pale] = CANVAS[a.tone % CANVAS.length];
+      // The shadow it throws on the pavement, which is what stops it floating.
+      const shade = [{x: a.at.x, y: a.at.y}, {x: a.at.x + a.w, y: a.at.y},
+                     {x: a.at.x + a.w, y: a.at.y + a.reach}, {x: a.at.x, y: a.at.y + a.reach}]
+        .map(v => project({x: v.x + .04, y: v.y + .04}));
+      g.poly(shade.flatMap(v => [v.x, v.y])).fill({color: 0x0b0f10, alpha: .3 - dark * .16});
+      // The canvas itself, in bands across the frontage, sloping down to the
+      // street so the rain runs off it.
+      const step = a.w / a.stripes;
+      for (let k = 0; k < a.stripes; k++) {
+        const x0 = a.at.x + k * step, x1 = x0 + step;
+        const quad = [
+          lift(project({x: x0, y: a.at.y}), a.h),
+          lift(project({x: x1, y: a.at.y}), a.h),
+          lift(project({x: x1, y: a.at.y + a.reach}), a.h - a.drop),
+          lift(project({x: x0, y: a.at.y + a.reach}), a.h - a.drop),
+        ];
+        // Not darkened as far as a roof is: an awning sits under a lamp and
+        // over a lit window, which is the whole reason a shopfront has one.
+        g.poly(quad.flatMap(v => [v.x, v.y]))
+          .fill(mix(k % 2 ? pale : band, 0x1d2124, .1 + dark * .34));
+      }
+      // The valance hanging off the front lip, which is what makes it read as
+      // cloth rather than as a shelf.
+      const fl = lift(project({x: a.at.x, y: a.at.y + a.reach}), a.h - a.drop);
+      const fr = lift(project({x: a.at.x + a.w, y: a.at.y + a.reach}), a.h - a.drop);
+      const hang = .055 * TILE.h;
+      g.poly([fl.x, fl.y, fr.x, fr.y, fr.x, fr.y + hang, fl.x, fl.y + hang])
+        .fill(mix(band, 0x0f1416, .22 + dark * .4));
+      return g;
+    };
+
     // Every slot in every block that the addresses do not take. A block is a
     // terrace: the address takes one frontage slot and ordinary buildings take
     // the rest, shoulder to shoulder, so the city is built up rather than
@@ -531,9 +572,11 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight}: {
     const filler = new Container();
     const rows: {cell: Cell; slot: ReturnType<typeof terrace>[number]; depth: number}[] = [];
     const addressAt = new Map<string, string>();      // "col,row,index" -> id
+    const hung = new Map<string, ReturnType<typeof awnings>>();
     for (const [id, cell] of cells) addressAt.set(`${cell.col},${cell.row},${addressSlot(SLOTS)}`, id);
     for (let col = 0; col < size.cols; col++) {
       for (let row = 0; row < size.rows; row++) {
+        hung.set(`${col},${row}`, awnings({col, row}, SLOTS));
         terrace({col, row}, SLOTS).forEach((slot, index) => {
           const key = `${col},${row},${index}`;
           if (slot.front && addressAt.has(key)) return;   // the address builds here
@@ -588,6 +631,14 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight}: {
       const away = distance(slot.at, size);
       g.alpha = 1 - away * .35 * (0.35 + dark * .65);
       filler.addChild(g);
+      // And the canvas over its shopfront, drawn straight after the building it
+      // hangs on so it can never end up behind it.
+      for (const a of hung.get(`${cell.col},${cell.row}`) || []) {
+        if (a.at.x < slot.at.x - 1e-9 || a.at.x + a.w > slot.at.x + slot.w + 1e-9) continue;
+        const shop = canopy(a);
+        shop.alpha = g.alpha;
+        filler.addChild(shop);
+      }
     }
     layer.addChild(filler);
 
