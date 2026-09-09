@@ -4777,3 +4777,39 @@ remedy of its own. Both failure modes fail.
 | investor median cash | $14,019 | $14,166 |
 
 Evidence: `core/businesses_test.go`. All gates green, `npm test` 34.
+
+## The businesses commit crashed the live game
+
+Committed, restarted the live save, and it died on the first request. Not a
+regression I found by reading: the server returned nothing and the log had a nil
+dereference in the call that reads the world.
+
+A campaign that predates an address has no record of it, and everything that
+walks the location list finds nothing where a property should be. There is a
+repair for exactly this, and it has been there a long time. It never ran,
+because it sits behind `Version < SaveVersion` — and adding a business does not
+change the shape of a save, only its contents, so nothing had bumped the number.
+The live campaign was already at the current version and was therefore skipped.
+
+The repair is not a version migration and is no longer gated like one. It runs
+on every load. Bumping the version would have fixed today's crash and left the
+next person to add a place to discover the same thing the same way.
+
+Two things came out of it that are worth more than the fix. What a place earns
+was a switch inside world creation, so an address added later was worth nothing
+forever in a campaign already running — it is one table now, read by both the
+new city and the repair. And a business arriving in an old save now comes
+staffed and stocked, because a business is a going concern before anybody buys
+it, which is already the rule everywhere else.
+
+Verified against the save that actually crashed, not a fixture: it loads, and
+the four businesses arrive earning 20, 16, 28 and 40 with their people and
+stock in place.
+
+Three tests, and I had to write a fourth. The first three sit in the core and
+call the repair directly, so commenting out the call in the load path left them
+all passing — the wiring was untested, which is exactly the seam that broke.
+The store test loads a campaign at the current version with an address struck
+out and asks whether it comes back. Both breaks now fail.
+
+Evidence: `core/new_places_test.go`, `store/store_test.go`.

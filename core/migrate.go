@@ -135,14 +135,7 @@ func (w *World) MigrateLivingWorld() {
 		}
 	}
 
-	// A place added to the city after a campaign began has no record in it at
-	// all, and everything that walks the location list would find nil where a
-	// property should be. Anything new starts unowned and in good order.
-	for _, l := range Locations {
-		if w.Properties[l.ID] == nil {
-			w.Properties[l.ID] = &Property{Owner: "independent", Condition: 100}
-		}
-	}
+	w.SettleNewPlaces()
 
 	// Businesses acquired before they had an inside were working concerns all
 	// along. Without this they would read as unstaffed and unstocked, and start
@@ -159,5 +152,27 @@ func (w *World) MigrateLivingWorld() {
 		if prop.Supply == 0 {
 			prop.Supply = trade.RestockAmount
 		}
+	}
+}
+
+// SettleNewPlaces gives a campaign a record for any address added to the city
+// since it began. It runs on EVERY load, not only when the save version has
+// moved: adding four businesses to the city crashed every existing save,
+// because those saves were already at the current version and the repair was
+// gated behind a version bump nobody had made.
+//
+// Anything new starts unowned, in good order, earning what that address earns,
+// and — if it is a trading business — already staffed and stocked, because a
+// business is a going concern before anybody buys it.
+func (w *World) SettleNewPlaces() {
+	for _, l := range Locations {
+		if w.Properties[l.ID] != nil {
+			continue
+		}
+		prop := &Property{Owner: "independent", Condition: 100, Income: PlaceIncome[l.ID]}
+		if trade, running := TradeOf(l.ID); running {
+			prop.Staff, prop.Supply = trade.Hands, trade.RestockAmount
+		}
+		w.Properties[l.ID] = prop
 	}
 }

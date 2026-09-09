@@ -101,3 +101,55 @@ func TestLegacyEstatePurchaseMigration(t *testing.T) {
 		t.Fatal("migration invented ownership for a dead player")
 	}
 }
+
+// Adding four businesses to the city crashed every save already at the current
+// version: the repair that gives a campaign a record for a new address was
+// gated behind a version bump, and adding a place does not bump the version.
+// This loads a campaign that has never heard of an address and asks whether it
+// comes back with one.
+func TestASaveThatNeverHeardOfAnAddressGetsOneOnLoad(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "test.sqlite3")
+	s, e := Open(path)
+	if e != nil {
+		t.Fatal(e)
+	}
+	// A campaign at the version this build writes, from which one address has
+	// been struck out entirely — which is exactly what an old save looks like
+	// the morning after a business is added to the city.
+	missing := "haulage"
+	e = s.Change(func(w *core.World) error {
+		w.Version = core.SaveVersion
+		delete(w.Properties, missing)
+		return nil
+	})
+	if e != nil {
+		t.Fatal(e)
+	}
+	s.DB.Close()
+
+	s, e = Open(path)
+	if e != nil {
+		t.Fatal(e)
+	}
+	defer s.DB.Close()
+	w, e := s.Read()
+	if e != nil {
+		t.Fatal(e)
+	}
+	prop := w.Properties[missing]
+	if prop == nil {
+		t.Fatalf("%s is still missing after a load, so reading the world would panic on it", missing)
+	}
+	if prop.Income != core.PlaceIncome[missing] {
+		t.Errorf("%s came back earning %d against %d in a new city", missing, prop.Income, core.PlaceIncome[missing])
+	}
+	// The crash itself was here.
+	defer func() {
+		if r := recover(); r != nil {
+			t.Fatalf("reading a loaded campaign: %v", r)
+		}
+	}()
+	if w.Public() == nil {
+		t.Fatal("the world read back as nothing")
+	}
+}

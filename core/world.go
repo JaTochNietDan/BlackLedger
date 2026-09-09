@@ -585,37 +585,7 @@ func New(seed uint32) *World {
 			// an organization its existence.
 			owner = "russo"
 		}
-		income := 0
-		switch p.ID {
-		case "laundry":
-			income = 14
-		case "garage":
-			income = 24
-		case "casino":
-			// The floor take only: the bar, the door and the rooms upstairs.
-			// What the tables make is decided every night by the float behind
-			// them, in CasinoDay, rather than accruing by the hour.
-			income = 18
-		case "club":
-			income = 30
-		case "market":
-			income = 18
-		case "docks":
-			income = 22
-		case "bar":
-			income = 12
-		case "restaurant":
-			income = 20
-		case "poolhall":
-			income = 16
-		case "butcher":
-			income = 28
-		case "haulage":
-			// The most an ordinary business earns in this city, and the most
-			// it costs to run: six men on the books before it has moved
-			// anything.
-			income = 40
-		}
+		income := PlaceIncome[p.ID]
 		property := &Property{Owner: owner, Condition: 100, Income: income}
 		// A trading business is already running before anybody buys it: it has
 		// people working it and something to work with. Ownership changes who
@@ -1844,4 +1814,20 @@ func (w *World) AcquireReadiness(id string) string {
 		return "Not enough cash"
 	}
 	return ""
+}
+
+// PlaceIncome is what each address earns its owner by the hour. It is a table
+// rather than a switch inside world creation because a save loaded from an
+// earlier build has to be given the same figure, and a business added to the
+// city after a campaign began was otherwise worth nothing in it forever.
+//
+// The casino's is the floor take only: the bar, the door and the rooms
+// upstairs. What the tables make is decided every night by the float behind
+// them, in CasinoDay, rather than accruing by the hour. Haulage is the most an
+// ordinary business earns here and the most it costs to run — six men on the
+// books before it has moved anything.
+var PlaceIncome = map[string]int{
+	"laundry": 14, "garage": 24, "casino": 18, "club": 30,
+	"market": 18, "docks": 22, "bar": 12,
+	"restaurant": 20, "poolhall": 16, "butcher": 28, "haulage": 40,
 }

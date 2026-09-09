@@ -47,6 +47,14 @@ func decode(data string) (*core.World, error) {
 		}
 		w.Version = 2
 	}
+	if e == nil {
+		// A place added to the city has no record in a save written before it
+		// existed, and everything that walks the location list finds nil where
+		// a property should be. This is not a version migration and must not
+		// be gated like one: adding four addresses crashed every save already
+		// at the current version, because nothing had bumped the number.
+		w.SettleNewPlaces()
+	}
 	if e == nil && w.Version < core.SaveVersion {
 		// Campaigns begun before the city had holdings, people and quarrels.
 		w.MigrateLivingWorld()
