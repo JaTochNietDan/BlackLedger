@@ -166,3 +166,15 @@ func abs(v int) int {
 	}
 	return v
 }
+
+// CityPageBriefs is what the page could run today, for measurement. The city
+// page is the only prose a model is allowed to touch, and how often it gets a
+// rewrite past the guard is a question nobody could ask from outside the
+// package.
+func (w *World) CityPageBriefs() []struct{ Headline, Body string } {
+	out := []struct{ Headline, Body string }{}
+	for _, b := range w.cityPage() {
+		out = append(out, struct{ Headline, Body string }{b.headline, b.body})
+	}
+	return out
+}

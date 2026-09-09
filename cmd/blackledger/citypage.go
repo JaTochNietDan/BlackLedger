@@ -68,7 +68,7 @@ func (a *app) polish() bool {
 		}
 		body, took := core.AcceptPolish(brief.Body, better)
 		if !took {
-			log.Printf("City page: rewrite refused for %q", brief.Headline)
+			log.Printf("City page: rewrite refused for %q — %s", brief.Headline, core.PolishRefusal(brief.Body, better))
 		}
 		_ = a.s.Change(func(w *core.World) error {
 			if w.ID != snapshot.ID || w.Life != snapshot.Life {

@@ -1,6 +1,9 @@
 package core
 
-import "testing"
+import (
+	"strings"
+	"testing"
+)
 
 // The director may set a fact better. It may not add one.
 
@@ -100,5 +103,69 @@ func TestARefusalIsFinal(t *testing.T) {
 				t.Error("a refusal emptied the brief instead of leaving the facts")
 			}
 		}
+	}
+}
+
+// The log said only "rewrite refused", which cannot tell a model that wrote
+// eight sentences from one that invented a councilman, and those want opposite
+// answers. A refusal nobody can read is a refusal nobody can act on.
+func TestARefusedRewriteSaysWhichRuleTurnedItDown(t *testing.T) {
+	const original = "Clear over Bellwether, and warm enough by afternoon that the benches on the front were taken by eleven."
+	for _, c := range []struct{ rewritten, expect string }{
+		{"Clear over Bellwether today. 11 arrests were made on the front by afternoon, police said.", "figure"},
+		{"Clear over Bellwether. Councilman Ferro was seen on the benches by afternoon, taking the air.", "name"},
+		{"Clear over Bellwether, and warm enough that you could sit on the benches all afternoon without a coat.", "addressed the reader"},
+		{"Clear.", "too short"},
+		{original, "unchanged"},
+	} {
+		why := PolishRefusal(original, c.rewritten)
+		if why == "" {
+			t.Fatalf("this was printed: %q", c.rewritten)
+		}
+		if !strings.Contains(why, c.expect) {
+			t.Fatalf("refused %q as %q, wanted something about %q", c.rewritten, why, c.expect)
+		}
+		if _, took := AcceptPolish(original, c.rewritten); took {
+			t.Fatalf("AcceptPolish took what PolishRefusal turned down: %q", c.rewritten)
+		}
+	}
+	// And a clean rewrite is still taken, with no reason given.
+	good := "Clear over Bellwether. It was warm enough by afternoon that the benches on the front were taken by eleven."
+	if why := PolishRefusal(original, good); why != "" {
+		t.Fatalf("a clean rewrite was refused as %q", why)
+	}
+	if _, took := AcceptPolish(original, good); !took {
+		t.Fatal("a clean rewrite was not taken")
+	}
+}
+
+// The digit rule was written first and looked complete. It is not: a model
+// asked to write like a 1953 city paper writes like one, and city papers spell
+// their numbers. "Seventeen arrests were made in the district overnight" and "a
+// dozen shops closed early" both went straight into the paper as fact.
+func TestAnInventedQuantityIsCaughtEvenWhenItIsSpelled(t *testing.T) {
+	const original = "Cloud over the city and no sign of it lifting. The forecast says the same again tomorrow."
+	for _, rewritten := range []string{
+		"Cloud over the city and no sign of it lifting. Seventeen arrests were made in the district overnight, police said.",
+		"Cloud over the city. The forecast says the same again tomorrow, with rain expected for three days.",
+		"Cloud over the city and no sign of it lifting. A dozen shops closed early because of it.",
+	} {
+		if out, took := AcceptPolish(original, rewritten); took {
+			t.Fatalf("the paper printed an invented quantity: %q", out)
+		}
+		if why := PolishRefusal(original, rewritten); !strings.Contains(why, "quantity") {
+			t.Fatalf("refused %q as %q, which does not name the quantity", rewritten, why)
+		}
+	}
+	// A quantity the original already used may be kept.
+	kept := "Cloud over the city, and the forecast says the same again tomorrow. Nothing suggests it lifting."
+	if _, took := AcceptPolish(original, kept); !took {
+		t.Fatalf("a rewrite inventing nothing was refused as %q", PolishRefusal(original, kept))
+	}
+	// And "one" is not treated as a count, because in this register it is a
+	// pronoun and refusing it would refuse nearly everything.
+	pronoun := "Cloud over the city and no sign of it lifting. Not one forecast suggests otherwise."
+	if _, took := AcceptPolish(original, pronoun); !took {
+		t.Fatalf("\"one\" was read as an invented count: %q", PolishRefusal(original, pronoun))
 	}
 }

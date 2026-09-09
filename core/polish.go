@@ -27,6 +27,18 @@ import (
 // number finds anything the reader would take as a quantity.
 var number = regexp.MustCompile(`\d+`)
 
+// spelledNumber is the other half of that. A model asked to write like a 1953
+// city paper writes like one, and city papers spell their numbers: the digit
+// rule below let "Seventeen arrests were made in the district overnight" and "a
+// dozen shops closed early" straight through, which is the exact lie this file
+// exists to stop. Found by writing a test case for the digit rule and picking
+// the wrong example.
+//
+// "One" is deliberately absent. In this register it is almost always a pronoun
+// — "one of the families", "no one would say" — and refusing every rewrite
+// containing it would refuse nearly all of them for no gain.
+var spelledNumber = regexp.MustCompile(`(?i)\b(two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety|hundred|thousand|million|dozen|score)\b`)
+
 // properName finds a capitalised word that is not at the start of a sentence —
 // which in newspaper copy is very close to "a name the writer has introduced".
 var properName = regexp.MustCompile(`([a-z,;]\s+)([A-Z][a-z]{2,})`)
@@ -41,6 +53,23 @@ const PolishLimit = 620
 // it returns the original, so a caller that ignores the boolean still cannot
 // print an invention.
 func AcceptPolish(original, rewritten string) (string, bool) {
+	clean, why := judgePolish(original, rewritten)
+	if why != "" {
+		return original, false
+	}
+	return clean, true
+}
+
+// PolishRefusal says why a rewrite cannot be printed, or "" when it can. The
+// log said only "rewrite refused", which cannot tell a model that wrote eight
+// sentences from one that invented a councilman — and those want completely
+// different answers. A refusal nobody can read is a refusal nobody can act on.
+func PolishRefusal(original, rewritten string) string {
+	_, why := judgePolish(original, rewritten)
+	return why
+}
+
+func judgePolish(original, rewritten string) (string, string) {
 	clean := strings.TrimSpace(rewritten)
 	// Models like to explain themselves. Anything before the copy is not copy.
 	if cut := strings.LastIndex(clean, "\n\n"); cut > 0 && cut < len(clean)/2 {
@@ -48,12 +77,18 @@ func AcceptPolish(original, rewritten string) (string, bool) {
 	}
 	clean = strings.Trim(clean, "\"")
 
-	if len(clean) < 40 || len(clean) > PolishLimit {
-		return original, false
+	if clean == "" {
+		return original, "the model returned nothing"
+	}
+	if len(clean) < 40 {
+		return original, "it came back too short to be a brief"
+	}
+	if len(clean) > PolishLimit {
+		return original, "it ran past the length a brief is allowed"
 	}
 	// A rewrite that is barely a rewrite is not worth the risk of taking it.
 	if clean == strings.TrimSpace(original) {
-		return original, false
+		return original, "it came back unchanged"
 	}
 
 	// Every number in the new copy has to have been in the old copy. This is
@@ -65,7 +100,16 @@ func AcceptPolish(original, rewritten string) (string, bool) {
 	}
 	for _, n := range number.FindAllString(clean, -1) {
 		if !had[n] {
-			return original, false
+			return original, "it introduced the figure " + n
+		}
+	}
+	spoken := map[string]bool{}
+	for _, n := range spelledNumber.FindAllString(original, -1) {
+		spoken[strings.ToLower(n)] = true
+	}
+	for _, n := range spelledNumber.FindAllString(clean, -1) {
+		if !spoken[strings.ToLower(n)] {
+			return original, "it introduced the quantity " + strings.ToLower(n)
 		}
 	}
 
@@ -80,7 +124,7 @@ func AcceptPolish(original, rewritten string) (string, bool) {
 	}
 	for _, m := range properName.FindAllStringSubmatch(clean, -1) {
 		if !knew[m[2]] && !commonCapital[m[2]] {
-			return original, false
+			return original, "it introduced the name " + m[2]
 		}
 	}
 
@@ -89,10 +133,10 @@ func AcceptPolish(original, rewritten string) (string, bool) {
 	lower := strings.ToLower(clean)
 	for _, leak := range []string{" you ", "you ", " your ", "the player", "as an ai", "i have"} {
 		if strings.HasPrefix(lower, strings.TrimSpace(leak)) || strings.Contains(lower, leak) {
-			return original, false
+			return original, "it stopped being a newspaper and addressed the reader"
 		}
 	}
-	return clean, true
+	return clean, ""
 }
 
 // commonCapital is the handful of capitalised words that are part of writing

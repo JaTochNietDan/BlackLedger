@@ -2566,3 +2566,64 @@ port gives "The local model could not be reached. Authored play is unaffected."
 Evidence: two properties in `cmd/blackledger/director_status_test.go`, both
 branches driven live, twelve clean apicheck runs, `mise run verify` and `npm
 test` green, `mise run simulate` unchanged at 52 / 0 / 82 / 0.
+
+## What the model actually gets past the guard
+
+The city page is the only prose in the game a model is allowed to touch, and the
+log said `City page: rewrite refused` over and over without ever saying which
+rule turned it down. That is the same fault as the director's status line from
+the last slice: a refusal nobody can read is a refusal nobody can act on. It now
+names the rule, and `PolishRefusal` exposes the reason without duplicating the
+logic.
+
+Then I measured, which found a real hole.
+
+**The guard checked digits and not words.** A model asked to write like a 1953
+city paper writes like one, and city papers spell their numbers. All three of
+these went straight into the paper as fact:
+
+```
+Seventeen arrests were made in the district overnight, police said.
+The forecast says the same again tomorrow, with rain expected for three days.
+A dozen shops closed early because of it.
+```
+
+The file's own comment says an invented fact "is not a blemish, it is a lie the
+player has no way to detect — they would read that eleven people were arrested
+and believe it", and that is exactly what was getting through. Spelled
+quantities are checked now. "One" is deliberately excluded: in this register it
+is almost always a pronoun, and refusing every rewrite containing it would
+refuse nearly all of them for nothing.
+
+I found this by writing a test case for the digit rule and picking a bad
+example, which passed when it should not have.
+
+**A measurement I nearly published was measuring my own bug.** My first probe
+ran the real model over the real briefs and reported three of nine accepted,
+five of them refused for coming back empty. That is not the game: the server
+sets `think: false` and my probe did not, so qwen3:14b spent its whole budget
+reasoning and returned nothing. Matching the server's request:
+
+| of nine real briefs | first probe (wrong) | matching the server |
+|---|---|---|
+| accepted | 3 | 7 |
+| model returned nothing | 5 | 0 |
+| came back unchanged | 0 | 2 |
+
+Seven in nine, and the accepted rewrites are better than the originals:
+"Additional officers have been assigned to the district. The department will not
+say why or for how long."
+
+**And one thing I was wrong about while looking.** Instrumenting the polish path
+during an automated run showed 80 of 81 attempts returning immediately because
+the model lock was busy, and I was ready to write that the feature never runs.
+It is not a fault. The attempt fires on every committed action, one rewrite is
+in flight at a time by design, and `cmd/apicheck` commits a whole campaign
+faster than one rewrite completes. A long-running server driven at a human pace
+logged twenty-seven completed rewrites. The queue is doing what its comment says
+it does.
+
+Evidence: two properties in `core/polish_test.go`, the empty-response case now
+named separately from a short one, nine real briefs through the live model,
+twelve clean apicheck runs, `mise run verify` and `npm test` green, `mise run
+simulate` unchanged at 52 / 0 / 82 / 0.
