@@ -48,6 +48,7 @@ ROOMS = {
     "cabstand": "a taxi dispatch office, a wall of hooks and route cards, a radio set on the counter, cabs through the window",
     "dealer": "a car showroom interior, two cars on a polished floor, a salesman's desk, wide window onto the forecourt",
     "archway": "a repair shop inside a brick railway arch, an inspection pit, tools on the wall, a car up on blocks",
+    "scrapyard": "a scrapyard office hut, a weighbridge dial on the wall, a stove, stacked wrecks through the grimy window",
     "poolhall": "a billiard hall, three tables under low hanging lamps, cue racks on the wall, a payphone in the corner",
     "butcher": "a butcher shop interior, marble counter, hooks and rails, a heavy cold room door at the back",
     "haulage": "a haulage yard office, a wall of route boards and keys, a counter, trucks visible through the window",

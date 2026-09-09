@@ -231,5 +231,16 @@
   "y": 786,
   "cost": 390,
   "blurb": "A second yard, under the viaduct, where nobody asks what came in on the back of the truck."
+ },
+ {
+  "id": "scrapyard",
+  "name": "Devlin Salvage",
+  "type": "work",
+  "kind": "scrapyard",
+  "district": 2,
+  "x": 303,
+  "y": 786,
+  "cost": 460,
+  "blurb": "Six acres of what the city used to drive, stacked four high. Everything ends up here, and somebody pays for the privilege of leaving it."
  }
 ]

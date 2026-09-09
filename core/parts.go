@@ -89,11 +89,7 @@ func (w *World) StripCar(location string) error {
 	// The buyers. A garage is where parts go, so a city with more of them
 	// going around is a city where a garage has more work — which is the whole
 	// of why anybody would hold one.
-	for _, l := range Locations {
-		if l.Kind == "garage" {
-			w.ShiftCustom(l.ID, "parts coming in off the street", PartsTrade)
-		}
-	}
+	w.PartsAbout(PartsTrade)
 
 	place, _ := PlaceByID(location)
 	w.Log(label+" in pieces at "+place.Name,
@@ -102,4 +98,22 @@ func (w *World) StripCar(location string) error {
 	w.Report("theft", "CAR STRIPPED IN "+upper(place.Name),
 		w.unattributed(place.Name, fmt.Sprintf("A car was taken apart in the street at %s overnight. Garages in the district report no shortage of work.", place.Name)))
 	return nil
+}
+
+// PartsAbout is what more cars going to pieces does to the trades that live off
+// it. A garage takes the parts and a scrapyard takes what is left, so both do
+// better when there is more of it happening — which is the whole of why anybody
+// would hold one.
+//
+// Trade is capped, so this cannot run away however much of the city ends up on
+// bricks.
+func (w *World) PartsAbout(delta int) {
+	for _, l := range Locations {
+		switch l.Kind {
+		case "garage":
+			w.ShiftCustom(l.ID, "parts coming in off the street", delta)
+		case "scrapyard":
+			w.ShiftCustom(l.ID, "more of the city arriving on a low-loader", delta)
+		}
+	}
 }

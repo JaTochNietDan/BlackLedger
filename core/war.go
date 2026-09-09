@@ -163,6 +163,22 @@ func (w *World) contestAt(attacker, defender *Faction, weakest string) {
 		w.Player.Cash = max(0, w.Player.Cash-damage*RaidTakes)
 		w.ShiftCustom(weakest, "Somebody came through the front of it", -6)
 	}
+	// And what they drive. A raid that reaches people reaches what is parked
+	// outside them: the inbox called it cars being destroyed during
+	// operations, and it is the demand the forecourt and the yards live on.
+	// Whoever loses one buys another within the fortnight, so a war is good
+	// business for anybody holding a lot.
+	if w.WorldRandom() < .35 {
+		if driver := w.parkedAt(weakest, defender.ID); driver != nil {
+			label := VehicleByTier(driver.Car).Label
+			driver.Car = 0
+			w.PartsAbout(1)
+			w.Log("A car burns at "+place.Name,
+				fmt.Sprintf("%s's %s went up in the street while %s were in the building. %s is walking.",
+					driver.Name, label, Leads(attacker.Name), driver.Name), "danger")
+		}
+	}
+
 	// A raid reaches people, not only premises.
 	if w.WorldRandom() < .18 {
 		// Whoever is on the door is the one standing in it: the first thing a
@@ -570,4 +586,19 @@ func (w *World) MoneyPressure(f, toward *Faction) int {
 		drift += Tempting
 	}
 	return drift
+}
+
+
+// parkedAt finds somebody of this organization who is standing at a place and
+// has a car to lose. It is deliberately the same shape as StoodInIt: whoever is
+// there is who a raid reaches.
+func (w *World) parkedAt(place, faction string) *NPC {
+	for i := range w.NPCs {
+		n := &w.NPCs[i]
+		if n.Dead || n.Location != place || n.Faction != faction || n.Car == 0 {
+			continue
+		}
+		return n
+	}
+	return nil
 }

@@ -1880,4 +1880,6 @@ var PlaceIncome = map[string]int{
 	// A forecourt earns steadily on servicing and part-exchange; the money in
 	// it is the cars, and that is settled when one is sold.
 	"dealer": 22, "archway": 21,
+	// A yard earns on what everybody else is finished with.
+	"scrapyard": 18,
 }

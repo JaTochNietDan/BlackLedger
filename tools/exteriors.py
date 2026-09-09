@@ -42,6 +42,7 @@ FRONTS = {
     "cabstand": "a taxi company yard and office, low brick office, line of parked cabs, fuel pump, wire fence",
     "dealer": "a car dealership forecourt, rows of parked cars, low showroom with wide plate glass, pennant strings overhead",
     "archway": "a motor repair shop under a railway viaduct, brick arch, roller door, cars waiting at the kerb",
+    "scrapyard": "a car breaker's yard behind a corrugated fence, stacked wrecks, a crane jib against the sky, weighbridge hut",
     "poolhall": "a first-floor billiard hall over a shopfront, long low windows, a stair door at street level",
     "butcher": "a butcher's shop with a tiled front, wide window, delivery van at the kerb, cold store behind",
     "haulage": "a haulage yard behind a wire fence, flatbed trucks, a low office hut, fuel pump",

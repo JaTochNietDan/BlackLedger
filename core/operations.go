@@ -105,6 +105,12 @@ var trades = map[string]Trade{
 		Remedy:  "Have a word with whoever is standing at the stage door",
 		RemedyDetail: "The cut stops and the room keeps its own money.", RemedyCost: 190, Cover: 14, Watched: 3, Hides: 0,
 	},
+	"scrapyard": {
+		Hands: 3, Wage: 8, Drain: 5, Restock: 150, RestockAmount: 40, Supplies: "the torch and the crane",
+		Trouble: "A car came in that somebody is still looking for, and it is halfway down the stack.",
+		Remedy:  "Make that one disappear properly", RemedyDetail: "Cut up, weighed in, and off the books.", RemedyCost: 180,
+		Cover:   10, Watched: 1, Hides: 6,
+	},
 	"dealer": {
 		Hands: 4, Wage: 11, Drain: 6, Restock: 340, RestockAmount: 45, Supplies: "cars on the lot",
 		Trouble: "Two cars on the forecourt turn out to have come off a boat, and somebody official has noticed.",

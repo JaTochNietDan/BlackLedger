@@ -5433,3 +5433,37 @@ Not built: a scrapyard, and the city taking cars off each other in raids. A raid
 already reaches the people standing at a place, so the second is a short step.
 
 Evidence: `core/parts_test.go`, `core/parts.go`.
+
+## Cars are destroyed during operations, and the yards take them
+
+The inbox asked for cars destroyed during operations, and for a scrapyard that
+links in the way garages do. Both are in. A raid already reached the people
+standing at a place; it reaches what is parked outside them now. Whoever loses
+one is somebody who would drive and has none, so within a fortnight they buy
+another and the forecourt takes its quarter. A war is good business for
+anybody holding a lot.
+
+Devlin Salvage is the eleventh kind: six acres of what the city used to drive,
+stacked four high. A car going to pieces lifts a scrapyard's trade the way it
+lifts a garage's, through the same capped mechanism, so neither can run away.
+
+The measurement was wrong first, and this one is worth recording because it
+passed convincingly. My first version counted cars among a family's surviving
+members before and after a month of war, and reported twenty-two lost before a
+line of the mechanism existed. Somebody killed in a raid leaves the member list,
+so it was counting deaths. Following named people who are alive at both ends
+gives the honest figure: three of fifty-one survivors lost what they drove.
+
+Twenty-three addresses, fourteen ownable businesses, eleven kinds.
+
+Balance unchanged in every figure, for the same reason as the last three slices:
+the simulated strategies never buy or lose a car. That is expected and it is not
+reassuring, and I keep saying so because it would be easy to read as evidence.
+
+Still open from the inbox, and it is the good half of a line I have not used:
+"more car repairs to be made from broken windows from theft". Stripping takes a
+car outright, so a garage gets parts but never repair work. A car left damaged
+rather than gone would give the owner a reason to visit a garage, which is a
+better link than the one I built.
+
+Evidence: `core/wrecks_test.go`, two breaks verified.
