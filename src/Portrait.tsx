@@ -26,14 +26,21 @@ function faceFor(id: string) {
   return Math.abs(h) % CAST;
 }
 
-export function Portrait({id, size}: {id: string; size?: 'small' | 'tiny'}) {
-  const cell = painted[id];
+// The size of the cast, for anywhere that offers a choice of one. The core
+// holds the same number (CastFaces) because the core is what refuses a bad one.
+export const CAST_FACES = CAST;
+
+export function Portrait({id, size, face}: {id: string; size?: 'small' | 'tiny'; face?: number}) {
+  // A face dealt out by a hash of a name is fair to the cast and can still hand
+  // somebody a portrait they do not recognise as themselves. A player who has
+  // picked their own overrules that, and overrules a painted one too.
+  const cell = face ? undefined : painted[id];
   const cls = 'portrait' + (size ? ' portrait-' + size : '');
   if (cell) {
     return <span aria-hidden="true" className={cls + ' painted-portrait'}
       style={{backgroundPosition: `${cell[0] * 50}% ${cell[1] * 100}%`}}/>;
   }
-  const n = faceFor(id);
+  const n = face ? (face - 1) % CAST : faceFor(id);
   // The drawn version is underneath and the generated face is laid over it.
   //
   // It used to be the other way round — the sheet on the element's own

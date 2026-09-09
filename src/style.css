@@ -863,3 +863,12 @@ body{height:100%;overflow:hidden;margin:0;background:var(--bg);color:var(--ink);
 .cloth-outside{display:flex;gap:2px;flex-wrap:wrap;margin-top:2px}
 .cloth-outside .cloth-cell{flex:1 1 26%}
 .cloth-outside .cloth-cell.wide{flex:1 1 30%}
+
+/* The player choosing their own face. The city deals one out by a hash of a
+   name, which is fair to the cast and can still be wrong about who you are. */
+.face-setting{align-items:flex-start}
+.face-choices{display:grid;grid-template-columns:repeat(auto-fill,minmax(56px,1fr));gap:8px;margin-top:12px;max-width:520px}
+.face-choice{padding:0;border:2px solid transparent;border-radius:4px;background:none;cursor:pointer;line-height:0}
+.face-choice:hover{border-color:var(--edge,#6b5f4a)}
+.face-choice.chosen{border-color:var(--gold,#c9a24a)}
+.face-choice .portrait{display:block;width:100%;height:auto;aspect-ratio:64/78}

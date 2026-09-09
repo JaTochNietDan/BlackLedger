@@ -20,7 +20,7 @@ export function FamiliesScreen({world, onMeet}: {world: Snapshot; onMeet: (id: s
         {/* The player's own organization is led by the player, who is not one
             of the city's people and so has no id to draw from. Their own face
             is the one the rest of the interface already uses. */}
-        <Portrait id={f.leader_id || (f.yours ? world.player.name : f.id)} size="small"/>
+        <Portrait id={f.leader_id || (f.yours ? world.player.name : f.id)} face={f.yours && !f.leader_id ? world.player.face : undefined} size="small"/>
         <div>
           <b>{f.name}</b>
           <small>{f.leader ? `Led by ${f.leader}` : 'Nobody will say who runs it'}</small>

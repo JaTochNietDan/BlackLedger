@@ -2,6 +2,7 @@ package core
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 )
 
@@ -59,6 +60,15 @@ func (w *World) apply(c Command) error {
 			w.Factions[i].Goodwill = 0
 		}
 		w.Log("A stranger arrives", w.Player.Name+" rents a room at the Mariner. The previous life left its mark on the city.", "personal")
+	} else if c.Kind == "face" {
+		// Choosing your own face costs nothing and takes no time, so it is not
+		// an action offered at a place: the clock does not move for it and no
+		// room in this city is where you decide what you look like.
+		n, err := strconv.Atoi(c.Choice)
+		if err != nil || n < 0 || n > CastFaces {
+			return fmt.Errorf("that is not one of the faces")
+		}
+		p.Face = n
 	} else if !p.Alive {
 		return fmt.Errorf("this life has ended")
 	} else if c.Kind == "choice" {

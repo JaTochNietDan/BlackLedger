@@ -86,6 +86,13 @@ type Person struct {
 	// done for them. Absent for somebody who answers to nobody.
 	Serves  string `json:"serves,omitempty"`
 	Service int    `json:"service,omitempty"`
+	// The face the player picked for themselves, one-based into the cast, and
+	// nothing at all if they never picked. Nobody in this city is gendered by
+	// the rules, so a face is otherwise dealt out by a hash of a name — which
+	// is fair to the cast and can still hand somebody a portrait they do not
+	// recognise as themselves. This is the one place a player is allowed to
+	// overrule the city about who they are looking at.
+	Face int `json:"face,omitempty"`
 	// When the police let go, and what they took them in for. Absent for
 	// anybody who is not inside.
 	HeldUntil int    `json:"held_until,omitempty"`

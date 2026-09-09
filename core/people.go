@@ -342,3 +342,9 @@ func (w *World) casualty(faction string) *NPC {
 // so that anything still calling it gets the current behaviour rather than the
 // version without an aftermath.
 func (w *World) ConsiderInternalMove(f *Faction) bool { return w.InternalMove(f) }
+
+// CastFaces is how many painted faces the city has to hand out. It is the size
+// of the sheet the view draws from (src/Portrait.tsx), and it is stated here
+// because the core is what validates a player's choice of one — a number the
+// view knows and the core does not is a number the core cannot refuse.
+const CastFaces = 24
