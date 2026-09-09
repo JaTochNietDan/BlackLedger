@@ -1,5 +1,6 @@
+import type {ReactElement} from 'react';
 import {useMemo,useState} from 'react';
-import type {Snapshot,Presence} from './types';
+import type {Action,Snapshot,Presence} from './types';
 import {Portrait} from './Portrait';
 
 // Fifty-three cards and four screens of scrolling, in whatever order the save
@@ -37,7 +38,15 @@ function Card({who}: {who: Presence}) {
   </article>;
 }
 
-export function PeopleScreen({world}: {world: Snapshot}) {
+export function PeopleScreen({world, actions = [], render}: {
+  world: Snapshot;
+  // Work about people rather than about a building: putting a price on a name,
+  // asking what is being said. It used to be printed at the exchange, which
+  // meant crossing the city to reach a decision about somebody who was never
+  // there.
+  actions?: Action[];
+  render?: (a: Action) => ReactElement;
+}) {
   const everyone = world.everyone || [];
   const [query, setQuery] = useState('');
   const [only, setOnly] = useState<string | null>(null);
@@ -63,6 +72,11 @@ export function PeopleScreen({world}: {world: Snapshot}) {
         ? `${world.population.living} people live in this city and you know ${world.population.known} of them. ${world.population.organized} answer to an organization, ${world.population.jobs} hold one of the city's jobs, and ${world.population.street} answer to nobody.`
         : 'Everybody in Bellwether, and what they are doing about it.'}
     </p>
+
+    {!!render && actions.length > 0 && <section className="anywhere-strip" aria-label="What you can do about people">
+      <h4>Whatever room you are in<span>These are about people, not about premises</span></h4>
+      <div className="actions">{actions.filter(a => a.id === 'contract' || a.id === 'investigate').map(render)}</div>
+    </section>}
 
     <div className="people-controls">
       <input type="search" value={query} placeholder={`Search ${everyone.length} people…`}

@@ -483,6 +483,13 @@ type Action struct {
 	// them in an order a person can navigate. Set by the core, never guessed
 	// by the presentation.
 	Group string `json:"group"`
+	// Anywhere marks work that belongs to the player rather than to the room
+	// they happen to be standing in. Putting a price on a name, reaching an
+	// understanding with a family and asking around about one are all done
+	// through other people; none of them needs the player to walk to a
+	// particular counter first, and the city's own screens for people and for
+	// families are where they belong. The room's own panel leaves them out.
+	Anywhere bool `json:"anywhere,omitempty"`
 	// Subject is whose name this action is about, when it is about somebody
 	// standing here rather than about the premises. Lending a man money is not
 	// the same kind of thing as repairing a roof, and a list that shows them
@@ -762,6 +769,14 @@ func (w *World) Actions(id string) []Action {
 			out[len(out)-1].Asks = price
 		}
 	}
+	// anywhere marks the action just added as work the room has nothing to do
+	// with, so the interface can put it where it belongs rather than in the
+	// list of things you can do at a fishmonger's.
+	anywhere := func() {
+		if len(out) > 0 {
+			out[len(out)-1].Anywhere = true
+		}
+	}
 	need := func(b bool, s string) string {
 		if b {
 			return s
@@ -794,6 +809,36 @@ func (w *World) Actions(id string) []Action {
 		}
 		add("travel", "Visit "+l.Name, w.Journey(p.Location, l.ID), 0, "", detail)
 		return out
+	}
+	// Work that belongs to the player rather than to a room. All of it used to
+	// live at the exchange, which meant crossing the city to tell your own crew
+	// to move on somebody, or to put a price on a name the city already knows —
+	// none of which happens at a counter in a building. It is offered wherever
+	// the player is standing and the interface files it under people and
+	// families rather than under the premises.
+	add("contract", "Ask about a name", 30, 0,
+		need(p.Contacts < 1, "Build a contact who will carry this"),
+		"Put a price on somebody. What it costs depends on who they are and who does the work. A failed attempt can be traced back to you.")
+	anywhere()
+	add("investigate", "Ask about threats", 45, 30, "", "Investigate existing threats. Evidence is not a guarantee of safety.")
+	anywhere()
+	for i := range w.Factions {
+		f := &w.Factions[i]
+		if f.ID == w.PlayerOrganizationID() {
+			continue
+		}
+		asks("enquire:"+f.ID, "Ask around about "+f.Name, EnquiryMinutes, EnquiryCost, w.EnquiryReadiness(f.ID),
+			fmt.Sprintf("$%d in the right pockets. What comes back is current for about a week. You are at %d of 3 on them as it stands.", EnquiryCost, w.Intelligence(f.ID)))
+		anywhere()
+		if w.Allied(f.ID) {
+			add("break:"+f.ID, "End the understanding with "+f.Name, 30, 0, "",
+				fmt.Sprintf("Stops the $%d a day and the quarrels that come with it. They will remember that you did it first.", PactTribute))
+			anywhere()
+			continue
+		}
+		asks("pact:"+f.ID, "Reach an understanding with "+f.Name, PactMinutes, PactOpening, w.PactReadiness(f.ID),
+			fmt.Sprintf("$%d to open and $%d a day. Neither of you moves on the other, they may answer when somebody comes for you, and every quarrel of theirs becomes yours.", PactOpening, PactTribute))
+		anywhere()
 	}
 	switch id {
 	case "precinct":
@@ -915,15 +960,6 @@ func (w *World) Actions(id string) []Action {
 				fmt.Sprintf("$%d. Every one of their places loses %d trade and the organization loses %d strength. A paper full of crime is a paper full of crime whoever it is about, so the whole city gets harder — and about one time in five they find out who paid for it.", SmearCost, SmearCustom, SmearPower))
 		}
 	case "market":
-		add("investigate", "Ask about threats", 45, 30, "", "Investigate existing threats. Evidence is not a guarantee of safety.")
-		for i := range w.Factions {
-			f := &w.Factions[i]
-			if f.ID == w.PlayerOrganizationID() {
-				continue
-			}
-			asks("enquire:"+f.ID, "Ask around about "+f.Name, EnquiryMinutes, EnquiryCost, w.EnquiryReadiness(f.ID),
-				fmt.Sprintf("$%d in the right pockets. What comes back is current for about a week. You are at %d of 3 on them as it stands.", EnquiryCost, w.Intelligence(f.ID)))
-		}
 		add("lie_low", "Keep a low profile", 120, 15, "", "Lose 10 heat. Time still passes for rivals and businesses.")
 		add("deposit", fmt.Sprintf("Wire $%d out of the city", DepositLot), 45, 0, w.DepositReadiness(),
 			fmt.Sprintf("$%d of it arrives; the arrangement takes %d%%. It survives you, and whoever comes next can reach it if they can afford to.", DepositLot*(100-DepositCut)/100, DepositCut))
@@ -965,22 +1001,6 @@ func (w *World) Actions(id string) []Action {
 			away("trip:"+d.ID, "Travel to "+d.Name, d.Days*1440, w.TripReadiness(d.ID),
 				fmt.Sprintf("%s %s $%d all in and %d days away. The city runs without you: businesses go unwatched, work you promised runs down, and anything arranged for you happens to an empty house. Attention falls %d a day while you are gone.", d.Blurb, d.Purpose, w.TripCost(d.ID), d.Days, d.Relief))
 		}
-		for i := range w.Factions {
-			f := &w.Factions[i]
-			if f.ID == w.PlayerOrganizationID() {
-				continue
-			}
-			if w.Allied(f.ID) {
-				add("break:"+f.ID, "End the understanding with "+f.Name, 30, 0, "",
-					fmt.Sprintf("Stops the $%d a day and the quarrels that come with it. They will remember that you did it first.", PactTribute))
-				continue
-			}
-			asks("pact:"+f.ID, "Reach an understanding with "+f.Name, PactMinutes, PactOpening, w.PactReadiness(f.ID),
-				fmt.Sprintf("$%d to open and $%d a day. Neither of you moves on the other, they may answer when somebody comes for you, and every quarrel of theirs becomes yours.", PactOpening, PactTribute))
-		}
-		add("contract", "Ask about a name", 30, 0,
-			need(p.Contacts < 1, "Build a contact who will carry this"),
-			"Put a price on somebody. What it costs depends on who they are and who does the work. A failed attempt can be traced back to you.")
 	case "club":
 		add("audience", "Request an audience", 45, 0, w.AudienceReadiness(id), "Discuss your standing with the Bellandi family.")
 		add("provoke", "Demand protection money", 30, 0, "", "EXTREME RISK. Bellandi owns this casino. Challenging them can bring lethal retaliation.")

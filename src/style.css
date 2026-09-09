@@ -916,3 +916,12 @@ body{height:100%;overflow:hidden;margin:0;background:var(--bg);color:var(--ink);
 .casino-crowd{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:12px 26px 0}
 .floor-face{display:flex;align-items:center;gap:7px;font-size:12px;color:#cfd3bf}
 .floor-face .portrait{width:26px;height:32px}
+
+/* Work that is about people and families rather than about a building. It used
+   to be printed in one room's panel, which meant crossing the city to decide
+   something about somebody who was never in that room. */
+.anywhere-strip{margin:18px 0 6px;padding:16px 18px;border:1px solid var(--line);background:#16221f}
+.anywhere-strip h4{margin:0;font:12px system-ui;letter-spacing:.2em;text-transform:uppercase;color:var(--gold)}
+.anywhere-strip h4 span{display:block;margin-top:4px;letter-spacing:0;text-transform:none;font-size:11px;color:var(--muted)}
+.anywhere-strip .actions{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.family-card .actions{margin-top:12px}

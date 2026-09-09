@@ -1,4 +1,5 @@
-import type {Snapshot} from './types';
+import type {ReactElement} from 'react';
+import type {Action,Snapshot} from './types';
 import {Portrait} from './Portrait';
 
 // Three thin cards: a strength, a money word and a bare number for standing —
@@ -6,7 +7,14 @@ import {Portrait} from './Portrait';
 // fighting or what the number means. Everything needed was already in the city;
 // it was simply never asked for.
 
-export function FamiliesScreen({world, onMeet}: {world: Snapshot; onMeet: (id: string) => void}) {
+export function FamiliesScreen({world, onMeet, actions = [], render}: {
+  world: Snapshot; onMeet: (id: string) => void;
+  // Understandings and what is being said about a family are reached through
+  // other people. Neither of them happens at a counter, and both used to be
+  // printed at one.
+  actions?: Action[];
+  render?: (a: Action) => ReactElement;
+}) {
   const mine = world.factions.filter(f => f.yours);
   const others = world.factions.filter(f => !f.yours);
   const pacts = new Set((world.pacts || []).map(p => p.id));
@@ -46,9 +54,17 @@ export function FamiliesScreen({world, onMeet}: {world: Snapshot; onMeet: (id: s
 
       {f.knowledge < 2 && !f.yours && <p className="family-note subtle">
         {f.knowledge === 0
-          ? 'Nobody will talk to you about them. Ask around at Mercer Exchange.'
+          ? 'Nobody will talk to you about them. Asking around is done through other people, from wherever you are.'
           : 'What you know of them is second-hand. Somebody inside would tell you more.'}
       </p>}
+
+      {!!render && !f.yours && (() => {
+        // Reaching an understanding, ending one, and asking what is being said:
+        // all of it is carried by other people, so it is offered here rather
+        // than at whatever counter it used to be printed at.
+        const theirs = actions.filter(a => a.id.endsWith(':' + f.id));
+        return theirs.length > 0 && <div className="actions">{theirs.map(render)}</div>;
+      })()}
 
       {!f.yours && <button className="plain" onClick={() => onMeet(f.id)}>
         Meet {f.leader || 'them'} ↗
