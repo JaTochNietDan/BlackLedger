@@ -10,7 +10,7 @@ import {Card, pipOf, isRedSuit, knownCard, clothRows, clothColour, outsideBets, 
 // not know something — a card whose suit it never sent — this draws a card face
 // down rather than choosing one.
 
-export interface HandState {playing:boolean; place?:string; stake?:number; player?:number; dealer?:number; cards?:number; mine?:Card[]; theirs?:Card[]}
+export interface HandState {playing:boolean; settled?:boolean; won?:boolean; outcome?:string; where?:string; place?:string; stake?:number; player?:number; dealer?:number; cards?:number; mine?:Card[]; theirs?:Card[]}
 export interface WheelState {spun:boolean; place?:string; stake?:number; bet?:string; pocket?:number; colour?:string; won?:boolean; pays?:number}
 
 function PlayingCard({card, facedown}:{card?:Card; facedown?:boolean}) {
@@ -39,15 +39,18 @@ function Row({cards, hidden}:{cards:Card[]; hidden:number}) {
 // The blackjack felt. The dealer's second card is not dealt until the player
 // stands, so it is drawn face down: that is what is true, not a decoration.
 export function CardTable({hand, money, act}:{hand:HandState; money:(n:number)=>string; act:(kind:string)=>void}) {
-  if (!hand.playing) return null;
+  if (!hand.playing && !hand.settled) return null;
   const mine = hand.mine ?? [], theirs = hand.theirs ?? [];
   const total = hand.player ?? 0;
+  // A settled hand has nothing left to hide: the dealer has turned their card
+  // over, and that is the moment the player sat down for.
+  const over = !!hand.settled;
   return (
     <div className="felt">
       <div className="felt-head"><span>{hand.place}</span><b>{money(hand.stake ?? 0)} down</b></div>
       <div className="seat">
         <span className="seat-name">Dealer</span>
-        <Row cards={theirs} hidden={theirs.length < 2 ? 1 : 0}/>
+        <Row cards={theirs} hidden={!over && theirs.length < 2 ? 1 : 0}/>
         <b className="seat-total">{hand.dealer ?? 0}</b>
       </div>
       <div className="seat">
@@ -55,10 +58,12 @@ export function CardTable({hand, money, act}:{hand:HandState; money:(n:number)=>
         <Row cards={mine} hidden={0}/>
         <b className={'seat-total' + (total > 21 ? ' warning' : '')}>{total}</b>
       </div>
-      <div className="felt-actions">
-        <button onClick={() => act('hit')} disabled={total > 21}>Another card</button>
-        <button onClick={() => act('stand')} disabled={total > 21}>Stand on {total}</button>
-      </div>
+      {over
+        ? <p className={'felt-result' + (hand.won ? ' won' : '')}>{hand.outcome}</p>
+        : <div className="felt-actions">
+            <button onClick={() => act('hit')} disabled={total > 21}>Another card</button>
+            <button onClick={() => act('stand')} disabled={total > 21}>Stand on {total}</button>
+          </div>}
       <p className="felt-note">The dealer draws to sixteen and stands on seventeen. A tie gives your money back.</p>
     </div>
   );

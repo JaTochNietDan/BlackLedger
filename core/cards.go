@@ -41,6 +41,13 @@ type TableHand struct {
 	// hand whose cards are not known; the totals are still true of it.
 	Mine   []Card `json:"mine,omitempty"`
 	Theirs []Card `json:"theirs,omitempty"`
+	// What happened, kept on the hand after it is settled. A finished hand used
+	// to stop being described at all: the felt vanished the instant the dealer
+	// turned their card over, so the one moment the player was waiting for —
+	// what the dealer actually had — was the one thing the game never showed
+	// them. It stays on the table until the next hand is dealt.
+	Won     bool   `json:"won,omitempty"`
+	Outcome string `json:"outcome,omitempty"`
 }
 
 // Card is one card off the deck: what it says and what suit it is. Value is
@@ -179,10 +186,13 @@ func (w *World) settleHand(won bool, why string) error {
 		house.Cash = max(0, house.Cash-net)
 	}
 	w.tableAftermath(place.Name, house, net, stake.Amount)
+	hand.Won = won
 	if won {
-		w.Log("Paid out at "+place.Name, fmt.Sprintf("%s $%d comes back across the table.", why, returned), "business")
+		hand.Outcome = fmt.Sprintf("%s $%d comes back across the table.", why, returned)
+		w.Log("Paid out at "+place.Name, hand.Outcome, "business")
 	} else {
-		w.Log("Gone at "+place.Name, fmt.Sprintf("%s The $%d stays where it is.", why, stake.Amount), "business")
+		hand.Outcome = fmt.Sprintf("%s The $%d stays where it is.", why, stake.Amount)
+		w.Log("Gone at "+place.Name, hand.Outcome, "business")
 	}
 	return nil
 }
@@ -200,7 +210,7 @@ func (w *World) push(why string) error {
 
 // HandDescription is what is on the table, for the interface.
 func (w *World) HandDescription() map[string]any {
-	if w.Hand == nil || w.Hand.Done {
+	if w.Hand == nil {
 		return map[string]any{"playing": false}
 	}
 	place, _ := PlaceByID(w.Hand.Place)
@@ -216,8 +226,9 @@ func (w *World) HandDescription() map[string]any {
 		theirs = []Card{}
 	}
 	return map[string]any{
-		"playing": true, "place": place.Name, "stake": stake.Amount,
+		"playing": !w.Hand.Done, "settled": w.Hand.Done, "won": w.Hand.Won,
+		"outcome": w.Hand.Outcome, "place": place.Name, "stake": stake.Amount,
 		"player": w.Hand.Player, "dealer": w.Hand.Dealer, "cards": w.Hand.Cards,
-		"mine": mine, "theirs": theirs,
+		"mine": mine, "theirs": theirs, "where": w.Hand.Place,
 	}
 }

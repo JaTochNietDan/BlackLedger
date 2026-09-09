@@ -12,13 +12,13 @@ import (
 
 func main() {
 	if len(os.Args) < 2 || len(os.Args) > 3 {
-		log.Fatal("usage: go run ./cmd/qa-fixture <new-qa.sqlite3> [police|damage|warning|russo-warning|attack|voice|contact|paused-job|leader|doorman|arrest|debt|herald|killing|dead|offer|audience|street|room|gone|post|round|bereaved|inside|writeoff|writeoff-dead|worn]")
+		log.Fatal("usage: go run ./cmd/qa-fixture <new-qa.sqlite3> [police|damage|warning|russo-warning|attack|voice|contact|paused-job|leader|doorman|arrest|debt|herald|killing|dead|offer|audience|street|room|gone|post|round|bereaved|inside|writeoff|writeoff-dead|worn|tables]")
 	}
 	scenario := "police"
 	if len(os.Args) == 3 {
 		scenario = os.Args[2]
 	}
-	if scenario != "police" && scenario != "damage" && scenario != "warning" && scenario != "russo-warning" && scenario != "attack" && scenario != "voice" && scenario != "contact" && scenario != "paused-job" && scenario != "leader" && scenario != "doorman" && scenario != "arrest" && scenario != "debt" && scenario != "herald" && scenario != "killing" && scenario != "dead" && scenario != "offer" && scenario != "audience" && scenario != "street" && scenario != "room" && scenario != "gone" && scenario != "post" && scenario != "round" && scenario != "bereaved" && scenario != "inside" && scenario != "writeoff" && scenario != "writeoff-dead" && scenario != "worn" {
+	if scenario != "police" && scenario != "damage" && scenario != "warning" && scenario != "russo-warning" && scenario != "attack" && scenario != "voice" && scenario != "contact" && scenario != "paused-job" && scenario != "leader" && scenario != "doorman" && scenario != "arrest" && scenario != "debt" && scenario != "herald" && scenario != "killing" && scenario != "dead" && scenario != "offer" && scenario != "audience" && scenario != "street" && scenario != "room" && scenario != "gone" && scenario != "post" && scenario != "round" && scenario != "bereaved" && scenario != "inside" && scenario != "writeoff" && scenario != "writeoff-dead" && scenario != "worn" && scenario != "tables" {
 		log.Fatal("unsupported QA scenario")
 	}
 	path := os.Args[1]
@@ -144,6 +144,16 @@ func main() {
 				m.Location, m.Role = "bar", "Runs Russo Motor Works"
 			}
 			w.Minute = 715
+			return nil
+		}
+		if scenario == "tables" {
+			// The player sitting down at a casino with money on them, for looking
+			// at the tables themselves: the cards and the wheel take the screen
+			// and hold it until the player gets up, so this is the one fixture
+			// where the point is what the game looks like while you play it.
+			w.Player.Cash, w.Player.Respect = 4000, 60
+			w.District = 2
+			w.Player.Location = "casino"
 			return nil
 		}
 		if scenario == "room" {

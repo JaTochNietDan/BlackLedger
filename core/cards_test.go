@@ -278,3 +278,51 @@ func TestAnAceAlreadyInTheHandStillComesDownLater(t *testing.T) {
 		t.Errorf("two tens and a five came to %d", got)
 	}
 }
+
+// A hand that is over is the moment the player sat down for: the dealer turns
+// their card over and you find out. The table used to stop describing a hand
+// the instant it settled, so the felt vanished before it had said anything and
+// the only account of it was a line in the ledger.
+func TestASettledHandStaysOnTheTableAndSaysWhatHappened(t *testing.T) {
+	w := player(t)
+	if err := w.Deal("club", "small"); err != nil {
+		t.Fatal(err)
+	}
+	// Stand without going over: a player who busts is finished before the
+	// dealer plays at all, so there is no second card to turn over and the
+	// table is right to show none.
+	for w.Hand != nil && !w.Hand.Done && w.Hand.Player < 12 {
+		if err := w.DrawCard(); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if w.Hand == nil || w.Hand.Done {
+		t.Fatal("the hand ended before anybody stood on it")
+	}
+	if err := w.Stand(); err != nil {
+		t.Fatal(err)
+	}
+	d := w.HandDescription()
+	if d["playing"] != false {
+		t.Fatal("a finished hand is still being played")
+	}
+	if d["settled"] != true {
+		t.Fatal("a finished hand is not on the table at all")
+	}
+	if d["outcome"] == "" || d["outcome"] == nil {
+		t.Error("the hand is over and the table does not say what happened")
+	}
+	if len(d["theirs"].([]Card)) < 2 {
+		t.Errorf("the dealer never turned their card over: %v", d["theirs"])
+	}
+	if d["where"] != "club" {
+		t.Errorf("the table cannot say which room it is in: %v", d["where"])
+	}
+	// And it is gone the moment the next one is dealt over it.
+	if err := w.Deal("club", "small"); err != nil {
+		t.Fatal(err)
+	}
+	if next := w.HandDescription(); next["playing"] != true || next["settled"] != false {
+		t.Errorf("the old hand is still on the table: %v", next)
+	}
+}

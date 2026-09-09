@@ -20,9 +20,13 @@ const premisesOrder = ['acquire', 'repair', 'hire', 'layoff', 'restock', 'remedy
 
 function rank(id: string) { const at = premisesOrder.indexOf(id); return at < 0 ? premisesOrder.length : at }
 
-export function Interior({place, people, actions, render, onLeave, comings, minute}: {
+export function Interior({place, people, actions, render, onLeave, onTables, comings, minute}: {
   place: Place; people: Presence[]; actions: Action[];
   render: (a: Action) => ReactElement; onLeave: () => void;
+  // A room with tables in it offers one way in and the tables take the screen.
+  // The cards and the wheel are not premises work to be listed between hiring
+  // and restocking: they are a place you sit down.
+  onTables?: () => void;
   // The hour, from the core's own clock — the same number the city outside is
   // lit from, so the inside and the outside are the same place at the same
   // time of day rather than two pictures that happen to share a save.
@@ -141,6 +145,11 @@ export function Interior({place, people, actions, render, onLeave, comings, minu
           : <p className="nothing-here">There is nothing to do with them here.</p>}
       </section> : <>
         <p className="room-hint">Pick somebody in the room to deal with them, or use the building itself.</p>
+
+        {onTables && <button className="action primary sit-down-here" onClick={onTables}>
+          <span><strong>Sit down at the tables</strong>
+          <span className="desc">The cards and the wheel, played out at the table until you get up.</span></span>
+        </button>}
 
         {premises.length > 0 && <section className="action-group">
           <h4>These premises<span>The same work, in the same order, in every building</span></h4>
