@@ -827,6 +827,15 @@ func (w *World) Actions(id string) []Action {
 	anywhere()
 	add("investigate", "Ask about threats", 45, 30, "", "Investigate existing threats. Evidence is not a guarantee of safety.")
 	anywhere()
+	// What the police think of you follows you around; neither of these happens
+	// at a counter. A detective who will lose some paperwork does not take the
+	// money across a desk at the exchange, and keeping your head down is not
+	// somewhere you go.
+	asks("bribe", "An understanding with the detective", 45, w.BribeCost(), w.BribeReadiness(),
+		fmt.Sprintf("$%d to Detective Harlow to lose some paperwork. Clears attention now and buys nothing later. Above %d heat nobody will be seen taking it.", w.BribeCost(), BribeCeiling))
+	anywhere()
+	add("lie_low", "Keep a low profile", 120, 15, "", "Lose 10 heat. Time still passes for rivals and businesses.")
+	anywhere()
 	for i := range w.Factions {
 		f := &w.Factions[i]
 		if f.ID == w.PlayerOrganizationID() {
@@ -965,7 +974,6 @@ func (w *World) Actions(id string) []Action {
 				fmt.Sprintf("$%d. Every one of their places loses %d trade and the organization loses %d strength. A paper full of crime is a paper full of crime whoever it is about, so the whole city gets harder — and about one time in five they find out who paid for it.", SmearCost, SmearCustom, SmearPower))
 		}
 	case "market":
-		add("lie_low", "Keep a low profile", 120, 15, "", "Lose 10 heat. Time still passes for rivals and businesses.")
 		add("deposit", fmt.Sprintf("Wire $%d out of the city", DepositLot), 45, 0, w.DepositReadiness(),
 			fmt.Sprintf("$%d of it arrives; the arrangement takes %d%%. It survives you, and whoever comes next can reach it if they can afford to.", DepositLot*(100-DepositCut)/100, DepositCut))
 		asks("offshore_access", "Establish that the account is yours", AccessMinutes, AccessCost, w.AccessReadiness(),
@@ -997,8 +1005,6 @@ func (w *World) Actions(id string) []Action {
 			asks("retain:"+o.ID, "An arrangement with "+o.Name, OfficialMinutes, w.OfficialOpening(o), w.RetainerReadiness(o.ID),
 				fmt.Sprintf("$%d to open and $%d a day after. %s They cut you loose above %d attention and keep the opening payment.", w.OfficialOpening(o), o.Retainer, o.Detail, w.OfficialCeiling(o)))
 		}
-		asks("bribe", "An understanding with the detective", 45, w.BribeCost(), w.BribeReadiness(),
-			fmt.Sprintf("$%d to Detective Harlow to lose some paperwork. Clears attention now and buys nothing later. Above %d heat nobody will be seen taking it.", w.BribeCost(), BribeCeiling))
 		for _, d := range destinations {
 			// Minutes are zero here because Trip runs the days itself, a day at
 			// a time, so that what happens in the city while the player is

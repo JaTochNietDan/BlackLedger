@@ -31,7 +31,7 @@ func offered(w *World, kind string) (Action, bool) {
 
 func TestTheWorkThatIsNotAboutTheRoomIsOfferedWhereverYouStand(t *testing.T) {
 	rooms := []string{"bar", "laundry", "docks", "room", "garage", "casino", "market"}
-	for _, kind := range []string{"contract", "investigate", "enquire:bellandi", "pact:russo"} {
+	for _, kind := range []string{"contract", "investigate", "enquire:bellandi", "pact:russo", "bribe", "lie_low"} {
 		for _, room := range rooms {
 			w := standing(t, room)
 			a, ok := offered(w, kind)

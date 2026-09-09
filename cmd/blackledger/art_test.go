@@ -277,3 +277,31 @@ func TestEveryActionCardInARoomIsTheSameSize(t *testing.T) {
 		t.Errorf("the detail is unbounded: %s", desc)
 	}
 }
+
+// Work that belongs to the player rather than to a room has three homes, and
+// each one is where the thing it is about already lives: names on the People
+// screen, understandings and enquiries on the family they concern, and what the
+// police think on the ledger beside the rest of the accounts. A flag that
+// removes work from the room panel without giving it somewhere else to be is
+// how a button disappears.
+func TestPlayerWorkHasSomewhereToBe(t *testing.T) {
+	source, err := os.ReadFile("../../src/main.tsx")
+	if err != nil {
+		t.Skip("no interface beside this build")
+	}
+	main := string(source)
+	for _, home := range []string{
+		"<PeopleScreen world={w} actions={anywhere}",
+		"<FamiliesScreen world={w} actions={anywhere}",
+		"<LedgerScreen world={w} render={actionButton} actions={anywhere.filter(",
+	} {
+		if !strings.Contains(main, home) {
+			t.Errorf("no screen is given the player's own work: %q is not in the interface", home)
+		}
+	}
+	// And the room panel is still the thing dropping it, or it would be in two
+	// places at once.
+	if !strings.Contains(main, "&&!a.anywhere") {
+		t.Error("the room panel no longer leaves the player's own work out")
+	}
+}

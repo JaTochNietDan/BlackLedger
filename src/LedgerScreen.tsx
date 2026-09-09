@@ -1,5 +1,6 @@
 import {useMemo,useState} from 'react';
-import type {Snapshot,Record as CityRecord} from './types';
+import type {ReactElement} from 'react';
+import type {Action,Snapshot,Record as CityRecord} from './types';
 
 // The Ledger showed the market, two figures and then sixty rows of
 // undifferentiated history: five screens of scrolling for a page whose whole
@@ -25,7 +26,16 @@ const kinds: [string, string][] = [
   ['personal', 'Personal'], ['travel', 'Travel'], ['death', 'Deaths'],
 ];
 
-export function LedgerScreen({world}: {world: Snapshot}) {
+export function LedgerScreen({world, actions = [], render}: {
+  world: Snapshot;
+  // What the police think of you is an account like any other, and the two
+  // things that change it are not counter work: a detective who will lose some
+  // paperwork does not take the money across a desk at the exchange, and
+  // keeping your head down is not somewhere you go. Both used to be printed at
+  // the exchange and are now offered wherever the player is standing.
+  actions?: Action[];
+  render?: (a: Action) => ReactElement;
+}) {
   const b = world.books;
   const [query, setQuery] = useState('');
   const [kind, setKind] = useState<string | null>(null);
@@ -70,6 +80,11 @@ export function LedgerScreen({world}: {world: Snapshot}) {
         </ul>
       </details>
     </div>}
+
+    {!!render && actions.length > 0 && <section className="anywhere-strip" aria-label="What you can do about your attention">
+      <h4>What the police think<span>Neither of these happens at a counter. Do them from wherever you are.</span></h4>
+      <div className="actions compact">{actions.map(render)}</div>
+    </section>}
 
     <h2>What happened</h2>
     <div className="people-controls">
