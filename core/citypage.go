@@ -141,22 +141,50 @@ func (w *World) standingEmpty() (string, bool) {
 // CityPageDay files the day's filler. Two pieces: enough that the paper has
 // something in it on a day when nothing happened, few enough that the news is
 // still the news.
+// CityPageRest is how many days a brief waits before it may run again. Read
+// out of a real campaign: THE CITY COUNTED ran four times in seven days with
+// the same forty-eight people and the same eighteen of them employed, and the
+// Mariner was announced as standing empty five times in the same week. The
+// pick was randomised per day and the comment claimed consecutive days would
+// not repeat, but nothing ever looked at what had already been printed.
+const CityPageRest = 3
+
+// ranLately reports whether the page has carried this headline in the last few
+// days. Filler that has nothing new to say has nothing to say.
+func (w *World) ranLately(headline string) bool {
+	since := w.Minute - CityPageRest*1440
+	for i := len(w.News) - 1; i >= 0; i-- {
+		s := w.News[i]
+		if s.Minute < since {
+			return false
+		}
+		if s.Kind == "civic" && s.Headline == headline {
+			return true
+		}
+	}
+	return false
+}
+
 func (w *World) CityPageDay() {
 	page := w.cityPage()
 	if len(page) == 0 {
 		return
 	}
 	// Deterministic from the day, so the same day of the same campaign always
-	// prints the same page, and consecutive days do not run the same two.
+	// prints the same page. Walking the list from a per-day starting point
+	// visits every brief exactly once, which is what keeps a page from running
+	// the same item twice in one issue.
 	h := skySeed(w.ID) ^ uint32(w.Minute/1440)*2246822519
 	h ^= h >> 13
-	for n := 0; n < 2 && n < len(page); n++ {
-		pick := page[int((h>>uint(n*8))%uint32(len(page)))]
-		// Never the same brief twice in one issue.
-		if n == 1 && pick.headline == page[int(h%uint32(len(page)))].headline {
-			pick = page[(int(h%uint32(len(page)))+1)%len(page)]
+	start := int(h % uint32(len(page)))
+	printed := 0
+	for n := 0; n < len(page) && printed < 2; n++ {
+		pick := page[(start+n)%len(page)]
+		if w.ranLately(pick.headline) {
+			continue
 		}
 		w.Report("civic", pick.headline, pick.body)
+		printed++
 	}
 }
 

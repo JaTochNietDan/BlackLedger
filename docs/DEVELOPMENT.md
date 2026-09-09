@@ -2746,3 +2746,51 @@ Evidence: all four choices and both evenings driven through the API, one
 property in `core/sitdown_test.go` proven to fail when the fix is removed,
 twelve clean apicheck runs, `mise run verify` and `npm test` green, `mise run
 simulate` unchanged at 52 / 0 / 82 / 0.
+
+## Reading the paper a third time
+
+The last two end-to-end reads found four faults each, so I drove a fresh
+campaign to day fifty-two and read it again.
+
+**Every fix from tonight is holding.** No gendered assumption, no plural name
+with a singular verb, no numeral in prose, no role without an article, no
+price-board name after a unit count. `Somebody was robbed at Saint Agnes`,
+`Crated arms are fetching more than they did`, `Two people in the same
+organization stood below them`, `They were a landlady`. The English is clean
+across two hundred and forty stories.
+
+**One fault, and it is the day-to-day version of one I fixed this morning.**
+Within a day the paper collapses repeats. Across days it repeated itself
+verbatim:
+
+| ran in seven days | |
+|---|---|
+| THE CITY COUNTED | 4 times, always "Some 48 people… of whom 18…" |
+| PREMISES STANDING EMPTY | 5 times, always the Mariner |
+| MORE OFFICERS ON THE STREETS | 5 times |
+
+Day 30's entire issue was two stories, both of them yesterday's. The pick was
+randomised per day and the comment above it claimed consecutive days would not
+repeat, but nothing ever looked at what had already been printed. Filler that
+has nothing new to say has nothing to say: a civic brief now waits three days
+before it may run again.
+
+**I broke the fix while making it and caught it by re-reading my own code.**
+Rewriting the loop to skip recent briefs, I dropped the guard that stopped a
+page running the same item twice in one issue. Walking the candidate list once
+from a per-day starting point does both jobs.
+
+**And one repeat survived, which found a second site.** After the fix, fifty-
+eight days produced exactly one repeat: `BELLANDI FAMILY SAID TO BE STRUGGLING`
+on consecutive days. That story is filed by the family-fortunes code, not the
+city page, so it never saw the new rule. A family's fortunes are news; the same
+sentence about them two days running is not.
+
+Measured on a fresh fifty-nine-day campaign after both fixes: **zero civic
+repeats inside the rest period, zero empty issues, median three stories an
+issue.**
+
+Evidence: one property in `core/citypage_test.go`, proven to fail when the rest
+rule is removed (it names the headline and the two days), twenty-two clean
+apicheck runs, `mise run verify` and `npm test` green, `mise run simulate`
+unchanged at 52 / 0 / 82 / 0.

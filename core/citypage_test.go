@@ -134,3 +134,48 @@ func TestFillerGivesUpItsPlaceBeforeNews(t *testing.T) {
 		t.Error("a killing was evicted from the archive by filler about the weather")
 	}
 }
+
+// Read out of a real campaign's paper: THE CITY COUNTED ran on four days in
+// seven with the same forty-eight people and the same eighteen of them
+// employed, and the Mariner was announced as standing empty five times in the
+// same week. The pick was randomised per day, and nothing ever looked at what
+// had already been printed.
+func TestTheCityPageDoesNotRepeatItselfAllWeek(t *testing.T) {
+	w := New(88)
+	w.News = nil
+	for day := 0; day < 21; day++ {
+		w.Minute = day * 1440
+		w.CityPageDay()
+	}
+	// No headline twice inside its rest period.
+	seen := map[string]int{}
+	for _, s := range w.News {
+		if s.Kind != "civic" {
+			continue
+		}
+		day := s.Minute / 1440
+		if last, ok := seen[s.Headline]; ok && day-last < CityPageRest {
+			t.Fatalf("%q ran on day %d and again on day %d", s.Headline, last+1, day+1)
+		}
+		seen[s.Headline] = day
+	}
+	// And no issue runs the same brief twice.
+	byDay := map[int]map[string]bool{}
+	for _, s := range w.News {
+		if s.Kind != "civic" {
+			continue
+		}
+		day := s.Minute / 1440
+		if byDay[day] == nil {
+			byDay[day] = map[string]bool{}
+		}
+		if byDay[day][s.Headline] {
+			t.Fatalf("day %d ran %q twice", day+1, s.Headline)
+		}
+		byDay[day][s.Headline] = true
+	}
+	// The page still comes out. Three weeks of empty issues is not a fix.
+	if len(w.News) < 21 {
+		t.Fatalf("three weeks produced %d civic briefs", len(w.News))
+	}
+}

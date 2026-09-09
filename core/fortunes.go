@@ -41,6 +41,15 @@ func (w *World) FortunesDay() {
 		if move > -FortuneShift && move < FortuneShift {
 			continue
 		}
+		// A family's fortunes are news; the same sentence about them two days
+		// running is not. Measured over fifty-eight days, this was the only
+		// civic headline still repeating once the city page learned to wait.
+		if w.ranLately(upper(f.Name) + " GAINING GROUND") {
+			continue
+		}
+		if w.ranLately(upper(f.Name) + " SAID TO BE STRUGGLING") {
+			continue
+		}
 		f.Reported = f.Power
 		if move > 0 {
 			w.Report("civic", upper(f.Name)+" GAINING GROUND", fmt.Sprintf(
