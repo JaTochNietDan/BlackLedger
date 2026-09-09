@@ -80,6 +80,12 @@ type Person struct {
 	// anybody who is not inside.
 	HeldUntil int    `json:"held_until,omitempty"`
 	HeldFor   string `json:"held_for,omitempty"`
+	// The minute the door shut, so the morning it opens can say what the city
+	// did in between. A sentence runs from two days to twelve — three times
+	// the longest trip out of Bellwether — and the release record used to say
+	// only that whatever it cost "happened while you were not there to watch
+	// it", which is the same empty claim the trips made.
+	HeldFrom int `json:"held_from,omitempty"`
 	// When the paper last carried something the player put there. Absent for
 	// anybody who has never been able to.
 	LastPress int `json:"last_press,omitempty"`

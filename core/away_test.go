@@ -17,6 +17,8 @@ func TestComingHomeSaysWhatHappened(t *testing.T) {
 	w.Minute += 1440
 	w.Report("killing", "SOMEBODY IS DEAD", "b")
 	w.Report("war", "TWO FAMILIES AT WAR", "b")
+	// The record is written when the player gets back, which is after.
+	w.Minute += 1440
 	line := w.WhatYouMissed(left)
 	if !strings.Contains(line, "SOMEBODY IS DEAD") || !strings.Contains(line, "TWO FAMILIES AT WAR") {
 		t.Fatalf("a returning player reads %q", line)
@@ -34,6 +36,7 @@ func TestComingHomeLeavesOutTheWeather(t *testing.T) {
 	w.Minute += 1440
 	w.Report("civic", "RAIN ACROSS THE DISTRICT", "b")
 	w.Report("civic", "THE CITY COUNTED", "b")
+	w.Minute += 1440
 	if line := w.WhatYouMissed(left); !strings.HasPrefix(line, "Nothing") {
 		t.Fatalf("four days of weather came back as %q", line)
 	}
@@ -47,6 +50,7 @@ func TestComingHomeDoesNotReportWhatYouWereThereFor(t *testing.T) {
 	left := w.Minute
 	w.Minute += 1440
 	w.Report("killing", "WHILE YOU WERE GONE", "b")
+	w.Minute += 1440
 	line := w.WhatYouMissed(left)
 	if strings.Contains(line, "BEFORE YOU LEFT") {
 		t.Fatalf("the city told a returning player something they watched happen: %q", line)
@@ -64,6 +68,7 @@ func TestComingHomeIsASummaryNotAnArchive(t *testing.T) {
 	for i := 0; i < 9; i++ {
 		w.Report("robbery", "ROBBERY NUMBER "+string(rune('A'+i)), "b")
 	}
+	w.Minute += 1440
 	line := w.WhatYouMissed(left)
 	if strings.Count(line, "ROBBERY NUMBER") > MissedHeadlines {
 		t.Fatalf("the whole paper came back with them: %q", line)
@@ -79,6 +84,7 @@ func TestComingHomeDoesNotReadAPreviousLifesPaper(t *testing.T) {
 	left := w.Minute
 	w.Minute += 1440
 	w.Report("killing", "IN A LIFE BEFORE THIS ONE", "b")
+	w.Minute += 1440
 	w.Life++
 	if line := w.WhatYouMissed(left); strings.Contains(line, "IN A LIFE BEFORE") {
 		t.Fatalf("a new protagonist was handed the last one's headlines: %q", line)
@@ -109,11 +115,83 @@ func TestComingHomeDoesNotSayTheSameThingTwice(t *testing.T) {
 		w.Minute = left + day*1440
 		w.Report("police", "POLICE PRESSURE ON RUSSO OUTFIT", "b")
 	}
+	w.Minute += 1440
 	line := w.WhatYouMissed(left)
 	if strings.Count(line, "POLICE PRESSURE") != 1 {
 		t.Fatalf("a returning player is told the same thing more than once: %q", line)
 	}
 	if strings.Contains(line, "other stor") {
 		t.Fatalf("the duplicates were counted as further news: %q", line)
+	}
+}
+
+// The paper files the story of the player's own arrest at the exact minute the
+// door shuts, so a man walking out of a cell was being told that the paper had
+// reported him walking into it. The minute you leave is a minute you were there
+// for.
+func TestComingOutIsNotToldAboutYourOwnArrest(t *testing.T) {
+	w := New(41)
+	w.Player.Home = "room"
+	w.Confine(4, "what was found at the laundry")
+	arrest := w.News[len(w.News)-1].Headline
+	if err := w.SitOut(); err != nil {
+		t.Fatal(err)
+	}
+	var out string
+	for _, r := range w.History {
+		if r.Title == "Out" {
+			out = r.Text
+		}
+	}
+	if out == "" {
+		t.Fatal("nothing was filed on release")
+	}
+	if strings.Contains(out, arrest) {
+		t.Fatalf("a man leaving a cell was told the paper reported him entering it: %q", out)
+	}
+}
+
+// Twelve days inside is three times the longest trip out of the city, and the
+// release record used to say only that whatever it cost happened while the
+// player was not there to watch it.
+func TestComingOutSaysWhatHappened(t *testing.T) {
+	w := New(42)
+	w.Player.Home = "room"
+	w.Confine(6, "what was found at the laundry")
+	w.Minute += 1440
+	w.Report("killing", "SOMEBODY IS DEAD", "b")
+	w.Minute = w.Player.HeldUntil - 1440
+	if err := w.SitOut(); err != nil {
+		t.Fatal(err)
+	}
+	var out string
+	for _, r := range w.History {
+		if r.Title == "Out" {
+			out = r.Text
+		}
+	}
+	if !strings.Contains(out, "SOMEBODY IS DEAD") {
+		t.Fatalf("six days inside and the city said nothing: %q", out)
+	}
+}
+
+// And the other end of the same fault: after talking his way out, the player
+// was told the paper had reported him talking his way out.
+func TestComingOutIsNotToldAboutYourOwnRelease(t *testing.T) {
+	w := New(43)
+	w.Player.Home = "room"
+	w.Confine(6, "what was found at the laundry")
+	since := w.Player.HeldFrom
+	w.Minute += 2 * 1440
+	w.Report("killing", "SOMEBODY IS DEAD", "b")
+	// The release is filed at the moment the player walks out, which is now.
+	w.Minute += 1440
+	w.Report("police", "CHARGES DROPPED AFTER COOPERATION", "b")
+	line := w.WhatYouMissed(since)
+	if strings.Contains(line, "CHARGES DROPPED") {
+		t.Fatalf("the player was told the paper reported his own release: %q", line)
+	}
+	if !strings.Contains(line, "SOMEBODY IS DEAD") {
+		t.Fatalf("real news went with it: %q", line)
 	}
 }

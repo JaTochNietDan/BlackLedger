@@ -24,7 +24,13 @@ import (
 func (w *World) missedSince(minute int) []Story {
 	out := []Story{}
 	for _, s := range w.News {
-		if s.Minute >= minute && s.Life == w.Life {
+		// Open at both ends. The minute the door shut and the minute it opened
+		// are both minutes the player was there for, and the paper files the
+		// story of the arrest at the first and the story of the release at the
+		// second. A man walking out of a cell was being told that the paper
+		// had reported him walking into it, and after buying his way out, that
+		// the paper had reported him buying his way out.
+		if s.Minute > minute && s.Minute < w.Minute && s.Life == w.Life {
 			out = append(out, s)
 		}
 	}

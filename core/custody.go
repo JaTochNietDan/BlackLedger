@@ -185,6 +185,7 @@ func (w *World) Confine(days int, because string) {
 	p := &w.Player
 	p.HeldUntil = w.Minute + days*1440
 	p.HeldFor = because
+	p.HeldFrom = w.Minute
 	p.Location = "precinct"
 	p.Weapon, p.Charges = 0, 0
 	w.Log("Taken in", fmt.Sprintf("%d days for %s. Your businesses keep their hours and your ground keeps nobody on it. You will hear about all of it afterwards.", days, because), "danger")
@@ -200,11 +201,12 @@ func (w *World) Release() {
 	if p.HeldUntil == 0 {
 		return
 	}
-	served := p.HeldFor
-	p.HeldUntil, p.HeldFor = 0, ""
+	served, since := p.HeldFor, p.HeldFrom
+	p.HeldUntil, p.HeldFor, p.HeldFrom = 0, "", 0
 	p.Location = p.Home
 	p.Heat = min(p.Heat, ReleasedHeat)
-	w.Log("Out", fmt.Sprintf("Nobody meets you. Whatever %s cost you happened while you were not there to watch it, and it is on the books now.", served), "personal")
+	w.Log("Out", fmt.Sprintf("Nobody meets you. You went in for %s, and whatever that cost you happened while you were not there to watch it. %s",
+		served, w.WhatYouMissed(since)), "personal")
 }
 
 // SitOut is doing the time. It advances the clock to the morning they open the

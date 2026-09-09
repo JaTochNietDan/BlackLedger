@@ -2190,3 +2190,64 @@ Still unverified over HTTP, and honestly so: 19 systems behind wealth or
 standing even a surviving harness does not reach, and 12 that never appear
 because it never enters the state, `lawyer` wanting an arrest and `sell:arms`
 wanting arms in the ground among them.
+
+## Coming out
+
+A sentence runs from two days to twelve, which is three times the longest trip
+out of the city, and the record filed on release said only that whatever it cost
+"happened while you were not there to watch it." The same empty claim the trips
+made, behind a different door. `WhatYouMissed` was written to be reused, so this
+should have been a two-line change. It was, and then reading the output found
+three faults, one of them in my own measurement.
+
+**The first measurement was wrong and I nearly published it.** I measured that
+forty campaigns out of forty came out of a two-day sentence to real news, which
+was too good to be true and was. The paper files the story of the player's own
+arrest at the exact minute the door shuts, so every single release was reporting
+`MAN CHARGED AFTER DISTRICT SEARCHES` back to the man it had charged. The minute
+you leave is a minute you were there for. With that excluded, the honest curve:
+
+| days inside | of 60 sentences, came out to real news |
+|---|---|
+| 2 | 21 |
+| 4 | 33 |
+| 6 | 40 |
+| 8 | 51 |
+| 12 | 57 |
+
+That shape is right: two days and it is a coin flip, twelve days and the city
+has almost always moved.
+
+**Then the same fault at the other end.** Talking your way out files `CHARGES
+DROPPED AFTER COOPERATION` at the moment you walk through the door, and the
+release record read that back too. The window is open at both ends now — the
+minute it shut and the minute it opened are both minutes the player was present
+for.
+
+**And a line I had been reading past.** "Whatever what was found at the laundry
+cost you happened while you were not there to watch it." The reason phrase was
+spliced straight after "Whatever". It reads "You went in for what was found at
+the laundry, and whatever that cost you happened while you were not there to
+watch it" now.
+
+Read out of a real save, eight days served:
+
+```
+Nobody meets you. You went in for what was found at the laundry, and whatever
+that cost you happened while you were not there to watch it. While you were
+gone the paper carried: SOFIA DOYLE FOUND DEAD · END OF BRENNER COMPANY ·
+POLICE PRESSURE ON BELLANDI FAMILY. And 3 other stories.
+```
+
+**Second bird: three systems verified over HTTP for the first time.** `sit_out`,
+`lawyer` and `talk` were all in the "never appeared in any action list" group,
+and this confirms exactly why — they exist only inside a cell, and the harness
+has never been arrested. All three were driven through the API against a save
+with the sentence forced into it, and all three work. That does not close the
+coverage gap, but it does mean those three are no longer unverified.
+
+Evidence: three more properties in `core/away_test.go`, twelve clean apicheck
+runs, `mise run verify` and `npm test` green, `mise run simulate` unchanged at
+53 / 0 / 82 / 0. Six existing tests in that file were filing their stories at
+the same minute as the return and had to advance the clock the way real play
+does — the exclusion is at both ends, and they were leaning on neither.
