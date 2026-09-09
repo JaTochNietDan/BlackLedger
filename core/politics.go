@@ -46,10 +46,15 @@ func (w *World) BusinessPressure() {
 		return
 	}
 	f := &w.Factions[actor]
-	speaker := "vittorio"
-	if actor == 1 {
-		speaker = "elena"
+	// The demand comes from whoever runs the family, for the same reason the
+	// audience does. This named Vittorio and Elena by position in the faction
+	// list, so a successor's demand arrived in a dead predecessor's voice.
+	leader := w.Leader(f.ID)
+	if leader == nil {
+		// A family with nobody left to lead it is not collecting from anybody.
+		return
 	}
+	speaker := leader.ID
 	rival := w.Rival(f.ID)
 	if rival == nil {
 		rival = f

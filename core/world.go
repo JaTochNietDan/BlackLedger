@@ -780,7 +780,7 @@ func (w *World) Actions(id string) []Action {
 		add("recruit", "Recruit "+hand, 30, 90, reason, "A driver and collector. $12 daily wages; loyalty matters.")
 		about(driver)
 	case "garage":
-		add("audience", "Request an audience with Russo", 45, 0, "", "Discuss your standing with the Russo Outfit.")
+		add("audience", "Request an audience with Russo", 45, 0, w.AudienceReadiness(id), "Discuss your standing with the Russo Outfit.")
 		if next, ok := nextVehicle(p.Car); ok {
 			hides := "Nothing to hide anything in."
 			if next.Compartment > 0 {
@@ -899,7 +899,7 @@ func (w *World) Actions(id string) []Action {
 			need(p.Contacts < 1, "Build a contact who will carry this"),
 			"Put a price on somebody. What it costs depends on who they are and who does the work. A failed attempt can be traced back to you.")
 	case "club":
-		add("audience", "Request an audience", 45, 0, "", "Discuss your standing with the Bellandi family.")
+		add("audience", "Request an audience", 45, 0, w.AudienceReadiness(id), "Discuss your standing with the Bellandi family.")
 		add("provoke", "Demand protection money", 30, 0, "", "EXTREME RISK. Bellandi owns this casino. Challenging them can bring lethal retaliation.")
 	}
 	if w.Hand != nil && !w.Hand.Done && w.Hand.Place == id {

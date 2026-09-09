@@ -3332,3 +3332,55 @@ Recorded and not fixed, because it is the harness and not the game: apicheck
 checks `earning` before travel, so a late campaign standing in a room that
 offers `courier` forever never leaves it. That is why coverage collapsed. It is
 also why the fault was found, so the ordering stays for now.
+
+## A seat across from whoever runs the family now
+
+The hardcoded hire suggested a class rather than a bug: a label taught something
+its effect was not. Auditing for the same split found the mirror image of it —
+two scenes whose *speaker* was hardcoded while everything around them asked the
+city who held the job.
+
+Every other authored scene names its speaker by role. The fixer's offers use
+`w.HolderID("fixer")`, the police stop uses `w.HolderID("detective")`, and both
+follow the job when the person holding it dies. The audience and the business
+demand named `"vittorio"` and `"elena"` — the two people who happened to lead
+the two families on the first morning. Families change hands constantly; that is
+most of what the living world does. Across twenty long runs it destroys
+seventeen families and creates nineteen. So the moment a leader was killed and
+the strongest survivor took over, the successor's demand arrived in a dead
+predecessor's voice, and the player was seated across a table from a corpse.
+
+The demand was worse than the audience. It picked its speaker by *position* in
+the faction list, `actor == 1`, so the identity was not even wrong in a stable
+way.
+
+Both now ask `w.Leader(faction)`, which already existed and already skips the
+dead. That opened a second question the hardcoding had hidden: a family can lose
+everybody. The view falls back to the first person in the city when it cannot
+find a scene's speaker, so an audience opening with no leader would have seated a
+stranger and let them set a family's terms. Neither scene opens now without
+somebody to speak, and `AudienceReadiness` disables the action with "Nobody is
+left to speak for the Bellandi Family" rather than spending the player's evening
+on nothing.
+
+Evidence: `core/speaker_test.go` states that the person in the chair is the
+person who runs the family. Both cases failed before the fix with the shape of
+the bug — "Rosa Marchetti leads bellandi now, but the chair holds Vittorio
+Bellandi (dead: true)" — and the audience case was re-broken afterwards to
+confirm the check can still see it. A third test covers the family with nobody
+left. Verified over HTTP on a driven save: with Vittorio dead and Rosa Marchetti
+leading the Bellandi Family, requesting an audience at the club returned a scene
+spoken by `heir`, Rosa Marchetti. `mise run verify` and `npm test` green, `mise
+run simulate` unchanged at defiant 52 / investor 0 / reckless 82 / worker 0, 0
+errors.
+
+Ninth near-miss, recorded so I do not chase it again: in that HTTP check Rosa's
+role still read "Soldier" rather than "Head of the Bellandi Family". That is my
+forcing method, not the game. I edited the save directly instead of going
+through `Succeed`, which is what sets the title.
+
+Still unexamined in this class, and worth the next pass: the view's silent
+fallback from a missing speaker to `world.npcs[0]`. Core no longer emits one, so
+nothing reaches it today, but a fallback that turns "nobody said this" into "a
+specific real person said this" is the wrong shape for a game whose core is the
+only source of truth.

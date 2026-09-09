@@ -2,12 +2,45 @@ package core
 
 import "fmt"
 
+// AudienceReadiness explains why a family cannot see the player, or returns "".
+// The audience is a seat across from whoever runs the family, so when nobody
+// does there is no seat: the scene refuses to open, and the action has to say
+// so rather than spending the player's evening on nothing.
+func (w *World) AudienceReadiness(location string) string {
+	actor := "bellandi"
+	if location == "garage" {
+		actor = "russo"
+	}
+	f := w.faction(actor)
+	if f == nil {
+		return "There is no such family in this city any more"
+	}
+	if w.Leader(actor) == nil {
+		return "Nobody is left to speak for " + f.Name
+	}
+	return ""
+}
+
 // OpenAudience is reached only after the location's action completes without interruption.
 func (w *World) OpenAudience(location string) {
-	actor, speaker, surname := "bellandi", "vittorio", "Bellandi"
+	// Who sits across the table is a job, not a person. Every other authored
+	// scene already asks the city who holds it — the fixer, the detective —
+	// and this one named Vittorio and Elena, the two people who happened to
+	// lead the two families on the first morning. Families change hands: the
+	// leader is shot, the strongest survivor takes over, and the chair here
+	// went on holding a corpse.
+	actor, surname := "bellandi", "Bellandi"
 	if location == "garage" {
-		actor, speaker, surname = "russo", "elena", "Russo"
+		actor, surname = "russo", "Russo"
 	}
+	leader := w.Leader(actor)
+	if leader == nil {
+		// Nobody is left to grant one. The view falls back to the first person
+		// in the city when it cannot find a speaker, so an empty chair here
+		// would put a stranger's face and voice on a family's terms.
+		return
+	}
+	speaker := leader.ID
 	body := "“People mistake an open door for an invitation. Tell me you understand the difference.”"
 	if actor == "russo" {
 		body = "“You are doing business near my people. We can settle our differences, or you can show me that an arrangement with you is worth something.”"
