@@ -602,3 +602,16 @@ export function awnings(cell: Cell, slots = 2): Awning[] {
   }
   return out;
 }
+
+// goldenness is the colour of the light rather than the amount of it.
+//
+// nightness alone made dawn a weaker night: the same blue-black ground, a
+// little lighter. What separates six in the morning from three in the morning
+// is not brightness, it is temperature — the light comes in low and warm and
+// only for an hour or so at each end of the day. This runs 0 through the middle
+// of the day and through the small hours, and 1 at the two turns.
+export function goldenness(minute: number): number {
+  const hour = (minute % 1440) / 60;
+  const near = (peak: number) => Math.max(0, 1 - Math.abs(hour - peak) / 1.75);
+  return Math.min(1, Math.max(near(6.2), near(19.2)));
+}

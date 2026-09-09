@@ -2,7 +2,7 @@ import {useEffect, useRef} from 'react';
 import {Application, Assets, Container, Graphics, Sprite, Text, Texture, TextStyle} from 'pixi.js';
 import {Viewport} from 'pixi-viewport';
 import type {Snapshot} from './types';
-import {addressSlot, along, awnings, blockFor, BLOCK, bounds, carriageways, distance, dressing, faces, fillerShape, grid, island, kerbside, lampPosts, markings, middle, mix, nightness, PAVE, plot, project, ROAD, size, terrace, TILE, walk, wires} from './iso';
+import {addressSlot, along, awnings, blockFor, BLOCK, bounds, carriageways, distance, dressing, faces, fillerShape, goldenness, grid, island, kerbside, lampPosts, markings, middle, mix, nightness, PAVE, plot, project, ROAD, size, terrace, TILE, walk, wires} from './iso';
 import type {Cell, Vec} from './iso';
 import cutouts from '../public/art/iso/isometric.json';
 import type {Spotlight} from './CityStreet';
@@ -382,6 +382,18 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight}: {
     // How dark it is, from the clock the core keeps. Everything below reads
     // this one number rather than deciding for itself what time it is.
     const dark = nightness(state.minute);
+    // And what colour that light is. Low sun at either end of the day, nothing
+    // in the middle of it and nothing in the small hours, so dawn stops being
+    // a weaker night and becomes its own hour.
+    const gold = goldenness(state.minute);
+    // Anything the light falls on flatly — ground, road, pavement — takes the
+    // temperature of it. Buildings do not: they are painted, and warming them
+    // as a whole washes the art out.
+    // Stone takes the low sun; asphalt barely does, which is what keeps the
+    // roads reading as roads at dawn instead of the whole city going one
+    // flat brown.
+    const sunlit = (c: number) => mix(c, 0xa9713f, gold * .2);
+    const tarmac = (c: number) => mix(c, 0x6b4f3c, gold * .09);
 
     // The ground: one slab under the whole city, so nothing floats and the
     // roads are cut out of something rather than laid on nothing.
@@ -389,7 +401,7 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight}: {
     const far = {x: size.cols * BLOCK, y: size.rows * BLOCK};
     const corners = [{x: -.6, y: -.6}, {x: far.x + .6, y: -.6}, {x: far.x + .6, y: far.y + .6}, {x: -.6, y: far.y + .6}]
       .map(project);
-    earth.poly(corners.flatMap(c => [c.x, c.y])).fill(mix(0x2a2f2c, 0x0f1416, dark));
+    earth.poly(corners.flatMap(c => [c.x, c.y])).fill(sunlit(mix(0x2a2f2c, 0x0f1416, dark)));
     layer.addChild(earth);
 
     // The carriageways, full width and height, so every junction is square.
@@ -401,7 +413,7 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight}: {
         {x: way.a.x - pad.x, y: way.a.y - pad.y}, {x: way.b.x + pad.x, y: way.a.y - pad.y},
         {x: way.b.x + pad.x, y: way.b.y + pad.y}, {x: way.a.x - pad.x, y: way.b.y + pad.y},
       ].map(project);
-      road.poly(box.flatMap(c => [c.x, c.y])).fill(mix(0x333a38, 0x161b1c, dark));
+      road.poly(box.flatMap(c => [c.x, c.y])).fill(tarmac(mix(0x333a38, 0x161b1c, dark)));
     }
     layer.addChild(road);
 
@@ -413,14 +425,14 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight}: {
       const i = island(cell);
       const outer = [{x: i.x, y: i.y}, {x: i.x + i.w, y: i.y}, {x: i.x + i.w, y: i.y + i.d}, {x: i.x, y: i.y + i.d}]
         .map(project);
-      pave.poly(outer.flatMap(c => [c.x, c.y])).fill(mix(0x4a514c, 0x252b29, dark));
+      pave.poly(outer.flatMap(c => [c.x, c.y])).fill(sunlit(mix(0x4a514c, 0x252b29, dark)));
       kerb.poly(outer.flatMap(c => [c.x, c.y])).stroke({width: 1.6, color: mix(0x5d675f, 0x323b36, dark), alpha: .95});
       // The join between pavement and building, a shade darker so the plot
       // reads as ground the building sits on rather than as more pavement.
       const b = plot(cell);
       const inner = [{x: b.x, y: b.y}, {x: b.x + b.w, y: b.y}, {x: b.x + b.w, y: b.y + b.d}, {x: b.x, y: b.y + b.d}]
         .map(project);
-      pave.poly(inner.flatMap(c => [c.x, c.y])).fill(mix(0x3e443f, 0x1e2422, dark));
+      pave.poly(inner.flatMap(c => [c.x, c.y])).fill(sunlit(mix(0x3e443f, 0x1e2422, dark)));
     }
     layer.addChild(pave, kerb);
 

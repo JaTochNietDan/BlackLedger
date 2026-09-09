@@ -9,7 +9,7 @@
 
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {BLOCK, PAVE, ROAD, addressSlot, awnings, island, terrace} from '../.runtime/frontend-test/iso.js';
+import {BLOCK, PAVE, ROAD, addressSlot, awnings, goldenness, island, nightness, terrace} from '../.runtime/frontend-test/iso.js';
 
 const SLOTS = 2;                 // must match CityIso.tsx
 
@@ -100,4 +100,20 @@ test('two awnings never overlap', () => {
       const y = Math.min(a.at.y + a.reach, b.at.y + b.reach) - Math.max(a.at.y, b.at.y);
       assert.ok(!(x > 1e-9 && y > 1e-9), 'two awnings occupy the same air');
     }
+});
+
+// The light has a temperature as well as a level. Without this, dawn is only a
+// weaker night: the same blue-black ground, a little lighter.
+test('the light is warm at the turns of the day and nowhere else', () => {
+  const at = (h, m = 0) => h * 60 + m;
+  assert.equal(goldenness(at(12)), 0, 'midday is not golden hour');
+  assert.equal(goldenness(at(3)), 0, 'three in the morning is not golden hour');
+  assert.ok(goldenness(at(6, 12)) > .95, 'dawn is not warm');
+  assert.ok(goldenness(at(19, 12)) > .95, 'dusk is not warm');
+  // And it is the opposite of a brightness curve: dawn and the small hours are
+  // both dark, and only one of them is gold.
+  assert.ok(nightness(at(3)) === 1 && nightness(at(5, 30)) > 0, 'both are night');
+  assert.ok(goldenness(at(5, 30)) > goldenness(at(3)), 'dawn is no warmer than 3am');
+  // It wraps with the clock rather than running off the end of a day.
+  assert.equal(goldenness(at(6, 12)), goldenness(at(6, 12) + 1440 * 9));
 });
