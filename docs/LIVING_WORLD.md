@@ -119,4 +119,11 @@ business could get more business if cars are destroyed during operations and
 whatnot. That's the kind of intertwined and linked up world we need to be
 creating and I want you to be continuously autonomously creating
 
+Another thing is that we could have the ability for people to steal car parts
+and sell them to garages and that's how garages make money, they make more if
+there's more car theft or more car repairs to be made from broken windows from
+theft etc. Maybe a scrapyard would also be a good idea that links in similarly.
+Flesh that out in the loop. Add it to the inbox. Think about more interlinked
+stuff too.
+
 Ultiamtely the expectation is that I don't have to think of all of these concepts, you, the agent will think of these too and build them out and playtest and simulate them yourself.
