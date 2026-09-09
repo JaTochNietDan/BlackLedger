@@ -160,7 +160,7 @@ func TestANewPersonReadsTheirOwnEdition(t *testing.T) {
 func TestTheArchiveIsBounded(t *testing.T) {
 	w := New(61)
 	for i := 0; i < newsCapacity*3; i++ {
-		w.Report("war", "HEADLINE", "Body.")
+		w.Report("war", fmt.Sprintf("HEADLINE %d", i), "Body.")
 	}
 	if len(w.News) > newsCapacity {
 		t.Fatalf("the archive grew to %d stories", len(w.News))
@@ -317,7 +317,7 @@ func TestTheArchiveIsWorthKeeping(t *testing.T) {
 	w.News = nil
 	for i := 0; i < newsCapacity+40; i++ {
 		w.Minute = i * 720
-		w.Report("business", "STORY", "b")
+		w.Report("business", fmt.Sprintf("STORY %d", i), "b")
 	}
 	if len(w.News) != newsCapacity {
 		t.Fatalf("the paper is holding %d stories against a cap of %d", len(w.News), newsCapacity)

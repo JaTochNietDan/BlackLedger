@@ -1,6 +1,9 @@
 package core
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 // The Bellwether Herald prints what the city can see. It is assembled at the
 // moment events are committed, not summarised afterwards, so a headline always
@@ -18,6 +21,9 @@ type Story struct {
 	Headline string `json:"headline"`
 	Body     string `json:"body"`
 	Kind     string `json:"kind"`
+	// How many times this happened on the day it was filed. One story, with a
+	// number on it, rather than the same paragraph printed over and over.
+	Count int `json:"count,omitempty"`
 	// Set once a brief has been through the director, whether or not the
 	// rewrite was accepted. A refusal is as final as an acceptance: asking the
 	// same model the same question again gets the same answer, and the paper is
@@ -35,12 +41,63 @@ const newsCapacity = 240
 
 // Report files a story. Callers pass what the city could observe, which is why
 // the wording differs from the private record written to the player's history.
+//
+// The same story is never printed twice in one issue. Read end to end, a
+// campaign's paper carried seven identical paragraphs about a robbery at Saint
+// Agnes in a single edition, because seven people were robbed there that day and
+// each one filed its own copy. No newspaper does that; it writes one piece
+// saying it happened seven times, and that piece is a better story than any one
+// of them.
 func (w *World) Report(kind, headline, body string) {
+	if prior := w.todayStory(kind, headline); prior != nil {
+		prior.Count++
+		prior.Minute = w.Minute
+		prior.Body = runOf(kind, prior.Count, body)
+		return
+	}
 	w.News = append(w.News, Story{
 		ID: ID(), Minute: w.Minute, Life: w.Life,
-		Headline: headline, Body: body, Kind: kind,
+		Headline: headline, Body: body, Kind: kind, Count: 1,
 	})
 	w.trimNews()
+}
+
+// todayStory finds a story already filed today under the same headline.
+func (w *World) todayStory(kind, headline string) *Story {
+	day := w.Minute / 1440
+	for i := len(w.News) - 1; i >= 0; i-- {
+		s := &w.News[i]
+		if s.Minute/1440 != day || s.Life != w.Life {
+			break // the archive is in order; nothing older can be today's
+		}
+		if s.Kind == kind && s.Headline == headline {
+			return s
+		}
+	}
+	return nil
+}
+
+// runOf is how a paper writes the same thing happening repeatedly: as one
+// incident with a number on it, which reads as a district in trouble rather
+// than as a stuck press.
+func runOf(kind string, count int, latest string) string {
+	if count < 2 {
+		return latest
+	}
+	times := map[int]string{2: "twice", 3: "three times", 4: "four times",
+		5: "five times", 6: "six times", 7: "seven times"}[count]
+	if times == "" {
+		times = fmt.Sprintf("%d times", count)
+	}
+	switch kind {
+	case "robbery":
+		return fmt.Sprintf("%s It happened %s in the same day, which residents say is not the usual run of things.", latest, times)
+	case "attack":
+		return fmt.Sprintf("%s There were %s such incidents before the day was out.", latest, times)
+	case "police":
+		return fmt.Sprintf("%s Officers were back %s before the day was out.", latest, times)
+	}
+	return fmt.Sprintf("%s It happened %s that day.", latest, times)
 }
 
 // trimNews keeps the archive inside its bound, and drops filler before news.
@@ -151,6 +208,13 @@ func (w *World) Editions() []map[string]any {
 // The player reads their own work here with no name attached, which is exactly
 // what the rest of the city sees.
 func (w *World) unattributed(place string, what string) string {
+	// Callers that already said the police have nothing get left alone. The
+	// robbery copy read "Police have asked anybody who saw it to come forward.
+	// Police have made no arrest and are appealing for anyone who saw the
+	// incident at Saint Agnes." — the same sentence twice, in every edition.
+	if strings.Contains(what, "Police") || strings.Contains(what, "police") {
+		return what
+	}
 	return fmt.Sprintf("%s Police have made no arrest and are appealing for anyone who saw the incident at %s.", what, place)
 }
 

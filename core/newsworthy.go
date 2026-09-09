@@ -21,10 +21,10 @@ package core
 
 var newsworthiness = map[string]int{
 	"killing":  100,
-	"attempt":  85,   // somebody survived it, which is the only difference
+	"attempt":  85, // somebody survived it, which is the only difference
 	"war":      80,
 	"attack":   70,
-	"collapse": 65,   // an organization ending is the end of something
+	"collapse": 65, // an organization ending is the end of something
 	"split":    60,
 	"arrest":   55,
 	"police":   50,
@@ -33,8 +33,8 @@ var newsworthiness = map[string]int{
 	"robbery":  30,
 	"politics": 25,
 	"business": 15,
-	"obituary": 10,   // set apart from the news anyway, never a lead
-	"civic":    5,    // the city page: real, and never the front page
+	"obituary": 10, // set apart from the news anyway, never a lead
+	"civic":    5,  // the city page: real, and never the front page
 }
 
 // Newsworthiness is how far up the page a kind of story belongs. Anything the

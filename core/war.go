@@ -476,7 +476,6 @@ func (w *World) HolderName(id string) string {
 	return prop.Owner
 }
 
-
 // howItEnded says why the shooting stopped, from what is left on the ground.
 // A war that burned out and a war that finished somebody are the same
 // transition in the model and are not the same story in the city.

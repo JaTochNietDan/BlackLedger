@@ -90,7 +90,7 @@ func TestARefusalIsFinal(t *testing.T) {
 	w := New(83)
 	w.CityPageDay()
 	s, _ := w.NextPolish()
-	w.SetPolish(s.ID, "", false)          // refused
+	w.SetPolish(s.ID, "", false) // refused
 	for _, n := range w.News {
 		if n.ID == s.ID {
 			if !n.Polished {

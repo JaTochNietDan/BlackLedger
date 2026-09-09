@@ -55,7 +55,7 @@ func TestAWarIsCountedOnceAndPlacedCorrectly(t *testing.T) {
 	// A war between two other families.
 	w.Conflicts = append(w.Conflicts, core.Conflict{A: "bellandi", B: "russo", State: "war"})
 	eyes.changed(w, &got)
-	eyes.changed(w, &got)     // still running; must not count again
+	eyes.changed(w, &got) // still running; must not count again
 	if got.WarsStarted != 1 {
 		t.Errorf("one war was counted %d times", got.WarsStarted)
 	}

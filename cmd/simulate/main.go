@@ -5,8 +5,8 @@ import (
 	"blackledger/sim"
 	"encoding/json"
 	"flag"
-	"math"
 	"fmt"
+	"math"
 	"os"
 	"sort"
 	"strings"
@@ -18,7 +18,6 @@ import (
 // answer is always "the city did nothing", and that is a fact about the run
 // rather than about the city.
 const livingWorldHorizon = 20
-
 
 func main() {
 	runs := flag.Int("runs", 100, "campaigns per strategy")
@@ -158,7 +157,7 @@ func main() {
 	out := map[string]any{"corpus_sha256": corpusHash, "corpus_proposals": len(corpus), "elapsed_seconds": time.Since(start).Seconds(), "director": *director, "max_commands": *steps, "summary": summaries, "campaigns": reports}
 	if len(short) > 0 {
 		out["warning"] = fmt.Sprintf(
-			"the city measures are not meaningful for %s: a campaign has to run past about %.0f days "+
+			"the city measures are not meaningful for %s: a campaign has to run past about %d days "+
 				"before families have time to escalate, split or fall, and these ended sooner. "+
 				"Raise -steps, or read only the strategies that survived.",
 			strings.Join(short, ", "), livingWorldHorizon)

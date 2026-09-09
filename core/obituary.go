@@ -29,10 +29,10 @@ func (w *World) mourned(n *NPC) bool {
 		return false
 	}
 	if _, official := OfficialByID(n.ID); official {
-		return true                       // a man with a title always gets one
+		return true // a man with a title always gets one
 	}
 	if n.Rank >= RankLieutenant {
-		return true                       // somebody who stood over other people
+		return true // somebody who stood over other people
 	}
 	// Or somebody the city had reason to know: they ran premises, or the
 	// player had actually dealt with them.
@@ -129,7 +129,6 @@ func (w *World) ObituaryDay() {
 		w.Report("obituary", headline, body)
 	}
 }
-
 
 // sharesAName reports whether a role already carries the family's name in it,
 // so the paper does not print "Russo boss of Russo Outfit".

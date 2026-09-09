@@ -1782,3 +1782,39 @@
 - The banner now shows the biggest unread story rather than the latest.
 - Verified in the browser on that same save: the banner reads **IVO COSTA KILLED** where it would have read *A CLEAR DAY*. No console errors.
 - `mise run verify` passes, `npm test` 23/23, `cmd/apicheck` reports no invariant failures, balance unchanged at defiant 58 / investor 0 / reckless 82 / worker 0, 0 errors.
+
+## The paper stops printing the same story seven times
+
+I drove a QA save (a copy of a backup, with the stale `-wal` and `-shm` deleted
+beside it) forward to day 42 with eight `cmd/apicheck` runs, dumped all 28
+editions in order, and read them end to end as a story. LIVING_WORLD.md says a
+system is finished when the results still make sense read back that way, and
+nobody had done it.
+
+Most of it read well. A war started, a killing avenged a killing and said so
+("It was over what happened to Luca Toth"), a family split, the Russo outfit
+ended, the dead got obituaries, and the fighting stopped. That arc is the thing
+the simulation is for and it survived being read as prose.
+
+One issue was ruined. The same robbery at Saint Agnes was printed seven times in
+a single edition, each time in full, and each copy carried a doubled police
+line: "Police have asked anybody who saw it to come forward. Police have made no
+arrest and are appealing for anyone who saw the incident at Saint Agnes." No
+paper does that. It writes one piece saying it happened seven times, and that
+piece is a better story than any of the seven.
+
+`Report` now collapses a repeat into the story already filed for that kind and
+headline today, in this life, bumping a `Count` and rewriting the body with a
+run sentence appropriate to the kind — a robbery "happened three times in the
+same day, which residents say is not the usual run of things"; police "were back
+three times before the day was out". A different headline is still a different
+story, yesterday's story is never today's, and `unattributed()` no longer
+prepends "Police" to a sentence that already names them.
+
+Evidence: four new properties in `core/repeats_test.go` (a run collapses, two
+distinct robberies stay two stories, a day boundary breaks a run, the police
+line is not printed twice). Two older archive tests filed one identical headline
+hundreds of times to test boundedness; that is now a run of length N, so they
+file distinct headlines instead, which is what a bounded-archive test actually
+means. `mise run verify` and `npm test` pass. `mise run simulate` is unchanged
+at defiant 58 / investor 0 / reckless 82 / worker 0 deaths, 0 errors.
