@@ -5266,3 +5266,51 @@ seven to thirteen days and rarely own a watched business at all.
 Evidence: `core/notice_test.go`, two breaks verified. One existing test changed
 with the reason: it compared against a flat constant and now asks the world what
 tonight's fade is, because that is no longer the same for everybody.
+
+## A place for things to sit without being looked at
+
+The third shape of what a business is. Cover and Watched are numbers a trade
+contributes; this is something the player can only do because of what they own.
+
+The first candidate did not survive reading the wiring, and that is worth
+recording. A cab company whose drivers see where people go sounds right, and it
+would have been worth nothing: the city already tells the player where all
+eighty-six people are, whether they are walking, where to, and how many minutes
+out. There is no finding anybody to be done. Building it would have been an
+action that revealed what the screen already said.
+
+What the player genuinely cannot do is hold contraband without it being seen.
+Attention accrues every day for every unit not out of sight, and out of sight
+meant a false floor in a car or a cellar under the house. A yard full of trucks
+and a cold room are places things sit without being looked at, and that is what
+those trades are for. Five crates of moonshine draw five points a day with
+nowhere to put them, one point behind a cab yard, and nothing at all behind a
+haulage yard.
+
+The measurement was wrong first time, in a way worth naming. I used eight crates
+of arms, which is twenty-four points of attention before a cap of six — so every
+case measured the cap, and a cab yard and no yard at all both came back as six.
+Five crates of moonshine sits under the cap and the difference is plain.
+
+Underneath it, another address named where a kind was meant: a car costs half to
+keep when the player owns "the garage", written when the city could hold exactly
+one. It asks the kind now, through `OwnsKind`.
+
+That fix is currently latent and I am not claiming otherwise. There is still one
+garage, so swapping the fix back out leaves the garage test passing — it cannot
+be caught failing. What can be proved is the thing the fix rests on, and it is
+proved over the kinds the city genuinely has two of: owning the Golden Lily
+counts as owning a casino, and breaking `OwnsKind` fails that immediately.
+
+| the trade | keeps out of sight |
+| --- | --- |
+| haulage | 7 |
+| butcher | 4 |
+| cabs | 4 |
+| garage | 3 |
+| laundry | 2 |
+| restaurant | 1 |
+| casino, poolhall, burlesque | nothing |
+
+Evidence: `core/hides_test.go`, two breaks verified and one honestly reported as
+unprovable until the city has a second garage.

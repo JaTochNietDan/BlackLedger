@@ -112,4 +112,11 @@ businesses and expanding them and adding more and how they interact with the
 city simulation and remember we want to really have a lot of characters living
 in this city
 
+Another idea is that we can have a car dealership that actually acts as the
+place you buy your cars from and other living NPCs buy their cars from. We can
+have all the city link together to be internally consistent that way. The
+business could get more business if cars are destroyed during operations and
+whatnot. That's the kind of intertwined and linked up world we need to be
+creating and I want you to be continuously autonomously creating
+
 Ultiamtely the expectation is that I don't have to think of all of these concepts, you, the agent will think of these too and build them out and playtest and simulate them yourself.

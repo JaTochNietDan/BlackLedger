@@ -107,6 +107,17 @@ func (w *World) Concealed() int {
 	if w.Fitted("cellar") {
 		hidden += CellarHold
 	}
+	// And the trades whose whole business is things sitting somewhere without
+	// being looked at. A yard full of trucks and a cold room are that; a revue
+	// bar is not.
+	for _, l := range Locations {
+		if !w.Own(l.ID) {
+			continue
+		}
+		if trade, runs := TradeOf(l.ID); runs {
+			hidden += trade.Hides
+		}
+	}
 	return hidden
 }
 
@@ -121,7 +132,7 @@ func (w *World) CarUpkeep() int {
 		return 0
 	}
 	upkeep := VehicleByTier(w.Player.Car).Upkeep
-	if w.Own("garage") {
+	if w.OwnsKind("garage") {
 		upkeep = (upkeep + 1) / 2
 	}
 	return upkeep
@@ -212,7 +223,7 @@ func (w *World) ServiceReadiness(id string) string {
 // ServiceFee is nothing at a motor works of your own: the people there work on
 // cars all day and one of them is yours.
 func (w *World) ServiceFee() int {
-	if w.Own("garage") {
+	if w.OwnsKind("garage") {
 		return 0
 	}
 	return CarService
