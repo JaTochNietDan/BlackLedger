@@ -2627,3 +2627,61 @@ Evidence: two properties in `core/polish_test.go`, the empty-response case now
 named separately from a short one, nine real briefs through the live model,
 twelve clean apicheck runs, `mise run verify` and `npm test` green, `mise run
 simulate` unchanged at 52 / 0 / 82 / 0.
+
+## What survives you
+
+The account abroad is the game's answer to its own hardest rule — everything a
+person owns dies with them — and none of it had been driven over HTTP. Nor had
+laundering, the still, restocking, inspecting or dismantling. All seven were in
+the harness's unreached list.
+
+I drove the whole arc against a forced save, including the part that only
+happens once a protagonist is dead.
+
+```
+Money leaves the city: $500 sent out, $410 of it arrives. The account holds
+$1640 and answers to nobody here, including you if anything happens.
+```
+
+Then the protagonist died. The next arrival, Frankie Vale, started with the
+usual ninety dollars, and the market offered:
+
+| | |
+|---|---|
+| deposit | You need $500 to send out at once |
+| offshore_access | You need $400 to establish that it is yours |
+| withdraw | The account does not answer to you yet |
+
+$1640 sitting there and out of reach, exactly as the file's comment says it
+should be: "reaching it as a stranger costs money a stranger does not have."
+Given $900, the new life paid the $400, took the money home, and the ledger said
+`It comes home: $1640 back in the city and in your hands, where anybody can take
+it from you.` The central promise of the system works.
+
+Worth noting because it surprised me: the person who sent the money out has to
+pay for access too. That is not an oversight — the deposit record says it at the
+time, "answers to nobody here, **including you** if anything happens" — but it
+is a sharper rule than I expected and it is stated plainly at the moment it
+matters.
+
+Laundering and the rest of the premises work read correctly as well:
+
+```
+The books absorb it: $348 through Bluebird Laundry. Police attention falls by
+14, to 56. The premises take a little more wear each time, and trade at
+Bluebird Laundry is down to 1%.
+A still at Bluebird Laundry: $450 of copper and pipe in the back. It makes its
+own stock now, and stock has to be moved.
+The still comes out of Bluebird Laundry: Copper and pipe out through the back
+door. There is less to find here now.
+```
+
+**No bugs, which is the result.** Seven systems driven end to end and every line
+read: no invented figure, no assumed gender, no count of one taking a plural, no
+cost left unstated. After a night of finding a fault in almost everything I
+looked at, a system that comes through clean is worth writing down as clean.
+
+Evidence: `deposit`, `offshore_access`, `withdraw`, `launder`, `still`,
+`restock`, `inspect` and `dismantle` all driven through the API, the inheritance
+verified across a real death, twelve clean apicheck runs, `mise run verify` and
+`npm test` green.
