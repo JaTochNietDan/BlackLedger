@@ -4723,3 +4723,57 @@ with it.
 
 Evidence: `cmd/blackledger/director_compare_test.go`, which is skipped unless
 `BLACK_LEDGER_COMPARE` is set because it needs a model and takes seven minutes.
+
+## Four more businesses, and the guards that stopped me shipping them badly
+
+From the inbox: expand the businesses. The city had three you could own — a
+laundry, a garage and a casino. It now has seven. A restaurant with a back room
+nobody books, a billiard hall where somebody is already running a book, a
+butcher with a cold room and a licence to move refrigerated goods at any hour,
+and a haulage yard with four trucks.
+
+Each has its own trouble, because a business is only interesting while there is
+a kind of trouble the player has not met. The restaurant fails an inspection.
+The pool hall loses its own money to somebody's book in the back. The butcher's
+cold room dies overnight and takes a week of stock with it. The haulage yard
+has a driver talking to Ward Street.
+
+I was wrong about the view and should say so. I read the asset code, found a
+wireframe fallback with a comment saying a building added tomorrow would still
+have a card rather than a hole, and concluded adding places was safe. It is not.
+Three tests require every address to have a painted front, an interior, and a
+block of its own on the map, and they refuse the fallback. Reading the comment
+was not reading the wiring.
+
+Five guards caught real faults, which is the whole argument for having them:
+
+- Two addresses had no picture and no interior.
+- Two of my coordinates landed on blocks already taken, so Vittoria's would have
+  been pushed off Saint Agnes and the butcher off Russo Motor Works.
+- Every place needs its own ways of dying, and four had none.
+- "One man off the books" tripped the scan for prose that assumes a gender
+  nothing in the game records.
+
+Painting them turned up a fault in the art tools worth more than the paintings.
+A place's seed was its position in a sorted list, so adding four addresses
+shifted every index after them and repainted eleven finished buildings. The
+seed comes from the place's name now, and both tools skip anything already
+painted unless asked for everything. A building should look the same tomorrow as
+it does today.
+
+The balance simulation barely moved: one death fewer for the defiant strategy
+and $147 more for the investor. That is not evidence the new businesses work.
+Those campaigns run seven to thirteen days and never get near the $980 a haulage
+yard costs, so the simulation hardly touches them. They are tested directly
+instead, over the whole trade table rather than over the four, so a fifth cannot
+be added without the test noticing: every trade must be buyable, earn something,
+open already staffed and supplied, suffer when run down, and have trouble and a
+remedy of its own. Both failure modes fail.
+
+| | before | after |
+| --- | --- | --- |
+| ownable businesses | 3 | 7 |
+| defiant deaths | 52 | 51 |
+| investor median cash | $14,019 | $14,166 |
+
+Evidence: `core/businesses_test.go`. All gates green, `npm test` 34.

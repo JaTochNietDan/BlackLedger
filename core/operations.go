@@ -44,6 +44,30 @@ var trades = map[string]Trade{
 		Trouble: "A dealer is working with somebody on the floor and the tables are losing.",
 		Remedy:  "Deal with the dealer", RemedyDetail: "Ends the arrangement, one way or another.", RemedyCost: 160,
 	},
+	// What goes wrong at a laundry is not what goes wrong at a casino, and it
+	// is not what goes wrong at a restaurant either. Each of these has its own
+	// trouble, because a business the player has learned to run is only
+	// interesting while there is a kind of trouble they have not met.
+	"restaurant": {
+		Hands: 4, Wage: 7, Drain: 7, Restock: 150, RestockAmount: 45, Supplies: "the week's food order",
+		Trouble: "The kitchen failed an inspection and the dining room is half empty.",
+		Remedy:  "Put the kitchen right", RemedyDetail: "New fittings and a word with the inspector.", RemedyCost: 170,
+	},
+	"poolhall": {
+		Hands: 2, Wage: 5, Drain: 4, Restock: 70, RestockAmount: 40, Supplies: "cloth, chalk and drink",
+		Trouble: "Somebody is running their own book out of the back and taking the room's money with it.",
+		Remedy:  "Put the outside book out", RemedyDetail: "The room takes its own bets again.", RemedyCost: 110,
+	},
+	"butcher": {
+		Hands: 3, Wage: 9, Drain: 8, Restock: 200, RestockAmount: 45, Supplies: "stock and ice",
+		Trouble: "The cold room failed overnight and a week of stock went with it.",
+		Remedy:  "Get the cold room running", RemedyDetail: "An engineer, and the stock replaced.", RemedyCost: 210,
+	},
+	"haulage": {
+		Hands: 6, Wage: 12, Drain: 11, Restock: 320, RestockAmount: 50, Supplies: "fuel and parts",
+		Trouble: "A driver has been talking to somebody at Ward Street and the yard knows it.",
+		Remedy:  "Find out which driver", RemedyDetail: "One driver off the books, and the runs are quiet again.", RemedyCost: 240,
+	},
 }
 
 // TradeOf reports how a place runs, and whether it runs at all.

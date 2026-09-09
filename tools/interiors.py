@@ -10,6 +10,7 @@ The rooms are painted empty. The people who are standing in one are drawn over
 the top by the interface, out of who the core says is actually there, so a room
 never disagrees with the city about who is in it.
 """
+import hashlib
 import os
 import subprocess
 import sys
@@ -40,9 +41,23 @@ ROOMS = {
     "estate": "the drawing room of a large house, tall windows, heavy drapes, a grand fireplace",
     "precinct": "a police station front office, tiled floor, high wooden counter, notice boards, barred inner door",
     "herald": "a newspaper composing room, rows of typewriters, paper spikes, hanging lamps, printing press beyond",
+    "restaurant": "a small restaurant dining room, tables with white cloths, a curtained door to a back room, wall lamps",
+    "poolhall": "a billiard hall, three tables under low hanging lamps, cue racks on the wall, a payphone in the corner",
+    "butcher": "a butcher shop interior, marble counter, hooks and rails, a heavy cold room door at the back",
+    "haulage": "a haulage yard office, a wall of route boards and keys, a counter, trucks visible through the window",
 }
 
 W, H = 832, 512
+
+
+def seed_for(place):
+    """A place's seed comes from its name, not its position in this list.
+
+    It used to be 4000 + index, so adding four addresses to the city shifted
+    every index after them and would have repainted sixteen rooms that were
+    already finished. A room should look the same tomorrow as it does today.
+    """
+    return 4000 + int(hashlib.sha256(place.encode()).hexdigest()[:6], 16) % 100000
 
 
 def generate(prompt, seed, path):
@@ -58,9 +73,14 @@ def main(out_dir):
     os.makedirs(out_dir, exist_ok=True)
     work = tempfile.mkdtemp(prefix="rooms-")
     for i, (place, what) in enumerate(sorted(ROOMS.items())):
-        raw = os.path.join(work, f"{place}.png")
-        generate(f"{what}, {LOOK}", 4000 + i * 13, raw)
         out = os.path.join(out_dir, f"room-{place}-v1.jpg")
+        # Paint what has no picture; leave a finished room alone. See the note
+        # in tools/exteriors.py.
+        if os.path.exists(out) and "--all" not in sys.argv:
+            print(f"  {i + 1}/{len(ROOMS)} {place} already painted", flush=True)
+            continue
+        raw = os.path.join(work, f"{place}.png")
+        generate(f"{what}, {LOOK}", seed_for(place), raw)
         # Saved as JPEG: these are backdrops behind figures, and a megabyte a
         # room would be four times the weight of the whole rest of the game.
         Image.open(raw).convert("RGB").resize((W, H), Image.LANCZOS).save(

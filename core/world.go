@@ -604,6 +604,17 @@ func New(seed uint32) *World {
 			income = 22
 		case "bar":
 			income = 12
+		case "restaurant":
+			income = 20
+		case "poolhall":
+			income = 16
+		case "butcher":
+			income = 28
+		case "haulage":
+			// The most an ordinary business earns in this city, and the most
+			// it costs to run: six men on the books before it has moved
+			// anything.
+			income = 40
 		}
 		property := &Property{Owner: owner, Condition: 100, Income: income}
 		// A trading business is already running before anybody buys it: it has

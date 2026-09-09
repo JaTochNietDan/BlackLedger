@@ -11,6 +11,7 @@ nothing at runtime depends on a model. Run through mise:
     mise run art        # once
     mise run exteriors
 """
+import hashlib
 import os
 import subprocess
 import sys
@@ -34,9 +35,23 @@ FRONTS = {
     "estate": "a large house set back behind a wall, gables, tall chimneys, gravel drive",
     "precinct": "a grey stone police station, heavy steps, lamp either side of the door, barred windows",
     "herald": "a three-storey newspaper building, tall printing hall windows, loading bay at street level",
+    "restaurant": "a small family restaurant on a corner, awning over the window, lace half-curtains, a lit doorway",
+    "poolhall": "a first-floor billiard hall over a shopfront, long low windows, a stair door at street level",
+    "butcher": "a butcher's shop with a tiled front, wide window, delivery van at the kerb, cold store behind",
+    "haulage": "a haulage yard behind a wire fence, flatbed trucks, a low office hut, fuel pump",
 }
 
 W, H = 768, 512
+
+
+def seed_for(place):
+    """A place's seed comes from its name, not its position in this list.
+
+    It used to be 7000 + index, so adding four addresses to the city shifted
+    every index after them and repainted eleven buildings that were already
+    finished. A building should look the same tomorrow as it does today.
+    """
+    return 7000 + int(hashlib.sha256(place.encode()).hexdigest()[:6], 16) % 100000
 
 
 def generate(prompt, seed, path):
@@ -52,9 +67,15 @@ def main(out_dir):
     os.makedirs(out_dir, exist_ok=True)
     work = tempfile.mkdtemp(prefix="fronts-")
     for i, (place, what) in enumerate(sorted(FRONTS.items())):
-        raw = os.path.join(work, f"{place}.png")
-        generate(f"{what}, {LOOK}", 7000 + i * 17, raw)
         out = os.path.join(out_dir, f"front-{place}-v1.jpg")
+        # Paint what has no picture. A building that is already finished is
+        # left alone: running this to add one address must not repaint the
+        # rest of the city, and "--all" is there for when that is the point.
+        if os.path.exists(out) and "--all" not in sys.argv:
+            print(f"  {i + 1}/{len(FRONTS)} {place} already painted", flush=True)
+            continue
+        raw = os.path.join(work, f"{place}.png")
+        generate(f"{what}, {LOOK}", seed_for(place), raw)
         Image.open(raw).convert("RGB").save(out, quality=82, optimize=True)
         print(f"  {i + 1}/{len(FRONTS)} {place} -> {out}", flush=True)
 
