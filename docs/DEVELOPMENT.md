@@ -4637,3 +4637,47 @@ Evidence: `core/purse_test.go`, `core/lowercase_sweep_test.go`,
 run simulate` unchanged at defiant 52 / investor 0 / reckless 82 / worker 0 with
 identical median cash — and as before, those campaigns are too short to see any
 of this.
+
+## The director can see who is struggling
+
+The last part of the inbox item: family money should drive what the director
+writes. It could not, because the director had never been told about money. The
+full brief ships the whole faction record, so a family's cash was in the JSON as
+a bare integer, and neither prompt mentioned it. Searching the director for the
+word "money" or "cash" returned nothing at all.
+
+A bare integer would not have helped anyway. Ten thousand dollars is a fortune
+or a fortnight depending entirely on what a day costs them, and nothing knew
+what a day cost them: the bill was a line inside the morning that charged it.
+
+So the bill is a function now, and three things ask it. How an organization is
+placed is one of four states — comfortable, getting by, struggling, or cannot
+pay its people — decided by how long it could go on paying everybody if the
+money stopped tomorrow. The words belong to the core. What it means to be
+struggling is a fact about the world, not a phrase a prompt or a screen invents.
+
+Both briefs now explain what the four states mean for behaviour, close to what
+the inbox asked for: a comfortable organization is patient, protects what it has
+and is worth taking from; a struggling one presses harder and moves on somebody
+else's ground; one that cannot pay its people is desperate and unpredictable.
+
+One judgement worth recording. A family living within its income is not given a
+countdown. Ninety days of cover is not a thought anybody in the world is having,
+and handing the model that number invites a speaker to talk about three months
+of runway nobody is counting. The field is simply absent for them.
+
+Three tests, and all of them fail when the code is broken: renaming a state in
+the prompt is caught, and so is the context sending a word the prompt never
+explains. There is also a test that the bill described is the bill the morning
+actually charges, so the two cannot drift apart.
+
+Not done, and next: the controlled comparison. Whether the model actually writes
+differently for a struggling family is a claim I have not tested, and I am not
+making it. All that is established is that the information reaches it and the
+prompt explains it.
+
+Also still open: nothing in the core reads a person's poverty yet. `Broke` is
+consulted by one button. A broke man and a comfortable one behave identically.
+
+Evidence: `core/placed_test.go`, `cmd/blackledger/director_money_test.go`. All
+gates green, `npm test` 34.

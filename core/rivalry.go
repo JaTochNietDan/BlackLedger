@@ -76,12 +76,7 @@ func (w *World) FamilyDay() {
 		// family of ninety runs far more people than the handful who happen to
 		// have names. Paying only the named ones would have made a family of
 		// ninety and a family of ten cost the same to run.
-		// Power covers the anonymous mass of an organization; the named people
-		// are paid on top, and they are the ones whose pockets the rest of the
-		// game can see. Billing on strength alone meant a family that had
-		// collapsed to nothing owed nothing, stopped being short, and started
-		// paying its five remaining men again out of an empty safe.
-		wages := f.Power*FamilyWage + len(w.Members(f.ID))*SoldierWage
+		wages := w.FamilyBill(f)
 		f.Cash += income * 24
 		f.Cash -= wages
 		if f.Cash < 0 {
@@ -310,3 +305,73 @@ const (
 	// a long bad run is a decline and not a disappearance.
 	MostWhoLeaveAtOnce = 6
 )
+
+// FamilyBill is what a day costs an organization. Power covers the anonymous
+// mass of it; the named people are paid on top, and they are the ones whose
+// pockets the rest of the game can see. Billing on strength alone meant a
+// family that had collapsed to nothing owed nothing, stopped being short, and
+// started paying its five remaining men again out of an empty safe.
+//
+// It is a function rather than a line inside the day because two things ask
+// it: the morning that charges it, and everything that wants to say how a
+// family is placed. Those must not be able to drift apart.
+func (w *World) FamilyBill(f *Faction) int {
+	if f == nil {
+		return 0
+	}
+	return f.Power*FamilyWage + len(w.Members(f.ID))*SoldierWage
+}
+
+// FamilyIncome is what an organization's holdings bring in over a day.
+func (w *World) FamilyIncome(f *Faction) int {
+	if f == nil {
+		return 0
+	}
+	income := 0
+	for _, id := range w.FamilyHoldings(f.ID) {
+		prop := w.Properties[id]
+		income += prop.Income * prop.Condition / 100
+	}
+	return income * 24
+}
+
+// DaysOfCover is how long an organization could go on paying everybody if the
+// money stopped coming in tomorrow. It is the honest measure of how a family is
+// placed, and cash alone is not: a family holding five thousand dollars against
+// a bill of eight hundred a day is in more trouble than one holding two
+// thousand against a bill of ninety.
+//
+// A family whose income already covers its bill is not counting days at all.
+func (w *World) DaysOfCover(f *Faction) int {
+	if f == nil {
+		return 0
+	}
+	shortfall := w.FamilyBill(f) - w.FamilyIncome(f)
+	if shortfall <= 0 {
+		return WellCovered
+	}
+	return min(WellCovered, f.Cash/shortfall)
+}
+
+// WellCovered is the point past which counting days stops meaning anything: an
+// organization that is living within its income is not running out of money on
+// any particular morning.
+const WellCovered = 90
+
+// HowTheyArePlaced describes an organization's finances in the terms anything
+// reasoning about them should use. The words are the core's, not a screen's or
+// a prompt's, because what it means to be struggling is a fact about the world.
+func (w *World) HowTheyArePlaced(f *Faction) string {
+	if f == nil {
+		return "nobody"
+	}
+	switch {
+	case f.Short > 0:
+		return "cannot pay its people"
+	case w.DaysOfCover(f) < 7:
+		return "struggling"
+	case w.DaysOfCover(f) < 30:
+		return "getting by"
+	}
+	return "comfortable"
+}

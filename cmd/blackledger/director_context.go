@@ -243,3 +243,35 @@ func commissionBriefs(w *core.World) []map[string]any {
 	}
 	return out
 }
+
+// organizationMoney is how each family is placed, in words. The director was
+// shipped the whole Faction record, so a family's cash was in the JSON as a
+// bare integer nothing in the prompt ever mentioned — and a bare integer says
+// nothing anyway, because whether ten thousand dollars is a great deal depends
+// entirely on what a day costs them.
+//
+// The words are the core's. What it means to be struggling is a fact about the
+// world, not a phrase this file invents for a prompt.
+func organizationMoney(w *core.World) map[string]map[string]any {
+	out := map[string]map[string]any{}
+	for i := range w.Factions {
+		f := &w.Factions[i]
+		entry := map[string]any{
+			"placed":         w.HowTheyArePlaced(f),
+			"day_costs_them": w.FamilyBill(f),
+			"day_earns_them": w.FamilyIncome(f),
+		}
+		// Days of cover only means something for a family that is running
+		// down. One living within its income is not counting days, and saying
+		// "90" invites a speaker to talk about three months of runway that
+		// nobody in the world is thinking about.
+		if cover := w.DaysOfCover(f); cover < core.WellCovered {
+			entry["days_before_it_cannot_pay"] = cover
+		}
+		if f.Short > 0 {
+			entry["days_running_it_has_missed_payday"] = f.Short
+		}
+		out[f.Name] = entry
+	}
+	return out
+}

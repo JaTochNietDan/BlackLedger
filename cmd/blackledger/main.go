@@ -269,6 +269,7 @@ func (a *app) generateAttempt(snapshot *core.World, feedback string) error {
 	contextData["player_situation"] = playerSituation(snapshot)
 	contextData["city_conflicts"] = cityConflicts(snapshot)
 	contextData["organization_holdings"] = organizationHoldings(snapshot)
+	contextData["organization_money"] = organizationMoney(snapshot)
 	// The brief was only ever sent on the focused prompt, and the default is
 	// the full one — so in the live game nothing had ever told the model what
 	// an operation is. It wrote a story about collecting a debt when the game
