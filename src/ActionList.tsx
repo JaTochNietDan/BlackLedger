@@ -50,7 +50,7 @@ function Person({who, actions, render}: {who: Presence; actions: Action[]; rende
   </article>;
 }
 
-export function ActionList({actions, people, render}: {actions: Action[]; people: Presence[]; render: (a: Action) => ReactElement}) {
+export function ActionList({actions, people, render, here = true}: {actions: Action[]; people: Presence[]; render: (a: Action) => ReactElement; here?: boolean}) {
   const [query, setQuery] = useState('');
   const [openBlocked, setOpenBlocked] = useState<Record<string, boolean>>({});
   const [showRoom, setShowRoom] = useState(false);
@@ -95,11 +95,11 @@ export function ActionList({actions, people, render}: {actions: Action[]; people
     {lead.length > 0 && <div className="actions lead">{lead.map(render)}</div>}
 
     {present.length > 0 && <section className="action-group people-here">
-      <h4>In the room<span>{present.length} of {people.length} you can deal with</span></h4>
+      <h4>{here ? 'In the room' : 'Who is there'}<span>{present.length} of {people.length} you can deal with</span></h4>
       {present.map(p => <Person key={p.who.id} who={p.who} actions={p.mine} render={render}/>)}
       {bystanders.length > 0 && <>
         <button className="reveal-blocked" aria-expanded={showRoom} onClick={() => setShowRoom(o => !o)}>
-          {showRoom ? 'Hide' : 'Show'} {bystanders.length} others in the room
+          {showRoom ? 'Hide' : 'Show'} {bystanders.length} {here ? 'others in the room' : 'others there'}
         </button>
         {showRoom && <ul className="bystanders">{bystanders.map(b =>
           <li key={b.id}><b>{b.name}</b><span>{b.standing}</span></li>)}</ul>}

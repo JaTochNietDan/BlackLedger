@@ -3260,3 +3260,36 @@ now; emptying the list makes it fail and prints the whole epitaph.
 Evidence: `core/epitaph_test.go`, proven to fail when the list is removed, the
 screen read in a browser against a real death, twelve clean apicheck runs, `mise
 run verify` and `npm test` green, `mise run simulate` unchanged at 52/0/82/0.
+
+## Do not call a room the player is not standing in "the room"
+
+The first thing a new player ever sees had never been read. I started a fresh
+life on 8894 and looked: day 1, 08:00, Alex Varga, $90, standing in The Mariner,
+with the opening opportunity pointing at Saint Agnes. The sidebar showed Saint
+Agnes, which is right — the panel follows the selected place, not the player.
+Its people section was headed "IN THE ROOM · 2 of 4 you can deal with", which is
+not. The player is not in that room. The same heading also promised "2 others in
+the room" behind the expander.
+
+The wiring says why. `ActionList` printed "In the room" as fixed text and had no
+way to know whose room it was drawing, while its parent in `src/main.tsx`
+already computes `l.id === p.location` for the eyebrow above it — that is how the
+panel says "YOU ARE HERE" or "NEIGHBORHOOD DIRECTORY". The knowledge existed one
+level up and was not passed down.
+
+`ActionList` now takes an optional `here`, defaulting to true, and `main.tsx`
+passes the comparison it already makes. A room you stand in still reads "In the
+room" and "others in the room"; a room you are only looking at reads "Who is
+there" and "others there".
+
+Evidence: the opening read in a browser on a fresh save, before and after — the
+Saint Agnes panel now reads "WHO IS THERE · 2 of 4 you can deal with" and "Show
+2 others there" while the player stands in The Mariner. Twelve apicheck runs, no
+invariant failures. `mise run verify` and `npm test` green, `mise run simulate`
+unchanged at defiant 52 / investor 0 / reckless 82 / worker 0, 0 errors.
+
+Not changed, and recorded as a judgement rather than a fault: the opening ledger
+record carries the game's premise ("A room. A name. No protection.") and the
+City screen does not show it, because the clock has not moved and the banner
+correctly reads "Nothing yet. The clock is paused." Where the premise line
+belongs is a design decision, not a bug.
