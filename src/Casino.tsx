@@ -1,6 +1,7 @@
 import {useEffect, useRef, useState} from 'react';
-import type {Action, Record as Entry} from './types';
+import type {Action, Presence, Record as Entry} from './types';
 import {CardTable, Wheel} from './Tables';
+import {Portrait} from './Portrait';
 import type {HandState, WheelState} from './Tables';
 
 // Sitting down at a table is not a thing you do out of the corner of a sidebar.
@@ -31,9 +32,13 @@ export function hasTables(actions: Action[]) {
 
 type Game = 'cards' | 'wheel';
 
-export function Casino({place, actions, hand, wheel, cash, money, revision, records, act, onLeave}: {
+export function Casino({place, actions, people, hand, wheel, cash, money, revision, records, act, onLeave}: {
   place: string;
   actions: Action[];
+  // Who else is in the room. A floor with nobody on it is a room: the city
+  // already knows where everybody is standing, and these are the same people
+  // whose money the house takes on the nights the player is not here.
+  people: Presence[];
   hand: HandState;
   wheel: WheelState;
   cash: number;
@@ -77,6 +82,13 @@ export function Casino({place, actions, hand, wheel, cash, money, revision, reco
           {dealt ? 'Finish the hand to leave' : 'Get up and leave ↩'}
         </button>
       </header>
+
+      {people.length > 0 && <div className="casino-crowd" aria-label="On the floor">
+        {people.slice(0, 8).map(w => <span key={w.id} className="floor-face" title={w.role || w.standing}>
+          <Portrait id={w.id} size="tiny"/><small>{w.name}</small>
+        </span>)}
+        <small className="subtle">{people.length === 1 ? 'One other person on the floor' : people.length + ' others on the floor'}</small>
+      </div>}
 
       <nav className="casino-games" aria-label="Games">
         <button aria-pressed={game === 'cards'} onClick={() => setGame('cards')}>Blackjack</button>

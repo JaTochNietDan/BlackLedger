@@ -134,4 +134,15 @@ their own purse to be put right (core/repairs.go). Somebody with nothing keeps
 driving it broken, so a poor district gives its garage the same crimes and less
 work. "Think about more interlinked stuff too" stays open; it is standing.
 
+I also think we have a lot of UI QoL fixes to make here, it's weird that for
+example you have to go to Mercer Exchange to tell Leo to try to take out Russo.
+Stuff like that should really be doable anywhere right? Or commissioning
+attacks, stuff like that, seem like they should be doable from any location? It's
+weird that you need to go to where Russo is to commission a hit on her. It feels
+like a lot of the game is based around where you are for ALL actions which is not
+the right way. You need to really fix all that up, make it more logical, improve
+the UX around it, not every action should be located in the action pane of these
+buildings. You need to think through what the right place for this stuff is and
+right context.
+
 Ultiamtely the expectation is that I don't have to think of all of these concepts, you, the agent will think of these too and build them out and playtest and simulate them yourself.

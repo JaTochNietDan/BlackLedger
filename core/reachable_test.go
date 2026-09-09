@@ -146,6 +146,14 @@ func sweepCities(t *testing.T) (offered, enabled map[string]int) {
 		}
 		live(t, r, 200)
 		r.Player.Cash, r.Player.Health = 20000, 100
+		// A hundred hours of a hard-run house leaves the police very interested
+		// indeed: heat comes out at 77 to 95 across these seeds, and a detective
+		// will not be seen taking money from anybody past BribeCeiling. This
+		// sweep was reaching the bribe by luck — one seed happening to land just
+		// under the line — so a tick that changed nothing about the police could
+		// take the button dark. The state the comment above describes is being
+		// built rather than hoped for.
+		r.Player.Heat = BribeCeiling - 10
 		note(r)
 	}
 	return offered, enabled

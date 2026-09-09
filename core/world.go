@@ -1531,6 +1531,7 @@ func (w *World) Advance(minutes int) {
 			w.OperationsDay()
 			w.StillDay()
 			w.CasinoDay()
+			w.TableNight()
 			w.CarDay()
 			w.CarTrade()
 			w.RepairsDay()
