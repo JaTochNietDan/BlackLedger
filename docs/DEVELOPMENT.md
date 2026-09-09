@@ -4000,3 +4000,44 @@ Recording the shape plainly, because it is the seventh this audit has produced
 and the only one that hides in what a test does *not* ask: a button offered and
 never live looks exactly like a button correctly refused, and only counting
 across many states tells them apart.
+
+## Twenty-nine and seventeen out of fifty-two
+
+Back to the browser after sixteen fixes, and a second reading of the People
+screen. Its opening line:
+
+> 52 people live in this city and you know 33 of them. 29 answer to an
+> organization and 17 to nobody.
+
+Twenty-nine and seventeen make forty-six. Six people were in neither figure: the
+four officials, the fixer, and the player's own crew before the player is an
+organization. Somebody doing one of the city's jobs answers to the city rather
+than to a family or to nobody, and the sentence had no room for them.
+
+It also disagreed with the screen underneath it. The filters file each person in
+exactly one place and their counts do add to the whole city — crew 1, they owe
+you 1, names everybody knows 10, organizations 23, the street 17. So the header
+said twenty-nine answer to an organization directly above a chip reading
+"Organizations 23", because that chip does not hold the family heads it files
+under names everybody knows. Both numbers are correct under their own
+definitions and a reader cannot reconcile them.
+
+The summary now carries a third figure and the line reads "29 answer to an
+organization, 6 hold one of the city's jobs, and 17 answer to nobody", which
+comes to fifty-two.
+
+Evidence: `core/population_test.go` states that the three figures add to the
+population, in a new city, in one run four thousand half-hours, and in one where
+the player is an organization so their crew answers to somebody. It fails when
+the new figure is removed, in all three. Read on screen against a save driven to
+day 32.
+
+One thing worth recording about the reading itself. The first look at the fixed
+screen showed "undefined hold one of the city's jobs", because the page was the
+new build and the server behind it was not. That is not a fault in the game and
+it is exactly why the screen gets read rather than the code: a field added in
+one place and not served from the other looks fine in every test and wrong to
+the only person who matters.
+
+`mise run verify` and `npm test` green, `mise run simulate` unchanged at defiant
+52 / investor 0 / reckless 82 / worker 0, 0 errors.

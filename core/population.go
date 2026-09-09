@@ -238,8 +238,15 @@ func (w *World) PopulationSummary() map[string]any {
 	for i := range w.Factions {
 		organized += len(w.Members(w.Factions[i].ID))
 	}
+	// Everybody is in exactly one of three places, and the screen said so
+	// without leaving room for the third. Somebody doing one of the city's
+	// jobs — the four officials, the fixer, the driver — answers neither to a
+	// family nor to nobody, and the header read "29 answer to an organization
+	// and 17 to nobody" of a city of 52.
+	living, street := len(w.People()), len(w.Civilians())
 	return map[string]any{
-		"living": len(w.People()), "organized": organized,
-		"street": len(w.Civilians()), "known": len(w.Cast()),
+		"living": living, "organized": organized,
+		"street": street, "jobs": max(0, living-organized-street),
+		"known": len(w.Cast()),
 	}
 }

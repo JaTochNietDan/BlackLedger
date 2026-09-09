@@ -60,7 +60,7 @@ export function PeopleScreen({world}: {world: Snapshot}) {
     <h1 className="screen-title">Names worth knowing</h1>
     <p className="subtle">
       {world.population
-        ? `${world.population.living} people live in this city and you know ${world.population.known} of them. ${world.population.organized} answer to an organization and ${world.population.street} to nobody.`
+        ? `${world.population.living} people live in this city and you know ${world.population.known} of them. ${world.population.organized} answer to an organization, ${world.population.jobs} hold one of the city's jobs, and ${world.population.street} answer to nobody.`
         : 'Everybody in Bellwether, and what they are doing about it.'}
     </p>
 
