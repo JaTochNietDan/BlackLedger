@@ -68,7 +68,7 @@ export function Herald({world}: {world: Snapshot}) {
         </div>
       </div>
       <div className="columns">
-        {issue.stories.map((s, i) => <article className={i === 0 ? 'lead' : ''} key={s.id}>
+        {issue.stories.filter(s => s.kind !== 'civic').map((s, i) => <article className={i === 0 ? 'lead' : ''} key={s.id}>
           {s.subject && <figure className="cut" dangerouslySetInnerHTML={{__html:
             pressPlate(s.kind, s.subject, s.headline) +
             (s.subject.kind !== 'city' ? `<figcaption>${s.subject.name}</figcaption>` : '')}}/>}
@@ -78,6 +78,20 @@ export function Herald({world}: {world: Snapshot}) {
           <p className="body">{s.body}</p>
         </article>)}
       </div>
+
+      {/* The city page: weather, prices, how many people are in the place.
+          Set apart from the news because it is not news — it is what a paper
+          carries on a day when nothing happened, and a paper that only speaks
+          when the city is being violent is not a paper. */}
+      {issue.stories.some(s => s.kind === 'civic') && <div className="city-page">
+        <h3>The city in brief</h3>
+        <div className="briefs">
+          {issue.stories.filter(s => s.kind === 'civic').map(s => <article key={s.id}>
+            <h4>{s.headline}</h4>
+            <p>{s.body}</p>
+          </article>)}
+        </div>
+      </div>}
     </div>
     </div>
   </>;

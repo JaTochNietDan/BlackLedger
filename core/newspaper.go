@@ -35,8 +35,31 @@ func (w *World) Report(kind, headline, body string) {
 		ID: ID(), Minute: w.Minute, Life: w.Life,
 		Headline: headline, Body: body, Kind: kind,
 	})
-	if len(w.News) > newsCapacity {
-		w.News = w.News[len(w.News)-newsCapacity:]
+	w.trimNews()
+}
+
+// trimNews keeps the archive inside its bound, and drops filler before news.
+//
+// The city page files two briefs a day whether or not anything happened, so
+// without this the weather would quietly evict the killings: at two a day the
+// filler alone would fill a 240-story archive in four months and a player
+// reading back through the paper would find nothing but prices. What the
+// archive is for is the history of the city, so a brief about a clear day gives
+// up its place before a man who was shot does.
+func (w *World) trimNews() {
+	for len(w.News) > newsCapacity {
+		oldest := -1
+		for i, s := range w.News {
+			if s.Kind == "civic" {
+				oldest = i
+				break
+			}
+		}
+		if oldest < 0 {
+			w.News = w.News[len(w.News)-newsCapacity:]
+			return
+		}
+		w.News = append(w.News[:oldest], w.News[oldest+1:]...)
 	}
 }
 

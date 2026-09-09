@@ -1352,6 +1352,7 @@ func (w *World) Advance(minutes int) {
 			w.OwnPeopleDay()
 			w.PactDay()
 			w.ServiceDay()
+			w.CityPageDay()
 			w.ScrutinyDay()
 			w.CivicDay()
 			w.PrunePeople()

@@ -713,3 +713,15 @@ body{height:100%;overflow:hidden;margin:0;background:var(--bg);color:var(--ink);
      enough to say so and not enough to make the type feel crooked. */
   .paper-sheet{transform:rotate(-.22deg)}
 }
+
+/* The city page. Smaller than the news and set in three columns rather than
+   two, the way a paper sets the odds and ends it runs under the fold. */
+.paper .city-page{margin-top:6px;border-top:3px double #1b1a16;padding-top:14px}
+.paper .city-page h3{font:700 12px system-ui;letter-spacing:.2em;text-transform:uppercase;
+  color:#4a463c;margin:0 0 12px;text-align:center}
+.paper .briefs{column-count:3;column-gap:26px;column-rule:1px solid #c3bba6}
+.paper .briefs article{break-inside:avoid;margin:0 0 16px}
+.paper .briefs h4{font:700 12px system-ui;letter-spacing:.09em;text-transform:uppercase;
+  color:#12110e;margin:0 0 5px;line-height:1.3}
+.paper .briefs p{font:12px/1.55 var(--serif);color:#2a2822;margin:0;hyphens:auto}
+@media(max-width:900px){.paper .briefs{column-count:1}}
