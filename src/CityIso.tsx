@@ -392,8 +392,15 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight}: {
     // Stone takes the low sun; asphalt barely does, which is what keeps the
     // roads reading as roads at dawn instead of the whole city going one
     // flat brown.
+    // And what the sky is doing, which comes from the core: the view is not
+    // allowed to decide it is raining. Wet streets outlast the rain itself, so
+    // this is a number rather than a flag.
+    const wet = state.sky?.wet ?? 0;
+    // Fog is the one weather that changes how far the player can see, so it is
+    // the one that touches the depth haze rather than the ground.
+    const murk = state.sky?.kind === 'fog' ? .42 : 0;
     const sunlit = (c: number) => mix(c, 0xa9713f, gold * .2);
-    const tarmac = (c: number) => mix(c, 0x6b4f3c, gold * .09);
+    const tarmac = (c: number) => mix(mix(c, 0x141a20, wet * .38), 0x6b4f3c, gold * .09 * (1 - wet * .6));
 
     // The ground: one slab under the whole city, so nothing floats and the
     // roads are cut out of something rather than laid on nothing.
@@ -518,6 +525,15 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight}: {
       // clock, so the pools it throws come up as the light goes down.
       glow.ellipse(p.x, p.y, TILE.w * .40, TILE.h * .40).fill({color: 0xd9b678, alpha: .11 * dark});
       glow.ellipse(p.x, p.y, TILE.w * .21, TILE.h * .21).fill({color: 0xf0d6a0, alpha: .10 * dark});
+      // On a wet road the lamp is twice: the pool it throws, and the smear of
+      // itself lying in the water. A reflection stretches toward whoever is
+      // looking at it, which in this projection is straight down the screen.
+      if (wet > 0) {
+        glow.ellipse(p.x, p.y + TILE.h * .55, TILE.w * .035, TILE.h * 1.05)
+          .fill({color: 0xf0d6a0, alpha: .1 * wet * (.25 + dark * .75)});
+        glow.ellipse(p.x, p.y + TILE.h * .3, TILE.w * .09, TILE.h * .5)
+          .fill({color: 0xd9b678, alpha: .07 * wet * (.25 + dark * .75)});
+      }
       const H = 32;
       posts.poly([p.x - 1.4, p.y, p.x + 1.4, p.y, p.x + .8, p.y - H, p.x - .8, p.y - H]).fill(0x1b1f21);
       posts.ellipse(p.x, p.y, 3.2, 1.3).fill(0x14171a);
@@ -700,7 +716,7 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight}: {
         g.poly(f.top.flatMap(v => [v.x, v.y])).fill(mix(0x6a7168, 0x2c3433, dark));
       }
       const away = distance(slot.at, size);
-      g.alpha = 1 - away * .35 * (0.16 + dark * .84);
+      g.alpha = 1 - away * .35 * (0.16 + dark * .84) - away * murk;
       filler.addChild(g);
       // And the canvas over its shopfront, drawn straight after the building it
       // hangs on so it can never end up behind it.
@@ -760,7 +776,7 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight}: {
       group.on('pointerout', () => { group.alpha = resting });
       if (p.id === here) group.on('pointertap', () => { if (p.id === here) enter.current() });
       const away = distance(at, size);
-      const resting = (shut ? .45 : 1) * (1 - away * .22 * (0.14 + dark * .86));
+      const resting = (shut ? .45 : 1) * Math.max(.15, 1 - away * .22 * (0.14 + dark * .86) - away * murk);
       group.alpha = resting;
 
       // The ground it stands on, so nothing floats.
