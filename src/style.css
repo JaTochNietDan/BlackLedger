@@ -61,12 +61,17 @@ body{height:100%;overflow:hidden;margin:0;background:var(--bg);color:var(--ink);
 .city-header .map-key{position:static;grid-area:opportunity;margin:0;padding:0;display:block;background:none}
 .city-header .map-key:empty{display:none}
 .city-pane .known-threats{margin:0 22px 14px}
+/* The city column scrolls when what is in it is taller than the window.
+   It did not, and the workspace around it clips: on a short screen the bottom
+   of the street, the room's actions and the band that says where something
+   happened were simply cut off, with no scrollbar to reach them. */
+.city-pane{overflow-y:auto;overflow-x:hidden;min-height:0}
 .city-pane .city-stage{flex:0 0 auto}
 .city-pane .street-scene{height:auto;min-height:0;padding:0;display:flex;flex-direction:column}
 .city-pane .street-scene iframe{height:auto;aspect-ratio:1280/820;width:100%;flex:none}
 .city-pane .street-inspect{position:static;transform:none;width:auto;margin:0;padding:8px 12px 12px;flex-wrap:wrap;justify-content:center}
 .city-pane .destination-directory{margin-top:0;height:clamp(320px,calc(100vh - 300px),720px)}
-@media(max-width:800px){.city-header{padding:14px 16px;grid-template-columns:1fr;grid-template-areas:"heading" "views" "opportunity"}.city-pane .known-threats{margin:0 16px 12px}.city-pane .destination-directory{height:auto}.city-header .next-opportunity{max-width:none;width:100%}}
+@media(max-width:800px){.workspace{overflow:auto}.city-header{padding:14px 16px;grid-template-columns:1fr;grid-template-areas:"heading" "views" "opportunity"}.city-pane .known-threats{margin:0 16px 12px}.city-pane .destination-directory{height:auto}.city-header .next-opportunity{max-width:none;width:100%}}
 
 .property-art-pending{display:flex;align-items:center;gap:16px;padding:12px;color:var(--gold)}.property-art-pending svg{width:70px;height:60px;flex:none}.property-art-pending span{font:19px var(--serif);color:var(--muted)}
 

@@ -170,3 +170,36 @@ func TestWalkersAreDrawnOnTheStreetAndNotOnlyListed(t *testing.T) {
 		t.Fatalf("a walker is not placed on the street: %s", found)
 	}
 }
+
+// The workspace clips what it cannot fit — it is overflow:hidden, which is what
+// keeps the map and the sidebar in their own columns. That makes every column
+// inside it a scroller in its own right, or its content is simply cut off with
+// no scrollbar to reach it. The city column was not one: on a short screen the
+// bottom of the room, the addresses and the band that says where something
+// happened all ran below the fold and could not be reached at all.
+func TestEveryColumnInsideTheWorkspaceCanBeScrolled(t *testing.T) {
+	css, err := os.ReadFile("../../src/style.css")
+	if err != nil {
+		t.Skip("no stylesheet beside this build")
+	}
+	sheet := string(css)
+	if !regexp.MustCompile(`\.workspace\{[^}]*overflow:hidden`).MatchString(sheet) {
+		t.Skip("the workspace no longer clips, so its columns need not scroll")
+	}
+	for _, column := range []string{".city-pane", ".sidebar"} {
+		rules := regexp.MustCompile(regexp.QuoteMeta(column) + `\{[^}]*\}`).FindAllString(sheet, -1)
+		if len(rules) == 0 {
+			t.Errorf("%s has no styling at all", column)
+			continue
+		}
+		scrolls := false
+		for _, rule := range rules {
+			if strings.Contains(rule, "overflow:auto") || strings.Contains(rule, "overflow-y:auto") {
+				scrolls = true
+			}
+		}
+		if !scrolls {
+			t.Errorf("%s sits in a workspace that clips and cannot be scrolled: %v", column, rules)
+		}
+	}
+}

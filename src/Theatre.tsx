@@ -1,4 +1,4 @@
-import {useEffect,useState} from 'react';
+import {useEffect,useRef,useState} from 'react';
 import type {Place,VisualCue} from './types';
 import {Portrait} from './Portrait';
 import {playMoment} from './sound';
@@ -49,6 +49,12 @@ export function Theatre({cue, place, onDone, onProgress, plate = true}: {
     img.src = scenePlate(cue.kind);
   }, [cue.kind]);
 
+  // The band reports where something happened, and the column it sits in can be
+  // taller than the window — so on a short screen it opened below the fold and
+  // the player was told nothing at all. It brings itself into view.
+  const band = useRef<HTMLDivElement>(null);
+  useEffect(() => { band.current?.scrollIntoView({block: 'nearest', behavior: 'smooth'}) }, [cue.id]);
+
   // The noise the city makes, once, at the top of the moment — not on every
   // frame, and not again when the same moment is replayed mid-flight.
   useEffect(() => { playMoment(cue.kind) }, [cue.id]);
@@ -67,7 +73,7 @@ export function Theatre({cue, place, onDone, onProgress, plate = true}: {
     return () => cancelAnimationFrame(frame);
   }, [cue.id]);
 
-  return <div className="theatre" role="status" aria-label={cue.caption}>
+  return <div className="theatre" ref={band} role="status" aria-label={cue.caption}>
     <div className="theatre-where">
       <span className="eyebrow">{cue.kind === 'arrest' ? 'YOU WERE TAKEN TO' : 'IT HAPPENED AT'}</span>
       <b>{place.name}</b>
