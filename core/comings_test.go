@@ -14,6 +14,12 @@ func TestYouSeeSomebodyLeaveTheRoomYouAreStandingIn(t *testing.T) {
 	n := w.NPC("mara")
 	n.Role, n.Location = "Runs Bluebird Laundry", "bar"
 	w.SetOut()
+	if len(w.Comings) != 0 {
+		t.Fatal("she was noticed leaving before she had left")
+	}
+	// The room notices her at the moment she walks out of it, not at the
+	// moment she decides to.
+	walksOut(w, n)
 	if len(w.Comings) != 1 {
 		t.Fatalf("she walked out of the room and the city noted %d things", len(w.Comings))
 	}
@@ -100,6 +106,7 @@ func TestSomebodyOutWalkingIsNotReportedAsBeingSomewhere(t *testing.T) {
 	n := w.NPC("mara")
 	n.Role, n.Location = "Runs Bluebird Laundry", "bar"
 	w.SetOut()
+	walksOut(w, n)
 
 	var her Presence
 	for _, p := range w.Everyone() {
@@ -169,6 +176,7 @@ func TestYouCannotDealWithSomebodyWhoHasWalkedOut(t *testing.T) {
 	// Send her somewhere; she is now on the street, not in the bar.
 	n.Role = "Runs Bluebird Laundry"
 	w.SetOut()
+	walksOut(w, n)
 	if !w.Travelling(n) {
 		t.Fatal("she did not set off")
 	}

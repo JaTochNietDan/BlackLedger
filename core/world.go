@@ -127,6 +127,16 @@ type NPC struct {
 	Heading string `json:"heading,omitempty"`
 	Arrives int    `json:"arrives,omitempty"`
 	Errand  string `json:"errand,omitempty"`
+	// Where this person's day is, so the evening has somewhere to send them
+	// back from. Taken the first time they are seen standing somewhere in the
+	// daytime, which is how saves written before the city had a shift acquire
+	// one.
+	Post string `json:"post,omitempty"`
+	// When they actually set off, which is not when they decided to. A shift
+	// change that empties every building at the same minute puts most of the
+	// city on the street at once; people leave over a few hours instead. Zero
+	// once they have gone, so it doubles as the record of having left.
+	Sets int `json:"sets,omitempty"`
 }
 type Faction struct {
 	ID       string `json:"id"`

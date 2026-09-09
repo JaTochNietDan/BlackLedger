@@ -1891,3 +1891,78 @@ failures. Run against a save written by the older build, the same check reports
 two — correctly, because those sentences are still in that player's ledger.
 `mise run verify`, `npm test` and `mise run simulate` unchanged at 58 / 0 / 82 /
 0, 0 errors.
+
+## The city keeps hours
+
+I measured before building anything. Over a simulated week, sampled every hour,
+**forty-seven of fifty people never moved at all** and three moved once between
+them. The three busiest places at three in the morning were the three busiest
+places at three in the afternoon, by the same margin. The city's population was
+furniture.
+
+This was not for want of a movement system. `core/errands.go` is good: a man
+crosses town to settle a grudge, a family sends somebody to mind a holding it
+has just lost. But its own comment says it — "nobody in this city moves without
+a reason that ends" — and every reason it knows is a reason that ends. Once
+everybody had a reason to be where they already stood, nobody moved again for
+the rest of the campaign.
+
+What was missing was the ordinary reason. The day ends and people go out.
+
+`core/routine.go` gives the city a shift. In the first half of the day people
+are at their posts; in the second they are where they drink. Where somebody
+drinks is derived from their id rather than stored, so it never drifts and
+survives every save ever written — the whole point is that Ivo Costa is at The
+Blue Hour of an evening and is there every evening for the rest of his life.
+Anybody with work to do keeps doing it: a role holder is on duty, a family
+member with ground to mind is minding it, and a leader is not found propping up
+a bar. The resolution is a half-day because that is the resolution the clock
+has, and pretending to finer grain would be a lie told by this file rather than
+a fact about the city.
+
+**A stampede is not a shift change.** The first version emptied every building
+at the same minute and put thirty-nine of fifty people on the street at once —
+caught immediately by an existing test that had been written for a world where
+walking was rare. People now leave over about five hours, at a time fixed per
+person, so the one who always leaves early always leaves early. Deciding to go
+and going are no longer the same minute, which is also more truthful: the room
+notices somebody leave at the moment they walk out of it.
+
+That change quietly broke the test that caught it. Staggered departures meant
+the test's one sample per half-day always landed before anybody had set off, so
+it saw an empty street and passed on nothing. It now steps through the half-day
+an hour at a time, and asserts a floor as well as a ceiling so it cannot go
+blind again.
+
+Measured after, same probe, two weeks:
+
+| | before | after |
+|---|---|---|
+| people who moved in a week | 3 of 50 | 36 of 50 |
+| busiest room at 09:00 | Mercer Exchange | Mercer Exchange |
+| busiest room at 21:00 | Mercer Exchange | Saint Agnes |
+| most people on the street at once | 0 | 10 |
+
+And the promise the whole thing rests on: of people who move, **860 of 864
+person-hours find them where they usually are at that hour**. A rhythm nobody
+can learn is just noise.
+
+Balance moved slightly and in the right direction: defiant deaths **58 → 53**,
+reckless unchanged at 82, investor and worker still 0, no errors. A city where
+people are not standing still all day is a marginally less reliable shooting
+gallery. New baseline is 53 / 0 / 82 / 0.
+
+Also fixed, seen in the live game's own result banner: "The a professional you
+paid $2501 to reach Elena Russo did not finish it." The contract tiers are
+labelled for buttons — "A professional", "Someone who needs the money" — and a
+label carrying its own article cannot be given another one. Tiers now have a
+separate noun for prose, and `cmd/apicheck` checks for the whole class.
+
+Evidence: six properties in `core/routine_test.go`, one in `core/copy_test.go`,
+ten clean `apicheck` runs on a fresh campaign, `mise run verify` and `npm test`
+green.
+
+Not yet looked at: a bar holds thirteen people at nine at night, and I have not
+seen what the room panel does with that. The list is already filtered to who
+you can deal with and it lives in the scrolling sidebar rather than the main
+viewport, so it is probably fine, but probably is not looked at.

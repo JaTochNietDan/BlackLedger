@@ -2,6 +2,17 @@ package core
 
 import "testing"
 
+// walksOut runs the clock on to the moment a person actually leaves. Deciding
+// to go and going are no longer the same minute: a shift change is spread over
+// the hours a shift change takes, so a test that wants somebody on the street
+// has to wait for them to pick up their coat.
+func walksOut(w *World, n *NPC) {
+	if n.Sets > w.Minute {
+		w.Minute = n.Sets
+	}
+	w.Arrivals()
+}
+
 // The city's people stood at fixed addresses for their whole lives. Somebody
 // who ran a business was permanently inside it; somebody who hated a man across
 // town never went to find him. The only thing that ever changed an address was
@@ -22,6 +33,7 @@ func TestSomebodyWhoIsNotWhereTheyWorkGoesToWork(t *testing.T) {
 	if n.Arrives <= w.Minute {
 		t.Fatalf("she arrives at minute %d and it is minute %d", n.Arrives, w.Minute)
 	}
+	walksOut(w, n)
 	if !w.Travelling(n) {
 		t.Fatal("she has set off and the city does not think she is going anywhere")
 	}
@@ -44,6 +56,7 @@ func TestAJourneyTakesTheTimeAJourneyTakes(t *testing.T) {
 	n := w.NPC("mara")
 	n.Role, n.Location = "Runs Bluebird Laundry", "bar"
 	w.SetOut()
+	walksOut(w, n)
 	want := TravelMinutes("bar", "laundry")
 	if n.Arrives-w.Minute != want {
 		t.Fatalf("the walk from the bar to the laundry takes %d minutes and she has allowed %d", want, n.Arrives-w.Minute)
@@ -88,6 +101,7 @@ func TestTheStreetSaysWhoIsOnItAndWhy(t *testing.T) {
 	n := w.NPC("mara")
 	n.Role, n.Location = "Runs Bluebird Laundry", "bar"
 	w.SetOut()
+	walksOut(w, n)
 	street := w.OnTheStreet()
 	if len(street) == 0 {
 		t.Fatal("somebody set off and the street is empty")
@@ -122,6 +136,7 @@ func TestSomebodyCarryingSomethingGoesToFindTheManTheyBlame(t *testing.T) {
 	if holder.Heading != "club" {
 		t.Fatalf("she is carrying enough to act on and is heading for %q", holder.Heading)
 	}
+	walksOut(w, holder)
 	street := w.OnTheStreet()
 	if len(street) == 0 || street[0].Because == "" {
 		t.Fatal("the city cannot say why she is walking across town")
@@ -152,30 +167,32 @@ func TestTheCityWalksWithoutBeingAlwaysInMotion(t *testing.T) {
 		heading := map[string]string{}
 		for day := 0; day < 21; day++ {
 			for step := 0; step < 8; step++ {
-				// Step the way the clock does: to the next half-day boundary,
-				// sampling in between so a journey can be caught in progress.
+				// Step through the half-day an hour at a time. People no
+				// longer all leave on the boundary — a shift change is spread
+				// over the hours a shift change takes — so sampling only at
+				// the boundary would find the street empty and prove nothing.
 				boundary := (w.Minute/720 + 1) * 720
-				for _, at := range []int{w.Minute + (boundary-w.Minute)/3, boundary} {
+				for at := w.Minute + 60; at <= boundary; at += 60 {
 					w.Minute = at
 					w.Arrivals()
 					if w.Minute%720 == 0 {
 						w.SetOut()
 					}
-				}
-				street := w.OnTheStreet()
-				sampled++
-				if len(street) > 0 {
-					occupied++
-				}
-				if len(street) > mostAtOnce {
-					mostAtOnce = len(street)
-				}
-				for i := range w.NPCs {
-					n := &w.NPCs[i]
-					if was := heading[n.ID]; was != "" && n.Heading == "" && n.Location == was {
-						journeys++
+					street := w.OnTheStreet()
+					sampled++
+					if len(street) > 0 {
+						occupied++
 					}
-					heading[n.ID] = n.Heading
+					if len(street) > mostAtOnce {
+						mostAtOnce = len(street)
+					}
+					for i := range w.NPCs {
+						n := &w.NPCs[i]
+						if was := heading[n.ID]; was != "" && n.Heading == "" && n.Location == was {
+							journeys++
+						}
+						heading[n.ID] = n.Heading
+					}
 				}
 			}
 			w.PeopleDay()
@@ -187,6 +204,12 @@ func TestTheCityWalksWithoutBeingAlwaysInMotion(t *testing.T) {
 		journeys, share*100, sampled, mostAtOnce)
 	if journeys == 0 {
 		t.Fatal("three weeks in twenty cities and nobody walked anywhere")
+	}
+	// Staggering departures once made this test sample only moments when
+	// nobody had set off yet, so it saw an empty street and passed on nothing.
+	// A city with journeys in it has somebody walking some of the time.
+	if share < .05 {
+		t.Fatalf("the street was occupied on %.0f%% of samples: this test is not looking at anything", share*100)
 	}
 	if share > .9 {
 		t.Fatalf("somebody is on the street %.0f%% of the time: the city is permanently in motion", share*100)
@@ -224,6 +247,16 @@ func TestWhenGroundChangesHandsSomebodyWalks(t *testing.T) {
 	w.Properties[taken].Owner = "russo"
 	w.Minute += 720
 	w.SetOut()
+	// Everybody who decided to go has a departure time of their own; run on to
+	// the last of them so the whole shift change is on the street at once.
+	latest := w.Minute
+	for i := range w.NPCs {
+		if s := w.NPCs[i].Sets; s > latest {
+			latest = s
+		}
+	}
+	w.Minute = latest
+	w.Arrivals()
 	street := w.OnTheStreet()
 	if len(street) == 0 {
 		t.Fatalf("%s changed hands and nobody in the city moved", taken)

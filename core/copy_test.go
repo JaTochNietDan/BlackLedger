@@ -118,3 +118,25 @@ func TestASplinterIsNamedLikeEveryOtherFamily(t *testing.T) {
 		t.Fatal("an old save's name can still begin a sentence in lower case")
 	}
 }
+
+// Seen in the live game's result banner: "The a professional you paid $2501 to
+// reach Elena Russo did not finish it." The contract tiers are labelled for
+// buttons — "A professional", "Someone who needs the money" — and a label
+// carrying its own article cannot be given another one.
+
+func TestAHiredHandIsNamedInASentence(t *testing.T) {
+	for _, tier := range contractTiers {
+		if tier.Noun == "" {
+			t.Fatalf("%q has no form fit for a sentence", tier.Label)
+		}
+		line := upper1(tier.Noun) + " you paid $200 for reached them."
+		for _, bad := range []string{"The a ", "The A ", "The someone ", "The Someone "} {
+			if strings.Contains(line, bad) {
+				t.Fatalf("a ledger line reads %q", line)
+			}
+		}
+		if strings.ToUpper(line[:1]) != line[:1] {
+			t.Fatalf("a ledger line begins in lower case: %q", line)
+		}
+	}
+}

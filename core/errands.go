@@ -81,7 +81,20 @@ type Journeying struct {
 // everything that reasons about where a person belongs keeps working; only
 // what is in a room, and what is on the street, changes.
 func (w *World) Travelling(n *NPC) bool {
-	return n != nil && n.Heading != "" && n.Arrives > w.Minute && !n.Dead
+	return n != nil && n.Heading != "" && n.Sets == 0 && n.Arrives > w.Minute && !n.Dead
+}
+
+// setsOff spreads a shift change over the hours a shift change takes. Fixed
+// per person, so the one who always leaves early always leaves early.
+func setsOff(id string) int {
+	sum := 0
+	for i := 0; i < len(id); i++ {
+		sum = sum*131 + int(id[i])
+	}
+	if sum < 0 {
+		sum = -sum
+	}
+	return 1 + sum%300
 }
 
 // errand is somewhere a person has reason to be, and the reason.
@@ -138,6 +151,12 @@ func (w *World) wanted(n *NPC) (errand, bool) {
 			return errand{id, "minding " + place.Name}, true
 		}
 	}
+	// The day ends and people go out. This is last because it is the weakest
+	// reason anybody has to be anywhere, and it must never pull somebody off
+	// work they are needed for.
+	if e, ok := w.routine(n); ok {
+		return e, true
+	}
 	// A summons from whoever is above them was tried here and removed. It
 	// pulled every member to their leader, so a man who had just walked across
 	// the city to mind a holding became its only minder and was immediately
@@ -155,7 +174,12 @@ func (w *World) SetOut() {
 		if n.Dead || n.Location == "" || w.Travelling(n) || n.Held > w.Minute {
 			continue
 		}
-		n.Heading, n.Arrives, n.Errand = "", 0, ""
+		n.Heading, n.Arrives, n.Errand, n.Sets = "", 0, "", 0
+		// Where a person is standing in the daytime is where their day is,
+		// unless something better has already claimed them.
+		if n.Post == "" && !Evening(w.Minute) {
+			w.keepPost(n, n.Location)
+		}
 		where, ok := w.wanted(n)
 		if !ok {
 			continue
@@ -165,8 +189,8 @@ func (w *World) SetOut() {
 		}
 		n.Heading = where.where
 		n.Errand = where.because
-		n.Arrives = w.Minute + TravelMinutes(n.Location, where.where)
-		w.noticed(n, true)
+		n.Sets = w.Minute + setsOff(n.ID)
+		n.Arrives = n.Sets + TravelMinutes(n.Location, where.where)
 	}
 }
 
@@ -180,14 +204,31 @@ func (w *World) Arrivals() {
 			continue
 		}
 		if n.Dead {
-			n.Heading, n.Arrives, n.Errand = "", 0, ""
+			n.Heading, n.Arrives, n.Errand, n.Sets = "", 0, "", 0
 			continue
+		}
+		// Still deciding to go. The room they are in is the room they are in
+		// until they walk out of it, and the player watching sees them go at
+		// the moment they go.
+		if n.Sets > w.Minute {
+			continue
+		}
+		if n.Sets > 0 {
+			n.Sets = 0
+			w.noticed(n, true)
 		}
 		if n.Arrives > w.Minute {
 			continue
 		}
 		n.Location = n.Heading
-		n.Heading, n.Arrives, n.Errand = "", 0, ""
+		n.Heading, n.Arrives, n.Errand, n.Sets = "", 0, "", 0
+		// Arriving anywhere in the daytime is arriving at work: whatever
+		// reason brought them, this is now where their day is, and the evening
+		// has somewhere to send them back from. An evening arrival is a drink
+		// and changes nothing.
+		if !Evening(w.Minute) {
+			w.keepPost(n, n.Location)
+		}
 		w.noticed(n, false)
 	}
 }

@@ -14,8 +14,12 @@ import (
 // you can be warned about, run from, or answer.
 
 type Tier struct {
-	ID      string
-	Label   string
+	ID    string
+	Label string
+	// Noun is the tier in the middle of a sentence, with whatever article it
+	// needs. Label is a button and reads "A professional"; splicing that into
+	// prose printed "The a professional you paid $2501 to reach Elena Russo".
+	Noun    string
 	Detail  string
 	Skill   int     // how good they are
 	Rate    float64 // multiplier on the target's price
@@ -23,13 +27,13 @@ type Tier struct {
 }
 
 var contractTiers = []Tier{
-	{ID: "cheap", Label: "Someone who needs the money",
+	{ID: "cheap", Label: "Someone who needs the money", Noun: "the one who needed the money",
 		Detail: "Cheap and unreliable. If it goes wrong they are very likely to be caught, and they will not hold their tongue.",
 		Skill:  35, Rate: 1, Capture: .5},
-	{ID: "professional", Label: "A professional",
+	{ID: "professional", Label: "A professional", Noun: "the professional",
 		Detail: "Costs more and usually finishes. If it goes wrong there is a fair chance they are taken alive.",
 		Skill:  55, Rate: 2.2, Capture: .25},
-	{ID: "specialist", Label: "A specialist",
+	{ID: "specialist", Label: "A specialist", Noun: "the specialist",
 		Detail: "Expensive, quiet, and rarely caught. Ask what that costs before you decide it is worth it.",
 		Skill:  78, Rate: 4.5, Capture: .08},
 }
@@ -260,8 +264,8 @@ func (w *World) resolveContract(c Contract) {
 			w.Player.Heat = min(100, w.Player.Heat+6)
 			w.Player.Respect += 3
 			w.Log("Your arrangement is settled",
-				fmt.Sprintf("The %s you paid $%d for reached %s. %s Nobody has connected it to you yet.",
-					strings.ToLower(tier.Label), c.Fee, person.Name, method), "danger")
+				fmt.Sprintf("%s you paid $%d for reached %s. %s Nobody has connected it to you yet.",
+					upper1(tier.Noun), c.Fee, person.Name, method), "danger")
 		}
 		return
 	}
@@ -275,8 +279,8 @@ func (w *World) resolveContract(c Contract) {
 	// It failed. Whether it comes back to whoever paid is the real risk.
 	if c.Payer == "player" {
 		w.Log("Your arrangement failed",
-			fmt.Sprintf("The %s you paid $%d to reach %s did not finish it. %s is alive and now knows somebody wants them dead.",
-				strings.ToLower(tier.Label), c.Fee, person.Name, person.Name), "danger")
+			fmt.Sprintf("%s you paid $%d to reach %s did not finish it. %s is alive and now knows somebody wants them dead.",
+				upper1(tier.Noun), c.Fee, person.Name, person.Name), "danger")
 	} else {
 		w.Log("An attempt that failed", fmt.Sprintf("Someone went for %s and did not finish it. %s knows they are worth killing now.", person.Name, person.Name), "danger")
 	}

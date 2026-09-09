@@ -43,3 +43,11 @@ func article(word string) string {
 	}
 	return "a"
 }
+
+// upper1 begins a sentence with a phrase written for the middle of one.
+func upper1(s string) string {
+	if s == "" {
+		return s
+	}
+	return strings.ToUpper(s[:1]) + s[1:]
+}

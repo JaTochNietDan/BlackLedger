@@ -175,6 +175,15 @@ var badCopy = []struct{ pattern, why string }{
 	{"They were Soldier", "a role was used without an article"},
 	{"They were  ", "a role was empty and left a hole"},
 	{"come forward. Police", "the police line was printed twice"},
+	// A label written for a button, spliced into a sentence: the contract
+	// tiers read "A professional", and the ledger printed "The a professional
+	// you paid $2501 to reach Elena Russo".
+	{"The a ", "a label with its own article was given another one"},
+	{"The an ", "a label with its own article was given another one"},
+	{"the a ", "a label with its own article was given another one"},
+	{"The someone ", "a label written for a button was spliced into a sentence"},
+	{"The The ", "an article was added to a phrase that had one"},
+	{" a a ", "an article was doubled"},
 }
 
 // readable checks everything the city has written down.
