@@ -241,10 +241,20 @@ func (w *World) Kill(id, cause string) bool {
 }
 
 func describeStanding(n *NPC, w *World) string {
+	job := lowerFirst(n.Role)
+	// The people in the building answer to nobody in the sense this function
+	// means, and the city said exactly that: "You know Mayor Ellis Crane now:
+	// They answered to nobody." A man who is the mayor is described by the
+	// office, and there is only one of each, so it takes "the".
+	if IsOfficial(n.ID) && job != "" {
+		if titled(job) {
+			return "They were " + job
+		}
+		return "They were the " + job
+	}
 	if n.Faction == "" {
 		return "They answered to nobody"
 	}
-	job := lowerFirst(n.Role)
 	if f := w.faction(n.Faction); f != nil {
 		if job == "" {
 			return "They were one of " + f.Name

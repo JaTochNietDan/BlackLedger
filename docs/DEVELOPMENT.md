@@ -2354,3 +2354,52 @@ the singular. Both sentences are regression cases now.
 Evidence: four new properties in `core/copy_test.go`, twenty clean apicheck runs
 against a fresh campaign, a fifty-three-day paper scanned for all nine known
 copy patterns with zero hits, `mise run verify` and `npm test` green.
+
+## The influence system, driven end to end
+
+The three officials are what the endgame is made of and none of it had been
+exercised over HTTP. `retain:commissioner`, `retain:mayor`, `retain:editor`,
+`puff`, `spike` and `bribe` were all in the harness's untried list. I forced a
+save into a state with money, respect and two premises, and drove the lot
+through the API.
+
+It works, and the writing is the best in the game:
+
+```
+An arrangement with Commissioner Vance: $900 to open it and $45 a day to keep
+it. Files go to the bottom of piles.
+Page five, with a photograph: A paragraph about a local businessman. Worth 6
+respect and 5 off what the police think, and it cost nobody anything.
+It does not run: "AUTHORITIES SEIZE THE BLUE HOUR" was set and is not in
+tomorrow's paper. As far as this city is concerned it did not happen, and one
+more person knows it did.
+The arrangement with Editor Sam Rourke ends: You stop paying. He does not
+argue, which tells you what it was worth to him.
+Somebody at the paper talked: The arrangement at the Herald is over. Nobody
+says why, and nobody at that desk will take a call from you again.
+```
+
+`puff` really does put a story in the next issue — `LOCAL BUSINESSMAN BACKS
+DISTRICT TRADE` appeared in the paper the following day — and `spike` really
+does take one out. The whole loop is verified.
+
+**One fault, and it hit all three officials.** `You know Mayor Ellis Crane now:
+They answered to nobody.` An official belongs to no organization, and the
+function that describes where somebody stands checked the organization first
+and returned before it ever looked at the office. A man who is the mayor is
+described by the office. There is exactly one of each, so it takes "the": *They
+were the police commissioner*, *They were editor of the Bellwether Herald*.
+
+**A correction to my own note.** I had listed `press` with the newspaper actions
+in the running plan for the influence system. It is not one — `press` is having
+your clothes cleaned and pressed. It belongs with `dress`, and grouping it by
+the name alone was a guess I did not check.
+
+Also confirmed in passing, from the same run's paper: `Crated arms are fetching
+more than they did` — the plural fix from earlier tonight is holding in a live
+campaign.
+
+Evidence: the loop driven end to end through the API against a forced save, one
+new property in `core/copy_test.go`, three more patterns on the `cmd/apicheck`
+copy scan, fifteen clean runs, `mise run verify` and `npm test` green, `mise run
+simulate` unchanged at 52 / 0 / 82 / 0.

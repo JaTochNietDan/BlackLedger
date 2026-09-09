@@ -193,6 +193,10 @@ var badCopy = []struct{ pattern, why string }{
 	{"a head of", "a titled office was given an article"},
 	{"an head of", "a titled office was given an article"},
 	{"twice such", "a frequency was used where a count belongs"},
+	// "You know Mayor Ellis Crane now: They answered to nobody."
+	{"a police commissioner", "a unique office took an indefinite article"},
+	{"a mayor of", "a unique office took an indefinite article"},
+	{"an editor of", "a unique office took an indefinite article"},
 	{"three times such", "a frequency was used where a count belongs"},
 }
 

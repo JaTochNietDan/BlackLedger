@@ -240,3 +240,27 @@ func TestSomebodyWithAJobDoesNotSeizeACasino(t *testing.T) {
 		t.Fatal("a person with no job and no rank is pinned to the spot")
 	}
 }
+
+// "You know Mayor Ellis Crane now: They answered to nobody." An official has no
+// faction, so the city described the mayor by what he did not belong to rather
+// than by the office he held.
+func TestTheCityNamesAnOfficeWhenSomebodyHoldsOne(t *testing.T) {
+	w := New(24)
+	for _, o := range Officials() {
+		n := w.NPC(o.ID)
+		if n == nil {
+			t.Fatalf("%s is not in the city", o.Name)
+		}
+		got := describeStanding(n, w)
+		if strings.Contains(got, "answered to nobody") {
+			t.Fatalf("the city says the %s %q", o.Role, got)
+		}
+		if !strings.Contains(strings.ToLower(got), strings.ToLower(o.Role)) {
+			t.Fatalf("the city describes the %s as %q", o.Role, got)
+		}
+		// Exactly one person holds each of these, so it is "the".
+		if strings.Contains(got, "a police") || strings.Contains(got, "a mayor") {
+			t.Fatalf("a unique office took an indefinite article: %q", got)
+		}
+	}
+}
