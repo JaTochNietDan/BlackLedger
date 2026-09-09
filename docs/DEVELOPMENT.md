@@ -3876,3 +3876,41 @@ which is past the threshold of 150. The prune is reachable, just not soon.
 Evidence: each of the three fixes fails its test when reverted, confirmed one at
 a time. `mise run verify` and `npm test` green, `mise run simulate` unchanged at
 defiant 52 / investor 0 / reckless 82 / worker 0, 0 errors.
+
+## Agreement and capitalisation are two jobs at the same site
+
+Four more states through the reading harness: the player in a cell, the player
+dead, a city holding as many organizations as it allows, and two families whose
+names collide in the same sentence. Two read clean, two did not, and what they
+found is a lesson about the previous slice rather than a new class of fault.
+
+**Custody and death read clean.** In a cell, everywhere but the precinct
+correctly offers nothing, and the three ways out read properly. After the player
+dies, the epitaph and everything around it read properly. 1,294 and 962 passages
+respectively, across three cities each. Neither needed a change.
+
+**The other two found eight sentences beginning in lower case**, all of the same
+shape: a family named "the Duarte Brothers" starting a sentence. But five of
+those sites are ones I had edited *in the previous slice*, when I gave them verb
+agreement and did not notice they also began sentences. `Agree` and `Leads` are
+two independent requirements that land on the same interpolation, and I had
+applied one and moved on.
+
+So rather than trust the scan alone, I listed every call to `Agree` in the core
+and asked of each whether its name begins a sentence. Twenty-six sites: sixteen
+already capitalised, seven correctly mid-sentence, and five that needed it and
+had not been reached by any scan yet. The scan and the list found different
+things — the scan found what the world happened to write, the list found what it
+could write — and neither would have been enough alone.
+
+Ten sites in total this slice: three war reports, three commission briefs, and
+the four sentences about leaving service, a rival learning where weapons came
+from, a family under new leadership, and a family that has stopped complaining.
+
+Evidence: nine scans now pass across the states and names tried so far,
+`core/state_scan2_test.go` adds the four new ones, and reverting any fix fails
+its scan. The other half is stated too: `Leads` must leave an ordinary name
+untouched, checked against six name shapes and end to end by leaving a seeded
+family, or every campaign's two openers would be mangled to fix the ones the
+world invents. `mise run verify` and `npm test` green, `mise run simulate`
+unchanged at defiant 52 / investor 0 / reckless 82 / worker 0, 0 errors.

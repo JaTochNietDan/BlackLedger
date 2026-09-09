@@ -116,7 +116,7 @@ func (w *World) SituationalOperations() []SituationalOperation {
 		out = append(out, SituationalOperation{
 			ID:      "warning_off",
 			Effect:  Effect{Reward: 175, Respect: 6, Heat: 5, Minutes: 75},
-			Because: fmt.Sprintf("%s %s stopped complaining about you, which is worse than complaining. Somebody who talks to them thinks it is worth one conversation.", f.Name, Agree(f.Name, "has", "have")),
+			Because: fmt.Sprintf("%s %s stopped complaining about you, which is worse than complaining. Somebody who talks to them thinks it is worth one conversation.", Leads(f.Name), Agree(f.Name, "has", "have")),
 		})
 	}
 

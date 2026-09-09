@@ -243,7 +243,7 @@ func (w *World) AvailableCommission(location string) (Commission, bool) {
 		}
 		if rival.Cash > f.Cash {
 			c.Kind, c.Target, c.Amount, c.Baseline = ObjectiveDrain, rival.ID, 900, rival.Cash
-			c.Brief = fmt.Sprintf("Take nine hundred dollars out of %s. %s %s care how it leaves their hands, only that it does.", rival.Name, f.Name, Agree(f.Name, "does not", "do not"))
+			c.Brief = fmt.Sprintf("Take nine hundred dollars out of %s. %s %s care how it leaves their hands, only that it does.", rival.Name, Leads(f.Name), Agree(f.Name, "does not", "do not"))
 			c.Pay, c.Respect, c.Goodwill, c.Penalty = 500, 6, 16, 10
 			return c, true
 		}
@@ -255,13 +255,13 @@ func (w *World) AvailableCommission(location string) (Commission, bool) {
 			prop := w.Properties[target]
 			if prop.Condition > 45 {
 				c.Kind, c.Target, c.Amount = ObjectiveDamage, target, 45
-				c.Brief = fmt.Sprintf("Put %s out of the state it is in. %s %s it at forty-five percent or worse, and %s want to be seen doing it.", place.Name, f.Name, Agree(f.Name, "wants", "want"), Agree(f.Name, "does not", "do not"))
+				c.Brief = fmt.Sprintf("Put %s out of the state it is in. %s %s it at forty-five percent or worse, and %s want to be seen doing it.", place.Name, Leads(f.Name), Agree(f.Name, "wants", "want"), Agree(f.Name, "does not", "do not"))
 				c.Pay, c.Respect, c.Goodwill, c.Penalty = 420, 5, 14, 8
 				return c, true
 			}
 		}
 		c.Kind, c.Target, c.Amount, c.Baseline = ObjectiveDrain, rival.ID, 900, rival.Cash
-		c.Brief = fmt.Sprintf("Take nine hundred dollars out of %s. %s %s care how it leaves their hands, only that it does.", rival.Name, f.Name, Agree(f.Name, "does not", "do not"))
+		c.Brief = fmt.Sprintf("Take nine hundred dollars out of %s. %s %s care how it leaves their hands, only that it does.", rival.Name, Leads(f.Name), Agree(f.Name, "does not", "do not"))
 		c.Pay, c.Respect, c.Goodwill, c.Penalty = 500, 6, 16, 10
 		return c, true
 	}
@@ -275,7 +275,7 @@ func (w *World) AvailableCommission(location string) (Commission, bool) {
 		}
 		place, _ := PlaceByID(where)
 		c.Kind, c.Target, c.GoodID, c.Amount = ObjectiveDeliver, where, "moonshine", 25
-		c.Brief = fmt.Sprintf("Bring twenty-five crates of moonshine to %s and hand them over. %s %s short and would rather owe you than owe anybody else.", place.Name, f.Name, Agree(f.Name, "is", "are"))
+		c.Brief = fmt.Sprintf("Bring twenty-five crates of moonshine to %s and hand them over. %s %s short and would rather owe you than owe anybody else.", place.Name, Leads(f.Name), Agree(f.Name, "is", "are"))
 		c.Pay, c.Respect, c.Goodwill, c.Penalty = 1150, 4, 12, 8
 		return c, true
 	}

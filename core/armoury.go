@@ -196,7 +196,7 @@ func (w *World) ArmouryDay() {
 		if rival := w.fighting(f.ID); rival != nil && w.WorldRandom() < .45 {
 			rival.Goodwill = max(-100, rival.Goodwill-8)
 			if w.Reach() >= 2 {
-				w.Log("Word gets back", fmt.Sprintf("%s %s where %s got them. Their standing with you falls to %+d.", rival.Name, Agree(rival.Name, "knows", "know"), f.Name, rival.Goodwill), "danger")
+				w.Log("Word gets back", fmt.Sprintf("%s %s where %s got them. Their standing with you falls to %+d.", Leads(rival.Name), Agree(rival.Name, "knows", "know"), f.Name, rival.Goodwill), "danger")
 			}
 		}
 	}
