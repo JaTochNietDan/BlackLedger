@@ -86,6 +86,7 @@ func (w *World) FillRoles() {
 				Color: "#7c8791", Location: r.Where, Rank: RankAssociate,
 				Ambition: 40, Skill: 50,
 			})
+			w.SettlePurses()
 			continue
 		}
 		successor := w.nearestTo(r.Where)

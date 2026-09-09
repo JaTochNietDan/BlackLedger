@@ -63,6 +63,7 @@ func (w *World) AddCivilian() *NPC {
 		Location: trade.place, Rank: RankAssociate,
 		Ambition: 15 + int(w.WorldRandom()*60), Skill: 20 + int(w.WorldRandom()*50),
 	})
+	w.SettlePurses()
 	return &w.NPCs[len(w.NPCs)-1]
 }
 

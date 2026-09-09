@@ -55,20 +55,28 @@ func TestWhatSomebodyIsCarryingComesFromWhoTheyAre(t *testing.T) {
 	soldier.Rank, soldier.Faction = RankSoldier, ""
 	boss := *mark
 	boss.Rank = RankLeader
-	if w.Pockets(&boss) <= w.Pockets(&soldier) {
-		t.Fatalf("a boss carried $%d and a soldier $%d", w.Pockets(&boss), w.Pockets(&soldier))
+	// What somebody is carrying is now their own money, so Pockets reports
+	// what they have rather than working it out from their rank on the spot.
+	// The rule this test was written for moved to StandingPurse: that is what
+	// a person of this standing would have on an ordinary day, and it is what
+	// the city settles a newcomer onto and pays them toward.
+	if w.StandingPurse(&boss) <= w.StandingPurse(&soldier) {
+		t.Fatalf("a boss would carry $%d and a soldier $%d", w.StandingPurse(&boss), w.StandingPurse(&soldier))
 	}
 	dead := *mark
 	dead.Dead = true
 	if w.Pockets(&dead) != 0 {
 		t.Fatal("a dead man was carrying money")
 	}
-	// A rich organization puts more in its people's pockets.
-	poor := w.Pockets(mark)
+	// A rich organization puts more in its people's pockets — which is now a
+	// statement about what they are paid toward rather than about what is in
+	// their hand this second. Somebody's own money does not change because
+	// their family had a good morning.
+	poor := w.StandingPurse(mark)
 	if f := w.faction(mark.Faction); f != nil {
 		f.Cash += 40000
 	}
-	if w.Pockets(mark) <= poor {
+	if w.StandingPurse(mark) <= poor {
 		t.Fatal("a richer organization did not put more in anybody's pocket")
 	}
 }

@@ -30,6 +30,17 @@ func (w *World) Pockets(n *NPC) int {
 	if n == nil || n.Dead {
 		return 0
 	}
+	return n.Purse
+}
+
+// StandingPurse is what somebody of this standing would have on them on an ordinary
+// day: their place in an organization, and how well that organization is doing.
+// It is what a person is settled onto when they have never been paid, and what
+// their week pays toward. Nobody in this city walks around with nothing.
+func (w *World) StandingPurse(n *NPC) int {
+	if n == nil || n.Dead {
+		return 0
+	}
 	purse := 30 + n.Rank*2
 	if f := w.faction(n.Faction); f != nil {
 		purse += min(400, f.Cash/40) * max(1, n.Rank) / RankLeader
@@ -41,6 +52,16 @@ func (w *World) Pockets(n *NPC) int {
 		purse = purse * 3 / 2 // it is on him, and it shows
 	}
 	return purse
+}
+
+// TakePurse takes everything somebody has on them and reports how much it was.
+func (w *World) TakePurse(n *NPC) int {
+	if n == nil || n.Dead {
+		return 0
+	}
+	took := n.Purse
+	n.Purse = 0
+	return took
 }
 
 // MuggingTarget finds who is here and worth taking something off. Only somebody
@@ -184,4 +205,70 @@ func (w *World) answerFor(mark *NPC, hand Hand, goodwill int) {
 	if goodwill >= 20 {
 		w.RetaliationFrom(f.ID)
 	}
+}
+
+// SettlePurses puts money in the pocket of anybody who has never had any. It
+// runs when a city is made and again when one is loaded, so a save written
+// before people had money reads as a city where everybody is carrying what
+// their standing would carry rather than a city of paupers.
+//
+// It only ever settles somebody who has never been paid and has nothing, so it
+// cannot quietly refill a man who was robbed this morning.
+func (w *World) SettlePurses() {
+	for i := range w.NPCs {
+		n := &w.NPCs[i]
+		if n.Dead || n.Purse != 0 || n.Paid != 0 {
+			continue
+		}
+		n.Purse = w.StandingPurse(n)
+		n.Paid = max(1, w.Minute)
+	}
+}
+
+// LivingCost is what a day costs somebody who is not the player: a room, food,
+// and whatever else a person spends money on without deciding to.
+const LivingCost = 12
+
+// PayTheCity is everybody else's payday. People who answer to an organization
+// are paid by it, and are not paid when it cannot meet its wages — which is
+// what makes starving a family reach the people in it rather than stopping at
+// a number on a screen. Everybody else earns their own living.
+//
+// Nobody accumulates without limit: a week's carrying is as much as anybody
+// keeps on them, and what is over that has been spent on something the game
+// does not model.
+func (w *World) PayTheCity() {
+	for i := range w.NPCs {
+		n := &w.NPCs[i]
+		if n.Dead {
+			continue
+		}
+		// A day's earnings cover the day and make up a seventh of whatever the
+		// week has taken off them, so somebody robbed on Monday is themselves
+		// again by the weekend and nobody accumulates without end. A flat
+		// fraction of their standing was tried first and it starved the city:
+		// an ordinary man carries about thirty dollars, a seventh of which is
+		// four, and a day costs twelve — so three quarters of the city was
+		// broke inside four months.
+		standing := w.StandingPurse(n)
+		earned := LivingCost + max(0, standing-n.Purse)/7
+		if f := w.faction(n.Faction); f != nil && f.Short > 0 {
+			// Their family missed payday. Officials are on the city's books
+			// rather than a family's and are paid regardless.
+			if !IsOfficial(n.ID) {
+				earned = 0
+			}
+		}
+		if earned > 0 {
+			n.Paid = max(1, w.Minute)
+		}
+		n.Purse = max(0, n.Purse+earned-LivingCost)
+	}
+}
+
+// Broke reports whether somebody has run out. A person with nothing behaves
+// differently from a comfortable one, and this is the question the rest of the
+// game asks about it.
+func (w *World) Broke(n *NPC) bool {
+	return n != nil && !n.Dead && n.Purse < LivingCost
 }

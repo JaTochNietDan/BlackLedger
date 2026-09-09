@@ -167,6 +167,7 @@ func (w *World) AddMember(faction, role string, rank int, base string) *NPC {
 		Faction: faction, Location: base, Rank: rank,
 		Ambition: 20 + int(w.WorldRandom()*70), Skill: 25 + int(w.WorldRandom()*60),
 	})
+	w.SettlePurses()
 	return &w.NPCs[len(w.NPCs)-1]
 }
 

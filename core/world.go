@@ -138,6 +138,18 @@ type NPC struct {
 	// daytime, which is how saves written before the city had a shift acquire
 	// one.
 	Post string `json:"post,omitempty"`
+	// What this person actually has. It used to be worked out at the moment
+	// somebody robbed them, from their rank and their family's money, so the
+	// same man could be robbed every day of the year and be carrying the same
+	// amount every time. Absent in saves written before people had money, which
+	// reads as nothing — Pockets settles a person who has never been paid onto
+	// what their standing would carry, so an old save behaves as it did.
+	Purse int `json:"purse,omitempty"`
+	// The minute this person was last paid. It exists so that having nothing
+	// can be told from never having been given anything: a man robbed down to
+	// nothing must not be quietly refilled by the same pass that settles a
+	// newcomer.
+	Paid int `json:"paid,omitempty"`
 	// When they actually set off, which is not when they decided to. A shift
 	// change that empties every building at the same minute puts most of the
 	// city on the street at once; people leave over a few hours instead. Zero
@@ -609,6 +621,7 @@ func New(seed uint32) *World {
 	w.Goods = newGoods()
 	// The two established families are already rivals when the player arrives.
 	w.Antagonize("bellandi", "russo", 50)
+	w.SettlePurses()
 	w.Log("A room. A name. No protection.", "Mara Bell left word at Saint Agnes: there is work, if you can be discreet. Your room costs $15 each midnight.", "personal")
 	return w
 }
@@ -1020,8 +1033,15 @@ func (w *World) Actions(id string) []Action {
 		}
 	}
 	if mark, ok := w.MuggingTarget(id); ok {
+		// People carry their own money now, so somebody can genuinely have
+		// nothing — a man whose family has missed payday for a month. "About
+		// $0 on them" is not a sum, it is a thing to say in words.
+		carrying := fmt.Sprintf("About $%d on them.", w.Pockets(mark))
+		if w.Broke(mark) {
+			carrying = "Nothing worth taking, by the look of them."
+		}
 		add("mug", "Take what "+mark.Name+" is carrying", MuggingMinutes, 0, w.MuggingReadiness(id),
-			fmt.Sprintf("About $%d on them. Your standing improves the odds and makes you the person they describe afterwards: above %d presence they can name you. They will hold it against you either way, and so will %s.", w.Pockets(mark), RecognisedAt, w.factionName(mark.Faction)))
+			fmt.Sprintf("%s Your standing improves the odds and makes you the person they describe afterwards: above %d presence they can name you. They will hold it against you either way, and so will %s.", carrying, RecognisedAt, w.factionName(mark.Faction)))
 		about(mark.ID)
 		if hand, ok := w.CrewHands(); ok {
 			reason := w.MuggingReadiness(id)

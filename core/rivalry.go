@@ -76,7 +76,12 @@ func (w *World) FamilyDay() {
 		// family of ninety runs far more people than the handful who happen to
 		// have names. Paying only the named ones would have made a family of
 		// ninety and a family of ten cost the same to run.
-		wages := f.Power * FamilyWage
+		// Power covers the anonymous mass of an organization; the named people
+		// are paid on top, and they are the ones whose pockets the rest of the
+		// game can see. Billing on strength alone meant a family that had
+		// collapsed to nothing owed nothing, stopped being short, and started
+		// paying its five remaining men again out of an empty safe.
+		wages := f.Power*FamilyWage + len(w.Members(f.ID))*SoldierWage
 		f.Cash += income * 24
 		f.Cash -= wages
 		if f.Cash < 0 {

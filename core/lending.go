@@ -102,7 +102,7 @@ func (w *World) OutOnLoan() int {
 // in their pocket tonight, but what their position in this city is worth. A
 // lieutenant of a rich family can find a great deal more than a docker, and the
 // whole skill of this trade is knowing the difference.
-func (w *World) Repayable(n *NPC) int { return w.Pockets(n) * PayReach }
+func (w *World) Repayable(n *NPC) int { return w.StandingPurse(n) * PayReach }
 
 // LoanSize is what this person could be lent. Never more than they could
 // plausibly bring back with the interest on it — a lender who hands somebody

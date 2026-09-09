@@ -29,6 +29,12 @@ func TestWhoYouPickDecidesWhatItIsWorthAndWhatItCosts(t *testing.T) {
 				t.Fatal("nobody was in the room")
 			}
 			mark.Rank, mark.Skill = rank, 40+rank/3
+			// People carry their own money, settled when they arrived in the
+			// city. This test promotes a man after the fact, so his pocket has
+			// to be settled again onto the standing he now has — otherwise
+			// both ranks are measured carrying whatever the same man happened
+			// to have, and the comparison says nothing.
+			mark.Purse = w.StandingPurse(mark)
 			// Drive the roll from the seed rather than the campaign, so the two
 			// ranks face the same run of luck.
 			// The first draw after seeding an LCG is not uniform across a run

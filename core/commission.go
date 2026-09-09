@@ -236,7 +236,7 @@ func (w *World) AvailableCommission(location string) (Commission, bool) {
 		if w.atWar(f.ID, rival.ID) {
 			if mark := w.expendable(rival.ID); mark != nil {
 				c.Kind, c.Target = ObjectiveRemove, mark.ID
-				c.Brief = fmt.Sprintf("%s of %s is not to see the end of the week. %s did not say this to you and will deny it if asked.", mark.Name, rival.Name, f.Name)
+				c.Brief = fmt.Sprintf("%s of %s is not to see the end of the week. %s did not say this to you and will deny it if asked.", mark.Name, rival.Name, Leads(f.Name))
 				c.Pay, c.Respect, c.Goodwill, c.Penalty = 900, 10, 22, 14
 				return c, true
 			}
@@ -283,7 +283,7 @@ func (w *World) AvailableCommission(location string) (Commission, bool) {
 	// A quiet, solvent organization wants somebody worth being seen with.
 	target := ((w.Presence()/10)+2)*10 + 10
 	c.Kind, c.Amount = ObjectiveStanding, target
-	c.Brief = fmt.Sprintf("Be worth %d to this city. %s will not be seen doing business with somebody nobody has heard of, and would like to do business with you.", target, f.Name)
+	c.Brief = fmt.Sprintf("Be worth %d to this city. %s will not be seen doing business with somebody nobody has heard of, and would like to do business with you.", target, Leads(f.Name))
 	c.Pay, c.Respect, c.Goodwill, c.Penalty = 300, 0, 18, 6
 	return c, true
 }

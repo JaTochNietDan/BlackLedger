@@ -133,6 +133,7 @@ func (w *World) Splinter(parent *Faction) bool {
 	w.NPCs = append(w.NPCs, NPC{ID: id, Name: leader, Role: "Head of " + name, Trust: 0,
 		Voice: w.voiceFor(leader), Color: "#8d7f6a", Faction: id,
 		Location: taken, Rank: RankLeader, Ambition: 60 + int(w.WorldRandom()*40), Skill: 40 + int(w.WorldRandom()*50)})
+	w.SettlePurses()
 	// A breakaway takes people with it, not only ground.
 	w.AddMember(id, "Lieutenant", RankLieutenant, taken)
 

@@ -91,6 +91,7 @@ func (w *World) ensureOfficials() {
 			Color: "#7c8791", Location: o.Place(), Rank: RankLieutenant,
 			Ambition: 55, Skill: 30,
 		})
+		w.SettlePurses()
 	}
 }
 

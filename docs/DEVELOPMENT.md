@@ -4564,3 +4564,76 @@ has. That is the next slice.
 
 Evidence: `core/family_money_test.go`, `core/starve_test.go`,
 `core/money_probe_test.go`. `mise run verify` and `npm test` green at 34.
+
+## People have money of their own
+
+The second half of the inbox item: everybody in the city is a person like the
+player, so they should have money like one. They had none. What somebody was
+carrying was worked out at the moment they were robbed, from their rank and
+their family's cash, and nothing was ever taken off the person. The same man
+could be robbed every day for a year and be carrying the same amount every time.
+
+A person now owns a purse. The old derivation survives as what a person of that
+standing would carry on an ordinary day: it is what the city settles a newcomer
+onto, and what their week pays them toward. Robbing somebody empties it.
+
+The reason this matters is that it joins the two halves of the inbox together. A
+family that misses payday does not pay its people, so starving a family reaches
+the men in it rather than stopping at a number on a screen:
+
+| the family | between five people | broke |
+| --- | --- | --- |
+| paying its way | $1,359 | none |
+| everything taken, six weeks | $640 | four of five |
+
+Officials are on the city's books rather than a family's and are paid whoever is
+struggling.
+
+Three things went wrong worth recording. The first arithmetic I wrote paid
+people a seventh of their standing and charged them twelve dollars a day to
+live. An ordinary man carries about thirty dollars, a seventh of which is four,
+so three quarters of the city was broke inside four months and the median person
+had nothing. Earnings now cover the day and make up a seventh of whatever the
+week has taken, so somebody robbed on Monday is himself by the weekend. Thirty
+to forty people in eight hundred are broke, and they are the ones in starved
+families, which is the point.
+
+The second: a family that had collapsed entirely owed nothing, so it stopped
+being short and started paying its five remaining men out of an empty safe. The
+bill was charged on strength alone, and the named people were not in it. They
+are now. That is the third time the same reset has bitten in one night.
+
+The third: lending asks what somebody could find over a week, and its own
+comment says explicitly that this is "not what is in their pocket tonight". It
+was calling the function that now returns exactly that. Its comment was right
+and the code had quietly become wrong about it.
+
+Four tests were changed rather than the code they guarded, which needs saying.
+Two asserted that rank and a rich family decide what is in a pocket. That rule
+moved rather than went away: it is now about what somebody is paid toward, and
+both tests check it there. A balance test promotes a man after the fact and had
+to settle his pocket onto the standing he now has, or both ranks were measured
+carrying whatever the same man happened to have. One asserted that a landless
+family loses strength on the first morning, covered in the previous slice.
+
+## A sweep instead of a sentence a week
+
+Four family names beginning a sentence in lower case were fixed today, one at a
+time, each surfacing only because the world happened to write that sentence. The
+existing scan gives one invented family an article-carrying name and waits.
+
+The new sweep renames every organization in five cities to carry a lower case
+article, ages them, renames whatever the world invented in the meantime, and
+reads every passage. It found one more site nobody had reached, in the brief for
+having somebody killed. Then it read 5,724 passages clean. Reverting one fix
+makes it fail, so it can see what it claims to check.
+
+A grep for format strings that start a sentence with a name suggested seventy
+candidate sites. The sweep found one. The grep was over-reporting, and the sweep
+is the honest measure of the two.
+
+Evidence: `core/purse_test.go`, `core/lowercase_sweep_test.go`,
+`core/money_probe_test.go`. `mise run verify` and `npm test` green at 34, `mise
+run simulate` unchanged at defiant 52 / investor 0 / reckless 82 / worker 0 with
+identical median cash — and as before, those campaigns are too short to see any
+of this.

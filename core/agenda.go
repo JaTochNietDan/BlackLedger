@@ -33,6 +33,7 @@ func (w *World) cityPace() float64 {
 // PeopleDay gives every living person one chance a day to pursue what they
 // want. Called from the clock, so it happens whether or not anyone is watching.
 func (w *World) PeopleDay() {
+	w.PayTheCity()
 	// Somebody ambitious inside an organization spends every day looking at the
 	// person above them. Two a day against one a day of forgetting means it
 	// takes about a month and a half to become a reason, which is the only
