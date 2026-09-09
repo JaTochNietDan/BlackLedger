@@ -2794,3 +2794,69 @@ Evidence: one property in `core/citypage_test.go`, proven to fail when the rest
 rule is removed (it names the headline and the two days), twenty-two clean
 apicheck runs, `mise run verify` and `npm test` green, `mise run simulate`
 unchanged at 52 / 0 / 82 / 0.
+
+## The guide cannot tell you something the rules do not, except once
+
+The Guide's own header promises that it "asks the game the same question the
+buttons ask, so it cannot tell you something the rules do not". Reading it in
+the browser for the first time, it lives up to that almost everywhere: every
+locked step gives the game's own reason for being locked, and the thresholds in
+`Rules that do not change` are interpolated from the constants the police use,
+so they cannot drift.
+
+Almost. The standing it takes to buy premises was written out three times as a
+bare `6` — in the rule, in the opportunity that suggests it, and in the guide
+line itself. Any one of the three could have changed and the page would have
+gone on saying six. It is one constant now, and the test breaks if the guide
+states a figure of its own: hardcoding `Earn 6 respect first` back while moving
+the rule to nine makes it fail with *"the guide says "Earn 6 respect first"
+while the rule uses 9"*.
+
+That was the only figure in the file not derived from a constant.
+
+## What the director actually gets past the validator
+
+Nobody had taken this number, and it was not possible until a refused draft
+stopped killing the director for the rest of the campaign. Eighteen requests
+against the live model on a mid-campaign save:
+
+| of 18 requests | |
+|---|---|
+| produced a usable scene | 0 |
+| refused by the validator | 11 |
+| lost to the world changing while the model wrote | 7 |
+
+**The seven are largely my harness and I will not claim otherwise.** My loop
+advances the clock to make a prepared scene arrive, so the world moves while the
+model is writing. In real play the clock is paused while the player decides,
+which is exactly when the director is asked, so context changes are much rarer
+than this makes them look.
+
+**The eleven are real, and they are not random.** The validator's reasons, from
+the server's own log:
+
+```
+6x  body must explicitly name the selected venue "Bluebird Laundry" and
+    describe the task there
+2x  body includes an unsupported deadline "before the end of the day"
+2x  body assigns this job's people to a family through "Bellandi men", but the
+    work is credited to Nico Ward's people
+1x  director context changed during preparation
+```
+
+The dominant failure is the model not naming the venue in the dialogue. The
+prompt does ask for it — `Name that venue accurately in the dialogue` — on line
+22 of a 32-line brief. The validator is right to refuse; the instruction is
+buried.
+
+**And the correction pass is weaker than it looks.** A rejected first draft is
+retried once with the reason fed back. Measured over the same run: nine first
+drafts rejected, eight still rejected after the retry. **The retry rescued one
+in nine.**
+
+I am not changing the prompt on this evidence. Moving an instruction and
+declaring victory without a controlled before-and-after is the mistake I made
+twice tonight measuring my own harness. What is worth recording is the shape:
+the model fails the same way repeatedly, the failure is specific and stated, and
+the retry barely helps. A campaign earlier tonight on a simpler save did get
+scenes through, so this is a rate on one state, not a universal one.

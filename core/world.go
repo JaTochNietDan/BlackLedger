@@ -728,7 +728,7 @@ func (w *World) Actions(id string) []Action {
 			add("sitdown", "Call "+q.A.Name+" and "+q.B.Name+" to a room", SitdownMinutes, 0, w.SitdownReadiness(),
 				fmt.Sprintf("$%d for the room and the guarantees, paid whether or not anybody agrees to anything. The only thing in this city that ends a war without either side losing it. %s", SitdownFee, warning))
 		}
-		reason := need(p.Respect < 6, "Earn 6 respect first")
+		reason := need(p.Respect < PremisesRespect, fmt.Sprintf("Earn %d respect first", PremisesRespect))
 		if len(p.Crew) > 0 {
 			reason = "Leo is already in your crew"
 		}

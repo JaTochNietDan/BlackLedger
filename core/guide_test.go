@@ -1,6 +1,7 @@
 package core
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 )
@@ -244,6 +245,37 @@ func TestTheGuideKnowsWhenYouAreDead(t *testing.T) {
 	for _, s := range w.Guide() {
 		if s.Open {
 			t.Errorf("%q is offered to somebody who is dead", s.Title)
+		}
+	}
+}
+
+// The guide's own header promises it "cannot tell you something the rules do
+// not". It could: the standing it takes to buy premises was written out three
+// times as a bare 6 — in the rule, in the opportunity that suggests it, and in
+// the guide line itself — so one of the three could change and the page would
+// go on saying six. Every figure the guide states now comes from the constant
+// the rule uses.
+func TestTheGuideStatesNoFigureOfItsOwn(t *testing.T) {
+	w := proprietor(t)
+	w.Player.Respect = PremisesRespect - 1
+	found := false
+	for _, s := range w.Guide() {
+		if s.Title != "Premises of your own" {
+			continue
+		}
+		found = true
+		if s.Reason != fmt.Sprintf("Earn %d respect first", PremisesRespect) {
+			t.Fatalf("the guide says %q while the rule uses %d", s.Reason, PremisesRespect)
+		}
+	}
+	if !found {
+		t.Fatal("the guide does not mention premises")
+	}
+	// And the rule itself agrees, at the one place the player meets it.
+	w.Player.Respect = PremisesRespect
+	for _, s := range w.Guide() {
+		if s.Title == "Premises of your own" && s.Reason != "" {
+			t.Fatalf("at exactly %d respect the guide still says %q", PremisesRespect, s.Reason)
 		}
 	}
 }

@@ -17,6 +17,12 @@ const (
 	// OrganizationHoldings is the ground it takes before anybody thinks of you
 	// as a thing rather than a person.
 	OrganizationHoldings = 2
+	// PremisesRespect is the standing it takes before anybody will sell you
+	// premises. It was written out three times as a bare 6 — in the rule, in
+	// the opportunity that suggests it, and in the guide page whose own header
+	// promises it "cannot tell you something the rules do not". One of the
+	// three could have changed and the guide would have gone on saying six.
+	PremisesRespect = 6
 	// OrganizationStanding is the name it takes.
 	OrganizationStanding = 25
 )

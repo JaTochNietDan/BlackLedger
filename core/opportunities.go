@@ -20,7 +20,7 @@ func (w *World) NextOpportunity() *Opportunity {
 	if p.JobCount == 0 {
 		return &Opportunity{"Make your first connection", "Mara has paid work at Saint Agnes. A small job starts your reputation.", "bar"}
 	}
-	if p.Respect < 6 {
+	if p.Respect < PremisesRespect {
 		return &Opportunity{"Become a known face", "Earn 6 respect to recruit an associate or establish your first business.", "bar"}
 	}
 	owns := false
