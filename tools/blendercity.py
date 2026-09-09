@@ -155,13 +155,78 @@ def light() -> None:
 # an image texture can be dropped onto these later without touching the
 # geometry.
 
+# Where generated textures are looked for. A missing file is not an error: the
+# building falls back to its flat colour, so the city always renders and a
+# half-finished texture set never breaks the build.
+TEXTURES = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                        "art", "textures")
+
+# How much wall one tile of a texture covers, in Blender units. One storey is
+# 0.42, so 0.34 puts roughly one course-and-a-bit of brick per floor — set once
+# here so brick is the same size on every building in the city.
+TILE_SIZE = 0.34
+
+
+def _image(name: str):
+    """A generated texture, if there is one on disk."""
+    for ext in (".png", ".jpg", ".jpeg", ".webp"):
+        path = os.path.join(TEXTURES, name + ext)
+        if os.path.exists(path):
+            return bpy.data.images.load(path, check_existing=True)
+    return None
+
+
 def surface(name: str, rgb: tuple[float, float, float], rough: float = 0.85,
-            emit: tuple[float, float, float] | None = None):
+            emit: tuple[float, float, float] | None = None,
+            texture: str | None = None, repeat: float = 1.0):
+    """A material: a flat colour, or a generated texture if one exists.
+
+    The texture is box-projected from each object's own coordinates rather than
+    from a UV layout. That is the whole trick for a city made of boxes — no
+    unwrapping, every face of every building gets the texture at the same
+    real-world size by construction, so the brick does not come out larger on
+    the tenement than on the tavern.
+
+    Textures must be generated FLAT: no baked shadows, no highlights, no
+    lighting of any kind. Blender does the light. A texture with its own
+    shadows in it fights the sun and the building goes muddy.
+    """
     mat = bpy.data.materials.new(name)
     mat.use_nodes = True
-    bsdf = mat.node_tree.nodes["Principled BSDF"]
+    tree = mat.node_tree
+    bsdf = tree.nodes["Principled BSDF"]
     bsdf.inputs["Base Color"].default_value = (*rgb, 1)
     bsdf.inputs["Roughness"].default_value = rough
+
+    img = _image(texture) if texture else None
+    if img is not None:
+        coord = tree.nodes.new("ShaderNodeTexCoord")
+        mapping = tree.nodes.new("ShaderNodeMapping")
+        scale = 1.0 / (TILE_SIZE * repeat)
+        mapping.inputs["Scale"].default_value = (scale, scale, scale)
+        tex = tree.nodes.new("ShaderNodeTexImage")
+        tex.image = img
+        tex.projection = "BOX"
+        tex.projection_blend = 0.25          # softens the corner seams
+        tex.extension = "REPEAT"
+        # Tinted by the palette, so one brick texture serves a whole street of
+        # different-coloured buildings rather than needing one per colourway.
+        mix = tree.nodes.new("ShaderNodeMixRGB")
+        mix.blend_type = "MULTIPLY"
+        mix.inputs["Fac"].default_value = 1.0
+        mix.inputs["Color2"].default_value = (*[c * 1.9 for c in rgb], 1)
+        # A little relief from the same image, which is most of what makes a
+        # flat texture stop looking like a decal.
+        bump = tree.nodes.new("ShaderNodeBump")
+        bump.inputs["Strength"].default_value = 0.22
+
+        tree.links.new(mapping.inputs["Vector"], coord.outputs["Object"])
+        tree.links.new(tex.inputs["Vector"], mapping.outputs["Vector"])
+        tree.links.new(mix.inputs["Color1"], tex.outputs["Color"])
+        tree.links.new(bsdf.inputs["Base Color"], mix.outputs["Color"])
+        tree.links.new(bump.inputs["Height"], tex.outputs["Color"])
+        tree.links.new(bsdf.inputs["Normal"], bump.outputs["Normal"])
+
     if emit is not None:
         bsdf.inputs["Emission Color"].default_value = (*emit, 1)
         bsdf.inputs["Emission Strength"].default_value = 1.15
@@ -194,10 +259,10 @@ def tenement(width: float, depth: float, storeys: int, *, palette: dict,
     ground = 0.52 if shopfront else storey
     height = ground + storey * (storeys - 1)
 
-    wall = surface("wall", palette["wall"], 0.9)
-    upper = surface("upper", tuple(c * 1.14 for c in palette["wall"]), 0.9)
-    trim = surface("trim", palette["trim"], 0.7)
-    roof = surface("roof", palette["roof"], 0.95)
+    wall = surface("wall", palette["wall"], 0.9, texture="brick")
+    upper = surface("upper", tuple(c * 1.14 for c in palette["wall"]), 0.9, texture="brick")
+    trim = surface("trim", palette["trim"], 0.7, texture="stone", repeat=1.6)
+    roof = surface("roof", palette["roof"], 0.95, texture="roof", repeat=2.2)
     glass = surface("glass", (0.055, 0.065, 0.075), 0.25)
     warm = surface("warm", palette["glow"], 0.4, emit=palette["glow"])
 
@@ -206,7 +271,7 @@ def tenement(width: float, depth: float, storeys: int, *, palette: dict,
     # makes a model read as a box.
     block("shell", (0, 0, 0), (width, depth, height), upper)
     block("base", (0, 0, 0), (width * 1.004, depth * 1.004, ground),
-          surface("stall", palette["stall"], 0.8))
+          surface("stall", palette["stall"], 0.8, texture="render", repeat=1.3))
 
     # The shopfront: panes between piers, with a blank fascia over them. The
     # fascia is deliberately empty — the sign belongs to the renderer, which
@@ -279,7 +344,7 @@ def tenement(width: float, depth: float, storeys: int, *, palette: dict,
         block("coping", (0, 0, height + 0.075), (width * 1.04, depth * 1.04, 0.014), roof)
     if chimney:
         block("chimney", (width * 0.2, depth * 0.22, height), (0.1, 0.1, 0.26),
-              surface("stack", palette["stack"], 0.95))
+              surface("stack", palette["stack"], 0.95, texture="brick", repeat=0.55))
         block("pot", (width * 0.2, depth * 0.22, height + 0.26), (0.115, 0.115, 0.03), trim)
 
 
