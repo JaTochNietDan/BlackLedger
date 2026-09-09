@@ -91,7 +91,7 @@ export function LedgerScreen({world}: {world: Snapshot}) {
           {first && <h3 className="log-day">Day {day}</h3>}
           <article className={'log-row ' + r.kind}>
             <time>{time(r.minute).split(' · ')[1]}<br/>Life {r.life}</time>
-            <div><h3>{r.title}</h3><p>{r.text}</p></div>
+            <div><h3>{r.title}{(r.count??1)>1&&<i className="again">{r.count} times</i>}</h3><p>{r.text}</p></div>
           </article>
         </div>;
       })}

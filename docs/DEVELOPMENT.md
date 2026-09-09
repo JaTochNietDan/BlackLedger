@@ -2860,3 +2860,58 @@ twice tonight measuring my own harness. What is worth recording is the shape:
 the model fails the same way repeatedly, the failure is specific and stated, and
 the retry barely helps. A campaign earlier tonight on a simpler save did get
 scenes through, so this is a rate on one state, not a universal one.
+
+## The ledger was eating its own history
+
+I read the ledger end to end a second time. Every fix from the first read is
+holding: `They are already at Saint Agnes`, `They are available again`, `Stella
+Iordan helped themselves to $74` — no assumed gender anywhere in sixty records.
+
+Then I counted, and found something worse than a copy fault.
+
+| campaign length | records held | distinct | exact repeats |
+|---|---|---|---|
+| day 12 | 60 | 37 | 38% |
+| day 28 | 60 | 44 | 26% |
+| **day 58** | **60** | **10** | **83%** |
+
+At day fifty-eight, **forty-nine of the sixty records the ledger holds were the
+same sentence**: "Envelope delivered — Mara pays $45. A small favor, completed
+without questions." Repetition had not merely made the log unreadable. The
+archive is bounded, so the repeats had pushed every notable thing that ever
+happened out of it. A campaign with a war, three deaths and a family collapse in
+it had a permanent record consisting of one errand, forty-nine times.
+
+The paper learned this within a day, hours earlier this morning. The ledger had
+it across a whole campaign and nobody had counted.
+
+The same thing happening again today now collapses onto the record already
+there, with a count. Two details mattered:
+
+- The record is **removed and re-appended** rather than updated in place. The
+  result panel after every action is built by diffing record ids, so a
+  collapsed repeat has to take a fresh id or the player commits an action and
+  is told nothing happened.
+- A different day, a different life, or a different amount is a different
+  event, and stays one.
+
+| after, same seeds | records | distinct | exact repeats |
+|---|---|---|---|
+| day 12 | 60 | 53 | 11% |
+| day 58 | 60 | 39 | 35% |
+
+Thirty-nine distinct records over fifty-eight days instead of ten. The
+remaining repeats are across days, which is correct: the count is per day, and
+`x32` on one day beside `x31` on another is two true facts.
+
+The Ledger screen shows the count beside the title.
+
+**One test had to change and it is the same shape as this morning's.** A test
+filled the log with two hundred copies of one line to force a rollover. Two
+hundred copies is now one record, so it fills nothing — it uses distinct lines,
+which is what filling a log means.
+
+Evidence: three properties in `core/ledger_test.go`, one of them holding the
+line that a collapsed repeat must still read as a new outcome, fourteen clean
+apicheck runs, `mise run verify` and `npm test` green, `mise run simulate`
+unchanged at 52 / 0 / 82 / 0.

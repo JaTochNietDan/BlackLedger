@@ -225,6 +225,12 @@ type Record struct {
 	Title  string `json:"title"`
 	Text   string `json:"text"`
 	Kind   string `json:"kind"`
+	// How many times this happened today. Measured on a real fifty-eight day
+	// campaign: forty-nine of the sixty records the ledger holds were the same
+	// sentence — "Mara pays $45. A small favor, completed without questions."
+	// Repetition had not merely made the log unreadable, it had pushed every
+	// notable thing that ever happened out of the archive.
+	Count int `json:"count,omitempty"`
 }
 type Death struct {
 	Name   string `json:"name"`
@@ -488,7 +494,28 @@ func (w *World) WorldRandom() float64 {
 	return float64(w.WorldRNG) / 4294967296
 }
 func (w *World) Log(title, text, kind string) {
-	w.History = append(w.History, Record{ID(), w.Minute, w.Life, title, text, kind})
+	// The same thing happening again today is not a new thing to say. The
+	// record is removed and re-appended rather than updated in place, so it
+	// keeps its position in the order of events and takes a fresh id — the
+	// result panel after an action is built by diffing record ids, and a
+	// collapsed repeat has to still read as something that just happened.
+	day := w.Minute / 1440
+	for i := len(w.History) - 1; i >= 0; i-- {
+		r := w.History[i]
+		if r.Minute/1440 != day || r.Life != w.Life {
+			break
+		}
+		if r.Title == title && r.Text == text {
+			again := r.Count + 1
+			if again < 2 {
+				again = 2
+			}
+			w.History = append(w.History[:i], w.History[i+1:]...)
+			w.History = append(w.History, Record{ID(), w.Minute, w.Life, title, text, kind, again})
+			return
+		}
+	}
+	w.History = append(w.History, Record{ID(), w.Minute, w.Life, title, text, kind, 1})
 	if len(w.History) > 180 {
 		w.History = w.History[len(w.History)-180:]
 	}

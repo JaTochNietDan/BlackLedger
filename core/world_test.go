@@ -2,6 +2,7 @@ package core
 
 import (
 	"encoding/json"
+	"fmt"
 	"strings"
 	"testing"
 )
@@ -43,8 +44,10 @@ func TestTravel(t *testing.T) {
 
 func TestPresentationRecordsSurviveHistoryRollover(t *testing.T) {
 	w := New(27)
+	// Distinct records: the ledger collapses the same thing happening twice in
+	// a day, so two hundred copies of one line no longer fill anything.
 	for i := 0; i < 200; i++ {
-		w.Log("Old record", "Earlier in the campaign", "personal")
+		w.Log("Old record", fmt.Sprintf("Earlier in the campaign, number %d", i), "personal")
 	}
 	act(t, &w, "travel", "bar")
 	if len(w.History) != 180 || len(w.LastResult.Records) == 0 {
