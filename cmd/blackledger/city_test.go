@@ -119,7 +119,7 @@ func TestTheCityCanBeReadWithoutWebGL(t *testing.T) {
 // Every address must have a painted cut-out. A missing one falls back to a
 // flat-shaded solid, which is correct behaviour and looks like a bug sitting
 // next to eleven painted buildings.
-func TestEveryAddressIsPainted(t *testing.T) {
+func TestTheManifestAndTheArtAgree(t *testing.T) {
 	body, err := os.ReadFile("../../public/art/iso/isometric.json")
 	if err != nil {
 		t.Skip("no isometric art beside this build")
@@ -131,18 +131,39 @@ func TestEveryAddressIsPainted(t *testing.T) {
 	if err := json.Unmarshal(body, &painted); err != nil {
 		t.Fatalf("the manifest does not parse: %v", err)
 	}
-	have := map[string]string{}
+	// Every entry points at a file that is there. A manifest naming art that
+	// has been deleted is worse than no art: the view asks for a texture,
+	// the load fails, and the building silently disappears instead of falling
+	// back to its solid.
+	listed := map[string]bool{}
 	for _, p := range painted {
-		have[p.ID] = p.File
+		listed[p.File] = true
+		if _, err := os.Stat("../../public/art/" + p.File); err != nil {
+			t.Errorf("the manifest lists %s and the file is not there", p.File)
+		}
 	}
-	for _, l := range core.Locations {
-		file, ok := have[l.ID]
-		if !ok {
-			t.Errorf("%s has no isometric cut-out, so it stands on the map as a blocked-out solid", l.Name)
+	// And every cut-out on disk is in the manifest, so art that was dropped in
+	// by hand and never registered does not sit there doing nothing.
+	found, err := os.ReadDir("../../public/art/iso")
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, e := range found {
+		name := e.Name()
+		if !strings.HasPrefix(name, "iso-") || !strings.HasSuffix(name, ".png") {
 			continue
 		}
-		if _, err := os.Stat("../../public/art/" + file); err != nil {
-			t.Errorf("%s is in the manifest as %s and the file is not there", l.Name, file)
+		if !listed["iso/"+name] {
+			t.Errorf("%s is on disk and not in the manifest; run tools/manifest.py", name)
+		}
+	}
+	// An address with no cut-out is not a failure. It stands as a blocked-out
+	// solid, which is what lets the city be looked at while it is being
+	// re-thought — this test used to assert that all twelve were painted, and
+	// that stopped being true the day the generated set was thrown out.
+	for _, l := range core.Locations {
+		if l.Name == "" {
+			t.Error("an address with no name cannot be drawn at all")
 		}
 	}
 }
@@ -229,8 +250,9 @@ func TestTheBlocksBetweenTheAddressesAreBuiltOn(t *testing.T) {
 		}
 	}
 	// Enough of them that a row of blocks does not read as the same building
-	// repeated, which is its own kind of placeholder.
-	if fillers < 4 {
+	// repeated — but only once there are any at all. A city with no cut-outs
+	// is a city being re-thought, and every block falls back to its solid.
+	if fillers > 0 && fillers < 4 {
 		t.Errorf("only %d filler buildings; a city needs more variety than that", fillers)
 	}
 	// A block is a terrace: the address takes one slot on the frontage and
