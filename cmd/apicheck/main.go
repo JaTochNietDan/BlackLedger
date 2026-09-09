@@ -107,6 +107,8 @@ type action struct {
 
 type place struct {
 	ID      string   `json:"id"`
+	Name    string   `json:"name"`
+	Room    string   `json:"room"`
 	Owned   bool     `json:"owned"`
 	Actions []action `json:"actions"`
 }
@@ -201,6 +203,11 @@ func readable(s *snapshot, fail func(int, string, ...any)) {
 	for _, r := range s.History {
 		check("a ledger record", r.Title)
 		check("a ledger record", r.Text)
+	}
+	// What the room says about itself is prose too, assembled from a headcount
+	// and the hour.
+	for _, l := range s.Locations {
+		check("the note in "+l.Name, l.Room)
 	}
 	days := map[int]int{}
 	for _, e := range s.Editions {

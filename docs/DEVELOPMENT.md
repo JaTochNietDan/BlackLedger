@@ -1966,3 +1966,52 @@ Not yet looked at: a bar holds thirteen people at nine at night, and I have not
 seen what the room panel does with that. The list is already filtered to who
 you can deal with and it lives in the scrolling sidebar rather than the main
 viewport, so it is probably fine, but probably is not looked at.
+
+## The room says whether it is busy
+
+Two things from standing in the game and looking.
+
+**The open question from last time is answered: no.** A bar holds fourteen
+people at ten at night now, and I had not seen what the room panel does with
+that. It does the right thing already. The header reads "IN THE ROOM · 3 of 14
+you can deal with", three cards render, and the rest sit behind "Show 11 others
+in the room". No overcrowding, no main-viewport scroll, no change made. Worth
+recording as a negative result: I went looking for a problem I had created and
+there was not one.
+
+**What was actually wrong is that none of the new rhythm reached the player.**
+Standing in Saint Agnes at ten at night with fourteen people in it read exactly
+like standing in it at nine in the morning with two. The only trace of the
+difference was a number in the corner of a filter, and a number with nothing to
+compare it against says nothing. Having built a city that keeps hours, I had
+left it invisible from inside.
+
+`core/crowd.go` gives the room a sentence about itself, and only when there is
+something to say. Bands are read as a share of everybody still living, so the
+description keeps meaning something as the population rises and falls, and the
+evening wording differs from the daytime wording because a full bar at ten at
+night is a different fact from a crowded market at nine. A room with an
+unremarkable number of people in it says nothing at all — a note on every room
+is a note the player stops reading.
+
+Read out of a real save at ten at night:
+
+```
+Saint Agnes    14  Saint Agnes is full tonight. 14 people, and the ones by the
+                   door are watching who comes in.
+Pier 14         1  Nearly empty at this hour: one other person, and nobody else
+                   worth counting.
+The Mariner     0  There is nobody else in here.
+```
+
+The note is a description and nothing else. One of the five properties in
+`core/crowd_test.go` exists only to hold that line: filling a room with the
+entire city must not change what can be done in it. Another checks that
+somebody out on the street is not counted into the room they have left.
+
+`cmd/apicheck` now scans the room notes along with the ledger and the paper,
+since they are assembled prose like everything else.
+
+Evidence: five properties in `core/crowd_test.go`, ten clean apicheck runs on a
+fresh campaign, `mise run verify` and `npm test` green, `mise run simulate`
+unchanged at 53 / 0 / 82 / 0.
