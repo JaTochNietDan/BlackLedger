@@ -96,3 +96,47 @@ func TestNoTwoPeopleInTheCityShareAName(t *testing.T) {
 		t.Logf("seed %d: %d people, all named apart", seed, len(seen))
 	}
 }
+
+// Three newspapermen standing in the market, seen in the browser. A civilian's
+// trade is drawn at random from the table each time, with replacement, so with
+// sixty-two people and forty-nine ways to earn a living the city gets four of
+// one job and none of another. That is a shorter city than it looks: a room of
+// people who are all the same thing is a room of one person repeated.
+//
+// The trades are dealt out, so every way of making a living in this city is
+// somebody's before any of them is a second person's.
+func TestTheCityFillsEveryJobBeforeDoublingUpOnAny(t *testing.T) {
+	worst, worstSeed := 0, uint32(0)
+	for _, seed := range []uint32{7, 31, 88, 149, 219, 401, 555} {
+		w := New(seed)
+		count := map[string]int{}
+		for _, n := range w.People() {
+			if n.Faction != "" || IsOfficial(n.ID) {
+				continue
+			}
+			count[n.Role+"@"+n.Location]++
+		}
+		empty := 0
+		for _, trade := range streetTrades {
+			if count[trade.role+"@"+trade.place] == 0 {
+				empty++
+			}
+		}
+		most := 0
+		for _, n := range count {
+			most = max(most, n)
+		}
+		if most > worst {
+			worst, worstSeed = most, seed
+		}
+		// With sixty-two people and forty-nine trades, every trade should be
+		// taken and thirteen of them doubled — never more than twice.
+		if empty > 0 && most > 1 {
+			t.Errorf("seed %d: %d ways to earn a living have nobody doing them while another has %d people", seed, empty, most)
+		}
+	}
+	if worst > 2 {
+		t.Errorf("seed %d: %d people in this city do the same job in the same room", worstSeed, worst)
+	}
+	t.Logf("the most anybody's job is doubled up: %d", worst)
+}

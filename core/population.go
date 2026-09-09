@@ -69,7 +69,7 @@ func (w *World) AddCivilian() *NPC {
 	if !ok {
 		return nil
 	}
-	trade := streetTrades[int(w.WorldRandom()*float64(len(streetTrades)))%len(streetTrades)]
+	trade := w.nextStreetTrade()
 	id := fmt.Sprintf("street-%d", len(w.NPCs)+1)
 	for w.NPC(id) != nil {
 		id += "x"
@@ -266,4 +266,39 @@ func (w *World) PopulationSummary() map[string]any {
 		"street": street, "jobs": max(0, living-organized-street),
 		"known": len(w.Cast()),
 	}
+}
+
+// nextStreetTrade picks what somebody does for a living. Trades are DEALT
+// rather than drawn: the least-taken jobs are found first and one of those is
+// chosen, so every way of earning a living in this city is somebody's before
+// any of them is a second person's.
+//
+// Drawing at random with replacement put three newspapermen in the market at
+// once — seen in the browser, not in a test — while a third of the city's jobs
+// had nobody doing them at all. A room where everybody is the same thing is a
+// room of one person repeated, which is a shorter city than it looks.
+func (w *World) nextStreetTrade() struct{ role, place string } {
+	taken := map[string]int{}
+	for i := range w.NPCs {
+		n := &w.NPCs[i]
+		if n.Dead || n.Faction != "" || IsOfficial(n.ID) {
+			continue
+		}
+		taken[n.Role+"@"+n.Location]++
+	}
+	fewest := -1
+	for _, trade := range streetTrades {
+		if held := taken[trade.role+"@"+trade.place]; fewest < 0 || held < fewest {
+			fewest = held
+		}
+	}
+	open := streetTrades[:0:0]
+	for _, trade := range streetTrades {
+		if taken[trade.role+"@"+trade.place] == fewest {
+			open = append(open, trade)
+		}
+	}
+	// Which of the open ones is still chance, so two cities from two seeds are
+	// not the same city with the same people in the same order.
+	return open[int(w.WorldRandom()*float64(len(open)))%len(open)]
 }

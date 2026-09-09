@@ -5132,3 +5132,40 @@ bystanders behind a count, but I have not looked at a crowded room in the
 browser yet and am not claiming it reads well.
 
 Evidence: `core/population_places_test.go`. All gates green, `npm test` 41.
+
+## Three newspapermen in one room
+
+I published last slice that the busiest room now holds twenty people, that I had
+not looked at one in the browser, and that I was not claiming it read well. This
+is that look, and it turned up something a test would not have.
+
+The room itself reads fine. The core already says "20 people in here, which for
+this hour is a crowd", offers the seven you can actually deal with, and folds
+the other thirteen behind a count. Opened, they are a two-column list of names
+and trades. Nothing needed fixing there.
+
+What the list showed was three newspapermen standing in the market together, and
+two stallholders. A civilian's trade was drawn at random from the table each
+time, with replacement, so sixty-two people across forty-nine ways of earning a
+living gave four or five of one job while a third of the city's jobs had nobody
+doing them at all. A room where everybody is the same thing is a room of one
+person repeated, which is a shorter city than it looks — and it is exactly the
+failure mode of raising a population without watching what fills it.
+
+Trades are dealt now rather than drawn: the least-taken jobs are found and one
+of those is chosen, so every way of making a living here is somebody's before
+any of them is a second person's. Which of the open ones is still chance, so two
+seeds are not the same city in the same order. Nobody's job is doubled more than
+twice, and no trade goes unfilled.
+
+I also owe a correction. I wrote that the suite went from 45 seconds to 94
+"because the prose scans read every passage a bigger city writes". That is not
+where the time is. Timing every test individually, the ten slowest are all
+many-campaign balance tests — the slowest is eleven seconds and no scan is near
+the top. The cost is that every simulated day now moves eighty-seven people
+instead of fifty-three, spread across everything that runs campaigns. No scan
+needs weakening, which is just as well, because they have caught real faults all
+night.
+
+Evidence: `core/population_places_test.go`, verified by reverting to the random
+draw. All gates green, `npm test` 41.
