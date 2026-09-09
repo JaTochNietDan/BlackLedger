@@ -808,6 +808,11 @@ func (w *World) Actions(id string) []Action {
 			detail = fmt.Sprintf("%d minutes on foot, %d driving. Travel advances the city clock. Known threats may interrupt you.", walk, w.Journey(p.Location, l.ID))
 		}
 		add("travel", "Visit "+l.Name, w.Journey(p.Location, l.ID), 0, "", detail)
+		// What can be done about a place without being in it. An order given to
+		// somebody else is given wherever you happen to be standing; walking
+		// across the city to tell your own crew to go somewhere else is a
+		// journey, not a decision.
+		out = append(out, w.ordersAbout(l)...)
 		return out
 	}
 	// Work that belongs to the player rather than to a room. All of it used to
@@ -1114,27 +1119,19 @@ func (w *World) Actions(id string) []Action {
 		add("move", "Move on "+l.Name, MoveMinutes, 0, w.MoveOnReadiness(id),
 			fmt.Sprintf("Commit your organization against %s. Your strength against theirs decides it, and a holding they cannot defend becomes yours. Driven off, it costs you somebody who went with you. Draws %d police attention and hardens the quarrel.", holder.Name, MoveHeat))
 	}
+	out = append(out, w.ordersAbout(l)...)
 	if f, ok := w.SabotageTarget(id); ok {
-		if hand, ok := w.CrewHands(); ok {
-			reason := w.SabotageReadiness(id)
-			if reason == "" {
-				reason = w.DelegateReadiness()
-			}
-			add("sabotage:crew", "Send "+hand.Name+" against "+l.Name, 90, 0, reason,
-				fmt.Sprintf("The same damage to %s and worse odds. %d less attention on you and a fifth of the standing. Turned away, they take the beating and %d loyalty, and sometimes they do not come back.", f.Name, HandHeatRelief, HandLoyaltyCost))
-		}
 		// The difference between these two buttons is whether you are there,
 		// not whether the crew is: SabotageReadiness requires a crew either
 		// way, the odds read their loyalty either way, and the failure text
 		// says "You and Leo left without reaching anything" here against
 		// "went in without you" beside it. The description said "Send your
-		// crew", which is the other button.
+		// crew", which is the other button — and that one is offered from
+		// anywhere, by ordersAbout, because giving it does not put you in the
+		// building. This one does, so it is only here.
 		add("sabotage", "Move against "+l.Name+" yourself", 90, 0, w.SabotageReadiness(id),
 			fmt.Sprintf("Go in with your crew against %s. Damages the property, weakens %s and costs you standing with them. They will retaliate, and a failed attempt injures you.", l.Name, f.Name))
-		if rival := w.Rival(f.ID); rival != nil {
-			add("incite", "Point "+f.Name+" at "+rival.Name, 45, 25, w.InciteReadiness(id),
-				fmt.Sprintf("Spend $25 on the right conversations so %s %s %s moved against them. Hardens their quarrel and can start a war you are not part of. A story that does not hold up costs you standing with %s.", f.Name, Agree(f.Name, "believes", "believe"), rival.Name, f.Name))
-		}
+		_ = f
 	}
 	if id == "laundry" || id == "garage" || id == "casino" {
 		if w.Own(id) {

@@ -76,3 +76,81 @@ func TestTheRoomsOwnPanelLeavesThatWorkOut(t *testing.T) {
 		t.Error("the exchange lost the button it used to be the only home of")
 	}
 }
+
+// Sending your own crew against a family's premises, and pointing one family at
+// another, were offered only while standing in the building it was aimed at.
+// Neither rule ever asked where the player was: the readiness reads respect, a
+// crew, their loyalty and what you know, and nothing else. Walking across the
+// city to give an order you are not going to carry out yourself is not a
+// decision, it is a journey.
+func TestOrdersAimedAtAPlaceCanBeGivenFromAnywhere(t *testing.T) {
+	w := standing(t, "bar")
+	w.Player.Crew = []Crew{{"leo", "Leo Carver", 90}}
+	w.Player.Contacts = 3
+	target := ""
+	for _, l := range Locations {
+		if prop := w.Properties[l.ID]; prop != nil && l.ID != w.Player.Location && l.District <= w.District {
+			if f := w.faction(prop.Owner); f != nil && f.ID != w.PlayerOrganizationID() {
+				target = l.ID
+				break
+			}
+		}
+	}
+	if target == "" {
+		t.Fatal("no rival holds anything reachable")
+	}
+	want := map[string]bool{"sabotage:crew": false, "incite": false}
+	for _, a := range w.Actions(target) {
+		if _, ours := want[a.ID]; !ours {
+			continue
+		}
+		want[a.ID] = true
+		if a.Disabled {
+			t.Errorf("%s at %s is refused from across the city: %s", a.ID, target, a.Reason)
+		}
+		if a.Target != target {
+			t.Errorf("%s is aimed at %q rather than at %s", a.ID, a.Target, target)
+		}
+	}
+	for id, found := range want {
+		if !found {
+			t.Errorf("%s cannot be given about %s without walking there", id, target)
+		}
+	}
+	// And the order actually goes through from where the player is standing.
+	next, err := Execute(w, Command{Revision: w.Revision, Kind: "sabotage:crew", Target: target})
+	if err != nil {
+		t.Fatalf("the order could not be given from the bar: %v", err)
+	}
+	if next.Player.Location != "bar" {
+		t.Errorf("giving an order moved the player to %s", next.Player.Location)
+	}
+	// It resolves there and then rather than leaving a task behind, the same
+	// way going in yourself does, so what proves it happened is the time it
+	// took and the account of it.
+	if next.Minute != w.Minute+90 {
+		t.Errorf("the order took %d minutes", next.Minute-w.Minute)
+	}
+	if next.LastResult == nil || len(next.LastResult.Records) == 0 {
+		t.Error("the order was given and the city has no account of it")
+	}
+}
+
+// Going in yourself is the one that needs you there. It is the difference
+// between the two buttons, and it must not quietly become a third way to
+// teleport.
+func TestGoingInYourselfStillMeansGoingThere(t *testing.T) {
+	w := standing(t, "bar")
+	w.Player.Crew = []Crew{{"leo", "Leo Carver", 90}}
+	for _, l := range Locations {
+		if prop := w.Properties[l.ID]; prop != nil && l.ID != w.Player.Location {
+			if f := w.faction(prop.Owner); f != nil && f.ID != w.PlayerOrganizationID() {
+				for _, a := range w.Actions(l.ID) {
+					if a.ID == "sabotage" {
+						t.Fatalf("%s offers going in yourself from across the city", l.ID)
+					}
+				}
+			}
+		}
+	}
+}
