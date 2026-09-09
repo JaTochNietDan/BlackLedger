@@ -1740,3 +1740,20 @@
 - Read plainly: **a war starts in about one campaign in nine, and an organization is destroyed in one campaign in a hundred.** The layers are not broken — they fire, and they vary by strategy in ways that make sense, with `defiant` seeing eleven wars of which *none* were between other families, while `investor` and `worker` mostly watch other people's. But the city is sparse: nine campaigns in ten never see it do anything to itself.
 - That is a finding, not a fix. Making the city more active is a balance change and deserves its own slice with before-and-after numbers, which is what this measure now makes possible. **The baseline is recorded above.**
 - `mise run verify` passes, `npm test` 23/23. Balance unchanged: this only observes — defiant 58 / investor 0 / reckless 82 / worker 0, 0 errors, exactly as before.
+
+## A correction: the city is alive, and my measurement was too short
+- The previous entry concluded that the living world barely fires — a war in 43 campaigns of 400, an organization destroyed in 4. **That conclusion was wrong, and the commit message carrying it (`f02725d`) is wrong too.** It is left in the history rather than rewritten, and this is the correction.
+- The fault was the horizon. `cmd/simulate` defaults to 200 commands, which is a **median of 12.6 game days**, and for `reckless` **0.2 days**. Families escalate, split and fall over weeks. Asking whether the city moved in a fortnight and concluding that it does not move is a fact about the run, not about the city.
+- **Re-measured at 1000 commands**, where the surviving strategies reach 60 to 70 game days:
+
+| | at 200 commands (12.6-day median) | at 1000 commands (`investor`, 71.6-day median) |
+|---|---|---|
+| runs where a war started | 15 of 100 | **38 of 40** |
+| runs where an organization was destroyed | 1 of 100 | **25 of 40** |
+| runs where holdings changed hands | 7 of 100 | **30 of 40** |
+| wars the player was no party to | 8 | 90 |
+
+- `worker` tells the same story: a war in 28 of 40 runs, holdings moving in 26. Across all 160 long runs a war starts in 54% and an organization dies in 28% — and that average is dragged down by the two strategies that get themselves killed in the first week, not by a quiet city. **The living world does what the document asks. Nobody had looked at it over a long enough campaign.**
+- So the fix was to the measurement, not the world. The summary now reports **`median_game_days`** rather than only minutes, and **`city_measures_meaningful`** per strategy, and the run prints a warning naming any strategy that ended before the twenty-day horizon: *"a campaign has to run past about 20 days before families have time to escalate, split or fall, and these ended sooner."* At the default every strategy is flagged, which is exactly the guard that would have stopped the wrong conclusion.
+- **A separate finding worth its own look later**: `reckless` has a median campaign of **0.2 game days** — under five hours — and dies in 31 of 40 long runs. Dying is that strategy's job, but dying before lunch on the first day suggests something degenerate in its opening rather than a hard game.
+- No world change: the city was never touched. `mise run verify` passes, `npm test` 23/23, balance identical at defiant 58 / investor 0 / reckless 82 / worker 0, 0 errors.

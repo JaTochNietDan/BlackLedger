@@ -5,12 +5,20 @@ import (
 	"blackledger/sim"
 	"encoding/json"
 	"flag"
+	"math"
 	"fmt"
 	"os"
 	"sort"
 	"strings"
 	"time"
 )
+
+// livingWorldHorizon is how many game days a campaign has to cover before the
+// city measures say anything. Families escalate over weeks; at a fortnight the
+// answer is always "the city did nothing", and that is a fact about the run
+// rather than about the city.
+const livingWorldHorizon = 20
+
 
 func main() {
 	runs := flag.Int("runs", 100, "campaigns per strategy")
@@ -66,6 +74,10 @@ func main() {
 		}
 	}
 	summaries := map[string]any{}
+	// Which strategies did not last long enough for the city block to mean
+	// anything, named in the output so nobody reads a short campaign as a quiet
+	// city again.
+	short := []string{}
 	for _, p := range strategies {
 		deaths, errors := 0, 0
 		cash := []int{}
@@ -128,9 +140,30 @@ func main() {
 			sort.Ints(values)
 			ms[k] = map[string]any{"reached": len(values), "median_commands_when_reached": values[len(values)/2]}
 		}
-		summaries[p] = map[string]any{"runs": *runs, "deaths": deaths, "errors": errors, "median_final_cash": cash[len(cash)/2], "median_game_minutes": minutes[len(minutes)/2], "milestones": ms, "city": city}
+		// Days, not minutes. The living-world measures are about what the city
+		// does over weeks, and a summary reported in minutes let a 12-day
+		// median pass for a campaign — which produced a confident and wrong
+		// conclusion that the city was dormant. It was not; the runs were short.
+		span := minutes[len(minutes)/2]
+		days := float64(span) / 1440
+		summaries[p] = map[string]any{"runs": *runs, "deaths": deaths, "errors": errors,
+			"median_final_cash": cash[len(cash)/2], "median_game_minutes": span,
+			"median_game_days": math.Round(days*10) / 10, "milestones": ms, "city": city,
+			"city_measures_meaningful": days >= livingWorldHorizon,
+		}
+		if days < livingWorldHorizon {
+			short = append(short, fmt.Sprintf("%s (%.1f days)", p, days))
+		}
 	}
 	out := map[string]any{"corpus_sha256": corpusHash, "corpus_proposals": len(corpus), "elapsed_seconds": time.Since(start).Seconds(), "director": *director, "max_commands": *steps, "summary": summaries, "campaigns": reports}
+	if len(short) > 0 {
+		out["warning"] = fmt.Sprintf(
+			"the city measures are not meaningful for %s: a campaign has to run past about %.0f days "+
+				"before families have time to escalate, split or fall, and these ended sooner. "+
+				"Raise -steps, or read only the strategies that survived.",
+			strings.Join(short, ", "), livingWorldHorizon)
+		fmt.Fprintln(os.Stderr, out["warning"])
+	}
 	enc := json.NewEncoder(os.Stdout)
 	enc.SetIndent("", "  ")
 	if err := enc.Encode(out); err != nil {
