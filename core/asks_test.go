@@ -1,6 +1,9 @@
 package core
 
-import "testing"
+import (
+	"strings"
+	"testing"
+)
 
 // An action that pays its own fee has to declare Cost of nothing, or the
 // command layer takes the money a second time. The panel prints the price from
@@ -95,6 +98,7 @@ var paysItsOwnWay = []string{
 	"launder", "car", "dress", "arms:weapon", "arms:armour", "charge",
 	"bribe", "bankroll", "hire", "restock", "remedy",
 	"retain:commissioner", "retain:mayor", "retain:editor",
+	"share:", "sign:", "bail:",
 	"pact:bellandi", "enquire:bellandi", "smear:bellandi",
 }
 
@@ -120,6 +124,14 @@ func TestEveryPricedActionKeepsItsPrice(t *testing.T) {
 	for i := range w.Factions {
 		w.Factions[i].Goodwill = 60
 	}
+	// Somebody of the player's standing in a room, so a share can be paid, and
+	// somebody of theirs in a cell, so bail is offered.
+	w.NPCs = append(w.NPCs,
+		NPC{ID: "ownman", Name: "Otto Reiss", Location: "bar",
+			Faction: w.PlayerOrganizationID(), Rank: RankSoldier, Role: "Yours", Trust: 40},
+		NPC{ID: "cellman", Name: "Bruno Sala", Location: "precinct",
+			Faction: w.PlayerOrganizationID(), Rank: RankSoldier, Role: "Yours",
+			Trust: 40, Held: w.Minute + 2*1440})
 
 	seen := map[string]Action{}
 	for i := range Locations {
@@ -133,7 +145,17 @@ func TestEveryPricedActionKeepsItsPrice(t *testing.T) {
 	}
 	missing, checked := []string{}, 0
 	for _, kind := range paysItsOwnWay {
+		// Three of these carry a person's id after the colon, so they are
+		// matched on the prefix and the first one found stands for the rest.
 		a, offered := seen[kind]
+		if !offered && strings.HasSuffix(kind, ":") {
+			for id, found := range seen {
+				if strings.HasPrefix(id, kind) {
+					a, offered = found, true
+					break
+				}
+			}
+		}
 		if !offered {
 			missing = append(missing, kind)
 			continue

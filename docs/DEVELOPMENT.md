@@ -4440,3 +4440,53 @@ The shape is closed. Twenty actions pay their own way, all twenty say so, and a
 new one that does not will not be caught by any test from outside — that is
 stated plainly rather than implied, because the guard protects what exists and
 cannot know what has not been written.
+
+## Bail was charged twice
+
+I had recorded, and written into the previous slice, that the engine charges a
+declared cost only in the final switch, so the actions carrying a person's name
+after a colon were exempt. That was wrong. The line that takes the money sits
+above the whole prefix chain and runs for every action in the game.
+
+Bailing somebody out declared the fee on the button and paid it again inside the
+effect. A three-day bail costs $960 and took $1,920. The test measures the
+pocket, not the ledger, and subtracts what the same hour costs in a second world
+that does not bail anyone, so the fee stands alone:
+
+```
+bail of $960 took $1920 out of the pocket (spent 1864, the hour itself costs -56)
+```
+
+Fixing it broke an older test, which is the best thing that happened here. A
+declared cost also disables the button when the player cannot afford it, and a
+display-only price does not. The affordability gate had been riding on the same
+field as the charge, and moving one silently dropped the other. The readiness
+function is now passed explicitly.
+
+The narrow fix is worth less than the rule, so the rule is a test: nothing the
+prefix chain handles may declare a cost. The thirteen prefixes are written out
+by hand rather than derived from the file the rule is about, because a list
+built from the code would agree with the code no matter what the code said.
+
+Two silent prices turned up in the same reading. Signing somebody on and paying
+somebody a share both pay their own way and both showed no money on the button.
+They were missed the first time because the earlier guard matched exact action
+names and these carry a person's id. It now matches on the prefix, and the test
+world has somebody of the player's in a bar and somebody of theirs in a cell so
+that all three are actually exercised. Both failure modes fail:
+
+```
+share: pays its own fee and names no price
+sign:  ...also declares a cost of 140, so the money would go out twice
+```
+
+A share cost sixty dollars in three places — the gate, the payment and the
+button — as a bare number in each. It is `ShareCost` now.
+
+Scope: this covers actions reachable in a well-supplied city and a cell. Twenty-
+five of the twenty-six named are exercised; a remedy is not offered anywhere in
+that city, so it is checked by reading and not by the test.
+
+Evidence: `core/double_charge_test.go`, `core/asks_test.go`. `mise run verify`
+and `npm test` green at 34, `mise run simulate` unchanged at defiant 52 /
+investor 0 / reckless 82 / worker 0, 0 errors, cash 7122 / 14019 / 90 / 12360.

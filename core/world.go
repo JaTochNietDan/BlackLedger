@@ -772,7 +772,7 @@ func (w *World) Actions(id string) []Action {
 			days := (n.Held - w.Minute + 1439) / 1440
 			// The ledger entry this writes has always counted correctly; the
 			// description beside it said "for the 1 days still on them".
-			add("bail:"+n.ID, "Bail out "+n.Name, 60, days*BailDaily, "",
+			asks("bail:"+n.ID, "Bail out "+n.Name, 60, days*BailDaily, w.BailReadiness(n.ID),
 				fmt.Sprintf("$%d for the %s still on them. They come out owing you, which is not the same as being grateful.",
 					days*BailDaily, plainly(days, "day", counted(days, "day", "days"))))
 		}
@@ -1221,8 +1221,8 @@ func (w *World) Actions(id string) []Action {
 		if n.Location != id {
 			continue
 		}
-		add("share:"+n.ID, "Pay "+n.Name+" a share", 15, 0, w.PayShareReadiness(n.ID),
-			fmt.Sprintf("$60. They think of you at %d of 100. Below %d they start looking for somewhere else to be, and somebody ambitious who leaves takes a business with them.", n.Trust, DefectionTrust))
+		asks("share:"+n.ID, "Pay "+n.Name+" a share", 15, ShareCost, w.PayShareReadiness(n.ID),
+			fmt.Sprintf("They think of you at %d of 100. Below %d they start looking for somewhere else to be, and somebody ambitious who leaves takes a business with them.", n.Trust, DefectionTrust))
 		add("dismiss:"+n.ID, "Put "+n.Name+" out", 15, 0, w.LetGoReadiness(n.ID),
 			fmt.Sprintf("Ends the $%d a day. Nobody takes that as well as they pretend to.", MemberWage))
 	}
@@ -1234,7 +1234,7 @@ func (w *World) Actions(id string) []Action {
 		if IsOfficial(n.ID) || w.isRoleHolder(n) {
 			continue
 		}
-		add("sign:"+n.ID, "Put "+n.Name+" on", 45, 0, w.SignOnReadiness(n.ID),
+		asks("sign:"+n.ID, "Put "+n.Name+" on", 45, SigningCost, w.SignOnReadiness(n.ID),
 			fmt.Sprintf("$%d up front and $%d a day. Adds to what your organization is worth in a fight, stands in front of what comes at you, and can decide one morning that it is not worth it.", SigningCost, MemberWage))
 		break
 	}

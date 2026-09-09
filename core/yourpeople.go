@@ -15,6 +15,9 @@ const (
 	// SigningCost is what it takes to put somebody on. It is a week up front,
 	// the same arrangement the businesses use.
 	SigningCost = 140
+	// ShareCost is what a share out of your own pocket costs. It was written
+	// as a bare 60 in three places: the gate, the payment and the button.
+	ShareCost = 60
 	// MemberWage is what one of your own costs a day.
 	MemberWage = 14
 	// MemberTrust is what somebody starts at when they sign on.
@@ -116,7 +119,7 @@ func (w *World) PayShareReadiness(id string) string {
 	if w.NPC(id).Trust >= 100 {
 		return "They could not think better of you than they already do"
 	}
-	if w.Player.Cash < 60 {
+	if w.Player.Cash < ShareCost {
 		return "Not enough cash"
 	}
 	return ""
@@ -127,13 +130,13 @@ func (w *World) PayShare(id string) error {
 	if reason := w.PayShareReadiness(id); reason != "" {
 		return fmt.Errorf("%s", reason)
 	}
-	if err := w.Pay(60); err != nil {
+	if err := w.Pay(ShareCost); err != nil {
 		return err
 	}
 	n := w.NPC(id)
 	before := n.Trust
 	n.Trust = min(100, before+25)
-	w.Log("A share for "+n.Name, fmt.Sprintf("$60 out of your own pocket. They think of you at %d rather than %d.", n.Trust, before), "politics")
+	w.Log("A share for "+n.Name, fmt.Sprintf("$%d out of your own pocket. They think of you at %d rather than %d.", ShareCost, n.Trust, before), "politics")
 	return nil
 }
 
