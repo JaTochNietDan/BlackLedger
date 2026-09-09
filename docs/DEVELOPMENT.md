@@ -4969,3 +4969,74 @@ worker 0 with $10 of movement in one median, which is expected: those campaigns
 run seven to thirteen days and a family's money takes a month to say anything.
 
 Evidence: `core/desperation_test.go`. All gates green, `npm test` 41.
+
+
+## What the inbox asked for, and what came of it
+
+Both entries the user wrote are now built, so they come out of the inbox and are
+recorded here in their original wording. The rule is that an entry stays in the
+inbox until it genuinely exists in the game, which is what keeps that list
+honest.
+
+> Something to add to the inbox, we should be tracking money that other living
+> NPCs have, their families have etc. remember it's a living world and all the
+> other living NPCs are just like us so we have to ensure that's all fleshed out.
+> Then their money can also play into their decision making from the AI director.
+> I'd imagine that a family with a lot of money would be more stable but also more
+> of a target while a family with little money might be struggling and also more
+> aggressive and unpredictable as they're trying to survive. This type of stuff
+> >
+> Following on from fleshing that out I'd imagine that there's a way to wage war
+> against a family by starving it financially by decimating businesses or taking
+> them over that they get money from and then they won't be able to pay wages for
+> their people and it'll weaken them. This is a whole section of the game I want
+> you to flesh out in a continuous loop. I also want you to start expanding the
+> businesses available in the game. Also did we manage to build out the specific
+> unique UI for gambling? So that looks like a proper game of roulette or
+> blackjack you're playing and not just text buttons on a screen, think actual
+> playing cards, table, etc
+
+What was built, in the order it happened: families got a daily bill so their
+money meant something; the starvation war was made to work, because a stripped
+family used to fade on a timer that outran its money and so losing the
+businesses caused nothing; everybody in the city got a purse of their own; the
+director was told how each family is placed, and then measured and found to
+ignore it; four businesses were added, each with its own kind of trouble; the
+gambling tables were built with real cards and a real wheel; and money was made
+to press on a quarrel.
+
+Two of those are worth remembering for what they cost. Adding the businesses
+crashed the live save, because the repair that gives an old campaign a new
+address sat behind a version check that adding content does not trip. And the
+money-pressure measurement reported a clean result in both directions before the
+mechanism existed, because the two cities being compared were never running the
+same run of luck.
+
+## A family ends and its people are still on its books
+
+The inbox is empty, so this is my own choosing. When an organization is
+destroyed the city writes its obituary, drops it from the world and forgets it.
+Nine people go on answering to it. Their record names a family that no longer
+exists, everything that tries to look it up finds nothing, and they keep
+standing in rooms working for nobody.
+
+The fix was already written. `orphan` exists, its comment says it is for exactly
+this — "so nobody is left answering to an id that resolves to nothing" — and it
+was only ever called when the *player's* organization ended. Neither path that
+destroys a family called it. That is a rule applied to one case and not to the
+identical one beside it, which is now the twenty-fourth shape on the list.
+
+Both paths call it now, and the ledger says what became of them, because an
+organization ending is something that happens to people rather than to a row in
+a table.
+
+Two prose faults came out of it, both mine and both caught by guards that were
+already there. My first wording put men on the street, and nobody in this city
+has a gender the game ever recorded. And the line the paper prints when a war
+ends with somebody holding nothing had no verb agreement, so a family called
+somebody's people "is not holding anything any more" — I fixed the
+capitalisation of that same sentence one slice ago and did not read the verb.
+More families reach that state now, which is why it surfaced today.
+
+Evidence: `core/orphans_test.go`, and both calls verified by removing them. All
+gates green, `npm test` 41.

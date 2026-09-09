@@ -106,22 +106,7 @@ into `docs/DEVELOPMENT.md` once they are actually built and tested. An entry
 stays here, in the original wording, until it is genuinely implemented — so if
 it is still in this list, it does not exist in the game yet.
 
-Something to add to the inbox, we should be tracking money that other living
-NPCs have, their families have etc. remember it's a living world and all the
-other living NPCs are just like us so we have to ensure that's all fleshed out.
-Then their money can also play into their decision making from the AI director.
-I'd imagine that a family with a lot of money would be more stable but also more
-of a target while a family with little money might be struggling and also more
-aggressive and unpredictable as they're trying to survive. This type of stuff
-
-Following on from fleshing that out I'd imagine that there's a way to wage war
-against a family by starving it financially by decimating businesses or taking
-them over that they get money from and then they won't be able to pay wages for
-their people and it'll weaken them. This is a whole section of the game I want
-you to flesh out in a continuous loop. I also want you to start expanding the
-businesses available in the game. Also did we manage to build out the specific
-unique UI for gambling? So that looks like a proper game of roulette or
-blackjack you're playing and not just text buttons on a screen, think actual
-playing cards, table, etc
+*Empty. Everything that was here has been built and is written up in
+`docs/DEVELOPMENT.md`.*
 
 Ultiamtely the expectation is that I don't have to think of all of these concepts, you, the agent will think of these too and build them out and playtest and simulate them yourself.

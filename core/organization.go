@@ -122,6 +122,10 @@ func (w *World) OrganizationDay() {
 // gone. Their premises pass to their estate the way they always did, and the
 // name goes with them.
 func (w *World) Dissolve(id string) {
+	// Whoever answered to it answers to nobody now. Both paths that end an
+	// organization have to do this or the city keeps people on the books of a
+	// family it can no longer look up.
+	w.orphan(id)
 	kept := w.Factions[:0]
 	for _, f := range w.Factions {
 		if f.ID != id {

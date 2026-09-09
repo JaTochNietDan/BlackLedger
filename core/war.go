@@ -268,8 +268,16 @@ func (w *World) dissolve() {
 		}
 		if len(w.FamilyHoldings(f.ID)) == 0 && f.Power <= 15 && len(w.Factions)-len(gone) > 2 {
 			gone[f.ID] = true
-			w.Log("An organization ends", fmt.Sprintf("%s no longer %s anything worth defending. What remains of it answers to someone else now.",
-				Leads(f.Name), Agree(f.Name, "holds", "hold")), "politics")
+			// The people. `orphan` exists for exactly this and was written for
+			// exactly this reason — nobody left answering to an id that
+			// resolves to nothing — and this path had never called it, so a
+			// family could be buried and nine men would go on working for it.
+			// They are out of work now, and the city is told how many, because
+			// an organization ending is a thing that happens to people.
+			out := len(w.Members(f.ID))
+			w.orphan(f.ID)
+			w.Log("An organization ends", fmt.Sprintf("%s no longer %s anything worth defending. %s out of work and on the street tonight.",
+				Leads(f.Name), Agree(f.Name, "holds", "hold"), counted(out, "person is", "people are")), "politics")
 			w.Report("collapse", "END OF "+strings.ToUpper(f.Name),
 				fmt.Sprintf("%s %s ceased to operate as an organization. Its remaining interests have been absorbed by others.",
 					Leads(f.Name), Agree(f.Name, "has", "have")))
@@ -513,7 +521,7 @@ func (w *World) howItEnded(a, b *Faction) string {
 		beaten = b.Name
 	}
 	if beaten != "" {
-		return fmt.Sprintf("%s is not holding anything in the district any more. Whether that is the end of them is a question nobody is asking out loud.", Leads(beaten))
+		return fmt.Sprintf("%s %s not holding anything in the district any more. Whether that is the end of them is a question nobody is asking out loud.", Leads(beaten), Agree(beaten, "is", "are"))
 	}
 	return fmt.Sprintf("%s and %s have stopped short of destroying each other. Both are smaller than they were, and both are still here.", Leads(a.Name), b.Name)
 }
