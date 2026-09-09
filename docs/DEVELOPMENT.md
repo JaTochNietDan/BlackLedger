@@ -3042,3 +3042,45 @@ properties in `core/sitdown_test.go`, one holding that an agreed meeting is not
 called off by a point, one holding that a real refusal names the family and the
 figure. `mise run verify`, `npm test` green, `mise run simulate` unchanged at
 52 / 0 / 82 / 0.
+
+## An action the game offers is an action the game accepts
+
+The sitdown fault was not going to be unique. Every action whose work is done
+after the clock advances can refuse for a reason that became true during the
+hours it took, and there are ten of them in the command path: `sit_out`,
+`lawyer`, `talk`, `post`, `unpost`, `operate:*`, `incite`, `move`, `sabotage`
+and the sitdown.
+
+So I wrote the rule down as a property instead of chasing them one at a time.
+`TestEveryOfferedActionIsAccepted` walks forty campaigns through varied money,
+standing, health and clock positions, and for every action the game lists as
+*available* it executes that action and requires it to succeed. **2,264 offers
+across 36 distinct actions, all accepted.**
+
+**And then it failed to catch the thing it was written for, which is worth more
+than the test.** I reverted the sitdown fix and ran it: green. Random states
+almost never sit a value exactly on a threshold, and that is precisely where
+this class lives — a family at −26 against a limit of −25.
+
+So I added a second pass that puts the world *on* the boundaries: every faction
+at exactly the standing a sitdown needs, cash at exactly the fee, respect at
+exactly the requirement, and the clock started so the hours an action takes will
+cross the point where organizations reconsider each other. Reverted the fix
+again: **still green.**
+
+I could not make a fixture reproduce it. The one-point drift needs a live
+campaign's accumulated history — business demands, retaliation, standing moved
+by things the player did days ago — and a world built at rest does not have any.
+
+**So the honest account is this.** The new test asserts a real invariant over
+2,264 offers and would catch a new action added with a mismatched gate, which is
+the common form of this fault. It does **not** cover the timing-drift form. The
+only instrument that has ever caught that is `cmd/apicheck` driving a real save,
+which found it originally and now runs clean over eighty-eight runs across four
+fresh campaigns.
+
+A test that passes when you break the code is not evidence, and saying which
+part of the class it covers is the difference between a guard and a comfort.
+
+Evidence: `core/offered_test.go`, twenty-two more clean apicheck runs, `mise run
+verify` and `npm test` green, `mise run simulate` unchanged at 52 / 0 / 82 / 0.
