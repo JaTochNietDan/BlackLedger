@@ -368,13 +368,39 @@ func (w *World) FactionTurn() {
 				switch c.State {
 				case "war":
 					w.Log("Open war in the city", fmt.Sprintf("%s and %s are now at war. Their quarrel is not yours, but the city will feel it.", a.Name, b.Name), "politics")
-					w.Report("war", "OPEN WAR ON THE WATERFRONT",
+					// Named. Every war in the city used to be reported under the
+					// same headline, so a player who read the paper twice could
+					// not tell that the second one was a different war.
+					w.Report("war", upper(a.Name)+" AND "+upper(b.Name)+" AT WAR",
 						fmt.Sprintf("Violence between %s and %s has escalated beyond the usual. Businesses in the affected districts are advised that the police cannot guarantee protection.", a.Name, b.Name))
 				case "feud":
+					// A quarrel reaching this state means two opposite things
+					// depending on where it came from. Coming up from cold, two
+					// families have stopped speaking. Coming down from war, the
+					// shooting has stopped — and the first version of this
+					// printed "bad blood between them" the day a war ended,
+					// which is the wrong story told at the wrong moment.
+					if previous == "war" {
+						w.Log("A war burns out", fmt.Sprintf("%s and %s have stopped short of destroying each other.", a.Name, b.Name), "politics")
+						w.Report("politics", "THE FIGHTING STOPS BETWEEN "+upper(a.Name)+" AND "+upper(b.Name),
+							w.howItEnded(a, b))
+						break
+					}
 					w.Log("A quarrel hardens", fmt.Sprintf("%s and %s are no longer on speaking terms.", a.Name, b.Name), "politics")
+					// A quarrel hardening was written only into the player's own
+					// record, so the city could be two moves from a war and the
+					// paper had never mentioned it.
+					w.Report("civic", "BAD BLOOD BETWEEN "+upper(a.Name)+" AND "+upper(b.Name),
+						fmt.Sprintf("%s and %s are no longer on speaking terms, by the account of people who deal with both. Nothing has been said openly and nothing needs to be.", a.Name, b.Name))
 				case "cold":
 					if previous == "war" {
 						w.Log("A war burns out", fmt.Sprintf("%s and %s have stopped short of destroying each other.", a.Name, b.Name), "politics")
+						// And the end of a war was never reported at all: the
+						// paper announced every war and never once said one was
+						// over, so as far as a reader could tell they were all
+						// still running.
+						w.Report("politics", "THE FIGHTING STOPS BETWEEN "+upper(a.Name)+" AND "+upper(b.Name),
+							w.howItEnded(a, b))
 					}
 				}
 			}
@@ -448,4 +474,22 @@ func (w *World) HolderName(id string) string {
 		return f.Name
 	}
 	return prop.Owner
+}
+
+
+// howItEnded says why the shooting stopped, from what is left on the ground.
+// A war that burned out and a war that finished somebody are the same
+// transition in the model and are not the same story in the city.
+func (w *World) howItEnded(a, b *Faction) string {
+	beaten := ""
+	switch {
+	case len(w.FamilyHoldings(a.ID)) == 0:
+		beaten = a.Name
+	case len(w.FamilyHoldings(b.ID)) == 0:
+		beaten = b.Name
+	}
+	if beaten != "" {
+		return fmt.Sprintf("%s is not holding anything in the district any more. Whether that is the end of them is a question nobody is asking out loud.", beaten)
+	}
+	return fmt.Sprintf("%s and %s have stopped short of destroying each other. Both are smaller than they were, and both are still here.", a.Name, b.Name)
 }
