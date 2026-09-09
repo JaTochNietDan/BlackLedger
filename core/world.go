@@ -441,7 +441,15 @@ type Action struct {
 	Subject  string `json:"subject,omitempty"`
 	ID       string `json:"id"`
 	Label    string `json:"label"`
-	Minutes  int    `json:"minutes"`
+	Minutes int `json:"minutes"`
+	// Away is time the action spends that Minutes does not, because the effect
+	// runs the clock itself. Only the trips out of the city do this: they run
+	// day by day so that what happens while the player is gone happens to a
+	// city they are not standing in. Minutes is what the command layer spends
+	// and had to stay zero; the panel prints the cost of an action from it, so
+	// the longest actions in the game showed no time at all beside "Rest for
+	// four hours · 240 min".
+	Away     int    `json:"away,omitempty"`
 	Cost     int    `json:"cost"`
 	Disabled bool   `json:"disabled"`
 	Reason   string `json:"reason"`
@@ -690,13 +698,21 @@ func (w *World) Actions(id string) []Action {
 				subject = who
 			}
 		}
-		out = append(out, Action{GroupOf(id), subject, id, label, minutes, cost, reason != "", reason, detail, l.ID})
+		out = append(out, Action{Group: GroupOf(id), Subject: subject, ID: id, Label: label, Minutes: minutes, Cost: cost, Disabled: reason != "", Reason: reason, Detail: detail, Target: l.ID})
 	}
 	// about names the person the action just added is aimed at, for the ones
 	// that put a name in the label rather than in the id.
 	about := func(who string) {
 		if len(out) > 0 {
 			out[len(out)-1].Subject = who
+		}
+	}
+	// away offers work whose effect runs the clock itself, so the panel can
+	// print how long it takes without the command layer spending it twice.
+	away := func(id, label string, minutes int, reason, detail string) {
+		add(id, label, 0, 0, reason, detail)
+		if len(out) > 0 {
+			out[len(out)-1].Away = minutes
 		}
 	}
 	need := func(b bool, s string) string {
@@ -899,7 +915,7 @@ func (w *World) Actions(id string) []Action {
 			// Minutes are zero here because Trip runs the days itself, a day at
 			// a time, so that what happens in the city while the player is
 			// away happens to a city the player is not standing in.
-			add("trip:"+d.ID, "Travel to "+d.Name, 0, 0, w.TripReadiness(d.ID),
+			away("trip:"+d.ID, "Travel to "+d.Name, d.Days*1440, w.TripReadiness(d.ID),
 				fmt.Sprintf("%s %s $%d all in and %d days away. The city runs without you: businesses go unwatched, work you promised runs down, and anything arranged for you happens to an empty house. Attention falls %d a day while you are gone.", d.Blurb, d.Purpose, w.TripCost(d.ID), d.Days, d.Relief))
 		}
 		for i := range w.Factions {

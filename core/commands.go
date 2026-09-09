@@ -332,7 +332,11 @@ func (w *World) apply(c Command) error {
 			case "crew_bonus":
 				before := p.Crew[0].Loyalty
 				p.Crew[0].Loyalty = min(100, before+25)
-				w.Log("A share for Leo", fmt.Sprintf("You paid a $40 bonus. Loyalty rose from %d to %d.", before, p.Crew[0].Loyalty), "personal")
+				// The last hardcoded name in the game, and it survived the sweep
+				// that found the others because the pattern looked for a quote
+				// before the name or a space after it, and this one sits at the
+				// end of a string.
+				w.Log("A share for "+p.Crew[0].Name, fmt.Sprintf("You paid a $40 bonus. Loyalty rose from %d to %d.", before, p.Crew[0].Loyalty), "personal")
 			case "delegate":
 				w.SendOnCollections()
 			case "provoke":

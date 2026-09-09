@@ -4221,3 +4221,54 @@ no total of its own, so there is no arithmetic to reconcile there; the market
 lists three goods with a price and a reference price each and nothing that
 sums; and the district names in the view are not a copy of a core table — core
 has no such table, it names them in prose.
+
+## The rules the game prints about itself
+
+The guide prints six rules as prose. Each is a claim about the code, and the
+page beside them had already turned out to be wrong about itself twice, so I
+asked three of them rather than assuming.
+
+**"The clock only moves when you commit to something."** Read as a property: an
+action declaring no time must not move the clock. Twenty-four free actions were
+taken across two cities and every one of them was honest, except the three trips
+out of the city. Those declare zero minutes and cost two, three and four days.
+The reason is sound — a trip runs the clock a day at a time so that what happens
+while the player is away happens to a city they are not standing in — but zero
+is also what the panel prints the cost from, so the longest actions in the game
+showed no time at all beside "Rest for four hours · 240 min". The description
+said "2 days away" and the button said nothing.
+
+An action can now declare time its effect will spend itself, and the trips read
+"2 days away" where everything else reads its minutes. The command layer still
+spends nothing, so nobody is sent away for a fortnight.
+
+**"Attention is public and so are the thresholds."** The sentence quotes two
+constants; it quotes the right ones, and they are in the right order. Clean.
+
+**"Anybody out on the street cannot be dealt with until they arrive."** True, and
+kept in two places rather than one: somebody walking is not in the room, so most
+work about them is never offered, and anything that still is gets refused. The
+test states both halves, including that the same work becomes possible again
+when they stop walking — otherwise it would pass for somebody nobody can ever
+deal with.
+
+**One more hardcoded name, in a class I had declared clean.** Paying the crew a
+bonus wrote "A share for Leo" whoever was actually on the books. My earlier
+sweep missed it because the pattern looked for a quote before the name or a
+space after it, and this one sits at the end of a string. Correcting the record:
+that sweep was not clean, and the lesson is that a grep anchored on delimiters
+misses the cases at a string's edge.
+
+Eighteenth near-miss, and the second time the same trap has caught me: my first
+fixture for the street rule picked the fixer, who is refused earlier and
+correctly for a reason that has nothing to do with the street. The second picked
+somebody I had appended to the city, who never receives a lending offer because
+only the first few people in a room do. The test now takes whoever the game is
+actually offering.
+
+Evidence: `core/stated_rules_test.go` holds the three properties. Reverting the
+trips to a bare zero fails the first; the others fail if the constants or the
+street rule move. `mise run verify` and `npm test` green (34 tests), `mise run
+simulate` unchanged at defiant 52 / investor 0 / reckless 82 / worker 0, 0
+errors. Verified over HTTP on a driven save: the three trips report 2,880, 4,320
+and 5,760 minutes away where they used to report nothing.
