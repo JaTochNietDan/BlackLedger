@@ -251,7 +251,7 @@ func (w *World) takeFromSomebody(n *NPC) {
 
 	if f := w.faction(prop.Owner); f != nil {
 		f.Cash = max(0, f.Cash-take)
-		w.Log("Taken from "+place.Name, fmt.Sprintf("%s helped themselves to $%d of %s money at %s.", n.Name, take, f.Name, place.Name), "politics")
+		w.Log("Taken from "+place.Name, theftLine(n.Name, take, f.Name, place.Name), "politics")
 		w.Report("robbery", "ROBBERY AT "+upper(place.Name),
 			w.unattributed(place.Name, fmt.Sprintf("A sum was taken from %s, an establishment associated with %s.", place.Name, f.Name)))
 		return
@@ -259,4 +259,15 @@ func (w *World) takeFromSomebody(n *NPC) {
 	w.Log("Taken from "+place.Name, fmt.Sprintf("%s helped themselves to $%d at %s.", n.Name, take, place.Name), "politics")
 	w.Report("robbery", "ROBBERY AT "+upper(place.Name),
 		w.unattributed(place.Name, fmt.Sprintf("The day's takings were taken from %s.", place.Name)))
+}
+
+// theftLine says whose money was taken without putting a possessive after an
+// organization's name. The seeded families read fine either way — "$133 of
+// Bellandi Family money" is ordinary attributive English — but the living
+// world names the families it makes after the person who broke away, and
+// "$133 of Franca Sabbatini's people money" stacks one possessive on another.
+// Read on the Ledger screen in a browser. The verb follows the name too.
+func theftLine(who string, take int, family, place string) string {
+	return fmt.Sprintf("%s helped themselves to $%d of what %s %s at %s.",
+		who, take, family, Agree(family, "keeps", "keep"), place)
 }

@@ -3700,3 +3700,42 @@ out there back into the city", and the garage reads "What a garage does, once
 there is something of yours in it". `mise run verify` and `npm test` green,
 `mise run simulate` unchanged at defiant 52 / investor 0 / reckless 82 / worker
 0, 0 errors.
+
+## A possessive stacked on a family that names itself after a person
+
+Read the Ledger screen in a browser — the last screen I had never read. The
+running totals and the filters are sound: "$0 a day from 0 businesses" agrees,
+and the eight filter counts sum exactly to the sixty entries the search box
+offers. One entry did not read.
+
+> Sofia Doyle helped themselves to $133 of Franca Sabbatini's people money at
+> Bluebird Laundry.
+
+Splinter families are named after whoever broke away, so their names already end
+in a possessive plural. Putting "money" after one stacks a second possessive on
+the first. The seeded families are why this survived: "$133 of Bellandi Family
+money" is ordinary attributive English, and every campaign starts with two
+families that read fine. It only breaks on the names the living world makes for
+itself, and making families is most of what the living world does — thirty-nine
+created across eighty long campaigns.
+
+The line now says what was taken without a possessive at all, and agrees its
+verb with the name through `Agree`, the helper already used for exactly this
+class of organization name:
+
+| name | reads |
+| --- | --- |
+| Bellandi Family | of what Bellandi Family keeps at Bluebird Laundry |
+| Franca Sabbatini's people | of what Franca Sabbatini's people keep at Bluebird Laundry |
+| the Duarte Brothers | of what the Duarte Brothers keep at Bluebird Laundry |
+
+Evidence: `core/possessive_test.go` runs the line through four shapes of family
+name and checks both the possessive and the verb. It fails when the old form is
+put back, on the verb for the singular names and on the possessive for the
+plural ones. `mise run verify` and `npm test` green, `mise run simulate`
+unchanged at defiant 52 / investor 0 / reckless 82 / worker 0, 0 errors.
+
+Also checked on that screen and correct, so it is not chased again: a commission
+in progress reads "$0 of $900 taken out of Franca Sabbatini's people", which
+looks like the zero-figure fault fixed above and is not — it is progress against
+a target, and nothing has been taken yet.
