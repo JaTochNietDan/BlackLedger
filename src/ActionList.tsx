@@ -1,6 +1,7 @@
 import {useMemo,useState} from 'react';
 import type {ReactElement} from 'react';
-import type {Action,Presence} from './types';
+import type {Action,Group,Presence} from './types';
+import {placeActions} from './grouping';
 
 // A location was a set of premises with a list of verbs attached. But half of
 // what a player does anywhere is done to somebody who happens to be standing
@@ -12,14 +13,15 @@ import type {Action,Presence} from './types';
 // it with their own work under their own names, then everything else that is
 // neither.
 
-const groupTitles: [string, string, string][] = [
-  ['work', 'Work', 'Jobs that pay today'],
-  ['business', 'These premises', 'Keeping what you own earning'],
-  ['street', 'The street', 'Work that can go wrong'],
-  ['standing', 'Standing', 'Who you are to this city'],
-  ['money', 'Money', 'Moving it, hiding it, spending it'],
-  ['travel', 'Elsewhere', 'Leaving where you are standing'],
-];
+// The groups come from the core, which owns them and says so. This file used to
+// keep its own copy of the list and the copy had drifted: it was missing
+// "people", so any action in that group whose subject was not standing in the
+// room vanished from the panel — no button, no reason, nothing. Paying the crew
+// a bonus while they are out on collections is the ordinary case of that.
+//
+// The fallback below is the same one the core applies to an action nobody has
+// classified: put it under work rather than lose it.
+const lastResort: Group = {id: 'work', title: 'Work', blurb: 'Jobs that pay today'};
 
 function Person({who, actions, render}: {who: Presence; actions: Action[]; render: (a: Action) => ReactElement}) {
   const [open, setOpen] = useState(false);
@@ -50,7 +52,7 @@ function Person({who, actions, render}: {who: Presence; actions: Action[]; rende
   </article>;
 }
 
-export function ActionList({actions, people, render, here = true}: {actions: Action[]; people: Presence[]; render: (a: Action) => ReactElement; here?: boolean}) {
+export function ActionList({actions, people, render, groups, here = true}: {actions: Action[]; people: Presence[]; render: (a: Action) => ReactElement; groups?: Group[]; here?: boolean}) {
   const [query, setQuery] = useState('');
   const [openBlocked, setOpenBlocked] = useState<Record<string, boolean>>({});
   const [showRoom, setShowRoom] = useState(false);
@@ -76,10 +78,9 @@ export function ActionList({actions, people, render, here = true}: {actions: Act
   const shown = new Set(present.map(p => p.who.id));
   const bystanders = people.filter(p => !shown.has(p.id));
 
-  const sections = groupTitles.map(([id, title, blurb]) => {
-    const mine = impersonal.filter(a => a.group === id);
-    return {id, title, blurb, open: mine.filter(a => !a.disabled), blocked: mine.filter(a => a.disabled)};
-  }).filter(s => s.open.length || s.blocked.length);
+  const sections = placeActions(groups?.length ? groups : [lastResort], impersonal)
+    .map(s => ({...s, open: s.mine.filter(a => !a.disabled), blocked: s.mine.filter(a => a.disabled)}))
+    .filter(s => s.open.length || s.blocked.length);
 
   const available = matches.filter(a => !a.disabled).length;
 

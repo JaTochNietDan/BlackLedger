@@ -4081,3 +4081,47 @@ like a family nobody will discuss, and that the crowd words are not the money
 words. All fail when the change is reverted. Read on screen against a save
 driven to day 32. `mise run verify` and `npm test` green, `mise run simulate`
 unchanged at defiant 52 / investor 0 / reckless 82 / worker 0, 0 errors.
+
+## The panel kept its own copy of a list the core owns
+
+Second reading of the room panel, with the arithmetic check that has been
+paying. The search box offered "Search 10 actions here" and the sections held
+nine. One action was not on the screen at all.
+
+The core owns the list of groups an action can belong to, complete with titles
+and blurbs, and says so in a comment: "Groups is the ordered list, for anything
+that renders them." Nothing rendered them. The panel kept its own copy of the
+list, and the copy was missing **people**. So every action in that group whose
+subject was not standing in the room fell out of the panel entirely — not
+greyed out with a reason, gone. Paying the crew a bonus while they are away on
+collections is the ordinary case, and the player could see neither the button
+nor why it was unavailable. Lending, collecting, extending and writing off a
+debt all live in that group too, and all vanish the moment the other person
+walks out of the room.
+
+The panel now renders from what the core sends, so the two cannot drift again,
+and anything carrying a group this build has not heard of joins the first
+section rather than falling out — the same fallback the core applies to an
+action nobody has classified.
+
+Sixteenth near-miss, and it mattered. Bail is in that same group, and I fixed
+bail's reachability the night before. My first thought on seeing this was that
+the fix had never actually reached the screen. It had: somebody held at the
+station is in that room, so bail attaches to their card and renders. Checking
+before writing saved a retraction.
+
+Evidence: `core/grouping_view_test.go` states from the core's side that every
+group an action can carry has a title, checked against every action the
+reachability sweep can produce across six kinds of city. `tests/grouping.test.mjs`
+states the panel's half: every action lands in a section, a group this build has
+not heard of is not dropped, nothing is placed twice, and no groups at all
+places nothing rather than guessing. Both halves fail when broken — removing the
+fallback loses the unknown group, and deleting "people" from the list reproduces
+the original bug exactly. Read on screen against a save driven to day 32, where
+the panel now shows a People section with the crew bonus behind "Show 1 you
+cannot do yet", and the sections add to ten.
+
+Also checked on that screen and correct: the books add up, income nought against
+costs of thirty-two, itemised as rent fifteen, crew twelve and the house five.
+`mise run verify` and `npm test` green (29 tests), `mise run simulate` unchanged
+at defiant 52 / investor 0 / reckless 82 / worker 0, 0 errors.

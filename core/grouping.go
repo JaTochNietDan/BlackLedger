@@ -19,7 +19,9 @@ import "strings"
 // what they own, then the people, then the risky work, then the slow work of
 // becoming somebody, then money, then leaving.
 type Group struct {
-	ID, Title, Blurb string
+	ID    string `json:"id"`
+	Title string `json:"title"`
+	Blurb string `json:"blurb"`
 }
 
 var groups = []Group{
