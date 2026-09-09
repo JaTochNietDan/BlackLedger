@@ -243,18 +243,12 @@ func (a *app) generate(snapshot *core.World) error {
 	log.Printf("Director correcting rejected proposal: %s", err)
 	return a.generateAttempt(snapshot, "Your last proposal failed validation: "+err.Error()+". Return a corrected complete proposal under the same constraints. Do not mention this correction in character dialogue.")
 }
-func (a *app) generateAttempt(snapshot *core.World, feedback string) error {
-	operation := snapshot.NextDirectorOperation()
-	connection := directorConnection(snapshot)
-	beneficiaries := []string{""}
-	for _, faction := range snapshot.Factions {
-		beneficiaries = append(beneficiaries, faction.ID)
-	}
+// directorContext assembles everything the model is told about the city. It is
+// a function of its own so that a comparison between two briefs can send the
+// real thing rather than a copy of it that could quietly fall out of step.
+func directorContext(snapshot *core.World, operation string, connection *core.ArrangementMemory, feedback string, beneficiaries []string, focused bool) map[string]any {
 	contextData := map[string]any{"allowed_beneficiary_ids": beneficiaries, "current_clock": fmt.Sprintf("Day %d, %02d:%02d", snapshot.Minute/1440+1, snapshot.Minute%1440/60, snapshot.Minute%60), "validation_feedback": feedback, "required_operation": operation, "required_connection": connection, "recent_arrangements": arrangementBriefs(snapshot), "life": snapshot.Life, "minute": snapshot.Minute, "player": snapshot.Player, "factions": snapshot.Factions, "npcs": snapshot.NPCs, "dead": snapshot.Dead, "places": core.Locations, "properties": snapshot.Properties, "recent_history": recentWorldChanges(snapshot)}
-	responseFormat := proposalSchema(snapshot, operation, connection)
-	activePrompt := prompt
-	if env("BLACK_LEDGER_DIRECTOR_BRIEF", "full") == "focused" {
-		activePrompt = focusedPrompt
+	if focused {
 		contextData = focusedContext(snapshot, operation, connection, feedback, beneficiaries)
 	}
 	attributeDirectorContext(contextData, snapshot, connection)
@@ -275,6 +269,23 @@ func (a *app) generateAttempt(snapshot *core.World, feedback string) error {
 	// an operation is. It wrote a story about collecting a debt when the game
 	// had asked for crates to be handed over, because nothing said otherwise.
 	contextData["job_brief"] = jobBrief(snapshot, operation, connection)
+	return contextData
+}
+
+func (a *app) generateAttempt(snapshot *core.World, feedback string) error {
+	operation := snapshot.NextDirectorOperation()
+	connection := directorConnection(snapshot)
+	beneficiaries := []string{""}
+	for _, faction := range snapshot.Factions {
+		beneficiaries = append(beneficiaries, faction.ID)
+	}
+	responseFormat := proposalSchema(snapshot, operation, connection)
+	activePrompt := prompt
+	focused := env("BLACK_LEDGER_DIRECTOR_BRIEF", "full") == "focused"
+	if focused {
+		activePrompt = focusedPrompt
+	}
+	contextData := directorContext(snapshot, operation, connection, feedback, beneficiaries, focused)
 	b, _ := json.Marshal(contextData)
 	// Experimental opt-in: reasoning shares the bounded generation budget with
 	// the final JSON. Requests remain asynchronous and bounded; structural

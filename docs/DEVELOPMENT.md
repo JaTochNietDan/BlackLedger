@@ -4681,3 +4681,45 @@ consulted by one button. A broke man and a comfortable one behave identically.
 
 Evidence: `core/placed_test.go`, `cmd/blackledger/director_money_test.go`. All
 gates green, `npm test` 34.
+
+## The director reads the money picture and writes the same thing anyway
+
+I shipped the money picture last slice and wrote explicitly that whether the
+model uses it was untested and unclaimed. This is that test, and the answer is
+no.
+
+One fixed city on one seed, one family driven into each of two states, eight
+requests each way against qwen3:14b, everything identical except whether
+`organization_money` was in the context:
+
+| | scenes reaching for a word about money |
+| --- | --- |
+| told, family cannot pay | 2 of 8 |
+| not told, family cannot pay | 3 of 8 |
+| told, family comfortable | 5 of 8 |
+| not told, family comfortable | 5 of 8 |
+
+Being told changes nothing. It is very slightly the wrong way round for the
+broke family, which at eight runs is noise rather than a finding.
+
+The measure is weak and that has to be said before the result is trusted. It
+counts words like wages, owe and short, which appear in perfectly ordinary job
+offers that have nothing to do with a family's finances — which is almost
+certainly why the comfortable family scores highest of the four. A better
+measure would ask what the speaker wants rather than which words they used.
+
+A hypothesis I have not tested: the full brief ships every faction record, every
+person, every property and the whole recent history, so one small key is easy to
+lose in it. The focused brief exists and sends far less. Comparing the two on
+this same question is the obvious next experiment, and it is not evidence yet.
+
+What this does not overturn: the four states are still the right thing for the
+core to know, and everything in the game that reasons about a family can now ask
+how it is placed. The claim that fails is only the one about the model.
+
+The context assembly was extracted into `directorContext` so this comparison
+sends the real payload rather than a copy that could quietly fall out of step
+with it.
+
+Evidence: `cmd/blackledger/director_compare_test.go`, which is skipped unless
+`BLACK_LEDGER_COMPARE` is set because it needs a model and takes seven minutes.
