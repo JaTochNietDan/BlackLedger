@@ -4319,3 +4319,45 @@ fail in one direction, and it happened to be the direction that was green.
 Breaking it again does not fail now, because with the fix in place both figures
 are close either way — so the flaw is latent rather than visible, and the
 arithmetic is tested directly instead of pretending otherwise.
+
+## The last two rules the game states, and no fault in either
+
+The remaining two of the six. Both hold, and the work was almost entirely in
+getting my own harness out of the way.
+
+**"What you built passes to the strongest of your own people and becomes an
+organization you can deal with, or fight."** The passing had been verified once.
+The second half never had. A player with three premises and three people of
+their own is killed, and the next life arrives to find all three premises and
+all three people under one name with a leader at its head — and the city offers
+the new arrival every ordinary way of dealing with it: asking around about it,
+reaching an understanding, going to work for it, running something about it in
+the paper. Its premises can be moved on like anybody else's. Nothing here needed
+changing.
+
+**"The city does not scale to you. An organization at ninety strength will kill
+you on your first day if you give it a reason."** A hundred and twenty new
+arrivals provoked the opening family and went home. Seventy-seven died. Forty-
+three were still standing two days later. Both halves are asserted: a majority
+must die, or the sentence is a warning the city does not mean, and some must
+live, or the provocation is not a risk but a way of ending the game.
+
+**Two near-misses in one test, both mine.** The first version cleared any scene
+that opened rather than answering it, and an attack arrives as a scene — so
+discarding it discarded the attack, and nobody died. The second version answered
+properly and still nobody died, because the player was left standing in the
+nightclub they had provoked for two days running, and `Attack` checks whether
+the player is at home before anything else. The car pulls up outside an empty
+room. A person is at home at night; the test now puts them there.
+
+That is the nineteenth and twentieth near-miss, and both had the same shape: a
+harness that avoided the thing it was measuring. It is worth saying plainly that
+"nobody died in a hundred and twenty cities" was twice a fact about my code.
+
+All six stated rules are now tested. One was false and is fixed — the player was
+taking a third more money out of a family than the city could take out of
+anybody. Five hold. Evidence: `core/inheritance_test.go` and
+`core/stated_rules_test.go`; both of these fail when broken, one when the
+holdings stop passing and one when the city stops killing. `mise run verify` and
+`npm test` green, `mise run simulate` unchanged at defiant 52 / investor 0 /
+reckless 82 / worker 0, 0 errors.
