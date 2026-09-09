@@ -203,7 +203,9 @@ func (w *World) contestAt(attacker, defender *Faction, weakest string) {
 			strings.ToUpper(place.Name)+" CHANGES HANDS")
 		return
 	}
-	w.Log("Trouble at "+place.Name, fmt.Sprintf("%s struck %s, a holding of %s. Its condition is now %d%%.", attacker.Name, place.Name, defender.Name, prop.Condition), "politics")
+	// A name that carries its own article begins the sentence, so it has to be
+	// capitalised: this read "the Duarte Brothers struck Saint Agnes".
+	w.Log("Trouble at "+place.Name, fmt.Sprintf("%s struck %s, a holding of %s. Its condition is now %d%%.", Leads(attacker.Name), place.Name, defender.Name, prop.Condition), "politics")
 }
 
 // classify names the state a quarrel is in. It is harder to enter a war than to
@@ -390,7 +392,7 @@ func (w *World) FactionTurn() {
 					// printed "bad blood between them" the day a war ended,
 					// which is the wrong story told at the wrong moment.
 					if previous == "war" {
-						w.Log("A war burns out", fmt.Sprintf("%s and %s have stopped short of destroying each other.", a.Name, b.Name), "politics")
+						w.Log("A war burns out", fmt.Sprintf("%s and %s have stopped short of destroying each other.", Leads(a.Name), b.Name), "politics")
 						w.Report("politics", "THE FIGHTING STOPS BETWEEN "+upper(a.Name)+" AND "+upper(b.Name),
 							w.howItEnded(a, b))
 						break
@@ -403,7 +405,7 @@ func (w *World) FactionTurn() {
 						fmt.Sprintf("%s and %s are no longer on speaking terms, by the account of people who deal with both. Nothing has been said openly and nothing needs to be.", a.Name, b.Name))
 				case "cold":
 					if previous == "war" {
-						w.Log("A war burns out", fmt.Sprintf("%s and %s have stopped short of destroying each other.", a.Name, b.Name), "politics")
+						w.Log("A war burns out", fmt.Sprintf("%s and %s have stopped short of destroying each other.", Leads(a.Name), b.Name), "politics")
 						// And the end of a war was never reported at all: the
 						// paper announced every war and never once said one was
 						// over, so as far as a reader could tell they were all
@@ -499,5 +501,5 @@ func (w *World) howItEnded(a, b *Faction) string {
 	if beaten != "" {
 		return fmt.Sprintf("%s is not holding anything in the district any more. Whether that is the end of them is a question nobody is asking out loud.", beaten)
 	}
-	return fmt.Sprintf("%s and %s have stopped short of destroying each other. Both are smaller than they were, and both are still here.", a.Name, b.Name)
+	return fmt.Sprintf("%s and %s have stopped short of destroying each other. Both are smaller than they were, and both are still here.", Leads(a.Name), b.Name)
 }

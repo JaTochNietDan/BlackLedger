@@ -3781,3 +3781,40 @@ One site that looks like the others and is correct, recorded so it is not
 the subject of an inquiry into their books. Y has not responded to the
 newspaper's questions", where Y is the leader rather than the family. A person
 takes a singular verb whatever their organization is called.
+
+## The same harness, pointed at three more kinds of name
+
+The agreement sweep proved a method rather than fixing one bug: build a city
+with the awkward case in it, run it forward, then read everything it wrote.
+`core/naming_scan_test.go` generalises that to the other name shapes the world
+can produce, and to a second hazard.
+
+**A name that carries its own article.** Splinter families come out as "the
+Duarte Brothers", and a name beginning with a lower-case "the" starts a sentence
+in lower case unless something capitalises it. `Leads` exists for exactly this
+and is used in eight places. Two more had missed it, and the second one is the
+reason this test runs five cities rather than one. The first city wrote "the
+Duarte Brothers struck Saint Agnes, a holding of Russo Outfit" and nothing else.
+Only a different seed ever wrote "the Duarte Brothers and Falcone Brothers have
+stopped short of destroying each other", because a sentence is only written when
+the world happens to do the thing that writes it. One run's luck is not
+evidence; the same line appears at three call sites and all three are fixed.
+
+**Two clean results, recorded as results.** A family whose leader's name ends in
+s — "Otto Reiss" — is written the same way everywhere: 21 possessives across 22
+passages, all "Reiss's", none in the other convention. And the player's own
+organization, which is named "<Player>'s people" and appears in prose a rival's
+never does, reads correctly in all 31 passages that name it: no lower-case
+sentence start, no verb disagreement. Neither needed a change.
+
+Evidence: the article scan fails on both sites when `Leads` is removed, and
+reports the two separately because they come from different seeds. `mise run
+verify` and `npm test` green, `mise run simulate` unchanged at defiant 52 /
+investor 0 / reckless 82 / worker 0, 0 errors.
+
+What this pass is really worth is the harness. `writings(w)` collects everything
+the city has written — ledger titles and bodies, newspaper headlines and
+bodies, every commission brief, and every label, description and refusal in all
+twelve rooms — and `live(t, w, n)` runs the world forward to produce it. Any
+future question of the form "does the game read correctly when X" is now a
+fixture plus a scan, run over several seeds.
