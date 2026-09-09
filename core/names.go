@@ -1,6 +1,9 @@
 package core
 
-import "strings"
+import (
+	"fmt"
+	"strings"
+)
 
 // Organizations are named by three separate systems — the seeded families, the
 // splinters, and whatever the player's own people end up being called — and the
@@ -32,6 +35,15 @@ func Agree(name, singular, plural string) string {
 	return singular
 }
 
+// titled is true for a role that already carries its own complement — "head of
+// the Russo Outfit", "runs Bluebird Laundry". A unique office named with what
+// it is an office of takes no article, and adding one printed "They were a head
+// of the Russo Outfit". This was introduced by the fix for "They were
+// Lieutenant" and found by reading the paper end to end a second time.
+func titled(role string) bool {
+	return strings.Contains(role, " of ") || strings.HasPrefix(strings.ToLower(role), "runs ")
+}
+
 // article picks "a" or "an" for a word. The obituaries read "They were
 // Lieutenant" until somebody read one.
 func article(word string) string {
@@ -50,4 +62,27 @@ func upper1(s string) string {
 		return s
 	}
 	return strings.ToUpper(s[:1]) + s[1:]
+}
+
+// spelled writes a small number the way a newspaper does. Prose that says "2
+// people in the same organization stood below them" reads like a report from a
+// machine, which in this case it was. Above twelve the paper uses figures, as
+// papers do.
+var numbers = []string{"no", "one", "two", "three", "four", "five", "six",
+	"seven", "eight", "nine", "ten", "eleven", "twelve"}
+
+func spelled(n int) string {
+	if n >= 0 && n < len(numbers) {
+		return numbers[n]
+	}
+	return fmt.Sprintf("%d", n)
+}
+
+// withArticle is a role fit to follow "They were": an ordinary job takes an
+// article, a titled office does not.
+func withArticle(job string) string {
+	if titled(job) {
+		return job
+	}
+	return article(job) + " " + job
 }

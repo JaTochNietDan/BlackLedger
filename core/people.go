@@ -253,14 +253,14 @@ func describeStanding(n *NPC, w *World) string {
 		// appending it again produced "Head of the Russo Outfit of Russo
 		// Outfit" in the Herald.
 		if strings.Contains(n.Role, f.Name) {
-			return "They were " + article(job) + " " + job
+			return "They were " + withArticle(job)
 		}
-		return "They were " + article(job) + " " + job + " of " + f.Name
+		return "They were " + withArticle(job) + " of " + f.Name
 	}
 	if job == "" {
 		return "They answered to nobody"
 	}
-	return "They were " + article(job) + " " + job
+	return "They were " + withArticle(job)
 }
 
 // Succeed promotes the strongest surviving member of an organization to lead it.

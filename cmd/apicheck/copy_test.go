@@ -14,9 +14,12 @@ func TestThePluralSubjectRuleKnowsWhatTheSubjectIs(t *testing.T) {
 		"Franca Sabbatini's people has people asking where you sleep.",
 		"They were a soldier a week ago. Franca Sabbatini's people is short of people.",
 		"Cesare Ferro's people holds the ground.",
+		"Nico Ward's people controls Saint Agnes now.",
 	}
 	fine := []string{
 		"Violence between Brenner Company and Franca Sabbatini's people has escalated beyond the usual.",
+		"Nico Ward's people moved against Saint Agnes and were driven off.",
+		"Nico Ward's people came for Bluebird Laundry.",
 		"Franca Sabbatini's people have taken Saint Agnes from Falcone Crew.",
 		"Bellandi Family has taken Saint Agnes.",
 		"Officers raided premises connected to Cesare Ferro's people.",

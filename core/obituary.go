@@ -54,9 +54,9 @@ func (w *World) obituary(n *NPC) (string, string) {
 	opening := "They answered to nobody."
 	if role := n.Role; role != "" {
 		job := lowerFirst(role)
-		opening = "They were " + article(job) + " " + job + "."
+		opening = "They were " + withArticle(job) + "."
 		if f := w.faction(n.Faction); f != nil && !sharesAName(role, f.Name) {
-			opening = "They were " + article(job) + " " + job + " of " + f.Name + "."
+			opening = "They were " + withArticle(job) + " of " + f.Name + "."
 		}
 	} else if f := w.faction(n.Faction); f != nil {
 		opening = "They were one of " + f.Name + "."
@@ -105,7 +105,7 @@ func (w *World) obituary(n *NPC) (string, string) {
 	if under == 1 {
 		after = " One person in the same organization stood below them, and will be told by somebody."
 	} else if under > 1 {
-		after = fmt.Sprintf(" %d people in the same organization stood below them, and will be told by somebody.", under)
+		after = fmt.Sprintf(" %s people in the same organization stood below them, and will be told by somebody.", upper1(spelled(under)))
 	}
 
 	return headline, opening + where + left + after

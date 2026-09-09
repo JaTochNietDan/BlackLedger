@@ -2301,3 +2301,56 @@ test loads a good with the old name to prove an old save reads correctly.
 Evidence: the loop driven end to end through the API against a forced save, one
 new property in `core/copy_test.go`, twelve clean apicheck runs, `mise run
 verify` and `npm test` green, `mise run simulate` unchanged at 53 / 0 / 82 / 0.
+
+## Reading the paper a second time
+
+Eight copy fixes had landed since anyone last read a campaign's paper end to
+end, and that read is what found most of them. So I drove a fresh save to day
+forty-seven, forty-six issues and two hundred and forty stories, and read it in
+order.
+
+It reads. Russo Outfit dies over ten days, and the sequence is legible as a
+story: an attempt on Vittorio Bellandi, an explosion at Mercer Exchange, Ennio
+Zanetti knifed in the crowd *over what happened to Perla Moreau*, Elena Russo
+shot at the loading doors having *gone after Vittorio Bellandi over what
+happened to Ennio Zanetti*, END OF RUSSO OUTFIT, and the obituaries following a
+day behind each death. That is the thing the simulation is for and it survives
+being read as prose.
+
+**Four faults, and two of them were mine from earlier tonight.**
+
+`They were a head of the Russo Outfit.` The fix for "They were Lieutenant" gave
+every role an article, and a role that already carries its own complement takes
+none. A titled office is now recognised as one.
+
+`There were twice such incidents before the day was out.` The run-collapsing
+used a frequency where a count belongs. It says "two such incidents" now, while
+the robbery sentence keeps the frequency, because that sentence wants one.
+
+`2 people in the same organization stood below them.` A 1953 newspaper spells
+small numbers, and prose with a numeral in it reads like a report from a
+machine, which it was.
+
+`Franca Sabbatini's people now controls Bluebird Laundry.` A plural name with a
+singular verb in a site the plural-subject scan did not cover, because its verb
+list stopped at "holds".
+
+**And one that is not a copy fault at all.** `DETECTIVE HARLOW TAKES OVER THE
+BLUE HOUR` — the city detective had walked off his beat and seized a casino.
+The guard on that excluded the officials and the heads of organizations but not
+the people holding the city's standing jobs. `keepsPost`, written for the NPC
+routines, is exactly that predicate, and it is the guard now. Premises still
+turn over: five in the next fifty-three-day campaign, all ordinary people.
+Balance moved defiant 53 → 52, which is a real behavioural change and a small
+one. New baseline 52 / 0 / 82 / 0.
+
+**The scan cried wolf for the third time, and this one is worth writing down.**
+Widening the plural-subject verb list, I added "moved" and "came" — and it
+immediately reported "Nico Ward's people moved against Saint Agnes and were
+driven off", which is correct English, because a past tense is the same for
+singular and plural. Every verb on that list must be one that exists *only* in
+the singular. Both sentences are regression cases now.
+
+Evidence: four new properties in `core/copy_test.go`, twenty clean apicheck runs
+against a fresh campaign, a fifty-three-day paper scanned for all nine known
+copy patterns with zero hits, `mise run verify` and `npm test` green.

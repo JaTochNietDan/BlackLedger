@@ -49,9 +49,13 @@ func (w *World) PeopleDay() {
 	}
 	for i := range w.NPCs {
 		n := &w.NPCs[i]
-		if n.Dead || n.Rank >= RankLeader || IsOfficial(n.ID) {
-			continue // whoever is at the top has people for this, and so does
-			// anybody with a title
+		// keepsPost covers the top of an organization, the officials, anybody
+		// the police are holding, and — the reason this changed — anybody
+		// holding one of the city's standing jobs. The paper carried
+		// "DETECTIVE HARLOW TAKES OVER THE BLUE HOUR": the city detective had
+		// walked off his beat and seized a casino.
+		if n.Dead || w.keepsPost(n) {
+			continue
 		}
 		if w.WorldRandom() >= dailyAmbition(n)*w.cityPace() {
 			continue

@@ -188,6 +188,12 @@ var badCopy = []struct{ pattern, why string }{
 	{"crates of Crated", "a good's price-board name was used after a unit count"},
 	{"cases of Untaxed", "a good's price-board name was used after a unit count"},
 	{"crates of Moonshine", "a good's price-board name was used after a unit count"},
+	// Both found by reading a campaign's paper end to end a second time, and
+	// both introduced by earlier fixes on this same list.
+	{"a head of", "a titled office was given an article"},
+	{"an head of", "a titled office was given an article"},
+	{"twice such", "a frequency was used where a count belongs"},
+	{"three times such", "a frequency was used where a count belongs"},
 }
 
 // singularOne catches "Whatever was arranged for you happened 1 times to a
@@ -197,9 +203,14 @@ var badCopy = []struct{ pattern, why string }{
 // sleep". It is anchored at a sentence start and refuses to cross a comma or
 // the words that introduce a second party, because "Violence between Brenner
 // Company and Franca Sabbatini's people has escalated" is correct English and
-// a plain substring reported it as a fault four times in fifteen runs. A check
-// that misses something is worth more than one that cries wolf.
-var pluralSubject = regexp.MustCompile(`(^|\. )[A-Z][A-Za-z']*(\s[A-Z][A-Za-z']*)*'s people (has|is|was|holds) `)
+// a plain substring reported it as a fault four times in fifteen runs.
+//
+// Every verb listed is one that ONLY exists in the singular. Adding "moved"
+// and "came" to widen the net reported "Nico Ward's people moved against Saint
+// Agnes and were driven off", which is correct — a past tense is the same for
+// both. That was the third time this scan cried wolf. A check that misses
+// something is worth more than one that has to be ignored.
+var pluralSubject = regexp.MustCompile(`(^|\. )[A-Z][A-Za-z']*(\s[A-Z][A-Za-z']*)*'s people (has|is|was|holds|controls|takes|wants|makes|thinks) `)
 
 var singularOne = regexp.MustCompile(`(^|[^0-9])1 (times|days|people|stories|others|minutes|crates|men)\b`)
 

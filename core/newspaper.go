@@ -93,7 +93,9 @@ func runOf(kind string, count int, latest string) string {
 	case "robbery":
 		return fmt.Sprintf("%s It happened %s in the same day, which residents say is not the usual run of things.", latest, times)
 	case "attack":
-		return fmt.Sprintf("%s There were %s such incidents before the day was out.", latest, times)
+		// A count, not a frequency: "There were twice such incidents" is what
+		// this printed until somebody read it.
+		return fmt.Sprintf("%s There were %s such incidents before the day was out.", latest, spelled(count))
 	case "police":
 		return fmt.Sprintf("%s Officers were back %s before the day was out.", latest, times)
 	}

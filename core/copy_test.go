@@ -160,3 +160,83 @@ func TestAGoodReadsCorrectlyAfterACount(t *testing.T) {
 		t.Fatalf("crated arms read as %q after a count", got)
 	}
 }
+
+// Found by reading a second campaign's paper end to end, after eight copy
+// fixes had landed. Two of these three faults were introduced by those fixes.
+
+func TestATitledOfficeTakesNoArticle(t *testing.T) {
+	w := New(18)
+	f := &w.Factions[0]
+	// The fix for "They were Lieutenant" gave every role an article, and this
+	// is what that did to a role that already carries its own complement.
+	n := &NPC{ID: "z", Name: "Elena Russo", Role: "Head of the " + f.Name, Faction: f.ID}
+	if got := describeStanding(n, w); strings.Contains(got, "a head of") {
+		t.Fatalf("the city says %q", got)
+	}
+	if got := describeStanding(n, w); !strings.Contains(got, "They were head of") {
+		t.Fatalf("the city says %q", got)
+	}
+	// An ordinary job still takes one.
+	n.Role = "Lieutenant"
+	if got := describeStanding(n, w); !strings.Contains(got, "a lieutenant") {
+		t.Fatalf("an ordinary role lost its article: %q", got)
+	}
+}
+
+func TestThePaperCountsInWords(t *testing.T) {
+	// "There were twice such incidents before the day was out." A frequency
+	// where a count belongs.
+	w := New(19)
+	w.News = nil
+	for i := 0; i < 3; i++ {
+		w.Report("attack", "DAMAGE AT SAINT AGNES", "Saint Agnes was attacked overnight.")
+	}
+	body := w.News[len(w.News)-1].Body
+	if strings.Contains(body, "twice such") || strings.Contains(body, "three times such") {
+		t.Fatalf("the paper reads %q", body)
+	}
+	if !strings.Contains(body, "three such incidents") {
+		t.Fatalf("the paper reads %q", body)
+	}
+	// And a robbery still takes the frequency, because that sentence wants one.
+	w.News = nil
+	for i := 0; i < 2; i++ {
+		w.Report("robbery", "ROBBERY IN SAINT AGNES", "A man was robbed.")
+	}
+	if body := w.News[0].Body; !strings.Contains(body, "twice in the same day") {
+		t.Fatalf("the paper reads %q", body)
+	}
+}
+
+func TestAnObituaryCountsInWords(t *testing.T) {
+	if spelled(2) != "two" || spelled(12) != "twelve" {
+		t.Fatal("the paper is writing small numbers as figures")
+	}
+	if spelled(41) != "41" {
+		t.Fatalf("the paper spelled out a large number as %q", spelled(41))
+	}
+}
+
+// "DETECTIVE HARLOW TAKES OVER THE BLUE HOUR" — the city detective had walked
+// off his beat and seized a casino. The guard on that excluded the officials
+// and the heads of organizations, but not the people holding the city's
+// standing jobs.
+func TestSomebodyWithAJobDoesNotSeizeACasino(t *testing.T) {
+	w := New(20)
+	for _, r := range roles {
+		n := w.NPC(r.Seed)
+		if n == nil {
+			continue
+		}
+		n.Role, n.Location = r.Title, r.Where
+		n.Skill, n.Ambition = 100, 100
+		if !w.keepsPost(n) {
+			t.Fatalf("the %s is free to walk off and take over a business", r.Title)
+		}
+	}
+	// Somebody with no job still can, or nothing in the city ever changes.
+	nobody := &NPC{ID: "nobody", Name: "Nobody", Skill: 100, Ambition: 100, Post: "bar"}
+	if w.keepsPost(nobody) {
+		t.Fatal("a person with no job and no rank is pinned to the spot")
+	}
+}
