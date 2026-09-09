@@ -74,15 +74,92 @@ func TestGoingOverEndsItImmediately(t *testing.T) {
 	_ = w
 }
 
+// This test used to call `soften`, which brought a single ace down one at a
+// time as the hand was built. The hand now keeps the cards it was dealt and
+// `Total` adds them up, so the rule lives there instead: the same rule, asked
+// of the thing that now owns it, and asked harder — soften could only ever
+// rescue one ace, and a hand can hold four.
 func TestAnAceComesDownRatherThanKillingYou(t *testing.T) {
-	if soften(22, 11) != 12 {
-		t.Fatalf("an ace on twenty-two left %d", soften(22, 11))
+	ace := Card{Rank: "A", Suit: "spades", Value: 11}
+	seven := Card{Rank: "7", Suit: "hearts", Value: 7}
+	king := Card{Rank: "K", Suit: "clubs", Value: 10}
+	four := Card{Rank: "4", Suit: "diamonds", Value: 4}
+
+	if got := Total([]Card{ace, seven}); got != 18 {
+		t.Errorf("an ace and a seven came to %d, and the ace should have stayed up", got)
 	}
-	if soften(22, 7) != 22 {
-		t.Fatal("a seven behaved like an ace")
+	if got := Total([]Card{ace, king, four}); got != 15 {
+		t.Errorf("an ace, a king and a four came to %d rather than fifteen", got)
 	}
-	if soften(18, 11) != 18 {
-		t.Fatal("an ace came down when it did not have to")
+	if got := Total([]Card{seven, king, four}); got != 21 {
+		t.Errorf("a hand with no ace was softened to %d", got)
+	}
+	// Four aces is four, not forty-four: every one of them comes down, which
+	// the old one-at-a-time rescue could not do.
+	if got := Total([]Card{ace, ace, ace, ace}); got != 14 {
+		t.Errorf("four aces came to %d", got)
+	}
+}
+
+// The number on the screen has to be the sum of the cards beside it. Keeping a
+// total and a list of cards is keeping the same fact twice, and this is the
+// check that they cannot drift.
+func TestAHandIsWorthExactlyWhatIsLyingOnTheTable(t *testing.T) {
+	w := New(53)
+	w.District = 2
+	w.Player.Cash, w.Player.Respect, w.Player.Health = 20000, 200, 100
+	w.Player.Dress, w.Player.Location = 1, "casino"
+	if err := w.Deal("casino", "small"); err != nil {
+		t.Fatal(err)
+	}
+	for step := 0; step < 8 && w.Hand != nil && !w.Hand.Done; step++ {
+		if w.Hand.Player != Total(w.Hand.Mine) {
+			t.Fatalf("the hand says %d and the cards on the table come to %d", w.Hand.Player, Total(w.Hand.Mine))
+		}
+		if w.Hand.Cards != len(w.Hand.Mine) {
+			t.Fatalf("the hand counts %d cards and %d are on the table", w.Hand.Cards, len(w.Hand.Mine))
+		}
+		if w.Hand.Dealer != Total(w.Hand.Theirs) {
+			t.Fatalf("the dealer shows %d and their cards come to %d", w.Hand.Dealer, Total(w.Hand.Theirs))
+		}
+		if err := w.DrawCard(); err != nil {
+			t.Fatal(err)
+		}
+	}
+}
+
+// And every card is a real card: something a deck actually contains.
+func TestEveryCardDealtIsACardThatExists(t *testing.T) {
+	w := New(11)
+	seenRanks, seenSuits := map[string]bool{}, map[string]bool{}
+	for i := 0; i < 4000; i++ {
+		c := w.card()
+		known := false
+		for _, r := range ranks {
+			if r.Rank == c.Rank && r.Value == c.Value {
+				known = true
+			}
+		}
+		if !known {
+			t.Fatalf("the deck produced a %s worth %d", c.Rank, c.Value)
+		}
+		right := false
+		for _, s := range suits {
+			if s == c.Suit {
+				right = true
+			}
+		}
+		if !right {
+			t.Fatalf("the deck produced a card of %q", c.Suit)
+		}
+		seenRanks[c.Rank] = true
+		seenSuits[c.Suit] = true
+	}
+	if len(seenRanks) != len(ranks) {
+		t.Errorf("4000 cards showed %d of %d ranks", len(seenRanks), len(ranks))
+	}
+	if len(seenSuits) != len(suits) {
+		t.Errorf("4000 cards showed %d of %d suits", len(seenSuits), len(suits))
 	}
 }
 
@@ -178,5 +255,26 @@ func TestATieGivesTheMoneyBack(t *testing.T) {
 	}
 	if !pushed {
 		t.Fatal("no hand in 2000 ever tied")
+	}
+}
+
+// The rules bug the cards uncovered. Softening used to look only at the card
+// just drawn, so an ace already in the hand could not come down later: an ace,
+// a five and a ten is sixteen at any table in the world, and this game called
+// it twenty-six and took the money. Keeping the cards makes the hand's value a
+// question about all of them, which is the only way the answer is right.
+func TestAnAceAlreadyInTheHandStillComesDownLater(t *testing.T) {
+	ace := Card{Rank: "A", Suit: "spades", Value: 11}
+	five := Card{Rank: "5", Suit: "hearts", Value: 5}
+	ten := Card{Rank: "10", Suit: "clubs", Value: 10}
+	if got := Total([]Card{ace, five, ten}); got != 16 {
+		t.Errorf("an ace, a five and a ten came to %d rather than sixteen", got)
+	}
+	if got := Total([]Card{ace, five}); got != 16 {
+		t.Errorf("an ace and a five came to %d rather than sixteen", got)
+	}
+	// And a hand that is genuinely over stays over.
+	if got := Total([]Card{ten, ten, five}); got != 25 {
+		t.Errorf("two tens and a five came to %d", got)
 	}
 }

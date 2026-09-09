@@ -4859,3 +4859,61 @@ Next: the table itself, for both games — cards, felt and a wheel.
 
 Evidence: `core/roulette.go`, `core/roulette_test.go`. All gates green,
 `npm test` 34.
+
+## The tables are tables now
+
+From the inbox, the user's own words: a proper game of roulette or blackjack
+rather than text buttons, "think actual playing cards, table, etc". Both games
+are now played on a felt.
+
+The core had to change first, and the reason is the whole architecture. A hand
+of blackjack was two totals and a count — the player showing nineteen, the
+dealer showing ten. There was no such thing in this game as the nine of hearts.
+Drawing playing cards from that would have been the view inventing facts, which
+is the one thing it may never do.
+
+So the deck has faces. A hand keeps the cards it was dealt, and what the hand is
+worth is added up from them and from nowhere else, so the number on the screen
+is always the sum of the cards beside it. That is a test rather than an
+intention: it walks a hand card by card and compares the two every step.
+
+Giving the cards faces uncovered a rules bug that had been there all along.
+Softening looked only at the card just drawn, so an ace already in the hand
+could never come down later. An ace, a five and a ten is sixteen at any table in
+the world; this game called it twenty-six and took the money. It also meant
+four aces could not all come down.
+
+That fix moved the balance and it should be said plainly. The house edge over
+twenty thousand hands went from 6.3% to 4.6%, because hands that used to be
+taken as busts are now played out. It remains inside the tolerance the books
+assume, and the cause is a rule being right rather than a number being tuned.
+
+What is drawn: a felt with the dealer's row and the player's row, real cards
+with rank and suit, and the dealer's hole card face down — because it genuinely
+has not been dealt yet, not as decoration. For roulette, a wheel with the
+pockets in the wheel's own order, which alternates colours and is not the
+cloth's order and not numerical, and a cloth in three columns of twelve with the
+dozens and outside bets along the bottom.
+
+The view's own layout facts are tested: the cloth holds every number once,
+eighteen red and eighteen black with ten and eleven both black and eighteen and
+nineteen both red, the wheel face holds all thirty-seven pockets and alternates
+colours all the way round, and every outside bet names an id the core accepts. A
+card whose suit the core did not send is drawn face down rather than guessed.
+
+Two things caught in the browser rather than in a test. The same game was
+offered twice in one room, once on the felt and again as a text button below it;
+the buttons are hidden only where the felt is actually offering that game, so a
+refusal the player needs to read is never swallowed with them. And an existing
+guard refused the file: it resets its hook count on `function Name`, and I had
+written arrow constants, so it read a hook in one component as sitting below
+another component's early return. Matching the surrounding convention was the
+right fix rather than weakening the rule.
+
+Played end to end in the browser. A straight-up bet on 14 for $50, the ball in
+9 red, the wheel showing it and the cloth saying "gone". A hand dealt at the
+same table: ten and nine of hearts against a jack of clubs, nineteen against
+ten, with the hole card face down.
+
+Evidence: `src/Tables.tsx`, `src/cards.ts`, `tests/cards.test.mjs`,
+`core/cards.go`, `core/cards_test.go`. All gates green, `npm test` 41.

@@ -793,3 +793,73 @@ body{height:100%;overflow:hidden;margin:0;background:var(--bg);color:var(--ink);
 .paper .obituaries article{max-width:520px;margin:0 auto 14px;text-align:center}
 .paper .obituaries h4{font:400 20px var(--serif);letter-spacing:.07em;color:#12110e;margin:0 0 5px}
 .paper .obituaries p{font:italic 13px/1.6 var(--serif);color:#2a2822;margin:0}
+
+/* The tables. A felt, real cards and a wheel, because a game you play through
+   a paragraph is a game you are being told about. Nothing here decides
+   anything — it is the arrangement of what the core says is on the table. */
+.tables{margin:14px 0 18px}
+.felt{background:radial-gradient(120% 90% at 50% 0%,#1f5138 0%,#153a28 55%,#102b1e 100%);
+  border:1px solid #0b1f16;border-radius:10px;padding:14px 14px 12px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 6px 18px rgba(0,0,0,.35);color:#e8e3d6}
+.felt-head{display:flex;justify-content:space-between;align-items:baseline;
+  font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:#9db8a6;margin-bottom:10px}
+.felt-head b{color:#e8dfa8;letter-spacing:0}
+.seat{display:flex;align-items:center;gap:10px;margin:8px 0}
+.seat-name{width:52px;flex:none;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#9db8a6}
+.seat-total{margin-left:auto;font-size:19px;min-width:2ch;text-align:right;color:#f0ead8}
+.seat-total.warning{color:#e2836f}
+.card-row{display:flex;gap:5px;flex-wrap:wrap}
+
+.card{width:38px;height:54px;border-radius:4px;background:#f4f0e4;color:#1b1b1b;
+  border:1px solid #cdc6b4;position:relative;flex:none;
+  box-shadow:0 2px 4px rgba(0,0,0,.35);font-family:Georgia,'Times New Roman',serif}
+.card b{position:absolute;top:3px;left:4px;font-size:12px;line-height:1}
+.card b.upside{top:auto;left:auto;bottom:3px;right:4px;transform:rotate(180deg)}
+.card i{position:absolute;inset:0;display:grid;place-items:center;font-style:normal;font-size:20px}
+.card.red{color:#a3232b}
+.card.facedown{background:repeating-linear-gradient(45deg,#6d2f33 0 4px,#5a2529 4px 8px);border-color:#3d1a1d}
+.card.facedown span{position:absolute;inset:5px;border:1px solid rgba(244,240,228,.35);border-radius:2px}
+
+.felt-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.felt-actions button{flex:1 1 auto;min-width:120px;padding:9px 12px;border-radius:5px;
+  border:1px solid #2f6a4b;background:#22523a;color:#eae4d4;font:inherit;font-size:13px;cursor:pointer}
+.felt-actions button:hover:not(:disabled){background:#2b6547;border-color:#3d8560}
+.felt-actions button:disabled{opacity:.45;cursor:default}
+.felt-note{margin:10px 0 0;font-size:11px;line-height:1.5;color:#8fae9c}
+.felt-result{margin:10px 0 0;font-size:13px;color:#d8cfae;text-align:center}
+.felt-result.won{color:#9fd6a8}
+
+/* The wheel: pockets laid round a rim in the wheel's own order, which is not
+   the cloth's and not numerical. */
+.wheel-felt{display:flex;flex-direction:column;align-items:stretch}
+.wheel-face{position:relative;width:190px;height:190px;margin:2px auto 6px;border-radius:50%;
+  background:conic-gradient(from -4deg,#3a2a1c 0deg,#2b1f16 360deg);
+  border:6px solid #4a3524;box-shadow:inset 0 0 22px rgba(0,0,0,.7),0 4px 14px rgba(0,0,0,.4)}
+.wheel-rim{position:absolute;inset:0}
+.pocket{position:absolute;top:50%;left:50%;font-size:9px;line-height:1;
+  transform:rotate(var(--at)) translateY(-80px) rotate(calc(-1 * var(--at)));
+  width:16px;height:12px;margin:-6px 0 0 -8px;display:grid;place-items:center;border-radius:2px}
+.pocket.red{background:#8e2b2b;color:#f6ece0}
+.pocket.black{background:#1d1d1d;color:#e8e0d2}
+.pocket.green{background:#1f6b45;color:#f0f6ee}
+.pocket.landed{outline:2px solid #e8dfa8;outline-offset:1px;font-weight:700}
+.wheel-hub{position:absolute;inset:34%;border-radius:50%;background:#241a12;
+  border:1px solid #4a3524;display:grid;place-items:center;text-align:center;line-height:1.2}
+.wheel-hub b{font-size:24px}
+.wheel-hub b.red{color:#e08a7f}.wheel-hub b.black{color:#d8d2c4}.wheel-hub b.green{color:#8fd6a8}
+.wheel-hub small{display:block;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:#93a89a}
+
+.cloth{margin-top:8px}
+.cloth-grid{display:flex;flex-direction:column;gap:2px}
+.cloth-row{display:flex;gap:2px}
+.cloth-cell{flex:1;min-width:0;padding:5px 2px;font:inherit;font-size:11px;cursor:pointer;
+  border:1px solid rgba(0,0,0,.45);border-radius:2px;color:#f2ece0}
+.cloth-cell.red{background:#8e2b2b}
+.cloth-cell.black{background:#1d1d1d}
+.cloth-cell.green{background:#1f6b45}
+.cloth-cell.zero{width:100%;margin-bottom:2px}
+.cloth-cell.outside{background:rgba(0,0,0,.28)}
+.cloth-cell.picked{outline:2px solid #e8dfa8;outline-offset:-2px;font-weight:700}
+.cloth-outside{display:flex;gap:2px;flex-wrap:wrap;margin-top:2px}
+.cloth-outside .cloth-cell{flex:1 1 26%}
+.cloth-outside .cloth-cell.wide{flex:1 1 30%}

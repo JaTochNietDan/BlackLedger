@@ -34,26 +34,65 @@ type TableHand struct {
 	Cards int
 	// Done is set when the hand has been settled, so nothing settles twice.
 	Done bool
+	// What was actually dealt. The hand used to be two totals and a count, so
+	// there was no such thing in this game as the seven of clubs — which meant
+	// a table drawing playing cards would have been drawing cards nobody had
+	// dealt. Absent in saves written before the deck had faces, which read as a
+	// hand whose cards are not known; the totals are still true of it.
+	Mine   []Card `json:"mine,omitempty"`
+	Theirs []Card `json:"theirs,omitempty"`
 }
+
+// Card is one card off the deck: what it says and what suit it is. Value is
+// carried with it so that what a hand is worth and what is lying on the table
+// can never disagree — the total is added up from these and from nowhere else.
+type Card struct {
+	Rank  string `json:"rank"`
+	Suit  string `json:"suit"`
+	Value int    `json:"value"`
+}
+
+// ranks are what a card can say, in order, with what each is worth. An ace is
+// eleven here and softened later if the hand would otherwise be dead.
+var ranks = []struct {
+	Rank  string
+	Value int
+}{
+	{"A", 11}, {"2", 2}, {"3", 3}, {"4", 4}, {"5", 5}, {"6", 6}, {"7", 7},
+	{"8", 8}, {"9", 9}, {"10", 10}, {"J", 10}, {"Q", 10}, {"K", 10},
+}
+
+// suits are the four of them, named as the interface will draw them.
+var suits = []string{"spades", "hearts", "diamonds", "clubs"}
 
 // card is what comes off the deck. Face cards are ten and an ace is eleven
 // unless that busts, which is the one piece of arithmetic the house does for
 // you.
-func (w *World) card() int {
-	value := 1 + int(w.Random()*13)
-	if value > 10 {
-		return 10
-	}
-	if value == 1 {
-		return 11
-	}
-	return value
+//
+// The suit is drawn from the same stream as the rank because it is part of the
+// same card. It changes nothing about the odds — every suit is worth the same —
+// but a card without one is not a card.
+func (w *World) card() Card {
+	r := ranks[min(len(ranks)-1, int(w.Random()*float64(len(ranks))))]
+	suit := suits[min(len(suits)-1, int(w.Random()*float64(len(suits))))]
+	return Card{Rank: r.Rank, Suit: suit, Value: r.Value}
 }
 
-// soften brings an eleven down to a one when the hand would otherwise be dead.
-func soften(total, drawn int) int {
-	if total > Bust && drawn == 11 {
-		return total - 10
+// Total is what a row of cards is worth, with aces brought down one at a time
+// while the hand would otherwise be dead. It is the only place a hand's value
+// is worked out, so the number on the screen is always the sum of the cards
+// beside it.
+func Total(cards []Card) int {
+	total, aces := 0, 0
+	for _, c := range cards {
+		total += c.Value
+		if c.Rank == "A" {
+			aces++
+		}
+	}
+	for total > Bust && aces > 0 {
+		total -= 10
+		aces--
 	}
 	return total
 }
@@ -73,14 +112,12 @@ func (w *World) Deal(id, stakeID string) error {
 	if err := w.Pay(stake.Amount); err != nil {
 		return err
 	}
-	first, second := w.card(), w.card()
-	total := first + second
-	if total > Bust {
-		total -= 10 // two aces
-	}
-	w.Hand = &TableHand{Place: id, Stake: stakeID, Player: total, Dealer: w.card(), Cards: 2}
+	mine := []Card{w.card(), w.card()}
+	theirs := []Card{w.card()}
+	w.Hand = &TableHand{Place: id, Stake: stakeID, Mine: mine, Theirs: theirs,
+		Player: Total(mine), Dealer: Total(theirs), Cards: len(mine)}
 	place, _ := PlaceByID(id)
-	w.Log("A hand at "+place.Name, fmt.Sprintf("$%d down. You are showing %d and the dealer is showing %d.", stake.Amount, total, w.Hand.Dealer), "personal")
+	w.Log("A hand at "+place.Name, fmt.Sprintf("$%d down. You are showing %d and the dealer is showing %d.", stake.Amount, w.Hand.Player, w.Hand.Dealer), "personal")
 	return nil
 }
 
@@ -89,9 +126,9 @@ func (w *World) DrawCard() error {
 	if w.Hand == nil || w.Hand.Done {
 		return fmt.Errorf("there is no hand on the table")
 	}
-	drawn := w.card()
-	w.Hand.Player = soften(w.Hand.Player+drawn, drawn)
-	w.Hand.Cards++
+	w.Hand.Mine = append(w.Hand.Mine, w.card())
+	w.Hand.Player = Total(w.Hand.Mine)
+	w.Hand.Cards = len(w.Hand.Mine)
 	if w.Hand.Player > Bust {
 		return w.settleHand(false, "You went over.")
 	}
@@ -105,8 +142,8 @@ func (w *World) Stand() error {
 		return fmt.Errorf("there is no hand on the table")
 	}
 	for w.Hand.Dealer < DealerStands {
-		drawn := w.card()
-		w.Hand.Dealer = soften(w.Hand.Dealer+drawn, drawn)
+		w.Hand.Theirs = append(w.Hand.Theirs, w.card())
+		w.Hand.Dealer = Total(w.Hand.Theirs)
 	}
 	if w.Hand.Dealer > Bust {
 		return w.settleHand(true, fmt.Sprintf("The dealer went over on %d.", w.Hand.Dealer))
@@ -168,8 +205,19 @@ func (w *World) HandDescription() map[string]any {
 	}
 	place, _ := PlaceByID(w.Hand.Place)
 	stake, _ := tableStake(w.Hand.Stake)
+	// The cards themselves, so a table can draw what was dealt rather than a
+	// number. Never nil: a row the interface has to guard is a row it will
+	// eventually forget to guard.
+	mine, theirs := w.Hand.Mine, w.Hand.Theirs
+	if mine == nil {
+		mine = []Card{}
+	}
+	if theirs == nil {
+		theirs = []Card{}
+	}
 	return map[string]any{
 		"playing": true, "place": place.Name, "stake": stake.Amount,
 		"player": w.Hand.Player, "dealer": w.Hand.Dealer, "cards": w.Hand.Cards,
+		"mine": mine, "theirs": theirs,
 	}
 }
