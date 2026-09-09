@@ -221,7 +221,8 @@ func (w *World) SitOut() error {
 		return nil
 	}
 	w.Player.Respect += days * ServedRespect
-	w.Log("You did not say anything", fmt.Sprintf("%d days and not a name out of you. That is worth %d respect on this street and it is the only thing you earned in there.", days, days*ServedRespect), "personal")
+	w.Log("You did not say anything", fmt.Sprintf("%s and not a name out of you. That is worth %d respect on this street and it is the only thing you earned in there.",
+		plainly(days, "A day", fmt.Sprintf("%d days", days)), days*ServedRespect), "personal")
 	w.Release()
 	return nil
 }
@@ -327,7 +328,8 @@ func (w *World) Bail(id string) error {
 	n.Held = 0
 	n.Trust = min(100, n.Trust+18)
 	n.Sore = max(0, n.Sore-40)
-	w.Log(n.Name+" comes out", fmt.Sprintf("$%d for the %d days still on him. He walks out knowing exactly who paid it.", days*BailDaily, days), "personal")
+	w.Log(n.Name+" comes out", fmt.Sprintf("$%d for the %s still on him. He walks out knowing exactly who paid it.",
+		days*BailDaily, plainly(days, "day", fmt.Sprintf("%d days", days))), "personal")
 	return nil
 }
 

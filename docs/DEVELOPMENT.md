@@ -2015,3 +2015,67 @@ since they are assembled prose like everything else.
 Evidence: five properties in `core/crowd_test.go`, ten clean apicheck runs on a
 fresh campaign, `mise run verify` and `npm test` green, `mise run simulate`
 unchanged at 53 / 0 / 82 / 0.
+
+## Coming home
+
+A trip out of Bellwether takes two to four days and the clock runs the whole
+time. I measured whether that means anything: forty campaigns, driven to day
+twelve, then four days away.
+
+| in four days away | in 40 campaigns |
+|---|---|
+| the paper printed something | 40 |
+| a family's power moved by more than 8 | 3 |
+| somebody died | 2 |
+| a holding changed hands, a family formed or fell, a quarrel started or ended | 1 each |
+
+So the city does run, and the structural changes are properly rare over four
+days, which is right. But the record filed on the player's return read "4 days
+gone. The city did not wait" — a claim with nothing in it. Everything that had
+happened was sitting in the Herald, filed under days the player had no reason to
+go back and read. Coming home is the moment that information is worth most, and
+the game was silent at exactly that moment.
+
+The return record now carries what the paper carried. The headlines are printed
+as the paper printed them, in the paper's own order of importance, because
+sentence-casing them would lower-case the names and paraphrasing them would be
+this file inventing news. Civic filler is dropped — somebody back from four days
+away does not need to be told it rained. Read out of a real save:
+
+```
+3 days gone. While you were gone the paper carried: POLICE PRESSURE ON RUSSO
+OUTFIT · MERCER EXCHANGE CHANGES HANDS · RUSSO OUTFIT MOVES INTO BLUEBIRD
+LAUNDRY. And 1 other story.
+```
+
+Half the trips come back to "Nothing in the paper you needed to be here for",
+which is honest rather than a failure: over four days at day twelve, half the
+time nothing above civic filler happened.
+
+**Two faults found by reading around the thing I was building.** The first was
+in the line next to it: "Whatever was arranged for you happened 1 times to a
+locked door." The second only appeared once the summary existed: "POLICE
+PRESSURE ON RUSSO OUTFIT · POLICE PRESSURE ON RUSSO OUTFIT" — the paper
+collapses repeats within a day, a trip spans several, and two days of the same
+headline is one thing to be told.
+
+**And a fault in the checker itself.** I added a count-agreement pattern to
+`cmd/apicheck` as a plain substring, and it reported "11 people in here, which
+for this hour is a crowd" as a fault four runs out of ten. A check that cries
+wolf is worse than no check. It is a bounded regexp now, and fourteen
+consecutive runs on a fresh campaign are clean.
+
+Two other sites where a count of one was reachable are fixed: a one-day sentence
+served, and one day of somebody else's bail. The rest of the `%d days` sites in
+the codebase are not patched blind — the check will surface them if real play
+ever produces a one.
+
+Not covered, stated plainly: `cmd/apicheck` has never once taken a trip. All
+three appear in its "never tried" list every run, because the fare is out of
+reach at the cash its play reaches. This slice was verified by driving a save to
+day fourteen, setting the cash directly in the save file, and taking all three
+trips through the HTTP API by hand.
+
+Evidence: seven properties in `core/away_test.go`, fourteen clean apicheck runs,
+`mise run verify` and `npm test` green, `mise run simulate` unchanged at
+53 / 0 / 82 / 0.

@@ -163,6 +163,7 @@ func (w *World) Trip(id string) error {
 	// Out of the city means out of the city: nothing that asks where the player
 	// is standing can be satisfied while they are two hundred miles from it.
 	w.Player.Location = "transit"
+	left := w.Minute
 	dodged := 0
 	relief := 0
 	for day := 0; day < d.Days && w.Player.Alive; day++ {
@@ -176,14 +177,15 @@ func (w *World) Trip(id string) error {
 		relief += fell
 	}
 	if dodged > 0 {
-		w.Log("Somebody called while you were away", fmt.Sprintf("Whatever was arranged for you happened %d times to a locked door. Nobody who goes to that trouble takes it well.", dodged), "danger")
+		w.Log("Somebody called while you were away", fmt.Sprintf("Whatever was arranged for you happened %s to a locked door. Nobody who goes to that trouble takes it well.",
+			plainly(dodged, "once", fmt.Sprintf("%d times", dodged))), "danger")
 	}
 	if relief > 0 {
 		w.Log("Off the books for a while", fmt.Sprintf("Attention fell by %d while you were nowhere anybody could find you. It is now %d.", relief, w.Player.Heat), "personal")
 	}
 	if w.Player.Alive {
 		w.Player.Location = TripDepart
-		w.Log("Back in Bellwether", fmt.Sprintf("%d days gone. The city did not wait.", d.Days), "travel")
+		w.Log("Back in Bellwether", fmt.Sprintf("%d days gone. %s", d.Days, w.WhatYouMissed(left)), "travel")
 	}
 	return nil
 }

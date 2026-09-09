@@ -20,6 +20,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"regexp"
 	"strings"
 	"time"
 )
@@ -188,6 +189,11 @@ var badCopy = []struct{ pattern, why string }{
 	{" a a ", "an article was doubled"},
 }
 
+// singularOne catches "Whatever was arranged for you happened 1 times to a
+// locked door". The boundary matters: without it "11 people in here" was
+// reported as a fault, and a check that cries wolf is worse than no check.
+var singularOne = regexp.MustCompile(`(^|[^0-9])1 (times|days|people|stories|others|minutes|crates|men)\b`)
+
 // readable checks everything the city has written down.
 func readable(s *snapshot, fail func(int, string, ...any)) {
 	check := func(where, text string) {
@@ -198,6 +204,9 @@ func readable(s *snapshot, fail func(int, string, ...any)) {
 			if strings.Contains(text, bad.pattern) {
 				fail(0, "%s: %s (%q)", where, bad.why, first(text, 80))
 			}
+		}
+		if singularOne.MatchString(text) {
+			fail(0, "%s: a count of one took a plural noun (%q)", where, first(text, 80))
 		}
 	}
 	for _, r := range s.History {
