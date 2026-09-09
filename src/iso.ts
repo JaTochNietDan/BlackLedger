@@ -659,3 +659,43 @@ export function vents(cell: Cell, slots = 2): Vent[] {
   }
   return out;
 }
+
+// ---------------------------------------------------------------------------
+// The trolley.
+//
+// One avenue in this city carries a streetcar, which is what a 1950s city has
+// instead of the cars it does not have enough of yet. The rails are laid from
+// the same grid as the carriageways, so they run down the centre of a street
+// the whole length of the city and cross every junction square — there is no
+// way for them to end up half on the pavement, because they are not placed,
+// they are derived.
+
+// TROLLEY_GAUGE is the distance between the two rails, in tiles. Narrow: a
+// streetcar is not a mainline train, and at this scale two lines any further
+// apart read as a road marking rather than as track.
+export const TROLLEY_GAUGE = .22;
+
+// trolleyAvenue is which north-south street carries it: the middle one, so the
+// track runs through the city rather than along its edge.
+export const trolleyAvenue = ({cols}: {cols: number}) => Math.max(1, Math.round(cols / 2));
+
+// rails gives the two running rails, as a pair of segments down one avenue.
+export function rails(size: {cols: number; rows: number}): Segment[] {
+  const x = trolleyAvenue(size) * BLOCK, bottom = size.rows * BLOCK;
+  return [
+    {a: {x: x - TROLLEY_GAUGE / 2, y: -.5}, b: {x: x - TROLLEY_GAUGE / 2, y: bottom + .5}},
+    {a: {x: x + TROLLEY_GAUGE / 2, y: -.5}, b: {x: x + TROLLEY_GAUGE / 2, y: bottom + .5}},
+  ];
+}
+
+// sleepers gives the cross-ties showing through the setts between the rails.
+// Spaced in tiles rather than per block, so they do not line up with the
+// junctions and give the track a rhythm of its own.
+export function sleepers(size: {cols: number; rows: number}): Segment[] {
+  const x = trolleyAvenue(size) * BLOCK, bottom = size.rows * BLOCK;
+  const out: Segment[] = [];
+  for (let y = 0; y < bottom; y += .34) {
+    out.push({a: {x: x - TROLLEY_GAUGE * .8, y}, b: {x: x + TROLLEY_GAUGE * .8, y}});
+  }
+  return out;
+}

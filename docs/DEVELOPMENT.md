@@ -1582,3 +1582,11 @@
 - **The first version was wrong and the screenshot is why.** Six evenly spaced ellipses stack into a column of visible grey rings — a drill bit, not smoke. It now takes twenty small overlapping puffs per chimney, each nudged off the centre line, widening faster near the top where a plume is losing its shape. That reads as smoke.
 - Verified in a browser at 12:12 and at 03:10: ragged plumes drifting off the rooftops, visible against both the pale daylight ground and the dark. No console errors.
 - `mise run verify` passes, `npm test` 19/19, `cmd/apicheck` reports no invariant failures, 100 runs unchanged: defiant 58 / investor 0 / reckless 82 / worker 0, 0 errors.
+
+## A streetcar down the middle avenue
+- `rails()` and `sleepers()` derive the track from the same grid the carriageways come from, so it runs down the centre of one avenue for the whole length of the city and crosses every junction square. It cannot end up half on the pavement because it is not placed anywhere — it is computed from `trolleyAvenue(size) * BLOCK`.
+- The test states that as a property rather than trusting it: both rails are parallel to the avenue, within half a carriageway of its centre line, spanning the full height of the city, exactly `TROLLEY_GAUGE` apart, with the ties between them and no block anywhere on the track.
+- The dashed centre line is suppressed on that one street. A painted centre line and a pair of rails down the same tarmac is two things claiming the middle of the road.
+- **Proved it renders and lands where the geometry says**: rails filled magenta and photographed — one straight track down one avenue, corner to corner, between the blocks and through the junctions, partly occluded by the buildings in front of it, which is the depth sort behaving. Then restored to polished-steel grey, a little brighter at night because a rail head that is used is the one thing in a dark street that catches light.
+- Verified in a browser at 12:12: the double line with its ties reads as track in the avenue beside Saint Agnes. No console errors.
+- `mise run verify` passes, `npm test` 20/20, `cmd/apicheck` reports no invariant failures.

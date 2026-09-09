@@ -9,7 +9,7 @@
 
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {BLOCK, PAVE, ROAD, addressSlot, awnings, goldenness, island, nightness, terrace, vents} from '../.runtime/frontend-test/iso.js';
+import {BLOCK, PAVE, ROAD, addressSlot, awnings, goldenness, island, nightness, rails, sleepers, terrace, trolleyAvenue, TROLLEY_GAUGE, vents} from '../.runtime/frontend-test/iso.js';
 
 const SLOTS = 2;                 // must match CityIso.tsx
 
@@ -149,4 +149,34 @@ test('smoke comes off a roof and steam off a pavement', () => {
   assert.ok(grates > 0, 'no steam anywhere');
   // And most of the city gives off nothing: every roof smoking is a foundry.
   assert.ok(chimneys + grates < cells.length * .7, 'the whole city is smoking');
+});
+
+// The rails are derived from the same grid as the roads, so they cannot end up
+// half on the pavement. This is what "by construction" has to mean to be worth
+// anything: the test states the property, the geometry makes it unavoidable.
+test('the trolley runs down the middle of a street, not over the kerb', () => {
+  const size = {cols: 6, rows: 4};
+  const pair = rails(size);
+  assert.equal(pair.length, 2, 'a track has two rails');
+  const centre = trolleyAvenue(size) * BLOCK;
+  for (const r of pair) {
+    assert.equal(r.a.x, r.b.x, 'a rail wanders off its street');
+    // Inside the carriageway, which is ROAD wide centred on the grid line.
+    assert.ok(Math.abs(r.a.x - centre) <= ROAD / 2 - .05, 'a rail is on the pavement');
+    // And it runs the whole length of the city rather than stopping in the
+    // middle of nowhere, the same rule the carriageways follow.
+    assert.ok(r.a.y <= 0 && r.b.y >= size.rows * BLOCK, 'the track stops in mid-air');
+  }
+  assert.ok(Math.abs((pair[1].a.x - pair[0].a.x) - TROLLEY_GAUGE) < 1e-9, 'the gauge is wrong');
+  // The ties stay between the rails.
+  for (const s of sleepers(size)) {
+    assert.ok(Math.abs(s.a.x - centre) < TROLLEY_GAUGE, 'a sleeper sticks out past the rails');
+    assert.equal(s.a.y, s.b.y, 'a sleeper is not square to the track');
+  }
+  // And no building stands on the track: the avenue it takes is a road.
+  for (const cell of cells) {
+    const i = island(cell);
+    assert.ok(centre <= i.x || centre >= i.x + i.w,
+      `the trolley runs through block ${JSON.stringify(cell)}`);
+  }
 });

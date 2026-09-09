@@ -2,7 +2,7 @@ import {useEffect, useRef} from 'react';
 import {Application, Assets, Container, Graphics, Sprite, Text, Texture, TextStyle} from 'pixi.js';
 import {Viewport} from 'pixi-viewport';
 import type {Snapshot} from './types';
-import {addressSlot, along, awnings, blockFor, BLOCK, bounds, carriageways, distance, dressing, faces, fillerShape, goldenness, grid, island, kerbside, lampPosts, markings, middle, mix, nightness, PAVE, plot, project, ROAD, size, terrace, TILE, vents, walk, wires} from './iso';
+import {addressSlot, along, awnings, blockFor, BLOCK, bounds, carriageways, distance, dressing, faces, fillerShape, goldenness, grid, island, kerbside, lampPosts, markings, middle, mix, nightness, PAVE, plot, project, ROAD, size, rails, sleepers, terrace, TILE, trolleyAvenue, TROLLEY_GAUGE, vents, walk, wires} from './iso';
 import type {Cell, Vec} from './iso';
 import cutouts from '../public/art/iso/isometric.json';
 import type {Spotlight} from './CityStreet';
@@ -436,9 +436,12 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight}: {
     }
     layer.addChild(pave, kerb);
 
-    // A broken line down the middle of every carriageway.
+    // A broken line down the middle of every carriageway — except the one the
+    // trolley runs down, where the track is what is down the middle.
     const paint = new Graphics();
+    const avenue = trolleyAvenue(size) * BLOCK;
     for (const way of carriageways(size)) {
+      if (Math.abs(way.a.x - avenue) < .001 && Math.abs(way.b.x - avenue) < .001) continue;
       const length = Math.hypot(way.b.x - way.a.x, way.b.y - way.a.y);
       const dashes = Math.max(2, Math.round(length / .5));
       for (let i = 0; i < dashes; i += 2) {
@@ -448,6 +451,25 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight}: {
       }
     }
     paint.stroke({width: 1.3, color: 0x6d6a52, alpha: .35});
+
+    // The trolley track: two running rails down one avenue, with the ties
+    // showing through the setts between them. Laid from the same grid as the
+    // carriageways, which is why it crosses every junction square and cannot
+    // end up half on the pavement.
+    const track = new Graphics();
+    for (const tie of sleepers(size)) {
+      const a = project(tie.a), b = project(tie.b);
+      track.moveTo(a.x, a.y).lineTo(b.x, b.y);
+    }
+    track.stroke({width: 1.4, color: mix(0x4d4a3f, 0x22231f, dark), alpha: .55});
+    for (const rail of rails(size)) {
+      const a = project(rail.a), b = project(rail.b);
+      // The rail head is polished by use, so it catches whatever light there
+      // is — the one thing in this street that is brighter at night.
+      track.moveTo(a.x, a.y).lineTo(b.x, b.y);
+    }
+    track.stroke({width: 1.6, color: mix(0x9a9c93, 0xb4af9f, dark), alpha: .62 + dark * .26});
+    layer.addChild(track);
 
     // The paint at the junctions: the bars of a crossing and the line a car
     // waits behind. Laid from the same grid as the kerbs, so it lines up by
