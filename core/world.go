@@ -790,9 +790,14 @@ func (w *World) Actions(id string) []Action {
 				fmt.Sprintf("$%d, then $%d a day to keep on the road. %s Journeys take %d%% of the time they take on foot. %s A car outside is a thing witnesses describe.", next.Cost, next.Upkeep, next.Detail, int(next.Pace*100), hides))
 		}
 		fee := w.ServiceFee()
-		service := fmt.Sprintf("$%d. Restores up to 55 condition, currently %d of 100. Below %d it is worth nothing to you.", fee, w.CarCondition(), Wreck)
-		if fee == 0 {
-			service = fmt.Sprintf("Your own people, at no charge. Restores up to 55 condition, currently %d of 100.", w.CarCondition())
+		// With no car there is no condition to state, and "currently 0 of 100"
+		// reads as a wreck in the yard rather than as nothing at all.
+		service := "What a garage does, once there is something of yours in it. Restores up to 55 condition."
+		if p.Car > 0 {
+			service = fmt.Sprintf("$%d. Restores up to 55 condition, currently %d of 100. Below %d it is worth nothing to you.", fee, w.CarCondition(), Wreck)
+			if fee == 0 {
+				service = fmt.Sprintf("Your own people, at no charge. Restores up to 55 condition, currently %d of 100.", w.CarCondition())
+			}
 		}
 		add("service", "Have the car worked on", CarServiceMinutes, 0, w.ServiceReadiness(id), service)
 	case "docks":
@@ -858,8 +863,13 @@ func (w *World) Actions(id string) []Action {
 			fmt.Sprintf("$%d of it arrives; the arrangement takes %d%%. It survives you, and whoever comes next can reach it if they can afford to.", DepositLot*(100-DepositCut)/100, DepositCut))
 		add("offshore_access", "Establish that the account is yours", AccessMinutes, 0, w.AccessReadiness(),
 			fmt.Sprintf("$%d in papers and a journey. Only worth it if there is enough out there to be worth reaching.", AccessCost))
-		add("withdraw", "Bring it all home", 45, 0, w.WithdrawReadiness(),
-			fmt.Sprintf("Brings $%d back into the city, where it can be taken from you.", w.Offshore))
+		// An empty account has no sum to bring home. "Brings $0 back into the
+		// city" is a figure that says nothing while looking like one.
+		bringing := "Brings whatever is out there back into the city, where it can be taken from you."
+		if w.Offshore > 0 {
+			bringing = fmt.Sprintf("Brings $%d back into the city, where it can be taken from you.", w.Offshore)
+		}
+		add("withdraw", "Bring it all home", 45, 0, w.WithdrawReadiness(), bringing)
 		if next, ok := nextAttire(p.Dress); ok {
 			notice := "Nobody official looks twice at it."
 			if next.Notice > 0 {
@@ -1235,9 +1245,17 @@ func (w *World) Actions(id string) []Action {
 		if reason := w.LendReadiness(n.ID); (reason == "" || w.Known(n)) && offers < LendOffers {
 			offers++
 			size := w.LoanSize(n)
+			// LoanSize is nothing when the book is full or the money is not
+			// there, and the refusal beside this already says which. Terms of
+			// "$0 out, $0 back" are not terms.
+			terms := fmt.Sprintf("Money out at %d%% back inside %s, when there is room on your book for it.",
+				int(LoanRate*100), counted(LoanTermDays, "day", "days"))
+			if size > 0 {
+				terms = fmt.Sprintf("$%d out, $%d back inside %s.",
+					size, size+int(float64(size)*LoanRate), counted(LoanTermDays, "day", "days"))
+			}
 			add("lend:"+n.ID, "Lend "+n.Name+" money", LendMinutes, 0, reason,
-				fmt.Sprintf("$%d out, $%d back inside %s. If they cannot pay, what you do about it is the decision, and the street will hear which way you went.",
-					size, size+int(float64(size)*LoanRate), counted(LoanTermDays, "day", "days")))
+				terms+" If they cannot pay, what you do about it is the decision, and the street will hear which way you went.")
 		}
 	}
 	if len(p.Crew) > 0 {

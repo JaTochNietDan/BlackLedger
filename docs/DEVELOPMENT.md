@@ -3665,3 +3665,38 @@ reads "currently 0 of 100". All three are disabled with refusals that already
 explain the situation, so nobody is misled about what they can do — but a
 description of a transaction that cannot happen should not quote its terms as
 zero. That is the next slice in this pass.
+
+## Terms of zero are not terms
+
+The three descriptions the detail pass left behind. A loan the player has no
+room on their book to make read "$0 out, $0 back inside 7 days". Bringing money
+home with no account read "Brings $0 back into the city". Servicing a car the
+player does not own read "Restores up to 55 condition, currently 0 of 100".
+
+Stating the severity plainly, because it is not what a nil-dereference is:
+nobody is misled about what they can do. All three actions are disabled, and
+their refusals already say why — "You have $262 out already, which is as much as
+you can afford to be owed", "The account does not answer to you yet", "There is
+nothing of yours to work on". The fault is narrower. A description exists to
+tell the player what an action would do if they took it, and a figure of zero
+tells them nothing while looking like a figure. The car one is the worst of the
+three: "currently 0 of 100" reads as a wreck sitting in the yard rather than as
+no car at all.
+
+Each now says what is true when there is nothing to quote — the loan describes
+its rate and term without a sum, the account says it brings back whatever is out
+there, the garage says what a garage does — and quotes the figures unchanged the
+moment there are any.
+
+Evidence: `core/zero_terms_test.go` scans every action in every room for a
+player who owns nothing and finds no dollar figure of zero, across 104 actions;
+a second test covers the car, which has no dollar sign; and a third states the
+other half, that a player with $1,200 offshore, a car in the yard and room on
+their book still sees every figure. All three failed before the fix and fail
+again when the zero-quoting forms are put back. Verified over HTTP on a driven
+save with an empty account and no car: the market reads "Money out at 35% back
+inside 7 days, when there is room on your book for it" and "Brings whatever is
+out there back into the city", and the garage reads "What a garage does, once
+there is something of yours in it". `mise run verify` and `npm test` green,
+`mise run simulate` unchanged at defiant 52 / investor 0 / reckless 82 / worker
+0, 0 errors.
