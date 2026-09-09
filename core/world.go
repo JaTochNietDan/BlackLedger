@@ -138,6 +138,10 @@ type Faction struct {
 	// Peak is the strength this family recovers toward once its holdings are
 	// repaired. Saves written before families held property carry no peak.
 	Peak int `json:"peak,omitempty"`
+	// The strength the paper last reported. Families rise and fall in the
+	// simulation constantly and the player had no way to feel any of it without
+	// opening a screen and comparing numbers to numbers they did not write down.
+	Reported int `json:"reported,omitempty"`
 }
 type Property struct {
 	Owner     string  `json:"owner"`
@@ -486,7 +490,10 @@ func newPerson(life int) Person {
 }
 func New(seed uint32) *World {
 	w := &World{Version: SaveVersion, ID: ID(), Life: 1, Minute: 480, RNG: seed, Player: newPerson(1), Properties: map[string]*Property{}, Tasks: []Task{}, Plots: []Plot{}, History: []Record{}, Dead: []Death{}, Offers: []Offer{}, Director: Director{"authored", "Authored opening. Local AI can prepare additional encounters.", -9999}}
-	w.Factions = []Faction{{"bellandi", "Bellandi Family", "Vittorio Bellandi", 90, 0, 8000, 90}, {"russo", "Russo Outfit", "Elena Russo", 58, 0, 4500, 58}}
+	w.Factions = []Faction{
+		{ID: "bellandi", Name: "Bellandi Family", Leader: "Vittorio Bellandi", Power: 90, Cash: 8000, Peak: 90, Reported: 90},
+		{ID: "russo", Name: "Russo Outfit", Leader: "Elena Russo", Power: 58, Cash: 4500, Peak: 58, Reported: 58},
+	}
 	w.NPCs = []NPC{
 		{ID: "mara", Name: "Mara Bell", Role: "Fixer", Trust: 10, Voice: "af_heart", Color: "#a48761", Location: "bar", Rank: RankAssociate, Ambition: 45, Skill: 60},
 		{ID: "leo", Name: "Leo Carver", Role: "Driver", Trust: 20, Voice: "am_michael", Color: "#9ca795", Location: "bar", Rank: RankAssociate, Ambition: 35, Skill: 45},
@@ -1361,6 +1368,7 @@ func (w *World) Advance(minutes int) {
 			w.OwnPeopleDay()
 			w.PactDay()
 			w.ServiceDay()
+			w.FortunesDay()
 			w.ObituaryDay()
 			w.CityPageDay()
 			w.ScrutinyDay()
