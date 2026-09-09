@@ -106,7 +106,6 @@ into `docs/DEVELOPMENT.md` once they are actually built and tested. An entry
 stays here, in the original wording, until it is genuinely implemented — so if
 it is still in this list, it does not exist in the game yet.
 
-- Having debug options for a developer and playtester like me is important, whether it be being able to play a range theater scenes out from a menu or simulate other visual actions and whatnot to get an idea of how well it's working and what can be changed or modified. This debug mode should probably run on a separate port and be separate from the main game.
 - Separating more stuff out of the ledger and whatnot probably makes sense. Like the underground market probably doesn't belong in there. Not sure if the daily cost belongs in there either. Needs refinement.
 
 Ultiamtely the expectation is that I don't have to think of all of these concepts, you, the agent will think of these too and build them out and playtest and simulate them yourself.

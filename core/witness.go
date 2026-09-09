@@ -91,3 +91,23 @@ func (w *World) witnessKilling(victim *NPC, cause, headline string) {
 		fmt.Sprintf("%s at %s. %s", victim.Name, l.Name, cause),
 		headline, victim.ID)
 }
+
+// MomentKinds is every kind of moment the city knows how to show, heaviest
+// first. Exported so that anything which offers them — the workshop, a test —
+// gets them from the city rather than keeping its own list that goes stale the
+// day a new one is added.
+func MomentKinds() []string {
+	out := make([]string, 0, len(gravity))
+	for kind := range gravity {
+		out = append(out, kind)
+	}
+	for a := range out {
+		for b := a + 1; b < len(out); b++ {
+			if gravity[out[b]] > gravity[out[a]] ||
+				(gravity[out[b]] == gravity[out[a]] && out[b] < out[a]) {
+				out[a], out[b] = out[b], out[a]
+			}
+		}
+	}
+	return out
+}

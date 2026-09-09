@@ -40,6 +40,10 @@ run = "go test -race ./core/ ./store/ ./sim/ ./cmd/blackledger/ -count=1"
 description = "Headless campaigns at scale"
 run = "go run ./cmd/simulate"
 
+[tasks.workshop]
+description = "The playtest workshop, on its own port, against a scratch world"
+run = ["npm run build", "go run ./cmd/playtest"]
+
 [tasks.fit-art]
 description = "Measure where each cut-out's building stands in its own frame"
 run = [".venv/bin/python tools/fitiso.py public/art/iso .runtime/iso-fit --proof"]
