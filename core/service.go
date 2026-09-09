@@ -133,7 +133,7 @@ func (w *World) LeaveService() error {
 	w.Player.Serves, w.Player.Service = "", 0
 	if f != nil {
 		f.Goodwill = max(-100, f.Goodwill-LeavingCost)
-		w.Log("You are your own man again", fmt.Sprintf("%s does not keep people who leave in their good books. Their standing with you is %+d.", f.Name, f.Goodwill), "politics")
+		w.Log("You answer to nobody again", fmt.Sprintf("%s does not keep people who leave in their good books. Their standing with you is %+d.", f.Name, f.Goodwill), "politics")
 		w.RetaliationFrom(f.ID)
 	}
 	return nil

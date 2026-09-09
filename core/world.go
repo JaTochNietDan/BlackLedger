@@ -1283,8 +1283,8 @@ func (w *World) Attack(plot Plot) {
 	p := &w.Player
 	if p.Location != p.Home {
 		w.Properties[p.Home].Condition = max(10, w.Properties[p.Home].Condition-45)
-		w.Witness("attack", p.Home, "Armed men damaged your residence while you were away.", "")
-		w.Log("Someone came looking", "You were away. Armed men damaged your residence and left before anyone could identify them.", "danger")
+		w.Witness("attack", p.Home, "Somebody came armed and damaged your residence while you were away.", "")
+		w.Log("Someone came looking", "You were away. They came armed, damaged your residence and left before anyone could identify them.", "danger")
 		return
 	}
 	if plot.Known || w.Watchers() > 0 || w.Reach() >= 2 {

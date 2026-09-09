@@ -172,7 +172,7 @@ func (w *World) ResolveArrest(e *Scene, choice string) error {
 		p.Respect = max(0, p.Respect-8)
 		w.Player.Heat = max(0, w.Player.Heat-20)
 		w.Log(n.Name+" goes instead", fmt.Sprintf("%s answers for what was in the building and is gone %d days. Everybody who works for you heard about it before morning.", n.Name, days), "danger")
-		w.Report("police", "ONE MAN CHARGED AFTER "+upper(w.cityName())+" SEARCHES",
+		w.Report("police", "ONE CHARGED AFTER "+upper(w.cityName())+" SEARCHES",
 			fmt.Sprintf("%s has been charged following searches across the district. Police said no other arrests were expected.", n.Name))
 		return nil
 	}
@@ -189,10 +189,10 @@ func (w *World) Confine(days int, because string) {
 	p.Location = "precinct"
 	p.Weapon, p.Charges = 0, 0
 	w.Log("Taken in", fmt.Sprintf("%d days for %s. Your businesses keep their hours and your ground keeps nobody on it. You will hear about all of it afterwards.", days, because), "danger")
-	w.Report("police", "MAN CHARGED AFTER DISTRICT SEARCHES",
+	w.Report("police", "ONE CHARGED AFTER DISTRICT SEARCHES",
 		fmt.Sprintf("%s has been remanded following searches across the district. Police said the investigation was continuing.", p.Name))
 	w.Witness("arrest", "precinct", fmt.Sprintf("%d days for %s. They took the laces out of your shoes at the desk.", days, because),
-		"MAN CHARGED AFTER DISTRICT SEARCHES", w.HolderID("detective"))
+		"ONE CHARGED AFTER DISTRICT SEARCHES", w.HolderID("detective"))
 }
 
 // Release is the morning it ends.

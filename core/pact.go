@@ -89,7 +89,7 @@ func (w *World) commonEnemy(id string) (*Faction, bool) {
 // PactReadiness explains why an understanding cannot be reached, or returns "".
 func (w *World) PactReadiness(id string) string {
 	if !w.Incorporated() {
-		return "Nobody makes an arrangement like this with a man"
+		return "Nobody makes an arrangement like this with one person. It takes an organization"
 	}
 	f := w.faction(id)
 	if f == nil || f.ID == w.PlayerOrganizationID() {

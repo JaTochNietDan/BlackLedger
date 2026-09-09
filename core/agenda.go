@@ -125,7 +125,7 @@ func (w *World) takeFromAPerson(n *NPC) bool {
 	w.Resent(mark.ID, n.ID, 40, "being robbed at "+place.Name)
 	w.Log("Robbed in the street", fmt.Sprintf("%s took $%d off %s near %s.", n.Name, purse, mark.Name, place.Name), "politics")
 	w.Report("robbery", "ROBBERY IN "+upper(place.Name),
-		w.unattributed(place.Name, fmt.Sprintf("A man was robbed near %s. Police have asked anybody who saw it to come forward.", place.Name)))
+		w.unattributed(place.Name, fmt.Sprintf("Somebody was robbed near %s. Police have asked anybody who saw it to come forward.", place.Name)))
 	return true
 }
 

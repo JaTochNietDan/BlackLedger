@@ -160,7 +160,7 @@ func TestYouOnlyKnowItIsATrapIfSomebodyToldYou(t *testing.T) {
 	if err := w.CallSitdown(); err != nil {
 		t.Fatal(err)
 	}
-	if !containsName(w.Event.Body, "more men than the room needs") {
+	if !containsName(w.Event.Body, "more people than the room needs") {
 		t.Fatalf("the scene said: %s", w.Event.Body)
 	}
 }

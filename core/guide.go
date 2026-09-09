@@ -107,7 +107,7 @@ func (w *World) Guide() []Step {
 			w.anyPactReason(), len(w.Pacts) > 0),
 		step("Somebody else's ladder", "Go to work for a family instead of building your own. A slower living that needs no capital.",
 			w.anyServiceReason(), p.Serves != ""),
-		step("The chair", "Move on the man running the organization you answer to. What it wins is not a promotion; it is the organization.",
+		step("The chair", "Move on whoever runs the organization you answer to. What it wins is not a promotion; it is the organization.",
 			w.TakeoverReadiness(), false),
 	}
 	return steps

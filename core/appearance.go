@@ -94,7 +94,7 @@ func (w *World) Ruin(amount int) {
 	before := w.DressCondition()
 	w.Player.DressWear = max(0, before-amount)
 	if before >= Shabby && w.Player.DressWear < Shabby {
-		w.Log("The suit is finished", fmt.Sprintf("%s, torn and marked past anything a brush will fix. Until it is put right you are just another man in the street.", AttireByTier(w.Player.Dress).Label), "personal")
+		w.Log("The suit is finished", fmt.Sprintf("%s, torn and marked past anything a brush will fix. Until it is put right you are just another face in the street.", AttireByTier(w.Player.Dress).Label), "personal")
 	}
 }
 

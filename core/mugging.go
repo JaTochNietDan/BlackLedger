@@ -148,7 +148,7 @@ func (w *World) Mug(location string, hand Hand) error {
 		w.Log("Taken off "+mark.Name, fmt.Sprintf("$%d, and nobody who could put a name to it. %s will be asking, though.", purse, mark.Name), "politics")
 	}
 	w.Report("robbery", "ROBBERY IN "+upper(place.Name),
-		w.unattributed(place.Name, fmt.Sprintf("A man was robbed at %s. Police have asked anybody who saw it to come forward.", place.Name)))
+		w.unattributed(place.Name, fmt.Sprintf("Somebody was robbed at %s. Police have asked anybody who saw it to come forward.", place.Name)))
 
 	// Robbing a man with a title is not robbing a man.
 	if IsOfficial(mark.ID) {

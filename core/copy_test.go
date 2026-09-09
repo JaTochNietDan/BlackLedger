@@ -264,3 +264,28 @@ func TestTheCityNamesAnOfficeWhenSomebodyHoldsOne(t *testing.T) {
 		}
 	}
 }
+
+// Read out of a real save after taking an organization: "You hold 4 of its
+// premises, 8 of its people stayed and 0 would not." A zero written as a figure
+// reads like a report from a machine.
+func TestTakingAnOrganizationReadsLikeProse(t *testing.T) {
+	if spelled(0) != "no" {
+		t.Fatalf("zero reads as %q", spelled(0))
+	}
+	for _, n := range []int{0, 1, 4, 8, 12} {
+		if s := spelled(n); strings.ContainsAny(s, "0123456789") {
+			t.Fatalf("%d reads as %q in prose", n, s)
+		}
+	}
+	// And the first fix for it produced "You hold no of its premises", because
+	// "no" reads in "no people" and never after a preposition.
+	if countOf(0) != "none" {
+		t.Fatalf("a count of nothing followed by \"of\" reads as %q", countOf(0))
+	}
+	for _, n := range []int{0, 1, 4, 12} {
+		if line := "You hold " + countOf(n) + " of its premises."; strings.Contains(line, " no of ") {
+			t.Fatalf("the record reads %q", line)
+		}
+	}
+
+}

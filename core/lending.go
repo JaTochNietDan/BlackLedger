@@ -300,7 +300,7 @@ func (w *World) Lean(id string) error {
 	w.dropLoan(l.ID)
 	w.Log("Collected at "+place.Name, fmt.Sprintf("$%d of $%d out of %s, and the rest written off because there was no more of it. The street heard about this before you got home.", got, owed, n.Name), "business")
 	w.Report("robbery", "ASSAULT REPORTED AT "+upper(place.Name),
-		w.unattributed(place.Name, fmt.Sprintf("A man was assaulted near %s. Police say the victim has declined to make a complaint.", place.Name)))
+		w.unattributed(place.Name, fmt.Sprintf("Somebody was assaulted near %s. Police say the victim has declined to make a complaint.", place.Name)))
 	return nil
 }
 

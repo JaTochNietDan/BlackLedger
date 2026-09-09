@@ -116,7 +116,7 @@ func (w *World) CallSitdown() error {
 
 	body := fmt.Sprintf("“%s and %s, in the same room, because you asked. Nobody has said anything yet.”", q.A.Name, q.B.Name)
 	if q.Suspected {
-		body = fmt.Sprintf("“%s and %s, in the same room, because you asked. One of them brought more men than the room needs, and Mara caught your eye on the way in.”", q.A.Name, q.B.Name)
+		body = fmt.Sprintf("“%s and %s, in the same room, because you asked. One of them brought more people than the room needs, and Mara caught your eye on the way in.”", q.A.Name, q.B.Name)
 	}
 	speaker := w.HolderID("fixer")
 	w.Event = &Scene{
@@ -239,7 +239,7 @@ func (w *World) bloodbath(a, b *Faction) {
 	}
 	w.Log("It was never a meeting", body, "danger")
 	w.Report("killing", "SHOOTING AT SAINT AGNES",
-		fmt.Sprintf("Several men were shot at a bar on the waterfront. Police believe a meeting between interests associated with %s and %s was the occasion.", a.Name, b.Name))
+		fmt.Sprintf("Several people were shot at a bar on the waterfront. Police believe a meeting between interests associated with %s and %s was the occasion.", a.Name, b.Name))
 	w.Witness("gunfight", SitdownGround, "A meeting at Saint Agnes ended in gunfire.", "")
 	if w.Player.Health <= 0 {
 		w.Die("A meeting at Saint Agnes that was never a meeting.")

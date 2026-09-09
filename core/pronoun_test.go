@@ -22,7 +22,10 @@ import (
 // This reads the source rather than the output because the faults are spread
 // across forty files and most of them need a state no single campaign reaches.
 
-var gendered = regexp.MustCompile(`\b(he|him|his|himself|she|her|hers|herself)\b`)
+// Nouns count as well as pronouns. "Nobody makes an arrangement like this with
+// a man" and "3 men" for a crew of three were the same fault wearing a
+// different word, and the first version of this test could not see either.
+var gendered = regexp.MustCompile(`\b(he|him|his|himself|she|her|hers|herself|man|men|woman|women|boy|boys|girl|girls|gentleman|gentlemen|lady|ladies)\b`)
 
 func TestNobodyInThisCityHasAGenderTheGameNeverGaveThem(t *testing.T) {
 	names, err := filepath.Glob("*.go")
@@ -42,6 +45,13 @@ func TestNobodyInThisCityHasAGenderTheGameNeverGaveThem(t *testing.T) {
 			trimmed := strings.TrimSpace(line)
 			// Comments are prose about the code, not prose the player reads.
 			if strings.HasPrefix(trimmed, "//") || !strings.Contains(line, `"`) {
+				continue
+			}
+			// A few string literals are data the game matches against rather
+			// than words it shows anybody — the endings that make an
+			// organization's name plural, for one. They carry a marker, and
+			// the marker has to be justified where it is written.
+			if strings.Contains(line, "// not prose") {
 				continue
 			}
 			// Only what is inside a string literal reaches a player.

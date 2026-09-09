@@ -25,6 +25,17 @@ const (
 	TakeoverKeep = .6
 )
 
+// countOf writes a count that is followed by "of". spelled(0) is "no", which
+// reads in "no people" and not in "no of its premises" — the first fix for
+// "You hold 4 of its premises, 8 of its people stayed and 0 would not" printed
+// exactly that, and was caught by reading the line a second time.
+func countOf(n int) string {
+	if n == 0 {
+		return "none"
+	}
+	return spelled(n)
+}
+
 // Leader is whoever is at the top of an organization, as a person.
 func (w *World) Leader(id string) *NPC {
 	f := w.faction(id)
@@ -67,7 +78,7 @@ func (w *World) TakeoverReadiness() string {
 		return "You are in no condition for this"
 	}
 	if f.Power > peak(f)*TakeoverWeak/5 {
-		return f.Name + " is doing too well for anybody to move on the man running it"
+		return f.Name + " is doing too well for anybody to move on whoever is running it"
 	}
 	return ""
 }
@@ -143,7 +154,15 @@ func (w *World) TakeOver() error {
 	w.Dissolve(f.ID)
 	w.OrganizationDay()
 
-	w.Log("It is yours", fmt.Sprintf("%s is dead and %s is a name nobody uses now. You hold %d of its premises, %d of its people stayed and %d would not, and every quarrel it was in is yours.", leader.Name, name, len(held), kept, left), "politics")
+	// "8 of its people stayed and 0 would not" — a zero written as a figure
+	// reads like a report from a machine, which is what it was.
+	walked := fmt.Sprintf("%s would not", spelled(left))
+	if left == 0 {
+		walked = "nobody walked out"
+	}
+	premises := countOf(len(held))
+	w.Log("It is yours", fmt.Sprintf("%s is dead and %s is a name nobody uses now. You hold %s of its premises, %s of its people stayed and %s, and every quarrel it was in is yours.",
+		leader.Name, name, premises, spelled(kept), walked), "politics")
 	w.Report("politics", upper(name)+" IS FINISHED",
 		fmt.Sprintf("%s is dead and the organization they ran is understood to have passed to somebody who worked for them. Police have not commented.", leader.Name))
 	return nil

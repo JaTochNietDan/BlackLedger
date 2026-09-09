@@ -45,7 +45,7 @@ func (w *World) MoveTarget(id string) (*Faction, bool) {
 // MoveOnReadiness explains why a move cannot be made, or returns "".
 func (w *World) MoveOnReadiness(id string) string {
 	if !w.Incorporated() {
-		return "A man does not take ground. An organization does"
+		return "One person does not take ground. An organization does"
 	}
 	holder, ok := w.MoveTarget(id)
 	if !ok {

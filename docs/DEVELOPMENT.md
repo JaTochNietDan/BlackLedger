@@ -2449,3 +2449,64 @@ Evidence: `core/pronoun_test.go`, twelve clean apicheck runs, a fresh campaign's
 sixty ledger records scanned for gendered pronouns with zero hits, `mise run
 verify` and `npm test` green, `mise run simulate` unchanged at 52 / 0 / 82 / 0.
 One string in `src/playtest.tsx` fixed alongside.
+
+## Taking a family, and the rest of the gendered prose
+
+The takeover path — going to work for a family, coming up to lieutenant, and
+then moving on whoever is in the chair — had never been exercised over HTTP.
+Neither had `serve`, `sitdown` or `pact`. I forced a save and drove it.
+
+It works, and the payoff line is one of the best in the game:
+
+```
+Vittorio Bellandi is dead: At The Monarch, late, with the city quiet:
+Vittorio Bellandi was shot in the doorway while the band kept playing. They
+had run Bellandi Family, and somebody who worked for them had come up far
+enough to want it.
+
+It is yours: Vittorio Bellandi is dead and Bellandi Family is a name nobody
+uses now. You hold four of its premises, eight of its people stayed and two
+would not, and every quarrel it was in is yours.
+```
+
+The gates are real and behaved correctly: the family has to have fallen to a
+third of its peak first, and being refused said so plainly.
+
+**A negative result worth recording.** `serve` looked as though it was missing
+from the game — it appeared at no location in the whole payload. It is not
+missing. Only the room the player is standing in carries its full action list,
+and `serve` is offered at the family's *home*, which is its highest-earning
+holding. I nearly filed this as a bug. The rule from earlier tonight held: do
+not conclude a cause you have not checked.
+
+**Two copy faults, the second one mine, from the fix for the first.** The
+takeover record read `8 of its people stayed and 0 would not` — a zero written
+as a figure. I fixed it with the number-speller, and the next run printed `You
+hold no of its premises`, because "no" reads in "no people" and never after a
+preposition. Both were found by reading the same line twice.
+
+**And the gendered prose, finished.** The pronoun check from the last slice
+caught pronouns; it did not catch nouns. `Nobody makes an arrangement like this
+with a man`, `3 men` for a crew of three, `MAN CHARGED AFTER DISTRICT SEARCHES`,
+`A man was robbed at Saint Agnes`, `You are your own man again`. Twenty-six more
+lines across fourteen files. Where a specific person was meant, the city now
+names them without guessing; where it was period idiom about an anonymous crowd,
+it kept the voice without picking a gender — `Bellandi Family had people
+waiting`, `Two of them in a doorway`, `They came armed, damaged your residence
+and left`.
+
+**The check cried wolf a fourth time,** on `pluralNames = {"people",
+"Brothers", "Boys"}` — a list of name endings the game matches against, not
+words it shows anybody. Data that is not prose now carries a visible marker, and
+the marker has to be justified where it is written.
+
+**And I nearly trusted a check that could not fail.** I broke `countOf` to prove
+the test caught it, saw a pass, and only on looking properly found my edit had
+never applied. The second attempt asserted the marker was present before
+replacing it, and the test failed exactly as it should. "Prove the check can
+fail" means proving the break happened too.
+
+Evidence: the path driven end to end through the API, three new properties, a
+fresh forty-day campaign with zero gendered stories and zero gendered ledger
+records, fifteen clean apicheck runs, `mise run verify` and `npm test` green,
+`mise run simulate` unchanged at 52 / 0 / 82 / 0.

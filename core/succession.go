@@ -65,7 +65,7 @@ func (w *World) CoupAftermath(f *Faction, winner, loser *NPC) {
 			if m.Dead || m.ID == winner.ID || m.Rank >= RankLeader {
 				continue
 			}
-			w.KillBy(m.ID, winner, fmt.Sprintf("They had backed the wrong man when %s took %s.", winner.Name, f.Name))
+			w.KillBy(m.ID, winner, fmt.Sprintf("They had backed the wrong side when %s took %s.", winner.Name, f.Name))
 			f.Power = max(10, f.Power-4)
 			break
 		}
@@ -75,7 +75,7 @@ func (w *World) CoupAftermath(f *Faction, winner, loser *NPC) {
 	// taking whatever they can hold with them.
 	if w.WorldRandom() < WalkOutChance && w.Splinter(f) {
 		w.Log("They would not answer to "+winner.Name,
-			fmt.Sprintf("What is left of %s is not all of what it was. Some of them would rather start again than take orders from the man who did this.", f.Name), "politics")
+			fmt.Sprintf("What is left of %s is not all of what it was. Some of them would rather start again than take orders from whoever did this.", f.Name), "politics")
 		return
 	}
 

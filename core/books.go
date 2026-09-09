@@ -49,9 +49,9 @@ func (w *World) Books() map[string]any {
 	}
 	add("Rent", HomeRent(p.Home), placeName(p.Home))
 	add("Security", 10*p.Security, plural(p.Security, "detail", "details"))
-	add("Crew", 12*len(p.Crew), plural(len(p.Crew), "man", "men"))
+	add("Crew", 12*len(p.Crew), plural(len(p.Crew), "on the payroll", "on the payroll"))
 	add("Staff", w.Wages(), plural(w.staffed(), "hand", "hands")+" across your premises")
-	add("Your own people", w.MemberWages(), plural(len(w.OwnPeople()), "man", "men"))
+	add("Your own people", w.MemberWages(), plural(len(w.OwnPeople()), "on the payroll", "on the payroll"))
 	add("The car", w.CarUpkeep(), w.carName())
 	add("The house", w.ComfortUpkeep(), "what is fitted at "+placeName(p.Home))
 	add("Retainers", w.RetainerCost(), w.retainerNames())

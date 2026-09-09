@@ -40,7 +40,7 @@ func (w *World) MemberWages() int { return len(w.OwnPeople()) * MemberWage }
 // SignOnReadiness explains why somebody cannot be taken on, or returns "".
 func (w *World) SignOnReadiness(id string) string {
 	if !w.Incorporated() {
-		return "Nobody signs on with a man. They sign on with something that has a name"
+		return "Nobody signs on with one person. They sign on with something that has a name"
 	}
 	n := w.NPC(id)
 	if n == nil || n.Dead {
@@ -182,7 +182,7 @@ func (w *World) defect(n *NPC) {
 		w.Properties[taken].Owner = "independent"
 		n.Faction, n.Rank, n.Role = "", RankSoldier, "Runs "+place.Name
 		n.Location, n.Trust = taken, 0
-		w.Log(n.Name+" is running "+place.Name+" now", fmt.Sprintf("They stopped being paid properly and stopped waiting. %s is not yours any more, and the man who took it knows every arrangement you have.", place.Name), "danger")
+		w.Log(n.Name+" is running "+place.Name+" now", fmt.Sprintf("They stopped being paid properly and stopped waiting. %s is not yours any more, and whoever took it knows every arrangement you have.", place.Name), "danger")
 		w.Report("business", upper(n.Name)+" TAKES OVER "+upper(place.Name),
 			fmt.Sprintf("%s is now run by %s, who is understood to have previously worked for its former proprietor.", place.Name, n.Name))
 		return

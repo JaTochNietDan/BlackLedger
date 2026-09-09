@@ -43,7 +43,7 @@ var mannerByPlace = map[string][]string{
 		"beaten in a storeroom with the door shut on it"},
 	"docks": {"put into the water with pockets full of chain",
 		"shot on the quay and rolled off it",
-		"crushed between a hull and the dockside, which happens to men who work there",
+		"crushed between a hull and the dockside, which happens to people who work there",
 		"taken onto a boat that came back without them"},
 	"laundry": {"held under in a press until it stopped",
 		"shot through the window from a car that did not stop",

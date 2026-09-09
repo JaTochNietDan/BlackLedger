@@ -85,7 +85,7 @@ func (w *World) apply(c Command) error {
 		case "attack":
 			if c.Choice == "bargain" {
 				p.Respect = max(0, p.Respect-5)
-				w.Log("A costly reprieve", "The men accept your money and withdraw. Their withdrawal does not repair your relationship with the family that sent them.", "danger")
+				w.Log("A costly reprieve", "They accept your money and withdraw. Their withdrawal does not repair your relationship with the family that sent them.", "danger")
 			} else {
 				base := .12
 				if c.Choice == "escape" {
@@ -330,7 +330,7 @@ func (w *World) apply(c Command) error {
 				} else {
 					w.Retaliation()
 				}
-				w.Log("A demand nobody forgets", "The manager refuses. A Bellandi man watches you leave. You have challenged a powerful family on its own ground.", "politics")
+				w.Log("A demand nobody forgets", "The manager refuses. Somebody of Bellandi's watches you leave. You have challenged a powerful family on its own ground.", "politics")
 			case "play:small", "play:high":
 				if err := w.Deal(target, strings.TrimPrefix(c.Kind, "play:")); err != nil {
 					return err

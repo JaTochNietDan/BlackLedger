@@ -35,7 +35,7 @@ var streetTrades = []struct{ role, place string }{
 	{"Docker", "docks"}, {"Ship's clerk", "docks"}, {"Net mender", "docks"},
 	{"Laundress", "laundry"}, {"Presser", "laundry"},
 	{"Mechanic", "garage"}, {"Panel beater", "garage"},
-	{"Croupier", "club"}, {"Doorman", "club"}, {"Cigarette girl", "club"},
+	{"Croupier", "club"}, {"Doorkeeper", "club"}, {"Cigarette seller", "club"},
 	{"Stallholder", "market"}, {"Butcher", "market"}, {"Clerk", "market"},
 	{"Dealer", "casino"}, {"Floor manager", "casino"},
 	{"Landlady", "room"}, {"Boarder", "room"},

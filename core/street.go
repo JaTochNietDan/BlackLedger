@@ -50,7 +50,7 @@ func (w *World) OnTheWay(from, to string) (Sighting, bool) {
 		a, b := w.factionName(c.A), w.factionName(c.B)
 		body := fmt.Sprintf("Two cars and a lot of shouting outside %s, and then everybody was somewhere else. Somebody was face down in the road when the street filled in again.", where.Name)
 		if explained {
-			body = fmt.Sprintf("Two cars outside %s and men out of both of them. %s and %s, and no doubt about which was which. Somebody was face down in the road when it was over.", where.Name, a, b)
+			body = fmt.Sprintf("Two cars outside %s and people out of both of them. %s and %s, and no doubt about which was which. Somebody was face down in the road when it was over.", where.Name, a, b)
 		}
 		stray := 0
 		if w.WorldRandom() < .3 {
@@ -68,7 +68,7 @@ func (w *World) OnTheWay(from, to string) (Sighting, bool) {
 		if holder == nil || target == nil || holder.Dead || target.Dead {
 			continue
 		}
-		body := fmt.Sprintf("Two men in a doorway near %s, one of them doing all the talking and neither of them enjoying it. Neither looked at you.", where.Name)
+		body := fmt.Sprintf("Two of them in a doorway near %s, one doing all the talking and neither enjoying it. Neither looked at you.", where.Name)
 		if explained || w.Known(holder) {
 			body = fmt.Sprintf("%s has %s against a wall in a doorway near %s. It is about %s, and it is not finished.", holder.Name, target.Name, where.Name, g.Because)
 		}

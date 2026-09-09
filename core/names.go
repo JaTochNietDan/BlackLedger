@@ -23,7 +23,7 @@ func Leads(name string) string {
 }
 
 // pluralNames are the endings that make an organization take a plural verb.
-var pluralNames = []string{"people", "Brothers", "Boys"}
+var pluralNames = []string{"people", "Brothers", "Boys"} // not prose: organization name endings
 
 // Agree picks the verb form that goes with an organization's name.
 func Agree(name, singular, plural string) string {

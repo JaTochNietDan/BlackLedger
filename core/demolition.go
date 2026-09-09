@@ -62,7 +62,7 @@ func (w *World) BuyCharge() error {
 	}
 	w.Player.Charges++
 	w.Player.Heat = min(100, w.Player.Heat+6)
-	w.Log("A crate off a boat at Pier 14", fmt.Sprintf("$%d for something nobody in this city sells twice to the same man. You are holding %d. It draws %d attention a day and a search that finds it ends everything.", ChargeCost, w.Player.Charges, ChargeHeat), "danger")
+	w.Log("A crate off a boat at Pier 14", fmt.Sprintf("$%d for something nobody in this city sells twice to the same customer. You are holding %d. It draws %d attention a day and a search that finds it ends everything.", ChargeCost, w.Player.Charges, ChargeHeat), "danger")
 	return nil
 }
 
