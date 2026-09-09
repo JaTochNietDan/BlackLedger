@@ -508,6 +508,55 @@ func pick(s *snapshot, visited map[string]int, tried map[string]int, turn int) (
 type failure struct {
 	Step    int    `json:"step"`
 	Problem string `json:"problem"`
+	// What the game was showing when it refused. A 409 on an action the game
+	// had just listed as available is the only way the timing-drift class has
+	// ever been caught, and the report used to carry the message and nothing
+	// else — the state that produced it was gone by the time anyone read it,
+	// and finding the cause took three failed hypotheses and seven hundred
+	// attempts. Now the refusal brings its own evidence.
+	Refused *refusal `json:"refused,omitempty"`
+}
+
+// refusal is the action as the game offered it, and the world it was offered
+// in.
+type refusal struct {
+	Kind     string `json:"kind"`
+	Target   string `json:"target"`
+	Offered  bool   `json:"offered_as_available"`
+	Reason   string `json:"reason_shown,omitempty"`
+	Minute   int    `json:"minute"`
+	Location string `json:"location"`
+	Cash     int    `json:"cash"`
+	Health   int    `json:"health"`
+	Heat     int    `json:"heat"`
+	Respect  int    `json:"respect"`
+	Standing string `json:"standing,omitempty"`
+}
+
+// asOffered describes the action the way the player saw it a moment earlier.
+func asOffered(s *snapshot, cmd command) *refusal {
+	r := &refusal{Kind: cmd.Kind, Target: cmd.Target, Minute: s.Minute,
+		Location: s.Player.Location, Cash: s.Player.Cash, Health: s.Player.Health,
+		Heat: s.Player.Heat, Respect: s.Player.Respect}
+	for _, p := range s.Locations {
+		if p.ID != s.Player.Location {
+			continue
+		}
+		for _, a := range p.Actions {
+			if a.ID == cmd.Kind {
+				r.Offered = !a.Disabled
+				r.Reason = a.Reason
+			}
+		}
+	}
+	// Standing with every organization, because that is what moved under the
+	// sitdown and nothing in the report would have shown it.
+	parts := []string{}
+	for _, f := range s.Factions {
+		parts = append(parts, fmt.Sprintf("%s %+d", f.ID, f.Goodwill))
+	}
+	r.Standing = strings.Join(parts, ", ")
+	return r
 }
 
 // blocked is why a venture was never exercised. A coverage list that says only
@@ -599,6 +648,9 @@ func main() {
 				continue
 			}
 			fail(step, "HTTP %d on %s: %s", status, cmd.Kind, body)
+			if len(rep.Failures) > 0 {
+				rep.Failures[len(rep.Failures)-1].Refused = asOffered(before, cmd)
+			}
 			if s, err = c.state(); err != nil {
 				break
 			}

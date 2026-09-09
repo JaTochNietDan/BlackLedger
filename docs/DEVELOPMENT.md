@@ -3084,3 +3084,38 @@ part of the class it covers is the difference between a guard and a comfort.
 
 Evidence: `core/offered_test.go`, twenty-two more clean apicheck runs, `mise run
 verify` and `npm test` green, `mise run simulate` unchanged at 52 / 0 / 82 / 0.
+
+## Making the only instrument that catches it keep the evidence
+
+`cmd/apicheck` is the only thing that has ever caught the timing-drift class —
+an action the game lists as available and then refuses. It found the sitdown by
+accident, and its report carried the message and nothing else. By the time
+anyone read that report the state which produced it was gone, which is why
+finding the cause took three failed hypotheses and seven hundred attempts.
+
+A refusal now brings its own evidence: the action as the game offered it
+(including whether it was listed as available and any reason shown), the minute,
+the location, cash, health, attention, respect, and **the player's standing with
+every organization** — which is the thing that moved under the sitdown and the
+one thing the report would never have shown.
+
+**I could not verify it against the real fault, and say so.** I reverted the
+sitdown fix and ran sixty-six `apicheck` runs across three fresh saves to make
+the 409 happen again with the new capture in place. It did not recur — the
+original was two occurrences in twenty-two runs on one save's particular
+history, and fresh campaigns did not reproduce it. So the end-to-end capture of
+a live 409 is unproven.
+
+What is proven is the capture itself, directly: `asOffered` is given a snapshot
+where `sitdown` is enabled and `rob` is disabled with a reason, and one family
+sits at −26. It records the enabled action as offered, the disabled one as
+disabled with its reason, the world around both, and the standing. Blanking the
+standing line makes the test fail with *"standing was not recorded"*.
+
+That is a smaller claim than "the report now explains the bug", and it is the
+one I can stand behind. The next time this class fires, the evidence will be in
+the report instead of in a state nobody can get back.
+
+Evidence: one property in `cmd/apicheck/copy_test.go`, proven to fail when the
+capture is removed, fourteen clean apicheck runs, `mise run verify` and `npm
+test` green, `mise run simulate` unchanged at 52 / 0 / 82 / 0.
