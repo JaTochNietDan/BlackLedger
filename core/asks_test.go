@@ -84,3 +84,75 @@ func TestDeclaringAPriceDoesNotChargeItTwice(t *testing.T) {
 	}
 	t.Logf("declared $%d, took $%d once the hours' other money had moved", a.Asks, spent)
 }
+
+// The regression guard, by name rather than by count. A first version asserted
+// only that "at least twelve" actions named a fee, and silencing one still left
+// twenty-four — a test that passed when I broke the code. These are the actions
+// that pay their own way, so each must name a price and must declare no cost,
+// or the engine would take the money on top of the fee.
+var paysItsOwnWay = []string{
+	"sitdown", "spike", "puff", "offshore_access", "still", "armoury",
+	"launder", "car", "dress", "arms:weapon", "arms:armour", "charge",
+	"bribe", "bankroll", "hire", "restock", "remedy",
+	"retain:commissioner", "retain:mayor", "retain:editor",
+	"pact:bellandi", "enquire:bellandi", "smear:bellandi",
+}
+
+func TestEveryPricedActionKeepsItsPrice(t *testing.T) {
+	w := New(59)
+	w.District = 2
+	w.Player.Cash, w.Player.Respect, w.Player.Health = 60000, 200, 100
+	w.Player.Contacts = 5
+	w.Player.Heat = 10
+	w.Offshore = 5000
+	w.Player.Offshore = false
+	w.Player.Crew = []Crew{{"leo", "Leo Carver", 90}}
+	for _, id := range []string{"laundry", "garage", "casino"} {
+		w.Properties[id].Owner = "player:1"
+		w.Properties[id].Staff = 0
+		w.Properties[id].Supply = 0
+		w.Properties[id].Condition = 60
+	}
+	w.Incorporate()
+	w.ensureOfficials()
+	w.News = append(w.News, Story{ID: ID(), Minute: w.Minute, Life: w.Life,
+		Headline: "QUESTIONED AT THE DOCKS", Body: "Police called again.", Kind: "police"})
+	for i := range w.Factions {
+		w.Factions[i].Goodwill = 60
+	}
+
+	seen := map[string]Action{}
+	for i := range Locations {
+		id := Locations[i].ID
+		w.Player.Location = id
+		for _, a := range w.Actions(id) {
+			if _, had := seen[a.ID]; !had {
+				seen[a.ID] = a
+			}
+		}
+	}
+	missing, checked := []string{}, 0
+	for _, kind := range paysItsOwnWay {
+		a, offered := seen[kind]
+		if !offered {
+			missing = append(missing, kind)
+			continue
+		}
+		checked++
+		if a.Asks <= 0 {
+			t.Errorf("%s pays its own fee and names no price", kind)
+		}
+		if a.Cost != 0 {
+			t.Errorf("%s pays its own fee and also declares a cost of %d, so the money would go out twice",
+				kind, a.Cost)
+		}
+	}
+	if checked < len(paysItsOwnWay)-4 {
+		t.Errorf("only %d of %d priced actions were offered anywhere; this city is not exercising them: %v",
+			checked, len(paysItsOwnWay), missing)
+	}
+	if len(missing) > 0 {
+		t.Logf("not offered in this city, so not checked: %v", missing)
+	}
+	t.Logf("checked %d actions that pay their own way", checked)
+}

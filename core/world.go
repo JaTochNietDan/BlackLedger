@@ -820,7 +820,7 @@ func (w *World) Actions(id string) []Action {
 			if next.Compartment > 0 {
 				hides = fmt.Sprintf("A false floor a search will not find %d units under.", next.Compartment)
 			}
-			add("car", "Buy "+lowerFirst(next.Label), 60, 0, w.CarReadiness(),
+			asks("car", "Buy "+lowerFirst(next.Label), 60, next.Cost, w.CarReadiness(),
 				fmt.Sprintf("$%d, then $%d a day to keep on the road. %s Journeys take %d%% of the time they take on foot. %s A car outside is a thing witnesses describe.", next.Cost, next.Upkeep, next.Detail, int(next.Pace*100), hides))
 		}
 		fee := w.ServiceFee()
@@ -837,13 +837,13 @@ func (w *World) Actions(id string) []Action {
 	case "docks":
 		add("dockwork", "Work the night cargo", 90, 0, "", "Earn $75 and 1 respect. Small chance of a work injury.")
 		if next, ok := nextArmament(weapons, p.Weapon); ok {
-			add("arms:weapon", "Buy "+next.Label, 45, 0, w.ArmsReadiness("weapon"),
+			asks("arms:weapon", "Buy "+next.Label, 45, next.Cost, w.ArmsReadiness("weapon"),
 				fmt.Sprintf("$%d. %s Improves your odds when violence is your idea. A search takes it.", next.Cost, next.Detail))
 		}
-		add("charge", "Buy a charge off a boat", ChargeMinutes, 0, w.ChargeReadiness(),
+		asks("charge", "Buy a charge off a boat", ChargeMinutes, ChargeCost, w.ChargeReadiness(),
 			fmt.Sprintf("$%d. Not a message: a declaration. Wrecks a business outright, kills whoever was standing in it about a third of the time, and cannot be mistaken for anything else. Draws %d police attention a day while you hold it, and a search that finds it is a prosecution rather than a fine.", ChargeCost, ChargeHeat))
 		if next, ok := nextArmament(armour, p.Armour); ok {
-			add("arms:armour", "Buy "+next.Label, 45, 0, w.ArmsReadiness("armour"),
+			asks("arms:armour", "Buy "+next.Label, 45, next.Cost, w.ArmsReadiness("armour"),
 				fmt.Sprintf("$%d. %s Reduces what a beating costs you. A search takes it.", next.Cost, next.Detail))
 		}
 	case "herald":
@@ -855,7 +855,7 @@ func (w *World) Actions(id string) []Action {
 				add("release:"+o.ID, "Stop paying "+o.Name, 30, 0, "",
 					fmt.Sprintf("Ends the arrangement and the $%d a day. Opening it again costs the opening payment over.", o.Retainer))
 			} else {
-				add("retain:"+o.ID, "An arrangement with "+o.Name, OfficialMinutes, 0, w.RetainerReadiness(o.ID),
+				asks("retain:"+o.ID, "An arrangement with "+o.Name, OfficialMinutes, w.OfficialOpening(o), w.RetainerReadiness(o.ID),
 					fmt.Sprintf("$%d to open and $%d a day after. %s They cut you loose above %d attention and keep the opening payment.", w.OfficialOpening(o), o.Retainer, o.Detail, w.OfficialCeiling(o)))
 			}
 		}
@@ -879,7 +879,7 @@ func (w *World) Actions(id string) []Action {
 			if f.ID == w.PlayerOrganizationID() {
 				continue
 			}
-			add("smear:"+f.ID, "Run something about "+f.Name, SmearMinutes, 0, w.SmearReadiness(f.ID),
+			asks("smear:"+f.ID, "Run something about "+f.Name, SmearMinutes, SmearCost, w.SmearReadiness(f.ID),
 				fmt.Sprintf("$%d. Every one of their places loses %d trade and the organization loses %d strength. A paper full of crime is a paper full of crime whoever it is about, so the whole city gets harder — and about one time in five they find out who paid for it.", SmearCost, SmearCustom, SmearPower))
 		}
 	case "market":
@@ -889,7 +889,7 @@ func (w *World) Actions(id string) []Action {
 			if f.ID == w.PlayerOrganizationID() {
 				continue
 			}
-			add("enquire:"+f.ID, "Ask around about "+f.Name, EnquiryMinutes, 0, w.EnquiryReadiness(f.ID),
+			asks("enquire:"+f.ID, "Ask around about "+f.Name, EnquiryMinutes, EnquiryCost, w.EnquiryReadiness(f.ID),
 				fmt.Sprintf("$%d in the right pockets. What comes back is current for about a week. You are at %d of 3 on them as it stands.", EnquiryCost, w.Intelligence(f.ID)))
 		}
 		add("lie_low", "Keep a low profile", 120, 15, "", "Lose 10 heat. Time still passes for rivals and businesses.")
@@ -909,7 +909,7 @@ func (w *World) Actions(id string) []Action {
 			if next.Notice > 0 {
 				notice = fmt.Sprintf("Dressing above your visible means draws %d police attention a day.", next.Notice)
 			}
-			add("dress", "Be measured for "+lowerFirst(next.Label), 60, 0, w.DressReadiness(),
+			asks("dress", "Be measured for "+lowerFirst(next.Label), 60, next.Cost, w.DressReadiness(),
 				fmt.Sprintf("$%d. %s Worth %d presence while it is kept, and it wears. %s", next.Cost, next.Detail, next.Presence, notice))
 		}
 		for _, o := range officials {
@@ -921,10 +921,10 @@ func (w *World) Actions(id string) []Action {
 					fmt.Sprintf("Ends the arrangement and the $%d a day. Opening it again costs the opening payment over.", o.Retainer))
 				continue
 			}
-			add("retain:"+o.ID, "An arrangement with "+o.Name, OfficialMinutes, 0, w.RetainerReadiness(o.ID),
+			asks("retain:"+o.ID, "An arrangement with "+o.Name, OfficialMinutes, w.OfficialOpening(o), w.RetainerReadiness(o.ID),
 				fmt.Sprintf("$%d to open and $%d a day after. %s They cut you loose above %d attention and keep the opening payment.", w.OfficialOpening(o), o.Retainer, o.Detail, w.OfficialCeiling(o)))
 		}
-		add("bribe", "An understanding with the detective", 45, 0, w.BribeReadiness(),
+		asks("bribe", "An understanding with the detective", 45, w.BribeCost(), w.BribeReadiness(),
 			fmt.Sprintf("$%d to Detective Harlow to lose some paperwork. Clears attention now and buys nothing later. Above %d heat nobody will be seen taking it.", w.BribeCost(), BribeCeiling))
 		for _, d := range destinations {
 			// Minutes are zero here because Trip runs the days itself, a day at
@@ -943,7 +943,7 @@ func (w *World) Actions(id string) []Action {
 					fmt.Sprintf("Stops the $%d a day and the quarrels that come with it. They will remember that you did it first.", PactTribute))
 				continue
 			}
-			add("pact:"+f.ID, "Reach an understanding with "+f.Name, PactMinutes, 0, w.PactReadiness(f.ID),
+			asks("pact:"+f.ID, "Reach an understanding with "+f.Name, PactMinutes, PactOpening, w.PactReadiness(f.ID),
 				fmt.Sprintf("$%d to open and $%d a day. Neither of you moves on the other, they may answer when somebody comes for you, and every quarrel of theirs becomes yours.", PactOpening, PactTribute))
 		}
 		add("contract", "Ask about a name", 30, 0,
@@ -985,7 +985,7 @@ func (w *World) Actions(id string) []Action {
 		}
 	}
 	if place, ok := PlaceByID(id); ok && place.Type == "racket" && w.Own(id) {
-		add("launder", "Run takings through the books", 90, 0, w.LaunderReadiness(id),
+		asks("launder", "Run takings through the books", 90, w.LaunderFee(id), w.LaunderReadiness(id),
 			fmt.Sprintf("$%d to clear up to %d police attention through %s. Wears the premises, and the books need a day between rounds.", w.LaunderFee(id), w.launderCapacity(id), l.Name))
 	}
 	if prop := w.Properties[id]; prop != nil && prop.Income > 0 && !w.Own(id) {
@@ -1064,7 +1064,7 @@ func (w *World) Actions(id string) []Action {
 			add("inspect", "Review the books", 0, 0, "", "Read current income and repair needs without advancing time.")
 			if trade, running := TradeOf(id); running {
 				prop := w.Properties[id]
-				add("hire", "Take somebody on", 45, 0, w.HireReadiness(id),
+				asks("hire", "Take somebody on", 45, trade.Wage*7, w.HireReadiness(id),
 					fmt.Sprintf("%d of %d positions filled. A week's wages up front at $%d a day after. Short-handed, it earns less and attracts trouble.", prop.Staff, trade.Hands, trade.Wage))
 				add("layoff", "Let somebody go", 30, 0, w.LayOffReadiness(id),
 					fmt.Sprintf("Cuts $%d a day from the wage bill and what the place can handle.", trade.Wage))
@@ -1072,10 +1072,10 @@ func (w *World) Actions(id string) []Action {
 					add("order", "Take on a standing order", 60, 0, w.OrderReadiness(id),
 						fmt.Sprintf("$%d a day from somebody respectable, for as long as %s keeps working at %d%%. It needs %d%% trade before anybody offers one, and losing it costs %d trade on top of the money.", OrderBonus, l.Name, int(OrderCapacity*100), OrderCustom, OrderLoss))
 				}
-				add("restock", "Buy "+trade.Supplies, 45, 0, w.RestockReadiness(id),
+				asks("restock", "Buy "+trade.Supplies, 45, trade.Restock, w.RestockReadiness(id),
 					fmt.Sprintf("$%d. Currently %d left; a business out of %s barely trades.", trade.Restock, prop.Supply, trade.Supplies))
 				if prop.Trouble {
-					add("remedy", trade.Remedy, 60, 0, w.RemedyReadiness(id),
+					asks("remedy", trade.Remedy, 60, trade.RemedyCost, w.RemedyReadiness(id),
 						fmt.Sprintf("$%d. %s %s", trade.RemedyCost, trade.Trouble, trade.RemedyDetail))
 				}
 				if ArmourySite(id) {
@@ -1099,7 +1099,7 @@ func (w *World) Actions(id string) []Action {
 			}
 			if HasBankroll(id) {
 				prop := w.Properties[id]
-				add("bankroll", "Put money behind the tables", 45, 0, w.BankrollReadiness(id),
+				asks("bankroll", "Put money behind the tables", 45, BankrollLot, w.BankrollReadiness(id),
 					fmt.Sprintf("$%d into the float, currently $%d. %s The house keeps roughly %d%% of what crosses the tables over a season and loses on plenty of single nights. A house that cannot pay a winner is finished as a room worth playing in.", BankrollLot, prop.Bankroll, coverage(w.NightHandleAt(id)), HouseEdge))
 				add("draw", "Take money off the tables", 45, 0, w.DrawReadiness(id),
 					fmt.Sprintf("$%d out of the $%d float and into your hands. It is the only way this room's winnings reach you, and every lot taken is action it can no longer attract.", BankrollLot, prop.Bankroll))

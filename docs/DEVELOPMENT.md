@@ -4401,3 +4401,42 @@ point the button is built. Others charge a figure that is computed further in �
 a retainer's opening payment, laundering, a car, a suit, arms, restocking — and
 each would need its figure lifted to the button. They are the same fault and are
 not fixed here.
+
+## The rest of the silent prices
+
+Finishing the previous slice, which fixed six of them and named the rest. Twenty
+actions in the game pay their own fee, and fourteen were still showing no price:
+an arrangement with an official, laundering, a car, a suit, a weapon, armour, a
+charge off a boat, an understanding with the detective, a pact, a bankroll,
+hiring, restocking, a remedy, asking around about a family, and running
+something about one in the paper.
+
+Read over HTTP on a driven save, every one of them now names what it takes and
+declares no cost, so the engine takes it once:
+
+| where | what it asks |
+| --- | --- |
+| an arrangement with the commissioner | $1,476 |
+| an understanding with the detective | $2,920 |
+| a pact with a family | $700 |
+| a charge off a boat | $850 |
+| a used Ford | $620 |
+| asking around about a family | $90 |
+
+The regression guard is worth more than the fix. My first version of it asserted
+that "at least twelve" actions named a fee — and silencing one still left
+twenty-four, so it passed when I broke the code. It names the twenty now, and
+both failure modes fail it: making one go quiet, and making one declare a cost
+the engine would charge on top of its own fee. That is the twenty-second time a
+check of mine has needed the same lesson, and the first time I have caught it by
+running the break before writing the slice up rather than after.
+
+Evidence: `core/asks_test.go`. `mise run verify` and `npm test` green, `mise run
+simulate` unchanged at defiant 52 / investor 0 / reckless 82 / worker 0, 0
+errors, with identical median cash — as it should be, since nothing about what
+anything costs has changed, only what the button says.
+
+The shape is closed. Twenty actions pay their own way, all twenty say so, and a
+new one that does not will not be caught by any test from outside — that is
+stated plainly rather than implied, because the guard protects what exists and
+cannot know what has not been written.
