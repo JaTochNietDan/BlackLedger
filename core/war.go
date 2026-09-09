@@ -177,6 +177,13 @@ func (w *World) contestAt(attacker, defender *Faction, weakest string) {
 				fmt.Sprintf("%s's %s went up in the street while %s were in the building. %s is walking.",
 					driver.Name, label, Leads(attacker.Name), driver.Name), "danger")
 		}
+	} else if driver := w.parkedAt(weakest, defender.ID); driver != nil && !driver.Hurt {
+		// What a raid does not burn it goes through. A car left in that state
+		// is not a loss, it is a bill, and somebody in this city is paid it.
+		driver.Hurt = true
+		w.Log("Glass in the road at "+place.Name,
+			fmt.Sprintf("%s's car was gone through and left where it stood while %s were in the building.",
+				driver.Name, Leads(attacker.Name)), "danger")
 	}
 
 	// A raid reaches people, not only premises.

@@ -126,4 +126,12 @@ theft etc. Maybe a scrapyard would also be a good idea that links in similarly.
 Flesh that out in the loop. Add it to the inbox. Think about more interlinked
 stuff too.
 
+Built: parts and the trade that buys them (core/parts.go), a scrapyard for what
+is left of a car, and the last line of it — the glass. A car taken apart in a
+street leaves the rest of the row broken rather than gone, a raid that does not
+burn a car goes through it instead, and one owner a day pays a garage out of
+their own purse to be put right (core/repairs.go). Somebody with nothing keeps
+driving it broken, so a poor district gives its garage the same crimes and less
+work. "Think about more interlinked stuff too" stays open; it is standing.
+
 Ultiamtely the expectation is that I don't have to think of all of these concepts, you, the agent will think of these too and build them out and playtest and simulate them yourself.

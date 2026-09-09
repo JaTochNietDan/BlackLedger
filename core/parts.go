@@ -91,10 +91,19 @@ func (w *World) StripCar(location string) error {
 	// of why anybody would hold one.
 	w.PartsAbout(PartsTrade)
 
+	// Nobody takes one car apart in a quiet street and leaves the rest of the
+	// row untouched. What is still there in the morning is still there with the
+	// glass out of it, and that is a garage's actual trade.
+	glass := w.BreakGlass(location, mark.ID)
+
 	place, _ := PlaceByID(location)
 	w.Log(label+" in pieces at "+place.Name,
 		fmt.Sprintf("%s's car went for parts. $%d for the night's work, and %s will know by morning that it was somebody.",
 			mark.Name, worth, mark.Name), "danger")
+	if glass > 0 {
+		w.Log("Glass in the road at "+place.Name,
+			fmt.Sprintf("%s in the street were gone through and left where they stood. Somebody will be paid to put them right.", plural(glass, "more car", "more cars")), "danger")
+	}
 	w.Report("theft", "CAR STRIPPED IN "+upper(place.Name),
 		w.unattributed(place.Name, fmt.Sprintf("A car was taken apart in the street at %s overnight. Garages in the district report no shortage of work.", place.Name)))
 	return nil

@@ -164,6 +164,10 @@ type NPC struct {
 	// from somebody whose car was taken. Without it, settling a city would
 	// quietly hand a replacement to anybody who had just lost one.
 	Drove int `json:"drove,omitempty"`
+	// Whether what they drive is standing there with the glass out of it. A
+	// thief working a street does not take every car on it; the rest are left
+	// needing a garage, and that work is what a garage actually lives on.
+	Hurt bool `json:"hurt,omitempty"`
 	// The minute this person was last paid. It exists so that having nothing
 	// can be told from never having been given anything: a man robbed down to
 	// nothing must not be quietly refilled by the same pass that settles a
@@ -1522,6 +1526,7 @@ func (w *World) Advance(minutes int) {
 			w.CasinoDay()
 			w.CarDay()
 			w.CarTrade()
+			w.RepairsDay()
 			w.ChargeDay()
 			w.DemolitionDay()
 			w.CityHallDay()
