@@ -3165,3 +3165,44 @@ confirming the check can see it.
 Evidence: `cmd/blackledger/director_status_test.go`, proven to fail when the
 validator's words are restored, twelve clean apicheck runs, `mise run verify`
 and `npm test` green, `mise run simulate` unchanged at 52 / 0 / 82 / 0.
+
+## The scene, and a button for stopping something that was not happening
+
+The scene modal had never been looked at. Getting one on screen took forcing the
+state: no authored encounter fired in ninety actions of ordinary play, so I gave
+the player a business and set the next pressure to the current minute.
+
+It reads very well — portrait, name, office, the demand in the speaker's own
+voice, three numbered choices each stating its cost and its consequence, TIME
+PAUSED in the corner and "Decisions are saved immediately" at the foot. Nothing
+wrong with any of it.
+
+Underneath the dialogue were two buttons: **Read aloud** and **Stop voice**,
+always, both. A control for stopping something that was not happening, sitting
+next to the control for starting it.
+
+**I nearly filed a second fault that was not one.** The label beside the speaker
+looked like dead state — `setSpeech` appeared nowhere in the file. It is passed
+by reference as the voice player's `status` callback, so the label is live and
+says "Preparing voice…", "Speaking…", "Replay voice" as it goes. Reading the
+wiring before writing it up saved a wrong fix, which is the fifth time that has
+happened tonight.
+
+That live status is also the fix. The player already reports what it is doing,
+so `speaking()` moved into `voice.ts` beside the states it reads, and the stop
+appears only while a reading is being prepared or is playing. Putting it there
+rather than in the view means it cannot drift from those strings without the
+existing voice tests failing too.
+
+The test walks a real reading: idle, preparing, speaking, ended, and failed.
+Making `speaking` return true always fails it with *"stop offered before
+anything was asked for"*.
+
+Also confirmed while there: the voice toggle in Settings governs whether a scene
+reads itself aloud on opening, not whether the button exists. Offering a manual
+reading with auto-play off is deliberate, and correct.
+
+Evidence: one test in `tests/voice.test.mjs` proven to fail when the predicate
+is broken, the modal re-read in the browser with the stop control gone, twelve
+clean apicheck runs, `mise run verify` and `npm test` green, `mise run simulate`
+unchanged at 52 / 0 / 82 / 0.
