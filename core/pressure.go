@@ -63,7 +63,7 @@ func (w *World) ScrutinyDay() {
 	if before < ScrutinyCrackdown && w.Scrutiny() >= ScrutinyCrackdown {
 		w.Log("The city has had enough", fmt.Sprintf("It is not about you. Between the killings, the explosions and whatever was in the paper this morning, the police have stopped waiting for a reason. Everything is harder now, for everybody."), "danger")
 		w.Report("police", "CITY ORDERS CRACKDOWN ON ORGANIZED CRIME",
-			"The commissioner has announced what he describes as an end to tolerance. Officers have been reassigned from other duties and the courts have been asked to sit longer.")
+			"The commissioner has announced what they describe as an end to tolerance. Officers have been reassigned from other duties and the courts have been asked to sit longer.")
 	}
 	if before >= ScrutinyCrackdown && w.Scrutiny() < ScrutinyCrackdown {
 		w.Log("It has gone quiet", "Whatever the police were doing, they are doing less of it. The city has found something else to worry about.", "personal")

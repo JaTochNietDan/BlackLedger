@@ -2403,3 +2403,49 @@ Evidence: the loop driven end to end through the API against a forced save, one
 new property in `core/copy_test.go`, three more patterns on the `cmd/apicheck`
 copy scan, fifteen clean runs, `mise run verify` and `npm test` green, `mise run
 simulate` unchanged at 52 / 0 / 82 / 0.
+
+## Reading the ledger
+
+The paper has been read end to end twice. The ledger's "What happened" log never
+had been, and the player reads it far more often. So I drove a save to day ten
+and read all sixty records in order.
+
+It reads well as a story — a crew member sent out and coming back hurt, a
+business skimmed until the family notices, a war on the street that eventually
+kills you — and it turned up one fault, in forty-nine places at once.
+
+```
+Stella Iordan was not as easy as he looked.
+$298 off Stella Iordan, and a man with your standing is not somebody anybody
+has to describe twice.
+```
+
+The city hands out names of every kind. Stella, Franca, Perla, Elena, Mara and
+Ida sit beside Nico, Leo and Otto, and **nothing anywhere in the save records a
+gender**, because the game has never had a reason to. The prose assumed one
+anyway. Two paragraphs further down the same screen, the obituaries were saying
+"They were a soldier of Russo Outfit."
+
+That is the argument on its own: the game contradicting itself about the same
+person in the same issue. The convention already existed and simply had not been
+applied. Forty-nine lines across sixteen files now use it — the crew, the marks,
+the officials, the people in a cell, and the player, whose own name is generated
+the same way. Where the line was a period idiom about nobody in particular, it
+stayed idiomatic without picking a gender: "the street respects somebody who
+does their time quietly".
+
+**The check reads the source, not the output.** Every other copy rule tonight
+lives in `cmd/apicheck`, but these faults are spread across sixteen files and
+most need a state no single campaign reaches — the ledger read found them in
+one campaign only because that campaign happened to mug somebody. The test walks
+every non-test file in `core` and fails on a gendered pronoun inside a string
+literal, naming the file, the line and the text.
+
+And I checked the check, which is the lesson of the last three ticks: I put
+"he looked" back into `mugging.go`, confirmed the test failed and printed the
+offending line, then restored it. A test that cannot fail proves nothing.
+
+Evidence: `core/pronoun_test.go`, twelve clean apicheck runs, a fresh campaign's
+sixty ledger records scanned for gendered pronouns with zero hits, `mise run
+verify` and `npm test` green, `mise run simulate` unchanged at 52 / 0 / 82 / 0.
+One string in `src/playtest.tsx` fixed alongside.

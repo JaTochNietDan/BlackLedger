@@ -48,14 +48,14 @@ func (w *World) SendOnCollections() {
 	w.Tasks = append(w.Tasks, Task{ID(), "Leo · collections", w.Minute + CollectionMinutes})
 	w.Homes = append(w.Homes, TaskHome{Task: w.Tasks[len(w.Tasks)-1].ID, Person: n.ID, Where: home})
 	if round == n.Location {
-		w.Log(n.Name+" starts the round", fmt.Sprintf("He is already at %s. Two hours of doors.", place.Name), "work")
+		w.Log(n.Name+" starts the round", fmt.Sprintf("They are already at %s. Two hours of doors.", place.Name), "work")
 		return
 	}
 	n.Heading = round
 	n.Errand = "on collections at " + place.Name
 	n.Arrives = w.Minute + TravelMinutes(n.Location, round)
 	w.noticed(n, true)
-	w.Log(n.Name+" heads out", fmt.Sprintf("%s, and %d minutes to walk it. He is not here while he is doing it.", place.Name, n.Arrives-w.Minute), "work")
+	w.Log(n.Name+" heads out", fmt.Sprintf("%s, and %d minutes to walk it. They are not here while they are doing it.", place.Name, n.Arrives-w.Minute), "work")
 }
 
 // settleTasks pays for the work that has finished and sends whoever did it
@@ -83,11 +83,11 @@ func (w *World) sendHome(task string) {
 		w.Homes = append(w.Homes[:i], w.Homes[i+1:]...)
 		n := w.NPC(home.Person)
 		if n == nil || n.Dead || home.Where == "" {
-			w.Log("Leo returns", fmt.Sprintf("$%d from collections. He is available again.", CollectionPay), "business")
+			w.Log("Leo returns", fmt.Sprintf("$%d from collections. They are available again.", CollectionPay), "business")
 			return
 		}
 		if n.Location == home.Where || w.Travelling(n) {
-			w.Log(n.Name+" returns", fmt.Sprintf("$%d from collections. He is available again.", CollectionPay), "business")
+			w.Log(n.Name+" returns", fmt.Sprintf("$%d from collections. They are available again.", CollectionPay), "business")
 			return
 		}
 		place, _ := PlaceByID(home.Where)
@@ -98,7 +98,7 @@ func (w *World) sendHome(task string) {
 		w.Log(n.Name+" starts back", fmt.Sprintf("$%d from collections, and %d minutes back to %s.", CollectionPay, n.Arrives-w.Minute, place.Name), "business")
 		return
 	}
-	w.Log("Leo returns", fmt.Sprintf("$%d from collections. He is available again.", CollectionPay), "business")
+	w.Log("Leo returns", fmt.Sprintf("$%d from collections. They are available again.", CollectionPay), "business")
 }
 
 const (

@@ -31,10 +31,10 @@ type Official struct {
 
 var officials = []Official{
 	{ID: "commissioner", Name: "Commissioner Vance", Role: "Police commissioner",
-		Detail:   "Files go to the bottom of piles. Raids begin 20 attention later than they otherwise would, and nothing is ever forfeited while he is paid.",
+		Detail:   "Files go to the bottom of piles. Raids begin 20 attention later than they otherwise would, and nothing is ever forfeited while they are paid.",
 		Retainer: 45, Opening: 900, Ceiling: 78},
 	{ID: "mayor", Name: "Mayor Ellis Crane", Role: "Mayor of Bellwether",
-		Detail:   "Licences, inspections and the right words in the right rooms. Every business of yours earns a fifth more while he is paid.",
+		Detail:   "Licences, inspections and the right words in the right rooms. Every business of yours earns a fifth more while they are paid.",
 		Retainer: 60, Opening: 1400, Ceiling: 65},
 	{ID: "editor", Name: "Editor Sam Rourke", Role: "Editor of the Bellwether Herald",
 		Detail:   "What the city read this morning. Stories about you can be pulled before they run, stories about anybody else can be arranged, and either is a thing somebody at that paper knows about you.",
@@ -207,7 +207,7 @@ func (w *World) Retain(id string) error {
 	}
 	w.Player.Retainers = append(w.Player.Retainers, id)
 	w.MeetPerson(id)
-	w.Log("An arrangement with "+o.Name, fmt.Sprintf("$%d to open it and $%d a day to keep it. %s It ends the day he decides you are worth more trouble than money.", o.Opening, o.Retainer, o.Detail), "politics")
+	w.Log("An arrangement with "+o.Name, fmt.Sprintf("$%d to open it and $%d a day to keep it. %s It ends the day they decide you are worth more trouble than money.", o.Opening, o.Retainer, o.Detail), "politics")
 	return nil
 }
 
@@ -225,7 +225,7 @@ func (w *World) EndRetainer(id string) error {
 	}
 	w.Player.Retainers = kept
 	o, _ := OfficialByID(id)
-	w.Log("The arrangement with "+o.Name+" ends", "You stop paying. He does not argue, which tells you what it was worth to him.", "politics")
+	w.Log("The arrangement with "+o.Name+" ends", "You stop paying. They do not argue, which tells you what it was worth to them.", "politics")
 	return nil
 }
 
@@ -241,7 +241,7 @@ func (w *World) CityHallDay() {
 			continue
 		}
 		w.EndRetainerQuietly(id)
-		w.Log(o.Name+" is not taking calls", fmt.Sprintf("Your attention is at %d and he has a pension. The arrangement is over and the money you paid to open it is not coming back.", w.Player.Heat), "danger")
+		w.Log(o.Name+" is not taking calls", fmt.Sprintf("Your attention is at %d and they have a pension. The arrangement is over and the money you paid to open it is not coming back.", w.Player.Heat), "danger")
 	}
 }
 
@@ -274,7 +274,7 @@ func (w *World) OfficialKilled(id string) {
 		f.Power = max(10, f.Power-8)
 		f.Cash = max(0, f.Cash-1200)
 	}
-	w.Log("They will turn the city over", fmt.Sprintf("%s is dead. Every man in this city with a name is going to spend the next month explaining where he was, and that includes you.", o.Name), "danger")
+	w.Log("They will turn the city over", fmt.Sprintf("%s is dead. Everybody in this city with a name is going to spend the next month explaining where they were, and that includes you.", o.Name), "danger")
 	w.Report("police", "CITY REELS AS "+upper(o.Name)+" IS KILLED",
 		fmt.Sprintf("%s, %s, was killed today. The police have announced what they describe as an unprecedented operation against organized crime in the city. No arrests have been made.", o.Name, o.Role))
 }

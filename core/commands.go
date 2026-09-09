@@ -570,7 +570,7 @@ func (w *World) apply(c Command) error {
 				case "recruit":
 					p.Crew = append(p.Crew, Crew{"leo", "Leo Carver", 65})
 					p.Respect += 2
-					w.Log("Your first associate", "Leo Carver joins you. He expects $12 a day and a boss who keeps their word.", "personal")
+					w.Log("Your first associate", "Leo Carver joins you. They expect $12 a day and a boss who keeps their word.", "personal")
 				case "investigate":
 					w.Investigate()
 				case "lie_low":

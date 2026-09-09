@@ -121,9 +121,9 @@ func (w *World) Mug(location string, hand Hand) error {
 		w.Resent(mark.ID, w.crewID(hand), 30, "what was tried at "+place.Name)
 		w.answerFor(mark, hand, 12)
 		if hand.Crew {
-			w.Log("It went wrong at "+place.Name, fmt.Sprintf("%s went at %s and came off worse. %s knows who sent him.", hand.Name, mark.Name, mark.Name), "danger")
+			w.Log("It went wrong at "+place.Name, fmt.Sprintf("%s went at %s and came off worse. %s knows who sent them.", hand.Name, mark.Name, mark.Name), "danger")
 		} else {
-			w.Log("It went wrong at "+place.Name, fmt.Sprintf("%s was not as easy as he looked. You came away with nothing and %d less health, and he saw all of it.", mark.Name, health-w.Player.Health), "danger")
+			w.Log("It went wrong at "+place.Name, fmt.Sprintf("%s was not as easy as they looked. You came away with nothing and %d less health, and they saw all of it.", mark.Name, health-w.Player.Health), "danger")
 		}
 		if w.Player.Health <= 0 {
 			w.Die("A robbery at " + place.Name + " that should have been simple.")
@@ -142,7 +142,7 @@ func (w *World) Mug(location string, hand Hand) error {
 	if w.Recognised(hand) {
 		w.Resent(mark.ID, w.crewID(hand), 45, "being robbed at "+place.Name)
 		w.answerFor(mark, hand, 25)
-		w.Log("He knows your face", fmt.Sprintf("$%d off %s, and a man with your standing is not somebody anybody has to describe twice.", purse, mark.Name), "danger")
+		w.Log("They know your face", fmt.Sprintf("$%d off %s, and somebody with your standing is not a person anybody has to describe twice.", purse, mark.Name), "danger")
 	} else {
 		w.Resent(mark.ID, w.crewID(hand), 20, "being robbed at "+place.Name)
 		w.Log("Taken off "+mark.Name, fmt.Sprintf("$%d, and nobody who could put a name to it. %s will be asking, though.", purse, mark.Name), "politics")

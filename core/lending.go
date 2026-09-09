@@ -153,7 +153,7 @@ func (w *World) LendReadiness(id string) string {
 		return fmt.Sprintf("Nobody borrows from a stranger. It takes %d respect", LendStanding)
 	}
 	if w.Inside(n) {
-		return "The police have him"
+		return "The police have them"
 	}
 	if size := w.LoanSize(n); size < LoanFloor {
 		return fmt.Sprintf("You have $%d out already, which is as much as you can afford to be owed", w.OutOnLoan())
@@ -250,7 +250,7 @@ func (w *World) LeanReadiness(id string) string {
 		return "That conversation happens in person"
 	}
 	if w.Inside(n) {
-		return "The police have him"
+		return "The police have them"
 	}
 	return ""
 }
@@ -365,7 +365,7 @@ func (w *World) Forgive(id string) error {
 	w.Player.Respect = max(0, w.Player.Respect-ForgiveRespect)
 	n.Trust = min(100, n.Trust+40)
 	n.Sore, n.SoreAt = 0, ""
-	w.Log(n.Name+" owes you nothing", fmt.Sprintf("$%d off the books and a man who knows exactly what that was worth. It is not how this business is done, and everybody will hear that too.", owed), "personal")
+	w.Log(n.Name+" owes you nothing", fmt.Sprintf("$%d off the books and somebody who knows exactly what that was worth. It is not how this business is done, and everybody will hear that too.", owed), "personal")
 	return nil
 }
 

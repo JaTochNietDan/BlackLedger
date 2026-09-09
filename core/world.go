@@ -713,7 +713,7 @@ func (w *World) Actions(id string) []Action {
 			}
 			days := (n.Held - w.Minute + 1439) / 1440
 			add("bail:"+n.ID, "Bail out "+n.Name, 60, days*BailDaily, "",
-				fmt.Sprintf("$%d for the %d days still on him. He comes out owing you, which is not the same as being grateful.", days*BailDaily, days))
+				fmt.Sprintf("$%d for the %d days still on them. They come out owing you, which is not the same as being grateful.", days*BailDaily, days))
 		}
 	case "bar":
 		add("courier", "Carry a discreet envelope", CourierMinutes, 0, "",
@@ -787,7 +787,7 @@ func (w *World) Actions(id string) []Action {
 					fmt.Sprintf("Ends the arrangement and the $%d a day. Opening it again costs the opening payment over.", o.Retainer))
 			} else {
 				add("retain:"+o.ID, "An arrangement with "+o.Name, OfficialMinutes, 0, w.RetainerReadiness(o.ID),
-					fmt.Sprintf("$%d to open and $%d a day after. %s He cuts you loose above %d attention and keeps the opening payment.", w.OfficialOpening(o), o.Retainer, o.Detail, w.OfficialCeiling(o)))
+					fmt.Sprintf("$%d to open and $%d a day after. %s They cut you loose above %d attention and keep the opening payment.", w.OfficialOpening(o), o.Retainer, o.Detail, w.OfficialCeiling(o)))
 			}
 		}
 		spikeable := "Nothing in today's paper is about you."
@@ -841,7 +841,7 @@ func (w *World) Actions(id string) []Action {
 				continue
 			}
 			add("retain:"+o.ID, "An arrangement with "+o.Name, OfficialMinutes, 0, w.RetainerReadiness(o.ID),
-				fmt.Sprintf("$%d to open and $%d a day after. %s He cuts you loose above %d attention and keeps the opening payment.", w.OfficialOpening(o), o.Retainer, o.Detail, w.OfficialCeiling(o)))
+				fmt.Sprintf("$%d to open and $%d a day after. %s They cut you loose above %d attention and keep the opening payment.", w.OfficialOpening(o), o.Retainer, o.Detail, w.OfficialCeiling(o)))
 		}
 		add("bribe", "An understanding with the detective", 45, 0, w.BribeReadiness(),
 			fmt.Sprintf("$%d to Detective Harlow to lose some paperwork. Clears attention now and buys nothing later. Above %d heat nobody will be seen taking it.", w.BribeCost(), BribeCeiling))
@@ -870,7 +870,7 @@ func (w *World) Actions(id string) []Action {
 			"Put a price on somebody. What it costs depends on who they are and who does the work. A failed attempt can be traced back to you.")
 	case "club":
 		add("audience", "Request an audience", 45, 0, "", "Discuss your standing with the Bellandi family.")
-		add("provoke", "Demand protection money", 30, 0, "", "EXTREME RISK. Bellandi owns this casino. Challenging him can bring lethal retaliation.")
+		add("provoke", "Demand protection money", 30, 0, "", "EXTREME RISK. Bellandi owns this casino. Challenging them can bring lethal retaliation.")
 	}
 	if w.Hand != nil && !w.Hand.Done && w.Hand.Place == id {
 		add("hit", "Take another card", 5, 0, "",
@@ -903,7 +903,7 @@ func (w *World) Actions(id string) []Action {
 				reason = w.DelegateReadiness()
 			}
 			add("rob:crew", "Send "+hand.Name+" for the till", 45, 0, reason,
-				fmt.Sprintf("The same money and worse odds, because he brings his loyalty to it and not your name. %d less police attention on you and a fifth of the standing. Going wrong costs him %d loyalty, and sometimes more than that.", HandHeatRelief, HandLoyaltyCost))
+				fmt.Sprintf("The same money and worse odds, because they bring their loyalty to it and not your name. %d less police attention on you and a fifth of the standing. Going wrong costs them %d loyalty, and sometimes more than that.", HandHeatRelief, HandLoyaltyCost))
 		}
 	}
 	for _, g := range w.Goods {
@@ -923,7 +923,7 @@ func (w *World) Actions(id string) []Action {
 	}
 	if mark, ok := w.MuggingTarget(id); ok {
 		add("mug", "Take what "+mark.Name+" is carrying", MuggingMinutes, 0, w.MuggingReadiness(id),
-			fmt.Sprintf("About $%d on him. Your standing improves the odds and makes you the man he describes afterwards: above %d presence he can name you. He will hold it against you either way, and so will %s.", w.Pockets(mark), RecognisedAt, w.factionName(mark.Faction)))
+			fmt.Sprintf("About $%d on them. Your standing improves the odds and makes you the person they describe afterwards: above %d presence they can name you. They will hold it against you either way, and so will %s.", w.Pockets(mark), RecognisedAt, w.factionName(mark.Faction)))
 		about(mark.ID)
 		if hand, ok := w.CrewHands(); ok {
 			reason := w.MuggingReadiness(id)
@@ -931,7 +931,7 @@ func (w *World) Actions(id string) []Action {
 				reason = w.DelegateReadiness()
 			}
 			add("mug:crew", "Send "+hand.Name+" after "+mark.Name, MuggingMinutes, 0, reason,
-				fmt.Sprintf("The same $%d and worse odds, and it is his face rather than yours. %s holds it against him instead.", w.Pockets(mark), mark.Name))
+				fmt.Sprintf("The same $%d and worse odds, and it is their face rather than yours. %s holds it against them instead.", w.Pockets(mark), mark.Name))
 			about(mark.ID)
 		}
 	}
@@ -950,7 +950,7 @@ func (w *World) Actions(id string) []Action {
 				reason = w.DelegateReadiness()
 			}
 			add("sabotage:crew", "Send "+hand.Name+" against "+l.Name, 90, 0, reason,
-				fmt.Sprintf("The same damage to %s and worse odds. %d less attention on you and a fifth of the standing. Turned away, he takes the beating and %d loyalty, and sometimes he does not come back.", f.Name, HandHeatRelief, HandLoyaltyCost))
+				fmt.Sprintf("The same damage to %s and worse odds. %d less attention on you and a fifth of the standing. Turned away, they take the beating and %d loyalty, and sometimes they do not come back.", f.Name, HandHeatRelief, HandLoyaltyCost))
 		}
 		add("sabotage", "Move against "+f.Name+" yourself", 90, 0, w.SabotageReadiness(id),
 			fmt.Sprintf("Send your crew against %s. Damages the property, weakens %s and costs you standing with them. They will retaliate, and a failed attempt injures you.", l.Name, f.Name))
@@ -1081,7 +1081,7 @@ func (w *World) Actions(id string) []Action {
 		if leader := w.Leader(w.Player.Serves); leader != nil && leader.Location == id {
 			f := w.faction(w.Player.Serves)
 			add("takeover", "Move on "+leader.Name, TakeoverMinutes, 0, w.TakeoverReadiness(),
-				fmt.Sprintf("Everything %s has becomes yours: the premises, the people who stay, and every quarrel the name was in. He is not an easy man to be in a room with, and if he is expecting it you are not one of theirs any more, if you are anything.", f.Name))
+				fmt.Sprintf("Everything %s has becomes yours: the premises, the people who stay, and every quarrel the name was in. They are not an easy person to be in a room with, and if they are expecting it you are not one of theirs any more, if you are anything.", f.Name))
 		}
 	}
 	if l.Type == "home" {
@@ -1193,12 +1193,12 @@ func (w *World) Actions(id string) []Action {
 		roundPlace, _ := PlaceByID(round)
 		collecting := fmt.Sprintf("Two hours of doors at %s: $%d. Requires 30 loyalty.", roundPlace.Name, CollectionPay)
 		if n := w.NPC(p.Crew[0].ID); n != nil && n.Location != round {
-			collecting = fmt.Sprintf("%s walks to %s — %d minutes — and is not here while he is doing it. Two hours of doors: $%d. Requires 30 loyalty.",
+			collecting = fmt.Sprintf("%s walks to %s — %d minutes — and is not here while they are doing it. Two hours of doors: $%d. Requires 30 loyalty.",
 				n.Name, roundPlace.Name, TravelMinutes(n.Location, round), CollectionPay)
 		}
 		add("delegate", "Send Leo on collections", 15, 0, reason, collecting)
 		about(p.Crew[0].ID)
-		add("crew_bonus", "Pay Leo a bonus", 15, 40, need(p.Crew[0].Loyalty >= 100, "Loyalty is already at its maximum"), "Restore up to 25 loyalty. Below 30 he refuses collections; at 50 he can help protect businesses when available.")
+		add("crew_bonus", "Pay Leo a bonus", 15, 40, need(p.Crew[0].Loyalty >= 100, "Loyalty is already at its maximum"), "Restore up to 25 loyalty. Below 30 they refuse collections; at 50 they can help protect businesses when available.")
 		about(p.Crew[0].ID)
 	}
 	if offer, ok := w.AvailableCommission(id); ok {
@@ -1513,7 +1513,7 @@ func (w *World) OfferIfReady() {
 		return
 	}
 	if w.Player.JobCount == 2 && !w.hasRecord("A favor with a price") {
-		e, _ := w.ValidateProposal(Proposal{"", "A favor with a price", "“A merchant wants a sealed ledger moved before his partners arrive. I would understand if you preferred the ordinary work.”", w.HolderID("fixer"), "courier", "You moved the ledger. Mara now knows you can handle sensitive work.", "", []Approach{{Method: "careful", Label: "Wait for a quiet route"}, {Method: "press", Label: "Move it before the partners arrive"}}})
+		e, _ := w.ValidateProposal(Proposal{"", "A favor with a price", "“A merchant wants a sealed ledger moved before their partners arrive. I would understand if you preferred the ordinary work.”", w.HolderID("fixer"), "courier", "You moved the ledger. Mara now knows you can handle sensitive work.", "", []Approach{{Method: "careful", Label: "Wait for a quiet route"}, {Method: "press", Label: "Move it before the partners arrive"}}})
 		e.Source = "authored"
 		w.Event = e
 		w.RememberArrangement(e, "offered")

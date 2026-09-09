@@ -58,10 +58,10 @@ func (w *World) TakeoverReadiness() string {
 	}
 	if w.Player.Location != leader.Location {
 		place, _ := PlaceByID(leader.Location)
-		return "He is at " + place.Name
+		return "They are at " + place.Name
 	}
 	if w.Presence() < TakeoverStanding {
-		return fmt.Sprintf("Nobody would follow you rather than him. You need %d presence", TakeoverStanding)
+		return fmt.Sprintf("Nobody would follow you rather than them. You need %d presence", TakeoverStanding)
 	}
 	if w.Player.Health < 50 {
 		return "You are in no condition for this"
@@ -101,10 +101,10 @@ func (w *World) TakeOver() error {
 		w.Player.Health = max(0, w.Player.Health-injury)
 		w.Player.Serves, w.Player.Service = "", 0
 		f.Goodwill = max(-100, f.Goodwill-70)
-		w.Log("He was expecting it", fmt.Sprintf("%s knew before you were through the door. You are not one of theirs any more and %s is not a name you can use.", leader.Name, name), "danger")
+		w.Log("They were expecting it", fmt.Sprintf("%s knew before you were through the door. You are not one of theirs any more and %s is not a name you can use.", leader.Name, name), "danger")
 		w.RetaliationFrom(f.ID)
 		if w.Player.Health <= 0 {
-			w.Die("A move on " + leader.Name + " that he saw coming.")
+			w.Die("A move on " + leader.Name + " that they saw coming.")
 		}
 		return nil
 	}
@@ -145,6 +145,6 @@ func (w *World) TakeOver() error {
 
 	w.Log("It is yours", fmt.Sprintf("%s is dead and %s is a name nobody uses now. You hold %d of its premises, %d of its people stayed and %d would not, and every quarrel it was in is yours.", leader.Name, name, len(held), kept, left), "politics")
 	w.Report("politics", upper(name)+" IS FINISHED",
-		fmt.Sprintf("%s is dead and the organization he ran is understood to have passed to somebody who worked for him. Police have not commented.", leader.Name))
+		fmt.Sprintf("%s is dead and the organization they ran is understood to have passed to somebody who worked for them. Police have not commented.", leader.Name))
 	return nil
 }

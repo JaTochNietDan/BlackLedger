@@ -162,7 +162,7 @@ func (w *World) SabotageBy(id string, hand Hand) error {
 		w.Player.Heat = min(100, w.Player.Heat+w.HandHeat(hand, 12))
 		f.Goodwill = max(-100, f.Goodwill-20)
 		if hand.Crew {
-			w.Log("Turned away at "+place.Name, fmt.Sprintf("%s men were waiting. %s went in without you and came back with nothing. %s knows who sent him.", f.Name, hand.Name, f.Leader), "danger")
+			w.Log("Turned away at "+place.Name, fmt.Sprintf("%s men were waiting. %s went in without you and came back with nothing. %s knows who sent them.", f.Name, hand.Name, f.Leader), "danger")
 		} else {
 			w.Log("Turned away at "+place.Name, fmt.Sprintf("%s men were waiting. You and %s left without reaching anything, and you were hurt (-%d health). %s knows who came.", f.Name, crew, health-w.Player.Health, f.Leader), "danger")
 		}

@@ -156,7 +156,7 @@ func (w *World) BreakPact(id, why string) {
 func (w *World) PactDay() {
 	for _, f := range w.Allies() {
 		if w.Player.Cash < w.DailyCost() {
-			w.BreakPact(f.ID, "The tribute stopped arriving. Nobody stands with a man who cannot pay for it.")
+			w.BreakPact(f.ID, "The tribute stopped arriving. Nobody stands with somebody who cannot pay for it.")
 			continue
 		}
 		// Their quarrels are yours now.

@@ -97,13 +97,13 @@ func (w *World) HandHurt(hand Hand, injury int, what string) {
 		if n := w.NPC(member.ID); n != nil {
 			w.KillBy(n.ID, nil, fmt.Sprintf("They had gone to %s for somebody else.", what))
 		} else {
-			w.Log(name+" did not come back", fmt.Sprintf("You sent him to %s and somebody was waiting. There is nobody to send now.", what), "danger")
+			w.Log(name+" did not come back", fmt.Sprintf("You sent them to %s and somebody was waiting. There is nobody to send now.", what), "danger")
 		}
 		return
 	}
 	before := member.Loyalty
 	member.Loyalty = max(0, member.Loyalty-HandLoyaltyCost)
-	w.Log(member.Name+" took it instead of you", fmt.Sprintf("He went out to %s and came back hurt. Loyalty falls from %d to %d, and he knows whose idea it was.", what, before, member.Loyalty), "danger")
+	w.Log(member.Name+" took it instead of you", fmt.Sprintf("They went out to %s and came back hurt. Loyalty falls from %d to %d, and they know whose idea it was.", what, before, member.Loyalty), "danger")
 }
 
 // HandRespectFor is the standing a piece of work is worth, which is less when

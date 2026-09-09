@@ -103,7 +103,7 @@ func (w *World) Take(weight int, because string) {
 	days := w.Sentence(weight)
 	price := 400 + weight*220 + w.Player.Heat*10
 	choices := []Choice{
-		{ID: "serve", Label: "Go with them", Detail: fmt.Sprintf("%d days. Your businesses run without you and nobody defends your ground. The street respects a man who does his time quietly.", days)},
+		{ID: "serve", Label: "Go with them", Detail: fmt.Sprintf("%d days. Your businesses run without you and nobody defends your ground. The street respects somebody who does their time quietly.", days)},
 	}
 	if fall := w.FallGuy(); fall != nil {
 		choices = append(choices, Choice{ID: "fall:" + fall.ID, Label: "Give them " + fall.Name,
@@ -154,7 +154,7 @@ func (w *World) ResolveArrest(e *Scene, choice string) error {
 	case len(choice) > 5 && choice[:5] == "fall:":
 		n := w.NPC(choice[5:])
 		if n == nil || n.Dead {
-			return fmt.Errorf("he is not there to give them")
+			return fmt.Errorf("they are not there to give them")
 		}
 		for _, l := range Locations {
 			if prop := w.Properties[l.ID]; prop != nil && prop.Posted == n.ID {
@@ -284,7 +284,7 @@ func (w *World) CustodyDay() {
 	for i := range w.NPCs {
 		if n := &w.NPCs[i]; n.Held > 0 && n.Held <= w.Minute {
 			n.Held = 0
-			w.Log(n.Name+" is out", "Whatever they had was not enough to keep him. He is available again, and he remembers where he was.", "personal")
+			w.Log(n.Name+" is out", "Whatever they had was not enough to keep them. They are available again, and they remember where they were.", "personal")
 		}
 	}
 	if w.Player.HeldUntil > 0 && w.Player.HeldUntil <= w.Minute {
@@ -330,7 +330,7 @@ func (w *World) Bail(id string) error {
 	n.Held = 0
 	n.Trust = min(100, n.Trust+18)
 	n.Sore = max(0, n.Sore-40)
-	w.Log(n.Name+" comes out", fmt.Sprintf("$%d for the %s still on him. He walks out knowing exactly who paid it.",
+	w.Log(n.Name+" comes out", fmt.Sprintf("$%d for the %s still on them. They walk out knowing exactly who paid it.",
 		days*BailDaily, plainly(days, "day", fmt.Sprintf("%d days", days))), "personal")
 	return nil
 }

@@ -33,7 +33,7 @@ func (w *World) NextOpportunity() *Opportunity {
 		return &Opportunity{"Build a steady income", "Bluebird Laundry needs 6 respect and capital; buying out a former organization costs more. Its income grows with game time.", "laundry"}
 	}
 	if len(p.Crew) == 0 {
-		return &Opportunity{"Bring someone into the fold", "Leo costs $90 to recruit and $12 a day. He can collect money or protect businesses.", "bar"}
+		return &Opportunity{"Bring someone into the fold", "Leo costs $90 to recruit and $12 a day. They can collect money or protect businesses.", "bar"}
 	}
 	if p.Contacts < 2 {
 		return &Opportunity{"Know who is asking about you", "Develop your information network through Mara. Good contacts can warn of personal danger.", "bar"}

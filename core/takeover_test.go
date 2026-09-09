@@ -136,7 +136,7 @@ func TestBeingExpectedIsTheEndOfIt(t *testing.T) {
 		if f.Goodwill >= goodwill {
 			t.Fatal("the organization did not mind")
 		}
-		if !w.hasRecord("He was expecting it") {
+		if !w.hasRecord("They were expecting it") {
 			t.Fatal("nothing was recorded")
 		}
 	}

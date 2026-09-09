@@ -93,7 +93,7 @@ func (w *World) Incorporate() {
 		c.Hostility = min(100, max(0, 40-other.Goodwill/2))
 		c.State, c.Since = classify(c), w.Minute
 	}
-	w.Log("They have started calling you something", fmt.Sprintf("%s. Two premises and a name is the point at which this city stops thinking of you as a man and starts thinking of you as a thing it has to deal with. You are in the same book as the others now, and the same things are done to what is in that book.", name), "politics")
+	w.Log("They have started calling you something", fmt.Sprintf("%s. Two premises and a name is the point at which this city stops thinking of you as a person and starts thinking of you as a thing it has to deal with. You are in the same book as the others now, and the same things are done to what is in that book.", name), "politics")
 	w.Report("politics", "A NEW NAME ON THE WATERFRONT",
 		fmt.Sprintf("Interests associated with %s are now spoken of as an organization rather than a proprietor. Rivals are said to have noticed.", w.Player.Name))
 }

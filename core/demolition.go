@@ -142,9 +142,9 @@ func (w *World) Plant(id string) error {
 			owner.Goodwill = max(-100, owner.Goodwill-45)
 			w.RetaliationFrom(owner.ID)
 		}
-		w.Log("It went off early at "+place.Name, fmt.Sprintf("Something was wrong with it, or with the hour you chose. You are burned and cut (-%d health) and half the street saw a man running.", injury), "danger")
+		w.Log("It went off early at "+place.Name, fmt.Sprintf("Something was wrong with it, or with the hour you chose. You are burned and cut (-%d health) and half the street saw somebody running.", injury), "danger")
 		w.Report("attack", "EXPLOSION AT "+strings.ToUpper(place.Name),
-			fmt.Sprintf("An explosion at %s is being treated as deliberate. Witnesses described a man leaving on foot. Police say a prosecution is likely.", place.Name))
+			fmt.Sprintf("An explosion at %s is being treated as deliberate. Witnesses described somebody leaving on foot. Police say a prosecution is likely.", place.Name))
 		if w.Player.Health <= 0 {
 			w.Die("A charge at " + place.Name + " went off with you still under it.")
 		}

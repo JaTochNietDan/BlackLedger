@@ -155,7 +155,7 @@ function captionFor(kind: string, place: string): string {
     case 'explosion': return `Something went up at ${place} and took the windows with it.`;
     case 'gunfight': return `Shots traded across the front of ${place}.`;
     case 'raid': return `Police came through the doors at ${place}.`;
-    case 'arrest': return `They took him out of ${place} in front of everybody.`;
+    case 'arrest': return `They took them out of ${place} in front of everybody.`;
     case 'seizure': return `${place} changed hands, and not quietly.`;
     case 'attack': return `Somebody was worked over outside ${place}.`;
     default: return `The day's takings went out of the back of ${place}.`;
