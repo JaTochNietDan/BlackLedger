@@ -2915,3 +2915,79 @@ Evidence: three properties in `core/ledger_test.go`, one of them holding the
 line that a collapsed repeat must still read as a new outcome, fourteen clean
 apicheck runs, `mise run verify` and `npm test` green, `mise run simulate`
 unchanged at 52 / 0 / 82 / 0.
+
+## Counting the paper, and a correction I made to myself before publishing it
+
+The ledger was fixed by counting it rather than reading it, so I counted the
+Herald the same way. Fifty-eight days, 198 stories:
+
+| | |
+|---|---|
+| civic filler | 117 of 198 (59%) |
+| issues carrying no news at all | 26 of 58 |
+| real stories per issue, median | 1 |
+
+Days 29 to 43 were a near-unbroken run of issues containing nothing but the
+weather and a standing notice about an empty building. My first conclusion was
+that the living world goes quiet once one organization is on top — in that
+campaign the player's people were at power 100 holding three of the best
+premises, every conflict was theirs, and there had been one death in fifty-eight
+days.
+
+**That conclusion was wrong, and I caught it by running the right instrument
+before writing it down.** `mise run simulate -runs 20 -steps 1000` puts twenty
+campaigns past the horizon where the living-world measures mean anything:
+
+| across 20 campaigns, ~85 game days | |
+|---|---|
+| wars started | 70, in 17 of 20 runs |
+| families created | 19, in 14 runs |
+| families destroyed | 17, in 12 runs |
+| holdings changed hands | 29, in 16 runs |
+
+The city is not degenerate at length. The quiet campaign was one dominated city,
+not a dead simulation, and I would have published the opposite from a single
+run. That is the fourth time tonight a measurement of mine was really a
+measurement of one harness's play.
+
+**What is true is that the paper has too few things to say.** The city has kept
+hours since this morning — people are at their posts through the morning and in
+the bars and clubs after midday — and the paper had never once mentioned it,
+which for a paper printed in this city is a strange thing to miss. It now
+reports the evening when the evening is worth reporting, from a real count taken
+at midnight before anybody sets off for the day shift.
+
+**And an honest negative result: it did not fix the filler share.** After
+adding it, the same fifty-eight day campaign is 60% civic — the new brief simply
+takes a slot another one would have had. The ratio is set by how much news the
+city makes, not by how many things the page can say, and adding briefs will
+never change it. Worth knowing before anybody adds more.
+
+My own test caught a copy fault in it before it shipped: the first version
+printed "fifty of the district were in one of them", a figure in prose, which
+this paper does not do. It describes the share instead.
+
+## Unresolved: a sitdown offered and then refused
+
+`cmd/apicheck` now reaches the sitdown, and on two runs out of twenty-two it
+reported:
+
+```
+HTTP 409 on sitdown: {"error":"One of them would not sit in a room you arranged"}
+```
+
+The game listed the action as available and then refused the command. That
+breaks the rule the interface runs on — the reason a thing cannot be done is
+supposed to be knowable before committing to it.
+
+`CallSitdown` runs **after** the clock advances, deliberately, "so the evening
+actually costs the evening", so three hours pass between the readiness check
+that enabled the button and the check that refused it.
+
+I could not reproduce it. Four hundred sitdowns in a single-quarrel fixture
+never refused; three hundred with a second quarrel whose family would not sit
+with the player never once saw the worst quarrel change under the player during
+those three hours. Both hypotheses are ruled out, and I am not shipping a fix
+for a cause I have not found. Recorded here with the reproduction that does
+work: drive a fresh save with twenty-two `apicheck` runs and watch for a 409 on
+`sitdown`.

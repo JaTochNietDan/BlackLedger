@@ -96,6 +96,26 @@ func (w *World) cityPage() []brief {
 			fmt.Sprintf("%s has been standing without anybody answering for it. The building is sound. What it wants is somebody to open it, and the terms are said to be reasonable to anybody who asks about them.", empty)})
 	}
 
+	// How the city spent its evening. The city keeps hours now — people are at
+	// their posts through the morning and in the bars and clubs after midday —
+	// and the paper had never once mentioned it, which for a paper printed in
+	// this city is a strange thing to miss. The page is composed at midnight,
+	// before anybody has set off for the day shift, so what it counts is where
+	// the evening left them.
+	// The share is described rather than counted. "Fifty of the district were
+	// in one of them" is a figure in prose, which this paper does not print,
+	// and the share is the thing worth knowing anyway.
+	if night, ok := w.lastNight(); ok {
+		switch {
+		case night >= .30:
+			out = append(out, brief{"A FULL NIGHT ON THE FRONT",
+				"The houses along the front did well of it last night. Better than a third of the district was in one of them at closing, which the people who keep them say is a Saturday's trade on an ordinary evening."})
+		case night <= .08:
+			out = append(out, brief{"THE HOUSES WERE EMPTY",
+				"A thin night on the front. Barely anybody was in the bars and the clubs at closing, and those who keep them are asking each other why."})
+		}
+	}
+
 	// And the day of the week, because a paper that never mentions Sunday is
 	// not a paper.
 	if IsSunday(w.Minute) {
@@ -103,6 +123,20 @@ func (w *World) cityPage() []brief {
 			"Saint Agnes will hold its usual services. The market on the harbour road will not open. Those with business that cannot wait for Monday will find the usual people in the usual places, as they always have."})
 	}
 	return out
+}
+
+// lastNight is how much of the district was in a bar or a club when the page
+// was composed, as a share. Reported only when it is worth remarking on.
+func (w *World) lastNight() (float64, bool) {
+	all := w.living()
+	if all < 10 {
+		return 0, false
+	}
+	drinking := 0
+	for _, id := range haunts {
+		drinking += w.InTheRoom(id)
+	}
+	return float64(drinking) / float64(all), true
 }
 
 // dearest is whichever good has moved furthest from what it usually costs,

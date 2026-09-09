@@ -179,3 +179,57 @@ func TestTheCityPageDoesNotRepeatItselfAllWeek(t *testing.T) {
 		t.Fatalf("three weeks produced %d civic briefs", len(w.News))
 	}
 }
+
+// The city keeps hours — people are at their posts through the morning and in
+// the bars and clubs after midday — and the paper had never once mentioned it.
+// Counted over a fifty-eight day campaign, the Herald was 59% civic filler and
+// twenty-six of its fifty-eight issues carried no news at all; a paper printed
+// in this city with nothing to say about its evenings is missing something it
+// can see.
+func TestThePaperCanSeeTheEvening(t *testing.T) {
+	w := New(41)
+	// Everybody out.
+	for i := range w.NPCs {
+		w.NPCs[i].Location, w.NPCs[i].Heading, w.NPCs[i].Dead = haunts[i%len(haunts)], "", false
+	}
+	full := ""
+	for _, b := range w.cityPage() {
+		if strings.Contains(b.headline, "FULL NIGHT") {
+			full = b.body
+		}
+	}
+	if full == "" {
+		t.Fatal("the whole district was in the bars and the paper had nothing to say")
+	}
+	// Nobody out.
+	for i := range w.NPCs {
+		w.NPCs[i].Location = "market"
+	}
+	empty := ""
+	for _, b := range w.cityPage() {
+		if strings.Contains(b.headline, "HOUSES WERE EMPTY") {
+			empty = b.body
+		}
+	}
+	if empty == "" {
+		t.Fatal("nobody was out and the paper had nothing to say")
+	}
+	// An ordinary night is not news.
+	live := w.living()
+	for i := range w.NPCs {
+		if i < live/6 {
+			w.NPCs[i].Location = haunts[i%len(haunts)]
+		} else {
+			w.NPCs[i].Location = "market"
+		}
+	}
+	for _, b := range w.cityPage() {
+		if strings.Contains(b.headline, "NIGHT ON THE FRONT") || strings.Contains(b.headline, "HOUSES WERE EMPTY") {
+			t.Fatalf("an ordinary evening was reported as news: %q", b.headline)
+		}
+	}
+	// And it counts in words, like the rest of the paper.
+	if strings.ContainsAny(full+empty, "0123456789") {
+		t.Fatalf("the evening brief prints figures in prose: %q / %q", full, empty)
+	}
+}
