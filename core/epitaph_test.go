@@ -1,6 +1,7 @@
 package core
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 )
@@ -81,5 +82,50 @@ func TestWhatSurvivesTheCityIsSaidPlainly(t *testing.T) {
 	got := w2.Epitaph()["inherits"].(string)
 	if !strings.Contains(got, "5200") {
 		t.Fatalf("with $5200 abroad the next life is told %q", got)
+	}
+}
+
+// The death screen is the one thing the whole game builds toward, and it had
+// never been looked at. Driven for real — a protagonist on day 30 with three
+// premises, six people and 481 respect, killed on the street by somebody
+// else's war — it reads well and the Guide's central promise holds: what they
+// built passed to the strongest of their own people and became an organization
+// the next life can deal with or fight.
+//
+// The branch nobody had seen is the other one: dying with nobody to inherit.
+func TestDyingWithNobodyLeavesThePremisesStandingInTheirName(t *testing.T) {
+	w := New(52)
+	w.Player.Name = "Alex Varga"
+	// Two premises and no one to take them on.
+	for _, id := range []string{"laundry", "garage"} {
+		w.Properties[id].Owner = fmt.Sprintf("player:%d", w.Life)
+	}
+	for i := range w.NPCs {
+		w.NPCs[i].Faction = ""
+	}
+	w.Player.Crew = nil
+	w.Die("Nothing anybody would call a war.")
+
+	e := w.Epitaph()
+	if e == nil {
+		t.Fatal("a death produced no epitaph")
+	}
+	if got := e["estate"].(string); got != "" {
+		t.Fatalf("nobody was left and yet %q inherited", got)
+	}
+	became := e["became"].(string)
+	if !strings.Contains(became, "no one to answer for it") {
+		t.Fatalf("the epitaph reads %q", became)
+	}
+	// And the screen must be able to say WHICH premises, or the sentence above
+	// is a claim with nothing behind it.
+	standing, _ := e["standing"].([]string)
+	if len(standing) == 0 {
+		t.Fatalf("premises were left standing in their name and none are listed: %v", e)
+	}
+	for _, name := range standing {
+		if name == "" {
+			t.Fatal("a premises was listed with no name")
+		}
 	}
 }

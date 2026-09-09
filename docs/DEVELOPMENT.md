@@ -3206,3 +3206,57 @@ Evidence: one test in `tests/voice.test.mjs` proven to fail when the predicate
 is broken, the modal re-read in the browser with the stop control gone, twelve
 clean apicheck runs, `mise run verify` and `npm test` green, `mise run simulate`
 unchanged at 52 / 0 / 82 / 0.
+
+## The death screen, and the promise the whole game rests on
+
+The death screen is the one thing everything else builds toward and nobody had
+looked at it. I drove a campaign to a protagonist worth killing — day 30, three
+premises, six people, 481 respect — and then killed him properly, on the street,
+in somebody else's war.
+
+It reads as well as anything in the game. `THE CITY CONTINUES` above the fold,
+the name and the cause in two lines, then what he lived to, what he was worth
+and what he earned; what became of the thing he built; the four headlines the
+paper carried; what the next one gets; and a single way forward.
+
+**And it verified the Guide's central promise for the first time.** The Guide
+says *"Death is permanent. What you built passes to the strongest of your own
+people and becomes an organization you can deal with, or fight."* That is
+exactly what happened: a new faction appeared, `Franca Sabbatini's people`,
+power 70, holding two of the three premises, led by one of the dead man's own —
+and the ledger said so in its own words:
+
+```
+Franca Sabbatini is running it now: Everything that answered to Nico Ward
+answers to Franca Sabbatini by the end of the week, under a name Nico Ward
+never chose.
+```
+
+**Three things looked like faults and none of them were.**
+
+The epitaph showed the *previous* protagonist. That was my forcing method: I had
+set `alive=false` in the save, which never runs the death path that builds it.
+Killing him through the game produced the right one.
+
+The `standing` list — what is left standing in the dead man's name — was empty
+for a man with three premises. It is correct: somebody inherited them, so
+nothing stands in his name. The view renders that list when it is not empty, and
+I checked before writing it up.
+
+And the dead protagonist's own organization is still in the faction list at full
+strength holding nothing, dissolved only when the next life begins. It is never
+seen, because the death screen blocks every other screen until the player begins
+again.
+
+That is three near-misses in one slice, and seven tonight. Reading the wiring
+before writing up a fault is now the most valuable habit of the night.
+
+**What was actually missing is a test for the other branch.** Dying with nobody
+to inherit says *"They had nobody. Whatever they held stands with no one to
+answer for it"* — and if the list behind that sentence were ever empty, the
+sentence would be a claim with nothing behind it. There is a property for it
+now; emptying the list makes it fail and prints the whole epitaph.
+
+Evidence: `core/epitaph_test.go`, proven to fail when the list is removed, the
+screen read in a browser against a real death, twelve clean apicheck runs, `mise
+run verify` and `npm test` green, `mise run simulate` unchanged at 52/0/82/0.
