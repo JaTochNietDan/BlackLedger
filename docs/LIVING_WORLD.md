@@ -109,7 +109,6 @@ it is still in this list, it does not exist in the game yet.
 - The newspaper right now is like a square, I'd like a more stylized version where it actually looks like a newspaper, think softer edges, make it look like a piece of paper, crinkly, etc. Look to examples of old newspapers for inspriation.
 - A further idea to flesh out the newspaper could be adding a few pieces of filler text about the city that is generated dynamically by the director. That may add a feeling of living city to the game.
 - Having debug options for a developer and playtester like me is important, whether it be being able to play a range theater scenes out from a menu or simulate other visual actions and whatnot to get an idea of how well it's working and what can be changed or modified. This debug mode should probably run on a separate port and be separate from the main game.
-- The height of the page should be fixed to the viewport, i.e no vertical scrolling the whole page or the main area, only scrolling stuff like actions or other submenus where it makes sense.
 - Separating more stuff out of the ledger and whatnot probably makes sense. Like the underground market probably doesn't belong in there. Not sure if the daily cost belongs in there either. Needs refinement.
 
 Ultiamtely the expectation is that I don't have to think of all of these concepts, you, the agent will think of these too and build them out and playtest and simulate them yourself.

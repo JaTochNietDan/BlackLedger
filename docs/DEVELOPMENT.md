@@ -1641,3 +1641,10 @@
 - The trolley avenue is cobbled rather than asphalted, since it already had rails down it.
 - Verified in a browser at 12:12, zoomed in and out: flag courses running with the grid, asphalt grain on the carriageways, setts on the trolley avenue, no seams at the junctions. No console errors.
 - `mise run verify` passes, `npm test` 21/21.
+
+## The page is the viewport
+- From the inbox, and stated twice in the Interface principles: the page must not scroll, only the areas inside it that are meant to. A screen that grows past the bottom of the window takes the header with it, and the header carries the clock, the money and the rail — the three things that have to be visible at all times.
+- The shell is now the viewport height and `body` cannot scroll at all. Everything under the header takes the space that is left and scrolls inside itself: the sidebar, the room's work panel, the destination directory, the guide, the log. The city canvas stops guessing at `calc(100vh - 162px)` and simply fills what remains, which also means it no longer disagrees with the header when the header wraps.
+- **Measured rather than eyeballed, on all six screens.** Document and body scroll height minus client height is **0 everywhere** — City, People, Families, Ledger, Herald, Guide. And nothing is lost to the change: a sweep for elements with `overflow:hidden` whose content exceeds their box found **none** on any screen, so no content became unreachable in exchange for the fixed height.
+- One thing the browser showed that the numbers did not: on the guide, the scrolling element was the 750px reading column itself, so the scrollbar sat in the middle of the page beside a wide empty margin. The column is now inside the scroller rather than being it.
+- `mise run verify` passes, `npm test` 21/21.
