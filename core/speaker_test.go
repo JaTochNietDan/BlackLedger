@@ -57,15 +57,27 @@ func TestAnAudienceIsWithWhoeverLeadsTheFamilyNow(t *testing.T) {
 
 func TestADemandComesFromWhoeverLeadsTheFamilyNow(t *testing.T) {
 	w := leaderless(t, "bellandi")
-	want := w.Leader("bellandi")
-	// Own something visibly earning in Bellandi's district, and let the demand land.
+	// Own something visibly earning, and let a demand land. Which family
+	// collects is decided by who holds ground; what this asserts is that
+	// whoever it turns out to be speaks with their current leader's voice,
+	// not a predecessor's.
 	w.Properties["club"].Owner = "player:1"
 	w.Properties["club"].Income = 30
-	w.Factions[0].Goodwill = 0
+	for i := range w.Factions {
+		w.Factions[i].Goodwill = 0
+	}
 	w.NextPressure = w.Minute
 	w.BusinessPressure()
 	if w.Event == nil || w.Event.Kind != "business_pressure" {
 		t.Skip("no demand landed in this arrangement")
+	}
+	collecting := w.faction(w.Event.Actor)
+	if collecting == nil {
+		t.Fatalf("the demand comes from %q, which is not a family", w.Event.Actor)
+	}
+	want := w.Leader(collecting.ID)
+	if want == nil {
+		t.Fatalf("%s is collecting with nobody to lead it", collecting.Name)
 	}
 	if w.Event.Speaker != want.ID {
 		spoke := w.NPC(w.Event.Speaker)

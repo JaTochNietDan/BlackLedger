@@ -1,6 +1,9 @@
 package core
 
-import "fmt"
+import (
+	"fmt"
+	"sort"
+)
 
 // BusinessPressure is an authored political decision grounded in current ownership.
 // The schedule is private; the player sees only the delivered demand.
@@ -11,20 +14,22 @@ func (w *World) BusinessPressure() {
 	interval := 720 - 90*w.SkimNotice()
 	w.NextPressure = w.Minute + max(240, min(1440, interval))
 	var target *Place
-	actor := 0
+	var actor *Faction
 	ownsBusiness := false
+	claims := w.Claimants()
 	for i := range Locations {
 		l := &Locations[i]
 		if !w.Own(l.ID) || w.Properties[l.ID].Income <= 0 {
 			continue
 		}
 		ownsBusiness = true
-		family := 0
-		if l.District > 0 {
-			family = 1
+		family := claims[l.District]
+		if family == nil {
+			// Nobody is left with a claim on this street.
+			continue
 		}
 		// A local understanding does not suppress another family's territorial claim.
-		if w.Factions[family].Goodwill >= 25 || w.BusinessTruces[w.Factions[family].ID] > w.Minute {
+		if family.Goodwill >= 25 || w.BusinessTruces[family.ID] > w.Minute {
 			continue
 		}
 		// The premises worth demanding a share of are the ones visibly earning.
@@ -45,7 +50,7 @@ func (w *World) BusinessPressure() {
 		}
 		return
 	}
-	f := &w.Factions[actor]
+	f := actor
 	// The demand comes from whoever runs the family, for the same reason the
 	// audience does. This named Vittorio and Elena by position in the faction
 	// list, so a successor's demand arrived in a dead predecessor's voice.
@@ -242,4 +247,90 @@ func (w *World) ResolveBeneficiary(id string) {
 			w.RetaliationFrom(f.ID)
 		}
 	}
+}
+
+// Claimants decides which family collects in each district of the city.
+//
+// This was two slice indices: family zero for the player's first district,
+// family one for anything beyond it. Dissolve removes a family from that
+// slice, and destroying families is most of what the living world does —
+// seventeen of them across twenty long campaigns. So the indices stopped
+// meaning the families they were written for as soon as the city did its job,
+// and with one family left the second index was not an index into anything: a
+// player who owned earning premises outside their first district and had seen
+// one family fall crashed the city on the next collection.
+//
+// Two things have to hold. Ground is the honest answer to whose street this
+// is, so a family holding premises in a district collects there. And separate
+// districts need separate claimants, or buying one family off would silence
+// every demand in the city — which is the property the truce tests state. So a
+// district nobody holds goes to the strongest family not already collecting
+// from the player, and only falls back to a family that is when there is
+// nobody else. When there are no families at all, nobody collects.
+func (w *World) Claimants() map[int]*Faction {
+	mine := w.PlayerOrganizationID()
+	candidates := []*Faction{}
+	for i := range w.Factions {
+		if w.Factions[i].ID != mine {
+			candidates = append(candidates, &w.Factions[i])
+		}
+	}
+	sort.SliceStable(candidates, func(a, b int) bool {
+		if candidates[a].Power != candidates[b].Power {
+			return candidates[a].Power > candidates[b].Power
+		}
+		return candidates[a].ID < candidates[b].ID
+	})
+	claims := map[int]*Faction{}
+	if len(candidates) == 0 {
+		return claims
+	}
+	districts := map[int]bool{}
+	for i := range Locations {
+		districts[Locations[i].District] = true
+	}
+	ordered := []int{}
+	for d := range districts {
+		ordered = append(ordered, d)
+	}
+	sort.Ints(ordered)
+	taken := map[string]bool{}
+	unheld := []int{}
+	for _, d := range ordered {
+		var best *Faction
+		bestHeld := 0
+		for _, f := range candidates {
+			held := 0
+			for i := range Locations {
+				if Locations[i].District != d {
+					continue
+				}
+				if prop := w.Properties[Locations[i].ID]; prop != nil && prop.Owner == f.ID {
+					held++
+				}
+			}
+			// candidates is already strongest-first, so a plain > keeps the
+			// stronger family on a tie without a second comparison here.
+			if held > bestHeld {
+				best, bestHeld = f, held
+			}
+		}
+		if best != nil {
+			claims[d], taken[best.ID] = best, true
+			continue
+		}
+		unheld = append(unheld, d)
+	}
+	for _, d := range unheld {
+		for _, f := range candidates {
+			if !taken[f.ID] {
+				claims[d], taken[f.ID] = f, true
+				break
+			}
+		}
+		if claims[d] == nil {
+			claims[d] = candidates[0]
+		}
+	}
+	return claims
 }

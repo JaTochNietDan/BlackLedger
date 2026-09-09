@@ -3408,3 +3408,64 @@ seat across from Bellandi" with Rosa Marchetti's portrait, name and job above
 the body, and the two choices the player cannot afford carry their own refusals
 ("Not enough cash: this takes $150 and you are holding $75"). `mise run verify`
 green, `npm test` 25 pass 0 fail.
+
+## Whose street this is, decided by ground rather than by slice position
+
+Continuing the audit into positional indexing found a crash, not a wording
+fault. The business demand chose which family was collecting with two literal
+indices: `Factions[0]` for the player's first district, `Factions[1]` for
+anything beyond it. `Dissolve` removes a family from that slice, and destroying
+families is most of what the living world does — twenty-one of them across
+eighty long campaigns in the run below. So those indices stopped meaning the
+families they were written for as soon as the city did its job, and once one of
+the two originals fell, `Factions[1]` was not an index into anything. A player
+who owned an earning business outside their first district and had seen a family
+fall crashed the collection. Nothing in the server recovers, so the request died
+mid-commit.
+
+`Claimants` replaces both indices, and has to hold two things at once. Ground is
+the honest answer to whose street this is, so a family holding premises in a
+district collects there. But separate districts need separate claimants, or
+buying one family off would silence every demand in the city. That second
+property is not mine — it is already stated by three tests written long before
+this change, and the first version of the fix broke all three by handing every
+district to whoever was strongest. Ground alone is not enough because the
+opening city is a two-two tie in the first district and nobody at all holds the
+second. So a district nobody holds goes to the strongest family not already
+collecting from the player, and only falls back to one that is when there is
+nobody else.
+
+Evidence: `core/pressure_family_test.go` reproduces the crash — "the city
+panicked collecting from apartment: runtime error: index out of range [1] with
+length 1" — and still does when the positional version is put back, confirmed
+by re-breaking it. Two further tests state that a family taking a district over
+inherits the claim, that no families means no demands, and that districts get
+distinct claimants. The three pre-existing truce and territorial-claim tests
+pass unmodified; that they pass is the evidence the design property survived,
+and I did not touch them.
+
+Verified over HTTP on a driven save with Bellandi dissolved, one family left,
+and the player owning the garage beyond their first district: the collection
+that used to crash produced "A claim on your earnings" from the Russo Outfit,
+spoken by Elena Russo.
+
+Measured before and after over eighty long campaigns on the same seeds
+(`-runs 20 -steps 1000`), so the political layer can be seen not to have moved:
+
+| measure | before | after |
+| --- | --- | --- |
+| wars started | 106 | 112 |
+| holdings changed hands | 50 | 52 |
+| families created | 38 | 39 |
+| families destroyed | 18 | 21 |
+| deaths | 20 / 0 / 20 / 0 | 20 / 0 / 20 / 0 |
+| errors | 0 | 0 |
+
+`mise run verify` and `npm test` green, `mise run simulate` unchanged at defiant
+52 / investor 0 / reckless 82 / worker 0, 0 errors.
+
+Correcting an earlier record: the living-world baseline written up as "70 wars,
+19 families created, 17 destroyed, 29 holdings changed hands across 20 runs" is
+not comparable to the table above. That figure counted a subset; the run here
+aggregates all eighty campaigns, twenty per strategy. The numbers are the same
+world measured differently.
