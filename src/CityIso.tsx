@@ -2,7 +2,7 @@ import {useEffect, useRef} from 'react';
 import {Application, Assets, Container, Graphics, Sprite, Text, Texture, TextStyle} from 'pixi.js';
 import {Viewport} from 'pixi-viewport';
 import type {Snapshot} from './types';
-import {addressSlot, along, awnings, blockFor, BLOCK, bounds, carriageways, distance, dressing, faces, fillerShape, goldenness, grid, island, kerbside, lampPosts, markings, middle, mix, nightness, PAVE, plot, project, ROAD, size, rails, sleepers, terrace, TILE, trolleyAvenue, TROLLEY_GAUGE, vents, walk, wires} from './iso';
+import {addressSlot, along, awnings, blockFor, BLOCK, bounds, carriageways, distance, dressing, faces, goldenness, grid, island, kerbside, lampPosts, markings, middle, mix, nightness, PAVE, plot, project, ROAD, size, rails, sleepers, terrace, TILE, trolleyAvenue, TROLLEY_GAUGE, vents, walk, wires} from './iso';
 import type {Cell, Vec} from './iso';
 import cutouts from '../public/art/iso/isometric.json';
 import type {Spotlight} from './CityStreet';
@@ -22,7 +22,6 @@ import type {Layout} from './layout';
 // player clicked. Nothing here decides anything — where a building stands and
 // who is inside it still come from the core.
 
-const COLOUR = (hex: string) => parseInt(hex.slice(1), 16);
 
 // The painted cut-outs, by address. A building with one is drawn as itself; a
 // building without one is drawn as the blocked-out solid it was before, so
@@ -696,6 +695,11 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight,
       }
     }
     rows.sort((a, b) => a.depth - b.depth);
+    // Which blocks something was actually built on. An awning hangs on a
+    // shopfront and smoke comes off a chimney, so neither belongs over an
+    // empty plot — a plume standing in mid-air above bare ground is worse than
+    // no plume, because it says a building is there when none is.
+    const built = new Set<string>();
     // The frontmost slot of each block, which is where its plumes are hung.
     const nearest = new Map<string, number>();
     for (const r of rows) {
@@ -703,7 +707,6 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight,
       nearest.set(key, Math.max(nearest.get(key) ?? -Infinity, r.depth));
     }
     for (const {cell, slot, index} of rows) {
-      const shape = fillerShape({col: cell.col * 7 + Math.round(slot.at.x * 3), row: cell.row * 5 + Math.round(slot.at.y * 3)});
       // Which building this is. Stepping through the set by position rather
       // than picking at random stops the same picture landing next door to
       // itself, which with six buildings and sixty-odd slots it otherwise does
@@ -743,20 +746,28 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight,
         art.tint = mix(mix(0xd8d4c6, 0xc4ced2, warmth), 0x6f7a80, .1 + dark * .48);
         g.addChild(art);
       } else {
-        const inset = .04;
+        // Nothing built here yet, so nothing is drawn standing here. A slab of
+        // massing in place of a building is a placeholder pretending to be
+        // architecture: it makes the city look finished and wrong rather than
+        // unfinished and honest. What is drawn instead is the ground it will
+        // stand on — an empty plot, flat, so the shape of the city can still be
+        // read while the buildings for it are being made.
+        const inset = .05;
         const at = {x: slot.at.x + inset, y: slot.at.y + inset};
         const w = slot.w - inset * 2, d = slot.d - inset * 2;
-        const f = faces(at, {w, d, h: shape.h});
-        g.poly(f.left.flatMap(v => [v.x, v.y])).fill(mix(0x3c423c, 0x171d1e, dark));
-        g.poly(f.right.flatMap(v => [v.x, v.y])).fill(mix(0x555c53, 0x232a2a, dark));
-        g.poly(f.top.flatMap(v => [v.x, v.y])).fill(mix(0x6a7168, 0x2c3433, dark));
+        const ground = [{x: at.x, y: at.y}, {x: at.x + w, y: at.y},
+                        {x: at.x + w, y: at.y + d}, {x: at.x, y: at.y + d}].map(project);
+        g.poly(ground.flatMap(c => [c.x, c.y]))
+          .fill({color: mix(0x2f352f, 0x141a19, dark), alpha: .55})
+          .stroke({width: 1, color: mix(0x4d5750, 0x232c29, dark), alpha: .8});
       }
       const away = distance(slot.at, size);
       g.alpha = 1 - away * .35 * (0.16 + dark * .84) - away * murk;
       filler.addChild(g);
+      if (fillArt) built.add(`${cell.col},${cell.row}`);
       // And the canvas over its shopfront, drawn straight after the building it
       // hangs on so it can never end up behind it.
-      for (const a of hung.get(`${cell.col},${cell.row}`) || []) {
+      for (const a of (fillArt ? hung.get(`${cell.col},${cell.row}`) : []) || []) {
         if (a.at.x < slot.at.x - 1e-9 || a.at.x + a.w > slot.at.x + slot.w + 1e-9) continue;
         const shop = canopy(a);
         shop.alpha = g.alpha;
@@ -764,7 +775,8 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight,
       }
       // The block's plumes go down after its nearest building, so smoke stands
       // over its own roofs and still passes behind anything in front of it.
-      if (nearest.get(`${cell.col},${cell.row}`) === slot.at.x + slot.w / 2 + slot.at.y + slot.d / 2) {
+      if (built.has(`${cell.col},${cell.row}`) &&
+          nearest.get(`${cell.col},${cell.row}`) === slot.at.x + slot.w / 2 + slot.at.y + slot.d / 2) {
         for (const v of smoking.get(`${cell.col},${cell.row}`) || []) filler.addChild(plume(v));
       }
     }
@@ -841,8 +853,10 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight,
       // there is something to say about the ground.
       if (!hasArt || marked) {
         ground.poly(corners.flatMap(c => [c.x, c.y]))
-          .fill(hasArt ? {color: lit ? 0xd6b77c : 0x000000, alpha: lit ? .12 : 0} : lit ? 0x2a2f23 : 0x1b2422)
-          .stroke({width: p.id === selected ? 2.5 : 1.5, color: lit || p.id === selected ? 0xd6b77c : p.owned ? 0x8f7849 : 0x232e2b});
+          .fill(hasArt
+            ? {color: lit ? 0xd6b77c : 0x000000, alpha: lit ? .12 : 0}
+            : {color: lit ? 0x2a2f23 : mix(0x323830, 0x161c1b, dark), alpha: .6})
+          .stroke({width: p.id === selected ? 2.5 : 1.5, color: lit || p.id === selected ? 0xd6b77c : p.owned ? 0x8f7849 : 0x3b453f});
         group.addChild(ground);
       }
 
@@ -871,15 +885,11 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight,
         group.addChild(art);
         tallest = (art.height / TILE.h) * .6;
       } else {
-        // The building, one box at a time, so a piece of it can be replaced.
-        for (const part of block.parts) {
-          const f = faces(at, part);
-          const g = new Graphics();
-          g.poly(f.left.flatMap(v => [v.x, v.y])).fill(COLOUR(part.left));
-          g.poly(f.right.flatMap(v => [v.x, v.y])).fill(COLOUR(part.right));
-          g.poly(f.top.flatMap(v => [v.x, v.y])).fill(COLOUR(part.top));
-          group.addChild(g);
-        }
+        // An address with no picture yet stands as its empty plot rather than
+        // as a blocked-out solid. The name still hangs over it and it can still
+        // be clicked, so the address is entirely usable — it simply does not
+        // pretend to have been built.
+        tallest = 0;
       }
       const name = new Text({
         text: p.name,
