@@ -44,8 +44,8 @@ func (w *World) FortunesDay() {
 		f.Reported = f.Power
 		if move > 0 {
 			w.Report("civic", upper(f.Name)+" GAINING GROUND", fmt.Sprintf(
-				"%s is spoken of more confidently than it was. People who deal with them say there is more of them to deal with, and those who owe them are said to be paying on time.",
-				f.Name))
+				"%s %s spoken of more confidently than it was. People who deal with them say there is more of them to deal with, and those who owe them are said to be paying on time.",
+				Leads(f.Name), Agree(f.Name, "is", "are")))
 			continue
 		}
 		// A family that has lost a lot is the more interesting story, and the
@@ -58,6 +58,7 @@ func (w *World) FortunesDay() {
 			lost = "One premises is still spoken of as theirs. It was more than that."
 		}
 		w.Report("civic", upper(f.Name)+" SAID TO BE STRUGGLING", fmt.Sprintf(
-			"%s has had a poor few weeks by the reckoning of people who watch such things. %s", f.Name, lost))
+			"%s %s had a poor few weeks by the reckoning of people who watch such things. %s",
+			Leads(f.Name), Agree(f.Name, "has", "have"), lost))
 	}
 }

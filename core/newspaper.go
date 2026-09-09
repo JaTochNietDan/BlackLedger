@@ -169,14 +169,20 @@ func (w *World) Editions() []map[string]any {
 	}
 	order := []*issue{}
 	byDay := map[int]*issue{}
+	// One city, one paper, one issue a day. A protagonist dying at noon does
+	// not make the Herald print a second edition; the change of life belongs
+	// to the reader, not to the day. The issue takes the latest life it
+	// carries, so a crossover day reads as the new life's.
 	for _, s := range w.News {
 		day := s.Minute/1440 + 1
-		key := s.Life*100000 + day
-		if byDay[key] == nil {
-			byDay[key] = &issue{day: day, life: s.Life}
-			order = append(order, byDay[key])
+		if byDay[day] == nil {
+			byDay[day] = &issue{day: day, life: s.Life}
+			order = append(order, byDay[day])
 		}
-		byDay[key].stories = append(byDay[key].stories, s)
+		if s.Life > byDay[day].life {
+			byDay[day].life = s.Life
+		}
+		byDay[day].stories = append(byDay[day].stories, s)
 	}
 	out := []map[string]any{}
 	for i := len(order) - 1; i >= 0; i-- {
@@ -247,7 +253,7 @@ var (
 func Dateline(minute int) string {
 	day := minute / 1440
 	// The third of March, a Tuesday, is day one.
-	weekday := weekdays[(day+1)%7]
+	weekday := Weekday(minute)
 	month, date := 2, 3+day
 	for month < len(monthNames) && date > daysIn(month) {
 		date -= daysIn(month)
@@ -255,6 +261,14 @@ func Dateline(minute int) string {
 	}
 	return fmt.Sprintf("%s, %s %d, 1953", weekday, monthNames[min(month, len(monthNames)-1)], date)
 }
+
+// Weekday names the day a minute falls on. The third of March, a Tuesday, is
+// day one. Everything that cares what day it is asks here: the city page
+// announced Sunday on a Monday for as long as it did its own arithmetic.
+func Weekday(minute int) string { return weekdays[(minute/1440+1)%7] }
+
+// IsSunday is the one weekday the city behaves differently on.
+func IsSunday(minute int) bool { return Weekday(minute) == "Sunday" }
 
 func daysIn(month int) int {
 	switch month {

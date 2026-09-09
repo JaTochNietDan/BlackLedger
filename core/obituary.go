@@ -53,9 +53,10 @@ func (w *World) obituary(n *NPC) (string, string) {
 	// paper was printing "Russo boss of Russo Outfit".
 	opening := "They answered to nobody."
 	if role := n.Role; role != "" {
-		opening = "They were " + role + "."
+		job := lowerFirst(role)
+		opening = "They were " + article(job) + " " + job + "."
 		if f := w.faction(n.Faction); f != nil && !sharesAName(role, f.Name) {
-			opening = "They were " + role + " of " + f.Name + "."
+			opening = "They were " + article(job) + " " + job + " of " + f.Name + "."
 		}
 	} else if f := w.faction(n.Faction); f != nil {
 		opening = "They were one of " + f.Name + "."

@@ -244,16 +244,23 @@ func describeStanding(n *NPC, w *World) string {
 	if n.Faction == "" {
 		return "They answered to nobody"
 	}
+	job := lowerFirst(n.Role)
 	if f := w.faction(n.Faction); f != nil {
+		if job == "" {
+			return "They were one of " + f.Name
+		}
 		// A successor's role already carries the organization's name, so
 		// appending it again produced "Head of the Russo Outfit of Russo
 		// Outfit" in the Herald.
 		if strings.Contains(n.Role, f.Name) {
-			return "They were " + n.Role
+			return "They were " + article(job) + " " + job
 		}
-		return "They were " + n.Role + " of " + f.Name
+		return "They were " + article(job) + " " + job + " of " + f.Name
 	}
-	return "They were " + n.Role
+	if job == "" {
+		return "They answered to nobody"
+	}
+	return "They were " + article(job) + " " + job
 }
 
 // Succeed promotes the strongest surviving member of an organization to lead it.

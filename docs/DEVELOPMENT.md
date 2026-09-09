@@ -1818,3 +1818,43 @@ hundreds of times to test boundedness; that is now a run of length N, so they
 file distinct headlines instead, which is what a bounded-archive test actually
 means. `mise run verify` and `npm test` pass. `mise run simulate` is unchanged
 at defiant 58 / investor 0 / reckless 82 / worker 0 deaths, 0 errors.
+
+## Five things the paper got wrong about English
+
+Having read one campaign's paper end to end, I read another, and this time
+checked every sentence rather than the story. The world was right in all of it.
+The English was not.
+
+- `the Rizzo Crew has ceased to operate` — the splinter naming forms bake a
+  lower-case article into the name, so any sentence starting with one started in
+  lower case.
+- `Cesare Ferro's people has had a poor few weeks` — the player's own
+  organization is named with a plural noun and took a singular verb.
+- `Crated arms is fetching more than it did` — two of the three goods have
+  plural names.
+- `They were Lieutenant.` — the role went in with no article, in the obituary
+  and, from a second function, in the killing story.
+- `SUNDAY IN BELLWETHER` under a dateline reading Monday, April 13 — the city
+  page did its own weekday arithmetic and was one day out.
+
+The first four are one problem: prose is assembled from names and roles that
+nothing checks the grammar of. `core/names.go` now holds `Leads` (capitalise an
+article the name carries), `Agree` (verb form for an organization name) and
+`article` (a/an), and the newspaper sites use them. Whether a good's name is
+plural is deliberately *not* stored in the save — it is a fact about the word,
+not the market, and a campaign begun before tonight would otherwise print the
+old sentence forever. The Sunday fault is now impossible: `Weekday` and
+`IsSunday` are the only place that knows what day it is, and `Dateline` uses
+them too.
+
+One more thing came out of the same reading: a protagonist dying at midday split
+the archive, so DAY 41 appeared twice with the same dateline. One city, one
+paper, one issue a day; `Editions` groups by day alone and the issue takes the
+latest life it carries.
+
+Evidence: six properties in `core/copy_test.go` and one in
+`core/repeats_test.go`, each stating the fault it came from. Then the real
+check — a QA save driven eight days forward and every sentence of all eighteen
+issues scanned for the five patterns, plus any body starting in lower case:
+zero. `mise run verify` and `npm test` pass, `mise run simulate` unchanged at
+58 / 0 / 82 / 0, 0 errors.

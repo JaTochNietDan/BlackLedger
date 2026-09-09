@@ -99,8 +99,8 @@ func (w *World) FillRoles() {
 		successor.Faction, successor.Rank = "", RankAssociate
 		successor.Trust = 0 // a stranger is a stranger, whatever the last one knew
 		w.Log("Somebody else is doing that job now", fmt.Sprintf(r.Announce, successor.Name), "personal")
-		w.Report("politics", upper(successor.Name)+" TAKES UP "+upper(r.Title),
-			fmt.Sprintf("%s has taken over work formerly done by somebody else. The change was not explained.", successor.Name))
+		w.Report("politics", upper(successor.Name)+" TAKES OVER AS "+upper(r.Title),
+			fmt.Sprintf("%s is doing the work of the %s now. The change was not explained and nobody has said where the last one went.", successor.Name, lowerFirst(r.Title)))
 	}
 }
 

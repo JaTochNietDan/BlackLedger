@@ -18,6 +18,20 @@ type Good struct {
 	Heat int `json:"heat"`
 }
 
+// pluralGoods are the goods whose names take a plural verb. This is a fact
+// about the word, not about the market, so it is not stored in the save: a
+// campaign begun before anybody read the paper would otherwise keep printing
+// "Crated arms is fetching more than it did" forever.
+var pluralGoods = map[string]bool{"cigarettes": true, "arms": true}
+
+// Agrees picks the verb form that goes with this good's name.
+func (g Good) Agrees(singular, plural string) string {
+	if pluralGoods[g.ID] {
+		return plural
+	}
+	return singular
+}
+
 // Lot is how much changes hands in one transaction. The interface offers plain
 // actions rather than a quantity field, so trade happens in fixed lots.
 const Lot = 5

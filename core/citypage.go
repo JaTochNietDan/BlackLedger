@@ -32,7 +32,6 @@ type brief struct {
 // them actually runs is chosen below.
 func (w *World) cityPage() []brief {
 	out := []brief{}
-	day := w.Minute / 1440
 	sky := w.Sky()
 
 	// The weather, which is the one thing every newspaper has always printed.
@@ -59,12 +58,12 @@ func (w *World) cityPage() []brief {
 	if g, ok := w.dearest(); ok {
 		if g.Price > g.Base {
 			out = append(out, brief{"PRICES UP AT THE DOCKS",
-				fmt.Sprintf("%s is fetching more than it did, at around $%d the %s against $%d not long ago. Those who deal in it say supply; those who buy it say something else.",
-					g.Name, g.Price, g.Unit, g.Base)})
+				fmt.Sprintf("%s %s fetching more than %s did, at around $%d the %s against $%d not long ago. Those who deal in it say supply; those who buy it say something else.",
+					g.Name, g.Agrees("is", "are"), g.Agrees("it", "they"), g.Price, g.Unit, g.Base)})
 		} else {
 			out = append(out, brief{"A GLUT ON THE WATERFRONT",
-				fmt.Sprintf("%s has fallen to about $%d the %s, down from $%d. More of it has come into the city than the city has use for, and it is being sold accordingly.",
-					g.Name, g.Price, g.Unit, g.Base)})
+				fmt.Sprintf("%s %s fallen to about $%d the %s, down from $%d. More of it has come into the city than the city has use for, and it is being sold accordingly.",
+					g.Name, g.Agrees("has", "have"), g.Price, g.Unit, g.Base)})
 		}
 	}
 
@@ -99,7 +98,7 @@ func (w *World) cityPage() []brief {
 
 	// And the day of the week, because a paper that never mentions Sunday is
 	// not a paper.
-	if day%7 == 6 {
+	if IsSunday(w.Minute) {
 		out = append(out, brief{"SUNDAY IN BELLWETHER",
 			"Saint Agnes will hold its usual services. The market on the harbour road will not open. Those with business that cannot wait for Monday will find the usual people in the usual places, as they always have."})
 	}

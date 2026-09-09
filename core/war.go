@@ -192,7 +192,8 @@ func (w *World) contestAt(attacker, defender *Faction, weakest string) {
 		}
 		w.Log("A holding changes hands", fmt.Sprintf("%s has taken %s from %s. The city notices who could not hold it.", attacker.Name, place.Name, defender.Name), "politics")
 		w.Report("seizure", strings.ToUpper(place.Name)+" CHANGES HANDS",
-			fmt.Sprintf("%s now controls %s, previously held by %s. Neither organization would comment.", attacker.Name, place.Name, defender.Name))
+			fmt.Sprintf("%s now controls %s, previously held by %s. Neither organization would comment.",
+				Leads(attacker.Name), place.Name, defender.Name))
 		w.Witness("seizure", weakest, fmt.Sprintf("%s took %s off %s. Their people were in it by the evening.", attacker.Name, place.Name, defender.Name),
 			strings.ToUpper(place.Name)+" CHANGES HANDS")
 		return
@@ -262,7 +263,8 @@ func (w *World) dissolve() {
 			gone[f.ID] = true
 			w.Log("An organization ends", f.Name+" no longer holds anything worth defending. What remains of it answers to someone else now.", "politics")
 			w.Report("collapse", "END OF "+strings.ToUpper(f.Name),
-				fmt.Sprintf("%s has ceased to operate as an organization. Its remaining interests have been absorbed by others.", f.Name))
+				fmt.Sprintf("%s %s ceased to operate as an organization. Its remaining interests have been absorbed by others.",
+					Leads(f.Name), Agree(f.Name, "has", "have")))
 			continue
 		}
 		kept = append(kept, f)
@@ -319,7 +321,8 @@ func (w *World) considerReestablish() {
 			f.Power = min(peak(f), f.Power+8)
 			w.Log("They are back on their feet", fmt.Sprintf("%s has taken over %s. An organization with nothing left has found somewhere to start again.", f.Name, l.Name), "politics")
 			w.Report("recovery", upper(f.Name)+" MOVES INTO "+upper(l.Name),
-				fmt.Sprintf("%s has taken over the running of %s, which had been standing without an owner.", f.Name, l.Name))
+				fmt.Sprintf("%s %s taken over the running of %s, which had been standing without an owner.",
+					Leads(f.Name), Agree(f.Name, "has", "have"), l.Name))
 			return
 		}
 	}

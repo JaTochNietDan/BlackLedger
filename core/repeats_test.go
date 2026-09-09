@@ -65,3 +65,27 @@ func TestThePoliceLineIsNotPrintedTwice(t *testing.T) {
 		t.Errorf("copy with no police line did not get one: %q", plain)
 	}
 }
+
+// Read back in order, the archive showed DAY 12 twice with the same dateline:
+// the protagonist had died at midday and the paper had split its own issue in
+// half. A newspaper has no idea who is reading it.
+
+func TestOneDayIsOneIssueEvenWhenTheReaderChanges(t *testing.T) {
+	w := New(97)
+	w.News = nil
+	w.Minute = 11 * 1440
+	w.Report("business", "SOMETHING IN THE MORNING", "b")
+	w.Life++
+	w.Minute = 11*1440 + 800
+	w.Report("politics", "SOMETHING IN THE AFTERNOON", "b")
+	issues := w.Editions()
+	if len(issues) != 1 {
+		t.Fatalf("one day of news came back as %d issues", len(issues))
+	}
+	if issues[0]["count"].(int) != 2 {
+		t.Fatalf("the issue carries %v stories, not both", issues[0]["count"])
+	}
+	if issues[0]["life"].(int) != w.Life || !issues[0]["mine"].(bool) {
+		t.Fatalf("the crossover issue belongs to life %v, not the current one", issues[0]["life"])
+	}
+}
