@@ -297,7 +297,7 @@ func (w *World) resolveContract(c Contract) {
 	if f := w.faction(person.Faction); f != nil {
 		f.Goodwill = max(-100, f.Goodwill-45)
 		w.RetaliationFrom(f.ID)
-		w.Log("They gave up a name", fmt.Sprintf("The one who went for %s was taken alive and questioned. %s knows who paid, and so do the police.", person.Name, f.Name), "danger")
+		w.Log("They gave up a name", fmt.Sprintf("The one who went for %s was taken alive and questioned. %s %s who paid, and so do the police.", person.Name, f.Name, Agree(f.Name, "knows", "know")), "danger")
 		return
 	}
 	w.Log("They gave up a name", fmt.Sprintf("The one who went for %s was taken alive and questioned. Your name came out of it.", person.Name), "danger")

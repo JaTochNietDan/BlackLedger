@@ -1022,7 +1022,7 @@ func (w *World) Actions(id string) []Action {
 			fmt.Sprintf("Go in with your crew against %s. Damages the property, weakens %s and costs you standing with them. They will retaliate, and a failed attempt injures you.", l.Name, f.Name))
 		if rival := w.Rival(f.ID); rival != nil {
 			add("incite", "Point "+f.Name+" at "+rival.Name, 45, 25, w.InciteReadiness(id),
-				fmt.Sprintf("Spend $25 on the right conversations so %s believes %s moved against them. Hardens their quarrel and can start a war you are not part of. A story that does not hold up costs you standing with %s.", f.Name, rival.Name, f.Name))
+				fmt.Sprintf("Spend $25 on the right conversations so %s %s %s moved against them. Hardens their quarrel and can start a war you are not part of. A story that does not hold up costs you standing with %s.", f.Name, Agree(f.Name, "believes", "believe"), rival.Name, f.Name))
 		}
 	}
 	if id == "laundry" || id == "garage" || id == "casino" {

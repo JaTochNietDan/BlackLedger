@@ -80,7 +80,7 @@ func (w *World) CoupAftermath(f *Faction, winner, loser *NPC) {
 	}
 
 	w.Report("politics", "UPHEAVAL IN "+upper(f.Name),
-		fmt.Sprintf("%s is understood to be under new leadership following the death of %s. Associates describe the organization as divided.", f.Name, loser.Name))
+		fmt.Sprintf("%s %s understood to be under new leadership following the death of %s. Associates describe the organization as divided.", f.Name, Agree(f.Name, "is", "are"), loser.Name))
 }
 
 // InternalMove is one person below the top deciding they should be at it. It

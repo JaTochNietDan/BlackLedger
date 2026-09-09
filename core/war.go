@@ -325,7 +325,7 @@ func (w *World) considerReestablish() {
 			prop.Owner = f.ID
 			prop.Condition = max(prop.Condition, 40)
 			f.Power = min(peak(f), f.Power+8)
-			w.Log("They are back on their feet", fmt.Sprintf("%s has taken over %s. An organization with nothing left has found somewhere to start again.", f.Name, l.Name), "politics")
+			w.Log("They are back on their feet", fmt.Sprintf("%s %s taken over %s. An organization with nothing left has found somewhere to start again.", f.Name, Agree(f.Name, "has", "have"), l.Name), "politics")
 			w.Report("recovery", upper(f.Name)+" MOVES INTO "+upper(l.Name),
 				fmt.Sprintf("%s %s taken over the running of %s, which had been standing without an owner.",
 					Leads(f.Name), Agree(f.Name, "has", "have"), l.Name))

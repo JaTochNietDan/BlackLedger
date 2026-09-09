@@ -3739,3 +3739,45 @@ Also checked on that screen and correct, so it is not chased again: a commission
 in progress reads "$0 of $900 taken out of Franca Sabbatini's people", which
 looks like the zero-figure fault fixed above and is not — it is progress against
 a target, and nothing has been taken yet.
+
+## Prose written for two families, in a city that makes its own
+
+The possessive found on the Ledger was one instance of a shape, so this pass
+swept it. An organization inherited by somebody is named "<Person>'s people" and
+is grammatically plural. The two families every campaign starts with —
+"Bellandi Family", "Russo Outfit" — are singular. Any sentence written against
+the openers alone is wrong for every family the world creates by that path, and
+the world creates far more families than it starts with.
+
+I did not trust a grep for this. `core/agreement_test.go` builds a city with a
+plural-named family holding two premises, sets it at war with both openers, runs
+four thousand half-hours, and then reads everything the city wrote down: 180
+ledger entries, 240 newspaper stories, every action label, description and
+refusal in all twelve rooms, and every commission brief. Eleven sites were
+wrong, in the ledger, the paper, the commission board and a button description:
+the family knew, wanted, believed, kept, had, was and did, where it should have
+known, wanted, believed, kept, had, were and done. All eleven now go through
+`Agree`, the helper already written for this.
+
+The scan caught something my grep had not, and also reported something that was
+not a fault. "Violence between Bellandi Family and Otto Reiss's people has
+escalated" is correct English — the violence has escalated, not the people — and
+the first version of the check flagged it. A plural name inside a prepositional
+phrase does not govern the verb after it, so the check now reads clause by
+clause and ignores a name that follows "between". Had I fixed what it reported,
+I would have broken a correct sentence.
+
+Evidence: the scan passes on a driven world and fails when any of the sites is
+put back. A second test states the other half, which matters just as much —
+"Bellandi Family does not keep people who leave in their good books" must keep
+its singular verb, and leaving a seeded family end to end confirms it does.
+Fixing agreement by making everything plural would read exactly as wrong for the
+families most players actually meet. `mise run verify` and `npm test` green,
+`mise run simulate` unchanged at defiant 52 / investor 0 / reckless 82 / worker
+0, 0 errors.
+
+One site that looks like the others and is correct, recorded so it is not
+"fixed" later: the Herald's inquiry story reads "premises associated with X are
+the subject of an inquiry into their books. Y has not responded to the
+newspaper's questions", where Y is the leader rather than the family. A person
+takes a singular verb whatever their organization is called.
