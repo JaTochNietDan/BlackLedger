@@ -94,11 +94,20 @@ func TestRunningSomethingAboutSomebodyElseHeatsTheWholeCity(t *testing.T) {
 			if !w.Player.Alive {
 				continue
 			}
+			// A family can be destroyed inside a month now that money presses on
+			// a quarrel, and a city that no longer has one has nothing to say
+			// about what it thinks of the player. This used to reach straight
+			// into the lookup and crashed the first time a war finished one
+			// off.
+			them := w.faction("bellandi")
+			if them == nil {
+				continue
+			}
 			for _, id := range w.FamilyHoldings("bellandi") {
 				theirs += w.Custom(id)
 			}
 			scrutiny += w.Scrutiny()
-			goodwill += w.faction("bellandi").Goodwill
+			goodwill += them.Goodwill
 		}
 		return
 	}

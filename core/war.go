@@ -369,6 +369,20 @@ func (w *World) FactionTurn() {
 				if gap := a.Power - b.Power; gap > 40 || gap < -40 {
 					drift++
 				}
+				// And money. An organization that cannot meet its wages is not
+				// careful, because being careful has stopped paying: it presses
+				// where it would have waited. An organization with a great deal
+				// of money is stable and is exactly for that reason worth
+				// moving on. Both of those were in the world as numbers and
+				// nothing had ever read them.
+				// Divided, and deliberately. Applied whole this was a shove
+				// rather than a thumb: up to six against a drift that runs
+				// from minus three to plus three, twice a day, which put every
+				// city in the city at war in two hundred of two hundred runs.
+				// A quarrel between two organizations that are both desperate
+				// moves faster than one between two that are comfortable, and
+				// that is all it should do.
+				drift += (w.MoneyPressure(a, b) + w.MoneyPressure(b, a)) / 3
 			}
 			c.Hostility = min(100, max(0, c.Hostility+drift))
 
@@ -499,7 +513,7 @@ func (w *World) howItEnded(a, b *Faction) string {
 		beaten = b.Name
 	}
 	if beaten != "" {
-		return fmt.Sprintf("%s is not holding anything in the district any more. Whether that is the end of them is a question nobody is asking out loud.", beaten)
+		return fmt.Sprintf("%s is not holding anything in the district any more. Whether that is the end of them is a question nobody is asking out loud.", Leads(beaten))
 	}
 	return fmt.Sprintf("%s and %s have stopped short of destroying each other. Both are smaller than they were, and both are still here.", Leads(a.Name), b.Name)
 }
@@ -512,3 +526,40 @@ func (w *World) howItEnded(a, b *Faction) string {
 // fifteen. Measured over four hundred attacks each, that was $689 against $483,
 // thirty percent apart and in the player's favour.
 const RaidTakes = 15
+
+const (
+	// Desperate is what an organization that cannot pay anybody adds to its
+	// quarrels each time the city looks at them, and Pressed is what one that
+	// is merely running its reserves down adds.
+	Desperate = 2
+	Pressed   = 1
+	// Tempting is what a neighbour's money adds, which is the other half of
+	// what the same fact means: a family with a great deal of money is stable,
+	// and is worth taking from precisely because it has something to take.
+	Tempting = 1
+)
+
+// MoneyPressure is what f's situation, and what it sees across the street, do
+// to how hard it pushes a quarrel with `toward`. It is a function of its own so
+// that it can be measured without running a month of the city: money changes
+// which branches a family takes, which changes what it draws from the world's
+// random stream, so a month of simulation cannot tell the effect of money from
+// the effect of a different run of luck.
+func (w *World) MoneyPressure(f, toward *Faction) int {
+	if f == nil || toward == nil {
+		return 0
+	}
+	drift := 0
+	switch w.HowTheyArePlaced(f) {
+	case "cannot pay its people":
+		drift += Desperate
+	case "struggling":
+		drift += Pressed
+	}
+	// Nothing is tempting about a rich organization holding nothing: there is
+	// no ground to take and the money is not on the street.
+	if w.HowTheyArePlaced(toward) == "comfortable" && len(w.FamilyHoldings(toward.ID)) > 0 {
+		drift += Tempting
+	}
+	return drift
+}

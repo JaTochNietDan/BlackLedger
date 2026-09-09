@@ -4917,3 +4917,55 @@ ten, with the hole card face down.
 
 Evidence: `src/Tables.tsx`, `src/cards.ts`, `tests/cards.test.mjs`,
 `core/cards.go`, `core/cards_test.go`. All gates green, `npm test` 41.
+
+## Money presses on a quarrel
+
+The last open piece of the inbox item, in the user's own words: a family with a
+lot of money is stable but more of a target, and one with little money is
+struggling, aggressive and unpredictable. The four states existed and nothing in
+the world read them. Only the director's context did, and the director
+demonstrably ignores it.
+
+An organization that cannot meet its wages now presses a quarrel harder, because
+being careful has stopped paying. One with a great deal of money and premises to
+hold is worth moving on, which is the other half of the same fact. Money nobody
+can reach is not a temptation: a rich family holding no ground adds nothing.
+
+The measurement is the part worth reading. My first attempt ran two cities for a
+month, identical except for money, and reported a clean result in both
+directions before a line of the mechanism existed. Money decides which branches
+a family takes, and every branch changes what is drawn from the world's shared
+random stream, so the two cities were not running the same run of luck at all.
+A month of simulation cannot see this. The pressure is a function of its own and
+is measured directly, with no randomness in it.
+
+Then the wiring, which is the fault this project keeps being caught by. My first
+wiring test called the function directly and passed with the line in the city's
+turn commented out. The real one runs two cities with the *same* cash on both
+sides, so nothing that reads cash takes a different branch, and pins the world's
+stream to the same value every turn. The only difference is whether payday was
+missed. It fails when the connection is cut.
+
+Applied whole, the pressure was a shove rather than a thumb: up to six against a
+drift running from minus three to plus three, twice a day. Every city in two
+hundred went to war, which an existing guard caught immediately. It is divided
+now, so two desperate organizations move faster than two comfortable ones and
+that is all it does.
+
+Two other things the change surfaced. A family can now be destroyed inside a
+month, and a balance test reached straight into a lookup for one that was no
+longer there; that is the second-oldest fault shape in this list. And the
+lowercase sweep found one more sentence, in the line the paper prints when a war
+ends with somebody holding nothing.
+
+I raised a balance test's sample from 120 campaigns to 600 while the pressure
+was still too strong, and then reverted it: with the pressure divided, that test
+returns exactly the numbers it returned before, 114 of 120 and the same median
+attention. The sample was never the problem. Recording it because the reasoning
+was published in a comment for a while and was wrong.
+
+`mise run simulate` is unchanged at defiant 51 / investor 0 / reckless 82 /
+worker 0 with $10 of movement in one median, which is expected: those campaigns
+run seven to thirteen days and a family's money takes a month to say anything.
+
+Evidence: `core/desperation_test.go`. All gates green, `npm test` 41.
