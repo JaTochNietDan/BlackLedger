@@ -3818,3 +3818,61 @@ bodies, every commission brief, and every label, description and refusal in all
 twelve rooms — and `live(t, w, n)` runs the world forward to produce it. Any
 future question of the form "does the game read correctly when X" is now a
 fixture plus a scan, run over several seeds.
+
+## The same harness, pointed at states instead of names
+
+`core/state_scan_test.go` builds cities in awkward conditions — a family holding
+nothing, a family with nobody left, a city down to one organization, a player
+with nothing, and a world run five times longer than anything measured before —
+and reads everything each one writes against a set of checks rather than one.
+Nine thousand passages. Three faults, and two false alarms I did not act on.
+
+**A ledger entry that reported losses already taken.** Every midnight the player
+could not cover the bills, it wrote "Security leaves; your residence is now a
+rented room. Unpaid crew lose loyalty." After the first such night there is no
+security to leave, the residence is already a rented room, and the crew's
+loyalty is already nothing. The entry now names only what it actually took, and
+when there is nothing left says so: "You could not cover the bills. There is
+nothing left to take, which is its own kind of trouble."
+
+**A splinter announcement that agreed one family's verb and not the other's.**
+"Bruno Duarte's people wants it back" — the line already ran the new family's
+name through `Agree` and left the parent's alone.
+
+**A refusal that could not tell two cases apart**, the sixth of that class.
+Lending is capped at a share of everything the player has, out and in hand, so a
+full book and an empty pocket look identical to the arithmetic. Both were
+refused with "You have $0 out already, which is as much as you can afford to be
+owed", which for a player holding nothing is true and says nothing. A player
+with no money is now told "Nobody lends money they do not have. It takes $300 in
+hand to put $120 on the street."
+
+**The two I did not act on.** The scan reported "Janos Kovac of Vera Kohl's
+people is not to see the end of the week" as a disagreement. The subject is
+Janos Kovac; the plural name sits in a prepositional phrase and governs nothing.
+That is the second construction of this kind, after "Violence between A and B
+has escalated", and the check now skips a clause where the name follows "of" as
+well as "between". Skipping a whole clause containing "of" can mask a real
+fault, and that is the price of not manufacturing false ones.
+
+The other was mine. Over four hundred game days, 154 of 180 ledger entries were
+the same headline — but this harness keeps a broke player alive far past where a
+campaign ends, so the bills fail every midnight by construction. That is what I
+built, not what the game does. I removed the assertion rather than "fixing" the
+game to satisfy it, and pointed the test at the newspaper instead, which is the
+living world's own voice and owes nothing to a player standing still.
+
+That gave a new measurement worth keeping. Over 20,000 half-hours, about four
+hundred and seventeen game days, the paper printed **240 stories with 117
+distinct headlines**, the most repeated appearing **17 times**. The city does not
+run out of things to say at length.
+
+It also corrects something I published two slices ago. I wrote that the people
+prune "has almost certainly never run in any real campaign" because a city holds
+about 52 people at day 47. That holds for the horizons a campaign actually
+reaches, but the population does grow: at day 417 this world held 153 people,
+which is past the threshold of 150. The prune is reachable, just not soon.
+
+Evidence: each of the three fixes fails its test when reverted, confirmed one at
+a time. `mise run verify` and `npm test` green, `mise run simulate` unchanged at
+defiant 52 / investor 0 / reckless 82 / worker 0, 0 errors.

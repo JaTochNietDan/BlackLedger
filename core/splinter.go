@@ -144,8 +144,12 @@ func (w *World) Splinter(parent *Faction) bool {
 		c.State = "feud"
 		c.Since = w.Minute
 	}
-	w.Log("A family splits", fmt.Sprintf("%s %s broken away from %s, taking %s. %s leads them, and %s wants it back.",
-		Leads(name), Agree(name, "has", "have"), parent.Name, place.Name, leader, parent.Name), "politics")
+	// Both families in this sentence are subjects, so both verbs follow their
+	// names. The new one was already agreed; the parent's "wants it back" was
+	// not, and read "Bruno Duarte's people wants it back".
+	w.Log("A family splits", fmt.Sprintf("%s %s broken away from %s, taking %s. %s leads them, and %s %s it back.",
+		Leads(name), Agree(name, "has", "have"), parent.Name, place.Name, leader,
+		parent.Name, Agree(parent.Name, "wants", "want")), "politics")
 	w.Report("split", "SPLIT IN "+strings.ToUpper(parent.Name),
 		fmt.Sprintf("A faction led by %s has broken from %s and taken control of %s. Observers expect the dispute to be settled outside the courts.", leader, parent.Name, place.Name))
 	return true

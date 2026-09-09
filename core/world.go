@@ -1477,13 +1477,35 @@ func (w *World) Advance(minutes int) {
 				p.Cash -= bill
 				w.Log("Accounts settled", fmt.Sprintf("$%d paid for housing, security and crew.", bill), "business")
 			} else {
-				p.Cash = max(0, p.Cash-15)
-				p.Home = "room"
-				p.Security = 0
-				if len(p.Crew) > 0 {
+				// Report the night that happened, not the first one. This said
+				// "Security leaves; your residence is now a rented room.
+				// Unpaid crew lose loyalty" every midnight the player came up
+				// short, so the second night and every night after claimed
+				// three losses that had already been taken.
+				lost := []string{}
+				if p.Security > 0 {
+					lost = append(lost, "Security leaves")
+					p.Security = 0
+				}
+				if p.Home != "room" {
+					lost = append(lost, "your residence is now a rented room")
+					p.Home = "room"
+				}
+				if len(p.Crew) > 0 && p.Crew[0].Loyalty > 0 {
+					lost = append(lost, p.Crew[0].Name+" is not being paid and knows it")
 					p.Crew[0].Loyalty = max(0, p.Crew[0].Loyalty-20)
 				}
-				w.Log("Your arrangements unravel", "You could not cover the bills. Security leaves; your residence is now a rented room. Unpaid crew lose loyalty.", "danger")
+				had := p.Cash
+				p.Cash = max(0, p.Cash-15)
+				text := "You could not cover the bills."
+				if len(lost) > 0 {
+					text += " " + upper1(strings.Join(lost, "; ")) + "."
+				} else if had > 0 {
+					text += fmt.Sprintf(" There was nothing left to take but $%d of what you were carrying.", had-p.Cash)
+				} else {
+					text += " There is nothing left to take, which is its own kind of trouble."
+				}
+				w.Log("Your arrangements unravel", text, "danger")
 			}
 		}
 		for j := 0; j < len(w.Plots); j++ {

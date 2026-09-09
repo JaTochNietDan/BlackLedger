@@ -156,7 +156,15 @@ func (w *World) LendReadiness(id string) string {
 		return "The police have them"
 	}
 	if size := w.LoanSize(n); size < LoanFloor {
-		return fmt.Sprintf("You have $%d out already, which is as much as you can afford to be owed", w.OutOnLoan())
+		// Two ways to fall below the floor, and one sentence used to cover
+		// both. Lending is capped at a share of everything the player has, out
+		// and in hand, so a full book and an empty pocket look the same to the
+		// arithmetic — and a player holding nothing was told "You have $0 out
+		// already, which is as much as you can afford to be owed".
+		if out := w.OutOnLoan(); out > 0 {
+			return fmt.Sprintf("You have $%d out already, which is as much as you can afford to be owed", out)
+		}
+		return fmt.Sprintf("Nobody lends money they do not have. It takes $%d in hand to put $%d on the street", int(float64(LoanFloor)/LoanShare), LoanFloor)
 	}
 	return ""
 }

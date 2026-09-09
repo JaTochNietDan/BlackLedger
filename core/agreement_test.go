@@ -28,7 +28,17 @@ func disagrees(text string) string {
 		if m == nil {
 			continue
 		}
-		if strings.Contains(strings.ToLower(sentence[:m[0]]), "between ") {
+		// A plural name inside a prepositional phrase does not govern the verb
+		// after it. Two constructions in this game put one there, and both are
+		// correct English that an earlier version of this check reported:
+		//   "Violence between Bellandi Family and Otto Reiss's people has ..."
+		//   "Janos Kovac of Vera Kohl's people is not to see the end ..."
+		// In each the subject is what comes before the preposition. Skipping a
+		// whole clause containing "of" can mask a real fault, which is the
+		// price of not manufacturing false ones.
+		before := strings.ToLower(sentence[:m[0]])
+		if strings.Contains(before, "between ") || strings.HasSuffix(before, " of ") ||
+			strings.Contains(before, " of ") {
 			continue
 		}
 		return sentence[m[0]:m[1]]
