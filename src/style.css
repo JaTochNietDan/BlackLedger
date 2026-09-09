@@ -284,8 +284,10 @@
 /* The generated cast: two dozen period portraits made offline and baked into a
    sheet. The drawn face sits underneath as the fallback, so a missing sheet
    degrades to a drawing rather than to a grey box. */
-.cast-portrait{display:inline-block;position:relative;overflow:hidden;background-image:url('/art/faces-noir-v1.png');background-size:600% 400%;background-repeat:no-repeat;border:1px solid #4b4433}
-.cast-portrait .drawn-fallback{position:absolute;inset:0;z-index:-1}
+.cast-portrait{display:inline-block;position:relative;overflow:hidden;border:1px solid #4b4433}
+.cast-portrait .drawn-fallback{position:absolute;inset:0}
+/* The generated face, over the drawing rather than under it. */
+.cast-portrait .cast-face{position:absolute;inset:0;background-image:url('/art/faces-noir-v1.png');background-size:600% 400%;background-repeat:no-repeat}
 .cast-portrait .drawn-fallback svg{width:100%;height:100%;display:block}
 .portrait-tiny.cast-portrait{width:30px;height:36px}
 .portrait-small.cast-portrait{width:46px;height:56px}
@@ -439,16 +441,39 @@
 .room-plate{line-height:0}
 .room-plate .interior{display:block;width:100%;height:auto}
 .room.painted{min-height:280px}
-.stander{position:absolute;background:none;border:0;padding:0;transform-origin:bottom center;display:flex;flex-direction:column;align-items:center;filter:drop-shadow(0 6px 10px #000a)}
-.stander .portrait,.stander .portrait-wrap{width:46px;height:56px;border:1px solid #0d1211;border-bottom:0;display:block}
-.stander .portrait-wrap .portrait{width:46px;height:56px;border:0}
-.stander-coat{display:block;width:66px;height:62px;margin-top:-1px;background:linear-gradient(180deg,#232927,#0b0e0d);clip-path:polygon(30% 0,70% 0,100% 100%,0 100%);border-top:1px solid #333c36}
+.stander{position:absolute;background:none;border:0;padding:0;transform-origin:bottom center;display:flex;flex-direction:column;align-items:center}
+/* The floor under their feet. Every prop in the city got one of these and it
+   is the single thing that stopped them floating over the pavement. */
+.stander-shadow{position:absolute;bottom:12px;left:50%;width:74px;height:13px;transform:translateX(-50%);background:radial-gradient(closest-side,#000c,#0000);pointer-events:none}
+/* The hat was tried and taken out again: a dark bar over a rectangular
+   portrait reads as a picture in a box, not as a head in a hat. What actually
+   turns the portrait into a person is losing the rectangle. */
+.stander-hat{display:none}
+/* A head, not a photograph. The painted portrait is cropped to the shape of
+   somebody's head and shoulders and set into the coat, so the figure reads as
+   one person rather than as a picture propped on a stand. */
+.stander .portrait,.stander .portrait-wrap{width:50px;height:58px;border:0;display:block}
+.stander .portrait-wrap .portrait{width:50px;height:58px;border:0}
+.stander .portrait{clip-path:ellipse(45% 47% at 50% 45%);margin-bottom:-9px}
+/* A coat, lit from the same side the room is: brighter at the shoulder, dark
+   at the hem, with a faint collar line. The collar was tried bright first and
+   read as a bow tie on everybody, which is why it is barely there now. */
+.stander-coat{display:block;width:72px;height:60px;margin-top:-1px;
+  background:
+    linear-gradient(163deg,#6f6d63 0 1px,#0000 1px) 50% 3%/13px 17px no-repeat,
+    linear-gradient(197deg,#6f6d63 0 1px,#0000 1px) 50% 3%/13px 17px no-repeat,
+    linear-gradient(105deg,#39413c,#1a201f 46%,#0b0e0d);
+  clip-path:polygon(28% 0,72% 0,88% 16%,96% 100%,4% 100%,12% 16%);border-top:1px solid #333c36}
 .stander.yours .stander-coat{background:linear-gradient(180deg,#3a3020,#16130d);border-top-color:var(--gold)}
 .stander.sour .stander-coat{background:linear-gradient(180deg,#3a221c,#160e0c);border-top-color:#b3705f}
 .stander-name{font:9.5px system-ui;letter-spacing:.05em;color:#cfd3c4;background:#0b0f0ecc;padding:1px 5px;margin-top:3px;opacity:0;transition:opacity .12s}
 .stander:hover .stander-name,.stander:focus-visible .stander-name,.stander.picked .stander-name{opacity:1}
-.stander:hover .portrait,.stander:focus-visible .portrait{border-color:#f1d191}
-.stander.picked .portrait,.stander.picked .portrait-wrap{border-color:var(--gold);box-shadow:0 0 0 2px #d6b77c88}
+/* Picked and hovered used to be shown with a border on the portrait, which is
+   gone with the rectangle. A ring on the floor instead — the same way the city
+   marks the address the player is standing at. */
+.stander:hover .stander-shadow,.stander:focus-visible .stander-shadow{background:radial-gradient(closest-side,#000c,#0000),radial-gradient(closest-side,#f1d19155,#0000)}
+.stander.picked .stander-shadow{background:radial-gradient(closest-side,#000c,#0000),radial-gradient(closest-side,#d6b77c99,#0000)}
+.stander.picked .stander-coat{border-top-color:var(--gold);box-shadow:0 0 14px #d6b77c55}
 .room-rest{position:absolute;right:10px;top:10px;background:#0b0f0ecc;color:#c9b98f;font-size:11px;padding:3px 8px}
 /* What the journey costs, before the player commits to it. The clock is the
    scarcest thing in this game, so the cost belongs on the thing it buys. */

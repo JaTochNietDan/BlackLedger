@@ -63,6 +63,9 @@ export function Interior({place, people, actions, render, onLeave, comings, minu
   const onFloor = [...people].sort((a, b) => worth(a) - worth(b));
 
   const traffic = (comings || []).filter(c => c.where === place.id);
+  // The hour, read once: the room's wash and the people standing in it have to
+  // agree, and they only do that if they come off the same number.
+  const light = roomLight(minute);
 
   return <div className="interior-stage">
     {!!traffic.length && <div className="room-traffic" role="status">
@@ -74,7 +77,7 @@ export function Interior({place, people, actions, render, onLeave, comings, minu
       style={painted ? {backgroundImage: `url(${paintedRoom(place.id)})`} : undefined}>
       <div className="room-plate" dangerouslySetInnerHTML={{__html: interiorSVG(place, painted)}}/>
       {/* The hour, laid over the backdrop rather than baked into it. */}
-      <span className="room-light" aria-hidden="true" style={{background: roomLight(minute).wash}}/>
+      <span className="room-light" aria-hidden="true" style={{background: light.wash}}/>
       {/* The people are drawn over the room in HTML rather than inside the
           picture, so each one can wear their own face. A silhouette with
           nothing on its head could be anybody. */}
@@ -82,10 +85,22 @@ export function Interior({place, people, actions, render, onLeave, comings, minu
         const spot = standingSpots[i];
         return <button key={who.id}
           className={'stander' + (who.id === picked ? ' picked' : '') + (who.yours ? ' yours' : '') + (who.overdue || who.sore ? ' sour' : '')}
-          style={{left: `${spot.left}%`, bottom: `${spot.bottom}%`, transform: `translateX(-50%) scale(${spot.scale.toFixed(2)})`}}
+          style={{
+            left: `${spot.left}%`, bottom: `${spot.bottom}%`,
+            transform: `translateX(-50%) scale(${spot.scale.toFixed(2)})`,
+            // A person standing in a dark room is dark. The wash over the
+            // backdrop used to go under the figures, so at three in the morning
+            // the room went dark and everybody in it stayed lit like a shop
+            // window. The city dims its people by the same number.
+            filter: `drop-shadow(0 6px 10px #000a) brightness(${(1 - light.dark * .38).toFixed(2)})`,
+          }}
           aria-pressed={who.id === picked}
           title={`${who.name} — ${who.standing}`}
           onClick={() => setPicked(who.id === picked ? '' : who.id)}>
+          {/* What they are standing on. Nothing in the city is allowed to
+              float and neither is anybody in here. */}
+          <span className="stander-shadow" aria-hidden="true"/>
+          <span className="stander-hat" aria-hidden="true"/>
           <Portrait id={who.id} size="small"/>
           <span className="stander-coat" aria-hidden="true"/>
           <span className="stander-name">{who.name.split(' ')[0]}</span>

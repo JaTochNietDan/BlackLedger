@@ -34,9 +34,19 @@ export function Portrait({id, size}: {id: string; size?: 'small' | 'tiny'}) {
       style={{backgroundPosition: `${cell[0] * 50}% ${cell[1] * 100}%`}}/>;
   }
   const n = faceFor(id);
-  return <span aria-hidden="true" className={cls + ' cast-portrait'} style={{
-    backgroundPosition: `${(n % CAST_COLS) * 100 / (CAST_COLS - 1)}% ${Math.floor(n / CAST_COLS) * 100 / (CAST_ROWS - 1)}%`,
-  }}>
+  // The drawn version is underneath and the generated face is laid over it.
+  //
+  // It used to be the other way round — the sheet on the element's own
+  // background and the drawing as a child behind it — and that does not work:
+  // a negative z-index child still paints above its parent's background, so
+  // the crude drawing covered the generated face every time and the fallback
+  // was what everybody actually saw. Layering it this way means the drawing is
+  // seen only when the sheet genuinely fails to load, which is what a fallback
+  // is for.
+  return <span aria-hidden="true" className={cls + ' cast-portrait'}>
     <span className="drawn-fallback" dangerouslySetInnerHTML={{__html: portrait(id)}}/>
+    <span className="cast-face" style={{
+      backgroundPosition: `${(n % CAST_COLS) * 100 / (CAST_COLS - 1)}% ${Math.floor(n / CAST_COLS) * 100 / (CAST_ROWS - 1)}%`,
+    }}/>
   </span>;
 }
