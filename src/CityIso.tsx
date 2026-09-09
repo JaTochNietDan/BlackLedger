@@ -527,7 +527,7 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight}: {
     // terrace: the address takes one frontage slot and ordinary buildings take
     // the rest, shoulder to shoulder, so the city is built up rather than
     // twelve models in twelve fields.
-    const SLOTS = 3;
+    const SLOTS = 2;
     const filler = new Container();
     const rows: {cell: Cell; slot: ReturnType<typeof terrace>[number]; depth: number}[] = [];
     const addressAt = new Map<string, string>();      // "col,row,index" -> id
@@ -558,19 +558,23 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight}: {
       const g = new Graphics();
       if (fillArt) {
         // Scaled to the slot it fills, so neighbours meet at their walls.
-        const across = (slot.w + slot.d) * (TILE.w / 2) * 1.16;
+        // No overshoot. It was added to close the party walls and its actual
+        // effect was to drive every sprite into its neighbour: roofs cutting
+        // through roofs and buildings hanging over the kerb. A hairline gap
+        // between two buildings reads as two buildings; an overlap reads as
+        // broken.
+        const across = (slot.w + slot.d) * (TILE.w / 2);
         const art = new Sprite(fillArt);
         art.anchor.set(.5, 1);
         art.scale.set(across / fillArt.width);
         const foot = project({x: slot.at.x + slot.w, y: slot.at.y + slot.d});
         const mid = project({x: slot.at.x + slot.w / 2, y: slot.at.y + slot.d / 2});
         art.position.set(mid.x, foot.y);
-        // A little variation in tone and height between neighbours, so a
-        // terrace reads as buildings put up at different times rather than as
-        // one building stamped along the street.
+        // Tone varies between neighbours; proportions do not. Scaling the
+        // height alone squashed and stretched buildings that were drawn
+        // correctly, which is its own artefact on top of the overlapping.
         const warmth = ((order * 37) % 7) / 7;
         art.tint = mix(mix(0xc6c2b6, 0xb2bcc0, warmth), 0x6f7a80, .3 + dark * .28);
-        art.scale.y *= .93 + warmth * .16;
         g.addChild(art);
       } else {
         const inset = .04;
@@ -665,10 +669,9 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight}: {
 
       const centre = project({x: at.x + block.w / 2, y: at.y + block.d / 2});
       // How wide this slot is on screen, which is what a cut-out has to match:
-      // the picture is scaled to the ground it stands on, never to itself. The
-      // small overshoot is what closes the party walls — neighbours meeting at
-      // their edges rather than leaving a stripe of pavement between them.
-      const across = (block.w + block.d) * (TILE.w / 2) * 1.16;
+      // the picture is scaled to the ground it stands on, never to itself, and
+      // to exactly that ground, so it cannot lean into its neighbour's.
+      const across = (block.w + block.d) * (TILE.w / 2);
       let tallest = Math.max(...block.parts.map(q => (q.base || 0) + q.h));
 
       const texture = textures.get(p.id);

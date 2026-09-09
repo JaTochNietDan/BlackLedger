@@ -489,7 +489,7 @@ export type Slot = {at: Vec; w: number; d: number; front: boolean; end: boolean}
 // terrace lays a block's frontage out as slots. The front row faces the street
 // that runs along the near edge; the back row fills the far edge, so a block
 // reads as built-up rather than as one building with a lawn.
-export function terrace(cell: Cell, slots = 3): Slot[] {
+export function terrace(cell: Cell, slots = 2): Slot[] {
   const i = island(cell);
   const depth = (i.d - PAVE * 2) * .46;          // how far back a row reaches
   const width = (i.w - PAVE * 2) / slots;
@@ -513,7 +513,7 @@ export function terrace(cell: Cell, slots = 3): Slot[] {
 
 // Which slot an address takes: the middle of the near row, so the building the
 // player came to see faces the street and is never hidden behind another.
-export const addressSlot = (slots = 3) => Math.floor(slots / 2);
+export const addressSlot = (_slots = 2) => 0;
 
 // ---------------------------------------------------------------------------
 // What is painted on the road.

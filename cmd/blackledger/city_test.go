@@ -283,3 +283,32 @@ func TestStreetDressingStandsOnThePavement(t *testing.T) {
 		t.Error("dressing is not inset from the kerb, so a prop can overhang the carriageway")
 	}
 }
+
+// A building is scaled to the ground it stands on, and to exactly that ground.
+//
+// This is a text guard against the mistake it is named for. A 1.16x overshoot
+// was added to the sprite scaling to close the party walls between neighbours,
+// and its real effect was to push every building into the one beside it —
+// roofs through roofs, walls over the kerb — which is what the city looked
+// like until it was taken out. The slot rectangles never overlapped (see
+// tests/city-blocks.test.mjs); the pictures drawn on them did. Nothing here
+// can check pixels, so it checks that the multiplier is gone.
+func TestNoBuildingIsDrawnWiderThanItsGround(t *testing.T) {
+	source, err := os.ReadFile("../../src/CityIso.tsx")
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, line := range strings.Split(string(source), "\n") {
+		if !strings.Contains(line, "const across =") || !strings.Contains(line, "TILE.w") {
+			continue
+		}
+		if !strings.HasSuffix(strings.TrimSpace(line), "* (TILE.w / 2);") {
+			t.Errorf("a building is scaled by something other than its own plot: %s", strings.TrimSpace(line))
+		}
+	}
+	// And its proportions are its own: scaling one axis alone squashed and
+	// stretched buildings that were painted correctly.
+	if strings.Contains(string(source), "art.scale.y *=") {
+		t.Error("a building's height is being scaled independently of its width, which distorts it")
+	}
+}
