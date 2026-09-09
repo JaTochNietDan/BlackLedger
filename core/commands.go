@@ -193,7 +193,15 @@ func (w *World) apply(c Command) error {
 				w.RunArrangement(e, e.Effect.Minutes)
 			} else {
 				w.RememberArrangement(e, "declined")
-				w.Log("An offer declined", "You decline "+w.NPC(e.Speaker).Name+"'s proposal. No payment changes hands.", "story")
+				// A save written before the prune knew about open scenes can
+				// already have forgotten this person, and there is no migration
+				// that puts somebody back. Say it without the name rather than
+				// crash looking one up.
+				declined := "You decline the proposal. No payment changes hands."
+				if n := w.NPC(e.Speaker); n != nil {
+					declined = "You decline " + n.Name + "'s proposal. No payment changes hands."
+				}
+				w.Log("An offer declined", declined, "story")
 			}
 		}
 	} else {

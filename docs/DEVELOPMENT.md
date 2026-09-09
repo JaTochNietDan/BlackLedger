@@ -3469,3 +3469,52 @@ Correcting an earlier record: the living-world baseline written up as "70 wars,
 not comparable to the table above. That figure counted a subset; the run here
 aggregates all eighty campaigns, twenty per strategy. The numbers are the same
 world measured differently.
+
+## The city must not forget who the player is talking to
+
+Sweeping the same class further — a lookup whose result is used without asking
+whether it found anything — found one live crash and two near-misses. The
+near-misses first, so they are not chased again. `migrate.go` guards its
+`Factions[0]`/`Factions[1]` pair with `len(w.Factions) >= 2`, which is correct.
+`yourpeople.go` reads `w.NPC(id).Trust` and `n.Faction` straight off the lookup,
+but every caller passes through `LetGoReadiness`, which returns a refusal when
+the person is nil. Both fine.
+
+The real one is `PrunePeople`, which keeps a long save bounded by forgetting the
+dead once nothing refers to them. What counts as a reference was a list, and the
+list did not include the person standing in front of the player. A scene names
+its speaker by id and by nothing else. So: a proposal is open, the person who
+made it is killed, the prune forgets them, and declining the offer prints their
+name straight off the lookup — `w.NPC(e.Speaker).Name` on nil. Nothing in the
+server recovers. The same gap covered a suspended arrangement, which remembers
+who it is with the same way.
+
+Both are references now. The refusal is also written so it does not need the
+lookup at all: a save from before this change can already have lost a speaker,
+and no migration puts somebody back, so it reads "You decline the proposal" when
+there is nobody left to name.
+
+Evidence: `core/prune_test.go` reproduces the crash — "declining crashed the
+city: runtime error: invalid memory address or nil pointer dereference" — and
+three tests state the properties. Each was re-broken afterwards: removing the
+scene-speaker reference fails the prune test, and restoring the unguarded
+lookup fails the refusal test. `mise run verify` and `npm test` green, `mise run
+simulate` unchanged at defiant 52 / investor 0 / reckless 82 / worker 0, 0
+errors, and sixteen apicheck runs against one save with no invariant failures.
+
+Two negative results, recorded as results.
+
+The loan book does not need protecting here, and the first version of that test
+was measuring its own setup. `Kill` writes off a current-life loan at the moment
+of death, and a loan carried over from an earlier life is already read through a
+nil check in both `LoanDay` and `LoanDescription`. I removed the clause I had
+added for it.
+
+And this crash is not one a player hits today. `PrunePeople` only runs once the
+city holds more than 150 people. Driven to day 47 over sixteen apicheck runs,
+the city held 52 living people and 3 dead, and that number is stable rather than
+growing — the population settles around fifty and stays there. So the prune has
+almost certainly never run in any campaign anybody has played, and the crash is
+reachable only in a campaign far longer than any I have driven. The reference
+list was incomplete either way, which is the reason to fix it; the severity is
+not what it first looked like.

@@ -202,6 +202,18 @@ func (w *World) referenced(id string) bool {
 	if n := w.NPC(id); n != nil && w.isRoleHolder(n) {
 		return true
 	}
+	// The person standing in front of the player right now. A scene names its
+	// speaker by id and nothing else, so forgetting them leaves the open
+	// conversation pointing at nobody — and declining the offer looked their
+	// name up without asking whether they were still there.
+	if w.Event != nil && w.Event.Speaker == id {
+		return true
+	}
+	// An arrangement the player walked away from mid-job is still theirs to
+	// come back to, and it remembers who it is with the same way.
+	if w.SuspendedJob != nil && w.SuspendedJob.Scene != nil && w.SuspendedJob.Scene.Speaker == id {
+		return true
+	}
 	for _, c := range w.Contracts {
 		if c.Target == id {
 			return true
