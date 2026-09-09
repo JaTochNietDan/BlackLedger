@@ -4361,3 +4361,43 @@ anybody. Five hold. Evidence: `core/inheritance_test.go` and
 holdings stop passing and one when the city stops killing. `mise run verify` and
 `npm test` green, `mise run simulate` unchanged at defiant 52 / investor 0 /
 reckless 82 / worker 0, 0 errors.
+
+## Work that pays its own fee showed no price
+
+Auditing the actions that had never had their label, gate and effect read
+together. The sitdown reads "Call Vittorio Bellandi and Elena Russo to a room",
+its description says "$220 for the room and the guarantees", and its button
+showed no money at all.
+
+The reason is the same one the trips had with time. The panel prints a price
+from the declared cost, and the command layer *charges* the declared cost — so
+an effect that pays its own fee has to declare nothing, or the money goes out
+twice. Calling a sitdown pays `SitdownFee` itself, so it declared zero, so the
+price vanished from the only place a player looks for one.
+
+An action can now name a fee the command layer will not take, the same way it
+can name time the effect will spend. Six actions that pay their own way say what
+they cost: the sitdown, pulling a story, planting a paragraph, reaching an
+account abroad, a still, and a room under the floor.
+
+A false start worth recording. My first attempt measured this by pressing every
+action a rich player could press and comparing cash before and after. Twenty-four
+of twenty-seven came back "charges silently", which is nonsense: those actions
+advance the clock, so the difference includes a day's income, wages and rent. It
+also flagged lending, where the money is not a fee at all but a sum going out on
+the street. The measurement was of my own harness, which is the twenty-first time
+that has happened tonight. The real audit was reading every `w.Pay(` in the core
+against the declared cost at the button that leads to it.
+
+Evidence: `core/asks_test.go` states both halves — the fee is on the button, and
+declaring it does not charge it twice. Removing it from any of the six fails the
+first; the second watches a still cost $450 and take $408 once the hours' own
+income and rent had landed, which is one fee and not two. `mise run verify` and
+`npm test` green, `mise run simulate` unchanged at defiant 52 / investor 0 /
+reckless 82 / worker 0, 0 errors.
+
+Scope stated honestly: this covers the six whose fee is a plain constant at the
+point the button is built. Others charge a figure that is computed further in —
+a retainer's opening payment, laundering, a car, a suit, arms, restocking — and
+each would need its figure lifted to the button. They are the same fault and are
+not fixed here.

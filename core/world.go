@@ -449,8 +449,15 @@ type Action struct {
 	// and had to stay zero; the panel prints the cost of an action from it, so
 	// the longest actions in the game showed no time at all beside "Rest for
 	// four hours · 240 min".
-	Away     int    `json:"away,omitempty"`
-	Cost     int    `json:"cost"`
+	Away int `json:"away,omitempty"`
+	// Cost is what the command layer charges. An effect that pays its own fee
+	// has to declare nothing here or the money would be taken twice.
+	Cost int `json:"cost"`
+	// Asks is that fee, for the panel. The price is printed from Cost, so work
+	// that charges its own way showed no price at all: calling two families to
+	// a room takes $220 and the button said nothing about money, with the
+	// figure only in the description. Same shape as the trips and their days.
+	Asks     int    `json:"asks,omitempty"`
 	Disabled bool   `json:"disabled"`
 	Reason   string `json:"reason"`
 	Detail   string `json:"detail"`
@@ -715,6 +722,14 @@ func (w *World) Actions(id string) []Action {
 			out[len(out)-1].Away = minutes
 		}
 	}
+	// asks is the same for money: work that pays its own fee, so the panel can
+	// print the price without the command layer taking it a second time.
+	asks := func(id, label string, minutes, price int, reason, detail string) {
+		add(id, label, minutes, 0, reason, detail)
+		if len(out) > 0 {
+			out[len(out)-1].Asks = price
+		}
+	}
 	need := func(b bool, s string) string {
 		if b {
 			return s
@@ -771,7 +786,7 @@ func (w *World) Actions(id string) []Action {
 			if q.Suspected {
 				warning = "Somebody has already told you that one of them is not coming to talk."
 			}
-			add("sitdown", "Call "+q.A.Name+" and "+q.B.Name+" to a room", SitdownMinutes, 0, w.SitdownReadiness(),
+			asks("sitdown", "Call "+q.A.Name+" and "+q.B.Name+" to a room", SitdownMinutes, SitdownFee, w.SitdownReadiness(),
 				fmt.Sprintf("$%d for the room and the guarantees, paid whether or not anybody agrees to anything. The only thing in this city that ends a war without either side losing it. %s", SitdownFee, warning))
 		}
 		reason := need(p.Respect < PremisesRespect, fmt.Sprintf("Earn %d respect first", PremisesRespect))
@@ -855,9 +870,9 @@ func (w *World) Actions(id string) []Action {
 			spikeable = fmt.Sprintf("%s in today's paper %s about you or about the police.",
 				upper1(counted(n, "story", "stories")), is)
 		}
-		add("spike", "Pull a story", SpikeMinutes, 0, w.SpikeReadiness(),
+		asks("spike", "Pull a story", SpikeMinutes, SpikeCost, w.SpikeReadiness(),
 			fmt.Sprintf("%s The worst of them does not run, and the city's interest in it goes with it. About one time in seven somebody in that building notices and the arrangement is over.", spikeable))
-		add("puff", "A paragraph about a local businessman", PuffMinutes, 0, w.PuffReadiness(),
+		asks("puff", "A paragraph about a local businessman", PuffMinutes, PuffCost, w.PuffReadiness(),
 			fmt.Sprintf("$%d for %d respect and %d off what the police think. The cheapest standing in this city and the only kind nobody was hurt for.", PuffCost, PuffRespect, PuffHeat))
 		for i := range w.Factions {
 			f := &w.Factions[i]
@@ -880,7 +895,7 @@ func (w *World) Actions(id string) []Action {
 		add("lie_low", "Keep a low profile", 120, 15, "", "Lose 10 heat. Time still passes for rivals and businesses.")
 		add("deposit", fmt.Sprintf("Wire $%d out of the city", DepositLot), 45, 0, w.DepositReadiness(),
 			fmt.Sprintf("$%d of it arrives; the arrangement takes %d%%. It survives you, and whoever comes next can reach it if they can afford to.", DepositLot*(100-DepositCut)/100, DepositCut))
-		add("offshore_access", "Establish that the account is yours", AccessMinutes, 0, w.AccessReadiness(),
+		asks("offshore_access", "Establish that the account is yours", AccessMinutes, AccessCost, w.AccessReadiness(),
 			fmt.Sprintf("$%d in papers and a journey. Only worth it if there is enough out there to be worth reaching.", AccessCost))
 		// An empty account has no sum to bring home. "Brings $0 back into the
 		// city" is a figure that says nothing while looking like one.
@@ -1068,7 +1083,7 @@ func (w *World) Actions(id string) []Action {
 						add("stock_arms", "Put the crates under the floor", 60, 0, w.StockReadiness(),
 							fmt.Sprintf("Moves what you are carrying into the room. %d of %d crates down there, and an organization at war pays $%d apiece for them.", prop.Crates, ArmouryHold, w.ArmsPrice()))
 					} else {
-						add("armoury", "Build a room under the floor", ArmouryMinutes, 0, w.ArmouryReadiness(id),
+						asks("armoury", "Build a room under the floor", ArmouryMinutes, ArmouryCost, w.ArmouryReadiness(id),
 							fmt.Sprintf("$%d. Holds %d crates of arms and draws %d attention a day plus one for every %d in it. Organizations at war buy at %d%% of the waterfront price and get stronger for it. A search that finds it takes everything and the premises with it.", ArmouryCost, ArmouryHold, ArmouryHeat, ArmouryCrateHeat, WarPremium))
 					}
 				}
@@ -1077,7 +1092,7 @@ func (w *World) Actions(id string) []Action {
 						add("dismantle", "Take the still out", 90, 0, w.DismantleReadiness(id),
 							fmt.Sprintf("Ends production of about %d crates a day and the attention that comes with it.", w.StillOutput(id)))
 					} else {
-						add("still", "Set up a still in the back", StillMinutes, 0, w.StillReadiness(id),
+						asks("still", "Set up a still in the back", StillMinutes, StillCost, w.StillReadiness(id),
 							fmt.Sprintf("$%d. Produces moonshine you can sell, draws %d attention a day on top of what the stock draws, and a search that finds it costs far more than one that does not.", StillCost, StillHeat))
 					}
 				}
