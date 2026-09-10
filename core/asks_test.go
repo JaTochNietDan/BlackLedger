@@ -161,8 +161,15 @@ func TestEveryPricedActionKeepsItsPrice(t *testing.T) {
 			continue
 		}
 		checked++
-		if a.Asks <= 0 {
+		// An action whose figure the player types states its price in the
+		// field, not on the card: there is no one number to print before they
+		// have said how much. Cost still has to be zero or the money leaves
+		// twice, which is what this guard is actually for.
+		if a.Asks <= 0 && a.Sum == nil {
 			t.Errorf("%s pays its own fee and names no price", kind)
+		}
+		if a.Sum != nil && (a.Sum.Least <= 0 || a.Sum.Most < a.Sum.Least) {
+			t.Errorf("%s asks for a figure between %d and %d", kind, a.Sum.Least, a.Sum.Most)
 		}
 		if a.Cost != 0 {
 			t.Errorf("%s pays its own fee and also declares a cost of %d, so the money would go out twice",

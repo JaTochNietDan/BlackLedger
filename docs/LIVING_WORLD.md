@@ -140,21 +140,21 @@ in this city
 
 ## Inbox — open
 
+Now when gambling for some reason you changed it back to "play the nickle machine" which doesn't even show our slots page it just seems to run some background simulation and it doesn't allow you to set your own bet as we fleshed out prior.
+
+We used to have "sit down at the tables" when you were at a casino which is much nicer. No idea why you changed to this weird action button thing again that doesn't even show our fancy interface.
+
+Also a bug that existed before/after that change, merely sitting down to play the games already started playing a game, which is wrong.
+
+This all feels a bit haphazard. Make sure you are keeping track of what you are doing and not regressing. We need to be fixing out UI and making it better.
+
+---
+
 Ok this is much better. It may be worth adding a couple more casino games. It
 could be a reason to have other casinos, to have other casino games like slot
 machines and whatnot, any other common games you can think of adding.
 
 — slot machines are built (56de529); another game or two is not
-
----
-
-When setting up the funding on a casino that you own, you should be able to set
-that to an actual number by entering it, not having to use a pre-set amount. We
-definitely want more level of detail with business management like that. It
-should be as dynamic and user settable as possible. Like deposit or withdraw
-money.
-
-— not started
 
 ---
 
@@ -208,7 +208,73 @@ in a damaged state.
 
 — not started
 
+---
+
+Why does it seem like you can send Leo Carver on collections in practically every single building's
+action menu?
+
+---
+
+The roulette graphics look better but I think that the betting table part should be to the right of the wheel, not below it, like on a real table. You should be able to pick your specific bet amount, up to the maximum (as we talked about in another inbox item, maximum can be set by the casino owner). You can also place multiple bets in roulette, on different numbers, combinations etc, like the real game by putting down chips on each one you want to bet on.
+
+---
+
+We should try to improve the images being displayed on the newspaper. Having a portrait of an affected person or building would be great. Some other black and white dramatization of something would also be great if plausible.
+
+--- 
+
+The walking between buildings simulation is not that great right now because we don't have the map working properly and the little bar that explains that you're traveling between buildings is at the bottom of the page often below the fold.
+
+---
+
+Is buying a business called "establish protection"? That's not super clear what that means, we should fix
+the wording on that to explain what that actually entails.
+
+---
+
+I don't see a lot of cursing from characters in this game, we should increase that since it's with the mafia style. Characters should be able to make threats to you too, I have not seen that yet.
+
+--- 
+
+I got some gossip by getting that girl a coffee and then I see "bad blood" red box at the top of the page but it never goes away and it's annoying.
+
+---
+
+Vitor Bellendi is always at the kessler filling station for some reason. That seems odd?
+
+I go to The Monarch and request a sit down with the controlling family and it sits me down with the family lead but the lead is not present at this location. That seems unusual. That lead is at Kesseler Filling Station...
+
+---
+
+When inside a building you can't see who the family that owns it (if any) is anymore.
+
+---
+
+When inside a building you own the top buttons should probably be for owner management and under a separate subtitle for management actions.
+
+---
+
+I don't think "moving against X business yourself" should required respect, that doesn't make sense.
+
+---
+
+Ensure efficiency of development loops by increasing efficiency of your workflow in any way that you can accomplish.
+
 ## Inbox — answered
+
+When setting up the funding on a casino that you own, you should be able to set
+that to an actual number by entering it, not having to use a pre-set amount. We
+definitely want more level of detail with business management like that. It
+should be as dynamic and user settable as possible. Like deposit or withdraw
+money.
+
+— built: money into and out of a business now moves in whatever figure is typed.
+  Putting money behind the tables, taking it off them, wiring it out of the city
+  and bringing it home each carry a number field bounded by what is actually
+  there, and the old lot survives only as what the field starts on. The core
+  owns the bounds (Action.Sum) so the interface invents none of them.
+
+---
 
 Another idea is that we can have a car dealership that actually acts as the
 place you buy your cars from and other living NPCs buy their cars from. We can

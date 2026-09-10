@@ -29,14 +29,14 @@ func keepFloat(seed uint32, target, days int) (int, bool) {
 	banked := 0
 	for day := 0; day < days; day++ {
 		for w.Properties["casino"].Bankroll+BankrollLot <= target && w.Player.Cash >= BankrollLot {
-			if err := w.Bankroll("casino"); err != nil {
+			if err := w.Bankroll("casino", 0); err != nil {
 				break
 			}
 		}
 		w.CasinoDay()
 		for w.Properties["casino"].Bankroll-BankrollLot >= target {
 			before := w.Player.Cash
-			if err := w.Draw("casino"); err != nil {
+			if err := w.Draw("casino", 0); err != nil {
 				break
 			}
 			banked += w.Player.Cash - before

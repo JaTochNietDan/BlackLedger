@@ -140,60 +140,100 @@ func (w *World) night(l Place) {
 	}
 }
 
-// BankrollReadiness explains why money cannot be put behind the tables, or
-// returns "".
-func (w *World) BankrollReadiness(id string) string {
+// BankrollLeast is the smallest figure worth calling a float. Below it the
+// player is not funding a room, they are rounding.
+const BankrollLeast = 25
+
+// BankrollReadiness explains why the typed figure cannot be put behind the
+// tables, or returns "". A figure of zero is whatever the field would have
+// started on, so a caller that names no amount still moves a lot.
+func (w *World) BankrollReadiness(id string, amount int) string {
 	if !HasBankroll(id) || !w.Own(id) {
 		return "This is not a room of yours"
 	}
-	if w.Player.Cash < BankrollLot {
+	amount = w.BankrollSum(id, amount)
+	if w.Player.Cash < BankrollLeast {
 		return "Not enough cash"
+	}
+	if amount < BankrollLeast {
+		return fmt.Sprintf("A float starts at $%d", BankrollLeast)
+	}
+	if amount > w.Player.Cash {
+		return fmt.Sprintf("You have $%d", w.Player.Cash)
 	}
 	return ""
 }
 
-// Bankroll puts a lot of the player's own money behind the tables, where the
-// house can lose it and where it is the reason anybody worth taking money from
-// comes through the door.
-func (w *World) Bankroll(id string) error {
-	if reason := w.BankrollReadiness(id); reason != "" {
+// BankrollSum is the figure a request actually moves: what was typed, or the
+// lot when nothing was.
+func (w *World) BankrollSum(id string, amount int) int {
+	if amount > 0 {
+		return amount
+	}
+	return min(BankrollLot, max(BankrollLeast, w.Player.Cash))
+}
+
+// Bankroll puts money of the player's own behind the tables, where the house
+// can lose it and where it is the reason anybody worth taking money from comes
+// through the door.
+func (w *World) Bankroll(id string, amount int) error {
+	if reason := w.BankrollReadiness(id, amount); reason != "" {
 		return fmt.Errorf("%s", reason)
 	}
-	if err := w.Pay(BankrollLot); err != nil {
+	amount = w.BankrollSum(id, amount)
+	if err := w.Pay(amount); err != nil {
 		return err
 	}
 	prop := w.Properties[id]
-	prop.Bankroll += BankrollLot
+	prop.Bankroll += amount
 	place, _ := PlaceByID(id)
 	w.Log("Money behind the tables at "+place.Name,
-		fmt.Sprintf("$%d more, for $%d in the float. The room can now cover about $%d of action a night.", BankrollLot, prop.Bankroll, w.NightHandleAt(id)), "business")
+		fmt.Sprintf("$%d more, for $%d in the float. The room can now cover about $%d of action a night.", amount, prop.Bankroll, w.NightHandleAt(id)), "business")
 	return nil
 }
 
-// DrawReadiness explains why nothing can be taken off the tables, or returns "".
-func (w *World) DrawReadiness(id string) string {
+// DrawReadiness explains why the typed figure cannot come off the tables, or
+// returns "".
+func (w *World) DrawReadiness(id string, amount int) string {
 	if !HasBankroll(id) || !w.Own(id) {
 		return "This is not a room of yours"
 	}
-	if w.Properties[id].Bankroll < BankrollLot {
+	float := w.Properties[id].Bankroll
+	if float < BankrollLeast {
 		return "There is not enough behind the tables to take any out"
+	}
+	amount = w.DrawSum(id, amount)
+	if amount < BankrollLeast {
+		return fmt.Sprintf("Take $%d or more", BankrollLeast)
+	}
+	if amount > float {
+		return fmt.Sprintf("There is $%d behind the tables", float)
 	}
 	return ""
 }
 
-// Draw takes a lot back out of the float and into the player's hands. It is the
-// only way the money a casino makes ever reaches them, and every lot taken is
+// DrawSum is the figure a request actually takes off the tables.
+func (w *World) DrawSum(id string, amount int) int {
+	if amount > 0 {
+		return amount
+	}
+	return min(BankrollLot, w.Properties[id].Bankroll)
+}
+
+// Draw takes money back out of the float and into the player's hands. It is the
+// only way the money a casino makes ever reaches them, and everything taken is
 // action the room can no longer attract.
-func (w *World) Draw(id string) error {
-	if reason := w.DrawReadiness(id); reason != "" {
+func (w *World) Draw(id string, amount int) error {
+	if reason := w.DrawReadiness(id, amount); reason != "" {
 		return fmt.Errorf("%s", reason)
 	}
+	amount = w.DrawSum(id, amount)
 	prop := w.Properties[id]
-	prop.Bankroll -= BankrollLot
-	w.Earn(BankrollLot)
+	prop.Bankroll -= amount
+	w.Earn(amount)
 	place, _ := PlaceByID(id)
 	w.Log("Taken off the tables at "+place.Name,
-		fmt.Sprintf("$%d in your hands, $%d left in the float. The room can cover about $%d of action a night now.", BankrollLot, prop.Bankroll, w.NightHandleAt(id)), "business")
+		fmt.Sprintf("$%d in your hands, $%d left in the float. The room can cover about $%d of action a night now.", amount, prop.Bankroll, w.NightHandleAt(id)), "business")
 	return nil
 }
 

@@ -5481,3 +5481,49 @@ Every line I write in those sections begins with an em dash. Anything without
 one is the user's own words, and they are never edited, summarised or split
 across sections — a message that carries both an idea and a standing instruction
 stays whole, where its main purpose puts it, and my line says so.
+
+## Money moves in the figure you type
+
+Four actions moved money in lots somebody else chose: $250 behind the tables,
+$250 off them, $500 out of the city, and the whole offshore account home in one
+go. The inbox asked for the opposite — "as dynamic and user settable as
+possible" — and the gambling side already had the shape, because a stake has
+been typed into `Command.Amount` since the tables were built.
+
+So `Bankroll`, `Draw`, `Deposit` and `Withdraw` take an amount. Zero still means
+what the fixed lot meant, which is what keeps every existing caller, save and
+simulation honest: nothing that never names a figure behaves differently.
+
+The bounds belong to the core, not the panel. `Action.Sum` carries `Least`,
+`Most`, `Preset` and a label, and the panel renders a number field from it and
+sends what is in it. So the withdraw field caps at what is actually out there,
+the draw field caps at the float, and the funding field caps at cash on hand —
+none of it computed twice in two languages.
+
+The card had to stop being a `<button>`. A number input inside a button is not
+clickable and is not valid HTML, so an action carrying a Sum renders as
+`SumAction`: the same card, a field, an "All" shortcut, and its own commit
+button that prints the figure it is about to move.
+
+| Action | Least | Most | Starts on |
+|---|---|---|---|
+| bankroll | 25 | cash in hand | 250 |
+| draw | 25 | what is behind the tables | 250 or the float |
+| deposit | 100 | cash in hand | 500 |
+| withdraw | 25 | what is offshore | all of it |
+
+One test change, and the reason. `TestEveryPricedActionKeepsItsPrice` required
+every action that pays its own fee to print a price on the card. An action whose
+figure the player types has no one number to print before they have said how
+much, so the guard now exempts a card carrying a Sum from that and checks its
+bounds instead. The half of that guard that matters — `Cost` must be zero or the
+money leaves twice — is unchanged and still covers all of them.
+
+Verified by breaking it: `BankrollSum` made to ignore the typed figure fails
+both the amount test and the refusal test, in the right direction.
+
+Evidence: `core/typed_amounts_test.go`, one break verified. The browser
+playtest did not happen this slice: the Chrome extension is not connected, so
+the card was exercised over the API instead — $1,337 behind the tables moved
+cash 3150 → 1826 and the float 0 → 1337, and the draw field's ceiling followed
+it to 1337.

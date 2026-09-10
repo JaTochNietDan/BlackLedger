@@ -31,29 +31,51 @@ const (
 // BankReachable reports whether arrangements of this kind can be made here.
 func BankReachable(location string) bool { return location == "market" }
 
-// DepositReadiness explains why money cannot be sent out, or returns "".
-func (w *World) DepositReadiness() string {
+// DepositLeast is the smallest sum the arrangement will carry: below it the
+// cut is not worth anybody's trouble.
+const DepositLeast = 100
+
+// DepositSum is the figure a request actually wires out: what was typed, or the
+// lot when nothing was.
+func (w *World) DepositSum(amount int) int {
+	if amount > 0 {
+		return amount
+	}
+	return DepositLot
+}
+
+// DepositReadiness explains why the typed figure cannot be sent out, or
+// returns "".
+func (w *World) DepositReadiness(amount int) string {
 	if !BankReachable(w.Player.Location) {
 		return "This is not arranged here"
 	}
-	if w.Player.Cash < DepositLot {
-		return fmt.Sprintf("You need $%d to send out at once", DepositLot)
+	amount = w.DepositSum(amount)
+	if w.Player.Cash < DepositLeast {
+		return fmt.Sprintf("You need $%d to send anything out", DepositLeast)
+	}
+	if amount < DepositLeast {
+		return fmt.Sprintf("Nothing under $%d is carried", DepositLeast)
+	}
+	if amount > w.Player.Cash {
+		return fmt.Sprintf("You have $%d", w.Player.Cash)
 	}
 	return ""
 }
 
-// Deposit sends a lot out of the city, less the cut.
-func (w *World) Deposit() error {
-	if reason := w.DepositReadiness(); reason != "" {
+// Deposit sends the typed figure out of the city, less the cut.
+func (w *World) Deposit(amount int) error {
+	if reason := w.DepositReadiness(amount); reason != "" {
 		return fmt.Errorf("%s", reason)
 	}
-	if err := w.Pay(DepositLot); err != nil {
+	amount = w.DepositSum(amount)
+	if err := w.Pay(amount); err != nil {
 		return err
 	}
-	kept := DepositLot * (100 - DepositCut) / 100
+	kept := amount * (100 - DepositCut) / 100
 	w.Offshore += kept
 	w.Log("Money leaves the city", fmt.Sprintf("$%d sent out, $%d of it arrives. The account holds $%d and answers to nobody here, including you if anything happens.",
-		DepositLot, kept, w.Offshore), "business")
+		amount, kept, w.Offshore), "business")
 	return nil
 }
 
@@ -88,8 +110,20 @@ func (w *World) EstablishAccess() error {
 	return nil
 }
 
-// WithdrawReadiness explains why nothing can be drawn, or returns "".
-func (w *World) WithdrawReadiness() string {
+// WithdrawLeast is the smallest sum worth a journey to fetch.
+const WithdrawLeast = 25
+
+// WithdrawSum is the figure a request actually brings home. Nothing typed means
+// all of it, which is what the plain action has always done.
+func (w *World) WithdrawSum(amount int) int {
+	if amount > 0 {
+		return amount
+	}
+	return w.Offshore
+}
+
+// WithdrawReadiness explains why the typed figure cannot be drawn, or returns "".
+func (w *World) WithdrawReadiness(amount int) string {
 	if !BankReachable(w.Player.Location) {
 		return "This is not arranged here"
 	}
@@ -99,18 +133,31 @@ func (w *World) WithdrawReadiness() string {
 	if w.Offshore == 0 {
 		return "The account is empty"
 	}
+	amount = w.WithdrawSum(amount)
+	if amount > w.Offshore {
+		return fmt.Sprintf("There is $%d out there", w.Offshore)
+	}
+	if amount < min(WithdrawLeast, w.Offshore) {
+		return fmt.Sprintf("Bring $%d or more", min(WithdrawLeast, w.Offshore))
+	}
 	return ""
 }
 
-// Withdraw brings everything back into the city at once. Money in hand is money
+// Withdraw brings the typed figure back into the city. Money in hand is money
 // that can be taken, which is the risk of bringing it home.
-func (w *World) Withdraw() error {
-	if reason := w.WithdrawReadiness(); reason != "" {
+func (w *World) Withdraw(amount int) error {
+	if reason := w.WithdrawReadiness(amount); reason != "" {
 		return fmt.Errorf("%s", reason)
 	}
-	amount := w.Offshore
-	w.Offshore = 0
+	amount = w.WithdrawSum(amount)
+	w.Offshore -= amount
 	w.Earn(amount)
-	w.Log("It comes home", fmt.Sprintf("$%d back in the city and in your hands, where anybody can take it from you.", amount), "business")
+	// "$0 is still out there" is a figure that says nothing while looking like
+	// one, the same fault the panel's own wording had.
+	rest := "The account is empty now."
+	if w.Offshore > 0 {
+		rest = fmt.Sprintf("$%d is still out there.", w.Offshore)
+	}
+	w.Log("It comes home", fmt.Sprintf("$%d back in the city and in your hands, where anybody can take it from you. %s", amount, rest), "business")
 	return nil
 }

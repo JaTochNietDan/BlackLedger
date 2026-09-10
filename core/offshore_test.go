@@ -13,7 +13,7 @@ func banker(t *testing.T) *World {
 func TestBankingMoneyCostsSomethingToDo(t *testing.T) {
 	w := banker(t)
 	cash := w.Player.Cash
-	if err := w.Deposit(); err != nil {
+	if err := w.Deposit(0); err != nil {
 		t.Fatal(err)
 	}
 	if w.Player.Cash != cash-DepositLot {
@@ -36,7 +36,7 @@ func TestBankingMoneyCostsSomethingToDo(t *testing.T) {
 func TestMoneySentOutSurvivesThePersonWhoSentIt(t *testing.T) {
 	w := banker(t)
 	for i := 0; i < 3; i++ {
-		if err := w.Deposit(); err != nil {
+		if err := w.Deposit(0); err != nil {
 			t.Fatal(err)
 		}
 	}
@@ -66,7 +66,7 @@ func TestMoneySentOutSurvivesThePersonWhoSentIt(t *testing.T) {
 	if next.Player.Cash != 90 {
 		t.Fatalf("a new person started with %d rather than the usual 90", next.Player.Cash)
 	}
-	if next.WithdrawReadiness() == "" {
+	if next.WithdrawReadiness(0) == "" {
 		t.Fatal("a stranger could draw on it without establishing anything")
 	}
 }
@@ -92,7 +92,7 @@ func TestReachingItAsAStrangerCostsMoreThanAStrangerHas(t *testing.T) {
 	if err := w.EstablishAccess(); err != nil {
 		t.Fatal(err)
 	}
-	if err := w.Withdraw(); err != nil {
+	if err := w.Withdraw(0); err != nil {
 		t.Fatal(err)
 	}
 	if w.Player.Cash != 4000 {
@@ -108,16 +108,16 @@ func TestAnEmptyAccountIsNotWorthReaching(t *testing.T) {
 	if w.AccessReadiness() == "" {
 		t.Fatal("access was offered with nothing out there")
 	}
-	if w.WithdrawReadiness() == "" {
+	if w.WithdrawReadiness(0) == "" {
 		t.Fatal("a withdrawal was offered from an empty account")
 	}
-	if err := w.Withdraw(); err == nil {
+	if err := w.Withdraw(0); err == nil {
 		t.Fatal("withdrew from an empty account")
 	}
 	// And none of it is arranged anywhere but where such things are arranged.
 	w.Offshore = 1000
 	w.Player.Location = "docks"
-	for _, reason := range []string{w.DepositReadiness(), w.AccessReadiness(), w.WithdrawReadiness()} {
+	for _, reason := range []string{w.DepositReadiness(0), w.AccessReadiness(), w.WithdrawReadiness(0)} {
 		if reason == "" {
 			t.Fatal("banking was arranged at the waterfront")
 		}
@@ -132,14 +132,14 @@ func TestBankingIsALossNotASavingsPlan(t *testing.T) {
 	w.Player.Cash = 100000
 	start := w.Player.Cash
 	for i := 0; i < 20; i++ {
-		if err := w.Deposit(); err != nil {
+		if err := w.Deposit(0); err != nil {
 			t.Fatal(err)
 		}
 	}
 	if err := w.EstablishAccess(); err != nil {
 		t.Fatal(err)
 	}
-	if err := w.Withdraw(); err != nil {
+	if err := w.Withdraw(0); err != nil {
 		t.Fatal(err)
 	}
 	if w.Player.Cash >= start {

@@ -1127,3 +1127,17 @@ body{height:100%;overflow:hidden;margin:0;background:var(--bg);color:var(--ink);
   font:16px var(--serif);text-align:right}
 .money-field input:focus{outline:none;color:#fff}
 .money-field small{color:var(--muted);font-size:10px;white-space:nowrap}
+
+/* A card that asks for a figure. The commit is its own button because a number
+   field cannot live inside one. */
+.sum-action{display:flex;flex-direction:column;gap:0}
+.sum-action.refused{opacity:.62}
+.sum-field{display:flex;align-items:flex-end;gap:8px;margin-top:9px}
+.sum-field label{flex:1;min-width:0;display:block}
+.sum-field label span{display:block;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.sum-field input{width:100%;background:#101a19;border:1px solid var(--line);color:var(--ink);font:13px system-ui;font-variant-numeric:tabular-nums;padding:7px 9px;border-radius:2px}
+.sum-field input:focus-visible{outline:2px solid var(--gold);outline-offset:1px}
+.sum-field .plain{padding:7px 9px;font-size:11px;color:var(--gold)}
+.action-commit{margin-top:9px;width:100%;background:#26332b;border:1px solid #6d7554;color:var(--ink);font:12px system-ui;padding:8px 10px;border-radius:2px;text-align:center}
+.action-commit:disabled{opacity:.55;color:var(--muted)}
+.actions.compact .sum-action{min-height:0}

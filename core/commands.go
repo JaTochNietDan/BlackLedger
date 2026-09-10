@@ -480,11 +480,11 @@ func (w *World) apply(c Command) error {
 					return err
 				}
 			case "bankroll":
-				if err := w.Bankroll(target); err != nil {
+				if err := w.Bankroll(target, c.Amount); err != nil {
 					return err
 				}
 			case "draw":
-				if err := w.Draw(target); err != nil {
+				if err := w.Draw(target, c.Amount); err != nil {
 					return err
 				}
 			case "dress":
@@ -542,7 +542,7 @@ func (w *World) apply(c Command) error {
 					return err
 				}
 			case "deposit":
-				if err := w.Deposit(); err != nil {
+				if err := w.Deposit(c.Amount); err != nil {
 					return err
 				}
 			case "offshore_access":
@@ -550,7 +550,7 @@ func (w *World) apply(c Command) error {
 					return err
 				}
 			case "withdraw":
-				if err := w.Withdraw(); err != nil {
+				if err := w.Withdraw(c.Amount); err != nil {
 					return err
 				}
 			case "bribe":

@@ -163,7 +163,7 @@ func TestWinningsOnlyReachThePlayerWhenTheyTakeThemOut(t *testing.T) {
 	if w.Player.Cash != cash {
 		t.Fatal("a night at the tables paid straight into the player's pocket")
 	}
-	if err := w.Draw("casino"); err != nil {
+	if err := w.Draw("casino", 0); err != nil {
 		t.Fatal(err)
 	}
 	if w.Player.Cash != cash+BankrollLot || w.Properties["casino"].Bankroll >= float {
@@ -173,14 +173,14 @@ func TestWinningsOnlyReachThePlayerWhenTheyTakeThemOut(t *testing.T) {
 
 func TestFundingAndDrawingAreRefusedWhereTheyMakeNoSense(t *testing.T) {
 	w := houseKeeper(t)
-	if w.DrawReadiness("casino") == "" {
+	if w.DrawReadiness("casino", 0) == "" {
 		t.Fatal("drew from an empty float")
 	}
-	if w.BankrollReadiness("laundry") == "" || w.BankrollReadiness("club") == "" {
+	if w.BankrollReadiness("laundry", 0) == "" || w.BankrollReadiness("club", 0) == "" {
 		t.Fatal("a laundry or somebody else's room took a float")
 	}
 	w.Player.Cash = 10
-	if w.BankrollReadiness("casino") == "" {
+	if w.BankrollReadiness("casino", 0) == "" {
 		t.Fatal("funded a room with no money")
 	}
 }

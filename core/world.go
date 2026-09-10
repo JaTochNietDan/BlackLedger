@@ -33,8 +33,8 @@ type Place struct {
 	// have needed its own copy of the same rules, and the two would have
 	// drifted apart the first time either was touched. Empty on anything
 	// nobody runs a business out of.
-	Type string `json:"type"`
-	Kind string `json:"kind,omitempty"`
+	Type     string `json:"type"`
+	Kind     string `json:"kind,omitempty"`
 	District int    `json:"district"`
 	X        int    `json:"x"`
 	Y        int    `json:"y"`
@@ -466,16 +466,16 @@ type World struct {
 	Attention int `json:"attention,omitempty"`
 	// A hand on the table that has not been settled. Absent whenever nobody is
 	// sitting at one, which is nearly always.
-	Hand  *TableHand `json:"hand,omitempty"`
+	Hand *TableHand `json:"hand,omitempty"`
 	// Where the drums stopped on the last pull, so a machine can be drawn
 	// rather than described.
 	Reels *Pull `json:"reels,omitempty"`
 	// The last turn of the wheel. Absent in saves written before the room had
 	// one, which reads as a wheel nobody has played.
-	Spin *Spin `json:"spin,omitempty"`
-	News  []Story    `json:"news,omitempty"`
-	Plots []Plot     `json:"plots"`
-	Tasks []Task     `json:"tasks"`
+	Spin  *Spin   `json:"spin,omitempty"`
+	News  []Story `json:"news,omitempty"`
+	Plots []Plot  `json:"plots"`
+	Tasks []Task  `json:"tasks"`
 	// Where the people doing those tasks were standing when they were sent.
 	Homes      []TaskHome `json:"homes,omitempty"`
 	Event      *Scene     `json:"event"`
@@ -498,6 +498,16 @@ type Command struct {
 	// a fixed lot still applies.
 	Amount int `json:"amount,omitempty"`
 }
+
+// Sum is a figure the player types on an action card, bounded by what the core
+// knows they can actually move.
+type Sum struct {
+	Least  int    `json:"least"`
+	Most   int    `json:"most"`
+	Preset int    `json:"preset"`
+	Label  string `json:"label"`
+}
+
 type Action struct {
 	// Group is what this action is for, so the interface can offer ninety of
 	// them in an order a person can navigate. Set by the core, never guessed
@@ -514,10 +524,10 @@ type Action struct {
 	// standing here rather than about the premises. Lending a man money is not
 	// the same kind of thing as repairing a roof, and a list that shows them
 	// as two identical cards has thrown away what the player needs to decide.
-	Subject  string `json:"subject,omitempty"`
-	ID       string `json:"id"`
-	Label    string `json:"label"`
-	Minutes int `json:"minutes"`
+	Subject string `json:"subject,omitempty"`
+	ID      string `json:"id"`
+	Label   string `json:"label"`
+	Minutes int    `json:"minutes"`
 	// Away is time the action spends that Minutes does not, because the effect
 	// runs the clock itself. Only the trips out of the city do this: they run
 	// day by day so that what happens while the player is gone happens to a
@@ -533,7 +543,11 @@ type Action struct {
 	// that charges its own way showed no price at all: calling two families to
 	// a room takes $220 and the button said nothing about money, with the
 	// figure only in the description. Same shape as the trips and their days.
-	Asks     int    `json:"asks,omitempty"`
+	Asks int `json:"asks,omitempty"`
+	// Sum, when set, means the player types how much rather than accepting a
+	// fixed lot. The panel puts a number field on the card and sends what is in
+	// it as Command.Amount; the core still decides what an empty field means.
+	Sum      *Sum   `json:"sum,omitempty"`
 	Disabled bool   `json:"disabled"`
 	Reason   string `json:"reason"`
 	Detail   string `json:"detail"`
@@ -789,6 +803,15 @@ func (w *World) Actions(id string) []Action {
 			out[len(out)-1].Asks = price
 		}
 	}
+	// sum puts a typed figure on the action just added: how much goes behind the
+	// tables, how much is wired out. Work that moves money the player names
+	// rather than a lot somebody chose for them.
+	sum := func(least, most, preset int, label string) {
+		if len(out) == 0 {
+			return
+		}
+		out[len(out)-1].Sum = &Sum{Least: least, Most: max(least, most), Preset: min(max(preset, least), max(least, most)), Label: label}
+	}
 	// anywhere marks the action just added as work the room has nothing to do
 	// with, so the interface can put it where it belongs rather than in the
 	// list of things you can do at a fishmonger's.
@@ -986,17 +1009,19 @@ func (w *World) Actions(id string) []Action {
 				fmt.Sprintf("$%d. Every one of their places loses %d trade and the organization loses %d strength. A paper full of crime is a paper full of crime whoever it is about, so the whole city gets harder — and about one time in five they find out who paid for it.", SmearCost, SmearCustom, SmearPower))
 		}
 	case "market":
-		add("deposit", fmt.Sprintf("Wire $%d out of the city", DepositLot), 45, 0, w.DepositReadiness(),
-			fmt.Sprintf("$%d of it arrives; the arrangement takes %d%%. It survives you, and whoever comes next can reach it if they can afford to.", DepositLot*(100-DepositCut)/100, DepositCut))
+		add("deposit", "Wire money out of the city", 45, 0, w.DepositReadiness(0),
+			fmt.Sprintf("The arrangement takes %d%% of whatever you send; $%d of a $%d wire arrives. It survives you, and whoever comes next can reach it if they can afford to.", DepositCut, DepositLot*(100-DepositCut)/100, DepositLot))
+		sum(DepositLeast, p.Cash, DepositLot, "Sent out")
 		asks("offshore_access", "Establish that the account is yours", AccessMinutes, AccessCost, w.AccessReadiness(),
 			fmt.Sprintf("$%d in papers and a journey. Only worth it if there is enough out there to be worth reaching.", AccessCost))
 		// An empty account has no sum to bring home. "Brings $0 back into the
 		// city" is a figure that says nothing while looking like one.
 		bringing := "Brings whatever is out there back into the city, where it can be taken from you."
 		if w.Offshore > 0 {
-			bringing = fmt.Sprintf("Brings $%d back into the city, where it can be taken from you.", w.Offshore)
+			bringing = fmt.Sprintf("There is $%d out there. Whatever you bring home can be taken from you.", w.Offshore)
 		}
-		add("withdraw", "Bring it all home", 45, 0, w.WithdrawReadiness(), bringing)
+		add("withdraw", "Bring money home", 45, 0, w.WithdrawReadiness(0), bringing)
+		sum(min(WithdrawLeast, w.Offshore), w.Offshore, w.Offshore, "Brought home")
 		if next, ok := nextAttire(p.Dress); ok {
 			notice := "Nobody official looks twice at it."
 			if next.Notice > 0 {
@@ -1251,10 +1276,12 @@ func (w *World) Actions(id string) []Action {
 			}
 			if HasBankroll(id) {
 				prop := w.Properties[id]
-				asks("bankroll", "Put money behind the tables", 45, BankrollLot, w.BankrollReadiness(id),
-					fmt.Sprintf("$%d into the float, currently $%d. %s The house keeps roughly %d%% of what crosses the tables over a season and loses on plenty of single nights. A house that cannot pay a winner is finished as a room worth playing in.", BankrollLot, prop.Bankroll, coverage(w.NightHandleAt(id)), HouseEdge))
-				add("draw", "Take money off the tables", 45, 0, w.DrawReadiness(id),
-					fmt.Sprintf("$%d out of the $%d float and into your hands. It is the only way this room's winnings reach you, and every lot taken is action it can no longer attract.", BankrollLot, prop.Bankroll))
+				asks("bankroll", "Put money behind the tables", 45, 0, w.BankrollReadiness(id, 0),
+					fmt.Sprintf("Into the float, currently $%d. %s The house keeps roughly %d%% of what crosses the tables over a season and loses on plenty of single nights. A house that cannot pay a winner is finished as a room worth playing in.", prop.Bankroll, coverage(w.NightHandleAt(id)), HouseEdge))
+				sum(BankrollLeast, p.Cash, BankrollLot, "Behind the tables")
+				add("draw", "Take money off the tables", 45, 0, w.DrawReadiness(id, 0),
+					fmt.Sprintf("Out of the $%d float and into your hands. It is the only way this room's winnings reach you, and everything taken is action it can no longer attract.", prop.Bankroll))
+				sum(BankrollLeast, prop.Bankroll, min(BankrollLot, prop.Bankroll), "Taken out")
 			}
 			if w.Properties[id].Income > 0 {
 				current := w.Mode(id)
