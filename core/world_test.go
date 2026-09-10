@@ -121,6 +121,7 @@ func TestWarningAndInterruption(t *testing.T) {
 		t.Fatal("did not pause at attack")
 	}
 }
+
 // This test used to assert the opposite: that a player standing in a bar was
 // safe and came home to a broken door. That is the behaviour the inbox
 // complained about — "they always seem to hit my home when I'm not there and

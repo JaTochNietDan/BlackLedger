@@ -19,7 +19,7 @@ var guideMeans = map[string][]string{
 	"Somewhere to start":            {"courier"},
 	"Somebody who knows people":     {"contact"},
 	"Premises of your own":          {"acquire"},
-	"A name of your own":            {},          // becomes true on its own
+	"A name of your own":            {}, // becomes true on its own
 	"People who answer to you":      {"sign:"},
 	"Somebody on the door":          {"post"},
 	"Money on the street":           {"lend:"},

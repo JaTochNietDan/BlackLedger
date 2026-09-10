@@ -10,11 +10,11 @@ import "testing"
 func TestHowAFamilyIsPlacedTellsTheFourStatesApart(t *testing.T) {
 	seen := map[string]bool{}
 	for _, c := range []struct {
-		name          string
-		cash, power   int
-		holdings      bool
-		short         int
-		want          string
+		name        string
+		cash, power int
+		holdings    bool
+		short       int
+		want        string
 	}{
 		{"paying nobody", 0, 60, false, 3, "cannot pay its people"},
 		{"a few days left", 900, 60, false, 0, "struggling"},

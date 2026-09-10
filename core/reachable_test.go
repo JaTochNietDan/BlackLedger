@@ -165,9 +165,9 @@ func sweepCities(t *testing.T) (offered, enabled map[string]int) {
 // had never seen offered at all — and every one is now confirmed live by a
 // state built below. If one goes dark again, this fails.
 var mustBeLive = []string{
-	"bail:*",          // the person is in a cell, which is why it is offered
-	"launder",         // needs the police interested in you
-	"spike", "puff",   // need an arrangement with the paper
+	"bail:*",        // the person is in a cell, which is why it is offered
+	"launder",       // needs the police interested in you
+	"spike", "puff", // need an arrangement with the paper
 	"smear:bellandi",  // the same, aimed at a family
 	"bribe",           // needs the police and a quiet profile at once
 	"charge",          // needs the docks and the money

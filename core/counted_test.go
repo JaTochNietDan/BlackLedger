@@ -13,8 +13,8 @@ import (
 
 func TestCountedAgreesTheNounWithTheNumber(t *testing.T) {
 	for _, c := range []struct {
-		n              int
-		want           string
+		n    int
+		want string
 	}{
 		{0, "0 days"}, {1, "1 day"}, {2, "2 days"}, {21, "21 days"},
 	} {

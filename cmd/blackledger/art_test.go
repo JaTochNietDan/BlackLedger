@@ -187,7 +187,7 @@ func TestEveryColumnInsideTheWorkspaceCanBeScrolled(t *testing.T) {
 		t.Skip("the workspace no longer clips, so its columns need not scroll")
 	}
 	for _, column := range []string{".city-pane", ".sidebar"} {
-		rules := regexp.MustCompile(regexp.QuoteMeta(column) + `\{[^}]*\}`).FindAllString(sheet, -1)
+		rules := regexp.MustCompile(regexp.QuoteMeta(column)+`\{[^}]*\}`).FindAllString(sheet, -1)
 		if len(rules) == 0 {
 			t.Errorf("%s has no styling at all", column)
 			continue

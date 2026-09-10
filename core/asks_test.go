@@ -41,7 +41,10 @@ func TestWorkThatPaysItsOwnFeeStillShowsAPrice(t *testing.T) {
 	w.News = append(w.News, Story{ID: ID(), Minute: w.Minute, Life: w.Life,
 		Headline: "QUESTIONED AT THE DOCKS", Body: "Police called again.", Kind: "police"})
 
-	for _, c := range []struct{ place, kind string; fee int }{
+	for _, c := range []struct {
+		place, kind string
+		fee         int
+	}{
 		{"herald", "spike", SpikeCost},
 		{"herald", "puff", PuffCost},
 		{"market", "offshore_access", AccessCost},

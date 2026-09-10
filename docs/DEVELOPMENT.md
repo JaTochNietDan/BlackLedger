@@ -5782,3 +5782,7 @@ go. The whole gate finishes in the time the core suite takes on its own.
 `verify` is unchanged and still there for anything that wants the steps in
 order. Nothing about what is checked has changed — this is the same work, done
 at the same time as itself.
+
+One more thing the gate was not doing: `gofmt -l` prints names and exits zero,
+so a check that has quietly listed eleven unformatted files for a while passed
+every time it ran. It fails now, and the eleven are formatted.

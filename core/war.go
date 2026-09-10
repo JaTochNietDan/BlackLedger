@@ -596,7 +596,6 @@ func (w *World) MoneyPressure(f, toward *Faction) int {
 	return drift
 }
 
-
 // parkedAt finds somebody of this organization who is standing at a place and
 // has a car to lose. It is deliberately the same shape as StoodInIt: whoever is
 // there is who a raid reaches.

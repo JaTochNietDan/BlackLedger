@@ -122,13 +122,13 @@ func TestTheModelWritesDifferentlyForAFamilyThatCannotPay(t *testing.T) {
 	}
 
 	type row struct {
-		label             string
-		mentions, total   int
+		label           string
+		mentions, total int
 	}
 	rows := []row{}
 	for _, c := range []struct {
-		label              string
-		withMoney, broke   bool
+		label            string
+		withMoney, broke bool
 	}{
 		{"told, family cannot pay", true, true},
 		{"not told, family cannot pay", false, true},

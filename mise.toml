@@ -44,7 +44,9 @@ go test ./core -count=1 > .runtime/gate-core.log 2>&1 &
 core=$!
 go test ./cmd/... ./sim ./store -count=1 > .runtime/gate-rest.log 2>&1 &
 rest=$!
-gofmt -l core cmd store sim
+# gofmt -l only prints names, so on its own it passes whatever it finds. It
+# had been quietly listing eleven files for a while.
+test -z "$(gofmt -l core cmd store sim)" || { gofmt -l core cmd store sim; exit 1; }
 go vet ./...
 npx tsc --noEmit
 npm run build >/dev/null

@@ -101,27 +101,27 @@ var trades = map[string]Trade{
 	},
 	"burlesque": {
 		Hands: 7, Wage: 10, Drain: 9, Restock: 260, RestockAmount: 45, Supplies: "the bar and the wardrobe",
-		Trouble: "Somebody from outside is leaning on the dancers for a cut of what they take.",
-		Remedy:  "Have a word with whoever is standing at the stage door",
+		Trouble:      "Somebody from outside is leaning on the dancers for a cut of what they take.",
+		Remedy:       "Have a word with whoever is standing at the stage door",
 		RemedyDetail: "The cut stops and the room keeps its own money.", RemedyCost: 190, Cover: 14, Watched: 3, Hides: 0,
 	},
 	"scrapyard": {
 		Hands: 3, Wage: 8, Drain: 5, Restock: 150, RestockAmount: 40, Supplies: "the torch and the crane",
 		Trouble: "A car came in that somebody is still looking for, and it is halfway down the stack.",
 		Remedy:  "Make that one disappear properly", RemedyDetail: "Cut up, weighed in, and off the books.", RemedyCost: 180,
-		Cover:   10, Watched: 1, Hides: 6,
+		Cover: 10, Watched: 1, Hides: 6,
 	},
 	"dealer": {
 		Hands: 4, Wage: 11, Drain: 6, Restock: 340, RestockAmount: 45, Supplies: "cars on the lot",
 		Trouble: "Two cars on the forecourt turn out to have come off a boat, and somebody official has noticed.",
 		Remedy:  "Get the paperwork straight", RemedyDetail: "New documents, and the pair of them off the lot.", RemedyCost: 260,
-		Cover:   12, Watched: 1, Hides: 5,
+		Cover: 12, Watched: 1, Hides: 5,
 	},
 	"filling": {
 		Hands: 3, Wage: 8, Drain: 7, Restock: 210, RestockAmount: 45, Supplies: "petrol and the rack behind the counter",
 		Trouble: "The tanker did not come, and the pumps are running on what is in the ground.",
 		Remedy:  "Pay somebody to bring a load out of hours", RemedyDetail: "A tanker at four in the morning, and nobody writes it down.", RemedyCost: 190,
-		Cover:   9, Watched: 1, Hides: 4,
+		Cover: 9, Watched: 1, Hides: 4,
 	},
 	"cabs": {
 		Hands: 8, Wage: 9, Drain: 10, Restock: 280, RestockAmount: 50, Supplies: "fuel and tyres",

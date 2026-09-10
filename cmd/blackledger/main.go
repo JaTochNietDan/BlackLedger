@@ -243,6 +243,7 @@ func (a *app) generate(snapshot *core.World) error {
 	log.Printf("Director correcting rejected proposal: %s", err)
 	return a.generateAttempt(snapshot, "Your last proposal failed validation: "+err.Error()+". Return a corrected complete proposal under the same constraints. Do not mention this correction in character dialogue.")
 }
+
 // directorContext assembles everything the model is told about the city. It is
 // a function of its own so that a comparison between two briefs can send the
 // real thing rather than a copy of it that could quietly fall out of step.

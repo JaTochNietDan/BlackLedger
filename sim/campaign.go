@@ -8,17 +8,17 @@ import (
 )
 
 type Place struct {
-	ID        string        `json:"id"`
-	Owned     bool          `json:"owned"`
-	Locked    bool          `json:"locked"`
-	Cost      int           `json:"cost"`
-	Condition int           `json:"condition"`
-	Income    int           `json:"income"`
+	ID        string `json:"id"`
+	Owned     bool   `json:"owned"`
+	Locked    bool   `json:"locked"`
+	Cost      int    `json:"cost"`
+	Condition int    `json:"condition"`
+	Income    int    `json:"income"`
 	// How much longer this place is keeping its money somewhere else after
 	// being robbed. The city knows it whether or not anybody is standing in the
 	// room, which is what lets a policy walk to a different one instead.
-	Shy int `json:"shy"`
-	Actions   []core.Action `json:"actions"`
+	Shy     int           `json:"shy"`
+	Actions []core.Action `json:"actions"`
 }
 type Event struct {
 	ID      string        `json:"id"`
