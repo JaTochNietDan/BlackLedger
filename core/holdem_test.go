@@ -140,3 +140,40 @@ func TestAHandEverybodyElseThrewInIsOverWhereItStands(t *testing.T) {
 		t.Fatalf("everybody threw their hand in and the pot of $%d came to $%d", g.Pot, w.Player.Cash-before)
 	}
 }
+
+// Two cards are not a hand yet, and the screen says what you have from the
+// moment they are dealt. Rank answers the question it is asked — five cards —
+// so asked about two of a suit it called them a flush, and a player holding the
+// queen and three of diamonds was told they had one.
+func TestTwoCardsAreNotAFlush(t *testing.T) {
+	if got := BestOfSeven(hand("Qd", "3d"), nil); got.Category != HighCard {
+		t.Errorf("the queen and three of diamonds is %s", got.Name())
+	}
+	if got := BestOfSeven(hand("Qd", "Qs"), nil); got.Category != Pair {
+		t.Errorf("two queens is %s", got.Name())
+	}
+	if got := BestOfSeven(hand("Ah", "Kh"), hand("2c", "7d", "9s")); got.Category != HighCard {
+		t.Errorf("ace king of hearts on a rainbow flop is %s", got.Name())
+	}
+}
+
+// And the board reaches the screen as a row rather than as nothing at all. A
+// nil slice arrives in the browser as null, the screen counts its length, and
+// the whole page goes blank the moment anybody sits down.
+func TestTheBoardIsAlwaysARow(t *testing.T) {
+	w, _ := backroom(t)
+	if err := w.SitInTheBackRoom(BackRoom, 50); err != nil {
+		t.Fatal(err)
+	}
+	table := w.CardsDescription()
+	board, ok := table["board"].([]Card)
+	if !ok {
+		t.Fatalf("the board is published as %T before the flop", table["board"])
+	}
+	if board == nil {
+		t.Fatal("the board is published as null before the flop, which is a blank screen")
+	}
+	if len(board) != 0 {
+		t.Fatalf("%d cards are face up before anybody has bet", len(board))
+	}
+}

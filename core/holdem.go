@@ -1,5 +1,7 @@
 package core
 
+import "sort"
+
 // Texas hold'em, because the user asked for it: "I'd also prefer if this game
 // was the Texas Hold Em version as it's better to play so we can fix that
 // maybe." Draw poker gives the player one decision — which cards to throw — and
@@ -18,9 +20,11 @@ func BestOfSeven(hole, board []Card) HandRank {
 	seven = append(seven, hole...)
 	seven = append(seven, board...)
 	if len(seven) < 5 {
-		// Before the flop there is no five-card hand yet, so a pair of aces is
-		// worth what a pair of aces is worth and nothing else has a name.
-		return Rank(seven)
+		// Before the flop there is no five-card hand yet. Rank answers the
+		// question it is asked — five cards — and asked about two it called
+		// any two of a suit a flush, so the screen told a player holding the
+		// queen and three of diamonds that they had one.
+		return beforeTheFlop(seven)
 	}
 	best := HandRank{Category: -1}
 	five := make([]Card, 5)
@@ -76,4 +80,27 @@ func StreetName(street string) string {
 		return "on the river"
 	}
 	return "at the showdown"
+}
+
+// beforeTheFlop is what a hand is worth before there are five cards to make one of. A
+// pair is a pair; two of a suit is two of a suit and nothing more.
+func beforeTheFlop(cards []Card) HandRank {
+	count := map[int]int{}
+	for _, c := range cards {
+		count[pokerRank(c)]++
+	}
+	order := make([]int, 0, len(count))
+	for r := range count {
+		order = append(order, r)
+	}
+	sort.Slice(order, func(i, j int) bool {
+		if count[order[i]] != count[order[j]] {
+			return count[order[i]] > count[order[j]]
+		}
+		return order[i] > order[j]
+	})
+	if len(order) > 0 && count[order[0]] >= 2 {
+		return HandRank{Pair, order}
+	}
+	return HandRank{HighCard, order}
 }

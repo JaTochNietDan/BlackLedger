@@ -952,7 +952,9 @@ export function BackRoom({
             a game of what the other seats do rather than of what they drew. */}
         <div className="board">
           <span className="seat-name">The table</span>
-          <Row cards={cards.board} hidden={5 - cards.board.length} />
+          {/* Defensive on both counts: a board is never sent as null now, and
+              a save written before it was published still opens. */}
+          <Row cards={cards.board ?? []} hidden={5 - (cards.board ?? []).length} />
         </div>
         <div className="seat mine">
           <span className="seat-name">You</span>

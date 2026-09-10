@@ -66,8 +66,10 @@ type CardGame struct {
 	// Deck is what is left to draw from, so the draw cannot deal a card that is
 	// already in somebody's hand.
 	Deck []Card `json:"deck"`
-	// Board is what is face up in the middle: three, then one, then one.
-	Board []Card `json:"board,omitempty"`
+	// Board is what is face up in the middle: three, then one, then one. Never
+	// omitted: the screen reads its length, and a board that arrives as null
+	// before the flop is a blank screen the moment anybody sits down.
+	Board []Card `json:"board"`
 	// Street is how far the hand has got — preflop, flop, turn, river, shown.
 	Street string `json:"street,omitempty"`
 	// Bet is what it costs to stay in beyond the ante, and Mine is what the
@@ -331,6 +333,15 @@ func (w *World) tableRemembers(g *CardGame) string {
 	return " " + joinNames(holding) + " have not forgotten the last time."
 }
 
+// cards is a row of cards that is never nil, because the screen counts it and
+// a nil slice reaches the browser as null rather than as an empty row.
+func cards(in []Card) []Card {
+	if in == nil {
+		return []Card{}
+	}
+	return in
+}
+
 // take deals off the top of what is left.
 func (g *CardGame) take(n int) []Card {
 	out := g.Deck[:n]
@@ -580,7 +591,7 @@ func (w *World) CardsDescription() map[string]any {
 	return map[string]any{
 		"place": g.Place, "ante": g.Ante, "pot": g.Pot, "mine": g.Mine,
 		"hand": BestOfSeven(g.Mine, g.Board).Name(), "seats": seats,
-		"board": g.Board, "street": g.Street, "street_name": StreetName(g.Street),
+		"board": cards(g.Board), "street": g.Street, "street_name": StreetName(g.Street),
 		"bet": g.Bet, "my_bet": g.MyBet, "facing": g.Facing, "folded": g.Folded,
 		"done": g.Done, "outcome": g.Outcome, "won": g.Won,
 	}
