@@ -6401,3 +6401,39 @@ four different city states.
 Balance: deaths 0/0/51/82/77, median cash 12405/14156/7230/90/547.
 
 Evidence: `core/expansion.go`, `sim/city_test.go`.
+
+## The last thing moving in somebody else's units
+
+`Lot = 5`, and the comment above it said why: "the interface offers plain
+actions rather than a quantity field, so trade happens in fixed lots." That was
+true when it was written. It stopped being true the night the typed-amount work
+landed, and nobody went back for it — so the one high-variance income path in
+the game, the one whose whole decision is *how much do you dare carry*, had that
+decision made by a constant.
+
+Buying and selling take a number now. Nothing named still means the lot for a
+purchase and all of it for a sale, which is what selling has always meant here:
+the risk ends when the last of it is gone, so every existing caller, save and
+simulation behaves as it did.
+
+The field knows both real limits — what a person can carry, which is their
+pockets plus whatever the car hides, and what they can pay for. A card should
+not offer a number the rule will refuse, and the refusals say which limit was
+hit rather than "not enough cash": "You can carry 3 more crates", "That is
+$420", "You are carrying 2 crates".
+
+Two breaks verified, one per side: a purchase that ignores the typed number
+buys four with the price of three, and a sale that always empties the stock
+sells twelve when five were asked for.
+
+Balance unchanged: deaths 0/0/51/82/77, median cash 12405/14156/7230/90/547.
+The simulated policies do not trade contraband, so that is an absence of
+evidence rather than evidence — the same thing the car work had to say.
+
+**And a check for harm I might have done last tick.** Families now take unheld
+premises, which could quietly narrow the player's path to owning anything. It
+did not: the investor and defiant policies still reach the laundry, the garage
+and the casino in 100 runs of 100. The thief moved from 28 to 25 and 25 to 23,
+which is noise for a policy that dies at fifty commands.
+
+Evidence: `core/trade_amount_test.go`.

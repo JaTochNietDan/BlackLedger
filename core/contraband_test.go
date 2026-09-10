@@ -14,7 +14,7 @@ func TestBuyingAndSellingMovesMoneyAndStock(t *testing.T) {
 	w := trader(t)
 	price := w.Good("moonshine").Price
 	cash := w.Player.Cash
-	if err := w.Buy("moonshine"); err != nil {
+	if err := w.Buy("moonshine", 0); err != nil {
 		t.Fatal(err)
 	}
 	if w.Holding("moonshine") != Lot {
@@ -25,7 +25,7 @@ func TestBuyingAndSellingMovesMoneyAndStock(t *testing.T) {
 	}
 	// Selling into a higher price is where the profit comes from.
 	w.Good("moonshine").Price = price * 2
-	if err := w.Sell("moonshine"); err != nil {
+	if err := w.Sell("moonshine", 0); err != nil {
 		t.Fatal(err)
 	}
 	if w.Holding("moonshine") != 0 {
@@ -39,27 +39,27 @@ func TestBuyingAndSellingMovesMoneyAndStock(t *testing.T) {
 func TestTradeNeedsAMarketAndTheMeans(t *testing.T) {
 	w := trader(t)
 	w.Player.Cash = 10
-	if w.TradeReadiness("moonshine", "buy") == "" {
+	if w.TradeReadiness("moonshine", "buy", 0) == "" {
 		t.Fatal("bought without the cash")
 	}
-	if err := w.Buy("moonshine"); err == nil {
+	if err := w.Buy("moonshine", 0); err == nil {
 		t.Fatal("the command ignored a requirement the action reports")
 	}
 	w.Player.Cash = 1000
-	if err := w.Sell("moonshine"); err == nil {
+	if err := w.Sell("moonshine", 0); err == nil {
 		t.Fatal("sold goods that were never held")
 	}
 	// The waterfront deals in what comes off a boat, not in everything.
 	w.Player.Location = "docks"
-	if w.TradeReadiness("cigarettes", "buy") == "" {
+	if w.TradeReadiness("cigarettes", "buy", 0) == "" {
 		t.Fatal("the docks traded a good it does not deal in")
 	}
-	if w.TradeReadiness("moonshine", "buy") != "" {
+	if w.TradeReadiness("moonshine", "buy", 0) != "" {
 		t.Fatal("the docks refused the one good it does deal in")
 	}
 	// Nowhere else is a market at all.
 	w.Player.Location = "room"
-	if w.TradeReadiness("moonshine", "buy") == "" {
+	if w.TradeReadiness("moonshine", "buy", 0) == "" {
 		t.Fatal("a rented room traded contraband")
 	}
 	if w.Good("nonsense") != nil {
@@ -69,7 +69,7 @@ func TestTradeNeedsAMarketAndTheMeans(t *testing.T) {
 
 func TestCarryingGoodsDrawsAttention(t *testing.T) {
 	w := trader(t)
-	if err := w.Buy("moonshine"); err != nil {
+	if err := w.Buy("moonshine", 0); err != nil {
 		t.Fatal(err)
 	}
 	heat := w.Player.Heat
@@ -78,7 +78,7 @@ func TestCarryingGoodsDrawsAttention(t *testing.T) {
 		t.Fatal("carrying contraband drew no attention")
 	}
 	// Attention stops once the goods are gone.
-	if err := w.Sell("moonshine"); err != nil {
+	if err := w.Sell("moonshine", 0); err != nil {
 		t.Fatal(err)
 	}
 	settled := w.Player.Heat
@@ -88,7 +88,7 @@ func TestCarryingGoodsDrawsAttention(t *testing.T) {
 	}
 	// Cigarettes are the quiet trade.
 	quiet := trader(t)
-	if err := quiet.Buy("cigarettes"); err != nil {
+	if err := quiet.Buy("cigarettes", 0); err != nil {
 		t.Fatal(err)
 	}
 	before := quiet.Player.Heat
@@ -100,7 +100,7 @@ func TestCarryingGoodsDrawsAttention(t *testing.T) {
 
 func TestASearchTakesWhatIsBeingCarried(t *testing.T) {
 	w := trader(t)
-	if err := w.Buy("moonshine"); err != nil {
+	if err := w.Buy("moonshine", 0); err != nil {
 		t.Fatal(err)
 	}
 	if lost := w.Seize("A search."); lost != Lot {
@@ -158,7 +158,7 @@ func TestOlderSavesCarryNothing(t *testing.T) {
 	if w.Carrying() != 0 || w.Holding("moonshine") != 0 {
 		t.Fatal("a save with no recorded stock was carrying something")
 	}
-	if err := w.Sell("moonshine"); err == nil {
+	if err := w.Sell("moonshine", 0); err == nil {
 		t.Fatal("sold from an absent stock record")
 	}
 }

@@ -19,9 +19,9 @@ func TestTheTradeRewardsJudgementRatherThanExistence(t *testing.T) {
 		w.Player.Cash = 100000
 		start := w.Player.Cash
 		for i := 0; i < cycles; i++ {
-			_ = w.Buy("moonshine")
+			_ = w.Buy("moonshine", 0)
 			w.MarketPrices()
-			_ = w.Sell("moonshine")
+			_ = w.Sell("moonshine", 0)
 			w.MarketPrices()
 		}
 		blind += w.Player.Cash - start
@@ -35,16 +35,16 @@ func TestTheTradeRewardsJudgementRatherThanExistence(t *testing.T) {
 			g := p.Good("moonshine")
 			switch {
 			case p.Holding("moonshine") == 0 && g.Price <= g.Base*9/10:
-				_ = p.Buy("moonshine")
+				_ = p.Buy("moonshine", 0)
 			case p.Holding("moonshine") > 0 && g.Price >= g.Base*11/10:
-				_ = p.Sell("moonshine")
+				_ = p.Sell("moonshine", 0)
 			}
 			p.MarketPrices()
 			if p.Carrying() > 0 {
 				heatHeld++
 			}
 		}
-		_ = p.Sell("moonshine")
+		_ = p.Sell("moonshine", 0)
 		patient += p.Player.Cash - pStart
 	}
 	blind /= campaigns

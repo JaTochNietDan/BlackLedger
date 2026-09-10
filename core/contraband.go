@@ -53,8 +53,10 @@ func (g Good) Agrees(singular, plural string) string {
 	return singular
 }
 
-// Lot is how much changes hands in one transaction. The interface offers plain
-// actions rather than a quantity field, so trade happens in fixed lots.
+// Lot is what a trade moves when nobody names a number. It was how much changed
+// hands full stop, because the interface had no field to type into — which made
+// the decision the whole underground trade is built around, how much do you
+// dare carry, a constant somebody else chose. A card can carry a figure now.
 const Lot = 5
 
 func newGoods() []Good {
@@ -160,7 +162,7 @@ func (w *World) ContrabandDay() {
 }
 
 // TradeReadiness explains why a trade cannot happen, or returns "".
-func (w *World) TradeReadiness(good, side string) string {
+func (w *World) TradeReadiness(good, side string, units int) string {
 	g := w.Good(good)
 	if g == nil {
 		return "Nobody deals in that here"
@@ -169,50 +171,81 @@ func (w *World) TradeReadiness(good, side string) string {
 		return "There is no market for this here"
 	}
 	if side == "buy" {
-		if w.Player.Cash < g.Price*Lot {
-			return "Not enough cash"
+		units = w.BuyUnits(good, units)
+		if units <= 0 {
+			return "Name how many"
+		}
+		if room := w.CarryLimit() - w.Carrying(); units > room {
+			return fmt.Sprintf("You can carry %s more", counted(max(0, room), g.Unit, g.Unit+"s"))
+		}
+		if w.Player.Cash < g.Price*units {
+			return fmt.Sprintf("That is $%d", g.Price*units)
 		}
 		return ""
 	}
-	if w.Holding(good) == 0 {
+	held := w.Holding(good)
+	if held == 0 {
 		return "You are not carrying any"
+	}
+	if units > held {
+		return fmt.Sprintf("You are carrying %s", counted(held, g.Unit, g.Unit+"s"))
 	}
 	return ""
 }
 
+// BuyUnits is how many a purchase actually moves: what was typed, or the lot
+// when nothing was, and never more than there is room or money for.
+func (w *World) BuyUnits(good string, units int) int {
+	if units > 0 {
+		return units
+	}
+	g := w.Good(good)
+	if g == nil || g.Price <= 0 {
+		return 0
+	}
+	room := max(0, w.CarryLimit()-w.Carrying())
+	return max(1, min(Lot, min(room, w.Player.Cash/g.Price)))
+}
+
 // Buy takes a lot at the current price.
-func (w *World) Buy(good string) error {
-	if reason := w.TradeReadiness(good, "buy"); reason != "" {
+func (w *World) Buy(good string, units int) error {
+	if reason := w.TradeReadiness(good, "buy", units); reason != "" {
 		return fmt.Errorf("%s", reason)
 	}
 	g := w.Good(good)
-	cost := g.Price * Lot
+	units = w.BuyUnits(good, units)
+	cost := g.Price * units
 	if err := w.Pay(cost); err != nil {
 		return err
 	}
 	if w.Player.Stock == nil {
 		w.Player.Stock = map[string]int{}
 	}
-	w.Player.Stock[good] += Lot
+	w.Player.Stock[good] += units
 	w.Player.Heat = min(100, w.Player.Heat+1)
 	w.Log("A quiet purchase", fmt.Sprintf("%d %ss of %s for $%d, at $%d each. Holding stock draws attention until it is sold.",
-		Lot, g.Unit, g.InBulk(), cost, g.Price), "business")
+		units, g.Unit, g.InBulk(), cost, g.Price), "business")
 	return nil
 }
 
 // Sell moves everything the player is carrying of one good at the current
 // price. Selling is where the profit is realised and where the risk ends.
-func (w *World) Sell(good string) error {
-	if reason := w.TradeReadiness(good, "sell"); reason != "" {
+func (w *World) Sell(good string, units int) error {
+	if reason := w.TradeReadiness(good, "sell", units); reason != "" {
 		return fmt.Errorf("%s", reason)
 	}
 	g := w.Good(good)
 	held := w.Holding(good)
-	takings := g.Price * held
-	w.Player.Stock[good] = 0
+	// Nothing named sells all of it, which is what selling has always meant
+	// here: the risk ends when the last of it is gone.
+	if units <= 0 || units > held {
+		units = held
+	}
+	takings := g.Price * units
+	w.Player.Stock[good] = held - units
 	w.Earn(takings)
 	w.Log("The goods move on", fmt.Sprintf("%d %ss of %s sold for $%d, at $%d each.",
-		held, g.Unit, g.InBulk(), takings, g.Price), "business")
+		units, g.Unit, g.InBulk(), takings, g.Price), "business")
 	return nil
 }
 

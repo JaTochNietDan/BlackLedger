@@ -1306,13 +1306,24 @@ func (w *World) Actions(id string) []Action {
 		}
 		// Cost is zero because Buy charges the lot itself; declaring it would
 		// have the command layer charge it a second time.
-		add("buy:"+g.ID, fmt.Sprintf("Buy %d %ss of %s", Lot, g.Unit, g.InBulk()), 30, 0,
-			w.TradeReadiness(g.ID, "buy"),
-			fmt.Sprintf("$%d for the lot, at $%d each today. Holding stock draws police attention every day until it is sold, and can be taken from you.", g.Price*Lot, g.Price))
+		// How much is the decision the whole underground trade is built around,
+		// so it is typed rather than fixed at a lot somebody else chose. The
+		// field knows what a person can carry and what they can pay for,
+		// because both are real limits and a card should not offer a number the
+		// rule will refuse.
+		room := max(0, w.CarryLimit()-w.Carrying())
+		afford := 0
+		if g.Price > 0 {
+			afford = p.Cash / g.Price
+		}
+		add("buy:"+g.ID, "Buy "+g.InBulk(), 30, 0, w.TradeReadiness(g.ID, "buy", 0),
+			fmt.Sprintf("$%d each today. You can carry %s more. Holding stock draws police attention every day until it is sold, and can be taken from you.",
+				g.Price, counted(room, g.Unit, g.Unit+"s")))
+		sum(1, min(room, afford), min(Lot, min(room, afford)), "How many")
 		if held := w.Holding(g.ID); held > 0 {
-			add("sell:"+g.ID, fmt.Sprintf("Sell %d %ss of %s", held, g.Unit, g.InBulk()), 30, 0,
-				w.TradeReadiness(g.ID, "sell"),
-				fmt.Sprintf("$%d each today, for $%d.", g.Price, g.Price*held))
+			add("sell:"+g.ID, "Sell "+g.InBulk(), 30, 0, w.TradeReadiness(g.ID, "sell", 0),
+				fmt.Sprintf("$%d each today. You are carrying %s, worth $%d.", g.Price, counted(held, g.Unit, g.Unit+"s"), g.Price*held))
+			sum(1, held, held, "How many")
 		}
 	}
 	if mark, ok := w.StripTarget(id); ok {

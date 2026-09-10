@@ -661,11 +661,11 @@ func (w *World) apply(c Command) error {
 			case "contract":
 				w.OpenContract()
 			case "buy:moonshine", "buy:cigarettes", "buy:arms":
-				if err := w.Buy(strings.TrimPrefix(c.Kind, "buy:")); err != nil {
+				if err := w.Buy(strings.TrimPrefix(c.Kind, "buy:"), c.Amount); err != nil {
 					return err
 				}
 			case "sell:moonshine", "sell:cigarettes", "sell:arms":
-				if err := w.Sell(strings.TrimPrefix(c.Kind, "sell:")); err != nil {
+				if err := w.Sell(strings.TrimPrefix(c.Kind, "sell:"), c.Amount); err != nil {
 					return err
 				}
 			case "operate:clean", "operate:standard", "operate:hard":

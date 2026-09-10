@@ -38,7 +38,7 @@ func TestAStillPaysForMovingTheStockNotForOwningIt(t *testing.T) {
 				if sell && w.Holding("moonshine") > 0 {
 					// Move it: the whole point is that stock has to go.
 					w.Player.Location = "market"
-					_ = w.Sell("moonshine")
+					_ = w.Sell("moonshine", 0)
 					w.Player.Location = "laundry"
 				}
 			}
