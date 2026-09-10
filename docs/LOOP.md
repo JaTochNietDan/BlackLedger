@@ -64,9 +64,11 @@ which half is standing.
    same for the other rooms. The city already gambles at every room that runs a
    float (`core/floor.go`), which this tick checked rather than rebuilt.
 6. **The people behind the counter.** `Property.Hands` names the staff of every
-   business the player holds (`core/hands.go`). Still open: poaching somebody
-   off a rival's counter, and what a business does when it cannot find anybody
-   in the city to hire.
+   business at an address anybody holds, and somebody standing in front of you
+   who works for a rival can be offered a place at one of yours
+   (`core/hands.go`). Still open: what a business does when the city has nobody
+   left to hire, and whether the people you employ should be worth talking to
+   for what they know about the room they stand in.
 
 ---
 
@@ -152,7 +154,7 @@ each other and the run is race-clean.
 
 Balance baseline, seven strategies
 (worker/investor/defiant/reckless/thief/smuggler/racketeer):
-deaths 0/0/51/82/78/0/37, median cash 12585/14307/7408/90/1410/5303/2203.
+deaths 0/0/52/82/78/0/37, median cash 12585/14129/7418/90/1063/5332/2080.
 `mise run simulate > <scratchpad>/sim.json` then **parse** the JSON; grepping it
 is useless. Each strategy also reports `mean_heat`, `seizures` and `runs_hurt`,
 because deaths and cash cannot tell a safe policy from one whose money is taken

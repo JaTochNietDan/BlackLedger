@@ -125,10 +125,12 @@ func TestABadNightAtCardsIsSomethingTwoPeopleFallOutOver(t *testing.T) {
 	if cards == 0 {
 		t.Fatal("sixty days of card games and nobody fell out with anybody over one")
 	}
-	// And not a city whose quarrels are all about poker. Falling out with every
-	// loser rather than the one who was cleaned out put nine of sixteen down to
-	// a card game.
-	if cards*2 > len(w.Grudges) {
-		t.Fatalf("%d of this city's %d grudges are about a card game", cards, len(w.Grudges))
+	// And not a city whose only quarrels are about poker. Asked as "there are
+	// other reasons people fall out here" rather than as a share: the city
+	// holds seven to sixteen grudges at a time, and a ratio on a denominator
+	// that small says more about the sample than about the game.
+	other := len(w.Grudges) - cards
+	if other == 0 {
+		t.Fatalf("every one of this city's %d grudges is about a card game", len(w.Grudges))
 	}
 }

@@ -1,5 +1,7 @@
 package core
 
+import "fmt"
+
 // A business's staff was a number. You hired a pair of hands, the wage bill went
 // up, and nobody in Bellwether had a job: the person behind the counter of a
 // place the player owned did not exist, could not be talked to, killed, robbed,
@@ -45,6 +47,14 @@ func (w *World) AtWork() []*NPC {
 	return out
 }
 
+// HolderFaction is whose organization holds this address, if any.
+func (w *World) HolderFaction(id string) string {
+	if prop := w.Properties[id]; prop != nil {
+		return prop.Owner
+	}
+	return ""
+}
+
 // takeOn finds somebody in this city to stand behind that counter. Nobody with
 // a job already, nobody a family owns, nobody who is dead or inside. Returns
 // the empty string when there is nobody, which is a real answer: a city can run
@@ -72,7 +82,9 @@ func (w *World) takeOn(id string) string {
 		// holdings, so a laundry that hired one had a position filled by
 		// somebody who was never behind the counter. Measured over a week of
 		// daytimes: one of three hands was never once in the room.
-		if n.Faction != "" && n.Faction != w.PlayerOrganizationID() {
+		// A family's own people work for their family, not behind somebody
+		// else's counter.
+		if n.Faction != "" && n.Faction != w.HolderFaction(id) {
 			continue
 		}
 		// Somebody already spending their day there is the obvious hire, then
@@ -132,7 +144,7 @@ func (w *World) EmptyChairs() {
 		if prop == nil {
 			continue
 		}
-		kept := prop.Hands[:0]
+		kept := make([]string, 0, len(prop.Hands))
 		for _, who := range prop.Hands {
 			if n := w.NPC(who); n != nil && !n.Dead {
 				kept = append(kept, who)
@@ -142,8 +154,14 @@ func (w *World) EmptyChairs() {
 			prop.Hands = kept
 			prop.Staff = min(prop.Staff, len(kept))
 		}
-		if !w.Own(l.ID) {
+		// Every address somebody holds, not only the player's. A rival with a
+		// laundry has somebody in it, or there is nobody to poach, nobody to
+		// lean on, and nobody to lose when the place is taken.
+		if prop.Owner == "" || prop.Owner == "independent" {
 			continue
+		}
+		if trade, ok := TradeOf(l.ID); ok && prop.Staff == 0 && prop.Income > 0 {
+			prop.Staff = trade.Hands
 		}
 		for len(prop.Hands) < prop.Staff {
 			who := w.takeOn(l.ID)
@@ -178,4 +196,107 @@ func (w *World) HandsDescription(id string) []map[string]any {
 		})
 	}
 	return out
+}
+
+// Poaching. Now that the people behind a counter are people, they can be taken.
+// Somebody good is somebody a rival is already paying, and money is the whole
+// of the argument — which is also the cheapest way for a business war to be
+// fought without anybody being shot.
+
+// PoachPays is the signing money, as weeks of the wage the position carries.
+const PoachPays = 3
+
+// PoachCost is what it takes to walk somebody off a rival's counter and onto
+// yours. The wage is the one the new position carries, because that is what the
+// player is committing to pay.
+func (w *World) PoachCost(into string) int {
+	trade, ok := TradeOf(into)
+	if !ok {
+		return 0
+	}
+	return trade.Wage * 7 * PoachPays
+}
+
+// PoachReadiness explains why somebody cannot be taken on, or returns "".
+func (w *World) PoachReadiness(who, into string) string {
+	n := w.NPC(who)
+	if n == nil || n.Dead {
+		return "There is nobody here by that name"
+	}
+	trade, ok := TradeOf(into)
+	if !ok || !w.Own(into) {
+		return "That is not a business of yours"
+	}
+	from := w.EmployerOf(who)
+	if from == "" {
+		return n.Name + " works for nobody, and can simply be hired"
+	}
+	if w.Own(from) {
+		return n.Name + " already works for you"
+	}
+	prop := w.Properties[into]
+	if prop.Staff >= trade.Hands {
+		place, _ := PlaceByID(into)
+		return "Every position at " + place.Name + " is filled"
+	}
+	if w.Player.Cash < w.PoachCost(into) {
+		return "Not enough cash to make it worth their while"
+	}
+	return ""
+}
+
+// Poach takes somebody off a rival's books and puts them behind your counter.
+func (w *World) Poach(who, into string) error {
+	if reason := w.PoachReadiness(who, into); reason != "" {
+		return fmt.Errorf("%s", reason)
+	}
+	from := w.EmployerOf(who)
+	if err := w.Pay(w.PoachCost(into)); err != nil {
+		return err
+	}
+	old := w.Properties[from]
+	kept := make([]string, 0, len(old.Hands))
+	for _, id := range old.Hands {
+		if id != who {
+			kept = append(kept, id)
+		}
+	}
+	old.Hands = kept
+	old.Staff = min(old.Staff, len(kept))
+	n := w.NPC(who)
+	w.Properties[into].Staff++
+	w.putToWork(who, into)
+	// Money is not friendship, but it is not nothing either.
+	n.Trust = min(100, n.Trust+8)
+	// The family they were working for takes it as what it is.
+	if f := w.faction(old.Owner); f != nil {
+		f.Goodwill = max(-100, f.Goodwill-PoachGalls)
+	}
+	here, _ := PlaceByID(into)
+	there, _ := PlaceByID(from)
+	w.Log(n.Name+" comes to work for you",
+		fmt.Sprintf("$%d to walk out of %s and behind the counter at %s. %s will have noticed.",
+			w.PoachCost(into), there.Name, here.Name, w.HolderName(from)), "business")
+	return nil
+}
+
+// PoachGalls is what a family thinks of somebody taking their people. Small
+// beside a burnt-out holding and large beside nothing at all, which is what
+// this used to cost.
+const PoachGalls = 9
+
+// shortHanded is a business of the player's with a position going, and nothing
+// if every counter they hold is covered.
+func (w *World) shortHanded() string {
+	for _, l := range Locations {
+		prop := w.Properties[l.ID]
+		trade, ok := TradeOf(l.ID)
+		if prop == nil || !ok || !w.Own(l.ID) {
+			continue
+		}
+		if prop.Staff < trade.Hands {
+			return l.ID
+		}
+	}
+	return ""
 }

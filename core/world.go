@@ -1658,6 +1658,32 @@ func (w *World) Actions(id string) []Action {
 			fmt.Sprintf("$%d up front and $%d a day. Adds to what your organization is worth in a fight, stands in front of what comes at you, and can decide one morning that it is not worth it.", SigningCost, MemberWage))
 		break
 	}
+	// Somebody standing here who works behind somebody else's counter. Money is
+	// the whole of the argument, and it is the cheapest way a business war gets
+	// fought without anybody being shot.
+	poached := 0
+	for i := range w.NPCs {
+		n := &w.NPCs[i]
+		if n.Dead || n.Location != id || IsOfficial(n.ID) || poached >= 2 {
+			continue
+		}
+		from := w.EmployerOf(n.ID)
+		if from == "" || w.Own(from) {
+			continue
+		}
+		into := w.shortHanded()
+		if into == "" {
+			continue
+		}
+		there, _ := PlaceByID(from)
+		here, _ := PlaceByID(into)
+		poached++
+		asks("poach:"+n.ID, "Offer "+n.Name+" a place at "+here.Name, 30, w.PoachCost(into),
+			w.PoachReadiness(n.ID, into),
+			fmt.Sprintf("$%d to walk out of %s, where %s pays them, and behind your counter instead. It leaves them short-handed and they will know who did it.",
+				w.PoachCost(into), there.Name, w.HolderName(from)))
+		about(n.ID)
+	}
 	// Money out with a name on it, and what to do about it when the name stops
 	// being able to pay. Anybody who already owes you is always listed; new
 	// lending is capped, because a room of fifteen strangers rendered as

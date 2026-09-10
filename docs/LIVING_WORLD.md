@@ -172,6 +172,28 @@ This all feels a bit haphazard. Make sure you are keeping track of what you are 
 
 ---
 
+When inside a building it shows this info at the bottom of the action list which is wrong. It'd probably be better to have a more fleshed out display of current building your in with the name and stuff up higher in the fold in a consistent place when you're inside.
+
+The Golden Lily
+INDEPENDENT
+95% condition
+
+---
+
+When I went after Tila myself, the newspaper info on the attempt showed the wrong portait.
+
+---
+
+We should probably show options like "buy kerrigan haulage" before you can afford it instead of having it hidden.
+
+---
+
+Let's verify, can you be attacked while traversing the map? Can your car affect this, whether it's armored, etc? This should all be the case.
+
+---
+
+When playing the slot machine we should show actual images for the stuff on the rollers. Also it seems to swap the results on the rollers at the end which is odd, they just flip around at random mid-end game. For example it shows 7-7- as it progresses then at the very end it flips to "bell", "lemon", "cherry". Sort that out.
+
 ## Inbox — answered
 
 We should also add ambient sounds and sounds to the slot machines and whatnot. I

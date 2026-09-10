@@ -7267,3 +7267,45 @@ Baseline: deaths 0/0/51/82/78/0/37, median cash
 12585/14307/7408/90/1410/5303/2203. Small movement across most of them, which is
 what naming the staff does: the same people are now unavailable for whatever
 else the city would have had them doing.
+
+## Everybody's counter, and taking somebody off one
+
+Named staff last tick covered only the player's own businesses, so a rival's
+laundry still had nobody in it — which meant there was nobody to poach, nobody
+to lean on, and nobody for them to lose when the place changed hands. Every
+address somebody holds is staffed now, the player's and everybody else's, and a
+family's own people work for their family rather than behind a stranger's
+counter.
+
+Measured over sixty days: 84 people living, 20 of them holding a job, 16 still
+on the evening's floors, and 41 hands played in the back room. A quarter of the
+city works somewhere and the rest of the city still happens.
+
+**Poaching.** Somebody standing in front of you who works behind a rival's
+counter can be offered a place at one of yours: three weeks of the wage the new
+position carries, they walk out, the rival is short-handed for it, and the
+family they were working for thinks less of you by `PoachGalls`. It is the
+cheapest way a business war gets fought without anybody being shot. Offered
+where they are standing, filed under business, and a test walks the same path
+the interface walks rather than calling the function.
+
+### A break that did not bite, and why
+
+Breaking the removal from the rival's books produced no failure. The filter was
+written `kept := old.Hands[:0]`, the idiom for filtering a slice in place — so
+appending into it wrote through the same backing array the loop was reading, and
+disabling the assignment still left the list mangled rather than intact. The
+guard was fine; the break was not a break. Both filters here allocate now, and
+the same break fails properly: "Pia Iordan works for you and is still on the
+butcher's books."
+
+### A guard changed, with the reason
+
+`TestABadNightAtCardsIsSomethingTwoPeopleFallOutOver` asked that card grudges be
+under half of all of them. This city holds seven to sixteen grudges at a time,
+so that is a ratio on a denominator small enough to say more about the sample
+than about the game — employment moved who is in the back room and it read five
+of seven. It asks that there are other reasons people fall out here.
+
+Baseline: deaths 0/0/52/82/78/0/37, median cash
+12585/14129/7418/90/1063/5332/2080.
