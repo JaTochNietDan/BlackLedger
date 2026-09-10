@@ -122,6 +122,12 @@ func (w *World) doingNow(n *NPC) string {
 		return "Somewhere on the street"
 	case w.Inside(n):
 		return "Held at Ward Street Station"
+	case n.Hurt && n.Car > 0 && CarWorkshop(n.Location):
+		// Why they are standing in a garage, which is not their job and not
+		// their rank. Somebody waiting on a windscreen is the most ordinary
+		// thing in this city and it outranks whatever their title is, the same
+		// way collecting does.
+		return "Waiting on the glass at " + where
 	case w.onARound(n.ID):
 		// What he is actually doing outranks what his job is called. He read as
 		// "Driver, on duty at Bluebird Laundry" while he was standing in it

@@ -73,6 +73,12 @@ func (w *World) RepairsDay() {
 		if n.Dead || !n.Hurt || n.Car == 0 {
 			continue
 		}
+		// At the bench, not anywhere in the city. The work is somebody standing
+		// at a counter with the car outside; a fee that moved wherever they
+		// happened to be was a garage's trade with no garage in it.
+		if n.Location != garage {
+			continue
+		}
 		// Somebody who cannot find the fee drives it broken. That is the link
 		// running the other way: a garage in a poor district has less work than
 		// the same garage in a district with money in it, off the same crimes.

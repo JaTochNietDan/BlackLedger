@@ -1,6 +1,9 @@
 package core
 
-import "testing"
+import (
+	"strings"
+	"testing"
+)
 
 // The last line of the inbox entry: "more car repairs to be made from broken
 // windows from theft". Stripping and raids took a car away outright, which
@@ -42,7 +45,11 @@ func TestABrokenCarPutsWorkAndMoneyThroughAGarage(t *testing.T) {
 	var mark *NPC
 	for i := range w.NPCs {
 		if n := &w.NPCs[i]; !n.Dead && w.WouldDrive(n) {
-			n.Car, n.Hurt, n.Purse = 1, true, 500
+			// Standing at the bench, because that is now the whole of it: they
+			// brought it in. This test used to leave them wherever the city had
+			// put them, which passed while a repair was a figure moving once a
+			// day rather than somebody at a counter.
+			n.Car, n.Hurt, n.Purse, n.Location = 1, true, 500, "garage"
 			mark = n
 			break
 		}
@@ -80,7 +87,7 @@ func TestSomebodyWhoCannotFindTheFeeKeepsDrivingItBroken(t *testing.T) {
 		}
 		n.Purse = 0 // nobody in this city can pay for anything
 		if w.WouldDrive(n) && mark == nil {
-			n.Car, n.Hurt = 1, true
+			n.Car, n.Hurt, n.Location = 1, true, "garage"
 			mark = n
 		}
 	}
@@ -146,4 +153,135 @@ func TestARaidLeavesCarsNeedingWork(t *testing.T) {
 		t.Errorf("a month of raids in six cities, %d cars still on the road, and not one needs a garage", watched)
 	}
 	t.Logf("%d of %d cars that survived need work", broken, watched)
+}
+
+// A car with the glass out of it is a reason to be somewhere. The repair used
+// to happen as a silent transfer once a day, wherever the owner happened to be
+// standing, which is a garage's trade with no garage in it. They take the car
+// in now, so the bench has people at it who are there for a reason — and that
+// is a room the player can walk into and meet somebody.
+func TestABrokenCarTakesItsOwnerToTheGarage(t *testing.T) {
+	w := New(61)
+	w.District = 2
+	var mark *NPC
+	for i := range w.NPCs {
+		if n := &w.NPCs[i]; !n.Dead && w.WouldDrive(n) && n.Location != w.theGarage() {
+			n.Car, n.Hurt, n.Purse = 1, true, 500
+			mark = n
+			break
+		}
+	}
+	if mark == nil {
+		t.Fatal("nobody in this city drives")
+	}
+	w.SetOut()
+	if mark.Heading != w.theGarage() {
+		t.Fatalf("%s is heading for %q rather than the garage", mark.Name, mark.Heading)
+	}
+	if mark.Errand == "" {
+		t.Error("they are going there for no stated reason")
+	}
+	t.Logf("%s: %s", mark.Name, mark.Errand)
+}
+
+// And the money only moves when they are actually standing at the bench.
+func TestNobodyIsBilledForWorkTheyNeverBroughtIn(t *testing.T) {
+	w := New(61)
+	w.Properties["garage"].Owner = "player:1"
+	var mark *NPC
+	for i := range w.NPCs {
+		if n := &w.NPCs[i]; !n.Dead && w.WouldDrive(n) {
+			n.Car, n.Hurt, n.Purse = 1, true, 500
+			n.Location = "bar" // broken down on the other side of the city
+			mark = n
+			break
+		}
+	}
+	if mark == nil {
+		t.Fatal("nobody in this city drives")
+	}
+	// Nobody else may be standing at the bench with a broken car either.
+	for i := range w.NPCs {
+		if n := &w.NPCs[i]; n.ID != mark.ID && n.Location == "garage" {
+			n.Hurt = false
+		}
+	}
+	cash, purse := w.Player.Cash, mark.Purse
+	w.RepairsDay()
+	if mark.Purse != purse || w.Player.Cash != cash {
+		t.Errorf("a car across the city was worked on: they paid %d and the bench took %d",
+			purse-mark.Purse, w.Player.Cash-cash)
+	}
+	if !mark.Hurt {
+		t.Error("a car nobody brought in came back mended")
+	}
+}
+
+// What it is worth: how many people stand in a garage on an ordinary day. A
+// bench nobody visits is a number in a ledger; a bench with somebody at it is a
+// room worth walking into.
+func TestAGarageHasPeopleInItOnAnOrdinaryDay(t *testing.T) {
+	visits, cities := 0, 0
+	for _, seed := range []uint32{5, 23, 61, 97, 181} {
+		w := New(seed)
+		w.District = 2
+		cities++
+		// An ordinary week in a city where cars get gone through: the glass
+		// goes somewhere every night, which is what the street does.
+		for day := 0; day < 7; day++ {
+			w.RNG, w.WorldRNG = seed+uint32(day), seed+uint32(day)
+			for i := range w.NPCs {
+				n := &w.NPCs[i]
+				if !n.Dead && n.Car > 0 && !n.Hurt && n.Purse >= GlassCost && w.WorldRandom() < .1 {
+					n.Hurt = true
+				}
+			}
+			for half := 0; half < 2; half++ {
+				w.SetOut()
+				w.Minute += 720
+				w.Arrivals()
+			}
+			for _, n := range w.OnTheFloor(w.theGarage()) {
+				_ = n
+			}
+			for i := range w.NPCs {
+				if n := &w.NPCs[i]; !n.Dead && n.Location == w.theGarage() {
+					visits++
+				}
+			}
+			w.RepairsDay()
+		}
+	}
+	t.Logf("%d people standing in a garage across %d cities over a week", visits, cities)
+	if visits == 0 {
+		t.Error("a week of broken glass and nobody ever went to a garage")
+	}
+}
+
+// And the room says why they are in it. A family head standing in a garage
+// reads as holding court unless somebody says otherwise, and what he is
+// actually doing is waiting on a windscreen.
+func TestTheRoomSaysWhyTheyAreAtTheBench(t *testing.T) {
+	w := New(61)
+	w.District = 2
+	var mark *NPC
+	for i := range w.NPCs {
+		if n := &w.NPCs[i]; !n.Dead && n.Car > 0 {
+			n.Hurt, n.Location = true, "garage"
+			mark = n
+			break
+		}
+	}
+	if mark == nil {
+		t.Fatal("nobody in this city drives")
+	}
+	said := w.doingNow(mark)
+	if !strings.Contains(said, "glass") {
+		t.Errorf("standing in a garage with the windscreen out, the city says: %q", said)
+	}
+	// And once it is put right they are not still waiting on it.
+	mark.Hurt = false
+	if after := w.doingNow(mark); strings.Contains(after, "glass") {
+		t.Errorf("the car is mended and they are still waiting: %q", after)
+	}
 }

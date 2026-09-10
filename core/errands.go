@@ -135,6 +135,18 @@ func (w *World) wanted(n *NPC) (errand, bool) {
 		}
 		return errand{target.Location, "looking for " + target.Name + " over " + g.Because}, true
 	}
+	// A car with the glass out of it. Somebody who can find the fee takes it in
+	// rather than driving it broken, which is why a garage has anybody at the
+	// counter at all: the trade is people standing there, not a figure moving
+	// once a day. It outranks minding a holding for the morning — a family's
+	// ground is still there in the afternoon.
+	if n.Hurt && n.Car > 0 && n.Purse >= GlassCost {
+		if id := w.theGarage(); id != "" && id != n.Location {
+			if place, ok := PlaceByID(id); ok {
+				return errand{id, "taking the car in to " + place.Name}, true
+			}
+		}
+	}
 	// An organization's ground has to be minded by somebody. A family holding
 	// with nobody standing in it pulls one of that family's people across the
 	// city — which is also what makes a war visible on the street: take a
