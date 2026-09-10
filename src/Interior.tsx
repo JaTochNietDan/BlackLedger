@@ -197,8 +197,25 @@ export function Interior({
       warn: place.trading < 0.8,
     });
   }
+  // The count against what the work takes, because one of them on its own is
+  // not a fact anybody can act on: three is right at a laundry and short at a
+  // casino, and a counter that has emptied itself reads as nothing at all.
   if (place.owned && place.staff !== undefined) {
-    facts.push({what: 'On the books', is: String(place.staff)});
+    const wants = place.positions ?? place.staff;
+    facts.push({
+      what: 'On the books',
+      is: place.staff < wants ? place.staff + ' of ' + wants : String(place.staff),
+      warn: place.staff < wants,
+    });
+  }
+  // What is owed to them. A player who has been short knows the nights are
+  // being counted somewhere; this is where.
+  if (place.owned && place.unpaid) {
+    facts.push({
+      what: 'Unpaid',
+      is: place.unpaid + (place.unpaid === 1 ? ' night' : ' nights'),
+      warn: true,
+    });
   }
   if (place.owned && place.income > 0) {
     facts.push({what: 'Earns', is: '$' + place.income + '/hr'});

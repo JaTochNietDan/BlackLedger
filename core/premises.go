@@ -44,10 +44,19 @@ func (w *World) PlaceNote(id string) string {
 	switch {
 	case w.Player.Heat >= ForfeitThreshold && prop.Income > 0:
 		return "At this much attention they can take it"
+	// Above the broken press, because a press is mended by somebody and there
+	// is nobody: a place that has gone a week without paying anybody is offered
+	// nobody at all until it pays.
+	case running && w.wordIsOut(id):
+		return fmt.Sprintf("Nobody will work here: %d nights unpaid", prop.Unpaid)
 	case prop.Trouble && running:
 		return trade.Trouble
 	case running && prop.Supply <= 0:
 		return "Out of " + trade.Supplies
+	// And a shorter stretch of it, below the stock, because a night or two is
+	// something a player recovers from without doing anything about it.
+	case running && prop.Unpaid > 0:
+		return fmt.Sprintf("Wages %s behind", plural(prop.Unpaid, "night", "nights"))
 	case running && prop.Staff < trade.Hands:
 		return fmt.Sprintf("Short-handed: %d of %d", prop.Staff, trade.Hands)
 	case prop.Condition < 60:

@@ -186,3 +186,56 @@ func TestAPlaceThatPaysFillsItsOwnChairs(t *testing.T) {
 		}
 	}
 }
+
+// And the room says why. A counter that nobody will stand behind reads as
+// "Short-handed: 0 of 3" if the note is left as it was, which is the fact with
+// its cause left out — and the player has no way back to a log line from four
+// weeks ago.
+func TestTheRoomSaysWhyTheCounterIsEmpty(t *testing.T) {
+	t.Parallel()
+	w, id := unpaidRun(t)
+	for day := 0; day < 60; day++ {
+		w.Event = nil
+		w.Advance(1440)
+		w.Event = nil
+	}
+	note := w.PlaceNote(id)
+	if !strings.Contains(note, "Nobody will work here") {
+		t.Fatalf("the counter is empty because nobody is paid and the room says %q", note)
+	}
+	if !strings.Contains(note, "unpaid") {
+		t.Fatalf("the room does not say how long it has been: %q", note)
+	}
+	// And the figures the room draws carry it too, so it is not one sentence
+	// that could be missed.
+	for _, l := range w.Public()["locations"].([]map[string]any) {
+		if l["id"] != id {
+			continue
+		}
+		if l["unpaid"].(int) < PatienceRunsOut {
+			t.Fatalf("the room is drawn from %d unpaid nights", l["unpaid"])
+		}
+		return
+	}
+	t.Fatal("the laundry is not in the payload the room is drawn from")
+}
+
+// A place that pays says none of this, which is the ordinary case.
+func TestARoomThatPaysSaysNothingAboutWages(t *testing.T) {
+	t.Parallel()
+	w := New(61)
+	w.Event, w.District = nil, 9
+	w.Player.Health, w.Player.Respect = 100, 30
+	w.Player.Location, w.Player.Cash = "laundry", 200000
+	if err := w.apply(Command{Kind: "acquire", Target: "laundry", RequestID: "buyitandsaynothing"}); err != nil {
+		t.Fatal(err)
+	}
+	for day := 0; day < 10; day++ {
+		w.Event = nil
+		w.Advance(1440)
+		w.Event = nil
+	}
+	if note := w.PlaceNote("laundry"); strings.Contains(note, "unpaid") || strings.Contains(note, "behind") {
+		t.Fatalf("a business that pays its people is told its wages are behind: %q", note)
+	}
+}

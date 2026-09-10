@@ -8463,3 +8463,27 @@ fails on the player being billed for three people who are not there.
 
 Balance unchanged. Every strategy in the simulation pays its bills, which is why
 this rule costs them nothing.
+
+## The room says why the counter is empty
+
+Three nights of rules the player only meets as a log line. A counter that
+nobody will stand behind read as "Short-handed: 0 of 3" in the room — the fact
+with its cause left out, and no way back to a message from four weeks ago.
+
+The room note now says "Nobody will work here: 12 nights unpaid", above the
+broken press, because a press is mended by somebody and there is nobody. A
+shorter stretch says "Wages two nights behind", below the stock, because a night
+or two is something a player recovers from without doing anything about it.
+
+The header carries it as figures too, so it is not one sentence that could be
+missed. "On the books" reads "1 of 3" and warns when the counter is short —
+three is right at a laundry and short at a casino, and a count on its own is not
+something anybody can act on. "Unpaid" appears beside it with the nights on it.
+`unpaid` goes down the wire with the rest of a place's facts.
+
+Both halves broken to check. Putting the note back as it was leaves the room
+saying a press has broken. Sending zero nights instead of the real count fails
+the payload half.
+
+Checked on 8791 after the restart: seventeen trading addresses, each reporting
+its staff against its positions and its unpaid nights.
