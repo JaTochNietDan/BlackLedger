@@ -39,6 +39,9 @@ func TestAnAudienceIsWithWhoeverLeadsTheFamilyNow(t *testing.T) {
 	} {
 		w := leaderless(t, tc.faction)
 		want := w.Leader(tc.faction)
+		// Whoever leads them now has to be in the room: the chair holds the
+		// person sitting in it, not an address that used to mean a family.
+		seat(w, tc.faction, tc.where)
 		w.OpenAudience(tc.where)
 		if w.Event == nil {
 			t.Fatalf("%s: no audience opened", tc.faction)
@@ -108,6 +111,7 @@ func TestAFamilyWithNobodyLeftGrantsNoAudience(t *testing.T) {
 		t.Fatal("the audience is still offered when nobody can grant it")
 	}
 	w.Event = nil
+	seat(w, "bellandi", "club")
 	w.OpenAudience("club")
 	if w.Event != nil {
 		t.Fatalf("a scene opened with nobody to speak: %+v", w.Event)

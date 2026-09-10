@@ -5786,3 +5786,49 @@ at the same time as itself.
 One more thing the gate was not doing: `gofmt -l` prints names and exits zero,
 so a check that has quietly listed eleven unformatted files for a while passed
 every time it ran. It fails now, and the eleven are formatted.
+
+## A lead has a table, and the chair holds whoever is sitting in it
+
+Two complaints in one message, and they turned out to be the same fault.
+
+"Vitor Bellendi is always at the kessler filling station for some reason." He
+was, and so was every other family lead, wherever the city happened to leave
+them. `keepsPost` exempts a lead from the evening — "the leader of a family is
+not found propping up a bar" — and nothing else ever gave one a reason to walk.
+So a lead who went out once for petrol stood at that pump for the rest of the
+game. A lead holds court at the family's own seat now, its best-earning ground,
+and goes back to it.
+
+| Over 40 cities, a week each | Hours at their own seat | Elsewhere | Leads who drifted |
+|---|---|---|---|
+| With the rule | 11,808 | 1,632 | 0 of 80 |
+| Without it | 5,722 | 7,718 | 71 of 80 |
+
+"I request a sit down with the controlling family and it sits me down with the
+family lead but the lead is not present at this location." The audience was
+addressed rather than peopled: the club meant Bellandi and the garage meant
+Russo, whatever either family was actually doing, and the chair held the lead
+wherever they were. It happens where somebody who can settle terms is standing
+now — the lead when the lead is there, otherwise the most senior of theirs in
+the room, and nobody below a lieutenant is authorised to agree to anything. A
+lieutenant sitting in for an absent lead says so in the scene. Asking in a room
+with none of them in it is refused, and the refusal says where their lead is.
+
+That also unhooked the sit-down from two addresses. It is offered anywhere the
+family's speaker is, which is what makes the first fix visible: you go to where
+the lead is, and the lead is somewhere that means something.
+
+**Four test changes, all for the same reason and all stated.** Four tests opened
+an audience at an address and assumed a family, which is exactly the assumption
+being removed; they seat a speaker in the room first. A fifth, about a holding
+changing hands, looked only at who was still walking — and the person with the
+best reason to go is now the lead, whose seat is that ground, so she sets off
+first and has arrived by the time the last of them leaves. It accepts somebody
+standing in it who was not there before.
+
+Balance: deaths 0/0/50/82/83 against 0/0/50/82/82, median cash
+12378/14050/7230/90/586 against 12360/13903/7223/90/586. One extra death in a
+hundred thief runs and cash within a percent, which is the city's people
+standing in slightly different rooms rather than a change in what anything pays.
+
+Evidence: `core/seat_test.go`, three breaks verified.

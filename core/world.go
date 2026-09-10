@@ -964,7 +964,6 @@ func (w *World) Actions(id string) []Action {
 		add("recruit", "Recruit "+hand, 30, 90, reason, "A driver and collector. $12 daily wages; loyalty matters.")
 		about(driver)
 	case "garage":
-		add("audience", "Request an audience with Russo", 45, 0, w.AudienceReadiness(id), "Discuss your standing with the Russo Outfit.")
 		fee := w.ServiceFee()
 		// With no car there is no condition to state, and "currently 0 of 100"
 		// reads as a wreck in the yard rather than as nothing at all.
@@ -1066,8 +1065,23 @@ func (w *World) Actions(id string) []Action {
 				fmt.Sprintf("%s %s $%d all in and %d days away. The city runs without you: businesses go unwatched, work you promised runs down, and anything arranged for you happens to an empty house. Attention falls %d a day while you are gone.", d.Blurb, d.Purpose, w.TripCost(d.ID), d.Days, d.Relief))
 		}
 	case "club":
-		add("audience", "Request an audience", 45, 0, w.AudienceReadiness(id), "Discuss your standing with the Bellandi family.")
 		add("provoke", "Demand protection money", 30, 0, "", "EXTREME RISK. Bellandi owns this casino. Challenging them can bring lethal retaliation.")
+	}
+	// A sit-down happens where somebody who can agree to something is standing,
+	// which used to be two addresses by name: the club meant Bellandi and the
+	// garage meant Russo whatever either family was doing that day.
+	if id == p.Location {
+		if actor := w.AudienceActor(id); actor != "" {
+			f := w.faction(actor)
+			across := w.Speaker(actor, id)
+			with := f.Name
+			if lead := w.Leader(actor); lead == nil || across.ID != lead.ID {
+				with = across.Name + " of " + f.Name
+			}
+			add("audience", "Request an audience", 45, 0, w.AudienceReadiness(id),
+				"Sit down with "+with+" and settle where you stand with them.")
+			about(across.ID)
+		}
 	}
 	if w.Hand != nil && !w.Hand.Done && w.Hand.Place == id {
 		add("hit", "Take another card", 5, 0, "",

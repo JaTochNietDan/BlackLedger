@@ -168,6 +168,19 @@ func (w *World) wanted(n *NPC) (errand, bool) {
 			}
 		}
 	}
+	// A family lead holds court somewhere, and it is the family's own seat —
+	// its best-earning ground. "Vitor Bellendi is always at the kessler filling
+	// station for some reason": he was, forever, because keepsPost() exempts a
+	// lead from the evening and nothing else ever gave one a reason to walk.
+	// Wherever the first morning put him was where he died. A lead is not found
+	// propping up a bar, which is still true; he is found at his own table.
+	if n.Rank >= RankLeader && n.Faction != "" {
+		if seat := w.homeOf(n.Faction); seat != "" && seat != n.Location {
+			if place, ok := PlaceByID(seat); ok {
+				return errand{seat, "holding court at " + place.Name}, true
+			}
+		}
+	}
 	// An organization's ground has to be minded by somebody. A family holding
 	// with nobody standing in it pulls one of that family's people across the
 	// city — which is also what makes a war visible on the street: take a

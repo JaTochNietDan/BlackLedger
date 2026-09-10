@@ -8,6 +8,8 @@ func TestRussoAudienceCancelsOnlyRussoPlans(t *testing.T) {
 	w.Player.Location = "garage"
 	w.Player.Cash = 300
 	w.Plots = []Plot{{ID: ID(), Kind: "sabotage", Life: 1, Actor: "russo", Target: "garage", Due: 1000}, {ID: ID(), Kind: "hit", Life: 1, Actor: "bellandi", Due: 1100}}
+	// A sit-down is with whoever of theirs is in the room, so put one there.
+	seat(w, "russo", "garage")
 	var err error
 	w, err = Execute(w, Command{Kind: "audience", Target: "garage", Revision: w.Revision})
 	if err != nil {
@@ -32,6 +34,7 @@ func TestRussoAudienceCancelsOnlyRussoPlans(t *testing.T) {
 func TestAudienceFavorIsOptionalAndUsesNormalJobRules(t *testing.T) {
 	for _, decision := range []string{"accept", "decline"} {
 		w := New(27)
+		seat(w, "russo", "garage")
 		w.OpenAudience("garage")
 		start := w.Minute
 		w.Plots = []Plot{{ID: ID(), Kind: "sabotage", Life: 1, Actor: "russo", Target: "garage", Due: 1000}}
@@ -51,6 +54,7 @@ func TestAudienceFavorIsOptionalAndUsesNormalJobRules(t *testing.T) {
 }
 func TestLegacyAudienceAndUnaffordableTribute(t *testing.T) {
 	w := New(27)
+	seat(w, "bellandi", "club")
 	w.OpenAudience("club")
 	w.Event.Actor = ""
 	before := w.Clone()

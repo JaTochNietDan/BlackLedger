@@ -253,6 +253,14 @@ func TestWhenGroundChangesHandsSomebodyWalks(t *testing.T) {
 	if taken == "" {
 		t.Fatal("the family holds nothing to lose")
 	}
+	// Who was standing in it before it changed hands, so arriving can be told
+	// apart from having been there all along.
+	before := map[string]bool{}
+	for i := range w.NPCs {
+		if w.NPCs[i].Location == taken {
+			before[w.NPCs[i].ID] = true
+		}
+	}
 	w.Properties[taken].Owner = "russo"
 	w.Minute += 720
 	w.SetOut()
@@ -270,9 +278,23 @@ func TestWhenGroundChangesHandsSomebodyWalks(t *testing.T) {
 	if len(street) == 0 {
 		t.Fatalf("%s changed hands and nobody in the city moved", taken)
 	}
+	// Still walking to it, or already standing in it having come from
+	// somewhere else. This used to look only at the street, which caught
+	// whoever was mid-stride at the moment the clock stopped — and the person
+	// with the best reason to go is now the family's lead, whose seat is their
+	// best-earning ground. She sets off first and the walk is short, so by the
+	// time the last of them has left she has arrived and the street no longer
+	// shows her. What the rule promises is that somebody comes, not that
+	// somebody is always caught in the road.
 	going := false
 	for _, j := range street {
 		if j.ToID == taken {
+			going = true
+		}
+	}
+	for i := range w.NPCs {
+		n := &w.NPCs[i]
+		if n.Faction == "russo" && !n.Dead && n.Location == taken && !before[n.ID] {
 			going = true
 		}
 	}

@@ -2,6 +2,14 @@ package core
 
 import "testing"
 
+// seat puts a family's lead in a room, so a test about terms does not depend on
+// where the city happened to leave them.
+func seat(w *World, actor, where string) {
+	if lead := w.Leader(actor); lead != nil {
+		lead.Location, lead.Heading, lead.Arrives, lead.Sets = where, "", 0, 0
+	}
+}
+
 func TestBusinessTruceHasLimitedScopeAndExpires(t *testing.T) {
 	w := New(27)
 	w.Player.Cash = 300
@@ -9,6 +17,11 @@ func TestBusinessTruceHasLimitedScopeAndExpires(t *testing.T) {
 	w.Properties["laundry"].Owner = "player:1"
 	w.Properties["garage"].Owner = "player:1"
 	w.Plots = []Plot{{ID: "russo-business", Life: 1, Actor: "russo", Kind: "sabotage", Target: "garage"}, {ID: "russo-personal", Life: 1, Actor: "russo", Kind: "hit"}, {ID: "bellandi-business", Life: 1, Actor: "bellandi", Kind: "sabotage", Target: "laundry"}}
+	// A sit-down happens where somebody who can speak for the family is
+	// standing, not at an address that used to mean them by name. This test is
+	// about what a ceasefire covers, so it puts a Russo speaker in the room
+	// rather than relying on the garage meaning Russo.
+	seat(w, "russo", "garage")
 	w.OpenAudience("garage")
 	start := w.Minute
 	cash := w.Factions[1].Cash
@@ -49,6 +62,7 @@ func TestBusinessTruceHasLimitedScopeAndExpires(t *testing.T) {
 
 func TestBusinessTrucePaymentAndNewLife(t *testing.T) {
 	w := New(27)
+	seat(w, "bellandi", "club")
 	w.OpenAudience("club")
 	if _, err := Execute(w, Command{Revision: w.Revision, Kind: "choice", Event: w.Event.ID, Choice: "business_truce"}); err == nil {
 		t.Fatal("unaffordable ceasefire accepted")
@@ -59,6 +73,7 @@ func TestBusinessTrucePaymentAndNewLife(t *testing.T) {
 	w.Player.Cash = 300
 	choice(t, &w, "business_truce")
 	first := w.BusinessTruces["bellandi"]
+	seat(w, "bellandi", "club")
 	w.OpenAudience("club")
 	choice(t, &w, "business_truce")
 	if w.BusinessTruces["bellandi"] != first {

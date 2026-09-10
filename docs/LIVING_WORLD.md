@@ -236,15 +236,24 @@ I got some gossip by getting that girl a coffee and then I see "bad blood" red b
 
 ---
 
+When inside a building you own the top buttons should probably be for owner management and under a separate subtitle for management actions.
+
+## Inbox — answered
+
 Vitor Bellendi is always at the kessler filling station for some reason. That seems odd?
 
 I go to The Monarch and request a sit down with the controlling family and it sits me down with the family lead but the lead is not present at this location. That seems unusual. That lead is at Kesseler Filling Station...
 
+— built, and they were the same fault. A lead never had a reason to walk
+  anywhere — the evening exempts them, so wherever an errand once left them was
+  where they stayed for the rest of the game. A lead holds court at the family's
+  own seat now, and goes back to it. The sit-down happens where somebody who can
+  settle terms is standing rather than at an address that meant a family by
+  name: the club meant Bellandi and the garage meant Russo whatever either was
+  doing. If their lead is not there but a lieutenant of theirs is, you sit with
+  the lieutenant and the scene says so.
+
 ---
-
-When inside a building you own the top buttons should probably be for owner management and under a separate subtitle for management actions.
-
-## Inbox — answered
 
 Why does it seem like you can send Leo Carver on collections in practically every single building's
 action menu?
