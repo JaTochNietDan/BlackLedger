@@ -96,3 +96,31 @@ func TestTheHolderCanActuallyNameTheLimit(t *testing.T) {
 		t.Fatalf("the figure the field starts on is refused: %v", err)
 	}
 }
+
+// And the core says it for every address, not only the one a journey is
+// already underway to. The list behind the map reads this for all of them at
+// once, so a place that reports nothing is a row with no cost on it.
+func TestEveryAddressSaysWhatItCostsToReach(t *testing.T) {
+	t.Parallel()
+	w := New(61)
+	w.Event, w.District = nil, 9
+	quiet := 0
+	for _, l := range w.Public()["locations"].([]map[string]any) {
+		cross, ok := l["crossing"].(map[string]any)
+		if !ok {
+			t.Fatalf("%s says nothing at all about reaching it", l["id"])
+		}
+		if cross["minutes"].(int) < 0 {
+			t.Fatalf("%s is a negative journey away", l["id"])
+		}
+		if cross["minutes"].(int) == 0 {
+			quiet++
+			if l["id"] != w.Player.Location {
+				t.Fatalf("%s is no distance away and is not where the player is standing", l["id"])
+			}
+		}
+	}
+	if quiet != 1 {
+		t.Fatalf("%d addresses are no distance away and the player stands in one place", quiet)
+	}
+}

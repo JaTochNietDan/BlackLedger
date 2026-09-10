@@ -11,7 +11,7 @@ import {
   TextStyle,
 } from 'pixi.js';
 import {Viewport} from 'pixi-viewport';
-import type {Snapshot} from './types';
+import type {Place, Snapshot} from './types';
 import {
   addressSlot,
   along,
@@ -1441,14 +1441,38 @@ export function CityIso({
     }
   }
 
+  // The city without the map. This list is how somebody reaches an address
+  // with a keyboard, or when the drawing will not run, and it was twenty-six
+  // names in the order the city happens to hold them — no distance, no sign of
+  // which are yours, nothing to choose on. The journeys here run from ten
+  // minutes to a hundred and twenty-five, so where a place is decides most of
+  // what going there costs, and this is where that ought to be legible.
+  //
+  // Nearest first, where you are standing at the top, and the addresses that
+  // are not open to you yet at the bottom rather than sorted into the middle
+  // by a journey nobody can make.
+  const here = state.player.location;
+  const reachable = [...state.locations].sort((a, b) => {
+    const shut = (p: Place) => (p.id === here ? 0 : p.district > state.district ? 2 : 1);
+    if (shut(a) !== shut(b)) return shut(a) - shut(b);
+    return (a.crossing?.minutes ?? 0) - (b.crossing?.minutes ?? 0);
+  });
+
   return (
     <div className="city-iso" ref={host}>
       {/* The city has to be reachable without a mouse, and without WebGL. */}
       <div className="iso-reader" aria-label="City addresses">
-        {state.locations.map(p => (
+        {reachable.map(p => (
           <button key={p.id} onClick={() => onSelect(p.id)}>
             {p.name}
-            {p.district > state.district ? ' (not open to you yet)' : ''}
+            {p.owned ? ' · yours' : ''}
+            {p.id === state.player.location
+              ? ' · you are here'
+              : p.district > state.district
+                ? ' · not open to you yet'
+                : p.crossing
+                  ? ' · ' + p.crossing.minutes + ' min'
+                  : ''}
           </button>
         ))}
       </div>

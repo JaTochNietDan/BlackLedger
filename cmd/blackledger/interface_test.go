@@ -181,3 +181,29 @@ func TestTheResultBandCanCountInDays(t *testing.T) {
 		}
 	}
 }
+
+// The city without the map. Every address is reachable from a plain list of
+// buttons behind the drawing, for somebody on a keyboard or without WebGL, and
+// it was twenty-six names in whatever order the city held them: no distance, no
+// sign of which were yours, nothing to choose on. The journeys in this city run
+// from ten minutes to a hundred and twenty-five, so where a place is decides
+// most of what going there costs, and that list is where it has to be legible.
+func TestTheCityListSaysWhatEachJourneyCosts(t *testing.T) {
+	t.Parallel()
+	src := source(t, "src/CityIso.tsx")
+	if !holds(src, "p.crossing.minutes") {
+		t.Fatal("the address list names every place and says nothing about reaching any of them")
+	}
+	if !holds(src, "aria-label=\"City addresses\"") {
+		t.Fatal("the list that is the city without the map is gone")
+	}
+	// Sorted, and by the journey rather than by anything else.
+	if !holds(src, "a.crossing?.minutes ?? 0) - (b.crossing?.minutes ?? 0)") {
+		t.Fatal("the addresses are not ordered by how long it takes to reach them")
+	}
+	// And what cannot be reached is not sorted into the middle by a journey
+	// nobody can make.
+	if !holds(src, "p.district > state.district ? 2 : 1") {
+		t.Fatal("an address that is not open to the player is ordered as though it were")
+	}
+}

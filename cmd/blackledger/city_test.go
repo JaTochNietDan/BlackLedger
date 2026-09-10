@@ -101,9 +101,16 @@ func TestTheCityCanBeReadWithoutWebGL(t *testing.T) {
 	if !holds(source, "iso-reader") {
 		t.Error("the city has no text alternative, so a browser without WebGL shows an empty pane")
 	}
-	// Every address, not a selection of them.
-	if !holds(source, "state.locations.map") {
+	// Every address, not a selection of them. It reads a sorted copy rather
+	// than the city's own order now — nearest first, so the list is a way of
+	// choosing where to go rather than twenty-six names — so what this guards
+	// is that the copy is of all of them and nothing is filtered out on the
+	// way.
+	if !holds(source, "[...state.locations].sort") || !holds(source, "reachable.map") {
 		t.Error("the text alternative does not list the city's own addresses")
+	}
+	if holds(source, "state.locations.filter") {
+		t.Error("the text alternative shows a selection of the city's addresses rather than all of them")
 	}
 	// The camera must not be reset by an ordinary update: a player who has
 	// zoomed in on the docks should stay there when an hour passes.

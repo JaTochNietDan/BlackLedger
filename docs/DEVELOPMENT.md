@@ -8512,3 +8512,36 @@ Then the rest of the codebase was searched for the same shape: twelve writes to
 a loop variable ranged by value. Eleven are the copy-mutate-append idiom, where
 the mutated copy is what gets kept — grudges fading, loans falling due, chips
 settling. This was the only one where the write was lost.
+
+## Whether the map is the right way to move around the city
+
+The one thing genuinely left from the user's words, and the first thing to do
+with it was measure rather than argue. Six hundred and fifty journeys between
+the city's addresses: shortest ten minutes, median forty-five, longest a hundred
+and twenty-five, spread over twenty-three distinct lengths. Where a place is
+decides most of what going there costs, so the map is load-bearing rather than
+decoration and pulling it out would throw away a real fact.
+
+What was wrong was the other way in. Behind the drawing there is a plain list of
+buttons — the city for somebody on a keyboard, or in a browser where the
+renderer will not start — and it was twenty-six names in whatever order the city
+happened to hold them. No distance, no sign of which were yours, nothing to
+choose on. A player who wanted to go somewhere near had to know the geography by
+heart.
+
+It is nearest first now, with the minutes on each row, "yours" on the ones you
+hold, where you are standing at the top, and the addresses not open to you yet
+at the bottom rather than sorted into the middle by a journey nobody can make.
+
+The core had to be fixed to say it. `Journey` floored every trip at five
+minutes, including the trip nobody takes, so the city reported ten minutes to
+reach the room the player was standing in. Standing where you already are is no
+journey.
+
+The existing guard on that list required the old spelling and had to be
+rewritten rather than reverted: it now checks that the list is built from a
+sorted copy of every address and that nothing is filtered out of it, which is
+what it was always for.
+
+Read off 8791 after the restart: Saint Agnes 0 min, four addresses at 15, three
+at 25.

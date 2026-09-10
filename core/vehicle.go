@@ -95,6 +95,13 @@ func (w *World) Pace() float64 {
 // Journey is how long it takes the player to get somewhere, which is the whole
 // reason to own a car.
 func (w *World) Journey(from, to string) int {
+	// Standing where you already are is no journey. Everything else is at
+	// least five minutes, because two addresses on the same street are still
+	// two addresses — but the floor used to apply to the trip nobody takes, so
+	// the city reported ten minutes to reach the room the player was in.
+	if from == to {
+		return 0
+	}
 	return max(5, int(float64(TravelMinutes(from, to))*w.Pace()+.5))
 }
 
