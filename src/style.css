@@ -1179,3 +1179,7 @@ body{height:100%;overflow:hidden;margin:0;background:var(--bg);color:var(--ink);
 .cloth-cell.picked{box-shadow:inset 0 0 0 2px #f0e4b0}
 .chip-run{list-style:none;margin:6px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:4px 12px;font-size:11px;color:var(--muted)}
 .chip-run li.won{color:#9fd6a8}
+
+/* What somebody says to your face. Their words, not a status line. */
+.said{margin:8px 0 0;padding:8px 11px;font:italic 13px/1.5 var(--serif);color:#e8ddc2;
+  background:#20191399;border-left:2px solid #a3564a}

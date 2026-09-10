@@ -41,6 +41,7 @@ function Person({who, actions, render}: {who: Presence; actions: Action[]; rende
         {notes && <small className={who.overdue || who.sore ? 'warning' : 'subtle'}>{notes}</small>}
       </div>
     </header>
+    {who.says && <p className="said">{who.says}</p>}
     {available.length > 0 && <div className="actions">{available.map(render)}</div>}
     {blocked.length > 0 && <>
       <button className="reveal-blocked" aria-expanded={open} onClick={() => setOpen(o => !o)}>

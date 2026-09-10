@@ -37,6 +37,14 @@ const (
 	GrudgeFade = 1
 	// MaxGrudges bounds the save. The oldest and lightest are forgotten first.
 	MaxGrudges = 60
+	// GrudgeNews is how long a piece of bad blood is worth repeating. "I see
+	// bad blood red box at the top of the page but it never goes away and it's
+	// annoying" — because it was a standing state and it was drawn as news. It
+	// fades a point a day, so a serious grudge sat at the top of the page for a
+	// month and a half. What the player wants to hear is that two people have
+	// just fallen out; after three days it is not news, and the grudge itself
+	// goes on being true underneath.
+	GrudgeNews = 3 * 1440
 )
 
 // Resent records that one person now has a reason to dislike another. Both must
@@ -285,6 +293,10 @@ func (w *World) GrudgeSummary() []map[string]any {
 		// to hear is that two people have a problem, before one of them
 		// settles it.
 		if g.Weight < 15 {
+			continue
+		}
+		// Only what is worth saying out loud this week.
+		if w.Minute-g.Since > GrudgeNews {
 			continue
 		}
 		holder, target := w.NPC(g.Holder), w.NPC(g.Against)

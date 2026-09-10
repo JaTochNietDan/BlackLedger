@@ -5998,3 +5998,45 @@ Two breaks verified, one per half: the car, and the plate on top of it.
 Balance unchanged: deaths 0/0/50/82/83, median cash 12378/14050/7230/90/586.
 
 Evidence: `core/theirs_test.go`.
+
+## People say what they are carrying
+
+Two inbox lines, and they turned out to be one system.
+
+"I don't see a lot of cursing from characters in this game, we should increase
+that since it's with the mafia style. Characters should be able to make threats
+to you too, I have not seen that yet."
+
+"I see 'bad blood' red box at the top of the page but it never goes away and
+it's annoying."
+
+The city already knew who had a reason to dislike the player, how badly, and
+what it was about — `n.Sore` and `n.SoreAt` have been committed state for a
+while — and did nothing with it but sort a list and draw a banner.
+
+Somebody carrying something against you, standing in the same room as you, says
+so. Three levels, and the closer they are to the weight at which people actually
+move the less polite it gets. Temperament shapes it: a careful man does not make
+speeches about it, a vain one wants the room to hear, a loyal one mentions his
+people. Of 498 lines from people past that weight, 289 carried an oath.
+
+Nothing here invents a grievance. Every line is built from the weight the
+simulation committed and the reason it recorded, and only from people the player
+actually knows — a stranger with a grievance is a stranger, and this game does
+not put words in the mouths of people it has not introduced.
+
+**And the banner was a standing state drawn as news.** Bad blood fades a point a
+day, so a grudge heavy enough to be worth mentioning sat at the top of the page
+for six weeks. What is worth hearing is that two people have just fallen out, so
+it is said for three days and then stops. The grudge goes on being true
+underneath — the test checks that the headline going away does not throw the
+grudge away with it — and the person holding it now tells the player themselves.
+
+**A break that did not bite, and the fix.** Deleting the worst of the three
+levels left the test passing, because it only asked whether the top of the scale
+differed from the bottom and the top fell through to the middle. It asks for
+three distinct voices now, and the same break fails it.
+
+Balance unchanged: deaths 0/0/50/82/83, median cash 12378/14050/7230/90/586.
+
+Evidence: `core/threats_test.go`, two breaks verified.

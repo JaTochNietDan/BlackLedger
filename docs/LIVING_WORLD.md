@@ -229,17 +229,29 @@ The walking between buildings simulation is not that great right now because we 
 
 ---
 
-I don't see a lot of cursing from characters in this game, we should increase that since it's with the mafia style. Characters should be able to make threats to you too, I have not seen that yet.
-
---- 
-
-I got some gossip by getting that girl a coffee and then I see "bad blood" red box at the top of the page but it never goes away and it's annoying.
-
----
-
 When inside a building you own the top buttons should probably be for owner management and under a separate subtitle for management actions.
 
 ## Inbox — answered
+
+I don't see a lot of cursing from characters in this game, we should increase that since it's with the mafia style. Characters should be able to make threats to you too, I have not seen that yet.
+
+— built: somebody carrying something against you says so to your face, and the
+  closer they are to acting on it the less polite the saying gets. Three levels
+  of it, shaped by their temperament — a careful man does not make speeches and
+  a vain one wants the room to hear. Of 498 lines from people past the weight at
+  which people move, 289 had an oath in them.
+
+---
+
+I got some gossip by getting that girl a coffee and then I see "bad blood" red box at the top of the page but it never goes away and it's annoying.
+
+— built: it was a standing state drawn as news. Bad blood fades a point a day,
+  so a serious grudge sat at the top of the page for a month and a half. What is
+  worth hearing is that two people have just fallen out, so it says so for three
+  days and then stops. The grudge itself goes on being true underneath, and the
+  person carrying it now tells you about it themselves.
+
+---
 
 The roulette graphics look better but I think that the betting table part should be to the right of the wheel, not below it, like on a real table. You should be able to pick your specific bet amount, up to the maximum (as we talked about in another inbox item, maximum can be set by the casino owner). You can also place multiple bets in roulette, on different numbers, combinations etc, like the real game by putting down chips on each one you want to bet on.
 

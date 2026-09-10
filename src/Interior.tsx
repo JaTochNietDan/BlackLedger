@@ -198,6 +198,9 @@ export function Interior({place, people, actions, render, onLeave, onTables, fel
           </small>}
           </div>
         </header>
+        {/* What they say to your face. The core writes the line out of what
+            they are actually carrying; this only prints it. */}
+        {who.says && <p className="said">{who.says}</p>}
         <button className="plain step-away" onClick={() => setPicked('')}>
           ← Step away{premises.length + elsewhere.length > 0 ? ` · ${premises.length + elsewhere.length} other things to do here` : ''}
         </button>

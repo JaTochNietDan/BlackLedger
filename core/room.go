@@ -15,6 +15,10 @@ import "fmt"
 // Presence is one person where the player is standing, and everything the
 // player has earned the right to know about them.
 type Presence struct {
+	// Says is what this person says to the player's face, when they have
+	// something to say. Built by the core out of what they are carrying; the
+	// interface prints it and invents nothing.
+	Says    string `json:"says,omitempty"`
 	ID      string `json:"id"`
 	Name    string `json:"name"`
 	Role    string `json:"role,omitempty"`
@@ -237,6 +241,11 @@ func (w *World) see(n *NPC) Presence {
 		p.Faction = w.factionName(n.Faction)
 		p.Trust, p.Sore = n.Trust, n.Sore
 		p.Temperament = TemperamentOf(n).Label
+		// Only to your face. Somebody two miles away is not saying anything to
+		// anybody, whatever they are carrying.
+		if n.Location == w.Player.Location && !w.Travelling(n) {
+			p.Says = w.Threat(n)
+		}
 	}
 	if l := w.LoanTo(n.ID); l != nil {
 		p.Owes, p.Overdue = l.Owed, l.Missed > 0
