@@ -184,7 +184,7 @@ When I went after Tila myself, the newspaper info on the attempt showed the wron
 
 ---
 
-We should probably show options like "buy kerrigan haulage" before you can afford it instead of having it hidden.
+We should probably show options like "buy kerrigan haulage" before you can afford it instead of having it hidden. We probably should just show all hidden options tbh. Not sure if hiding them is productive.
 
 ---
 
@@ -193,6 +193,16 @@ Let's verify, can you be attacked while traversing the map? Can your car affect 
 ---
 
 When playing the slot machine we should show actual images for the stuff on the rollers. Also it seems to swap the results on the rollers at the end which is odd, they just flip around at random mid-end game. For example it shows 7-7- as it progresses then at the very end it flips to "bell", "lemon", "cherry". Sort that out.
+
+---
+
+Playing the game in the back room at the Green Baize is weird. It should again be a separate scene that takes up the screen when you're playing it and you have to leave it rather than right now it just lives in a small box above the action bar. That's silly stuff. We need to stop doing that in future and always dedicate these games to their own screen.
+
+I'd also prefer if this game was the Texas Hold Em version as it's better to play so we can fix that maybe.
+
+---
+
+While managing the Green Baize I don't see its current funds or how to add to the funds or withdraw from the funds dynamically like we talked about.
 
 ## Inbox — answered
 

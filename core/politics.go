@@ -140,12 +140,35 @@ func (w *World) ResolveSabotage(p Plot) {
 	if len(w.Player.Crew) > 0 && len(w.Tasks) == 0 && w.Player.Crew[0].Loyalty >= 50 {
 		damage = min(damage, max(10, damage-20))
 	}
+	// A room that saw them coming is a room that is ready for them: the
+	// shutters are down, the stock is out the back, and there are people
+	// standing in it. Knowing used to be worth a sentence in the report — "this
+	// matches the operation your sources uncovered" — and nothing else at all,
+	// which made both investigating and the word from your own counter flavour.
+	if p.Known {
+		if hands := len(w.Properties[p.Target].Hands); hands > 0 {
+			damage = max(damage/3, damage-ReadyFor*hands)
+		}
+	}
 	prop := w.Properties[p.Target]
 	damage = min(damage, prop.Condition)
 	prop.Condition -= damage
+	// Who turned it away, and by how much. This used to name the player's first
+	// crew member without checking there was one, because crew were the only
+	// thing that could reduce the damage. The people behind the counter can
+	// too, and the first business that defended itself without a crew panicked
+	// the game.
 	defense := ""
 	if prevented := unguarded - damage; prevented > 0 {
-		defense = fmt.Sprintf(" %s helped defend the business, preventing %d additional condition loss.", w.Player.Crew[0].Name, prevented)
+		switch {
+		case len(w.Player.Crew) > 0 && len(w.Tasks) == 0 && w.Player.Crew[0].Loyalty >= 50:
+			defense = fmt.Sprintf(" %s helped defend the business, preventing %d additional condition loss.", w.Player.Crew[0].Name, prevented)
+		case len(w.Properties[p.Target].Hands) > 0:
+			defense = fmt.Sprintf(" The place was expecting them and %s was standing in it, which cost the attack %d condition.",
+				w.HandNames(p.Target), prevented)
+		default:
+			defense = fmt.Sprintf(" Something turned %d of it away.", prevented)
+		}
 	}
 	evidence := "The attackers left no proof of who sent them."
 	if p.Known {

@@ -88,6 +88,8 @@ func (w *World) BusinessDay() {
 	// is not a position that is filled, and the count has to say so or the
 	// place goes on handling work nobody is there to do.
 	w.EmptyChairs()
+	// And what they saw from behind it.
+	w.WordFromTheCounter()
 	heat, worn := 0, []string{}
 	for _, l := range Locations {
 		prop := w.Properties[l.ID]

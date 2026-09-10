@@ -7309,3 +7309,34 @@ of seven. It asks that there are other reasons people fall out here.
 
 Baseline: deaths 0/0/52/82/78/0/37, median cash
 12585/14129/7418/90/1063/5332/2080.
+
+## What the counter sees
+
+The only way to learn that a family had commissioned an attack on a business of
+yours was to go and investigate it, so a business the player owned was a number
+that could be broken and the people standing in it were not looking out of the
+window. `WordFromTheCounter` runs every business day: somebody behind a counter
+of yours may notice the same car parked across the road three afternoons
+running, and say so. The odds are their trust in you, which is what finally
+gives the trust of an employee a job. Measured over 300 days: people who think
+well of you mentioned it 83 times, people who think nothing of you never once.
+
+And knowing had to be worth something or the word is flavour. Until this, a
+known plot changed one sentence in the report — "this matches the operation your
+sources uncovered" — and nothing else, which made investigating flavour too. A
+business that is expecting it takes less: shutters down, stock out the back, and
+people standing in the room. Measured on one sabotage against a laundry: 35
+condition off it cold, 11 off it when the counter had said something. An empty
+counter cannot be ready for anything however much warning there was.
+
+Two faults found on the way:
+
+- **A crash waiting in the sabotage report.** It named the player's first crew
+  member without checking there was one, because crew were the only thing that
+  could ever reduce the damage. The first business that defended itself without
+  a crew panicked the game. It now says who actually turned it away.
+- **The prose guard caught "the same two men in it"**, a gender nothing in the
+  city had recorded.
+
+Baseline: deaths 0/0/52/82/78/0/37, median cash
+12585/14129/7418/90/1063/5332/2080.

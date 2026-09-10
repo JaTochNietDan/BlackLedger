@@ -300,3 +300,73 @@ func (w *World) shortHanded() string {
 	}
 	return ""
 }
+
+// What the counter sees. The people behind your counters watch the street all
+// day, and somebody standing across the road from your laundry for three
+// afternoons is the sort of thing they would mention. Until this, the only way
+// to learn that a family had commissioned an attack on a business of yours was
+// to go and investigate it — so a business the player owned was a number that
+// could be broken, and the people in it were not looking out of the window.
+//
+// It also gives the trust of somebody you employ a job. A man who thinks well
+// of you tells you what he saw; a man who does not keeps his head down, which
+// is the difference between the two kinds of employee a player can have.
+
+// NoticeAt is the best odds anybody has of spotting it in a day, at full trust.
+// Kept low: a business that always sees it coming has nothing to fear, and
+// investigating would stop being worth the trip.
+const NoticeAt = .14
+
+// ReadyFor is how much of an attack each pair of hands turns away when the
+// place is expecting it.
+const ReadyFor = 9
+
+// WordFromTheCounter is one day of your people watching their own street. Called
+// every business day.
+func (w *World) WordFromTheCounter() {
+	for i := range w.Plots {
+		p := &w.Plots[i]
+		if p.Life != w.Life || p.Known || p.Target == "" {
+			continue
+		}
+		prop := w.Properties[p.Target]
+		if prop == nil || !w.Own(p.Target) || len(prop.Hands) == 0 {
+			continue
+		}
+		for _, who := range prop.Hands {
+			n := w.NPC(who)
+			if n == nil || n.Dead {
+				continue
+			}
+			// Somebody who thinks nothing of you saw the same street and said
+			// nothing about it.
+			if w.WorldRandom() >= NoticeAt*float64(n.Trust)/100 {
+				continue
+			}
+			p.Known = true
+			place, _ := PlaceByID(p.Target)
+			w.Log("A word from "+place.Name,
+				fmt.Sprintf("%s says the same car has been parked across from %s three afternoons running, and the same two people in it who never get out. Somebody is looking the place over.",
+					n.Name, place.Name), "danger")
+			break
+		}
+	}
+}
+
+// HandNames is who is behind that counter, for a sentence.
+func (w *World) HandNames(id string) string {
+	prop := w.Properties[id]
+	if prop == nil {
+		return "nobody"
+	}
+	names := make([]string, 0, len(prop.Hands))
+	for _, who := range prop.Hands {
+		if n := w.NPC(who); n != nil {
+			names = append(names, n.Name)
+		}
+	}
+	if len(names) == 0 {
+		return "nobody"
+	}
+	return joinNames(names)
+}
