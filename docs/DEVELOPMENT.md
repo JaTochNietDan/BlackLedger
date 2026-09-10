@@ -6724,3 +6724,41 @@ action offered somewhere it does not belong, but which works when pressed, is a
 different fault and this does not cover it.
 
 Evidence: `core/offered_test.go`, one break verified.
+
+## And a card that can never be pressed at all
+
+The guard above covers a card that says you may and a rule that then says you
+may not. It cannot see the first fault shape in the loop's own list: the car
+button that lived in the garage's case while its rule asked for a forecourt,
+drawn in the one room where it could never work and absent from the room where
+it would have. That card is honestly greyed out with a reason. It is just
+useless.
+
+The invariant is that an action drawn in a room must be usable in *some* room,
+in *some* state. The trick is what "some state" means, and the first version got
+it wrong: asked of one comfortable campaign it reported fourteen faults, all
+false — the tank was full, the premises fully staffed, nobody was looking at the
+player. Those are refusals that clear the moment anything changes, which is a
+button doing its job.
+
+So it asks two campaigns. One has everything: a crew, somebody signed on and not
+yet standing anywhere, premises trading at ninety-five, an account abroad that
+already answers to you. One needs everything: no crew, nobody on any door, the
+premises at forty percent and short-handed and in trouble, the tank dry, the
+suit ruined, the police interested, money abroad you have not yet proved is
+yours. Between them the state-based refusals all clear, and what is left is a
+card with nowhere to be pressed.
+
+Three hundred and fifty-three distinct actions across the two, every one of them
+usable somewhere.
+
+**Verified by reintroducing the real bug.** Moving the car button back into the
+garage's case gives exactly the historical failure: "car (garage: Nobody sells
+cars here)".
+
+Two exemptions, both stated in the code. The three ways out of a cell are drawn
+whether or not anybody is in one, because the cell is where a player learns they
+exist. So are the two things a newspaper can be made to do, which need the paper
+to take your calls first.
+
+Evidence: `core/offered_test.go`, one break verified.
