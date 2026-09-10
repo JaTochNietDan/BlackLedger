@@ -300,8 +300,29 @@ func (w *World) SitInTheBackRoom(place string, ante int) error {
 		}
 	}
 	w.Game = g
-	w.Log("A game in the back room", fmt.Sprintf("$%d a head with %s. Five cards, one draw.", ante, listNames(g.Seats)), "personal")
+	w.Log("A game in the back room", fmt.Sprintf("$%d a head with %s. Five cards, one draw.%s",
+		ante, listNames(g.Seats), w.tableRemembers(g)), "personal")
 	return nil
+}
+
+// tableRemembers is what the player is told when they sit down against people
+// they have played before. The city already knows who is carrying something
+// against them; this is the one table where they find out before the money
+// goes in rather than afterwards.
+func (w *World) tableRemembers(g *CardGame) string {
+	var holding []string
+	for _, s := range g.Seats {
+		if n := w.NPC(s.Who); grudging(n) {
+			holding = append(holding, n.Name)
+		}
+	}
+	if len(holding) == 0 {
+		return ""
+	}
+	if len(holding) == 1 {
+		return " " + holding[0] + " has not forgotten the last time."
+	}
+	return " " + joinNames(holding) + " have not forgotten the last time."
 }
 
 // take deals off the top of what is left.
@@ -604,7 +625,17 @@ const (
 	// ReadsIt is the skill above which somebody folds a hand that is behind
 	// rather than paying to be shown it.
 	ReadsIt = 45
+	// TakesItPersonally is how sore somebody has to be at the player before it
+	// changes how they sit down against them. A memory that stays in a field is
+	// worth nothing: a man you took a night's money off pays to see your hand
+	// rather than believing you, because what he wants back is what you took.
+	TakesItPersonally = 15
 )
+
+// grudging reports whether this person is playing the player rather than the
+// cards. It is the same number everything else in the city reads to decide who
+// would move against them.
+func grudging(n *NPC) bool { return n != nil && n.Sore >= TakesItPersonally }
 
 // drawNote is what the player is told when the cards have been changed: what
 // they are holding and what everybody else bought, which is all the reading
@@ -714,6 +745,9 @@ func (w *World) bettingPass() bool {
 		// with the nerve to represent one they have not got.
 		if owed == 0 {
 			bluff := n.Ambition >= BluffNerve && w.Random() < .18
+			if grudging(n) {
+				bluff = bluff || w.Random() < .12
+			}
 			s.Said = "checks"
 			if strength >= 4 || bluff {
 				put := min(g.Ante*2, w.Pockets(n))
@@ -736,7 +770,14 @@ func (w *World) bettingPass() bool {
 		}
 		// A raise, once, and only from somebody holding something and willing
 		// to say so.
-		if !g.Raised && strength >= 6 && n.Ambition >= BluffNerve {
+		// Somebody with something against the player puts it up on less, and
+		// does not need the nerve for it: wanting their money back is the
+		// nerve.
+		up := strength >= 6 && n.Ambition >= BluffNerve
+		if grudging(n) {
+			up = up || strength >= 4
+		}
+		if !g.Raised && up {
 			put := min(owed+g.Ante*2, w.Pockets(n))
 			n.Purse -= put
 			s.In += put
@@ -754,6 +795,11 @@ func (w *World) bettingPass() bool {
 		// A pair somebody can read is worth a call.
 		folds := strength <= 1 || (strength <= 2 && owed > g.Ante*2) ||
 			(strength <= 3 && n.Skill < ReadsIt && owed > g.Ante*3)
+		// A man who wants his money back pays to see the hand. He is wrong more
+		// often for it, which is what makes him worth betting into.
+		if grudging(n) && strength >= 1 {
+			folds = false
+		}
 		if folds {
 			s.Folded, s.Said = true, "throws the hand in"
 			continue

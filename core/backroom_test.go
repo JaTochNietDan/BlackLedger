@@ -706,3 +706,135 @@ func TestARoomYouHaveCleanedOutHasNoGameLeftInIt(t *testing.T) {
 		t.Fatal("a room was emptied and nobody in it minded")
 	}
 }
+
+// The memory is worth nothing if it stays in a field. A man you took a night's
+// money off does not sit down against you the same way twice: he pays to see
+// your hand rather than believing you, because what he wants back is what you
+// took. That has to be visible in the money, not in a sentence.
+func TestSomebodyYouTookMoneyOffPlaysYouHarder(t *testing.T) {
+	round := func(sore int) (int, int) {
+		called, raised := 0, 0
+		for seed := uint32(1); seed <= 1200; seed++ {
+			w, seated := backroom(t)
+			w.RNG = seed * 2654435761
+			for _, id := range seated {
+				w.NPC(id).Sore = sore
+			}
+			if err := w.SitInTheBackRoom(BackRoom, 50); err != nil {
+				t.Fatalf("no game: %v", err)
+			}
+			if err := w.ChangeCards(nil); err != nil {
+				t.Fatal(err)
+			}
+			// The player bets into them every time, so what comes back is the
+			// only thing that differs between the two runs.
+			if err := w.PlaceBet(150); err != nil {
+				t.Fatal(err)
+			}
+			for _, s := range w.Game.Seats {
+				if !s.Folded && s.In > 0 {
+					called++
+				}
+			}
+			if w.Game.Raised {
+				raised++
+			}
+			if w.Game.Facing {
+				if err := w.CallBet(); err != nil {
+					t.Fatal(err)
+				}
+			}
+		}
+		return called, raised
+	}
+	freshCalls, freshRaises := round(0)
+	soreCalls, soreRaises := round(SoreAtCards)
+	t.Logf("against a $150 bet: a fresh table calls %d times and puts it up %d, a table you have taken money off calls %d and puts it up %d",
+		freshCalls, freshRaises, soreCalls, soreRaises)
+	if soreCalls <= freshCalls {
+		t.Fatalf("people you cleaned out play you exactly as they did the first night: %d calls against %d", soreCalls, freshCalls)
+	}
+	if soreRaises <= freshRaises {
+		t.Fatalf("nobody who is sore at you ever puts it up: %d against %d", soreRaises, freshRaises)
+	}
+}
+
+// And what that is worth to the player, which is the point of it being in the
+// game rather than in a paragraph. A table that will not lay a hand down pays
+// off a good hand more often and bluffs into a bad one more often, so the same
+// player takes more off them and gives more back.
+func TestATableWithAGrudgeIsWorthMoreAndCostsMore(t *testing.T) {
+	run := func(sore int) (int, int) {
+		total, swing := 0, 0
+		for seed := uint32(1); seed <= 2000; seed++ {
+			w, seated := backroom(t)
+			w.RNG = seed * 2654435761
+			for _, id := range seated {
+				w.NPC(id).Sore = sore
+			}
+			cash := w.Player.Cash
+			if err := w.SitInTheBackRoom(BackRoom, 50); err != nil {
+				t.Fatalf("no game: %v", err)
+			}
+			if err := w.ChangeCards(roomDraw(w.Game.Mine)); err != nil {
+				t.Fatal(err)
+			}
+			put := 0
+			if Rank(w.Game.Mine).Category >= Trips {
+				put = 100
+			}
+			if err := w.PlaceBet(put); err != nil {
+				t.Fatal(err)
+			}
+			if w.Game.Facing {
+				var err error
+				if Rank(w.Game.Mine).Category < Trips {
+					err = w.FoldHand()
+				} else {
+					err = w.CallBet()
+				}
+				if err != nil {
+					t.Fatal(err)
+				}
+			}
+			moved := w.Player.Cash - cash
+			total += moved
+			if moved < 0 {
+				swing -= moved
+			} else {
+				swing += moved
+			}
+		}
+		return total, swing
+	}
+	fresh, freshSwing := run(0)
+	sore, soreSwing := run(SoreAtCards)
+	t.Logf("over 2000 hands: a fresh table is worth $%d with $%d changing hands, a table with a grudge is worth $%d with $%d changing hands",
+		fresh, freshSwing, sore, soreSwing)
+	if soreSwing <= freshSwing {
+		t.Fatalf("a table playing the player rather than the cards moved less money, not more: $%d against $%d", soreSwing, freshSwing)
+	}
+}
+
+// A player sitting down against people they have cleaned out before should be
+// told so before the money goes in, not after.
+func TestYouAreToldWhoAtTheTableRemembersYou(t *testing.T) {
+	w, seated := backroom(t)
+	w.NPC(seated[1]).Sore = SoreAtCards
+	if err := w.SitInTheBackRoom(BackRoom, 50); err != nil {
+		t.Fatalf("no game: %v", err)
+	}
+	last := w.History[len(w.History)-1]
+	if !strings.Contains(last.Text, w.NPC(seated[1]).Name) ||
+		!strings.Contains(last.Text, "not forgotten") {
+		t.Fatalf("sitting down against somebody who is sore at you read: %q", last.Text)
+	}
+	// And a fresh table says nothing of the kind.
+	fresh, _ := backroom(t)
+	if err := fresh.SitInTheBackRoom(BackRoom, 50); err != nil {
+		t.Fatal(err)
+	}
+	if body := fresh.History[len(fresh.History)-1].Text; strings.Contains(body, "not forgotten") {
+		t.Fatalf("a table nobody had played before remembered something: %q", body)
+	}
+}

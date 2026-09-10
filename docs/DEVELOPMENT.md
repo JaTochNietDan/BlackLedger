@@ -7141,3 +7141,36 @@ saying somebody has something against you.
 
 Baseline unmoved: deaths 0/0/51/82/78/0/38, median cash
 12585/14229/7376/90/1444/5361/2589.
+
+## The grudge sits down at the table
+
+A memory that stays in a field is worth nothing. Last tick a heavy loser came
+away sore at the player; this tick that changes how they sit down against them.
+Somebody carrying `TakesItPersonally` or more pays to see the hand rather than
+believing it, puts it up on less and without needing the nerve for it, and
+bluffs more often — because what he wants back is what you took.
+
+Measured against a flat $150 bet over 1,200 hands:
+
+| the table | calls | puts it up |
+| --- | --- | --- |
+| fresh | 1,606 | 132 |
+| has been cleaned out by you before | 3,180 | 666 |
+
+And what it is worth, which is why it is in the game rather than in a paragraph.
+The same player, over 2,000 hands, folding what is beaten and betting three of a
+kind or better:
+
+| the table | the player is | money changing hands |
+| --- | --- | --- |
+| fresh | +$13,400 | $179,100 |
+| carrying a grudge | +$23,100 | $199,200 |
+
+A table that will not lay a hand down pays off a good hand more often and bluffs
+into a bad one more often. So making enemies at cards is profitable at cards,
+and the price is paid somewhere else: `Sore` is the same number everything in
+this city reads to decide who would move against the player.
+
+Sitting down now says who remembers, before the money goes in rather than after.
+A fresh table says nothing of the kind, which the guard checks both ways.
+Disabling `grudging` fails three tests. Baseline unmoved.

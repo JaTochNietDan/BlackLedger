@@ -47,8 +47,9 @@ which half is standing.
    Screen in `src/Tables.tsx`, drawn inside the poolhall rather than as a
    takeover, and what a night costs somebody is remembered: a heavy loser is
    sore, somebody you paid thinks better of you, and a room can be emptied.
-   Still open: sound, and a second sitting where the same faces remember the
-   last one out loud.
+   A grudge changes how somebody plays the player: they call light, raise on
+   less and bluff more, which is worth $23,100 against $13,400 over 2,000
+   hands and costs elsewhere. Still open: sound.
 4. **The rest of the open inbox.** Wording ("establish protection" for buying a
    business), the roulette table beside the wheel rather than under it and
    multiple chips down at once, newspaper pictures, the travel bar below the
