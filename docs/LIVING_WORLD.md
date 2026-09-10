@@ -215,11 +215,22 @@ family to keep them more protected from attacks.
   plate on it, because a figure that does not agree with what happens is a lie
   told slowly.
 
----
+## Inbox — answered
 
 When inside a building you own the top buttons should probably be for owner management and under a separate subtitle for management actions.
 
-## Inbox — answered
+— built, and it turned up something worse. The block was already at the top; it
+  had no subtitle saying what it was, and inside a place of yours it now reads
+  "Running The Blue Bird" over "staff, stock, repairs and what the house takes".
+  But going looking for what belonged in it found that the grouping guard was
+  only checking that an action's group was one the interface renders — and the
+  fallback group is one it renders. So the house limit, plating a car, fuelling
+  it, taking money off your own tables, and every strike and every order to send
+  one of your own after somebody were all filed under "Jobs that pay today". A
+  hundred and sixty actions, quietly in the wrong place. They are classified now
+  and the guard asks the question it meant to ask.
+
+---
 
 We should try to improve the images being displayed on the newspaper. Having a portrait of an affected person or building would be great. Some other black and white dramatization of something would also be great if plausible.
 
