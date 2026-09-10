@@ -500,6 +500,13 @@ type World struct {
 	// A hand on the table that has not been settled. Absent whenever nobody is
 	// sitting at one, which is nearly always.
 	Hand *TableHand `json:"hand,omitempty"`
+	// How many hands the city has played in the back room without the player.
+	// Absent in saves written before the city played its own games.
+	BackRoomHands int `json:"back_room_hands,omitempty"`
+	// What the table has taken for the seat, all told. Kept apart from the
+	// room's ordinary income because a poolhall earns either way and the
+	// question worth asking is what the table itself is worth.
+	BackRoomTake int `json:"back_room_take,omitempty"`
 	// A hand of cards in the back room, against people rather than a house.
 	// Absent whenever nobody is playing, which is nearly always.
 	Game *CardGame `json:"game,omitempty"`
@@ -1894,6 +1901,7 @@ func (w *World) Advance(minutes int) {
 			w.StillDay()
 			w.CasinoDay()
 			w.TableNight()
+			w.BackRoomNight()
 			w.RouteDay()
 			w.PawnDay()
 			w.CarDay()

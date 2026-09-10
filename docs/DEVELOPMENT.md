@@ -7174,3 +7174,59 @@ this city reads to decide who would move against the player.
 Sitting down now says who remembers, before the money goes in rather than after.
 A fresh table says nothing of the kind, which the guard checks both ways.
 Disabling `grudging` fails three tests. Baseline unmoved.
+
+## The city plays its own games
+
+The back room was a game only the player had ever played in. The people standing
+in it have money, a reason to gamble it and nothing else to do of an evening,
+and the room has an owner who ought to be earning from the table whether or not
+the player is at it. `core/citygame.go` plays one hand a night among whoever
+spends the evening in the back room: five cards, one draw, no betting, and the
+money moves between their purses.
+
+The room takes `TableCharge` a seat. Not a rake — the pot stays exactly what
+everybody put in, which is the point of a game with no house in it. The house is
+renting a table. It goes to whoever holds the poolhall, the player included, and
+an address nobody holds keeps it. Measured over thirty days with the player
+holding the room: 15 hands and $416 taken for the table, against $3,814 the room
+made all told. The table is worth about a ninth of a poolhall.
+
+Somebody cleaned out at that table falls out with whoever took it, through the
+city's own grudge machinery rather than a second one written for cards.
+
+Three faults, all found by measuring rather than reading:
+
+- **The hand was played at midnight, when everybody has gone home.** One hand in
+  thirty days. It asks whose evening the poolhall is rather than who is standing
+  in it as the day turns over.
+- **Everybody who lost fell out with the winner.** Nine of this city's sixteen
+  grudges were about a card game inside two months. One person a night now, and
+  only somebody who cannot sit down again: four of twelve.
+- **The shuffle ran on the world's own stream.** Fifty-one draws a night taken
+  out from under everything else the city does off-screen. Nothing was wrong
+  with the cards and everything downstream of them moved, which surfaced as
+  `TestACarPaysForItselfInWorkDone` failing — a car netted $11,482 against
+  $11,618 on foot where it had been ahead. That the car's margin is that thin is
+  worth knowing, but a card game in a poolhall should not be able to decide it.
+  The unwatched game runs on a stream of its own, derived from the seed and the
+  day, and touches neither of the city's two.
+
+With that third stream the baseline is where it was: deaths 0/0/51/82/78/0/38,
+median cash 12585/14229/7376/90/1451/5361/2589, and only the thief moved, by
+$7, from the new grudges.
+
+### A guard changed, with the reason
+
+`TestBadBloodStopsBeingNews` advanced a week and asserted the whole gossip
+summary was empty. The city now falls out over its own card games while that
+week passes, so an empty page would mean nothing had happened in seven days
+rather than that this quarrel had stopped being news. It asks about the quarrel
+it created.
+
+### The queue, checked
+
+Item 4 of `docs/LOOP.md` listed eight things from the user's inbox. Seven are
+answered in `docs/LIVING_WORLD.md` — the wording, the roulette cloth and
+multiple chips, the travel bar, cursing and threats, the bad blood box, the
+family lead, and Leo Carver's collections. What is genuinely left is one
+question: whether the map is the right way to move around the city at all.

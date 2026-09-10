@@ -50,12 +50,19 @@ which half is standing.
    A grudge changes how somebody plays the player: they call light, raise on
    less and bluff more, which is worth $23,100 against $13,400 over 2,000
    hands and costs elsewhere. Still open: sound.
-4. **The rest of the open inbox.** Wording ("establish protection" for buying a
-   business), the roulette table beside the wheel rather than under it and
-   multiple chips down at once, newspaper pictures, the travel bar below the
-   fold, cursing and threats from characters, a "bad blood" box that never
-   clears, a family lead who sits you down somewhere he is not, and why Leo
-   Carver can be sent on collections from every building in the city.
+4. **The rest of the open inbox.** Checked this tick and nearly all of it is
+   built: the wording, the roulette cloth and multiple chips, the travel bar,
+   cursing and threats, the bad blood box, the family lead, and Leo Carver's
+   collections are all answered in `docs/LIVING_WORLD.md`. What is genuinely
+   left from the user's words is one question: **whether the map is the right
+   way to move around the city at all**.
+5. **The city playing its own games.** Built: one hand a night among whoever
+   spends the evening in the back room, a seat charge to whoever holds the
+   poolhall, and a falling-out for whoever is cleaned out (`core/citygame.go`).
+   An unwatched game runs on a third RNG stream of its own — shuffling off
+   `WorldRNG` moved everything else the city does off-screen. Still open: the
+   same for the other rooms, and whether the city should gamble at the tables
+   it does not own.
 
 ---
 
@@ -141,7 +148,7 @@ each other and the run is race-clean.
 
 Balance baseline, seven strategies
 (worker/investor/defiant/reckless/thief/smuggler/racketeer):
-deaths 0/0/51/82/78/0/38, median cash 12585/14229/7376/90/1444/5361/2589.
+deaths 0/0/51/82/78/0/38, median cash 12585/14229/7376/90/1451/5361/2589.
 `mise run simulate > <scratchpad>/sim.json` then **parse** the JSON; grepping it
 is useless. Each strategy also reports `mean_heat`, `seizures` and `runs_hurt`,
 because deaths and cash cannot tell a safe policy from one whose money is taken

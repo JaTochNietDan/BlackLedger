@@ -126,10 +126,16 @@ func TestBadBloodIsNewsAndStopsBeingNews(t *testing.T) {
 	if len(w.GrudgeSummary()) == 0 {
 		t.Fatal("fresh bad blood was not worth hearing about")
 	}
-	// A week later nobody is still talking about it.
+	// A week later nobody is still talking about it. Asked about this quarrel
+	// rather than about the summary being empty: the city now falls out over
+	// its own card games while the week passes, so an empty page would mean
+	// nothing had happened in seven days rather than that this had stopped
+	// being news.
 	w.Advance(GrudgeNews + 1440)
-	if len(w.GrudgeSummary()) != 0 {
-		t.Fatalf("the same bad blood is still at the top of the page: %+v", w.GrudgeSummary())
+	for _, line := range w.GrudgeSummary() {
+		if line["holder"] == a.Name && line["against"] == b.Name {
+			t.Fatalf("the same bad blood is still at the top of the page: %+v", line)
+		}
 	}
 	// And it is still there in the world, because it did not stop being true.
 	held := false
