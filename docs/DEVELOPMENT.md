@@ -6690,3 +6690,37 @@ Balance, seven strategies: deaths 0/0/51/82/76/0/38, median cash
 12405/14156/7230/90/567/5160/2008.
 
 Evidence: `core/informant_test.go`, `sim/campaign.go`.
+
+## An action offered as available must actually work
+
+The browser has been unreachable all session — the extension reports it is not
+connected — so the loop's own rule about playtesting every other tick has gone
+unmet for the whole of it. The answer to that is not to claim the interface is
+fine. It is to make the headless suite catch what a person pressing buttons
+would have caught.
+
+This is the fault shape the project keeps hitting and had no guard for. The car
+button lived in the garage's case while its rule asked for a forecourt. The
+holder's button to set the house limit was offered with no field on it, so it
+sent an amount of nothing and `SetLimit` refused it every single time. Both were
+found by a person pressing them.
+
+`TestEveryActionOfferedCanActuallyBeTaken` builds a rich campaign — three
+premises, a crew, a car, a suit, stock, money, standing — and walks every
+address in reach. For every action the city offers as **available**, it presses
+it on a copy, typing whatever a card with a figure starts on. Six hundred and
+fifteen actions, and every one of them worked.
+
+**Verified by reintroducing the real bug.** Deleting the house limit's field
+gives exactly the historical failure: "1 of 615 actions were offered as
+available and then refused: casino/limit: a house limit runs from $20 to $5000".
+
+**What it does not catch, stated plainly.** I also tried offering the car button
+at the garage again, and the guard passed — correctly. That action is offered
+there *and greyed out with a reason*, because `CarReadiness` asks about the
+place. A card that is refused on its face is honest; this guard is about the
+worse case, a card that says you may and a rule that then says you may not. An
+action offered somewhere it does not belong, but which works when pressed, is a
+different fault and this does not cover it.
+
+Evidence: `core/offered_test.go`, one break verified.
