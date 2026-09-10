@@ -72,6 +72,12 @@ func (w *World) routine(n *NPC) (errand, bool) {
 	}
 	if Evening(w.Minute) {
 		where := haunt(n.ID)
+		// Unless somebody has put a night on within walking distance, which is
+		// the whole of what paying for a band buys. One night: tomorrow they
+		// are back where they always are.
+		if on := w.theNight(n.Location); on != "" {
+			where = on
+		}
 		if where == n.Post || where == n.Location {
 			return errand{}, false
 		}

@@ -6812,3 +6812,33 @@ Balance, seven strategies: deaths 0/0/52/82/77/0/38, median cash
 12405/14231/7544/90/1403/5505/1936.
 
 Evidence: `core/footfall_test.go`.
+
+## Putting a night on
+
+A room's takings depend on who is standing in it now, which left an owner with
+an empty room and nothing to do about it. This is the oldest answer there is:
+pay for a band and a barrel, and the people who would have drunk somewhere else
+drink here instead.
+
+It moves actual people. A number that went up without anybody walking through
+the door would be the same abstraction the takings were last week. And the
+promise the routine makes — that a person drinks in the same place every evening
+for the rest of their life, so a player can learn where to find them — is kept,
+because a night is one night. Tomorrow they are back where they always are.
+
+Only somewhere people drink can hold one, only the holder can pay for it, and
+only within forty minutes' walk: a band is a reason to go a bit further, not to
+cross the city.
+
+**A guard that could not fail, caught by breaking it.** The first version of the
+test watched the club before and after the evening came, and it passed with the
+draw deleted — because the bar, the club and the casino fill up every night
+whether anybody paid for a band or not. It was measuring the evening. It now
+runs the same city twice from the same seed, one with a night and one without,
+and compares them at the same minute. With the draw deleted it fails.
+
+Balance unchanged across all seven strategies, which is expected: no policy in
+the harness owns a room people drink in and thinks to pay for a band.
+
+Evidence: `core/night_test.go`, one break verified after the first one did not
+bite.

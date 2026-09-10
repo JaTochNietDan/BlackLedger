@@ -246,6 +246,9 @@ type Property struct {
 	// When the till was last taken, and when a car was last taken apart in the
 	// street outside. A place remembers being robbed: it is what stops the same
 	// drawer being emptied every forty-five minutes.
+	// The minute a night runs until: a band, a barrel and the word going round,
+	// which is what an owner does about an empty room.
+	Night    int `json:"night,omitempty"`
 	Robbed   int `json:"robbed,omitempty"`
 	Stripped int `json:"stripped,omitempty"`
 	// Limit is the most this room will take on one bet, set by whoever holds
@@ -1491,6 +1494,13 @@ func (w *World) Actions(id string) []Action {
 					}
 					add("post", "Put somebody on the door", PostingMinutes, 0, w.PostReadiness(id), detail)
 				}
+			}
+			// An empty room is a room taking nothing, and this is the oldest
+			// answer to one. It moves people rather than a number.
+			if PlaysHost(id) {
+				asks("night", "Put a night on", NightMinutes, NightCost, w.NightReadiness(id),
+					fmt.Sprintf("$%d on a band, a barrel and the word going round. For one evening the people who drink within %d minutes' walk drink here instead, and what a room takes is who is standing in it.",
+						NightCost, NightDraw))
 			}
 			add("repair", "Repair the property", 60, 50, need(w.Properties[id].Condition >= 100, "Already in good condition"), "Restore 40 condition.")
 		} else {

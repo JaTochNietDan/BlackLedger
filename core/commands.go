@@ -522,6 +522,10 @@ func (w *World) apply(c Command) error {
 				if err := w.BuyVehicle(); err != nil {
 					return err
 				}
+			case "night":
+				if err := w.PutOnANight(target); err != nil {
+					return err
+				}
 			case "plate":
 				if err := w.FitPlate(target); err != nil {
 					return err
