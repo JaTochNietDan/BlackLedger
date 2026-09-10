@@ -188,6 +188,16 @@ INDEPENDENT
 
 When I went after Tila myself, the newspaper info on the attempt showed the wrong portait.
 
+— built. The paper worked out who a story was about by reading its own headline
+  back and returning the first person in the city whose name appeared in it, so
+  a headline naming two people — which is most of what a paper about people
+  going after each other prints — was illustrated with whichever of them the
+  city happened to list first. The core knew whose story it was when it filed it
+  and threw that away. A story carries its subject now, and everything that
+  files one about a person says who: the attempt, the killing, the arrest, the
+  obituary and the city hall death. Headlines written before this still get read
+  back, because those stories are still in the archive.
+
 ---
 
 We should probably show options like "buy kerrigan haulage" before you can afford it instead of having it hidden. We probably should just show all hidden options tbh. Not sure if hiding them is productive.

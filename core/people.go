@@ -228,7 +228,7 @@ func (w *World) Kill(id, cause string) bool {
 	if person.Rank >= RankLieutenant {
 		headline = strings.ToUpper(person.Name) + " KILLED"
 	}
-	w.Report("killing", headline, cause+" "+describeStanding(person, w)+". Police say enquiries are continuing.")
+	w.ReportAbout("killing", headline, cause+" "+describeStanding(person, w)+". Police say enquiries are continuing.", person.ID)
 	w.witnessKilling(person, cause, headline)
 	if led != "" {
 		w.Succeed(led)

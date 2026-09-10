@@ -127,7 +127,7 @@ func (w *World) ObituaryDay() {
 			continue
 		}
 		headline, body := w.obituary(n)
-		w.Report("obituary", headline, body)
+		w.ReportAbout("obituary", headline, body, n.ID)
 	}
 }
 

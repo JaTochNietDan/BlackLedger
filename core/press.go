@@ -25,6 +25,16 @@ type Subject struct {
 // name premises and people in capitals, which is what makes this readable
 // rather than a second record that could disagree with the first.
 func (w *World) SubjectOf(s Story) Subject {
+	// Whoever filed it said who it was about, so there is nothing to work out.
+	// Everything below this is for stories written before a story could say.
+	if s.About != "" {
+		if n := w.NPC(s.About); n != nil {
+			return Subject{Kind: "person", ID: n.ID, Name: n.Name}
+		}
+		if place, ok := PlaceByID(s.About); ok {
+			return Subject{Kind: "place", ID: place.ID, Name: place.Name}
+		}
+	}
 	headline := strings.ToUpper(s.Headline)
 
 	// Premises first: a place is the more specific thing when a headline names

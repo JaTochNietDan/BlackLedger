@@ -29,6 +29,14 @@ type Story struct {
 	// same model the same question again gets the same answer, and the paper is
 	// not going to sit there re-asking about Tuesday's weather forever.
 	Polished bool `json:"polished,omitempty"`
+	// Who the story is about, when the thing that filed it knew. The paper used
+	// to work this out by reading its own headline back and returning the first
+	// person in the city whose name appeared in it, so a headline naming two
+	// people — which is most of what a paper about people going after each
+	// other prints — was illustrated with whichever of them the city happened
+	// to list first. Absent on every story filed before this, which is why
+	// SubjectOf still reads the headline when it is empty.
+	About string `json:"about,omitempty"`
 }
 
 // newsCapacity bounds the archive. Measured: a city at war files a little over
@@ -49,6 +57,13 @@ const newsCapacity = 240
 // saying it happened seven times, and that piece is a better story than any one
 // of them.
 func (w *World) Report(kind, headline, body string) {
+	w.ReportAbout(kind, headline, body, "")
+}
+
+// ReportAbout files a story and says whose it is. Everything that knows the
+// answer should use this: a paper that has to guess from its own prose will
+// eventually guess wrong, and it did.
+func (w *World) ReportAbout(kind, headline, body, about string) {
 	if prior := w.todayStory(kind, headline); prior != nil {
 		prior.Count++
 		prior.Minute = w.Minute
@@ -57,7 +72,7 @@ func (w *World) Report(kind, headline, body string) {
 	}
 	w.News = append(w.News, Story{
 		ID: ID(), Minute: w.Minute, Life: w.Life,
-		Headline: headline, Body: body, Kind: kind, Count: 1,
+		Headline: headline, Body: body, Kind: kind, Count: 1, About: about,
 	})
 	w.trimNews()
 }

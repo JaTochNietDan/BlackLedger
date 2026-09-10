@@ -153,8 +153,8 @@ func (w *World) finishThem(n *NPC, hand Hand, where string, crowd int, family *F
 		w.Player.Respect += StrikeRespect
 	}
 	w.Witness("gunfight", n.Location, name+" was killed at "+where+".", "")
-	w.Report("killing", "KILLING AT "+upper(where),
-		w.unattributed(where, fmt.Sprintf("%s was found dead at %s. Police have no arrest and describe the killing as targeted.", name, where)))
+	w.ReportAbout("killing", "KILLING AT "+upper(where),
+		w.unattributed(where, fmt.Sprintf("%s was found dead at %s. Police have no arrest and describe the killing as targeted.", name, where)), n.ID)
 	if family != nil {
 		family.Goodwill = max(-100, family.Goodwill-40)
 		w.RetaliationFrom(family.ID)
@@ -175,8 +175,8 @@ func (w *World) itWentWrong(n *NPC, hand Hand, where string, family *Faction) {
 		family.Goodwill = max(-100, family.Goodwill-25)
 		w.RetaliationFrom(family.ID)
 	}
-	w.Report("attempt", "ATTEMPT ON THE LIFE OF "+upper(n.Name),
-		w.unattributed(where, fmt.Sprintf("%s survived an attack at %s. Police say the assault was targeted and no arrest has been made.", n.Name, where)))
+	w.ReportAbout("attempt", "ATTEMPT ON THE LIFE OF "+upper(n.Name),
+		w.unattributed(where, fmt.Sprintf("%s survived an attack at %s. Police say the assault was targeted and no arrest has been made.", n.Name, where)), n.ID)
 
 	if !hand.Crew {
 		// You were there, and it can be the end of you.
@@ -210,8 +210,8 @@ func (w *World) itWentWrong(n *NPC, hand Hand, where string, family *Faction) {
 			hurt.Held = w.Minute + 3*1440
 		}
 		w.Player.Crew = nil
-		w.Report("arrest", "ARREST AFTER ATTACK ON "+upper(n.Name),
-			"Somebody taken at the scene is assisting police with their enquiries. Sources suggest a name has been given.")
+		w.ReportAbout("arrest", "ARREST AFTER ATTACK ON "+upper(n.Name),
+			"Somebody taken at the scene is assisting police with their enquiries. Sources suggest a name has been given.", n.ID)
 		if family != nil {
 			family.Goodwill = max(-100, family.Goodwill-45)
 			w.RetaliationFrom(family.ID)

@@ -7557,3 +7557,31 @@ tests, and paying the seat charge to the player instead of the room fails four.
 
 Baseline unmoved: deaths 0/0/52/82/78/0/37, median cash
 12585/14129/7418/90/1063/5332/2080.
+
+## The paper reading its own headline back
+
+"When I went after Tila myself, the newspaper info on the attempt showed the
+wrong portrait."
+
+`SubjectOf` worked out who a story was about by upper-casing its headline and
+returning the first person in `w.NPCs` whose name appeared in it. A headline
+naming two people — which is most of what a paper about people going after each
+other prints — was illustrated with whichever of them the city happened to list
+first. The core knew whose story it was at the moment it filed it and threw that
+away, which is the fault shape of the interface stating something the core does
+not have, seen from the other side: the core deriving from prose what it already
+knew as a fact.
+
+`Story.About` carries it. `ReportAbout` files with a subject and `Report` is now
+that with an empty one, so nothing else had to change. Everything that files a
+story about a person says who: the attempt, the killing, the arrest, the
+obituary and the city hall death. Stories written before this still have their
+headlines read back, because they are still in the archive and that is all they
+have.
+
+The premises rule survives where it should. A headline naming a room is still a
+picture of the room when nothing said otherwise — "KILLED AT THE MONARCH" is a
+photograph of The Monarch — and a story filed about a person beats it.
+
+Disabling the recorded subject fails two guards. Baseline unmoved: deaths
+0/0/52/82/78/0/37, median cash 12585/14129/7418/90/1063/5332/2080.

@@ -292,8 +292,8 @@ func (w *World) resolveContract(c Contract) {
 	}
 	// Taken alive, and questioned.
 	w.Player.Heat = min(100, w.Player.Heat+25)
-	w.Report("arrest", "ARREST AFTER ATTACK ON "+strings.ToUpper(person.Name),
-		"Somebody taken at the scene is said to be assisting police with their enquiries. Sources suggest they have given a name.")
+	w.ReportAbout("arrest", "ARREST AFTER ATTACK ON "+strings.ToUpper(person.Name),
+		"Somebody taken at the scene is said to be assisting police with their enquiries. Sources suggest they have given a name.", person.ID)
 	if f := w.faction(person.Faction); f != nil {
 		f.Goodwill = max(-100, f.Goodwill-45)
 		w.RetaliationFrom(f.ID)

@@ -276,8 +276,8 @@ func (w *World) OfficialKilled(id string) {
 		f.Cash = max(0, f.Cash-1200)
 	}
 	w.Log("They will turn the city over", fmt.Sprintf("%s is dead. Everybody in this city with a name is going to spend the next month explaining where they were, and that includes you.", o.Name), "danger")
-	w.Report("police", "CITY REELS AS "+upper(o.Name)+" IS KILLED",
-		fmt.Sprintf("%s, %s, was killed today. The police have announced what they describe as an unprecedented operation against organized crime in the city. No arrests have been made.", o.Name, o.Role))
+	w.ReportAbout("police", "CITY REELS AS "+upper(o.Name)+" IS KILLED",
+		fmt.Sprintf("%s, %s, was killed today. The police have announced what they describe as an unprecedented operation against organized crime in the city. No arrests have been made.", o.Name, o.Role), o.ID)
 }
 
 // RetainerDescription is what the player is paying for, for the interface.
