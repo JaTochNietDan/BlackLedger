@@ -220,3 +220,56 @@ func TestAnOlderSaveIsDrivingSomethingThatRuns(t *testing.T) {
 		t.Fatalf("migration left the car at %d", w.CarCondition())
 	}
 }
+
+// "When I go to the car dealership I don't see any option to buy cars."
+//
+// The button lived in the garage's own case in the room switch, and the rule
+// behind it asks for a forecourt: at a garage it was offered and permanently
+// refused, and at the forecourt it was never offered at all. A rule and its
+// button asking two different questions, which is the same fault that made
+// CarSource and CarWorkshop one function in the first place.
+func TestTheForecourtOffersTheCarsAndTheGarageDoesNot(t *testing.T) {
+	w := New(11)
+	w.District = 2
+	w.Player.Cash, w.Player.Respect, w.Player.Health = 4000, 40, 100
+	offered := func(place string) (Action, bool) {
+		w.Player.Location = place
+		for _, a := range w.Actions(place) {
+			if a.ID == "car" {
+				return a, true
+			}
+		}
+		return Action{}, false
+	}
+	lot := ""
+	for _, l := range Locations {
+		if l.Kind == "dealer" {
+			lot = l.ID
+			break
+		}
+	}
+	if lot == "" {
+		t.Fatal("this city sells no cars anywhere")
+	}
+	a, ok := offered(lot)
+	if !ok {
+		t.Fatal("the forecourt does not offer a car")
+	}
+	if a.Disabled {
+		t.Errorf("standing on the forecourt with $4,000: %q", a.Reason)
+	}
+	if _, ok := offered("garage"); ok {
+		t.Error("a garage offers cars for sale; a garage works on the one you have")
+	}
+	// And the one thing a garage does have is still there.
+	w.Player.Location = "garage"
+	work := false
+	for _, act := range w.Actions("garage") {
+		if act.ID == "service" {
+			work = true
+		}
+	}
+	if !work {
+		t.Error("the garage stopped working on cars")
+	}
+}

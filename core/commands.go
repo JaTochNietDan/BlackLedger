@@ -272,6 +272,22 @@ func (w *World) apply(c Command) error {
 				return err
 			}
 			w.Advance(a.Minutes)
+		} else if mark, ok := strings.CutPrefix(c.Kind, "strike:"); ok {
+			// Resolved before the clock moves, so an attempt that kills the
+			// player cannot also collect the hour it never survived.
+			if err := w.Strike(mark, w.OwnHands()); err != nil {
+				return err
+			}
+			w.Advance(a.Minutes)
+		} else if mark, ok := strings.CutPrefix(c.Kind, "send:"); ok {
+			hand, ok := w.CrewHands()
+			if !ok {
+				return fmt.Errorf("you have nobody to send")
+			}
+			if err := w.Strike(mark, hand); err != nil {
+				return err
+			}
+			w.Advance(a.Minutes)
 		} else if c.Kind == "fill" {
 			if err := w.FillUp(target); err != nil {
 				return err

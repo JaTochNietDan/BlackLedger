@@ -918,14 +918,6 @@ func (w *World) Actions(id string) []Action {
 		about(driver)
 	case "garage":
 		add("audience", "Request an audience with Russo", 45, 0, w.AudienceReadiness(id), "Discuss your standing with the Russo Outfit.")
-		if next, ok := nextVehicle(p.Car); ok {
-			hides := "Nothing to hide anything in."
-			if next.Compartment > 0 {
-				hides = fmt.Sprintf("A false floor a search will not find %d units under.", next.Compartment)
-			}
-			asks("car", "Buy "+lowerFirst(next.Label), 60, next.Cost, w.CarReadiness(),
-				fmt.Sprintf("$%d, then $%d a day to keep on the road. %s Journeys take %d%% of the time they take on foot. %s A car outside is a thing witnesses describe.", next.Cost, next.Upkeep, next.Detail, int(next.Pace*100), hides))
-		}
 		fee := w.ServiceFee()
 		// With no car there is no condition to state, and "currently 0 of 100"
 		// reads as a wreck in the yard rather than as nothing at all.
@@ -1033,6 +1025,21 @@ func (w *World) Actions(id string) []Action {
 			fmt.Sprintf("You are showing %d and the dealer is showing %d. Over %d and it is finished.", w.Hand.Player, w.Hand.Dealer, Bust))
 		add("stand", "Stand on "+fmt.Sprint(w.Hand.Player), 5, 0, "",
 			fmt.Sprintf("The dealer draws to %d and stands on %d. A tie gives your money back.", DealerStands-1, DealerStands))
+	}
+	// Cars are sold on a forecourt. This lived in the garage's own case, where
+	// it was offered and then permanently refused by a rule that asks for a
+	// forecourt — and the forecourt, which is where the rule points, never
+	// offered it at all. A button and its rule have to be asking the same
+	// question.
+	if CarSource(id) {
+		if next, ok := nextVehicle(p.Car); ok {
+			hides := "Nothing to hide anything in."
+			if next.Compartment > 0 {
+				hides = fmt.Sprintf("A false floor a search will not find %d units under.", next.Compartment)
+			}
+			asks("car", "Buy "+lowerFirst(next.Label), 60, next.Cost, w.CarReadiness(),
+				fmt.Sprintf("$%d, then $%d a day to keep on the road. %s Journeys take %d%% of the time they take on foot. %s A car outside is a thing witnesses describe.", next.Cost, next.Upkeep, next.Detail, int(next.Pace*100), hides))
+		}
 	}
 	if Pumps(id) {
 		short := FuelFull - w.Fuel()
@@ -1150,6 +1157,25 @@ func (w *World) Actions(id string) []Action {
 			}
 			add("mug:crew", "Send "+hand.Name+" after "+mark.Name, MuggingMinutes, 0, reason,
 				fmt.Sprintf("The same $%d and worse odds, and it is their face rather than yours. %s holds it against them instead.", w.Pockets(mark), mark.Name))
+			about(mark.ID)
+		}
+	}
+	// Going after somebody who is standing here. Two buttons, because they are
+	// two different bets: your own hands and your own risk, or somebody else's
+	// face and what happens to them if it goes wrong.
+	for _, who := range w.PeopleHere(id) {
+		mark, ok := w.StrikeTarget(who.ID)
+		if !ok {
+			continue
+		}
+		add("strike:"+mark.ID, "Go after "+mark.Name+" yourself", StrikeMinutes, 0, w.StrikeReadiness(mark.ID),
+			fmt.Sprintf("Your own hands, and the best odds you can get: what you are carrying and what you are worth both count. It can kill you, a room with people in it remembers your face, and %s answers for %s either way.",
+				w.factionOrStreet(mark), theirOrTheir(mark)))
+		about(mark.ID)
+		if hand, ok := w.CrewHands(); ok {
+			reason := w.SendReadiness(mark.ID)
+			add("send:"+mark.ID, "Send "+hand.Name+" after "+mark.Name, StrikeMinutes, 0, reason,
+				fmt.Sprintf("Their face at the scene rather than yours, on worse odds than your own. Taken alive they are known to be yours and they give you up; sometimes they do not come back at all."))
 			about(mark.ID)
 		}
 	}

@@ -181,16 +181,32 @@ seem to hit my home when I'm not there and they are coming after me.
 
 ---
 
-Why can't I attempt to take people out? How does that work? I thought we talked
-before about fleshing out the ability to either send a family member after
-someone to kill them or to attempt to kill them myself, where doing it myself
-comes with much greater risk of my own injury or death based on my skills and
-equipment. If you send someone of your own then there's a chance they are killed
-or captured and then they could be interrogated and give you up as the assailant
-or they would know who they are and who they are working on behalf of and send
-them to sleep with the fishies anyways.
+I thought we added car sales so you could buy new cars that would increase you traversal speed
+but when I go to the car dealership I don't see any option to buy cars.
 
-— answered: only the paid-contract path exists. Going yourself, and sending one of your own, do not
+It would also be good if we generated nice car images to show what you're buying and stats
+information about the speed of the car relevant to what it gives to you.
+
+You should probably also be able to outfit your car with protection like armor etc at a garage
+which will help you survive attacks when traversing out in the streets.
+
+We could probably also extend to be able to provide cars, and armor the cars for people in our
+family to keep them more protected from attacks.
+
+— part built: the missing button is fixed. Cars were offered in the garage's own case in
+  the room switch and refused there by a rule that asks for a forecourt, and the forecourt
+  never offered them at all — a button and its rule asking two different questions. They
+  are on the forecourt now. Car pictures, what a car is worth in speed, armour at a garage,
+  and cars for your own people are all still to do.
+
+---
+
+It seems like you can rob places or take from people's cars multiple times in a row, that should
+probably be tracked and time limited etc. Or in the case of the car - until that person repairs
+their car or gets a new car, which is a dynamic living NPC thing they could do when their car is
+in a damaged state.
+
+— not started
 
 ## Inbox — answered
 
@@ -247,3 +263,18 @@ Add a gas station business to the inbox, probably multiple locations. Sells gas
 that cars need and it sells other stuff that usual gas stations sell.
 
 — built: two filling stations, and petrol a car actually burns (6d18d9f)
+
+---
+
+Why can't I attempt to take people out? How does that work? I thought we talked
+before about fleshing out the ability to either send a family member after
+someone to kill them or to attempt to kill them myself, where doing it myself
+comes with much greater risk of my own injury or death based on my skills and
+equipment. If you send someone of your own then there's a chance they are killed
+or captured and then they could be interrogated and give you up as the assailant
+or they would know who they are and who they are working on behalf of and send
+them to sleep with the fishies anyways.
+
+— built: going after somebody yourself, and sending one of your own
+  (core/strike.go). Yours are the best odds you can buy and the only ones that can kill
+  you; sending puts their face at the scene, and taken alive they are known to be yours.
