@@ -37,9 +37,11 @@ which half is standing.
 1. **Sound, and a better bandit.** `src/sound.ts` synthesises noises in-browser
    with no assets. The slot machine wants a real case, a payline, a coin tray
    and strips that roll rather than one face per drum, plus ambient room sound.
-2. **Cars.** Still open: pictures of what you are buying, and what a car is
-   worth in speed stated honestly. Plate is built for the player's own car and
-   for your people's (`core/plate.go`, `core/theirs.go`).
+2. **Cars.** Speed is stated honestly already: the forecourt quotes a real
+   journey from where the player is standing, in minutes on foot against
+   minutes in the car being sold, and says when plate is weighing the figure
+   down. Still open: pictures of what you are buying. Plate is built for the
+   player's own car and for your people's (`core/plate.go`, `core/theirs.go`).
 3. **A back-room card game** whose other players are people from the city.
    Built: Texas hold'em behind the poolhall, no house and no edge,
    seats filled from whoever is in the room, four streets of betting with one

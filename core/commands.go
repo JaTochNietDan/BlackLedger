@@ -339,6 +339,11 @@ func (w *World) apply(c Command) error {
 				return err
 			}
 			w.Advance(a.Minutes)
+		} else if who, ok := strings.CutPrefix(c.Kind, "ask:"); ok {
+			if err := w.AskTheCounter(who); err != nil {
+				return err
+			}
+			w.Advance(a.Minutes)
 		} else if who, ok := strings.CutPrefix(c.Kind, "poach:"); ok {
 			into := w.shortHanded()
 			if into == "" {

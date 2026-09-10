@@ -1,6 +1,9 @@
 package core
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 // A business's staff was a number. You hired a pair of hands, the wage bill went
 // up, and nobody in Bellwether had a job: the person behind the counter of a
@@ -369,4 +372,85 @@ func (w *World) HandNames(id string) string {
 		return "nobody"
 	}
 	return joinNames(names)
+}
+
+// Asking the counter. The people behind yours have names, a wage and a view of
+// the street, and until now nothing to say: they noticed a car parked across
+// the road on their own schedule and the player could not ask. Everything in
+// the answer is a fact the city already holds — who has been in, what the trade
+// is doing, whether somebody is looking the place over — so this is a way of
+// reading the world through somebody who lives in it rather than a new source
+// of anything.
+
+// AskReadiness explains why this person will not answer, or returns "".
+func (w *World) AskReadiness(who string) string {
+	n := w.NPC(who)
+	if n == nil || n.Dead {
+		return "There is nobody here by that name"
+	}
+	at := w.EmployerOf(who)
+	if at == "" {
+		return n.Name + " does not work for anybody"
+	}
+	if !w.Own(at) {
+		return n.Name + " works for " + w.HolderName(at)
+	}
+	if n.Location != at || w.Travelling(n) {
+		return n.Name + " is not behind the counter"
+	}
+	return ""
+}
+
+// AskTheCounter is what they saw from behind it.
+func (w *World) AskTheCounter(who string) error {
+	if reason := w.AskReadiness(who); reason != "" {
+		return fmt.Errorf("%s", reason)
+	}
+	n := w.NPC(who)
+	at := w.EmployerOf(who)
+	place, _ := PlaceByID(at)
+	prop := w.Properties[at]
+
+	said := []string{}
+	// The thing worth saying first, if there is one.
+	for _, p := range w.Plots {
+		if p.Life == w.Life && p.Target == at && !p.Known {
+			p.Known = true
+		}
+		if p.Life == w.Life && p.Target == at {
+			said = append(said, "There has been a car across the road three afternoons running, and nobody gets out of it.")
+			break
+		}
+	}
+	switch {
+	case prop.Trouble:
+		said = append(said, "Something has gone wrong in the back and nobody has put it right.")
+	case prop.Staff < handsWanted(at):
+		said = append(said, fmt.Sprintf("There are %d of us doing the work of %d.", prop.Staff, handsWanted(at)))
+	case prop.Supply == 0:
+		said = append(said, "We are out of nearly everything.")
+	}
+	if n := w.Footfall(at); n > 0 {
+		said = append(said, fmt.Sprintf("%s through the door today.", counted(n, "person", "people")))
+	} else {
+		said = append(said, "Nobody at all today.")
+	}
+	if n.Sore > 0 {
+		said = append(said, "They say it without looking at you.")
+	} else if n.Trust >= 40 {
+		said = append(said, "They seem glad you asked.")
+	}
+	w.Log(n.Name+" behind the counter",
+		fmt.Sprintf("At %s. %s", place.Name, strings.Join(said, " ")), "personal")
+	n.Trust = min(100, n.Trust+2)
+	return nil
+}
+
+// handsWanted is how many positions this business has, and none where it is not
+// a business that runs on people.
+func handsWanted(id string) int {
+	if trade, ok := TradeOf(id); ok {
+		return trade.Hands
+	}
+	return 0
 }

@@ -7739,3 +7739,31 @@ the race detector is the evidence rather than my reading of it.
 
 A tick now costs 25 seconds while iterating and 63 before a commit, against 210
 when this started.
+
+## Asking the counter
+
+The people behind your counters have names, a wage and a view of the street, and
+nothing to say. They notice a car parked across the road on their own schedule;
+a player standing in front of one could not ask.
+
+`AskTheCounter` is a question filed under the person rather than work the
+premises needs doing. Everything in the answer is a fact the city already holds:
+somebody looking the place over, trouble in the back, positions unfilled, stock
+gone, how many came through the door today, and whether they say it looking at
+you or not. It is a way of reading the world through somebody who lives in it
+rather than a new source of anything, and asking costs them nothing and gains
+them two points of trust.
+
+**A guard that did not cover the path it was named for.** The question is only
+offered inside a room you hold, so breaking the check on who somebody works for
+failed nothing — the panel was hiding the fault. It calls `AskTheCounter` on a
+rival's employee directly now, and the same break reports that Pia Iordan works
+for a rival and answered.
+
+Also checked rather than assumed, and the queue is corrected: a car's speed is
+already stated honestly. The forecourt quotes a real journey from where the
+player is standing, in minutes on foot against minutes in the car being sold,
+and says so when plate is weighing the figure down. What is left of that queue
+item is pictures.
+
+No balance run: nothing here can move it.

@@ -1665,6 +1665,20 @@ func (w *World) Actions(id string) []Action {
 			fmt.Sprintf("$%d up front and $%d a day. Adds to what your organization is worth in a fight, stands in front of what comes at you, and can decide one morning that it is not worth it.", SigningCost, MemberWage))
 		break
 	}
+	// Somebody of yours behind this counter, and what they saw from it. Filed
+	// under the person, because it is a question for them rather than work the
+	// premises needs doing.
+	if w.Own(id) {
+		for _, who := range w.Properties[id].Hands {
+			n := w.NPC(who)
+			if n == nil || n.Dead || n.Location != id {
+				continue
+			}
+			add("ask:"+who, "Ask "+n.Name+" what they have seen", 10, 0, w.AskReadiness(who),
+				"They stand here all day. What comes through the door, what has gone wrong in the back, and anybody who has been looking the place over.")
+			about(who)
+		}
+	}
 	// Somebody standing here who works behind somebody else's counter. Money is
 	// the whole of the argument, and it is the cheapest way a business war gets
 	// fought without anybody being shot.
