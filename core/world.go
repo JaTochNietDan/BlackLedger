@@ -1466,6 +1466,19 @@ func (w *World) Actions(id string) []Action {
 		// crew", which is the other button — and that one is offered from
 		// anywhere, by ordersAbout, because giving it does not put you in the
 		// building. This one does, so it is only here.
+		// The quiet version of the same idea, and the one that uses the fact
+		// that a business is people. It costs the holder the same trade for a
+		// couple of days and leaves nothing anybody can point at.
+		//
+		// Only where there is actually somebody to lean on. Offered everywhere
+		// it was refused in every room in the city, which is noise rather than
+		// a thing to want — the guard for exactly that caught it.
+		if prop := w.Properties[id]; prop != nil && len(prop.Hands) > 0 {
+			holder := w.HolderName(id)
+			add("frighten", "Put the wind up the people at "+l.Name, FrightenMinutes, 0, w.FrightenReadiness(id),
+				fmt.Sprintf("One of them stops turning up, and %s %s short-handed until they find somebody. No damage and no crew: what it costs you is that they remember your face and %s %s less of you.",
+					holder, Agree(holder, "is", "are"), holder, Agree(holder, "thinks", "think")))
+		}
 		add("sabotage", "Move against "+l.Name+" yourself", 90, 0, w.SabotageReadiness(id),
 			fmt.Sprintf("Go in with your crew against %s. Damages the property, weakens %s and costs you standing with them. They will retaliate, and a failed attempt injures you.", l.Name, f.Name))
 		_ = f

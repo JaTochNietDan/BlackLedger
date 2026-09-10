@@ -617,6 +617,10 @@ func (w *World) apply(c Command) error {
 				if err := w.Hire(target); err != nil {
 					return err
 				}
+			case "frighten":
+				if err := w.Frighten(target); err != nil {
+					return err
+				}
 			case "wage":
 				if err := w.SetWage(target, c.Amount); err != nil {
 					return err

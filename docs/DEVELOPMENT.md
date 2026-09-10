@@ -8091,3 +8091,28 @@ hands to 1 with nothing having happened", and last tick's exact wage formula
 reports the same of the butcher.
 
 The fault shape is now in the brief where the next tick will read it.
+
+## The quiet way to move against a business
+
+Moving against a business meant damaging the property: go in with the crew, take
+the condition off it, and wait for the answer. That was the loud option and the
+only one. A business is people now — named, standing in a room, with a wage and
+a view of the street — so there is a quiet one.
+
+`Frighten` puts one of them off coming in. The counter is short-handed for two
+days, the family thinks less of the player by `FrightenGalls`, and the person
+carries `FrightenedOff` away from it: they remember the afternoon somebody came
+into where they work. Nothing is broken, which is the point of doing it that
+way, and the room witnesses it, because rooms talk.
+
+Which one is whoever is standing there. Picking the most useful of them would be
+the player reading a list rather than walking into a shop.
+
+**Two guards caught it, both about the interface rather than the rule.** Offered
+in every room, it was refused in every one of them — `TestNoActionIsOfferedOnlyWhereItIsRefused`
+reported it as drawn everywhere and available nowhere, which is noise rather than
+a thing to want. It is offered where there is actually somebody behind a counter.
+And the description read "Vera Kohl's people thinks less of you", which the
+prose guard has caught before; both sentences agree their verbs now.
+
+Baseline unmoved: no campaign policy walks into a rival's shop to lean on it.

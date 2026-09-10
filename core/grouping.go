@@ -59,7 +59,7 @@ var actionGroup = map[string]string{
 	"recruit": "people", "crew_bonus": "people", "contact": "people",
 
 	// Work that can go wrong.
-	"rob": "street", "mug": "street", "sabotage": "street", "move": "street",
+	"rob": "street", "mug": "street", "sabotage": "street", "move": "street", "frighten": "street",
 	"incite": "street", "provoke": "street", "takeover": "street", "charge": "street",
 	"plant": "street", "strip": "street",
 
