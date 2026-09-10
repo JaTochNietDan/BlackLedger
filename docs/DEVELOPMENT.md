@@ -6352,3 +6352,52 @@ thing to fix rather than to measure.
 claim made in this file can be checked against a run rather than asserted.
 
 Evidence: `sim/city_test.go`, one break verified.
+
+## A city somebody else is competing for
+
+The corrected measure said the families held nineteen percent of the city after
+two months and twenty-five after sixteen. Three quarters of it answered to
+nobody, permanently.
+
+Nothing in the rules ever took an unheld shop. Property moved between families
+in a war, a splinter walked off with one holding, and a family that had lost
+everything could start again on unheld ground. A family in good order never
+grew. Layer 1 of `docs/LIVING_WORLD.md` says organizations own income-earning
+property and layer 4 says war creates the openings a player exploits; neither is
+true of a map nobody wants.
+
+`ConsiderExpansion` is a family in good order leaning on somewhere that answers
+to nobody: forty-five power, three hundred and twenty of their own money, the
+nearest unheld address to their own seat so a family grows outward from where it
+already is. One a turn, off the world's own stream, because the player is not
+party to it. And a family already holding a quarter of the city stops — past
+that they are not expanding, they are winning.
+
+**That cap was not enough on its own**, and the measurement said so: once there
+was more to take, war seizures carried one family to sixty-one percent by eight
+months and it stayed there. So the other half of this slice is that a family
+which has won too much fractures from the inside. Splintering was only ever
+weakness, fighting, or having nobody left to fight — which is half of why
+anybody breaks away. The other half is a lieutenant looking at how much there is
+and how little of it is his.
+
+| 12 cities | Organizations hold | Largest one |
+|---|---|---|
+| 60 days | 52% | 28% |
+| 240 days | 65% | 57% |
+
+Holdings changing hands over a season went from 22 to 104. Organizations formed
+went from 11 to 15.
+
+Two breaks verified, one per half: with expansion disabled the city sits at
+nineteen percent again, and with the overgrown rule removed one family reaches
+sixty-one percent and the guard fails.
+
+**And the prose guard earned its keep again.** The headline read VERA KOHL'S
+PEOPLE TAKES OVER THE PAPER MOON. A family name can be plural, `Agree` exists
+for exactly that, and the scan that reads every passage in the game found it in
+four different city states.
+
+Balance: deaths 0/0/51/82/77, median cash 12405/14156/7230/90/547.
+
+Evidence: `core/expansion.go`, `sim/city_test.go`.

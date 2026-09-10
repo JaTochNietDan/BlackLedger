@@ -64,3 +64,36 @@ func TestACityDoesNotCollapseIntoOneOwner(t *testing.T) {
 		t.Fatalf("%d cities ended with nobody alive in them", dead)
 	}
 }
+
+// A city nobody is fighting over is as dead as a city somebody has won.
+//
+// The concentration guard above was written the wrong way round. Counting only
+// owners that resolve to a live organization, families held nineteen percent of
+// the city after two months and twenty-five percent after sixteen — three
+// quarters of it answering to nobody, permanently. Nothing in the rules took an
+// unheld shop except a family that had lost everything and was starting again.
+// Layer 1 says organizations own income-earning property; layer 4 says war
+// creates the openings a player exploits. Neither is true of a map nobody wants.
+func TestOrganizationsGrowIntoTheCity(t *testing.T) {
+	const cities = 12
+	for _, days := range []int{60, 240} {
+		organised, worst := 0, 0
+		for seed := uint32(1); seed <= cities; seed++ {
+			r := City(seed*2654435761, days)
+			organised += r.Organised
+			if r.Biggest > worst {
+				worst = r.Biggest
+			}
+		}
+		mean := organised / cities
+		t.Logf("after %d days organizations hold %d%% of the city, the largest of them %d%%", days, mean, worst)
+		if mean < 40 {
+			t.Fatalf("after %d days the families hold %d%% of the city and nobody is fighting over the rest", days, mean)
+		}
+		// And the other end of the same question, which is why this is one
+		// test: growing into the city must not mean eating it.
+		if worst >= 60 {
+			t.Fatalf("after %d days one organization holds %d%% of the city", days, worst)
+		}
+	}
+}

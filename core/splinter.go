@@ -95,7 +95,25 @@ func (w *World) splinterReady(f *Faction) bool {
 			unopposed = false
 		}
 	}
-	return weakened || fighting || unopposed
+	// And so does one that has won too much of the city. This was only ever
+	// weakness, which is half of why anybody breaks away: the other half is a
+	// lieutenant looking at how much there is and at how little of it is his.
+	// Measured before it was written — once families started taking premises
+	// that answered to nobody, one of them held sixty-one percent of the city
+	// after eight months and kept it, which is a city with a winner and nothing
+	// left to play.
+	return weakened || fighting || unopposed || w.overgrown(f)
+}
+
+// OvergrownShare is the share of the city's earning addresses past which a
+// family is worth breaking up from the inside.
+const OvergrownShare = 35
+
+// overgrown reports whether a family holds enough of the city that somebody in
+// it is doing the arithmetic.
+func (w *World) overgrown(f *Faction) bool {
+	total := w.earningAddresses()
+	return total > 0 && len(w.FamilyHoldings(f.ID))*100/total >= OvergrownShare
 }
 
 // Splinter breaks a new organization out of an existing one, taking a holding
