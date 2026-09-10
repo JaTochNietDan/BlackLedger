@@ -43,8 +43,8 @@ type TableHand struct {
 	// a table drawing playing cards would have been drawing cards nobody had
 	// dealt. Absent in saves written before the deck had faces, which read as a
 	// hand whose cards are not known; the totals are still true of it.
-	Mine   []Card `json:"mine,omitempty"`
-	Theirs []Card `json:"theirs,omitempty"`
+	Mine   []Card `json:"mine"`
+	Theirs []Card `json:"theirs"`
 	// What happened, kept on the hand after it is settled. A finished hand used
 	// to stop being described at all: the felt vanished the instant the dealer
 	// turned their card over, so the one moment the player was waiting for —

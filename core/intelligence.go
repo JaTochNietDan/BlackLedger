@@ -138,13 +138,13 @@ type PublicFaction struct {
 	LeaderID string `json:"leader_id,omitempty"`
 	// Holdings is the ground they are standing on, by name. Premises are the
 	// most public thing an organization has: anybody can walk past them.
-	Holdings []string `json:"holdings,omitempty"`
+	Holdings []string `json:"holdings"`
 	// Members is how many people answer to them, and Seats the number of those
 	// the player could actually put a name to.
 	Members, Known int `json:"-"`
 	People         int `json:"people,omitempty"`
 	// Fighting is who they are at war or at odds with, in words.
-	Fighting []string `json:"fighting,omitempty"`
+	Fighting []string `json:"fighting"`
 	// Standing is what their goodwill means, said plainly.
 	Standing string `json:"standing,omitempty"`
 	// Yours is whether this is the player's own organization.

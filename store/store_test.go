@@ -4,6 +4,8 @@ import (
 	"blackledger/core"
 	"encoding/json"
 	"path/filepath"
+	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -157,5 +159,57 @@ func TestASaveThatNeverHeardOfAnAddressGetsOneOnLoad(t *testing.T) {
 	}()
 	if w.Public() == nil {
 		t.Fatal("the world read back as nothing")
+	}
+}
+
+// A save written before a field existed has nothing under its name, and Go
+// reads nothing as a nil slice, which goes down the wire as `null` for the view
+// to count and blank on. Loading fills them, so an old campaign is no more
+// dangerous to open than a new one.
+func TestAnOldSaveComesBackWithEveryListFilled(t *testing.T) {
+	t.Parallel()
+	w, err := decode(`{"version":1,"life":1,"seed":7,"properties":{},"npcs":[]}`)
+	if err != nil {
+		t.Fatal(err)
+	}
+	empty := []string{}
+	findNil(reflect.ValueOf(w), "", &empty, map[uintptr]bool{})
+	if len(empty) > 0 {
+		t.Fatalf("an old save came back with %d lists that are nothing rather than empty: %s",
+			len(empty), strings.Join(empty[:min(6, len(empty))], ", "))
+	}
+}
+
+func findNil(v reflect.Value, path string, out *[]string, seen map[uintptr]bool) {
+	switch v.Kind() {
+	case reflect.Pointer, reflect.Interface:
+		if v.IsNil() {
+			return
+		}
+		if v.Kind() == reflect.Pointer {
+			if seen[v.Pointer()] {
+				return
+			}
+			seen[v.Pointer()] = true
+		}
+		findNil(v.Elem(), path, out, seen)
+	case reflect.Struct:
+		for i := 0; i < v.NumField(); i++ {
+			if v.Type().Field(i).IsExported() {
+				findNil(v.Field(i), path+"/"+v.Type().Field(i).Name, out, seen)
+			}
+		}
+	case reflect.Slice:
+		if v.IsNil() {
+			*out = append(*out, path)
+			return
+		}
+		for i := 0; i < v.Len() && i < 3; i++ {
+			findNil(v.Index(i), path+"/*", out, seen)
+		}
+	case reflect.Map:
+		for _, key := range v.MapKeys() {
+			findNil(v.MapIndex(key), path+"/*", out, seen)
+		}
 	}
 }

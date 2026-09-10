@@ -8399,3 +8399,36 @@ rather than to pile on security the player can simply drop.
 
 Balance moved a little and nothing broke: racketeer deaths 47 to 45, racketeer
 cash $979 to $967, publican $1,693 to $1,728.
+
+## Every list is a list
+
+The view blanked on a hand of cards because the core sent it nothing where it
+had been promised a list: `Board []Card` carried `omitempty`, so before the flop
+the key was simply not there and `cards.board.length` is a blank screen rather
+than an empty table. That was fixed where it happened. This is the shape behind
+it.
+
+Go has two ways of sending a list that is empty and neither of them is a list.
+`omitempty` leaves the key out, and a slice nothing has been put in is written
+as `null`. Either one asks the view to know which fields do that, guard each one
+by hand, and go on remembering as the core grows — and it only takes one to
+blank the screen.
+
+So the core does not do either any more. `omitempty` came off all twenty-four
+list fields, and `core/lists.go` walks the world and gives every empty one a
+body: at `New`, so a fresh campaign is clean, and on load, so an old save is no
+more dangerous to open than a new one. It is not called from `Public`, because
+reading must not change the world and there is a test that says so.
+
+Three guards, each broken to check it bites. No list field in the core may carry
+`omitempty` — putting it back on `grudges` fails. Nothing the API sends may be
+null unless its name is on a short list of things that really are absent rather
+than empty, a scene nobody is in or a hand nobody has played — turning off the
+fill fails it on `player/retainers`. And an old save comes back with every list
+filled — turning off the fill on load leaves 72 of them nothing.
+
+The load-time fill found a crash of its own on the way: a save with no tables in
+it at all walks into `SetMapIndex` on a nil map. Filling now steps over a map
+nothing has been put in.
+
+Live payload on 8791 after the restart: no nothings anywhere the view counts.

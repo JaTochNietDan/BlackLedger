@@ -133,7 +133,7 @@ type Spin struct {
 	Done   bool   `json:"done"`
 	// Every chip that was on the cloth. A spin from before the table took more
 	// than one bet has none, and reads by Bet and Down as it always did.
-	Chips []Chip `json:"chips,omitempty"`
+	Chips []Chip `json:"chips"`
 }
 
 // SpinReadiness explains why the wheel cannot be played, or returns "".

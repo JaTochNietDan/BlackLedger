@@ -190,10 +190,10 @@ func (w *World) EmptyChairs() {
 // they do not hold: a rival's payroll is not public.
 func (w *World) HandsDescription(id string) []map[string]any {
 	prop := w.Properties[id]
+	out := []map[string]any{}
 	if prop == nil || !w.Own(id) || len(prop.Hands) == 0 {
-		return nil
+		return out
 	}
-	out := make([]map[string]any, 0, len(prop.Hands))
 	for _, who := range prop.Hands {
 		n := w.NPC(who)
 		if n == nil {

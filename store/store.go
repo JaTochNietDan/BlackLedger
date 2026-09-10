@@ -59,6 +59,10 @@ func decode(data string) (*core.World, error) {
 		// would have no customers in it for the rest of the campaign.
 		w.SettleCars()
 		w.SettleFuel()
+		// And every list is a list. A save written before a field existed has
+		// nothing under its name, and Go reads nothing as a nil slice, which
+		// goes down the wire as `null` for the view to count and blank on.
+		w.FillLists()
 	}
 	if e == nil && w.Version < core.SaveVersion {
 		// Campaigns begun before the city had holdings, people and quarrels.

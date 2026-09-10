@@ -85,7 +85,7 @@ type Person struct {
 	Charges int `json:"charges,omitempty"`
 	// Standing arrangements with people in the building. Absent in saves from
 	// before there was a building.
-	Retainers []string `json:"retainers,omitempty"`
+	Retainers []string `json:"retainers"`
 	// What the player has asked about lately, and when what they were told
 	// stops being current. Absent in saves from before anybody could ask.
 	Enquiries map[string]int `json:"enquiries,omitempty"`
@@ -241,7 +241,7 @@ type Property struct {
 	// it is right to read a count; this is the same number as a list of people
 	// who live in this city. Absent in saves written before anybody had a job,
 	// which read as a business whose staff are nobody in particular.
-	Hands []string `json:"hands,omitempty"`
+	Hands []string `json:"hands"`
 	// When this counter can find somebody again. Whoever walked out of it does
 	// not come back the same morning, and the city does not hand you a
 	// replacement before you have noticed the gap. Absent in saves written
@@ -276,7 +276,7 @@ type Property struct {
 	// What has been fitted to a residence. It belongs to the building rather
 	// than to whoever lives there. Absent in saves written before that was
 	// possible, which is a place with nothing in it.
-	Comforts []string `json:"comforts,omitempty"`
+	Comforts []string `json:"comforts"`
 	// A room under the floor with crates in it, and how many. Absent
 	// everywhere else and in saves from before there was such a room.
 	Armoury bool `json:"armoury,omitempty"`
@@ -428,7 +428,7 @@ type VisualCue struct {
 	// Actors are the people who were in it. Their ids travel with their names
 	// because a face is drawn from an id, and a scene about somebody that
 	// cannot show them is a scene about nobody.
-	Actors []CueActor `json:"actors,omitempty"`
+	Actors []CueActor `json:"actors"`
 	// Gravity is how much it is worth stopping for, so the interface never has
 	// to guess which of five things in one command is the one to show.
 	Gravity int `json:"gravity,omitempty"`
@@ -441,9 +441,9 @@ type VisualCue struct {
 // not what it cost — so the interface could only ever show the city's minutes
 // and never the player's decision.
 type Result struct {
-	Cues []VisualCue `json:"cues,omitempty"`
+	Cues []VisualCue `json:"cues"`
 	// Who came into or left the room while this was being done.
-	Comings []Coming `json:"comings,omitempty"`
+	Comings []Coming `json:"comings"`
 	// Action is what the player chose, in their own words, and Kind its id.
 	Action  string   `json:"action,omitempty"`
 	Kind    string   `json:"kind,omitempty"`
@@ -464,7 +464,7 @@ type World struct {
 	// What walked in or out of the room the player is standing in during this
 	// command. Like VisualCues, it belongs to the command rather than the save.
 	Comings        []Coming             `json:"-"`
-	Arrangements   []ArrangementMemory  `json:"arrangements,omitempty"`
+	Arrangements   []ArrangementMemory  `json:"arrangements"`
 	NextPressure   int                  `json:"next_pressure,omitempty"`
 	Version        int                  `json:"version"`
 	ID             string               `json:"id"`
@@ -479,28 +479,28 @@ type World struct {
 	Factions       []Faction            `json:"factions"`
 	NPCs           []NPC                `json:"npcs"`
 	Properties     map[string]*Property `json:"properties"`
-	Conflicts      []Conflict           `json:"conflicts,omitempty"`
-	Goods          []Good               `json:"goods,omitempty"`
+	Conflicts      []Conflict           `json:"conflicts"`
+	Goods          []Good               `json:"goods"`
 	// Money sent out of the city. Deliberately on the world rather than the
 	// player, because it outlives them; new_life resets the player and leaves
 	// this standing.
 	Offshore  int        `json:"offshore,omitempty"`
-	Contracts []Contract `json:"contracts,omitempty"`
+	Contracts []Contract `json:"contracts"`
 	// Things of the player's sitting behind a pawnbroker's counter. Tied to one
 	// protagonist: nobody inherits somebody else's ticket.
-	Tickets []Ticket `json:"tickets,omitempty"`
+	Tickets []Ticket `json:"tickets"`
 	// Standing work an organization has asked for. Tied to one protagonist:
 	// nobody inherits somebody else's obligations.
-	Commissions []Commission `json:"commissions,omitempty"`
+	Commissions []Commission `json:"commissions"`
 	// What people in this city hold against each other. Absent in saves from
 	// before anybody remembered anything.
-	Grudges []Grudge `json:"grudges,omitempty"`
+	Grudges []Grudge `json:"grudges"`
 	// Understandings the player has with organizations. Tied to one
 	// protagonist: nobody inherits somebody else's friends.
-	Pacts []Pact `json:"pacts,omitempty"`
+	Pacts []Pact `json:"pacts"`
 	// Money out with somebody's name on it. Tied to one protagonist, because a
 	// debt is owed to a man and not to an address.
-	Loans []Loan `json:"loans,omitempty"`
+	Loans []Loan `json:"loans"`
 	// How hard the city as a whole is looking, which is nobody's attention in
 	// particular and everybody's problem. Absent in older saves, which is a
 	// city that has not been counting.
@@ -546,11 +546,11 @@ type World struct {
 	// The dice, and the point if there is one. Absent whenever nobody is at the
 	// table, which is nearly always.
 	Dice  *Craps  `json:"dice,omitempty"`
-	News  []Story `json:"news,omitempty"`
+	News  []Story `json:"news"`
 	Plots []Plot  `json:"plots"`
 	Tasks []Task  `json:"tasks"`
 	// Where the people doing those tasks were standing when they were sent.
-	Homes      []TaskHome `json:"homes,omitempty"`
+	Homes      []TaskHome `json:"homes"`
 	Event      *Scene     `json:"event"`
 	History    []Record   `json:"history"`
 	Dead       []Death    `json:"dead"`
@@ -573,7 +573,7 @@ type Command struct {
 	// Chips is a whole cloth at once: what a roulette table actually takes,
 	// which is as many bets as somebody can reach, all settled against the same
 	// pocket. Empty means the old single bet on Choice and Amount.
-	Chips []Chip `json:"chips,omitempty"`
+	Chips []Chip `json:"chips"`
 }
 
 // Sum is a figure the player types on an action card, bounded by what the core
@@ -763,6 +763,9 @@ func New(seed uint32) *World {
 	w.Antagonize("bellandi", "russo", 50)
 	w.SettlePurses()
 	w.SettleCars()
+	// Every list is a list from here on, even the empty ones, so nothing the
+	// view counts arrives as nothing.
+	w.FillLists()
 	w.Log("A room. A name. No protection.", "Mara Bell left word at Saint Agnes: there is work, if you can be discreet. Your room costs $15 each midnight.", "personal")
 	return w
 }
@@ -2221,7 +2224,7 @@ type Proposal struct {
 	Operation   string     `json:"operation"`
 	Outcome     string     `json:"outcome"`
 	Beneficiary string     `json:"beneficiary,omitempty"`
-	Approaches  []Approach `json:"approaches,omitempty"`
+	Approaches  []Approach `json:"approaches"`
 }
 
 func (w *World) ValidateProposal(p Proposal) (*Scene, error) {
