@@ -8314,3 +8314,8 @@ it and what it runs on come with it".
 
 Breaking it reports "a laundry just taken over has 3 of 3 positions filled and 0
 names".
+
+It is worth more than it sounds: the publican's median went from $915 to $1,700,
+because a business now starts earning what a staffed business earns on the day
+it is bought rather than the day after, and its manager can be appointed the
+same morning. Every other policy moved by tens, which is the world stream.
