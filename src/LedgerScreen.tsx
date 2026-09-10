@@ -123,6 +123,27 @@ export function LedgerScreen({
               </div>
             )}
           </div>
+          {/* What is already unpaid, above the breakdown, because the day's
+              costs are what is owed and this is where it has already gone
+              wrong. Wages are the last thing the night gives up and the only
+              one with people on the other side of it: a week of this and
+              somebody stops coming in, and nobody new takes the job until it
+              is paid. */}
+          {!!b.behind?.length && (
+            <ul className="books-behind" aria-label="Premises behind on wages">
+              {b.behind.map(w => (
+                <li key={w.id} className={w.shut ? 'warning shut' : 'warning'}>
+                  <b>{w.place}</b>
+                  <small>
+                    {w.nights === 1 ? 'one night unpaid' : w.nights + ' nights unpaid'}
+                    {w.shut
+                      ? ' · nobody will take the job until it is paid'
+                      : ' · ' + w.hands + ' of ' + w.positions + ' still coming in'}
+                  </small>
+                </li>
+              ))}
+            </ul>
+          )}
           <details className="books-lines">
             <summary>What the {money(b.costs)} a day is</summary>
             <ul>

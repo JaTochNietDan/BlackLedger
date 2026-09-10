@@ -243,3 +243,30 @@ func TestTheBackRoomIsNotSilent(t *testing.T) {
 		t.Fatal("nothing knows what chips sound like")
 	}
 }
+
+// And the ledger draws it. The core can hold a fact the interface never puts on
+// a page, which is the same as not holding it.
+func TestTheLedgerDrawsWhatIsBehind(t *testing.T) {
+	t.Parallel()
+	src := source(t, "src/LedgerScreen.tsx")
+	if !holds(src, "b.behind?.length") {
+		t.Fatal("the ledger never asks whether anything is behind")
+	}
+	if !holds(src, "b.behind.map") {
+		t.Fatal("the ledger knows something is behind and does not say which premises")
+	}
+	if !holds(src, "nobody will take the job until it is paid") {
+		t.Fatal("a place nobody will work at reads the same as one that is a night late")
+	}
+	// Above the breakdown of the day's costs, because what is owed and what has
+	// already gone wrong are not the same thing and the second one is the one
+	// to act on.
+	behind := strings.Index(src, "books-behind")
+	lines := strings.Index(src, "books-lines")
+	if behind < 0 || lines < 0 || behind > lines {
+		t.Fatal("what is already unpaid is drawn below the breakdown of what is owed")
+	}
+	if !holds(source(t, "src/style.css"), ".books-behind li.shut") {
+		t.Fatal("a place nobody will work at is drawn exactly like one a night behind")
+	}
+}

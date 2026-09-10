@@ -8570,3 +8570,27 @@ that has shrunk, so a new hand being dealt is not heard as cards landing.
 Every one of the five broken in turn and each fails its own line: no hum, no
 card, the count taken from something other than the core's board, the first look
 treated as a deal, and the chips unscored in the synthesiser.
+
+## The ledger says what is already unpaid
+
+Five nights of rules about wages, and the page whose whole job is "what am I
+worth and what is this costing me" said nothing about the one cost that has
+already gone wrong. The day's lines are what the player owes. Being behind on
+the wages is where they have already failed to pay it, and it is the only cost
+in the book with people on the other side of it: a week of it and somebody stops
+coming in, and nobody new takes the job until it is paid.
+
+The books now carry every premises that is behind, with the nights against it,
+how many of its positions are still being stood in, and whether the word is out.
+The ledger draws them above the breakdown of the day's costs, because what is
+owed and what has already gone wrong are not the same thing and the second is
+the one to act on. A place nobody will work at is drawn darker than one a night
+late.
+
+Three breaks, three failures. Listing nothing fails on sixty days of paying
+nobody naming no premises. Listing everything the player holds fails on a player
+who pays every bill being told they are behind. Taking the block out of the
+ledger fails on the page never asking.
+
+Read off 8791 after the restart: nothing behind, which is what a campaign that
+pays its way should say.

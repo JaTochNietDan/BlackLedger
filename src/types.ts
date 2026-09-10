@@ -488,6 +488,14 @@ export interface Snapshot {
     costs: number;
     net: number;
     lines: {label: string; amount: number; detail?: string}[];
+    behind: {
+      id: string;
+      place: string;
+      nights: number;
+      hands: number;
+      positions: number;
+      shut: boolean;
+    }[];
     cash: number;
     sheltered: number;
     lent: number;

@@ -92,3 +92,60 @@ func TestNothingIsListedThatCostsNothing(t *testing.T) {
 		}
 	}
 }
+
+// The page whose whole job is "what am I worth and what is this costing me"
+// said nothing about the one cost that has already gone wrong. The day's lines
+// are what the player owes; being behind on the wages is where they have
+// already failed to pay it, and it is the only one with people on the other
+// side: a week of it and somebody stops coming in, and nobody new takes the job
+// until it is paid.
+func TestTheBooksSayWhichPremisesAreBehind(t *testing.T) {
+	t.Parallel()
+	w, id := unpaidRun(t)
+	if behind := w.Books()["behind"].([]map[string]any); len(behind) != 0 {
+		t.Fatalf("a laundry bought this morning is already behind on its wages: %v", behind)
+	}
+	for day := 0; day < 60; day++ {
+		w.Event = nil
+		w.Advance(1440)
+		w.Event = nil
+	}
+	behind := w.Books()["behind"].([]map[string]any)
+	if len(behind) != 1 {
+		t.Fatalf("sixty days of paying nobody and the books name %d premises", len(behind))
+	}
+	row := behind[0]
+	if row["id"] != id {
+		t.Fatalf("the books are behind on %v rather than on the laundry", row["id"])
+	}
+	if row["nights"].(int) < PatienceRunsOut {
+		t.Fatalf("the books say %v nights against a place nobody will work at", row["nights"])
+	}
+	if !row["shut"].(bool) {
+		t.Fatal("the books do not say that nobody will take the job")
+	}
+	if row["positions"].(int) == 0 {
+		t.Fatal("the books cannot say how many are missing, because they do not say how many it takes")
+	}
+}
+
+// And a player who pays has nothing there, which is the ordinary case: an empty
+// warning above the day's costs would be a page crying wolf every morning.
+func TestTheBooksOfAPlayerWhoPaysAreQuiet(t *testing.T) {
+	t.Parallel()
+	w := New(61)
+	w.Event, w.District = nil, 9
+	w.Player.Health, w.Player.Respect = 100, 30
+	w.Player.Location, w.Player.Cash = "laundry", 200000
+	if err := w.apply(Command{Kind: "acquire", Target: "laundry", RequestID: "buyitandpaythebooks"}); err != nil {
+		t.Fatal(err)
+	}
+	for day := 0; day < 20; day++ {
+		w.Event = nil
+		w.Advance(1440)
+		w.Event = nil
+	}
+	if behind := w.Books()["behind"].([]map[string]any); len(behind) != 0 {
+		t.Fatalf("a player who pays every bill is told they are behind: %v", behind)
+	}
+}

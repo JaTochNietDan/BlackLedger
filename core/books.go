@@ -62,7 +62,28 @@ func (w *World) Books() map[string]any {
 		costs += l.Amount
 	}
 
+	// And what is behind. The day's costs are what the player owes; this is
+	// where they have already failed to pay it. Wages are the last thing the
+	// night gives up and the only one with people on the other side of it: a
+	// week of this and somebody stops coming in, and nobody new will take the
+	// job until it is paid. The page whose whole job is "what is this costing
+	// me" was the one place in the game that did not say so.
+	behind := []map[string]any{}
+	for _, l := range Locations {
+		prop := w.Properties[l.ID]
+		if prop == nil || !w.Own(l.ID) || prop.Unpaid == 0 {
+			continue
+		}
+		place, _ := PlaceByID(l.ID)
+		behind = append(behind, map[string]any{
+			"id": l.ID, "place": place.Name, "nights": prop.Unpaid,
+			"hands": len(prop.Hands), "positions": tradeHands(l.ID),
+			"shut": w.wordIsOut(l.ID),
+		})
+	}
+
 	return map[string]any{
+		"behind":    behind,
 		"income":    daily,
 		"costs":     costs,
 		"net":       daily - costs,

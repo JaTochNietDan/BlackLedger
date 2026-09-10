@@ -387,6 +387,14 @@ body{height:100%;overflow:hidden;margin:0;background:var(--bg);color:var(--ink);
 .books-lines li i{grid-row:1;grid-column:2;font-style:normal;font-variant-numeric:tabular-nums;color:var(--red)}
 .books-lines li.total{border-bottom:0;border-top:1px solid var(--line);margin-top:4px}
 .books-lines li.total b,.books-lines li.total i{font:16px var(--serif);color:var(--ink)}
+/* What is already unpaid, above the day's breakdown. Bordered rather than
+   coloured through, so it reads as a standing state of the premises and not as
+   a line of arithmetic. */
+.books-behind{list-style:none;margin:0 0 14px;padding:0;display:grid;gap:6px}
+.books-behind li{border-left:3px solid var(--red);padding:6px 0 6px 10px;background:#2a1a1a33}
+.books-behind li.shut{background:#3a1c1c66}
+.books-behind li b{display:block;font-weight:400;font-size:13px}
+.books-behind li small{font-size:10.5px;color:var(--muted)}
 .log-day{font:12px system-ui;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin:22px 0 2px;font-weight:500}
 @media(max-width:1000px){.books{grid-template-columns:1fr}}
 
