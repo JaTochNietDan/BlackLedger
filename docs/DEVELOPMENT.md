@@ -7529,3 +7529,31 @@ every save written before petrol existed from standing at the kerb.
 
 Baseline unmoved: deaths 0/0/52/82/78/0/37, median cash
 12585/14129/7418/90/1063/5332/2080.
+
+## The till at the Green Baize
+
+"While managing the Green Baize I don't see its current funds or how to add to
+the funds or withdraw from the funds dynamically like we talked about."
+
+The Green Baize is the poolhall, whose type is `racket` rather than `casino`, so
+`HasBankroll` was false for it and none of the float machinery reached it. It is
+also the one room in this city that runs a card game and charges for the seat,
+and that money was going straight into the holder's pocket without ever being
+anywhere they could look at it.
+
+`RunsAGame` is the new question — every casino, and the back room — and it gates
+the three money functions and both actions while `HasBankroll` goes on gating
+the nightly handle, because a back room has no handle. The seat charge is paid
+into the room's own money now. Measured over thirty days: $632 taken for the
+table and $632 in the till.
+
+It is a till rather than a float, and the wording says so on the action, in the
+log line and in the room panel: nothing is covered out of it, because the money
+across that table belongs to the people sitting at it. A casino's float is what
+the house can pay a winner; this is just the room's money.
+
+Both halves break correctly: narrowing `RunsAGame` back to casinos fails three
+tests, and paying the seat charge to the player instead of the room fails four.
+
+Baseline unmoved: deaths 0/0/52/82/78/0/37, median cash
+12585/14129/7418/90/1063/5332/2080.

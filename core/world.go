@@ -1493,12 +1493,18 @@ func (w *World) Actions(id string) []Action {
 					}
 				}
 			}
-			if HasBankroll(id) {
+			if RunsAGame(id) {
 				prop := w.Properties[id]
-				asks("bankroll", "Put money behind the tables", 45, 0, w.BankrollReadiness(id, 0),
+				where, out := "Put money behind the tables", "Take money off the tables"
+				if !HasBankroll(id) {
+					// A back room covers nothing, so its money is a till rather
+					// than a float behind a table.
+					where, out = "Put money in the till", "Take money out of the till"
+				}
+				asks("bankroll", where, 45, 0, w.BankrollReadiness(id, 0),
 					fmt.Sprintf("Into the float, currently $%d. %s The house keeps roughly %d%% of what crosses the tables over a season and loses on plenty of single nights. A house that cannot pay a winner is finished as a room worth playing in.", prop.Bankroll, coverage(w.NightHandleAt(id)), HouseEdge))
 				sum(BankrollLeast, p.Cash, BankrollLot, "Behind the tables")
-				add("draw", "Take money off the tables", 45, 0, w.DrawReadiness(id, 0),
+				add("draw", out, 45, 0, w.DrawReadiness(id, 0),
 					fmt.Sprintf("Out of the $%d float and into your hands. It is the only way this room's winnings reach you, and everything taken is action it can no longer attract.", prop.Bankroll))
 				sum(BankrollLeast, prop.Bankroll, min(BankrollLot, prop.Bankroll), "Taken out")
 			}

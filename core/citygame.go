@@ -141,8 +141,12 @@ func (w *World) chargeForTheTable(n *NPC) {
 	if prop == nil {
 		return
 	}
+	// The room's money, not the holder's pocket. Somebody managing the Green
+	// Baize should be able to look at what the table has taken, add to it and
+	// draw it out, which they cannot do with money that has already gone into
+	// their own hands.
 	if w.Own(BackRoom) {
-		w.Earn(TableCharge)
+		prop.Bankroll += TableCharge
 		return
 	}
 	if f := w.faction(prop.Owner); f != nil {

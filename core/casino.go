@@ -34,11 +34,22 @@ const (
 	RuinCondition = 25
 )
 
-// HasBankroll reports whether a property is a room that runs a float.
+// HasBankroll reports whether a property is a room that runs a float behind
+// tables of its own — a casino, and only a casino, because that is what the
+// nightly handle is worked out for.
 func HasBankroll(id string) bool {
 	place, ok := PlaceByID(id)
 	return ok && place.Type == "casino"
 }
+
+// RunsAGame reports whether a room has money of its own that the player can
+// look at, add to and take out. Every casino, and the poolhall, which is a
+// racket rather than a casino and so had none of this — while being the one
+// room in the city that runs a card game and charges for the seat. The money it
+// took went straight into the holder's pocket without ever being anywhere they
+// could see it, which is what the note was about: "I don't see its current
+// funds or how to add to the funds or withdraw from the funds dynamically."
+func RunsAGame(id string) bool { return HasBankroll(id) || id == BackRoom }
 
 // Confidence is how much of its potential action a house attracts, which is
 // decided by what is behind the tables. A thin float is not a secret: the
@@ -166,7 +177,7 @@ const BankrollLeast = 25
 // tables, or returns "". A figure of zero is whatever the field would have
 // started on, so a caller that names no amount still moves a lot.
 func (w *World) BankrollReadiness(id string, amount int) string {
-	if !HasBankroll(id) || !w.Own(id) {
+	if !RunsAGame(id) || !w.Own(id) {
 		return "This is not a room of yours"
 	}
 	amount = w.BankrollSum(id, amount)
@@ -213,7 +224,7 @@ func (w *World) Bankroll(id string, amount int) error {
 // DrawReadiness explains why the typed figure cannot come off the tables, or
 // returns "".
 func (w *World) DrawReadiness(id string, amount int) string {
-	if !HasBankroll(id) || !w.Own(id) {
+	if !RunsAGame(id) || !w.Own(id) {
 		return "This is not a room of yours"
 	}
 	float := w.Properties[id].Bankroll

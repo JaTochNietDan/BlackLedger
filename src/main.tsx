@@ -614,6 +614,21 @@ function App() {
               </small>
             </div>
           )}
+          {/* The poolhall is a racket rather than a casino, so none of the
+              float rows reached it — and it is the one room that runs a card
+              game and charges for the seat. Its money is a till: nothing is
+              covered out of it, and what the table takes goes into it. */}
+          {l.owned && l.id === 'poolhall' && (
+            <div>
+              <span>In the till</span>
+              <b>{money(l.bankroll ?? 0)}</b>
+              <small>
+                {(l.bankroll ?? 0) === 0
+                  ? 'Nothing in it yet'
+                  : "the room's own money, and what the table has taken for the seat"}
+              </small>
+            </div>
+          )}
           {l.owned && l.income > 0 && (
             <div>
               <span>Condition</span>

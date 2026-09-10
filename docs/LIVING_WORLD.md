@@ -234,6 +234,17 @@ I'd also prefer if this game was the Texas Hold Em version as it's better to pla
 
 While managing the Green Baize I don't see its current funds or how to add to the funds or withdraw from the funds dynamically like we talked about.
 
+— built. The Green Baize is a racket rather than a casino, so none of the float
+  machinery reached it — while being the one room in this city that runs a card
+  game and charges for the seat. It has a till now: the room panel says what is
+  in it, and the room offers putting money in and taking it out in whatever
+  figure you type rather than a lot the room decided for you. What the table
+  takes for the seat goes into the till rather than straight into your pocket,
+  which is what makes it worth looking at — measured over thirty days, $632
+  taken and $632 in the till. It is a till and not a float: nothing is covered
+  out of it, because the money across that table belongs to the people sitting
+  at it.
+
 ---
 
 It probably would make sense that we don't always know everyone's location and that's a service that we have to pay for to gain that information from. Maybe only some people know where someone is and we would have to be able to convince us to give them their location, especially if it's a rival family lead.
