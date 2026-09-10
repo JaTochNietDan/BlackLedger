@@ -116,6 +116,19 @@ func (w *World) PayDay() {
 // not the same kind of thing as being paid a little less.
 const Unpaid = 4
 
+const (
+	// PatienceRunsOut is how many unpaid nights somebody stands behind a
+	// counter for before it stops being a job. A week: long enough that a bad
+	// stretch is not the end of anybody's employment, short enough that a
+	// player who has stopped paying finds out by losing people.
+	PatienceRunsOut = 7
+	// NotBeingPaid is the daily chance one of them does not come in once that
+	// week has passed. Higher than a rival's offer, because there is no money
+	// in this at all, and still a decision somebody makes on a day of their
+	// own choosing rather than a number crossing a line.
+	NotBeingPaid = .2
+)
+
 // NobodyGotPaid takes the day off what the people behind the player's counters
 // think of them, counts the night against each place, and reports how many
 // hands went unpaid. Called from the night the bills do not clear.
@@ -135,17 +148,13 @@ func (w *World) NobodyGotPaid() int {
 			n.Trust = max(0, n.Trust-Unpaid)
 			short++
 		}
-		// A week of this should be a reason to stop coming in, and it cannot
-		// happen: the first night the bills do not clear strips the security
-		// and the address, so the day's cost falls from $2,033 to $33 and every
-		// night after it clears out of what the business earns. Measured over
-		// twelve days of a player with nothing: two unpaid nights, never three.
-		//
-		// So the count is kept and read — the room can say a place has gone
-		// unpaid, and it is true — and nothing is hung off a threshold that
-		// cannot be reached. Making it reachable means the bill paying what it
-		// can rather than all or nothing, which is a change to how the day
-		// settles and not a rule to bolt on.
+		// A week of this is a reason to stop coming in, and Notice reads the
+		// count for exactly that. It was unreachable while the day's bill was
+		// all or nothing: one short night stripped the security and the
+		// address, the cost fell from $2,033 to $33, and every night after
+		// cleared out of what the business earned. Settle gives things up in
+		// order now, so a place earning less than its counter costs goes
+		// unpaid night after night and the count climbs.
 	}
 	return short
 }

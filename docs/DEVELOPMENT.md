@@ -8366,3 +8366,36 @@ honest way to leave a design decision that depends on a measurement.
 
 Making it reachable means the day's bill paying what it can rather than all or
 nothing, which is a change to how the day settles rather than a rule to bolt on.
+
+## The day's bill gives things up in order
+
+The nightly settlement was all or nothing. A player a dollar short lost their
+security, their address and their crew's loyalty in a single night — and then
+the bill was $33 instead of $2,033, so it cleared every night after and nothing
+was ever unpaid again. Being briefly short was a cliff, and being persistently
+short was impossible.
+
+`core/settling.go` gives things up one at a time now, and each only while what
+is left of the bill is still out of reach: the security first, because it is the
+thing a person stops paying for first; then the crew, who are people and notice;
+then the address, down to a rented room; and the wages last, because the people
+behind a counter are the last thing anybody stops paying. A player a dollar
+short loses the security and keeps everything else. A player down to the payroll
+still makes the payroll, having given up everything else to do it.
+
+That made a week of unpaid wages reachable, so `PatienceRunsOut` went back in.
+It had been written and removed once for being unreachable: `core/hands.go` now
+reads the unpaid count alongside a grudge and a rival's offer, and after seven
+unpaid nights there is a chance each day that somebody does not come in.
+
+The measurement that mattered was the one that failed. A held address in working
+order earns several times what its counter costs, so no amount of standing bills
+starves it — three retained officials, twenty days, and the laundry paid for all
+of it. What makes an unpaid night happen is a place that earns nothing and still
+has people on the books. Over forty days of a wrecked laundry: eighteen unpaid
+nights at worst and one hand of three left. The harnesses in
+`core/walkedout_test.go` and `core/unpaid_test.go` were rewritten to say that
+rather than to pile on security the player can simply drop.
+
+Balance moved a little and nothing broke: racketeer deaths 47 to 45, racketeer
+cash $979 to $967, publican $1,693 to $1,728.

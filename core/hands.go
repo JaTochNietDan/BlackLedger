@@ -502,6 +502,16 @@ func (w *World) Notice() {
 			if w.hadEnough(n) {
 				odds = WalksOut
 			}
+			// And a week of not being paid. This was written once and taken
+			// out again for being unreachable: the day's bill was all or
+			// nothing, so one short night stripped the security and the
+			// address and every night after cleared out of what the business
+			// earned. The bill gives things up in order now, so a place that
+			// earns less than its counter costs goes unpaid night after night,
+			// and this is a week somebody actually lives through.
+			if prop.Unpaid >= PatienceRunsOut {
+				odds = max64(odds, NotBeingPaid)
+			}
 			// And what the player pays against what the work is worth in this
 			// city. Somebody paid over the rate is not listening to anybody;
 			// somebody paid the floor is, whatever they think of you. The city

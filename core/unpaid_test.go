@@ -53,10 +53,11 @@ func TestMissingPayrollReachesThePeopleItNames(t *testing.T) {
 // and the address and leaving out the people whose wages were most of the bill.
 func TestTheNightThatDoesNotClearSaysWhoWentUnpaid(t *testing.T) {
 	t.Parallel()
-	w, _ := broke2(t)
-	// A bill nothing could cover: security is charged by the day and the
-	// laundry does not earn that fast.
-	w.Player.Security, w.Player.Cash = 40, 0
+	w, id := broke2(t)
+	// A bill nothing can cover. Not a standing one — the security and the
+	// address are given up first and what is left clears out of the takings —
+	// but a counter with nothing coming in behind it.
+	w.Properties[id].Condition, w.Player.Cash = 0, 0
 	for day := 0; day < 3; day++ {
 		w.Event = nil
 		w.Advance(1440)

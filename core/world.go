@@ -2083,50 +2083,7 @@ func (w *World) Advance(minutes int) {
 			w.CivicDay()
 			w.PrunePeople()
 			w.DressDay()
-			bill := w.DailyCost()
-			if p.Cash >= bill {
-				p.Cash -= bill
-				w.EverybodyGotPaid()
-				w.Log("Accounts settled", fmt.Sprintf("$%d paid for housing, security and crew.", bill), "business")
-			} else {
-				// Report the night that happened, not the first one. This said
-				// "Security leaves; your residence is now a rented room.
-				// Unpaid crew lose loyalty" every midnight the player came up
-				// short, so the second night and every night after claimed
-				// three losses that had already been taken.
-				lost := []string{}
-				if p.Security > 0 {
-					lost = append(lost, "Security leaves")
-					p.Security = 0
-				}
-				if p.Home != "room" {
-					lost = append(lost, "your residence is now a rented room")
-					p.Home = "room"
-				}
-				if len(p.Crew) > 0 && p.Crew[0].Loyalty > 0 {
-					lost = append(lost, p.Crew[0].Name+" is not being paid and knows it")
-					p.Crew[0].Loyalty = max(0, p.Crew[0].Loyalty-20)
-				}
-				// And the people behind the counters, whose wages are most of
-				// that bill. They lost nothing by it: a player could miss
-				// payroll for a month and every hand still turned up. What it
-				// costs is what they think of whoever is not paying them, which
-				// is the number that decides whether they stay.
-				if short := w.NobodyGotPaid(); short > 0 {
-					lost = append(lost, plural(short, "hand", "hands")+" went unpaid")
-				}
-				had := p.Cash
-				p.Cash = max(0, p.Cash-15)
-				text := "You could not cover the bills."
-				if len(lost) > 0 {
-					text += " " + upper1(strings.Join(lost, "; ")) + "."
-				} else if had > 0 {
-					text += fmt.Sprintf(" There was nothing left to take but $%d of what you were carrying.", had-p.Cash)
-				} else {
-					text += " There is nothing left to take, which is its own kind of trouble."
-				}
-				w.Log("Your arrangements unravel", text, "danger")
-			}
+			w.Settle()
 		}
 		for j := 0; j < len(w.Plots); j++ {
 			plot := &w.Plots[j]

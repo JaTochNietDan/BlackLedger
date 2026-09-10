@@ -3,8 +3,8 @@ package core
 import "testing"
 
 // Missing payroll costs what the people behind the counter think of the player,
-// and that number decides how well the place runs. It does not decide whether
-// they stay: leaving is about a grudge, or about being paid under the rate. So
+// and that number decides how well the place runs. It did not decide whether
+// they stay: leaving was about a grudge, or about being paid under the rate. So
 // a player could go weeks paying nobody and keep every hand, thinking less of
 // them each morning.
 //
@@ -13,6 +13,11 @@ import "testing"
 // nothing of anybody — but because there is no money in it, which is a fact
 // about the week rather than about them.
 
+// A place that earns less than its counter costs is what makes an unpaid night
+// happen at all. A held address in working order pays for its own staff several
+// times over, so no amount of standing bills starves it: the security and the
+// address are given up first and what is left clears out of the takings. A
+// wrecked one still has people on the books and nothing coming in.
 func unpaidRun(t *testing.T) (*World, string) {
 	t.Helper()
 	w := New(61)
@@ -23,11 +28,11 @@ func unpaidRun(t *testing.T) (*World, string) {
 	if err := w.apply(Command{Kind: "acquire", Target: "laundry", RequestID: "buyitthenstarve"}); err != nil {
 		t.Fatal(err)
 	}
-	// A bill nothing can cover: security is charged by the day and earns
-	// nothing back.
-	// Nothing the laundry earns can cover this, so no night quietly clears and
-	// resets the count.
-	w.Player.Security, w.Player.Cash = 200, 0
+	w.Properties["laundry"].Condition = 0
+	w.Player.Cash = 0
+	if w.Wages() == 0 {
+		t.Fatal("nobody stands behind this counter, so nothing here can go unpaid")
+	}
 	return w, "laundry"
 }
 
@@ -44,15 +49,13 @@ func TestAnUnpaidNightIsCountedAgainstThePlace(t *testing.T) {
 	}
 }
 
-// And nobody can be unpaid for long, which is the finding rather than the
-// feature. The first night the bills do not clear strips the security and the
-// address, so the day's cost falls from $2,033 to $33 and every night after
-// clears out of what the business earns.
-func TestNobodyStaysUnpaidForLong(t *testing.T) {
+// And a week of it empties the counter, which is the rule that could not be
+// written while the day's bill was all or nothing.
+func TestAWeekUnpaidAndTheyStopComingIn(t *testing.T) {
 	t.Parallel()
 	w, id := unpaidRun(t)
-	worst := 0
-	for day := 0; day < 20; day++ {
+	filled, worst := w.Properties[id].Staff, 0
+	for day := 0; day < 40; day++ {
 		w.Event = nil
 		w.Advance(1440)
 		w.Event = nil
@@ -60,13 +63,13 @@ func TestNobodyStaysUnpaidForLong(t *testing.T) {
 			worst = n
 		}
 	}
-	t.Logf("twenty days of a player with nothing: the longest unpaid run was %d nights", worst)
-	if worst == 0 {
-		t.Fatal("a player with nothing covered every bill, so this measures nothing")
+	t.Logf("forty days of a place that earns nothing: %d unpaid nights at worst, %d of %d hands left",
+		worst, w.Properties[id].Staff, filled)
+	if worst < PatienceRunsOut {
+		t.Fatalf("a week of unpaid wages is still not reachable, at %d nights", worst)
 	}
-	if worst >= 7 {
-		t.Fatalf("a week of unpaid wages is reachable after all, at %d nights — the rule that was "+
-			"removed for being unreachable should go back in", worst)
+	if w.Properties[id].Staff >= filled {
+		t.Fatal("nobody was paid for weeks and the whole counter still turned up")
 	}
 }
 
@@ -91,7 +94,7 @@ func TestOneShortNightCostsNobody(t *testing.T) {
 		t.Fatalf("one short night and somebody was already gone: %d of %d", w.Properties[id].Staff, filled)
 	}
 	// And paying again forgets it.
-	w.Player.Security, w.Player.Cash = 0, 50000
+	w.Properties[id].Condition, w.Player.Cash = 100, 50000
 	for day := 0; day < 3 && w.Properties[id].Unpaid != 0; day++ {
 		w.Event = nil
 		w.Advance(1440)
