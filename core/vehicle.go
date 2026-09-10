@@ -88,7 +88,8 @@ func (w *World) Pace() float64 {
 	// Between a wreck and perfect order, the benefit scales with how well it is
 	// running rather than switching off at a threshold.
 	kept := float64(w.CarCondition()-Wreck) / float64(100-Wreck)
-	return 1 - (1-car.Pace)*kept
+	// Plate is weight, and weight costs part of what the car was worth.
+	return 1 - (1-car.Pace)*kept*(1-w.PlateDrag())
 }
 
 // Journey is how long it takes the player to get somewhere, which is the whole
@@ -233,7 +234,9 @@ func (w *World) BuyVehicle() error {
 			house.Cash += margin
 		}
 	}
-	w.Player.Car, w.Player.CarWear = next.Tier, 100
+	// Plate is fitted to a car, not to a person. What you had on the last one
+	// is on the last one.
+	w.Player.Car, w.Player.CarWear, w.Player.Plate = next.Tier, 100, 0
 	// A car off the lot comes with a tank in it.
 	w.Player.Fuel, w.Player.Fuelled = FuelFull, max(1, w.Minute)
 	w.Log("Off the lot at Russo Motor Works", fmt.Sprintf("%s, $%d. $%d a day to keep on the road. %s", next.Label, next.Cost, w.CarUpkeep(), next.Detail), "personal")
@@ -306,6 +309,7 @@ func (w *World) VehicleDescription() map[string]any {
 		"exposed":   w.Exposed(),
 		"upkeep":    w.CarUpkeep(),
 		"running":   w.Driving(),
+		"plate":     w.Plating(), "plate_max": PlateStages,
 	}
 }
 

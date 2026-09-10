@@ -51,7 +51,9 @@ func (w *World) Cover() float64 {
 		return w.doorProtection()
 	}
 	if w.InTransit() {
-		return 0
+		// Nothing out here but what you are driving, which is why anybody
+		// bothers plating one.
+		return w.PlateCoverHere()
 	}
 	strangers, own := 0., 0.
 	for _, who := range w.PeopleHere(w.Player.Location) {

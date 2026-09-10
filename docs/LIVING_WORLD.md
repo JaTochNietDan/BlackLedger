@@ -203,8 +203,15 @@ family to keep them more protected from attacks.
 — part built: the missing button is fixed. Cars were offered in the garage's own case in
   the room switch and refused there by a rule that asks for a forecourt, and the forecourt
   never offered them at all — a button and its rule asking two different questions. They
-  are on the forecourt now. Car pictures, what a car is worth in speed, armour at a garage,
-  and cars for your own people are all still to do.
+  are on the forecourt now.
+— and armour is built. A garage plates a car in two stages, fitted to the car
+  rather than to you, and the Packard that has always been called armoured now
+  actually is. It is worth something only on the street between two addresses,
+  which is the one stretch of the city where nothing else protects anybody: of
+  600 unwarned hits out there, 71 survived bare, 149 with the doors plated and
+  225 with the glass in too. It costs speed, because plate is weight.
+— still to do: pictures of what you are buying, what a car is worth in speed
+  stated honestly, and cars and plate for your own people.
 
 ---
 

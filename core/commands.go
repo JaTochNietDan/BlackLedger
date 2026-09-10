@@ -502,6 +502,10 @@ func (w *World) apply(c Command) error {
 				if err := w.BuyVehicle(); err != nil {
 					return err
 				}
+			case "plate":
+				if err := w.FitPlate(target); err != nil {
+					return err
+				}
 			case "service":
 				if err := w.Service(target); err != nil {
 					return err

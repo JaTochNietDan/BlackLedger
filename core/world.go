@@ -74,6 +74,10 @@ type Person struct {
 	// before there were cars, which is walking.
 	Car     int `json:"car,omitempty"`
 	CarWear int `json:"car_wear,omitempty"`
+	// Plate is what a garage has put on this car, over whatever it came with.
+	// Fitted to the car rather than to the person: a new one off the lot is
+	// bare, whatever the last one was carrying.
+	Plate int `json:"plate,omitempty"`
 	// Explosives in hand. Absent in saves from before anybody could buy any.
 	Charges int `json:"charges,omitempty"`
 	// Standing arrangements with people in the building. Absent in saves from
@@ -982,6 +986,12 @@ func (w *World) Actions(id string) []Action {
 			}
 		}
 		add("service", "Have the car worked on", CarServiceMinutes, 0, w.ServiceReadiness(id), service)
+		// Plate. The one thing worth having on the street between two
+		// addresses, where there are no walls, no door and nobody who knows
+		// you — which is where a car is.
+		asks("plate", w.PlateLabel(), PlateMinutes, PlateCost, w.PlateReadiness(id),
+			fmt.Sprintf("$%d and %d hours on the bench. Worth %d%% against somebody who pulls level with you out on the street, and nothing at all to somebody who walks in a door after you. Plate is weight: it costs %d%% of what the car is worth for speed. Currently %d of %d stages on it.",
+				PlateCost, PlateMinutes/60, int(PlateCover*100), int(PlateWeight*100), w.Plating(), PlateStages))
 	case "docks":
 		add("dockwork", "Work the night cargo", 90, 0, "", "Earn $75 and 1 respect. Small chance of a work injury.")
 		if next, ok := nextArmament(weapons, p.Weapon); ok {

@@ -38,8 +38,8 @@ which half is standing.
    with no assets. The slot machine wants a real case, a payline, a coin tray
    and strips that roll rather than one face per drum, plus ambient room sound.
 2. **Cars.** Still open: pictures of what you are buying, what a car is worth in
-   speed stated honestly, armour fitted at a garage, and buying or armouring
-   cars for your own people.
+   speed stated honestly, and buying or plating cars for your own people. Plate
+   for the player's own car is built (`core/plate.go`).
 3. **A back-room card game** whose other players are people from the city, which
    is the ambitious one. Craps is built.
 4. **The rest of the open inbox.** Wording ("establish protection" for buying a

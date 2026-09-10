@@ -5927,3 +5927,43 @@ letting the total past the player's cash.
 Balance unchanged: deaths 0/0/50/82/83, median cash 12378/14050/7230/90/586.
 
 Evidence: `core/chips_test.go`.
+
+## Plate, and the one place it is worth anything
+
+From the inbox: "You should probably also be able to outfit your car with
+protection like armor etc at a garage which will help you survive attacks when
+traversing out in the streets."
+
+The top of the range has been called an armoured Packard since the day the list
+was written, and no rule in the game had ever read that word. The plate was a
+sentence in a description.
+
+A garage fits it now, in two stages — the doors, then glass that has stopped
+things — at $900 and four hours each. It is fitted to the car rather than to the
+person: a new one off the lot is bare, whatever the last one was carrying, and
+the Packard is sold with both stages on because that is what it is.
+
+What makes this worth building rather than a number going up is where it
+applies. The street between two addresses is the one stretch of the city with no
+walls, no door and nobody who knows you — which is exactly what the ambush work
+established a few slices ago, and exactly where a car is. Plate is the only
+cover out there, and it is worth nothing at all to somebody who walks in a door
+after you. A car parked outside a bar protects nobody in the bar.
+
+| 600 unwarned hits on the street | Survived |
+|---|---|
+| No plate | 71 |
+| Doors plated | 149 |
+| Doors and glass | 225 |
+
+It costs speed. Plate is weight, and each stage takes 9% of what the car was
+worth as a car — so the fastest thing in the city is a bare Ford and the safest
+is a Packard you cannot hurry in.
+
+Two breaks verified, one per half: cover on the street, and drag on the pace.
+The gender guard caught "a man who walks in a door after you" in the new
+description, which is the second time it has earned its place this session.
+
+Balance unchanged: deaths 0/0/50/82/83, median cash 12378/14050/7230/90/586.
+
+Evidence: `core/plate_test.go`.
