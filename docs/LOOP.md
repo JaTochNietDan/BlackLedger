@@ -175,7 +175,7 @@ balance could have moved, then the live game and the commit.
 
 Balance baseline, seven strategies
 (worker/investor/defiant/reckless/thief/smuggler/racketeer):
-deaths 0/0/52/82/78/0/37, median cash 12585/14129/7418/90/1063/5332/2080.
+deaths 0/0/0/82/69/0/53, median cash 12585/2367/5857/90/1050/3563/1086.
 `mise run simulate > <scratchpad>/sim.json` then **parse** the JSON; grepping it
 is useless. Each strategy also reports `mean_heat`, `seizures` and `runs_hurt`,
 because deaths and cash cannot tell a safe policy from one whose money is taken
