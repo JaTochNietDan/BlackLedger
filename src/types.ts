@@ -84,6 +84,7 @@ export interface Place {
   still?: boolean;
   staff?: number;
   wage?: number;
+  runs?: string;
   hands?: {id: string; name: string; role: string; here: boolean}[];
   supply?: number;
   trouble?: boolean;

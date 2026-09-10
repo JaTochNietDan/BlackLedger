@@ -592,6 +592,13 @@ func (w *World) walkOut(who, from, to string) {
 	if n != nil && n.Post == from {
 		n.Post = ""
 	}
+	// And the title goes with the job. Somebody who no longer works here does
+	// not run it, and a role saying they do is a lie the rest of the city reads
+	// — the routine keeps a manager standing at their own address, so a stale
+	// one would have somebody minding a counter they had been put off.
+	if here, ok := PlaceByID(from); ok && n != nil && n.Role == "Runs "+here.Name {
+		n.Role = "Out of work"
+	}
 	here, _ := PlaceByID(from)
 	if to == "" {
 		w.Log(n.Name+" has had enough",

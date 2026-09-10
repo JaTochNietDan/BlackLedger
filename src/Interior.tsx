@@ -208,6 +208,11 @@ export function Interior({
   if (place.owned && place.wage) {
     facts.push({what: 'Pays', is: '$' + place.wage + '/day'});
   }
+  // Who has the keys. The person a rival will come for, and the reason the
+  // player does not have to be standing here.
+  if (place.owned && place.runs) {
+    facts.push({what: 'Run by', is: place.runs});
+  }
 
   return (
     <div className="interior-stage">

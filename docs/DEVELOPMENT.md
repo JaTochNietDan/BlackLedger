@@ -8213,3 +8213,20 @@ keeps no better stock than the unmanaged one; with the check on who already runs
 it removed, a business can have two people running it.
 
 Baseline unmoved: no campaign policy puts anybody in charge of anything.
+
+## Losing the manager
+
+A manager is somebody, which means they can be taken: poached off the counter,
+put off coming in by a family, or simply walk out. What must not survive is the
+title. `walkOut` left the role saying "Runs Bluebird Laundry" on a person who no
+longer worked there, and that is a lie the rest of the city reads — the routine
+keeps a manager standing at their own address, so a stale one would have
+somebody minding a counter they had been frightened away from.
+
+The title goes with the job now, and the place can be given to somebody else the
+same morning. The room says who has the keys, because that is the person a rival
+will come for and the reason the player is not standing there.
+
+Both new guards break correctly: with the title left behind, the test reports
+that Clara Esposito does not work here and is still called "Runs Bluebird
+Laundry"; with the row removed, the room does not say who runs it.

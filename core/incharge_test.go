@@ -104,3 +104,51 @@ func TestPuttingSomebodyInChargeIsOfferedAtTheBusiness(t *testing.T) {
 		t.Fatal("nobody runs the laundry")
 	}
 }
+
+// A manager is somebody, which means they can be taken. What must not survive
+// is the title: somebody who no longer works here does not run it, and a role
+// that says they do is a lie the rest of the city reads.
+func TestSomebodyWhoLeavesStopsRunningThePlace(t *testing.T) {
+	t.Parallel()
+	w, id := toRun(t)
+	who := w.Properties[id].Hands[0]
+	if err := w.PutInCharge(id, who); err != nil {
+		t.Fatal(err)
+	}
+	place, _ := PlaceByID(id)
+	n := w.NPC(who)
+	// Somebody puts them off coming in, which is a thing that happens to the
+	// people behind a counter now.
+	w.walkOut(who, id, "")
+	if w.RunsIt(id) != nil {
+		t.Fatalf("%s walked out and still runs the place", n.Name)
+	}
+	if n.Role == "Runs "+place.Name {
+		t.Fatalf("%s does not work here and is still called %q", n.Name, n.Role)
+	}
+	// And the place can be given to somebody else.
+	other := w.Properties[id].Hands[0]
+	if reason := w.InChargeReadiness(id, other); reason != "" {
+		t.Fatalf("the manager is gone and nobody else can be put in charge: %s", reason)
+	}
+}
+
+// The room says who runs it, because that is the person a rival will come for.
+func TestTheRoomSaysWhoRunsIt(t *testing.T) {
+	t.Parallel()
+	w, id := toRun(t)
+	who := w.Properties[id].Hands[0]
+	if err := w.PutInCharge(id, who); err != nil {
+		t.Fatal(err)
+	}
+	for _, l := range w.Public()["locations"].([]map[string]any) {
+		if l["id"] != id {
+			continue
+		}
+		if l["runs"] != w.NPC(who).Name {
+			t.Fatalf("the laundry is run by %s and says %v", w.NPC(who).Name, l["runs"])
+		}
+		return
+	}
+	t.Fatal("the laundry is not on the map")
+}

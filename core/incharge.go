@@ -98,3 +98,15 @@ func (w *World) TheyRunIt() {
 		prop.Supply = trade.RestockAmount
 	}
 }
+
+// RunsItName is who runs this place, for the room to say so. Empty where
+// nobody does, and where the player has no business knowing.
+func (w *World) RunsItName(id string) string {
+	if !w.Own(id) {
+		return ""
+	}
+	if n := w.RunsIt(id); n != nil {
+		return n.Name
+	}
+	return ""
+}

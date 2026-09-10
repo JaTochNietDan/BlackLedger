@@ -603,3 +603,12 @@ func TestTheRoomSaysWhatItPays(t *testing.T) {
 		t.Error("a business of yours does not say what it pays")
 	}
 }
+
+// A business of the player's says who has the keys, because that is the person
+// a rival will come for and the reason the player is not standing there.
+func TestTheRoomSaysWhoHasTheKeys(t *testing.T) {
+	room := source(t, "src/Interior.tsx")
+	if !holds(room, "{what: 'Run by', is: place.runs}") {
+		t.Error("a business run by somebody does not say who")
+	}
+}
