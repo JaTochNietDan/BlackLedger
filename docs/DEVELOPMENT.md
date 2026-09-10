@@ -6842,3 +6842,40 @@ the harness owns a room people drink in and thinks to pay for a band.
 
 Evidence: `core/night_test.go`, one break verified after the first one did not
 bite.
+
+## A measure that meant almost nothing
+
+Two slices ago I noted the worker was "hurt in every campaign while carrying no
+attention" and said it was worth a look on its own. It was, and the answer is
+that the measure was wrong rather than the world.
+
+Dock work takes ten health about one shift in seven. A policy that works the
+docks for two hundred commands takes fifty shifts, so ending a campaign bruised
+is a near certainty — and `runs_hurt` meant "ended below full health", which put
+a man with a bad back alongside a man who had been shot. A hundred in a hundred
+was the correct answer to a question not worth asking.
+
+What is worth reporting is how close somebody came to dying, so the report
+carries the low-water mark of health across the whole run and the summary its
+median.
+
+| 100 campaigns | Deaths | Cash | Lowest health |
+|---|---|---|---|
+| worker | 0 | 12,405 | 55 |
+| investor | 0 | 14,231 | 100 |
+| defiant | 52 | 7,544 | 0 |
+| reckless | 82 | 90 | 0 |
+| thief | 77 | 1,403 | 0 |
+| smuggler | 0 | 5,505 | 100 |
+| racketeer | 38 | 1,936 | 42 |
+
+That reads. The investor and the smuggler are never touched at all. The worker
+is bruised and never in danger. The racketeer is hurt badly and the median one
+survives it. And for the defiant, the reckless and the thief the median campaign
+does not end bruised — it ends at zero, which is the only honest way to say that
+the middle run of those policies is a death.
+
+`runs_hurt` is gone. A measure that answers a question nobody should ask is
+worse than no measure, because it gets quoted.
+
+Evidence: `sim/campaign.go`, `cmd/simulate/main.go`.

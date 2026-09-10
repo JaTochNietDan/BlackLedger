@@ -155,6 +155,7 @@ func main() {
 		// money is taken rather than whose life is looked identical to a safe
 		// one in this report.
 		heat, seizures, hurt, informed := 0, 0, 0, 0
+		lows := []int{}
 		for _, r := range reports {
 			if r.Strategy != p {
 				continue
@@ -162,13 +163,14 @@ func main() {
 			heat += r.Heat
 			seizures += r.Seizures
 			informed += r.Informed
+			lows = append(lows, r.Lowest)
 			if r.Health < 100 {
 				hurt++
 			}
 		}
 		summaries[p] = map[string]any{"runs": *runs, "deaths": deaths, "errors": errors,
-			"mean_heat": heat / max(1, *runs), "seizures": seizures, "runs_hurt": hurt,
-			"informed":          informed,
+			"mean_heat": heat / max(1, *runs), "seizures": seizures,
+			"informed": informed, "median_lowest_health": median(lows),
 			"median_final_cash": cash[len(cash)/2], "median_game_minutes": span,
 			"median_game_days": math.Round(days*10) / 10, "milestones": ms, "city": city,
 			"city_measures_meaningful": days >= livingWorldHorizon,
@@ -224,4 +226,14 @@ func seasonReport(cities, days int) map[string]any {
 		"cities": cities, "days": days, "totals": total,
 		"biggest_share_anywhere": worst, "runs": runs,
 	}
+}
+
+// median is the middle of a set of run figures, which is what a summary should
+// report: one campaign that went badly is not the shape of a hundred.
+func median(xs []int) int {
+	if len(xs) == 0 {
+		return 0
+	}
+	sort.Ints(xs)
+	return xs[len(xs)/2]
 }

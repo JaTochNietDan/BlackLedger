@@ -65,7 +65,14 @@ type Report struct {
 	// Times the goods were taken, by a search or in the street.
 	Seizures int `json:"seizures"`
 	// Times somebody in the city told the police about them.
-	Informed     int            `json:"informed"`
+	Informed int `json:"informed"`
+	// The lowest the player's health ever got. "Ended below full health" turned
+	// out to mean almost nothing: a policy that works the docks takes a ten
+	// point knock about one shift in seven and ends every campaign bruised,
+	// which read as a hundred runs in a hundred "hurt" and put it alongside a
+	// policy that was being shot at. How close somebody came to dying is the
+	// thing worth reporting.
+	Lowest       int            `json:"lowest_health"`
 	Milestones   map[string]int `json:"milestone_commands"`
 	Actions      map[string]int `json:"action_counts"`
 	Events       map[string]int `json:"event_counts"`
@@ -111,6 +118,8 @@ type watcher struct {
 	owners   map[string]string
 	factions map[string]bool
 	health   int
+	// lowest is the low-water mark of the player's health across the whole run.
+	lowest   int
 	holdings int
 }
 
@@ -118,6 +127,7 @@ func watch(w *core.World) *watcher {
 	m := &watcher{wars: map[string]bool{}, owners: map[string]string{}, factions: map[string]bool{}}
 	m.note(w)
 	m.health = w.Player.Health
+	m.lowest = w.Player.Health
 	m.holdings = owned(w)
 	return m
 }
@@ -205,6 +215,9 @@ func (m *watcher) changed(w *core.World, into *WorldMeasures) {
 	m.factions = map[string]bool{}
 	m.note(w)
 	m.health = w.Player.Health
+	if w.Player.Health < m.lowest {
+		m.lowest = w.Player.Health
+	}
 	m.holdings = owned(w)
 }
 
@@ -619,6 +632,7 @@ func RunRecorded(seed uint32, strategy, director string, limit int, trace bool, 
 	r.Cash = w.Player.Cash
 	r.Respect = w.Player.Respect
 	r.Heat, r.Health = w.Player.Heat, w.Player.Health
+	r.Lowest = eyes.lowest
 	// What the city took. The record is the only place a seizure is written
 	// down, which is right — it is a thing that happened, not a counter.
 	for _, entry := range w.History {
