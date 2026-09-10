@@ -8319,3 +8319,26 @@ It is worth more than it sounds: the publican's median went from $915 to $1,700,
 because a business now starts earning what a staffed business earns on the day
 it is bought rather than the day after, and its manager can be appointed the
 same morning. Every other policy moved by tens, which is the world stream.
+
+## The bill that named them and left them out
+
+A night the player cannot cover costs them their security, their address and
+their crew's loyalty. The people behind their counters lost nothing by it — and
+their wages are most of that bill. A player could miss payroll for a month and
+every hand still turned up.
+
+The wage bill names them, so missing it reaches them: `Unpaid` off what each of
+them thinks of the person not paying them, which is the number that already
+decides whether they stay. The night's report says how many went unpaid instead
+of listing the security and the address and leaving out the people.
+
+**Two tests that were measuring the wrong thing first.** Setting the player's
+cash to nothing does not make a bill unpayable: a laundry earns through the day,
+so by midnight there is something in the till again. Then paying the ceiling
+wage to force a shortfall added a point of regard a day, which fought the
+penalty and left the unpaid hands thinking *better* of the player than the paid
+ones. The mechanism and the report are measured separately now, and the bill is
+made unpayable with security, which is charged by the day and earns nothing.
+
+Baseline: the publican moved $1,700 to $1,693, which is noise. No policy misses
+payroll; a player who does will feel it.

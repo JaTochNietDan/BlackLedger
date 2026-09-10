@@ -110,3 +110,30 @@ func (w *World) PayDay() {
 		}
 	}
 }
+
+// Unpaid is what a day nobody covered costs the regard of the people who were
+// not paid. Larger than a day over the rate is worth, because not being paid is
+// not the same kind of thing as being paid a little less.
+const Unpaid = 4
+
+// NobodyGotPaid takes the day off what the people behind the player's counters
+// think of them, and reports how many there were. Called from the night the
+// bills do not clear.
+func (w *World) NobodyGotPaid() int {
+	short := 0
+	for _, l := range Locations {
+		prop := w.Properties[l.ID]
+		if prop == nil || !w.Own(l.ID) {
+			continue
+		}
+		for _, who := range prop.Hands {
+			n := w.NPC(who)
+			if n == nil || n.Dead {
+				continue
+			}
+			n.Trust = max(0, n.Trust-Unpaid)
+			short++
+		}
+	}
+	return short
+}

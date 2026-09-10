@@ -2101,6 +2101,14 @@ func (w *World) Advance(minutes int) {
 					lost = append(lost, p.Crew[0].Name+" is not being paid and knows it")
 					p.Crew[0].Loyalty = max(0, p.Crew[0].Loyalty-20)
 				}
+				// And the people behind the counters, whose wages are most of
+				// that bill. They lost nothing by it: a player could miss
+				// payroll for a month and every hand still turned up. What it
+				// costs is what they think of whoever is not paying them, which
+				// is the number that decides whether they stay.
+				if short := w.NobodyGotPaid(); short > 0 {
+					lost = append(lost, plural(short, "hand", "hands")+" went unpaid")
+				}
 				had := p.Cash
 				p.Cash = max(0, p.Cash-15)
 				text := "You could not cover the bills."
