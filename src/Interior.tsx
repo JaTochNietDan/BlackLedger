@@ -224,7 +224,15 @@ export function Interior({place, people, actions, render, onLeave, onTables, fel
             : 'Three drums and a handle, against the wall where they always are.'}</span></span>
         </button>}
 
-        <Work title="These premises" blurb="The same work, in the same order, in every building"
+        {/* "When inside a building you own the top buttons should probably be
+            for owner management and under a separate subtitle for management
+            actions." They are the top block already; what was missing was the
+            subtitle saying so, and two of the actions that belong in it were
+            filed elsewhere by the core until this was written down. */}
+        <Work title={place.owned ? 'Running ' + place.name : 'These premises'}
+              blurb={place.owned
+                ? 'Staff, stock, repairs and what the house takes — the work of holding it'
+                : 'The same work, in the same order, in every building'}
               actions={premises} render={render}/>
 
         {/* Everything that is not the premises, in the order the core says the

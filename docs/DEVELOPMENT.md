@@ -6128,3 +6128,46 @@ ships.
 
 Evidence: the live edition carries person and place subjects with real ids, so
 both paths are exercised by the current save.
+
+## A guard that could not fail, and the hundred and sixty actions behind it
+
+From the inbox: "When inside a building you own the top buttons should probably
+be for owner management and under a separate subtitle for management actions."
+
+The block was already at the top. What it had no subtitle saying was what it
+was, and inside a place of the player's it reads "Running The Blue Bird" over
+"staff, stock, repairs and what the house takes" now.
+
+Going to look at what belonged in that block found something bigger.
+`TestEveryActionBelongsSomewhere` asked whether every offered action's group is
+one the interface renders. `GroupOf` falls back to "work" for anything nobody
+classified, and "work" is a group the interface renders — so the test could
+never fail, whatever was forgotten. It is the fault shape already written down
+in the loop's own notes as "a guard that cannot fail", and it had been sitting
+in the file that exists to prevent exactly this.
+
+What was actually filed under "Jobs that pay today":
+
+| Action | Belongs |
+|---|---|
+| `strike:*`, `send:*` — all the violence in the game | the street |
+| `limit`, `draw` — the house limit and the float | your premises |
+| `plate`, `fill`, `service` — the car you own | standing |
+| `strip` — taking a car apart | the street |
+| `sit`, `rise`, `play`, `pull`, `wheel`, `dice`, `roll`, `hit`, `stand` | the tables |
+| `car:*`, `plate:*` — a car for one of your own | people |
+
+A hundred and sixty-odd action ids in a full campaign, most of them the two
+violence prefixes. There is a "tables" group now, `draw` stopped being filed as
+work that can go wrong, and everything about the player's own car sits with
+buying one.
+
+`Classified` reports whether a group was chosen rather than defaulted, and
+`TestNoOfferedActionIsThereByDefault` fails on the fallback. The old guard stays
+— it checks a different thing, that nothing lands in a group the interface would
+not draw — and the fallback stays too, because an action nobody classified must
+still reach the player.
+
+Balance unchanged: deaths 0/0/50/82/83, median cash 12378/14050/7230/90/586.
+
+Evidence: `core/grouping_test.go`, one break verified.

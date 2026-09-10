@@ -84,3 +84,38 @@ func TestThingsThatBelongTogetherAreTogether(t *testing.T) {
 		}
 	}
 }
+
+// The guard above only asked whether an action's group is one the interface
+// renders, and "work" is. So nine actions that nobody had classified — the
+// house limit, plating a car, and every verb at the tables — sat quietly under
+// "Jobs that pay today" and the test went on passing. This asks the question
+// that was meant: is this action's group a decision somebody made, or the
+// fallback?
+func TestNoOfferedActionIsThereByDefault(t *testing.T) {
+	w := proprietor(t)
+	own(w, "laundry", "garage", "casino")
+	w.District = 2
+	w.Player.Cash, w.Player.Respect, w.Player.Contacts = 90000, 200, 4
+	w.Player.Crew = []Crew{{ID: "leo", Name: "Leo Carver", Loyalty: 70}}
+	w.Player.Car, w.Player.CarWear = 1, 100
+	w.Player.Fuel, w.Player.Fuelled = FuelFull, max(1, w.Minute)
+	w.ensureOfficials()
+	w.OrganizationDay()
+
+	unclassified := map[string]bool{}
+	for _, l := range Locations {
+		w.Player.Location = l.ID
+		for _, a := range w.Actions(l.ID) {
+			if !Classified(a.ID) {
+				unclassified[a.ID] = true
+			}
+		}
+	}
+	if len(unclassified) > 0 {
+		names := []string{}
+		for id := range unclassified {
+			names = append(names, id)
+		}
+		t.Fatalf("actions filed under the fallback rather than anywhere chosen: %v", names)
+	}
+}

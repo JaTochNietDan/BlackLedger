@@ -30,6 +30,7 @@ var groups = []Group{
 	{"people", "People", "Who works for you, who owes you, who you know."},
 	{"street", "The street", "Work that can go wrong, and hurt somebody."},
 	{"standing", "Standing", "Who you are to this city, and who owes you a favour."},
+	{"tables", "The tables", "Cards, the wheel, the dice and the machines."},
 	{"money", "Money", "Moving it, hiding it, or putting it somewhere else."},
 	{"travel", "Elsewhere", "Leaving where you are standing."},
 }
@@ -43,13 +44,16 @@ func Groups() []Group { return groups }
 var actionGroup = map[string]string{
 	// Work that pays on the day.
 	"courier": "work", "dockwork": "work", "delegate": "work", "commission": "work",
-	"contract": "work", "service": "work", "order": "work",
+	"contract": "work", "order": "work",
 
 	// Premises.
 	"acquire": "business", "repair": "business", "hire": "business", "layoff": "business",
 	"restock": "business", "remedy": "business", "inspect": "business", "still": "business",
 	"dismantle": "business", "armoury": "business", "stock_arms": "business",
 	"bankroll": "business", "post": "business", "unpost": "business",
+	// Taking money back off your own tables is running the place, not a night
+	// out at it. This was filed under work that can go wrong.
+	"draw": "business", "limit": "business",
 
 	// People.
 	"recruit": "people", "crew_bonus": "people", "contact": "people",
@@ -57,14 +61,22 @@ var actionGroup = map[string]string{
 	// Work that can go wrong.
 	"rob": "street", "mug": "street", "sabotage": "street", "move": "street",
 	"incite": "street", "provoke": "street", "takeover": "street", "charge": "street",
-	"plant": "street", "hit": "street", "stand": "street", "draw": "street",
+	"plant": "street", "strip": "street",
 
 	// Becoming somebody.
 	"expand": "standing", "audience": "standing", "sitdown": "standing", "bribe": "standing",
 	"investigate": "standing", "lie_low": "standing", "dress": "standing", "press": "standing",
 	"security": "standing", "move_home": "standing", "car": "standing", "leave_service": "standing",
+	// Everything about the car you own, in one place. Fuelling it and plating
+	// it were nowhere, and having it worked on was filed as a job that pays.
+	"fill": "standing", "plate": "standing", "service": "standing",
 	"spike": "standing", "puff": "standing", "lawyer": "standing", "talk": "standing",
 	"sit_out": "standing",
+
+	// The tables. Sitting down, getting up, and every verb of every game.
+	"sit": "tables", "rise": "tables", "play": "tables", "pull": "tables",
+	"wheel": "tables", "dice": "tables", "roll": "tables", "hit": "tables",
+	"stand": "tables",
 
 	// Money.
 	"launder": "money", "deposit": "money", "withdraw": "money", "offshore_access": "money",
@@ -81,11 +93,31 @@ var prefixGroup = [][2]string{
 	{"forgive:", "people"}, {"bail:", "people"}, {"break:", "people"},
 	{"rob:", "street"}, {"mug:", "street"}, {"sabotage:", "street"},
 	{"arms:", "street"},
-	{"buy:", "money"}, {"sell:", "money"}, {"play:", "money"},
+	// Going after somebody, or sending one of your own to. The whole of the
+	// violence in this game sat under "jobs that pay today".
+	{"strike:", "street"}, {"send:", "street"},
+	// A car for one of your own, and plate on it: about them, not about you.
+	{"car:", "people"}, {"plate:", "people"},
+	{"buy:", "money"}, {"sell:", "money"}, {"play:", "tables"},
 	{"retain:", "standing"}, {"release:", "standing"}, {"smear:", "standing"},
 	{"enquire:", "standing"}, {"pact:", "standing"}, {"serve:", "standing"},
 	{"operate:", "business"}, {"fit:", "business"},
 	{"trip:", "travel"},
+}
+
+// Classified reports whether an action's group was chosen for it rather than
+// arrived at by the fallback. The fallback exists so that a new action still
+// reaches the player; it is not a place for an action to live.
+func Classified(id string) bool {
+	if _, ok := actionGroup[id]; ok {
+		return true
+	}
+	for _, rule := range prefixGroup {
+		if strings.HasPrefix(id, rule[0]) {
+			return true
+		}
+	}
+	return false
 }
 
 // GroupOf is what an action is for. Everything the core can offer has an
