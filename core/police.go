@@ -91,6 +91,10 @@ func (w *World) PoliceDay() {
 				fmt.Sprintf("Officers have raided premises connected to %s, citing the recent violence. Property was searched and records seized.", f.Name))
 		}
 	}
+	// And somebody with a grievance, who has worked out that the cheapest way
+	// to hurt a man moving crates is a telephone. This runs before the raid, so
+	// the word is in before anybody decides whether to come.
+	w.ConsiderInformant()
 	w.considerRaid()
 }
 

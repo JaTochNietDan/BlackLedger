@@ -6609,3 +6609,39 @@ Informants are the risk still missing.
 Balance: deaths 0/0/51/82/77/0, median cash 12405/14156/7230/90/547/5123.
 
 Evidence: `core/route_rival_test.go`, two breaks verified.
+
+## Somebody talks
+
+The last of the three risks layer 6 asks the underground trade to carry, and the
+only one that is not about wanting what you have. An informant is somebody who
+wants you finished and has found a cheaper way to do it than a gun.
+
+It had to be a person. The rule this game already applies to the people who rob
+the player — "named people with a place in the city, not anonymous thieves, and
+they can be answered" — holds here, or the whole thing is a dice roll wearing a
+hat. So an informant is somebody already carrying a grudge the simulation
+committed, over a reason it recorded, and saying it costs them most of the
+grudge: telling the police is what they had to get off their chest.
+
+Whether the name comes back is the question the city already asks about a
+robbery. With contacts you hear who and why. Without them you hear that Ward
+Street knows more than anybody there worked out for themselves, and that is all
+you ever hear.
+
+**The first version was too narrow, and the measurement said so.** I tied it to
+the trade alone, and in a hundred campaigns nobody ever picked up a telephone —
+because the policy that runs the route makes no enemies, and the policy that
+makes enemies never trades. What an informant actually needs is somebody who
+hates them and something to point at: a trade being run, crates in their hands,
+or a file the police already have open.
+
+**And a limit worth stating.** The mechanism is unit-tested with two breaks
+verified — no heat added when somebody talks, and the name never coming back —
+but the campaign figures barely move, because neither policy in the harness
+satisfies both halves at once. A policy that both trades and makes enemies is
+the probe this needs, and it does not exist yet. What is written above is what
+the tests show, not what the campaign numbers show.
+
+Balance: deaths 0/0/51/82/76/0, median cash 12405/14156/7230/90/567/5160.
+
+Evidence: `core/informant_test.go`.
