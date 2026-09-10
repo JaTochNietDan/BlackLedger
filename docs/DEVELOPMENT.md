@@ -6246,3 +6246,43 @@ sentinel is null until the first look now, and the first look only records where
 it is starting from.
 
 Evidence: `tests/cards.test.mjs`, five new tests, 55 node tests passing.
+
+## Ackerman & Son, pawnbrokers
+
+The inbox is clear and the queue is done, so this is the standing instruction:
+"there is always another business, and always more people to put in the city",
+and "find ways to link them together."
+
+A pawnbroker is the trade that sits at the join between things that already
+exist and had nowhere to happen. What gets taken off the street has to turn into
+money somewhere. Somebody who is short has to turn what they own into money and
+hope to get it back. Neither had an address.
+
+**Both directions are real.** Robbing a till, taking somebody's pockets and
+stripping a car all lift the shop's trade — the same shape the garage already
+has with car theft, which is the link the inbox liked. And the counter lends
+against the player's own car or the suit off their back: 35% of what it cost
+new, scaled by its condition, and 130% of that to get it back inside a week.
+After that it is in the window and it is gone. Pawning the suit costs the
+standing it was buying, which is the decision.
+
+A ticket that runs out is kept rather than thrown away, marked sold, so the
+counter can tell the player what became of the thing instead of shrugging at
+them.
+
+**The checklist caught everything I forgot**, which is what it is for. Three
+guards failed on the first run: no painted front, no interior to stand in, and
+"The Golden Lily and Ackerman & Son both want block 3,1 — one of them will be
+pushed off its own coordinates". Moved to a free block, and painted. The front
+came back with PAWNBROKE'S STOP across the fascia in letters the model invented,
+so the prompt asks for a plain unlettered board and it was repainted.
+
+Twenty-six addresses, fifteen ownable businesses, twelve kinds. Three more
+people in the city: a pawnbroker, a counter clerk and a valuer.
+
+Balance: deaths 0/0/50/82/79 against 0/0/50/82/83, median cash
+12378/14050/7230/90/567 against .../586. The thief moved by four deaths in a
+hundred and by three percent of a small number, which is a twenty-sixth address
+changing which room a policy walks into rather than anything paying differently.
+
+Evidence: `core/pawn_test.go`, and the three address guards that failed first.

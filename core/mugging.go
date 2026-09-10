@@ -153,6 +153,9 @@ func (w *World) Mug(location string, hand Hand) error {
 	}
 
 	w.Earn(purse)
+	// A wallet is not all of what somebody is carrying. The watch goes over a
+	// counter, which is what a pawnbroker is for.
+	w.FenceAbout(FenceTrade)
 	w.Player.Heat = min(100, w.Player.Heat+w.HandHeat(hand, MuggingHeat))
 	w.Player.Respect += w.HandRespectFor(hand, 3)
 	if f := w.faction(mark.Faction); f != nil {

@@ -364,6 +364,16 @@ func (w *World) apply(c Command) error {
 				}
 				w.Advance(a.Minutes)
 			}
+		} else if kind, ok := strings.CutPrefix(c.Kind, "pawn:"); ok {
+			if err := w.Pawn(kind); err != nil {
+				return err
+			}
+			w.Advance(a.Minutes)
+		} else if kind, ok := strings.CutPrefix(c.Kind, "redeem:"); ok {
+			if err := w.Redeem(kind); err != nil {
+				return err
+			}
+			w.Advance(a.Minutes)
 		} else if person, ok := strings.CutPrefix(c.Kind, "car:"); ok {
 			if err := w.BuyCarFor(person); err != nil {
 				return err

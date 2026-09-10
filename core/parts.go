@@ -100,6 +100,10 @@ func (w *World) StripCar(location string) error {
 	// one who comes looking for you later.
 	w.Aggrieve(mark.ID, PartsSore, "what was left of their car")
 
+	// Whatever was in it, as against what was bolted to it. That goes over a
+	// counter rather than to a garage.
+	w.FenceAbout(FenceTrade)
+
 	// The buyers. A garage is where parts go, so a city with more of them
 	// going around is a city where a garage has more work — which is the whole
 	// of why anybody would hold one.

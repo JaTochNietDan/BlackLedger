@@ -48,6 +48,7 @@ FRONTS = {
     "poolhall": "a first-floor billiard hall over a shopfront, long low windows, a stair door at street level",
     "butcher": "a butcher's shop with a tiled front, wide window, delivery van at the kerb, cold store behind",
     "haulage": "a haulage yard behind a wire fence, flatbed trucks, a low office hut, fuel pump",
+    "pawn": "a pawnbroker's shop on a corner, three brass balls hung over the door, a barred window crowded with other people's things, a low lit doorway, plain unlettered fascia board above the window with no writing on it",
 }
 
 W, H = 768, 512

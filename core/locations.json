@@ -264,5 +264,16 @@
   "y": 786,
   "cost": 360,
   "blurb": "Under the arches on the way out of town, open when nowhere else is, which is worth more than the petrol."
+ },
+ {
+  "id": "pawn",
+  "name": "Ackerman & Son",
+  "type": "racket",
+  "kind": "pawn",
+  "district": 1,
+  "x": 994,
+  "y": 442,
+  "cost": 300,
+  "blurb": "Three brass balls over the door and a window of other people's things. Open late, and nobody in it asks where anything came from."
  }
 ]

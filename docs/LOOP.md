@@ -80,7 +80,9 @@ and a local model that writes encounters and can be switched off.
 - **Identity.** One decision picks a person's face and their voice
   (`core/voices.go`); the server sends the voice with the line.
 - **Businesses.** Every address that earns can be bought and run. A place with
-  no price does not change hands.
+  no price does not change hands. Twenty-six addresses, twelve kinds; the
+  pawnbroker is where what is taken off the street turns into money and where
+  somebody short pawns the suit off their back.
 
 ---
 
@@ -130,7 +132,7 @@ they go. `go test ./core` alone is ~90s; the balance tests run in parallel with
 each other and the run is race-clean.
 
 Balance baseline, five strategies (worker/investor/defiant/reckless/thief):
-deaths 0/0/50/82/83, median cash 12378/14050/7230/90/586.
+deaths 0/0/50/82/79, median cash 12378/14050/7230/90/567.
 `mise run simulate > <scratchpad>/sim.json` then **parse** the JSON; grepping it
 is useless.
 

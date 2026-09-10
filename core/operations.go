@@ -111,6 +111,12 @@ var trades = map[string]Trade{
 		Remedy:  "Make that one disappear properly", RemedyDetail: "Cut up, weighed in, and off the books.", RemedyCost: 180,
 		Cover: 10, Watched: 1, Hides: 6,
 	},
+	"pawn": {
+		Hands: 2, Wage: 9, Drain: 6, Restock: 180, RestockAmount: 40, Supplies: "the float behind the counter",
+		Trouble: "Somebody came in looking for a watch they say was theirs, and it is in the window.",
+		Remedy:  "Settle it over the counter", RemedyDetail: "The watch goes back and nobody writes anything down.", RemedyCost: 170,
+		Cover: 11, Watched: 2, Hides: 5,
+	},
 	"dealer": {
 		Hands: 4, Wage: 11, Drain: 6, Restock: 340, RestockAmount: 45, Supplies: "cars on the lot",
 		Trouble: "Two cars on the forecourt turn out to have come off a boat, and somebody official has noticed.",

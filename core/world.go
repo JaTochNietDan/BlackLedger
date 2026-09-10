@@ -461,6 +461,9 @@ type World struct {
 	// this standing.
 	Offshore  int        `json:"offshore,omitempty"`
 	Contracts []Contract `json:"contracts,omitempty"`
+	// Things of the player's sitting behind a pawnbroker's counter. Tied to one
+	// protagonist: nobody inherits somebody else's ticket.
+	Tickets []Ticket `json:"tickets,omitempty"`
 	// Standing work an organization has asked for. Tied to one protagonist:
 	// nobody inherits somebody else's obligations.
 	Commissions []Commission `json:"commissions,omitempty"`
@@ -1171,6 +1174,25 @@ func (w *World) Actions(id string) []Action {
 			}
 		}
 	}
+	// The counter. What somebody who is short does with what they own, and what
+	// they do to get it back.
+	if id == w.thePawnshop() && id == p.Location {
+		for _, kind := range []string{"car", "dress"} {
+			what, _, held := w.pawnable(kind)
+			if t := w.Ticketed(kind); t != nil && !t.Sold {
+				asks("redeem:"+kind, "Redeem "+lowerFirst(t.what(w)), PawnMinutes, w.RedeemPrice(kind), w.RedeemReadiness(kind),
+					fmt.Sprintf("$%d against the $%d they gave you, and %s left on the ticket. After that it is in the window.",
+						w.RedeemPrice(kind), t.Lent, counted(max(0, (t.Due-w.Minute)/1440), "day", "days")))
+				continue
+			}
+			if !held {
+				continue
+			}
+			add("pawn:"+kind, "Leave "+lowerFirst(what)+" over the counter", PawnMinutes, 0, w.PawnReadiness(kind),
+				fmt.Sprintf("$%d now, and $%d to get it back inside %d days. After that it belongs to whoever buys it.",
+					w.PawnValue(kind), max(w.PawnValue(kind)+1, w.PawnValue(kind)*PawnBack/100), PawnDays))
+		}
+	}
 	if Pumps(id) {
 		short := FuelFull - w.Fuel()
 		detail := fmt.Sprintf("$%d for what the tank is short. It reads %d of %d.", w.FuelFee(id), w.Fuel(), FuelFull)
@@ -1807,6 +1829,7 @@ func (w *World) Advance(minutes int) {
 			w.StillDay()
 			w.CasinoDay()
 			w.TableNight()
+			w.PawnDay()
 			w.CarDay()
 			w.CarTrade()
 			w.RepairsDay()
@@ -2186,4 +2209,7 @@ var PlaceIncome = map[string]int{
 	"filling": 19, "pumps": 16,
 	// A yard earns on what everybody else is finished with.
 	"scrapyard": 18,
+	// A pawnbroker earns on the difference between what somebody will take
+	// today and what the thing is worth, which is most of it.
+	"pawn": 17,
 }

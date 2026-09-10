@@ -98,6 +98,10 @@ func (w *World) RobBy(id string, hand Hand) error {
 	take := prop.Income*8 + int(w.Random()*float64(prop.Income*10))
 	take = take * prop.Condition / 100
 	w.Earn(take)
+	// Not all of it is money. What comes out of a till in a bag goes over a
+	// counter somewhere, and the only counter in this city that takes it
+	// without asking is the pawnbroker's.
+	w.FenceAbout(FenceTrade)
 	w.Player.Heat = min(100, w.Player.Heat+w.HandHeat(hand, 10))
 	w.Player.Respect += w.HandRespectFor(hand, 2)
 	prop.Condition = max(0, prop.Condition-5)

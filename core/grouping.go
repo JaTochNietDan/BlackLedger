@@ -98,6 +98,8 @@ var prefixGroup = [][2]string{
 	{"strike:", "street"}, {"send:", "street"},
 	// A car for one of your own, and plate on it: about them, not about you.
 	{"car:", "people"}, {"plate:", "people"},
+	// A counter is where money comes from when there is none.
+	{"pawn:", "money"}, {"redeem:", "money"},
 	{"buy:", "money"}, {"sell:", "money"}, {"play:", "tables"},
 	{"retain:", "standing"}, {"release:", "standing"}, {"smear:", "standing"},
 	{"enquire:", "standing"}, {"pact:", "standing"}, {"serve:", "standing"},
