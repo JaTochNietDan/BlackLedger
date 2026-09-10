@@ -7647,3 +7647,37 @@ for sale at $180 and a player with $40 is not shown it at all.
 
 Baseline unmoved: deaths 0/0/52/82/78/0/37, median cash
 12585/14129/7418/90/1063/5332/2080.
+
+## Why the loop was slow, and what it costs now
+
+"Your development loops are insanely slow now... this one has been running for
+almost 11 minutes with no updates."
+
+Measured rather than guessed. Every tick was paying:
+
+| | before | now |
+| --- | --- | --- |
+| iterating on a change | `gate`, 120s, every time | `quick`, 70s |
+| the balance baseline | `simulate`, 90s, every tick | only when the balance could have moved |
+| before committing | `gate`, 120s | `gate`, 118s |
+
+The core suite is 1,069 tests summing 676 seconds of test time and finishing in
+117 because they run in parallel. The 54 balance files are nearly all of that
+weight: the slowest single test is 52 seconds and the top twelve are 357 between
+them. They answer "did I move the balance", which is not the question being
+asked while a change is still being written. `heavy(t)` skips them under
+`-short` and calls `t.Parallel()` otherwise, so `mise run quick` answers "did I
+break anything structural" in seventy seconds and the gate still answers
+everything.
+
+Two things I tried that made it worse, kept here so they are not tried again:
+
+- **Running the baseline inside the gate.** Three saturating jobs at once, and
+  the gate went from 1m58 to 4m49 while the core suite alone slowed from 117s to
+  130s. The machine was already the bottleneck.
+- Nothing else was free. The duplicated `tsc --noEmit` — the gate ran it and
+  then ran `npm run build`, which is `tsc --noEmit && vite build` — was worth a
+  few seconds and is gone.
+
+`tools/baseline.py` prints the seven-strategy figures, so `mise run simulate`
+reports them itself instead of every tick retyping the same parser.

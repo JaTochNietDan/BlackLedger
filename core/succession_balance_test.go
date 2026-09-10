@@ -6,7 +6,7 @@ import "testing"
 // unstable. This measures a season of cities running on their own.
 
 func TestUpheavalIsAnEventNotAClimate(t *testing.T) {
-	t.Parallel()
+	heavy(t)
 	const runs, days = 200, 120
 	coups, cities, collapsed, spawned := 0, 0, 0, 0
 	for seed := uint32(1); seed <= runs; seed++ {

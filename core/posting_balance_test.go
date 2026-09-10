@@ -7,7 +7,7 @@ import "testing"
 // the ground it keeps against the men it uses up.
 
 func TestSomebodyOnTheDoorKeepsTheGround(t *testing.T) {
-	t.Parallel()
+	heavy(t)
 	const runs, days = 200, 60
 	measure := func(post bool) (condition, standing, buried int) {
 		for seed := uint32(1); seed <= runs; seed++ {

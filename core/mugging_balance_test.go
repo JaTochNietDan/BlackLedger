@@ -6,7 +6,7 @@ import "testing"
 // boss carries a great deal and is standing next to his organization.
 
 func TestWhoYouPickDecidesWhatItIsWorthAndWhatItCosts(t *testing.T) {
-	t.Parallel()
+	heavy(t)
 	const runs = 400
 	type result struct{ took, money, hurt int }
 	measure := func(rank int) result {

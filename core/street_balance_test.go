@@ -6,7 +6,7 @@ import "testing"
 // to be rare enough to stay an event over a whole campaign.
 
 func TestCrossingTheCityIsMostlyUneventful(t *testing.T) {
-	t.Parallel()
+	heavy(t)
 	const runs, journeys = 120, 60
 	sightings, injuries, deaths := 0, 0, 0
 	for seed := uint32(1); seed <= runs; seed++ {

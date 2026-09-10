@@ -7,7 +7,7 @@ import "testing"
 // is a real change in a campaign rather than a line in a log.
 
 func TestBeingSomebodyIsWorseThanBeingNobody(t *testing.T) {
-	t.Parallel()
+	heavy(t)
 	const runs, days = 150, 90
 	measure := func(incorporated bool) (raids, seizures, lost int) {
 		for seed := uint32(1); seed <= runs; seed++ {

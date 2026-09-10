@@ -10,7 +10,7 @@ import (
 // the alternative: sitting on the same money and running a laundry.
 
 func TestSellingIntoAWarIsTheBestAndWorstMoneyInTheCity(t *testing.T) {
-	t.Parallel()
+	heavy(t)
 	const runs, days = 200, 45
 	earned, raided, ruined := 0, 0, 0
 	quiet := 0

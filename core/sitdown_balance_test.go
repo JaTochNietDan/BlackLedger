@@ -7,7 +7,7 @@ import "testing"
 // simulation produced on its own.
 
 func TestSomeRoomsAreSafeAndSomeAreNot(t *testing.T) {
-	t.Parallel()
+	heavy(t)
 	const runs, days = 300, 90
 	quarrels, traps, warned := 0, 0, 0
 	for seed := uint32(1); seed <= runs; seed++ {
@@ -51,7 +51,7 @@ func TestSomeRoomsAreSafeAndSomeAreNot(t *testing.T) {
 }
 
 func TestSettlingAWarIsWorthTheEvening(t *testing.T) {
-	t.Parallel()
+	heavy(t)
 	const runs = 200
 	settled, ended, hurt := 0, 0, 0
 	for seed := uint32(1); seed <= runs; seed++ {

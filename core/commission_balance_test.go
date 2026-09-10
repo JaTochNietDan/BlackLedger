@@ -9,7 +9,7 @@ import "testing"
 // is derived from the asking organization's situation, so the purpose layer is
 // not one errand with the names changed.
 func TestTheCityAsksForDifferentThingsAtDifferentTimes(t *testing.T) {
-	t.Parallel()
+	heavy(t)
 	const runs = 300
 	kinds := map[string]int{}
 	for seed := uint32(1); seed <= runs; seed++ {
@@ -66,7 +66,7 @@ func TestTheCityAsksForDifferentThingsAtDifferentTimes(t *testing.T) {
 // TestADeliveryIsWorthTakingOnlySometimes measures the supply run against the
 // market it has to be bought on, so it is a judgement rather than free money.
 func TestADeliveryIsWorthTakingOnlySometimes(t *testing.T) {
-	t.Parallel()
+	heavy(t)
 	const runs = 400
 	profitable, ruinous, total := 0, 0, 0
 	for seed := uint32(1); seed <= runs; seed++ {
@@ -93,7 +93,7 @@ func TestADeliveryIsWorthTakingOnlySometimes(t *testing.T) {
 // TestFailingWorkCostsMoreThanNeverTakingIt is the point of a deadline: a
 // commission has to be a risk, not a free lottery ticket.
 func TestFailingWorkCostsMoreThanNeverTakingIt(t *testing.T) {
-	t.Parallel()
+	heavy(t)
 	w := New(11)
 	w.MigrateLivingWorld()
 	f := &w.Factions[0]

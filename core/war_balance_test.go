@@ -8,7 +8,7 @@ import "testing"
 // bounds are deliberately wide: they catch a tuning change that makes the city
 // degenerate, not small drift.
 func TestCityConflictStaysVaried(t *testing.T) {
-	t.Parallel()
+	heavy(t)
 	const campaigns, days = 200, 180
 	sawWar, seizures, wiped := 0, 0, 0
 	emptied, grew, born := 0, 0, 0

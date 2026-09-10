@@ -6,7 +6,7 @@ import "testing"
 // This measures both halves over a campaign.
 
 func TestAnUnderstandingIsBoughtWithMoneyAndPaidForInEnemies(t *testing.T) {
-	t.Parallel()
+	heavy(t)
 	const runs, days = 200, 60
 	measure := func(ally bool) (kept, hostility, spent int) {
 		for seed := uint32(1); seed <= runs; seed++ {

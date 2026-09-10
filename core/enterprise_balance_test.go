@@ -8,7 +8,7 @@ import "testing"
 // attention it brings, and one skims and launders it away. The middle one is
 // supposed to lose.
 func TestSkimmingPaysOnlyIfTheAttentionIsManaged(t *testing.T) {
-	t.Parallel()
+	heavy(t)
 	const campaigns, days = 120, 40
 
 	type outcome struct{ cash, heat, condition, raids, kept int }

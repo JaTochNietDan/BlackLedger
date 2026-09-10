@@ -7,7 +7,7 @@ import "testing"
 // is an anecdote.
 
 func TestGoingYourselfEarnsMoreAndCostsMore(t *testing.T) {
-	t.Parallel()
+	heavy(t)
 	const runs = 500
 	type result struct{ took, respect, heat, hurt, dead, lostCrew int }
 	measure := func(own bool) result {

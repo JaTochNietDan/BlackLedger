@@ -36,6 +36,21 @@ run = [
 # checks running while it goes. `verify` runs its steps in order, so a tick that
 # wanted all of it waited about three minutes with one core busy; this finishes
 # in the time the core suite takes on its own.
+[tasks.quick]
+description = "The fast half: everything except the balance measurements"
+run = """
+set -e
+go test -short ./core -count=1 > .runtime/quick-core.log 2>&1 &
+core=$!
+go test -short ./cmd/... ./sim ./store -count=1 > .runtime/quick-rest.log 2>&1 &
+rest=$!
+test -z "$(gofmt -l core cmd store sim)" || { gofmt -l core cmd store sim; exit 1; }
+npx tsc --noEmit
+wait $rest || { cat .runtime/quick-rest.log; exit 1; }
+wait $core || { cat .runtime/quick-core.log; exit 1; }
+echo "[quick] all clear"
+"""
+
 [tasks.gate]
 description = "Everything verify checks, with the slow and fast halves overlapped"
 run = """
@@ -52,7 +67,8 @@ go vet ./...
 # characters, which made them unreadable, unreviewable, and expensive to search:
 # one grep match cost more to read than the rest of the file.
 npx prettier --check 'src/**/*.{ts,tsx}'
-npx tsc --noEmit
+# npm run build is `tsc --noEmit && vite build`, so the type check that used to
+# sit on the line above this one was being run twice.
 npm run build >/dev/null
 npm test >/dev/null
 wait $rest || { cat .runtime/gate-rest.log; exit 1; }
@@ -67,8 +83,12 @@ description = "The full race-detector run"
 run = "go test -race ./core/ ./store/ ./sim/ ./cmd/blackledger/ -count=1"
 
 [tasks.simulate]
-description = "Headless campaigns at scale"
-run = "go run ./cmd/simulate"
+description = "Headless campaigns at scale, with the seven-strategy baseline printed"
+run = """
+set -e
+go run ./cmd/simulate > .runtime/sim.json
+python3 tools/baseline.py .runtime/sim.json
+"""
 
 [tasks.workshop]
 description = "The playtest workshop, on its own port, against a scratch world"

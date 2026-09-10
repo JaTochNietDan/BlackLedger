@@ -10,7 +10,7 @@ import (
 // it its trade. This measures which way that comes out over a campaign.
 
 func TestTheBooksAndTheShopPullAgainstEachOther(t *testing.T) {
-	t.Parallel()
+	heavy(t)
 	const runs, days = 120, 60
 	shop := func(launderEvery int) (int, int) {
 		earned, custom := 0, 0
@@ -50,7 +50,7 @@ func TestTheBooksAndTheShopPullAgainstEachOther(t *testing.T) {
 // And the standing order is the reward for the other way of playing it: a shop
 // kept at capacity earns more than one merely owned.
 func TestAShopWorthRelyingOnEarnsMore(t *testing.T) {
-	t.Parallel()
+	heavy(t)
 	const days = 90
 	run := func(mind bool) int {
 		w := New(7)

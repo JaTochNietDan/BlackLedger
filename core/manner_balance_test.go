@@ -7,7 +7,7 @@ import "testing"
 // actually reaches on its own.
 
 func TestACityDescribesItsDeathsDifferently(t *testing.T) {
-	t.Parallel()
+	heavy(t)
 	const runs, days = 300, 120
 	descriptions := map[string]int{}
 	deaths := 0

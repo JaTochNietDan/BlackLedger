@@ -9,7 +9,7 @@ import (
 // standing benefit, so the only honest question is where it starts paying.
 
 func TestAMayorOnlyPaysForHimselfWithAPortfolio(t *testing.T) {
-	t.Parallel()
+	heavy(t)
 	const days = 60
 	run := func(places []string, retained bool) int {
 		w := New(37)
@@ -41,7 +41,7 @@ func TestAMayorOnlyPaysForHimselfWithAPortfolio(t *testing.T) {
 }
 
 func TestACommissionerBuysYouRoomToRunHot(t *testing.T) {
-	t.Parallel()
+	heavy(t)
 	const runs, days = 300, 30
 	raided := func(retained bool) int {
 		hit := 0

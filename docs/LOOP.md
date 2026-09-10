@@ -147,10 +147,25 @@ Do not claim an effect you have not measured.
 
 ### Gates
 
-`mise run gate` (~90s) is all of it: the core suite and the API suites start
-first and the format check, vet, tsc, the build and the 45 node tests run while
-they go. `go test ./core` alone is ~90s; the balance tests run in parallel with
-each other and the run is race-clean.
+**`mise run quick` (~70s) while you are working.** The core, API, sim and store
+suites under `-short`, plus gofmt and tsc. The balance measurements skip: they
+are 54 files running tens of thousands of simulated days, 676 seconds of test
+time against a suite that finishes in 117 because they run in parallel with each
+other, and they answer "did I move the balance" rather than "did I break
+something".
+
+**`mise run gate` (~120s) before committing.** All of it, balance included: the
+core suite and the API suites start first and the format check, vet, prettier,
+the build and the 56 node tests run while they go.
+
+**`mise run simulate` (~90s) only when the tick could have moved the balance.**
+It prints the baseline itself now. Running it every tick cost ninety seconds an
+hour for a number that had not changed; running it inside the gate cost more
+than that, because three saturating jobs at once made the whole gate 4m49
+against 1m58.
+
+One tick is: `quick` while iterating, `gate` once, `simulate` only if the
+balance could have moved, then the live game and the commit.
 
 Balance baseline, seven strategies
 (worker/investor/defiant/reckless/thief/smuggler/racketeer):

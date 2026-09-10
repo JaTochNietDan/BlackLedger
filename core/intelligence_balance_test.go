@@ -6,7 +6,7 @@ import "testing"
 // measures what a campaign actually knows about the city it is living in.
 
 func TestMostOfTheCityIsSomethingYouHaveNotAskedAbout(t *testing.T) {
-	t.Parallel()
+	heavy(t)
 	const runs, days = 200, 60
 	levels := map[int]int{}
 	for seed := uint32(1); seed <= runs; seed++ {

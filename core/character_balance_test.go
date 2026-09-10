@@ -7,7 +7,7 @@ import "testing"
 // to them.
 
 func TestWhoYouAreDecidesHowItEnds(t *testing.T) {
-	t.Parallel()
+	heavy(t)
 	const runs, days = 400, 20
 	type result struct{ acted, won, died int }
 	results := map[string]*result{}
@@ -54,7 +54,7 @@ func TestWhoYouAreDecidesHowItEnds(t *testing.T) {
 }
 
 func TestGraspingPeopleTakeMore(t *testing.T) {
-	t.Parallel()
+	heavy(t)
 	const runs = 300
 	take := map[string]int{}
 	for _, id := range []string{"greedy", "careful"} {
