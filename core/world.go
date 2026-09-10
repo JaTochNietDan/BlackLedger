@@ -1942,6 +1942,13 @@ func (w *World) AcquireReadiness(id string) string {
 	if prop := w.Properties[id]; prop == nil || prop.Income <= 0 {
 		return "There is nothing here to take over"
 	}
+	// And a place with no price is not for sale. The bar, the docks, the
+	// exchange and the club all earn and all carry a cost of nothing, because
+	// none of them was ever meant to change hands — opening the business block
+	// to everywhere that earns offered them for free.
+	if place, ok := PlaceByID(id); !ok || place.Cost <= 0 {
+		return "This is not somewhere that changes hands"
+	}
 	if w.Own(id) {
 		return "This is already yours"
 	}

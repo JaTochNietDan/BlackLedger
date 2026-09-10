@@ -148,3 +148,39 @@ func TestABusinessYouHoldCanBeRun(t *testing.T) {
 		}
 	}
 }
+
+// A place with no price is not for sale. The bar, the docks, the exchange and
+// the Bellandi club all earn and all carry a cost of nothing, because none of
+// them was ever meant to be bought — and "Establish protection, $0" on the
+// exchange is the interface offering a business for free.
+func TestSomewhereWithNoPriceIsNotForSale(t *testing.T) {
+	w := New(9)
+	w.District = 2
+	w.Player.Cash, w.Player.Respect, w.Player.Health = 40000, 90, 100
+	for _, l := range Locations {
+		prop := w.Properties[l.ID]
+		if prop == nil || prop.Income <= 0 || l.Cost > 0 {
+			continue
+		}
+		// Nobody holds it, so the only thing left that can refuse is the
+		// missing price. In a fresh city all four of these are family-held, and
+		// "belongs to another organization" would answer for them whether the
+		// price rule existed or not — which is a guard that cannot fail.
+		prop.Owner = "independent"
+		w.Player.Location = l.ID
+		for _, a := range w.Actions(l.ID) {
+			if a.ID != "acquire" {
+				continue
+			}
+			if !a.Disabled {
+				t.Errorf("%s costs nothing and is offered for sale anyway", l.ID)
+			}
+			if a.Cost == 0 && !a.Disabled {
+				t.Errorf("%s is a business for free", l.ID)
+			}
+		}
+		if reason := w.AcquireReadiness(l.ID); reason == "" {
+			t.Errorf("%s has no price and the rules allow taking it over", l.ID)
+		}
+	}
+}
