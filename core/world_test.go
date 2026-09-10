@@ -121,13 +121,24 @@ func TestWarningAndInterruption(t *testing.T) {
 		t.Fatal("did not pause at attack")
 	}
 }
+// This test used to assert the opposite: that a player standing in a bar was
+// safe and came home to a broken door. That is the behaviour the inbox
+// complained about — "they always seem to hit my home when I'm not there and
+// they are coming after me" — so the test is changed, not the code. A hit
+// nobody warned you about now goes where you are. The house is only what they
+// settle for when they were told where to find you and you were not there,
+// which TestWarningAllowsLeavingBeforeHit still guards.
 func TestAbsentPlayer(t *testing.T) {
 	w := New(27)
 	w.Player.Location = "bar"
+	condition := w.Properties["room"].Condition
 	w.Retaliation()
 	w.Advance(300)
-	if !w.Player.Alive || w.Properties["room"].Condition != 55 {
-		t.Fatal("absent target killed at home")
+	if w.Properties["room"].Condition != condition {
+		t.Fatal("they went to the house instead of to the bar the player was standing in")
+	}
+	if w.Player.Alive && w.Event == nil && w.Player.Health == 100 {
+		t.Fatal("an unwarned hit found the player in a bar and did nothing")
 	}
 }
 func TestTribute(t *testing.T) {

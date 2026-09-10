@@ -470,6 +470,11 @@ type World struct {
 	// where the drums stopped — is saved state, and somebody walking up to it
 	// should not be shown a game that started without them.
 	Seated string `json:"seated,omitempty"`
+	// Where the player is, when that is two hundred miles outside the city. A
+	// journey between two addresses and a week in Halloway both park the player
+	// in "transit", and they are not the same thing at all: one is a walk
+	// somebody can follow you down, the other is out of everybody's reach.
+	Abroad string `json:"abroad,omitempty"`
 	// A hand on the table that has not been settled. Absent whenever nobody is
 	// sitting at one, which is nearly always.
 	Hand *TableHand `json:"hand,omitempty"`
@@ -1584,34 +1589,29 @@ func (w *World) Die(cause string) {
 	w.Log(p.Name+" is dead", cause+" Your life ends here. The city continues.", "death")
 }
 func (w *World) Attack(plot Plot) {
-	p := &w.Player
-	if p.Location != p.Home {
-		w.Properties[p.Home].Condition = max(10, w.Properties[p.Home].Condition-45)
-		w.Witness("attack", p.Home, "Somebody came armed and damaged your residence while you were away.", "")
-		w.Log("Someone came looking", "You were away. They came armed, damaged your residence and left before anyone could identify them.", "danger")
+	// Two places in the world they cannot walk into: a police cell, and
+	// anywhere that is not this city. Both leave them the house.
+	if w.Held() || w.Abroad != "" {
+		w.wreckTheHouse()
 		return
 	}
-	if plot.Known || w.Watchers() > 0 || w.Reach() >= 2 {
-		home, _ := PlaceByID(p.Home)
-		body := "A car stops outside " + home.Name + ". "
-		if w.Guard() > 0 {
-			body += "Your security raises the alarm."
-		} else {
-			body += "A contact calls: leave by the back, now."
-		}
-		w.Event = &Scene{ID: "attack-" + plot.ID, Title: "Headlights outside", Body: body + " You have moments to act.", Speaker: w.HolderID("fixer"), Kind: "attack", Source: "authored", Minute: w.Minute, Choices: []Choice{{ID: "escape", Label: "Leave through the rear", Detail: "A chance to escape. Security and contacts help; injuries reduce your odds."}, {ID: "defend", Label: "Hold the entrance", Detail: "Rely on your security. Injuries and a weak defense can be fatal."}, {ID: "bargain", Label: "Offer $180 to stand down", Cost: 180, Detail: "Money may settle this incident, but your standing suffers."}}}
-	} else if w.Random() < .78-float64(p.Armour)*.09-w.doorProtection() {
-		w.Die("An attack at your residence caught you without warning or protection.")
-	} else {
-		p.Health = max(1, p.Health-w.Absorb(65))
-		w.Ruin(55)
-		w.Damage(40)
-		worn := "Nobody warned you."
-		if p.Armour > 0 {
-			worn = "What you were wearing took the worst of it."
-		}
-		w.Log("You survived by inches", "The attackers leave you wounded. "+worn+" You need rest and protection.", "danger")
+	// A warning is worth exactly this. Somebody told you they were coming and
+	// told you to stay away from home, so that is where they went. Being
+	// somewhere else is the whole value of having been warned; it costs the
+	// house, which is what makes it a decision rather than a free pass.
+	if plot.Known && w.Player.Location != w.Player.Home {
+		w.wreckTheHouse()
+		return
 	}
+	if w.Warned(plot) {
+		w.ambushScene(plot)
+		return
+	}
+	if w.Random() < w.AmbushOddsHere() {
+		w.Die(fmt.Sprintf("An attack at %s caught you without warning or protection.", w.whereItHappens()))
+		return
+	}
+	w.survived()
 }
 func (w *World) Advance(minutes int) {
 	p := &w.Player

@@ -5576,3 +5576,73 @@ dismissal — it is the thing to check first next time a fixed label reappears.
 
 Evidence: `core/sitting_test.go`, one break verified — disabling the clear in
 `clearTable` fails the sitting test in the right direction.
+
+## A hit comes to where you are
+
+From the inbox: "Can people only make attempts on your life while you're at
+home? They always seem to hit my home when I'm not there and they are coming
+after me."
+
+They could not. `Attack` returned early unless the player was standing in their
+own residence, took forty-five condition off the house and left. So anybody who
+spent the day working was unkillable, and the punishment for having a life was
+a broken door.
+
+The rule now asks where you are and what that place is worth.
+
+| Where | What it is worth |
+|---|---|
+| Home | the door, as before |
+| A room, per stranger in it | 5%, up to 25% |
+| A room, per one of yours in it | 10%, up to 20% |
+| Any room, in total | never more than 35% |
+| The street between two addresses | nothing, and 10% against you |
+
+A room also warns you when it is busy enough — three people, enough that a
+stranger walking in with his hand in his coat is something somebody says out
+loud — and a warned player gets the escape, defend or bargain scene wherever
+they are standing rather than only at home.
+
+Two places they cannot walk into, and both leave them the house: a police cell,
+and anywhere outside the city. The second needed the world to say so. A walk
+between two addresses and a week in Halloway both parked the player in
+"transit", which is how the first version of this quietly made leaving town
+worthless — the test that measures what a journey buys went to nought of three
+hundred. `World.Abroad` names the destination while the player is out of the
+city, so the two cases stopped being the same string.
+
+A warning still buys what it always bought. Somebody told you they were coming
+and told you to avoid home, so that is where they go: being elsewhere costs you
+the door instead of your life, which is a decision rather than a free pass.
+
+**Two test changes, both deliberate.** `TestAbsentPlayer` asserted the exact
+behaviour the inbox complained about — a player in a bar comes home to a house
+at 55 — so the test changed and the code did not. It now asserts the opposite,
+and `TestWarningAllowsLeavingBeforeHit` still guards the house-instead case that
+a warning creates. `TestNobodyInThisCityHasAGenderTheGameNeverGaveThem` caught
+"Two men come through the door" in the new scene, which is the guard doing its
+job; it reads "Two of them" now.
+
+**Measured, three arms rather than two.** Counting survivors of a warned attack
+measures the warning, not the room: a scene raised is a player still standing,
+and that test passes whatever cover is worth. So the measurement uses a room
+below the number of people it takes to warn you.
+
+| Where, 400 unwarned attacks | Survived |
+|---|---|
+| A bar with two people in it | 131 |
+| An empty bar | 90 |
+| The street | 48 |
+
+Deleting cover collapses the first two to 90 and 90; deleting the street penalty
+collapses the last two to 90 and 90. Each half of the rule fails the test on its
+own, in the right direction.
+
+**Balance is unchanged**, and here that is a real measurement rather than an
+absence of one. Deaths 50/0/82/0 and median cash 7223/13903/90/12360, identical
+to the recorded baseline. Making an unwarned attack certainly fatal moves
+reckless from 82 deaths to 100 and nothing else, so the simulation does reach
+the new path — it is just that the strategies which get shot at are shot at
+home.
+
+Evidence: `core/ambush_test.go`, `core/ambush.go`, two breaks verified.

@@ -186,13 +186,6 @@ you did for blackjack and roulette. Right now it looks scraggy.
 
 ---
 
-Can people only make attempts on your life while you're at home? They always
-seem to hit my home when I'm not there and they are coming after me.
-
-— answered: only at home, by the rule in w.Attack. The rule itself is not fixed yet
-
----
-
 I thought we added car sales so you could buy new cars that would increase you traversal speed
 but when I go to the car dealership I don't see any option to buy cars.
 
@@ -273,6 +266,19 @@ I don't think "moving against X business yourself" should required respect, that
 Ensure efficiency of development loops by increasing efficiency of your workflow in any way that you can accomplish.
 
 ## Inbox — answered
+
+Can people only make attempts on your life while you're at home? They always
+seem to hit my home when I'm not there and they are coming after me.
+
+— built: a hit comes to where you are standing. The room decides how much of a
+  chance you get — people in it make them careful and give somebody time to see
+  them come in, your own people make them slower, and the street between two
+  addresses has neither. Two places they cannot walk into: a police cell, and
+  anywhere outside the city. A warning is still worth what it always was: they
+  go to the house they were told to find you at, and being somewhere else costs
+  you the door instead of your life.
+
+---
 
 When setting up the funding on a casino that you own, you should be able to set
 that to an actual number by entering it, not having to use a pre-set amount. We

@@ -163,6 +163,11 @@ func (w *World) Trip(id string) error {
 	// Out of the city means out of the city: nothing that asks where the player
 	// is standing can be satisfied while they are two hundred miles from it.
 	w.Player.Location = "transit"
+	// Out of the city, and the world says so. "transit" alone is also an
+	// ordinary walk between two addresses, which is a place somebody can catch
+	// you on.
+	w.Abroad = d.ID
+	defer func() { w.Abroad = "" }()
 	left := w.Minute
 	dodged := 0
 	relief := 0
