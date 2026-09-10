@@ -139,10 +139,7 @@ func (w *World) PullReadiness(id string, stake Stake) string {
 	if w.Own(id) {
 		return "You would be playing your own machine"
 	}
-	if w.Player.Cash < stake.Amount {
-		return "Not enough cash"
-	}
-	return ""
+	return w.StakeReadiness(id, stake.Amount, w.MachineLimit(id))
 }
 
 // A Pull is where the reels stopped, kept so the interface can show the
@@ -152,14 +149,14 @@ type Pull struct {
 	Stake string
 	Stops [3]int
 	Pays  int
+	// Down is what went in. Stake is the old fixed lot by name, kept so a pull
+	// in an older save still reads.
+	Down int `json:"down,omitempty"`
 }
 
 // PullHandle plays one line on a machine.
-func (w *World) PullHandle(id, stakeID string) error {
-	stake, ok := slotStake(stakeID)
-	if !ok {
-		return fmt.Errorf("no such machine")
-	}
+func (w *World) PullHandle(id string, amount int) error {
+	stake := Stake{ID: "typed", Label: "A pull", Amount: amount}
 	if reason := w.PullReadiness(id, stake); reason != "" {
 		return fmt.Errorf("%s", reason)
 	}
@@ -176,7 +173,7 @@ func (w *World) PullHandle(id, stakeID string) error {
 	}
 	line := [3]Symbol{symbolAt(stops[0]), symbolAt(stops[1]), symbolAt(stops[2])}
 	pays := MachinePays(line)
-	w.Reels = &Pull{Place: id, Stake: stakeID, Stops: stops, Pays: pays}
+	w.Reels = &Pull{Place: id, Down: amount, Stops: stops, Pays: pays}
 
 	place, _ := PlaceByID(id)
 	house := w.faction(w.Properties[id].Owner)
@@ -212,7 +209,7 @@ func (w *World) MachineDescription() map[string]any {
 		return out
 	}
 	place, _ := PlaceByID(w.Reels.Place)
-	stake, _ := slotStake(w.Reels.Stake)
+	stake := Stake{Amount: w.pullDown()}
 	line := []string{}
 	for _, stop := range w.Reels.Stops {
 		line = append(line, symbolAt(stop).ID)
@@ -229,6 +226,20 @@ func sevenPays() int {
 		if s.ID == "seven" {
 			return s.Pays
 		}
+	}
+	return 0
+}
+
+// pullDown is what went into the machine on the last pull.
+func (w *World) pullDown() int {
+	if w.Reels == nil {
+		return 0
+	}
+	if w.Reels.Down > 0 {
+		return w.Reels.Down
+	}
+	if stake, ok := slotStake(w.Reels.Stake); ok {
+		return stake.Amount
 	}
 	return 0
 }

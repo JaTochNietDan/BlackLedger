@@ -25,8 +25,12 @@ const (
 // TableHand is a session at the tables that has not finished. It lives on the world
 // because it is real: money has been staked and the cards are on the table.
 type TableHand struct {
-	// Place is the room, and Stake what is down.
+	// Place is the room. Stake was one of two fixed lots by name and is kept
+	// only so a hand already on the table in an older save can be read; Down is
+	// what is actually on the cloth, in dollars, because a player picks the
+	// number now.
 	Place, Stake string
+	Down         int `json:"down,omitempty"`
 	// Player and Dealer are the totals showing.
 	Player, Dealer int
 	// Cards is how many the player has taken, so a natural can be told from a
@@ -105,11 +109,8 @@ func Total(cards []Card) int {
 }
 
 // Deal starts a hand. The stake is taken now, because it is on the table now.
-func (w *World) Deal(id, stakeID string) error {
-	stake, ok := tableStake(stakeID)
-	if !ok {
-		return fmt.Errorf("no such game")
-	}
+func (w *World) Deal(id string, amount int) error {
+	stake := Stake{ID: "typed", Label: "A hand", Amount: amount}
 	if reason := w.TableReadiness(id, stake); reason != "" {
 		return fmt.Errorf("%s", reason)
 	}
@@ -121,7 +122,7 @@ func (w *World) Deal(id, stakeID string) error {
 	}
 	mine := []Card{w.card(), w.card()}
 	theirs := []Card{w.card()}
-	w.Hand = &TableHand{Place: id, Stake: stakeID, Mine: mine, Theirs: theirs,
+	w.Hand = &TableHand{Place: id, Down: amount, Mine: mine, Theirs: theirs,
 		Player: Total(mine), Dealer: Total(theirs), Cards: len(mine)}
 	place, _ := PlaceByID(id)
 	w.Log("A hand at "+place.Name, fmt.Sprintf("$%d down. You are showing %d and the dealer is showing %d.", stake.Amount, w.Hand.Player, w.Hand.Dealer), "personal")
@@ -169,7 +170,7 @@ func (w *World) Stand() error {
 func (w *World) settleHand(won bool, why string) error {
 	hand := w.Hand
 	hand.Done = true
-	stake, _ := tableStake(hand.Stake)
+	stake := Stake{Amount: w.handDown(hand)}
 	place, _ := PlaceByID(hand.Place)
 	house := w.faction(w.Properties[hand.Place].Owner)
 
@@ -201,7 +202,7 @@ func (w *World) settleHand(won bool, why string) error {
 func (w *World) push(why string) error {
 	hand := w.Hand
 	hand.Done = true
-	stake, _ := tableStake(hand.Stake)
+	stake := Stake{Amount: w.handDown(hand)}
 	place, _ := PlaceByID(hand.Place)
 	w.Earn(stake.Amount)
 	w.Log("A stand-off at "+place.Name, why+" Your money comes back and nobody is any better off.", "business")
@@ -214,7 +215,7 @@ func (w *World) HandDescription() map[string]any {
 		return map[string]any{"playing": false}
 	}
 	place, _ := PlaceByID(w.Hand.Place)
-	stake, _ := tableStake(w.Hand.Stake)
+	stake := Stake{Amount: w.handDown(w.Hand)}
 	// The cards themselves, so a table can draw what was dealt rather than a
 	// number. Never nil: a row the interface has to guard is a row it will
 	// eventually forget to guard.
@@ -231,4 +232,19 @@ func (w *World) HandDescription() map[string]any {
 		"player": w.Hand.Player, "dealer": w.Hand.Dealer, "cards": w.Hand.Cards,
 		"mine": mine, "theirs": theirs, "where": w.Hand.Place,
 	}
+}
+
+// handDown is what is on the cloth. A hand written before players could name a
+// number carries one of the two old lots by name instead, and reads as that.
+func (w *World) handDown(hand *TableHand) int {
+	if hand == nil {
+		return 0
+	}
+	if hand.Down > 0 {
+		return hand.Down
+	}
+	if stake, ok := tableStake(hand.Stake); ok {
+		return stake.Amount
+	}
+	return 0
 }

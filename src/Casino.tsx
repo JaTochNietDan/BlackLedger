@@ -1,6 +1,6 @@
 import {useEffect, useRef, useState} from 'react';
 import type {Action, Presence, Record as Entry} from './types';
-import {CardTable, Machine, Wheel} from './Tables';
+import {CardTable, Machine, Money, Wheel} from './Tables';
 import type {HandState, MachineState, WheelState} from './Tables';
 
 // Sitting down at a table is not a thing you do out of the corner of a sidebar.
@@ -22,8 +22,7 @@ import type {HandState, MachineState, WheelState} from './Tables';
 // which no city has, and every card played comes back "that action is not
 // available here". The target is the id of the room the player is standing in.
 export function isTableAction(id: string) {
-  return id.startsWith('play:') || id.startsWith('wheel:') || id.startsWith('pull:') ||
-    id === 'hit' || id === 'stand';
+  return id === 'play' || id === 'wheel' || id === 'pull' || id === 'hit' || id === 'stand';
 }
 
 export function hasTables(actions: Action[]) {
@@ -32,7 +31,7 @@ export function hasTables(actions: Action[]) {
 
 type Game = 'cards' | 'wheel' | 'machine';
 
-export function Casino({place, actions, people, hand, wheel, machine, cash, money, revision, records, act, onLeave}: {
+export function Casino({place, actions, people, hand, wheel, machine, house, cash, money, revision, records, act, onLeave}: {
   place: string;
   actions: Action[];
   // Who else is in the room. Not drawn here any more — the room itself shows
@@ -44,6 +43,9 @@ export function Casino({place, actions, people, hand, wheel, machine, cash, mone
   // The machines against the wall. A room can have those and no tables at all,
   // which is the whole point of them.
   machine: MachineState;
+  // What this room takes on one bet, which is the holder's decision and not
+  // this component's.
+  house: {limit?:number; machine?:number; least?:number; usual?:number; pull?:number; yours?:boolean; high?:number};
   wheel: WheelState;
   cash: number;
   money: (n: number) => string;
@@ -51,16 +53,20 @@ export function Casino({place, actions, people, hand, wheel, machine, cash, mone
   // on every render.
   revision: number;
   records: Entry[];
-  act: (command: {kind: string; target?: string; choice?: string}) => void;
+  act: (command: {kind: string; target?: string; choice?: string; amount?: number}) => void;
   onLeave: () => void;
 }) {
   // A hand that is already dealt is the game you are playing, whatever tab you
   // were last looking at.
   const [game, setGame] = useState<Game>(hand.playing ? 'cards' : 'wheel');
+  // What the player is putting down, in dollars. Theirs to set, up to what the
+  // room takes; the core refuses anything past it whatever this says.
+  const [bet, setBet] = useState(0);
+  const [pull, setPull] = useState(0);
   useEffect(() => { if (hand.playing) setGame('cards') }, [hand.playing]);
   // A room with nothing but machines opens on them.
   useEffect(() => {
-    if (!hand.playing && !actions.some(a => a.id.startsWith('play:') || a.id.startsWith('wheel:'))) setGame('machine');
+    if (!hand.playing && !actions.some(a => a.id === 'play' || a.id === 'wheel')) setGame('machine');
   }, [actions, hand.playing]);
 
   // What the night has done so far. The ledger has all of this and always did;
@@ -74,12 +80,16 @@ export function Casino({place, actions, people, hand, wheel, machine, cash, mone
     if (fresh.length) setNight(was => [...fresh, ...was].slice(0, 12));
   }, [revision, records]);
 
-  const stakes = (prefix: string) => actions.filter(a => a.id.startsWith(prefix));
+  const at = (id: string) => actions.find(a => a.id === id);
   const dealt = hand.playing;
-  const machines = stakes('pull:');
+  const bandit = at('pull');
+  const cards = at('play');
+  const spin = at('wheel');
   // A poolhall with a bandit against the wall is not a casino, and the room
   // should not offer a felt it does not have.
-  const tables = actions.some(a => a.id.startsWith('play:') || a.id.startsWith('wheel:'));
+  const tables = !!cards || !!spin;
+  const least = house.least ?? 1;
+  const limit = house.limit ?? 0;
 
   return <div className="modal-shade table-shade">
     <section className="casino" role="dialog" aria-modal="true" aria-label={'The tables at ' + place}>
@@ -98,7 +108,7 @@ export function Casino({place, actions, people, hand, wheel, machine, cash, mone
       <nav className="casino-games" aria-label="Games">
         {tables && <button aria-pressed={game === 'cards'} onClick={() => setGame('cards')}>Blackjack</button>}
         {tables && <button aria-pressed={game === 'wheel'} onClick={() => setGame('wheel')} disabled={dealt}>Roulette</button>}
-        {machines.length > 0 && <button aria-pressed={game === 'machine'} onClick={() => setGame('machine')}
+        {!!bandit && <button aria-pressed={game === 'machine'} onClick={() => setGame('machine')}
           disabled={dealt}>The machines</button>}
       </nav>
 
@@ -112,19 +122,28 @@ export function Casino({place, actions, people, hand, wheel, machine, cash, mone
                     ? 'That hand is finished. Put something down and the next one is dealt a card at a time.'
                     : 'Nothing on the table. Put something down and it is dealt a card at a time.'}</p>
                   <div className="felt-actions">
-                    {stakes('play:').map(a => <button key={a.id} disabled={a.disabled} title={a.disabled ? a.reason : undefined}
-                      onClick={() => act({kind: a.id})}>{a.label}</button>)}
+                    <Money label="What you put down" amount={bet || house.usual || least} limit={limit}
+                           least={least} cash={cash} onChange={setBet}/>
+                    <button disabled={cards?.disabled} title={cards?.disabled ? cards.reason : undefined}
+                            onClick={() => act({kind: 'play', amount: bet || house.usual || least})}>
+                      Deal {money(bet || house.usual || least)}
+                    </button>
                   </div>
-                  {stakes('play:').every(a => a.disabled) && <p className="felt-refused">{stakes('play:')[0]?.reason}</p>}
+                  {cards?.disabled && <p className="felt-refused">{cards.reason}</p>}
+                  {(bet || house.usual || least) >= (house.high ?? Infinity) &&
+                    <p className="felt-note">Money like that and the floor wants to know who you are.</p>}
                 </div>}
               </div>
             : game === 'machine'
-            ? <Machine machine={machine} money={money} turn={revision}
-                       stakes={machines.filter(a => !a.disabled).map(a => ({id: a.id.slice(5), amount: a.asks ?? 0}))}
-                       pull={id => act({kind: 'pull:' + id})}/>
-            : <Wheel wheel={wheel} money={money} turn={revision}
-                     stakes={stakes('wheel:').filter(a => !a.disabled).map(a => ({id: a.id.slice(6), amount: a.asks ?? 0}))}
-                     spin={(stake, bet) => act({kind: 'wheel:' + stake, choice: bet})}/>}
+            ? <Machine machine={machine} money={money} turn={revision} cash={cash}
+                       least={least} limit={house.machine ?? least}
+                       amount={pull || house.pull || least} onAmount={setPull}
+                       refused={bandit?.disabled ? bandit.reason : ''}
+                       pull={amount => act({kind: 'pull', amount})}/>
+            : <Wheel wheel={wheel} money={money} turn={revision} cash={cash}
+                     least={least} limit={limit} amount={bet || house.usual || least} onAmount={setBet}
+                     refused={spin?.disabled ? spin.reason : ''}
+                     spin={(amount, choice) => act({kind: 'wheel', amount, choice})}/>}
         </div>
 
         <aside className="casino-night" aria-label="What the table has done">

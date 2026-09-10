@@ -232,6 +232,9 @@ type Property struct {
 	// What is behind the tables at a casino. Absent everywhere else, and in
 	// saves written before a room ran a float of its own.
 	Bankroll int `json:"bankroll,omitempty"`
+	// Limit is the most this room will take on one bet, set by whoever holds
+	// it. Nothing means nobody has said, and the room runs on what it is worth.
+	Limit int `json:"limit,omitempty"`
 	// What has been fitted to a residence. It belongs to the building rather
 	// than to whoever lives there. Absent in saves written before that was
 	// possible, which is a place with nothing in it.
@@ -489,6 +492,11 @@ type Command struct {
 	Target    string `json:"target"`
 	Event     string `json:"event"`
 	Choice    string `json:"choice"`
+	// Amount is money the player typed rather than picked: what to put down on
+	// a bet, what to put behind the tables, what to wire out of the city. Zero
+	// means they did not name one, and whatever the action would have done with
+	// a fixed lot still applies.
+	Amount int `json:"amount,omitempty"`
 }
 type Action struct {
 	// Group is what this action is for, so the interface can offer ninety of
@@ -1058,48 +1066,44 @@ func (w *World) Actions(id string) []Action {
 	// and whatever is in your pocket, which is why they are in rooms that are
 	// not casinos at all.
 	if HasMachines(id) {
-		for _, stake := range SlotStakes() {
-			// Cost is zero: PullHandle takes the money itself.
-			asks("pull:"+stake.ID, stake.Label, 15, stake.Amount, w.PullReadiness(id, stake),
-				fmt.Sprintf("$%d a pull on three drums of twenty. Three of a kind pays what is written on the machine, up to %d to 1 for the sevens, and a cherry on its own gives you your money back. The machine keeps about %d in every hundred that goes through it.",
-					stake.Amount, sevenPays(), MachineEdge()))
-		}
+		// One machine, and you decide what goes in it. Cost is zero because
+		// PullHandle takes the money itself, and the amount rides on the
+		// command rather than being one of two buttons.
+		asks("pull", "Play the machines", 15, 0, w.PullReadiness(id, Stake{Amount: w.MachineStakeOrUsual(id, 0)}),
+			fmt.Sprintf("Anything from $%d to $%d a pull on three drums of twenty. Three of a kind pays what is written on the machine, up to %d to 1 for the sevens, and a cherry on its own gives you your money back. The machine keeps about %d in every hundred that goes through it.",
+				LeastStake, w.MachineLimit(id), sevenPays(), MachineEdge()))
 	}
 	if HasTables(id) && !w.Own(id) {
-		for _, stake := range tableStakes {
-			// Cost is zero here because Play charges the stake itself; declaring
-			// it would have the command layer charge it a second time.
-			reason := w.TableReadiness(id, stake)
-			if reason == "" && w.Hand != nil && !w.Hand.Done {
-				// Where the hand is, the buttons to play it are right beside
-				// this and the refusal needs to say nothing more. Anywhere
-				// else, the refusal is all the player gets: reading the casino
-				// and the club side by side, both said "There is a hand on the
-				// table already" and only one of them offered anything to do
-				// about it. The room was on the hand the whole time.
-				reason = "You are in the middle of a hand"
-				if w.Hand.Place != id {
-					where := w.Hand.Place
-					if place, ok := PlaceByID(w.Hand.Place); ok {
-						where = place.Name
-					}
-					reason = "There is a hand of yours still on the table at " + where
+		// Cost stays nothing on both of these: each takes its own money, and
+		// what it takes is the amount the player named rather than one of two
+		// lots the room decided for them.
+		bet := w.TableStakeOrUsual(id, 0)
+		reason := w.TableReadiness(id, Stake{Amount: bet})
+		if reason == "" && w.Hand != nil && !w.Hand.Done {
+			// Where the hand is, the buttons to play it are right beside this
+			// and the refusal needs to say nothing more. Anywhere else, the
+			// refusal is all the player gets.
+			reason = "You are in the middle of a hand"
+			if w.Hand.Place != id {
+				where := w.Hand.Place
+				if place, ok := PlaceByID(w.Hand.Place); ok {
+					where = place.Name
 				}
+				reason = "There is a hand of yours still on the table at " + where
 			}
-			add("play:"+stake.ID, stake.Label, 60, 0, reason,
-				fmt.Sprintf("Stake $%d and play it out a card at a time. The dealer draws to %d and stands on %d, a tie gives your money back, and going over is finished before the dealer plays at all.", stake.Amount, DealerStands-1, DealerStands))
 		}
-		// The wheel. One decision, made before anything happens, and then
-		// nothing to do about it — which is the opposite of a hand of cards
-		// and the reason a room worth walking into offers both. The bets are
-		// on the cloth rather than on buttons, so this offers the wheel and
-		// the interface asks what to back.
-		for _, stake := range tableStakes {
-			// Cost stays nothing: PlayWheel charges the stake itself.
-			asks("wheel:"+stake.ID, "Play the wheel"+stakeSuffix(stake), 45, stake.Amount,
-				w.SpinReadiness(id, "red", stake),
-				fmt.Sprintf("Thirty-seven pockets and one of them is the nought, which belongs to the house and takes every bet on the outside. A number pays %d to 1, red or black and odd or even pay even money, a dozen pays 2 to 1. Every one of those is the true price, and the nought is the whole of the room's advantage.", 35))
-		}
+		asks("play", "Sit in at the cards", 60, 0, reason,
+			fmt.Sprintf("Anything from $%d to $%d a hand, played out a card at a time. The dealer draws to %d and stands on %d, a tie gives your money back, and going over is finished before the dealer plays at all. Above $%d the floor wants to know who you are.",
+				LeastStake, w.TableLimit(id), DealerStands-1, DealerStands, HighTableMoney))
+		asks("wheel", "Play the wheel", 45, 0, w.SpinReadiness(id, "red", Stake{Amount: bet}),
+			fmt.Sprintf("Anything from $%d to $%d on one bet. Thirty-seven pockets and one of them is the nought, which belongs to the house and takes every bet on the outside. A number pays %d to 1, red or black and odd or even pay even money, a dozen pays 2 to 1. Every one of those is the true price.",
+				LeastStake, w.TableLimit(id), 35))
+	}
+	// The house limit belongs to whoever holds the room.
+	if w.Own(id) && (HasTables(id) || HasMachines(id)) {
+		add("limit", "Set the house limit", 30, 0, w.LimitReadiness(id),
+			fmt.Sprintf("The most this room will take on one bet, anywhere from $%d to $%d. It reads $%d at the tables and $%d at the machines. Bigger action pays better and loses worse.",
+				HouseLimitFloor, HouseLimitCeiling, w.TableLimit(id), w.MachineLimit(id)))
 	}
 	// The trade, not the kind of room. The readiness function asks what is run
 	// here; this asked what the room looked like, so a casino of the player's
@@ -1763,7 +1767,7 @@ func (w *World) Public() map[string]any {
 	if len(history) > 60 {
 		history = history[len(history)-60:]
 	}
-	return map[string]any{"id": w.ID, "version": w.Version, "revision": w.Revision, "life": w.Life, "minute": w.Minute, "sky": w.Sky(), "player": w.Player, "district": w.District, "factions": w.PublicFactions(), "npcs": w.People(), "locations": locs, "event": scene, "history": history, "dead": w.Dead, "tasks": w.Tasks, "director": w.Director, "last_result": w.LastResult, "daily_cost": w.DailyCost(), "books": w.Books(), "guide": w.Guide(), "rules": GuideRules(), "groups": Groups(), "income": income, "security": w.Guard(), "opportunity": w.NextOpportunity(), "known_threats": w.KnownThreats(), "business_truces": w.ActiveBusinessTruces(), "conflicts": w.PublicConflicts(), "goods": w.Goods, "arms": w.ArmsDescription(), "appearance": w.AppearanceDescription(), "vehicle": w.VehicleDescription(), "residence": w.ResidenceDescription(), "offshore": map[string]any{"balance": w.Offshore, "reachable": w.Player.Offshore}, "newspaper": w.Edition(), "editions": w.Editions(), "arrangements": w.PendingArrangements(), "commissions": w.PublicCommissions(), "grudges": w.GrudgeSummary(), "cast": w.Cast(), "everyone": w.Everyone(), "retainers": w.RetainerDescription(), "armoury": w.ArmouryDescription(), "population": w.PopulationSummary(), "hand": w.HandDescription(), "wheel": w.WheelDescription(), "machine": w.MachineDescription(), "roles": w.RoleDescription(), "organization": w.PlayerOrganizationDescription(), "own_people": w.OwnPeopleDescription(), "pacts": w.PactDescription(), "book": w.LoanDescription(), "press": w.PressDescription(), "service": w.ServiceDescription(), "city": w.ScrutinyDescription(), "dashboard": w.Dashboard(), "epitaph": w.Epitaph(), "street": w.OnTheStreet(), "street_note": w.StreetNote()}
+	return map[string]any{"id": w.ID, "version": w.Version, "revision": w.Revision, "life": w.Life, "minute": w.Minute, "sky": w.Sky(), "player": w.Player, "district": w.District, "factions": w.PublicFactions(), "npcs": w.People(), "locations": locs, "event": scene, "history": history, "dead": w.Dead, "tasks": w.Tasks, "director": w.Director, "last_result": w.LastResult, "daily_cost": w.DailyCost(), "books": w.Books(), "guide": w.Guide(), "rules": GuideRules(), "groups": Groups(), "income": income, "security": w.Guard(), "opportunity": w.NextOpportunity(), "known_threats": w.KnownThreats(), "business_truces": w.ActiveBusinessTruces(), "conflicts": w.PublicConflicts(), "goods": w.Goods, "arms": w.ArmsDescription(), "appearance": w.AppearanceDescription(), "vehicle": w.VehicleDescription(), "residence": w.ResidenceDescription(), "offshore": map[string]any{"balance": w.Offshore, "reachable": w.Player.Offshore}, "newspaper": w.Edition(), "editions": w.Editions(), "arrangements": w.PendingArrangements(), "commissions": w.PublicCommissions(), "grudges": w.GrudgeSummary(), "cast": w.Cast(), "everyone": w.Everyone(), "retainers": w.RetainerDescription(), "armoury": w.ArmouryDescription(), "population": w.PopulationSummary(), "hand": w.HandDescription(), "wheel": w.WheelDescription(), "machine": w.MachineDescription(), "house": w.HouseDescription(), "roles": w.RoleDescription(), "organization": w.PlayerOrganizationDescription(), "own_people": w.OwnPeopleDescription(), "pacts": w.PactDescription(), "book": w.LoanDescription(), "press": w.PressDescription(), "service": w.ServiceDescription(), "city": w.ScrutinyDescription(), "dashboard": w.Dashboard(), "epitaph": w.Epitaph(), "street": w.OnTheStreet(), "street_note": w.StreetNote()}
 }
 func (w *World) hasRecord(title string) bool {
 	for _, r := range w.History {

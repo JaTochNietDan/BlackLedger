@@ -1116,3 +1116,14 @@ body{height:100%;overflow:hidden;margin:0;background:var(--bg);color:var(--ink);
 .bandit-handle i{position:absolute;top:-14px;left:-6px;width:26px;height:26px;border-radius:50%;
   background:radial-gradient(circle at 34% 30%,#e2554b,#8e2b2b);box-shadow:0 2px 5px rgba(0,0,0,.5)}
 .bandit-stakes{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:14px;flex-wrap:wrap}
+
+/* A figure the player types, rather than two buttons at two prices the room
+   picked for them. */
+.money-field{display:flex;align-items:center;gap:6px;position:relative;
+  background:#101b19;border:1px solid var(--line);padding:7px 10px}
+.money-field>span{font:10px system-ui;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.money-field i{font-style:normal;color:var(--gold);font-family:var(--serif);font-size:15px}
+.money-field input{width:6.5ch;background:none;border:0;color:var(--ink);
+  font:16px var(--serif);text-align:right}
+.money-field input:focus{outline:none;color:#fff}
+.money-field small{color:var(--muted);font-size:10px;white-space:nowrap}

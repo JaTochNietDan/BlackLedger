@@ -79,7 +79,7 @@ func TestAPullTakesTheStakeAndTheHousePaysTheWins(t *testing.T) {
 	pulls, won, spent := 0, 0, 0
 	for i := 0; i < 60; i++ {
 		cash := w.Player.Cash
-		if err := w.PullHandle("bar", "nickel"); err != nil {
+		if err := w.PullHandle("bar", 5); err != nil {
 			t.Fatal(err)
 		}
 		pulls++
@@ -127,7 +127,7 @@ func TestTheMachineCanActuallyBePlayedFromTheRoom(t *testing.T) {
 	w.Player.Location = "bar"
 	found := false
 	for _, a := range w.Actions("bar") {
-		if a.ID == "pull:nickel" {
+		if a.ID == "pull" {
 			found = true
 			if a.Disabled {
 				t.Errorf("the machine in the bar is refused: %s", a.Reason)
@@ -138,12 +138,12 @@ func TestTheMachineCanActuallyBePlayedFromTheRoom(t *testing.T) {
 		t.Fatal("the bar has a machine and does not offer it")
 	}
 	for _, a := range w.Actions("laundry") {
-		if a.ID == "pull:nickel" {
+		if a.ID == "pull" {
 			t.Error("a laundry offers a machine")
 		}
 	}
 	cash := w.Player.Cash
-	next, err := Execute(w, Command{Revision: w.Revision, Kind: "pull:nickel"})
+	next, err := Execute(w, Command{Revision: w.Revision, Kind: "pull", Amount: 5})
 	if err != nil {
 		t.Fatal(err)
 	}

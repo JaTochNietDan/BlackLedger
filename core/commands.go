@@ -293,8 +293,13 @@ func (w *World) apply(c Command) error {
 				return err
 			}
 			w.Advance(a.Minutes)
-		} else if machine, ok := strings.CutPrefix(c.Kind, "pull:"); ok {
-			if err := w.PullHandle(target, machine); err != nil {
+		} else if c.Kind == "pull" {
+			if err := w.PullHandle(target, w.MachineStakeOrUsual(target, c.Amount)); err != nil {
+				return err
+			}
+			w.Advance(a.Minutes)
+		} else if c.Kind == "limit" {
+			if err := w.SetLimit(target, c.Amount); err != nil {
 				return err
 			}
 			w.Advance(a.Minutes)
@@ -317,7 +322,7 @@ func (w *World) apply(c Command) error {
 				return err
 			}
 			w.Advance(a.Minutes)
-		} else if stakeID, ok := strings.CutPrefix(c.Kind, "wheel:"); ok {
+		} else if c.Kind == "wheel" {
 			// Resolved before the clock moves, like the rest of the tables:
 			// the ball drops and the money settles in one go, so the hours
 			// cannot land between the spin and being paid for it.
@@ -328,7 +333,7 @@ func (w *World) apply(c Command) error {
 			if bet == "" {
 				bet = "red"
 			}
-			if err := w.PlayWheel(p.Location, bet, stakeID); err != nil {
+			if err := w.PlayWheel(p.Location, bet, w.TableStakeOrUsual(p.Location, c.Amount)); err != nil {
 				return err
 			}
 			w.Advance(a.Minutes)
@@ -405,8 +410,10 @@ func (w *World) apply(c Command) error {
 					w.Retaliation()
 				}
 				w.Log("A demand nobody forgets", "The manager refuses. Somebody of Bellandi's watches you leave. You have challenged a powerful family on its own ground.", "politics")
-			case "play:small", "play:high":
-				if err := w.Deal(target, strings.TrimPrefix(c.Kind, "play:")); err != nil {
+			case "play":
+				// What the player typed, and the old fixed lot only if they are
+				// on a build that still sends one.
+				if err := w.Deal(target, w.TableStakeOrUsual(target, c.Amount)); err != nil {
 					return err
 				}
 			case "hit":

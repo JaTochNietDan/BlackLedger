@@ -107,8 +107,11 @@ func PocketColour(pocket int) string {
 // Spin is the wheel turning, kept on the world for the same reason a hand is:
 // the money is down and the result is real.
 type Spin struct {
-	// Place is the room and Stake what is on the cloth.
+	// Place is the room. Stake was one of two fixed lots by name and is kept so
+	// a spin in an older save still reads; Down is what was actually on the
+	// cloth, because a player names the number now.
 	Place, Stake string
+	Down         int `json:"down,omitempty"`
 	// Bet is what was backed, Pocket what came up, and Done whether it has
 	// been settled — so nothing settles twice.
 	Bet    string `json:"bet"`
@@ -133,11 +136,8 @@ func (w *World) SpinReadiness(id, betID string, stake Stake) string {
 
 // PlayWheel puts money on the cloth and turns the wheel. Unlike a hand of
 // cards there is nothing to decide afterwards, so it settles in one go.
-func (w *World) PlayWheel(id, betID, stakeID string) error {
-	stake, ok := tableStake(stakeID)
-	if !ok {
-		return fmt.Errorf("no such game")
-	}
+func (w *World) PlayWheel(id, betID string, amount int) error {
+	stake := Stake{ID: "typed", Label: "A spin", Amount: amount}
 	if reason := w.SpinReadiness(id, betID, stake); reason != "" {
 		return fmt.Errorf("%s", reason)
 	}
@@ -151,7 +151,7 @@ func (w *World) PlayWheel(id, betID, stakeID string) error {
 		pocket = Pockets - 1
 	}
 	won := bet.Wins(pocket)
-	w.Spin = &Spin{Place: id, Stake: stakeID, Bet: betID, Pocket: pocket, Won: won, Done: true}
+	w.Spin = &Spin{Place: id, Down: amount, Bet: betID, Pocket: pocket, Won: won, Done: true}
 
 	place, _ := PlaceByID(id)
 	house := w.faction(w.Properties[id].Owner)
@@ -185,7 +185,7 @@ func (w *World) WheelDescription() map[string]any {
 	}
 	place, _ := PlaceByID(w.Spin.Place)
 	bet, _ := RouletteBetByID(w.Spin.Bet)
-	stake, _ := tableStake(w.Spin.Stake)
+	stake := Stake{Amount: w.spinDown()}
 	return map[string]any{
 		"spun": true, "place": place.Name, "stake": stake.Amount,
 		"bet": bet.Label, "pocket": w.Spin.Pocket, "colour": PocketColour(w.Spin.Pocket),
@@ -200,4 +200,19 @@ func stakeSuffix(stake Stake) string {
 		return " at the high tables"
 	}
 	return ""
+}
+
+// spinDown is what was on the cloth. A spin recorded before players could name
+// a number carries one of the two old lots by name instead.
+func (w *World) spinDown() int {
+	if w.Spin == nil {
+		return 0
+	}
+	if w.Spin.Down > 0 {
+		return w.Spin.Down
+	}
+	if stake, ok := tableStake(w.Spin.Stake); ok {
+		return stake.Amount
+	}
+	return 0
 }

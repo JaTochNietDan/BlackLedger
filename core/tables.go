@@ -55,11 +55,20 @@ func (w *World) TableReadiness(id string, stake Stake) string {
 	if stake.ID == "high" && w.Presence() < HighTableStanding {
 		return "The floor manager looks at you and seats you nowhere near that table"
 	}
-	if w.Player.Cash < stake.Amount {
-		return "Not enough cash"
+	// Real money wants somebody the floor has heard of, whatever the button
+	// says: the old high table was a fixed lot, and this is the same rule
+	// asked of an amount the player typed.
+	if stake.Amount >= HighTableMoney && w.Presence() < HighTableStanding {
+		return "The floor manager looks at you and seats you nowhere near that money"
+	}
+	if reason := w.StakeReadiness(id, stake.Amount, w.TableLimit(id)); reason != "" {
+		return reason
 	}
 	return ""
 }
+
+// HighTableMoney is where the floor starts caring who you are.
+const HighTableMoney = 300
 
 // Play resolves a session at the tables. The house holds an edge, so this is a
 // way to lose money quickly and occasionally a way to make it.

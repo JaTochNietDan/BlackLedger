@@ -36,6 +36,27 @@ function Row({cards, hidden}:{cards:Card[]; hidden:number}) {
   );
 }
 
+
+// What the player is putting down. One field, in dollars, bounded by what the
+// room takes and what they are carrying — the games used to be two buttons at
+// two fixed prices, which made the size of a bet a thing the room decided.
+export function Money({amount, limit, least, cash, onChange, label}:{
+  amount:number; limit:number; least:number; cash:number;
+  onChange:(n:number)=>void; label:string;
+}) {
+  const most = Math.max(least, Math.min(limit, cash));
+  return (
+    <label className="money-field">
+      <span>{label}</span>
+      <i>$</i>
+      <input type="number" min={least} max={most} step={1} value={amount}
+             aria-label={label}
+             onChange={e => onChange(Math.max(least, Math.min(most, Math.floor(Number(e.target.value) || 0))))}/>
+      <small>{least} to {most}{limit > cash ? ' — the house takes ' + limit : ''}</small>
+    </label>
+  );
+}
+
 // One chip on the cloth. The core takes one bet a spin, so there is one chip:
 // putting it somewhere else moves it rather than adding to it.
 function Chip({amount, money}:{amount:number; money:(n:number)=>string}) {
@@ -98,17 +119,19 @@ const FALL = 3200, TURNS = 5, HEAD_TURNS = 3;
 // How far out the ball runs, which the stylesheet also has to agree with.
 const BALL_TRACK = -80;
 
-export function Wheel({wheel, stakes, money, spin, turn = 0}:{
-  wheel:WheelState; stakes:{id:string; amount:number}[]; money:(n:number)=>string;
-  spin:(stakeID:string, bet:string)=>void;
+export function Wheel({wheel, money, spin, amount, least, limit, cash, onAmount, refused = '', turn = 0}:{
+  wheel:WheelState; money:(n:number)=>string;
+  spin:(amount:number, bet:string)=>void;
+  // What is going on the cloth, and what the room will take. The player names
+  // the figure; the core refuses anything past the house limit whatever this
+  // component thinks.
+  amount:number; least:number; limit:number; cash:number;
+  onAmount:(n:number)=>void; refused?:string;
   // The world's revision, so a spin is animated once — and so two spins that
   // land in the same pocket are still two spins.
   turn?:number;
 }) {
   const [bet, setBet] = useState('red');
-  // Which of the house's stakes the chip is worth. The core offers the amounts;
-  // this only says which one is on the cloth.
-  const [stake, setStake] = useState(0);
   const [falling, setFalling] = useState(false);
   // The ball and the head are moved with the animation API rather than by a CSS
   // transition on a custom property. The transition was pinned at time zero and
@@ -178,13 +201,13 @@ export function Wheel({wheel, stakes, money, spin, turn = 0}:{
   // core's from the moment it was spun; this only holds it back until the ball
   // is in the pocket, the way the table does.
   const landed = wheel.spun && !falling ? wheel.pocket ?? 0 : null;
-  const chip = stakes[Math.min(stake, Math.max(0, stakes.length - 1))];
+
   const on = (id:string) => bet === id;
   const cell = (id:string, label:string|number, cls:string) => (
     <button key={id} className={'cloth-cell ' + cls + (on(id) ? ' picked' : '')}
             aria-pressed={on(id)} onClick={() => setBet(id)}>
       <span>{label}</span>
-      {on(id) && chip && <Chip amount={chip.amount} money={money}/>}
+      {on(id) && <Chip amount={amount} money={money}/>}
     </button>
   );
 
@@ -244,19 +267,14 @@ export function Wheel({wheel, stakes, money, spin, turn = 0}:{
       </div>
 
       <div className="felt-actions chips">
-        {stakes.length > 1 && <div className="chip-picker" role="group" aria-label="What the chip is worth">
-          {stakes.map((s, i) => (
-            <button key={s.id} className={'chip-choice' + (i === stake ? ' chosen' : '')}
-                    aria-pressed={i === stake} onClick={() => setStake(i)}>
-              <Chip amount={s.amount} money={money}/>
-            </button>
-          ))}
-        </div>}
-        {chip && <button className="spin-it" disabled={falling}
-                         onClick={() => spin(chip.id, bet)}>
-          {falling ? 'The ball is still going' : `Spin — ${money(chip.amount)} on ${bet.replace('number:', 'the ')}`}
-        </button>}
+        <Money label="On the cloth" amount={amount} limit={limit} least={least} cash={cash} onChange={onAmount}/>
+        <button className="spin-it" disabled={falling || !!refused}
+                title={refused || undefined}
+                onClick={() => spin(amount, bet)}>
+          {falling ? 'The ball is still going' : `Spin — ${money(amount)} on ${bet.replace('number:', 'the ')}`}
+        </button>
       </div>
+      {refused && <p className="felt-refused">{refused}</p>}
       <p className="felt-note">
         Thirty-seven pockets. The nought is neither colour and sits in no dozen, so it takes every
         bet on the outside — that is the whole of the house's advantage. Every payout here is the true one.
@@ -276,9 +294,14 @@ export interface MachineState {
 // nobody can see. The drums roll while the pull is being resolved and stop one
 // after another, left to right, the way the real ones do; where they stop is
 // the core's answer and nothing else.
-export function Machine({machine, stakes, money, pull, turn = 0}:{
-  machine:MachineState; stakes:{id:string; amount:number}[]; money:(n:number)=>string;
-  pull:(stakeID:string)=>void; turn?:number;
+export function Machine({machine, money, pull, amount, least, limit, cash, onAmount, refused = '', turn = 0}:{
+  machine:MachineState; money:(n:number)=>string;
+  pull:(amount:number)=>void;
+  // What goes in, and the most this machine takes — a tenth of what the tables
+  // take, because a bandit is small money by design.
+  amount:number; least:number; limit:number; cash:number;
+  onAmount:(n:number)=>void; refused?:string;
+  turn?:number;
 }) {
   const [rolling, setRolling] = useState([false, false, false]);
   const seen = useRef(-1);
@@ -294,12 +317,11 @@ export function Machine({machine, stakes, money, pull, turn = 0}:{
 
   // Which of the house's machines you are standing at. A nickel machine and a
   // dollar machine are two different machines against the same wall.
-  const [which, setWhich] = useState(0);
   const strip = machine.strip || [];
   const faceOf = (id?: string) => strip.find(s => s.id === id)?.face ?? '—';
   const line = machine.line ?? [];
   const settled = machine.pulled && !rolling.some(Boolean);
-  const here = stakes[Math.min(which, Math.max(0, stakes.length - 1))];
+
 
   return (
     <div className="felt machine-felt">
@@ -321,24 +343,20 @@ export function Machine({machine, stakes, money, pull, turn = 0}:{
         {/* The handle is the handle. Drawing one beside a row of buttons and
             expecting somebody to press the buttons is a picture of a machine,
             not a machine. */}
-        {here && <button className="bandit-handle" disabled={rolling.some(Boolean)}
-          onClick={() => pull(here.id)}
-          aria-label={`Pull the handle for ${money(here.amount)}`}
-          title={`Pull the handle — ${money(here.amount)}`}><i/></button>}
+        <button className="bandit-handle" disabled={rolling.some(Boolean) || !!refused}
+          onClick={() => pull(amount)}
+          aria-label={`Pull the handle for ${money(amount)}`}
+          title={refused || `Pull the handle — ${money(amount)}`}><i/></button>
       </div>
 
       <div className="bandit-stakes">
-        {stakes.map((s, i) => (
-          <button key={s.id} className={'chip-choice' + (i === which ? ' chosen' : '')}
-                  aria-pressed={i === which} onClick={() => setWhich(i)}>
-            <Chip amount={s.amount} money={money}/>
-          </button>
-        ))}
-        <button className="spin-it" disabled={!here || rolling.some(Boolean)}
-                onClick={() => here && pull(here.id)}>
-          {rolling.some(Boolean) ? 'The drums are still going' : `Pull for ${money(here ? here.amount : 0)}`}
+        <Money label="Into the slot" amount={amount} limit={limit} least={least} cash={cash} onChange={onAmount}/>
+        <button className="spin-it" disabled={rolling.some(Boolean) || !!refused}
+                title={refused || undefined} onClick={() => pull(amount)}>
+          {rolling.some(Boolean) ? 'The drums are still going' : `Pull for ${money(amount)}`}
         </button>
       </div>
+      {refused && <p className="felt-refused">{refused}</p>}
 
       <table className="paytable">
         <tbody>

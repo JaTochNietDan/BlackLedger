@@ -22,7 +22,7 @@ func TestAHandIsOnTheTableUntilItIsSettled(t *testing.T) {
 		t.Fatal("stood on no hand")
 	}
 	cash := w.Player.Cash
-	if err := w.Deal("club", "small"); err != nil {
+	if err := w.Deal("club", 50); err != nil {
 		t.Fatal(err)
 	}
 	stake, _ := tableStake("small")
@@ -33,7 +33,7 @@ func TestAHandIsOnTheTableUntilItIsSettled(t *testing.T) {
 	if d["playing"] != true || d["player"].(int) < 4 || d["player"].(int) > 21 || d["dealer"].(int) < 2 {
 		t.Fatalf("the table showed %v", d)
 	}
-	if err := w.Deal("club", "small"); err == nil {
+	if err := w.Deal("club", 50); err == nil {
 		t.Fatal("dealt a second hand over the first")
 	}
 	if err := w.Stand(); err != nil {
@@ -53,7 +53,7 @@ func TestGoingOverEndsItImmediately(t *testing.T) {
 	for seed := uint32(1); seed <= 600 && !found; seed++ {
 		probe := player(t)
 		probe.RNG = seed * 2654435761
-		if err := probe.Deal("club", "small"); err != nil {
+		if err := probe.Deal("club", 50); err != nil {
 			t.Fatal(err)
 		}
 		for probe.Hand != nil && !probe.Hand.Done {
@@ -109,7 +109,7 @@ func TestAHandIsWorthExactlyWhatIsLyingOnTheTable(t *testing.T) {
 	w.District = 2
 	w.Player.Cash, w.Player.Respect, w.Player.Health = 20000, 200, 100
 	w.Player.Dress, w.Player.Location = 1, "casino"
-	if err := w.Deal("casino", "small"); err != nil {
+	if err := w.Deal("casino", 50); err != nil {
 		t.Fatal(err)
 	}
 	for step := 0; step < 8 && w.Hand != nil && !w.Hand.Done; step++ {
@@ -175,7 +175,7 @@ func TestTheEdgeAtTheTableMatchesTheEdgeInTheBooks(t *testing.T) {
 	stake, _ := tableStake("small")
 	for i := 0; i < hands; i++ {
 		before := w.Player.Cash
-		if err := w.Deal("club", "small"); err != nil {
+		if err := w.Deal("club", 50); err != nil {
 			t.Fatal(err)
 		}
 		for w.Hand != nil && !w.Hand.Done && w.Hand.Player < DealerStands {
@@ -202,7 +202,7 @@ func TestTheDealerDrawsToSixteenAndStandsOnSeventeen(t *testing.T) {
 	for seed := uint32(1); seed <= 400; seed++ {
 		w := player(t)
 		w.RNG = seed * 2654435761
-		if err := w.Deal("club", "small"); err != nil {
+		if err := w.Deal("club", 50); err != nil {
 			t.Fatal(err)
 		}
 		if err := w.Stand(); err != nil {
@@ -217,13 +217,13 @@ func TestTheDealerDrawsToSixteenAndStandsOnSeventeen(t *testing.T) {
 func TestYouCannotSitAtYourOwnTablesOrOnesYouCannotAfford(t *testing.T) {
 	w := player(t)
 	w.Player.Cash = 10
-	if err := w.Deal("club", "small"); err == nil {
+	if err := w.Deal("club", 50); err == nil {
 		t.Fatal("sat down with ten dollars")
 	}
 	w.Player.Cash = 20000
 	w.Properties["club"].Owner = "player:1"
 	w.Life = 1
-	if err := w.Deal("club", "small"); err == nil {
+	if err := w.Deal("club", 50); err == nil {
 		t.Fatal("played at their own house")
 	}
 }
@@ -234,7 +234,7 @@ func TestATieGivesTheMoneyBack(t *testing.T) {
 		w := player(t)
 		w.RNG = seed * 2654435761
 		cash := w.Player.Cash
-		if err := w.Deal("club", "small"); err != nil {
+		if err := w.Deal("club", 50); err != nil {
 			t.Fatal(err)
 		}
 		for w.Hand != nil && !w.Hand.Done && w.Hand.Player < DealerStands {
@@ -285,7 +285,7 @@ func TestAnAceAlreadyInTheHandStillComesDownLater(t *testing.T) {
 // the only account of it was a line in the ledger.
 func TestASettledHandStaysOnTheTableAndSaysWhatHappened(t *testing.T) {
 	w := player(t)
-	if err := w.Deal("club", "small"); err != nil {
+	if err := w.Deal("club", 50); err != nil {
 		t.Fatal(err)
 	}
 	// Stand without going over: a player who busts is finished before the
@@ -319,7 +319,7 @@ func TestASettledHandStaysOnTheTableAndSaysWhatHappened(t *testing.T) {
 		t.Errorf("the table cannot say which room it is in: %v", d["where"])
 	}
 	// And it is gone the moment the next one is dealt over it.
-	if err := w.Deal("club", "small"); err != nil {
+	if err := w.Deal("club", 50); err != nil {
 		t.Fatal(err)
 	}
 	if next := w.HandDescription(); next["playing"] != true || next["settled"] != false {

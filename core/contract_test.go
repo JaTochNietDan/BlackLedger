@@ -317,7 +317,7 @@ func TestNothingIsChargedTwice(t *testing.T) {
 		kind    string
 	}{
 		{"arms", "docks", func(w *World) { w.Player.Cash = 240 }, "arms:weapon"},
-		{"tables", "club", func(w *World) { w.Player.Cash = 60 }, "play:small"},
+		{"tables", "club", func(w *World) { w.Player.Cash = 60 }, "play"},
 		{"bribe", "market", func(w *World) { w.Player.Cash = 100000; w.Player.Heat = 20 }, "bribe"},
 		{"contraband", "market", func(w *World) { w.Player.Cash = 210 }, "buy:moonshine"},
 		{"launder", "laundry", func(w *World) {

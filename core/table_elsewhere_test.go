@@ -15,10 +15,10 @@ func TestARefusedTableSaysWhereTheHandIs(t *testing.T) {
 	w.Player.Cash = 400
 	w.District = 2 // the casino is not in the first district
 	w.Player.Location = "club"
-	if _, err := Execute(w, Command{RequestID: ID(), Revision: w.Revision, Kind: "play:small", Target: "club"}); err != nil {
+	if _, err := Execute(w, Command{RequestID: ID(), Revision: w.Revision, Kind: "play", Target: "club", Amount: 50}); err != nil {
 		t.Fatalf("could not sit down at the club: %v", err)
 	}
-	next, err := Execute(w, Command{RequestID: ID(), Revision: w.Revision, Kind: "play:small", Target: "club"})
+	next, err := Execute(w, Command{RequestID: ID(), Revision: w.Revision, Kind: "play", Target: "club", Amount: 50})
 	if err == nil {
 		w = next
 	}
@@ -53,7 +53,7 @@ func TestARefusedTableSaysWhereTheHandIs(t *testing.T) {
 	// exactly the situation: they have walked to the other house to play.
 	w.Player.Location = elsewhere
 	for _, a := range w.Actions(elsewhere) {
-		if a.ID != "play:small" {
+		if a.ID != "play" {
 			continue
 		}
 		if !a.Disabled {
@@ -74,7 +74,7 @@ func TestTheRefusalWhereTheHandIsDoesNotSendYouAnywhere(t *testing.T) {
 	w.Player.Cash = 400
 	w.District = 2
 	w.Player.Location = "club"
-	next, err := Execute(w, Command{RequestID: ID(), Revision: w.Revision, Kind: "play:small", Target: "club"})
+	next, err := Execute(w, Command{RequestID: ID(), Revision: w.Revision, Kind: "play", Target: "club", Amount: 50})
 	if err != nil {
 		t.Fatalf("could not sit down: %v", err)
 	}
@@ -85,7 +85,7 @@ func TestTheRefusalWhereTheHandIsDoesNotSendYouAnywhere(t *testing.T) {
 	w.Player.Location = w.Hand.Place
 	here, _ := PlaceByID(w.Hand.Place)
 	for _, a := range w.Actions(w.Hand.Place) {
-		if a.ID != "play:small" || !a.Disabled {
+		if a.ID != "play" || !a.Disabled {
 			continue
 		}
 		if contains(a.Reason, here.Name) {

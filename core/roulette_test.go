@@ -2,6 +2,7 @@ package core
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 )
 
@@ -70,7 +71,7 @@ func TestAWinningNumberPaysThirtyFiveToOneAndReturnsTheStake(t *testing.T) {
 		before := w.Player.Cash
 		// Drive the wheel onto a known pocket by walking its stream.
 		w.RNG = seedForPocket(t, w, pocket)
-		if err := w.PlayWheel("casino", fmt.Sprintf("number:%d", pocket), "small"); err != nil {
+		if err := w.PlayWheel("casino", fmt.Sprintf("number:%d", pocket), 50); err != nil {
 			t.Fatalf("pocket %d: %v", pocket, err)
 		}
 		if w.Spin.Pocket != pocket {
@@ -93,7 +94,7 @@ func TestALosingSpinTakesTheStakeOnce(t *testing.T) {
 	stake, _ := tableStake("small")
 	before := w.Player.Cash
 	// Back a number, and whichever pocket comes up it is wrong 36 times in 37.
-	if err := w.PlayWheel("casino", "number:7", "small"); err != nil {
+	if err := w.PlayWheel("casino", "number:7", 50); err != nil {
 		t.Fatal(err)
 	}
 	if w.Spin.Won {
@@ -107,13 +108,13 @@ func TestALosingSpinTakesTheStakeOnce(t *testing.T) {
 // The room cannot have a hand of cards and a wheel going at once.
 func TestTheWheelWaitsForTheCardsToBeFinished(t *testing.T) {
 	w := wheelRoom(t)
-	if err := w.Deal("casino", "small"); err != nil {
+	if err := w.Deal("casino", 50); err != nil {
 		t.Fatalf("dealing: %v", err)
 	}
 	if w.Hand == nil || w.Hand.Done {
 		t.Skip("the hand settled itself, so there is nothing on the table to clash with")
 	}
-	if err := w.PlayWheel("casino", "red", "small"); err == nil {
+	if err := w.PlayWheel("casino", "red", 50); err == nil {
 		t.Error("the wheel was played with a hand still on the table")
 	}
 }
@@ -160,7 +161,7 @@ func TestTheWheelCanBePlayedAsACommand(t *testing.T) {
 	w := wheelRoom(t)
 	before := w.Player.Cash
 	next, err := Execute(w, Command{RequestID: ID(), Revision: w.Revision,
-		Kind: "wheel:small", Target: "casino", Choice: "number:17"})
+		Kind: "wheel", Target: "casino", Choice: "number:17", Amount: 50})
 	if err != nil {
 		t.Fatalf("playing the wheel: %v", err)
 	}
@@ -188,23 +189,29 @@ func TestTheWheelIsOfferedInARoomWithTables(t *testing.T) {
 	w := wheelRoom(t)
 	var wheel *Action
 	for i, a := range w.Actions("casino") {
-		if a.ID == "wheel:small" {
+		if a.ID == "wheel" {
 			wheel = &w.Actions("casino")[i]
 		}
 	}
 	if wheel == nil {
 		t.Fatal("a casino offers no wheel")
 	}
-	stake, _ := tableStake("small")
-	if wheel.Asks != stake.Amount {
-		t.Errorf("the wheel names a price of $%d against a $%d stake", wheel.Asks, stake.Amount)
+	// The wheel used to be two buttons at two fixed prices, and this asked that
+	// the button named its own price. A player names the figure now, so what is
+	// asked instead is that the button names no price of its own and that the
+	// room says what it will take.
+	if wheel.Asks != 0 {
+		t.Errorf("the wheel names a price of $%d when the player picks the figure", wheel.Asks)
+	}
+	if !strings.Contains(wheel.Detail, "$") || !strings.Contains(wheel.Detail, fmt.Sprint(w.TableLimit("casino"))) {
+		t.Errorf("the wheel does not say what the house takes: %q", wheel.Detail)
 	}
 	if wheel.Cost != 0 {
 		t.Errorf("the wheel declares a cost of %d, so the stake would go out twice", wheel.Cost)
 	}
 	// And not in a room without tables.
 	for _, a := range w.Actions("bar") {
-		if a.ID == "wheel:small" {
+		if a.ID == "wheel" {
 			t.Error("there is a roulette wheel in the bar")
 		}
 	}
@@ -222,7 +229,7 @@ func TestTheWorldTellsTheInterfaceWhatTheWheelDid(t *testing.T) {
 	if quiet["spun"] != false {
 		t.Error("a wheel nobody has played reads as spun")
 	}
-	if err := w.PlayWheel("casino", "number:17", "small"); err != nil {
+	if err := w.PlayWheel("casino", "number:17", 50); err != nil {
 		t.Fatal(err)
 	}
 	after, _ := w.Public()["wheel"].(map[string]any)
