@@ -21,12 +21,11 @@ import type {HandState, MachineState, WheelState} from './Tables';
 // as a command's target asks the core for an address called "The Blue Hour",
 // which no city has, and every card played comes back "that action is not
 // available here". The target is the id of the room the player is standing in.
+// Taking the seat and leaving it belong here too: the room's own list of work
+// should not offer "Get up and leave the tables" between restocking and hiring.
 export function isTableAction(id: string) {
-  return id === 'play' || id === 'wheel' || id === 'pull' || id === 'hit' || id === 'stand';
-}
-
-export function hasTables(actions: Action[]) {
-  return actions.some(a => isTableAction(a.id));
+  return id === 'play' || id === 'wheel' || id === 'pull' || id === 'hit' ||
+    id === 'stand' || id === 'sit' || id === 'rise';
 }
 
 type Game = 'cards' | 'wheel' | 'machine';
@@ -58,7 +57,12 @@ export function Casino({place, actions, people, hand, wheel, machine, house, cas
 }) {
   // A hand that is already dealt is the game you are playing, whatever tab you
   // were last looking at.
-  const [game, setGame] = useState<Game>(hand.playing ? 'cards' : 'wheel');
+  // Which game you are looking at when you sit down. The nav lists Blackjack
+  // first, so opening on the wheel showed a screen that did not match the tab
+  // that was pressed.
+  const [game, setGame] = useState<Game>(
+    hand.playing || actions.some(a => a.id === 'play') ? 'cards'
+      : actions.some(a => a.id === 'wheel') ? 'wheel' : 'machine');
   // What the player is putting down, in dollars. Theirs to set, up to what the
   // room takes; the core refuses anything past it whatever this says.
   const [bet, setBet] = useState(0);

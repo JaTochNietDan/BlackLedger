@@ -148,6 +148,18 @@ Also a bug that existed before/after that change, merely sitting down to play th
 
 This all feels a bit haphazard. Make sure you are keeping track of what you are doing and not regressing. We need to be fixing out UI and making it better.
 
+— part answered: sitting down is a decision the world knows about now, not a
+  screen the interface opened by itself. Taking a seat clears the last hand, the
+  last spin and the drums, so walking up to a table no longer shows a game
+  somebody already played — that was the "already started playing a game" bug,
+  and its cause was that the felt is saved state. Getting up is refused in the
+  middle of a hand and walking out of the room ends the sitting. "Sit down at
+  the tables" is a real action the core offers rather than a button the panel
+  drew for itself. The nickel and dollar machines went in 5f5e30d, before this
+  message, and the label no longer exists anywhere the game can offer it — a
+  stale bundle is the only way to still see it, which is worth knowing. The
+  standing half of this, keeping track and not regressing, stays open forever.
+
 ---
 
 Ok this is much better. It may be worth adding a couple more casino games. It

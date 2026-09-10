@@ -479,6 +479,14 @@ func (w *World) apply(c Command) error {
 				if err := w.Service(target); err != nil {
 					return err
 				}
+			case "sit":
+				if err := w.Sit(target); err != nil {
+					return err
+				}
+			case "rise":
+				if err := w.Rise(); err != nil {
+					return err
+				}
 			case "bankroll":
 				if err := w.Bankroll(target, c.Amount); err != nil {
 					return err

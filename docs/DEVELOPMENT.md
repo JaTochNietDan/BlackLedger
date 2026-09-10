@@ -5527,3 +5527,52 @@ playtest did not happen this slice: the Chrome extension is not connected, so
 the card was exercised over the API instead — $1,337 behind the tables moved
 cash 3150 → 1826 and the float 0 → 1337, and the draw field's ceiling followed
 it to 1337.
+
+## A sitting is something the world knows about
+
+From the inbox: "merely sitting down to play the games already started playing a
+game, which is wrong."
+
+It was, and the cause is worth writing down because it will happen again in
+another shape. The felt is saved state. The last hand, the last spin and where
+the three drums stopped are all kept on the world, deliberately, so a game can
+be drawn rather than described. Whether the player was *at* the tables was not
+kept anywhere: it was a boolean in one React file. So opening the takeover drew
+whatever the last sitting had left behind — cards face up, a ball in a pocket,
+three drums showing a line — and that reads exactly like a game that started
+without you.
+
+The view was not wrong about anything. It had nothing to be right with.
+
+So sitting down is a decision the core owns. `World.Seated` names the room,
+`Sit` takes the seat and clears the table, `Rise` gets up and clears it again,
+and `RiseReadiness` refuses while a hand is live because the money is already
+down. `Advance` calls `LeaveTable`, so walking out of the room ends the sitting
+whatever moved you — a journey, a scene, an errand somebody else ran.
+
+The room offers a seat rather than a game. "Sit down at the tables" is an action
+the core writes, with "Play the machines" in a room that has a bandit and no
+felt, and the panel's button commits it instead of flipping its own flag. The
+takeover opens on the game its own first tab names, which is why sitting down
+used to show the wheel under a nav that said Blackjack.
+
+Verified over the API on an isolated fixture, four behaviours in one run:
+
+| Step | seated | wheel | drums |
+|---|---|---|---|
+| sit | casino | clean | clean |
+| spin, then pull | casino | shown | shown |
+| rise | none | clean | clean |
+| sit again | casino | clean | clean |
+
+Getting up mid-hand is refused with "Finish the hand first", and travelling to
+the bar left seated empty.
+
+On the other half of the same message, "you changed it back to play the nickle
+machine": that label went in 5f5e30d, which is before the message was written,
+and `slotStakes` is now referenced by nothing the game can offer. A stale
+bundle in the browser is the only way to still see it. Saying so is not a
+dismissal — it is the thing to check first next time a fixed label reappears.
+
+Evidence: `core/sitting_test.go`, one break verified — disabling the clear in
+`clearTable` fails the sitting test in the right direction.
