@@ -545,7 +545,7 @@ export function Craps({dice, money, play, roll, amount, least, limit, cash, onAm
 export interface CardsState {
   place:string; ante:number; pot:number; mine:Card[]; hand:string;
   seats:{who:string; name:string; threw:number; in:number; folded:boolean; said:string;
-         cards?:Card[]; hand?:string}[];
+         sore?:number; moved?:number; cards?:Card[]; hand?:string}[];
   drawn:boolean; bet:number; my_bet:number; facing:boolean; folded:boolean;
   done:boolean; outcome:string; won:number;
 }
@@ -579,6 +579,13 @@ export function BackRoom({cards, money, cash, act}:{
               {s.in > 0 && !s.folded ? ` · ${money(s.in)} in` : ''}
               {s.hand ? ` · ${s.hand}` : ''}
             </small>
+            {/* What the night has cost them, and whether they are carrying
+                anything about it. The money in this game belongs to somebody,
+                so the screen says whose it was and what they think of you. */}
+            {cards.done && !!s.moved && <small className={'seat-moved' + (s.moved < 0 ? ' down' : '')}>
+              {s.moved > 0 ? `+${money(s.moved)}` : `−${money(-s.moved)}`}
+            </small>}
+            {!!s.sore && <small className="seat-sore">has something against you</small>}
           </div>
         ))}
         <div className="seat mine">

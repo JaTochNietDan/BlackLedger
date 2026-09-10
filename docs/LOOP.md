@@ -45,8 +45,10 @@ which half is standing.
    seats filled from whoever is in the room, and a round of betting after the
    draw with one raise, folding, and bluffing off `Ambition` (`core/backroom.go`).
    Screen in `src/Tables.tsx`, drawn inside the poolhall rather than as a
-   takeover. Still open: sound, and what a losing night does to how somebody
-   at that table treats the player afterwards.
+   takeover, and what a night costs somebody is remembered: a heavy loser is
+   sore, somebody you paid thinks better of you, and a room can be emptied.
+   Still open: sound, and a second sitting where the same faces remember the
+   last one out loud.
 4. **The rest of the open inbox.** Wording ("establish protection" for buying a
    business), the roulette table beside the wheel rather than under it and
    multiple chips down at once, newspaper pictures, the travel bar below the

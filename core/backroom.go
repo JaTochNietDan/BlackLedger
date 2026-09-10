@@ -37,6 +37,12 @@ type Seat struct {
 	// Threw is how many they changed, which is the only thing the player gets
 	// to see about a hand before it is turned over.
 	Threw int `json:"threw"`
+	// Had is what was in their pocket before the ante, so what a night at the
+	// table did to somebody can be told from what they were carrying. Measuring
+	// it at the showdown instead measures nothing: by then the ante and every
+	// bet have already gone, and a seat that simply is not paid has lost
+	// nothing between one line and the next.
+	Had int `json:"had,omitempty"`
 	// In is what this seat has put in beyond the ante, and Folded is whether
 	// they threw their hand in rather than pay to see yours.
 	In     int  `json:"in,omitempty"`
@@ -276,7 +282,7 @@ func (w *World) SitInTheBackRoom(place string, ante int) error {
 		if w.Pockets(n) < ante {
 			continue
 		}
-		seats = append(seats, Seat{Who: n.ID, Name: n.Name})
+		seats = append(seats, Seat{Who: n.ID, Name: n.Name, Had: w.Pockets(n)})
 	}
 	if len(seats) < 2 {
 		return fmt.Errorf("there is nobody in the back room with money to lose")
@@ -456,8 +462,53 @@ func (w *World) showdown() error {
 		g.Outcome = fmt.Sprintf("%s all had %s, and $%d went each way.", joinNames(names), best.Name(), share)
 	}
 	g.Done = true
+	w.remember()
 	w.Log("The hand in the back room", g.Outcome, "personal")
 	return nil
+}
+
+// SoreAtCards is the most somebody holds against a player who cleaned them out
+// in one hand, and BearsIt is the share of what they had that a loss has to be
+// before they carry it at all. A tenner off nine hundred is a tenner; a night's
+// money is a reason to remember a face.
+const (
+	SoreAtCards = 34
+	BearsIt     = .2
+)
+
+// remember is what the table takes away from the hand. The point of a game with
+// no house in it is that the money belongs to somebody: a man who loses a
+// night's money to you across a table has a reason to remember you, and a man
+// you paid has a reason to like you. Before this, both walked away with nothing
+// on their mind, which made the back room a slot machine with faces on it.
+func (w *World) remember() {
+	g := w.Game
+	for _, s := range g.Seats {
+		n := w.NPC(s.Who)
+		if n == nil || n.Dead {
+			continue
+		}
+		had, moved := s.Had, n.Purse-s.Had
+		switch {
+		case moved > 0:
+			// Money you handed over is goodwill, and more of it is more of it.
+			n.Trust = min(100, n.Trust+1+moved/(g.Ante*4))
+		case moved < 0 && had > 0:
+			share := float64(-moved) / float64(had)
+			if share < BearsIt {
+				continue
+			}
+			if share > 1 {
+				share = 1
+			}
+			weight := int(float64(SoreAtCards) * share)
+			because := "the night you took them at cards"
+			if n.Purse == 0 {
+				because = "the night you cleaned them out at cards"
+			}
+			w.Aggrieve(n.ID, weight, because)
+		}
+	}
 }
 
 // BackRoomAnte is what the player is staking: what they typed, or the smallest
@@ -512,6 +563,16 @@ func (w *World) CardsDescription() map[string]any {
 	for _, s := range g.Seats {
 		seat := map[string]any{"who": s.Who, "name": s.Name, "threw": s.Threw,
 			"in": s.In, "folded": s.Folded, "said": s.Said}
+		// What this hand did to them, and whether they were already carrying
+		// something about the last one. A table where the player has taken
+		// money off somebody twice should look different from one where
+		// everybody has just sat down.
+		if n := w.NPC(s.Who); n != nil {
+			seat["sore"] = n.Sore
+			if g.Done {
+				seat["moved"] = n.Purse - s.Had
+			}
+		}
 		// Nobody sees a hand before it is turned over.
 		if g.Done {
 			seat["cards"] = s.Cards

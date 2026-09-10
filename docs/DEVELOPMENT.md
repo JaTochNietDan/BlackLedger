@@ -7105,3 +7105,39 @@ builds four of the six things there are to build.
 Baseline: deaths 0/0/51/82/78/0/38, median cash
 12585/14229/7376/90/1444/5361/2589. The evening moving changed six of the seven
 by a little, which is what a fourth night spot does.
+
+## What the table takes away from the hand
+
+A game with no house in it is only worth building if the money belongs to
+somebody. Until this, it did not in the way that matters: everybody at the table
+walked away with nothing on their mind, which made the back room a slot machine
+with faces painted on it.
+
+Now a hand leaves something behind. Somebody who loses at least a fifth of what
+they walked in with holds it against the player, scaled by how much of their
+money it was, up to `SoreAtCards`; being cleaned out entirely says so in the
+reason. Somebody the player pays thinks better of them, because money handed
+over is goodwill. A small pot is a small thing and is not carried around: losing
+$10 of $900 leaves nothing at all, or a player who plays cards ends up with a
+city that is sore at them.
+
+The fault worth writing down: the first version measured what the hand did to
+somebody at the showdown, and a losing seat has lost nothing between one line
+and the next — the ante and every bet left their pocket long before. `Seat.Had`
+records what was in their pocket before the ante, which is the only place the
+question can be answered from.
+
+Both halves break correctly: with the memory disabled, two guards fail; with
+`BearsIt` raised past 1, four do.
+
+The room can be emptied, which is the natural end of a game with no house behind
+it. Measured: three winning hands at a $300 ante and the back room says there is
+nobody in it with money to lose, and all three of them are sore. The house never
+runs out. These people do, and then there is no game.
+
+The table publishes what the hand did to each seat and whether they are carrying
+anything, and `src/Tables.tsx` draws both — the money that moved, and a line
+saying somebody has something against you.
+
+Baseline unmoved: deaths 0/0/51/82/78/0/38, median cash
+12585/14229/7376/90/1444/5361/2589.

@@ -1257,3 +1257,6 @@ body{height:100%;overflow:hidden;margin:0;background:var(--bg);color:var(--ink);
 .felt.back-room .card-pick.throwing {transform:translateY(6px); box-shadow:0 0 0 2px #d9534f; opacity:.7}
 .felt.back-room .card-pick:not(:disabled):hover {transform:translateY(-4px)}
 .felt.back-room .felt-actions {flex-wrap:wrap; gap:10px; align-items:center}
+.felt.back-room .seat-moved {display:block; font-variant-numeric:tabular-nums; color:#7bd88f}
+.felt.back-room .seat-moved.down {color:#e07a6a}
+.felt.back-room .seat-sore {display:block; color:#e0b46a; opacity:.9}

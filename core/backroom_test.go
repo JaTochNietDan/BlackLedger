@@ -538,7 +538,7 @@ func TestTheTablePublishesEverythingTheScreenReads(t *testing.T) {
 	if !ok || len(seats) == 0 {
 		t.Fatal("the table has no seats on it")
 	}
-	for _, key := range []string{"who", "name", "threw", "in", "folded", "said"} {
+	for _, key := range []string{"who", "name", "threw", "in", "folded", "said", "sore"} {
 		if _, ok := seats[0][key]; !ok {
 			t.Errorf("the screen reads %q off a seat and the core does not send it", key)
 		}
@@ -582,5 +582,127 @@ func TestThereIsSomebodyInTheBackRoomToPlayAgainst(t *testing.T) {
 	// as the night then the city has stopped going to work.
 	if day >= night {
 		t.Fatalf("a game was on for %d daytime hours against %d evening ones", day, night)
+	}
+}
+
+// The whole reason for a game with no house in it is that the money belongs to
+// somebody. A man who loses a night's money to you across a table has a reason
+// to remember you, and a man you paid has a reason to like you. Until this,
+// both walked away with nothing on their mind.
+func TestTakingSomebodysMoneyAtCardsIsSomethingTheyRemember(t *testing.T) {
+	w, _ := backroom(t)
+	if err := w.SitInTheBackRoom(BackRoom, 300); err != nil {
+		t.Fatalf("no game: %v", err)
+	}
+	g := w.Game
+	loser := w.NPC(g.Seats[0].Who)
+	if loser.Sore != 0 {
+		t.Fatalf("%s was already sore before a card was turned over", loser.Name)
+	}
+	g.Mine = hand("Ah", "As", "Ad", "Ac", "Kh")
+	g.Seats[0].Cards = hand("2h", "7s", "9c", "Jc", "4h")
+	g.Seats[1].Cards = hand("2s", "7h", "8c", "Jh", "4s")
+	g.Seats[2].Cards = hand("3s", "6h", "8d", "Qh", "5s")
+	g.Drawn = true
+	if err := w.showdown(); err != nil {
+		t.Fatal(err)
+	}
+	if loser.Sore == 0 {
+		t.Fatalf("%s lost a third of everything they had and holds nothing against anybody", loser.Name)
+	}
+	if loser.SoreAt == "" {
+		t.Fatal("somebody is sore about nothing in particular")
+	}
+}
+
+func TestLosingToSomebodyAtCardsIsAlsoSomethingTheyRemember(t *testing.T) {
+	w, _ := backroom(t)
+	if err := w.SitInTheBackRoom(BackRoom, 300); err != nil {
+		t.Fatalf("no game: %v", err)
+	}
+	g := w.Game
+	winner := w.NPC(g.Seats[0].Who)
+	trust := winner.Trust
+	g.Mine = hand("2h", "7s", "9c", "Jc", "4h")
+	g.Seats[0].Cards = hand("Ah", "As", "Ad", "Ac", "Kh")
+	g.Seats[1].Cards = hand("2s", "7h", "8c", "Jh", "4s")
+	g.Seats[2].Cards = hand("3s", "6h", "8d", "Qh", "5s")
+	g.Drawn = true
+	if err := w.showdown(); err != nil {
+		t.Fatal(err)
+	}
+	if winner.Trust <= trust {
+		t.Fatalf("%s took a night's money off you and thinks no better of you for it", winner.Name)
+	}
+	if winner.Sore != 0 {
+		t.Fatalf("%s won and is sore about it", winner.Name)
+	}
+}
+
+// A small pot is a small thing. Somebody who drops a tenth of their pocket is
+// not carrying it around a week later, or the whole city ends up sore at a
+// player who plays cards.
+func TestASmallLossIsNotHeldAgainstAnybody(t *testing.T) {
+	w, _ := backroom(t)
+	if err := w.SitInTheBackRoom(BackRoom, 10); err != nil {
+		t.Fatalf("no game: %v", err)
+	}
+	g := w.Game
+	g.Mine = hand("Ah", "As", "Ad", "Ac", "Kh")
+	g.Seats[0].Cards = hand("2h", "7s", "9c", "Jc", "4h")
+	g.Seats[1].Cards = hand("2s", "7h", "8c", "Jh", "4s")
+	g.Seats[2].Cards = hand("3s", "6h", "8d", "Qh", "5s")
+	g.Drawn = true
+	if err := w.showdown(); err != nil {
+		t.Fatal(err)
+	}
+	for _, s := range g.Seats {
+		if n := w.NPC(s.Who); n.Sore != 0 {
+			t.Fatalf("%s lost $10 of $900 and holds it against you", n.Name)
+		}
+	}
+}
+
+// The money is real, so a room can be emptied. A player who keeps winning runs
+// out of people willing and able to sit down, which is the natural end of a
+// game with no house behind it: the house never runs out, and these people do.
+func TestARoomYouHaveCleanedOutHasNoGameLeftInIt(t *testing.T) {
+	w, seated := backroom(t)
+	hands, sore := 0, 0
+	for hands < 40 {
+		if reason := w.BackRoomReadiness(BackRoom, 300); reason != "" {
+			break
+		}
+		if err := w.SitInTheBackRoom(BackRoom, 300); err != nil {
+			t.Fatalf("no game: %v", err)
+		}
+		g := w.Game
+		// The player wins every hand, which is the fastest honest way to the
+		// end of the room's money.
+		g.Mine = hand("Ah", "As", "Ad", "Ac", "Kh")
+		g.Seats[0].Cards = hand("2h", "7s", "9c", "Jc", "4h")
+		g.Seats[1].Cards = hand("2s", "7h", "8c", "Jh", "4s")
+		g.Seats[2].Cards = hand("3s", "6h", "8d", "Qh", "5s")
+		g.Drawn = true
+		if err := w.showdown(); err != nil {
+			t.Fatal(err)
+		}
+		hands++
+	}
+	for _, id := range seated {
+		if w.NPC(id).Sore > 0 {
+			sore++
+		}
+	}
+	left := w.BackRoomReadiness(BackRoom, 300)
+	t.Logf("after %d winning hands: %d of the three are sore, and the room says %q", hands, sore, left)
+	if hands >= 40 {
+		t.Fatal("forty winning hands at $300 and the room still had money in it")
+	}
+	if left == "" {
+		t.Fatal("the game stopped and the room says there is nothing wrong")
+	}
+	if sore == 0 {
+		t.Fatal("a room was emptied and nobody in it minded")
 	}
 }
