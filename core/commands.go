@@ -357,6 +357,21 @@ func (w *World) apply(c Command) error {
 				return err
 			}
 			w.Advance(a.Minutes)
+		} else if c.Kind == "bet" {
+			if err := w.PlaceBet(c.Amount); err != nil {
+				return err
+			}
+			w.Advance(a.Minutes)
+		} else if c.Kind == "call" {
+			if err := w.CallBet(); err != nil {
+				return err
+			}
+			w.Advance(a.Minutes)
+		} else if c.Kind == "fold" {
+			if err := w.FoldHand(); err != nil {
+				return err
+			}
+			w.Advance(a.Minutes)
 		} else if c.Kind == "roll" {
 			if err := w.RollAgain(); err != nil {
 				return err

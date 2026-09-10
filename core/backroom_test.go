@@ -31,6 +31,23 @@ func backroom(t *testing.T) (*World, []string) {
 	return w, seated
 }
 
+// playOut checks the hand through: no bet from the player, and pay whatever
+// comes back at them. The cheapest way to reach a showdown from a test.
+func playOut(t *testing.T, w *World, throw []int) {
+	t.Helper()
+	if err := w.ChangeCards(throw); err != nil {
+		t.Fatalf("the draw was refused: %v", err)
+	}
+	if err := w.PlaceBet(0); err != nil {
+		t.Fatalf("checking was refused: %v", err)
+	}
+	if w.Game.Facing {
+		if err := w.CallBet(); err != nil {
+			t.Fatalf("calling was refused: %v", err)
+		}
+	}
+}
+
 func TestTheBackRoomSeatsPeopleWhoLiveHere(t *testing.T) {
 	w, seated := backroom(t)
 	if err := w.SitInTheBackRoom(BackRoom, 50); err != nil {
@@ -95,18 +112,16 @@ func TestTheBestHandTakesThePot(t *testing.T) {
 	if pot <= 0 {
 		t.Fatal("nobody put anything in")
 	}
-	if err := w.ChangeCards(nil); err != nil {
-		t.Fatalf("standing pat was refused: %v", err)
-	}
+	playOut(t, w, nil)
 	g := w.Game
 	if !g.Done {
 		t.Fatal("the hand never finished")
 	}
 	best, mine := BestAtTheTable(g), Rank(g.Mine)
-	if best.Beats(mine) && w.Player.Cash != before {
+	if best.Beats(mine) && w.Player.Cash > before {
 		t.Fatalf("a losing hand took %d out of the pot", w.Player.Cash-before)
 	}
-	if mine.Beats(best) && w.Player.Cash != before+pot {
+	if mine.Beats(best) && w.Player.Cash < before+pot {
 		t.Fatalf("the best hand at the table won %d of a %d pot", w.Player.Cash-before, pot)
 	}
 }
@@ -215,9 +230,7 @@ func TestTheBackRoomTakesNoRake(t *testing.T) {
 				throw = append(throw, i)
 			}
 		}
-		if err := w.ChangeCards(throw); err != nil {
-			t.Fatalf("the draw was refused: %v", err)
-		}
+		playOut(t, w, throw)
 		mine += w.Player.Cash - cash
 		after := 0
 		for _, id := range seated {
@@ -232,10 +245,85 @@ func TestTheBackRoomTakesNoRake(t *testing.T) {
 	if mine+table != 0 {
 		t.Fatalf("the money at the table does not add up: %d against %d", mine, table)
 	}
-	// A quarter of the ante per hand either way is noise; a rake is not.
-	if edge := float64(mine) / float64(hands*50); edge < -.06 || edge > .06 {
-		t.Fatalf("a game with no house in it returned %.1f%% of the ante per hand", edge*100)
+}
+
+// The draw alone is close to an equal share of the pots, which is what having
+// no house in the game means. Once there is money to answer, calling every bet
+// with any hand is the way to lose it, and folding what is beaten is the way to
+// stop. Both numbers are here because the first is the game being fair and the
+// second is the game being a game.
+func TestFoldingIsWorthMoreThanTheCardsAre(t *testing.T) {
+	run := func(fold, bet bool) int {
+		total := 0
+		for seed := uint32(1); seed <= 3000; seed++ {
+			w, _ := backroom(t)
+			w.RNG = seed * 2654435761
+			cash := w.Player.Cash
+			if err := w.SitInTheBackRoom(BackRoom, 50); err != nil {
+				t.Fatalf("no game: %v", err)
+			}
+			if err := w.ChangeCards(roomDraw(w.Game.Mine)); err != nil {
+				t.Fatalf("the draw was refused: %v", err)
+			}
+			put := 0
+			if bet && Rank(w.Game.Mine).Category >= Trips {
+				put = 100
+			}
+			if err := w.PlaceBet(put); err != nil {
+				t.Fatalf("betting was refused: %v", err)
+			}
+			if w.Game.Facing {
+				// Somebody put money in. Pay to see it, or believe them.
+				beaten := Rank(w.Game.Mine).Category < Trips
+				var err error
+				if fold && beaten {
+					err = w.FoldHand()
+				} else {
+					err = w.CallBet()
+				}
+				if err != nil {
+					t.Fatalf("answering the bet was refused: %v", err)
+				}
+			}
+			total += w.Player.Cash - cash
+		}
+		return total
 	}
+	calls, folds, plays := run(false, false), run(true, false), run(true, true)
+	t.Logf("over 3000 hands at $50: calling everything is $%d, folding what is beaten is $%d, folding and betting the good ones is $%d", calls, folds, plays)
+	if folds <= calls {
+		t.Fatalf("throwing beaten hands in cost more than paying for them: %d against %d", folds, calls)
+	}
+	if plays <= folds {
+		t.Fatalf("putting money on a made hand earned nothing: %d against %d", plays, folds)
+	}
+}
+
+// roomDraw is the way the room plays a hand, so a test can play it the same.
+func roomDraw(cards []Card) []int {
+	if Rank(cards).Category >= Straight {
+		return nil
+	}
+	count := map[int]int{}
+	for _, c := range cards {
+		count[pokerRank(c)]++
+	}
+	high := map[int]bool{}
+	if Rank(cards).Category == HighCard {
+		var r []int
+		for _, c := range cards {
+			r = append(r, pokerRank(c))
+		}
+		sort.Sort(sort.Reverse(sort.IntSlice(r)))
+		high[r[0]], high[r[1]] = true, true
+	}
+	var throw []int
+	for i, c := range cards {
+		if count[pokerRank(c)] == 1 && !high[pokerRank(c)] {
+			throw = append(throw, i)
+		}
+	}
+	return throw
 }
 
 // Random hands almost never tie — none did in four thousand — so the split has
@@ -311,10 +399,121 @@ func TestTheGameCanBePlayedThroughTheSamePathAsEverythingElse(t *testing.T) {
 	if err := w.apply(Command{Kind: "change", Choice: "0,2", RequestID: "backroomdrawtwo1"}); err != nil {
 		t.Fatalf("changing two cards was refused: %v", err)
 	}
+	if err := w.apply(Command{Kind: "bet", Amount: 0, RequestID: "backroomcheckit1"}); err != nil {
+		t.Fatalf("checking was refused: %v", err)
+	}
+	if w.Game.Facing {
+		if err := w.apply(Command{Kind: "call", RequestID: "backroomcallit1"}); err != nil {
+			t.Fatalf("calling was refused: %v", err)
+		}
+	}
 	if !w.Game.Done {
 		t.Fatal("the hand never came to a showdown")
 	}
 	if w.CardsDescription()["outcome"] == "" {
 		t.Fatal("the hand finished and the interface is told nothing about it")
+	}
+}
+
+// Money the player never sees again has to leave the table properly: what
+// somebody folds stays in the pot, and the pot is always exactly what everybody
+// put in it.
+func TestWhatIsFoldedStaysInThePot(t *testing.T) {
+	w, seated := backroom(t)
+	cash, purses := w.Player.Cash, 0
+	for _, id := range seated {
+		purses += w.NPC(id).Purse
+	}
+	if err := w.SitInTheBackRoom(BackRoom, 50); err != nil {
+		t.Fatalf("no game: %v", err)
+	}
+	if err := w.ChangeCards(nil); err != nil {
+		t.Fatal(err)
+	}
+	if err := w.PlaceBet(100); err != nil {
+		t.Fatalf("betting was refused: %v", err)
+	}
+	if w.Game.Facing {
+		if err := w.FoldHand(); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if !w.Game.Done {
+		t.Fatal("the hand never finished")
+	}
+	after := 0
+	for _, id := range seated {
+		after += w.NPC(id).Purse
+	}
+	if d := w.Player.Cash - cash + after - purses; d != 0 {
+		t.Fatalf("$%d appeared at the table out of nowhere", d)
+	}
+	if w.Game.Folded && w.Game.Won != -(w.Game.Ante+w.Game.MyBet) {
+		t.Fatalf("a folded hand cost $%d against $%d put in", -w.Game.Won, w.Game.Ante+w.Game.MyBet)
+	}
+}
+
+// The table has to talk, or the player is reading a spreadsheet. Every seat
+// says what it did, and nobody's cards are visible until the hand is over.
+func TestTheTableSaysWhatItDid(t *testing.T) {
+	w, _ := backroom(t)
+	if err := w.SitInTheBackRoom(BackRoom, 50); err != nil {
+		t.Fatalf("no game: %v", err)
+	}
+	if err := w.ChangeCards(nil); err != nil {
+		t.Fatal(err)
+	}
+	for _, seat := range w.CardsDescription()["seats"].([]map[string]any) {
+		if _, shown := seat["cards"]; shown {
+			t.Fatalf("%v's hand is on the screen before it is turned over", seat["name"])
+		}
+	}
+	if err := w.PlaceBet(0); err != nil {
+		t.Fatal(err)
+	}
+	if w.Game.Facing {
+		if err := w.CallBet(); err != nil {
+			t.Fatal(err)
+		}
+	}
+	said := 0
+	for _, s := range w.Game.Seats {
+		if s.Said != "" {
+			said++
+		}
+	}
+	if said == 0 {
+		t.Fatal("the money went round the table and nobody said anything")
+	}
+	for _, seat := range w.CardsDescription()["seats"].([]map[string]any) {
+		if _, shown := seat["cards"]; !shown {
+			t.Fatalf("the hand is over and %v's cards are still face down", seat["name"])
+		}
+	}
+}
+
+// Folding has to lose. A hand thrown in wins nothing however good it was, or
+// the button is decoration: with the fold not recorded, a player could throw in
+// the best hand at the table and still be paid for it.
+func TestAHandThrownInWinsNothingHoweverGoodItWas(t *testing.T) {
+	w, _ := backroom(t)
+	if err := w.SitInTheBackRoom(BackRoom, 50); err != nil {
+		t.Fatalf("no game: %v", err)
+	}
+	g := w.Game
+	g.Mine = hand("Ah", "As", "Ad", "Ac", "Kh")
+	g.Seats[0].Cards = hand("2h", "7s", "9c", "Jc", "4h")
+	g.Seats[1].Cards = hand("2s", "7h", "8c", "Jh", "4s")
+	g.Seats[2].Cards = hand("3s", "6h", "8d", "Qh", "5s")
+	g.Drawn = true
+	before := w.Player.Cash
+	if err := w.FoldHand(); err != nil {
+		t.Fatal(err)
+	}
+	if w.Player.Cash != before {
+		t.Fatalf("four aces were thrown in and paid $%d", w.Player.Cash-before)
+	}
+	if !strings.Contains(g.Outcome, "threw in") {
+		t.Fatalf("a folded hand was described as %q", g.Outcome)
 	}
 }

@@ -1245,9 +1245,22 @@ func (w *World) Actions(id string) []Action {
 	// The back room. Not a table: no house, no edge, and the money across it
 	// belongs to whoever is sitting in the room tonight.
 	if id == BackRoom {
-		if w.Game != nil && !w.Game.Done && w.Game.Place == id {
-			add("change", "Change your cards", 10, 0, "",
-				"Throw up to three and buy that many back. Nothing thrown is standing pat, and then everybody turns them over.")
+		if g := w.Game; g != nil && !g.Done && g.Place == id {
+			switch {
+			case !g.Drawn:
+				add("change", "Change your cards", 10, 0, "",
+					"Throw up to three and buy that many back. Nothing thrown is standing pat.")
+			case g.Facing:
+				add("call", fmt.Sprintf("Call the $%d", g.Bet-g.MyBet), 5, 0, w.CallReadiness(),
+					fmt.Sprintf("Somebody put it up. Pay $%d to see what they have, or throw the hand in and lose the $%d already in front of you.", g.Bet-g.MyBet, g.Ante+g.MyBet))
+				add("fold", "Throw the hand in", 5, 0, "",
+					fmt.Sprintf("You keep what is in your pocket and lose the $%d already in the pot.", g.Ante+g.MyBet))
+			default:
+				asks("bet", "Bet on the hand", 10, 0, "",
+					fmt.Sprintf("Up to $%d on %s, or nothing at all to check it through. Whatever goes in stays in.", MaxAnte, Rank(g.Mine).Name()))
+				add("fold", "Throw the hand in", 5, 0, "",
+					fmt.Sprintf("You keep what is in your pocket and lose the $%d already in the pot.", g.Ante+g.MyBet))
+			}
 		} else {
 			asks("cards", "Sit in on the game in the back room", 40, 0,
 				w.BackRoomReadiness(id, w.BackRoomAnte(0)),

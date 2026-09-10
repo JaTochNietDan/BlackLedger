@@ -7015,3 +7015,47 @@ never walks into it.
 
 Next on this: there is no betting round yet, so the only decision is the draw.
 Who bets what, and who folds, is where the people at the table become people.
+
+## Money on the table, and the people behind it
+
+The back room had one decision in it: which cards to throw. A round of betting
+is where the other players stop being a distribution and start being people. A
+man who raises on nothing twice a night is somebody the player learns to call,
+and a man who never puts a dollar in without the hand to back it is somebody
+they learn to believe.
+
+After the draw the player bets or checks. Everybody else answers in the order
+they are sitting: check, bet, call, fold, or once in a hand put it up again. One
+raise is the house rule, because a table that can raise for ever is a table
+nobody can write a decision for. If the money comes back at the player they call
+or throw the hand in. What is folded stays in the pot. Who does what comes from
+who they are: `Ambition` above `BluffNerve` is who bets a hand that cannot win,
+`Skill` above `ReadsIt` is who can tell a pair of queens from a pair of threes.
+
+Two faults the measurements caught:
+
+- **Nobody ever bet into a checked pot.** The pass skipped every seat whose
+  stake already equalled a bet of nothing, so the whole betting round moved no
+  money and the total came out to the dollar identical to the game without it.
+  That identical number is what gave it away.
+- **The room folded everything to a bet.** Anything under two pair went down to
+  any bet worth more than the ante, so betting a made hand bought the antes and
+  nothing else — measured at $1,800 worse than checking over 3,000 hands.
+
+Measured over 3,000 hands at a $50 ante, playing the draw the way the room
+plays it:
+
+| how the player plays the money | over 3,000 hands |
+| --- | --- |
+| calls every bet | −$115,900 |
+| folds what is beaten | −$3,800 |
+| folds, and bets three of a kind or better | +$13,900 |
+
+That is the shape a card game is supposed to have: the cards are nearly even and
+the money is where the game is. The pot conserves to the dollar on every hand,
+including hands somebody folds.
+
+Wired the same way as the rest: `bet` with the amount the player typed, `call`
+and `fold`, all filed under the tables, and the published table now carries what
+each seat put in and what each seat said, with nobody's cards visible until the
+hand is over. Baseline unmoved: no campaign policy walks into the back room.

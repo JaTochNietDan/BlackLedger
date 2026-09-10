@@ -37,6 +37,13 @@ type Seat struct {
 	// Threw is how many they changed, which is the only thing the player gets
 	// to see about a hand before it is turned over.
 	Threw int `json:"threw"`
+	// In is what this seat has put in beyond the ante, and Folded is whether
+	// they threw their hand in rather than pay to see yours.
+	In     int  `json:"in,omitempty"`
+	Folded bool `json:"folded,omitempty"`
+	// Said is what they did when the money went round, kept so the interface
+	// can show a table talking rather than a row of totals.
+	Said string `json:"said,omitempty"`
 }
 
 // CardGame is a hand in progress in the back room. It lives on the world
@@ -51,7 +58,19 @@ type CardGame struct {
 	// already in somebody's hand.
 	Deck []Card `json:"deck"`
 	// Drawn is set once cards have been changed, so nobody draws twice.
-	Drawn   bool   `json:"drawn,omitempty"`
+	Drawn bool `json:"drawn,omitempty"`
+	// Bet is what it costs to stay in beyond the ante, and Mine is what the
+	// player has already put toward it. Raised is set once somebody has put
+	// the money up a second time, because this room allows one raise: a table
+	// that can raise for ever is a table nobody can write a decision for.
+	Bet    int  `json:"bet,omitempty"`
+	MyBet  int  `json:"my_bet,omitempty"`
+	Raised bool `json:"raised,omitempty"`
+	// Facing is set when the money has come back at the player and they owe
+	// something to see the hands.
+	Facing bool `json:"facing,omitempty"`
+	// Folded is the player having thrown their hand in.
+	Folded  bool   `json:"folded,omitempty"`
 	Done    bool   `json:"done,omitempty"`
 	Outcome string `json:"outcome,omitempty"`
 	Won     int    `json:"won,omitempty"`
@@ -325,7 +344,10 @@ func (w *World) ChangeCards(discards []int) error {
 		g.Seats[i].Cards, g.Seats[i].Threw = g.change(w, g.Seats[i].Cards)
 	}
 	g.Drawn = true
-	return w.showdown()
+	// The hands are made. What they are worth is now a question of who will
+	// pay to see them, which is the half of this game the cards do not decide.
+	w.Log("The draw", w.drawNote(), "personal")
+	return nil
 }
 
 // change is how somebody who is not the player plays their hand: keep what is
@@ -366,29 +388,38 @@ func (g *CardGame) change(w *World, hand []Card) ([]Card, int) {
 	return append(keep, g.take(threw)...), threw
 }
 
-// showdown turns everything over and moves the money. A pot goes to the best
-// hand, or is split between every hand that good — the first version handed a
-// tie to the room and gave the player their ante back, which is not a split and
-// cost the player five and a half percent of the ante a hand over three
-// thousand of them.
+// showdown turns over everybody still in and moves the money. A pot goes to the
+// best hand, or is split between every hand that good — the first version
+// handed a tie to the room and gave the player their ante back, which is not a
+// split and cost the player five and a half percent of the ante a hand over
+// three thousand of them.
 func (w *World) showdown() error {
 	g := w.Game
 	mine := Rank(g.Mine)
-	best := mine
-	for _, s := range g.Seats {
-		if r := Rank(s.Cards); r.Beats(best) {
-			best = r
-		}
-	}
-	// Everybody holding the best hand, the player counted as seat -1.
+	// Everybody who paid to be here.
 	var winners []int
-	if !best.Beats(mine) {
-		winners = append(winners, -1)
+	best := HandRank{Category: -1}
+	if !g.Folded {
+		best = mine
+		winners = []int{-1}
 	}
 	for i, s := range g.Seats {
-		if !best.Beats(Rank(s.Cards)) {
+		if s.Folded {
+			continue
+		}
+		r := Rank(s.Cards)
+		switch {
+		case r.Beats(best):
+			best, winners = r, []int{i}
+		case !best.Beats(r):
 			winners = append(winners, i)
 		}
+	}
+	if len(winners) == 0 {
+		// Everybody threw their hand in, which cannot happen while the player
+		// is in it and can if the player folded to a table that then folded to
+		// nobody. The money sits with whoever put in most.
+		winners = []int{0}
 	}
 	share := g.Pot / len(winners)
 	// A pot that will not divide leaves a dollar or two on the table. It goes
@@ -402,7 +433,7 @@ func (w *World) showdown() error {
 		}
 		if seat < 0 {
 			w.Player.Cash += took
-			g.Won = took - g.Ante
+			g.Won = took - g.Ante - g.MyBet
 			names = append(names, "you")
 			continue
 		}
@@ -411,15 +442,17 @@ func (w *World) showdown() error {
 		}
 		names = append(names, g.Seats[seat].Name)
 	}
-	if len(winners) == 1 && winners[0] < 0 {
+	if g.Won == 0 && (g.Folded || winners[0] >= 0) {
+		g.Won = -g.Ante - g.MyBet
+	}
+	switch {
+	case g.Folded:
+		g.Outcome = fmt.Sprintf("You threw in %s and it cost you $%d.", mine.Name(), -g.Won)
+	case len(winners) == 1 && winners[0] < 0:
 		g.Outcome = fmt.Sprintf("You had %s and took $%d off the table.", mine.Name(), g.Won)
-	} else if len(winners) == 1 {
-		g.Won = -g.Ante
+	case len(winners) == 1:
 		g.Outcome = fmt.Sprintf("%s had %s against your %s, and the table went to %s.", names[0], best.Name(), mine.Name(), names[0])
-	} else {
-		if g.Won == 0 {
-			g.Won = -g.Ante
-		}
+	default:
 		g.Outcome = fmt.Sprintf("%s all had %s, and $%d went each way.", joinNames(names), best.Name(), share)
 	}
 	g.Done = true
@@ -477,7 +510,8 @@ func (w *World) CardsDescription() map[string]any {
 	}
 	seats := make([]map[string]any, 0, len(g.Seats))
 	for _, s := range g.Seats {
-		seat := map[string]any{"who": s.Who, "name": s.Name, "threw": s.Threw}
+		seat := map[string]any{"who": s.Who, "name": s.Name, "threw": s.Threw,
+			"in": s.In, "folded": s.Folded, "said": s.Said}
 		// Nobody sees a hand before it is turned over.
 		if g.Done {
 			seat["cards"] = s.Cards
@@ -488,6 +522,230 @@ func (w *World) CardsDescription() map[string]any {
 	return map[string]any{
 		"place": g.Place, "ante": g.Ante, "pot": g.Pot, "mine": g.Mine,
 		"hand": Rank(g.Mine).Name(), "seats": seats, "drawn": g.Drawn,
+		"bet": g.Bet, "my_bet": g.MyBet, "facing": g.Facing, "folded": g.Folded,
 		"done": g.Done, "outcome": g.Outcome, "won": g.Won,
 	}
+}
+
+// Betting. The draw is arithmetic anybody can do; the money is where the people
+// at the table stop being a distribution and start being people. A man who
+// raises on nothing twice a night is somebody the player learns to call, and a
+// man who never puts a dollar in without the hand to back it is somebody they
+// learn to believe.
+
+const (
+	// OneRaise is the house rule. A table that can raise for ever is a table
+	// nobody can write a decision for, and this room plays a single raise.
+	OneRaise = true
+	// BluffNerve is the ambition above which somebody in this room will put
+	// money on a hand that cannot win.
+	BluffNerve = 55
+	// ReadsIt is the skill above which somebody folds a hand that is behind
+	// rather than paying to be shown it.
+	ReadsIt = 45
+)
+
+// drawNote is what the player is told when the cards have been changed: what
+// they are holding and what everybody else bought, which is all the reading
+// anybody gets before the money goes round.
+func (w *World) drawNote() string {
+	g := w.Game
+	said := make([]string, 0, len(g.Seats))
+	for _, s := range g.Seats {
+		switch s.Threw {
+		case 0:
+			said = append(said, s.Name+" stood pat")
+		case 1:
+			said = append(said, s.Name+" took one")
+		default:
+			said = append(said, fmt.Sprintf("%s took %d", s.Name, s.Threw))
+		}
+	}
+	return fmt.Sprintf("You are holding %s. %s.", Rank(g.Mine).Name(), joinNames(said))
+}
+
+// strength is how good a hand looks to the person holding it. Skill is how well
+// they read it: somebody who cannot tell a pair of threes from a pair of
+// queens plays them the same way.
+func seatStrength(cards []Card, skill int) int {
+	r := Rank(cards)
+	s := r.Category * 2
+	if r.Category == Pair && len(r.Order) > 0 && r.Order[0] >= 11 && skill >= ReadsIt {
+		s++ // a pair worth playing, if you can tell
+	}
+	if r.Category == HighCard && len(r.Order) > 0 && r.Order[0] == 14 && skill >= ReadsIt {
+		s++
+	}
+	return s
+}
+
+// PlaceBet is the player putting money in, or checking with nothing. Everybody
+// else answers it, in the order they are sitting.
+func (w *World) PlaceBet(amount int) error {
+	g := w.Game
+	if g == nil || g.Done {
+		return fmt.Errorf("there is no hand on the table")
+	}
+	if !g.Drawn {
+		return fmt.Errorf("the cards have not been changed yet")
+	}
+	if g.Facing {
+		return fmt.Errorf("the bet is back with you: call it or throw the hand in")
+	}
+	if g.Bet > 0 {
+		return fmt.Errorf("the betting is finished")
+	}
+	if amount < 0 || amount > MaxAnte {
+		return fmt.Errorf("the room takes up to $%d on one bet", MaxAnte)
+	}
+	if amount > w.Player.Cash {
+		return fmt.Errorf("you cannot cover that")
+	}
+	if amount > 0 {
+		if err := w.Pay(amount); err != nil {
+			return err
+		}
+		g.Bet, g.MyBet, g.Pot = amount, amount, g.Pot+amount
+	}
+	w.roundOfBetting()
+	if g.Bet > g.MyBet {
+		g.Facing = true
+		return nil
+	}
+	return w.showdown()
+}
+
+// roundOfBetting walks the table until nobody is short. Anybody short of the
+// bet calls it, folds or, once in a hand, puts it up again — and somebody
+// checked to may bet, which is why one pass is not enough: the first version
+// skipped every seat whose stake already equalled a bet of nothing, so nobody
+// in this room ever bet into a checked pot and the betting round moved no money
+// at all. Three passes is the most a single raise can need.
+func (w *World) roundOfBetting() {
+	for pass := 0; pass < 3; pass++ {
+		if !w.bettingPass() {
+			return
+		}
+	}
+}
+
+// bettingPass walks the table once and reports whether anybody did anything.
+func (w *World) bettingPass() bool {
+	g := w.Game
+	moved := false
+	for i := range g.Seats {
+		s := &g.Seats[i]
+		if s.Folded || (s.In >= g.Bet && (g.Bet > 0 || s.Said != "")) {
+			continue
+		}
+		moved = true
+		n := w.NPC(s.Who)
+		if n == nil {
+			s.Folded, s.Said = true, "is not at the table any more"
+			continue
+		}
+		if s.In >= g.Bet && g.Bet > 0 {
+			continue
+		}
+		strength := seatStrength(s.Cards, n.Skill)
+		owed := g.Bet - s.In
+		// Nothing to call: a hand worth showing bets it, and so does somebody
+		// with the nerve to represent one they have not got.
+		if owed == 0 {
+			bluff := n.Ambition >= BluffNerve && w.Random() < .18
+			s.Said = "checks"
+			if strength >= 4 || bluff {
+				put := min(g.Ante*2, w.Pockets(n))
+				if put <= 0 {
+					continue
+				}
+				n.Purse -= put
+				s.In += put
+				g.Bet, g.Pot = s.In, g.Pot+put
+				s.Said = "bets $" + fmt.Sprint(put)
+				if bluff && strength < 4 {
+					s.Said = "bets $" + fmt.Sprint(put) + " without blinking"
+				}
+			}
+			continue
+		}
+		if w.Pockets(n) < owed {
+			s.Folded, s.Said = true, "has not got it and throws the hand in"
+			continue
+		}
+		// A raise, once, and only from somebody holding something and willing
+		// to say so.
+		if !g.Raised && strength >= 6 && n.Ambition >= BluffNerve {
+			put := min(owed+g.Ante*2, w.Pockets(n))
+			n.Purse -= put
+			s.In += put
+			g.Bet, g.Pot, g.Raised = s.In, g.Pot+put, true
+			s.Said = "puts it up $" + fmt.Sprint(s.In-(g.Bet-put))
+			s.Said = fmt.Sprintf("sees it and puts it up to $%d", s.In)
+			continue
+		}
+		// Otherwise: pay to see it, or read that it is beaten and stop paying.
+		// What it takes to make somebody put the hand down. The first version
+		// folded anything under two pair to any bet worth more than the ante,
+		// which made the whole table fold to a bet and turned betting a made
+		// hand into a way of buying the antes: measured over three thousand
+		// hands, betting the good ones was $1,800 worse than checking them.
+		// A pair somebody can read is worth a call.
+		folds := strength <= 1 || (strength <= 2 && owed > g.Ante*2) ||
+			(strength <= 3 && n.Skill < ReadsIt && owed > g.Ante*3)
+		if folds {
+			s.Folded, s.Said = true, "throws the hand in"
+			continue
+		}
+		n.Purse -= owed
+		s.In += owed
+		g.Pot += owed
+		s.Said = "calls"
+	}
+	return moved
+}
+
+// CallBet is the player paying to see the hands after somebody put it up.
+func (w *World) CallBet() error {
+	g := w.Game
+	if g == nil || g.Done || !g.Facing {
+		return fmt.Errorf("there is nothing to call")
+	}
+	owed := g.Bet - g.MyBet
+	if owed > w.Player.Cash {
+		return fmt.Errorf("you cannot cover that")
+	}
+	if err := w.Pay(owed); err != nil {
+		return err
+	}
+	g.MyBet, g.Pot, g.Facing = g.Bet, g.Pot+owed, false
+	// Whoever called the smaller figure has to match the bigger one or get out.
+	w.roundOfBetting()
+	return w.showdown()
+}
+
+// FoldHand is the player throwing it in rather than paying. What is already in
+// the pot stays in the pot, which is the whole of what folding costs.
+func (w *World) FoldHand() error {
+	g := w.Game
+	if g == nil || g.Done {
+		return fmt.Errorf("there is no hand on the table")
+	}
+	if !g.Drawn {
+		return fmt.Errorf("you have not seen your hand yet")
+	}
+	g.Folded, g.Facing = true, false
+	return w.showdown()
+}
+
+// CallReadiness explains why the player cannot pay to see the hands.
+func (w *World) CallReadiness() string {
+	g := w.Game
+	if g == nil || g.Done || !g.Facing {
+		return "There is nothing to call"
+	}
+	if owed := g.Bet - g.MyBet; owed > w.Player.Cash {
+		return fmt.Sprintf("You are $%d short of calling it", owed-w.Player.Cash)
+	}
+	return ""
 }
