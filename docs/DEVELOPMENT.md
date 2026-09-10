@@ -6437,3 +6437,45 @@ and the casino in 100 runs of 100. The thief moved from 28 to 25 and 25 to 23,
 which is noise for a policy that dies at fifty commands.
 
 Evidence: `core/trade_amount_test.go`.
+
+## Somebody who actually trades, and what they found
+
+Last slice let contraband move in whatever figure the player types, and had to
+admit the balance numbers said nothing about it: no policy in the harness had
+ever bought a crate of anything. The main high-variance income path in the game,
+by the design document's own account, was entirely unmeasured.
+
+Two things had to exist first. The view carried premises and people and not the
+one number the trade is decided on, so `Goods` is on it now. And `View.most`
+lets a policy ask a card how much it will take — the core already works out what
+a person can carry and what they can pay for, and a policy that recalculates
+that is a second opinion waiting to disagree. Mine did: the first version asked
+for four crates with room for one and the campaign ended on the refusal.
+
+**What the smuggler found is not what the design claims.**
+
+| 60 campaigns | |
+|---|---|
+| Purchases | 152 |
+| Sales | 26 |
+| Median days | 3.8 |
+| Median final cash | 3,570 |
+
+Six purchases for every sale, and a third of the investor's money. Contraband is
+not the main high-variance income path; it is a slow way to end up holding
+stock. The reason is structural rather than a matter of tuning. There is one
+price series for the whole city, so buying at the docks and selling at the
+market is the same price — there is no route, only a wait. Prices do swing
+widely, 55% to 177% of base over four months, but a campaign is a few days long,
+so a cycle rarely completes inside one. Meanwhile every day the stock is held
+draws attention.
+
+Layer 6 of `docs/LIVING_WORLD.md` asks for "sources, routes, and buyers" and
+"profit from risk taken knowingly". What exists is a price that moves and a
+pocket that holds. Routes are the missing half, and that is a design slice of
+its own rather than something to tune.
+
+Balance, six strategies: deaths 0/0/51/82/77/0, median cash
+12405/14156/7230/90/547/3595.
+
+Evidence: `sim/campaign.go`, and the 152-against-26 count above.

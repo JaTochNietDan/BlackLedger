@@ -28,6 +28,10 @@ type Event struct {
 
 // View deliberately excludes plots, RNG, queued offers and private director memory.
 type View struct {
+	// The market. A price that moves is the whole of the underground trade, and
+	// no policy in here could see one: the view carried premises and people and
+	// not the one number the trade is decided on.
+	Goods          []core.Good    `json:"goods"`
 	BusinessTruces map[string]int `json:"business_truces"`
 	Revision       int            `json:"revision"`
 	Minute         int            `json:"minute"`
@@ -218,6 +222,19 @@ func (v View) action(target, kind string) (core.Command, bool) {
 	}
 	return core.Command{}, false
 }
+
+// most is the largest figure this card will take, which the core works out
+// from what the player can carry and what they can pay for. A policy asks the
+// card rather than doing that arithmetic again.
+func (v View) most(target, kind string) int {
+	for _, a := range v.place(target).Actions {
+		if a.ID == kind && a.Sum != nil {
+			return a.Sum.Most
+		}
+	}
+	return 0
+}
+
 func (v View) at(target, kind string) (core.Command, bool) {
 	if v.Player.Location != target {
 		return v.action(target, "travel")
@@ -270,6 +287,67 @@ func Choose(v View, strategy string) (core.Command, error) {
 	// The thief builds the ordinary way first — a name, a crew, somebody on the
 	// door — and only then starts taking tills. A policy that robs from the
 	// first minute is dead inside six commands and measures nothing.
+	// The smuggler. Buys when a good is cheap against its own base and sells
+	// when it is dear, which is the only edge there is: prices move toward base
+	// with noise and a war disrupts supply. It exists because nothing in this
+	// harness had ever traded a crate of anything, so the main high-variance
+	// income path in the game was entirely unmeasured.
+	if strategy == "smuggler" && v.Player.Respect >= 6 {
+		// Attention is what kills this policy, and lying low is the only cure.
+		if v.Player.Heat >= 55 {
+			if c, ok := v.at(v.Player.Home, "lie_low"); ok {
+				return c, nil
+			}
+		}
+		here := v.Player.Location
+		trading := here == "market" || here == "docks"
+		carrying := 0
+		for _, g := range v.Goods {
+			carrying += v.Player.Stock[g.ID]
+		}
+		if trading {
+			// Sell anything at or above what it is normally worth.
+			for _, g := range v.Goods {
+				held := v.Player.Stock[g.ID]
+				if held == 0 || g.Price < g.Base {
+					continue
+				}
+				if c, ok := v.action(here, "sell:"+g.ID); ok {
+					c.Amount = min(held, v.most(here, c.Kind))
+					if c.Amount > 0 {
+						return c, nil
+					}
+				}
+			}
+			// Buy anything cheap, as much as the card will take. How much is
+			// asked of the card rather than worked out again: the first version
+			// did its own arithmetic and asked for four crates with room for
+			// one, and the campaign ended on the refusal.
+			if v.Player.Heat < 40 && v.Player.Cash > 600 {
+				for _, g := range v.Goods {
+					if g.Price*10 > g.Base*9 {
+						continue
+					}
+					c, ok := v.action(here, "buy:"+g.ID)
+					if !ok {
+						continue
+					}
+					c.Amount = min(v.most(here, c.Kind), max(1, (v.Player.Cash-500)/max(1, g.Price)))
+					if c.Amount > 0 {
+						return c, nil
+					}
+				}
+			}
+		}
+		// Somewhere that trades, when there is a reason to be there. Never a
+		// standing reason: a policy that always wants to be at the market spends
+		// the campaign walking to it.
+		if !trading && (carrying > 0 || v.Player.Cash > 900) && v.Player.Heat < 40 {
+			if c, ok := v.at("market", "wait"); ok && c.Kind == "travel" {
+				return c, nil
+			}
+		}
+	}
 	if strategy == "thief" && v.Player.Respect >= 6 && v.Player.Security >= 1 {
 		// A robbery that goes wrong is a beating, and two in a row is a death,
 		// so this one waits until it is whole before trying another.
