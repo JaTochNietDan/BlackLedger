@@ -186,8 +186,8 @@ func (w *World) Wages() int {
 		if !w.Own(id) {
 			continue
 		}
-		if trade, ok := TradeOf(id); ok {
-			total += prop.Staff * trade.Wage
+		if _, ok := TradeOf(id); ok {
+			total += prop.Staff * w.WageAt(id)
 		}
 	}
 	return total

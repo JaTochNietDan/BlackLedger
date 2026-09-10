@@ -8000,3 +8000,26 @@ with the rule removed — so the test now says it: the counter is not ready to
 hire the same morning, and the gap is still there the next day.
 
 Baseline unmoved: no campaign policy makes anybody sore at their own staff.
+
+## What you pay them
+
+People can walk out of a business over something the player did, and there was
+nothing to be done about it except not do it. A wage is the oldest answer, and
+the one thing an owner actually decides every week.
+
+The trade's wage is the rate — what the work is worth in this city — and what a
+place pays is a decision on top of it, between half the rate and three times it.
+Nobody stands behind a counter for less; past the ceiling the trade cannot carry
+it. Over the rate they think better of the player a point a day, under it a point
+worse, and the wage bill in the books follows the figure rather than the rate.
+
+Measured over twenty days: paid double, the three hands at a laundry think of
+the player at 60 all told; paid half, at 0. It is a wage and not a gift, so it
+takes weeks — which is the right shape for the thing it answers, because a
+grudge takes weeks to matter too.
+
+Both halves break correctly: with the generosity removed, paying double buys
+nothing; with the bill reading the rate instead of the figure, halving the wage
+does not change what the books say.
+
+Baseline unmoved: no campaign policy touches a wage.

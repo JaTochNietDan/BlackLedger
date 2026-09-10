@@ -246,10 +246,14 @@ type Property struct {
 	// not come back the same morning, and the city does not hand you a
 	// replacement before you have noticed the gap. Absent in saves written
 	// before anybody could leave, which reads as a counter that can hire today.
-	Shorthanded int  `json:"shorthanded,omitempty"`
-	Supply      int  `json:"supply,omitempty"`
-	Trouble     bool `json:"trouble,omitempty"`
-	Still       bool `json:"still,omitempty"`
+	Shorthanded int `json:"shorthanded,omitempty"`
+	// What this business pays a hand a day, when the player has decided it.
+	// Absent in saves written before the wage was a decision, which reads as
+	// the trade's own rate.
+	Wage    int  `json:"wage,omitempty"`
+	Supply  int  `json:"supply,omitempty"`
+	Trouble bool `json:"trouble,omitempty"`
+	Still   bool `json:"still,omitempty"`
 	// What is behind the tables at a casino. Absent everywhere else, and in
 	// saves written before a room ran a float of its own.
 	Bankroll int `json:"bankroll,omitempty"`
@@ -1509,6 +1513,17 @@ func (w *World) Actions(id string) []Action {
 							fmt.Sprintf("$%d. Produces moonshine you can sell, draws %d attention a day on top of what the stock draws, and a search that finds it costs far more than one that does not.", StillCost, StillHeat))
 					}
 				}
+			}
+			// What this place pays a hand a day. The rate is what the work is
+			// worth in this city; what you pay on top of it is the one thing an
+			// owner decides every week, and the only answer there is to people
+			// walking out.
+			if trade, running := TradeOf(id); running {
+				least, most := WageBounds(trade.Wage)
+				asks("wage", "Set what this place pays", 20, 0, w.PayReadiness(id, w.WageAt(id)),
+					fmt.Sprintf("$%d to $%d a day a head, against a rate of $%d. It reads $%d. Over the rate they think better of you a little at a time; under it they think less.",
+						least, most, trade.Wage, w.WageAt(id)))
+				sum(least, most, w.WageAt(id), "A day a head")
 			}
 			if RunsAGame(id) {
 				prop := w.Properties[id]

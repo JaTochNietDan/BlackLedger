@@ -47,7 +47,7 @@ var actionGroup = map[string]string{
 	"contract": "work", "order": "work",
 
 	// Premises.
-	"acquire": "business", "repair": "business", "hire": "business", "layoff": "business",
+	"acquire": "business", "repair": "business", "hire": "business", "layoff": "business", "wage": "business",
 	"restock": "business", "remedy": "business", "inspect": "business", "still": "business",
 	"dismantle": "business", "armoury": "business", "stock_arms": "business",
 	"bankroll": "business", "post": "business", "unpost": "business",

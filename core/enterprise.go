@@ -91,6 +91,7 @@ func (w *World) BusinessDay() {
 	// And what they saw from behind it, and whether anybody has had enough of
 	// standing there.
 	w.WordFromTheCounter()
+	w.PayDay()
 	w.Notice()
 	heat, worn := 0, []string{}
 	for _, l := range Locations {
