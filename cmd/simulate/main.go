@@ -27,6 +27,12 @@ func main() {
 	director := flag.String("director", "authored", "authored, fixture or replay (no model calls)")
 	corpusPath := flag.String("corpus", "", "JSON proposal array required for replay")
 	trace := flag.Bool("trace", false, "include each pre-command public state and command")
+	// The city with nobody in it. A campaign follows one protagonist for a
+	// median of a few days, which is why no report this harness has ever
+	// printed showed an organization ending. They end; nobody was watching
+	// long enough. These runs have no player policy at all.
+	cities := flag.Int("cities", 12, "cities to run with nobody playing them")
+	season := flag.Int("season", 60, "days to run each of those cities for")
 	flag.Parse()
 	if *runs < 1 || *runs > 10000 || *steps < 1 || *steps > 10000 || *first > 4294967295 {
 		fmt.Fprintln(os.Stderr, "invalid run/step/seed bounds")
@@ -154,7 +160,8 @@ func main() {
 			short = append(short, fmt.Sprintf("%s (%.1f days)", p, days))
 		}
 	}
-	out := map[string]any{"corpus_sha256": corpusHash, "corpus_proposals": len(corpus), "elapsed_seconds": time.Since(start).Seconds(), "director": *director, "max_commands": *steps, "summary": summaries, "campaigns": reports}
+	// What a season does to a city that nobody is playing.
+	out := map[string]any{"city_alone": seasonReport(*cities, *season), "corpus_sha256": corpusHash, "corpus_proposals": len(corpus), "elapsed_seconds": time.Since(start).Seconds(), "director": *director, "max_commands": *steps, "summary": summaries, "campaigns": reports}
 	if len(short) > 0 {
 		out["warning"] = fmt.Sprintf(
 			"the city measures are not meaningful for %s: a campaign has to run past about %d days "+
@@ -171,5 +178,33 @@ func main() {
 	}
 	if failed {
 		os.Exit(1)
+	}
+}
+
+// seasonReport runs a handful of cities with nobody in them and totals what
+// happened. It is the only measure in this harness that can see a family fall,
+// because a campaign does not last long enough for one to.
+func seasonReport(cities, days int) map[string]any {
+	if cities <= 0 || days <= 0 {
+		return map[string]any{"cities": 0}
+	}
+	total := map[string]int{}
+	worst, runs := 0, []sim.CityReport{}
+	for i := 0; i < cities; i++ {
+		r := sim.City(uint32(i+1)*2654435761, days)
+		runs = append(runs, r)
+		total["organizations_formed"] += r.Formed
+		total["organizations_fell"] += r.Fell
+		total["wars_started"] += r.Wars
+		total["wars_settled"] += r.Settled
+		total["holdings_changed_hands"] += r.Changed
+		total["people_killed"] += r.Killed
+		if r.Biggest > worst {
+			worst = r.Biggest
+		}
+	}
+	return map[string]any{
+		"cities": cities, "days": days, "totals": total,
+		"biggest_share_anywhere": worst, "runs": runs,
 	}
 }

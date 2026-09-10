@@ -6286,3 +6286,49 @@ hundred and by three percent of a small number, which is a twenty-sixth address
 changing which room a policy walks into rather than anything paying differently.
 
 Evidence: `core/pawn_test.go`, and the three address guards that failed first.
+
+## Watching the city instead of the player
+
+`docs/LIVING_WORLD.md` sets the standard for these systems: "a system is not
+finished because it runs. It is finished when a long simulation shows it
+producing varied, non-degenerate outcomes." Every report this harness has ever
+printed says `factions_destroyed: 0`.
+
+That is not because nothing falls. Left alone for sixty days, ten organizations
+fell across twenty-five cities. The measurement was watching the wrong thing: a
+campaign follows one protagonist, and the median campaign lasts between three
+and fourteen days — the reckless policy lasts five hours. Families escalate,
+split and collapse over weeks, and no run was alive long enough to see any of
+it. The number was reporting the lifespan of the player, not the health of the
+city.
+
+So `sim.City` runs a city with nobody in it. No policy and no commands: the
+clock turns and the families do whatever the rules make them do. Any scene is
+cleared rather than answered, because this is a measurement of the city and not
+of what the director would have said about it.
+
+| 12 cities, 60 days each | |
+|---|---|
+| Organizations formed | 11 |
+| Organizations fell | 7 |
+| Wars started | 28 |
+| Wars settled | 25 |
+| Holdings changed hands | 22 |
+| People killed | 32 |
+
+Two tests hold it to the standard. One says a city must keep moving: something
+must fall, something must be formed, and property must change hands. The other
+says it must not degenerate: no city may end with nobody alive, with no
+organizations left, or with ninety percent of the held property in one pair of
+hands.
+
+**That second number is worth watching.** The largest holding in any of the
+twelve is eighty percent. It passes, and it is closer to the line than anything
+else in this file. A city that ends with four fifths of itself under one name
+has not collapsed, but it is heading that way, and the next thing to measure
+here is whether that share keeps climbing over a longer season.
+
+`mise run simulate` reports all of it under `city_alone`, so a living-world
+claim made in this file can be checked against a run rather than asserted.
+
+Evidence: `sim/city_test.go`, one break verified.

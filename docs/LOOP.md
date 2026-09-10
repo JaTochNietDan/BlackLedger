@@ -134,7 +134,11 @@ each other and the run is race-clean.
 Balance baseline, five strategies (worker/investor/defiant/reckless/thief):
 deaths 0/0/50/82/79, median cash 12378/14050/7230/90/567.
 `mise run simulate > <scratchpad>/sim.json` then **parse** the JSON; grepping it
-is useless.
+is useless. It also runs twelve cities for sixty days with nobody playing them
+and reports that under `city_alone` — 11 organizations formed, 7 fell, 28 wars,
+22 holdings changed hands, largest share of the city in one pair of hands 80%.
+That is the only measure here that can see a family fall: a campaign follows one
+protagonist and does not last long enough for one to.
 
 ### Browser QA
 
