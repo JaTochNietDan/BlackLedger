@@ -174,4 +174,13 @@ you did for blackjack and roulette. Right now it looks scraggy.
 Can people only make attempts on your life while you're at home? They always
 seem to hit my home when I'm not there and they are coming after me.
 
+Why can't I attempt to take people out? How does that work? I thought we talked
+before about fleshing out the ability to either send a family member after
+someone to kill them or to attempt to kill them myself, where doing it myself
+comes with much greater risk of my own injury or death based on my skills and
+equipment. If you send someone of your own then there's a chance they are killed
+or captured and then they could be interrogated and give you up as the assailant
+or they would know who they are and who they are working on behalf of and send
+them to sleep with the fishies anyways.
+
 Ultiamtely the expectation is that I don't have to think of all of these concepts, you, the agent will think of these too and build them out and playtest and simulate them yourself.
