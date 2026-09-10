@@ -8187,3 +8187,29 @@ That is the fifth distinct way a guard has failed to guard this session: a
 needle too short, a break in the wrong direction, a rule that punished the
 ordinary case, a test that skipped, and now a precondition satisfied by the
 wrong thing. All five are in the brief.
+
+## Putting somebody in charge
+
+Somebody comes to run a business in this city already: one of the player's own
+people, when they have had enough of being badly paid, walks off with a holding
+and the paper prints it. The player could not do it on purpose. Every business
+they held was a place to walk to and restock by hand, which is the work a
+manager exists to take off somebody.
+
+`PutInCharge` hands one of the hands the keys. They are not a new person: they
+stand behind the same counter, are paid the same wage, and are somebody a rival
+can take or a family can put off coming in. What the player buys is not having
+to be there — a place with somebody running it keeps itself stocked out of the
+player's money. Measured over ten days away: 35 supplies against 0.
+
+The role is where the city already keeps this, so `RunsIt` reads it off rather
+than adding a field, and only one person can hold it. Being handed the keys is
+worth `InChargeTrust`, because being trusted with something is the cheapest
+loyalty there is — and it is the first thing in this game that raises trust for
+a reason other than money.
+
+Both halves break correctly: with the restocking removed, the managed laundry
+keeps no better stock than the unmanaged one; with the check on who already runs
+it removed, a business can have two people running it.
+
+Baseline unmoved: no campaign policy puts anybody in charge of anything.

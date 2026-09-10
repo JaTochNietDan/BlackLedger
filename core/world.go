@@ -1734,6 +1734,20 @@ func (w *World) Actions(id string) []Action {
 			}
 		}
 	}
+	// And putting one of them in charge of it. A manager is one of the hands,
+	// paid the same wage and standing behind the same counter; what the player
+	// buys is not having to walk over here to restock it.
+	if w.Own(id) && w.Properties[id] != nil {
+		for _, who := range w.Properties[id].Hands {
+			n := w.NPC(who)
+			if n == nil || n.Dead || n.Location != id {
+				continue
+			}
+			add("incharge:"+who, "Put "+n.Name+" in charge here", 20, 0, w.InChargeReadiness(id, who),
+				"They keep it stocked out of your money and you stop having to be here. One of them, and it is a thing to be given.")
+			about(who)
+		}
+	}
 	// Somebody of yours behind this counter, and what they saw from it. Filed
 	// under the person, because it is a question for them rather than work the
 	// premises needs doing.
