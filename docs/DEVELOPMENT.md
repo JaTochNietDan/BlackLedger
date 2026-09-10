@@ -5646,3 +5646,60 @@ the new path — it is just that the strategies which get shot at are shot at
 home.
 
 Evidence: `core/ambush_test.go`, `core/ambush.go`, two breaks verified.
+
+## A place remembers being robbed
+
+From the inbox: "It seems like you can rob places or take from people's cars
+multiple times in a row, that should probably be tracked and time limited etc."
+
+You could. Nothing about a robbery was remembered by the place it happened to,
+so the same till could be emptied every forty-five minutes for as long as
+somebody felt like standing there.
+
+What stops it is not a cooldown bolted onto a button. It is that the place
+changes. A shop robbed on Tuesday does not leave Wednesday's takings in the same
+drawer, and a row of cars that lost one to a man with a bag of tools gets looked
+at from the window afterwards. Two days for a till, one night for a street, and
+both wear off — a place that can never be robbed again has been deleted rather
+than defended. A failed attempt counts the same as a successful one, and if
+anything counts for more: somebody shouted, and everybody in there remembers.
+
+The refusal says when it will be worth trying again, in the words somebody would
+use rather than in minutes, and the panel says what a passer-by would see:
+"Wary since the last time, and keeping its money elsewhere."
+
+**The car half was already true and I had not noticed.** Taking a car apart sets
+the owner's car to none, so they cannot be stripped again; and `sellCarTo` puts
+them back on the road when they next walk onto the forecourt with the price in
+their pocket. Mugging is the same shape already — the purse is emptied and
+refills on its own. So the only two gaps were the till and the street.
+
+**The simulation could not see any of this, so I gave it eyes.** No strategy in
+`sim` ever robbed anything, which means the rule could have been added or
+deleted and every number in the report would have stayed where it was. There is
+a `thief` policy now. Its first version died in six commands — it robbed from
+the first minute, took two beatings and never built anything — which measures
+nothing, so it builds the ordinary way first and starts taking tills once it has
+a name and somebody on the door.
+
+It also needed the city to say what it knows. `Actions` for a room the player is
+not standing in returns travel and nothing else, so a policy could not tell a
+cold till from a warm one and just walked back and forth between two addresses
+until it died. The snapshot carries `shy` and `curtains` per location now, which
+is the same fact the panel prints.
+
+| thief, 100 runs | deaths | median cash | median days |
+|---|---|---|---|
+| With the rule | 82 | 586 | 2.8 |
+| With `Shy` returning zero | 86 | 443 | 2.5 |
+
+A thief who can stand in one room and take the same till all night takes more
+beatings, dies more often and ends with less. The rule is worth having rather
+than merely restrictive.
+
+**New balance baseline, five strategies**: deaths 0/0/50/82/82 and median cash
+12360/13903/7223/90/586 for worker, investor, defiant, reckless and thief.
+The first four are unchanged.
+
+Evidence: `core/cooling_test.go`, two breaks verified, plus the simulation
+figures above.

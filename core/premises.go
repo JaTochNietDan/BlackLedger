@@ -22,9 +22,14 @@ func (w *World) PlaceNote(id string) string {
 	l, _ := PlaceByID(id)
 	trade, running := TradeOf(id)
 
-	// What anybody walking past can see. A boarded window is not a secret.
+	// What anybody walking past can see. A boarded window is not a secret, and
+	// neither is a shop that has somebody standing near the door all week.
 	if !w.Own(id) {
 		switch {
+		case w.Shy(id) > 0:
+			return "Wary since the last time, and keeping its money elsewhere"
+		case w.Curtains(id) > 0:
+			return "Somebody in the street is watching who walks down it"
 		case prop.Condition < 40:
 			return "Boarded up and badly knocked about"
 		case prop.Condition < 70:

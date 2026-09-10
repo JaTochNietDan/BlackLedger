@@ -34,25 +34,20 @@ which half is standing.
 
 ## The queue
 
-1. **Typed amounts for business management.** Bankroll and draw move in fixed
-   `BankrollLot`s; deposit and withdraw in `DepositLot`s. `Command.Amount` now
-   exists and the gambling side already uses it — do the same for these, with a
-   number field per action in the interface. *"It should be as dynamic and user
-   settable as possible."*
-2. **Sound, and a better bandit.** `src/sound.ts` synthesises noises in-browser
+1. **Sound, and a better bandit.** `src/sound.ts` synthesises noises in-browser
    with no assets. The slot machine wants a real case, a payline, a coin tray
    and strips that roll rather than one face per drum, plus ambient room sound.
-3. **A hit that reaches you where you are.** `w.Attack` returns early unless
-   `p.Location == p.Home`, wrecking the house instead. Make it find you
-   wherever you are, with the room mattering — a crowded bar is not an empty
-   street — and keep the escape/defend/bargain scene.
-4. **Cars.** Still open: pictures of what you are buying, what a car is worth in
+2. **Cars.** Still open: pictures of what you are buying, what a car is worth in
    speed stated honestly, armour fitted at a garage, and buying or armouring
    cars for your own people.
-5. **Robbing the same place twice.** Needs a cooling-off per place, and for a
-   stripped car, until its owner repairs it or buys another.
-6. **More casino games.** Craps is the obvious one for the period. A back-room
+3. **More casino games.** Craps is the obvious one for the period. A back-room
    card game whose other players are people from the city is the ambitious one.
+4. **The rest of the open inbox.** Wording ("establish protection" for buying a
+   business), the roulette table beside the wheel rather than under it and
+   multiple chips down at once, newspaper pictures, the travel bar below the
+   fold, cursing and threats from characters, a "bad blood" box that never
+   clears, a family lead who sits you down somewhere he is not, and why Leo
+   Carver can be sent on collections from every building in the city.
 
 ---
 
@@ -128,7 +123,8 @@ Do not claim an effect you have not measured.
 
 `go test ./core` (~140s) · `mise run verify` · `npm test` (45 pass)
 
-Balance baseline: deaths 50/0/82/0, median cash 7223/13903/90/12360.
+Balance baseline, five strategies (worker/investor/defiant/reckless/thief):
+deaths 0/0/50/82/82, median cash 12360/13903/7223/90/586.
 `mise run simulate > <scratchpad>/sim.json` then **parse** the JSON; grepping it
 is useless.
 

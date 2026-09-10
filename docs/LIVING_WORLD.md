@@ -206,15 +206,6 @@ family to keep them more protected from attacks.
 
 ---
 
-It seems like you can rob places or take from people's cars multiple times in a row, that should
-probably be tracked and time limited etc. Or in the case of the car - until that person repairs
-their car or gets a new car, which is a dynamic living NPC thing they could do when their car is
-in a damaged state.
-
-— not started
-
----
-
 Why does it seem like you can send Leo Carver on collections in practically every single building's
 action menu?
 
@@ -266,6 +257,21 @@ I don't think "moving against X business yourself" should required respect, that
 Ensure efficiency of development loops by increasing efficiency of your workflow in any way that you can accomplish.
 
 ## Inbox — answered
+
+It seems like you can rob places or take from people's cars multiple times in a row, that should
+probably be tracked and time limited etc. Or in the case of the car - until that person repairs
+their car or gets a new car, which is a dynamic living NPC thing they could do when their car is
+in a damaged state.
+
+— built: a place remembers being robbed and keeps its money somewhere else for
+  two days, however the attempt went; a street that lost a car is watched from
+  the windows for a night. Both wear off, because a place that can never be
+  robbed again has been deleted rather than defended. The car half was already
+  true and I had not noticed: taking one apart leaves the owner with none, and
+  they buy another off the forecourt when they next walk onto it with the money.
+  Mugging was already the same shape — an emptied purse refills on its own.
+
+---
 
 Can people only make attempts on your life while you're at home? They always
 seem to hit my home when I'm not there and they are coming after me.

@@ -232,6 +232,11 @@ type Property struct {
 	// What is behind the tables at a casino. Absent everywhere else, and in
 	// saves written before a room ran a float of its own.
 	Bankroll int `json:"bankroll,omitempty"`
+	// When the till was last taken, and when a car was last taken apart in the
+	// street outside. A place remembers being robbed: it is what stops the same
+	// drawer being emptied every forty-five minutes.
+	Robbed   int `json:"robbed,omitempty"`
+	Stripped int `json:"stripped,omitempty"`
 	// Limit is the most this room will take on one bet, set by whoever holds
 	// it. Nothing means nobody has said, and the room runs on what it is worth.
 	Limit int `json:"limit,omitempty"`
@@ -1802,7 +1807,7 @@ func (w *World) Public() map[string]any {
 		if w.Own(l.ID) {
 			income += float64(prop.Income*prop.Condition) / 100
 		}
-		locs = append(locs, map[string]any{"id": l.ID, "name": l.Name, "type": l.Type, "district": l.District, "x": l.X, "y": l.Y, "cost": l.Cost, "blurb": l.Blurb, "owner": prop.Owner, "holder": w.HolderName(l.ID), "staff": prop.Staff, "supply": prop.Supply, "trouble": prop.Trouble, "trade": w.CustomDescription(l.ID), "posted": w.PostingDescription(l.ID), "people": w.PeopleHere(l.ID), "note": w.PlaceNote(l.ID), "room": w.RoomNote(l.ID), "note_warn": w.PlaceWarn(l.ID), "away": w.Away(l.ID), "travel_note": w.TravelNote(l.ID), "still": prop.Still, "bankroll": prop.Bankroll, "handle": w.NightHandleAt(l.ID), "capacity": w.Capacity(l.ID), "trading": w.Trading(l.ID), "condition": prop.Condition, "income": prop.Income, "owned": w.Own(l.ID), "locked": l.District > w.District, "actions": w.Actions(l.ID)})
+		locs = append(locs, map[string]any{"id": l.ID, "name": l.Name, "type": l.Type, "district": l.District, "x": l.X, "y": l.Y, "cost": l.Cost, "blurb": l.Blurb, "owner": prop.Owner, "holder": w.HolderName(l.ID), "staff": prop.Staff, "supply": prop.Supply, "trouble": prop.Trouble, "shy": w.Shy(l.ID), "curtains": w.Curtains(l.ID), "trade": w.CustomDescription(l.ID), "posted": w.PostingDescription(l.ID), "people": w.PeopleHere(l.ID), "note": w.PlaceNote(l.ID), "room": w.RoomNote(l.ID), "note_warn": w.PlaceWarn(l.ID), "away": w.Away(l.ID), "travel_note": w.TravelNote(l.ID), "still": prop.Still, "bankroll": prop.Bankroll, "handle": w.NightHandleAt(l.ID), "capacity": w.Capacity(l.ID), "trading": w.Trading(l.ID), "condition": prop.Condition, "income": prop.Income, "owned": w.Own(l.ID), "locked": l.District > w.District, "actions": w.Actions(l.ID)})
 	}
 	var scene any = nil
 	if e := w.Event; e != nil {

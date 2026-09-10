@@ -54,6 +54,10 @@ func (w *World) StripReadiness(location string) string {
 	if _, ok := w.StripTarget(location); !ok {
 		return "Nothing parked here belongs to anybody you know"
 	}
+	if left := w.Curtains(location); left > 0 {
+		place, _ := PlaceByID(location)
+		return fmt.Sprintf("The street at %s is still being watched from the windows since the last time. Worth walking down again %s", place.Name, soon(left))
+	}
 	return ""
 }
 
@@ -80,6 +84,11 @@ func (w *World) StripCar(location string) error {
 	}
 	mark, _ := w.StripTarget(location)
 	worth := w.PartsWorth(mark)
+	// The street remembers. Nobody in a row that lost a car last night parks in
+	// it again without looking, and somebody is at the window.
+	if prop := w.Properties[location]; prop != nil {
+		prop.Stripped = max(1, w.Minute)
+	}
 	label := VehicleByTier(mark.Car).Label
 	mark.Car = 0
 

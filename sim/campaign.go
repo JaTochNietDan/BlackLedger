@@ -14,6 +14,10 @@ type Place struct {
 	Cost      int           `json:"cost"`
 	Condition int           `json:"condition"`
 	Income    int           `json:"income"`
+	// How much longer this place is keeping its money somewhere else after
+	// being robbed. The city knows it whether or not anybody is standing in the
+	// room, which is what lets a policy walk to a different one instead.
+	Shy int `json:"shy"`
 	Actions   []core.Action `json:"actions"`
 }
 type Event struct {
@@ -261,6 +265,30 @@ func Choose(v View, strategy string) (core.Command, error) {
 	if v.Player.Health < 65 {
 		if c, ok := v.at(v.Player.Home, "rest"); ok {
 			return c, nil
+		}
+	}
+	// The thief builds the ordinary way first — a name, a crew, somebody on the
+	// door — and only then starts taking tills. A policy that robs from the
+	// first minute is dead inside six commands and measures nothing.
+	if strategy == "thief" && v.Player.Respect >= 6 && v.Player.Security >= 1 {
+		// A robbery that goes wrong is a beating, and two in a row is a death,
+		// so this one waits until it is whole before trying another.
+		if v.Player.Health < 85 {
+			if c, ok := v.at(v.Player.Home, "rest"); ok {
+				return c, nil
+			}
+		}
+		// Takes tills, and nothing else while there is one to take. No other
+		// policy here ever robs anything, so a rule about robbing the same
+		// place twice could be added or deleted and every number in the report
+		// would stay where it was.
+		for _, l := range v.Locations {
+			if l.Owned || l.Locked || l.Income <= 0 || l.Shy > 0 {
+				continue
+			}
+			if c, ok := v.at(l.ID, "rob"); ok {
+				return c, nil
+			}
 		}
 	}
 	if strategy == "worker" {

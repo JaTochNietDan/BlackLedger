@@ -24,6 +24,10 @@ func (w *World) RobberyReadiness(id string) string {
 	if w.Player.Health < 40 {
 		return "You are in no condition for this"
 	}
+	if left := w.Shy(id); left > 0 {
+		place, _ := PlaceByID(id)
+		return fmt.Sprintf("%s keeps its money somewhere else since the last time. Worth trying again %s", place.Name, soon(left))
+	}
 	return ""
 }
 
@@ -66,6 +70,10 @@ func (w *World) RobBy(id string, hand Hand) error {
 		return fmt.Errorf("unknown premises")
 	}
 	owner := w.faction(prop.Owner)
+	// However it goes from here, the place knows somebody came for the till.
+	// A failed attempt puts them on guard more than a successful one, not less:
+	// somebody shouted, and everyone in there remembers the face.
+	prop.Robbed = max(1, w.Minute)
 
 	if w.Random() >= w.robberyOdds(id, hand) {
 		injury := 10 + int(w.Random()*20)
