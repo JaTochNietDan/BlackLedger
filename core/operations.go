@@ -376,3 +376,20 @@ func (w *World) OwnsKind(kind string) bool {
 	}
 	return false
 }
+
+// tradeWage and tradeHands are what the work is worth here and how many pairs
+// of hands it takes, published so anything reading the city can compare what a
+// place pays against what the trade pays. Zero where a place is not a business.
+func tradeWage(id string) int {
+	if trade, ok := TradeOf(id); ok {
+		return trade.Wage
+	}
+	return 0
+}
+
+func tradeHands(id string) int {
+	if trade, ok := TradeOf(id); ok {
+		return trade.Hands
+	}
+	return 0
+}

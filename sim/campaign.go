@@ -17,7 +17,21 @@ type Place struct {
 	// How much longer this place is keeping its money somewhere else after
 	// being robbed. The city knows it whether or not anybody is standing in the
 	// room, which is what lets a policy walk to a different one instead.
-	Shy     int           `json:"shy"`
+	Shy int `json:"shy"`
+	// What is behind the counter: how many positions the trade has, how many
+	// are filled, who fills them, what they are paid against the rate, and who
+	// has the keys. A policy that only ever buys a place and walks away cannot
+	// see any of it, which is why twelve ticks of work on running a business
+	// reached no simulated campaign.
+	Staff     int    `json:"staff"`
+	Positions int    `json:"positions"`
+	Wage      int    `json:"wage"`
+	Rate      int    `json:"rate"`
+	Runs      string `json:"runs"`
+	Hands     []struct {
+		ID   string `json:"id"`
+		Name string `json:"name"`
+	} `json:"hands"`
 	Actions []core.Action `json:"actions"`
 }
 type Event struct {
@@ -407,6 +421,52 @@ func Choose(v View, strategy string) (core.Command, error) {
 				}
 			}
 		}
+	}
+	// The publican runs the businesses rather than only buying them. Twelve
+	// ticks of work — hiring, the wage, putting somebody in charge, restocking,
+	// the people who walk out and the families who come for them — reached no
+	// simulated campaign at all, because every policy here buys a place and
+	// then never thinks about it again. Every "baseline unmoved: no campaign
+	// policy does this" in the development log is this gap.
+	if strategy == "publican" {
+		// It buys the way the investor does — that ladder is below — and this
+		// is what it does with what it has bought.
+		if v.Player.Health < 85 {
+			if c, ok := v.at(v.Player.Home, "rest"); ok {
+				return c, nil
+			}
+		}
+		for _, p := range v.Locations {
+			if !p.Owned || p.Income <= 0 {
+				continue
+			}
+			// Somebody in charge of it, so it stocks itself.
+			if p.Runs == "" {
+				for _, h := range p.Hands {
+					if c, ok := v.at(p.ID, "incharge:"+h.ID); ok {
+						return c, nil
+					}
+				}
+			}
+			// And paid over the rate, so nobody listens to a rival.
+			if p.Wage > 0 && p.Wage <= p.Rate {
+				if c, ok := v.at(p.ID, "wage"); ok {
+					c.Amount = p.Rate + 2
+					return c, nil
+				}
+			}
+			if p.Staff < p.Positions {
+				if c, ok := v.at(p.ID, "hire"); ok {
+					return c, nil
+				}
+			}
+		}
+	}
+	if strategy == "publican" {
+		// Everything else the investor does: the crew, the home, the security
+		// and the ladder of premises. A publican is an investor who reads the
+		// books afterwards.
+		strategy = "investor"
 	}
 	// The racketeer does both, which is the only way to exercise an informant:
 	// somebody has to hate them and they have to be doing something worth

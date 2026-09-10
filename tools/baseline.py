@@ -8,11 +8,11 @@ where they can be run rather than retyped.
 import json
 import sys
 
-ORDER = ("worker", "investor", "defiant", "reckless", "thief", "smuggler", "racketeer")
+ORDER = ("worker", "investor", "defiant", "reckless", "thief", "smuggler", "racketeer", "publican")
 
 summary = json.load(open(sys.argv[1]))["summary"]
-print("deaths", "/".join(str(summary[k]["deaths"]) for k in ORDER))
-print("cash", "/".join(str(summary[k]["median_final_cash"]) for k in ORDER))
+print("deaths", "/".join(str(summary[k]["deaths"]) for k in ORDER if k in summary))
+print("cash", "/".join(str(summary[k]["median_final_cash"]) for k in ORDER if k in summary))
 city = json.load(open(sys.argv[1])).get("city_alone", {}).get("totals")
 if city:
     print("city_alone", city)

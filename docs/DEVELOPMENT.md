@@ -8230,3 +8230,37 @@ will come for and the reason the player is not standing there.
 Both new guards break correctly: with the title left behind, the test reports
 that Clara Esposito does not work here and is still called "Runs Bluebird
 Laundry"; with the row removed, the room does not say who runs it.
+
+## The publican, and what running a business is currently worth
+
+Twelve ticks of work on running a business — hiring, the wage, putting somebody
+in charge, restocking, the people who walk out and the families who come for
+them — reached no simulated campaign at all. Every "baseline unmoved: no
+campaign policy does this" in the entries above is the same gap: every policy
+here buys a place and then never thinks about it again.
+
+The publican is an investor who reads the books afterwards. It puts somebody in
+charge of what it holds, pays over the rate so nobody listens to a rival, and
+otherwise climbs the same ladder. `Place` in the sim's view now carries what a
+policy needs to see it: positions, staff, the wage against the trade's rate, who
+has the keys and who the hands are.
+
+**And it is losing, which is the finding.** Over a hundred campaigns of two
+hundred commands: a median of $470 against the investor's $2,367, and a casino
+in 52 runs against 99.
+
+That is worth having in front of us rather than argued about. The business layer
+currently charges for care without paying for it. A manager saves the player
+walking to the shop, which costs a policy nothing at all — a policy has no
+patience to spend. The wage over the rate buys loyalty against pressures that a
+two-hundred-command campaign rarely lives long enough to feel: people walk out
+over grudges, and families come for counters, on timescales longer than these
+runs.
+
+So either those pressures need to bite sooner, or care needs to pay something a
+policy can see — a well-run place earning more, rather than only being easier to
+own. The measurement is in the suite now and will say so every time the balance
+moves.
+
+Baseline: deaths 0/0/0/82/75/0/47/0, median cash
+12585/2367/5815/90/1091/3563/980/470.
