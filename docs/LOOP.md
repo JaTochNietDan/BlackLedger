@@ -40,8 +40,8 @@ which half is standing.
 2. **Cars.** Still open: pictures of what you are buying, what a car is worth in
    speed stated honestly, armour fitted at a garage, and buying or armouring
    cars for your own people.
-3. **More casino games.** Craps is the obvious one for the period. A back-room
-   card game whose other players are people from the city is the ambitious one.
+3. **A back-room card game** whose other players are people from the city, which
+   is the ambitious one. Craps is built.
 4. **The rest of the open inbox.** Wording ("establish protection" for buying a
    business), the roulette table beside the wheel rather than under it and
    multiple chips down at once, newspaper pictures, the travel bar below the
@@ -65,8 +65,11 @@ and a local model that writes encounters and can be switched off.
   grouped by the core's own groups, with refusals folded away.
 - **The tables.** A takeover screen: blackjack on baize, a roulette bowl with a
   turning head and a ball that lands in the core's pocket, and slot machines
-  (`core/slots.go`, 17 in every hundred worked out over all 8,000 lines). The
-  player types the stake; the holder sets the house limit (`core/limits.go`).
+  (`core/slots.go`, 17 in every hundred worked out over all 8,000 lines), and
+  craps with the pass line, the don't and the field (`core/dice.go`, 1.414%
+  measured over two million decisions). The player types the stake; the holder
+  sets the house limit (`core/limits.go`). Sitting down is a decision the world
+  knows about and it clears the felt.
 - **Cars.** Bought on a forecourt, repaired at a garage, wrecked to a scrapyard,
   and fuelled at two filling stations. Petrol burns as you drive and a dry car
   is standing wherever it stopped. The city's own drivers do all of this too,

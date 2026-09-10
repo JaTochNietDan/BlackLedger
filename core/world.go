@@ -488,7 +488,10 @@ type World struct {
 	Reels *Pull `json:"reels,omitempty"`
 	// The last turn of the wheel. Absent in saves written before the room had
 	// one, which reads as a wheel nobody has played.
-	Spin  *Spin   `json:"spin,omitempty"`
+	Spin *Spin `json:"spin,omitempty"`
+	// The dice, and the point if there is one. Absent whenever nobody is at the
+	// table, which is nearly always.
+	Dice  *Craps  `json:"dice,omitempty"`
 	News  []Story `json:"news,omitempty"`
 	Plots []Plot  `json:"plots"`
 	Tasks []Task  `json:"tasks"`
@@ -1169,6 +1172,17 @@ func (w *World) Actions(id string) []Action {
 		asks("wheel", "Play the wheel", 45, 0, w.SpinReadiness(id, "red", Stake{Amount: bet}),
 			fmt.Sprintf("Anything from $%d to $%d on one bet. Thirty-seven pockets and one of them is the nought, which belongs to the house and takes every bet on the outside. A number pays %d to 1, red or black and odd or even pay even money, a dozen pays 2 to 1. Every one of those is the true price.",
 				LeastStake, w.TableLimit(id), 35))
+		// The dice. Neither of the other two is this shape: one decision, and
+		// then a run of rolls nobody at the table can affect and everybody has
+		// to sit through.
+		if w.Dice != nil && !w.Dice.Done && w.Dice.Place == id {
+			add("roll", fmt.Sprintf("Throw again for the %d", w.Dice.Point), 5, 0, w.RollReadiness(),
+				fmt.Sprintf("$%d is already on %s. %s", w.Dice.Down, lowerFirst(diceBetLabel(w.Dice.Bet)), w.Dice.Outcome))
+		} else {
+			asks("dice", "Play the dice", 30, 0, w.DiceReadiness(id, "pass", Stake{Amount: bet}),
+				fmt.Sprintf("Anything from $%d to $%d on the line. The pass line and the don't both pay even money and the house keeps about 1.4 in every hundred, which is the best price in the building; the field looks like most of the numbers and keeps nearly twice that.",
+					LeastStake, w.TableLimit(id)))
+		}
 	}
 	// The house limit belongs to whoever holds the room.
 	if w.Own(id) && (HasTables(id) || HasMachines(id)) {
@@ -1864,7 +1878,7 @@ func (w *World) Public() map[string]any {
 	if len(history) > 60 {
 		history = history[len(history)-60:]
 	}
-	return map[string]any{"id": w.ID, "version": w.Version, "revision": w.Revision, "life": w.Life, "minute": w.Minute, "sky": w.Sky(), "player": w.Player, "district": w.District, "factions": w.PublicFactions(), "npcs": w.People(), "locations": locs, "event": scene, "history": history, "dead": w.Dead, "tasks": w.Tasks, "director": w.Director, "last_result": w.LastResult, "daily_cost": w.DailyCost(), "books": w.Books(), "guide": w.Guide(), "rules": GuideRules(), "groups": Groups(), "income": income, "security": w.Guard(), "opportunity": w.NextOpportunity(), "known_threats": w.KnownThreats(), "business_truces": w.ActiveBusinessTruces(), "conflicts": w.PublicConflicts(), "goods": w.Goods, "arms": w.ArmsDescription(), "appearance": w.AppearanceDescription(), "vehicle": w.VehicleDescription(), "residence": w.ResidenceDescription(), "offshore": map[string]any{"balance": w.Offshore, "reachable": w.Player.Offshore}, "newspaper": w.Edition(), "editions": w.Editions(), "arrangements": w.PendingArrangements(), "commissions": w.PublicCommissions(), "grudges": w.GrudgeSummary(), "cast": w.Cast(), "everyone": w.Everyone(), "retainers": w.RetainerDescription(), "armoury": w.ArmouryDescription(), "population": w.PopulationSummary(), "seated": w.Seated, "hand": w.HandDescription(), "wheel": w.WheelDescription(), "machine": w.MachineDescription(), "house": w.HouseDescription(), "roles": w.RoleDescription(), "organization": w.PlayerOrganizationDescription(), "own_people": w.OwnPeopleDescription(), "pacts": w.PactDescription(), "book": w.LoanDescription(), "press": w.PressDescription(), "service": w.ServiceDescription(), "city": w.ScrutinyDescription(), "dashboard": w.Dashboard(), "epitaph": w.Epitaph(), "street": w.OnTheStreet(), "street_note": w.StreetNote()}
+	return map[string]any{"id": w.ID, "version": w.Version, "revision": w.Revision, "life": w.Life, "minute": w.Minute, "sky": w.Sky(), "player": w.Player, "district": w.District, "factions": w.PublicFactions(), "npcs": w.People(), "locations": locs, "event": scene, "history": history, "dead": w.Dead, "tasks": w.Tasks, "director": w.Director, "last_result": w.LastResult, "daily_cost": w.DailyCost(), "books": w.Books(), "guide": w.Guide(), "rules": GuideRules(), "groups": Groups(), "income": income, "security": w.Guard(), "opportunity": w.NextOpportunity(), "known_threats": w.KnownThreats(), "business_truces": w.ActiveBusinessTruces(), "conflicts": w.PublicConflicts(), "goods": w.Goods, "arms": w.ArmsDescription(), "appearance": w.AppearanceDescription(), "vehicle": w.VehicleDescription(), "residence": w.ResidenceDescription(), "offshore": map[string]any{"balance": w.Offshore, "reachable": w.Player.Offshore}, "newspaper": w.Edition(), "editions": w.Editions(), "arrangements": w.PendingArrangements(), "commissions": w.PublicCommissions(), "grudges": w.GrudgeSummary(), "cast": w.Cast(), "everyone": w.Everyone(), "retainers": w.RetainerDescription(), "armoury": w.ArmouryDescription(), "population": w.PopulationSummary(), "seated": w.Seated, "hand": w.HandDescription(), "dice": w.DiceDescription(), "wheel": w.WheelDescription(), "machine": w.MachineDescription(), "house": w.HouseDescription(), "roles": w.RoleDescription(), "organization": w.PlayerOrganizationDescription(), "own_people": w.OwnPeopleDescription(), "pacts": w.PactDescription(), "book": w.LoanDescription(), "press": w.PressDescription(), "service": w.ServiceDescription(), "city": w.ScrutinyDescription(), "dashboard": w.Dashboard(), "epitaph": w.Epitaph(), "street": w.OnTheStreet(), "street_note": w.StreetNote()}
 }
 func (w *World) hasRecord(title string) bool {
 	for _, r := range w.History {

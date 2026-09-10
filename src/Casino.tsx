@@ -1,7 +1,7 @@
 import {useEffect, useRef, useState} from 'react';
 import type {Action, Presence, Record as Entry} from './types';
-import {CardTable, Machine, Money, Wheel} from './Tables';
-import type {HandState, MachineState, WheelState} from './Tables';
+import {CardTable, Craps, Machine, Money, Wheel} from './Tables';
+import type {DiceState, HandState, MachineState, WheelState} from './Tables';
 
 // Sitting down at a table is not a thing you do out of the corner of a sidebar.
 // The felt used to be drawn in the property panel beside the ownership figures
@@ -25,12 +25,12 @@ import type {HandState, MachineState, WheelState} from './Tables';
 // should not offer "Get up and leave the tables" between restocking and hiring.
 export function isTableAction(id: string) {
   return id === 'play' || id === 'wheel' || id === 'pull' || id === 'hit' ||
-    id === 'stand' || id === 'sit' || id === 'rise';
+    id === 'stand' || id === 'sit' || id === 'rise' || id === 'dice' || id === 'roll';
 }
 
-type Game = 'cards' | 'wheel' | 'machine';
+type Game = 'cards' | 'wheel' | 'dice' | 'machine';
 
-export function Casino({place, actions, people, hand, wheel, machine, house, cash, money, revision, records, act, onLeave}: {
+export function Casino({place, actions, people, hand, wheel, dice, machine, house, cash, money, revision, records, act, onLeave}: {
   place: string;
   actions: Action[];
   // Who else is in the room. Not drawn here any more — the room itself shows
@@ -46,6 +46,8 @@ export function Casino({place, actions, people, hand, wheel, machine, house, cas
   // this component's.
   house: {limit?:number; machine?:number; least?:number; usual?:number; pull?:number; yours?:boolean; high?:number};
   wheel: WheelState;
+  // The dice, and the point if one is on.
+  dice: DiceState;
   cash: number;
   money: (n: number) => string;
   // The world's revision, so a result is added to the night once and not again
@@ -68,6 +70,8 @@ export function Casino({place, actions, people, hand, wheel, machine, house, cas
   const [bet, setBet] = useState(0);
   const [pull, setPull] = useState(0);
   useEffect(() => { if (hand.playing) setGame('cards') }, [hand.playing]);
+  // A point already on is the game you are playing, whatever tab was last open.
+  useEffect(() => { if (dice.playing) setGame('dice') }, [dice.playing]);
   // A room with nothing but machines opens on them.
   useEffect(() => {
     if (!hand.playing && !actions.some(a => a.id === 'play' || a.id === 'wheel')) setGame('machine');
@@ -87,6 +91,7 @@ export function Casino({place, actions, people, hand, wheel, machine, house, cas
   const at = (id: string) => actions.find(a => a.id === id);
   const dealt = hand.playing;
   const bandit = at('pull');
+  const shooter = at('dice') || at('roll');
   const cards = at('play');
   const spin = at('wheel');
   // A poolhall with a bandit against the wall is not a casino, and the room
@@ -112,6 +117,8 @@ export function Casino({place, actions, people, hand, wheel, machine, house, cas
       <nav className="casino-games" aria-label="Games">
         {tables && <button aria-pressed={game === 'cards'} onClick={() => setGame('cards')}>Blackjack</button>}
         {tables && <button aria-pressed={game === 'wheel'} onClick={() => setGame('wheel')} disabled={dealt}>Roulette</button>}
+        {!!shooter && <button aria-pressed={game === 'dice'} onClick={() => setGame('dice')}
+          disabled={dealt}>Craps</button>}
         {!!bandit && <button aria-pressed={game === 'machine'} onClick={() => setGame('machine')}
           disabled={dealt}>The machines</button>}
       </nav>
@@ -138,6 +145,12 @@ export function Casino({place, actions, people, hand, wheel, machine, house, cas
                     <p className="felt-note">Money like that and the floor wants to know who you are.</p>}
                 </div>}
               </div>
+            : game === 'dice'
+            ? <Craps dice={dice} money={money} turn={revision} cash={cash}
+                     least={least} limit={limit} amount={bet || house.usual || least} onAmount={setBet}
+                     refused={shooter?.disabled ? shooter.reason : ''}
+                     play={(amount, choice) => act({kind: 'dice', amount, choice})}
+                     roll={() => act({kind: 'roll'})}/>
             : game === 'machine'
             ? <Machine machine={machine} money={money} turn={revision} cash={cash}
                        least={least} limit={house.machine ?? least}

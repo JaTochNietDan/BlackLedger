@@ -5832,3 +5832,57 @@ hundred thief runs and cash within a percent, which is the city's people
 standing in slightly different rooms rather than a change in what anything pays.
 
 Evidence: `core/seat_test.go`, three breaks verified.
+
+## The dice, and a lesson about sample size
+
+From the inbox: "It may be worth adding a couple more casino games."
+
+Craps, which is the game the period actually had, and which is worth adding for
+a reason beyond being a third thing to press. The three games in that room are
+three different shapes of decision. A hand of cards asks you something on every
+card. The wheel asks once and then there is nothing to do. The dice ask once and
+then make you sit through a run of throws nobody at the table can affect — the
+point is on, and it is the point or the seven, and everybody watches.
+
+Three bets, all real: the pass line, the don't with the twelve barred, and the
+field. As with the wheel, the edge is arithmetic rather than a fudge factor. The
+pass line wins 244 times in 495, which is 1.414%, and the don't is the same game
+the other way at 1.364%.
+
+**Measured, and the first measurement was wrong.** At 200,000 decisions the pass
+line came out at 1.75%. That looked like the world's linear congruential
+generator failing on consecutive draws — the lattice problem, and craps is the
+only game in the house that resolves over a sequence of rolls rather than one.
+So I mixed the draw with an avalanche step, and it came out at 1.12%. Then the
+same measurement at five million decisions:
+
+| | Edge over 5,000,000 decisions |
+|---|---|
+| Two plain draws | 1.402% |
+| One draw, mixed | 1.431% |
+| The truth | 1.414% |
+
+Both inside one standard error. The standard error at 200,000 decisions is
+0.22%, so the number that sent me looking for a fault was 1.5 of those from the
+true value, which is nothing at all. The generator was never the problem. The
+mixing is gone and the test takes two million decisions, where the error is
+0.07% and the claim it makes is one the sample can support. The single-roll
+distribution was right the whole time — sevens at 16.64% against a true 16.67%
+over 600,000 throws — which should have been the clue.
+
+**A break that broke nothing.** Flipping `Won` on the come-out craps branch left
+the pass-line edge identical to the last dollar, because `Won` is a label and
+the money comes from the argument to `settleDice`. The test that noticed was the
+one checking what the table says, not the one checking the edge. Breaking the
+payout instead moved the edge to -20.8%, which is the break in the right
+direction.
+
+The table draws real dice with real pips and a point box that lights when a
+number is on. The stickman's call is period and conditional: a three is "craps"
+on the come-out and just a three once a point is on, and the totals are spoken
+rather than printed — "8, 8" is a table read out by a machine.
+
+Balance unchanged: deaths 0/0/50/82/83, median cash 12378/14050/7230/90/586.
+
+Evidence: `core/dice_test.go`, one break verified after a first one that did not
+bite, and the whole flow driven over the API on an isolated fixture.

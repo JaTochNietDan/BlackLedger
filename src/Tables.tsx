@@ -375,3 +375,106 @@ export function Machine({machine, money, pull, amount, least, limit, cash, onAmo
     </div>
   );
 }
+
+// The dice. The third shape of decision this room offers: the cards ask you
+// something on every card, the wheel asks once and then there is nothing to do,
+// and this asks once and then makes you sit through a run of throws nobody can
+// affect. The point sitting there between throws is the whole game.
+export type DiceState = {
+  playing:boolean; settled:boolean; place?:string; where?:string;
+  bet?:string; bet_label?:string; stake?:number; point?:number;
+  dice?:number[]; total?:number; rolls?:number; won?:boolean; outcome?:string;
+  bets?:{id:string; label:string; detail:string}[];
+};
+
+// The pips, laid out the way they are on a die. Drawn rather than lettered,
+// because a die with a "5" printed on it is not a die.
+const pips: Record<number, [number, number][]> = {
+  1: [[50, 50]],
+  2: [[28, 28], [72, 72]],
+  3: [[28, 28], [50, 50], [72, 72]],
+  4: [[28, 28], [72, 28], [28, 72], [72, 72]],
+  5: [[28, 28], [72, 28], [50, 50], [28, 72], [72, 72]],
+  6: [[28, 25], [72, 25], [28, 50], [72, 50], [28, 75], [72, 75]],
+};
+
+function Die({face, rolling}: {face:number; rolling:boolean}) {
+  const shown = face >= 1 && face <= 6 ? face : 1;
+  return <span className={'die' + (rolling ? ' rolling' : '')} aria-label={`${shown}`}>
+    <svg viewBox="0 0 100 100" aria-hidden="true">
+      <rect x="3" y="3" width="94" height="94" rx="14"/>
+      {(pips[shown] || []).map(([x, y], i) => <circle key={i} cx={x} cy={y} r="9"/>)}
+    </svg>
+  </span>;
+}
+
+export function Craps({dice, money, play, roll, amount, least, limit, cash, onAmount, refused = '', turn = 0}:{
+  dice:DiceState; money:(n:number)=>string;
+  play:(amount:number, bet:string)=>void;
+  roll:()=>void;
+  amount:number; least:number; limit:number; cash:number;
+  onAmount:(n:number)=>void; refused?:string; turn?:number;
+}) {
+  const [bet, setBet] = useState('pass');
+  const [shaking, setShaking] = useState(false);
+  const seen = useRef(-1);
+  useEffect(() => {
+    if (turn === seen.current || (!dice.playing && !dice.settled)) return;
+    seen.current = turn;
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    setShaking(true);
+    const stop = setTimeout(() => setShaking(false), 650);
+    return () => clearTimeout(stop);
+  }, [turn, dice.playing, dice.settled]);
+
+  const live = dice.playing;
+  const bets = dice.bets ?? [];
+  const chosen = bets.find(b => b.id === (live ? dice.bet : bet));
+  const faces = dice.dice ?? [];
+  const point = dice.point ?? 0;
+
+  return <div className="felt dice-felt">
+    <div className="felt-head">
+      <span>{dice.place ?? 'The dice'}</span>
+      <b>{point > 0 ? `The point is ${point}` : 'Come out'}</b>
+    </div>
+
+    <div className="dice-table">
+      <div className={'dice-pair' + (shaking ? ' shaking' : '')}>
+        {faces.length === 2
+          ? faces.map((f, i) => <Die key={i} face={f} rolling={shaking}/>)
+          : [1, 1].map((f, i) => <Die key={i} face={f} rolling={false}/>)}
+      </div>
+      {/* The point, kept where the box is on a real layout: a number that is
+          on, and everybody at the table looking at it. */}
+      <div className={'point-box' + (point > 0 ? ' on' : '')}>
+        <small>POINT</small><b>{point > 0 ? point : '—'}</b>
+      </div>
+    </div>
+
+    {(dice.playing || dice.settled) && dice.outcome &&
+      <p className={'felt-result' + (dice.settled && dice.won ? ' won' : '')}>{dice.outcome}</p>}
+
+    {live
+      ? <div className="felt-actions dice-actions">
+          <p className="felt-note">{money(dice.stake ?? 0)} on {(dice.bet_label ?? 'the line').toLowerCase()}. Nothing to decide now: the {point} or a seven.</p>
+          <button className="spin-it" disabled={shaking} onClick={roll}>
+            {shaking ? 'The dice are still going' : `Throw again for the ${point}`}
+          </button>
+        </div>
+      : <>
+          <div className="dice-bets" role="group" aria-label="What to back">
+            {bets.map(b => <button key={b.id} aria-pressed={bet === b.id} title={b.detail}
+              onClick={() => setBet(b.id)}>{b.label}</button>)}
+          </div>
+          {chosen && <p className="felt-note">{chosen.detail}</p>}
+          <div className="felt-actions">
+            <Money label="On the line" amount={amount} limit={limit} least={least} cash={cash} onChange={onAmount}/>
+            <button disabled={!!refused} title={refused || undefined} onClick={() => play(amount, bet)}>
+              Throw {money(amount)}
+            </button>
+          </div>
+        </>}
+    {refused && <p className="felt-refused">{refused}</p>}
+  </div>;
+}

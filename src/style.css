@@ -1148,3 +1148,22 @@ body{height:100%;overflow:hidden;margin:0;background:var(--bg);color:var(--ink);
 .room-holder b{font:15px var(--serif);font-weight:400}
 .room-holder span{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
 .room-holder small{font-size:11px;color:var(--muted)}
+
+/* The dice. A pair, a point box, and three bets that are all real. */
+.dice-table{display:flex;align-items:center;justify-content:center;gap:28px;padding:22px 0}
+.dice-pair{display:flex;gap:14px}
+.die{width:58px;height:58px;display:block}
+.die svg{width:100%;height:100%}
+.die rect{fill:#f2ece0;stroke:#0006;stroke-width:2}
+.die circle{fill:#1b1614}
+.die.rolling{animation:tumble .6s ease-in-out}
+@keyframes tumble{0%{transform:rotate(0) translateY(0)}30%{transform:rotate(-18deg) translateY(-10px)}60%{transform:rotate(14deg) translateY(4px)}100%{transform:rotate(0) translateY(0)}}
+.point-box{width:74px;height:74px;border:2px solid #6d7554;display:grid;place-content:center;text-align:center;background:#14201ecc}
+.point-box.on{border-color:var(--gold);box-shadow:0 0 0 3px #d8b77722}
+.point-box small{display:block;font-size:9px;letter-spacing:.18em;color:var(--muted)}
+.point-box b{font:26px var(--serif);color:var(--gold)}
+.dice-bets{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:4px}
+.dice-bets button{background:#1b2926;border:1px solid #465243;color:var(--ink);font:12px system-ui;padding:7px 12px;border-radius:2px}
+.dice-bets button[aria-pressed="true"]{border-color:var(--gold);background:#343a29;color:#ffe6b0}
+.dice-actions{flex-direction:column;gap:10px}
+@media(prefers-reduced-motion:reduce){.die.rolling{animation:none}}

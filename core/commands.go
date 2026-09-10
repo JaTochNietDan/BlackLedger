@@ -322,6 +322,23 @@ func (w *World) apply(c Command) error {
 				return err
 			}
 			w.Advance(a.Minutes)
+		} else if c.Kind == "dice" {
+			// Same as the wheel: the money settles before the clock moves, so
+			// the hours cannot land between a throw and being paid for it. The
+			// bet rides on Choice because Target names the room.
+			bet := c.Choice
+			if bet == "" {
+				bet = "pass"
+			}
+			if err := w.PlayDice(p.Location, bet, w.TableStakeOrUsual(p.Location, c.Amount)); err != nil {
+				return err
+			}
+			w.Advance(a.Minutes)
+		} else if c.Kind == "roll" {
+			if err := w.RollAgain(); err != nil {
+				return err
+			}
+			w.Advance(a.Minutes)
 		} else if c.Kind == "wheel" {
 			// Resolved before the clock moves, like the rest of the tables:
 			// the ball drops and the money settles in one go, so the hours

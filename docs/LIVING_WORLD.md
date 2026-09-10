@@ -172,14 +172,6 @@ This all feels a bit haphazard. Make sure you are keeping track of what you are 
 
 ---
 
-Ok this is much better. It may be worth adding a couple more casino games. It
-could be a reason to have other casinos, to have other casino games like slot
-machines and whatnot, any other common games you can think of adding.
-
-— slot machines are built (56de529); another game or two is not
-
----
-
 When gambling you should be able to actually choose how much to gamble, not use
 set amounts, up to a max limit. The max limit should be defined by the casino
 owner dynamically, whether by you the owner by or by someone else who owns it.
@@ -239,6 +231,19 @@ I got some gossip by getting that girl a coffee and then I see "bad blood" red b
 When inside a building you own the top buttons should probably be for owner management and under a separate subtitle for management actions.
 
 ## Inbox — answered
+
+Ok this is much better. It may be worth adding a couple more casino games. It
+could be a reason to have other casinos, to have other casino games like slot
+machines and whatnot, any other common games you can think of adding.
+
+— built: slot machines (56de529) and now craps, which is a third shape of
+  decision rather than a third set of numbers. The cards ask you something on
+  every card, the wheel asks once and then there is nothing to do, and the dice
+  ask once and then make you sit through a run of throws nobody can affect. Pass
+  and don't pass both keep about 1.4 in every hundred, measured; the field keeps
+  nearly twice that and says so.
+
+---
 
 Vitor Bellendi is always at the kessler filling station for some reason. That seems odd?
 
