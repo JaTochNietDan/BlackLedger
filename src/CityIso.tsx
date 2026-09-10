@@ -896,7 +896,7 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight,
       // width of its neighbours, so it belongs to the terrace rather than
       // sitting in a field of its own.
       const slot = terrace(cell, SLOTS)[addressSlot(SLOTS)];
-      const block = {...blockFor(p.type), w: slot.w, d: slot.d};
+      const block = {...blockFor(p.type, p.id), w: slot.w, d: slot.d};
       const at = {x: slot.at.x, y: slot.at.y};
       return {p, cell, block, at, d: at.x + block.w / 2 + at.y + block.d / 2};
     }).sort((a, b) => a.d - b.d);

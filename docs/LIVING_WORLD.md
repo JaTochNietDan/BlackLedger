@@ -263,7 +263,18 @@ The walking between buildings simulation is not that great right now because we 
   worth reading — where you are going, how long, what you are crossing in, and
   whether anybody is known to be looking for you while you are out in it. That
   matters more than it did: the street is now the one stretch of the city where
-  a hit can catch you cold. The map itself is still open.
+  a hit can catch you cold.
+— and the map reads now. Fourteen of the twenty-five addresses were drawn as
+  two silhouettes — seven identical sheds for the docks, the haulage yard, the
+  cab stand, the forecourt, the scrapyard and two filling stations, and seven
+  identical shopfronts for the rest — so the city was a grid of copies you could
+  not find anything on. The ones that do different things look different: pumps
+  under a canopy, a crane over a scrapyard, plate glass on the forecourt, a line
+  of cabs, a flatbed in the haulage yard, roller doors on the garages, an awning
+  on the butcher, upstairs windows on the poolhall, vent stacks on the steam
+  laundry, and a lit marquee on the burlesque, which was being drawn as a house
+  because nobody had given its kind a shape.
+— still open: whether the map is the right way to move around the city at all.
 
 ---
 

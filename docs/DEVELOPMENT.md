@@ -6171,3 +6171,39 @@ still reach the player.
 Balance unchanged: deaths 0/0/50/82/83, median cash 12378/14050/7230/90/586.
 
 Evidence: `core/grouping_test.go`, one break verified.
+
+## A map you can read your own city off
+
+"We don't have the map working properly" is the vaguest line in the inbox, so
+the first job was finding something checkable in it.
+
+Two things, and both are checked now.
+
+**Fourteen of twenty-five addresses were drawn as two silhouettes.** Seven are
+type "work" — the docks, the haulage yard, the cab stand, the forecourt, the
+scrapyard and two filling stations — and every one was the same low shed with
+the same stack. Seven more are "racket" and were the same brick shopfront. A
+city that is a grid of copies is a city you cannot find anything on, which is
+what a map is for.
+
+`blockFor` takes the address as well as its kind now, and the ones that do
+different things look different: pumps under a canopy, a crane jib over the
+scrapyard, plate glass on the forecourt, a line of cabs at the office, a flatbed
+in the haulage yard, roller doors on both garages, an awning over the butcher,
+long upstairs windows on the poolhall, vent stacks on the steam laundry. The
+burlesque had no shape at all — its kind was not in the table, so a revue
+theatre was drawn as a terraced house — and it has a lit marquee now.
+
+The test does not demand that every building be unique. A row of shops should
+look like a row of shops. It demands that no one silhouette stand for most of a
+kind of work, which is what had happened.
+
+**And a fault that has not bitten yet.** `grid` puts an address on the block
+nearest its own coordinates and steps outwards when that block is taken — but
+it tried only the four cardinal neighbours at each ring, gave up after five
+rings, and then wrote itself into the taken map regardless. Two addresses could
+end up in the same block and be drawn standing inside each other. The current
+twenty-five do not collide, which is why nobody has seen it; the guard is there
+for the twenty-sixth.
+
+Evidence: `tests/city-grid.test.mjs`, three new tests, 50 node tests passing.

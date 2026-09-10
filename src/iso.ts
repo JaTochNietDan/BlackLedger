@@ -55,6 +55,11 @@ export type Block = {
 // on each other. A test reads this literal and the city's own coordinates and
 // fails if any two addresses would overlap at the current CELL — which is how
 // the first version was caught putting The Mariner through the Herald.
+//
+// FOOTPRINT is by kind; blockFor above is by address where an address does
+// something the kind does not describe. Seven of the twenty-five places in this
+// city are type "work" and seven more are "racket", and drawing fourteen
+// buildings as two silhouettes is a map nobody can read their own city off.
 export const FOOTPRINT: Record<string, [number, number]> = {
   casino: [2.2, 1.8],
   market: [2.4, 1.6],
@@ -86,7 +91,91 @@ const box = (w: number, d: number, h: number, c: typeof stone, o: Partial<Part> 
 // Blocks by the kind of place the core says it is. A type it has never heard of
 // still gets a building rather than a hole, because the city has to be complete
 // before it is pretty.
-export function blockFor(type: string): Block {
+export function blockFor(type: string, id = ''): Block {
+  // Seven of the twenty-five addresses are type "work" — the docks, the
+  // haulage yard, the cab stand, the forecourt, the scrapyard and two filling
+  // stations — and every one of them was the same low shed with the same
+  // stack. A map you cannot read your own city off is a map that is not
+  // working, so the ones with a shape of their own get it.
+  switch (id) {
+    case 'filling':
+    case 'pumps':
+      return {w: size('work')[0], d: size('work')[1], parts: [
+        box(1.1, 1.2, .7, pale, {dx: 1.5}),                       // the counter hut
+        box(2.6, 1.4, .09, dark, {base: 1.05}),                   // the canopy
+        box(.16, .16, 1.05, dark, {dx: .25, dy: .25}),            // its posts
+        box(.16, .16, 1.05, dark, {dx: .25, dy: 1.1}),
+        box(.3, .3, .55, glass, {dx: .55, dy: .5}),               // two glass-topped pumps
+        box(.3, .3, .55, glass, {dx: .55, dy: .95}),
+      ]};
+    case 'scrapyard':
+      return {w: size('work')[0], d: size('work')[1], parts: [
+        box(2.6, .12, .55, dark),                                 // the fence along the front
+        box(.9, 1.0, .5, brick, {dx: .1, dy: .3}),                // stacked wrecks
+        box(.7, .8, .8, brick, {dx: .3, dy: .45, base: .5}),
+        box(.2, .2, 1.9, dark, {dx: 2.0, dy: .6}),                // the crane mast
+        box(1.0, .12, .12, dark, {dx: 1.2, dy: .64, base: 1.75}), // and its jib
+      ]};
+    case 'dealer':
+      return {w: size('work')[0], d: size('work')[1], parts: [
+        box(1.2, 1.3, .85, pale, {dx: 1.4}),                      // the showroom
+        box(1.2, .14, .5, glass, {dx: 1.4, dy: 1.2, base: .2}),   // plate glass to the street
+        box(1.2, 1.3, .08, dark, {dx: 1.4, base: .85}),
+        box(.5, .3, .3, dark, {dx: .3, dy: .3}),                  // cars out on the apron
+        box(.5, .3, .3, dark, {dx: .3, dy: .85}),
+      ]};
+    case 'cabstand':
+      return {w: size('work')[0], d: size('work')[1], parts: [
+        box(1.0, 1.2, .75, brick, {dx: 1.6}),                     // the office
+        box(1.0, 1.2, .09, roofTile, {dx: 1.6, base: .75}),
+        box(.55, .3, .3, dark, {dx: .2, dy: .25}),                // a line of cabs
+        box(.55, .3, .3, dark, {dx: .2, dy: .7}),
+        box(.55, .3, .3, dark, {dx: .2, dy: 1.15}),
+      ]};
+    case 'haulage':
+      return {w: size('work')[0], d: size('work')[1], parts: [
+        box(2.6, 1.4, .55, dark),
+        box(1.1, .55, .75, brick, {dx: .15, dy: .5, base: .55}),  // a flatbed's cab
+        box(1.2, .5, .18, dark, {dx: 1.3, dy: .55, base: .55}),   // and its bed
+      ]};
+    case 'garage':
+    case 'archway':
+      return {w: size('racket')[0], d: size('racket')[1], parts: [
+        box(1.8, 1.5, .95, brick),
+        box(.95, .12, .7, dark, {dy: 1.46, dx: .45}),             // the roller door
+        box(1.9, 1.6, .09, dark, {base: .95, dx: -.05, dy: -.05}),
+        box(.5, .3, .3, dark, {dx: .05, dy: 1.62}),               // a car at the kerb
+      ]};
+    case 'butcher':
+      return {w: size('racket')[0], d: size('racket')[1], parts: [
+        box(1.8, 1.5, 1.05, pale),
+        box(1.8, .16, .3, glass, {base: .4, dy: 1.46}),           // the tiled window
+        box(1.9, .3, .08, roofTile, {base: .78, dy: 1.42, dx: -.05}), // the awning over it
+        box(1.9, 1.6, .09, dark, {base: 1.05, dx: -.05, dy: -.05}),
+      ]};
+    case 'poolhall':
+      return {w: size('racket')[0], d: size('racket')[1], parts: [
+        box(1.8, 1.5, 1.45, brick),
+        box(1.8, .14, .28, glass, {base: .95, dy: 1.44}),         // long low windows upstairs
+        box(.4, .12, .5, dark, {base: .1, dy: 1.46, dx: .1}),     // the stair door at street level
+        box(1.9, 1.6, .09, dark, {base: 1.45, dx: -.05, dy: -.05}),
+      ]};
+    case 'steamworks':
+      return {w: size('racket')[0], d: size('racket')[1], parts: [
+        box(1.8, 1.5, 1.0, brick),
+        box(1.9, 1.6, .1, dark, {base: 1.0, dx: -.05, dy: -.05}),
+        box(.2, .2, .9, dark, {base: 1.1, dx: .35, dy: .5}),      // vent stacks
+        box(.2, .2, 1.15, dark, {base: 1.1, dx: .8, dy: .5}),
+        box(.2, .2, .75, dark, {base: 1.1, dx: 1.25, dy: .5}),
+      ]};
+    case 'burlesque':
+      return {w: size('bar')[0], d: size('bar')[1], parts: [
+        box(1.5, 1.4, 1.5, brick),
+        box(1.6, .18, .35, glass, {base: 1.0, dy: 1.32}),         // the marquee, lit
+        box(1.7, .1, .1, dark, {base: 1.35, dx: -.1, dy: 1.36}),
+        box(1.6, 1.5, .09, dark, {base: 1.5, dx: -.05, dy: -.05}),
+      ]};
+  }
   switch (type) {
     case 'casino':
       return {w: size('casino')[0], d: size('casino')[1], parts: [
