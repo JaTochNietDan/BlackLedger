@@ -13,7 +13,12 @@
  * panel. That is the same fallback the core applies to an action nobody has
  * classified.
  */
-export interface Placed<A> {id: string; title: string; blurb: string; mine: A[]}
+export interface Placed<A> {
+  id: string;
+  title: string;
+  blurb: string;
+  mine: A[];
+}
 
 export function placeActions<A extends {group: string}>(
   order: readonly {id: string; title: string; blurb: string}[],
@@ -23,7 +28,9 @@ export function placeActions<A extends {group: string}>(
   const known = new Set(order.map(g => g.id));
   const first = order[0].id;
   return order.map(({id, title, blurb}) => ({
-    id, title, blurb,
+    id,
+    title,
+    blurb,
     mine: actions.filter(a => a.group === id || (id === first && !known.has(a.group))),
   }));
 }

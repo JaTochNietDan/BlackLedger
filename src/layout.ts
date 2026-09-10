@@ -28,7 +28,7 @@ export async function loadLayout(): Promise<Layout> {
     const body = await reply.json();
     return {slots: body.slots || {}, editable: !!body.editable};
   } catch {
-    return EMPTY;                       // a city with no arrangement is the automatic one
+    return EMPTY; // a city with no arrangement is the automatic one
   }
 }
 

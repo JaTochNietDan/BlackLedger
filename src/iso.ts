@@ -37,15 +37,21 @@ export const depth = (p: Vec) => p.x + p.y;
 // with a height in tiles and its own colour. Everything visible is made of
 // these, which is what makes a block swappable a piece at a time.
 export type Part = {
-  dx?: number; dy?: number;      // offset within the block, in tiles
-  w: number; d: number; h: number;
-  base?: number;                  // how far off the ground it starts
-  top: string; left: string; right: string;
-  flat?: boolean;                 // a slab: no walls worth drawing
+  dx?: number;
+  dy?: number; // offset within the block, in tiles
+  w: number;
+  d: number;
+  h: number;
+  base?: number; // how far off the ground it starts
+  top: string;
+  left: string;
+  right: string;
+  flat?: boolean; // a slab: no walls worth drawing
 };
 
 export type Block = {
-  w: number; d: number;           // footprint in tiles
+  w: number;
+  d: number; // footprint in tiles
   parts: Part[];
   label?: string;
 };
@@ -85,8 +91,13 @@ const roofTile = {top: '#5d4038', left: '#3a2823', right: '#281b18'};
 const glass = {top: '#c9a86a', left: '#8a6f3f', right: '#5e4b2a'};
 
 // box is the one primitive: a rectangular solid on the block's footprint.
-const box = (w: number, d: number, h: number, c: typeof stone, o: Partial<Part> = {}): Part =>
-  ({w, d, h, ...c, ...o});
+const box = (w: number, d: number, h: number, c: typeof stone, o: Partial<Part> = {}): Part => ({
+  w,
+  d,
+  h,
+  ...c,
+  ...o,
+});
 
 // Blocks by the kind of place the core says it is. A type it has never heard of
 // still gets a building rather than a hole, because the city has to be complete
@@ -100,128 +111,196 @@ export function blockFor(type: string, id = ''): Block {
   switch (id) {
     case 'filling':
     case 'pumps':
-      return {w: size('work')[0], d: size('work')[1], parts: [
-        box(1.1, 1.2, .7, pale, {dx: 1.5}),                       // the counter hut
-        box(2.6, 1.4, .09, dark, {base: 1.05}),                   // the canopy
-        box(.16, .16, 1.05, dark, {dx: .25, dy: .25}),            // its posts
-        box(.16, .16, 1.05, dark, {dx: .25, dy: 1.1}),
-        box(.3, .3, .55, glass, {dx: .55, dy: .5}),               // two glass-topped pumps
-        box(.3, .3, .55, glass, {dx: .55, dy: .95}),
-      ]};
+      return {
+        w: size('work')[0],
+        d: size('work')[1],
+        parts: [
+          box(1.1, 1.2, 0.7, pale, {dx: 1.5}), // the counter hut
+          box(2.6, 1.4, 0.09, dark, {base: 1.05}), // the canopy
+          box(0.16, 0.16, 1.05, dark, {dx: 0.25, dy: 0.25}), // its posts
+          box(0.16, 0.16, 1.05, dark, {dx: 0.25, dy: 1.1}),
+          box(0.3, 0.3, 0.55, glass, {dx: 0.55, dy: 0.5}), // two glass-topped pumps
+          box(0.3, 0.3, 0.55, glass, {dx: 0.55, dy: 0.95}),
+        ],
+      };
     case 'scrapyard':
-      return {w: size('work')[0], d: size('work')[1], parts: [
-        box(2.6, .12, .55, dark),                                 // the fence along the front
-        box(.9, 1.0, .5, brick, {dx: .1, dy: .3}),                // stacked wrecks
-        box(.7, .8, .8, brick, {dx: .3, dy: .45, base: .5}),
-        box(.2, .2, 1.9, dark, {dx: 2.0, dy: .6}),                // the crane mast
-        box(1.0, .12, .12, dark, {dx: 1.2, dy: .64, base: 1.75}), // and its jib
-      ]};
+      return {
+        w: size('work')[0],
+        d: size('work')[1],
+        parts: [
+          box(2.6, 0.12, 0.55, dark), // the fence along the front
+          box(0.9, 1.0, 0.5, brick, {dx: 0.1, dy: 0.3}), // stacked wrecks
+          box(0.7, 0.8, 0.8, brick, {dx: 0.3, dy: 0.45, base: 0.5}),
+          box(0.2, 0.2, 1.9, dark, {dx: 2.0, dy: 0.6}), // the crane mast
+          box(1.0, 0.12, 0.12, dark, {dx: 1.2, dy: 0.64, base: 1.75}), // and its jib
+        ],
+      };
     case 'dealer':
-      return {w: size('work')[0], d: size('work')[1], parts: [
-        box(1.2, 1.3, .85, pale, {dx: 1.4}),                      // the showroom
-        box(1.2, .14, .5, glass, {dx: 1.4, dy: 1.2, base: .2}),   // plate glass to the street
-        box(1.2, 1.3, .08, dark, {dx: 1.4, base: .85}),
-        box(.5, .3, .3, dark, {dx: .3, dy: .3}),                  // cars out on the apron
-        box(.5, .3, .3, dark, {dx: .3, dy: .85}),
-      ]};
+      return {
+        w: size('work')[0],
+        d: size('work')[1],
+        parts: [
+          box(1.2, 1.3, 0.85, pale, {dx: 1.4}), // the showroom
+          box(1.2, 0.14, 0.5, glass, {dx: 1.4, dy: 1.2, base: 0.2}), // plate glass to the street
+          box(1.2, 1.3, 0.08, dark, {dx: 1.4, base: 0.85}),
+          box(0.5, 0.3, 0.3, dark, {dx: 0.3, dy: 0.3}), // cars out on the apron
+          box(0.5, 0.3, 0.3, dark, {dx: 0.3, dy: 0.85}),
+        ],
+      };
     case 'cabstand':
-      return {w: size('work')[0], d: size('work')[1], parts: [
-        box(1.0, 1.2, .75, brick, {dx: 1.6}),                     // the office
-        box(1.0, 1.2, .09, roofTile, {dx: 1.6, base: .75}),
-        box(.55, .3, .3, dark, {dx: .2, dy: .25}),                // a line of cabs
-        box(.55, .3, .3, dark, {dx: .2, dy: .7}),
-        box(.55, .3, .3, dark, {dx: .2, dy: 1.15}),
-      ]};
+      return {
+        w: size('work')[0],
+        d: size('work')[1],
+        parts: [
+          box(1.0, 1.2, 0.75, brick, {dx: 1.6}), // the office
+          box(1.0, 1.2, 0.09, roofTile, {dx: 1.6, base: 0.75}),
+          box(0.55, 0.3, 0.3, dark, {dx: 0.2, dy: 0.25}), // a line of cabs
+          box(0.55, 0.3, 0.3, dark, {dx: 0.2, dy: 0.7}),
+          box(0.55, 0.3, 0.3, dark, {dx: 0.2, dy: 1.15}),
+        ],
+      };
     case 'haulage':
-      return {w: size('work')[0], d: size('work')[1], parts: [
-        box(2.6, 1.4, .55, dark),
-        box(1.1, .55, .75, brick, {dx: .15, dy: .5, base: .55}),  // a flatbed's cab
-        box(1.2, .5, .18, dark, {dx: 1.3, dy: .55, base: .55}),   // and its bed
-      ]};
+      return {
+        w: size('work')[0],
+        d: size('work')[1],
+        parts: [
+          box(2.6, 1.4, 0.55, dark),
+          box(1.1, 0.55, 0.75, brick, {dx: 0.15, dy: 0.5, base: 0.55}), // a flatbed's cab
+          box(1.2, 0.5, 0.18, dark, {dx: 1.3, dy: 0.55, base: 0.55}), // and its bed
+        ],
+      };
     case 'garage':
     case 'archway':
-      return {w: size('racket')[0], d: size('racket')[1], parts: [
-        box(1.8, 1.5, .95, brick),
-        box(.95, .12, .7, dark, {dy: 1.46, dx: .45}),             // the roller door
-        box(1.9, 1.6, .09, dark, {base: .95, dx: -.05, dy: -.05}),
-        box(.5, .3, .3, dark, {dx: .05, dy: 1.62}),               // a car at the kerb
-      ]};
+      return {
+        w: size('racket')[0],
+        d: size('racket')[1],
+        parts: [
+          box(1.8, 1.5, 0.95, brick),
+          box(0.95, 0.12, 0.7, dark, {dy: 1.46, dx: 0.45}), // the roller door
+          box(1.9, 1.6, 0.09, dark, {base: 0.95, dx: -0.05, dy: -0.05}),
+          box(0.5, 0.3, 0.3, dark, {dx: 0.05, dy: 1.62}), // a car at the kerb
+        ],
+      };
     case 'butcher':
-      return {w: size('racket')[0], d: size('racket')[1], parts: [
-        box(1.8, 1.5, 1.05, pale),
-        box(1.8, .16, .3, glass, {base: .4, dy: 1.46}),           // the tiled window
-        box(1.9, .3, .08, roofTile, {base: .78, dy: 1.42, dx: -.05}), // the awning over it
-        box(1.9, 1.6, .09, dark, {base: 1.05, dx: -.05, dy: -.05}),
-      ]};
+      return {
+        w: size('racket')[0],
+        d: size('racket')[1],
+        parts: [
+          box(1.8, 1.5, 1.05, pale),
+          box(1.8, 0.16, 0.3, glass, {base: 0.4, dy: 1.46}), // the tiled window
+          box(1.9, 0.3, 0.08, roofTile, {base: 0.78, dy: 1.42, dx: -0.05}), // the awning over it
+          box(1.9, 1.6, 0.09, dark, {base: 1.05, dx: -0.05, dy: -0.05}),
+        ],
+      };
     case 'poolhall':
-      return {w: size('racket')[0], d: size('racket')[1], parts: [
-        box(1.8, 1.5, 1.45, brick),
-        box(1.8, .14, .28, glass, {base: .95, dy: 1.44}),         // long low windows upstairs
-        box(.4, .12, .5, dark, {base: .1, dy: 1.46, dx: .1}),     // the stair door at street level
-        box(1.9, 1.6, .09, dark, {base: 1.45, dx: -.05, dy: -.05}),
-      ]};
+      return {
+        w: size('racket')[0],
+        d: size('racket')[1],
+        parts: [
+          box(1.8, 1.5, 1.45, brick),
+          box(1.8, 0.14, 0.28, glass, {base: 0.95, dy: 1.44}), // long low windows upstairs
+          box(0.4, 0.12, 0.5, dark, {base: 0.1, dy: 1.46, dx: 0.1}), // the stair door at street level
+          box(1.9, 1.6, 0.09, dark, {base: 1.45, dx: -0.05, dy: -0.05}),
+        ],
+      };
     case 'steamworks':
-      return {w: size('racket')[0], d: size('racket')[1], parts: [
-        box(1.8, 1.5, 1.0, brick),
-        box(1.9, 1.6, .1, dark, {base: 1.0, dx: -.05, dy: -.05}),
-        box(.2, .2, .9, dark, {base: 1.1, dx: .35, dy: .5}),      // vent stacks
-        box(.2, .2, 1.15, dark, {base: 1.1, dx: .8, dy: .5}),
-        box(.2, .2, .75, dark, {base: 1.1, dx: 1.25, dy: .5}),
-      ]};
+      return {
+        w: size('racket')[0],
+        d: size('racket')[1],
+        parts: [
+          box(1.8, 1.5, 1.0, brick),
+          box(1.9, 1.6, 0.1, dark, {base: 1.0, dx: -0.05, dy: -0.05}),
+          box(0.2, 0.2, 0.9, dark, {base: 1.1, dx: 0.35, dy: 0.5}), // vent stacks
+          box(0.2, 0.2, 1.15, dark, {base: 1.1, dx: 0.8, dy: 0.5}),
+          box(0.2, 0.2, 0.75, dark, {base: 1.1, dx: 1.25, dy: 0.5}),
+        ],
+      };
     case 'burlesque':
-      return {w: size('bar')[0], d: size('bar')[1], parts: [
-        box(1.5, 1.4, 1.5, brick),
-        box(1.6, .18, .35, glass, {base: 1.0, dy: 1.32}),         // the marquee, lit
-        box(1.7, .1, .1, dark, {base: 1.35, dx: -.1, dy: 1.36}),
-        box(1.6, 1.5, .09, dark, {base: 1.5, dx: -.05, dy: -.05}),
-      ]};
+      return {
+        w: size('bar')[0],
+        d: size('bar')[1],
+        parts: [
+          box(1.5, 1.4, 1.5, brick),
+          box(1.6, 0.18, 0.35, glass, {base: 1.0, dy: 1.32}), // the marquee, lit
+          box(1.7, 0.1, 0.1, dark, {base: 1.35, dx: -0.1, dy: 1.36}),
+          box(1.6, 1.5, 0.09, dark, {base: 1.5, dx: -0.05, dy: -0.05}),
+        ],
+      };
   }
   switch (type) {
     case 'casino':
-      return {w: size('casino')[0], d: size('casino')[1], parts: [
-        box(2.2, 1.8, 1.5, stone),
-        box(2.2, 1.8, .18, glass, {base: 1.5}),          // a lit band along the top
-        box(.9, .5, .5, roofTile, {base: 1.68, dx: .65, dy: .65}),
-        box(.24, .24, .7, dark, {base: 2.18, dx: .98, dy: .78}),
-      ]};
+      return {
+        w: size('casino')[0],
+        d: size('casino')[1],
+        parts: [
+          box(2.2, 1.8, 1.5, stone),
+          box(2.2, 1.8, 0.18, glass, {base: 1.5}), // a lit band along the top
+          box(0.9, 0.5, 0.5, roofTile, {base: 1.68, dx: 0.65, dy: 0.65}),
+          box(0.24, 0.24, 0.7, dark, {base: 2.18, dx: 0.98, dy: 0.78}),
+        ],
+      };
     case 'market':
-      return {w: size('market')[0], d: size('market')[1], parts: [
-        box(2.4, 1.6, 1.25, pale),
-        box(2.4, 1.6, .12, roofTile, {base: 1.25}),
-        box(.3, .3, .55, pale, {base: 1.37, dx: .2, dy: .65}),
-        box(.3, .3, .55, pale, {base: 1.37, dx: 1.9, dy: .65}),
-      ]};
+      return {
+        w: size('market')[0],
+        d: size('market')[1],
+        parts: [
+          box(2.4, 1.6, 1.25, pale),
+          box(2.4, 1.6, 0.12, roofTile, {base: 1.25}),
+          box(0.3, 0.3, 0.55, pale, {base: 1.37, dx: 0.2, dy: 0.65}),
+          box(0.3, 0.3, 0.55, pale, {base: 1.37, dx: 1.9, dy: 0.65}),
+        ],
+      };
     case 'civic':
-      return {w: size('civic')[0], d: size('civic')[1], parts: [
-        box(1.9, 1.6, 1.6, stone),
-        box(2.05, 1.75, .1, dark, {base: 1.6, dx: -.07, dy: -.07}),
-        box(.7, .7, .45, stone, {base: 1.7, dx: .6, dy: .45}),
-      ]};
+      return {
+        w: size('civic')[0],
+        d: size('civic')[1],
+        parts: [
+          box(1.9, 1.6, 1.6, stone),
+          box(2.05, 1.75, 0.1, dark, {base: 1.6, dx: -0.07, dy: -0.07}),
+          box(0.7, 0.7, 0.45, stone, {base: 1.7, dx: 0.6, dy: 0.45}),
+        ],
+      };
     case 'racket':
-      return {w: size('racket')[0], d: size('racket')[1], parts: [
-        box(1.8, 1.5, 1.05, brick),
-        box(1.9, 1.6, .1, dark, {base: 1.05, dx: -.05, dy: -.05}),
-        box(.5, .34, .3, dark, {base: 1.15, dx: 1.1, dy: .6}),   // a vent on the roof
-      ]};
+      return {
+        w: size('racket')[0],
+        d: size('racket')[1],
+        parts: [
+          box(1.8, 1.5, 1.05, brick),
+          box(1.9, 1.6, 0.1, dark, {base: 1.05, dx: -0.05, dy: -0.05}),
+          box(0.5, 0.34, 0.3, dark, {base: 1.15, dx: 1.1, dy: 0.6}), // a vent on the roof
+        ],
+      };
     case 'work':
-      return {w: size('work')[0], d: size('work')[1], parts: [
-        box(2.6, 1.4, .8, dark),
-        box(2.6, 1.4, .22, roofTile, {base: .8}),
-        box(.3, .3, 1.1, dark, {base: 1.02, dx: 2.1, dy: .5}),   // a stack
-      ]};
+      return {
+        w: size('work')[0],
+        d: size('work')[1],
+        parts: [
+          box(2.6, 1.4, 0.8, dark),
+          box(2.6, 1.4, 0.22, roofTile, {base: 0.8}),
+          box(0.3, 0.3, 1.1, dark, {base: 1.02, dx: 2.1, dy: 0.5}), // a stack
+        ],
+      };
     case 'bar':
-      return {w: size('bar')[0], d: size('bar')[1], parts: [
-        box(1.5, 1.4, 1.15, brick),
-        box(1.5, .14, .3, glass, {base: .35, dy: 1.36}),         // a lit window on the street
-        box(1.6, 1.5, .09, dark, {base: 1.15, dx: -.05, dy: -.05}),
-      ]};
+      return {
+        w: size('bar')[0],
+        d: size('bar')[1],
+        parts: [
+          box(1.5, 1.4, 1.15, brick),
+          box(1.5, 0.14, 0.3, glass, {base: 0.35, dy: 1.36}), // a lit window on the street
+          box(1.6, 1.5, 0.09, dark, {base: 1.15, dx: -0.05, dy: -0.05}),
+        ],
+      };
     case 'home':
     default:
-      return {w: size('home')[0], d: size('home')[1], parts: [
-        box(1.5, 1.3, 1.35, brick),
-        box(1.6, 1.4, .1, roofTile, {base: 1.35, dx: -.05, dy: -.05}),
-        box(.22, .22, .4, dark, {base: 1.45, dx: 1.05, dy: .3}), // a chimney
-      ]};
+      return {
+        w: size('home')[0],
+        d: size('home')[1],
+        parts: [
+          box(1.5, 1.3, 1.35, brick),
+          box(1.6, 1.4, 0.1, roofTile, {base: 1.35, dx: -0.05, dy: -0.05}),
+          box(0.22, 0.22, 0.4, dark, {base: 1.45, dx: 1.05, dy: 0.3}), // a chimney
+        ],
+      };
   }
 }
 
@@ -234,7 +313,8 @@ export function blockFor(type: string, id = ''): Block {
 export type Solid = {dx?: number; dy?: number; w: number; d: number; h: number; base?: number};
 
 export function faces(origin: Vec, part: Solid) {
-  const bx = origin.x + (part.dx || 0), by = origin.y + (part.dy || 0);
+  const bx = origin.x + (part.dx || 0),
+    by = origin.y + (part.dy || 0);
   const base = part.base || 0;
   const lift = (v: Vec, up: number) => ({x: v.x, y: v.y - up * TILE.h});
 
@@ -256,19 +336,23 @@ export const points = (vs: Vec[]) => vs.map(v => `${v.x.toFixed(1)},${v.y.toFixe
 // so a crowded address reads as a crowd instead of one figure.
 export function standing(at: Vec, block: {w: number; d: number}, i: number, of: number): Vec {
   const spread = Math.min(of, 6);
-  const along = spread <= 1 ? .5 : .15 + (i % spread) / (spread - 1) * .7;
-  const rank = Math.floor(i / spread);          // a second row behind the first
-  return {x: at.x + block.w * along, y: at.y + block.d + .22 + rank * .28};
+  const along = spread <= 1 ? 0.5 : 0.15 + ((i % spread) / (spread - 1)) * 0.7;
+  const rank = Math.floor(i / spread); // a second row behind the first
+  return {x: at.x + block.w * along, y: at.y + block.d + 0.22 + rank * 0.28};
 }
 
 // The door of a building, which is where a journey starts and ends: the near
 // corner of its plot, on the pavement.
-export const door = (at: Vec, block: {w: number; d: number}): Vec =>
-  ({x: at.x + block.w / 2, y: at.y + block.d + .25});
+export const door = (at: Vec, block: {w: number; d: number}): Vec => ({
+  x: at.x + block.w / 2,
+  y: at.y + block.d + 0.25,
+});
 
 // Somewhere along a walk between two doors.
-export const between = (a: Vec, b: Vec, t: number): Vec =>
-  ({x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t});
+export const between = (a: Vec, b: Vec, t: number): Vec => ({
+  x: a.x + (b.x - a.x) * t,
+  y: a.y + (b.y - a.y) * t,
+});
 
 // The roof of a block, which is where a moment happens: an explosion goes off
 // above a building, not on the pavement in front of it.
@@ -297,7 +381,7 @@ export const roof = (at: Vec, block: {w: number; d: number}, height: number): Ve
 // carriageway; PAVE is the footway inside each block, between kerb and wall.
 export const BLOCK = 3.6;
 export const ROAD = 1.0;
-export const PAVE = .42;
+export const PAVE = 0.42;
 
 export type Cell = {col: number; row: number};
 export type Rect = {x: number; y: number; w: number; d: number};
@@ -305,8 +389,10 @@ export type Segment = {a: Vec; b: Vec};
 
 // island is the ground inside one block: everything that is not carriageway.
 export const island = (c: Cell): Rect => ({
-  x: c.col * BLOCK + ROAD / 2, y: c.row * BLOCK + ROAD / 2,
-  w: BLOCK - ROAD, d: BLOCK - ROAD,
+  x: c.col * BLOCK + ROAD / 2,
+  y: c.row * BLOCK + ROAD / 2,
+  w: BLOCK - ROAD,
+  d: BLOCK - ROAD,
 });
 
 // plot is where the building itself stands, set back from the kerb by the
@@ -329,15 +415,20 @@ export const middle = (c: Cell): Vec => {
 // than stacking, though Bellwether as it stands never needs it.
 export function grid(places: {id: string; x: number; y: number}[]): Map<string, Cell> {
   const tiles = places.map(p => ({id: p.id, ...plan(p.x, p.y)}));
-  const minX = Math.min(...tiles.map(t => t.x)), minY = Math.min(...tiles.map(t => t.y));
+  const minX = Math.min(...tiles.map(t => t.x)),
+    minY = Math.min(...tiles.map(t => t.y));
   const taken = new Map<string, string>();
   const out = new Map<string, Cell>();
-  for (const t of tiles.sort((a, b) => (a.x + a.y) - (b.x + b.y))) {
+  for (const t of tiles.sort((a, b) => a.x + a.y - (b.x + b.y))) {
     let cell = {col: Math.round((t.x - minX) / BLOCK), row: Math.round((t.y - minY) / BLOCK)};
     // If somebody is already there, step outwards until a block is free.
     for (let ring = 1; taken.has(`${cell.col},${cell.row}`) && ring < 6; ring++) {
-      const around = [{col: cell.col + ring, row: cell.row}, {col: cell.col, row: cell.row + ring},
-                      {col: cell.col - ring, row: cell.row}, {col: cell.col, row: cell.row - ring}];
+      const around = [
+        {col: cell.col + ring, row: cell.row},
+        {col: cell.col, row: cell.row + ring},
+        {col: cell.col - ring, row: cell.row},
+        {col: cell.col, row: cell.row - ring},
+      ];
       const free = around.find(c => c.col >= 0 && c.row >= 0 && !taken.has(`${c.col},${c.row}`));
       if (free) cell = free;
     }
@@ -349,8 +440,12 @@ export function grid(places: {id: string; x: number; y: number}[]): Map<string, 
 
 // The extent of the city in blocks, which is what the roads have to span.
 export function bounds(cells: Map<string, Cell>): {cols: number; rows: number} {
-  let cols = 0, rows = 0;
-  for (const c of cells.values()) { cols = Math.max(cols, c.col); rows = Math.max(rows, c.row) }
+  let cols = 0,
+    rows = 0;
+  for (const c of cells.values()) {
+    cols = Math.max(cols, c.col);
+    rows = Math.max(rows, c.row);
+  }
   return {cols: cols + 1, rows: rows + 1};
 }
 
@@ -358,7 +453,8 @@ export function bounds(cells: Map<string, Cell>): {cols: number; rows: number} {
 // junction is square and no street stops in the middle of nowhere.
 export function carriageways({cols, rows}: {cols: number; rows: number}): Segment[] {
   const out: Segment[] = [];
-  const right = cols * BLOCK, bottom = rows * BLOCK;
+  const right = cols * BLOCK,
+    bottom = rows * BLOCK;
   for (let col = 0; col <= cols; col++) {
     const x = col * BLOCK;
     out.push({a: {x, y: 0}, b: {x, y: bottom}});
@@ -374,18 +470,20 @@ export function carriageways({cols, rows}: {cols: number; rows: number}): Segmen
 // the buildings: out of the block to the nearest corner, along one axis, then
 // the other, and in again.
 export function walk(from: Cell, to: Cell): Vec[] {
-  const start = middle(from), end = middle(to);
+  const start = middle(from),
+    end = middle(to);
   // The junction lines this walk uses: the street on the near side of each.
-  const lane = (a: number, b: number) => (a <= b ? Math.max(a, b) * 0 + (a + 1) * BLOCK - BLOCK : a * BLOCK);
+  const lane = (a: number, b: number) =>
+    a <= b ? Math.max(a, b) * 0 + (a + 1) * BLOCK - BLOCK : a * BLOCK;
   const outX = from.col <= to.col ? (from.col + 1) * BLOCK : from.col * BLOCK;
   const inY = to.row <= from.row ? (to.row + 1) * BLOCK : to.row * BLOCK;
   void lane;
   return [
     start,
-    {x: outX, y: start.y},          // out to the street
-    {x: outX, y: inY},              // along it
-    {x: end.x, y: inY},             // round the corner
-    end,                            // and in
+    {x: outX, y: start.y}, // out to the street
+    {x: outX, y: inY}, // along it
+    {x: end.x, y: inY}, // round the corner
+    end, // and in
   ];
 }
 
@@ -399,7 +497,8 @@ export function along(path: Vec[], t: number): Vec {
   let total = 0;
   for (let i = 0; i + 1 < path.length; i++) {
     const d = Math.hypot(path[i + 1].x - path[i].x, path[i + 1].y - path[i].y);
-    legs.push(d); total += d;
+    legs.push(d);
+    total += d;
   }
   if (total === 0) return path[0];
   let want = Math.min(1, Math.max(0, t)) * total;
@@ -419,7 +518,7 @@ export function lampPosts({cols, rows}: {cols: number; rows: number}): Vec[] {
   const out: Vec[] = [];
   for (let col = 0; col <= cols; col++) {
     for (let row = 0; row <= rows; row++) {
-      out.push({x: col * BLOCK + ROAD / 2 + .1, y: row * BLOCK + ROAD / 2 + .1});
+      out.push({x: col * BLOCK + ROAD / 2 + 0.1, y: row * BLOCK + ROAD / 2 + 0.1});
     }
   }
   return out;
@@ -428,19 +527,33 @@ export function lampPosts({cols, rows}: {cols: number; rows: number}): Vec[] {
 // Where the cars stand: along the kerb of a block, parked rather than driving.
 // The clock is stopped between actions, and a car moving while time is not
 // would be the view inventing something the simulation has not spent.
-export function kerbside(cell: Cell, seed: number): {at: Vec; horizontal: boolean; facing: number}[] {
+export function kerbside(
+  cell: Cell,
+  seed: number,
+): {at: Vec; horizontal: boolean; facing: number}[] {
   const i = island(cell);
   let h = ((cell.col * 73856093) ^ (cell.row * 19349663) ^ seed) >>> 0;
-  const next = () => { h = (h * 1664525 + 1013904223) >>> 0; return h / 4294967296 };
+  const next = () => {
+    h = (h * 1664525 + 1013904223) >>> 0;
+    return h / 4294967296;
+  };
   const out: {at: Vec; horizontal: boolean; facing: number}[] = [];
   const slots = 3;
   for (let n = 0; n < slots; n++) {
-    if (next() > .5) continue;
-    const f = (n + .5) / slots;
-    if (next() < .5) {
-      out.push({at: {x: i.x + i.w * f, y: i.y - ROAD * .28}, horizontal: true, facing: next() < .5 ? 1 : -1});
+    if (next() > 0.5) continue;
+    const f = (n + 0.5) / slots;
+    if (next() < 0.5) {
+      out.push({
+        at: {x: i.x + i.w * f, y: i.y - ROAD * 0.28},
+        horizontal: true,
+        facing: next() < 0.5 ? 1 : -1,
+      });
     } else {
-      out.push({at: {x: i.x - ROAD * .28, y: i.y + i.d * f}, horizontal: false, facing: next() < .5 ? 1 : -1});
+      out.push({
+        at: {x: i.x - ROAD * 0.28, y: i.y + i.d * f},
+        horizontal: false,
+        facing: next() < 0.5 ? 1 : -1,
+      });
     }
   }
   return out;
@@ -487,13 +600,13 @@ export function distance(at: Vec, extent: {cols: number; rows: number}): number 
 // building every time the city is drawn.
 export function fillerShape(cell: Cell): {h: number; inset: number; kind: number; art: number} {
   let h = ((cell.col * 374761393) ^ (cell.row * 668265263)) >>> 0;
-  h = (h ^ (h >> 13)) * 1274126177 >>> 0;
+  h = ((h ^ (h >> 13)) * 1274126177) >>> 0;
   const r = (n: number) => ((h >> n) & 255) / 255;
   // Shorter and set further back than the addresses that matter. A filler the
   // same size as the Monarch competes with it, and the first version — a plain
   // grey box filling its whole plot — read as a mistake rather than as
   // distance.
-  return {h: .55 + r(3) * .85, inset: .34 + r(11) * .2, kind: Math.floor(r(19) * 3), art: r(7)};
+  return {h: 0.55 + r(3) * 0.85, inset: 0.34 + r(11) * 0.2, kind: Math.floor(r(19) * 3), art: r(7)};
 }
 
 // ---------------------------------------------------------------------------
@@ -505,39 +618,62 @@ export function fillerShape(cell: Cell): {h: number; inset: number; kind: number
 // off it. They are placed on the pavement ring only — never in the road, never
 // under a building — so nothing can end up somewhere it could not stand.
 
-export type Prop = {kind: 'hydrant' | 'mailbox' | 'bin' | 'bench' | 'pole'; at: Vec; facing: number};
+export type Prop = {
+  kind: 'hydrant' | 'mailbox' | 'bin' | 'bench' | 'pole';
+  at: Vec;
+  facing: number;
+};
 
 // dressing is what one block carries, decided by where the block is so the same
 // corner has the same hydrant every time the city is drawn.
 export function dressing(cell: Cell): Prop[] {
   const i = island(cell);
   let h = ((cell.col * 2246822519) ^ (cell.row * 3266489917)) >>> 0;
-  const next = () => { h = (h * 1664525 + 1013904223) >>> 0; return h / 4294967296 };
+  const next = () => {
+    h = (h * 1664525 + 1013904223) >>> 0;
+    return h / 4294967296;
+  };
   const out: Prop[] = [];
 
   // The pavement ring, as four runs a prop can stand on. Kept a little inside
   // the kerb so nothing overhangs the carriageway.
-  const inset = PAVE * .42;
+  const inset = PAVE * 0.42;
   const runs: {from: Vec; to: Vec; facing: number}[] = [
-    {from: {x: i.x + inset, y: i.y + inset}, to: {x: i.x + i.w - inset, y: i.y + inset}, facing: -1},
-    {from: {x: i.x + inset, y: i.y + i.d - inset}, to: {x: i.x + i.w - inset, y: i.y + i.d - inset}, facing: 1},
-    {from: {x: i.x + inset, y: i.y + inset}, to: {x: i.x + inset, y: i.y + i.d - inset}, facing: -1},
-    {from: {x: i.x + i.w - inset, y: i.y + inset}, to: {x: i.x + i.w - inset, y: i.y + i.d - inset}, facing: 1},
+    {
+      from: {x: i.x + inset, y: i.y + inset},
+      to: {x: i.x + i.w - inset, y: i.y + inset},
+      facing: -1,
+    },
+    {
+      from: {x: i.x + inset, y: i.y + i.d - inset},
+      to: {x: i.x + i.w - inset, y: i.y + i.d - inset},
+      facing: 1,
+    },
+    {
+      from: {x: i.x + inset, y: i.y + inset},
+      to: {x: i.x + inset, y: i.y + i.d - inset},
+      facing: -1,
+    },
+    {
+      from: {x: i.x + i.w - inset, y: i.y + inset},
+      to: {x: i.x + i.w - inset, y: i.y + i.d - inset},
+      facing: 1,
+    },
   ];
 
   const kinds: Prop['kind'][] = ['hydrant', 'mailbox', 'bin', 'bench'];
   for (const run of runs) {
     // Most stretches of pavement carry nothing. A prop on every one reads as
     // a catalogue rather than as a street.
-    if (next() > .62) continue;
-    const at = between(run.from, run.to, .2 + next() * .6);
+    if (next() > 0.62) continue;
+    const at = between(run.from, run.to, 0.2 + next() * 0.6);
     out.push({kind: kinds[Math.floor(next() * kinds.length)], at, facing: run.facing});
   }
 
   // A telegraph pole on one corner of some blocks, which is what the wires
   // hang from.
-  if (next() < .55) {
-    out.push({kind: 'pole', at: {x: i.x + inset * .6, y: i.y + i.d - inset * .6}, facing: 1});
+  if (next() < 0.55) {
+    out.push({kind: 'pole', at: {x: i.x + inset * 0.6, y: i.y + i.d - inset * 0.6}, facing: 1});
   }
   return out;
 }
@@ -549,12 +685,13 @@ export function wires(poles: Vec[]): Segment[] {
   for (const a of poles) {
     for (const b of poles) {
       if (a === b) continue;
-      const dx = Math.abs(a.x - b.x), dy = Math.abs(a.y - b.y);
+      const dx = Math.abs(a.x - b.x),
+        dy = Math.abs(a.y - b.y);
       // One block apart, in line: that is a span. Anything else is not.
-      const spanX = dy < .2 && dx > BLOCK - .4 && dx < BLOCK + .4;
-      const spanY = dx < .2 && dy > BLOCK - .4 && dy < BLOCK + .4;
+      const spanX = dy < 0.2 && dx > BLOCK - 0.4 && dx < BLOCK + 0.4;
+      const spanY = dx < 0.2 && dy > BLOCK - 0.4 && dy < BLOCK + 0.4;
       if (!spanX && !spanY) continue;
-      if (a.x > b.x || (a.x === b.x && a.y > b.y)) continue;   // once per pair
+      if (a.x > b.x || (a.x === b.x && a.y > b.y)) continue; // once per pair
       out.push({a, b});
     }
   }
@@ -580,21 +717,27 @@ export type Slot = {at: Vec; w: number; d: number; front: boolean; end: boolean}
 // reads as built-up rather than as one building with a lawn.
 export function terrace(cell: Cell, slots = 2): Slot[] {
   const i = island(cell);
-  const depth = (i.d - PAVE * 2) * .46;          // how far back a row reaches
+  const depth = (i.d - PAVE * 2) * 0.46; // how far back a row reaches
   const width = (i.w - PAVE * 2) / slots;
   const out: Slot[] = [];
   for (let n = 0; n < slots; n++) {
     // The near row, along the street the camera looks down.
     out.push({
       at: {x: i.x + PAVE + n * width, y: i.y + i.d - PAVE - depth},
-      w: width, d: depth, front: true, end: n === 0 || n === slots - 1,
+      w: width,
+      d: depth,
+      front: true,
+      end: n === 0 || n === slots - 1,
     });
   }
   for (let n = 0; n < slots; n++) {
     // And the far row, backing onto it.
     out.push({
       at: {x: i.x + PAVE + n * width, y: i.y + PAVE},
-      w: width, d: depth, front: false, end: n === 0 || n === slots - 1,
+      w: width,
+      d: depth,
+      front: false,
+      end: n === 0 || n === slots - 1,
     });
   }
   return out;
@@ -619,21 +762,23 @@ export type Marking = {kind: 'crossing' | 'stop'; at: Vec; along: Vec; width: nu
 // junction in the city is marked the same way.
 export function markings({cols, rows}: {cols: number; rows: number}): Marking[] {
   const out: Marking[] = [];
-  const back = ROAD * .62;                    // how far from the centre of the junction
+  const back = ROAD * 0.62; // how far from the centre of the junction
   for (let col = 0; col <= cols; col++) {
     for (let row = 0; row <= rows; row++) {
-      const x = col * BLOCK, y = row * BLOCK;
+      const x = col * BLOCK,
+        y = row * BLOCK;
       // Only where two carriageways actually meet.
-      const hasEast = col < cols, hasSouth = row < rows;
+      const hasEast = col < cols,
+        hasSouth = row < rows;
       if (hasSouth) {
         // Crossing the north-south street, on the south side of the junction.
         out.push({kind: 'crossing', at: {x, y: y + back}, along: {x: 1, y: 0}, width: ROAD});
-        out.push({kind: 'stop', at: {x, y: y + back + .16}, along: {x: 1, y: 0}, width: ROAD});
+        out.push({kind: 'stop', at: {x, y: y + back + 0.16}, along: {x: 1, y: 0}, width: ROAD});
       }
       if (hasEast) {
         // And the east-west street, on the east side.
         out.push({kind: 'crossing', at: {x: x + back, y}, along: {x: 0, y: 1}, width: ROAD});
-        out.push({kind: 'stop', at: {x: x + back + .16, y}, along: {x: 0, y: 1}, width: ROAD});
+        out.push({kind: 'stop', at: {x: x + back + 0.16, y}, along: {x: 0, y: 1}, width: ROAD});
       }
     }
   }
@@ -654,37 +799,42 @@ export function markings({cols, rows}: {cols: number; rows: number}): Marking[] 
 // PAVE, so that holds by construction rather than by being checked.
 
 export type Awning = {
-  at: Vec;          // the corner of the canopy against the wall
-  w: number;        // how much of the frontage it covers
-  reach: number;    // how far out over the pavement it hangs
-  h: number;        // the height of its back edge, at the top of the shopfront
-  drop: number;     // how much lower the front edge is, so rain runs off it
-  stripes: number;  // bands of canvas across it
-  tone: number;     // which of the awning colours this one is
+  at: Vec; // the corner of the canopy against the wall
+  w: number; // how much of the frontage it covers
+  reach: number; // how far out over the pavement it hangs
+  h: number; // the height of its back edge, at the top of the shopfront
+  drop: number; // how much lower the front edge is, so rain runs off it
+  stripes: number; // bands of canvas across it
+  tone: number; // which of the awning colours this one is
 };
 
 // How far an awning may hang out over the pavement. Well inside the kerb: the
 // props already sit at PAVE * .42 and nothing may overhang the carriageway.
-const REACH = PAVE * .5;
+const REACH = PAVE * 0.5;
 
 // awnings gives the canopies on a block's street frontage. Only the front row
 // has them — the back row faces the yards — and only some of the shopfronts,
 // because a canopy on every one reads as a parade of market stalls.
 export function awnings(cell: Cell, slots = 2): Awning[] {
   let h = ((cell.col * 374761393) ^ (cell.row * 668265263) ^ 0x5bf03635) >>> 0;
-  const next = () => { h = (h * 1664525 + 1013904223) >>> 0; return h / 4294967296 };
+  const next = () => {
+    h = (h * 1664525 + 1013904223) >>> 0;
+    return h / 4294967296;
+  };
   const out: Awning[] = [];
   for (const slot of terrace(cell, slots)) {
     if (!slot.front) continue;
-    if (next() > .58) continue;
+    if (next() > 0.58) continue;
     // Not the whole frontage: a shopfront sits between the doorways, so the
     // canvas stops short of the party walls at either end.
-    const w = slot.w * (.5 + next() * .22);
+    const w = slot.w * (0.5 + next() * 0.22);
     const at = {x: slot.at.x + (slot.w - w) / 2, y: slot.at.y + slot.d};
     out.push({
-      at, w, reach: REACH,
-      h: .3 + next() * .06,
-      drop: .05 + next() * .03,
+      at,
+      w,
+      reach: REACH,
+      h: 0.3 + next() * 0.06,
+      drop: 0.05 + next() * 0.03,
       stripes: 4 + Math.floor(next() * 4),
       tone: Math.floor(next() * 4),
     });
@@ -715,7 +865,13 @@ export function goldenness(minute: number): number {
 // occupied. So they are placed here, deterministically, and drawn as shapes
 // rather than as particles.
 
-export type Vent = {at: Vec; kind: 'chimney' | 'grate'; height: number; drift: number; size: number};
+export type Vent = {
+  at: Vec;
+  kind: 'chimney' | 'grate';
+  height: number;
+  drift: number;
+  size: number;
+};
 
 // vents gives what a block gives off: smoke from a chimney on the roof of one
 // of its buildings, steam from a grate in the pavement outside. Never both from
@@ -723,27 +879,33 @@ export type Vent = {at: Vec; kind: 'chimney' | 'grate'; height: number; drift: n
 // smokes is a foundry.
 export function vents(cell: Cell, slots = 2): Vent[] {
   let h = ((cell.col * 2654435761) ^ (cell.row * 40503) ^ 0x9e3779b9) >>> 0;
-  const next = () => { h = (h * 1664525 + 1013904223) >>> 0; return h / 4294967296 };
+  const next = () => {
+    h = (h * 1664525 + 1013904223) >>> 0;
+    return h / 4294967296;
+  };
   const out: Vent[] = [];
   const rows = terrace(cell, slots);
-  if (next() < .42) {
+  if (next() < 0.42) {
     // A chimney, standing on the back of one of the roofs. Set back from the
     // street edge so the smoke rises behind the parapet rather than in front
     // of the building's own face.
     const slot = rows[Math.floor(next() * rows.length)];
     out.push({
-      at: {x: slot.at.x + slot.w * (.3 + next() * .4), y: slot.at.y + slot.d * .3},
+      at: {x: slot.at.x + slot.w * (0.3 + next() * 0.4), y: slot.at.y + slot.d * 0.3},
       kind: 'chimney',
-      height: 1.5 + next() * .9,        // where the smoke starts, above the ground
-      drift: (next() - .5) * .9,        // which way the wind has it
-      size: .8 + next() * .5,
+      height: 1.5 + next() * 0.9, // where the smoke starts, above the ground
+      drift: (next() - 0.5) * 0.9, // which way the wind has it
+      size: 0.8 + next() * 0.5,
     });
-  } else if (next() < .3) {
+  } else if (next() < 0.3) {
     // Or a grate in the pavement, which is the same idea at ankle height.
     const i = island(cell);
     out.push({
-      at: {x: i.x + PAVE * .5 + next() * (i.w - PAVE), y: i.y + i.d - PAVE * .5},
-      kind: 'grate', height: 0, drift: (next() - .5) * .5, size: .55 + next() * .4,
+      at: {x: i.x + PAVE * 0.5 + next() * (i.w - PAVE), y: i.y + i.d - PAVE * 0.5},
+      kind: 'grate',
+      height: 0,
+      drift: (next() - 0.5) * 0.5,
+      size: 0.55 + next() * 0.4,
     });
   }
   return out;
@@ -762,7 +924,7 @@ export function vents(cell: Cell, slots = 2): Vent[] {
 // TROLLEY_GAUGE is the distance between the two rails, in tiles. Narrow: a
 // streetcar is not a mainline train, and at this scale two lines any further
 // apart read as a road marking rather than as track.
-export const TROLLEY_GAUGE = .22;
+export const TROLLEY_GAUGE = 0.22;
 
 // trolleyAvenue is which north-south street carries it: the middle one, so the
 // track runs through the city rather than along its edge.
@@ -770,10 +932,11 @@ export const trolleyAvenue = ({cols}: {cols: number}) => Math.max(1, Math.round(
 
 // rails gives the two running rails, as a pair of segments down one avenue.
 export function rails(size: {cols: number; rows: number}): Segment[] {
-  const x = trolleyAvenue(size) * BLOCK, bottom = size.rows * BLOCK;
+  const x = trolleyAvenue(size) * BLOCK,
+    bottom = size.rows * BLOCK;
   return [
-    {a: {x: x - TROLLEY_GAUGE / 2, y: -.5}, b: {x: x - TROLLEY_GAUGE / 2, y: bottom + .5}},
-    {a: {x: x + TROLLEY_GAUGE / 2, y: -.5}, b: {x: x + TROLLEY_GAUGE / 2, y: bottom + .5}},
+    {a: {x: x - TROLLEY_GAUGE / 2, y: -0.5}, b: {x: x - TROLLEY_GAUGE / 2, y: bottom + 0.5}},
+    {a: {x: x + TROLLEY_GAUGE / 2, y: -0.5}, b: {x: x + TROLLEY_GAUGE / 2, y: bottom + 0.5}},
   ];
 }
 
@@ -781,10 +944,11 @@ export function rails(size: {cols: number; rows: number}): Segment[] {
 // Spaced in tiles rather than per block, so they do not line up with the
 // junctions and give the track a rhythm of its own.
 export function sleepers(size: {cols: number; rows: number}): Segment[] {
-  const x = trolleyAvenue(size) * BLOCK, bottom = size.rows * BLOCK;
+  const x = trolleyAvenue(size) * BLOCK,
+    bottom = size.rows * BLOCK;
   const out: Segment[] = [];
-  for (let y = 0; y < bottom; y += .34) {
-    out.push({a: {x: x - TROLLEY_GAUGE * .8, y}, b: {x: x + TROLLEY_GAUGE * .8, y}});
+  for (let y = 0; y < bottom; y += 0.34) {
+    out.push({a: {x: x - TROLLEY_GAUGE * 0.8, y}, b: {x: x + TROLLEY_GAUGE * 0.8, y}});
   }
   return out;
 }
@@ -814,25 +978,24 @@ export function reach(kind: string, t: number): number {
     case 'explosion': {
       // Out fast, then falling back. The outer bloom is the widest part of any
       // moment in the game, so it is what the ceiling below is measured against.
-      const core = t < .28 ? t * 1.3 : .364 - (t - .28) * .34;
+      const core = t < 0.28 ? t * 1.3 : 0.364 - (t - 0.28) * 0.34;
       return Math.max(0, core * 1.55);
     }
     case 'killing':
     case 'gunfight':
-      return .2;                       // a muzzle flash and its halo
+      return 0.2; // a muzzle flash and its halo
     case 'raid':
     case 'arrest':
-      return .34;                      // a lamp sweeping the front of a building
+      return 0.34; // a lamp sweeping the front of a building
     default:
-      return .18 + t * .34;            // a ring that opens once
+      return 0.18 + t * 0.34; // a ring that opens once
   }
 }
 
 // ReachCeiling is the most any moment may cover. A moment wider than the block
 // it happens on stops saying "here" and starts saying "everywhere", and the
 // whole point of a moment is that the player knows where to look.
-export const ReachCeiling = .6;
-
+export const ReachCeiling = 0.6;
 
 // How far up a building a moment happens.
 //
@@ -846,14 +1009,14 @@ export const ReachCeiling = .6;
 export function liftOf(kind: string): number {
   switch (kind) {
     case 'explosion':
-      return .55;                      // inside it, about halfway up
+      return 0.55; // inside it, about halfway up
     case 'killing':
     case 'gunfight':
-      return .1;                       // street level, where people are shot
+      return 0.1; // street level, where people are shot
     case 'raid':
     case 'arrest':
-      return .14;                      // a lamp on a car at the kerb
+      return 0.14; // a lamp on a car at the kerb
     default:
-      return .08;                      // a door, a till, a pair of hands
+      return 0.08; // a door, a till, a pair of hands
   }
 }

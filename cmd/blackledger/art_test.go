@@ -116,12 +116,9 @@ func TestEveryMomentTheTheatreCanPlayHasAPlate(t *testing.T) {
 // caught the hook below an early return. They fail if the theatre goes back to
 // covering the city, or if the street stops being able to spotlight one address.
 func TestTheCameraGoesToTheBuildingRatherThanOverTheCity(t *testing.T) {
-	css, err := os.ReadFile("../../src/style.css")
-	if err != nil {
-		t.Skip("no stylesheet beside this build")
-	}
+	css := rawSource(t, "src/style.css")
 	rule := regexp.MustCompile(`\.theatre\{[^}]*\}`)
-	found := rule.FindString(string(css))
+	found := rule.FindString(css)
 	if found == "" {
 		t.Fatal("the theatre has no styling at all")
 	}
@@ -129,12 +126,9 @@ func TestTheCameraGoesToTheBuildingRatherThanOverTheCity(t *testing.T) {
 	if strings.Contains(found, "inset:0") && !strings.Contains(found, "pointer-events:none") {
 		t.Fatalf("the theatre covers the whole city and swallows its clicks: %s", found)
 	}
-	street, err := os.ReadFile("../../src/CityStreet.tsx")
-	if err != nil {
-		t.Fatal(err)
-	}
+	street := source(t, "src/CityStreet.tsx")
 	for _, want := range []string{"spotlight", "lit"} {
-		if !strings.Contains(string(street), want) {
+		if !holds(street, want) {
 			t.Fatalf("the street cannot single out one address: no %q", want)
 		}
 	}
@@ -145,22 +139,16 @@ func TestTheCameraGoesToTheBuildingRatherThanOverTheCity(t *testing.T) {
 // supposedly walking through. The last piece of the living city is seeing them
 // on it — placed between the two fronts according to how far along they are.
 func TestWalkersAreDrawnOnTheStreetAndNotOnlyListed(t *testing.T) {
-	street, err := os.ReadFile("../../src/CityStreet.tsx")
-	if err != nil {
-		t.Skip("no interface sources beside this build")
-	}
-	body := string(street)
+	street := source(t, "src/CityStreet.tsx")
+	body := street
 	for _, want := range []string{"walker-figure", "getBoundingClientRect", "progress"} {
 		if !strings.Contains(body, want) {
 			t.Fatalf("the street cannot place a walker between two addresses: no %q", want)
 		}
 	}
-	css, err := os.ReadFile("../../src/style.css")
-	if err != nil {
-		t.Fatal(err)
-	}
+	css := rawSource(t, "src/style.css")
 	rule := regexp.MustCompile(`\.walker-figure\{[^}]*\}`)
-	found := rule.FindString(string(css))
+	found := rule.FindString(css)
 	if found == "" {
 		t.Fatal("a walker on the street has no styling")
 	}
@@ -178,11 +166,8 @@ func TestWalkersAreDrawnOnTheStreetAndNotOnlyListed(t *testing.T) {
 // bottom of the room, the addresses and the band that says where something
 // happened all ran below the fold and could not be reached at all.
 func TestEveryColumnInsideTheWorkspaceCanBeScrolled(t *testing.T) {
-	css, err := os.ReadFile("../../src/style.css")
-	if err != nil {
-		t.Skip("no stylesheet beside this build")
-	}
-	sheet := string(css)
+	css := rawSource(t, "src/style.css")
+	sheet := css
 	if !regexp.MustCompile(`\.workspace\{[^}]*overflow:hidden`).MatchString(sheet) {
 		t.Skip("the workspace no longer clips, so its columns need not scroll")
 	}
@@ -210,11 +195,8 @@ func TestEveryColumnInsideTheWorkspaceCanBeScrolled(t *testing.T) {
 // width of a receipt. Below the picture it has the whole width, and the cards
 // lay out across it instead of down it.
 func TestTheWorkInARoomSitsUnderThePictureAndAcross(t *testing.T) {
-	css, err := os.ReadFile("../../src/style.css")
-	if err != nil {
-		t.Skip("no stylesheet beside this build")
-	}
-	sheet := string(css)
+	css := rawSource(t, "src/style.css")
+	sheet := css
 	stage := regexp.MustCompile(`\.interior-stage\{[^}]*\}`).FindString(sheet)
 	if stage == "" {
 		t.Fatal("the room has no layout at all")
@@ -235,16 +217,13 @@ func TestTheWorkInARoomSitsUnderThePictureAndAcross(t *testing.T) {
 // And the column beside the map stops repeating the room. Two copies of the
 // same twenty-six cards is how the list got long enough to complain about.
 func TestTheColumnBesideTheMapDoesNotRepeatTheRoom(t *testing.T) {
-	source, err := os.ReadFile("../../src/main.tsx")
-	if err != nil {
-		t.Skip("no interface beside this build")
-	}
-	main := string(source)
-	if !strings.Contains(main, "here-instead") {
+	source := source(t, "src/main.tsx")
+	main := source
+	if !holds(main, "here-instead") {
 		t.Error("standing in a place, the column beside the map offers no way into the room")
 	}
 	// The full list is still what a place you are NOT standing in gets.
-	if !strings.Contains(main, "<ActionList actions={l.actions}") {
+	if !holds(main, "<ActionList actions={l.actions}") {
 		t.Error("a place across the city lost its own panel")
 	}
 }
@@ -254,11 +233,8 @@ func TestTheColumnBesideTheMapDoesNotRepeatTheRoom(t *testing.T) {
 // beside it, and the two grids in a section (what you can do, and what you
 // cannot) settled on two different heights. Every card in a room is one size.
 func TestEveryActionCardInARoomIsTheSameSize(t *testing.T) {
-	css, err := os.ReadFile("../../src/style.css")
-	if err != nil {
-		t.Skip("no stylesheet beside this build")
-	}
-	sheet := string(css)
+	css := rawSource(t, "src/style.css")
+	sheet := css
 	grid := regexp.MustCompile(`\.actions\.compact\{[^}]*\}`).FindString(sheet)
 	if !strings.Contains(grid, "grid-auto-rows:1fr") {
 		t.Errorf("rows are sized by their own contents, so cards differ between rows: %s", grid)
@@ -285,23 +261,20 @@ func TestEveryActionCardInARoomIsTheSameSize(t *testing.T) {
 // removes work from the room panel without giving it somewhere else to be is
 // how a button disappears.
 func TestPlayerWorkHasSomewhereToBe(t *testing.T) {
-	source, err := os.ReadFile("../../src/main.tsx")
-	if err != nil {
-		t.Skip("no interface beside this build")
-	}
-	main := string(source)
+	source := source(t, "src/main.tsx")
+	main := source
 	for _, home := range []string{
 		"<PeopleScreen world={w} actions={anywhere}",
 		"<FamiliesScreen world={w} actions={anywhere}",
 		"<LedgerScreen world={w} render={actionButton} actions={anywhere.filter(",
 	} {
-		if !strings.Contains(main, home) {
+		if !holds(main, home) {
 			t.Errorf("no screen is given the player's own work: %q is not in the interface", home)
 		}
 	}
 	// And the room panel is still the thing dropping it, or it would be in two
 	// places at once.
-	if !strings.Contains(main, "&&!a.anywhere") {
+	if !holds(main, "&& !a.anywhere") {
 		t.Error("the room panel no longer leaves the player's own work out")
 	}
 }
@@ -311,24 +284,18 @@ func TestPlayerWorkHasSomewhereToBe(t *testing.T) {
 // so and offered nothing. A name you can deal with now carries the work on its
 // own card, and a name you cannot carries the address they are standing at.
 func TestANameYouKnowCanBeDealtWithOrFound(t *testing.T) {
-	screen, err := os.ReadFile("../../src/PeopleScreen.tsx")
-	if err != nil {
-		t.Skip("no interface beside this build")
-	}
-	s := string(screen)
+	screen := source(t, "src/PeopleScreen.tsx")
+	s := screen
 	if !strings.Contains(s, "a.subject === who.id") {
 		t.Error("a person's card does not carry the work the core says is about them")
 	}
 	if !strings.Contains(s, "find-them") {
 		t.Error("a person standing somewhere else cannot be reached from their card")
 	}
-	main, err := os.ReadFile("../../src/main.tsx")
-	if err != nil {
-		t.Fatal(err)
-	}
+	main := source(t, "src/main.tsx")
 	// The work has to come from where the player actually is, or the card is
 	// offering something the command layer will refuse.
-	if !strings.Contains(string(main), "at={p.location} here={(w.locations.find(l=>l.id===p.location)?.actions||[]).filter(a=>!!a.subject)}") {
+	if !holds(main, "at={p.location} here={(w.locations.find(l => l.id === p.location)?.actions || []).filter( a => !!a.subject, )}") {
 		t.Error("the people screen is not given the work available where the player is standing")
 	}
 }
@@ -340,19 +307,13 @@ func TestANameYouKnowCanBeDealtWithOrFound(t *testing.T) {
 // are presentation; a number on a table is a fact.
 func TestNothingThatDrawsAGameRollsForAnything(t *testing.T) {
 	for _, name := range []string{"Tables.tsx", "Casino.tsx", "cards.ts"} {
-		source, err := os.ReadFile("../../src/" + name)
-		if err != nil {
-			t.Skipf("no %s beside this build", name)
-		}
-		if strings.Contains(string(source), "Math.random") {
+		drawn := source(t, "src/"+name)
+		if holds(drawn, "Math.random") {
 			t.Errorf("%s rolls for something; the core owns every number on a table", name)
 		}
 	}
-	tables, err := os.ReadFile("../../src/Tables.tsx")
-	if err != nil {
-		t.Skip("no tables beside this build")
-	}
-	s := string(tables)
+	tables := source(t, "src/Tables.tsx")
+	s := tables
 	if !strings.Contains(s, "wheel.pocket ?? 0") {
 		t.Error("the pocket the ball lands in is not the one the core spun")
 	}
@@ -373,11 +334,8 @@ func TestNothingThatDrawsAGameRollsForAnything(t *testing.T) {
 // ball in the pocket: on a frozen clock it never finishes and holds its first
 // frame for ever, which is a ball that never lands.
 func TestTheBallsRestingPlaceDoesNotDependOnAnimation(t *testing.T) {
-	tables, err := os.ReadFile("../../src/Tables.tsx")
-	if err != nil {
-		t.Skip("no tables beside this build")
-	}
-	s := string(tables)
+	tables := source(t, "src/Tables.tsx")
+	s := tables
 	if !strings.Contains(s, "el.style.transform = to;") {
 		t.Error("the ball's resting place is not written on the element")
 	}
@@ -387,11 +345,8 @@ func TestTheBallsRestingPlaceDoesNotDependOnAnimation(t *testing.T) {
 	if !strings.Contains(s, "ballAngle(was.ball, pocket") {
 		t.Error("the ball no longer travels to the pocket the core spun")
 	}
-	css, err := os.ReadFile("../../src/style.css")
-	if err != nil {
-		t.Skip("no stylesheet")
-	}
-	sheet := string(css)
+	css := rawSource(t, "src/style.css")
+	sheet := css
 	for _, part := range []string{".wheel-bowl{", ".wheel-head{", ".wheel-cone{", ".chip{", ".cloth-cell{"} {
 		if !strings.Contains(sheet, part) {
 			t.Errorf("the table has no %s", part)
@@ -416,11 +371,8 @@ func TestTheBallsRestingPlaceDoesNotDependOnAnimation(t *testing.T) {
 // exactly what happened the first time a chip was laid in the flow of a line
 // rather than pinned to the corner of a cell.
 func TestTheChipsRingCannotEscapeTheChip(t *testing.T) {
-	css, err := os.ReadFile("../../src/style.css")
-	if err != nil {
-		t.Skip("no stylesheet beside this build")
-	}
-	sheet := string(css)
+	css := rawSource(t, "src/style.css")
+	sheet := css
 	chip := regexp.MustCompile(`\n\.chip\{[^}]*\}`).FindString(sheet)
 	if chip == "" {
 		t.Fatal("there is no chip")

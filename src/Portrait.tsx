@@ -13,12 +13,18 @@ import {portrait} from './art';
 // fallback for anybody the sheet cannot cover.
 
 const painted: {[id: string]: [number, number]} = {
-  mara: [0, 0], leo: [1, 0], vittorio: [2, 0],
-  elena: [0, 1], harlow: [1, 1], 'Alex Varga': [2, 1],
+  mara: [0, 0],
+  leo: [1, 0],
+  vittorio: [2, 0],
+  elena: [0, 1],
+  harlow: [1, 1],
+  'Alex Varga': [2, 1],
 };
 
 // The generated sheet: 6 across, 4 down.
-const CAST_COLS = 6, CAST_ROWS = 4, CAST = CAST_COLS * CAST_ROWS;
+const CAST_COLS = 6,
+  CAST_ROWS = 4,
+  CAST = CAST_COLS * CAST_ROWS;
 
 // The core says which face somebody wears, because the voice they speak in is
 // chosen from the same answer and only one side of the wall can be the author
@@ -26,7 +32,10 @@ const CAST_COLS = 6, CAST_ROWS = 4, CAST = CAST_COLS * CAST_ROWS;
 // arithmetic it uses, kept so a portrait never comes out blank.
 function faceFor(id: string) {
   let h = 2166136261;
-  for (const c of id) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619) }
+  for (const c of id) {
+    h ^= c.charCodeAt(0);
+    h = Math.imul(h, 16777619);
+  }
   return Math.abs(h) % CAST;
 }
 
@@ -41,8 +50,13 @@ export function Portrait({id, size, face}: {id: string; size?: 'small' | 'tiny';
   const cell = face ? undefined : painted[id];
   const cls = 'portrait' + (size ? ' portrait-' + size : '');
   if (cell) {
-    return <span aria-hidden="true" className={cls + ' painted-portrait'}
-      style={{backgroundPosition: `${cell[0] * 50}% ${cell[1] * 100}%`}}/>;
+    return (
+      <span
+        aria-hidden="true"
+        className={cls + ' painted-portrait'}
+        style={{backgroundPosition: `${cell[0] * 50}% ${cell[1] * 100}%`}}
+      />
+    );
   }
   const n = face ? (face - 1) % CAST : faceFor(id);
   // The drawn version is underneath and the generated face is laid over it.
@@ -54,12 +68,17 @@ export function Portrait({id, size, face}: {id: string; size?: 'small' | 'tiny';
   // was what everybody actually saw. Layering it this way means the drawing is
   // seen only when the sheet genuinely fails to load, which is what a fallback
   // is for.
-  return <span aria-hidden="true" className={cls + ' cast-portrait'}>
-    <span className="drawn-fallback" dangerouslySetInnerHTML={{__html: portrait(id)}}/>
-    <span className="cast-face" style={{
-      backgroundPosition: `${(n % CAST_COLS) * 100 / (CAST_COLS - 1)}% ${Math.floor(n / CAST_COLS) * 100 / (CAST_ROWS - 1)}%`,
-    }}/>
-  </span>;
+  return (
+    <span aria-hidden="true" className={cls + ' cast-portrait'}>
+      <span className="drawn-fallback" dangerouslySetInnerHTML={{__html: portrait(id)}} />
+      <span
+        className="cast-face"
+        style={{
+          backgroundPosition: `${((n % CAST_COLS) * 100) / (CAST_COLS - 1)}% ${(Math.floor(n / CAST_COLS) * 100) / (CAST_ROWS - 1)}%`,
+        }}
+      />
+    </span>
+  );
 }
 
 // Where somebody's face sits on the sheet, as a CSS background-position. The
@@ -70,5 +89,5 @@ export function pressFace(id?: string): string | null {
   const cell = painted[id];
   if (cell) return `${cell[0] * 50}% ${cell[1] * 100}%`;
   const n = faceFor(id);
-  return `${(n % CAST_COLS) * 100 / (CAST_COLS - 1)}% ${Math.floor(n / CAST_COLS) * 100 / (CAST_ROWS - 1)}%`;
+  return `${((n % CAST_COLS) * 100) / (CAST_COLS - 1)}% ${(Math.floor(n / CAST_COLS) * 100) / (CAST_ROWS - 1)}%`;
 }

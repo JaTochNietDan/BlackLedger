@@ -7340,3 +7340,58 @@ Two faults found on the way:
 
 Baseline: deaths 0/0/52/82/78/0/37, median cash
 12585/14129/7418/90/1063/5332/2080.
+
+## The view, laid out so it can be read
+
+"A big thing to focus on here is cleaning up that code to ensure that the files
+are split out on the frontend as that's probably why your context is taking so
+long to do stuff now."
+
+Measured before touching anything:
+
+| file | lines | characters | longest line |
+| --- | --- | --- | --- |
+| src/main.tsx | 176 | 35,570 | 6,165 |
+| src/types.ts | 14 | 8,204 | 5,394 |
+
+Twelve lines in the view's entry file were over four hundred characters. One
+`grep -n` match in either file cost one to two thousand tokens to read, which
+is why searching them was expensive — and the same lines are why they could not
+be reviewed by eye.
+
+| file | before | after |
+| --- | --- | --- |
+| src/main.tsx | 176 lines, longest 6,165 | 1,451 lines, longest 233 |
+| src/types.ts | 14 lines, longest 5,394 | 504 lines, longest 98 |
+| src/CityIso.tsx | longest 1,090 | 1,460 lines, longest 100 |
+
+Nothing over four hundred characters is left in `src/` except two SVG template
+literals in `art.ts`, which are one string each and are data rather than logic.
+
+**The proof that this changed nothing.** The whole bundle was built before and
+after and compared: identical once you ignore where the spaces sit and how JSX
+splits a run of text into children. Both of those render the same — a line break
+between text and an expression is a single space, and adjacent text children are
+concatenated — and the normalised output is the same 944,168 characters either
+way, byte for byte. That is a stronger check than reading the diff.
+
+`mise run gate` now runs `prettier --check` over `src/`, so it cannot drift
+back, and `mise run format` lays it out again after editing.
+
+### Six guards that were hostages to whitespace
+
+The Go suites read the view's own source and check the two sides still agree —
+that a screen is handed the work the core marks, that a figure in the top bar
+has a picture, that the room offers a way in. They matched byte for byte,
+spacing included, so formatting broke six of them at once while changing nothing
+the browser does.
+
+They match on structure now: `source(t, path)` reads a file with every run of
+whitespace collapsed to one space and `holds` collapses the needle the same way,
+so `a={b} c={d}` and `a={b}\n  c={d}` are the same thing to a guard. Three
+guards keep reading raw text on purpose and say so — the stylesheet counts rules
+at the start of a line, the hook guard is about where a call sits relative to a
+return, and one checks what a statement ends with. The face-sheet guard read
+`CAST_COLS = 6, CAST_ROWS = 8` as one phrase and now finds the two numbers
+separately: a guard on another language's source must not also be a guard on its
+layout.

@@ -16,8 +16,14 @@ const sprites = (cutouts as {id: string; file: string}[]).map(c => c.id);
 // is for settling a picture onto its ground, not for moving it somewhere else.
 const NUDGE = 2;
 
-export function MapEditor({layout, slot, onChange, onClose}: {
-  layout: Layout; slot: string;
+export function MapEditor({
+  layout,
+  slot,
+  onChange,
+  onClose,
+}: {
+  layout: Layout;
+  slot: string;
   // Takes an update rather than a value. Every edit here is a change to the
   // arrangement as it stands at the moment of the click, and a handler that
   // closes over the arrangement as it stood at the last render will quietly
@@ -39,7 +45,7 @@ export function MapEditor({layout, slot, onChange, onClose}: {
     if (!slot) return;
     onChange(prev => {
       const slots = {...prev.slots};
-      delete slots[slot];               // back to whatever the city would choose
+      delete slots[slot]; // back to whatever the city would choose
       return {...prev, slots};
     });
   };
@@ -50,8 +56,10 @@ export function MapEditor({layout, slot, onChange, onClose}: {
     if (!slot) return;
     const move = (e: KeyboardEvent) => {
       const by: Record<string, [number, number]> = {
-        ArrowLeft: [-NUDGE, 0], ArrowRight: [NUDGE, 0],
-        ArrowUp: [0, -NUDGE], ArrowDown: [0, NUDGE],
+        ArrowLeft: [-NUDGE, 0],
+        ArrowRight: [NUDGE, 0],
+        ArrowUp: [0, -NUDGE],
+        ArrowDown: [0, NUDGE],
       };
       const step = by[e.key];
       if (!step) return;
@@ -69,42 +77,64 @@ export function MapEditor({layout, slot, onChange, onClose}: {
     setTimeout(() => setSaving(''), 4000);
   };
 
-  return <aside className="map-editor">
-    <header>
-      <h4>Arranging the map</h4>
-      <button className="plain" onClick={onClose}>Done</button>
-    </header>
+  return (
+    <aside className="map-editor">
+      <header>
+        <h4>Arranging the map</h4>
+        <button className="plain" onClick={onClose}>
+          Done
+        </button>
+      </header>
 
-    {!slot && <p className="nothing-here">
-      Click the ground of any slot on the map. The blue diamonds are the plots
-      buildings stand on — the ground rather than the picture, because a
-      building overlaps its neighbours' ground and the sprite under the pointer
-      is often not the one you meant.
-    </p>}
+      {!slot && (
+        <p className="nothing-here">
+          Click the ground of any slot on the map. The blue diamonds are the plots buildings stand
+          on — the ground rather than the picture, because a building overlaps its neighbours'
+          ground and the sprite under the pointer is often not the one you meant.
+        </p>
+      )}
 
-    {slot && <>
-      <p className="editor-slot">Block <b>{slot.split(',').slice(0, 2).join(', ')}</b>, slot <b>{slot.split(',')[2]}</b></p>
+      {slot && (
+        <>
+          <p className="editor-slot">
+            Block <b>{slot.split(',').slice(0, 2).join(', ')}</b>, slot <b>{slot.split(',')[2]}</b>
+          </p>
 
-      <div className="editor-sprites">
-        <button className={'sprite' + (placed?.sprite === NOTHING ? ' picked' : '')}
-          onClick={() => put({sprite: NOTHING})}>Nothing here</button>
-        {sprites.map(id => <button key={id}
-          className={'sprite' + (placed?.sprite === id ? ' picked' : '')}
-          onClick={() => put({sprite: id})}>{id}</button>)}
-      </div>
+          <div className="editor-sprites">
+            <button
+              className={'sprite' + (placed?.sprite === NOTHING ? ' picked' : '')}
+              onClick={() => put({sprite: NOTHING})}
+            >
+              Nothing here
+            </button>
+            {sprites.map(id => (
+              <button
+                key={id}
+                className={'sprite' + (placed?.sprite === id ? ' picked' : '')}
+                onClick={() => put({sprite: id})}
+              >
+                {id}
+              </button>
+            ))}
+          </div>
 
-      <p className="editor-nudge">
-        Nudge with the arrow keys{placed && (placed.dx || placed.dy)
-          ? `: ${placed.dx || 0}, ${placed.dy || 0}` : ''}
-      </p>
-      <button className="plain" onClick={forget}>Let the city choose again</button>
-    </>}
+          <p className="editor-nudge">
+            Nudge with the arrow keys
+            {placed && (placed.dx || placed.dy) ? `: ${placed.dx || 0}, ${placed.dy || 0}` : ''}
+          </p>
+          <button className="plain" onClick={forget}>
+            Let the city choose again
+          </button>
+        </>
+      )}
 
-    <footer>
-      <button onClick={save}>Save the arrangement</button>
-      {saving && <small>{saving}</small>}
-      {layout.editable === false &&
-        <small>Read only. Start the game with BLACK_LEDGER_EDIT=1 to save.</small>}
-    </footer>
-  </aside>;
+      <footer>
+        <button onClick={save}>Save the arrangement</button>
+        {saving && <small>{saving}</small>}
+        {layout.editable === false && (
+          <small>Read only. Start the game with BLACK_LEDGER_EDIT=1 to save.</small>
+        )}
+      </footer>
+    </aside>
+  );
 }

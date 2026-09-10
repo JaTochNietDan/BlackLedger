@@ -13,7 +13,10 @@
  * stories in the latest issue that the player has not seen yet. The archive is
  * still there behind "All issues" — it is the prompt that has to be honest.
  */
-export interface Filed {id: string; day: number}
+export interface Filed {
+  id: string;
+  day: number;
+}
 
 export function unreadInLatest(paper: readonly Filed[], seen: string | null): number {
   if (paper.length === 0) return 0;

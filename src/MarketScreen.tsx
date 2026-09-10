@@ -29,49 +29,64 @@ export function MarketScreen({world}: {world: Snapshot}) {
   // What the stock in your hands is costing you every day it stays there.
   const attention = carrying.reduce((sum, g) => sum + (held[g.id] || 0) * g.heat, 0);
 
-  return <section className="section-content">
-    <div className="eyebrow">PRICES &amp; WHAT YOU ARE HOLDING</div>
-    <h1 className="screen-title">The underground market</h1>
-    <p className="subtle market-note">
-      Prices move whether or not anybody is watching them. Stock is only worth
-      what somebody will pay for it today, and every day it sits in your hands
-      it is drawing attention.
-    </p>
-
-    <div className="market-board">
-      {goods.map(g => {
-        const move = g.base ? Math.round((g.price - g.base) / g.base * 100) : 0;
-        const have = held[g.id] || 0;
-        return <article key={g.id} className={'market-good' + (have ? ' holding' : '')}>
-          <header>
-            <b>{g.name}</b>
-            <span className={move > 4 ? 'up' : move < -4 ? 'down' : ''}>
-              {money(g.price)}<small> / {g.unit}</small>
-            </span>
-          </header>
-          <p className="market-move">
-            {move === 0 ? 'About what it usually goes for'
-              : `${Math.abs(move)}% ${move > 0 ? 'above' : 'below'} the usual ${money(g.base)}`}
-          </p>
-          <p className="market-holding">
-            {have
-              ? <><b>{have}</b> in your hands · {money(have * g.price)} at today's price</>
-              : <span className="subtle">none held</span>}
-          </p>
-          <p className="market-where">{counter[g.id] || 'Traded quietly, where such things are traded.'}</p>
-        </article>;
-      })}
-    </div>
-
-    {carrying.length > 0 && <div className="market-risk">
-      <h2>What holding it costs</h2>
-      <p>
-        {carrying.map(g => `${held[g.id]} ${g.name.toLowerCase()}`).join(', ')} —
-        {' '}<b>{attention}</b> attention a day, every day, until it moves.
-        {' '}Stock found in a raid is stock lost, and the raid is likelier the longer it sits.
+  return (
+    <section className="section-content">
+      <div className="eyebrow">PRICES &amp; WHAT YOU ARE HOLDING</div>
+      <h1 className="screen-title">The underground market</h1>
+      <p className="subtle market-note">
+        Prices move whether or not anybody is watching them. Stock is only worth what somebody will
+        pay for it today, and every day it sits in your hands it is drawing attention.
       </p>
-    </div>}
 
-    {goods.length === 0 && <p className="nothing-here">Nothing is being traded that you know of.</p>}
-  </section>;
+      <div className="market-board">
+        {goods.map(g => {
+          const move = g.base ? Math.round(((g.price - g.base) / g.base) * 100) : 0;
+          const have = held[g.id] || 0;
+          return (
+            <article key={g.id} className={'market-good' + (have ? ' holding' : '')}>
+              <header>
+                <b>{g.name}</b>
+                <span className={move > 4 ? 'up' : move < -4 ? 'down' : ''}>
+                  {money(g.price)}
+                  <small> / {g.unit}</small>
+                </span>
+              </header>
+              <p className="market-move">
+                {move === 0
+                  ? 'About what it usually goes for'
+                  : `${Math.abs(move)}% ${move > 0 ? 'above' : 'below'} the usual ${money(g.base)}`}
+              </p>
+              <p className="market-holding">
+                {have ? (
+                  <>
+                    <b>{have}</b> in your hands · {money(have * g.price)} at today's price
+                  </>
+                ) : (
+                  <span className="subtle">none held</span>
+                )}
+              </p>
+              <p className="market-where">
+                {counter[g.id] || 'Traded quietly, where such things are traded.'}
+              </p>
+            </article>
+          );
+        })}
+      </div>
+
+      {carrying.length > 0 && (
+        <div className="market-risk">
+          <h2>What holding it costs</h2>
+          <p>
+            {carrying.map(g => `${held[g.id]} ${g.name.toLowerCase()}`).join(', ')} —{' '}
+            <b>{attention}</b> attention a day, every day, until it moves. Stock found in a raid is
+            stock lost, and the raid is likelier the longer it sits.
+          </p>
+        </div>
+      )}
+
+      {goods.length === 0 && (
+        <p className="nothing-here">Nothing is being traded that you know of.</p>
+      )}
+    </section>
+  );
 }

@@ -44,6 +44,8 @@ func TestNoHookIsWrittenBelowAnEarlyReturn(t *testing.T) {
 			t.Fatal(err)
 		}
 		returned, returnedAt := false, 0
+		// Line by line and unflattened: this one is about where a call sits
+		// relative to a return, which is a fact about lines.
 		for i, line := range strings.Split(string(body), "\n") {
 			switch {
 			case componentTop.MatchString(line):
@@ -133,14 +135,14 @@ func TestTheHookGuardKnowsWhichReturnsMatter(t *testing.T) {
 // silently wears the wrong picture. This is the cheapest check that the two
 // sides still agree.
 func TestEveryTopBarFigureHasAnIconOfItsOwn(t *testing.T) {
-	art, err := os.ReadFile("../../src/art.ts")
-	if err != nil {
-		t.Skip("no interface sources beside this build")
-	}
+	art := source(t, "src/art.ts")
 	w := core.New(4)
 	w.Confine(5, "a still in the back")
 	for _, s := range w.Dashboard() {
-		if !strings.Contains(string(art), s.ID+":'M") {
+		// Written `cash: 'M3 6h18…'` since the view was formatted, and `cash:'M…'`
+		// before it. Flattening does not close a gap, so ask for the spelling
+		// the file actually uses.
+		if !holds(art, s.ID+": 'M") {
 			t.Errorf("the top bar shows %q and nothing draws it, so it wears the city skyline", s.ID)
 		}
 	}
@@ -152,10 +154,7 @@ func TestEveryTopBarFigureHasAnIconOfItsOwn(t *testing.T) {
 // player reading them together is reading a contradiction. Only one figure in
 // this game answers "of what it could", and it is the one the core computes.
 func TestOnlyOneFigureClaimsToBeWhatAPlaceCouldEarn(t *testing.T) {
-	body, err := os.ReadFile("../../src/main.tsx")
-	if err != nil {
-		t.Skip("no interface sources beside this build")
-	}
+	body := source(t, "src/main.tsx")
 	if n := strings.Count(string(body), "of what it could"); n != 0 {
 		t.Errorf("the property panel claims %d times to say what a place could earn; that sentence belongs to the core's own note", n)
 	}
@@ -167,11 +166,8 @@ func TestOnlyOneFigureClaimsToBeWhatAPlaceCouldEarn(t *testing.T) {
 // reads "5 days" was checked in a browser, because a regular expression cannot
 // tell you what a player sees.
 func TestTheResultBandCanCountInDays(t *testing.T) {
-	body, err := os.ReadFile("../../src/Outcome.tsx")
-	if err != nil {
-		t.Skip("no interface sources beside this build")
-	}
-	if !strings.Contains(string(body), "1440") {
+	body := source(t, "src/Outcome.tsx")
+	if !holds(body, "1440") {
 		t.Error("the result band has no idea what a day is, so a five-day sentence reads in hours")
 	}
 }

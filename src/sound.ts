@@ -24,11 +24,19 @@ function audio(): AudioContext | null {
 }
 
 export function soundOn(): boolean {
-  try { return localStorage.getItem('black-ledger-sound') !== 'off' } catch { return true }
+  try {
+    return localStorage.getItem('black-ledger-sound') !== 'off';
+  } catch {
+    return true;
+  }
 }
 
 export function setSound(on: boolean) {
-  try { localStorage.setItem('black-ledger-sound', on ? 'on' : 'off') } catch { /* a private window */ }
+  try {
+    localStorage.setItem('black-ledger-sound', on ? 'on' : 'off');
+  } catch {
+    /* a private window */
+  }
 }
 
 // noise is the raw material for anything that is not a tone: a shot, a blast,
@@ -44,16 +52,19 @@ function noise(ctx: AudioContext, seconds: number): AudioBufferSourceNode {
 }
 
 // One shot: a crack with almost no attack and a short tail.
-function shot(ctx: AudioContext, at: number, level = .5) {
-  const source = noise(ctx, .3);
+function shot(ctx: AudioContext, at: number, level = 0.5) {
+  const source = noise(ctx, 0.3);
   const band = ctx.createBiquadFilter();
-  band.type = 'bandpass'; band.frequency.value = 1800; band.Q.value = .7;
+  band.type = 'bandpass';
+  band.frequency.value = 1800;
+  band.Q.value = 0.7;
   const gain = ctx.createGain();
   gain.gain.setValueAtTime(0, at);
-  gain.gain.linearRampToValueAtTime(level, at + .004);
-  gain.gain.exponentialRampToValueAtTime(.0001, at + .22);
+  gain.gain.linearRampToValueAtTime(level, at + 0.004);
+  gain.gain.exponentialRampToValueAtTime(0.0001, at + 0.22);
   source.connect(band).connect(gain).connect(ctx.destination);
-  source.start(at); source.stop(at + .32);
+  source.start(at);
+  source.stop(at + 0.32);
 }
 
 // A blast: low, long, and with a body you feel rather than hear.
@@ -65,37 +76,40 @@ function blast(ctx: AudioContext, at: number) {
   low.frequency.exponentialRampToValueAtTime(90, at + 1.1);
   const gain = ctx.createGain();
   gain.gain.setValueAtTime(0, at);
-  gain.gain.linearRampToValueAtTime(.7, at + .02);
-  gain.gain.exponentialRampToValueAtTime(.0001, at + 1.5);
+  gain.gain.linearRampToValueAtTime(0.7, at + 0.02);
+  gain.gain.exponentialRampToValueAtTime(0.0001, at + 1.5);
   source.connect(low).connect(gain).connect(ctx.destination);
-  source.start(at); source.stop(at + 1.6);
+  source.start(at);
+  source.stop(at + 1.6);
 
   // The thump under it.
   const body = ctx.createOscillator();
   body.type = 'sine';
   body.frequency.setValueAtTime(78, at);
-  body.frequency.exponentialRampToValueAtTime(26, at + .8);
+  body.frequency.exponentialRampToValueAtTime(26, at + 0.8);
   const thump = ctx.createGain();
-  thump.gain.setValueAtTime(.6, at);
-  thump.gain.exponentialRampToValueAtTime(.0001, at + .9);
+  thump.gain.setValueAtTime(0.6, at);
+  thump.gain.exponentialRampToValueAtTime(0.0001, at + 0.9);
   body.connect(thump).connect(ctx.destination);
-  body.start(at); body.stop(at + 1);
+  body.start(at);
+  body.stop(at + 1);
 }
 
 // Two tones, alternating: a car at the kerb with its lamp turning.
 function siren(ctx: AudioContext, at: number, times = 4) {
   for (let i = 0; i < times; i++) {
-    const when = at + i * .42;
+    const when = at + i * 0.42;
     const tone = ctx.createOscillator();
     tone.type = 'square';
     tone.frequency.setValueAtTime(i % 2 ? 460 : 610, when);
     const gain = ctx.createGain();
     gain.gain.setValueAtTime(0, when);
-    gain.gain.linearRampToValueAtTime(.09, when + .05);
-    gain.gain.setValueAtTime(.09, when + .3);
-    gain.gain.exponentialRampToValueAtTime(.0001, when + .4);
+    gain.gain.linearRampToValueAtTime(0.09, when + 0.05);
+    gain.gain.setValueAtTime(0.09, when + 0.3);
+    gain.gain.exponentialRampToValueAtTime(0.0001, when + 0.4);
     tone.connect(gain).connect(ctx.destination);
-    tone.start(when); tone.stop(when + .42);
+    tone.start(when);
+    tone.stop(when + 0.42);
   }
 }
 
@@ -104,12 +118,13 @@ function knock(ctx: AudioContext, at: number) {
   const tone = ctx.createOscillator();
   tone.type = 'triangle';
   tone.frequency.setValueAtTime(220, at);
-  tone.frequency.exponentialRampToValueAtTime(90, at + .18);
+  tone.frequency.exponentialRampToValueAtTime(90, at + 0.18);
   const gain = ctx.createGain();
-  gain.gain.setValueAtTime(.22, at);
-  gain.gain.exponentialRampToValueAtTime(.0001, at + .3);
+  gain.gain.setValueAtTime(0.22, at);
+  gain.gain.exponentialRampToValueAtTime(0.0001, at + 0.3);
   tone.connect(gain).connect(ctx.destination);
-  tone.start(at); tone.stop(at + .32);
+  tone.start(at);
+  tone.stop(at + 0.32);
 }
 
 // What each kind of moment sounds like. The kinds are the core's own, from
@@ -120,16 +135,18 @@ export function playMoment(kind: string) {
   const ctx = audio();
   if (!ctx) return;
   if (ctx.state === 'suspended') ctx.resume().catch(() => {});
-  const at = ctx.currentTime + .02;
+  const at = ctx.currentTime + 0.02;
   switch (kind) {
     case 'explosion':
       blast(ctx, at);
       break;
     case 'killing':
-      shot(ctx, at, .55); shot(ctx, at + .17, .4);
+      shot(ctx, at, 0.55);
+      shot(ctx, at + 0.17, 0.4);
       break;
     case 'gunfight':
-      for (let i = 0; i < 5; i++) shot(ctx, at + i * .13 + Math.random() * .04, .3 + Math.random() * .2);
+      for (let i = 0; i < 5; i++)
+        shot(ctx, at + i * 0.13 + Math.random() * 0.04, 0.3 + Math.random() * 0.2);
       break;
     case 'raid':
     case 'arrest':
@@ -148,26 +165,30 @@ export function playMoment(kind: string) {
 // stopping is a wooden knock, and a payout is a run of coins into a metal tray.
 
 // clunk is a mechanism doing something: the handle going over, a drum stopping.
-function clunk(ctx: AudioContext, at: number, pitch: number, level = .3) {
+function clunk(ctx: AudioContext, at: number, pitch: number, level = 0.3) {
   const tone = ctx.createOscillator();
   tone.type = 'triangle';
   tone.frequency.setValueAtTime(pitch, at);
-  tone.frequency.exponentialRampToValueAtTime(pitch * .45, at + .09);
+  tone.frequency.exponentialRampToValueAtTime(pitch * 0.45, at + 0.09);
   const body = ctx.createGain();
   body.gain.setValueAtTime(level, at);
-  body.gain.exponentialRampToValueAtTime(.0001, at + .13);
+  body.gain.exponentialRampToValueAtTime(0.0001, at + 0.13);
   tone.connect(body).connect(ctx.destination);
-  tone.start(at); tone.stop(at + .15);
+  tone.start(at);
+  tone.stop(at + 0.15);
 
   // The rattle of the thing it is attached to.
-  const rattle = noise(ctx, .08);
+  const rattle = noise(ctx, 0.08);
   const band = ctx.createBiquadFilter();
-  band.type = 'bandpass'; band.frequency.value = pitch * 4; band.Q.value = 2;
+  band.type = 'bandpass';
+  band.frequency.value = pitch * 4;
+  band.Q.value = 2;
   const edge = ctx.createGain();
-  edge.gain.setValueAtTime(level * .5, at);
-  edge.gain.exponentialRampToValueAtTime(.0001, at + .07);
+  edge.gain.setValueAtTime(level * 0.5, at);
+  edge.gain.exponentialRampToValueAtTime(0.0001, at + 0.07);
   rattle.connect(band).connect(edge).connect(ctx.destination);
-  rattle.start(at); rattle.stop(at + .09);
+  rattle.start(at);
+  rattle.stop(at + 0.09);
 }
 
 // coin is one piece of metal landing on other metal.
@@ -177,10 +198,11 @@ function coin(ctx: AudioContext, at: number) {
   tone.frequency.setValueAtTime(1800 + Math.random() * 900, at);
   const gain = ctx.createGain();
   gain.gain.setValueAtTime(0, at);
-  gain.gain.linearRampToValueAtTime(.06, at + .003);
-  gain.gain.exponentialRampToValueAtTime(.0001, at + .12);
+  gain.gain.linearRampToValueAtTime(0.06, at + 0.003);
+  gain.gain.exponentialRampToValueAtTime(0.0001, at + 0.12);
   tone.connect(gain).connect(ctx.destination);
-  tone.start(at); tone.stop(at + .14);
+  tone.start(at);
+  tone.stop(at + 0.14);
 }
 
 // What each thing at the tables sounds like. Called by the interface at the
@@ -190,27 +212,29 @@ export function playTable(kind: string, count = 1) {
   const ctx = audio();
   if (!ctx) return;
   if (ctx.state === 'suspended') ctx.resume().catch(() => {});
-  const at = ctx.currentTime + .02;
+  const at = ctx.currentTime + 0.02;
   switch (kind) {
     case 'handle':
-      clunk(ctx, at, 150, .35);
-      clunk(ctx, at + .11, 110, .2);
+      clunk(ctx, at, 150, 0.35);
+      clunk(ctx, at + 0.11, 110, 0.2);
       break;
     case 'reel':
-      clunk(ctx, at, 320, .22);
+      clunk(ctx, at, 320, 0.22);
       break;
     case 'coins':
       // Longer for a bigger win: the tray is how a machine tells the room.
-      for (let i = 0; i < Math.max(4, Math.min(26, count)); i++) coin(ctx, at + i * .045 + Math.random() * .015);
+      for (let i = 0; i < Math.max(4, Math.min(26, count)); i++)
+        coin(ctx, at + i * 0.045 + Math.random() * 0.015);
       break;
     case 'card':
-      clunk(ctx, at, 620, .12);
+      clunk(ctx, at, 620, 0.12);
       break;
     case 'dice':
-      for (let i = 0; i < 5; i++) clunk(ctx, at + i * .06 + Math.random() * .02, 420 + Math.random() * 200, .1);
+      for (let i = 0; i < 5; i++)
+        clunk(ctx, at + i * 0.06 + Math.random() * 0.02, 420 + Math.random() * 200, 0.1);
       break;
     default:
-      clunk(ctx, at, 240, .18);
+      clunk(ctx, at, 240, 0.18);
   }
 }
 
@@ -226,8 +250,16 @@ export function roomTone(on: boolean) {
     if (room) {
       const {gain, nodes} = room;
       room = null;
-      gain.gain.setTargetAtTime(0, ctx.currentTime, .25);
-      setTimeout(() => { nodes.forEach(n => { try { n.stop() } catch { /* already stopped */ } }); }, 900);
+      gain.gain.setTargetAtTime(0, ctx.currentTime, 0.25);
+      setTimeout(() => {
+        nodes.forEach(n => {
+          try {
+            n.stop();
+          } catch {
+            /* already stopped */
+          }
+        });
+      }, 900);
     }
     return;
   }
@@ -235,14 +267,16 @@ export function roomTone(on: boolean) {
   if (ctx.state === 'suspended') ctx.resume().catch(() => {});
   const gain = ctx.createGain();
   gain.gain.setValueAtTime(0, ctx.currentTime);
-  gain.gain.setTargetAtTime(.035, ctx.currentTime, .8);
+  gain.gain.setTargetAtTime(0.035, ctx.currentTime, 0.8);
   gain.connect(ctx.destination);
 
   // A room full of people is low broadband noise with the top taken off it.
   const hum = noise(ctx, 4);
   hum.loop = true;
   const soft = ctx.createBiquadFilter();
-  soft.type = 'lowpass'; soft.frequency.value = 620; soft.Q.value = .4;
+  soft.type = 'lowpass';
+  soft.frequency.value = 620;
+  soft.Q.value = 0.4;
   hum.connect(soft).connect(gain);
   hum.start();
 

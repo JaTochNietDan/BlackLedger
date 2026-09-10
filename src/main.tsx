@@ -1,13 +1,13 @@
 import type {VisualCue} from './types';
 import {paintedCar} from './cityAssets';
 import {SumAction} from './SumAction';
-import {useCallback,useEffect,useRef,useState} from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
 import {createRoot} from 'react-dom/client';
 import {CityStreet} from './CityStreet';
 import {CityIso} from './CityIso';
 import {VoicePlayer, speaking, speakerOf} from './voice';
 import {unreadInLatest} from './paper';
-import {paintedAsset,paintedFront,paintedMask} from './cityAssets';
+import {paintedAsset, paintedFront, paintedMask} from './cityAssets';
 import {type Journey} from './TravelPresentation';
 import {icon, pressPlate} from './art';
 import {ActionList} from './ActionList';
@@ -22,7 +22,9 @@ import {BackRoom} from './Tables';
 
 // The verbs of a hand in the back room. Drawn on the table itself, so the room's
 // ordinary list must not offer "Throw the hand in" between hiring and restocking.
-function isBackRoomAction(id:string){return id==='change'||id==='bet'||id==='call'||id==='fold'}
+function isBackRoomAction(id: string) {
+  return id === 'change' || id === 'bet' || id === 'call' || id === 'fold';
+}
 import {Outcome} from './Outcome';
 import {PeopleScreen} from './PeopleScreen';
 import {LedgerScreen} from './LedgerScreen';
@@ -30,147 +32,1420 @@ import {FamiliesScreen} from './FamiliesScreen';
 import {Theatre} from './Theatre';
 import {setSound, soundOn} from './sound';
 import {Herald} from './Herald';
-import type {Snapshot,Command,Action,Place} from './types';
+import type {Snapshot, Command, Action, Place} from './types';
 import './style.css';
-const money=(n:number)=>'$'+Math.floor(n).toLocaleString();const time=(m:number)=>`Day ${Math.floor(m/1440)+1} · ${String(Math.floor(m%1440/60)).padStart(2,'0')}:${String(m%60).padStart(2,'0')}`;
-function Icon({id}:{id:string}){return <span aria-hidden="true" dangerouslySetInnerHTML={{__html:icon(id)}}/>}
-class RequestError extends Error{constructor(message:string,public status:number){super(message)}}
-async function api<T>(path:string,payload?:unknown):Promise<T>{const r=await fetch('/api/'+path,payload!==undefined?{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}:{});const data=await r.json();if(!r.ok)throw new RequestError(data.error||'Request failed',r.status);return data}
+const money = (n: number) => '$' + Math.floor(n).toLocaleString();
+const time = (m: number) =>
+  `Day ${Math.floor(m / 1440) + 1} · ${String(Math.floor((m % 1440) / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
+function Icon({id}: {id: string}) {
+  return <span aria-hidden="true" dangerouslySetInnerHTML={{__html: icon(id)}} />;
+}
+class RequestError extends Error {
+  constructor(
+    message: string,
+    public status: number,
+  ) {
+    super(message);
+  }
+}
+async function api<T>(path: string, payload?: unknown): Promise<T> {
+  const r = await fetch(
+    '/api/' + path,
+    payload !== undefined
+      ? {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload),
+        }
+      : {},
+  );
+  const data = await r.json();
+  if (!r.ok) throw new RequestError(data.error || 'Request failed', r.status);
+  return data;
+}
 // Which city the player last chose to look at. Boot used to force the card
 // view on every load, so the isometric city could be picked and then quietly
 // taken away again by the next refresh.
-function remembered():'street'|'iso'{try{return localStorage.getItem('black-ledger-view')==='street'?'street':'iso'}catch{return 'iso'}}
-function App(){
- const [world,setWorld]=useState<Snapshot|null>(null),[tab,setTab]=useState('city'),[selected,setSelected]=useState('bar'),[busy,setBusy]=useState(false),[notice,setNotice]=useState(''),[voice,setVoice]=useState(localStorage.getItem('black-ledger-voice')==='yes'),[speech,setSpeech]=useState('Read aloud'),[error,setError]=useState('');
- const [cityView,setCityView]=useState<'street'|'interior'|'iso'>(remembered);
- // Whether the player is sitting at a table. A game takes the whole screen and
- // holds it until they get up: playing one out of the corner of a sidebar, with
- // the building's staff and supplies beside it, is being shown a game rather
- // than playing one.
- // Whether the player is at the tables is the world's fact, not this file's.
- // It used to be local state, which meant the takeover could open on a table
- // still showing the last hand, the last spin and where the drums stopped —
- // all of it saved state — and that reads as a game that started without you.
- // Sitting down and getting up are commands now, and the core clears the felt.
- const atTable=!!world&&world.seated===world.player.location;
- // The arrangement of the map, and whether it is being arranged. Loaded once:
- // it is a file in the repository, not part of the world, so it does not
- // change under the player the way the city does.
- const [layout,setLayout]=useState<Layout>(EMPTY);
- const [arranging,setArranging]=useState(false);
- const [slot,setSlot]=useState('');
- useEffect(()=>{loadLayout().then(setLayout)},[]);
- const [sound,setSoundOn]=useState(soundOn);
- const [motion,setMotion]=useState(()=>{try{return localStorage.getItem('black-ledger-motion')!=='off'}catch{return true}});
- const [newsSeen,setNewsSeen]=useState<string>(()=>{try{return localStorage.getItem('black-ledger-news-seen')||''}catch{return ''}});
- const [journey,setJourney]=useState<Journey|null>(null);
- // The moment the city thought was worth taking the player to.
- const [playing,setPlaying]=useState<VisualCue|null>(null);
- // How far through the moment the camera is holding on. Driven by the theatre,
- // read by the street, which lights the building while it happens.
- const [beat,setBeat]=useState(0);
- const scene=useRef<HTMLElement|null>(null),latest=useRef(world),busyRef=useRef(false);latest.current=world;
- const voicePlayer=useRef<VoicePlayer|null>(null);
- if(!voicePlayer.current)voicePlayer.current=new VoicePlayer({
-  load:async(event,signal)=>{const r=await fetch('/api/speech',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({event}),signal});if(!r.ok)throw Error('Voice unavailable');return r.blob()},
-  audio:blob=>{const url=URL.createObjectURL(blob),player=new Audio(url);let disposed=false;return {play:()=>player.play(),pause:()=>player.pause(),dispose:()=>{if(!disposed){disposed=true;URL.revokeObjectURL(url);player.onended=null}},onEnded:fn=>{player.onended=fn}}},
-  status:setSpeech,unavailable:()=>setNotice('Voice is unavailable. You can continue reading.')
- });
- const stopVoice=useCallback(()=>voicePlayer.current!.stop(),[]);
- // Every hook must run on every render, including the one where the world is
- // still null. Sitting below the early return below made the hook count change
- // between the first render and the second, which is React error #310 and a
- // blank page on every boot.
- useEffect(()=>{if(tab!=='news')return;const latest=world?.newspaper?.[0]?.id;if(latest&&latest!==newsSeen){try{localStorage.setItem('black-ledger-news-seen',latest)}catch{}setNewsSeen(latest)}},[tab,world?.newspaper?.[0]?.id,newsSeen]);
- const speak=useCallback(async()=>{const id=latest.current?.event?.id;if(id)await voicePlayer.current!.speak(id)},[]);
- useEffect(()=>{let canceled=false;async function boot(){try{const pending=localStorage.getItem('black-ledger-pending');if(pending){try{await api('action',JSON.parse(pending));localStorage.removeItem('black-ledger-pending')}catch(err){if(err instanceof RequestError&&[400,409].includes(err.status))localStorage.removeItem('black-ledger-pending');else throw err}}const w=await api<Snapshot>('state');if(!canceled){setWorld(w);const destination=w.player.location==='room'&&w.player.job_count===0?'bar':w.player.location;setSelected(destination);setCityView(remembered())}}catch(err){setError((err as Error).message)}}boot();return()=>{canceled=true;stopVoice()}},[stopVoice]);
- useEffect(()=>{if(!journey)return;const timer=setTimeout(()=>setJourney(null),2400);return()=>clearTimeout(timer)},[journey,cityView]);
- useEffect(()=>{if(!notice)return;const id=setTimeout(()=>setNotice(''),6000);return()=>clearTimeout(id)},[notice]);
- useEffect(()=>{if(world&&!world.player.alive)scene.current?.focus()},[world?.player.alive]);
- useEffect(()=>{stopVoice();if(world?.event){scene.current?.focus();if(voice)speak()}},[world?.event?.id,stopVoice,speak]);
- useEffect(()=>{if(!voice||world?.event||world?.director.status!=='ready')return;const abort=new AbortController();fetch('/api/speech/prepare',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}',signal:abort.signal}).catch(()=>{});return()=>abort.abort()},[voice,world?.event?.id,world?.director.status]);
- useEffect(()=>{const id=setInterval(async()=>{if(busyRef.current||latest.current?.director.status!=='writing')return;try{const next=await api<Snapshot>('state');setWorld(w=>w&&w.revision===next.revision?{...w,director:next.director}:w)}catch{}},3000);return()=>clearInterval(id)},[]);
- async function prepare(){try{await api('director',{});setWorld(await api<Snapshot>('state'))}catch(err){setNotice((err as Error).message)}}
- async function commit(command:Command){if(!world||busyRef.current||journey)return;stopVoice();busyRef.current=true;setBusy(true);try{const pending=localStorage.getItem('black-ledger-pending');if(pending){await api('action',JSON.parse(pending));localStorage.removeItem('black-ledger-pending');setWorld(await api<Snapshot>('state'));setNotice('Recovered your previous action. Please choose your next action again.');return}
- const payload={...command,request_id:crypto.randomUUID(),revision:world.revision};localStorage.setItem('black-ledger-pending',JSON.stringify(payload));const next=await api<Snapshot>('action',payload);localStorage.removeItem('black-ledger-pending');setWorld(next);const cues=next.last_result?.cues||[];const worst=cues.length?[...cues].sort((a,b)=>(b.gravity||0)-(a.gravity||0))[0]:undefined;if(worst&&!next.event&&motionRef.current){setBeat(0);setPlaying(worst);setTab('city');setSelected(worst.target)}if(command.kind==='travel'&&!worst&&!next.event&&next.player.alive&&motionRef.current&&!matchMedia('(prefers-reduced-motion: reduce)').matches){const from=world.locations.find(l=>l.id===world.player.location),to=next.locations.find(l=>l.id===next.player.location);if(from&&to&&from.id!==to.id)setJourney({from,to,minutes:next.last_result?.elapsed||0})}if(command.kind==='new_life')setSelected('bar');/* The result has a panel of its own now; a toast repeating its headline is
+function remembered(): 'street' | 'iso' {
+  try {
+    return localStorage.getItem('black-ledger-view') === 'street' ? 'street' : 'iso';
+  } catch {
+    return 'iso';
+  }
+}
+function App() {
+  const [world, setWorld] = useState<Snapshot | null>(null),
+    [tab, setTab] = useState('city'),
+    [selected, setSelected] = useState('bar'),
+    [busy, setBusy] = useState(false),
+    [notice, setNotice] = useState(''),
+    [voice, setVoice] = useState(localStorage.getItem('black-ledger-voice') === 'yes'),
+    [speech, setSpeech] = useState('Read aloud'),
+    [error, setError] = useState('');
+  const [cityView, setCityView] = useState<'street' | 'interior' | 'iso'>(remembered);
+  // Whether the player is sitting at a table. A game takes the whole screen and
+  // holds it until they get up: playing one out of the corner of a sidebar, with
+  // the building's staff and supplies beside it, is being shown a game rather
+  // than playing one.
+  // Whether the player is at the tables is the world's fact, not this file's.
+  // It used to be local state, which meant the takeover could open on a table
+  // still showing the last hand, the last spin and where the drums stopped —
+  // all of it saved state — and that reads as a game that started without you.
+  // Sitting down and getting up are commands now, and the core clears the felt.
+  const atTable = !!world && world.seated === world.player.location;
+  // The arrangement of the map, and whether it is being arranged. Loaded once:
+  // it is a file in the repository, not part of the world, so it does not
+  // change under the player the way the city does.
+  const [layout, setLayout] = useState<Layout>(EMPTY);
+  const [arranging, setArranging] = useState(false);
+  const [slot, setSlot] = useState('');
+  useEffect(() => {
+    loadLayout().then(setLayout);
+  }, []);
+  const [sound, setSoundOn] = useState(soundOn);
+  const [motion, setMotion] = useState(() => {
+    try {
+      return localStorage.getItem('black-ledger-motion') !== 'off';
+    } catch {
+      return true;
+    }
+  });
+  const [newsSeen, setNewsSeen] = useState<string>(() => {
+    try {
+      return localStorage.getItem('black-ledger-news-seen') || '';
+    } catch {
+      return '';
+    }
+  });
+  const [journey, setJourney] = useState<Journey | null>(null);
+  // The moment the city thought was worth taking the player to.
+  const [playing, setPlaying] = useState<VisualCue | null>(null);
+  // How far through the moment the camera is holding on. Driven by the theatre,
+  // read by the street, which lights the building while it happens.
+  const [beat, setBeat] = useState(0);
+  const scene = useRef<HTMLElement | null>(null),
+    latest = useRef(world),
+    busyRef = useRef(false);
+  latest.current = world;
+  const voicePlayer = useRef<VoicePlayer | null>(null);
+  if (!voicePlayer.current)
+    voicePlayer.current = new VoicePlayer({
+      load: async (event, signal) => {
+        const r = await fetch('/api/speech', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({event}),
+          signal,
+        });
+        if (!r.ok) throw Error('Voice unavailable');
+        return r.blob();
+      },
+      audio: blob => {
+        const url = URL.createObjectURL(blob),
+          player = new Audio(url);
+        let disposed = false;
+        return {
+          play: () => player.play(),
+          pause: () => player.pause(),
+          dispose: () => {
+            if (!disposed) {
+              disposed = true;
+              URL.revokeObjectURL(url);
+              player.onended = null;
+            }
+          },
+          onEnded: fn => {
+            player.onended = fn;
+          },
+        };
+      },
+      status: setSpeech,
+      unavailable: () => setNotice('Voice is unavailable. You can continue reading.'),
+    });
+  const stopVoice = useCallback(() => voicePlayer.current!.stop(), []);
+  // Every hook must run on every render, including the one where the world is
+  // still null. Sitting below the early return below made the hook count change
+  // between the first render and the second, which is React error #310 and a
+  // blank page on every boot.
+  useEffect(() => {
+    if (tab !== 'news') return;
+    const latest = world?.newspaper?.[0]?.id;
+    if (latest && latest !== newsSeen) {
+      try {
+        localStorage.setItem('black-ledger-news-seen', latest);
+      } catch {}
+      setNewsSeen(latest);
+    }
+  }, [tab, world?.newspaper?.[0]?.id, newsSeen]);
+  const speak = useCallback(async () => {
+    const id = latest.current?.event?.id;
+    if (id) await voicePlayer.current!.speak(id);
+  }, []);
+  useEffect(() => {
+    let canceled = false;
+    async function boot() {
+      try {
+        const pending = localStorage.getItem('black-ledger-pending');
+        if (pending) {
+          try {
+            await api('action', JSON.parse(pending));
+            localStorage.removeItem('black-ledger-pending');
+          } catch (err) {
+            if (err instanceof RequestError && [400, 409].includes(err.status))
+              localStorage.removeItem('black-ledger-pending');
+            else throw err;
+          }
+        }
+        const w = await api<Snapshot>('state');
+        if (!canceled) {
+          setWorld(w);
+          const destination =
+            w.player.location === 'room' && w.player.job_count === 0 ? 'bar' : w.player.location;
+          setSelected(destination);
+          setCityView(remembered());
+        }
+      } catch (err) {
+        setError((err as Error).message);
+      }
+    }
+    boot();
+    return () => {
+      canceled = true;
+      stopVoice();
+    };
+  }, [stopVoice]);
+  useEffect(() => {
+    if (!journey) return;
+    const timer = setTimeout(() => setJourney(null), 2400);
+    return () => clearTimeout(timer);
+  }, [journey, cityView]);
+  useEffect(() => {
+    if (!notice) return;
+    const id = setTimeout(() => setNotice(''), 6000);
+    return () => clearTimeout(id);
+  }, [notice]);
+  useEffect(() => {
+    if (world && !world.player.alive) scene.current?.focus();
+  }, [world?.player.alive]);
+  useEffect(() => {
+    stopVoice();
+    if (world?.event) {
+      scene.current?.focus();
+      if (voice) speak();
+    }
+  }, [world?.event?.id, stopVoice, speak]);
+  useEffect(() => {
+    if (!voice || world?.event || world?.director.status !== 'ready') return;
+    const abort = new AbortController();
+    fetch('/api/speech/prepare', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: '{}',
+      signal: abort.signal,
+    }).catch(() => {});
+    return () => abort.abort();
+  }, [voice, world?.event?.id, world?.director.status]);
+  useEffect(() => {
+    const id = setInterval(async () => {
+      if (busyRef.current || latest.current?.director.status !== 'writing') return;
+      try {
+        const next = await api<Snapshot>('state');
+        setWorld(w => (w && w.revision === next.revision ? {...w, director: next.director} : w));
+      } catch {}
+    }, 3000);
+    return () => clearInterval(id);
+  }, []);
+  async function prepare() {
+    try {
+      await api('director', {});
+      setWorld(await api<Snapshot>('state'));
+    } catch (err) {
+      setNotice((err as Error).message);
+    }
+  }
+  async function commit(command: Command) {
+    if (!world || busyRef.current || journey) return;
+    stopVoice();
+    busyRef.current = true;
+    setBusy(true);
+    try {
+      const pending = localStorage.getItem('black-ledger-pending');
+      if (pending) {
+        await api('action', JSON.parse(pending));
+        localStorage.removeItem('black-ledger-pending');
+        setWorld(await api<Snapshot>('state'));
+        setNotice('Recovered your previous action. Please choose your next action again.');
+        return;
+      }
+      const payload = {...command, request_id: crypto.randomUUID(), revision: world.revision};
+      localStorage.setItem('black-ledger-pending', JSON.stringify(payload));
+      const next = await api<Snapshot>('action', payload);
+      localStorage.removeItem('black-ledger-pending');
+      setWorld(next);
+      const cues = next.last_result?.cues || [];
+      const worst = cues.length
+        ? [...cues].sort((a, b) => (b.gravity || 0) - (a.gravity || 0))[0]
+        : undefined;
+      if (worst && !next.event && motionRef.current) {
+        setBeat(0);
+        setPlaying(worst);
+        setTab('city');
+        setSelected(worst.target);
+      }
+      if (
+        command.kind === 'travel' &&
+        !worst &&
+        !next.event &&
+        next.player.alive &&
+        motionRef.current &&
+        !matchMedia('(prefers-reduced-motion: reduce)').matches
+      ) {
+        const from = world.locations.find(l => l.id === world.player.location),
+          to = next.locations.find(l => l.id === next.player.location);
+        if (from && to && from.id !== to.id)
+          setJourney({from, to, minutes: next.last_result?.elapsed || 0});
+      }
+      if (command.kind === 'new_life')
+        setSelected(
+          'bar',
+        ); /* The result has a panel of its own now; a toast repeating its headline is
    the same news twice. Toasts are for what the panel cannot say: errors, and
    a recovered action. */
-if(next.player.job_count>=2&&!['writing','ready'].includes(next.director.status)&&next.minute-next.director.last_request>180){await api('director',{});setWorld(await api<Snapshot>('state'))}
- }catch(err){if(err instanceof RequestError&&[400,409].includes(err.status))localStorage.removeItem('black-ledger-pending');setNotice((err as Error).message);try{setWorld(await api<Snapshot>('state'))}catch{}}finally{busyRef.current=false;setBusy(false)}}
- // A hand already on the table is a game in progress, so the table opens
- // itself. It is also what makes leaving the only way out: the core keeps the
- // hand, so walking away from the screen would only hide it.
- const motionRef=useRef(motion);motionRef.current=motion;
- function toggleMotion(){const on=!motion;setMotion(on);try{localStorage.setItem('black-ledger-motion',on?'on':'off')}catch{}if(!on){setPlaying(null);setJourney(null)}}
- function toggleSound(){const on=!sound;setSoundOn(on);setSound(on)}
- function toggleVoice(){const enabled=!voice;setVoice(enabled);localStorage.setItem('black-ledger-voice',enabled?'yes':'no');if(enabled)speak();else stopVoice()}
- if(!world)return <div className="loading">BLACK LEDGER<span>{error||'Opening the books…'}</span>{error&&<button onClick={()=>location.reload()}>Reconnect</button>}</div>;
- const p=world.player,locationInfo=world.locations.find(l=>l.id===selected)||world.locations[0],event=world.event,npc=speakerOf(world.npcs,event?.speaker);
- function actionButton(a:Action){if(a.sum)return <SumAction key={a.id} a={a} money={money} disabled={busy||!!journey} commit={commit}/>;
-  // What you are buying, drawn. Three cars were three lines of text that
-  // looked identical on the way past.
-  const car=a.tier?paintedCar(a.tier):null;
-  if(car)return <button key={a.id} className="action car-card" title={[a.detail,a.disabled?a.reason:''].filter(Boolean).join(' — ')} disabled={a.disabled||busy||!!journey} onClick={()=>commit({kind:a.id,target:a.target})}><img src={car} alt="" loading="lazy"/><strong>{a.label}</strong><span className="meta">{a.minutes?`${a.minutes} min`:''}{a.cost>0?<span>{money(a.cost)}</span>:a.asks?<span>{money(a.asks)}</span>:null}</span><span className="desc">{a.reason||a.detail}</span></button>;
-  return <button key={a.id} className={`action ${a.id==='provoke'?'danger':a.id==='travel'?'primary':''}`} title={[a.detail,a.disabled?a.reason:''].filter(Boolean).join(' — ')} disabled={a.disabled||busy||!!journey} onClick={()=>commit({kind:a.id,target:a.target})}><strong>{a.label}{a.id==='travel'?' ↗':''}</strong><span className="meta">{a.minutes?`${a.minutes} min`:a.away?`${Math.round(a.away/1440)} days away`:''}{a.cost>0?<span>{money(a.cost)}</span>:a.asks?<span>{money(a.asks)}</span>:null}</span><span className="desc">{a.reason||a.detail}</span></button>}
- function propertyPanel(l:Place){return <aside className="sidebar"><div className="person"><Portrait id={p.name} face={p.face}/><div><b>{p.name}</b><small>{p.respect<6?'An unknown face':p.crew.length?'Crew leader':'Neighborhood operator'} · Life {world!.life}</small>{world!.hand?.playing&&<small className="warning">At the tables in {world!.hand.place}: showing {world!.hand.player}, dealer shows {world!.hand.dealer}, {money(world!.hand.stake??0)} down</small>}{world!.armoury?.held&&<small className="warning">{world!.armoury.crates} of {world!.armoury.capacity} crates under {world!.armoury.place} · {world!.armoury.attention} attention a day · {world!.armoury.buyers} families buying</small>}{world!.service?.serving&&<small className="subtle">{world!.service.title} of {world!.service.name} · ${world!.service.pay}/day · {world!.service.next?`${world!.service.next} more jobs to come up`:'as high as they go'}</small>}{!!world!.pacts?.length&&<small className="subtle">Standing with {world!.pacts.map(p=>p.name+(p.strength?` (${p.power})`:'')).join(' · ')} · ${world!.pacts.reduce((n,p)=>n+p.tribute,0)}/day</small>}{!!world!.retainers?.length&&<small className="subtle">Paying {world!.retainers.map(r=>r.name+(r.outbid?' (outbid)':'')).join(' · ')} · ${world!.retainers.reduce((n,r)=>n+r.retainer,0)}/day</small>}{!!world!.arms?.charges&&<small className="warning">Carrying {world!.arms.charges} charge{world!.arms.charges>1?'s':''} · {world!.arms.charges*4} attention a day</small>}{!!world!.residence?.comforts?.length&&<small className="subtle">Home: {world!.residence!.comforts.map(c=>c.label).join(' · ')} · ${world!.residence!.upkeep}/day{world!.residence!.sheltered>0?` · ${money(world!.residence!.sheltered)} out of reach`:''}</small>}{world!.vehicle&&world!.vehicle.car!=='On foot and by streetcar'&&<small className="subtle">{world!.vehicle.car} · {world!.vehicle.condition}%{world!.vehicle.tank?` · petrol ${world!.vehicle.fuel} of ${world!.vehicle.tank}`:''}{world!.vehicle.running?` · $${world!.vehicle.upkeep}/day${world!.vehicle.concealed?` · hides ${world!.vehicle.concealed} units`:''}${world!.vehicle.plate?` · plated ${world!.vehicle.plate} of ${world!.vehicle.plate_max}`:''}`:' · will not start'}</small>}{world!.appearance&&<small className="subtle">{world!.appearance.attire}{world!.appearance.standing>0?` · ${world!.appearance.condition}% kept · +${world!.appearance.standing} presence`:world!.appearance.condition<100?` · ${world!.appearance.condition}% kept · worth nothing until it is put right`:''}</small>}<div className="bar"><i style={{width:`${p.health}%`}}/></div></div></div><div className="eyebrow">{l.locked?'BEYOND YOUR REACH':l.id===p.location?'YOU ARE HERE':'NEIGHBORHOOD DIRECTORY'} / {['Old Harbor','Ashbury','The Heights'][l.district]}</div><h2>{l.name}</h2><p className="subtle">{l.blurb}</p>{l.id===p.location&&l.room&&<p className="room-note"><Icon id="crew"/>{l.room}</p>}<div className={'building-art'+(paintedFront(l.id)?' street-front':'')}>{paintedAsset(l.id)?<img src={paintedAsset(l.id,l.condition)!} alt="" style={paintedMask(l.id)?{maskImage:`url(${paintedMask(l.id)})`,WebkitMaskImage:`url(${paintedMask(l.id)})`,maskSize:'contain',WebkitMaskSize:'contain',maskPosition:'center',WebkitMaskPosition:'center',maskRepeat:'no-repeat',WebkitMaskRepeat:'no-repeat'}:undefined}/>:<div className="property-art-pending"><svg viewBox="0 0 80 64" aria-hidden="true"><path d="M12 56V22L40 8l28 14v34H12Zm18 0V38h20v18M22 27h7m22 0h7M22 34h7m22 0h7M8 57h64" fill="none" stroke="currentColor" strokeWidth="2"/></svg><span>{l.name}</span></div>}</div><div className="fact-grid"><div><span>Ownership</span><b>{l.holder||(l.owned?'Your organization':'Independent')}</b></div>{l.owned&&l.income>0&&typeof l.trading==='number'&&<div><span>Working at</span><b className={l.trading<0.8?'warning':''}>{Math.round(l.trading*100)}%</b><small>{l.hands?.length?l.hands.map(h=>h.name+(h.here?'':' (out)')).join(' · '):l.staff!==undefined?`${l.staff} on the books`:''}{l.supply!==undefined?` · ${l.supply} supplies`:''}{l.trouble?' · trouble':''}{l.still?' · still running':''}</small></div>}<div><span>{l.owned&&l.income>0?'Hourly income':'Condition'}</span><b>{l.owned&&l.income>0?money(l.income*l.condition/100):l.condition+'%'}</b></div>{l.owned&&l.trade&&<div><span>Trade</span><b className={l.trade.custom<40?'warning':''}>{l.trade.custom}%</b><small>{l.trade.order?`standing order · ${money(l.trade.order_pays)}/day`:`regulars are worth ${Math.round(l.trade.multiplier*100)}% of ordinary takings`}</small></div>}{l.owned&&l.type==='casino'&&<div><span>Behind the tables</span><b className={(l.bankroll??0)<500?'warning':''}>{money(l.bankroll??0)}</b><small>{(l.bankroll??0)===0?'The tables are dark':`covers about ${money(l.handle??0)} of action a night`}</small></div>}{l.owned&&l.income>0&&<div><span>Condition</span><b className={l.condition<70?'warning':''}>{l.condition}%{l.condition<100?' · Repairs available':''}</b></div>}</div>{(()=>{const seat=l.actions.find(a=>a.id==='sit');return l.id===p.location&&seat&&<button className="action primary sit-down-here" disabled={seat.disabled||busy||!!journey} title={seat.disabled?seat.reason:undefined} onClick={()=>commit({kind:'sit',target:l.id})}><span><strong>{seat.label}</strong><span className="desc">{seat.disabled?seat.reason:seat.detail}</span></span></button>})()}{l.id===p.location?<div className="here-instead"><button className="action primary" onClick={()=>{setSelected(p.location);setCityView('interior')}}><strong>Step inside {l.name} ↗</strong><span className="desc">{l.actions.filter(a=>!isTableAction(a.id)&&!a.anywhere&&!a.disabled).length} things you can do in here, and {(l.people||[]).length} {((l.people||[]).length===1)?'person':'people'} standing in it.</span></button><p className="subtle">The room is where the work is. This column is for reading the city from where you are.</p></div>:<ActionList actions={l.actions} people={l.people||[]} render={actionButton} groups={world!.groups} here={false}/>}<div className="bottom-note"><Icon id="clock"/> Decisions pause the clock. Commitments advance it.</div></aside>}
- // The work that belongs to the player rather than to the room they are in. The
- // core marks it; this is where it is filed, which is beside the people and the
- // families it is actually about.
- const anywhere=(world?.locations.find(l=>l.id===world.player.location)?.actions||[]).filter(a=>a.anywhere);
- const unreadNews=unreadInLatest(world?.newspaper||[],newsSeen);
- // The banner announces the biggest unread story, not the newest one. Once the
- // city page started filing the weather every morning, "newest" meant the
- // banner would announce cloud cover over a man being shot the same afternoon.
- const headline=(()=>{const paper=world?.newspaper||[];const fresh=paper.slice(0,Math.max(unreadNews,1));return fresh.reduce((best,s)=>(s.weight||0)>(best.weight||0)?s:best,fresh[0])})();
- function content(){const w=world!;if(tab==='city'){const inside=cityView==='interior'&&locationInfo.id===p.location;return <div className={'workspace'+(inside?' inside':'')}><section className="city-pane"><header className="city-header"><div className="map-heading"><div className="eyebrow">THE CITY OF</div><h1>Bellwether</h1><p>A place to make your name. Or lose it.</p><div className="chapter-chip">{p.respect<6?'I · A FOOT IN THE DOOR':p.crew.length?'II · SOMETHING OF YOUR OWN':'I · MAKING CONNECTIONS'}</div></div><div className="city-view-switch"><button aria-pressed={cityView==='iso'} onClick={()=>{setCityView('iso');try{localStorage.setItem('black-ledger-view','iso')}catch{}}}>The city</button><button aria-pressed={cityView==='street'} onClick={()=>{setCityView('street');try{localStorage.setItem('black-ledger-view','street')}catch{}}}>The addresses</button>{layout.editable&&cityView==='iso'&&<button aria-pressed={arranging} onClick={()=>{setArranging(v=>!v);setSlot('')}}>{arranging?'Stop arranging':'Arrange the map'}</button>}<button className="enter" aria-pressed={cityView==='interior'} onClick={()=>{setSelected(p.location);setCityView('interior')}}>Step inside {w.locations.find(l=>l.id===p.location)?.name}</button></div><div className="map-key">{!w.known_threats?.length&&w.opportunity&&<button className="next-opportunity" title={w.opportunity.detail} onClick={()=>{setSelected(w.opportunity!.target);setCityView('street')}}><small>AN OPPORTUNITY</small>{w.opportunity.title} ↗</button>}</div></header>{unreadNews>0&&!!w.newspaper?.length&&<section className="headline-notice" role="status" aria-label="Latest news"><small>THE BELLWETHER HERALD · DAY {headline.day}</small><strong>{headline.headline}</strong><p>{headline.body}</p><button className="plain" onClick={()=>setTab('news')}>Read today's paper ({unreadNews}) ↗</button></section>}{!!w.grudges?.length&&<section className="known-threats" aria-label="What people are saying"><strong>Bad blood</strong>{w.grudges.map((g,i)=><p key={i}>{g.holder} has not forgiven {g.against} for {g.because}.</p>)}</section>}{!!w.commissions?.length&&<section className="known-threats" aria-label="Work you have taken on"><strong>What you owe people</strong>{w.commissions.map(c=><p key={c.id}><b>{c.giver} · {c.patron}</b> — {c.brief} <i>{c.met?'Ready to settle.':c.progress}</i> {money(c.pay)} · {Math.round(c.minutes_left/60)}h left</p>)}</section>}{!!w.known_threats?.length&&<section className="known-threats" aria-label="Known threats"><strong>Word on the street</strong>{w.known_threats.map((threat,i)=><p key={i}>{threat}</p>)}<button className="plain" onClick={()=>setTab('families')}>Consider negotiations ↗</button></section>}<div className="city-stage">{playing&&<Theatre cue={playing} place={w.locations.find(l=>l.id===playing.target)||w.locations[0]} onProgress={setBeat} plate={cityView!=='iso'} onDone={()=>setPlaying(null)}/>}{cityView==='interior'&&locationInfo.id===p.location?<Interior place={locationInfo} people={locationInfo.people||[]} actions={locationInfo.actions.filter(a=>!isTableAction(a.id)&&!a.anywhere&&!(w.cards&&isBackRoomAction(a.id)))} backroom={w.cards?<BackRoom cards={w.cards} money={money} cash={p.cash} act={c=>commit({target:p.location,...c})}/>:undefined} onTables={locationInfo.actions.some(a=>a.id==='sit'&&!a.disabled)?()=>commit({kind:'sit',target:locationInfo.id}):undefined} felt={locationInfo.actions.some(a=>a.id==='play'||a.id==='wheel')} groups={w.groups} comings={w.last_result?.comings} minute={w.minute} render={actionButton} onLeave={()=>setCityView('street')}/>:cityView==='iso'?<CityIso state={w} selected={selected} onSelect={setSelected} spotlight={playing?{id:playing.target,kind:playing.kind,t:beat}:null} onEnter={()=>{setSelected(p.location);setCityView('interior')}} layout={layout} editing={arranging} slot={slot} onSlot={setSlot}/>:<CityStreet state={w} selected={selected} onSelect={setSelected} spotlight={playing?{id:playing.target,kind:playing.kind,t:beat}:null} onEnter={()=>{setSelected(p.location);setCityView('interior')}}/>}{arranging&&cityView==='iso'&&<MapEditor layout={layout} slot={slot} onChange={setLayout} onClose={()=>{setArranging(false);setSlot('')}}/>}{journey&&(()=>{const cross=w.locations.find(l=>l.id===journey.to.id)?.crossing;return <div className={'street-journey'+(cross?.warned?' warned':'')} role="status"><div><strong>Crossing to {journey.to.name}</strong><span>{journey.minutes} minutes {cross?.driving?`driving${cross.plate?` · ${cross.plate} of ${cross.plate_max} plated`:' · no plate'}`:'on foot'}</span>{cross?.note&&<small>{cross.note}</small>}</div><button onClick={()=>setJourney(null)}>Skip journey →</button></div>})()}</div>{!playing&&!w.event&&w.last_result?.cues?.length&&<button className="replay-scene" onClick={()=>{const cues=w.last_result?.cues||[];const cue=[...cues].sort((a,b)=>(b.gravity||0)-(a.gravity||0))[0];if(cue){setCityView(v=>v==='interior'?remembered():v);setSelected(cue.target);setBeat(0);setPlaying(cue)}}}>Replay recorded scene ↻</button>}</section>{cityView==='interior'&&locationInfo.id===p.location?null:propertyPanel(locationInfo)}</div>}
- if(tab==='market')return <MarketScreen world={w}/>;
- if(tab==='ledger')return <LedgerScreen world={w} render={actionButton} actions={anywhere.filter(a=>a.id==='bribe'||a.id==='lie_low')}/>;
- if(tab==='crew')return <PeopleScreen world={w} actions={anywhere} render={actionButton} at={p.location} here={(w.locations.find(l=>l.id===p.location)?.actions||[]).filter(a=>!!a.subject)} onFind={id=>{setSelected(id);setTab('city');setCityView('street')}}/>;
- if(tab==='families')return <FamiliesScreen world={w} actions={anywhere} render={actionButton} onMeet={id=>{const seat=id==='bellandi'?'club':'garage';setSelected(seat);setTab('city');setCityView('street')}}/>;
- if(tab==='news')return <section className="section-content">{!!w.arrangements?.length&&<><div className="eyebrow">PAID FOR, NOT YET DONE</div><h1 className="screen-title">Your arrangements</h1>{w.arrangements.map((a,i)=><article className="card" key={i} style={{marginBottom:14}}><h2 style={{margin:'0 0 6px'}}>{a.target}</h2><p>{a.hired} · {money(a.paid)} paid. {a.status}</p></article>)}</>}<div className="eyebrow">THE BELLWETHER HERALD</div><h1 className="screen-title">What the city is reading</h1><p className="subtle">The paper prints what can be seen. It does not know who arranged anything, and reading it costs no time.</p><Herald world={w}/></section>;
-  if(tab==='settings')return <section className="section-content"><div className="eyebrow">HOW THIS PLAYS</div><h1 className="screen-title">Settings</h1><div className="settings"><div className="setting"><div><h3>Scenes</h3><p>When something happens that the city would remember — a killing, an arrest, a fire — the game takes you there and holds for a moment before the headline. Turn this off and the result is reported in words only.</p></div><button className={'toggle'+(motion?' on':'')} role="switch" aria-checked={motion} onClick={toggleMotion}><i/>{motion?'Shown':'Off'}</button></div><div className="setting"><div><h3>Sound</h3><p>An explosion, a shot, a police lamp turning over at the kerb. Short noises made by the browser rather than recordings, played once when a moment starts.</p></div><button className={'toggle'+(sound?' on':'')} role="switch" aria-checked={sound} onClick={toggleSound}><i/>{sound?'On':'Off'}</button></div><div className="setting"><div><h3>Voices</h3><p>Named characters keep the same voice for as long as they live. Deciding anything cuts them off, including a line still being spoken.</p></div><button className={'toggle'+(voice?' on':'')} role="switch" aria-checked={voice} onClick={toggleVoice}><i/>{voice?'On':'Off'}</button></div><div className="setting"><div><h3>The storyteller</h3><p>{w.director.detail}</p><p className="subtle">A model writes the encounters. It cannot touch money, time, injuries, property or death — the simulation owns all of those, and the game is playable with the model switched off.</p></div><button className="plain" onClick={prepare} disabled={w.director.status==='writing'}>{w.director.status==='writing'?'Writing…':'Prepare an encounter'}</button></div><div className="setting face-setting"><div><h3>Your face</h3><p>Nobody in Bellwether is gendered by the rules — the city says "they" about everybody — so a portrait is dealt out by a hash of your name, and it can hand you somebody you do not recognise as yourself. Pick your own. It is saved with the life.</p><div className="face-choices">{Array.from({length:CAST_FACES},(_,i)=>i+1).map(n=><button key={n} className={'face-choice'+(p.face===n?' chosen':'')} aria-pressed={p.face===n} aria-label={'Face '+n} onClick={()=>commit({kind:'face',choice:String(n)})}><Portrait id={p.name} face={n} size="small"/></button>)}</div></div><button className="plain" disabled={!p.face} onClick={()=>commit({kind:'face',choice:'0'})}>Let the city decide</button></div><div className="setting"><div><h3>This life</h3><p>Life {w.life} · {time(w.minute)} · saved after every action. There is one save and no way back: whatever happens to {p.name} has happened.</p></div><span className="setting-note">Ironman</span></div></div></section>;
- return <section className="section-content help">
-  <div className="eyebrow">WHERE YOU STAND</div>
-  <h1 className="screen-title">What you can do, and what you cannot yet</h1>
-  <p className="subtle">
-   This page is not written down anywhere. It asks the game the same question the buttons ask,
-   so it cannot tell you something the rules do not.
-  </p>
-  <ol className="guide-steps">
-   {(w.guide||[]).map(s=><li key={s.title} className={s.done?'done':s.open?'open':'shut'}>
-    <div className="guide-mark" aria-hidden="true">{s.done?'✓':s.open?'›':'·'}</div>
-    <div>
-     <b>{s.title}</b>
-     <p>{s.what}</p>
-     {s.done?<small className="subtle">Done.</small>
-      :s.open?<small className="ready">You can do this now.</small>
-      :<small className="warning">{s.reason}</small>}
-    </div>
-   </li>)}
-  </ol>
-  <h2>Rules that do not change</h2>
-  <ul className="guide-rules">{(w.rules||[]).map((r,i)=><li key={i}>{r}</li>)}</ul>
- </section>;
- }
- return <><div className={'shell '+(busy?'busy':'')} inert={!!event||!p.alive||atTable}><nav className="rail" aria-label="Main navigation"><div className="monogram"><span>B</span></div>{[['city','City'],['crew','People'],['families','Families'],['market','Market'],['ledger','Ledger'],['news','Herald'],['help','Guide']].map(([id,label])=><button key={id} className={(tab===id?'active':'')+(id==='news'&&unreadNews>0?' has-news':'')} aria-label={id==='news'&&unreadNews>0?`${label}, ${unreadNews} unread`:label} onClick={()=>setTab(id)}><Icon id={id}/>{label}{id==='news'&&unreadNews>0?<i className="news-count">{unreadNews}</i>:null}</button>)}<button className="bottom" onClick={toggleVoice} aria-label={(voice?'Disable':'Enable')+' voice acting'}><Icon id={voice?'voice':'mute'}/>Voice {voice?'on':'off'}</button><button onClick={()=>setTab('settings')} aria-label="Settings"><Icon id="settings"/>Settings</button></nav><main className="page"><header className="topbar"><div><div className="eyebrow">A CITY REMEMBERS</div><div className="brand">BLACK LEDGER</div></div><div className="stats">{(world.dashboard||[]).map(s=><div className={'stat'+(s.warn?' warning':'')} key={s.id} title={s.meaning}><Icon id={s.id}/><b>{s.value}</b><small>{s.label}{s.note?<i>{s.note}</i>:null}</small></div>)}<div className="stat clock"><b>{time(world.minute)}</b><small>{busy?'Resolving…':'Clock paused · awaiting your action'}</small></div></div></header><Outcome world={world} onLedger={()=>setTab('ledger')}/>{content()}</main></div>
- {atTable&&!event&&p.alive&&<Casino place={world.locations.find(l=>l.id===p.location)?.name||'the tables'} actions={(world.locations.find(l=>l.id===p.location)?.actions||[]).filter(a=>isTableAction(a.id))} people={world.locations.find(l=>l.id===p.location)?.people||[]} hand={world.hand??{playing:false}} wheel={world.wheel??{spun:false}} dice={world.dice??{playing:false,settled:false}} machine={world.machine??{pulled:false,stops:20,edge:0,two_cherries:0,one_cherry:0,strip:[]}} house={world.house??{games:false}} cash={p.cash} money={money} revision={world.revision} records={world.last_result?.records||[]} act={c=>commit({target:p.location,...c})} onLeave={()=>commit({kind:'rise',target:p.location})}/>}{(event||!p.alive)&&<div className="modal-shade"><section ref={scene} tabIndex={-1} className={'scene'+(event&&event.choices.length>3?' extended':'')} role="dialog" aria-modal="true" aria-labelledby="scene-title" onKeyDown={e=>{if(e.key==='Escape')stopVoice();if(e.key==='Tab'){const buttons=[...scene.current!.querySelectorAll<HTMLButtonElement>('button:not(:disabled)')];if(!buttons.length)return;const first=buttons[0],last=buttons.at(-1)!;if(e.shiftKey&&(document.activeElement===first||document.activeElement===scene.current)){last.focus();e.preventDefault()}else if(!e.shiftKey&&document.activeElement===last){first.focus();e.preventDefault()}}}}>
- {!p.alive?<>{(()=>{const e=world.epitaph;return <>
-   <div className="eyebrow">THE CITY CONTINUES</div>
-   <div className="death-seal">✦</div>
-   <h2 id="scene-title">{p.name} is dead.</h2>
-   <p className="spoken">{e?.cause||world.dead.at(-1)?.cause}</p>
-   <div className="life-recap" aria-label="This life in numbers">
-    <div><small>Lived to</small><b>Day {e?.day??Math.floor(world.minute/1440)+1}</b></div>
-    <div><small>Final respect</small><b>{e?.respect??p.respect}</b></div>
-    <div><small>Money earned</small><b>{money(e?.earned??p.earned??0)}</b></div>
-   </div>
-   {e&&<p className="legacy-line"><small>WHAT BECAME OF IT</small>{e.became}</p>}
-   {!!e?.standing?.length&&<p className="legacy-properties">Still standing in their name: {e.standing.join(' · ')}</p>}
-   {!!e?.headlines?.length&&<div className="legacy-press"><small>WHAT THE PAPER CARRIED</small>{e.headlines.map((h:string,n:number)=><b key={n}>{h}</b>)}</div>}
-   {e&&<p className="legacy-line"><small>WHAT THE NEXT ONE GETS</small>{e.inherits}</p>}
-   <button className="action primary" disabled={busy} onClick={()=>commit({kind:'new_life'})}>Begin as a new person <Icon id="arrow"/></button>
-   <p className="source">Life {world.life} · {time(world.minute)} · Outcome committed</p>
-  </>})()}</>:event&&<><div className="eyebrow"><span>{event.kind==='attack'?'A MOMENT TO ACT':'A PRIVATE CONVERSATION'}</span><span>TIME PAUSED</span></div><h2 id="scene-title">{event.title}</h2>{npc&&<div className="person"><Portrait id={npc.id}/><div><b>{npc.name}</b><small>{npc.role}</small></div></div>}{event.connection&&<aside className="story-connection" aria-label="Previous arrangement"><small>COMPLETED WORK WITH THIS CONTACT</small><b>{event.connection.title}</b><p>{event.connection.result}</p></aside>}<p className="spoken">{event.body}</p><div className="speech-control"><button className="plain" onClick={speak}><Icon id="voice"/> {speech}</button>{speaking(speech)&&<button className="plain" onClick={stopVoice}>Stop voice</button>}</div>{event.conditions?<p className="scene-conditions"><small>WHATEVER YOU CHOOSE</small>{event.conditions}</p>:null}<div className="choices">{event.choices.map((c,i)=><button key={c.id} data-choice className="action" disabled={c.disabled||busy} onClick={()=>commit({kind:'choice',choice:c.id,event:event.id})}><span className="number">{String(i+1).padStart(2,'0')}</span><span><strong>{c.label}</strong>{(c.pay||c.minutes)?<span className="terms">{c.pay?<b>{money(c.pay)}</b>:null}{c.minutes?<b>{c.minutes} min</b>:null}{c.respect?<b>+{c.respect} respect</b>:null}{c.heat?<b className="cost">+{c.heat} attention</b>:null}</span>:null}{c.detail?<span className="desc">{c.detail}</span>:null}{c.disabled&&c.reason?<span className="desc refused">{c.reason}</span>:null}</span></button>)}</div><p className="source">{event.source==='local-ai'?'Local AI encounter':'City encounter'} · Decisions are saved immediately.</p></>}
- </section></div>}{notice&&<div id="toast" role="status" aria-live="polite" style={{display:'block'}}>{notice}</div>}</>
+      if (
+        next.player.job_count >= 2 &&
+        !['writing', 'ready'].includes(next.director.status) &&
+        next.minute - next.director.last_request > 180
+      ) {
+        await api('director', {});
+        setWorld(await api<Snapshot>('state'));
+      }
+    } catch (err) {
+      if (err instanceof RequestError && [400, 409].includes(err.status))
+        localStorage.removeItem('black-ledger-pending');
+      setNotice((err as Error).message);
+      try {
+        setWorld(await api<Snapshot>('state'));
+      } catch {}
+    } finally {
+      busyRef.current = false;
+      setBusy(false);
+    }
+  }
+  // A hand already on the table is a game in progress, so the table opens
+  // itself. It is also what makes leaving the only way out: the core keeps the
+  // hand, so walking away from the screen would only hide it.
+  const motionRef = useRef(motion);
+  motionRef.current = motion;
+  function toggleMotion() {
+    const on = !motion;
+    setMotion(on);
+    try {
+      localStorage.setItem('black-ledger-motion', on ? 'on' : 'off');
+    } catch {}
+    if (!on) {
+      setPlaying(null);
+      setJourney(null);
+    }
+  }
+  function toggleSound() {
+    const on = !sound;
+    setSoundOn(on);
+    setSound(on);
+  }
+  function toggleVoice() {
+    const enabled = !voice;
+    setVoice(enabled);
+    localStorage.setItem('black-ledger-voice', enabled ? 'yes' : 'no');
+    if (enabled) speak();
+    else stopVoice();
+  }
+  if (!world)
+    return (
+      <div className="loading">
+        BLACK LEDGER<span>{error || 'Opening the books…'}</span>
+        {error && <button onClick={() => location.reload()}>Reconnect</button>}
+      </div>
+    );
+  const p = world.player,
+    locationInfo = world.locations.find(l => l.id === selected) || world.locations[0],
+    event = world.event,
+    npc = speakerOf(world.npcs, event?.speaker);
+  function actionButton(a: Action) {
+    if (a.sum)
+      return (
+        <SumAction key={a.id} a={a} money={money} disabled={busy || !!journey} commit={commit} />
+      );
+    // What you are buying, drawn. Three cars were three lines of text that
+    // looked identical on the way past.
+    const car = a.tier ? paintedCar(a.tier) : null;
+    if (car)
+      return (
+        <button
+          key={a.id}
+          className="action car-card"
+          title={[a.detail, a.disabled ? a.reason : ''].filter(Boolean).join(' — ')}
+          disabled={a.disabled || busy || !!journey}
+          onClick={() => commit({kind: a.id, target: a.target})}
+        >
+          <img src={car} alt="" loading="lazy" />
+          <strong>{a.label}</strong>
+          <span className="meta">
+            {a.minutes ? `${a.minutes} min` : ''}
+            {a.cost > 0 ? (
+              <span>{money(a.cost)}</span>
+            ) : a.asks ? (
+              <span>{money(a.asks)}</span>
+            ) : null}
+          </span>
+          <span className="desc">{a.reason || a.detail}</span>
+        </button>
+      );
+    return (
+      <button
+        key={a.id}
+        className={`action ${a.id === 'provoke' ? 'danger' : a.id === 'travel' ? 'primary' : ''}`}
+        title={[a.detail, a.disabled ? a.reason : ''].filter(Boolean).join(' — ')}
+        disabled={a.disabled || busy || !!journey}
+        onClick={() => commit({kind: a.id, target: a.target})}
+      >
+        <strong>
+          {a.label}
+          {a.id === 'travel' ? ' ↗' : ''}
+        </strong>
+        <span className="meta">
+          {a.minutes ? `${a.minutes} min` : a.away ? `${Math.round(a.away / 1440)} days away` : ''}
+          {a.cost > 0 ? <span>{money(a.cost)}</span> : a.asks ? <span>{money(a.asks)}</span> : null}
+        </span>
+        <span className="desc">{a.reason || a.detail}</span>
+      </button>
+    );
+  }
+  function propertyPanel(l: Place) {
+    return (
+      <aside className="sidebar">
+        <div className="person">
+          <Portrait id={p.name} face={p.face} />
+          <div>
+            <b>{p.name}</b>
+            <small>
+              {p.respect < 6
+                ? 'An unknown face'
+                : p.crew.length
+                  ? 'Crew leader'
+                  : 'Neighborhood operator'}{' '}
+              · Life {world!.life}
+            </small>
+            {world!.hand?.playing && (
+              <small className="warning">
+                At the tables in {world!.hand.place}: showing {world!.hand.player}, dealer shows{' '}
+                {world!.hand.dealer}, {money(world!.hand.stake ?? 0)} down
+              </small>
+            )}
+            {world!.armoury?.held && (
+              <small className="warning">
+                {world!.armoury.crates} of {world!.armoury.capacity} crates under{' '}
+                {world!.armoury.place} · {world!.armoury.attention} attention a day ·{' '}
+                {world!.armoury.buyers} families buying
+              </small>
+            )}
+            {world!.service?.serving && (
+              <small className="subtle">
+                {world!.service.title} of {world!.service.name} · ${world!.service.pay}/day ·{' '}
+                {world!.service.next
+                  ? `${world!.service.next} more jobs to come up`
+                  : 'as high as they go'}
+              </small>
+            )}
+            {!!world!.pacts?.length && (
+              <small className="subtle">
+                Standing with{' '}
+                {world!.pacts.map(p => p.name + (p.strength ? ` (${p.power})` : '')).join(' · ')} ·
+                ${world!.pacts.reduce((n, p) => n + p.tribute, 0)}/day
+              </small>
+            )}
+            {!!world!.retainers?.length && (
+              <small className="subtle">
+                Paying{' '}
+                {world!.retainers.map(r => r.name + (r.outbid ? ' (outbid)' : '')).join(' · ')} · $
+                {world!.retainers.reduce((n, r) => n + r.retainer, 0)}/day
+              </small>
+            )}
+            {!!world!.arms?.charges && (
+              <small className="warning">
+                Carrying {world!.arms.charges} charge{world!.arms.charges > 1 ? 's' : ''} ·{' '}
+                {world!.arms.charges * 4} attention a day
+              </small>
+            )}
+            {!!world!.residence?.comforts?.length && (
+              <small className="subtle">
+                Home: {world!.residence!.comforts.map(c => c.label).join(' · ')} · $
+                {world!.residence!.upkeep}/day
+                {world!.residence!.sheltered > 0
+                  ? ` · ${money(world!.residence!.sheltered)} out of reach`
+                  : ''}
+              </small>
+            )}
+            {world!.vehicle && world!.vehicle.car !== 'On foot and by streetcar' && (
+              <small className="subtle">
+                {world!.vehicle.car} · {world!.vehicle.condition}%
+                {world!.vehicle.tank
+                  ? ` · petrol ${world!.vehicle.fuel} of ${world!.vehicle.tank}`
+                  : ''}
+                {world!.vehicle.running
+                  ? ` · $${world!.vehicle.upkeep}/day${world!.vehicle.concealed ? ` · hides ${world!.vehicle.concealed} units` : ''}${world!.vehicle.plate ? ` · plated ${world!.vehicle.plate} of ${world!.vehicle.plate_max}` : ''}`
+                  : ' · will not start'}
+              </small>
+            )}
+            {world!.appearance && (
+              <small className="subtle">
+                {world!.appearance.attire}
+                {world!.appearance.standing > 0
+                  ? ` · ${world!.appearance.condition}% kept · +${world!.appearance.standing} presence`
+                  : world!.appearance.condition < 100
+                    ? ` · ${world!.appearance.condition}% kept · worth nothing until it is put right`
+                    : ''}
+              </small>
+            )}
+            <div className="bar">
+              <i style={{width: `${p.health}%`}} />
+            </div>
+          </div>
+        </div>
+        <div className="eyebrow">
+          {l.locked
+            ? 'BEYOND YOUR REACH'
+            : l.id === p.location
+              ? 'YOU ARE HERE'
+              : 'NEIGHBORHOOD DIRECTORY'}{' '}
+          / {['Old Harbor', 'Ashbury', 'The Heights'][l.district]}
+        </div>
+        <h2>{l.name}</h2>
+        <p className="subtle">{l.blurb}</p>
+        {l.id === p.location && l.room && (
+          <p className="room-note">
+            <Icon id="crew" />
+            {l.room}
+          </p>
+        )}
+        <div className={'building-art' + (paintedFront(l.id) ? ' street-front' : '')}>
+          {paintedAsset(l.id) ? (
+            <img
+              src={paintedAsset(l.id, l.condition)!}
+              alt=""
+              style={
+                paintedMask(l.id)
+                  ? {
+                      maskImage: `url(${paintedMask(l.id)})`,
+                      WebkitMaskImage: `url(${paintedMask(l.id)})`,
+                      maskSize: 'contain',
+                      WebkitMaskSize: 'contain',
+                      maskPosition: 'center',
+                      WebkitMaskPosition: 'center',
+                      maskRepeat: 'no-repeat',
+                      WebkitMaskRepeat: 'no-repeat',
+                    }
+                  : undefined
+              }
+            />
+          ) : (
+            <div className="property-art-pending">
+              <svg viewBox="0 0 80 64" aria-hidden="true">
+                <path
+                  d="M12 56V22L40 8l28 14v34H12Zm18 0V38h20v18M22 27h7m22 0h7M22 34h7m22 0h7M8 57h64"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                />
+              </svg>
+              <span>{l.name}</span>
+            </div>
+          )}
+        </div>
+        <div className="fact-grid">
+          <div>
+            <span>Ownership</span>
+            <b>{l.holder || (l.owned ? 'Your organization' : 'Independent')}</b>
+          </div>
+          {l.owned && l.income > 0 && typeof l.trading === 'number' && (
+            <div>
+              <span>Working at</span>
+              <b className={l.trading < 0.8 ? 'warning' : ''}>{Math.round(l.trading * 100)}%</b>
+              <small>
+                {l.hands?.length
+                  ? l.hands.map(h => h.name + (h.here ? '' : ' (out)')).join(' · ')
+                  : l.staff !== undefined
+                    ? `${l.staff} on the books`
+                    : ''}
+                {l.supply !== undefined ? ` · ${l.supply} supplies` : ''}
+                {l.trouble ? ' · trouble' : ''}
+                {l.still ? ' · still running' : ''}
+              </small>
+            </div>
+          )}
+          <div>
+            <span>{l.owned && l.income > 0 ? 'Hourly income' : 'Condition'}</span>
+            <b>
+              {l.owned && l.income > 0 ? money((l.income * l.condition) / 100) : l.condition + '%'}
+            </b>
+          </div>
+          {l.owned && l.trade && (
+            <div>
+              <span>Trade</span>
+              <b className={l.trade.custom < 40 ? 'warning' : ''}>{l.trade.custom}%</b>
+              <small>
+                {l.trade.order
+                  ? `standing order · ${money(l.trade.order_pays)}/day`
+                  : `regulars are worth ${Math.round(l.trade.multiplier * 100)}% of ordinary takings`}
+              </small>
+            </div>
+          )}
+          {l.owned && l.type === 'casino' && (
+            <div>
+              <span>Behind the tables</span>
+              <b className={(l.bankroll ?? 0) < 500 ? 'warning' : ''}>{money(l.bankroll ?? 0)}</b>
+              <small>
+                {(l.bankroll ?? 0) === 0
+                  ? 'The tables are dark'
+                  : `covers about ${money(l.handle ?? 0)} of action a night`}
+              </small>
+            </div>
+          )}
+          {l.owned && l.income > 0 && (
+            <div>
+              <span>Condition</span>
+              <b className={l.condition < 70 ? 'warning' : ''}>
+                {l.condition}%{l.condition < 100 ? ' · Repairs available' : ''}
+              </b>
+            </div>
+          )}
+        </div>
+        {(() => {
+          const seat = l.actions.find(a => a.id === 'sit');
+          return (
+            l.id === p.location &&
+            seat && (
+              <button
+                className="action primary sit-down-here"
+                disabled={seat.disabled || busy || !!journey}
+                title={seat.disabled ? seat.reason : undefined}
+                onClick={() => commit({kind: 'sit', target: l.id})}
+              >
+                <span>
+                  <strong>{seat.label}</strong>
+                  <span className="desc">{seat.disabled ? seat.reason : seat.detail}</span>
+                </span>
+              </button>
+            )
+          );
+        })()}
+        {l.id === p.location ? (
+          <div className="here-instead">
+            <button
+              className="action primary"
+              onClick={() => {
+                setSelected(p.location);
+                setCityView('interior');
+              }}
+            >
+              <strong>Step inside {l.name} ↗</strong>
+              <span className="desc">
+                {l.actions.filter(a => !isTableAction(a.id) && !a.anywhere && !a.disabled).length}{' '}
+                things you can do in here, and {(l.people || []).length}{' '}
+                {(l.people || []).length === 1 ? 'person' : 'people'} standing in it.
+              </span>
+            </button>
+            <p className="subtle">
+              The room is where the work is. This column is for reading the city from where you are.
+            </p>
+          </div>
+        ) : (
+          <ActionList
+            actions={l.actions}
+            people={l.people || []}
+            render={actionButton}
+            groups={world!.groups}
+            here={false}
+          />
+        )}
+        <div className="bottom-note">
+          <Icon id="clock" /> Decisions pause the clock. Commitments advance it.
+        </div>
+      </aside>
+    );
+  }
+  // The work that belongs to the player rather than to the room they are in. The
+  // core marks it; this is where it is filed, which is beside the people and the
+  // families it is actually about.
+  const anywhere = (
+    world?.locations.find(l => l.id === world.player.location)?.actions || []
+  ).filter(a => a.anywhere);
+  const unreadNews = unreadInLatest(world?.newspaper || [], newsSeen);
+  // The banner announces the biggest unread story, not the newest one. Once the
+  // city page started filing the weather every morning, "newest" meant the
+  // banner would announce cloud cover over a man being shot the same afternoon.
+  const headline = (() => {
+    const paper = world?.newspaper || [];
+    const fresh = paper.slice(0, Math.max(unreadNews, 1));
+    return fresh.reduce((best, s) => ((s.weight || 0) > (best.weight || 0) ? s : best), fresh[0]);
+  })();
+  function content() {
+    const w = world!;
+    if (tab === 'city') {
+      const inside = cityView === 'interior' && locationInfo.id === p.location;
+      return (
+        <div className={'workspace' + (inside ? ' inside' : '')}>
+          <section className="city-pane">
+            <header className="city-header">
+              <div className="map-heading">
+                <div className="eyebrow">THE CITY OF</div>
+                <h1>Bellwether</h1>
+                <p>A place to make your name. Or lose it.</p>
+                <div className="chapter-chip">
+                  {p.respect < 6
+                    ? 'I · A FOOT IN THE DOOR'
+                    : p.crew.length
+                      ? 'II · SOMETHING OF YOUR OWN'
+                      : 'I · MAKING CONNECTIONS'}
+                </div>
+              </div>
+              <div className="city-view-switch">
+                <button
+                  aria-pressed={cityView === 'iso'}
+                  onClick={() => {
+                    setCityView('iso');
+                    try {
+                      localStorage.setItem('black-ledger-view', 'iso');
+                    } catch {}
+                  }}
+                >
+                  The city
+                </button>
+                <button
+                  aria-pressed={cityView === 'street'}
+                  onClick={() => {
+                    setCityView('street');
+                    try {
+                      localStorage.setItem('black-ledger-view', 'street');
+                    } catch {}
+                  }}
+                >
+                  The addresses
+                </button>
+                {layout.editable && cityView === 'iso' && (
+                  <button
+                    aria-pressed={arranging}
+                    onClick={() => {
+                      setArranging(v => !v);
+                      setSlot('');
+                    }}
+                  >
+                    {arranging ? 'Stop arranging' : 'Arrange the map'}
+                  </button>
+                )}
+                <button
+                  className="enter"
+                  aria-pressed={cityView === 'interior'}
+                  onClick={() => {
+                    setSelected(p.location);
+                    setCityView('interior');
+                  }}
+                >
+                  Step inside {w.locations.find(l => l.id === p.location)?.name}
+                </button>
+              </div>
+              <div className="map-key">
+                {!w.known_threats?.length && w.opportunity && (
+                  <button
+                    className="next-opportunity"
+                    title={w.opportunity.detail}
+                    onClick={() => {
+                      setSelected(w.opportunity!.target);
+                      setCityView('street');
+                    }}
+                  >
+                    <small>AN OPPORTUNITY</small>
+                    {w.opportunity.title} ↗
+                  </button>
+                )}
+              </div>
+            </header>
+            {unreadNews > 0 && !!w.newspaper?.length && (
+              <section className="headline-notice" role="status" aria-label="Latest news">
+                <small>THE BELLWETHER HERALD · DAY {headline.day}</small>
+                <strong>{headline.headline}</strong>
+                <p>{headline.body}</p>
+                <button className="plain" onClick={() => setTab('news')}>
+                  Read today's paper ({unreadNews}) ↗
+                </button>
+              </section>
+            )}
+            {!!w.grudges?.length && (
+              <section className="known-threats" aria-label="What people are saying">
+                <strong>Bad blood</strong>
+                {w.grudges.map((g, i) => (
+                  <p key={i}>
+                    {g.holder} has not forgiven {g.against} for {g.because}.
+                  </p>
+                ))}
+              </section>
+            )}
+            {!!w.commissions?.length && (
+              <section className="known-threats" aria-label="Work you have taken on">
+                <strong>What you owe people</strong>
+                {w.commissions.map(c => (
+                  <p key={c.id}>
+                    <b>
+                      {c.giver} · {c.patron}
+                    </b>{' '}
+                    — {c.brief} <i>{c.met ? 'Ready to settle.' : c.progress}</i> {money(c.pay)} ·{' '}
+                    {Math.round(c.minutes_left / 60)}h left
+                  </p>
+                ))}
+              </section>
+            )}
+            {!!w.known_threats?.length && (
+              <section className="known-threats" aria-label="Known threats">
+                <strong>Word on the street</strong>
+                {w.known_threats.map((threat, i) => (
+                  <p key={i}>{threat}</p>
+                ))}
+                <button className="plain" onClick={() => setTab('families')}>
+                  Consider negotiations ↗
+                </button>
+              </section>
+            )}
+            <div className="city-stage">
+              {playing && (
+                <Theatre
+                  cue={playing}
+                  place={w.locations.find(l => l.id === playing.target) || w.locations[0]}
+                  onProgress={setBeat}
+                  plate={cityView !== 'iso'}
+                  onDone={() => setPlaying(null)}
+                />
+              )}
+              {cityView === 'interior' && locationInfo.id === p.location ? (
+                <Interior
+                  place={locationInfo}
+                  people={locationInfo.people || []}
+                  actions={locationInfo.actions.filter(
+                    a =>
+                      !isTableAction(a.id) && !a.anywhere && !(w.cards && isBackRoomAction(a.id)),
+                  )}
+                  backroom={
+                    w.cards ? (
+                      <BackRoom
+                        cards={w.cards}
+                        money={money}
+                        cash={p.cash}
+                        act={c => commit({target: p.location, ...c})}
+                      />
+                    ) : undefined
+                  }
+                  onTables={
+                    locationInfo.actions.some(a => a.id === 'sit' && !a.disabled)
+                      ? () => commit({kind: 'sit', target: locationInfo.id})
+                      : undefined
+                  }
+                  felt={locationInfo.actions.some(a => a.id === 'play' || a.id === 'wheel')}
+                  groups={w.groups}
+                  comings={w.last_result?.comings}
+                  minute={w.minute}
+                  render={actionButton}
+                  onLeave={() => setCityView('street')}
+                />
+              ) : cityView === 'iso' ? (
+                <CityIso
+                  state={w}
+                  selected={selected}
+                  onSelect={setSelected}
+                  spotlight={playing ? {id: playing.target, kind: playing.kind, t: beat} : null}
+                  onEnter={() => {
+                    setSelected(p.location);
+                    setCityView('interior');
+                  }}
+                  layout={layout}
+                  editing={arranging}
+                  slot={slot}
+                  onSlot={setSlot}
+                />
+              ) : (
+                <CityStreet
+                  state={w}
+                  selected={selected}
+                  onSelect={setSelected}
+                  spotlight={playing ? {id: playing.target, kind: playing.kind, t: beat} : null}
+                  onEnter={() => {
+                    setSelected(p.location);
+                    setCityView('interior');
+                  }}
+                />
+              )}
+              {arranging && cityView === 'iso' && (
+                <MapEditor
+                  layout={layout}
+                  slot={slot}
+                  onChange={setLayout}
+                  onClose={() => {
+                    setArranging(false);
+                    setSlot('');
+                  }}
+                />
+              )}
+              {journey &&
+                (() => {
+                  const cross = w.locations.find(l => l.id === journey.to.id)?.crossing;
+                  return (
+                    <div
+                      className={'street-journey' + (cross?.warned ? ' warned' : '')}
+                      role="status"
+                    >
+                      <div>
+                        <strong>Crossing to {journey.to.name}</strong>
+                        <span>
+                          {journey.minutes} minutes{' '}
+                          {cross?.driving
+                            ? `driving${cross.plate ? ` · ${cross.plate} of ${cross.plate_max} plated` : ' · no plate'}`
+                            : 'on foot'}
+                        </span>
+                        {cross?.note && <small>{cross.note}</small>}
+                      </div>
+                      <button onClick={() => setJourney(null)}>Skip journey →</button>
+                    </div>
+                  );
+                })()}
+            </div>
+            {!playing && !w.event && w.last_result?.cues?.length && (
+              <button
+                className="replay-scene"
+                onClick={() => {
+                  const cues = w.last_result?.cues || [];
+                  const cue = [...cues].sort((a, b) => (b.gravity || 0) - (a.gravity || 0))[0];
+                  if (cue) {
+                    setCityView(v => (v === 'interior' ? remembered() : v));
+                    setSelected(cue.target);
+                    setBeat(0);
+                    setPlaying(cue);
+                  }
+                }}
+              >
+                Replay recorded scene ↻
+              </button>
+            )}
+          </section>
+          {cityView === 'interior' && locationInfo.id === p.location
+            ? null
+            : propertyPanel(locationInfo)}
+        </div>
+      );
+    }
+    if (tab === 'market') return <MarketScreen world={w} />;
+    if (tab === 'ledger')
+      return (
+        <LedgerScreen
+          world={w}
+          render={actionButton}
+          actions={anywhere.filter(a => a.id === 'bribe' || a.id === 'lie_low')}
+        />
+      );
+    if (tab === 'crew')
+      return (
+        <PeopleScreen
+          world={w}
+          actions={anywhere}
+          render={actionButton}
+          at={p.location}
+          here={(w.locations.find(l => l.id === p.location)?.actions || []).filter(
+            a => !!a.subject,
+          )}
+          onFind={id => {
+            setSelected(id);
+            setTab('city');
+            setCityView('street');
+          }}
+        />
+      );
+    if (tab === 'families')
+      return (
+        <FamiliesScreen
+          world={w}
+          actions={anywhere}
+          render={actionButton}
+          onMeet={id => {
+            const seat = id === 'bellandi' ? 'club' : 'garage';
+            setSelected(seat);
+            setTab('city');
+            setCityView('street');
+          }}
+        />
+      );
+    if (tab === 'news')
+      return (
+        <section className="section-content">
+          {!!w.arrangements?.length && (
+            <>
+              <div className="eyebrow">PAID FOR, NOT YET DONE</div>
+              <h1 className="screen-title">Your arrangements</h1>
+              {w.arrangements.map((a, i) => (
+                <article className="card" key={i} style={{marginBottom: 14}}>
+                  <h2 style={{margin: '0 0 6px'}}>{a.target}</h2>
+                  <p>
+                    {a.hired} · {money(a.paid)} paid. {a.status}
+                  </p>
+                </article>
+              ))}
+            </>
+          )}
+          <div className="eyebrow">THE BELLWETHER HERALD</div>
+          <h1 className="screen-title">What the city is reading</h1>
+          <p className="subtle">
+            The paper prints what can be seen. It does not know who arranged anything, and reading
+            it costs no time.
+          </p>
+          <Herald world={w} />
+        </section>
+      );
+    if (tab === 'settings')
+      return (
+        <section className="section-content">
+          <div className="eyebrow">HOW THIS PLAYS</div>
+          <h1 className="screen-title">Settings</h1>
+          <div className="settings">
+            <div className="setting">
+              <div>
+                <h3>Scenes</h3>
+                <p>
+                  When something happens that the city would remember — a killing, an arrest, a fire
+                  — the game takes you there and holds for a moment before the headline. Turn this
+                  off and the result is reported in words only.
+                </p>
+              </div>
+              <button
+                className={'toggle' + (motion ? ' on' : '')}
+                role="switch"
+                aria-checked={motion}
+                onClick={toggleMotion}
+              >
+                <i />
+                {motion ? 'Shown' : 'Off'}
+              </button>
+            </div>
+            <div className="setting">
+              <div>
+                <h3>Sound</h3>
+                <p>
+                  An explosion, a shot, a police lamp turning over at the kerb. Short noises made by
+                  the browser rather than recordings, played once when a moment starts.
+                </p>
+              </div>
+              <button
+                className={'toggle' + (sound ? ' on' : '')}
+                role="switch"
+                aria-checked={sound}
+                onClick={toggleSound}
+              >
+                <i />
+                {sound ? 'On' : 'Off'}
+              </button>
+            </div>
+            <div className="setting">
+              <div>
+                <h3>Voices</h3>
+                <p>
+                  Named characters keep the same voice for as long as they live. Deciding anything
+                  cuts them off, including a line still being spoken.
+                </p>
+              </div>
+              <button
+                className={'toggle' + (voice ? ' on' : '')}
+                role="switch"
+                aria-checked={voice}
+                onClick={toggleVoice}
+              >
+                <i />
+                {voice ? 'On' : 'Off'}
+              </button>
+            </div>
+            <div className="setting">
+              <div>
+                <h3>The storyteller</h3>
+                <p>{w.director.detail}</p>
+                <p className="subtle">
+                  A model writes the encounters. It cannot touch money, time, injuries, property or
+                  death — the simulation owns all of those, and the game is playable with the model
+                  switched off.
+                </p>
+              </div>
+              <button
+                className="plain"
+                onClick={prepare}
+                disabled={w.director.status === 'writing'}
+              >
+                {w.director.status === 'writing' ? 'Writing…' : 'Prepare an encounter'}
+              </button>
+            </div>
+            <div className="setting face-setting">
+              <div>
+                <h3>Your face</h3>
+                <p>
+                  Nobody in Bellwether is gendered by the rules — the city says "they" about
+                  everybody — so a portrait is dealt out by a hash of your name, and it can hand you
+                  somebody you do not recognise as yourself. Pick your own. It is saved with the
+                  life.
+                </p>
+                <div className="face-choices">
+                  {Array.from({length: CAST_FACES}, (_, i) => i + 1).map(n => (
+                    <button
+                      key={n}
+                      className={'face-choice' + (p.face === n ? ' chosen' : '')}
+                      aria-pressed={p.face === n}
+                      aria-label={'Face ' + n}
+                      onClick={() => commit({kind: 'face', choice: String(n)})}
+                    >
+                      <Portrait id={p.name} face={n} size="small" />
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <button
+                className="plain"
+                disabled={!p.face}
+                onClick={() => commit({kind: 'face', choice: '0'})}
+              >
+                Let the city decide
+              </button>
+            </div>
+            <div className="setting">
+              <div>
+                <h3>This life</h3>
+                <p>
+                  Life {w.life} · {time(w.minute)} · saved after every action. There is one save and
+                  no way back: whatever happens to {p.name} has happened.
+                </p>
+              </div>
+              <span className="setting-note">Ironman</span>
+            </div>
+          </div>
+        </section>
+      );
+    return (
+      <section className="section-content help">
+        <div className="eyebrow">WHERE YOU STAND</div>
+        <h1 className="screen-title">What you can do, and what you cannot yet</h1>
+        <p className="subtle">
+          This page is not written down anywhere. It asks the game the same question the buttons
+          ask, so it cannot tell you something the rules do not.
+        </p>
+        <ol className="guide-steps">
+          {(w.guide || []).map(s => (
+            <li key={s.title} className={s.done ? 'done' : s.open ? 'open' : 'shut'}>
+              <div className="guide-mark" aria-hidden="true">
+                {s.done ? '✓' : s.open ? '›' : '·'}
+              </div>
+              <div>
+                <b>{s.title}</b>
+                <p>{s.what}</p>
+                {s.done ? (
+                  <small className="subtle">Done.</small>
+                ) : s.open ? (
+                  <small className="ready">You can do this now.</small>
+                ) : (
+                  <small className="warning">{s.reason}</small>
+                )}
+              </div>
+            </li>
+          ))}
+        </ol>
+        <h2>Rules that do not change</h2>
+        <ul className="guide-rules">
+          {(w.rules || []).map((r, i) => (
+            <li key={i}>{r}</li>
+          ))}
+        </ul>
+      </section>
+    );
+  }
+  return (
+    <>
+      <div className={'shell ' + (busy ? 'busy' : '')} inert={!!event || !p.alive || atTable}>
+        <nav className="rail" aria-label="Main navigation">
+          <div className="monogram">
+            <span>B</span>
+          </div>
+          {[
+            ['city', 'City'],
+            ['crew', 'People'],
+            ['families', 'Families'],
+            ['market', 'Market'],
+            ['ledger', 'Ledger'],
+            ['news', 'Herald'],
+            ['help', 'Guide'],
+          ].map(([id, label]) => (
+            <button
+              key={id}
+              className={
+                (tab === id ? 'active' : '') + (id === 'news' && unreadNews > 0 ? ' has-news' : '')
+              }
+              aria-label={
+                id === 'news' && unreadNews > 0 ? `${label}, ${unreadNews} unread` : label
+              }
+              onClick={() => setTab(id)}
+            >
+              <Icon id={id} />
+              {label}
+              {id === 'news' && unreadNews > 0 ? <i className="news-count">{unreadNews}</i> : null}
+            </button>
+          ))}
+          <button
+            className="bottom"
+            onClick={toggleVoice}
+            aria-label={(voice ? 'Disable' : 'Enable') + ' voice acting'}
+          >
+            <Icon id={voice ? 'voice' : 'mute'} />
+            Voice {voice ? 'on' : 'off'}
+          </button>
+          <button onClick={() => setTab('settings')} aria-label="Settings">
+            <Icon id="settings" />
+            Settings
+          </button>
+        </nav>
+        <main className="page">
+          <header className="topbar">
+            <div>
+              <div className="eyebrow">A CITY REMEMBERS</div>
+              <div className="brand">BLACK LEDGER</div>
+            </div>
+            <div className="stats">
+              {(world.dashboard || []).map(s => (
+                <div className={'stat' + (s.warn ? ' warning' : '')} key={s.id} title={s.meaning}>
+                  <Icon id={s.id} />
+                  <b>{s.value}</b>
+                  <small>
+                    {s.label}
+                    {s.note ? <i>{s.note}</i> : null}
+                  </small>
+                </div>
+              ))}
+              <div className="stat clock">
+                <b>{time(world.minute)}</b>
+                <small>{busy ? 'Resolving…' : 'Clock paused · awaiting your action'}</small>
+              </div>
+            </div>
+          </header>
+          <Outcome world={world} onLedger={() => setTab('ledger')} />
+          {content()}
+        </main>
+      </div>
+      {atTable && !event && p.alive && (
+        <Casino
+          place={world.locations.find(l => l.id === p.location)?.name || 'the tables'}
+          actions={(world.locations.find(l => l.id === p.location)?.actions || []).filter(a =>
+            isTableAction(a.id),
+          )}
+          people={world.locations.find(l => l.id === p.location)?.people || []}
+          hand={world.hand ?? {playing: false}}
+          wheel={world.wheel ?? {spun: false}}
+          dice={world.dice ?? {playing: false, settled: false}}
+          machine={
+            world.machine ?? {
+              pulled: false,
+              stops: 20,
+              edge: 0,
+              two_cherries: 0,
+              one_cherry: 0,
+              strip: [],
+            }
+          }
+          house={world.house ?? {games: false}}
+          cash={p.cash}
+          money={money}
+          revision={world.revision}
+          records={world.last_result?.records || []}
+          act={c => commit({target: p.location, ...c})}
+          onLeave={() => commit({kind: 'rise', target: p.location})}
+        />
+      )}
+      {(event || !p.alive) && (
+        <div className="modal-shade">
+          <section
+            ref={scene}
+            tabIndex={-1}
+            className={'scene' + (event && event.choices.length > 3 ? ' extended' : '')}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="scene-title"
+            onKeyDown={e => {
+              if (e.key === 'Escape') stopVoice();
+              if (e.key === 'Tab') {
+                const buttons = [
+                  ...scene.current!.querySelectorAll<HTMLButtonElement>('button:not(:disabled)'),
+                ];
+                if (!buttons.length) return;
+                const first = buttons[0],
+                  last = buttons.at(-1)!;
+                if (
+                  e.shiftKey &&
+                  (document.activeElement === first || document.activeElement === scene.current)
+                ) {
+                  last.focus();
+                  e.preventDefault();
+                } else if (!e.shiftKey && document.activeElement === last) {
+                  first.focus();
+                  e.preventDefault();
+                }
+              }
+            }}
+          >
+            {!p.alive ? (
+              <>
+                {(() => {
+                  const e = world.epitaph;
+                  return (
+                    <>
+                      <div className="eyebrow">THE CITY CONTINUES</div>
+                      <div className="death-seal">✦</div>
+                      <h2 id="scene-title">{p.name} is dead.</h2>
+                      <p className="spoken">{e?.cause || world.dead.at(-1)?.cause}</p>
+                      <div className="life-recap" aria-label="This life in numbers">
+                        <div>
+                          <small>Lived to</small>
+                          <b>Day {e?.day ?? Math.floor(world.minute / 1440) + 1}</b>
+                        </div>
+                        <div>
+                          <small>Final respect</small>
+                          <b>{e?.respect ?? p.respect}</b>
+                        </div>
+                        <div>
+                          <small>Money earned</small>
+                          <b>{money(e?.earned ?? p.earned ?? 0)}</b>
+                        </div>
+                      </div>
+                      {e && (
+                        <p className="legacy-line">
+                          <small>WHAT BECAME OF IT</small>
+                          {e.became}
+                        </p>
+                      )}
+                      {!!e?.standing?.length && (
+                        <p className="legacy-properties">
+                          Still standing in their name: {e.standing.join(' · ')}
+                        </p>
+                      )}
+                      {!!e?.headlines?.length && (
+                        <div className="legacy-press">
+                          <small>WHAT THE PAPER CARRIED</small>
+                          {e.headlines.map((h: string, n: number) => (
+                            <b key={n}>{h}</b>
+                          ))}
+                        </div>
+                      )}
+                      {e && (
+                        <p className="legacy-line">
+                          <small>WHAT THE NEXT ONE GETS</small>
+                          {e.inherits}
+                        </p>
+                      )}
+                      <button
+                        className="action primary"
+                        disabled={busy}
+                        onClick={() => commit({kind: 'new_life'})}
+                      >
+                        Begin as a new person <Icon id="arrow" />
+                      </button>
+                      <p className="source">
+                        Life {world.life} · {time(world.minute)} · Outcome committed
+                      </p>
+                    </>
+                  );
+                })()}
+              </>
+            ) : (
+              event && (
+                <>
+                  <div className="eyebrow">
+                    <span>
+                      {event.kind === 'attack' ? 'A MOMENT TO ACT' : 'A PRIVATE CONVERSATION'}
+                    </span>
+                    <span>TIME PAUSED</span>
+                  </div>
+                  <h2 id="scene-title">{event.title}</h2>
+                  {npc && (
+                    <div className="person">
+                      <Portrait id={npc.id} />
+                      <div>
+                        <b>{npc.name}</b>
+                        <small>{npc.role}</small>
+                      </div>
+                    </div>
+                  )}
+                  {event.connection && (
+                    <aside className="story-connection" aria-label="Previous arrangement">
+                      <small>COMPLETED WORK WITH THIS CONTACT</small>
+                      <b>{event.connection.title}</b>
+                      <p>{event.connection.result}</p>
+                    </aside>
+                  )}
+                  <p className="spoken">{event.body}</p>
+                  <div className="speech-control">
+                    <button className="plain" onClick={speak}>
+                      <Icon id="voice" /> {speech}
+                    </button>
+                    {speaking(speech) && (
+                      <button className="plain" onClick={stopVoice}>
+                        Stop voice
+                      </button>
+                    )}
+                  </div>
+                  {event.conditions ? (
+                    <p className="scene-conditions">
+                      <small>WHATEVER YOU CHOOSE</small>
+                      {event.conditions}
+                    </p>
+                  ) : null}
+                  <div className="choices">
+                    {event.choices.map((c, i) => (
+                      <button
+                        key={c.id}
+                        data-choice
+                        className="action"
+                        disabled={c.disabled || busy}
+                        onClick={() => commit({kind: 'choice', choice: c.id, event: event.id})}
+                      >
+                        <span className="number">{String(i + 1).padStart(2, '0')}</span>
+                        <span>
+                          <strong>{c.label}</strong>
+                          {c.pay || c.minutes ? (
+                            <span className="terms">
+                              {c.pay ? <b>{money(c.pay)}</b> : null}
+                              {c.minutes ? <b>{c.minutes} min</b> : null}
+                              {c.respect ? <b>+{c.respect} respect</b> : null}
+                              {c.heat ? <b className="cost">+{c.heat} attention</b> : null}
+                            </span>
+                          ) : null}
+                          {c.detail ? <span className="desc">{c.detail}</span> : null}
+                          {c.disabled && c.reason ? (
+                            <span className="desc refused">{c.reason}</span>
+                          ) : null}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                  <p className="source">
+                    {event.source === 'local-ai' ? 'Local AI encounter' : 'City encounter'} ·
+                    Decisions are saved immediately.
+                  </p>
+                </>
+              )
+            )}
+          </section>
+        </div>
+      )}
+      {notice && (
+        <div id="toast" role="status" aria-live="polite" style={{display: 'block'}}>
+          {notice}
+        </div>
+      )}
+    </>
+  );
 }
-createRoot(document.getElementById('root')!).render(<App/>);
+createRoot(document.getElementById('root')!).render(<App />);

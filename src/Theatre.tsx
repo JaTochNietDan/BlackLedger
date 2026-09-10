@@ -1,5 +1,5 @@
-import {useEffect,useRef,useState} from 'react';
-import type {Place,VisualCue} from './types';
+import {useEffect, useRef, useState} from 'react';
+import type {Place, VisualCue} from './types';
 import {Portrait} from './Portrait';
 import {playMoment} from './sound';
 
@@ -26,8 +26,16 @@ export const scenePlate = (kind: string) => `/art/scenes/scene-${kind}-v1.jpg`;
 // lights the real one, and what is left here is what a camera cannot say:
 // the caption, who was in it, and the headline afterwards.
 
-export function Theatre({cue, place, onDone, onProgress, plate = true}: {
-  cue: VisualCue; place: Place; onDone: () => void;
+export function Theatre({
+  cue,
+  place,
+  onDone,
+  onProgress,
+  plate = true,
+}: {
+  cue: VisualCue;
+  place: Place;
+  onDone: () => void;
   // Whether to show the painted plate for this kind of moment. In the city
   // view the building it happened at is on screen behind this band, so a stock
   // picture of a police station in front of the actual police station is one
@@ -53,47 +61,70 @@ export function Theatre({cue, place, onDone, onProgress, plate = true}: {
   // taller than the window — so on a short screen it opened below the fold and
   // the player was told nothing at all. It brings itself into view.
   const band = useRef<HTMLDivElement>(null);
-  useEffect(() => { band.current?.scrollIntoView({block: 'nearest', behavior: 'smooth'}) }, [cue.id]);
+  useEffect(() => {
+    band.current?.scrollIntoView({block: 'nearest', behavior: 'smooth'});
+  }, [cue.id]);
 
   // The noise the city makes, once, at the top of the moment — not on every
   // frame, and not again when the same moment is replayed mid-flight.
-  useEffect(() => { playMoment(cue.kind) }, [cue.id]);
+  useEffect(() => {
+    playMoment(cue.kind);
+  }, [cue.id]);
 
   useEffect(() => {
-    if (matchMedia('(prefers-reduced-motion: reduce)').matches) { setPaper(true); onProgress?.(1); return }
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setPaper(true);
+      onProgress?.(1);
+      return;
+    }
     const start = performance.now();
     let frame = 0;
     const step = (now: number) => {
       const at = Math.min(1, (now - start) / hold(cue));
       setT(at);
       onProgress?.(at);
-      if (at < 1) frame = requestAnimationFrame(step); else setPaper(true);
+      if (at < 1) frame = requestAnimationFrame(step);
+      else setPaper(true);
     };
     frame = requestAnimationFrame(step);
     return () => cancelAnimationFrame(frame);
   }, [cue.id]);
 
-  return <div className="theatre" ref={band} role="status" aria-label={cue.caption}>
-    <div className="theatre-where">
-      <span className="eyebrow">{cue.kind === 'arrest' ? 'YOU WERE TAKEN TO' : 'IT HAPPENED AT'}</span>
-      <b>{place.name}</b>
-    </div>
-    {/* The painted plate for this kind of moment, when there is one, small and
+  return (
+    <div className="theatre" ref={band} role="status" aria-label={cue.caption}>
+      <div className="theatre-where">
+        <span className="eyebrow">
+          {cue.kind === 'arrest' ? 'YOU WERE TAKEN TO' : 'IT HAPPENED AT'}
+        </span>
+        <b>{place.name}</b>
+      </div>
+      {/* The painted plate for this kind of moment, when there is one, small and
         beside the caption rather than instead of the city. */}
-    {plate && painted && <div className="theatre-plate" style={{backgroundImage: `url(${scenePlate(cue.kind)})`}}/>}
-    <p className="theatre-caption">{cue.caption}</p>
-    {!!cue.actors?.length && <div className="theatre-cast">
-      {/* The core names who was in it. A scene about somebody that cannot show
+      {plate && painted && (
+        <div className="theatre-plate" style={{backgroundImage: `url(${scenePlate(cue.kind)})`}} />
+      )}
+      <p className="theatre-caption">{cue.caption}</p>
+      {!!cue.actors?.length && (
+        <div className="theatre-cast">
+          {/* The core names who was in it. A scene about somebody that cannot show
           them is a scene about nobody. */}
-      {cue.actors.map(a => <span key={a.id} className="theatre-face">
-        <Portrait id={a.id} size="small"/>
-        <small>{a.name}</small>
-      </span>)}
-    </div>}
-    {paper && cue.headline && <div className="theatre-paper">
-      <small>THE BELLWETHER HERALD</small>
-      <b>{cue.headline}</b>
-    </div>}
-    <button className="plain theatre-done" onClick={onDone}>{paper ? 'Go on' : 'Skip'} →</button>
-  </div>;
+          {cue.actors.map(a => (
+            <span key={a.id} className="theatre-face">
+              <Portrait id={a.id} size="small" />
+              <small>{a.name}</small>
+            </span>
+          ))}
+        </div>
+      )}
+      {paper && cue.headline && (
+        <div className="theatre-paper">
+          <small>THE BELLWETHER HERALD</small>
+          <b>{cue.headline}</b>
+        </div>
+      )}
+      <button className="plain theatre-done" onClick={onDone}>
+        {paper ? 'Go on' : 'Skip'} →
+      </button>
+    </div>
+  );
 }

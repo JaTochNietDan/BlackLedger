@@ -39,13 +39,10 @@ var (
 // worse than no test. What matters now is that every address gets its own
 // block, which is exactly what the renderer computes.
 func TestEveryAddressGetsItsOwnBlock(t *testing.T) {
-	source, err := os.ReadFile("../../src/iso.ts")
-	if err != nil {
-		t.Skip("no interface sources beside this build")
-	}
-	body := string(source)
-	pitch := blockPitch.FindStringSubmatch(body)
-	cellMatch := cellSize.FindStringSubmatch(body)
+	source := source(t, "src/iso.ts")
+	body := source
+	pitch := blockPitch.FindStringSubmatch(string(body))
+	cellMatch := cellSize.FindStringSubmatch(string(body))
 	if pitch == nil || cellMatch == nil {
 		t.Fatal("the renderer no longer states BLOCK and CELL, so nothing here can be checked")
 	}
@@ -83,11 +80,8 @@ func TestEveryAddressGetsItsOwnBlock(t *testing.T) {
 // And the switch has to keep offering the card view while the city is built,
 // so a broken renderer never leaves the game unplayable.
 func TestTheCardViewIsStillReachable(t *testing.T) {
-	body, err := os.ReadFile("../../src/main.tsx")
-	if err != nil {
-		t.Skip("no interface sources beside this build")
-	}
-	if !strings.Contains(string(body), "CityStreet") || !strings.Contains(string(body), "CityIso") {
+	body := source(t, "src/main.tsx")
+	if !holds(body, "CityStreet") || !holds(body, "CityIso") {
 		t.Fatal("the city view and the card view are not both reachable")
 	}
 }
@@ -97,21 +91,18 @@ func TestTheCardViewIsStillReachable(t *testing.T) {
 // card view remains reachable (checked above), and the addresses remain
 // reachable without a mouse or WebGL at all.
 func TestTheCityCanBeReadWithoutWebGL(t *testing.T) {
-	body, err := os.ReadFile("../../src/CityIso.tsx")
-	if err != nil {
-		t.Skip("no interface sources beside this build")
-	}
-	source := string(body)
-	if !strings.Contains(source, "iso-reader") {
+	body := source(t, "src/CityIso.tsx")
+	source := body
+	if !holds(source, "iso-reader") {
 		t.Error("the city has no text alternative, so a browser without WebGL shows an empty pane")
 	}
 	// Every address, not a selection of them.
-	if !strings.Contains(source, "state.locations.map") {
+	if !holds(source, "state.locations.map") {
 		t.Error("the text alternative does not list the city's own addresses")
 	}
 	// The camera must not be reset by an ordinary update: a player who has
 	// zoomed in on the docks should stay there when an hour passes.
-	if strings.Contains(source, "useEffect(frame") {
+	if holds(source, "useEffect(frame") {
 		t.Error("the camera is re-framed on every update, which throws away where the player was looking")
 	}
 }
@@ -172,11 +163,8 @@ func TestTheManifestAndTheArtAgree(t *testing.T) {
 // goes to the address the core named and the effect plays over that building.
 // Two things have to stay true, and both are cheap to check in text.
 func TestMomentsPlayInTheCityAndGiveTheCameraBack(t *testing.T) {
-	body, err := os.ReadFile("../../src/CityIso.tsx")
-	if err != nil {
-		t.Skip("no interface sources beside this build")
-	}
-	source := string(body)
+	body := source(t, "src/CityIso.tsx")
+	source := body
 	// Every kind of moment the core can witness must be drawn as something.
 	// core/witness.go is the authority on what those are.
 	witness, err := os.ReadFile("../../core/witness.go")
@@ -188,13 +176,13 @@ func TestMomentsPlayInTheCityAndGiveTheCameraBack(t *testing.T) {
 		t.Fatalf("only %d kinds of moment were found in witness.go; the table has moved", len(kinds))
 	}
 	for _, k := range kinds {
-		if !strings.Contains(source, `'`+k[1]+`'`) {
+		if !holds(source, `'`+k[1]+`'`) {
 			t.Errorf("the city draws nothing for a %q, so the loudest thing that can happen there is silent", k[1])
 		}
 	}
 	// And the camera has to be given back: a player who was looking at the
 	// docks should not be left staring at a rooftop across town.
-	if !strings.Contains(source, "wasLooking") {
+	if !holds(source, "wasLooking") {
 		t.Error("the camera is taken to a moment and never returned to where the player had it")
 	}
 }
@@ -203,22 +191,19 @@ func TestMomentsPlayInTheCityAndGiveTheCameraBack(t *testing.T) {
 // scored falls through to a dull knock rather than silence, because silence
 // reads as a bug — but the loud ones have to be scored deliberately.
 func TestTheLoudMomentsAreScored(t *testing.T) {
-	body, err := os.ReadFile("../../src/sound.ts")
-	if err != nil {
-		t.Skip("no interface sources beside this build")
-	}
-	source := string(body)
+	body := source(t, "src/sound.ts")
+	source := body
 	for _, loud := range []string{"explosion", "killing", "gunfight", "raid", "arrest"} {
-		if !strings.Contains(source, `'`+loud+`'`) {
+		if !holds(source, `'`+loud+`'`) {
 			t.Errorf("a %q makes whatever the fallback makes, which is a knock", loud)
 		}
 	}
 	// It has to be possible to turn off, and it has to default to on rather
 	// than to a browser exception in a private window.
-	if !strings.Contains(source, "black-ledger-sound") {
+	if !holds(source, "black-ledger-sound") {
 		t.Error("the sound cannot be turned off")
 	}
-	if !strings.Contains(source, "catch { return true }") {
+	if !holds(source, "} catch { return true; }") {
 		t.Error("a browser that refuses local storage silences the city instead of defaulting to on")
 	}
 }
@@ -261,14 +246,11 @@ func TestTheBlocksBetweenTheAddressesAreBuiltOn(t *testing.T) {
 	// true of the older model, where each address stood alone in the middle of
 	// its block with pavement on all four sides, which read as an office park
 	// rather than as a city.
-	source, err := os.ReadFile("../../src/CityIso.tsx")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if !strings.Contains(string(source), "terrace({col, row}, SLOTS)") {
+	source := source(t, "src/CityIso.tsx")
+	if !holds(source, "terrace({col, row}, SLOTS)") {
 		t.Error("blocks are not laid out as terraces, so buildings do not stand next to each other")
 	}
-	if !strings.Contains(string(source), "addressAt.has(key)") {
+	if !holds(source, "addressAt.has(key)") {
 		t.Error("nothing keeps a filler out of the slot an address builds on")
 	}
 }
@@ -283,18 +265,15 @@ func TestTheBlocksBetweenTheAddressesAreBuiltOn(t *testing.T) {
 // land there was checked in the browser by recomputing every one of them
 // against its own block — none in a road, none under a building.
 func TestStreetDressingStandsOnThePavement(t *testing.T) {
-	source, err := os.ReadFile("../../src/iso.ts")
-	if err != nil {
-		t.Skip("no interface sources beside this build")
-	}
-	body := string(source)
-	if !strings.Contains(body, "export function dressing") {
+	source := source(t, "src/iso.ts")
+	body := source
+	if !holds(body, "export function dressing") {
 		t.Fatal("nothing places the things a pavement carries")
 	}
 	// The runs a prop may stand on are built from the island — the pavement
 	// ring — and inset from its edge. If that stops being true, props can
 	// wander into the road.
-	dress := body[strings.Index(body, "export function dressing"):]
+	dress := body[strings.Index(string(body), "export function dressing"):]
 	if end := strings.Index(dress, "\nexport function wires"); end > 0 {
 		dress = dress[:end]
 	}
@@ -316,11 +295,9 @@ func TestStreetDressingStandsOnThePavement(t *testing.T) {
 // tests/city-blocks.test.mjs); the pictures drawn on them did. Nothing here
 // can check pixels, so it checks that the multiplier is gone.
 func TestNoBuildingIsDrawnWiderThanItsGround(t *testing.T) {
-	source, err := os.ReadFile("../../src/CityIso.tsx")
-	if err != nil {
-		t.Fatal(err)
-	}
-	for _, line := range strings.Split(string(source), "\n") {
+	// Line by line and unflattened: this is about what one statement ends with.
+	source := rawSource(t, "src/CityIso.tsx")
+	for _, line := range strings.Split(source, "\n") {
 		if !strings.Contains(line, "const across =") || !strings.Contains(line, "TILE.w") {
 			continue
 		}
@@ -330,7 +307,7 @@ func TestNoBuildingIsDrawnWiderThanItsGround(t *testing.T) {
 	}
 	// And its proportions are its own: scaling one axis alone squashed and
 	// stretched buildings that were painted correctly.
-	if strings.Contains(string(source), "art.scale.y *=") {
+	if holds(source, "art.scale.y *=") {
 		t.Error("a building's height is being scaled independently of its width, which distorts it")
 	}
 }

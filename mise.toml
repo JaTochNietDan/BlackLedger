@@ -48,6 +48,10 @@ rest=$!
 # had been quietly listing eleven files for a while.
 test -z "$(gofmt -l core cmd store sim)" || { gofmt -l core cmd store sim; exit 1; }
 go vet ./...
+# The view is formatted too. Two files had grown lines of six thousand
+# characters, which made them unreadable, unreviewable, and expensive to search:
+# one grep match cost more to read than the rest of the file.
+npx prettier --check 'src/**/*.{ts,tsx}'
 npx tsc --noEmit
 npm run build >/dev/null
 npm test >/dev/null
@@ -125,3 +129,7 @@ run = ".venv/bin/python -c \"import sys;sys.path.insert(0,'tools');import isomet
 [tasks.interiors]
 description = "Regenerate the inside of every building (needs `mise run art` first)"
 run = ".venv/bin/python tools/interiors.py public/art/rooms"
+
+[tasks.format]
+description = "Lay the view's source out again after editing it"
+run = "npx prettier --write 'src/**/*.{ts,tsx}'"

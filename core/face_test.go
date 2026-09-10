@@ -72,13 +72,18 @@ func TestTheCoreAndTheSheetAgreeOnHowManyFacesThereAre(t *testing.T) {
 	if err != nil {
 		t.Skipf("no view to compare against: %v", err)
 	}
-	found := regexp.MustCompile(`CAST_COLS = (\d+), CAST_ROWS = (\d+)`).FindSubmatch(source)
-	if found == nil {
+	// Written across three lines since the view was formatted, so the two
+	// numbers are found separately rather than as one phrase: a guard that
+	// reads another language's source must not also be a guard on its layout.
+	cols := regexp.MustCompile(`CAST_COLS\s*=\s*(\d+)`).FindSubmatch(source)
+	rows := regexp.MustCompile(`CAST_ROWS\s*=\s*(\d+)`).FindSubmatch(source)
+	if cols == nil || rows == nil {
 		t.Fatal("the sheet no longer says how big it is; this guard cannot see it")
 	}
-	cols, _ := strconv.Atoi(string(found[1]))
-	rows, _ := strconv.Atoi(string(found[2]))
-	if cols*rows != CastFaces {
-		t.Errorf("the sheet holds %d faces and the core will accept %d", cols*rows, CastFaces)
+	found := [][]byte{nil, cols[1], rows[1]}
+	wide, _ := strconv.Atoi(string(found[1]))
+	high, _ := strconv.Atoi(string(found[2]))
+	if wide*high != CastFaces {
+		t.Errorf("the sheet holds %d faces and the core will accept %d", wide*high, CastFaces)
 	}
 }

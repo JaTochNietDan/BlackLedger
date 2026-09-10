@@ -1,8 +1,54 @@
 import {useEffect, useRef} from 'react';
-import {Application, Assets, Container, Graphics, Matrix, Sprite, Text, Texture, TextStyle} from 'pixi.js';
+import {
+  Application,
+  Assets,
+  Container,
+  Graphics,
+  Matrix,
+  Sprite,
+  Text,
+  Texture,
+  TextStyle,
+} from 'pixi.js';
 import {Viewport} from 'pixi-viewport';
 import type {Snapshot} from './types';
-import {addressSlot, along, awnings, blockFor, BLOCK, bounds, carriageways, distance, dressing, faces, goldenness, grid, island, kerbside, lampPosts, liftOf, markings, middle, mix, nightness, PAVE, plot, project, reach, ROAD, size, rails, sleepers, terrace, TILE, trolleyAvenue, TROLLEY_GAUGE, vents, walk, wires} from './iso';
+import {
+  addressSlot,
+  along,
+  awnings,
+  blockFor,
+  BLOCK,
+  bounds,
+  carriageways,
+  distance,
+  dressing,
+  faces,
+  goldenness,
+  grid,
+  island,
+  kerbside,
+  lampPosts,
+  liftOf,
+  markings,
+  middle,
+  mix,
+  nightness,
+  PAVE,
+  plot,
+  project,
+  reach,
+  ROAD,
+  size,
+  rails,
+  sleepers,
+  terrace,
+  TILE,
+  trolleyAvenue,
+  TROLLEY_GAUGE,
+  vents,
+  walk,
+  wires,
+} from './iso';
 import type {Cell, Vec} from './iso';
 import cutouts from '../public/art/iso/isometric.json';
 import type {Spotlight} from './CityStreet';
@@ -21,7 +67,6 @@ import type {Layout} from './layout';
 // the world changes, and it never writes anything back except which address the
 // player clicked. Nothing here decides anything — where a building stands and
 // who is inside it still come from the core.
-
 
 // The painted cut-outs, by address. A building with one is drawn as itself; a
 // building without one is drawn as the blocked-out solid it was before, so
@@ -42,9 +87,9 @@ const painted = new Map((cutouts as Cutout[]).map(c => [c.id, c]));
 // the footway it is paving, which is what the first attempt did.
 const GROUND: {id: string; file: string; span: number}[] = [
   {id: 'asphalt', file: '/art/ground/asphalt.jpg', span: 1.5},
-  {id: 'pavement', file: '/art/ground/pavement.jpg', span: .62},
-  {id: 'kerb', file: '/art/ground/kerb.jpg', span: .4},
-  {id: 'cobbles', file: '/art/ground/cobbles.jpg', span: .55},
+  {id: 'pavement', file: '/art/ground/pavement.jpg', span: 0.62},
+  {id: 'kerb', file: '/art/ground/kerb.jpg', span: 0.4},
+  {id: 'cobbles', file: '/art/ground/cobbles.jpg', span: 0.55},
 ];
 
 // Read back by id so the numbers above are the only place they live.
@@ -58,9 +103,15 @@ const spanOf = (id: string) => GROUND.find(g => g.id === id)?.span ?? 1;
 // reads as wallpaper hung behind the city — the give-away is that it does not
 // turn the corner at a junction.
 function laid(texture: Texture, span: number): Matrix {
-  const px = texture.width / span;                 // texture pixels per tile unit
-  return new Matrix(TILE.w / (2 * px), TILE.h / (2 * px),
-                    -TILE.w / (2 * px), TILE.h / (2 * px), 0, 0);
+  const px = texture.width / span; // texture pixels per tile unit
+  return new Matrix(
+    TILE.w / (2 * px),
+    TILE.h / (2 * px),
+    -TILE.w / (2 * px),
+    TILE.h / (2 * px),
+    0,
+    0,
+  );
 }
 
 // Where a cut-out's building actually stands inside its own picture.
@@ -77,7 +128,7 @@ function laid(texture: Texture, span: number): Matrix {
 const feet = (id: string, texture: Texture) => {
   const cut = painted.get(id);
   return {
-    anchor: cut?.anchor ?? [.5, 1],
+    anchor: cut?.anchor ?? [0.5, 1],
     base: cut?.base ?? texture.width,
   };
 };
@@ -100,7 +151,7 @@ const SLOTS = 2;
 
 // How far the camera may be pushed. Past these the city either fills the screen
 // with one roof or shrinks into the middle of an empty field.
-const ZOOM = {min: .45, max: 2.6};
+const ZOOM = {min: 0.45, max: 2.6};
 
 // A car at the kerb, built the same way a building is: small boxes in tile
 // space, drawn through the same projection. The first version was drawn by
@@ -111,14 +162,35 @@ const ZOOM = {min: .45, max: 2.6};
 // a short boot — not detail, which disappears at the size a city is drawn at.
 function car(colour: number, along: boolean): Graphics {
   const g = new Graphics();
-  const L = .62, W = .30;                     // length and width, in tiles
-  const dark = shade(colour, .55), light = shade(colour, 1.45);
+  const L = 0.62,
+    W = 0.3; // length and width, in tiles
+  const dark = shade(colour, 0.55),
+    light = shade(colour, 1.45);
 
   // Laid out along x, then mirrored by the caller for the other street.
   const body = [
-    {dx: 0, dy: 0, w: L, d: W, h: .11, base: .015, top: colour, left: dark, right: shade(colour, .8)},
-    {dx: L * .26, dy: -.005, w: L * .42, d: W + .01, h: .10, base: .125,
-     top: light, left: shade(colour, .5), right: shade(colour, .7)},
+    {
+      dx: 0,
+      dy: 0,
+      w: L,
+      d: W,
+      h: 0.11,
+      base: 0.015,
+      top: colour,
+      left: dark,
+      right: shade(colour, 0.8),
+    },
+    {
+      dx: L * 0.26,
+      dy: -0.005,
+      w: L * 0.42,
+      d: W + 0.01,
+      h: 0.1,
+      base: 0.125,
+      top: light,
+      left: shade(colour, 0.5),
+      right: shade(colour, 0.7),
+    },
   ];
   for (const part of body) {
     const f = faces({x: -L / 2, y: -W / 2}, part);
@@ -128,15 +200,17 @@ function car(colour: number, along: boolean): Graphics {
   }
   // Wheels: dark ellipses tucked under each end, which is what stops it
   // floating over the road.
-  for (const at of [-L * .3, L * .28]) {
+  for (const at of [-L * 0.3, L * 0.28]) {
     const w = project({x: at, y: W / 2});
     g.ellipse(w.x, w.y + 1, 3.6, 1.9).fill(0x0d0f10);
   }
   // Headlights, and only a hint of what they throw.
   const nose = project({x: -L / 2, y: 0});
-  g.circle(nose.x + 2, nose.y - 5, 1.4).fill({color: 0xf6e6bb, alpha: .9});
-  g.poly([nose.x, nose.y - 5, nose.x - 16, nose.y - 9, nose.x - 16, nose.y + 3])
-    .fill({color: 0xf0d6a0, alpha: .05});
+  g.circle(nose.x + 2, nose.y - 5, 1.4).fill({color: 0xf6e6bb, alpha: 0.9});
+  g.poly([nose.x, nose.y - 5, nose.x - 16, nose.y - 9, nose.x - 16, nose.y + 3]).fill({
+    color: 0xf0d6a0,
+    alpha: 0.05,
+  });
   void along;
   return g;
 }
@@ -157,9 +231,19 @@ function prop(kind: string, dark: number, facing: number): Graphics {
   // A contact shadow first, under everything. Without one a prop reads as a
   // shape floating over the pavement rather than as an object standing on it —
   // the first hydrant looked like a red cube hanging in the street.
-  if (kind !== 'pole') g.ellipse(0, 1, 5.5, 2).fill({color: 0x000000, alpha: .3 + .12 * dark});
-  else g.ellipse(0, 1, 4, 1.6).fill({color: 0x000000, alpha: .35 + .12 * dark});
-  const solid = (w: number, d: number, h: number, top: number, left: number, right: number, base = 0, dx = 0, dy = 0) => {
+  if (kind !== 'pole') g.ellipse(0, 1, 5.5, 2).fill({color: 0x000000, alpha: 0.3 + 0.12 * dark});
+  else g.ellipse(0, 1, 4, 1.6).fill({color: 0x000000, alpha: 0.35 + 0.12 * dark});
+  const solid = (
+    w: number,
+    d: number,
+    h: number,
+    top: number,
+    left: number,
+    right: number,
+    base = 0,
+    dx = 0,
+    dy = 0,
+  ) => {
     const f = faces({x: -w / 2 + dx, y: -d / 2 + dy}, {w, d, h, base});
     g.poly(f.left.flatMap(v => [v.x, v.y])).fill(left);
     g.poly(f.right.flatMap(v => [v.x, v.y])).fill(right);
@@ -171,28 +255,53 @@ function prop(kind: string, dark: number, facing: number): Graphics {
       // olive or umber, and a bright hydrant was the only saturated thing on
       // the street, which made it read as a bug rather than as a hydrant.
       const paint = mix(0x6e3a2c, 0x412219, dark);
-      solid(.065, .065, .10, mix(0x84493a, 0x4e2a20, dark), mix(0x5e2a20, 0x3c1a14, dark), paint);
-      solid(.10, .036, .022, paint, mix(0x5e2a20, 0x3c1a14, dark), paint, .07);   // the arms
+      solid(0.065, 0.065, 0.1, mix(0x84493a, 0x4e2a20, dark), mix(0x5e2a20, 0x3c1a14, dark), paint);
+      solid(0.1, 0.036, 0.022, paint, mix(0x5e2a20, 0x3c1a14, dark), paint, 0.07); // the arms
       break;
     }
     case 'mailbox': {
       const paint = mix(0x2f4a3c, 0x1b2b23, dark);
-      solid(.095, .08, .16, mix(0x3d5c4b, 0x22362c, dark), mix(0x1f3227, 0x121d17, dark), paint);
+      solid(0.095, 0.08, 0.16, mix(0x3d5c4b, 0x22362c, dark), mix(0x1f3227, 0x121d17, dark), paint);
       break;
     }
     case 'bin': {
-      solid(.08, .08, .11, mix(0x4a4b43, 0x24261f, dark), mix(0x2a2b25, 0x14150f, dark), mix(0x3a3b33, 0x1c1e18, dark));
+      solid(
+        0.08,
+        0.08,
+        0.11,
+        mix(0x4a4b43, 0x24261f, dark),
+        mix(0x2a2b25, 0x14150f, dark),
+        mix(0x3a3b33, 0x1c1e18, dark),
+      );
       break;
     }
     case 'bench': {
       const wood = mix(0x5a4632, 0x2e2419, dark);
-      solid(.25, .065, .03, wood, mix(0x33281c, 0x1a140e, dark), mix(0x453626, 0x231b13, dark), .045);
-      solid(.25, .022, .065, wood, mix(0x33281c, 0x1a140e, dark), mix(0x453626, 0x231b13, dark), .075, 0, -.022);
+      solid(
+        0.25,
+        0.065,
+        0.03,
+        wood,
+        mix(0x33281c, 0x1a140e, dark),
+        mix(0x453626, 0x231b13, dark),
+        0.045,
+      );
+      solid(
+        0.25,
+        0.022,
+        0.065,
+        wood,
+        mix(0x33281c, 0x1a140e, dark),
+        mix(0x453626, 0x231b13, dark),
+        0.075,
+        0,
+        -0.022,
+      );
       break;
     }
     case 'pole': {
       const timber = mix(0x4a3f31, 0x241f18, dark);
-      solid(.07, .07, 1.35, mix(0x5c5040, 0x2c261e, dark), mix(0x2e271f, 0x171310, dark), timber);
+      solid(0.07, 0.07, 1.35, mix(0x5c5040, 0x2c261e, dark), mix(0x2e271f, 0x171310, dark), timber);
       // The crossarm the wires run off.
       const top = project({x: 0, y: 0});
       g.rect(top.x - 11, top.y - 1.35 * TILE.h - 4, 22, 2).fill(timber);
@@ -214,18 +323,18 @@ function figure(colour: number, yours: boolean, walking: boolean, you = false): 
   // The coat: narrow at the shoulders, flaring to the pavement.
   g.poly([-3.6, -h + 5, 3.6, -h + 5, 5.2, 0, -5.2, 0]).fill(colour);
   // A collar catching the light, so the figure has a front.
-  g.poly([-3.6, -h + 5, 3.6, -h + 5, 2.4, -h + 8.5, -2.4, -h + 8.5]).fill(0xd8cfb4, .5);
-  g.circle(0, -h + 2.6, 3.1).fill(0xc9a98a);          // the head
+  g.poly([-3.6, -h + 5, 3.6, -h + 5, 2.4, -h + 8.5, -2.4, -h + 8.5]).fill(0xd8cfb4, 0.5);
+  g.circle(0, -h + 2.6, 3.1).fill(0xc9a98a); // the head
   // A hat, because it is 1950 and because without one a small figure reads as
   // a pin rather than as a man.
   g.ellipse(0, -h + 1.4, 5, 1.5).fill(0x1b1d1f);
   g.poly([-2.9, -h + 1.4, 2.9, -h + 1.4, 2.2, -h - 1.9, -2.2, -h - 1.9]).fill(0x24272a);
-  g.ellipse(0, .6, 5.4, 1.7).fill({color: 0x000000, alpha: .32});  // and a shadow to stand in
-  if (yours) g.circle(0, -h - 5.2, 1.7).fill(0xd6b77c);            // yours are marked
+  g.ellipse(0, 0.6, 5.4, 1.7).fill({color: 0x000000, alpha: 0.32}); // and a shadow to stand in
+  if (yours) g.circle(0, -h - 5.2, 1.7).fill(0xd6b77c); // yours are marked
   // And the player is not one of yours: a ring on the ground under them, so
   // they can be found in a crowd without reading a name.
   if (you) {
-    g.ellipse(0, 1, 8.5, 3).stroke({width: 1.6, color: 0xd6b77c, alpha: .85});
+    g.ellipse(0, 1, 8.5, 3).stroke({width: 1.6, color: 0xd6b77c, alpha: 0.85});
     g.circle(0, -h - 5.2, 2.2).fill(0xf0d6a0);
   }
   void walking;
@@ -243,18 +352,23 @@ function moment(kind: string, t: number, across: number): Graphics {
   const ease = 1 - t;
   switch (kind) {
     case 'explosion': {
-      const r = reach('explosion', t) / 1.55 * across;
+      const r = (reach('explosion', t) / 1.55) * across;
       if (r > 0) {
-        g.circle(0, 0, r).fill({color: 0xffcf7a, alpha: Math.max(0, .8 - t)});
-        g.circle(0, 0, r * 1.55).fill({color: 0xc4531f, alpha: Math.max(0, .35 - t * .45)});
+        g.circle(0, 0, r).fill({color: 0xffcf7a, alpha: Math.max(0, 0.8 - t)});
+        g.circle(0, 0, r * 1.55).fill({color: 0xc4531f, alpha: Math.max(0, 0.35 - t * 0.45)});
       }
-      if (t > .3) {
+      if (t > 0.3) {
         // Debris thrown out and falling: the only moment with anything solid
         // in it, because an explosion without pieces is a lamp.
         for (let i = 0; i < 11; i++) {
-          const a = i * 2.1, fly = (t - .3) * across * .62;
-          g.rect(Math.cos(a) * fly, Math.sin(a) * fly * .55 + (t - .3) * (t - .3) * 260, 5, 4)
-            .fill({color: 0x14100d, alpha: ease});
+          const a = i * 2.1,
+            fly = (t - 0.3) * across * 0.62;
+          g.rect(
+            Math.cos(a) * fly,
+            Math.sin(a) * fly * 0.55 + (t - 0.3) * (t - 0.3) * 260,
+            5,
+            4,
+          ).fill({color: 0x14100d, alpha: ease});
         }
       }
       break;
@@ -267,11 +381,12 @@ function moment(kind: string, t: number, across: number): Graphics {
       // simply too small to see, which is the same as not existing. A shot at
       // this distance is a hard white point and a wash of light on the wall
       // behind it.
-      if (t < .5 && Math.floor(t * 16) % 2 === 0) {
-        const n = Math.floor(t * 16), x = (n % 3 - 1) * across * .09;
-        g.circle(x, 0, reach(kind, t) * across).fill({color: 0xffe6a8, alpha: .3});
-        g.circle(x, 0, across * .075).fill({color: 0xfff3d2, alpha: .95});
-        g.circle(x, 0, across * .028).fill({color: 0xffffff, alpha: 1});
+      if (t < 0.5 && Math.floor(t * 16) % 2 === 0) {
+        const n = Math.floor(t * 16),
+          x = ((n % 3) - 1) * across * 0.09;
+        g.circle(x, 0, reach(kind, t) * across).fill({color: 0xffe6a8, alpha: 0.3});
+        g.circle(x, 0, across * 0.075).fill({color: 0xfff3d2, alpha: 0.95});
+        g.circle(x, 0, across * 0.028).fill({color: 0xffffff, alpha: 1});
       }
       break;
     }
@@ -280,11 +395,12 @@ function moment(kind: string, t: number, across: number): Graphics {
       // A lamp turning over on a car at the kerb, sweeping the front.
       // Same lesson as the muzzle flash: these were tuned when a plot was three
       // times the size it is now, so what was a lamp became a speck.
-      const swing = Math.sin(t * 26) * across * .2;
-      g.poly([0, 0, swing + across * .26, across * .3, swing - across * .08, across * .3])
-        .fill({color: 0xe0705c, alpha: .34});
-      g.circle(0, 0, reach(kind, t) * across * .5).fill({color: 0xe0705c, alpha: .2});
-      g.circle(0, 0, across * .085).fill({color: 0xf3a08c, alpha: .5 + Math.sin(t * 26) * .3});
+      const swing = Math.sin(t * 26) * across * 0.2;
+      g.poly([0, 0, swing + across * 0.26, across * 0.3, swing - across * 0.08, across * 0.3]).fill(
+        {color: 0xe0705c, alpha: 0.34},
+      );
+      g.circle(0, 0, reach(kind, t) * across * 0.5).fill({color: 0xe0705c, alpha: 0.2});
+      g.circle(0, 0, across * 0.085).fill({color: 0xf3a08c, alpha: 0.5 + Math.sin(t * 26) * 0.3});
       break;
     }
     case 'seizure':
@@ -294,21 +410,35 @@ function moment(kind: string, t: number, across: number): Graphics {
       // Something happened here: a hard ring that opens once and fades, which
       // is enough for a robbery and not so much that it reads as a fire.
       const r = reach(kind, t) * across;
-      g.circle(0, 0, r).stroke({width: 4, color: 0xd6b77c, alpha: Math.max(0, .85 - t)});
-      g.circle(0, 0, r * .55).fill({color: 0xd6b77c, alpha: Math.max(0, .16 - t * .16)});
+      g.circle(0, 0, r).stroke({width: 4, color: 0xd6b77c, alpha: Math.max(0, 0.85 - t)});
+      g.circle(0, 0, r * 0.55).fill({color: 0xd6b77c, alpha: Math.max(0, 0.16 - t * 0.16)});
       break;
     }
   }
   return g;
 }
 
-export function CityIso({state, selected, onSelect, onEnter, spotlight,
-                         layout = EMPTY, editing = false, slot: chosen = '', onSlot}: {
-  state: Snapshot; selected: string; onSelect: (id: string) => void; onEnter: () => void;
+export function CityIso({
+  state,
+  selected,
+  onSelect,
+  onEnter,
+  spotlight,
+  layout = EMPTY,
+  editing = false,
+  slot: chosen = '',
+  onSlot,
+}: {
+  state: Snapshot;
+  selected: string;
+  onSelect: (id: string) => void;
+  onEnter: () => void;
   spotlight?: Spotlight | null;
   // The arrangement, and whether it is being arranged. The city draws itself
   // the same way either way; editing only adds something to click on.
-  layout?: Layout; editing?: boolean; slot?: string;
+  layout?: Layout;
+  editing?: boolean;
+  slot?: string;
   onSlot?: (key: string) => void;
 }) {
   const host = useRef<HTMLDivElement>(null);
@@ -321,62 +451,92 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight,
   const wasLooking = useRef<{x: number; y: number; scale: number} | null>(null);
   // The handlers change on every render; the scene is built once, so it reads
   // them through a box rather than closing over a stale one.
-  const pick = useRef(onSelect); pick.current = onSelect;
-  const enter = useRef(onEnter); enter.current = onEnter;
-  const takeSlot = useRef(onSlot); takeSlot.current = onSlot;
+  const pick = useRef(onSelect);
+  pick.current = onSelect;
+  const enter = useRef(onEnter);
+  enter.current = onEnter;
+  const takeSlot = useRef(onSlot);
+  takeSlot.current = onSlot;
 
   // Build the renderer once. Rebuilding it on every state change would throw
   // away the camera the player had set, which is the whole point of having one.
   useEffect(() => {
     let dead = false;
     const application = new Application();
-    application.init({
-      backgroundAlpha: 0, antialias: true, autoDensity: true,
-      resolution: Math.min(devicePixelRatio, 2), preference: 'webgl',
-      resizeTo: host.current || undefined,
-    }).then(() => {
-      if (dead) { application.destroy(true); return }
-      app.current = application;
-      host.current?.append(application.canvas);
+    application
+      .init({
+        backgroundAlpha: 0,
+        antialias: true,
+        autoDensity: true,
+        resolution: Math.min(devicePixelRatio, 2),
+        preference: 'webgl',
+        resizeTo: host.current || undefined,
+      })
+      .then(() => {
+        if (dead) {
+          application.destroy(true);
+          return;
+        }
+        app.current = application;
+        host.current?.append(application.canvas);
 
-      const viewport = new Viewport({
-        screenWidth: host.current?.clientWidth || 800,
-        screenHeight: host.current?.clientHeight || 560,
-        worldWidth: 2600, worldHeight: 1800,
-        events: application.renderer.events,
+        const viewport = new Viewport({
+          screenWidth: host.current?.clientWidth || 800,
+          screenHeight: host.current?.clientHeight || 560,
+          worldWidth: 2600,
+          worldHeight: 1800,
+          events: application.renderer.events,
+        });
+        viewport
+          .drag()
+          .pinch()
+          .wheel({smooth: 3})
+          .decelerate({friction: 0.92})
+          .clampZoom({minScale: ZOOM.min, maxScale: ZOOM.max});
+        application.stage.addChild(viewport);
+        view.current = viewport;
+
+        const layer = new Container();
+        viewport.addChild(layer);
+        blocks.current = layer;
+        const above = new Container();
+        viewport.addChild(above);
+        effects.current = above;
+        draw();
+        frame();
+        // Then the painted city, once the pictures are in. Until they land the
+        // blocked-out solids stand in, which is why the first draw happens above
+        // rather than waiting on a network.
+        Promise.all([
+          ...[...painted.values()].map(async c => {
+            try {
+              textures.set(c.id, await Assets.load('/art/' + c.file));
+            } catch {
+              /* it keeps its block */
+            }
+          }),
+          // The ground goes on the same errand. A missing one is not an error:
+          // that surface stays the flat colour it has always been, so the city
+          // draws with whatever has arrived.
+          ...GROUND.map(async g => {
+            try {
+              const tex: Texture = await Assets.load(g.file);
+              tex.source.addressMode = 'repeat';
+              ground.set(g.id, tex);
+            } catch {
+              /* the flat colour stands */
+            }
+          }),
+        ]).then(() => {
+          if (!dead) {
+            draw();
+            frame();
+          }
+        });
+      })
+      .catch(() => {
+        /* the card view is still there; see TestTheCardViewIsStillReachable */
       });
-      viewport.drag().pinch().wheel({smooth: 3}).decelerate({friction: .92})
-        .clampZoom({minScale: ZOOM.min, maxScale: ZOOM.max});
-      application.stage.addChild(viewport);
-      view.current = viewport;
-
-      const layer = new Container();
-      viewport.addChild(layer);
-      blocks.current = layer;
-      const above = new Container();
-      viewport.addChild(above);
-      effects.current = above;
-      draw();
-      frame();
-      // Then the painted city, once the pictures are in. Until they land the
-      // blocked-out solids stand in, which is why the first draw happens above
-      // rather than waiting on a network.
-      Promise.all([
-        ...[...painted.values()].map(async c => {
-          try { textures.set(c.id, await Assets.load('/art/' + c.file)) } catch { /* it keeps its block */ }
-        }),
-        // The ground goes on the same errand. A missing one is not an error:
-        // that surface stays the flat colour it has always been, so the city
-        // draws with whatever has arrived.
-        ...GROUND.map(async g => {
-          try {
-            const tex: Texture = await Assets.load(g.file);
-            tex.source.addressMode = 'repeat';
-            ground.set(g.id, tex);
-          } catch { /* the flat colour stands */ }
-        }),
-      ]).then(() => { if (!dead) { draw(); frame() } });
-    }).catch(() => { /* the card view is still there; see TestTheCardViewIsStillReachable */ });
 
     const onResize = () => frame();
     window.addEventListener('resize', onResize);
@@ -385,7 +545,9 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight,
       dead = true;
       window.removeEventListener('resize', onResize);
       app.current?.destroy(true, {children: true});
-      app.current = null; view.current = null; blocks.current = null;
+      app.current = null;
+      view.current = null;
+      blocks.current = null;
     };
   }, []);
 
@@ -395,8 +557,15 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight,
   // Deliberately not spotlight.t: the moment animates in its own layer, and
   // rebuilding twelve buildings sixty times a second to redraw a fireball that
   // is not in them is work for nothing.
-  useEffect(draw, [state.revision, state.minute, selected, spotlight?.id,
-                   editing, chosen, JSON.stringify(layout.slots)]);
+  useEffect(draw, [
+    state.revision,
+    state.minute,
+    selected,
+    spotlight?.id,
+    editing,
+    chosen,
+    JSON.stringify(layout.slots),
+  ]);
 
   // When a moment starts, take the camera to the building it happened at and
   // remember where the player was looking so it can be given back.
@@ -407,7 +576,12 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight,
       const back = wasLooking.current;
       if (back) {
         wasLooking.current = null;
-        viewport.animate({time: 520, position: {x: back.x, y: back.y}, scale: back.scale, ease: 'easeInOutSine'});
+        viewport.animate({
+          time: 520,
+          position: {x: back.x, y: back.y},
+          scale: back.scale,
+          ease: 'easeInOutSine',
+        });
       }
       return;
     }
@@ -419,8 +593,10 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight,
     const cell = grid(state.locations).get(place.id) || {col: 0, row: 0};
     const c = project(middle(cell));
     viewport.animate({
-      time: 620, position: {x: c.x, y: c.y - 60},
-      scale: Math.min(ZOOM.max, Math.max(1.25, viewport.scale.x)), ease: 'easeInOutSine',
+      time: 620,
+      position: {x: c.x, y: c.y - 60},
+      scale: Math.min(ZOOM.max, Math.max(1.25, viewport.scale.x)),
+      ease: 'easeInOutSine',
     });
   }, [spotlight?.id]);
 
@@ -428,11 +604,13 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight,
   // actually drawn rather than from a guessed world rectangle. Called on the
   // first draw and when the window changes shape, never on an ordinary update.
   function frame() {
-    const layer = blocks.current, viewport = view.current;
+    const layer = blocks.current,
+      viewport = view.current;
     if (!layer || !viewport) return;
     const b = layer.getLocalBounds();
     if (b.width <= 0 || b.height <= 0) return;
-    const w = host.current?.clientWidth || 800, h = host.current?.clientHeight || 560;
+    const w = host.current?.clientWidth || 800,
+      h = host.current?.clientHeight || 560;
     viewport.resize(w, h, b.width, b.height);
     const scale = Math.min(w / (b.width + 120), h / (b.height + 120));
     viewport.setZoom(Math.max(ZOOM.min, Math.min(ZOOM.max, scale)), true);
@@ -495,16 +673,21 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight,
     const wet = state.sky?.wet ?? 0;
     // Fog is the one weather that changes how far the player can see, so it is
     // the one that touches the depth haze rather than the ground.
-    const murk = state.sky?.kind === 'fog' ? .42 : 0;
-    const sunlit = (c: number) => mix(c, 0xa9713f, gold * .2);
-    const tarmac = (c: number) => mix(mix(c, 0x141a20, wet * .38), 0x6b4f3c, gold * .09 * (1 - wet * .6));
+    const murk = state.sky?.kind === 'fog' ? 0.42 : 0;
+    const sunlit = (c: number) => mix(c, 0xa9713f, gold * 0.2);
+    const tarmac = (c: number) =>
+      mix(mix(c, 0x141a20, wet * 0.38), 0x6b4f3c, gold * 0.09 * (1 - wet * 0.6));
 
     // The ground: one slab under the whole city, so nothing floats and the
     // roads are cut out of something rather than laid on nothing.
     const earth = new Graphics();
     const far = {x: size.cols * BLOCK, y: size.rows * BLOCK};
-    const corners = [{x: -.6, y: -.6}, {x: far.x + .6, y: -.6}, {x: far.x + .6, y: far.y + .6}, {x: -.6, y: far.y + .6}]
-      .map(project);
+    const corners = [
+      {x: -0.6, y: -0.6},
+      {x: far.x + 0.6, y: -0.6},
+      {x: far.x + 0.6, y: far.y + 0.6},
+      {x: -0.6, y: far.y + 0.6},
+    ].map(project);
     earth.poly(corners.flatMap(c => [c.x, c.y])).fill(sunlit(mix(0x565c50, 0x0f1416, dark)));
     layer.addChild(earth);
 
@@ -513,22 +696,30 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight,
     // of that one.
     const avenue = trolleyAvenue(size) * BLOCK;
     const onTrolley = (way: {a: {x: number}; b: {x: number}}) =>
-      Math.abs(way.a.x - avenue) < .001 && Math.abs(way.b.x - avenue) < .001;
+      Math.abs(way.a.x - avenue) < 0.001 && Math.abs(way.b.x - avenue) < 0.001;
 
     // The carriageways, full width and height, so every junction is square.
     const road = new Graphics();
     for (const way of carriageways(size)) {
-      const horizontal = Math.abs(way.b.y - way.a.y) < .001;
+      const horizontal = Math.abs(way.b.y - way.a.y) < 0.001;
       const pad = horizontal ? {x: 0, y: ROAD / 2} : {x: ROAD / 2, y: 0};
       const box = [
-        {x: way.a.x - pad.x, y: way.a.y - pad.y}, {x: way.b.x + pad.x, y: way.a.y - pad.y},
-        {x: way.b.x + pad.x, y: way.b.y + pad.y}, {x: way.a.x - pad.x, y: way.b.y + pad.y},
+        {x: way.a.x - pad.x, y: way.a.y - pad.y},
+        {x: way.b.x + pad.x, y: way.a.y - pad.y},
+        {x: way.b.x + pad.x, y: way.b.y + pad.y},
+        {x: way.a.x - pad.x, y: way.b.y + pad.y},
       ].map(project);
       const surface = onTrolley(way) ? ground.get('cobbles') : ground.get('asphalt');
       const shade = tarmac(mix(0x4b514e, 0x161b1c, dark));
-      road.poly(box.flatMap(c => [c.x, c.y])).fill(surface
-        ? {texture: surface, matrix: laid(surface, spanOf(onTrolley(way) ? 'cobbles' : 'asphalt')), color: shade}
-        : shade);
+      road.poly(box.flatMap(c => [c.x, c.y])).fill(
+        surface
+          ? {
+              texture: surface,
+              matrix: laid(surface, spanOf(onTrolley(way) ? 'cobbles' : 'asphalt')),
+              color: shade,
+            }
+          : shade,
+      );
     }
     layer.addChild(road);
 
@@ -538,29 +729,49 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight,
     const kerb = new Graphics();
     for (const cell of cells.values()) {
       const i = island(cell);
-      const outer = [{x: i.x, y: i.y}, {x: i.x + i.w, y: i.y}, {x: i.x + i.w, y: i.y + i.d}, {x: i.x, y: i.y + i.d}]
-        .map(project);
+      const outer = [
+        {x: i.x, y: i.y},
+        {x: i.x + i.w, y: i.y},
+        {x: i.x + i.w, y: i.y + i.d},
+        {x: i.x, y: i.y + i.d},
+      ].map(project);
       const flags = ground.get('pavement');
       const stone = sunlit(mix(0x7c8175, 0x252b29, dark));
-      pave.poly(outer.flatMap(c => [c.x, c.y])).fill(flags
-        ? {texture: flags, matrix: laid(flags, spanOf('pavement')), color: stone}
-        : stone);
+      pave
+        .poly(outer.flatMap(c => [c.x, c.y]))
+        .fill(
+          flags ? {texture: flags, matrix: laid(flags, spanOf('pavement')), color: stone} : stone,
+        );
       const edging = ground.get('kerb');
       const edge = mix(0x939a8b, 0x323b36, dark);
-      kerb.poly(outer.flatMap(c => [c.x, c.y])).stroke(edging
-        ? {width: 2.2, texture: edging, matrix: laid(edging, spanOf('kerb')), color: edge, alpha: .95}
-        : {width: 1.6, color: edge, alpha: .95});
+      kerb.poly(outer.flatMap(c => [c.x, c.y])).stroke(
+        edging
+          ? {
+              width: 2.2,
+              texture: edging,
+              matrix: laid(edging, spanOf('kerb')),
+              color: edge,
+              alpha: 0.95,
+            }
+          : {width: 1.6, color: edge, alpha: 0.95},
+      );
       // The join between pavement and building, a shade darker so the plot
       // reads as ground the building sits on rather than as more pavement.
       const b = plot(cell);
-      const inner = [{x: b.x, y: b.y}, {x: b.x + b.w, y: b.y}, {x: b.x + b.w, y: b.y + b.d}, {x: b.x, y: b.y + b.d}]
-        .map(project);
+      const inner = [
+        {x: b.x, y: b.y},
+        {x: b.x + b.w, y: b.y},
+        {x: b.x + b.w, y: b.y + b.d},
+        {x: b.x, y: b.y + b.d},
+      ].map(project);
       // The join between pavement and plot keeps the same flags a shade darker,
       // so it reads as the same ground rather than as a different material.
       const joint = sunlit(mix(0x6c7266, 0x1e2422, dark));
-      pave.poly(inner.flatMap(c => [c.x, c.y])).fill(flags
-        ? {texture: flags, matrix: laid(flags, spanOf('pavement')), color: joint}
-        : joint);
+      pave
+        .poly(inner.flatMap(c => [c.x, c.y]))
+        .fill(
+          flags ? {texture: flags, matrix: laid(flags, spanOf('pavement')), color: joint} : joint,
+        );
     }
     layer.addChild(pave, kerb);
 
@@ -568,16 +779,22 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight,
     // trolley runs down, where the track is what is down the middle.
     const paint = new Graphics();
     for (const way of carriageways(size)) {
-      if (Math.abs(way.a.x - avenue) < .001 && Math.abs(way.b.x - avenue) < .001) continue;
+      if (Math.abs(way.a.x - avenue) < 0.001 && Math.abs(way.b.x - avenue) < 0.001) continue;
       const length = Math.hypot(way.b.x - way.a.x, way.b.y - way.a.y);
-      const dashes = Math.max(2, Math.round(length / .5));
+      const dashes = Math.max(2, Math.round(length / 0.5));
       for (let i = 0; i < dashes; i += 2) {
-        const from = project({x: way.a.x + (way.b.x - way.a.x) * (i / dashes), y: way.a.y + (way.b.y - way.a.y) * (i / dashes)});
-        const to = project({x: way.a.x + (way.b.x - way.a.x) * ((i + .6) / dashes), y: way.a.y + (way.b.y - way.a.y) * ((i + .6) / dashes)});
+        const from = project({
+          x: way.a.x + (way.b.x - way.a.x) * (i / dashes),
+          y: way.a.y + (way.b.y - way.a.y) * (i / dashes),
+        });
+        const to = project({
+          x: way.a.x + (way.b.x - way.a.x) * ((i + 0.6) / dashes),
+          y: way.a.y + (way.b.y - way.a.y) * ((i + 0.6) / dashes),
+        });
         paint.moveTo(from.x, from.y).lineTo(to.x, to.y);
       }
     }
-    paint.stroke({width: 1.3, color: 0x6d6a52, alpha: .35});
+    paint.stroke({width: 1.3, color: 0x6d6a52, alpha: 0.35});
 
     // The trolley track: two running rails down one avenue, with the ties
     // showing through the setts between them. Laid from the same grid as the
@@ -585,17 +802,19 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight,
     // end up half on the pavement.
     const track = new Graphics();
     for (const tie of sleepers(size)) {
-      const a = project(tie.a), b = project(tie.b);
+      const a = project(tie.a),
+        b = project(tie.b);
       track.moveTo(a.x, a.y).lineTo(b.x, b.y);
     }
-    track.stroke({width: 1.4, color: mix(0x4d4a3f, 0x22231f, dark), alpha: .55});
+    track.stroke({width: 1.4, color: mix(0x4d4a3f, 0x22231f, dark), alpha: 0.55});
     for (const rail of rails(size)) {
-      const a = project(rail.a), b = project(rail.b);
+      const a = project(rail.a),
+        b = project(rail.b);
       // The rail head is polished by use, so it catches whatever light there
       // is — the one thing in this street that is brighter at night.
       track.moveTo(a.x, a.y).lineTo(b.x, b.y);
     }
-    track.stroke({width: 1.6, color: mix(0x9a9c93, 0xb4af9f, dark), alpha: .62 + dark * .26});
+    track.stroke({width: 1.6, color: mix(0x9a9c93, 0xb4af9f, dark), alpha: 0.62 + dark * 0.26});
     layer.addChild(track);
 
     // The paint at the junctions: the bars of a crossing and the line a car
@@ -603,37 +822,63 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight,
     // construction rather than by being nudged into place.
     const road_paint = new Graphics();
     for (const mark of markings(size)) {
-      const across = {x: -mark.along.y, y: mark.along.x};   // square to the street
+      const across = {x: -mark.along.y, y: mark.along.x}; // square to the street
       if (mark.kind === 'crossing') {
         const bars = 5;
         for (let i = 0; i < bars; i++) {
-          const t = (i + .5) / bars - .5;
+          const t = (i + 0.5) / bars - 0.5;
           const centre = {
-            x: mark.at.x + across.x * t * mark.width * .82,
-            y: mark.at.y + across.y * t * mark.width * .82,
+            x: mark.at.x + across.x * t * mark.width * 0.82,
+            y: mark.at.y + across.y * t * mark.width * 0.82,
           };
-          const half = .085, long = .30;
+          const half = 0.085,
+            long = 0.3;
           const corners = [
-            {x: centre.x - across.x * half - mark.along.x * long, y: centre.y - across.y * half - mark.along.y * long},
-            {x: centre.x + across.x * half - mark.along.x * long, y: centre.y + across.y * half - mark.along.y * long},
-            {x: centre.x + across.x * half + mark.along.x * long, y: centre.y + across.y * half + mark.along.y * long},
-            {x: centre.x - across.x * half + mark.along.x * long, y: centre.y - across.y * half + mark.along.y * long},
+            {
+              x: centre.x - across.x * half - mark.along.x * long,
+              y: centre.y - across.y * half - mark.along.y * long,
+            },
+            {
+              x: centre.x + across.x * half - mark.along.x * long,
+              y: centre.y + across.y * half - mark.along.y * long,
+            },
+            {
+              x: centre.x + across.x * half + mark.along.x * long,
+              y: centre.y + across.y * half + mark.along.y * long,
+            },
+            {
+              x: centre.x - across.x * half + mark.along.x * long,
+              y: centre.y - across.y * half + mark.along.y * long,
+            },
           ].map(project);
           road_paint.poly(corners.flatMap(c => [c.x, c.y]));
         }
       } else {
-        const half = mark.width * .44, thick = .05;
+        const half = mark.width * 0.44,
+          thick = 0.05;
         const corners = [
-          {x: mark.at.x - across.x * half - mark.along.x * thick, y: mark.at.y - across.y * half - mark.along.y * thick},
-          {x: mark.at.x + across.x * half - mark.along.x * thick, y: mark.at.y + across.y * half - mark.along.y * thick},
-          {x: mark.at.x + across.x * half + mark.along.x * thick, y: mark.at.y + across.y * half + mark.along.y * thick},
-          {x: mark.at.x - across.x * half + mark.along.x * thick, y: mark.at.y - across.y * half + mark.along.y * thick},
+          {
+            x: mark.at.x - across.x * half - mark.along.x * thick,
+            y: mark.at.y - across.y * half - mark.along.y * thick,
+          },
+          {
+            x: mark.at.x + across.x * half - mark.along.x * thick,
+            y: mark.at.y + across.y * half - mark.along.y * thick,
+          },
+          {
+            x: mark.at.x + across.x * half + mark.along.x * thick,
+            y: mark.at.y + across.y * half + mark.along.y * thick,
+          },
+          {
+            x: mark.at.x - across.x * half + mark.along.x * thick,
+            y: mark.at.y - across.y * half + mark.along.y * thick,
+          },
         ].map(project);
         road_paint.poly(corners.flatMap(c => [c.x, c.y]));
       }
     }
     // Worn paint, not fresh: it has been on the road a while.
-    road_paint.fill({color: mix(0xd8d2b8, 0x9a957f, .35 + dark * .3), alpha: .34});
+    road_paint.fill({color: mix(0xd8d2b8, 0x9a957f, 0.35 + dark * 0.3), alpha: 0.34});
     layer.addChild(paint, road_paint);
 
     // The lamps, at every corner of every block, and the pools they throw.
@@ -643,26 +888,40 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight,
       const p = project(foot);
       // A lamp burning at noon is the surest sign nothing is looking at the
       // clock, so the pools it throws come up as the light goes down.
-      glow.ellipse(p.x, p.y, TILE.w * .40, TILE.h * .40).fill({color: 0xd9b678, alpha: .11 * dark});
-      glow.ellipse(p.x, p.y, TILE.w * .21, TILE.h * .21).fill({color: 0xf0d6a0, alpha: .10 * dark});
+      glow
+        .ellipse(p.x, p.y, TILE.w * 0.4, TILE.h * 0.4)
+        .fill({color: 0xd9b678, alpha: 0.11 * dark});
+      glow
+        .ellipse(p.x, p.y, TILE.w * 0.21, TILE.h * 0.21)
+        .fill({color: 0xf0d6a0, alpha: 0.1 * dark});
       // On a wet road the lamp is twice: the pool it throws, and the smear of
       // itself lying in the water. A reflection stretches toward whoever is
       // looking at it, which in this projection is straight down the screen.
       if (wet > 0) {
-        glow.ellipse(p.x, p.y + TILE.h * .55, TILE.w * .035, TILE.h * 1.05)
-          .fill({color: 0xf0d6a0, alpha: .1 * wet * (.25 + dark * .75)});
-        glow.ellipse(p.x, p.y + TILE.h * .3, TILE.w * .09, TILE.h * .5)
-          .fill({color: 0xd9b678, alpha: .07 * wet * (.25 + dark * .75)});
+        glow
+          .ellipse(p.x, p.y + TILE.h * 0.55, TILE.w * 0.035, TILE.h * 1.05)
+          .fill({color: 0xf0d6a0, alpha: 0.1 * wet * (0.25 + dark * 0.75)});
+        glow
+          .ellipse(p.x, p.y + TILE.h * 0.3, TILE.w * 0.09, TILE.h * 0.5)
+          .fill({color: 0xd9b678, alpha: 0.07 * wet * (0.25 + dark * 0.75)});
       }
       const H = 32;
-      posts.poly([p.x - 1.4, p.y, p.x + 1.4, p.y, p.x + .8, p.y - H, p.x - .8, p.y - H]).fill(0x1b1f21);
+      posts
+        .poly([p.x - 1.4, p.y, p.x + 1.4, p.y, p.x + 0.8, p.y - H, p.x - 0.8, p.y - H])
+        .fill(0x1b1f21);
       posts.ellipse(p.x, p.y, 3.2, 1.3).fill(0x14171a);
-      posts.rect(p.x - .8, p.y - H - 1, 5, 1.3).fill(0x1b1f21);
-      const lx = p.x + 4.4, ly = p.y - H + 1;
-      posts.poly([lx - 2.2, ly, lx + 2.2, ly, lx + 1.4, ly + 4.8, lx - 1.4, ly + 4.8])
-        .fill({color: mix(0x8b8778, 0xf3dcae, dark), alpha: .3 + .62 * dark});
-      posts.poly([lx - 2.6, ly - 1.3, lx + 2.6, ly - 1.3, lx + 2.2, ly, lx - 2.2, ly]).fill(0x22262a);
-      glow.poly([lx, ly + 4, lx + 12, p.y + 3, lx - 12, p.y + 3]).fill({color: 0xf0d6a0, alpha: .07 * dark});
+      posts.rect(p.x - 0.8, p.y - H - 1, 5, 1.3).fill(0x1b1f21);
+      const lx = p.x + 4.4,
+        ly = p.y - H + 1;
+      posts
+        .poly([lx - 2.2, ly, lx + 2.2, ly, lx + 1.4, ly + 4.8, lx - 1.4, ly + 4.8])
+        .fill({color: mix(0x8b8778, 0xf3dcae, dark), alpha: 0.3 + 0.62 * dark});
+      posts
+        .poly([lx - 2.6, ly - 1.3, lx + 2.6, ly - 1.3, lx + 2.2, ly, lx - 2.2, ly])
+        .fill(0x22262a);
+      glow
+        .poly([lx, ly + 4, lx + 12, p.y + 3, lx - 12, p.y + 3])
+        .fill({color: 0xf0d6a0, alpha: 0.07 * dark});
     }
     layer.addChild(glow, posts);
 
@@ -683,36 +942,47 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight,
     // The wires: strung block to block, sagging the way a wire does.
     const strung = new Graphics();
     for (const span of wires(poles)) {
-      const a = project(span.a), b = project(span.b);
+      const a = project(span.a),
+        b = project(span.b);
       const lift = 1.35 * TILE.h + 8;
-      strung.moveTo(a.x, a.y - lift)
+      strung
+        .moveTo(a.x, a.y - lift)
         .quadraticCurveTo((a.x + b.x) / 2, (a.y + b.y) / 2 - lift + 9, b.x, b.y - lift);
-      strung.moveTo(a.x, a.y - lift + 8)
+      strung
+        .moveTo(a.x, a.y - lift + 8)
         .quadraticCurveTo((a.x + b.x) / 2, (a.y + b.y) / 2 - lift + 17, b.x, b.y - lift + 8);
     }
-    strung.stroke({width: 1, color: mix(0x4a4f48, 0x15191a, dark), alpha: .75});
+    strung.stroke({width: 1, color: mix(0x4a4f48, 0x15191a, dark), alpha: 0.75});
     layer.addChild(clutter, strung);
 
     // A canvas awning over a shopfront, hanging out over the pavement. Drawn
     // from the terrace geometry rather than painted into the art, because it
     // belongs to the street: it is the one part of a building that reaches
     // past its own wall.
-    const CANVAS = [[0x2f4436, 0xd8cdb4], [0x6b2f2c, 0xd8cdb4],
-                    [0x8a6a2c, 0xe0d5bb], [0x2c3d55, 0xd2c9b2]];
+    const CANVAS = [
+      [0x2f4436, 0xd8cdb4],
+      [0x6b2f2c, 0xd8cdb4],
+      [0x8a6a2c, 0xe0d5bb],
+      [0x2c3d55, 0xd2c9b2],
+    ];
     const canopy = (a: ReturnType<typeof awnings>[number]) => {
       const g = new Graphics();
       const lift = (v: Vec, up: number) => ({x: v.x, y: v.y - up * TILE.h});
       const [band, pale] = CANVAS[a.tone % CANVAS.length];
       // The shadow it throws on the pavement, which is what stops it floating.
-      const shade = [{x: a.at.x, y: a.at.y}, {x: a.at.x + a.w, y: a.at.y},
-                     {x: a.at.x + a.w, y: a.at.y + a.reach}, {x: a.at.x, y: a.at.y + a.reach}]
-        .map(v => project({x: v.x + .04, y: v.y + .04}));
-      g.poly(shade.flatMap(v => [v.x, v.y])).fill({color: 0x0b0f10, alpha: .3 - dark * .16});
+      const shade = [
+        {x: a.at.x, y: a.at.y},
+        {x: a.at.x + a.w, y: a.at.y},
+        {x: a.at.x + a.w, y: a.at.y + a.reach},
+        {x: a.at.x, y: a.at.y + a.reach},
+      ].map(v => project({x: v.x + 0.04, y: v.y + 0.04}));
+      g.poly(shade.flatMap(v => [v.x, v.y])).fill({color: 0x0b0f10, alpha: 0.3 - dark * 0.16});
       // The canvas itself, in bands across the frontage, sloping down to the
       // street so the rain runs off it.
       const step = a.w / a.stripes;
       for (let k = 0; k < a.stripes; k++) {
-        const x0 = a.at.x + k * step, x1 = x0 + step;
+        const x0 = a.at.x + k * step,
+          x1 = x0 + step;
         const quad = [
           lift(project({x: x0, y: a.at.y}), a.h),
           lift(project({x: x1, y: a.at.y}), a.h),
@@ -721,16 +991,18 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight,
         ];
         // Not darkened as far as a roof is: an awning sits under a lamp and
         // over a lit window, which is the whole reason a shopfront has one.
-        g.poly(quad.flatMap(v => [v.x, v.y]))
-          .fill(mix(k % 2 ? pale : band, 0x1d2124, .1 + dark * .34));
+        g.poly(quad.flatMap(v => [v.x, v.y])).fill(
+          mix(k % 2 ? pale : band, 0x1d2124, 0.1 + dark * 0.34),
+        );
       }
       // The valance hanging off the front lip, which is what makes it read as
       // cloth rather than as a shelf.
       const fl = lift(project({x: a.at.x, y: a.at.y + a.reach}), a.h - a.drop);
       const fr = lift(project({x: a.at.x + a.w, y: a.at.y + a.reach}), a.h - a.drop);
-      const hang = .055 * TILE.h;
-      g.poly([fl.x, fl.y, fr.x, fr.y, fr.x, fr.y + hang, fl.x, fl.y + hang])
-        .fill(mix(band, 0x0f1416, .22 + dark * .4));
+      const hang = 0.055 * TILE.h;
+      g.poly([fl.x, fl.y, fr.x, fr.y, fr.x, fr.y + hang, fl.x, fl.y + hang]).fill(
+        mix(band, 0x0f1416, 0.22 + dark * 0.4),
+      );
       return g;
     };
 
@@ -746,19 +1018,28 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight,
       // smoke. What reads as smoke is enough of them that no single edge shows,
       // each one nudged off the centre line so the column is ragged.
       const puffs = v.kind === 'chimney' ? 20 : 12;
-      const rise = v.kind === 'chimney' ? 1.9 : .7;
+      const rise = v.kind === 'chimney' ? 1.9 : 0.7;
       let h = Math.abs(Math.round(v.at.x * 733 + v.at.y * 971)) >>> 0;
-      const next = () => { h = (h * 1664525 + 1013904223) >>> 0; return h / 4294967296 };
+      const next = () => {
+        h = (h * 1664525 + 1013904223) >>> 0;
+        return h / 4294967296;
+      };
       for (let k = 0; k < puffs; k++) {
         const t = (k + 1) / puffs;
         const up = (v.height + t * rise) * TILE.h;
         // Widening as it goes, and faster near the top where it is losing its
         // shape rather than holding a column.
-        const wide = v.size * TILE.w * .05 * (1 + t * t * 3.4 + t);
-        const wobble = (next() - .5) * wide * .55;
-        g.ellipse(foot.x + v.drift * t * t * TILE.w * .5 + wobble,
-                  foot.y - up + (next() - .5) * wide * .3, wide, wide * .66)
-          .fill({color: mix(0xb9bdb8, 0x8b9296, dark), alpha: (1 - t) * (v.kind === 'chimney' ? .085 : .07)});
+        const wide = v.size * TILE.w * 0.05 * (1 + t * t * 3.4 + t);
+        const wobble = (next() - 0.5) * wide * 0.55;
+        g.ellipse(
+          foot.x + v.drift * t * t * TILE.w * 0.5 + wobble,
+          foot.y - up + (next() - 0.5) * wide * 0.3,
+          wide,
+          wide * 0.66,
+        ).fill({
+          color: mix(0xb9bdb8, 0x8b9296, dark),
+          alpha: (1 - t) * (v.kind === 'chimney' ? 0.085 : 0.07),
+        });
       }
       return g;
     };
@@ -768,20 +1049,30 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight,
     // the rest, shoulder to shoulder, so the city is built up rather than
     // twelve models in twelve fields.
     const filler = new Container();
-    const rows: {cell: Cell; slot: ReturnType<typeof terrace>[number]; index: number; depth: number}[] = [];
-    const addressAt = new Map<string, string>();      // "col,row,index" -> id
+    const rows: {
+      cell: Cell;
+      slot: ReturnType<typeof terrace>[number];
+      index: number;
+      depth: number;
+    }[] = [];
+    const addressAt = new Map<string, string>(); // "col,row,index" -> id
     const hung = new Map<string, ReturnType<typeof awnings>>();
     const smoking = new Map<string, ReturnType<typeof vents>>();
-    for (const [id, cell] of cells) addressAt.set(`${cell.col},${cell.row},${addressSlot(SLOTS)}`, id);
+    for (const [id, cell] of cells)
+      addressAt.set(`${cell.col},${cell.row},${addressSlot(SLOTS)}`, id);
     for (let col = 0; col < size.cols; col++) {
       for (let row = 0; row < size.rows; row++) {
         hung.set(`${col},${row}`, awnings({col, row}, SLOTS));
         smoking.set(`${col},${row}`, vents({col, row}, SLOTS));
         terrace({col, row}, SLOTS).forEach((slot, index) => {
           const key = `${col},${row},${index}`;
-          if (slot.front && addressAt.has(key)) return;   // the address builds here
-          rows.push({cell: {col, row}, slot, index,
-                     depth: slot.at.x + slot.w / 2 + slot.at.y + slot.d / 2});
+          if (slot.front && addressAt.has(key)) return; // the address builds here
+          rows.push({
+            cell: {col, row},
+            slot,
+            index,
+            depth: slot.at.x + slot.w / 2 + slot.at.y + slot.d / 2,
+          });
         });
       }
     }
@@ -834,7 +1125,7 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight,
         // height alone squashed and stretched buildings that were drawn
         // correctly, which is its own artefact on top of the overlapping.
         const warmth = ((order * 37) % 7) / 7;
-        art.tint = mix(mix(0xd8d4c6, 0xc4ced2, warmth), 0x6f7a80, .1 + dark * .48);
+        art.tint = mix(mix(0xd8d4c6, 0xc4ced2, warmth), 0x6f7a80, 0.1 + dark * 0.48);
         g.addChild(art);
       } else {
         // Nothing built here yet, so nothing is drawn standing here. A slab of
@@ -843,17 +1134,22 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight,
         // unfinished and honest. What is drawn instead is the ground it will
         // stand on — an empty plot, flat, so the shape of the city can still be
         // read while the buildings for it are being made.
-        const inset = .05;
+        const inset = 0.05;
         const at = {x: slot.at.x + inset, y: slot.at.y + inset};
-        const w = slot.w - inset * 2, d = slot.d - inset * 2;
-        const ground = [{x: at.x, y: at.y}, {x: at.x + w, y: at.y},
-                        {x: at.x + w, y: at.y + d}, {x: at.x, y: at.y + d}].map(project);
+        const w = slot.w - inset * 2,
+          d = slot.d - inset * 2;
+        const ground = [
+          {x: at.x, y: at.y},
+          {x: at.x + w, y: at.y},
+          {x: at.x + w, y: at.y + d},
+          {x: at.x, y: at.y + d},
+        ].map(project);
         g.poly(ground.flatMap(c => [c.x, c.y]))
-          .fill({color: mix(0x2f352f, 0x141a19, dark), alpha: .55})
-          .stroke({width: 1, color: mix(0x4d5750, 0x232c29, dark), alpha: .8});
+          .fill({color: mix(0x2f352f, 0x141a19, dark), alpha: 0.55})
+          .stroke({width: 1, color: mix(0x4d5750, 0x232c29, dark), alpha: 0.8});
       }
       const away = distance(slot.at, size);
-      g.alpha = 1 - away * .35 * (0.16 + dark * .84) - away * murk;
+      g.alpha = 1 - away * 0.35 * (0.16 + dark * 0.84) - away * murk;
       filler.addChild(g);
       if (fillArt) built.add(`${cell.col},${cell.row}`);
       // And the canvas over its shopfront, drawn straight after the building it
@@ -866,8 +1162,10 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight,
       }
       // The block's plumes go down after its nearest building, so smoke stands
       // over its own roofs and still passes behind anything in front of it.
-      if (built.has(`${cell.col},${cell.row}`) &&
-          nearest.get(`${cell.col},${cell.row}`) === slot.at.x + slot.w / 2 + slot.at.y + slot.d / 2) {
+      if (
+        built.has(`${cell.col},${cell.row}`) &&
+        nearest.get(`${cell.col},${cell.row}`) === slot.at.x + slot.w / 2 + slot.at.y + slot.d / 2
+      ) {
         for (const v of smoking.get(`${cell.col},${cell.row}`) || []) filler.addChild(plume(v));
       }
     }
@@ -890,16 +1188,18 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight,
       }
     }
     layer.addChild(cars);
-    const placed = state.locations.map(p => {
-      const cell = cells.get(p.id) || {col: 0, row: 0};
-      // The address stands in the middle of its block's frontage, in a slot the
-      // width of its neighbours, so it belongs to the terrace rather than
-      // sitting in a field of its own.
-      const slot = terrace(cell, SLOTS)[addressSlot(SLOTS)];
-      const block = {...blockFor(p.type, p.id), w: slot.w, d: slot.d};
-      const at = {x: slot.at.x, y: slot.at.y};
-      return {p, cell, block, at, d: at.x + block.w / 2 + at.y + block.d / 2};
-    }).sort((a, b) => a.d - b.d);
+    const placed = state.locations
+      .map(p => {
+        const cell = cells.get(p.id) || {col: 0, row: 0};
+        // The address stands in the middle of its block's frontage, in a slot the
+        // width of its neighbours, so it belongs to the terrace rather than
+        // sitting in a field of its own.
+        const slot = terrace(cell, SLOTS)[addressSlot(SLOTS)];
+        const block = {...blockFor(p.type, p.id), w: slot.w, d: slot.d};
+        const at = {x: slot.at.x, y: slot.at.y};
+        return {p, cell, block, at, d: at.x + block.w / 2 + at.y + block.d / 2};
+      })
+      .sort((a, b) => a.d - b.d);
 
     for (const {p, cell, block, at} of placed) {
       const lit = spotlight?.id === p.id;
@@ -911,29 +1211,41 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight,
       // Hover lifts a building out of the haze; leaving puts it back where it
       // was rather than at full brightness, which would have left every
       // building the mouse crossed permanently nearer than the rest.
-      group.on('pointerover', () => { group.alpha = Math.min(1, group.alpha + .25) });
-      group.on('pointerout', () => { group.alpha = resting });
-      if (p.id === here) group.on('pointertap', () => { if (p.id === here) enter.current() });
+      group.on('pointerover', () => {
+        group.alpha = Math.min(1, group.alpha + 0.25);
+      });
+      group.on('pointerout', () => {
+        group.alpha = resting;
+      });
+      if (p.id === here)
+        group.on('pointertap', () => {
+          if (p.id === here) enter.current();
+        });
       const away = distance(at, size);
-      const resting = (shut ? .45 : 1) * Math.max(.15, 1 - away * .22 * (0.14 + dark * .86) - away * murk);
+      const resting =
+        (shut ? 0.45 : 1) * Math.max(0.15, 1 - away * 0.22 * (0.14 + dark * 0.86) - away * murk);
       group.alpha = resting;
 
       // The ground it stands on, so nothing floats.
       const ground = new Graphics();
       const corners = [
-        project(at), project({x: at.x + block.w, y: at.y}),
-        project({x: at.x + block.w, y: at.y + block.d}), project({x: at.x, y: at.y + block.d}),
+        project(at),
+        project({x: at.x + block.w, y: at.y}),
+        project({x: at.x + block.w, y: at.y + block.d}),
+        project({x: at.x, y: at.y + block.d}),
       ];
       // What the windows throw on the pavement. A painted building is full of
       // lit windows and stood in a pool of nothing; this is the light getting
       // out of it.
-      if (dark > .1) {
+      if (dark > 0.1) {
         const centreNow = project(middle(cell));
         const spill = new Graphics();
-        spill.ellipse(centreNow.x, centreNow.y + TILE.h * .35, TILE.w * .78, TILE.h * .78)
-          .fill({color: 0xe8bf82, alpha: .07 * dark});
-        spill.ellipse(centreNow.x, centreNow.y + TILE.h * .3, TILE.w * .45, TILE.h * .45)
-          .fill({color: 0xf2d3a0, alpha: .06 * dark});
+        spill
+          .ellipse(centreNow.x, centreNow.y + TILE.h * 0.35, TILE.w * 0.78, TILE.h * 0.78)
+          .fill({color: 0xe8bf82, alpha: 0.07 * dark});
+        spill
+          .ellipse(centreNow.x, centreNow.y + TILE.h * 0.3, TILE.w * 0.45, TILE.h * 0.45)
+          .fill({color: 0xf2d3a0, alpha: 0.06 * dark});
         group.addChild(spill);
       }
 
@@ -943,11 +1255,17 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight,
       // is only wanted under a blocked-out one — or under any of them when
       // there is something to say about the ground.
       if (!hasArt || marked) {
-        ground.poly(corners.flatMap(c => [c.x, c.y]))
-          .fill(hasArt
-            ? {color: lit ? 0xd6b77c : 0x000000, alpha: lit ? .12 : 0}
-            : {color: lit ? 0x2a2f23 : mix(0x323830, 0x161c1b, dark), alpha: .6})
-          .stroke({width: p.id === selected ? 2.5 : 1.5, color: lit || p.id === selected ? 0xd6b77c : p.owned ? 0x8f7849 : 0x3b453f});
+        ground
+          .poly(corners.flatMap(c => [c.x, c.y]))
+          .fill(
+            hasArt
+              ? {color: lit ? 0xd6b77c : 0x000000, alpha: lit ? 0.12 : 0}
+              : {color: lit ? 0x2a2f23 : mix(0x323830, 0x161c1b, dark), alpha: 0.6},
+          )
+          .stroke({
+            width: p.id === selected ? 2.5 : 1.5,
+            color: lit || p.id === selected ? 0xd6b77c : p.owned ? 0x8f7849 : 0x3b453f,
+          });
         group.addChild(ground);
       }
 
@@ -974,7 +1292,7 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight,
         const foot = project({x: at.x + block.w, y: at.y + block.d});
         art.position.set(foot.x + (chosenHere?.dx || 0), foot.y + (chosenHere?.dy || 0));
         group.addChild(art);
-        tallest = (art.height / TILE.h) * .6;
+        tallest = (art.height / TILE.h) * 0.6;
       } else {
         // An address with no picture yet stands as its empty plot rather than
         // as a blocked-out solid. The name still hangs over it and it can still
@@ -985,12 +1303,13 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight,
       const name = new Text({
         text: p.name,
         style: new TextStyle({
-          fontFamily: 'system-ui, sans-serif', fontSize: 13,
+          fontFamily: 'system-ui, sans-serif',
+          fontSize: 13,
           fill: p.id === selected || p.id === here ? 0xd6b77c : 0xcfd4c6,
           stroke: {color: 0x0d1413, width: 4, join: 'round'},
         }),
       });
-      name.anchor.set(.5, 1);
+      name.anchor.set(0.5, 1);
       name.position.set(centre.x, centre.y - tallest * TILE.h - 10);
       name.resolution = 2;
       group.addChild(name);
@@ -1002,15 +1321,19 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight,
         // People stand in twos and threes, not in a line. The gap between one
         // knot and the next is what makes a pavement read as people rather
         // than as a row of pegs — an even spacing looked like a fence.
-        const of = Math.min(crowd.length, 12), per = Math.min(of, 5);
-        const knot = Math.floor(i / 2), inKnot = i % 2;
+        const of = Math.min(crowd.length, 12),
+          per = Math.min(of, 5);
+        const knot = Math.floor(i / 2),
+          inKnot = i % 2;
         const wobble = ((i * 2654435761) % 1000) / 1000;
-        const across_ = Math.min(.9, Math.max(.08,
-          .10 + (knot % 3) * .31 + inKnot * .055 + wobble * .05));
-        const rank = Math.floor(i / per) + (wobble > .7 ? 1 : 0);
+        const across_ = Math.min(
+          0.9,
+          Math.max(0.08, 0.1 + (knot % 3) * 0.31 + inKnot * 0.055 + wobble * 0.05),
+        );
+        const rank = Math.floor(i / per) + (wobble > 0.7 ? 1 : 0);
         const spot = project({
           x: island_.x + island_.w * across_,
-          y: island_.y + island_.d - PAVE * (.36 + rank * .5 + wobble * .18),
+          y: island_.y + island_.d - PAVE * (0.36 + rank * 0.5 + wobble * 0.18),
         });
         const g = figure(who.yours ? 0x4a4432 : 0x23262a, !!who.yours, false);
         // Half of them turned the other way, so a knot of people looks like a
@@ -1030,8 +1353,8 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight,
       if (p.id === here && state.player.alive) {
         const you = figure(0x2f3a2c, false, false, true);
         const at_ = project({
-          x: island_.x + island_.w * .5,
-          y: island_.y + island_.d - PAVE * .18,
+          x: island_.x + island_.w * 0.5,
+          y: island_.y + island_.d - PAVE * 0.18,
         });
         you.position.set(at_.x, at_.y);
         group.addChild(you);
@@ -1044,14 +1367,15 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight,
     // the buildings they are walking between. Where they are comes from the
     // core: it knows the two addresses and how far along the walk they are.
     for (const j of state.street || []) {
-      const from = cells.get(j.from_id), to = cells.get(j.to_id);
+      const from = cells.get(j.from_id),
+        to = cells.get(j.to_id);
       if (!from || !to) continue;
       // Along the streets, not through the buildings.
       const path = walk(from, to);
       const spot = project(along(path, j.progress));
       // Which way they are pointing: from where they were a moment ago to
       // where they are now, so a figure faces its own direction of travel.
-      const behind = project(along(path, Math.max(0, j.progress - .04)));
+      const behind = project(along(path, Math.max(0, j.progress - 0.04)));
       const g = figure(j.yours ? 0x4a4432 : 0x23262a, !!j.yours, true);
       if (spot.x < behind.x) g.scale.x = -1;
       g.position.set(spot.x, spot.y);
@@ -1060,12 +1384,13 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight,
       const tag = new Text({
         text: j.name.split(' ')[0],
         style: new TextStyle({
-          fontFamily: 'system-ui, sans-serif', fontSize: 10,
+          fontFamily: 'system-ui, sans-serif',
+          fontSize: 10,
           fill: j.yours ? 0xd6b77c : 0xb9c0b2,
           stroke: {color: 0x0d1413, width: 3, join: 'round'},
         }),
       });
-      tag.anchor.set(.5, 1);
+      tag.anchor.set(0.5, 1);
       tag.position.set(spot.x, spot.y - 20);
       tag.resolution = 2;
       layer.addChild(tag);
@@ -1094,12 +1419,20 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight,
             ].map(project);
             const here = key === chosen;
             const face = new Graphics();
-            face.poly(corners.flatMap(c => [c.x, c.y]))
-              .fill({color: here ? 0xd6b77c : 0x7fd4ff, alpha: here ? .3 : .07})
-              .stroke({width: here ? 2.5 : 1, color: here ? 0xf1d191 : 0x7fd4ff, alpha: here ? 1 : .5});
+            face
+              .poly(corners.flatMap(c => [c.x, c.y]))
+              .fill({color: here ? 0xd6b77c : 0x7fd4ff, alpha: here ? 0.3 : 0.07})
+              .stroke({
+                width: here ? 2.5 : 1,
+                color: here ? 0xf1d191 : 0x7fd4ff,
+                alpha: here ? 1 : 0.5,
+              });
             face.eventMode = 'static';
             face.cursor = 'pointer';
-            face.on('pointertap', (e) => { e.stopPropagation(); takeSlot.current?.(key) });
+            face.on('pointertap', e => {
+              e.stopPropagation();
+              takeSlot.current?.(key);
+            });
             marks.addChild(face);
           });
         }
@@ -1108,13 +1441,20 @@ export function CityIso({state, selected, onSelect, onEnter, spotlight,
     }
   }
 
-  return <div className="city-iso" ref={host}>
-    {/* The city has to be reachable without a mouse, and without WebGL. */}
-    <div className="iso-reader" aria-label="City addresses">
-      {state.locations.map(p => <button key={p.id} onClick={() => onSelect(p.id)}>
-        {p.name}{p.district > state.district ? ' (not open to you yet)' : ''}
-      </button>)}
+  return (
+    <div className="city-iso" ref={host}>
+      {/* The city has to be reachable without a mouse, and without WebGL. */}
+      <div className="iso-reader" aria-label="City addresses">
+        {state.locations.map(p => (
+          <button key={p.id} onClick={() => onSelect(p.id)}>
+            {p.name}
+            {p.district > state.district ? ' (not open to you yet)' : ''}
+          </button>
+        ))}
+      </div>
+      <p className="iso-hint">
+        Drag to move · scroll to zoom · double-click where you are standing to step inside
+      </p>
     </div>
-    <p className="iso-hint">Drag to move · scroll to zoom · double-click where you are standing to step inside</p>
-  </div>;
+  );
 }
