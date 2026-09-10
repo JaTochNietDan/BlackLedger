@@ -5467,3 +5467,17 @@ rather than gone would give the owner a reason to visit a garage, which is a
 better link than the one I built.
 
 Evidence: `core/wrecks_test.go`, two breaks verified.
+
+## The inbox, and how it is read
+
+`docs/LIVING_WORLD.md` now separates three things that used to sit in one list:
+standing instructions about how the work is done, open entries the game does not
+answer yet, and answered ones. A standing instruction can never be finished and
+must never be ticked off; an open entry stays in the user's exact words until
+the game actually does it; an answered entry keeps its original wording and a
+line saying where the work went.
+
+Every line I write in those sections begins with an em dash. Anything without
+one is the user's own words, and they are never edited, summarised or split
+across sections — a message that carries both an idea and a standing instruction
+stays whole, where its main purpose puts it, and my line says so.

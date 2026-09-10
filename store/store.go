@@ -58,6 +58,7 @@ func decode(data string) (*core.World, error) {
 		// cars in it reads as a city where nobody ever did, and the forecourt
 		// would have no customers in it for the rest of the campaign.
 		w.SettleCars()
+		w.SettleFuel()
 	}
 	if e == nil && w.Version < core.SaveVersion {
 		// Campaigns begun before the city had holdings, people and quarrels.

@@ -94,23 +94,86 @@ make sense read back as a story.
 - Don't allow main viewport to scroll, only sub areas like the actions bar when necessary
 - Use icons where possible to save text space and have more recognizable icons for common actions that you can start to recognize efficiently
 
-## Inbox — unsorted ideas
+## What the user sends, and how to tell it apart
 
 This section belongs to the user. Add anything here in any form: a mechanic, a
 scenario you want to be possible, a moment you want to be surprised by, a
 complaint about how something plays. Nothing here is a commitment or a promise
 of order.
 
-Claude folds these into the layers above as they are designed, and moves them
-into `docs/DEVELOPMENT.md` once they are actually built and tested. An entry
-stays here, in the original wording, until it is genuinely implemented — so if
-it is still in this list, it does not exist in the game yet.
+Three different things arrive here and they are not the same kind of thing:
+
+**Standing instructions** are about how the work is done rather than what to
+build. They are never finished, they never move to `docs/DEVELOPMENT.md`, and
+nothing should ever be ticked off against them.
+
+**Open** entries are ideas, requests and complaints the game does not answer
+yet. They stay in the user's exact words until it does.
+
+**Answered** entries have been built or answered. The account of what was built
+lives in `docs/DEVELOPMENT.md`; what stays here is the original wording and a
+line saying where it went.
+
+Every line Claude writes in these sections begins with an em dash. Anything
+without one is the user's own words and is never edited, summarised or split.
+
+## Standing instructions
+
+Ultiamtely the expectation is that I don't have to think of all of these concepts, you, the agent will think of these too and build them out and playtest and simulate them yourself.
 
 Remember we can also have multiple casinos, and multiples of businesses. We can
 also do strip clubs, as is very typical of mafia life. Keep fleshing out
 businesses and expanding them and adding more and how they interact with the
 city simulation and remember we want to really have a lot of characters living
 in this city
+
+— Neither of these is ever finished. They govern the loop rather than sit in it.
+
+## Inbox — open
+
+Ok this is much better. It may be worth adding a couple more casino games. It
+could be a reason to have other casinos, to have other casino games like slot
+machines and whatnot, any other common games you can think of adding.
+
+— slot machines are built (56de529); another game or two is not
+
+When setting up the funding on a casino that you own, you should be able to set
+that to an actual number by entering it, not having to use a pre-set amount. We
+definitely want more level of detail with business management like that. It
+should be as dynamic and user settable as possible. Like deposit or withdraw
+money.
+
+— not started
+
+When gambling you should be able to actually choose how much to gamble, not use
+set amounts, up to a max limit. The max limit should be defined by the casino
+owner dynamically, whether by you the owner by or by someone else who owns it.
+
+— not started
+
+We should also add ambient sounds and sounds to the slot machines and whatnot. I
+also want you to flesh out the slot machine a lot more, make it much nicer like
+you did for blackjack and roulette. Right now it looks scraggy.
+
+— not started
+
+Can people only make attempts on your life while you're at home? They always
+seem to hit my home when I'm not there and they are coming after me.
+
+— answered: only at home, by the rule in w.Attack. The rule itself is not fixed yet
+
+Why can't I attempt to take people out? How does that work? I thought we talked
+before about fleshing out the ability to either send a family member after
+someone to kill them or to attempt to kill them myself, where doing it myself
+comes with much greater risk of my own injury or death based on my skills and
+equipment. If you send someone of your own then there's a chance they are killed
+or captured and then they could be interrogated and give you up as the assailant
+or they would know who they are and who they are working on behalf of and send
+them to sleep with the fishies anyways.
+
+— answered: only the paid-contract path exists. Going yourself, and sending one of your own, do not
+
+## Inbox — answered
 
 Another idea is that we can have a car dealership that actually acts as the
 place you buy your cars from and other living NPCs buy their cars from. We can
@@ -119,6 +182,10 @@ business could get more business if cars are destroyed during operations and
 whatnot. That's the kind of intertwined and linked up world we need to be
 creating and I want you to be continuously autonomously creating
 
+— built: the forecourt, and the city buying its own cars (f888f62, 878a0da, cd97b71).
+— The last line of it, "I want you to be continuously autonomously creating", is a standing
+  instruction and is not finished by any of that.
+
 Another thing is that we could have the ability for people to steal car parts
 and sell them to garages and that's how garages make money, they make more if
 there's more car theft or more car repairs to be made from broken windows from
@@ -126,13 +193,8 @@ theft etc. Maybe a scrapyard would also be a good idea that links in similarly.
 Flesh that out in the loop. Add it to the inbox. Think about more interlinked
 stuff too.
 
-Built: parts and the trade that buys them (core/parts.go), a scrapyard for what
-is left of a car, and the last line of it — the glass. A car taken apart in a
-street leaves the rest of the row broken rather than gone, a raid that does not
-burn a car goes through it instead, and one owner a day pays a garage out of
-their own purse to be put right (core/repairs.go). Somebody with nothing keeps
-driving it broken, so a poor district gives its garage the same crimes and less
-work. "Think about more interlinked stuff too" stays open; it is standing.
+— built: parts, the scrapyard, the glass and the garage's trade (878a0da, 0b330cc,
+  522cd9b, 832b5f1). "Think about more interlinked stuff too" is standing and stays open.
 
 I also think we have a lot of UI QoL fixes to make here, it's weird that for
 example you have to go to Mercer Exchange to tell Leo to try to take out Russo.
@@ -145,42 +207,16 @@ the UX around it, not every action should be located in the action pane of these
 buildings. You need to think through what the right place for this stuff is and
 right context.
 
+— built: work that is not about a room now follows the player, and the audit is written down (730e6b8, e24ab05, 28758c4)
+
 We should also focus on cleaning up that massive action bar, I think it'd be
 better to display actions below the interior render when inside a building or
 something like that. I want you to experiment, think it through and really clean
 it up
 
-Ok this is much better. It may be worth adding a couple more casino games. It
-could be a reason to have other casinos, to have other casino games like slot
-machines and whatnot, any other common games you can think of adding.
+— built: the room's work sits under the picture in cards of one size (b8a50fd, 5d3fb66)
 
 Add a gas station business to the inbox, probably multiple locations. Sells gas
 that cars need and it sells other stuff that usual gas stations sell.
 
-When setting up the funding on a casino that you own, you should be able to set
-that to an actual number by entering it, not having to use a pre-set amount. We
-definitely want more level of detail with business management like that. It
-should be as dynamic and user settable as possible. Like deposit or withdraw
-money.
-
-When gambling you should be able to actually choose how much to gamble, not use
-set amounts, up to a max limit. The max limit should be defined by the casino
-owner dynamically, whether by you the owner by or by someone else who owns it.
-
-We should also add ambient sounds and sounds to the slot machines and whatnot. I
-also want you to flesh out the slot machine a lot more, make it much nicer like
-you did for blackjack and roulette. Right now it looks scraggy.
-
-Can people only make attempts on your life while you're at home? They always
-seem to hit my home when I'm not there and they are coming after me.
-
-Why can't I attempt to take people out? How does that work? I thought we talked
-before about fleshing out the ability to either send a family member after
-someone to kill them or to attempt to kill them myself, where doing it myself
-comes with much greater risk of my own injury or death based on my skills and
-equipment. If you send someone of your own then there's a chance they are killed
-or captured and then they could be interrogated and give you up as the assailant
-or they would know who they are and who they are working on behalf of and send
-them to sleep with the fishies anyways.
-
-Ultiamtely the expectation is that I don't have to think of all of these concepts, you, the agent will think of these too and build them out and playtest and simulate them yourself.
+— built: two filling stations, and petrol a car actually burns (6d18d9f)
