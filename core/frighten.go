@@ -46,7 +46,28 @@ func (w *World) FrightenReadiness(id string) string {
 	if w.Player.Health < 40 {
 		return "In this condition nobody would take you seriously"
 	}
+	// Somebody of theirs standing in it. A quiet word with the staff is a thing
+	// you do when nobody is watching the door, and a family minding its own
+	// holding is the oldest answer there is to it.
+	if who := w.theirsHere(id, prop.Owner); who != nil {
+		return who.Name + " is standing in here, and this is not the kind of thing you do in front of somebody"
+	}
 	return ""
+}
+
+// theirsHere is somebody of that organization standing in the room, and nothing
+// when nobody is watching the door.
+func (w *World) theirsHere(id, faction string) *NPC {
+	if faction == "" {
+		return nil
+	}
+	for i := range w.NPCs {
+		n := &w.NPCs[i]
+		if !n.Dead && n.Faction == faction && n.Location == id && !w.Travelling(n) {
+			return n
+		}
+	}
+	return nil
 }
 
 // Frighten puts one of them off coming in. Which one is whoever is standing
@@ -109,6 +130,11 @@ func (w *World) TheyFrighten() {
 		for _, l := range Locations {
 			prop := w.Properties[l.ID]
 			if prop == nil || !w.Own(l.ID) || len(prop.Hands) == 0 {
+				continue
+			}
+			// Not past somebody of the player's on the door, which is the
+			// answer to this and the reason to post anybody anywhere.
+			if w.PostedAt(l.ID) != nil {
 				continue
 			}
 			who := prop.Hands[0]

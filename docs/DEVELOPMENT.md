@@ -8138,3 +8138,26 @@ written before the rule existed rather than by one written for it.
 Baseline moved where it should: deaths 0/0/0/82/75/0/47 against 0/0/0/82/69/0/53,
 median cash 12585/2367/5815/90/1091/3563/980. The thief and the racketeer are
 the policies that make families hate them, and they are the ones who felt it.
+
+## What a door is for
+
+A family can put one of the people behind your counter off coming in, and until
+this there was nothing to be done about it. Putting a man on the door did
+something against a raid and nothing at all against somebody walking in and
+having a quiet word, which is most of what this game's violence actually is.
+
+Now it works both ways. A counter with one of the player's own posted at it is
+not one a family walks into. A rival's counter with one of theirs standing in it
+is not one the player leans on either — and that needs no new state, because a
+family minding its own holding is already what this city looks like when it is
+watching a door.
+
+**A test that skipped rather than failed.** The first version of the door test
+looked for somebody of the player's to post, found nobody, and skipped: a player
+who has taken nobody on has nobody to post. It reported PASS in every summary
+and proved nothing, and removing the rule it guarded changed no result at all.
+Signing somebody on first is the real precondition, not a reason to skip. With
+that fixed, the same break reports "somebody was on the door and 1 of your
+people were still put off".
+
+Baseline: deaths and cash unmoved from the last run.
