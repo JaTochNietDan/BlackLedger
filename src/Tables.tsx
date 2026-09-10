@@ -1,5 +1,5 @@
 import {useEffect, useRef, useState} from 'react';
-import {Card, pipOf, isRedSuit, knownCard, clothRows, clothColour, outsideBets, ballAngle, wheelAngle, wheelOrder} from './cards';
+import {Card, pipOf, isRedSuit, knownCard, clothTable, clothColour, outsideBets, ballAngle, wheelAngle, wheelOrder, wheelPaint} from './cards';
 
 // The tables, drawn as tables. Blackjack was two numbers in a sentence and
 // roulette was a button; both are games somebody sits down to play, and a game
@@ -75,7 +75,20 @@ export function CardTable({hand, money, act}:{hand:HandState; money:(n:number)=>
 // How long the ball is in the air, and how many turns it makes getting there.
 // Nothing about the outcome: the core spun the pocket before this component was
 // told anything, and the animation only takes its time arriving at it.
-const FALL = 2400, TURNS = 4;
+// How long the ball is in the air, and how many turns each part makes getting
+// there. Nothing about the outcome: the core spun the pocket before this
+// component was told anything, and the animation only takes its time arriving
+// at it. The head turns a whole number of times so it ends where it started,
+// which is what keeps the numbers on it upright at rest.
+const FALL = 3200, TURNS = 5, HEAD_TURNS = 3;
+// How far out the ball runs, which the stylesheet also has to agree with.
+const BALL_TRACK = -80;
+
+// One chip on the cloth. The core takes one bet a spin, so there is one chip:
+// putting it somewhere else moves it rather than adding to it.
+function Chip({amount, money}:{amount:number; money:(n:number)=>string}) {
+  return <span className="chip" aria-hidden="true"><i/>{money(amount).replace('$', '')}</span>;
+}
 
 export function Wheel({wheel, stakes, money, spin, turn = 0}:{
   wheel:WheelState; stakes:{id:string; amount:number}[]; money:(n:number)=>string;
@@ -85,8 +98,20 @@ export function Wheel({wheel, stakes, money, spin, turn = 0}:{
   turn?:number;
 }) {
   const [bet, setBet] = useState('red');
-  const [ball, setBall] = useState(0);
+  // Which of the house's stakes the chip is worth. The core offers the amounts;
+  // this only says which one is on the cloth.
+  const [stake, setStake] = useState(0);
   const [falling, setFalling] = useState(false);
+  // The ball and the head are moved with the animation API rather than by a CSS
+  // transition on a custom property. The transition was pinned at time zero and
+  // never advanced — every render re-wrote the inline style and started it
+  // again, so the ball sat at the top of the bowl however long you waited, and
+  // an inline transform could not override the stuck transition either. An
+  // animation is started once, by the spin, and nothing that re-renders can
+  // interrupt it.
+  const ball = useRef<HTMLSpanElement>(null);
+  const head = useRef<HTMLDivElement>(null);
+  const at = useRef({ball: 0, head: 0});
   // Every pocket this sitting has seen, newest first. The view is remembering
   // what the core told it, which is what the board of numbers over a real wheel
   // is: a record, not a prediction.
@@ -98,11 +123,46 @@ export function Wheel({wheel, stakes, money, spin, turn = 0}:{
     seen.current = turn;
     const pocket = wheel.pocket ?? 0;
     const quiet = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    setBall(b => ballAngle(b, pocket, quiet ? 0 : TURNS));
+    const was = at.current;
+    const now = {
+      ball: ballAngle(was.ball, pocket, quiet ? 0 : TURNS),
+      head: quiet ? was.head : was.head - HEAD_TURNS * 360,
+    };
+    at.current = now;
     setRun(r => [pocket, ...r].slice(0, 14));
+    // Where it ends up is written on the element, and the animation only covers
+    // the journey there. That order matters: a browser that is not animating —
+    // reduced motion, a tab nothing is drawing — shows the ball in the pocket
+    // the core spun rather than frozen wherever the flight began.
+    // Where it ends up is written on the element, and the animation only covers
+    // the journey there. That order matters: a browser that is not animating —
+    // reduced motion, or a tab whose clock is frozen because nothing is being
+    // drawn — shows the ball in the pocket the core spun instead of holding the
+    // first frame of a flight that never finishes.
+    const ease = 'cubic-bezier(.12,.58,.16,1)';
+    const flights: Animation[] = [];
+    const fly = (el: HTMLElement, from: string, to: string) => {
+      el.style.transform = to;
+      if (!quiet) {
+        flights.push(el.animate([{transform: from}, {transform: to}], {duration: FALL, easing: ease}));
+      }
+    };
+    if (ball.current) {
+      fly(ball.current, `rotate(${was.ball}deg) translateY(${BALL_TRACK}px)`,
+        `rotate(${now.ball}deg) translateY(${BALL_TRACK}px)`);
+    }
+    if (head.current) {
+      fly(head.current, `rotate(${was.head}deg)`, `rotate(${now.head}deg)`);
+    }
     if (quiet) return;
     setFalling(true);
-    const done = setTimeout(() => setFalling(false), FALL);
+    // And the flight is cancelled when its time is up, which uncovers the
+    // resting place underneath it. A timer runs even when a timeline does not,
+    // so this is what makes a frozen tab still show the right answer.
+    const done = setTimeout(() => {
+      setFalling(false);
+      flights.forEach(f => f.cancel());
+    }, FALL);
     return () => clearTimeout(done);
   }, [turn, wheel.spun, wheel.pocket]);
 
@@ -110,62 +170,84 @@ export function Wheel({wheel, stakes, money, spin, turn = 0}:{
   // core's from the moment it was spun; this only holds it back until the ball
   // is in the pocket, the way the table does.
   const landed = wheel.spun && !falling ? wheel.pocket ?? 0 : null;
+  const chip = stakes[Math.min(stake, Math.max(0, stakes.length - 1))];
+  const on = (id:string) => bet === id;
+  const cell = (id:string, label:string|number, cls:string) => (
+    <button key={id} className={'cloth-cell ' + cls + (on(id) ? ' picked' : '')}
+            aria-pressed={on(id)} onClick={() => setBet(id)}>
+      <span>{label}</span>
+      {on(id) && chip && <Chip amount={chip.amount} money={money}/>}
+    </button>
+  );
+
   return (
     <div className="felt wheel-felt">
-      <div className={'wheel-face' + (falling ? ' falling' : '')}>
-        <div className="wheel-rim">
-          {wheelOrder.map(n => (
-            <span key={n} className={'pocket ' + clothColour(n) + (landed === n ? ' landed' : '')}
-                  style={{['--at' as string]: `${wheelAngle(n)}deg`}}>{n}</span>
-          ))}
+      <div className="wheel-table">
+        <div className={'wheel-bowl' + (falling ? ' falling' : '')}>
+          {/* The wheel head: one slice per pocket, in the pockets' own order,
+              turning under the ball the way a real one does. */}
+          <div className="wheel-head" ref={head} style={{background: wheelPaint()}}>
+            {wheelOrder.map(n => (
+              <span key={n} className={'pocket ' + clothColour(n) + (landed === n ? ' landed' : '')}
+                    style={{['--at' as string]: `${wheelAngle(n)}deg`}}>{n}</span>
+            ))}
+            <span className="wheel-cone" aria-hidden="true"/>
+          </div>
+          {/* The ball rides the track and drops into the pocket the core spun. */}
+          <span className="wheel-ball" ref={ball} aria-hidden="true"/>
+          <div className="wheel-hub">
+            {landed === null
+              ? <small>{falling ? 'Round it goes' : 'No more bets'}</small>
+              : <><b className={clothColour(landed)}>{landed}</b><small>{wheel.colour}</small></>}
+          </div>
         </div>
-        {/* The ball rides the rim and drops into the pocket the core spun. */}
-        <span className="wheel-ball" aria-hidden="true" style={{['--ball' as string]: `${ball}deg`,
-          transitionDuration: `${FALL}ms`}}/>
-        <div className="wheel-hub">
-          {landed === null
-            ? <small>{falling ? 'Round it goes' : 'Nothing spun yet'}</small>
-            : <><b className={clothColour(landed)}>{landed}</b><small>{wheel.colour}</small></>}
+
+        <div className="wheel-side">
+          {run.length > 0 && <div className="wheel-run" aria-label="What this wheel has done">
+            <small>THE LAST OF THEM</small>
+            <div>{run.map((n, i) => <span key={i} className={'ran ' + clothColour(n)}>{n}</span>)}</div>
+          </div>}
+          {wheel.spun && landed !== null && (
+            <p className={'felt-result' + (wheel.won ? ' won' : '')}>
+              {wheel.bet} at {money(wheel.stake ?? 0)} — {wheel.won ? `paid ${wheel.pays} to 1` : 'gone'}
+            </p>
+          )}
         </div>
       </div>
 
-      {run.length > 0 && <div className="wheel-run" aria-label="What this wheel has done">
-        {run.map((n, i) => <span key={i} className={'ran ' + clothColour(n)}>{n}</span>)}
-      </div>}
-
-      {wheel.spun && landed !== null && (
-        <p className={'felt-result' + (wheel.won ? ' won' : '')}>
-          {wheel.bet} at {money(wheel.stake ?? 0)} — {wheel.won ? `paid ${wheel.pays} to 1` : 'gone'}
-        </p>
-      )}
-
+      {/* The cloth, laid out the way a table is: the nought down the left, three
+          rows of twelve, and the outside along the bottom. Your chip sits on
+          whatever you last put it on — the core takes one bet a spin. */}
       <div className="cloth">
-        <button className={'cloth-cell green zero' + (bet === 'number:0' ? ' picked' : '')}
-                onClick={() => setBet('number:0')}>0</button>
-        <div className="cloth-grid">
-          {clothRows().map((row, i) => (
-            <div className="cloth-row" key={i}>
-              {row.map(n => (
-                <button key={n} className={'cloth-cell ' + clothColour(n) + (bet === 'number:' + n ? ' picked' : '')}
-                        onClick={() => setBet('number:' + n)}>{n}</button>
-              ))}
-            </div>
-          ))}
+        <div className="cloth-numbers">
+          {cell('number:0', 0, 'green zero')}
+          <div className="cloth-grid">
+            {clothTable().map((row, i) => (
+              <div className="cloth-row" key={i}>
+                {row.map(n => cell('number:' + n, n, clothColour(n)))}
+              </div>
+            ))}
+          </div>
         </div>
         <div className="cloth-outside">
-          {outsideBets().map(b => (
-            <button key={b.id} className={'cloth-cell outside' + (b.wide ? ' wide' : '') + (bet === b.id ? ' picked' : '')}
-                    onClick={() => setBet(b.id)}>{b.label}</button>
-          ))}
+          {outsideBets().map(b => cell(b.id, b.label, 'outside' + (b.wide ? ' wide' : '') +
+            (b.id === 'red' || b.id === 'black' ? ' ' + b.id : '')))}
         </div>
       </div>
 
-      <div className="felt-actions">
-        {stakes.map(s => (
-          <button key={s.id} onClick={() => spin(s.id, bet)}>
-            Spin {money(s.amount)}
-          </button>
-        ))}
+      <div className="felt-actions chips">
+        {stakes.length > 1 && <div className="chip-picker" role="group" aria-label="What the chip is worth">
+          {stakes.map((s, i) => (
+            <button key={s.id} className={'chip-choice' + (i === stake ? ' chosen' : '')}
+                    aria-pressed={i === stake} onClick={() => setStake(i)}>
+              <Chip amount={s.amount} money={money}/>
+            </button>
+          ))}
+        </div>}
+        {chip && <button className="spin-it" disabled={falling}
+                         onClick={() => spin(chip.id, bet)}>
+          {falling ? 'The ball is still going' : `Spin — ${money(chip.amount)} on ${bet.replace('number:', 'the ')}`}
+        </button>}
       </div>
       <p className="felt-note">
         Thirty-seven pockets. The nought is neither colour and sits in no dozen, so it takes every

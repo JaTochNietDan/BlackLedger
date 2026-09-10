@@ -80,3 +80,32 @@ export function ballAngle(from: number, pocket: number, turns: number) {
   const forward = ((target - now) % 360 + 360) % 360;
   return from + turns * 360 + forward;
 }
+
+/**
+ * The cloth as a table is actually laid: three rows of twelve, reading left to
+ * right and low to high, with the row that pays the third column at the top.
+ * clothRows above is the same numbers stood on end, which is what the panel
+ * needed when the wheel was a column in a sidebar.
+ */
+export function clothTable() {
+  const rows: number[][] = [[], [], []];
+  for (let n = 1; n <= 36; n++) rows[2 - ((n - 1) % 3)].push(n);
+  return rows;
+}
+
+/**
+ * The wheel head, painted in the pockets' own order. One slice per pocket, in
+ * the colour that pocket is — the same colours the cloth uses, because they are
+ * the same numbers. The core decides what wins; this only says what the thing
+ * looks like.
+ */
+export function wheelPaint() {
+  const slice = 360 / wheelOrder.length;
+  const ink = {red: '#8e2b2b', black: '#1a1a1a', green: '#1f6b45'};
+  const stops = wheelOrder.map((n, i) => {
+    const colour = ink[clothColour(n) as keyof typeof ink];
+    return `${colour} ${(i * slice).toFixed(3)}deg ${((i + 1) * slice).toFixed(3)}deg`;
+  });
+  // Half a slice back, so a pocket's own angle points at the middle of it.
+  return `conic-gradient(from ${(-slice / 2).toFixed(3)}deg, ${stops.join(', ')})`;
+}

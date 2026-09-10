@@ -843,40 +843,92 @@ body{height:100%;overflow:hidden;margin:0;background:var(--bg);color:var(--ink);
 .felt-result{margin:10px 0 0;font-size:13px;color:#d8cfae;text-align:center}
 .felt-result.won{color:#9fd6a8}
 
-/* The wheel: pockets laid round a rim in the wheel's own order, which is not
-   the cloth's and not numerical. */
-.wheel-felt{display:flex;flex-direction:column;align-items:stretch}
-.wheel-face{position:relative;width:190px;height:190px;margin:2px auto 6px;border-radius:50%;
-  background:conic-gradient(from -4deg,#3a2a1c 0deg,#2b1f16 360deg);
-  border:6px solid #4a3524;box-shadow:inset 0 0 22px rgba(0,0,0,.7),0 4px 14px rgba(0,0,0,.4)}
-.wheel-rim{position:absolute;inset:0}
-.pocket{position:absolute;top:50%;left:50%;font-size:9px;line-height:1;
-  transform:rotate(var(--at)) translateY(-80px) rotate(calc(-1 * var(--at)));
-  width:16px;height:12px;margin:-6px 0 0 -8px;display:grid;place-items:center;border-radius:2px}
-.pocket.red{background:#8e2b2b;color:#f6ece0}
-.pocket.black{background:#1d1d1d;color:#e8e0d2}
-.pocket.green{background:#1f6b45;color:#f0f6ee}
-.pocket.landed{outline:2px solid #e8dfa8;outline-offset:1px;font-weight:700}
-.wheel-hub{position:absolute;inset:34%;border-radius:50%;background:#241a12;
-  border:1px solid #4a3524;display:grid;place-items:center;text-align:center;line-height:1.2}
-.wheel-hub b{font-size:24px}
-.wheel-hub b.red{color:#e08a7f}.wheel-hub b.black{color:#d8d2c4}.wheel-hub b.green{color:#8fd6a8}
-.wheel-hub small{display:block;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:#93a89a}
+/* The table. A wheel in a bowl with the head turning under the ball, and a
+   cloth laid out the way a table is laid out: the nought down the left, three
+   rows of twelve, the outside along the bottom, and one chip sitting on
+   whatever you last put it on — the core takes one bet a spin. */
+.wheel-felt{display:flex;flex-direction:column;align-items:stretch;gap:12px;
+  background:radial-gradient(120% 90% at 50% 0%,#2b2119 0%,#1b1510 60%,#120e0a 100%);
+  border-color:#3a2a1c}
+.wheel-table{display:grid;grid-template-columns:auto minmax(0,1fr);gap:18px;align-items:center;justify-items:start}
 
-.cloth{margin-top:8px}
-.cloth-grid{display:flex;flex-direction:column;gap:2px}
-.cloth-row{display:flex;gap:2px}
-.cloth-cell{flex:1;min-width:0;padding:5px 2px;font:inherit;font-size:11px;cursor:pointer;
-  border:1px solid rgba(0,0,0,.45);border-radius:2px;color:#f2ece0}
+.wheel-bowl{position:relative;width:200px;height:200px;border-radius:50%;flex:none;
+  background:radial-gradient(circle at 34% 26%,#6b4a2c,#3a2617 62%,#241708);
+  border:2px solid #7a5730;
+  box-shadow:inset 0 3px 12px rgba(255,222,170,.18),inset 0 -8px 26px rgba(0,0,0,.65),0 10px 34px rgba(0,0,0,.55)}
+/* The track the ball runs on, cut into the bowl. */
+.wheel-bowl::before{content:'';position:absolute;inset:9px;border-radius:50%;
+  background:radial-gradient(circle at 50% 40%,#0000 62%,#00000055 70%,#0000 76%);
+  box-shadow:inset 0 0 14px rgba(0,0,0,.6)}
+.wheel-head{position:absolute;inset:26px;border-radius:50%;
+  box-shadow:inset 0 0 0 2px #7a5730,inset 0 0 30px rgba(0,0,0,.55),0 0 18px rgba(0,0,0,.5)}
+/* The cone in the middle, which is the bit that makes a wheel look like a
+   wheel rather than a pie chart. */
+.wheel-cone{position:absolute;inset:22%;border-radius:50%;
+  background:radial-gradient(circle at 38% 30%,#c8a86e,#7a5730 55%,#3a2617);
+  box-shadow:0 3px 10px rgba(0,0,0,.6),inset 0 -4px 10px rgba(0,0,0,.45)}
+.pocket{position:absolute;top:50%;left:50%;font-size:9px;line-height:1;color:#f2ece0;
+  transform:rotate(var(--at)) translateY(-68px) rotate(calc(-1 * var(--at)));
+  width:15px;height:11px;margin:-6px 0 0 -7px;display:grid;place-items:center;
+  text-shadow:0 1px 2px #000}
+.pocket.landed{outline:2px solid #f0e4b0;outline-offset:1px;border-radius:2px;font-weight:700}
+.wheel-ball{position:absolute;top:50%;left:50%;width:11px;height:11px;margin:-5.5px 0 0 -5.5px;
+  border-radius:50%;background:radial-gradient(circle at 32% 30%,#fffdf4,#ded2b6 65%,#8d8168);
+  box-shadow:0 2px 5px rgba(0,0,0,.7),inset 0 -1px 2px rgba(0,0,0,.35);z-index:4;
+  transform:translateY(-80px)}
+.wheel-bowl.falling .wheel-ball{filter:blur(.4px)}
+.wheel-hub{position:absolute;inset:38%;border-radius:50%;z-index:5;display:grid;place-items:center;
+  text-align:center;line-height:1.15;background:#1c130b;border:1px solid #7a5730;
+  box-shadow:0 2px 10px rgba(0,0,0,.6)}
+.wheel-hub b{font-size:22px;font-family:var(--serif);font-weight:400}
+.wheel-hub b.red{color:#e08a7f}.wheel-hub b.black{color:#e2dccd}.wheel-hub b.green{color:#8fd6a8}
+.wheel-hub small{display:block;font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:#93a89a}
+
+.wheel-side{min-width:0}
+.wheel-run small{display:block;font-size:9px;letter-spacing:.2em;color:#9db8a6;margin-bottom:6px}
+.wheel-run>div{display:flex;gap:4px;flex-wrap:wrap}
+.ran{font-size:10px;line-height:1;padding:4px 5px;border-radius:2px;min-width:18px;text-align:center}
+.ran.red{background:#8e2b2b;color:#f6ece0}
+.ran.black{background:#1d1d1d;color:#e8e0d2}
+.ran.green{background:#1f6b45;color:#f0f6ee}
+.felt-result{margin:12px 0 0;font-size:13px;color:#d8cfae}
+.felt-result.won{color:#9fd6a8}
+
+/* The cloth. */
+.cloth{background:linear-gradient(#1c5a3c,#164a32);border:2px solid #c9a24a;border-radius:4px;
+  padding:8px;box-shadow:inset 0 0 30px rgba(0,0,0,.35)}
+.cloth-numbers{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px}
+.cloth-grid{display:grid;gap:4px}
+.cloth-row{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:4px}
+.cloth-outside{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:4px;margin-top:4px}
+.cloth-cell{position:relative;background:#14442f;border:1px solid #d8c68a;color:#f4efe2;
+  font:12.5px var(--serif);padding:5px 4px;display:grid;place-items:center;min-height:27px}
 .cloth-cell.red{background:#8e2b2b}
-.cloth-cell.black{background:#1d1d1d}
-.cloth-cell.green{background:#1f6b45}
-.cloth-cell.zero{width:100%;margin-bottom:2px}
-.cloth-cell.outside{background:rgba(0,0,0,.28)}
-.cloth-cell.picked{outline:2px solid #e8dfa8;outline-offset:-2px;font-weight:700}
-.cloth-outside{display:flex;gap:2px;flex-wrap:wrap;margin-top:2px}
-.cloth-outside .cloth-cell{flex:1 1 26%}
-.cloth-outside .cloth-cell.wide{flex:1 1 30%}
+.cloth-cell.black{background:#191919}
+.cloth-cell.green,.cloth-cell.zero{background:#1f6b45}
+.cloth-cell.zero{grid-row:1/4;writing-mode:vertical-rl;transform:rotate(180deg);padding:4px 9px}
+.cloth-cell.outside{font-size:11px;letter-spacing:.06em;text-transform:uppercase;background:#14442f}
+.cloth-cell.outside.wide{grid-column:span 2}
+.cloth-cell:hover{outline:1px solid #f0e4b0}
+.cloth-cell.picked{outline:2px solid #f0e4b0;outline-offset:-2px}
+
+/* A chip: a stack of one, sitting on the cloth where you put it. */
+.chip{position:absolute;right:-6px;top:-6px;width:26px;height:26px;border-radius:50%;
+  display:grid;place-items:center;font:10px system-ui;font-weight:600;color:#241708;
+  background:radial-gradient(circle at 34% 28%,#f6e4b0,#d9b25e 62%,#a9803a);
+  border:2px dashed #7a5730;box-shadow:0 2px 5px rgba(0,0,0,.55);z-index:2}
+.chip i{position:absolute;inset:3px;border-radius:50%;border:1px solid rgba(122,87,48,.55)}
+.felt-actions.chips{display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:center}
+.chip-picker{display:flex;gap:10px;align-items:center}
+.chip-choice{position:relative;width:34px;height:34px;border-radius:50%;border:1px solid #465243;
+  background:#16241f;padding:0}
+.chip-choice .chip{position:static;width:28px;height:28px;margin:auto}
+.chip-choice.chosen{border-color:#f0e4b0;box-shadow:0 0 0 2px rgba(240,228,176,.25)}
+.spin-it{background:#3d4530;border:1px solid #c9a24a;color:#f3e8c7;padding:11px 20px;
+  font:13px var(--serif);letter-spacing:.04em}
+.spin-it:disabled{opacity:.55}
+
+
 
 /* The player choosing their own face. The city deals one out by a hash of a
    name, which is fair to the cast and can still be wrong about who you are. */
@@ -998,19 +1050,10 @@ body{height:100%;overflow:hidden;margin:0;background:var(--bg);color:var(--ink);
 .person-card .actions.compact .action .desc{display:none}
 .person-card .actions.compact .action .meta{margin-top:3px}
 
-/* The ball. It rides the rim and drops into the pocket the core spun; the only
-   thing this decides is how long it takes to get there. */
-.wheel-ball{position:absolute;top:50%;left:50%;width:9px;height:9px;margin:-4.5px 0 0 -4.5px;
-  border-radius:50%;background:radial-gradient(circle at 32% 30%,#fffdf4,#c2b394 70%,#8d8168);
-  box-shadow:0 1px 3px #000a;z-index:3;
-  transform:rotate(var(--ball,0deg)) translateY(-80px);
-  transition:transform 2400ms cubic-bezier(.16,.62,.18,1)}
-.wheel-face.falling .wheel-rim{animation:rimturn 2400ms cubic-bezier(.16,.62,.18,1)}
-@keyframes rimturn{from{transform:rotate(0deg)}to{transform:rotate(-140deg)}}
-/* What this wheel has done, newest first: a record of what the core spun. */
-.wheel-run{display:flex;gap:5px;flex-wrap:wrap;justify-content:center;margin:8px 0 0}
-.ran{font-size:10px;line-height:1;padding:4px 5px;border-radius:2px;min-width:18px;text-align:center}
-.ran.red{background:#8e2b2b;color:#f6ece0}
-.ran.black{background:#1d1d1d;color:#e8e0d2}
-.ran.green{background:#1f6b45;color:#f0f6ee}
-@media(prefers-reduced-motion:reduce){.wheel-ball{transition:none}.wheel-face.falling .wheel-rim{animation:none}}
+/* The wheel takes the middle of the table until there is something to put
+   beside it, which is what a table looks like before anybody has played. */
+.wheel-table:has(.wheel-side:empty){grid-template-columns:minmax(0,1fr);justify-items:center}
+/* Red and black are red and black on the outside too: they are the same bet as
+   the numbers above them, and a green box saying RED is a label, not a table. */
+.cloth-cell.outside.red{background:#8e2b2b}
+.cloth-cell.outside.black{background:#191919}

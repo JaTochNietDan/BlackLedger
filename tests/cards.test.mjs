@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {pipOf, isRedSuit, knownCard, clothRows, clothColour, outsideBets, wheelOrder, wheelAngle, ballAngle} from '../.runtime/frontend-test/cards.js';
+import {pipOf, isRedSuit, knownCard, clothRows, clothColour, outsideBets, wheelOrder, wheelAngle, ballAngle, clothTable, wheelPaint} from '../.runtime/frontend-test/cards.js';
 
 test('every suit the core deals has a pip and a colour', () => {
   for (const suit of ['spades', 'hearts', 'diamonds', 'clubs']) {
@@ -91,4 +91,29 @@ test('the ball always travels forward and stops on the pocket the core chose', (
 
 test('a wheel nobody has spun yet does not move the ball', () => {
   assert.equal(ballAngle(500, 0, 0), 500);
+});
+
+test('the cloth is laid out the way a table is: three rows of twelve', () => {
+  const rows = clothTable();
+  assert.equal(rows.length, 3);
+  for (const row of rows) assert.equal(row.length, 12);
+  const flat = rows.flat();
+  assert.equal(new Set(flat).size, 36);
+  for (let n = 1; n <= 36; n++) assert.ok(flat.includes(n), n + ' is not on the cloth');
+  // The top row is the one that pays the third column: 3, 6, 9 and so on.
+  for (const n of rows[0]) assert.equal(n % 3, 0);
+  for (const n of rows[2]) assert.equal(n % 3, 1);
+  // And it reads left to right, low to high, like every table ever built.
+  assert.deepEqual(rows[2].slice(0, 3), [1, 4, 7]);
+});
+
+test('the wheel is painted in the pockets own order and colours', () => {
+  const paint = wheelPaint();
+  // One slice per pocket — two angles each — plus the one the gradient starts
+  // from, which is what turns a pocket's own angle into the middle of its slice.
+  assert.equal((paint.match(/deg/g) || []).length, wheelOrder.length * 2 + 1);
+  assert.ok(paint.startsWith('conic-gradient('));
+  // One green slice, named once: the nought, and nothing else on the wheel.
+  const greens = (paint.match(/#1f6b45/g) || []).length;
+  assert.equal(greens, 1, 'the nought is the only green pocket');
 });

@@ -356,8 +356,56 @@ func TestNothingThatDrawsAGameRollsForAnything(t *testing.T) {
 	if !strings.Contains(s, "wheel.pocket ?? 0") {
 		t.Error("the pocket the ball lands in is not the one the core spun")
 	}
-	// And the ball has to travel to it rather than appear in it.
-	if !strings.Contains(s, "ballAngle(b, pocket") {
+	// And the ball has to travel to it rather than appear in it. The angle it
+	// travels from used to be React state and is now a ref, because a render
+	// must not be able to restart a flight — the fact being guarded is the
+	// same one.
+	if !strings.Contains(s, "ballAngle(was.ball, pocket") {
 		t.Error("the ball no longer goes round to the pocket")
+	}
+}
+
+// The table is drawn as a table: a bowl with a head that turns under the ball,
+// and a cloth laid out the way a cloth is laid out with a chip on it. The one
+// thing that must hold whatever the browser is doing is where the ball comes to
+// rest — the pocket is written on the element, and the flight is only the
+// journey to it. An animation is not allowed to be the only thing that puts the
+// ball in the pocket: on a frozen clock it never finishes and holds its first
+// frame for ever, which is a ball that never lands.
+func TestTheBallsRestingPlaceDoesNotDependOnAnimation(t *testing.T) {
+	tables, err := os.ReadFile("../../src/Tables.tsx")
+	if err != nil {
+		t.Skip("no tables beside this build")
+	}
+	s := string(tables)
+	if !strings.Contains(s, "el.style.transform = to;") {
+		t.Error("the ball's resting place is not written on the element")
+	}
+	if !strings.Contains(s, "f.cancel()") {
+		t.Error("a flight that outlives its time is never cancelled, so it hides where the ball landed")
+	}
+	if !strings.Contains(s, "ballAngle(was.ball, pocket") {
+		t.Error("the ball no longer travels to the pocket the core spun")
+	}
+	css, err := os.ReadFile("../../src/style.css")
+	if err != nil {
+		t.Skip("no stylesheet")
+	}
+	sheet := string(css)
+	for _, part := range []string{".wheel-bowl{", ".wheel-head{", ".wheel-cone{", ".chip{", ".cloth-cell{"} {
+		if !strings.Contains(sheet, part) {
+			t.Errorf("the table has no %s", part)
+		}
+	}
+	// One ball, one head: a second copy of either rule left over from an older
+	// wheel silently overrides the new one, which is how the ball spent an
+	// afternoon sitting at the top of the bowl.
+	// Counted at the start of a line, because ".wheel-bowl.falling .wheel-ball{"
+	// contains the same text and is a different rule — the first version of this
+	// guard counted that one too and reported a duplicate that was not there.
+	for _, one := range []string{"\n.wheel-ball{", "\n.wheel-head{"} {
+		if n := strings.Count(sheet, one); n != 1 {
+			t.Errorf("%s is declared %d times; a leftover copy overrides the live one", strings.TrimPrefix(one, "\n"), n)
+		}
 	}
 }
