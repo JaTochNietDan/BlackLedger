@@ -1262,9 +1262,6 @@ func (w *World) Actions(id string) []Action {
 	if id == BackRoom {
 		if g := w.Game; g != nil && !g.Done && g.Place == id {
 			switch {
-			case !g.Drawn:
-				add("change", "Change your cards", 10, 0, "",
-					"Throw up to three and buy that many back. Nothing thrown is standing pat.")
 			case g.Facing:
 				add("call", fmt.Sprintf("Call the $%d", g.Bet-g.MyBet), 5, 0, w.CallReadiness(),
 					fmt.Sprintf("Somebody put it up. Pay $%d to see what they have, or throw the hand in and lose the $%d already in front of you.", g.Bet-g.MyBet, g.Ante+g.MyBet))
@@ -1272,7 +1269,8 @@ func (w *World) Actions(id string) []Action {
 					fmt.Sprintf("You keep what is in your pocket and lose the $%d already in the pot.", g.Ante+g.MyBet))
 			default:
 				asks("bet", "Bet on the hand", 10, 0, "",
-					fmt.Sprintf("Up to $%d on %s, or nothing at all to check it through. Whatever goes in stays in.", MaxAnte, Rank(g.Mine).Name()))
+					fmt.Sprintf("Up to $%d %s, or nothing at all to check it through. You have %s. Whatever goes in stays in.",
+						MaxAnte, StreetName(g.Street), BestOfSeven(g.Mine, g.Board).Name()))
 				add("fold", "Throw the hand in", 5, 0, "",
 					fmt.Sprintf("You keep what is in your pocket and lose the $%d already in the pot.", g.Ante+g.MyBet))
 			}

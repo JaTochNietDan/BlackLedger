@@ -48,7 +48,7 @@ func TestYouCannotWalkOutOnMoneyYouHavePutIn(t *testing.T) {
 	if err := w.Rise(); err == nil {
 		t.Fatal("getting up mid-hand was allowed")
 	}
-	playOut(t, w, nil)
+	playOut(t, w)
 	if reason := w.RiseReadiness(); reason != "" {
 		t.Fatalf("the hand is over and getting up is still refused: %s", reason)
 	}

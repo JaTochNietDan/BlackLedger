@@ -7430,3 +7430,58 @@ Texas Hold'em, the other half of that message, is next.
 
 Baseline unmoved: deaths 0/0/52/82/78/0/37, median cash
 12585/14129/7418/90/1063/5332/2080.
+
+## Texas hold'em
+
+"I'd also prefer if this game was the Texas Hold Em version as it's better to
+play so we can fix that maybe."
+
+Draw poker gave the player one decision, which cards to throw, and then turned
+everything over. Hold'em gives four rounds of the only decision that matters at
+a card table, against a board everybody can see, so what the people across from
+you do with the same three cards is the game.
+
+Two cards each, three on the table, then one, then one. `BestOfSeven` walks the
+twenty-one hands of five and keeps the best; `HandRank` and `Beats` are
+untouched, because what five cards are worth was already the one place that
+arithmetic lived. A betting round ends when nobody is short, the next street
+goes face up, what is in front of everybody goes into the pot and the money goes
+round again. A hand nobody is left contesting is over where it stands rather
+than dealing a river to somebody playing against nobody.
+
+Measured over 3,000 hands at a $50 ante, the same three policies as the draw:
+
+| how the player plays | draw poker | hold'em |
+| --- | --- | --- |
+| calls every bet | −$115,900 | −$67,112 |
+| folds what is beaten | −$3,800 | −$33,812 |
+| folds, and bets the good ones | +$13,900 | +$48,338 |
+
+The gap between the worst policy and the best is $129,800 under the draw and
+$115,450 under hold'em, but the *winning* policy earns three and a half times as
+much. That is the reason to prefer it: there is more to play for.
+
+Two things worth writing down:
+
+- **"Beaten" depends on the street.** The first version of the folding policy
+  folded anything under three of a kind, which before the flop is every hand in
+  the game — so folding measured worse than calling and the test failed for a
+  reason that was about the test. A hand is worth paying for preflop, or from a
+  pair up once there is a board.
+- **A grudge is worth the opposite of what it was worth.** Under the draw the
+  same crude policy came out $23,100 ahead against a table with a grudge and
+  $13,400 against a fresh one, because a table that calls light pays off a made
+  hand. Under hold'em it comes out $71,500 behind against the grudge and $15,600
+  behind fresh, because four streets of a table that raises on less punishes a
+  policy that folds too much. Both are the same fact — people with a reason to
+  want your money play harder — and what it is worth depends entirely on how you
+  play back. The test is named for what it measures now: the money moves more.
+
+**A handler deleted with the draw.** Cutting the `change` command out of
+`commands.go` took the `poach:` handler with it, because it had been inserted
+between `change` and `bet`. Nothing failed to build: the command simply returned
+no error and did nothing, and one test caught it — "Pia Iordan was taken on and
+works at the butcher".
+
+Baseline unmoved: deaths 0/0/52/82/78/0/37, median cash
+12585/14129/7418/90/1063/5332/2080.

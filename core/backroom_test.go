@@ -1,6 +1,7 @@
 package core
 
 import (
+	"fmt"
 	"sort"
 	"strings"
 	"testing"
@@ -31,20 +32,23 @@ func backroom(t *testing.T) (*World, []string) {
 	return w, seated
 }
 
-// playOut checks the hand through: no bet from the player, and pay whatever
-// comes back at them. The cheapest way to reach a showdown from a test.
-func playOut(t *testing.T, w *World, throw []int) {
+// playOut checks the hand through every street: no bet from the player, and pay
+// whatever comes back at them. The cheapest way to reach a showdown from a test.
+func playOut(t *testing.T, w *World) {
 	t.Helper()
-	if err := w.ChangeCards(throw); err != nil {
-		t.Fatalf("the draw was refused: %v", err)
-	}
-	if err := w.PlaceBet(0); err != nil {
-		t.Fatalf("checking was refused: %v", err)
-	}
-	if w.Game.Facing {
-		if err := w.CallBet(); err != nil {
-			t.Fatalf("calling was refused: %v", err)
+	for i := 0; i < 12 && !w.Game.Done; i++ {
+		if w.Game.Facing {
+			if err := w.CallBet(); err != nil {
+				t.Fatalf("calling was refused: %v", err)
+			}
+			continue
 		}
+		if err := w.PlaceBet(0); err != nil {
+			t.Fatalf("checking was refused: %v", err)
+		}
+	}
+	if !w.Game.Done {
+		t.Fatal("a hand of hold'em never reached a showdown")
 	}
 }
 
@@ -76,8 +80,14 @@ func TestTheBackRoomSeatsPeopleWhoLiveHere(t *testing.T) {
 			t.Fatalf("%s was dealt in and was never in the room", n.Name)
 		}
 	}
-	if len(g.Mine) != 5 {
-		t.Fatalf("a hand of draw poker is five cards, not %d", len(g.Mine))
+	if len(g.Mine) != 2 {
+		t.Fatalf("a hand of hold'em is two cards, not %d", len(g.Mine))
+	}
+	if g.Street != Preflop {
+		t.Fatalf("a hand was dealt and the street is %q", g.Street)
+	}
+	if len(g.Board) != 0 {
+		t.Fatalf("%d cards were face up before anybody had bet", len(g.Board))
 	}
 }
 
@@ -88,8 +98,10 @@ func TestEveryCardOnTheTableIsADifferentCard(t *testing.T) {
 		if err := w.SitInTheBackRoom(BackRoom, 50); err != nil {
 			t.Fatalf("nobody could get a game: %v", err)
 		}
+		playOut(t, w)
 		seen := map[Card]bool{}
 		all := append([]Card{}, w.Game.Mine...)
+		all = append(all, w.Game.Board...)
 		for _, s := range w.Game.Seats {
 			all = append(all, s.Cards...)
 		}
@@ -112,12 +124,12 @@ func TestTheBestHandTakesThePot(t *testing.T) {
 	if pot <= 0 {
 		t.Fatal("nobody put anything in")
 	}
-	playOut(t, w, nil)
+	playOut(t, w)
 	g := w.Game
 	if !g.Done {
 		t.Fatal("the hand never finished")
 	}
-	best, mine := BestAtTheTable(g), Rank(g.Mine)
+	best, mine := BestAtTheTable(g), BestOfSeven(g.Mine, g.Board)
 	if best.Beats(mine) && w.Player.Cash > before {
 		t.Fatalf("a losing hand took %d out of the pot", w.Player.Cash-before)
 	}
@@ -230,7 +242,7 @@ func TestTheBackRoomTakesNoRake(t *testing.T) {
 				throw = append(throw, i)
 			}
 		}
-		playOut(t, w, throw)
+		playOut(t, w)
 		mine += w.Player.Cash - cash
 		after := 0
 		for _, id := range seated {
@@ -262,27 +274,36 @@ func TestFoldingIsWorthMoreThanTheCardsAre(t *testing.T) {
 			if err := w.SitInTheBackRoom(BackRoom, 50); err != nil {
 				t.Fatalf("no game: %v", err)
 			}
-			if err := w.ChangeCards(roomDraw(w.Game.Mine)); err != nil {
-				t.Fatalf("the draw was refused: %v", err)
-			}
-			put := 0
-			if bet && Rank(w.Game.Mine).Category >= Trips {
-				put = 100
-			}
-			if err := w.PlaceBet(put); err != nil {
-				t.Fatalf("betting was refused: %v", err)
-			}
-			if w.Game.Facing {
-				// Somebody put money in. Pay to see it, or believe them.
-				beaten := Rank(w.Game.Mine).Category < Trips
-				var err error
-				if fold && beaten {
-					err = w.FoldHand()
-				} else {
-					err = w.CallBet()
+			// Four streets of the same decision, which is the whole of what
+			// hold'em asks and four times what the draw asked.
+			for i := 0; i < 12 && !w.Game.Done; i++ {
+				// What "beaten" means depends on the street. Before the flop
+				// nobody has a hand yet, so folding everything under three of
+				// a kind there is folding every hand in the game — which is
+				// what the first version of this test did, and it made folding
+				// look like the losing policy.
+				rank := BestOfSeven(w.Game.Mine, w.Game.Board)
+				made := rank.Category >= Trips
+				worthPaying := rank.Category >= Pair || w.Game.Street == Preflop
+				if w.Game.Facing {
+					// Somebody put money in. Pay to see it, or believe them.
+					var err error
+					if fold && !worthPaying {
+						err = w.FoldHand()
+					} else {
+						err = w.CallBet()
+					}
+					if err != nil {
+						t.Fatalf("answering the bet was refused: %v", err)
+					}
+					continue
 				}
-				if err != nil {
-					t.Fatalf("answering the bet was refused: %v", err)
+				put := 0
+				if bet && made {
+					put = 100
+				}
+				if err := w.PlaceBet(put); err != nil {
+					t.Fatalf("betting was refused: %v", err)
 				}
 			}
 			total += w.Player.Cash - cash
@@ -299,33 +320,6 @@ func TestFoldingIsWorthMoreThanTheCardsAre(t *testing.T) {
 	}
 }
 
-// roomDraw is the way the room plays a hand, so a test can play it the same.
-func roomDraw(cards []Card) []int {
-	if Rank(cards).Category >= Straight {
-		return nil
-	}
-	count := map[int]int{}
-	for _, c := range cards {
-		count[pokerRank(c)]++
-	}
-	high := map[int]bool{}
-	if Rank(cards).Category == HighCard {
-		var r []int
-		for _, c := range cards {
-			r = append(r, pokerRank(c))
-		}
-		sort.Sort(sort.Reverse(sort.IntSlice(r)))
-		high[r[0]], high[r[1]] = true, true
-	}
-	var throw []int
-	for i, c := range cards {
-		if count[pokerRank(c)] == 1 && !high[pokerRank(c)] {
-			throw = append(throw, i)
-		}
-	}
-	return throw
-}
-
 // Random hands almost never tie — none did in four thousand — so the split has
 // to be put on the table by hand or it is a branch nobody has ever run.
 func TestATiedPotIsSplitRatherThanGivenAway(t *testing.T) {
@@ -336,11 +330,14 @@ func TestATiedPotIsSplitRatherThanGivenAway(t *testing.T) {
 	g := w.Game
 	before := w.Player.Cash
 	purse := w.NPC(g.Seats[0].Who).Purse
-	g.Mine = hand("Kh", "Ks", "9d", "5c", "3h")
-	g.Seats[0].Cards = hand("Kd", "Kc", "9s", "5h", "3s")
-	g.Seats[1].Cards = hand("2h", "7s", "9c", "Jc", "4h")
-	g.Seats[2].Cards = hand("2s", "7h", "8c", "Jh", "4s")
-	g.Drawn = true
+	// The same hand for two people, which hold'em produces far more often than
+	// draw poker did: the board is most of everybody's hand.
+	g.Board = hand("Kh", "Kd", "9s", "5h", "3s")
+	g.Mine = hand("Ah", "Qc")
+	g.Seats[0].Cards = hand("Ad", "Qs")
+	g.Seats[1].Cards = hand("2h", "7s")
+	g.Seats[2].Cards = hand("2s", "7h")
+	g.Street = River
 	if err := w.showdown(); err != nil {
 		t.Fatal(err)
 	}
@@ -393,18 +390,21 @@ func TestTheGameCanBePlayedThroughTheSamePathAsEverythingElse(t *testing.T) {
 	if offered("cards") != nil {
 		t.Fatal("a second game was offered while a hand was on the table")
 	}
-	if a := offered("change"); a == nil || a.Disabled {
-		t.Fatal("a hand was dealt and there is no way to change a card")
+	if a := offered("bet"); a == nil || a.Disabled {
+		t.Fatal("a hand was dealt and there is no way to put money on it")
 	}
-	if err := w.apply(Command{Kind: "change", Choice: "0,2", RequestID: "backroomdrawtwo1"}); err != nil {
-		t.Fatalf("changing two cards was refused: %v", err)
-	}
-	if err := w.apply(Command{Kind: "bet", Amount: 0, RequestID: "backroomcheckit1"}); err != nil {
-		t.Fatalf("checking was refused: %v", err)
-	}
-	if w.Game.Facing {
-		if err := w.apply(Command{Kind: "call", RequestID: "backroomcallit1"}); err != nil {
-			t.Fatalf("calling was refused: %v", err)
+	// Four streets, checked and called through the same path the interface
+	// uses. Each command needs an id of its own or the store refuses the repeat.
+	for i := 0; i < 12 && !w.Game.Done; i++ {
+		id := fmt.Sprintf("backroomstreet%02d", i)
+		var err error
+		if w.Game.Facing {
+			err = w.apply(Command{Kind: "call", RequestID: id})
+		} else {
+			err = w.apply(Command{Kind: "bet", Amount: 0, RequestID: id})
+		}
+		if err != nil {
+			t.Fatalf("playing the hand out was refused: %v", err)
 		}
 	}
 	if !w.Game.Done {
@@ -427,16 +427,11 @@ func TestWhatIsFoldedStaysInThePot(t *testing.T) {
 	if err := w.SitInTheBackRoom(BackRoom, 50); err != nil {
 		t.Fatalf("no game: %v", err)
 	}
-	if err := w.ChangeCards(nil); err != nil {
-		t.Fatal(err)
-	}
 	if err := w.PlaceBet(100); err != nil {
 		t.Fatalf("betting was refused: %v", err)
 	}
-	if w.Game.Facing {
-		if err := w.FoldHand(); err != nil {
-			t.Fatal(err)
-		}
+	if err := w.FoldHand(); err != nil {
+		t.Fatal(err)
 	}
 	if !w.Game.Done {
 		t.Fatal("the hand never finished")
@@ -460,22 +455,12 @@ func TestTheTableSaysWhatItDid(t *testing.T) {
 	if err := w.SitInTheBackRoom(BackRoom, 50); err != nil {
 		t.Fatalf("no game: %v", err)
 	}
-	if err := w.ChangeCards(nil); err != nil {
-		t.Fatal(err)
-	}
 	for _, seat := range w.CardsDescription()["seats"].([]map[string]any) {
 		if _, shown := seat["cards"]; shown {
 			t.Fatalf("%v's hand is on the screen before it is turned over", seat["name"])
 		}
 	}
-	if err := w.PlaceBet(0); err != nil {
-		t.Fatal(err)
-	}
-	if w.Game.Facing {
-		if err := w.CallBet(); err != nil {
-			t.Fatal(err)
-		}
-	}
+	playOut(t, w)
 	said := 0
 	for _, s := range w.Game.Seats {
 		if s.Said != "" {
@@ -501,11 +486,12 @@ func TestAHandThrownInWinsNothingHoweverGoodItWas(t *testing.T) {
 		t.Fatalf("no game: %v", err)
 	}
 	g := w.Game
-	g.Mine = hand("Ah", "As", "Ad", "Ac", "Kh")
-	g.Seats[0].Cards = hand("2h", "7s", "9c", "Jc", "4h")
-	g.Seats[1].Cards = hand("2s", "7h", "8c", "Jh", "4s")
-	g.Seats[2].Cards = hand("3s", "6h", "8d", "Qh", "5s")
-	g.Drawn = true
+	g.Board = hand("Ah", "Ad", "Ac", "Kh", "7d")
+	g.Mine = hand("As", "Ks")
+	g.Seats[0].Cards = hand("2h", "7s")
+	g.Seats[1].Cards = hand("2s", "8h")
+	g.Seats[2].Cards = hand("3s", "6h")
+	g.Street = River
 	before := w.Player.Cash
 	if err := w.FoldHand(); err != nil {
 		t.Fatal(err)
@@ -529,7 +515,8 @@ func TestTheTablePublishesEverythingTheScreenReads(t *testing.T) {
 	}
 	table := w.CardsDescription()
 	for _, key := range []string{"place", "ante", "pot", "mine", "hand", "seats",
-		"drawn", "bet", "my_bet", "facing", "folded", "done", "outcome", "won"} {
+		"board", "street", "street_name", "bet", "my_bet", "facing", "folded",
+		"done", "outcome", "won"} {
 		if _, ok := table[key]; !ok {
 			t.Errorf("the screen reads %q off the table and the core does not send it", key)
 		}
@@ -603,7 +590,7 @@ func TestTakingSomebodysMoneyAtCardsIsSomethingTheyRemember(t *testing.T) {
 	g.Seats[0].Cards = hand("2h", "7s", "9c", "Jc", "4h")
 	g.Seats[1].Cards = hand("2s", "7h", "8c", "Jh", "4s")
 	g.Seats[2].Cards = hand("3s", "6h", "8d", "Qh", "5s")
-	g.Drawn = true
+	g.Street = River
 	if err := w.showdown(); err != nil {
 		t.Fatal(err)
 	}
@@ -627,7 +614,7 @@ func TestLosingToSomebodyAtCardsIsAlsoSomethingTheyRemember(t *testing.T) {
 	g.Seats[0].Cards = hand("Ah", "As", "Ad", "Ac", "Kh")
 	g.Seats[1].Cards = hand("2s", "7h", "8c", "Jh", "4s")
 	g.Seats[2].Cards = hand("3s", "6h", "8d", "Qh", "5s")
-	g.Drawn = true
+	g.Street = River
 	if err := w.showdown(); err != nil {
 		t.Fatal(err)
 	}
@@ -652,7 +639,7 @@ func TestASmallLossIsNotHeldAgainstAnybody(t *testing.T) {
 	g.Seats[0].Cards = hand("2h", "7s", "9c", "Jc", "4h")
 	g.Seats[1].Cards = hand("2s", "7h", "8c", "Jh", "4s")
 	g.Seats[2].Cards = hand("3s", "6h", "8d", "Qh", "5s")
-	g.Drawn = true
+	g.Street = River
 	if err := w.showdown(); err != nil {
 		t.Fatal(err)
 	}
@@ -683,7 +670,7 @@ func TestARoomYouHaveCleanedOutHasNoGameLeftInIt(t *testing.T) {
 		g.Seats[0].Cards = hand("2h", "7s", "9c", "Jc", "4h")
 		g.Seats[1].Cards = hand("2s", "7h", "8c", "Jh", "4s")
 		g.Seats[2].Cards = hand("3s", "6h", "8d", "Qh", "5s")
-		g.Drawn = true
+		g.Street = River
 		if err := w.showdown(); err != nil {
 			t.Fatal(err)
 		}
@@ -723,9 +710,6 @@ func TestSomebodyYouTookMoneyOffPlaysYouHarder(t *testing.T) {
 			if err := w.SitInTheBackRoom(BackRoom, 50); err != nil {
 				t.Fatalf("no game: %v", err)
 			}
-			if err := w.ChangeCards(nil); err != nil {
-				t.Fatal(err)
-			}
 			// The player bets into them every time, so what comes back is the
 			// only thing that differs between the two runs.
 			if err := w.PlaceBet(150); err != nil {
@@ -760,10 +744,17 @@ func TestSomebodyYouTookMoneyOffPlaysYouHarder(t *testing.T) {
 }
 
 // And what that is worth to the player, which is the point of it being in the
-// game rather than in a paragraph. A table that will not lay a hand down pays
-// off a good hand more often and bluffs into a bad one more often, so the same
-// player takes more off them and gives more back.
-func TestATableWithAGrudgeIsWorthMoreAndCostsMore(t *testing.T) {
+// game rather than in a paragraph. A table that will not lay a hand down moves
+// more money in both directions.
+//
+// Under draw poker the same crude policy came out ahead against a grudge —
+// $23,100 against $13,400 — because a table that calls light pays off a made
+// hand. Under hold'em it comes out behind, $-71,500 against $-15,600, because
+// four streets of a table that raises on less punishes a policy that folds
+// everything under three of a kind before the board is out. Both are the same
+// fact about the room: people with a reason to want your money play harder,
+// and what that is worth depends entirely on how you play back.
+func TestATableWithAGrudgeMovesMoreMoney(t *testing.T) {
 	run := func(sore int) (int, int) {
 		total, swing := 0, 0
 		for seed := uint32(1); seed <= 2000; seed++ {
@@ -776,24 +767,25 @@ func TestATableWithAGrudgeIsWorthMoreAndCostsMore(t *testing.T) {
 			if err := w.SitInTheBackRoom(BackRoom, 50); err != nil {
 				t.Fatalf("no game: %v", err)
 			}
-			if err := w.ChangeCards(roomDraw(w.Game.Mine)); err != nil {
-				t.Fatal(err)
-			}
-			put := 0
-			if Rank(w.Game.Mine).Category >= Trips {
-				put = 100
-			}
-			if err := w.PlaceBet(put); err != nil {
-				t.Fatal(err)
-			}
-			if w.Game.Facing {
-				var err error
-				if Rank(w.Game.Mine).Category < Trips {
-					err = w.FoldHand()
-				} else {
-					err = w.CallBet()
+			for i := 0; i < 12 && !w.Game.Done; i++ {
+				made := BestOfSeven(w.Game.Mine, w.Game.Board).Category >= Trips
+				if w.Game.Facing {
+					var err error
+					if made {
+						err = w.CallBet()
+					} else {
+						err = w.FoldHand()
+					}
+					if err != nil {
+						t.Fatal(err)
+					}
+					continue
 				}
-				if err != nil {
+				put := 0
+				if made {
+					put = 100
+				}
+				if err := w.PlaceBet(put); err != nil {
 					t.Fatal(err)
 				}
 			}
@@ -809,7 +801,7 @@ func TestATableWithAGrudgeIsWorthMoreAndCostsMore(t *testing.T) {
 	}
 	fresh, freshSwing := run(0)
 	sore, soreSwing := run(SoreAtCards)
-	t.Logf("over 2000 hands: a fresh table is worth $%d with $%d changing hands, a table with a grudge is worth $%d with $%d changing hands",
+	t.Logf("over 2000 hands: a fresh table leaves the player $%d with $%d changing hands, a table with a grudge leaves them $%d with $%d changing hands",
 		fresh, freshSwing, sore, soreSwing)
 	if soreSwing <= freshSwing {
 		t.Fatalf("a table playing the player rather than the cards moved less money, not more: $%d against $%d", soreSwing, freshSwing)

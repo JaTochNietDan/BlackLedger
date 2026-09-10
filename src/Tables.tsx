@@ -879,6 +879,9 @@ export interface CardsState {
   ante: number;
   pot: number;
   mine: Card[];
+  board: Card[];
+  street: string;
+  street_name: string;
   hand: string;
   seats: {
     who: string;
@@ -892,7 +895,6 @@ export interface CardsState {
     cards?: Card[];
     hand?: string;
   }[];
-  drawn: boolean;
   bet: number;
   my_bet: number;
   facing: boolean;
@@ -902,9 +904,11 @@ export interface CardsState {
   won: number;
 }
 
-// Which of the five the player is throwing. Held here rather than in the core
-// because it is not a decision until it is sent: picking a card up and putting
-// it down again is not something the city needs to know about.
+// The back room, at hold'em. Two cards each, five in the middle, and four
+// rounds of the only decision at a card table. What the player reads is the
+// board, what each seat put in, and what they said when the money went round —
+// which is the whole of what there is to go on, because nobody changes a card
+// in this game and everybody can see the same five.
 export function BackRoom({
   cards,
   money,
@@ -916,25 +920,21 @@ export function BackRoom({
   cash: number;
   act: (command: {kind: string; choice?: string; amount?: number}) => void;
 }) {
-  const [throwing, setThrowing] = useState<number[]>([]);
   const [bet, setBet] = useState(0);
   const owed = Math.max(0, cards.bet - cards.my_bet);
-  const live = !cards.done;
-  const pick = (i: number) =>
-    setThrowing(t => (t.includes(i) ? t.filter(n => n !== i) : t.length >= 3 ? t : [...t, i]));
   return (
     <div className="felt back-room">
       <div className="felt-head">
-        <span>The back room</span>
+        <span>{cards.street_name === 'at the showdown' ? 'The showdown' : cards.street_name}</span>
         <b>{money(cards.pot)} in the middle</b>
       </div>
       <div className="baize">
         {cards.seats.map(s => (
           <div key={s.who} className={'seat player-seat' + (s.folded ? ' folded' : '')}>
             <span className="seat-name">{s.name}</span>
-            <Row cards={s.cards ?? []} hidden={s.cards ? 0 : 5} />
+            <Row cards={s.cards ?? []} hidden={s.cards ? 0 : 2} />
             <small className="seat-said">
-              {s.folded ? 'out' : s.said || (cards.drawn ? drawNote(s.threw) : 'waiting')}
+              {s.folded ? 'out' : s.said || 'waiting'}
               {s.in > 0 && !s.folded ? ` · ${money(s.in)} in` : ''}
               {s.hand ? ` · ${s.hand}` : ''}
             </small>
@@ -949,23 +949,15 @@ export function BackRoom({
             {!!s.sore && <small className="seat-sore">has something against you</small>}
           </div>
         ))}
+        {/* The five in the middle belong to everybody, which is what makes this
+            a game of what the other seats do rather than of what they drew. */}
+        <div className="board">
+          <span className="seat-name">The table</span>
+          <Row cards={cards.board} hidden={5 - cards.board.length} />
+        </div>
         <div className="seat mine">
           <span className="seat-name">You</span>
-          <div className="card-row">
-            {cards.mine.map((c, i) => (
-              <button
-                key={i}
-                type="button"
-                className={'card-pick' + (throwing.includes(i) ? ' throwing' : '')}
-                aria-pressed={throwing.includes(i)}
-                aria-label={`${c.rank} of ${c.suit}`}
-                disabled={cards.drawn || !live}
-                onClick={() => pick(i)}
-              >
-                <PlayingCard card={c} />
-              </button>
-            ))}
-          </div>
+          <Row cards={cards.mine} hidden={0} />
           <small className="seat-said">
             {cards.hand}
             {cards.my_bet > 0 ? ` · ${money(cards.my_bet)} in` : ''}
@@ -974,13 +966,6 @@ export function BackRoom({
       </div>
       {cards.done ? (
         <p className={'felt-result' + (cards.won > 0 ? ' won' : '')}>{cards.outcome}</p>
-      ) : !cards.drawn ? (
-        <div className="felt-actions">
-          <button onClick={() => act({kind: 'change', choice: throwing.join(',')})}>
-            {throwing.length ? `Change ${throwing.length}` : 'Stand pat'}
-          </button>
-          <span className="felt-note">Pick up to three to throw away.</span>
-        </div>
       ) : cards.facing ? (
         <div className="felt-actions">
           <button onClick={() => act({kind: 'call'})} disabled={owed > cash}>
@@ -998,13 +983,9 @@ export function BackRoom({
         </div>
       )}
       <p className="felt-note">
-        No house in this game. The pot is what everybody put in, and it goes to the best hand at the
-        table.
+        No house in this game. Two cards each and five on the table; the pot is what everybody put
+        in, and it goes to the best five cards anybody can make.
       </p>
     </div>
   );
-}
-
-function drawNote(threw: number) {
-  return threw === 0 ? 'stood pat' : threw === 1 ? 'took one' : `took ${threw}`;
 }

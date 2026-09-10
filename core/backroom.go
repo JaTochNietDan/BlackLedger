@@ -34,8 +34,11 @@ type Seat struct {
 	Who   string `json:"who"`
 	Name  string `json:"name"`
 	Cards []Card `json:"cards"`
-	// Threw is how many they changed, which is the only thing the player gets
-	// to see about a hand before it is turned over.
+	// Threw is left from draw poker, where it was how many cards somebody
+	// bought and the only thing you could read off them before the showdown. In
+	// hold'em nobody changes a card: what you read is what they do with the
+	// money. Kept at zero so a save written before the game changed still
+	// loads.
 	Threw int `json:"threw"`
 	// Had is what was in their pocket before the ante, so what a night at the
 	// table did to somebody can be told from what they were carrying. Measuring
@@ -63,8 +66,10 @@ type CardGame struct {
 	// Deck is what is left to draw from, so the draw cannot deal a card that is
 	// already in somebody's hand.
 	Deck []Card `json:"deck"`
-	// Drawn is set once cards have been changed, so nobody draws twice.
-	Drawn bool `json:"drawn,omitempty"`
+	// Board is what is face up in the middle: three, then one, then one.
+	Board []Card `json:"board,omitempty"`
+	// Street is how far the hand has got — preflop, flop, turn, river, shown.
+	Street string `json:"street,omitempty"`
 	// Bet is what it costs to stay in beyond the ante, and Mine is what the
 	// player has already put toward it. Raised is set once somebody has put
 	// the money up a second time, because this room allows one raise: a table
@@ -250,7 +255,7 @@ func isStraight(order []int, count map[int]int) (bool, int) {
 func BestAtTheTable(g *CardGame) HandRank {
 	best := HandRank{Category: -1}
 	for _, s := range g.Seats {
-		if r := Rank(s.Cards); best.Category < 0 || r.Beats(best) {
+		if r := BestOfSeven(s.Cards, g.Board); best.Category < 0 || r.Beats(best) {
 			best = r
 		}
 	}
@@ -290,17 +295,18 @@ func (w *World) SitInTheBackRoom(place string, ante int) error {
 	if err := w.Pay(ante); err != nil {
 		return err
 	}
-	g := &CardGame{Place: place, Ante: ante, Pot: ante, Seats: seats, Deck: w.deck()}
-	g.Mine = g.take(5)
+	g := &CardGame{Place: place, Ante: ante, Pot: ante, Seats: seats,
+		Deck: w.deck(), Street: Preflop}
+	g.Mine = g.take(2)
 	for i := range g.Seats {
-		g.Seats[i].Cards = g.take(5)
+		g.Seats[i].Cards = g.take(2)
 		if n := w.NPC(g.Seats[i].Who); n != nil {
 			n.Purse -= ante
 			g.Pot += ante
 		}
 	}
 	w.Game = g
-	w.Log("A game in the back room", fmt.Sprintf("$%d a head with %s. Five cards, one draw.%s",
+	w.Log("A game in the back room", fmt.Sprintf("$%d a head with %s. Two cards each and five to come.%s",
 		ante, listNames(g.Seats), w.tableRemembers(g)), "personal")
 	return nil
 }
@@ -340,79 +346,49 @@ func listNames(seats []Seat) string {
 	return joinNames(names)
 }
 
-// Draw changes the cards the player named, lets everybody else change theirs,
-// and turns them over. Passing nothing is standing pat.
-func (w *World) ChangeCards(discards []int) error {
+// Streets. A betting round ends when nobody is short of the bet; then the next
+// cards go face up in the middle and the money goes round again. Four rounds,
+// which is four times the decision draw poker gave the player.
+
+// nextRound puts the next street on the table and clears what everybody has in
+// front of them, or calls the hand if there is nothing left to come.
+func (w *World) nextRound() error {
 	g := w.Game
-	if g == nil || g.Done {
-		return fmt.Errorf("there is no hand on the table")
+	street, cards := nextStreet(g.Street)
+	if street == Shown {
+		return w.showdown()
 	}
-	if g.Drawn {
-		return fmt.Errorf("the cards have been changed already")
-	}
-	if len(discards) > 3 {
-		return fmt.Errorf("the house lets you change three")
-	}
-	throw := map[int]bool{}
-	for _, i := range discards {
-		if i < 0 || i >= len(g.Mine) {
-			return fmt.Errorf("you are not holding a card there")
-		}
-		throw[i] = true
-	}
-	kept := make([]Card, 0, 5)
-	for i, c := range g.Mine {
-		if !throw[i] {
-			kept = append(kept, c)
-		}
-	}
-	g.Mine = append(kept, g.take(len(throw))...)
+	g.Street = street
+	g.Board = append(g.Board, g.take(cards)...)
+	// The money in front of people goes into the pot at the end of a street;
+	// what is owed on the next one starts at nothing.
+	g.Bet, g.MyBet, g.Raised, g.Facing = 0, 0, false, false
 	for i := range g.Seats {
-		g.Seats[i].Cards, g.Seats[i].Threw = g.change(w, g.Seats[i].Cards)
+		g.Seats[i].In, g.Seats[i].Said = 0, ""
 	}
-	g.Drawn = true
-	// The hands are made. What they are worth is now a question of who will
-	// pay to see them, which is the half of this game the cards do not decide.
-	w.Log("The draw", w.drawNote(), "personal")
+	// Everybody but the player may bet into the new street before it comes back
+	// to them.
+	w.roundOfBetting()
+	if g.Bet > g.MyBet {
+		g.Facing = true
+	}
 	return nil
 }
 
-// change is how somebody who is not the player plays their hand: keep what is
-// worth keeping and buy the rest. A pair draws three, two pair draws one,
-// anything made stands pat, and nothing at all keeps its two highest cards.
-//
-// The house rule is three cards, and it is three for everybody. The first
-// version let the room throw four while the player could throw three, which is
-// not a house edge — there is no house — but it is the same thing wearing a
-// different coat, and the money measured it at ten percent of the ante a hand.
-func (g *CardGame) change(w *World, hand []Card) ([]Card, int) {
-	r := Rank(hand)
-	if r.Category >= Straight {
-		return hand, 0
+// stillIn counts the hands that have not been thrown away, the player's
+// included. One left is a hand that is over without anybody showing anything.
+func (w *World) stillIn() int {
+	g := w.Game
+	n := 0
+	if !g.Folded {
+		n++
 	}
-	count := map[int]int{}
-	for _, c := range hand {
-		count[pokerRank(c)]++
-	}
-	// On nothing at all, keep the two highest: throwing the other three is the
-	// most the room allows anybody.
-	high := map[int]bool{}
-	if r.Category == HighCard {
-		ranked := make([]int, 0, len(hand))
-		for _, c := range hand {
-			ranked = append(ranked, pokerRank(c))
-		}
-		sort.Sort(sort.Reverse(sort.IntSlice(ranked)))
-		high[ranked[0]], high[ranked[1]] = true, true
-	}
-	keep := make([]Card, 0, 5)
-	for _, c := range hand {
-		if count[pokerRank(c)] > 1 || high[pokerRank(c)] {
-			keep = append(keep, c)
+	for _, s := range g.Seats {
+		if !s.Folded {
+			n++
 		}
 	}
-	threw := len(hand) - len(keep)
-	return append(keep, g.take(threw)...), threw
+	return n
 }
 
 // showdown turns over everybody still in and moves the money. A pot goes to the
@@ -422,7 +398,7 @@ func (g *CardGame) change(w *World, hand []Card) ([]Card, int) {
 // three thousand of them.
 func (w *World) showdown() error {
 	g := w.Game
-	mine := Rank(g.Mine)
+	mine := BestOfSeven(g.Mine, g.Board)
 	// Everybody who paid to be here.
 	var winners []int
 	best := HandRank{Category: -1}
@@ -434,7 +410,7 @@ func (w *World) showdown() error {
 		if s.Folded {
 			continue
 		}
-		r := Rank(s.Cards)
+		r := BestOfSeven(s.Cards, g.Board)
 		switch {
 		case r.Beats(best):
 			best, winners = r, []int{i}
@@ -603,7 +579,8 @@ func (w *World) CardsDescription() map[string]any {
 	}
 	return map[string]any{
 		"place": g.Place, "ante": g.Ante, "pot": g.Pot, "mine": g.Mine,
-		"hand": Rank(g.Mine).Name(), "seats": seats, "drawn": g.Drawn,
+		"hand": BestOfSeven(g.Mine, g.Board).Name(), "seats": seats,
+		"board": g.Board, "street": g.Street, "street_name": StreetName(g.Street),
 		"bet": g.Bet, "my_bet": g.MyBet, "facing": g.Facing, "folded": g.Folded,
 		"done": g.Done, "outcome": g.Outcome, "won": g.Won,
 	}
@@ -660,7 +637,16 @@ func (w *World) drawNote() string {
 // they read it: somebody who cannot tell a pair of threes from a pair of
 // queens plays them the same way.
 func seatStrength(cards []Card, skill int) int {
-	r := Rank(cards)
+	return handStrength(Rank(cards), skill)
+}
+
+// tableStrength is what somebody makes of their two cards and the board.
+func tableStrength(hole, board []Card, skill int) int {
+	return handStrength(BestOfSeven(hole, board), skill)
+}
+
+// handStrength is how good a made hand looks to the person holding it.
+func handStrength(r HandRank, skill int) int {
 	s := r.Category * 2
 	if r.Category == Pair && len(r.Order) > 0 && r.Order[0] >= 11 && skill >= ReadsIt {
 		s++ // a pair worth playing, if you can tell
@@ -677,9 +663,6 @@ func (w *World) PlaceBet(amount int) error {
 	g := w.Game
 	if g == nil || g.Done {
 		return fmt.Errorf("there is no hand on the table")
-	}
-	if !g.Drawn {
-		return fmt.Errorf("the cards have not been changed yet")
 	}
 	if g.Facing {
 		return fmt.Errorf("the bet is back with you: call it or throw the hand in")
@@ -704,7 +687,10 @@ func (w *World) PlaceBet(amount int) error {
 		g.Facing = true
 		return nil
 	}
-	return w.showdown()
+	if w.stillIn() < 2 {
+		return w.showdown()
+	}
+	return w.nextRound()
 }
 
 // roundOfBetting walks the table until nobody is short. Anybody short of the
@@ -739,7 +725,7 @@ func (w *World) bettingPass() bool {
 		if s.In >= g.Bet && g.Bet > 0 {
 			continue
 		}
-		strength := seatStrength(s.Cards, n.Skill)
+		strength := tableStrength(s.Cards, g.Board, n.Skill)
 		owed := g.Bet - s.In
 		// Nothing to call: a hand worth showing bets it, and so does somebody
 		// with the nerve to represent one they have not got.
@@ -828,7 +814,14 @@ func (w *World) CallBet() error {
 	g.MyBet, g.Pot, g.Facing = g.Bet, g.Pot+owed, false
 	// Whoever called the smaller figure has to match the bigger one or get out.
 	w.roundOfBetting()
-	return w.showdown()
+	if g.Bet > g.MyBet {
+		g.Facing = true
+		return nil
+	}
+	if w.stillIn() < 2 {
+		return w.showdown()
+	}
+	return w.nextRound()
 }
 
 // FoldHand is the player throwing it in rather than paying. What is already in
@@ -838,10 +831,9 @@ func (w *World) FoldHand() error {
 	if g == nil || g.Done {
 		return fmt.Errorf("there is no hand on the table")
 	}
-	if !g.Drawn {
-		return fmt.Errorf("you have not seen your hand yet")
-	}
 	g.Folded, g.Facing = true, false
+	// A hand nobody is left contesting is over: the pot goes to whoever is
+	// still in it without anybody having to show anything.
 	return w.showdown()
 }
 

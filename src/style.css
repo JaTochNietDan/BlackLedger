@@ -1266,3 +1266,14 @@ body{height:100%;overflow:hidden;margin:0;background:var(--bg);color:var(--ink);
 .casino.back-room-scene {max-width: 940px}
 .back-room-empty {padding: 24px 28px 32px; display: flex; flex-direction: column; gap: 16px}
 .back-room-empty p {margin: 0; max-width: 60ch}
+
+/* The five in the middle. They belong to everybody, so they sit across the
+   table rather than in front of a seat. */
+.felt.back-room .board {
+  flex-basis: 100%;
+  text-align: center;
+  padding: 12px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+.felt.back-room .board .card-row {justify-content: center}

@@ -41,15 +41,15 @@ which half is standing.
    worth in speed stated honestly. Plate is built for the player's own car and
    for your people's (`core/plate.go`, `core/theirs.go`).
 3. **A back-room card game** whose other players are people from the city.
-   Built: five card draw behind the poolhall, one draw, no house and no edge,
-   seats filled from whoever is in the room, and a round of betting after the
-   draw with one raise, folding, and bluffing off `Ambition` (`core/backroom.go`).
-   Screen in `src/Tables.tsx`, drawn inside the poolhall rather than as a
-   takeover, and what a night costs somebody is remembered: a heavy loser is
+   Built: Texas hold'em behind the poolhall, no house and no edge,
+   seats filled from whoever is in the room, four streets of betting with one
+   raise, folding, and bluffing off `Ambition` (`core/backroom.go`,
+   `core/holdem.go`).
+   Screen in `src/BackRoomScene.tsx`, which takes the whole screen the way the
+   casino does; what a night costs somebody is remembered: a heavy loser is
    sore, somebody you paid thinks better of you, and a room can be emptied.
    A grudge changes how somebody plays the player: they call light, raise on
-   less and bluff more, which is worth $23,100 against $13,400 over 2,000
-   hands and costs elsewhere. Still open: sound.
+   less and bluff more. Still open: sound.
 4. **The rest of the open inbox.** Checked this tick and nearly all of it is
    built: the wording, the roulette cloth and multiple chips, the travel bar,
    cursing and threats, the bad blood box, the family lead, and Leo Carver's

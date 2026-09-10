@@ -255,6 +255,9 @@ export interface Snapshot {
     ante: number;
     pot: number;
     mine: {rank: string; suit: string; value: number}[];
+    board: {rank: string; suit: string; value: number}[];
+    street: string;
+    street_name: string;
     hand: string;
     seats: {
       who: string;
@@ -268,7 +271,6 @@ export interface Snapshot {
       cards?: {rank: string; suit: string; value: number}[];
       hand?: string;
     }[];
-    drawn: boolean;
     bet: number;
     my_bet: number;
     facing: boolean;
