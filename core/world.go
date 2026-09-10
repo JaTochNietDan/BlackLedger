@@ -250,7 +250,12 @@ type Property struct {
 	// What this business pays a hand a day, when the player has decided it.
 	// Absent in saves written before the wage was a decision, which reads as
 	// the trade's own rate.
-	Wage    int  `json:"wage,omitempty"`
+	Wage int `json:"wage,omitempty"`
+	// How many nights running the wages here went unpaid. One is bad luck and
+	// the morning after is the same as any other; a week of it is a reason to
+	// stop coming in. Absent in saves written before the bill reached the
+	// people it names.
+	Unpaid  int  `json:"unpaid,omitempty"`
 	Supply  int  `json:"supply,omitempty"`
 	Trouble bool `json:"trouble,omitempty"`
 	Still   bool `json:"still,omitempty"`
@@ -2081,6 +2086,7 @@ func (w *World) Advance(minutes int) {
 			bill := w.DailyCost()
 			if p.Cash >= bill {
 				p.Cash -= bill
+				w.EverybodyGotPaid()
 				w.Log("Accounts settled", fmt.Sprintf("$%d paid for housing, security and crew.", bill), "business")
 			} else {
 				// Report the night that happened, not the first one. This said

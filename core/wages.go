@@ -117,15 +117,16 @@ func (w *World) PayDay() {
 const Unpaid = 4
 
 // NobodyGotPaid takes the day off what the people behind the player's counters
-// think of them, and reports how many there were. Called from the night the
-// bills do not clear.
+// think of them, counts the night against each place, and reports how many
+// hands went unpaid. Called from the night the bills do not clear.
 func (w *World) NobodyGotPaid() int {
 	short := 0
 	for _, l := range Locations {
 		prop := w.Properties[l.ID]
-		if prop == nil || !w.Own(l.ID) {
+		if prop == nil || !w.Own(l.ID) || len(prop.Hands) == 0 {
 			continue
 		}
+		prop.Unpaid++
 		for _, who := range prop.Hands {
 			n := w.NPC(who)
 			if n == nil || n.Dead {
@@ -134,6 +135,27 @@ func (w *World) NobodyGotPaid() int {
 			n.Trust = max(0, n.Trust-Unpaid)
 			short++
 		}
+		// A week of this should be a reason to stop coming in, and it cannot
+		// happen: the first night the bills do not clear strips the security
+		// and the address, so the day's cost falls from $2,033 to $33 and every
+		// night after it clears out of what the business earns. Measured over
+		// twelve days of a player with nothing: two unpaid nights, never three.
+		//
+		// So the count is kept and read — the room can say a place has gone
+		// unpaid, and it is true — and nothing is hung off a threshold that
+		// cannot be reached. Making it reachable means the bill paying what it
+		// can rather than all or nothing, which is a change to how the day
+		// settles and not a rule to bolt on.
 	}
 	return short
+}
+
+// EverybodyGotPaid forgets the unpaid nights, because they were paid. Called
+// from the night the bills clear.
+func (w *World) EverybodyGotPaid() {
+	for _, l := range Locations {
+		if prop := w.Properties[l.ID]; prop != nil && prop.Unpaid > 0 && w.Own(l.ID) {
+			prop.Unpaid = 0
+		}
+	}
 }

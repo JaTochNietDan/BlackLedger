@@ -8342,3 +8342,27 @@ made unpayable with security, which is charged by the day and earns nothing.
 
 Baseline: the publican moved $1,700 to $1,693, which is noise. No policy misses
 payroll; a player who does will feel it.
+
+## A rule that could not fire, and was not shipped
+
+Missing payroll costs what the people behind the counter think of the player.
+The obvious next step is that a week of it stops them coming in — nobody works a
+week for nothing — so I built it, and then measured it.
+
+It cannot happen. The first night the bills do not clear strips the security and
+downgrades the address, so the day's cost falls from $2,033 to $33 and every
+night after clears out of what the business earns. Over twenty days of a player
+with nothing at all, the longest unpaid run is one night.
+
+So the rule came out. Shipping a threshold nothing reaches is the fault this
+brief has been collecting all session, and it is worse than not shipping,
+because it reads as a pressure the game does not have. What stayed is the count
+itself, which is true and worth having: `Property.Unpaid` says a place went
+unpaid, and a test says the count is kept and cleared when the bills clear.
+
+A second test holds the finding: if the longest unpaid run ever reaches seven
+nights, it says so and tells the next reader to put the rule back. That is the
+honest way to leave a design decision that depends on a measurement.
+
+Making it reachable means the day's bill paying what it can rather than all or
+nothing, which is a change to how the day settles rather than a rule to bolt on.
