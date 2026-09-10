@@ -203,6 +203,11 @@ export function Interior({
   if (place.owned && place.income > 0) {
     facts.push({what: 'Earns', is: '$' + place.income + '/hr'});
   }
+  // What it pays, now that the wage is a decision rather than a rate. Beside
+  // what it earns, because that is the comparison an owner is making.
+  if (place.owned && place.wage) {
+    facts.push({what: 'Pays', is: '$' + place.wage + '/day'});
+  }
 
   return (
     <div className="interior-stage">

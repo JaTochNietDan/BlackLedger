@@ -8023,3 +8023,20 @@ nothing; with the bill reading the rate instead of the figure, halving the wage
 does not change what the books say.
 
 Baseline unmoved: no campaign policy touches a wage.
+
+## A field that knew what was in your pocket
+
+The wage is typed into the same field as a stake, a float, a house limit and the
+money behind a table, and that field said "More than the $18 there is" when the
+figure was too big. True of a stake. False of a wage: the ceiling on what a
+laundry pays a hand is what the trade will carry, not what is in the till. That
+is the fault shape the brief already lists — the interface stating a rule the
+core does not have — in one sentence of copy.
+
+It reads "$18 is the most" now, which is true whatever the field is for, and a
+guard holds both halves: the old wording must not come back, and the new one
+must still be there.
+
+The room also says what a business pays, beside what it earns, because that is
+the comparison an owner is making and the wage stopped being a rate this
+morning.

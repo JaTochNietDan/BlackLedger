@@ -25,11 +25,11 @@ export function SumAction({
   const amount = typed === '' ? 0 : typed;
   const over = amount > sum.most;
   const under = amount < sum.least;
-  const bad = over
-    ? `More than the ${money(sum.most)} there is`
-    : under
-      ? `At least ${money(sum.least)}`
-      : '';
+  // What is wrong with the figure, said the same way whatever the field is for.
+  // "More than the $18 there is" reads as a statement about the player's
+  // pocket, which is true of a stake and false of a wage: the ceiling on what a
+  // laundry pays a hand is what the trade will carry, not what is in the till.
+  const bad = over ? `${money(sum.most)} is the most` : under ? `At least ${money(sum.least)}` : '';
 
   return (
     <div

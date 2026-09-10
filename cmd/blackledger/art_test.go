@@ -580,3 +580,26 @@ func TestEverySymbolOnTheStripIsPainted(t *testing.T) {
 		t.Error("a symbol nothing paints leaves the drum blank")
 	}
 }
+
+// A field the player types a figure into says what is wrong with the figure,
+// and it is used for a stake, a float, a house limit and a wage. "More than the
+// $18 there is" is a statement about the player's pocket: true of a stake and
+// false of a wage, where the ceiling is what the trade will carry.
+func TestATypedFigureDoesNotClaimToKnowWhatIsInYourPocket(t *testing.T) {
+	sum := source(t, "src/SumAction.tsx")
+	if holds(sum, "More than the ${money(sum.most)} there is") {
+		t.Error("the figure field tells a business owner what is in their pocket")
+	}
+	if !holds(sum, "`${money(sum.most)} is the most`") {
+		t.Error("the figure field no longer says what the most is")
+	}
+}
+
+// And a business of the player's says what it pays, now that the wage is a
+// decision rather than the trade's own rate.
+func TestTheRoomSaysWhatItPays(t *testing.T) {
+	room := source(t, "src/Interior.tsx")
+	if !holds(room, "{what: 'Pays', is: '$' + place.wage + '/day'}") {
+		t.Error("a business of yours does not say what it pays")
+	}
+}
