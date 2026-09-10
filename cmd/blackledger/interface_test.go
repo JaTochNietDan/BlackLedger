@@ -172,8 +172,12 @@ func TestOnlyOneFigureClaimsToBeWhatAPlaceCouldEarn(t *testing.T) {
 // tell you what a player sees.
 func TestTheResultBandCanCountInDays(t *testing.T) {
 	t.Parallel()
+	// The three things a band that counts in days has to do, rather than the
+	// bare number 1440, which any arithmetic anywhere in the file satisfies.
 	body := source(t, "src/Outcome.tsx")
-	if !holds(body, "1440") {
-		t.Error("the result band has no idea what a day is, so a five-day sentence reads in hours")
+	for _, part := range []string{"m >= 1440", "Math.floor(m / 1440)", "(m % 1440) / 60"} {
+		if !holds(body, part) {
+			t.Errorf("the result band cannot count in days: %q is not in it", part)
+		}
 	}
 }

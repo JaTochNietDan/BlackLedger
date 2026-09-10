@@ -7947,3 +7947,31 @@ filed. One of them, the back room, had lost its hold'em answer to a replacement
 that silently matched nothing in an earlier tick; it has it now. Reading the
 inbox at the start of a tick is cheap again, which is the point of the section
 existing.
+
+## A guard over the guards
+
+"Make sure you are keeping track of what you are doing and not regressing."
+
+The brief's first fault shape is *a guard that cannot fail*, and the text guards
+that read the view's source are the easiest place in this project to write one.
+A needle short enough or generic enough to appear anywhere passes forever while
+the thing it was written about quietly goes away. Two were found by hand last
+tick and this one — `") : ("` matched every ternary in the file, and `"1440"`
+matched any arithmetic on a day — and finding them by hand is not a plan.
+
+`TestNoGuardIsWrittenWithANeedleThatCannotFail` reads the guards themselves and
+fails on any needle under ten characters that a guard demands is *present*.
+Needles a guard demands are *absent* are exempt and say why: a short one there
+errs toward failing rather than passing, and "the room must not contain the word
+backroom" is exactly as strong as it sounds.
+
+It found one more on its first run. `TestTheCardViewIsStillReachable` asked for
+`"CityIso"`, which is in the import line of a file that no longer draws it; it
+asks for the mount now, and renaming that mount fails it.
+
+Three guards rewritten, all three verified by breaking the thing they watch:
+
+- the result band counts in days by three separate pieces of arithmetic rather
+  than by the number 1440 appearing somewhere,
+- a drum's fallback is named rather than being any ternary,
+- the two city views are mounted rather than imported.

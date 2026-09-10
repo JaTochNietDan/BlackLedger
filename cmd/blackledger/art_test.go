@@ -574,7 +574,9 @@ func TestEverySymbolOnTheStripIsPainted(t *testing.T) {
 	if !holds(tables, "const art = reelArt(painted[i][at])") {
 		t.Error("the case decides for itself what a symbol looks like")
 	}
-	if !holds(tables, "art ? (") || !holds(tables, ") : (") {
+	// The fallback, named: `") : ("` matched every ternary in the file and
+	// could not have failed.
+	if !holds(tables, "art ? ( <svg") || !holds(tables, "/> ) : ( face )") {
 		t.Error("a symbol nothing paints leaves the drum blank")
 	}
 }

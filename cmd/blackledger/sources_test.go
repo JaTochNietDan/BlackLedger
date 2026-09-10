@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
 	"testing"
@@ -54,3 +56,46 @@ func rawSource(t *testing.T, path string) string {
 
 // holds reports whether the flattened source contains the flattened needle.
 func holds(src, needle string) bool { return strings.Contains(src, flat(needle)) }
+
+// A guard over the guards.
+//
+// The brief's first fault shape is "a guard that cannot fail", and these text
+// guards are the easiest place in the project to write one: a needle short
+// enough or generic enough to appear in any file passes forever while the thing
+// it was written about quietly goes away. Two were found by hand — `") : ("`
+// matched every ternary in a file, and `"1440"` matched any arithmetic on a day
+// — and finding them by hand is not a plan.
+//
+// So the needles are checked. Anything under this many characters is either a
+// bare number, a fragment of punctuation, or a word common enough to appear
+// somewhere by accident; a real needle is a phrase.
+const ShortestNeedle = 10
+
+func TestNoGuardIsWrittenWithANeedleThatCannotFail(t *testing.T) {
+	t.Parallel()
+	files, err := filepath.Glob("*_test.go")
+	if err != nil || len(files) == 0 {
+		t.Skip("no guards beside this build")
+	}
+	// Only what a guard demands is present. A short needle a guard demands is
+	// ABSENT errs the safe way: it fails more often than it should rather than
+	// less, and "the room must not contain the word backroom" is exactly as
+	// strong as it sounds.
+	needle := regexp.MustCompile(`!holds\([a-zA-Z]+, "((?:[^"\\]|\\.)*)"`)
+	weak := []string{}
+	for _, file := range files {
+		body, err := os.ReadFile(file)
+		if err != nil {
+			t.Fatal(err)
+		}
+		for _, found := range needle.FindAllStringSubmatch(string(body), -1) {
+			if len(found[1]) < ShortestNeedle {
+				weak = append(weak, fmt.Sprintf("%s: %q", filepath.Base(file), found[1]))
+			}
+		}
+	}
+	if len(weak) > 0 {
+		t.Errorf("%d guard(s) ask for something short enough to be in any file, so they cannot fail: %v",
+			len(weak), weak)
+	}
+}

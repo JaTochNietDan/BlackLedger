@@ -82,8 +82,10 @@ func TestEveryAddressGetsItsOwnBlock(t *testing.T) {
 // so a broken renderer never leaves the game unplayable.
 func TestTheCardViewIsStillReachable(t *testing.T) {
 	t.Parallel()
+	// Both mounted, not merely imported: a component name on its own appears in
+	// the import line of a file that no longer draws it.
 	body := source(t, "src/main.tsx")
-	if !holds(body, "CityStreet") || !holds(body, "CityIso") {
+	if !holds(body, "<CityStreet state={w}") || !holds(body, "<CityIso state={w}") {
 		t.Fatal("the city view and the card view are not both reachable")
 	}
 }
