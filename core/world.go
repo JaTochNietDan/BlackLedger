@@ -512,6 +512,10 @@ type World struct {
 	// everybody is; the player knows where they last saw them. Absent in saves
 	// written before anybody had to find anybody.
 	Sightings map[string]Seen `json:"sightings,omitempty"`
+	// And when each family last had somebody in the same room as the player.
+	// They know the address; where you are standing tonight is a different
+	// question. Absent in saves written before anybody had to look for you.
+	SeenBy map[string]int `json:"seen_by,omitempty"`
 	// What the table has taken for the seat, all told. Kept apart from the
 	// room's ordinary income because a poolhall earns either way and the
 	// question worth asking is what the table itself is worth.
@@ -1905,6 +1909,15 @@ func (w *World) Attack(plot Plot) {
 		w.wreckTheHouse()
 		return
 	}
+	// And a family that has not seen you lately does not know where you are
+	// tonight. They know your address, because it is an address; where you are
+	// standing is a different question and the answer is whether any of their
+	// people have laid eyes on you. Being somewhere they have not looked is
+	// cover, and being seen is what costs it.
+	if !w.TheyKnowWhereYouAre(plot.Actor) {
+		w.wreckTheHouse()
+		return
+	}
 	if w.Warned(plot) {
 		w.ambushScene(plot)
 		return
@@ -1916,10 +1929,12 @@ func (w *World) Attack(plot Plot) {
 	w.survived()
 }
 func (w *World) Advance(minutes int) {
-	// Standing in a room is seeing who is in it. Written down as the clock
-	// moves rather than as the world is read: reading must not change anything,
-	// which is a rule this project holds and a guard that caught me breaking it.
+	// Standing in a room is seeing who is in it, and being seen in it. Written
+	// down as the clock moves rather than as the world is read: reading must
+	// not change anything, which is a rule this project holds and a guard that
+	// caught me breaking it.
 	w.SeeTheRoom()
+	w.noticedByTheCity()
 	p := &w.Player
 	// A seat is taken in one room. Whatever moved the player out of it — a
 	// journey, a scene, an errand somebody else ran for them — they are not at

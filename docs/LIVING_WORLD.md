@@ -335,8 +335,15 @@ I want you to think through this and consider what makes the most sense.
   70 trust, and being asked at all is a thing they hold against you whatever
   they answer. What you are told is four hours old, because it is where they
   last saw them and not where they are.
-— still open: the same limitation on the city's own killers, who should know
-  where you live and not where you are, and lose even that when you move house.
+— and the city's own killers play by it too. A family knows your address,
+  because it is an address and addresses do not move; where you are standing
+  tonight is a different question, and the answer is whether any of their people
+  have laid eyes on you in the last day. An attempt on somebody they cannot
+  place goes to the house instead. Being somewhere they have not looked is
+  cover, being seen is what costs it, and moving house takes back everything
+  they had learned. The campaign death rates did not move — the strategies spend
+  their lives in public — which is the honest reading: this is cover for a player
+  who chooses to use it rather than a general softening.
 
 ---
 

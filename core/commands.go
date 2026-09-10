@@ -842,6 +842,9 @@ func (w *World) apply(c Command) error {
 						w.Properties[target].Owner = fmt.Sprintf("player:%d", w.Life)
 					}
 					p.Home = target
+					// Whatever anybody had learned about where to find you was
+					// about the old address.
+					w.MovedHouse()
 					p.Security = 0
 					l, _ := PlaceByID(target)
 					w.Log("A different view", l.Name+" is now your residence. Hired security must be arranged here.", "personal")

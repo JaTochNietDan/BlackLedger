@@ -143,6 +143,10 @@ func TestAbsentPlayer(t *testing.T) {
 	t.Parallel()
 	w := New(27)
 	w.Player.Location = "bar"
+	// Found: a family knows an address and not an evening, so being somewhere
+	// they have not looked is cover now. This test is about what happens after
+	// they have looked.
+	w.SeenBy = map[string]int{"bellandi": w.Minute, "russo": w.Minute}
 	condition := w.Properties["room"].Condition
 	w.Retaliation()
 	w.Advance(300)

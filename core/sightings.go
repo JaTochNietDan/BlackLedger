@@ -105,3 +105,50 @@ func (w *World) WhereNote(id string) string {
 	}
 	return fmt.Sprintf("Last seen at %s, %s ago", place.Name, counted(hours, "hour", "hours"))
 }
+
+// And what the city knows about the player. "They could have knowledge of where
+// you live but not where you currently are, and when you move house they will no
+// longer know where you live until they find out via some contact."
+//
+// A family knows your address: it is a rented room with your name on it and the
+// city is small. Where you are standing tonight is a different question, and the
+// answer is whether any of their people have laid eyes on you lately. So being
+// somewhere they have not seen you is cover, and being seen is what costs it —
+// which is the same rule the player plays by, from the other side.
+
+// TheyKnowYou is how long a family remembers seeing the player somewhere. The
+// same day as a sighting of the player's own, because it is the same fact.
+const TheyKnowYou = SightingLasts
+
+// noticedByTheCity writes down that a family's people saw the player where they are.
+// Called as the clock moves, alongside the player's own looking.
+func (w *World) noticedByTheCity() {
+	for i := range w.NPCs {
+		n := &w.NPCs[i]
+		if n.Dead || n.Faction == "" || n.Location != w.Player.Location || w.Travelling(n) {
+			continue
+		}
+		if n.Faction == w.PlayerOrganizationID() {
+			continue
+		}
+		if w.SeenBy == nil {
+			w.SeenBy = map[string]int{}
+		}
+		w.SeenBy[n.Faction] = w.Minute
+	}
+}
+
+// TheyKnowWhereYouAre reports whether this organization could put somebody in
+// the room the player is standing in tonight. At home they always can: it is an
+// address, and addresses do not move.
+func (w *World) TheyKnowWhereYouAre(actor string) bool {
+	if w.Player.Location == w.Player.Home {
+		return true
+	}
+	at, ok := w.SeenBy[actor]
+	return ok && w.Minute-at <= TheyKnowYou
+}
+
+// MovedHouse is what changes when the player sleeps somewhere new: whatever
+// anybody had learned about where to find them was about the old address.
+func (w *World) MovedHouse() { w.SeenBy = nil }

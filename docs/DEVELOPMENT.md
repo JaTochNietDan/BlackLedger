@@ -7883,3 +7883,31 @@ second name it was given asks about nobody.
 
 No balance run: none of this is reachable by a policy, which does not ask
 anybody anything.
+
+## Being hard to find
+
+"They could have knowledge of where you live but not where you currently are,
+and when you move house they will no longer know where you live until they find
+out via some contact."
+
+A hit found the player wherever they were. `SeenBy` is when each family last had
+somebody in the same room as them, written down as the clock moves — the same
+mechanism as the player's own looking, from the other side. `TheyKnowWhereYouAre`
+is true at home always, because that is an address, and otherwise only while a
+sighting is under a day old. An attempt by somebody who cannot place you goes to
+the house instead, which was already what a *warned* player away from home got;
+now not being found is worth the same as being told.
+
+`MovedHouse` clears it, so a new address is a clean slate.
+
+**Five existing guards said the opposite**, and they were right about the old
+design: "a hit finds you where you are", a crowded room being worth more than an
+empty street, a warned player still getting a scene. All of them are about what
+happens *once you have been found*, so they now say so — the family has laid
+eyes on the player, which is the state those tests were always assuming without
+having to name it.
+
+The campaign death rates did not move: 0/0/0/82/69/0/53 before and after. That is
+the honest reading rather than a disappointment — the strategies spend their
+lives in public rooms, so they are seen constantly. This is cover for a player
+who chooses to use it, not a general softening.

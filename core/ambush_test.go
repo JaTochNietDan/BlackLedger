@@ -14,6 +14,11 @@ import (
 func marked(seed uint32) *World {
 	w := New(seed * 2654435761)
 	w.Player.Health, w.Player.Contacts, w.Player.Security = 100, 0, 0
+	// They have found the player. A family knows an address and not an evening,
+	// so an attack away from home now goes to the house unless somebody of
+	// theirs has laid eyes on you — which is the thing these tests are not
+	// about. They are about what happens once you have been found.
+	w.SeenBy = map[string]int{"bellandi": w.Minute}
 	return w
 }
 
