@@ -151,7 +151,22 @@ func main() {
 		// conclusion that the city was dormant. It was not; the runs were short.
 		span := minutes[len(minutes)/2]
 		days := float64(span) / 1440
+		// What the city took, as against what the player kept. A policy whose
+		// money is taken rather than whose life is looked identical to a safe
+		// one in this report.
+		heat, seizures, hurt := 0, 0, 0
+		for _, r := range reports {
+			if r.Strategy != p {
+				continue
+			}
+			heat += r.Heat
+			seizures += r.Seizures
+			if r.Health < 100 {
+				hurt++
+			}
+		}
 		summaries[p] = map[string]any{"runs": *runs, "deaths": deaths, "errors": errors,
+			"mean_heat": heat / max(1, *runs), "seizures": seizures, "runs_hurt": hurt,
 			"median_final_cash": cash[len(cash)/2], "median_game_minutes": span,
 			"median_game_days": math.Round(days*10) / 10, "milestones": ms, "city": city,
 			"city_measures_meaningful": days >= livingWorldHorizon,

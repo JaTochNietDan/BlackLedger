@@ -48,14 +48,22 @@ type Step struct {
 	Command core.Command `json:"command"`
 }
 type Report struct {
-	Seed         uint32         `json:"seed"`
-	Strategy     string         `json:"strategy"`
-	Director     string         `json:"director"`
-	Commands     int            `json:"commands"`
-	Minutes      int            `json:"game_minutes"`
-	Alive        bool           `json:"alive"`
-	Cash         int            `json:"cash"`
-	Respect      int            `json:"respect"`
+	Seed     uint32 `json:"seed"`
+	Strategy string `json:"strategy"`
+	Director string `json:"director"`
+	Commands int    `json:"commands"`
+	Minutes  int    `json:"game_minutes"`
+	Alive    bool   `json:"alive"`
+	Cash     int    `json:"cash"`
+	Respect  int    `json:"respect"`
+	// What the city took out of them. Attention is the whole risk of the
+	// underground trade and the harness could not see it: a report of deaths
+	// and cash says nothing about a policy whose money is taken rather than
+	// whose life is.
+	Heat   int `json:"heat"`
+	Health int `json:"health"`
+	// Times the goods were taken, by a search or in the street.
+	Seizures     int            `json:"seizures"`
 	Milestones   map[string]int `json:"milestone_commands"`
 	Actions      map[string]int `json:"action_counts"`
 	Events       map[string]int `json:"event_counts"`
@@ -546,6 +554,14 @@ func RunRecorded(seed uint32, strategy, director string, limit int, trace bool, 
 	r.Minutes = w.Minute - start
 	r.Cash = w.Player.Cash
 	r.Respect = w.Player.Respect
+	r.Heat, r.Health = w.Player.Heat, w.Player.Health
+	// What the city took. The record is the only place a seizure is written
+	// down, which is right — it is a thing that happened, not a counter.
+	for _, entry := range w.History {
+		if entry.Title == "The goods are gone" {
+			r.Seizures += max(1, entry.Count)
+		}
+	}
 	r.Alive = w.Player.Alive
 	return r
 }

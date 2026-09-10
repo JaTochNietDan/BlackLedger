@@ -6524,3 +6524,46 @@ Balance, six strategies: deaths 0/0/51/82/77/0, median cash
 12405/14156/7230/90/547/5500.
 
 Evidence: `core/routes_test.go`.
+
+## What the city takes, as against what the player keeps
+
+The route made the underground trade a trade. The open question it left was
+whether the risk is the right shape: no smuggler died in sixty campaigns, and a
+report of deaths and cash cannot tell a safe policy from one whose money is
+taken rather than whose life is.
+
+So the report carries three more numbers: the attention a run ends on, whether
+it ended hurt, and how many times the goods were taken. A seizure is written in
+the record rather than in a counter — it is a thing that happened — so the
+harness reads it back out of the history.
+
+| 100 campaigns | Deaths | Median cash | Mean heat | Seizures | Hurt |
+|---|---|---|---|---|---|
+| worker | 0 | 12,405 | 0 | 0 | 100 |
+| investor | 0 | 14,156 | 0 | 0 | 0 |
+| defiant | 51 | 7,230 | 0 | 0 | 63 |
+| reckless | 82 | 90 | 0 | 0 | 82 |
+| thief | 77 | 547 | 57 | 0 | 95 |
+| smuggler | 0 | 5,500 | 37 | 14 | 0 |
+
+The three paths are three different dangers, which is what they should be. The
+investor is untouched. The thief is the violent one — fifty-seven attention,
+ninety-five runs in a hundred ending hurt, seventy-seven of them dead. The
+smuggler carries real attention and loses the goods fourteen times in a hundred,
+and is never once hurt.
+
+**One of three risks exists.** Layer 6 of `docs/LIVING_WORLD.md` asks for
+"seizure, informants, a rival who wants the route". Seizure is there and it
+bites. Informants and a rival who wants the route are not built, and now that
+the route exists a rival wanting it is a thing the faction system could act on —
+which is also what the layer means by contraband being "a common cause of war".
+That is the next slice on this system and it is written down rather than
+guessed at.
+
+The worker being hurt in every campaign and holding no attention is worth a
+second look on its own: that is a policy that spends its life on the docks.
+
+Balance, six strategies: deaths 0/0/51/82/77/0, median cash
+12405/14156/7230/90/547/5500.
+
+Evidence: `sim/campaign.go`, `cmd/simulate/main.go`.

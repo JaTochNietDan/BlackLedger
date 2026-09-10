@@ -134,7 +134,9 @@ each other and the run is race-clean.
 Balance baseline, six strategies (worker/investor/defiant/reckless/thief/smuggler):
 deaths 0/0/51/82/77/0, median cash 12405/14156/7230/90/547/5500.
 `mise run simulate > <scratchpad>/sim.json` then **parse** the JSON; grepping it
-is useless. It also runs twelve cities for sixty days with nobody playing them
+is useless. Each strategy also reports `mean_heat`, `seizures` and `runs_hurt`,
+because deaths and cash cannot tell a safe policy from one whose money is taken
+rather than whose life is. It also runs twelve cities for sixty days with nobody playing them
 and reports that under `city_alone` — 11 organizations formed, 7 fell, 28 wars,
 104 holdings changed hands. Organizations hold 52% of the city after 60 days and
 65% after 240, the largest of them 28% and 57%. Families grow into unheld
