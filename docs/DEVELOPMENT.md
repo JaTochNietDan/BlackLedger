@@ -8294,3 +8294,23 @@ it. Care pays now, and inside two hundred commands it does not pay as well as
 buying the next place — which is defensible, because expansion ought to be
 strong early, and is exactly the sort of claim that should be measured rather
 than assumed. The publican test says so every time the balance moves.
+
+## A counter with nobody standing at it
+
+Checking an assumption rather than acting on it. I believed the city quietly
+refilled the player's counters for free, which would have made losing somebody
+cost nothing and `hire` an action no policy ever needs. It does not: a position
+that empties stays empty, and filling it is the player's decision and a week's
+wages up front. A rival's counter does fill itself, because their family has
+people. Three tests pin all of that now, and I nearly changed every bit of it on
+a false belief.
+
+What the check did find is smaller and real. A laundry bought this morning said
+three positions filled and had nobody standing in it until the next business
+day: no names, so nobody to ask what they had seen, nobody to put in charge, and
+a wage bill for nobody. The people come with the premises now, at the moment of
+purchase, which is what the code beside it already claimed — "the people working
+it and what it runs on come with it".
+
+Breaking it reports "a laundry just taken over has 3 of 3 positions filled and 0
+names".

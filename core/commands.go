@@ -808,6 +808,12 @@ func (w *World) apply(c Command) error {
 						prop := w.Properties[target]
 						prop.Staff = max(prop.Staff, trade.Hands)
 						prop.Supply = max(prop.Supply, trade.RestockAmount)
+						// And the people, now, rather than on the next business
+						// day. A laundry bought this morning said three
+						// positions filled and had nobody standing in it until
+						// midnight — so there was nobody to ask, nobody to put
+						// in charge, and a wage bill for nobody.
+						w.EmptyChairs()
 					}
 					p.Respect += 4
 					l, _ := PlaceByID(target)
