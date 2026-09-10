@@ -36,6 +36,12 @@ function Row({cards, hidden}:{cards:Card[]; hidden:number}) {
   );
 }
 
+// One chip on the cloth. The core takes one bet a spin, so there is one chip:
+// putting it somewhere else moves it rather than adding to it.
+function Chip({amount, money}:{amount:number; money:(n:number)=>string}) {
+  return <span className="chip" aria-hidden="true"><i/>{money(amount).replace('$', '')}</span>;
+}
+
 // The blackjack felt. The dealer's second card is not dealt until the player
 // stands, so it is drawn face down: that is what is true, not a decoration.
 export function CardTable({hand, money, act}:{hand:HandState; money:(n:number)=>string; act:(kind:string)=>void}) {
@@ -46,17 +52,25 @@ export function CardTable({hand, money, act}:{hand:HandState; money:(n:number)=>
   // over, and that is the moment the player sat down for.
   const over = !!hand.settled;
   return (
-    <div className="felt">
+    <div className="felt card-felt">
       <div className="felt-head"><span>{hand.place}</span><b>{money(hand.stake ?? 0)} down</b></div>
-      <div className="seat">
-        <span className="seat-name">Dealer</span>
-        <Row cards={theirs} hidden={!over && theirs.length < 2 ? 1 : 0}/>
-        <b className="seat-total">{hand.dealer ?? 0}</b>
-      </div>
-      <div className="seat">
-        <span className="seat-name">You</span>
-        <Row cards={mine} hidden={0}/>
-        <b className={'seat-total' + (total > 21 ? ' warning' : '')}>{total}</b>
+      {/* The cloth itself, with the two seats on it and the money in the middle
+          of the table where a stake actually sits. */}
+      <div className="baize">
+        <div className="seat dealer">
+          <span className="seat-name">Dealer</span>
+          <Row cards={theirs} hidden={!over && theirs.length < 2 ? 1 : 0}/>
+          <b className="seat-total">{hand.dealer ?? 0}</b>
+        </div>
+        <div className="baize-line" aria-hidden="true">
+          {(hand.stake ?? 0) > 0 && <Chip amount={hand.stake ?? 0} money={money}/>}
+          <span>Blackjack pays 3 to 2</span>
+        </div>
+        <div className="seat mine">
+          <span className="seat-name">You</span>
+          <Row cards={mine} hidden={0}/>
+          <b className={'seat-total' + (total > 21 ? ' warning' : '')}>{total}</b>
+        </div>
       </div>
       {over
         ? <p className={'felt-result' + (hand.won ? ' won' : '')}>{hand.outcome}</p>
@@ -83,12 +97,6 @@ export function CardTable({hand, money, act}:{hand:HandState; money:(n:number)=>
 const FALL = 3200, TURNS = 5, HEAD_TURNS = 3;
 // How far out the ball runs, which the stylesheet also has to agree with.
 const BALL_TRACK = -80;
-
-// One chip on the cloth. The core takes one bet a spin, so there is one chip:
-// putting it somewhere else moves it rather than adding to it.
-function Chip({amount, money}:{amount:number; money:(n:number)=>string}) {
-  return <span className="chip" aria-hidden="true"><i/>{money(amount).replace('$', '')}</span>;
-}
 
 export function Wheel({wheel, stakes, money, spin, turn = 0}:{
   wheel:WheelState; stakes:{id:string; amount:number}[]; money:(n:number)=>string;

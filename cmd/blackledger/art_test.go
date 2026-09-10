@@ -409,3 +409,27 @@ func TestTheBallsRestingPlaceDoesNotDependOnAnimation(t *testing.T) {
 		}
 	}
 }
+
+// A chip has a ring drawn inside it with an absolute inset. If the chip itself
+// is not positioned, that ring escapes to the nearest positioned ancestor and
+// draws a circle the width of the whole screen across the game — which is
+// exactly what happened the first time a chip was laid in the flow of a line
+// rather than pinned to the corner of a cell.
+func TestTheChipsRingCannotEscapeTheChip(t *testing.T) {
+	css, err := os.ReadFile("../../src/style.css")
+	if err != nil {
+		t.Skip("no stylesheet beside this build")
+	}
+	sheet := string(css)
+	chip := regexp.MustCompile(`\n\.chip\{[^}]*\}`).FindString(sheet)
+	if chip == "" {
+		t.Fatal("there is no chip")
+	}
+	if !strings.Contains(chip, "position:relative") {
+		t.Errorf("a chip is not positioned, so the ring inside it will escape: %s", chip)
+	}
+	ring := regexp.MustCompile(`\.chip i\{[^}]*\}`).FindString(sheet)
+	if !strings.Contains(ring, "position:absolute") {
+		t.Skip("the ring is no longer drawn with an inset")
+	}
+}

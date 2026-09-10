@@ -822,14 +822,14 @@ body{height:100%;overflow:hidden;margin:0;background:var(--bg);color:var(--ink);
 .seat-name{width:52px;flex:none;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#9db8a6}
 .seat-total{margin-left:auto;font-size:19px;min-width:2ch;text-align:right;color:#f0ead8}
 .seat-total.warning{color:#e2836f}
-.card-row{display:flex;gap:5px;flex-wrap:wrap}
+.card-row{display:flex;gap:7px;flex-wrap:wrap}
 
-.card{width:38px;height:54px;border-radius:4px;background:#f4f0e4;color:#1b1b1b;
+.card{width:54px;height:76px;border-radius:5px;background:linear-gradient(#fbf8ef,#efe9d9);color:#1b1b1b;
   border:1px solid #cdc6b4;position:relative;flex:none;
-  box-shadow:0 2px 4px rgba(0,0,0,.35);font-family:Georgia,'Times New Roman',serif}
-.card b{position:absolute;top:3px;left:4px;font-size:12px;line-height:1}
-.card b.upside{top:auto;left:auto;bottom:3px;right:4px;transform:rotate(180deg)}
-.card i{position:absolute;inset:0;display:grid;place-items:center;font-style:normal;font-size:20px}
+  box-shadow:0 3px 7px rgba(0,0,0,.45);font-family:Georgia,'Times New Roman',serif}
+.card b{position:absolute;top:4px;left:6px;font-size:15px;line-height:1}
+.card b.upside{top:auto;left:auto;bottom:4px;right:6px;transform:rotate(180deg)}
+.card i{position:absolute;inset:0;display:grid;place-items:center;font-style:normal;font-size:28px}
 .card.red{color:#a3232b}
 .card.facedown{background:repeating-linear-gradient(45deg,#6d2f33 0 4px,#5a2529 4px 8px);border-color:#3d1a1d}
 .card.facedown span{position:absolute;inset:5px;border:1px solid rgba(244,240,228,.35);border-radius:2px}
@@ -911,9 +911,15 @@ body{height:100%;overflow:hidden;margin:0;background:var(--bg);color:var(--ink);
 .cloth-cell.outside.wide{grid-column:span 2}
 .cloth-cell:hover{outline:1px solid #f0e4b0}
 .cloth-cell.picked{outline:2px solid #f0e4b0;outline-offset:-2px}
+.cloth-cell .chip{position:absolute;right:-6px;top:-6px}
 
 /* A chip: a stack of one, sitting on the cloth where you put it. */
-.chip{position:absolute;right:-6px;top:-6px;width:26px;height:26px;border-radius:50%;
+/* A chip is positioned in its own right, because the ring inside it is drawn
+   with an absolute inset: on a chip that was not positioned, that ring escaped
+   to the nearest positioned ancestor and drew a circle a thousand pixels wide
+   across the whole screen. Where it needs to sit on the corner of a cell, the
+   cell says so. */
+.chip{position:relative;width:26px;height:26px;border-radius:50%;
   display:grid;place-items:center;font:10px system-ui;font-weight:600;color:#241708;
   background:radial-gradient(circle at 34% 28%,#f6e4b0,#d9b25e 62%,#a9803a);
   border:2px dashed #7a5730;box-shadow:0 2px 5px rgba(0,0,0,.55);z-index:2}
@@ -922,7 +928,7 @@ body{height:100%;overflow:hidden;margin:0;background:var(--bg);color:var(--ink);
 .chip-picker{display:flex;gap:10px;align-items:center}
 .chip-choice{position:relative;width:34px;height:34px;border-radius:50%;border:1px solid #465243;
   background:#16241f;padding:0}
-.chip-choice .chip{position:static;width:28px;height:28px;margin:auto}
+.chip-choice .chip{width:28px;height:28px;margin:auto}
 .chip-choice.chosen{border-color:#f0e4b0;box-shadow:0 0 0 2px rgba(240,228,176,.25)}
 .spin-it{background:#3d4530;border:1px solid #c9a24a;color:#f3e8c7;padding:11px 20px;
   font:13px var(--serif);letter-spacing:.04em}
@@ -1057,3 +1063,23 @@ body{height:100%;overflow:hidden;margin:0;background:var(--bg);color:var(--ink);
    the numbers above them, and a green box saying RED is a label, not a table. */
 .cloth-cell.outside.red{background:#8e2b2b}
 .cloth-cell.outside.black{background:#191919}
+
+/* The card table. The roulette wheel got a bowl and a cloth; this is the same
+   room, so the cards are dealt onto baize inside the same dark wood rather than
+   onto a plain green panel. */
+.card-felt{background:radial-gradient(120% 90% at 50% 0%,#2b2119 0%,#1b1510 60%,#120e0a 100%);
+  border-color:#3a2a1c}
+.baize{margin-top:10px;padding:14px 16px;border-radius:10px;
+  background:radial-gradient(120% 120% at 50% 0%,#1f6142 0%,#17492f 60%,#123722 100%);
+  border:2px solid #c9a24a;box-shadow:inset 0 0 34px rgba(0,0,0,.4)}
+.baize .seat{margin:0;min-height:80px;align-items:center}
+.baize .seat.dealer{padding-bottom:12px}
+.baize .seat.mine{padding-top:12px}
+/* The line across the middle of the cloth, where the money sits. */
+.baize-line{display:flex;align-items:center;justify-content:center;gap:12px;
+  border-top:1px solid rgba(240,228,176,.35);border-bottom:1px solid rgba(240,228,176,.35);
+  padding:8px 0;margin:4px 0}
+.baize-line span{font:10px system-ui;letter-spacing:.18em;text-transform:uppercase;color:#a8c6b3}
+
+.card-felt .seat-name{width:58px;color:#a8c6b3}
+.card-felt .seat-total{font:22px var(--serif);color:#f4efdd}
