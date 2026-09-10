@@ -236,11 +236,7 @@ func TestAGarageHasPeopleInItOnAnOrdinaryDay(t *testing.T) {
 					n.Hurt = true
 				}
 			}
-			for half := 0; half < 2; half++ {
-				w.SetOut()
-				w.Minute += 720
-				w.Arrivals()
-			}
+			aDay(w)
 			for _, n := range w.OnTheFloor(w.theGarage()) {
 				_ = n
 			}

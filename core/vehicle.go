@@ -336,41 +336,64 @@ func (w *World) SettleCars() {
 	}
 }
 
+// theForecourt is where cars change hands: the first lot in the list, so
+// reports and errands do not depend on map iteration order. It is the same
+// shape as theGarage, and for the same reason — the city needs one answer to
+// "where would somebody go for this".
+func (w *World) theForecourt() string {
+	for _, l := range Locations {
+		if l.Kind == "dealer" && w.Properties[l.ID] != nil {
+			return l.ID
+		}
+	}
+	return ""
+}
+
 // CarTrade is the city buying cars. Somebody who would drive, has none and can
 // afford one goes to a forecourt and buys, and whoever holds that forecourt
 // takes the margin — the same margin the player pays, because it is the same
 // transaction seen from the other side.
 //
-// It is one sale a day at most. A city where everybody replaces a car on the
-// same morning is a city where nothing was ever taken from anybody.
+// It used to be one sale a day at most, on the grounds that a city where
+// everybody replaces a car on the same morning is a city where nothing was ever
+// taken from anybody. The walk is what makes that true now: a person has to
+// cross Bellwether to the lot and be standing on it, and eight people who lost
+// cars in a raid arrive over days rather than together. Rationing it on top of
+// that left somebody queueing at a forecourt for a month.
 func (w *World) CarTrade() {
-	lot := ""
-	for _, l := range Locations {
-		if l.Kind == "dealer" && w.Properties[l.ID] != nil {
-			lot = l.ID
-			break
-		}
-	}
+	lot := w.theForecourt()
 	if lot == "" {
 		return
 	}
-	price := VehicleByTier(1).Cost
 	for i := range w.NPCs {
-		n := &w.NPCs[i]
-		if n.Dead || n.Car != 0 || !w.WouldDrive(n) || n.Purse < price {
-			continue
+		if n := &w.NPCs[i]; n.Location == lot {
+			w.sellCarTo(n)
 		}
-		n.Purse -= price
-		n.Car, n.Drove = 1, max(1, w.Minute)
-		if house := w.faction(w.Properties[lot].Owner); house != nil {
-			house.Cash += price * DealerMargin / 100
-		}
-		if w.Own(lot) {
-			w.Earn(price * DealerMargin / 100)
-			place, _ := PlaceByID(lot)
-			w.Log("A car sold at "+place.Name, fmt.Sprintf("%s bought one off the lot. $%d of it is yours.",
-				n.Name, price*DealerMargin/100), "business")
-		}
+	}
+}
+
+// sellCarTo is one sale, to somebody standing on the forecourt. Called when
+// they walk on and again when the day turns over: a sweep at midnight finds a
+// lot everybody left hours ago, which is how a man with four thousand dollars
+// in his pocket spent a month walking past the place every afternoon.
+func (w *World) sellCarTo(n *NPC) {
+	lot := w.theForecourt()
+	price := VehicleByTier(1).Cost
+	if lot == "" || n == nil || n.Dead || n.Car != 0 || n.Location != lot {
 		return
+	}
+	if !w.WouldDrive(n) || n.Purse < price {
+		return
+	}
+	n.Purse -= price
+	n.Car, n.Drove = 1, max(1, w.Minute)
+	if house := w.faction(w.Properties[lot].Owner); house != nil {
+		house.Cash += price * DealerMargin / 100
+	}
+	if w.Own(lot) {
+		w.Earn(price * DealerMargin / 100)
+		place, _ := PlaceByID(lot)
+		w.Log("A car sold at "+place.Name, fmt.Sprintf("%s bought one off the lot. $%d of it is yours.",
+			n.Name, price*DealerMargin/100), "business")
 	}
 }

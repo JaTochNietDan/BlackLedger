@@ -135,6 +135,17 @@ func (w *World) wanted(n *NPC) (errand, bool) {
 		}
 		return errand{target.Location, "looking for " + target.Name + " over " + g.Because}, true
 	}
+	// Nothing to drive and the money for one. Somebody who has lost a car goes
+	// and buys another, which is the other half of a forecourt: the sale used to
+	// find whoever stood first in the city's own order, wherever they were, so
+	// the lot never had anybody in it.
+	if n.Car == 0 && n.Drove > 0 && w.WouldDrive(n) && n.Purse >= VehicleByTier(1).Cost {
+		if id := w.theForecourt(); id != "" && id != n.Location {
+			if place, ok := PlaceByID(id); ok {
+				return errand{id, "buying another car at " + place.Name}, true
+			}
+		}
+	}
 	// A car with the glass out of it. Somebody who can find the fee takes it in
 	// rather than driving it broken, which is why a garage has anybody at the
 	// counter at all: the trade is people standing there, not a figure moving
@@ -241,6 +252,11 @@ func (w *World) Arrivals() {
 		if !Evening(w.Minute) {
 			w.keepPost(n, n.Location)
 		}
+		// What they came for. A garage's trade and a forecourt's are somebody
+		// walking in, not a figure moved at midnight — by midnight the counter
+		// is dark and everybody who came that day has gone home.
+		w.putRight(n)
+		w.sellCarTo(n)
 		w.noticed(n, false)
 	}
 }

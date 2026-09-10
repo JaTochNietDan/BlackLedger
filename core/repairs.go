@@ -69,34 +69,38 @@ func (w *World) RepairsDay() {
 		return
 	}
 	for i := range w.NPCs {
-		n := &w.NPCs[i]
-		if n.Dead || !n.Hurt || n.Car == 0 {
-			continue
+		if n := &w.NPCs[i]; n.Location == garage {
+			w.putRight(n)
 		}
-		// At the bench, not anywhere in the city. The work is somebody standing
-		// at a counter with the car outside; a fee that moved wherever they
-		// happened to be was a garage's trade with no garage in it.
-		if n.Location != garage {
-			continue
-		}
-		// Somebody who cannot find the fee drives it broken. That is the link
-		// running the other way: a garage in a poor district has less work than
-		// the same garage in a district with money in it, off the same crimes.
-		if n.Purse < GlassCost {
-			continue
-		}
-		n.Purse -= GlassCost
-		n.Hurt = false
-		if house := w.faction(w.Properties[garage].Owner); house != nil {
-			house.Cash += GlassCost
-		}
-		w.ShiftCustom(garage, "glass and locks after a night's thieving", RepairTrade)
-		if w.Own(garage) {
-			w.Earn(GlassCost)
-			place, _ := PlaceByID(garage)
-			w.Log("Work in at "+place.Name,
-				fmt.Sprintf("%s brought one in with the glass out of it. $%d for the job.", n.Name, GlassCost), "business")
-		}
+	}
+}
+
+// putRight is one car being worked on, for somebody standing at the bench. It
+// is called when they walk in and again when the day turns over, because a
+// sweep at midnight finds a garage everybody has already gone home from: they
+// bring the car in during the afternoon and are somewhere else by the small
+// hours.
+func (w *World) putRight(n *NPC) {
+	garage := w.theGarage()
+	if garage == "" || n == nil || n.Dead || !n.Hurt || n.Car == 0 || n.Location != garage {
 		return
+	}
+	// Somebody who cannot find the fee drives it broken. That is the link
+	// running the other way: a garage in a poor district has less work than the
+	// same garage in a district with money in it, off the same crimes.
+	if n.Purse < GlassCost {
+		return
+	}
+	n.Purse -= GlassCost
+	n.Hurt = false
+	if house := w.faction(w.Properties[garage].Owner); house != nil {
+		house.Cash += GlassCost
+	}
+	w.ShiftCustom(garage, "glass and locks after a night's thieving", RepairTrade)
+	if w.Own(garage) {
+		w.Earn(GlassCost)
+		place, _ := PlaceByID(garage)
+		w.Log("Work in at "+place.Name,
+			fmt.Sprintf("%s brought one in with the glass out of it. $%d for the job.", n.Name, GlassCost), "business")
 	}
 }

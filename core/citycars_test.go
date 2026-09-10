@@ -93,8 +93,13 @@ func TestTheCityBuysCarsAndTheForecourtTakesTheMargin(t *testing.T) {
 
 	before, purse := house.Cash, buyer.Purse
 	sold := 0
+	// The city's own day, because a sale is somebody walking onto the lot now.
+	// This used to call CarTrade forty times with nobody moving, which passed
+	// while the day's sale reached whoever stood first in the city's order
+	// wherever they happened to be.
+	buyer.Drove = max(1, w.Minute)
 	for day := 0; day < 40 && buyer.Car == 0; day++ {
-		w.Minute = day * 1440
+		aDay(w)
 		w.CarTrade()
 		if buyer.Car > 0 {
 			sold++
