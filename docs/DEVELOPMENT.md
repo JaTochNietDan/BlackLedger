@@ -6322,11 +6322,31 @@ says it must not degenerate: no city may end with nobody alive, with no
 organizations left, or with ninety percent of the held property in one pair of
 hands.
 
-**That second number is worth watching.** The largest holding in any of the
-twelve is eighty percent. It passes, and it is closer to the line than anything
-else in this file. A city that ends with four fifths of itself under one name
-has not collapsed, but it is heading that way, and the next thing to measure
-here is whether that share keeps climbing over a longer season.
+**That second number was wrong, and the correction is the more interesting
+result.** I reported the largest holding in any of the twelve as eighty percent
+and said it was heading towards collapse. It was not a holding. The measure
+counted every distinct value of `Owner`, and "independent" is a value of
+`Owner` — the placeholder for a shop that answers to nobody. Seventeen of
+twenty-one earning addresses carry it, so the instrument reported four fifths of
+the city in one pair of hands and the hands were nobody's. A figure that says
+nothing while looking like one, in the very slice that exists to stop that.
+
+Counting only owners that resolve to a live organization:
+
+| Days | Largest organization | All organizations together |
+|---|---|---|
+| 60 | 19% | 19% |
+| 120 | 23% | 20% |
+| 240 | 28% | 23% |
+| 480 | 28% | 25% |
+
+Nothing is concentrating. The opposite is true and it is the real finding: after
+a year and a third of simulated time, organizations hold a quarter of the city
+and three quarters of it answers to nobody at all, permanently. Layer 1 of
+`docs/LIVING_WORLD.md` says families own income-earning property; layer 4 says
+war creates the openings a player exploits. A map three quarters of which nobody
+is fighting over is as dead as a map somebody has won, and that is the next
+thing to fix rather than to measure.
 
 `mise run simulate` reports all of it under `city_alone`, so a living-world
 claim made in this file can be checked against a run rather than asserted.

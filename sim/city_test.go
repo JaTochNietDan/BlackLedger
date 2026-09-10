@@ -34,12 +34,13 @@ func TestACityLeftAloneKeepsMoving(t *testing.T) {
 
 func TestACityDoesNotCollapseIntoOneOwner(t *testing.T) {
 	const cities, days = 12, 60
-	worst, empty, dead := 0, 0, 0
+	worst, organised, empty, dead := 0, 0, 0, 0
 	for seed := uint32(1); seed <= cities; seed++ {
 		r := City(seed*2654435761, days)
 		if r.Biggest > worst {
 			worst = r.Biggest
 		}
+		organised += r.Organised
 		if r.Ended == 0 {
 			empty++
 		}
@@ -47,10 +48,14 @@ func TestACityDoesNotCollapseIntoOneOwner(t *testing.T) {
 			dead++
 		}
 	}
-	t.Logf("after %d days the largest holding in any of %d cities is %d%% of it; %d cities ended with no organizations and %d with nobody alive",
-		days, cities, worst, empty, dead)
+	// The second figure is the one to watch, and it is not guarded here because
+	// nothing has been done about it yet: organizations hold about a fifth of
+	// the city and the rest answers to nobody for ever. A city three quarters
+	// of which nobody is fighting over is as dead as one somebody has won.
+	t.Logf("after %d days the largest organization in any of %d cities holds %d%% of it, and organizations together hold %d%%; %d cities ended with no organizations and %d with nobody alive",
+		days, cities, worst, organised/cities, empty, dead)
 	if worst >= 90 {
-		t.Fatalf("a city ended with %d%% of it in one pair of hands", worst)
+		t.Fatalf("a city ended with %d%% of it in one organization's hands", worst)
 	}
 	if empty > 0 {
 		t.Fatalf("%d cities ended with no organization in them at all", empty)

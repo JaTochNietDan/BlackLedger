@@ -33,10 +33,21 @@ type CityReport struct {
 	Killed   int `json:"people_killed"`
 	Living   int `json:"people_living"`
 	Homeless int `json:"holdings_unheld"`
-	// Biggest is the share of held property in one organization's hands at the
-	// end, as a percentage. A city that ends with one owner has degenerated
-	// however busy it looked getting there.
+	// Biggest is the share of the city's earning addresses in one
+	// organization's hands at the end, as a percentage. A city that ends with
+	// one owner has degenerated however busy it looked getting there.
+	//
+	// Organizations only. The first version of this counted every distinct
+	// value of Owner, and "independent" is a value of Owner — the placeholder
+	// for a shop that answers to nobody. Seventeen of twenty-one earning
+	// addresses carry it, so the measure reported 80% of the city in one pair
+	// of hands and the hands were nobody's. A figure that says nothing while
+	// looking like one, which is the fault shape this project keeps a list of.
 	Biggest int `json:"biggest_share"`
+	// Organised is how much of the city any organization holds at all, which is
+	// the other half of the same question: a city nobody is fighting over is as
+	// dead as a city one family has won.
+	Organised int `json:"organised_share"`
 }
 
 // City runs one city for a season with nobody playing it.
@@ -126,22 +137,33 @@ func City(seed uint32, days int) CityReport {
 		}
 		r.Ended++
 	}
+	organised := 0
 	for _, l := range core.Locations {
 		if w.Properties[l.ID].Income <= 0 {
 			continue
 		}
+		total++
 		owner := w.Properties[l.ID].Owner
-		if owner == "" {
+		if owner == "" || owner == "independent" {
 			r.Homeless++
 			continue
 		}
-		total++
+		// Only an owner that resolves to a live organization counts as one. A
+		// shop somebody inherited and a shop nobody holds are not a faction
+		// with a fifth of the city.
+		if !organisation(w, owner) {
+			continue
+		}
+		organised++
 		held[owner]++
 	}
 	for _, n := range held {
 		if total > 0 && n*100/total > r.Biggest {
 			r.Biggest = n * 100 / total
 		}
+	}
+	if total > 0 {
+		r.Organised = organised * 100 / total
 	}
 	for _, n := range w.NPCs {
 		if n.Dead {
@@ -151,4 +173,15 @@ func City(seed uint32, days int) CityReport {
 		}
 	}
 	return r
+}
+
+// organisation reports whether this owner is a live organization rather than
+// the placeholder for nobody, a dead protagonist's estate, or a stranger.
+func organisation(w *core.World, owner string) bool {
+	for _, f := range w.Factions {
+		if f.ID == owner {
+			return true
+		}
+	}
+	return false
 }
