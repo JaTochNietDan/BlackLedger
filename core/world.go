@@ -1240,6 +1240,9 @@ func (w *World) Actions(id string) []Action {
 			if !HasTables(id) {
 				seat, what = "Play the machines", "Three drums and a handle, against the wall where they always are."
 			}
+			if id == BackRoom {
+				seat, what = "Go through to the back room", "A hand of cards against whoever is in there, played out in front of you until you get up."
+			}
 			add("sit", seat, 0, 0, w.SitReadiness(id), what)
 		}
 	}

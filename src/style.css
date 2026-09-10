@@ -1260,3 +1260,9 @@ body{height:100%;overflow:hidden;margin:0;background:var(--bg);color:var(--ink);
 .felt.back-room .seat-moved {display:block; font-variant-numeric:tabular-nums; color:#7bd88f}
 .felt.back-room .seat-moved.down {color:#e07a6a}
 .felt.back-room .seat-sore {display:block; color:#e0b46a; opacity:.9}
+
+/* The back room takes the screen the way the tables do. It has no games nav
+   above it — there is one game in there — so the felt starts under the header. */
+.casino.back-room-scene {max-width: 940px}
+.back-room-empty {padding: 24px 28px 32px; display: flex; flex-direction: column; gap: 16px}
+.back-room-empty p {margin: 0; max-width: 60ch}

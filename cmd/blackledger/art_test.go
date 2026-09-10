@@ -385,3 +385,36 @@ func TestTheChipsRingCannotEscapeTheChip(t *testing.T) {
 		t.Skip("the ring is no longer drawn with an inset")
 	}
 }
+
+// "It should again be a separate scene that takes up the screen when you're
+// playing it and you have to leave it rather than right now it just lives in a
+// small box above the action bar. That's silly stuff. We need to stop doing that
+// in future and always dedicate these games to their own screen."
+//
+// So this is the rule, written down where it can fail: a game is a screen you
+// go into and come out of, never a panel drawn beside the staffing figures and
+// the supply count.
+func TestEveryGameGetsAScreenOfItsOwn(t *testing.T) {
+	main := source(t, "src/main.tsx")
+	// Both takeovers hang off the same fact — the player has taken a seat the
+	// world knows about — and both are dismissed by getting up.
+	for _, screen := range []string{"<BackRoomScene", "<Casino"} {
+		if !holds(main, screen) {
+			t.Errorf("%s is not mounted, so that game has no screen of its own", screen)
+		}
+	}
+	if !holds(main, "atTable && inTheBackRoom") || !holds(main, "atTable && !inTheBackRoom") {
+		t.Error("the two takeovers do not divide the seat between them, so one of them draws over the other")
+	}
+	// And the room behind it must not draw a felt of its own. The interior
+	// panel used to be handed the table as a prop, which is exactly the shape
+	// the note was about.
+	room := source(t, "src/Interior.tsx")
+	if holds(room, "backroom") || holds(room, "<BackRoom") {
+		t.Error("the room panel draws a card table beside the premises work again")
+	}
+	// The verbs of a hand belong to the felt, not to the room's list of work.
+	if !holds(main, "!isBackRoomAction(a.id)") {
+		t.Error("the room's action list offers the verbs of a hand between hiring and restocking")
+	}
+}

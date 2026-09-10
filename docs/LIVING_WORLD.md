@@ -200,9 +200,32 @@ Playing the game in the back room at the Green Baize is weird. It should again b
 
 I'd also prefer if this game was the Texas Hold Em version as it's better to play so we can fix that maybe.
 
+— half built: the back room takes the screen. Sitting in on the game is a seat
+  the world knows about, exactly as it is at the tables — you go through, the
+  city waits, you cannot get up with money in the middle of the table, and
+  walking out of the poolhall ends the sitting. The felt is gone from the room's
+  panel and the verbs of a hand are gone from its action list. The standing rule
+  in this message, that a game always gets its own screen, is written down as a
+  guard that fails if either takeover stops being mounted or the room is handed
+  a table again. Texas Hold'em is still open and is the next thing here.
+
 ---
 
 While managing the Green Baize I don't see its current funds or how to add to the funds or withdraw from the funds dynamically like we talked about.
+
+---
+
+It probably would make sense that we don't always know everyone's location and that's a service that we have to pay for to gain that information from. Maybe only some people know where someone is and we would have to be able to convince us to give them their location, especially if it's a rival family lead.
+
+This would also act as a way of making it harder to make attempts on people's lives in the game as it would be a drawn out task more than anything.
+
+The same should be true of other living NPCs who are working on taking out other people, it should not always be easy to find out where someone is at any time.
+
+They could have knowledge of where you live but not where you currently are, and when you move house they will no longer know where you live until they find out via some contact.
+
+We don't want it to be a situation where we can just talk to one singular character and find out people's locations by paying a fee, that's too simplistic. We want a dynamic knowledge situation and bargainning situation. Some people may not want to give us that information and even asking them could affect our reputation with them. 
+
+I want you to think through this and consider what makes the most sense.
 
 ## Inbox — answered
 

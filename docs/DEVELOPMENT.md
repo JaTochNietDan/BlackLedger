@@ -7395,3 +7395,38 @@ return, and one checks what a statement ends with. The face-sheet guard read
 `CAST_COLS = 6, CAST_ROWS = 8` as one phrase and now finds the two numbers
 separately: a guard on another language's source must not also be a guard on its
 layout.
+
+## The back room takes the screen
+
+From the inbox, about the thing I had built four ticks earlier: "It should again
+be a separate scene that takes up the screen when you're playing it and you have
+to leave it rather than right now it just lives in a small box above the action
+bar. That's silly stuff. We need to stop doing that in future and always
+dedicate these games to their own screen."
+
+The core's half is that sitting in on the game is a seat the world knows about,
+exactly as it is at the tables. `Playable` counts the room behind the poolhall,
+`RiseReadiness` refuses while there is money of yours in the middle of the
+table, `clearTable` forgets a finished hand so nobody walks up to somebody
+else's, and walking out of the poolhall ends the sitting. The seat reads "Go
+through to the back room."
+
+The view's half is `src/BackRoomScene.tsx`, the same shape as the casino
+takeover and mounted off the same fact, with no games nav above it because there
+is one game in there. Sitting down before buying in is a real state — you can go
+through and look at the room before putting money in — so the empty felt says
+what the game is and offers the ante. The room's panel no longer draws a table
+and its action list no longer offers the verbs of a hand.
+
+The standing half of that message is a rule, so it is written down where it can
+fail. `TestEveryGameGetsAScreenOfItsOwn` checks both takeovers are mounted, that
+they divide the seat between them, that the interior is not handed a felt, and
+that the room's list drops the hand's verbs. Broken two ways it should break:
+renaming the mount reports "that game has no screen of its own", and handing the
+interior a table again reports "the room panel draws a card table beside the
+premises work again".
+
+Texas Hold'em, the other half of that message, is next.
+
+Baseline unmoved: deaths 0/0/52/82/78/0/37, median cash
+12585/14129/7418/90/1063/5332/2080.

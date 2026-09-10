@@ -18,7 +18,7 @@ import {EMPTY, loadLayout} from './layout';
 import type {Layout} from './layout';
 import {Portrait, CAST_FACES} from './Portrait';
 import {Casino, isTableAction} from './Casino';
-import {BackRoom} from './Tables';
+import {BackRoomScene} from './BackRoomScene';
 
 // The verbs of a hand in the back room. Drawn on the table itself, so the room's
 // ordinary list must not offer "Throw the hand in" between hiring and restocking.
@@ -93,6 +93,10 @@ function App() {
   // all of it saved state — and that reads as a game that started without you.
   // Sitting down and getting up are commands now, and the core clears the felt.
   const atTable = !!world && world.seated === world.player.location;
+  // Which kind of seat it is. The back room is a game with no house in it and
+  // no other table beside it, so it gets its own screen rather than a tab in
+  // the casino's.
+  const inTheBackRoom = atTable && world!.seated === 'poolhall';
   // The arrangement of the map, and whether it is being arranged. Loaded once:
   // it is a file in the repository, not part of the world, so it does not
   // change under the player the way the city does.
@@ -829,19 +833,8 @@ function App() {
                   place={locationInfo}
                   people={locationInfo.people || []}
                   actions={locationInfo.actions.filter(
-                    a =>
-                      !isTableAction(a.id) && !a.anywhere && !(w.cards && isBackRoomAction(a.id)),
+                    a => !isTableAction(a.id) && !a.anywhere && !isBackRoomAction(a.id),
                   )}
-                  backroom={
-                    w.cards ? (
-                      <BackRoom
-                        cards={w.cards}
-                        money={money}
-                        cash={p.cash}
-                        act={c => commit({target: p.location, ...c})}
-                      />
-                    ) : undefined
-                  }
                   onTables={
                     locationInfo.actions.some(a => a.id === 'sit' && !a.disabled)
                       ? () => commit({kind: 'sit', target: locationInfo.id})
@@ -1236,7 +1229,20 @@ function App() {
           {content()}
         </main>
       </div>
-      {atTable && !event && p.alive && (
+      {atTable && inTheBackRoom && !event && p.alive && (
+        <BackRoomScene
+          place={world.locations.find(l => l.id === p.location)?.name || 'the back room'}
+          cards={world.cards ?? null}
+          seat={(world.locations.find(l => l.id === p.location)?.actions || []).find(
+            a => a.id === 'cards',
+          )}
+          cash={p.cash}
+          money={money}
+          act={c => commit({target: p.location, ...c})}
+          onLeave={() => commit({kind: 'rise', target: p.location})}
+        />
+      )}
+      {atTable && !inTheBackRoom && !event && p.alive && (
         <Casino
           place={world.locations.find(l => l.id === p.location)?.name || 'the tables'}
           actions={(world.locations.find(l => l.id === p.location)?.actions || []).filter(a =>
