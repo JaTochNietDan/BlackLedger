@@ -7853,3 +7853,33 @@ Four tests changed, all of them reading the price off the game now rather than
 typing it: two campaign walkthroughs earn longer before the laundry, the
 investor's run is 200 commands rather than 100, and the buyout test asks
 `AcquisitionCost` what full payment is so it stays about paying it in full.
+
+## Asking after somebody
+
+"Maybe only some people know where someone is and we would have to be able to
+convince us to give them their location, especially if it's a rival family
+lead... We don't want it to be a situation where we can just talk to one
+singular character and find out people's locations by paying a fee, that's too
+simplistic. We want a dynamic knowledge situation and bargainning situation."
+
+So there is no broker and no fee. You ask whoever is standing in front of you,
+about somebody you cannot place. Whether they know is one thing: the same room,
+the same family, the same counter, all facts the city already holds. Whether
+they will say is another. Below `TellsYou` they say they have not seen them, the
+way people say it when they would rather not be asked again. Giving up somebody
+from their own family takes `GivesUpTheirOwn`, and being asked at all costs you
+`AskingGalls` of their opinion whatever they answer — the insult is the asking,
+not the refusal. What you are told is four hours old, because it is where they
+last saw them rather than where they are.
+
+**A guard that could not have caught this, and now can.** An action can be about
+two people, and an action id has room for one. The target travels on the
+action's `Choice`. `TestEveryActionOfferedCanActuallyBeTaken` replays every
+offered action and reported 48 of 665 as offered-then-refused — "there is nobody
+to ask about" — because it was replaying them without the second name. The
+guard sends it now, which means it covers a shape it previously could not, and
+a matching guard checks the panel sends it too: an action card that drops the
+second name it was given asks about nobody.
+
+No balance run: none of this is reachable by a policy, which does not ask
+anybody anything.

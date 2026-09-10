@@ -607,6 +607,10 @@ type Action struct {
 	// forecourt today. The panel draws the picture of that one rather than
 	// working it out from the label.
 	Tier int `json:"tier,omitempty"`
+	// Choice is a second name this action is about, sent back with the command.
+	// Asking somebody where a third person is needs both of them, and the id
+	// only has room for one.
+	Choice string `json:"choice,omitempty"`
 	// Sum, when set, means the player types how much rather than accepting a
 	// fixed lot. The panel puts a number field on the card and sends what is in
 	// it as Command.Amount; the core still decides what an empty field means.
@@ -1668,6 +1672,30 @@ func (w *World) Actions(id string) []Action {
 		asks("sign:"+n.ID, "Put "+n.Name+" on", 45, SigningCost, w.SignOnReadiness(n.ID),
 			fmt.Sprintf("$%d up front and $%d a day. Adds to what your organization is worth in a fight, stands in front of what comes at you, and can decide one morning that it is not worth it.", SigningCost, MemberWage))
 		break
+	}
+	// Asking whoever is standing here after somebody you cannot place. Offered
+	// for the people the player has reason to want and cannot find, which is
+	// what keeps it from being a list of every name in the city.
+	if asked := w.PeopleHere(id); len(asked) > 0 {
+		wanted := 0
+		for i := range w.NPCs {
+			mark := &w.NPCs[i]
+			if mark.Dead || wanted >= 3 || w.KnowsWhere(mark.ID) {
+				continue
+			}
+			if mark.Sore == 0 && w.LoanTo(mark.ID) == nil && mark.Rank < RankLeader {
+				continue
+			}
+			wanted++
+			who := asked[0]
+			add("about:"+who.ID, "Ask "+who.Name+" where "+mark.Name+" is", 15, 0,
+				w.AskAboutReadiness(who.ID, mark.ID),
+				"Whether they know is one thing and whether they will say is another. Asking somebody to give up one of their own family is a thing they remember.")
+			if len(out) > 0 {
+				out[len(out)-1].Subject = mark.ID
+				out[len(out)-1].Choice = mark.ID
+			}
+		}
 	}
 	// Somebody of yours behind this counter, and what they saw from it. Filed
 	// under the person, because it is a question for them rather than work the

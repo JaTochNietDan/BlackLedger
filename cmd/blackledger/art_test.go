@@ -535,3 +535,17 @@ func TestTheRoomSaysWhereYouAreAtTheTopOfIt(t *testing.T) {
 		}
 	}
 }
+
+// An action can be about two people — asking somebody where a third person is —
+// and the id only has room for one. The second travels on the action's choice,
+// which the panel has to send back or the command asks about nobody.
+func TestAnActionAboutTwoPeopleCarriesBothNames(t *testing.T) {
+	main := source(t, "src/main.tsx")
+	if !holds(main, "commit({kind: a.id, target: a.target, choice: a.choice})") {
+		t.Error("an ordinary action card drops the second name it was given")
+	}
+	sum := source(t, "src/SumAction.tsx")
+	if !holds(sum, "commit({kind: a.id, target: a.target, choice: a.choice, amount})") {
+		t.Error("an action with a figure in it drops the second name it was given")
+	}
+}

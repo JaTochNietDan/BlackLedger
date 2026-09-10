@@ -74,7 +74,7 @@ export function SumAction({
         type="button"
         className="action-commit"
         disabled={a.disabled || disabled || !!bad}
-        onClick={() => commit({kind: a.id, target: a.target, amount})}
+        onClick={() => commit({kind: a.id, target: a.target, choice: a.choice, amount})}
       >
         {bad || `${a.label} — ${money(amount)}`}
       </button>

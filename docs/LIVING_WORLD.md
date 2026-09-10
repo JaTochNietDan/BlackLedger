@@ -326,12 +326,17 @@ I want you to think through this and consider what makes the most sense.
   says "Last seen at The Monarch, three hours ago" or "Nobody has told you where
   to find them", and there is no button to walk to. Your own family and the
   people you employ are always findable, because they work for you.
-— what comes next, in order: asking somebody who might know, which is where the
-  bargaining lives — their trust, their loyalty to the target, and a cost to
-  their opinion of you for asking about their own; then the same limitation on
-  the city's own killers, who should know where you live and not where you are,
-  and lose even that when you move house. Deliberately not built as one broker
-  with a fee, which is the thing this message rules out.
+— and the asking is built. There is no broker and no fee: you ask whoever is
+  standing in front of you, about somebody you cannot place. Whether they know
+  is one thing — the same room, the same family, the same counter, all of them
+  facts the city already holds — and whether they say is another. Below 25 trust
+  they tell you they have not seen them, the way people say it when they would
+  rather not be asked again. Asking somebody to give up their own family takes
+  70 trust, and being asked at all is a thing they hold against you whatever
+  they answer. What you are told is four hours old, because it is where they
+  last saw them and not where they are.
+— still open: the same limitation on the city's own killers, who should know
+  where you live and not where you are, and lose even that when you move house.
 
 ---
 

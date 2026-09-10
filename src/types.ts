@@ -30,6 +30,7 @@ export interface Action {
   cost: number;
   asks?: number;
   tier?: number;
+  choice?: string;
   sum?: Sum;
   disabled: boolean;
   reason: string;

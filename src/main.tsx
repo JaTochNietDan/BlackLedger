@@ -389,7 +389,7 @@ function App() {
           className="action car-card"
           title={[a.detail, a.disabled ? a.reason : ''].filter(Boolean).join(' — ')}
           disabled={a.disabled || busy || !!journey}
-          onClick={() => commit({kind: a.id, target: a.target})}
+          onClick={() => commit({kind: a.id, target: a.target, choice: a.choice})}
         >
           <img src={car} alt="" loading="lazy" />
           <strong>{a.label}</strong>
@@ -410,7 +410,7 @@ function App() {
         className={`action ${a.id === 'provoke' ? 'danger' : a.id === 'travel' ? 'primary' : ''}`}
         title={[a.detail, a.disabled ? a.reason : ''].filter(Boolean).join(' — ')}
         disabled={a.disabled || busy || !!journey}
-        onClick={() => commit({kind: a.id, target: a.target})}
+        onClick={() => commit({kind: a.id, target: a.target, choice: a.choice})}
       >
         <strong>
           {a.label}

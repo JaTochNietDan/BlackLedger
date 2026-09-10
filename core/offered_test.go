@@ -46,7 +46,12 @@ func TestEveryActionOfferedCanActuallyBeTaken(t *testing.T) {
 			}
 			// A figure the card asks for is a figure the player would type, so
 			// press it with what the field starts on.
-			c := Command{Kind: a.ID, Target: a.Target, Revision: here.Revision, RequestID: "offered-check"}
+			// The second name, where an action has one. Asking somebody where a
+			// third person is needs both, and replaying it without the second
+			// asked about nobody — which the guard reported as the action being
+			// offered and then refused, when what was missing was the command.
+			c := Command{Kind: a.ID, Target: a.Target, Choice: a.Choice,
+				Revision: here.Revision, RequestID: "offered-check"}
 			if a.Sum != nil {
 				c.Amount = a.Sum.Preset
 			}
