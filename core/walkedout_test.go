@@ -1,6 +1,9 @@
 package core
 
-import "testing"
+import (
+	"strings"
+	"testing"
+)
 
 // Missing payroll costs what the people behind the counter think of the player,
 // and that number decides how well the place runs. It did not decide whether
@@ -102,5 +105,84 @@ func TestOneShortNightCostsNobody(t *testing.T) {
 	}
 	if w.Properties[id].Unpaid != 0 {
 		t.Fatalf("the bills were covered and the place still counts %d unpaid nights", w.Properties[id].Unpaid)
+	}
+}
+
+// And the city does not hand the counter back. A player who had paid nobody for
+// twenty-five days emptied their laundry, and two days later three fresh hands
+// turned up for nothing — the position count reset itself the moment it reached
+// zero, so starving a business cost a stretch of bad service and then nothing
+// at all, over and over, with nineteen unpaid nights against the place.
+func TestNobodyComesToWorkAtAPlaceThatIsNotPaying(t *testing.T) {
+	t.Parallel()
+	w, id := unpaidRun(t)
+	prop := w.Properties[id]
+	for day := 0; day < 60; day++ {
+		w.Event = nil
+		w.Advance(1440)
+		w.Event = nil
+	}
+	t.Logf("sixty days of paying nobody: %d hands, %d positions, %d unpaid nights",
+		len(prop.Hands), prop.Staff, prop.Unpaid)
+	if len(prop.Hands) > 0 {
+		t.Fatalf("sixty days of paying nobody and %d are still standing there", len(prop.Hands))
+	}
+	// And the place is not still billing for them. The position count used to
+	// reset itself to the trade's full complement the moment it reached zero,
+	// and the wages are counted off that number, so an empty counter went on
+	// charging the player for three people who were not there.
+	if prop.Staff > len(prop.Hands) {
+		t.Fatalf("%d hands stand there and the player is billed for %d", len(prop.Hands), prop.Staff)
+	}
+	told := false
+	for _, r := range w.History {
+		told = told || strings.Contains(r.Title, "Nobody will stand behind the counter")
+	}
+	if !told {
+		t.Fatal("the counter emptied itself and nobody told the player why it stays empty")
+	}
+
+	// And paying again is the way back. The word is about the money, not about
+	// the player, so there is nothing here to apologise for.
+	prop.Condition, w.Player.Cash = 100, 500000
+	for day := 0; day < 15; day++ {
+		w.Event = nil
+		w.Advance(1440)
+		w.Event = nil
+	}
+	if len(prop.Hands) == 0 {
+		t.Fatal("the bills were paid for a fortnight and nobody would take the job")
+	}
+	if prop.Toldabout {
+		t.Fatal("the place is staffed and paid and still remembers being told about")
+	}
+}
+
+// The ordinary case: a business that pays its people fills its own chairs, which
+// is what the city has always done and must go on doing.
+func TestAPlaceThatPaysFillsItsOwnChairs(t *testing.T) {
+	t.Parallel()
+	w := New(61)
+	w.Event, w.District = nil, 9
+	w.Player.Health, w.Player.Respect = 100, 30
+	w.Player.Location = "laundry"
+	w.Player.Cash = 200000
+	if err := w.apply(Command{Kind: "acquire", Target: "laundry", RequestID: "buyitandpay"}); err != nil {
+		t.Fatal(err)
+	}
+	prop := w.Properties["laundry"]
+	prop.Hands, prop.Staff = []string{}, 0
+	for day := 0; day < 10; day++ {
+		w.Event = nil
+		w.Advance(1440)
+		w.Event = nil
+	}
+	if len(prop.Hands) == 0 {
+		t.Fatal("a player who pays every bill cannot get anybody to stand behind their counter")
+	}
+	for _, r := range w.History {
+		if strings.Contains(r.Title, "Nobody will stand behind the counter") {
+			t.Fatal("a business that pays its people was told nobody would work there")
+		}
 	}
 }

@@ -164,7 +164,7 @@ func (w *World) NobodyGotPaid() int {
 func (w *World) EverybodyGotPaid() {
 	for _, l := range Locations {
 		if prop := w.Properties[l.ID]; prop != nil && prop.Unpaid > 0 && w.Own(l.ID) {
-			prop.Unpaid = 0
+			prop.Unpaid, prop.Toldabout = 0, false
 		}
 	}
 }

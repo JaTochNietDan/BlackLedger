@@ -163,13 +163,22 @@ func (w *World) EmptyChairs() {
 		if prop.Owner == "" || prop.Owner == "independent" {
 			continue
 		}
-		if trade, ok := TradeOf(l.ID); ok && prop.Staff == 0 && prop.Income > 0 {
+		if trade, ok := TradeOf(l.ID); ok && prop.Staff == 0 && prop.Income > 0 && !w.wordIsOut(l.ID) {
 			prop.Staff = trade.Hands
 		}
 		// A counter that somebody has just walked out of stays short. Without
 		// this the city handed the position straight back to the person who
 		// had had enough of it, on the same morning they left.
 		if w.Minute < prop.Shorthanded {
+			continue
+		}
+		// And nobody comes to work at a place that is not paying. Without
+		// this, a player who had paid nobody for twenty-five days emptied
+		// their laundry and the city handed them three fresh hands two days
+		// later, for nothing, over and over — nineteen unpaid nights and
+		// strangers still turning up.
+		if w.wordIsOut(l.ID) {
+			w.nobodyWillWork(l.ID)
 			continue
 		}
 		for len(prop.Hands) < prop.Staff {
@@ -622,4 +631,31 @@ func (w *World) walkOut(who, from, to string) {
 	w.Log(n.Name+" has gone to "+there.Name,
 		fmt.Sprintf("%s pays better than you do, or asks less. %s is short-handed at %d.",
 			w.HolderName(to), here.Name, old.Staff), "business")
+}
+
+// wordIsOut reports whether a place has gone long enough without paying
+// anybody that the city knows about it. The same week somebody standing behind
+// the counter will not work through is the week nobody new will start.
+func (w *World) wordIsOut(id string) bool {
+	prop := w.Properties[id]
+	return prop != nil && prop.Unpaid >= PatienceRunsOut
+}
+
+// nobodyWillWork says it once, the morning a position first goes begging,
+// because a place nobody will stand in is news and then it is the situation.
+func (w *World) nobodyWillWork(id string) {
+	prop := w.Properties[id]
+	trade, ok := TradeOf(id)
+	// The trade's own count rather than the position count: somebody walking
+	// out takes their position with them, so by the time the word is out the
+	// place wants nobody and nothing would ever be said.
+	if !ok || !w.Own(id) || len(prop.Hands) >= trade.Hands || prop.Toldabout {
+		return
+	}
+	prop.Toldabout = true
+	place, _ := PlaceByID(id)
+	w.Log("Nobody will stand behind the counter at "+place.Name,
+		fmt.Sprintf("It has been %d nights since anybody there was paid, and that is the sort of thing "+
+			"people in this city tell each other. Pay what is owed and somebody will take the job.",
+			prop.Unpaid), "danger")
 }

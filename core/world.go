@@ -255,10 +255,14 @@ type Property struct {
 	// the morning after is the same as any other; a week of it is a reason to
 	// stop coming in. Absent in saves written before the bill reached the
 	// people it names.
-	Unpaid  int  `json:"unpaid,omitempty"`
-	Supply  int  `json:"supply,omitempty"`
-	Trouble bool `json:"trouble,omitempty"`
-	Still   bool `json:"still,omitempty"`
+	Unpaid int `json:"unpaid,omitempty"`
+	// Whether the player has been told nobody will stand here. Said once, the
+	// morning a position first goes begging, and forgotten when the place is
+	// paid: a place nobody will work at is news and then it is the situation.
+	Toldabout bool `json:"toldabout,omitempty"`
+	Supply    int  `json:"supply,omitempty"`
+	Trouble   bool `json:"trouble,omitempty"`
+	Still     bool `json:"still,omitempty"`
 	// What is behind the tables at a casino. Absent everywhere else, and in
 	// saves written before a room ran a float of its own.
 	Bankroll int `json:"bankroll,omitempty"`

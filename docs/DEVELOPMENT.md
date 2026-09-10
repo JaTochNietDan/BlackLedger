@@ -8432,3 +8432,34 @@ it at all walks into `SetMapIndex` on a nil map. Filling now steps over a map
 nothing has been put in.
 
 Live payload on 8791 after the restart: no nothings anywhere the view counts.
+
+## Nobody comes to work at a place that is not paying
+
+Last night's rule emptied a counter for the first time: a week of unpaid wages
+and people stop coming in. This is what happened next, which was nothing.
+
+Measured over ninety days of a player who paid nobody: the laundry emptied
+around day twenty-five, and two days later three fresh hands turned up for
+free, and it happened again on day forty-three, and again on day fifty-five. The
+position count reset itself to the trade's full complement the moment it reached
+zero, so the whole punishment was a stretch of bad service. Worse, the wages are
+counted off that number, so an empty counter went on charging for three people
+who were not there.
+
+Two halves, in `core/hands.go`. The city does not offer a position at a place
+that has gone a week without paying anybody — `wordIsOut` — and the position
+count does not reset itself there either. The player is told once, the morning a
+position first goes begging, against the trade's own count rather than the
+position count: somebody walking out takes their position with them, so by the
+time the word is out the place wants nobody and nothing would ever be said.
+
+Paying again is the whole of the way back. The count clears, the word is
+forgotten, and the chairs fill. Measured: sixty days of paying nobody leaves an
+empty counter and no bill; a fortnight of paying brings all three back.
+
+Both halves were broken to check. Letting the city refill an unpaid counter
+fails on the message never being said. Letting the position count reset itself
+fails on the player being billed for three people who are not there.
+
+Balance unchanged. Every strategy in the simulation pays its bills, which is why
+this rule costs them nothing.
