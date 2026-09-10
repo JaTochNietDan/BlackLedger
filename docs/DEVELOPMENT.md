@@ -7975,3 +7975,28 @@ Three guards rewritten, all three verified by breaking the thing they watch:
   than by the number 1440 appearing somewhere,
 - a drum's fallback is named rather than being any ternary,
 - the two city views are mounted rather than imported.
+
+## People leaving
+
+You can walk somebody off a rival's counter and nothing walked anybody off
+yours, so employment only ever happened in one direction. `Notice` runs every
+business day: somebody carrying something against the player stops standing
+behind their counter, and where a rival has a position going and the money to
+fill it, that is where they go.
+
+**Two rules tried and measured before this one.** The first was a trust score:
+below twenty they leave. Everybody in this city starts at nothing and thinks
+nothing of a stranger, so that is every employee in the game — a laundry went
+from three hands to none inside a month with nothing having happened. The
+second added "a place in trouble under somebody who dislikes you" and failed the
+same way for the same reason. What is left is one rule that names something the
+player did: they are sore at you, which is a number the rest of the city already
+reads to decide who moves against them.
+
+`Property.Shorthanded` keeps the gap open for two days. Without it the city
+handed the position straight back on the morning it emptied, so losing somebody
+cost nothing. That was not proven by the first version of the test — it passed
+with the rule removed — so the test now says it: the counter is not ready to
+hire the same morning, and the gap is still there the next day.
+
+Baseline unmoved: no campaign policy makes anybody sore at their own staff.

@@ -241,10 +241,15 @@ type Property struct {
 	// it is right to read a count; this is the same number as a list of people
 	// who live in this city. Absent in saves written before anybody had a job,
 	// which read as a business whose staff are nobody in particular.
-	Hands   []string `json:"hands,omitempty"`
-	Supply  int      `json:"supply,omitempty"`
-	Trouble bool     `json:"trouble,omitempty"`
-	Still   bool     `json:"still,omitempty"`
+	Hands []string `json:"hands,omitempty"`
+	// When this counter can find somebody again. Whoever walked out of it does
+	// not come back the same morning, and the city does not hand you a
+	// replacement before you have noticed the gap. Absent in saves written
+	// before anybody could leave, which reads as a counter that can hire today.
+	Shorthanded int  `json:"shorthanded,omitempty"`
+	Supply      int  `json:"supply,omitempty"`
+	Trouble     bool `json:"trouble,omitempty"`
+	Still       bool `json:"still,omitempty"`
 	// What is behind the tables at a casino. Absent everywhere else, and in
 	// saves written before a room ran a float of its own.
 	Bankroll int `json:"bankroll,omitempty"`

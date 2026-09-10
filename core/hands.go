@@ -166,6 +166,12 @@ func (w *World) EmptyChairs() {
 		if trade, ok := TradeOf(l.ID); ok && prop.Staff == 0 && prop.Income > 0 {
 			prop.Staff = trade.Hands
 		}
+		// A counter that somebody has just walked out of stays short. Without
+		// this the city handed the position straight back to the person who
+		// had had enough of it, on the same morning they left.
+		if w.Minute < prop.Shorthanded {
+			continue
+		}
 		for len(prop.Hands) < prop.Staff {
 			who := w.takeOn(l.ID)
 			if who == "" {
@@ -453,4 +459,112 @@ func handsWanted(id string) int {
 		return trade.Hands
 	}
 	return 0
+}
+
+// Leaving. You can walk somebody off a rival's counter and nothing walks
+// anybody off yours, so employment only ever happened in one direction. A
+// business the city can take people out of is a business worth defending, and
+// it is the reason to care what the people behind your counters think of you.
+
+const (
+	// WalksOut is the chance a day that somebody who has had enough actually
+	// goes. Low: they leave on a day of their own choosing rather than the
+	// moment a number crosses a line, which is what makes it feel like a
+	// decision somebody made rather than a threshold.
+	WalksOut = .12
+	// FindingSomebody is how long a counter stays short after somebody walks
+	// off it. Two days: long enough that losing a pair of hands is felt, short
+	// enough that a business is not permanently crippled by one bad week.
+	FindingSomebody = 2 * 1440
+)
+
+// Notice is the day's chance that anybody behind your counters has had enough
+// of it, and that a rival with a position going takes one of them. Called every
+// business day, after the dead have come off the books.
+func (w *World) Notice() {
+	for _, l := range Locations {
+		prop := w.Properties[l.ID]
+		if prop == nil || len(prop.Hands) == 0 || !w.Own(l.ID) {
+			continue
+		}
+		for _, who := range append([]string{}, prop.Hands...) {
+			n := w.NPC(who)
+			if n == nil || n.Dead || !w.hadEnough(n) {
+				continue
+			}
+			if w.WorldRandom() >= WalksOut {
+				continue
+			}
+			// Somewhere else, if anybody is hiring; otherwise simply out.
+			to := w.hiringElsewhere(l.ID)
+			w.walkOut(who, l.ID, to)
+			break // one a day at each address, or a bad week empties the place
+		}
+	}
+}
+
+// hadEnough is why somebody stops standing behind your counter: they are
+// carrying something against you.
+//
+// Not a trust score. Everybody in this city starts at nothing and thinks
+// nothing of a stranger, so "below twenty" is every employee in the game and a
+// business would bleed people for no reason anybody could name — measured, a
+// laundry went from three hands to none in a month with nothing having happened.
+// A second cause was tried, a place in trouble under somebody who dislikes you,
+// and it failed the same way for the same reason. What is left is one rule that
+// names something the player did.
+func (w *World) hadEnough(n *NPC) bool {
+	return n.Sore >= TakesItPersonally
+}
+
+// hiringElsewhere is a rival's address with a position going and the money to
+// fill it, and nothing when nobody is hiring.
+func (w *World) hiringElsewhere(from string) string {
+	for _, l := range Locations {
+		prop := w.Properties[l.ID]
+		trade, ok := TradeOf(l.ID)
+		if prop == nil || !ok || l.ID == from || w.Own(l.ID) {
+			continue
+		}
+		if prop.Owner == "" || prop.Owner == "independent" || prop.Staff >= trade.Hands {
+			continue
+		}
+		if f := w.faction(prop.Owner); f == nil || f.Cash < trade.Wage*7 {
+			continue
+		}
+		return l.ID
+	}
+	return ""
+}
+
+// walkOut takes somebody off one set of books and, where there is somewhere to
+// go, puts them on another.
+func (w *World) walkOut(who, from, to string) {
+	old := w.Properties[from]
+	kept := make([]string, 0, len(old.Hands))
+	for _, id := range old.Hands {
+		if id != who {
+			kept = append(kept, id)
+		}
+	}
+	old.Hands = kept
+	old.Staff = min(old.Staff, len(kept))
+	old.Shorthanded = w.Minute + FindingSomebody
+	n := w.NPC(who)
+	if n != nil && n.Post == from {
+		n.Post = ""
+	}
+	here, _ := PlaceByID(from)
+	if to == "" {
+		w.Log(n.Name+" has had enough",
+			fmt.Sprintf("They are not behind the counter at %s this morning, and nobody expects them back. There are %d of you now.",
+				here.Name, old.Staff), "business")
+		return
+	}
+	w.Properties[to].Staff++
+	w.putToWork(who, to)
+	there, _ := PlaceByID(to)
+	w.Log(n.Name+" has gone to "+there.Name,
+		fmt.Sprintf("%s pays better than you do, or asks less. %s is short-handed at %d.",
+			w.HolderName(to), here.Name, old.Staff), "business")
 }
