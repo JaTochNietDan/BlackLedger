@@ -32,3 +32,9 @@ export const paintedMask = (id: string) => {
   // be masked by itself: that punches the picture out of its own frame.
   return fronts.includes(id) ? null : paintedAsset(id);
 };
+
+// The car on the forecourt. Three cars were three lines of text that looked
+// identical on the way past; these are painted offline the same way the
+// buildings are (tools/cars.py) and shipped as files.
+export const paintedCar = (tier: number) =>
+  tier >= 1 && tier <= 3 ? `/art/cars/car-${tier}-v1.jpg` : null;

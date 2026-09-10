@@ -6071,3 +6071,33 @@ out. It has a field now, bounded by the same floor and ceiling the rule uses.
 Balance unchanged: deaths 0/0/50/82/83, median cash 12378/14050/7230/90/586.
 
 Evidence: `core/crossing_test.go`, two breaks verified.
+
+## What a car is worth, said in minutes, with a picture of it
+
+The last two things on the cars message: "nice car images to show what you're
+buying and stats information about the speed of the car relevant to what it
+gives to you."
+
+The forecourt quoted a percentage — "journeys take 74% of the time they take on
+foot" — which is true and tells nobody anything, because nobody walks a
+percentage. `CarWorth` times the longest walk from where the player is standing,
+both ways, and the card names the road: "Pier 14 from here is 40 minutes on foot
+and 30 in this."
+
+The longest walk, because that is where a car earns its money. And the figure
+includes the weight of whatever plate is on it, using the same arithmetic
+`World.Pace` runs on the car the player owns — a quote that does not agree with
+what happens is a lie told slowly.
+
+Three cars were also three lines of text that looked identical on the way past.
+`tools/cars.py` paints them on the same contract as every other picture in this
+game: generated offline, shipped as files, nothing at runtime depending on a
+model. The action carries the tier it is selling so the panel draws that car
+rather than parsing the label.
+
+Two breaks verified: the plate weight dropping out of the quote, and the road
+never being named.
+
+Balance unchanged: deaths 0/0/50/82/83, median cash 12378/14050/7230/90/586.
+
+Evidence: `core/worth_test.go`, `public/art/cars/`.

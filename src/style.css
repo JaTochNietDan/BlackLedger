@@ -1192,3 +1192,6 @@ body{height:100%;overflow:hidden;margin:0;background:var(--bg);color:var(--ink);
 .street-journey small{display:block;font-size:11px;color:var(--muted);margin-top:4px;max-width:48ch}
 .street-journey.warned{border-color:var(--red)}
 .street-journey.warned small{color:#f0b8a8}
+
+/* A car card shows the car. */
+.action.car-card img{display:block;width:100%;height:120px;object-fit:cover;border:1px solid #465243;margin-bottom:9px;filter:saturate(.8) contrast(1.05)}

@@ -208,8 +208,12 @@ family to keep them more protected from attacks.
   foot, 175 with a car at the kerb and 231 with a plated one. It is the same
   three endings as before — killed, taken alive with your name coming out of it,
   or out with nothing — and a car moves them toward the last.
-— still to do: pictures of what you are buying, and what a car is worth in speed
-  stated honestly.
+— and both of the last two are built. The lot shows a painting of the car it is
+  selling (tools/cars.py, the same offline contract as the buildings), and it
+  quotes what the car is worth in minutes on a road this player actually walks
+  rather than as a percentage nobody walks. The quote includes the weight of any
+  plate on it, because a figure that does not agree with what happens is a lie
+  told slowly.
 
 ---
 

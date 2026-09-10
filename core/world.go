@@ -575,6 +575,10 @@ type Action struct {
 	// a room takes $220 and the button said nothing about money, with the
 	// figure only in the description. Same shape as the trips and their days.
 	Asks int `json:"asks,omitempty"`
+	// Tier is which of a graded thing this action is for — which car is on the
+	// forecourt today. The panel draws the picture of that one rather than
+	// working it out from the label.
+	Tier int `json:"tier,omitempty"`
 	// Sum, when set, means the player types how much rather than accepting a
 	// fixed lot. The panel puts a number field on the card and sends what is in
 	// it as Command.Amount; the core still decides what an empty field means.
@@ -1148,8 +1152,23 @@ func (w *World) Actions(id string) []Action {
 			if next.Compartment > 0 {
 				hides = fmt.Sprintf("A false floor a search will not find %d units under.", next.Compartment)
 			}
+			// What it is worth, in minutes on a road this player walks, rather
+			// than in a percentage nobody walks.
+			worth := w.CarWorth(next.Tier)
+			speed := ""
+			if worth.ToID != "" {
+				speed = fmt.Sprintf(" %s from here is %d minutes on foot and %d in this.", worth.To, worth.Walking, worth.Driving)
+				if worth.Plate > 0 {
+					speed += fmt.Sprintf(" That figure carries %s of plate, which is weight.", counted(worth.Plate, "stage", "stages"))
+				}
+			}
+			// Which car this is, so the panel can show the one being sold
+			// rather than guessing from the label.
 			asks("car", "Buy "+lowerFirst(next.Label), 60, next.Cost, w.CarReadiness(),
-				fmt.Sprintf("$%d, then $%d a day to keep on the road. %s Journeys take %d%% of the time they take on foot. %s A car outside is a thing witnesses describe.", next.Cost, next.Upkeep, next.Detail, int(next.Pace*100), hides))
+				fmt.Sprintf("$%d, then $%d a day to keep on the road. %s%s %s A car outside is a thing witnesses describe.", next.Cost, next.Upkeep, next.Detail, speed, hides))
+			if len(out) > 0 {
+				out[len(out)-1].Tier = next.Tier
+			}
 		}
 	}
 	if Pumps(id) {

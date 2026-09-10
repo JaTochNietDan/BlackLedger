@@ -110,6 +110,10 @@ run = ".venv/bin/python tools/portraits.py public/art 24"
 description = "Paint the moments the theatre plays (needs `mise run art` first)"
 run = ".venv/bin/python tools/scenes.py public/art/scenes"
 
+[tasks.cars]
+description = "Paint the cars on the forecourt (needs `mise run art` first)"
+run = ".venv/bin/python tools/cars.py public/art/cars"
+
 [tasks.exteriors]
 description = "Paint the buildings that have no exterior (needs `mise run art` first)"
 run = ".venv/bin/python tools/exteriors.py public/art/fronts"
