@@ -208,10 +208,6 @@ family to keep them more protected from attacks.
 
 ---
 
-The roulette graphics look better but I think that the betting table part should be to the right of the wheel, not below it, like on a real table. You should be able to pick your specific bet amount, up to the maximum (as we talked about in another inbox item, maximum can be set by the casino owner). You can also place multiple bets in roulette, on different numbers, combinations etc, like the real game by putting down chips on each one you want to bet on.
-
----
-
 We should try to improve the images being displayed on the newspaper. Having a portrait of an affected person or building would be great. Some other black and white dramatization of something would also be great if plausible.
 
 --- 
@@ -231,6 +227,16 @@ I got some gossip by getting that girl a coffee and then I see "bad blood" red b
 When inside a building you own the top buttons should probably be for owner management and under a separate subtitle for management actions.
 
 ## Inbox — answered
+
+The roulette graphics look better but I think that the betting table part should be to the right of the wheel, not below it, like on a real table. You should be able to pick your specific bet amount, up to the maximum (as we talked about in another inbox item, maximum can be set by the casino owner). You can also place multiple bets in roulette, on different numbers, combinations etc, like the real game by putting down chips on each one you want to bet on.
+
+— built, all three. The cloth sits to the right of the wheel. The chip is worth
+  whatever you type, up to the house limit the holder sets. And the table takes
+  as many chips as you want to put on it: click a spot to lay one down, click
+  again to stack, right-click to take one off, and every chip on the cloth is
+  settled against the same pocket.
+
+---
 
 Ok this is much better. It may be worth adding a couple more casino games. It
 could be a reason to have other casinos, to have other casino games like slot

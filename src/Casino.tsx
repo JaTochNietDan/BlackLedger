@@ -54,7 +54,7 @@ export function Casino({place, actions, people, hand, wheel, dice, machine, hous
   // on every render.
   revision: number;
   records: Entry[];
-  act: (command: {kind: string; target?: string; choice?: string; amount?: number}) => void;
+  act: (command: {kind: string; target?: string; choice?: string; amount?: number; chips?: {bet:string; amount:number}[]}) => void;
   onLeave: () => void;
 }) {
   // A hand that is already dealt is the game you are playing, whatever tab you
@@ -160,7 +160,7 @@ export function Casino({place, actions, people, hand, wheel, dice, machine, hous
             : <Wheel wheel={wheel} money={money} turn={revision} cash={cash}
                      least={least} limit={limit} amount={bet || house.usual || least} onAmount={setBet}
                      refused={spin?.disabled ? spin.reason : ''}
-                     spin={(amount, choice) => act({kind: 'wheel', amount, choice})}/>}
+                     spin={chips => act({kind: 'wheel', chips})}/>}
         </div>
 
         <aside className="casino-night" aria-label="What the table has done">

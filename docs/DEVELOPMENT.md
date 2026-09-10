@@ -5886,3 +5886,44 @@ Balance unchanged: deaths 0/0/50/82/83, median cash 12378/14050/7230/90/586.
 
 Evidence: `core/dice_test.go`, one break verified after a first one that did not
 bite, and the whole flow driven over the API on an isolated fixture.
+
+## The cloth takes as many chips as you put on it
+
+From the inbox, three things in one message: the betting layout belongs beside
+the wheel rather than under it, the chip should be worth whatever you type up to
+the house limit, and "you can also place multiple bets in roulette, on different
+numbers, combinations etc, like the real game by putting down chips on each one
+you want to bet on."
+
+The middle one was already built. The other two were not, and the third is the
+one that matters: one bet a spin was never how the game works. What a table
+takes is a cloth covered in chips, every one of them settled against the same
+pocket, and that is most of what makes roulette a game rather than a coin toss
+with extra numbers.
+
+`Chip` is a bet and what is on it. `SpinChips` takes a whole cloth, charges the
+total before the ball drops, settles each chip against the one pocket and fills
+in what each was worth. `PlayWheel` is now one chip in a slice of one, so every
+existing caller, save and test behaves exactly as before — and a spin still
+reads by `Bet` and `Down` for anything written before the table took a cloth.
+
+The house limit is per bet, the way a real table's is: two chips at the limit
+are two bets and both stand. What is refused is more on the cloth than the
+player has, however it is spread about.
+
+On the table itself, clicking a spot lays a chip down, clicking again stacks
+another, and right-clicking takes one off. After the ball drops the panel lists
+every chip and which of them came in, rather than describing one of them. The
+cloth moved to the right of the wheel, which is where a real one is and which
+also stopped the spin button sitting below the fold on a short window.
+
+Verified over the API on an isolated fixture: $20 on red, $5 straight up on 17
+and $10 on even, all in one spin. Pocket 9, red — red paid $40 back, the other
+two went, and the player finished $5 up on $35 down.
+
+Two breaks verified: settling every chip against the first chip's bet, and
+letting the total past the player's cash.
+
+Balance unchanged: deaths 0/0/50/82/83, median cash 12378/14050/7230/90/586.
+
+Evidence: `core/chips_test.go`.

@@ -1167,3 +1167,15 @@ body{height:100%;overflow:hidden;margin:0;background:var(--bg);color:var(--ink);
 .dice-bets button[aria-pressed="true"]{border-color:var(--gold);background:#343a29;color:#ffe6b0}
 .dice-actions{flex-direction:column;gap:10px}
 @media(prefers-reduced-motion:reduce){.die.rolling{animation:none}}
+
+/* The cloth belongs beside the wheel, which is where it is on a real table.
+   Under the wheel it read as a second thing rather than the same table, and it
+   pushed the spin button below the fold on a short window. */
+.wheel-layout{display:grid;grid-template-columns:minmax(0,auto) minmax(320px,1fr);gap:18px;align-items:start}
+.wheel-layout .cloth{margin:0}
+.wheel-layout .wheel-table{grid-template-columns:auto;justify-items:center}
+@media(max-width:1180px){.wheel-layout{grid-template-columns:minmax(0,1fr)}}
+/* Chips stack up: what is on a spot is what you put there. */
+.cloth-cell.picked{box-shadow:inset 0 0 0 2px #f0e4b0}
+.chip-run{list-style:none;margin:6px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:4px 12px;font-size:11px;color:var(--muted)}
+.chip-run li.won{color:#9fd6a8}

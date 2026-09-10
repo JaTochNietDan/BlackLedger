@@ -516,6 +516,10 @@ type Command struct {
 	// means they did not name one, and whatever the action would have done with
 	// a fixed lot still applies.
 	Amount int `json:"amount,omitempty"`
+	// Chips is a whole cloth at once: what a roulette table actually takes,
+	// which is as many bets as somebody can reach, all settled against the same
+	// pocket. Empty means the old single bet on Choice and Amount.
+	Chips []Chip `json:"chips,omitempty"`
 }
 
 // Sum is a figure the player types on an action card, bounded by what the core

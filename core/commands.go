@@ -346,14 +346,24 @@ func (w *World) apply(c Command) error {
 			// The bet rides on Choice, not Target: Target names the room and is
 			// what the action lookup above searches, so putting "red" in it
 			// would look for a wheel in a place called red and find nothing.
-			bet := c.Choice
-			if bet == "" {
-				bet = "red"
+			// A whole cloth if one was sent, and the single bet otherwise. The
+			// table has taken more than one chip for as long as there have been
+			// tables; this is the game catching up with it.
+			if len(c.Chips) > 0 {
+				if err := w.SpinChips(p.Location, c.Chips); err != nil {
+					return err
+				}
+				w.Advance(a.Minutes)
+			} else {
+				bet := c.Choice
+				if bet == "" {
+					bet = "red"
+				}
+				if err := w.PlayWheel(p.Location, bet, w.TableStakeOrUsual(p.Location, c.Amount)); err != nil {
+					return err
+				}
+				w.Advance(a.Minutes)
 			}
-			if err := w.PlayWheel(p.Location, bet, w.TableStakeOrUsual(p.Location, c.Amount)); err != nil {
-				return err
-			}
-			w.Advance(a.Minutes)
 		} else if person, ok := strings.CutPrefix(c.Kind, "sign:"); ok {
 			if err := w.SignOn(person); err != nil {
 				return err

@@ -11,7 +11,7 @@ import {Card, pipOf, isRedSuit, knownCard, clothTable, clothColour, outsideBets,
 // down rather than choosing one.
 
 export interface HandState {playing:boolean; settled?:boolean; won?:boolean; outcome?:string; where?:string; place?:string; stake?:number; player?:number; dealer?:number; cards?:number; mine?:Card[]; theirs?:Card[]}
-export interface WheelState {spun:boolean; place?:string; stake?:number; bet?:string; pocket?:number; colour?:string; won?:boolean; pays?:number}
+export interface WheelState {spun:boolean; place?:string; stake?:number; bet?:string; pocket?:number; colour?:string; won?:boolean; pays?:number; back?:number; chips?:{bet:string; label:string; amount:number; won:boolean; back:number}[]}
 
 function PlayingCard({card, facedown}:{card?:Card; facedown?:boolean}) {
   if (facedown || !card || !knownCard(card)) {
@@ -121,7 +121,7 @@ const BALL_TRACK = -80;
 
 export function Wheel({wheel, money, spin, amount, least, limit, cash, onAmount, refused = '', turn = 0}:{
   wheel:WheelState; money:(n:number)=>string;
-  spin:(amount:number, bet:string)=>void;
+  spin:(chips:{bet:string; amount:number}[])=>void;
   // What is going on the cloth, and what the room will take. The player names
   // the figure; the core refuses anything past the house limit whatever this
   // component thinks.
@@ -131,7 +131,11 @@ export function Wheel({wheel, money, spin, amount, least, limit, cash, onAmount,
   // land in the same pocket are still two spins.
   turn?:number;
 }) {
-  const [bet, setBet] = useState('red');
+  // What is on the cloth. A real table takes as many chips as you can reach,
+  // every one of them settled against the same pocket, and one bet a spin was
+  // never how the game works. Clicking a spot adds a chip of whatever is in the
+  // field; clicking it again takes one off.
+  const [chips, setChips] = useState<Record<string, number>>({});
   const [falling, setFalling] = useState(false);
   // The ball and the head are moved with the animation API rather than by a CSS
   // transition on a custom property. The transition was pinned at time zero and
@@ -202,17 +206,29 @@ export function Wheel({wheel, money, spin, amount, least, limit, cash, onAmount,
   // is in the pocket, the way the table does.
   const landed = wheel.spun && !falling ? wheel.pocket ?? 0 : null;
 
-  const on = (id:string) => bet === id;
+  const down = Object.entries(chips).filter(([, n]) => n > 0);
+  const total = down.reduce((n, [, v]) => n + v, 0);
+  const place = (id:string, by:number) => setChips(c => {
+    const next = Math.max(0, (c[id] ?? 0) + by);
+    const out = {...c};
+    if (next === 0) delete out[id]; else out[id] = next;
+    return out;
+  });
+  const on = (id:string) => (chips[id] ?? 0) > 0;
   const cell = (id:string, label:string|number, cls:string) => (
     <button key={id} className={'cloth-cell ' + cls + (on(id) ? ' picked' : '')}
-            aria-pressed={on(id)} onClick={() => setBet(id)}>
+            aria-pressed={on(id)}
+            title={on(id) ? `${money(chips[id])} down — right-click to take one off` : `Put ${money(amount)} on ${String(label)}`}
+            onClick={() => place(id, amount)}
+            onContextMenu={e => { e.preventDefault(); place(id, -amount); }}>
       <span>{label}</span>
-      {on(id) && <Chip amount={amount} money={money}/>}
+      {on(id) && <Chip amount={chips[id]} money={money}/>}
     </button>
   );
 
   return (
     <div className="felt wheel-felt">
+      <div className="wheel-layout">
       <div className="wheel-table">
         <div className={'wheel-bowl' + (falling ? ' falling' : '')}>
           {/* The wheel head: one slice per pocket, in the pockets' own order,
@@ -239,16 +255,23 @@ export function Wheel({wheel, money, spin, amount, least, limit, cash, onAmount,
             <div>{run.map((n, i) => <span key={i} className={'ran ' + clothColour(n)}>{n}</span>)}</div>
           </div>}
           {wheel.spun && landed !== null && (
-            <p className={'felt-result' + (wheel.won ? ' won' : '')}>
-              {wheel.bet} at {money(wheel.stake ?? 0)} — {wheel.won ? `paid ${wheel.pays} to 1` : 'gone'}
-            </p>
+            <div className={'felt-result' + (wheel.won ? ' won' : '')}>
+              {(wheel.chips ?? []).length > 1
+                ? <>
+                    <p>{money(wheel.stake ?? 0)} across {(wheel.chips ?? []).length} chips — {(wheel.back ?? 0) > 0 ? `${money(wheel.back ?? 0)} back` : 'nothing back'}</p>
+                    <ul className="chip-run">{(wheel.chips ?? []).map((c, i) =>
+                      <li key={i} className={c.won ? 'won' : ''}>{c.label} · {money(c.amount)}{c.won ? ` → ${money(c.back)}` : ''}</li>)}</ul>
+                  </>
+                : <p>{wheel.bet} at {money(wheel.stake ?? 0)} — {wheel.won ? `paid ${wheel.pays} to 1` : 'gone'}</p>}
+            </div>
           )}
         </div>
       </div>
 
-      {/* The cloth, laid out the way a table is: the nought down the left, three
-          rows of twelve, and the outside along the bottom. Your chip sits on
-          whatever you last put it on — the core takes one bet a spin. */}
+      {/* The cloth, laid out the way a table is: the nought down the left,
+          three rows of twelve, and the outside along the bottom. It sits beside
+          the wheel rather than under it, which is where a real one is, and it
+          takes as many chips as you want to put on it. */}
       <div className="cloth">
         <div className="cloth-numbers">
           {cell('number:0', 0, 'green zero')}
@@ -265,13 +288,17 @@ export function Wheel({wheel, money, spin, amount, least, limit, cash, onAmount,
             (b.id === 'red' || b.id === 'black' ? ' ' + b.id : '')))}
         </div>
       </div>
+      </div>
 
       <div className="felt-actions chips">
-        <Money label="On the cloth" amount={amount} limit={limit} least={least} cash={cash} onChange={onAmount}/>
-        <button className="spin-it" disabled={falling || !!refused}
-                title={refused || undefined}
-                onClick={() => spin(amount, bet)}>
-          {falling ? 'The ball is still going' : `Spin — ${money(amount)} on ${bet.replace('number:', 'the ')}`}
+        <Money label="A chip is worth" amount={amount} limit={limit} least={least} cash={cash} onChange={onAmount}/>
+        <button className="plain" disabled={down.length === 0} onClick={() => setChips({})}>Clear the cloth</button>
+        <button className="spin-it" disabled={falling || !!refused || down.length === 0}
+                title={refused || (down.length === 0 ? 'Put something on the cloth first' : undefined)}
+                onClick={() => spin(down.map(([bet, n]) => ({bet, amount: n})))}>
+          {falling ? 'The ball is still going'
+            : down.length === 0 ? 'No more bets'
+            : `Spin — ${money(total)} on ${down.length === 1 ? down[0][0].replace('number:', 'the ') : `${down.length} chips`}`}
         </button>
       </div>
       {refused && <p className="felt-refused">{refused}</p>}

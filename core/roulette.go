@@ -104,6 +104,19 @@ func PocketColour(pocket int) string {
 	return "black"
 }
 
+// Chip is one bet on the cloth: what it backs and what is on it. A real table
+// takes as many of these as somebody can reach, all settled against the same
+// pocket, which is most of what makes roulette a game rather than a coin toss
+// with extra numbers.
+type Chip struct {
+	Bet    string `json:"bet"`
+	Amount int    `json:"amount"`
+	// Won and Back are filled in once the ball has dropped, so the cloth can be
+	// drawn afterwards showing which chips came in.
+	Won  bool `json:"won,omitempty"`
+	Back int  `json:"back,omitempty"`
+}
+
 // Spin is the wheel turning, kept on the world for the same reason a hand is:
 // the money is down and the result is real.
 type Spin struct {
@@ -118,6 +131,9 @@ type Spin struct {
 	Pocket int    `json:"pocket"`
 	Won    bool   `json:"won"`
 	Done   bool   `json:"done"`
+	// Every chip that was on the cloth. A spin from before the table took more
+	// than one bet has none, and reads by Bet and Down as it always did.
+	Chips []Chip `json:"chips,omitempty"`
 }
 
 // SpinReadiness explains why the wheel cannot be played, or returns "".
@@ -134,15 +150,49 @@ func (w *World) SpinReadiness(id, betID string, stake Stake) string {
 	return ""
 }
 
-// PlayWheel puts money on the cloth and turns the wheel. Unlike a hand of
-// cards there is nothing to decide afterwards, so it settles in one go.
-func (w *World) PlayWheel(id, betID string, amount int) error {
-	stake := Stake{ID: "typed", Label: "A spin", Amount: amount}
-	if reason := w.SpinReadiness(id, betID, stake); reason != "" {
+// ChipsReadiness explains why this cloth cannot be spun, or returns "".
+//
+// The house limit is per bet, the way a real table's is: two chips at the limit
+// are two bets and are fine. What is not fine is more on the cloth than the
+// player has, however it is spread about.
+func (w *World) ChipsReadiness(id string, chips []Chip) string {
+	if len(chips) == 0 {
+		return "There is nothing on the cloth"
+	}
+	total := 0
+	for _, c := range chips {
+		if _, ok := RouletteBetByID(c.Bet); !ok {
+			return "That is not a bet this room takes"
+		}
+		if reason := w.TableReadiness(id, Stake{Amount: c.Amount}); reason != "" {
+			return reason
+		}
+		total += c.Amount
+	}
+	if w.Player.Cash < total {
+		return fmt.Sprintf("There is $%d on the cloth and you have $%d", total, w.Player.Cash)
+	}
+	if w.Hand != nil && !w.Hand.Done {
+		return "There is a hand of cards on the table already"
+	}
+	if w.Dice != nil && !w.Dice.Done {
+		return "There is a point on at the dice table"
+	}
+	return ""
+}
+
+// SpinChips puts a whole cloth down and turns the wheel once. Every chip is
+// settled against the same pocket, which is the only honest way to do it: one
+// number comes up and the table pays everybody who had it.
+func (w *World) SpinChips(id string, chips []Chip) error {
+	if reason := w.ChipsReadiness(id, chips); reason != "" {
 		return fmt.Errorf("%s", reason)
 	}
-	bet, _ := RouletteBetByID(betID)
-	if err := w.Pay(stake.Amount); err != nil {
+	total := 0
+	for _, c := range chips {
+		total += c.Amount
+	}
+	if err := w.Pay(total); err != nil {
 		return err
 	}
 	// The player is at this table, so this is the player's stream.
@@ -150,32 +200,60 @@ func (w *World) PlayWheel(id, betID string, amount int) error {
 	if pocket >= Pockets {
 		pocket = Pockets - 1
 	}
-	won := bet.Wins(pocket)
-	w.Spin = &Spin{Place: id, Down: amount, Bet: betID, Pocket: pocket, Won: won, Done: true}
+	returned, won := 0, false
+	settled := make([]Chip, 0, len(chips))
+	for _, c := range chips {
+		bet, _ := RouletteBetByID(c.Bet)
+		if bet.Wins(pocket) {
+			c.Won, c.Back = true, c.Amount*(bet.Pays+1)
+			returned += c.Back
+			won = true
+		}
+		settled = append(settled, c)
+	}
+	// Bet and Down keep reading for one chip, so a save written before the
+	// table took a cloth still describes itself, and so does this one.
+	lead := settled[0].Bet
+	w.Spin = &Spin{Place: id, Down: total, Bet: lead, Pocket: pocket, Won: won, Done: true, Chips: settled}
+	if returned > 0 {
+		w.Earn(returned)
+	}
 
 	place, _ := PlaceByID(id)
 	house := w.faction(w.Properties[id].Owner)
-	returned := 0
-	if won {
-		// The stake comes back with it: a dollar on a number that comes in is
-		// thirty-six dollars, not thirty-five.
-		returned = stake.Amount * (bet.Pays + 1)
-		w.Earn(returned)
-	}
-	net := returned - stake.Amount
+	net := returned - total
 	if house != nil {
 		house.Cash = max(0, house.Cash-net)
 	}
-	w.tableAftermath(place.Name, house, net, stake.Amount)
+	w.tableAftermath(place.Name, house, net, total)
 	dropped := fmt.Sprintf("%s, %s.", NumberWord(pocket), PocketColour(pocket))
-	if won {
+	what := chipWords(settled)
+	if returned > 0 {
 		w.Log("The wheel at "+place.Name, fmt.Sprintf("%s on %s. %s $%d comes back across the cloth.",
-			bet.Label, place.Name, dropped, returned), "business")
+			what, place.Name, dropped, returned), "business")
 	} else {
 		w.Log("The wheel at "+place.Name, fmt.Sprintf("%s on %s. %s The $%d stays where it is.",
-			bet.Label, place.Name, dropped, stake.Amount), "business")
+			what, place.Name, dropped, total), "business")
 	}
 	return nil
+}
+
+// chipWords describes what was on the cloth without listing thirty of them.
+func chipWords(chips []Chip) string {
+	if len(chips) == 1 {
+		bet, _ := RouletteBetByID(chips[0].Bet)
+		return bet.Label
+	}
+	return fmt.Sprintf("%d chips on the cloth", len(chips))
+}
+
+// PlayWheel is one chip on one bet, which is what the table took before it took
+// a cloth. Kept because a single bet is still the commonest thing anybody does.
+func (w *World) PlayWheel(id, betID string, amount int) error {
+	if reason := w.SpinReadiness(id, betID, Stake{Amount: amount}); reason != "" {
+		return fmt.Errorf("%s", reason)
+	}
+	return w.SpinChips(id, []Chip{{Bet: betID, Amount: amount}})
 }
 
 // WheelDescription is the last spin, for the interface to show.
@@ -186,10 +264,21 @@ func (w *World) WheelDescription() map[string]any {
 	place, _ := PlaceByID(w.Spin.Place)
 	bet, _ := RouletteBetByID(w.Spin.Bet)
 	stake := Stake{Amount: w.spinDown()}
+	// The whole cloth, so the table can show which chips came in rather than
+	// describing one of them.
+	chips := []map[string]any{}
+	for _, c := range w.Spin.Chips {
+		on, _ := RouletteBetByID(c.Bet)
+		chips = append(chips, map[string]any{"bet": c.Bet, "label": on.Label, "amount": c.Amount, "won": c.Won, "back": c.Back})
+	}
+	back := 0
+	for _, c := range w.Spin.Chips {
+		back += c.Back
+	}
 	return map[string]any{
 		"spun": true, "place": place.Name, "stake": stake.Amount,
 		"bet": bet.Label, "pocket": w.Spin.Pocket, "colour": PocketColour(w.Spin.Pocket),
-		"won": w.Spin.Won, "pays": bet.Pays,
+		"won": w.Spin.Won, "pays": bet.Pays, "chips": chips, "back": back,
 	}
 }
 
