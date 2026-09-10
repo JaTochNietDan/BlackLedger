@@ -418,3 +418,27 @@ func TestEveryGameGetsAScreenOfItsOwn(t *testing.T) {
 		t.Error("the room's action list offers the verbs of a hand between hiring and restocking")
 	}
 }
+
+// "It seems to swap the results on the rollers at the end which is odd, they
+// just flip around at random mid-end game. For example it shows 7-7- as it
+// progresses then at the very end it flips to bell, lemon, cherry."
+//
+// The case asked "has everything stopped, or is this drum still going?" and
+// showed the result only then, so a drum that had stopped while the others
+// turned fell back to the strip's first symbol and all three jumped when the
+// last one came down. The rule now is the brief's own: the resting state is
+// correct without animation, and the blur is the only thing the animation does.
+func TestADrumIsAlreadyShowingWhereItWillStop(t *testing.T) {
+	tables := source(t, "src/Tables.tsx")
+	if !holds(tables, "drumFaces(strip, line, !!machine.pulled)") {
+		t.Error("the case works out its own faces again instead of asking where the drums land")
+	}
+	if holds(tables, "settled || rolling[i]") {
+		t.Error("a drum's face depends on whether its neighbours have stopped")
+	}
+	// The tray is allowed to wait for the last drum, because what a pull paid
+	// is not a thing to announce while they are still going.
+	if !holds(tables, "const settled = machine.pulled && !rolling.some(Boolean)") {
+		t.Error("the tray no longer waits for the drums")
+	}
+}

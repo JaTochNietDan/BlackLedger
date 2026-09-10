@@ -155,3 +155,24 @@ export function reelWindow(strip: Reel[], landed: string, nudge = 0): string[] {
   for (let i = -1; i <= 1; i++) out.push(stops[(at + i + stops.length * 2) % stops.length]);
   return out;
 }
+
+// What the three drums are showing, which is the same question whether they are
+// turning or standing still.
+//
+// The case used to ask "has everything stopped, or is this drum still going?"
+// and show the result only then. A drum that had stopped while the others were
+// still turning satisfied neither half, so it fell back to the first symbol on
+// the strip — and when the last drum came down all three jumped to the real
+// result at once. From the outside that is a machine changing its mind: "it
+// shows 7-7- as it progresses then at the very end it flips to bell, lemon,
+// cherry."
+//
+// A drum shows where it is going to stop from the moment the handle goes down.
+// The blur is the animation's job and the face underneath is already right, so
+// there is nothing left to snap to.
+export function drumFaces(strip: Reel[], line: string[], pulled: boolean): string[][] {
+  const faceOf = (id?: string) => strip.find(s => s.id === id)?.face ?? '—';
+  return [0, 1, 2].map(i =>
+    pulled ? reelWindow(strip, faceOf(line[i]), i) : reelWindow(strip, faceOf(strip[0]?.id), i),
+  );
+}

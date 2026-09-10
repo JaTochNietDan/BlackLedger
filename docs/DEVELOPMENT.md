@@ -7585,3 +7585,34 @@ photograph of The Monarch — and a story filed about a person beats it.
 
 Disabling the recorded subject fails two guards. Baseline unmoved: deaths
 0/0/52/82/78/0/37, median cash 12585/14129/7418/90/1063/5332/2080.
+
+## The drums changing their minds
+
+"It seems to swap the results on the rollers at the end which is odd, they just
+flip around at random mid-end game. For example it shows 7-7- as it progresses
+then at the very end it flips to bell, lemon, cherry."
+
+A real fault, not an animation quirk. The case chose each drum's faces with
+`settled || rolling[i]` — has everything stopped, or is *this* drum still going?
+A drum that had stopped while the others were still turning is neither, so it
+fell through to the strip's first symbol, and when the last drum came down
+`settled` went true and all three snapped to the real result at once. Three
+sevens turning into a bell, a lemon and a cherry is exactly what that produces.
+
+`drumFaces` in `src/cards.ts` answers it once: a drum shows where it is going to
+stop from the moment the handle goes down. The blur is all the animation does,
+which is the rule this project already had written down — never rely on watching
+motion, make the resting state correct without it. The tray still waits for the
+last drum, because what a pull paid is not a thing to announce while they are
+going.
+
+It is a pure function, so it is tested in node rather than by looking at it, and
+breaking one drum's rule fails that test. A guard in the Go interface suite
+holds the shape: the case asks where the drums land instead of working it out,
+and no drum's face depends on whether its neighbours have stopped.
+
+Still open from that message: actual images on the rollers, which want drawing
+offline the way the exteriors and interiors are.
+
+Baseline unmoved: deaths 0/0/52/82/78/0/37, median cash
+12585/14129/7418/90/1063/5332/2080.

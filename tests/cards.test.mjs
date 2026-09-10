@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {pipOf, isRedSuit, knownCard, clothRows, clothColour, outsideBets, wheelOrder, wheelAngle, ballAngle, clothTable, wheelPaint, reelStops, reelWindow, REEL_WINDOW} from '../.runtime/frontend-test/cards.js';
+import {drumFaces, pipOf, isRedSuit, knownCard, clothRows, clothColour, outsideBets, wheelOrder, wheelAngle, ballAngle, clothTable, wheelPaint, reelStops, reelWindow, REEL_WINDOW} from '../.runtime/frontend-test/cards.js';
 
 test('every suit the core deals has a pip and a colour', () => {
   for (const suit of ['spades', 'hearts', 'diamonds', 'clubs']) {
@@ -164,4 +164,37 @@ test('three drums on the same face need not show the same shoulders', () => {
 
 test('an empty strip still fills the window', () => {
   assert.equal(reelWindow([], 'anything').length, REEL_WINDOW);
+});
+
+test('a drum shows where it is going to stop from the moment the handle goes down', () => {
+  const strip = [
+    {id: 'seven', face: '7', stops: 1, pays: 60},
+    {id: 'bell', face: '🔔', stops: 4, pays: 18},
+    {id: 'lemon', face: '🍋', stops: 7, pays: 0},
+    {id: 'cherry', face: '🍒', stops: 8, pays: 4},
+  ];
+  // The three the core landed on, which is deliberately not the strip's first
+  // face: that is what the case used to fall back to.
+  const line = ['bell', 'lemon', 'cherry'];
+  const rolled = drumFaces(strip, line, true);
+  assert.deepEqual(
+    rolled.map(w => w[1]),
+    ['🔔', '🍋', '🍒'],
+    'the payline does not show what the core landed on',
+  );
+  // Every drum reads the same whether its neighbours have stopped or not: the
+  // case used to fall back to the first symbol on the strip for a drum that had
+  // stopped while the others turned, and then all three jumped to the result
+  // when the last one came down.
+  for (let i = 0; i < 3; i++) {
+    assert.deepEqual(rolled[i], drumFaces(strip, line, true)[i], 'a drum changed its mind');
+  }
+  // And before the handle goes down it is the strip's own first face, not a
+  // result nobody has pulled for.
+  const idle = drumFaces(strip, line, false);
+  assert.deepEqual(
+    idle.map(w => w[1]),
+    ['7', '7', '7'],
+    'a machine nobody has pulled is not sitting on its own first face',
+  );
 });

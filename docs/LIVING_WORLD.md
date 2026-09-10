@@ -225,6 +225,19 @@ Let's verify, can you be attacked while traversing the map? Can your car affect 
 
 When playing the slot machine we should show actual images for the stuff on the rollers. Also it seems to swap the results on the rollers at the end which is odd, they just flip around at random mid-end game. For example it shows 7-7- as it progresses then at the very end it flips to "bell", "lemon", "cherry". Sort that out.
 
+— half built: the flipping is fixed, and it was a real fault rather than an
+  animation quirk. The case asked "has everything stopped, or is this drum still
+  going?" and showed the result only then — so a drum that had stopped while the
+  others were still turning satisfied neither half and fell back to the first
+  symbol on the strip, and when the last drum came down all three jumped to the
+  real result at once. Every drum shows where it is going to stop from the
+  moment the handle goes down; the blur is all the animation does, which is the
+  rule this project already had written down about never relying on watching
+  motion. The tray still waits for the last drum, because what a pull paid is
+  not a thing to announce while they are going. Actual images on the rollers are
+  still open — they want drawing offline, the way the exteriors and interiors
+  are.
+
 ---
 
 Playing the game in the back room at the Green Baize is weird. It should again be a separate scene that takes up the screen when you're playing it and you have to leave it rather than right now it just lives in a small box above the action bar. That's silly stuff. We need to stop doing that in future and always dedicate these games to their own screen.

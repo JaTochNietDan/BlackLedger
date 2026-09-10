@@ -13,6 +13,7 @@ import {
   wheelOrder,
   wheelPaint,
   reelWindow,
+  drumFaces,
 } from './cards';
 
 // The tables, drawn as tables. Blackjack was two numbers in a sentence and
@@ -560,18 +561,16 @@ export function Machine({
   // Which of the house's machines you are standing at. A nickel machine and a
   // dollar machine are two different machines against the same wall.
   const strip = machine.strip || [];
-  const faceOf = (id?: string) => strip.find(s => s.id === id)?.face ?? '—';
   const line = machine.line ?? [];
-  const settled = machine.pulled && !rolling.some(Boolean);
 
   // What is on the drums. Three faces a drum, the middle one on the payline,
   // taken from the core's own strip so the case cannot show a symbol the odds
-  // do not have.
-  const windows = [0, 1, 2].map(i =>
-    settled || rolling[i]
-      ? reelWindow(strip, faceOf(line[i]), i)
-      : reelWindow(strip, faceOf(strip[0]?.id), i),
-  );
+  // do not have — and showing where each drum is going to stop from the moment
+  // the handle goes down, so nothing changes when it gets there.
+  const windows = drumFaces(strip, line, !!machine.pulled);
+  // The tray and the line under it wait for the last drum, because what a pull
+  // paid is not a thing to announce while the drums are still going.
+  const settled = machine.pulled && !rolling.some(Boolean);
 
   return (
     <div className="felt machine-felt">
