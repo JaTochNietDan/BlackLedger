@@ -1352,15 +1352,31 @@ func (w *World) Actions(id string) []Action {
 			}
 			add("repair", "Repair the property", 60, 50, need(w.Properties[id].Condition >= 100, "Already in good condition"), "Restore 40 condition.")
 		} else {
-			label := "Establish protection"
+			// "Is buying a business called 'establish protection'? That's not
+			// super clear what that means." It is not, and it was not: this is
+			// buying the premises outright — the keys, the staff, the wage bill
+			// and everything the place earns. The old label described a
+			// protection racket, which is a different thing the game also has.
+			label := "Buy " + l.Name
 			if id == "casino" {
-				label = "Reopen the casino"
+				label = "Buy and reopen " + l.Name
 			}
 			cost := AcquisitionCost(w, id)
 			if strings.HasPrefix(w.Properties[id].Owner, "former:") {
-				label = "Buy out the former organization"
+				label = "Buy " + l.Name + " out of the former organization"
 			}
-			add("acquire", label, 60, cost, w.AcquireReadiness(id), fmt.Sprintf("Earn up to $%d/hour. Income accrues automatically; rivals may take notice.", w.Properties[id].Income))
+			taking := "The premises become yours."
+			if trade, running := TradeOf(id); running {
+				taking = fmt.Sprintf("The premises become yours: %d positions to keep filled at $%d a day each, %s to buy in, and repairs when it needs them.",
+					trade.Hands, trade.Wage, trade.Supplies)
+			}
+			// The price is printed from Cost by the panel. Putting it in the
+			// description too gave every address that is not for sale a line
+			// reading "$0 for the freehold", which is a figure that says
+			// nothing while looking like one — the same fault the guard for it
+			// was written to catch.
+			add("acquire", label, 60, cost, w.AcquireReadiness(id),
+				fmt.Sprintf("%s It earns up to $%d an hour while it is working, and every rival in the city can see who holds it now.", taking, w.Properties[id].Income))
 		}
 	}
 	for i := range w.Factions {
@@ -1510,10 +1526,19 @@ func (w *World) Actions(id string) []Action {
 			collecting = fmt.Sprintf("%s walks to %s — %d minutes — and is not here while they are doing it. Two hours of doors: $%d. Requires 30 loyalty.",
 				n.Name, roundPlace.Name, TravelMinutes(n.Location, round), CollectionPay)
 		}
+		// "Why does it seem like you can send Leo Carver on collections in
+		// practically every single building's action menu?" Because it was
+		// offered in every one: an order to your own man is work that belongs
+		// to you and not to whatever counter you are standing at, and the
+		// mechanism for saying so already existed. Neither of these puts you
+		// anywhere, so both follow you and the interface files them under the
+		// person rather than under the premises.
 		add("delegate", "Send "+hand+" on collections", 15, 0, reason, collecting)
 		about(p.Crew[0].ID)
+		anywhere()
 		add("crew_bonus", "Pay "+hand+" a bonus", 15, 40, need(p.Crew[0].Loyalty >= 100, "Loyalty is already at its maximum"), "Restore up to 25 loyalty. Below 30 they refuse collections; at 50 they can help protect businesses when available.")
 		about(p.Crew[0].ID)
+		anywhere()
 	}
 	if offer, ok := w.AvailableCommission(id); ok {
 		add("commission", "Hear what "+offer.GiverName+" wants", 30, 0, w.CommissionReadiness(id),

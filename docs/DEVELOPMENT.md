@@ -5703,3 +5703,47 @@ The first four are unchanged.
 
 Evidence: `core/cooling_test.go`, two breaks verified, plus the simulation
 figures above.
+
+## Work that says what it is, and sits where it belongs
+
+Four complaints from the inbox, none of them about what an action does and all
+of them about how it is labelled or where it is filed.
+
+**"Is buying a business called 'establish protection'?"** It was, and it should
+not have been: this is buying the premises outright, and the game has a
+protection racket elsewhere that the label described instead. It reads "Buy The
+Green Baize" now, and the description says what you are taking on — two
+positions to keep filled at five dollars a day each, cloth and chalk and drink
+to buy in, repairs when it needs them — rather than only what it earns.
+
+That change failed six existing tests, correctly. I had put the price into the
+description, and every address that is not for sale carries a cost of zero, so
+the city filled up with "$0 for the freehold". The panel prints the price from
+`Cost` already. This is the fault shape the docs list under "a figure that says
+nothing while looking like one", and the guard written for it caught mine.
+
+**"Why does it seem like you can send Leo Carver on collections in practically
+every single building's action menu?"** Because it was offered in every one. An
+order to your own man is work that belongs to you rather than to whatever
+counter you happen to be at, and `Action.Anywhere` has existed for exactly this
+since the placement audit. Sending him on collections and paying him a bonus
+both follow the player now, and the interface files them under the person.
+
+**"I don't think moving against a business yourself should require respect."**
+It does not any more. Nothing about a reputation stops a man walking into a
+warehouse with a crowbar, and what decides whether he gets out again is his
+crew, their loyalty and the family's strength — all asked already. A name is for
+other people doing things on your account, so the requirement moved to
+`SendAgainstReadiness`, which is the version where you are asking one of your
+own to go in without you.
+
+**"When inside a building you can't see who the family that owns it is."** The
+street panel says it and the room did not, so stepping inside lost the fact that
+decides how everything else in there should be read. The room names itself and
+its holder at the top, with its condition and how it is trading.
+
+Balance unchanged across all five strategies. Three breaks verified, one per
+core rule; the wording is checked by asserting the label and what the
+description has to mention.
+
+Evidence: `core/placement_test.go`, and the six guards that caught the zero.

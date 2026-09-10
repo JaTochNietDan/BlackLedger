@@ -1141,3 +1141,10 @@ body{height:100%;overflow:hidden;margin:0;background:var(--bg);color:var(--ink);
 .action-commit{margin-top:9px;width:100%;background:#26332b;border:1px solid #6d7554;color:var(--ink);font:12px system-ui;padding:8px 10px;border-radius:2px;text-align:center}
 .action-commit:disabled{opacity:.55;color:var(--muted)}
 .actions.compact .sum-action{min-height:0}
+
+/* Whose room this is, said once at the top of it. */
+.room-holder{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;padding:7px 11px;margin-bottom:8px;background:#16211fcc;border-left:2px solid var(--line)}
+.room-holder.yours{border-left-color:var(--gold)}
+.room-holder b{font:15px var(--serif);font-weight:400}
+.room-holder span{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+.room-holder small{font-size:11px;color:var(--muted)}

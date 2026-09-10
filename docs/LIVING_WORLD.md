@@ -138,6 +138,16 @@ in this city
   butcher, two garages, a scrapyard, a forecourt and two filling stations exist
   because of this line, and it is still not finished.
 
+---
+
+Ensure efficiency of development loops by increasing efficiency of your workflow in any way that you can accomplish.
+
+— Standing: how the work is done, so it never finishes. What it has changed so
+  far: the ~140s core suite and the ~4m simulation run in the background while
+  the next piece of work goes on, rather than the tick sitting and watching
+  them; the simulation is parsed rather than grepped; and a slice is measured by
+  breaking it once rather than by running the whole gate twice.
+
 ## Inbox — open
 
 Now when gambling for some reason you changed it back to "play the nickle machine" which doesn't even show our slots page it just seems to run some background simulation and it doesn't allow you to set your own bet as we fleshed out prior.
@@ -206,11 +216,6 @@ family to keep them more protected from attacks.
 
 ---
 
-Why does it seem like you can send Leo Carver on collections in practically every single building's
-action menu?
-
----
-
 The roulette graphics look better but I think that the betting table part should be to the right of the wheel, not below it, like on a real table. You should be able to pick your specific bet amount, up to the maximum (as we talked about in another inbox item, maximum can be set by the casino owner). You can also place multiple bets in roulette, on different numbers, combinations etc, like the real game by putting down chips on each one you want to bet on.
 
 ---
@@ -220,11 +225,6 @@ We should try to improve the images being displayed on the newspaper. Having a p
 --- 
 
 The walking between buildings simulation is not that great right now because we don't have the map working properly and the little bar that explains that you're traveling between buildings is at the bottom of the page often below the fold.
-
----
-
-Is buying a business called "establish protection"? That's not super clear what that means, we should fix
-the wording on that to explain what that actually entails.
 
 ---
 
@@ -242,21 +242,43 @@ I go to The Monarch and request a sit down with the controlling family and it si
 
 ---
 
-When inside a building you can't see who the family that owns it (if any) is anymore.
+When inside a building you own the top buttons should probably be for owner management and under a separate subtitle for management actions.
+
+## Inbox — answered
+
+Why does it seem like you can send Leo Carver on collections in practically every single building's
+action menu?
+
+— built: because it was offered in every one. An order to your own man is work
+  that belongs to you rather than to whatever counter you are standing at, and
+  the mechanism for saying so already existed. Sending him on collections and
+  paying him a bonus both follow you now, filed under the person.
 
 ---
 
-When inside a building you own the top buttons should probably be for owner management and under a separate subtitle for management actions.
+Is buying a business called "establish protection"? That's not super clear what that means, we should fix
+the wording on that to explain what that actually entails.
+
+— built: it reads "Buy The Green Baize" now, and the description says what you
+  are taking on — the positions to keep filled, the wage, the supplies and the
+  repairs — rather than only what it earns.
+
+---
+
+When inside a building you can't see who the family that owns it (if any) is anymore.
+
+— built: the room says whose it is at the top, with its condition and how it is
+  trading.
 
 ---
 
 I don't think "moving against X business yourself" should required respect, that doesn't make sense.
 
+— built: going in yourself asks about your crew, their loyalty and whether they
+  are already out, and nothing about your name. Sending them in on your account
+  still asks, because that is what a name is for.
+
 ---
-
-Ensure efficiency of development loops by increasing efficiency of your workflow in any way that you can accomplish.
-
-## Inbox — answered
 
 It seems like you can rob places or take from people's cars multiple times in a row, that should
 probably be tracked and time limited etc. Or in the case of the car - until that person repairs

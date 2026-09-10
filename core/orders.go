@@ -32,7 +32,7 @@ func (w *World) ordersAbout(l Place) []Action {
 		})
 	}
 	if hand, ok := w.CrewHands(); ok {
-		reason := w.SabotageReadiness(l.ID)
+		reason := w.SendAgainstReadiness(l.ID)
 		if reason == "" {
 			reason = w.DelegateReadiness()
 		}

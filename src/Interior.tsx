@@ -111,7 +111,23 @@ export function Interior({place, people, actions, render, onLeave, onTables, fel
   // agree, and they only do that if they come off the same number.
   const light = roomLight(minute);
 
+  // Whose room you are standing in. The street panel says this and the room did
+  // not, so stepping inside lost the one fact that decides how everything in
+  // here should be read: "when inside a building you can't see who the family
+  // that owns it (if any) is anymore."
+  const held = place.owned ? 'Yours' : place.holder || 'Independent';
+  const state = [
+    place.condition < 100 ? `${place.condition}% condition` : '',
+    place.owned && typeof place.trading === 'number' ? `working at ${Math.round(place.trading * 100)}%` : '',
+    place.note || '',
+  ].filter(Boolean).join(' · ');
+
   return <div className="interior-stage">
+    <div className={'room-holder' + (place.owned ? ' yours' : '')}>
+      <b>{place.name}</b>
+      <span>{held}</span>
+      {state && <small className={place.note_warn ? 'warning' : ''}>{state}</small>}
+    </div>
     {!!traffic.length && <div className="room-traffic" role="status">
       {traffic.map(c => <p key={c.id + String(c.leaving)} className={c.leaving ? 'left' : 'came'}>
         <i aria-hidden="true">{c.leaving ? '←' : '→'}</i>{c.note}

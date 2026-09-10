@@ -154,9 +154,6 @@ func (w *World) SabotageReadiness(id string) string {
 	if _, ok := w.SabotageTarget(id); !ok {
 		return "No rival organization holds this property"
 	}
-	if w.Player.Respect < 12 {
-		return "Earn 12 respect first"
-	}
 	if len(w.Player.Crew) == 0 {
 		return "Recruit crew before moving against a family"
 	}
@@ -168,6 +165,30 @@ func (w *World) SabotageReadiness(id string) string {
 	}
 	return ""
 }
+
+// SendAgainstReadiness is the same question asked of somebody carrying it out
+// on your account rather than beside you.
+//
+// The respect requirement used to sit on both. "I don't think moving against a
+// business yourself should require respect, that doesn't make sense" — and it
+// does not: nothing about a reputation stops a man walking into a warehouse
+// with a crowbar, and what decides whether he gets out again is his crew, his
+// health and the family's strength, all of which are asked already. What a name
+// is actually for is other people doing things on your account, so it stayed
+// where that is what is happening.
+func (w *World) SendAgainstReadiness(id string) string {
+	if reason := w.SabotageReadiness(id); reason != "" {
+		return reason
+	}
+	if w.Player.Respect < SendAgainstRespect {
+		return fmt.Sprintf("Nobody goes in on your name at %d respect. Earn %d first", w.Player.Respect, SendAgainstRespect)
+	}
+	return ""
+}
+
+// SendAgainstRespect is the name it takes before one of your own will walk into
+// somebody else's premises because you said so.
+const SendAgainstRespect = 12
 
 // sabotageChance is the probability the attack lands. A stronger family is
 // harder to reach; a loyal crew and a known name help.
@@ -195,6 +216,9 @@ func (w *World) SabotageBy(id string, hand Hand) error {
 		return fmt.Errorf("%s", reason)
 	}
 	if hand.Crew {
+		if reason := w.SendAgainstReadiness(id); reason != "" {
+			return fmt.Errorf("%s", reason)
+		}
 		if reason := w.DelegateReadiness(); reason != "" {
 			return fmt.Errorf("%s", reason)
 		}
