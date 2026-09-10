@@ -176,3 +176,86 @@ func TestPassingThroughReachesTheRecordAndCanHurt(t *testing.T) {
 		t.Fatal("nobody in 400 journeys past a war was ever hurt by it")
 	}
 }
+
+// holdOnly puts every premises a faction has into the named places and takes
+// away the rest, so a test can say where a family actually is.
+func holdOnly(w *World, faction string, places ...string) {
+	for _, l := range Locations {
+		if p := w.Properties[l.ID]; p != nil && p.Owner == faction {
+			p.Owner = "independent"
+		}
+	}
+	for _, id := range places {
+		if p := w.Properties[id]; p != nil {
+			p.Owner = faction
+		}
+	}
+}
+
+// A war is fought somewhere. Two families shooting at each other across the
+// water is not a reason for a body in the road outside the bar you are walking
+// to — that was the shape of the rule written when the city had one conflict
+// and everywhere was the same everywhere.
+func TestAWarAcrossTownStaysAcrossTown(t *testing.T) {
+	for seed := uint32(1); seed <= 400; seed++ {
+		w := walker(t)
+		w.WorldRNG = seed * 2654435761
+		c := &w.Conflicts[0]
+		c.State, c.Hostility = "war", 80
+		holdOnly(w, c.A, "archway")
+		holdOnly(w, c.B, "scrapyard")
+		s, ok := w.OnTheWay("bar", "docks")
+		if ok && strings.Contains(s.Title, "Shooting") {
+			t.Fatalf("a war fought at the archway put a body in the road on the way to the docks: %q", s.Body)
+		}
+	}
+}
+
+// And a war fought where you are walking still reaches you.
+func TestAWarWhereYouAreWalkingStillReachesYou(t *testing.T) {
+	seen := 0
+	for seed := uint32(1); seed <= 400; seed++ {
+		w := walker(t)
+		w.WorldRNG = seed * 2654435761
+		c := &w.Conflicts[0]
+		c.State, c.Hostility = "war", 80
+		holdOnly(w, c.A, "laundry")
+		holdOnly(w, c.B, "poolhall")
+		if s, ok := w.OnTheWay("bar", "docks"); ok && strings.Contains(s.Title, "Shooting") {
+			seen++
+		}
+	}
+	if seen == 0 {
+		t.Fatal("a war fought either side of the road never reached the road in 400 journeys")
+	}
+}
+
+// Passing a war is not one danger. Being at the door when the cars pull up is
+// worse than seeing it from the end of the street, and the difference has to be
+// big enough for a player to learn where not to walk.
+func TestTheFightingAtYourDoorIsWorseThanTheFightingDownTheRoad(t *testing.T) {
+	hit := func(a, b string) int {
+		caught := 0
+		for seed := uint32(1); seed <= 600; seed++ {
+			w := walker(t)
+			w.WorldRNG = seed * 2654435761
+			c := &w.Conflicts[0]
+			c.State, c.Hostility = "war", 80
+			holdOnly(w, c.A, a)
+			holdOnly(w, c.B, b)
+			if s, ok := w.OnTheWay("bar", "docks"); ok && s.Stray > 0 {
+				caught++
+			}
+		}
+		return caught
+	}
+	door := hit("laundry", "poolhall") // either side of the road you took
+	road := hit("club", "market")      // in reach, but not where you are
+	t.Logf("caught by the fighting: %d of 600 at the door, %d of 600 down the road", door, road)
+	if door <= road {
+		t.Fatalf("standing in it was no worse than watching it: %d against %d", door, road)
+	}
+	if road == 0 {
+		t.Fatal("a war two streets away never touched anybody, so distance is a wall rather than a gradient")
+	}
+}

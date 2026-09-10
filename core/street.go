@@ -19,6 +19,20 @@ const (
 	// StrayInjury is what being too close to a war costs somebody who was only
 	// passing.
 	StrayInjury = 18
+	// WarReach is how far from a fighting family's own premises the fighting
+	// spills. A war is fought over somewhere: two families shooting at each
+	// other across the water is not a reason for a body in the road outside the
+	// bar you are walking to. The old rule asked only whether the city had a
+	// war anywhere in it, which was written when the city had one conflict and
+	// everywhere was the same everywhere.
+	WarReach = 300
+	// CloseReach is how near the fighting has to be before passing it is
+	// genuinely dangerous rather than something you watched. Inside it, the
+	// cars pulled up at the door you were walking to.
+	CloseReach = 150
+	// StrayNear and StrayFar are how often somebody passing is caught by it.
+	StrayNear = .45
+	StrayFar  = .18
 )
 
 // Sighting is something the player passed, and whether they understood it.
@@ -42,18 +56,20 @@ func (w *World) OnTheWay(from, to string) (Sighting, bool) {
 	explained := w.Reach() >= 2
 
 	// A war in progress is the loudest thing on any street in this city, and
-	// the one thing that can reach somebody who was only passing.
-	for _, c := range w.Conflicts {
-		if c.State != "war" {
-			continue
-		}
+	// the one thing that can reach somebody who was only passing — if it is
+	// being fought anywhere near the road you took.
+	if c, near := w.warAlong(from, to); c != nil {
 		a, b := w.factionName(c.A), w.factionName(c.B)
 		body := fmt.Sprintf("Two cars and a lot of shouting outside %s, and then everybody was somewhere else. Somebody was face down in the road when the street filled in again.", where.Name)
 		if explained {
 			body = fmt.Sprintf("Two cars outside %s and people out of both of them. %s and %s, and no doubt about which was which. Somebody was face down in the road when it was over.", where.Name, a, b)
 		}
+		odds := StrayFar
+		if near {
+			odds = StrayNear
+		}
 		stray := 0
-		if w.WorldRandom() < .3 {
+		if w.WorldRandom() < odds {
 			stray = StrayInjury
 		}
 		return Sighting{Title: "Shooting on the way to " + where.Name, Body: body, Explained: explained, Stray: stray}, true
@@ -86,6 +102,48 @@ func (w *World) OnTheWay(from, to string) (Sighting, bool) {
 
 	// And in a quiet city, the city being quiet.
 	return Sighting{}, false
+}
+
+// warAlong reports the war being fought near the road between two places, if
+// there is one. Near means either side holds premises within WarReach of an end
+// of the journey: families fight over what they hold and next to what they
+// hold, so their own doors are where the cars pull up.
+// The second return says the fighting was at the door rather than in reach.
+func (w *World) warAlong(from, to string) (*Conflict, bool) {
+	ends := make([][2]int, 0, 2)
+	for _, id := range []string{from, to} {
+		if l, ok := PlaceByID(id); ok {
+			ends = append(ends, [2]int{l.X, l.Y})
+		}
+	}
+	for i := range w.Conflicts {
+		c := &w.Conflicts[i]
+		if c.State != "war" {
+			continue
+		}
+		// The nearest of their doors, not the first one the list happens to
+		// hold: a family with premises at both ends of the city was reported at
+		// whichever the file listed first, which made every war a far one.
+		nearest := -1
+		for _, side := range []string{c.A, c.B} {
+			for _, held := range w.FamilyHoldings(side) {
+				l, ok := PlaceByID(held)
+				if !ok {
+					continue
+				}
+				for _, e := range ends {
+					dx, dy := l.X-e[0], l.Y-e[1]
+					if d := dx*dx + dy*dy; nearest < 0 || d < nearest {
+						nearest = d
+					}
+				}
+			}
+		}
+		if nearest >= 0 && nearest <= WarReach*WarReach {
+			return c, nearest <= CloseReach*CloseReach
+		}
+	}
+	return nil, false
 }
 
 // PassThrough shows the player what they went past, and charges them for it if

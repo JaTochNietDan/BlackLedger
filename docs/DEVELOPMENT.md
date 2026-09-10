@@ -6930,3 +6930,42 @@ is the first time another family's fight has cost that player anything.
 Still open: `hurt_during_others_war` remains 0 for the investor. The curfew
 costs money, not blood. Somebody standing near a war should occasionally catch
 something meant for someone else.
+
+## A war is fought somewhere
+
+`OnTheWay` asked one question about war: does this city have one. If it did,
+every journey that rolled a scene put two cars and a body in the road outside
+wherever the player happened to be arriving, whether the fighting families held
+anything within a mile of it or not. That is the fault shape the loop brief
+lists first — a rule written when the city had one conflict and everywhere was
+the same everywhere.
+
+`warAlong(from, to)` now asks where. A war reaches a journey when either side
+holds premises within `WarReach` of an end of it, and it is at the door within
+`CloseReach`. Families fight over what they hold and next to what they hold, so
+their own doors are where the cars pull up. Being at the door is worse than
+watching from the end of the street: `StrayNear` .45 against `StrayFar` .18.
+
+A bug found by the measurement rather than by reading: the first version
+returned on the first holding it found in reach, so a family with premises at
+both ends of the city was reported at whichever `locations.json` listed first.
+Every war came out a far one — 19 of 600 either way. Taking the nearest door
+instead: 48 of 600 at the door, 19 down the road.
+
+Broken to check:
+
+- the locality test, with the old any-war-anywhere rule restored: a war fought
+  at the archway put a body in the road on the way to the docks.
+- the gradient test, with `StrayNear` set to `StrayFar`: 19 against 19.
+
+Baseline: deaths 0/0/52/82/78/0/38, median cash
+12405/14209/7544/90/1444/5505/1936. The thief moved 77 → 78 deaths and 1403 →
+1444, and nothing else moved. That is the expected shape — the thief is the
+policy that walks through contested ground.
+
+The investor's `hurt_during_others_war` is still 0 across a hundred campaigns.
+It is not a missing rule any more; it is arithmetic. Seven runs in a hundred see
+a war elsewhere at all, a war lasts a day or two, a journey rolls a scene 16% of
+the time, and a distant one catches you 18% of that. Making a bystander bleed
+needs a war that lasts, or a reason for the player to be near it, not a bigger
+number here.
