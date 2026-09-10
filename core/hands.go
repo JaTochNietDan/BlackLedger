@@ -476,6 +476,11 @@ const (
 	// off it. Two days: long enough that losing a pair of hands is felt, short
 	// enough that a business is not permanently crippled by one bad week.
 	FindingSomebody = 2 * 1440
+	// TemptedAway is the day's chance that somebody paid the least anybody
+	// stands there for listens to a rival who is hiring. Low, because it is a
+	// day: over two months it is most of a counter, which is what a business
+	// run on the floor wage should lose.
+	TemptedAway = .035
 )
 
 // Notice is the day's chance that anybody behind your counters has had enough
@@ -487,16 +492,25 @@ func (w *World) Notice() {
 		if prop == nil || len(prop.Hands) == 0 || !w.Own(l.ID) {
 			continue
 		}
+		to := w.hiringElsewhere(l.ID)
 		for _, who := range append([]string{}, prop.Hands...) {
 			n := w.NPC(who)
-			if n == nil || n.Dead || !w.hadEnough(n) {
+			if n == nil || n.Dead {
 				continue
 			}
-			if w.WorldRandom() >= WalksOut {
+			odds := 0.
+			if w.hadEnough(n) {
+				odds = WalksOut
+			}
+			// And what the player pays against what the work is worth in this
+			// city. Somebody paid over the rate is not listening to anybody;
+			// somebody paid the floor is, whatever they think of you. The city
+			// is bigger than any one family, so this does not wait for a
+			// particular rival to be hiring — where they land does.
+			odds = max64(odds, w.tempted(l.ID))
+			if odds <= 0 || w.WorldRandom() >= odds {
 				continue
 			}
-			// Somewhere else, if anybody is hiring; otherwise simply out.
-			to := w.hiringElsewhere(l.ID)
 			w.walkOut(who, l.ID, to)
 			break // one a day at each address, or a bad week empties the place
 		}
@@ -515,6 +529,30 @@ func (w *World) Notice() {
 // names something the player did.
 func (w *World) hadEnough(n *NPC) bool {
 	return n.Sore >= TakesItPersonally
+}
+
+// tempted is the day's chance that somebody standing behind this counter
+// listens to somebody else who is hiring. It is about paying under the rate and
+// nothing else: at the rate, which is what the work is worth in this city, they
+// have no reason to move, and the whole of TemptedAway is what somebody paid
+// the floor is worth to a rival.
+//
+// The first version made the rate itself worth half of it, and a business
+// paying exactly what the work is worth bled people for no reason anybody could
+// name — which is the same mistake as the first version of hadEnough, made
+// again a hundred lines further down.
+func (w *World) tempted(id string) float64 {
+	trade, ok := TradeOf(id)
+	if !ok {
+		return 0
+	}
+	paid := w.WageAt(id)
+	least, _ := WageBounds(trade.Wage)
+	if paid >= trade.Wage || least >= trade.Wage {
+		return 0
+	}
+	short := float64(trade.Wage-paid) / float64(trade.Wage-least)
+	return TemptedAway * short
 }
 
 // hiringElsewhere is a rival's address with a position going and the money to

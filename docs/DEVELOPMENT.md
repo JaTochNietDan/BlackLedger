@@ -8040,3 +8040,32 @@ must still be there.
 The room also says what a business pays, beside what it earns, because that is
 the comparison an owner is making and the wage stopped being a rate this
 morning.
+
+## Paying under the rate
+
+The wage was a lever with nothing pulling against it: people left over a grudge
+and nothing else, so a business that never wronged anybody was safe from the
+city entirely and paying the floor cost nothing.
+
+`tempted` is the day's chance somebody behind a counter listens to somebody else
+who is hiring, and it is about paying under the rate and nothing else. At the
+rate — what the work is worth in this city — nobody has a reason to move. At the
+floor it is the whole of `TemptedAway`, which over two months is most of a
+counter. In between it is a straight line.
+
+**The same mistake, made twice, a hundred lines apart.** The first version made
+the rate itself worth half the floor's temptation, so a business paying exactly
+what the work is worth bled people for no reason anybody could name — which is
+precisely how the first version of `hadEnough` failed two ticks ago, when "below
+twenty trust" turned out to be every employee in the game. Both times the fix
+was the same: the ordinary case has to be the safe one, and only something the
+player chose should cost them.
+
+Where somebody lands is a separate question from whether they go. A family that
+can pay a week's wages takes them; a city where nobody can simply loses them,
+because being underpaid is a reason to stop turning up whether or not anybody is
+hiring. Measured: of the people who left a counter paying the floor, the ones
+who left went straight onto somebody else's books.
+
+Baseline unmoved: no campaign policy sets a wage, so every business in a
+simulated run pays the rate and keeps its people.
