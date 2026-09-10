@@ -47,6 +47,7 @@ export interface Presence {
   doing?: string;
   where?: string;
   where_id?: string;
+  lost?: string;
   because?: string;
   trust?: number;
   sore?: number;

@@ -508,6 +508,10 @@ type World struct {
 	// How many hands the city has played in the back room without the player.
 	// Absent in saves written before the city played its own games.
 	BackRoomHands int `json:"back_room_hands,omitempty"`
+	// Where the player has seen people, and when. The city knows where
+	// everybody is; the player knows where they last saw them. Absent in saves
+	// written before anybody had to find anybody.
+	Sightings map[string]Seen `json:"sightings,omitempty"`
 	// What the table has taken for the seat, all told. Kept apart from the
 	// room's ordinary income because a poolhall earns either way and the
 	// question worth asking is what the table itself is worth.
@@ -1884,6 +1888,10 @@ func (w *World) Attack(plot Plot) {
 	w.survived()
 }
 func (w *World) Advance(minutes int) {
+	// Standing in a room is seeing who is in it. Written down as the clock
+	// moves rather than as the world is read: reading must not change anything,
+	// which is a rule this project holds and a guard that caught me breaking it.
+	w.SeeTheRoom()
 	p := &w.Player
 	// A seat is taken in one room. Whatever moved the player out of it — a
 	// journey, a scene, an errand somebody else ran for them — they are not at

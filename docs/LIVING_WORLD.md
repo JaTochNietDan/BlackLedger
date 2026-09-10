@@ -315,6 +315,24 @@ We don't want it to be a situation where we can just talk to one singular charac
 
 I want you to think through this and consider what makes the most sense.
 
+— thought through, and the foundation is built. What was actually easy was not
+  the killing: going after somebody, or sending one of your own, already needs
+  them standing in front of you. What was easy was *finding* them — the People
+  screen listed every living soul with their current address and a button that
+  walked you to it, so a name off a list was an address.
+— so the player's knowledge is now a thing of its own. You know where somebody
+  is because you saw them there, sightings are written down as the clock moves
+  through a room you are standing in, and they go stale after a day. The list
+  says "Last seen at The Monarch, three hours ago" or "Nobody has told you where
+  to find them", and there is no button to walk to. Your own family and the
+  people you employ are always findable, because they work for you.
+— what comes next, in order: asking somebody who might know, which is where the
+  bargaining lives — their trust, their loyalty to the target, and a cost to
+  their opinion of you for asking about their own; then the same limitation on
+  the city's own killers, who should know where you live and not where you are,
+  and lose even that when you move house. Deliberately not built as one broker
+  with a fee, which is the thing this message rules out.
+
 ---
 
 Taking over businesses should be a lot more expensive and high level stuff that you build up to over time.

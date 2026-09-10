@@ -7767,3 +7767,45 @@ and says so when plate is weighing the figure down. What is left of that queue
 item is pictures.
 
 No balance run: nothing here can move it.
+
+## Knowing where somebody is
+
+"It probably would make sense that we don't always know everyone's location and
+that's a service that we have to pay for to gain that information from... This
+would also act as a way of making it harder to make attempts on people's lives
+in the game as it would be a drawn out task more than anything."
+
+Thinking it through first changed what the tick built. What was easy was not the
+killing: going after somebody, and sending one of your own, both already require
+them standing in front of you. What was easy was *finding* them. The People
+screen listed every living soul in the city with their current address and a
+button that walked you there, so a name off a list was an address.
+
+So the player's knowledge is a thing of its own now. `Seen` is somebody laid
+eyes on somewhere and when; sightings are written down as the clock moves
+through the room the player is standing in; `KnowsWhere` is true while the
+sighting is under a day old and they have not moved since. Your own family and
+the people you employ are always findable, because they work for you and you can
+send for them. Everyone else, the list says "Last seen at The Monarch, three
+hours ago" or "Nobody has told you where to find them", and offers nothing to
+walk to.
+
+**Two guards caught me.** First I gated going after somebody on knowing where
+they are, which is redundant — they have to be in the room — and the test I
+wrote for it reported the existing refusal instead, which is how I found out.
+Then I wrote the sighting down inside `Public()`, and `TestReadingDoesNotAdvance`
+said "reading mutated world". Reading must not change anything. It is written as
+the clock moves instead, which is also the truer statement: standing in a room
+for a while is seeing who is in it.
+
+Two comings tests changed with the reason stated: they asked what the city list
+says about somebody walking and somebody arriving, and that list is the player's
+knowledge now rather than the city's own books, so they see her first.
+
+Baseline unmoved: deaths 0/0/52/82/78/0/37, median cash
+12585/14129/7418/90/1063/5332/2080.
+
+Next, in order: asking somebody who might know, which is where the bargaining
+lives — their trust, their loyalty to the target, and a cost to their opinion of
+you for asking about their own. Then the same limitation on the city's own
+killers, who should know where you live and not where you are.

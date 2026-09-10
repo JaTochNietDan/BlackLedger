@@ -52,6 +52,10 @@ type Presence struct {
 	// Where they are, for anything looking at the city rather than at one room.
 	Where   string `json:"where,omitempty"`
 	WhereID string `json:"where_id,omitempty"`
+	// Lost is what the player knows instead of an address, when they do not
+	// know where somebody is: where they last saw them and how long ago, or
+	// that nobody has told them.
+	Lost string `json:"lost,omitempty"`
 	// Face is one-based into the cast sheet, so nothing at all means the core
 	// did not say and the interface should fall back to its own reading.
 	Face int `json:"face,omitempty"`
@@ -228,14 +232,26 @@ func (w *World) see(n *NPC) Presence {
 		// hashes of two different strings.
 		Face: FaceOf(n.ID) + 1,
 	}
-	if place, ok := PlaceByID(n.Location); ok {
-		p.Where = place.Name
-	}
-	if w.Travelling(n) {
-		if to, ok := PlaceByID(n.Heading); ok {
-			p.Walking, p.WhereID, p.Where = true, n.Heading, "On the way to "+to.Name
-			p.Minutes = max(1, n.Arrives-w.Minute)
+	// Where they are, if the player knows. The city has always known where
+	// everybody is and so has the player, which made going after somebody a
+	// matter of reading an address off a list: "it probably would make sense
+	// that we don't always know everyone's location... this would also act as a
+	// way of making it harder to make attempts on people's lives." What the
+	// player has is where they last saw them.
+	if w.KnowsWhere(n.ID) {
+		if place, ok := PlaceByID(n.Location); ok {
+			p.Where = place.Name
 		}
+		if w.Travelling(n) {
+			if to, ok := PlaceByID(n.Heading); ok {
+				p.Walking, p.WhereID, p.Where = true, n.Heading, "On the way to "+to.Name
+				p.Minutes = max(1, n.Arrives-w.Minute)
+			}
+		}
+	} else {
+		// Not an address, so nothing to walk to. The note says what is known,
+		// which is usually where they were and how long ago.
+		p.WhereID, p.Where, p.Lost = "", "", w.WhereNote(n.ID)
 	}
 	if known {
 		p.Faction = w.factionName(n.Faction)

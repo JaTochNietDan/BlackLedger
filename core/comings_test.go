@@ -61,9 +61,13 @@ func TestNothingIsRemarkedOnInARoomYouAreNotIn(t *testing.T) {
 	w.Player.Location = "herald"
 	n := w.NPC("mara")
 	n.Role, n.Location = "Runs Bluebird Laundry", "bar"
+	w.See(n)
 	w.SetOut()
 	w.Minute = n.Arrives
 	w.Arrivals()
+	// And seen again where she arrived, because the question here is what the
+	// list says about somebody standing still rather than how she was found.
+	w.See(n)
 	for _, c := range w.Comings {
 		if c.Where != w.Player.Location {
 			t.Fatalf("the player was at the Herald and was told about %s: %+v", c.Where, c)
@@ -110,6 +114,10 @@ func TestSomebodyOutWalkingIsNotReportedAsBeingSomewhere(t *testing.T) {
 	w := New(4)
 	n := w.NPC("mara")
 	n.Role, n.Location = "Runs Bluebird Laundry", "bar"
+	// Seen before she left, or the list has nothing to say about her at all:
+	// what it reports is the player's knowledge now rather than the city's own
+	// books.
+	w.See(n)
 	w.SetOut()
 	walksOut(w, n)
 
@@ -122,6 +130,9 @@ func TestSomebodyOutWalkingIsNotReportedAsBeingSomewhere(t *testing.T) {
 	if her.ID == "" {
 		t.Fatal("she is not in the city at all")
 	}
+	// The city list is the player's knowledge now, not the city's own books, so
+	// somebody they have never laid eyes on has no address at all. She was seen
+	// at Saint Agnes before she walked out of it.
 	if !her.Walking {
 		t.Fatal("she is on the street and the city says she is standing somewhere")
 	}
@@ -152,6 +163,10 @@ func TestArrivingPutsSomebodyBackInARoom(t *testing.T) {
 	w.SetOut()
 	w.Minute = n.Arrives
 	w.Arrivals()
+	// Seen where she arrived: the list reports the player's knowledge now, and
+	// the question here is what it says about somebody standing still rather
+	// than how she came to be found.
+	w.See(n)
 	for _, p := range w.Everyone() {
 		if p.ID == n.ID {
 			if p.Walking || p.Where != "Bluebird Laundry" {

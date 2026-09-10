@@ -84,14 +84,16 @@ function Card({
           ) : (
             <p className="nothing-here">They are here, and there is nothing to do with them.</p>
           )
+        ) : !!onFind && !!who.where_id ? (
+          <button className="plain find-them" onClick={() => onFind(who.where_id!)}>
+            {who.walking ? 'Meet them at' : 'Find them at'}{' '}
+            {who.where?.replace('On the way to ', '') || 'their address'} ↗
+          </button>
         ) : (
-          !!onFind &&
-          !!who.where_id && (
-            <button className="plain find-them" onClick={() => onFind(who.where_id!)}>
-              {who.walking ? 'Meet them at' : 'Find them at'}{' '}
-              {who.where?.replace('On the way to ', '') || 'their address'} ↗
-            </button>
-          )
+          /* Nowhere to send them. The city knows where everybody is and the
+               player does not: what they have is where they last saw them, and
+               a name off a list is not an address. */
+          !!who.lost && <p className="not-found">{who.lost}</p>
         ))}
     </article>
   );
