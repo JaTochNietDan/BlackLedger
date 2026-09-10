@@ -75,3 +75,51 @@ func (w *World) Frighten(id string) error {
 			n.Name, holderName, Agree(holderName, "is", "are"), prop.Staff), "danger")
 	return nil
 }
+
+// And the same move, made against the player.
+//
+// Every actor in the city runs on the same rules: that is the principle the
+// whole living world is built on. The player can put the wind up somebody
+// else's counter, and until this the only thing a family could do to a business
+// of theirs was break it. A family that has fallen out with them sends
+// somebody round instead, which costs the same trade and leaves nothing to
+// point at — the same bargain from the other side.
+
+const (
+	// TheyLean is the day's chance a family that has fallen out with the player
+	// puts somebody off one of their counters. Low: over two months it is about
+	// one pair of hands, which is a nuisance rather than a siege.
+	TheyLean = .03
+	// FallenOut is the goodwill below which a family will do it at all. Nobody
+	// leans on the counter of somebody they have no quarrel with.
+	FallenOut = -40
+)
+
+// TheyFrighten is one day of the families the player has fallen out with
+// deciding whether to come for their people. Called every business day.
+func (w *World) TheyFrighten() {
+	for i := range w.Factions {
+		f := &w.Factions[i]
+		if f.ID == w.PlayerOrganizationID() || f.Goodwill > FallenOut {
+			continue
+		}
+		if w.WorldRandom() >= TheyLean {
+			continue
+		}
+		for _, l := range Locations {
+			prop := w.Properties[l.ID]
+			if prop == nil || !w.Own(l.ID) || len(prop.Hands) == 0 {
+				continue
+			}
+			who := prop.Hands[0]
+			n := w.NPC(who)
+			w.walkOut(who, l.ID, "")
+			place, _ := PlaceByID(l.ID)
+			w.Witness("politics", l.ID, "Somebody came into "+place.Name+" and did not buy anything.", "")
+			w.Log("A word at "+place.Name,
+				fmt.Sprintf("%s will not be behind that counter tomorrow. They will not say who asked them not to be, and %s %s no reason to hide it.",
+					n.Name, f.Name, Agree(f.Name, "has", "have")), "danger")
+			break // one address a day, or a family empties you in a week
+		}
+	}
+}

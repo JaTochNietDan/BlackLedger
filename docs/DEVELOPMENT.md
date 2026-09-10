@@ -8116,3 +8116,25 @@ And the description read "Vera Kohl's people thinks less of you", which the
 prose guard has caught before; both sentences agree their verbs now.
 
 Baseline unmoved: no campaign policy walks into a rival's shop to lean on it.
+
+## The same move, made against the player
+
+"Every actor in the city runs on the same rules" is the principle the whole
+living world is built on, and the tick before this one gave the player a move
+nobody else had. `TheyFrighten` is the other side of it: a family the player has
+fallen out with sends somebody round instead of breaking a window, and one of
+the people behind their counter does not come in tomorrow.
+
+Only families below `FallenOut` goodwill do it, and at `TheyLean` a day it is
+about one pair of hands over two months — a nuisance rather than a siege.
+
+**Last tick's guard earned its place immediately.** Removing the goodwill
+condition, so that any family would do it, failed
+`TestAPlayerWhoDoesNothingLosesNothing` with "laundry went from 3 hands to 1
+with nothing having happened". That is the third time this session a new rule
+has reached for the ordinary case, and the first time it was caught by a test
+written before the rule existed rather than by one written for it.
+
+Baseline moved where it should: deaths 0/0/0/82/75/0/47 against 0/0/0/82/69/0/53,
+median cash 12585/2367/5815/90/1091/3563/980. The thief and the racketeer are
+the policies that make families hate them, and they are the ones who felt it.

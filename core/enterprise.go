@@ -93,6 +93,7 @@ func (w *World) BusinessDay() {
 	w.WordFromTheCounter()
 	w.PayDay()
 	w.Notice()
+	w.TheyFrighten()
 	heat, worn := 0, []string{}
 	for _, l := range Locations {
 		prop := w.Properties[l.ID]
