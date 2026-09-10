@@ -1,5 +1,6 @@
 import {useEffect, useRef, useState} from 'react';
-import {Card, pipOf, isRedSuit, knownCard, clothTable, clothColour, outsideBets, ballAngle, wheelAngle, wheelOrder, wheelPaint} from './cards';
+import {playTable} from './sound';
+import {Card, pipOf, isRedSuit, knownCard, clothTable, clothColour, outsideBets, ballAngle, wheelAngle, wheelOrder, wheelPaint, reelWindow} from './cards';
 
 // The tables, drawn as tables. Blackjack was two numbers in a sentence and
 // roulette was a button; both are games somebody sits down to play, and a game
@@ -337,8 +338,14 @@ export function Machine({machine, money, pull, amount, least, limit, cash, onAmo
     seen.current = turn;
     if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     setRolling([true, true, true]);
+    playTable('handle');
     const stops = [0, 1, 2].map((i) => setTimeout(
-      () => setRolling(r => r.map((was, at) => (at === i ? false : was))), 700 + i * 450));
+      () => {
+        playTable('reel');
+        setRolling(r => r.map((was, at) => (at === i ? false : was)));
+        // The tray, once the last drum is down and only if it paid.
+        if (i === 2 && machine.won) playTable('coins', (machine.pays ?? 0) * 2);
+      }, 700 + i * 450));
     return () => stops.forEach(clearTimeout);
   }, [turn, machine.pulled]);
 
@@ -350,31 +357,55 @@ export function Machine({machine, money, pull, amount, least, limit, cash, onAmo
   const settled = machine.pulled && !rolling.some(Boolean);
 
 
+  // What is on the drums. Three faces a drum, the middle one on the payline,
+  // taken from the core's own strip so the case cannot show a symbol the odds
+  // do not have.
+  const windows = [0, 1, 2].map(i =>
+    settled || rolling[i] ? reelWindow(strip, faceOf(line[i]), i) : reelWindow(strip, faceOf(strip[0]?.id), i));
+
   return (
     <div className="felt machine-felt">
       <div className="felt-head"><span>{machine.place ?? 'The machine'}</span>
         <b>keeps {machine.edge} in every 100</b></div>
+
+      {/* The case. A bandit is a cabinet with a window, a line across the
+          middle of it, a handle down the side and a tray at the bottom that
+          the money falls into — not three letters in three boxes. */}
       <div className="bandit">
-        <div className="bandit-window">
-          {[0, 1, 2].map(i => (
-            <div key={i} className={'drum' + (rolling[i] ? ' rolling' : '')}>
-              <span>{rolling[i] ? faceOf(strip[(i * 3 + 1) % Math.max(1, strip.length)]?.id) : faceOf(line[i])}</span>
-            </div>
-          ))}
+        <div className="bandit-case">
+          <div className="bandit-crown"><span>{machine.stops} STOPS A DRUM</span></div>
+          <div className="bandit-window">
+            {/* The payline, across the middle of all three drums. */}
+            <span className="payline" aria-hidden="true"/>
+            {[0, 1, 2].map(i => (
+              <div key={i} className={'drum' + (rolling[i] ? ' rolling' : '')}>
+                {windows[i].map((face, at) => (
+                  <span key={at} className={'stop' + (at === 1 ? ' on-line' : '')}>{face}</span>
+                ))}
+              </div>
+            ))}
+          </div>
+          {/* The handle is the handle. Drawing one beside a row of buttons and
+              expecting somebody to press the buttons is a picture of a machine,
+              not a machine. */}
+          <button className="bandit-handle" disabled={rolling.some(Boolean) || !!refused}
+            onClick={() => pull(amount)}
+            aria-label={`Pull the handle for ${money(amount)}`}
+            title={refused || `Pull the handle — ${money(amount)}`}><i/></button>
+          {/* The tray. What comes back lands in it. */}
+          <div className={'coin-tray' + (settled && machine.won ? ' paid' : '')}>
+            {settled && machine.won
+              ? <b>{money((machine.stake ?? 0) * (machine.pays ?? 0))}</b>
+              : <small>NOTHING IN THE TRAY</small>}
+          </div>
         </div>
-        {settled && <p className={'felt-result' + (machine.won ? ' won' : '')}>
-          {machine.won
-            ? `Pays ${machine.pays} to 1 — ${money((machine.stake ?? 0) * (machine.pays ?? 0))} in the tray`
-            : 'Nothing. The machine keeps it.'}
-        </p>}
-        {/* The handle is the handle. Drawing one beside a row of buttons and
-            expecting somebody to press the buttons is a picture of a machine,
-            not a machine. */}
-        <button className="bandit-handle" disabled={rolling.some(Boolean) || !!refused}
-          onClick={() => pull(amount)}
-          aria-label={`Pull the handle for ${money(amount)}`}
-          title={refused || `Pull the handle — ${money(amount)}`}><i/></button>
       </div>
+
+      {settled && <p className={'felt-result' + (machine.won ? ' won' : '')}>
+        {machine.won
+          ? `${windows.map(w => w[1]).join(' · ')} — pays ${machine.pays} to 1`
+          : `${windows.map(w => w[1]).join(' · ')} — nothing. The machine keeps it.`}
+      </p>}
 
       <div className="bandit-stakes">
         <Money label="Into the slot" amount={amount} limit={limit} least={least} cash={cash} onChange={onAmount}/>

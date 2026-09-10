@@ -6207,3 +6207,42 @@ twenty-five do not collide, which is why nobody has seen it; the guard is there
 for the twenty-sixth.
 
 Evidence: `tests/city-grid.test.mjs`, three new tests, 50 node tests passing.
+
+## The machine, made properly, and the noise of the room
+
+"I also want you to flesh out the slot machine a lot more, make it much nicer
+like you did for blackjack and roulette. Right now it looks scraggy." And, from
+the same message: "We should also add ambient sounds and sounds to the slot
+machines and whatnot."
+
+The machine was three letters in three boxes, which is a picture of a result
+rather than a machine. A real drum is a strip of faces turning behind a window,
+and what you see is three of them at a time with the payline across the middle.
+
+`reelStops` expands the core's own strip — a symbol with four stops appears four
+times, and the length of the run is the number the odds divide by — and
+`reelWindow` returns the three faces showing when a drum has stopped on a given
+symbol. Its neighbours are its actual neighbours on the strip, which is why a
+machine feels like it nearly paid. A symbol with several stops has several
+homes, so three drums showing the same face need not show the same shoulders.
+Five tests, including one that a drum can only ever show a face the core has.
+
+Around it: a crown, the window with the line across it, the handle down the
+side, and a tray at the bottom that says what fell into it.
+
+**The noise.** Same contract as the rest of `src/sound.ts`: synthesised, nothing
+downloaded, nothing licensed. A handle is a spring and a clunk, a drum stopping
+is a wooden knock, a payout is a run of coins whose length is what it paid.
+There is a floor tone under the room while the player is at the tables, started
+when the takeover opens and stopped when it closes — a noise that goes on after
+you have left the table is a noise nobody asked for. A card for a hand, a rattle
+for the dice.
+
+**And a thing the noise exposed.** The takeover's "this sitting" panel keyed off
+the world's revision with a sentinel of -1, so the first look counted as
+something that had just happened: it dealt the previous result into the list,
+and once there were noises it played a card the moment the room opened. The
+sentinel is null until the first look now, and the first look only records where
+it is starting from.
+
+Evidence: `tests/cards.test.mjs`, five new tests, 55 node tests passing.

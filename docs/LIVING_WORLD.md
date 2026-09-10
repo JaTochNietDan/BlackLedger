@@ -172,11 +172,21 @@ This all feels a bit haphazard. Make sure you are keeping track of what you are 
 
 ---
 
+## Inbox — answered
+
 We should also add ambient sounds and sounds to the slot machines and whatnot. I
 also want you to flesh out the slot machine a lot more, make it much nicer like
 you did for blackjack and roulette. Right now it looks scraggy.
 
-— not started
+— built. The machine was three letters in three boxes, which is a picture of a
+  result rather than a machine. It is a cabinet now: a crown, a window with the
+  payline across the middle of it, three drums showing three faces each off the
+  core's own twenty-stop strip, the handle down the side and a tray at the
+  bottom that says what fell into it. And it makes a noise — the handle going
+  over, each drum knocking as it stops, and a run of coins into the tray that is
+  longer the more it paid. There is a floor tone under the room while you are at
+  the tables, a card for a hand and a rattle for the dice, all of it synthesised
+  the way the rest of the city's noise is: nothing downloaded, nothing licensed.
 
 ---
 
@@ -215,7 +225,7 @@ family to keep them more protected from attacks.
   plate on it, because a figure that does not agree with what happens is a lie
   told slowly.
 
-## Inbox — answered
+---
 
 When inside a building you own the top buttons should probably be for owner management and under a separate subtitle for management actions.
 

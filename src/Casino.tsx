@@ -1,4 +1,5 @@
 import {useEffect, useRef, useState} from 'react';
+import {playTable, roomTone} from './sound';
 import type {Action, Presence, Record as Entry} from './types';
 import {CardTable, Craps, Machine, Money, Wheel} from './Tables';
 import type {DiceState, HandState, MachineState, WheelState} from './Tables';
@@ -77,16 +78,27 @@ export function Casino({place, actions, people, hand, wheel, dice, machine, hous
     if (!hand.playing && !actions.some(a => a.id === 'play' || a.id === 'wheel')) setGame('machine');
   }, [actions, hand.playing]);
 
+  // The floor, while you are at it. Started when the takeover opens and stopped
+  // when it closes: a noise that goes on after you have left the table is a
+  // noise nobody asked for.
+  useEffect(() => { roomTone(true); return () => roomTone(false) }, []);
+
   // What the night has done so far. The ledger has all of this and always did;
   // what it did not have is a player watching one hand turn into the next.
   const [night, setNight] = useState<Entry[]>([]);
-  const seen = useRef(-1);
+  // Null until the first look, so sitting down is not treated as a thing that
+  // just happened: it used to deal the last result into "this sitting" and,
+  // once the tables had noises, play a card the moment the room opened.
+  const seen = useRef<number | null>(null);
   useEffect(() => {
+    if (seen.current === null) { seen.current = revision; return }
     if (revision === seen.current) return;
     seen.current = revision;
+    if (game === 'cards') playTable('card');
+    if (game === 'dice') playTable('dice');
     const fresh = records.filter(r => r.kind === 'personal' || r.kind === 'business');
     if (fresh.length) setNight(was => [...fresh, ...was].slice(0, 12));
-  }, [revision, records]);
+  }, [revision, records, game]);
 
   const at = (id: string) => actions.find(a => a.id === id);
   const dealt = hand.playing;

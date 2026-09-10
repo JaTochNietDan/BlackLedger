@@ -1213,3 +1213,29 @@ body{height:100%;overflow:hidden;margin:0;background:var(--bg);color:var(--ink);
   background-image:radial-gradient(#14100c 42%,transparent 44%);background-size:3px 3px;
   opacity:.3;mix-blend-mode:multiply}
 .cut figcaption{position:relative}
+
+/* The case. A bandit is a cabinet with a crown, a window with a line across it,
+   a handle down the side and a tray at the bottom the money falls into — not
+   three letters in three boxes. */
+.bandit-case{position:relative}
+.bandit-crown{text-align:center;margin-bottom:10px;padding:5px 0;border:1px solid #7a5730;border-radius:4px;
+  background:linear-gradient(#7a5730,#4a3620)}
+.bandit-crown span{font:9px system-ui;letter-spacing:.22em;color:#f0dfae}
+/* Three faces a drum, and the one on the line is the result. */
+.bandit-window{position:relative;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:10px;
+  background:#0d0a06;border:2px solid #7a5730;border-radius:6px;box-shadow:inset 0 0 18px #000}
+.payline{position:absolute;left:6px;right:6px;top:50%;height:2px;transform:translateY(-1px);
+  background:linear-gradient(90deg,transparent,#e2554b 12%,#e2554b 88%,transparent);opacity:.85;z-index:2}
+.drum{height:96px;display:grid;grid-template-rows:repeat(3,1fr);place-items:stretch;border-radius:4px;
+  background:linear-gradient(#cdc4ad,#f6f1e2 18%,#fffcf2 50%,#f6f1e2 82%,#cdc4ad);color:#241708;
+  overflow:hidden;box-shadow:inset 0 8px 12px rgba(0,0,0,.35),inset 0 -8px 12px rgba(0,0,0,.35)}
+.drum .stop{display:grid;place-items:center;font:11px var(--serif);letter-spacing:.04em;
+  color:#6c6152;border-top:1px solid rgba(0,0,0,.08)}
+.drum .stop:first-child{border-top:0}
+.drum .stop.on-line{font-size:15px;color:#241708}
+.coin-tray{margin-top:12px;padding:9px 12px;min-height:38px;display:grid;place-items:center;
+  border:2px solid #7a5730;border-radius:4px 4px 8px 8px;
+  background:linear-gradient(#1b130b,#2a1e12);box-shadow:inset 0 6px 14px #000}
+.coin-tray small{font:9px system-ui;letter-spacing:.18em;color:#7d7263}
+.coin-tray b{font:20px var(--serif);color:var(--gold)}
+.coin-tray.paid{border-color:#c9a24a;box-shadow:inset 0 6px 14px #000,0 0 0 2px rgba(201,162,74,.25)}

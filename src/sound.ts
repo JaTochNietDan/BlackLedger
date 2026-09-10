@@ -139,3 +139,112 @@ export function playMoment(kind: string) {
       knock(ctx, at);
   }
 }
+
+// The room, and the machines in it.
+//
+// "We should also add ambient sounds and sounds to the slot machines and
+// whatnot." Same contract as the rest of this file: synthesised, nothing
+// downloaded, nothing licensed. A handle is a spring and a clunk, a drum
+// stopping is a wooden knock, and a payout is a run of coins into a metal tray.
+
+// clunk is a mechanism doing something: the handle going over, a drum stopping.
+function clunk(ctx: AudioContext, at: number, pitch: number, level = .3) {
+  const tone = ctx.createOscillator();
+  tone.type = 'triangle';
+  tone.frequency.setValueAtTime(pitch, at);
+  tone.frequency.exponentialRampToValueAtTime(pitch * .45, at + .09);
+  const body = ctx.createGain();
+  body.gain.setValueAtTime(level, at);
+  body.gain.exponentialRampToValueAtTime(.0001, at + .13);
+  tone.connect(body).connect(ctx.destination);
+  tone.start(at); tone.stop(at + .15);
+
+  // The rattle of the thing it is attached to.
+  const rattle = noise(ctx, .08);
+  const band = ctx.createBiquadFilter();
+  band.type = 'bandpass'; band.frequency.value = pitch * 4; band.Q.value = 2;
+  const edge = ctx.createGain();
+  edge.gain.setValueAtTime(level * .5, at);
+  edge.gain.exponentialRampToValueAtTime(.0001, at + .07);
+  rattle.connect(band).connect(edge).connect(ctx.destination);
+  rattle.start(at); rattle.stop(at + .09);
+}
+
+// coin is one piece of metal landing on other metal.
+function coin(ctx: AudioContext, at: number) {
+  const tone = ctx.createOscillator();
+  tone.type = 'square';
+  tone.frequency.setValueAtTime(1800 + Math.random() * 900, at);
+  const gain = ctx.createGain();
+  gain.gain.setValueAtTime(0, at);
+  gain.gain.linearRampToValueAtTime(.06, at + .003);
+  gain.gain.exponentialRampToValueAtTime(.0001, at + .12);
+  tone.connect(gain).connect(ctx.destination);
+  tone.start(at); tone.stop(at + .14);
+}
+
+// What each thing at the tables sounds like. Called by the interface at the
+// moment the core says the thing happened, never on a timer of its own.
+export function playTable(kind: string, count = 1) {
+  if (!soundOn()) return;
+  const ctx = audio();
+  if (!ctx) return;
+  if (ctx.state === 'suspended') ctx.resume().catch(() => {});
+  const at = ctx.currentTime + .02;
+  switch (kind) {
+    case 'handle':
+      clunk(ctx, at, 150, .35);
+      clunk(ctx, at + .11, 110, .2);
+      break;
+    case 'reel':
+      clunk(ctx, at, 320, .22);
+      break;
+    case 'coins':
+      // Longer for a bigger win: the tray is how a machine tells the room.
+      for (let i = 0; i < Math.max(4, Math.min(26, count)); i++) coin(ctx, at + i * .045 + Math.random() * .015);
+      break;
+    case 'card':
+      clunk(ctx, at, 620, .12);
+      break;
+    case 'dice':
+      for (let i = 0; i < 5; i++) clunk(ctx, at + i * .06 + Math.random() * .02, 420 + Math.random() * 200, .1);
+      break;
+    default:
+      clunk(ctx, at, 240, .18);
+  }
+}
+
+// The room itself: the hum of a busy floor under everything else. Started when
+// the player sits down and stopped when they get up, because a noise that goes
+// on after you have left the table is a noise nobody asked for.
+let room: {gain: GainNode; nodes: AudioScheduledSourceNode[]} | null = null;
+
+export function roomTone(on: boolean) {
+  const ctx = audio();
+  if (!ctx) return;
+  if (!on || !soundOn()) {
+    if (room) {
+      const {gain, nodes} = room;
+      room = null;
+      gain.gain.setTargetAtTime(0, ctx.currentTime, .25);
+      setTimeout(() => { nodes.forEach(n => { try { n.stop() } catch { /* already stopped */ } }); }, 900);
+    }
+    return;
+  }
+  if (room) return;
+  if (ctx.state === 'suspended') ctx.resume().catch(() => {});
+  const gain = ctx.createGain();
+  gain.gain.setValueAtTime(0, ctx.currentTime);
+  gain.gain.setTargetAtTime(.035, ctx.currentTime, .8);
+  gain.connect(ctx.destination);
+
+  // A room full of people is low broadband noise with the top taken off it.
+  const hum = noise(ctx, 4);
+  hum.loop = true;
+  const soft = ctx.createBiquadFilter();
+  soft.type = 'lowpass'; soft.frequency.value = 620; soft.Q.value = .4;
+  hum.connect(soft).connect(gain);
+  hum.start();
+
+  room = {gain, nodes: [hum]};
+}

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {pipOf, isRedSuit, knownCard, clothRows, clothColour, outsideBets, wheelOrder, wheelAngle, ballAngle, clothTable, wheelPaint} from '../.runtime/frontend-test/cards.js';
+import {pipOf, isRedSuit, knownCard, clothRows, clothColour, outsideBets, wheelOrder, wheelAngle, ballAngle, clothTable, wheelPaint, reelStops, reelWindow, REEL_WINDOW} from '../.runtime/frontend-test/cards.js';
 
 test('every suit the core deals has a pip and a colour', () => {
   for (const suit of ['spades', 'hearts', 'diamonds', 'clubs']) {
@@ -116,4 +116,52 @@ test('the wheel is painted in the pockets own order and colours', () => {
   // One green slice, named once: the nought, and nothing else on the wheel.
   const greens = (paint.match(/#1f6b45/g) || []).length;
   assert.equal(greens, 1, 'the nought is the only green pocket');
+});
+
+// The drums.
+test('a drum shows the face it landed on, on the line', () => {
+  const strip = [
+    {id: 'seven', face: '7', stops: 1, pays: 100},
+    {id: 'bar', face: 'BAR', stops: 2, pays: 50},
+    {id: 'cherry', face: 'CHERRY', stops: 2, pays: 25},
+  ];
+  for (const s of strip) {
+    const win = reelWindow(strip, s.face);
+    assert.equal(win.length, REEL_WINDOW);
+    assert.equal(win[1], s.face, `${s.face} was not on the line: ${win.join('/')}`);
+  }
+});
+
+test('a drum only ever shows faces the core has', () => {
+  const strip = [
+    {id: 'seven', face: '7', stops: 1, pays: 100},
+    {id: 'bell', face: 'BELL', stops: 3, pays: 25},
+  ];
+  const faces = new Set(strip.map(s => s.face));
+  for (let nudge = 0; nudge < 6; nudge++)
+    for (const f of reelWindow(strip, 'BELL', nudge))
+      assert.ok(faces.has(f), `the drum showed ${f}, which is not on the strip`);
+});
+
+test('the strip is as long as the odds say it is', () => {
+  const strip = [
+    {id: 'seven', face: '7', stops: 1, pays: 100},
+    {id: 'bar', face: 'BAR', stops: 2, pays: 50},
+    {id: 'bell', face: 'BELL', stops: 17, pays: 25},
+  ];
+  assert.equal(reelStops(strip).length, 20);
+});
+
+test('three drums on the same face need not show the same shoulders', () => {
+  const strip = [
+    {id: 'seven', face: '7', stops: 1, pays: 100},
+    {id: 'bar', face: 'BAR', stops: 4, pays: 50},
+    {id: 'bell', face: 'BELL', stops: 15, pays: 25},
+  ];
+  const runs = new Set([0, 1, 2].map(n => reelWindow(strip, 'BAR', n).join('/')));
+  assert.ok(runs.size > 1, 'every drum showing BAR looked identical');
+});
+
+test('an empty strip still fills the window', () => {
+  assert.equal(reelWindow([], 'anything').length, REEL_WINDOW);
 });

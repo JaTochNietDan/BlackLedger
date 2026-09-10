@@ -109,3 +109,45 @@ export function wheelPaint() {
   // Half a slice back, so a pocket's own angle points at the middle of it.
   return `conic-gradient(from ${(-slice / 2).toFixed(3)}deg, ${stops.join(', ')})`;
 }
+
+// The drums of a bandit.
+//
+// The machine drew one face per drum: three letters in three boxes, which is a
+// picture of a result rather than a machine. A real drum is a strip of faces
+// that turns behind a window, and what you see is three of them at a time with
+// the payline across the middle one.
+//
+// The strip is the core's own — the same twenty stops it works the odds out
+// over — so a machine cannot show a face the rules do not have.
+
+export type Reel = {id: string; face: string; stops: number; pays: number};
+
+// REEL_WINDOW is how many faces of the strip the case shows at once. Three: the
+// one on the line, and the shoulder of the one above and below it, which is
+// what makes it read as a drum rather than a card.
+export const REEL_WINDOW = 3;
+
+// reelStops expands the core's strip into the actual run of faces on the drum:
+// a symbol with four stops appears four times. This is what turns behind the
+// window, and its length is the number the core divides by.
+export function reelStops(strip: Reel[]): string[] {
+  const out: string[] = [];
+  for (const s of strip) for (let i = 0; i < s.stops; i++) out.push(s.face);
+  return out;
+}
+
+// reelWindow is the three faces showing when the drum has stopped with `landed`
+// on the payline. The middle one is the result; the other two are its
+// neighbours on the strip, which is why a machine feels like it nearly paid.
+export function reelWindow(strip: Reel[], landed: string, nudge = 0): string[] {
+  const stops = reelStops(strip);
+  if (stops.length === 0) return Array(REEL_WINDOW).fill('—');
+  // Where on the strip this face sits. A face with several stops has several
+  // homes; nudge picks between them so three drums showing the same symbol do
+  // not show identical neighbours.
+  const homes = stops.map((f, i) => (f === landed ? i : -1)).filter(i => i >= 0);
+  const at = homes.length ? homes[Math.abs(nudge) % homes.length] : 0;
+  const out: string[] = [];
+  for (let i = -1; i <= 1; i++) out.push(stops[(at + i + stops.length * 2) % stops.length]);
+  return out;
+}
