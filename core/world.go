@@ -1312,17 +1312,26 @@ func (w *World) Actions(id string) []Action {
 		// because both are real limits and a card should not offer a number the
 		// rule will refuse.
 		room := max(0, w.CarryLimit()-w.Carrying())
+		// The price on this floor, which is not the price on the other one.
+		// That difference is the whole of the trade.
+		price := w.PriceAt(id, g.ID)
 		afford := 0
-		if g.Price > 0 {
-			afford = p.Cash / g.Price
+		if price > 0 {
+			afford = p.Cash / price
+		}
+		elsewhere := ""
+		if other := w.otherFloor(id, g.ID); other != "" {
+			place, _ := PlaceByID(other)
+			elsewhere = fmt.Sprintf(" %s pays $%d.", place.Name, w.PriceAt(other, g.ID))
 		}
 		add("buy:"+g.ID, "Buy "+g.InBulk(), 30, 0, w.TradeReadiness(g.ID, "buy", 0),
-			fmt.Sprintf("$%d each today. You can carry %s more. Holding stock draws police attention every day until it is sold, and can be taken from you.",
-				g.Price, counted(room, g.Unit, g.Unit+"s")))
+			fmt.Sprintf("$%d each here.%s You can carry %s more. Holding stock draws police attention every day until it is sold, and can be taken from you.",
+				price, elsewhere, counted(room, g.Unit, g.Unit+"s")))
 		sum(1, min(room, afford), min(Lot, min(room, afford)), "How many")
 		if held := w.Holding(g.ID); held > 0 {
 			add("sell:"+g.ID, "Sell "+g.InBulk(), 30, 0, w.TradeReadiness(g.ID, "sell", 0),
-				fmt.Sprintf("$%d each today. You are carrying %s, worth $%d.", g.Price, counted(held, g.Unit, g.Unit+"s"), g.Price*held))
+				fmt.Sprintf("$%d each here.%s You are carrying %s, worth $%d on this floor.",
+					price, elsewhere, counted(held, g.Unit, g.Unit+"s"), price*held))
 			sum(1, held, held, "How many")
 		}
 	}

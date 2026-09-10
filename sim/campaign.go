@@ -223,6 +223,25 @@ func (v View) action(target, kind string) (core.Command, bool) {
 	return core.Command{}, false
 }
 
+// The two ends of a route. Fixed facts about this city rather than something to
+// discover: what comes ashore comes ashore at the waterfront, and the floor
+// where the buyers are is the exchange.
+func (v View) cheapEnd(where, good string) bool { return where == "docks" }
+
+func (v View) dearEnd(good string) string {
+	if good == "arms" {
+		return "docks" // nowhere else deals in them at all
+	}
+	return "market"
+}
+
+func (v View) cheapestFloor(good string) string {
+	if good == "cigarettes" {
+		return "market" // the only floor that takes them
+	}
+	return "docks"
+}
+
 // most is the largest figure this card will take, which the core works out
 // from what the player can carry and what they can pay for. A policy asks the
 // card rather than doing that arithmetic again.
@@ -306,10 +325,12 @@ func Choose(v View, strategy string) (core.Command, error) {
 			carrying += v.Player.Stock[g.ID]
 		}
 		if trading {
-			// Sell anything at or above what it is normally worth.
+			// Sell whatever is being carried, wherever this floor pays more for
+			// it than the one it came from. The floors are not the same price
+			// any more, so a policy carries rather than waits.
 			for _, g := range v.Goods {
 				held := v.Player.Stock[g.ID]
-				if held == 0 || g.Price < g.Base {
+				if held == 0 {
 					continue
 				}
 				if c, ok := v.action(here, "sell:"+g.ID); ok {
@@ -325,7 +346,8 @@ func Choose(v View, strategy string) (core.Command, error) {
 			// one, and the campaign ended on the refusal.
 			if v.Player.Heat < 40 && v.Player.Cash > 600 {
 				for _, g := range v.Goods {
-					if g.Price*10 > g.Base*9 {
+					// Only where this floor is the cheap end of a route.
+					if !v.cheapEnd(here, g.ID) {
 						continue
 					}
 					c, ok := v.action(here, "buy:"+g.ID)
@@ -339,12 +361,27 @@ func Choose(v View, strategy string) (core.Command, error) {
 				}
 			}
 		}
-		// Somewhere that trades, when there is a reason to be there. Never a
-		// standing reason: a policy that always wants to be at the market spends
-		// the campaign walking to it.
-		if !trading && (carrying > 0 || v.Player.Cash > 900) && v.Player.Heat < 40 {
-			if c, ok := v.at("market", "wait"); ok && c.Kind == "travel" {
-				return c, nil
+		// Carrying something means walking it to the other end of the route,
+		// which is the risk this whole trade is made of.
+		if carrying > 0 && v.Player.Heat < 55 {
+			for _, g := range v.Goods {
+				if v.Player.Stock[g.ID] == 0 {
+					continue
+				}
+				if to := v.dearEnd(g.ID); to != "" && to != here {
+					if c, ok := v.at(to, "wait"); ok && c.Kind == "travel" {
+						return c, nil
+					}
+				}
+			}
+		}
+		if !trading && carrying == 0 && v.Player.Cash > 900 && v.Player.Heat < 40 {
+			for _, g := range v.Goods {
+				if from := v.cheapestFloor(g.ID); from != "" {
+					if c, ok := v.at(from, "wait"); ok && c.Kind == "travel" {
+						return c, nil
+					}
+				}
 			}
 		}
 	}

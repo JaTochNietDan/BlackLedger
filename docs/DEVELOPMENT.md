@@ -6479,3 +6479,48 @@ Balance, six strategies: deaths 0/0/51/82/77/0, median cash
 12405/14156/7230/90/547/3595.
 
 Evidence: `sim/campaign.go`, and the 152-against-26 count above.
+
+## A route, which is two prices and a walk between them
+
+Last slice measured the underground trade and found it was not one: 152
+purchases against 26 sales over sixty campaigns, because there was one price for
+the whole city and buying at the docks and selling at the market was the same
+transaction done twice. There was no route, only a wait.
+
+A floor is dearer or cheaper than the city's price by a fact about the floor.
+The waterfront is where it comes ashore — moonshine at 78% and arms at 82% —
+and the exchange is where the buyers are, at 118% for moonshine. The city's
+price still moves under all of it, so a good week and a bad week are still real;
+what is new is that the two ends of the city disagree about what a crate is
+worth, permanently.
+
+And the difference is paid for by the walk. That is the point of doing it now
+rather than earlier: the street between two addresses is the one stretch of this
+city where nothing covers anybody, which is why a car can be plated and why the
+crossing bar says what you are carrying it in. A route is a reason to be out
+there with something worth taking.
+
+The card quotes both ends: "$31 each here. Mercer Exchange pays $47."
+
+| 60 campaigns | Before | After |
+|---|---|---|
+| Purchases | 152 | 3,470 |
+| Sales | 26 | 3,463 |
+| Median final cash | 3,570 | 5,577 |
+
+It is a trade now rather than a way to end up holding stock. It is still worth
+less than owning premises — 5,500 against the investor's 14,156 — which seems
+right for money you have to carry through the street to collect, and no
+smuggler died in sixty campaigns, which says the risk is still mostly attention
+rather than violence. Whether that is the right shape for "the main
+high-variance income path" is the next question about it.
+
+**Two test changes, with the reason.** Two tests asserted that a trade moves
+`Good.Price`. The price is a fact about the floor now, so they ask the floor
+they are standing on. One break verified: with the spread deleted, carrying four
+crates across the city turns $160 into $160.
+
+Balance, six strategies: deaths 0/0/51/82/77/0, median cash
+12405/14156/7230/90/547/5500.
+
+Evidence: `core/routes_test.go`.

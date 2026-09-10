@@ -70,6 +70,63 @@ func newGoods() []Good {
 	}
 }
 
+// The route.
+//
+// There was one price for the whole city, so buying at the docks and selling at
+// the market was the same transaction done twice. Measured: a policy that
+// trades made 152 purchases and 26 sales over sixty campaigns, because there
+// was nothing to carry anything towards. Layer 6 of docs/LIVING_WORLD.md asks
+// for "sources, routes, and buyers"; what existed was a price that moved and a
+// pocket that held.
+//
+// A floor is dearer or cheaper than the city's price by a fact about the floor.
+// The waterfront is where it comes ashore, so it is cheap there and dear on the
+// exchange floor where the buyers are — and the difference is paid for by the
+// walk between them, which is the one stretch of this city where nothing covers
+// anybody and the reason a car is worth plating.
+var floorSpread = map[string]map[string]int{
+	"docks": {
+		// Off a boat, in quantity, from somebody who wants it gone tonight.
+		"moonshine": 78, "arms": 82,
+	},
+	"market": {
+		// The floor where the buyers are, and where a case of anything has
+		// already changed hands twice before it gets there.
+		"moonshine": 118, "cigarettes": 104,
+	},
+}
+
+// PriceAt is what one unit costs where the player is standing: the city's own
+// price, moved by what this floor is. Zero where nothing is traded.
+func (w *World) PriceAt(location, good string) int {
+	if !TradesAt(location, good) {
+		return 0
+	}
+	g := w.Good(good)
+	if g == nil {
+		return 0
+	}
+	spread := 100
+	if floor, ok := floorSpread[location]; ok {
+		if at, ok := floor[good]; ok {
+			spread = at
+		}
+	}
+	return max(1, g.Price*spread/100)
+}
+
+// otherFloor is the other address in this city that deals in the same good, so
+// a card can quote the price at the far end of the route rather than leaving
+// the player to walk over and find out.
+func (w *World) otherFloor(from, good string) string {
+	for _, l := range Locations {
+		if l.ID != from && TradesAt(l.ID, good) {
+			return l.ID
+		}
+	}
+	return ""
+}
+
 // Good finds a tradeable good by id.
 func (w *World) Good(id string) *Good {
 	for i := range w.Goods {
@@ -178,8 +235,8 @@ func (w *World) TradeReadiness(good, side string, units int) string {
 		if room := w.CarryLimit() - w.Carrying(); units > room {
 			return fmt.Sprintf("You can carry %s more", counted(max(0, room), g.Unit, g.Unit+"s"))
 		}
-		if w.Player.Cash < g.Price*units {
-			return fmt.Sprintf("That is $%d", g.Price*units)
+		if price := w.PriceAt(w.Player.Location, good); w.Player.Cash < price*units {
+			return fmt.Sprintf("That is $%d", price*units)
 		}
 		return ""
 	}
@@ -199,12 +256,12 @@ func (w *World) BuyUnits(good string, units int) int {
 	if units > 0 {
 		return units
 	}
-	g := w.Good(good)
-	if g == nil || g.Price <= 0 {
+	price := w.PriceAt(w.Player.Location, good)
+	if price <= 0 {
 		return 0
 	}
 	room := max(0, w.CarryLimit()-w.Carrying())
-	return max(1, min(Lot, min(room, w.Player.Cash/g.Price)))
+	return max(1, min(Lot, min(room, w.Player.Cash/price)))
 }
 
 // Buy takes a lot at the current price.
@@ -214,7 +271,8 @@ func (w *World) Buy(good string, units int) error {
 	}
 	g := w.Good(good)
 	units = w.BuyUnits(good, units)
-	cost := g.Price * units
+	price := w.PriceAt(w.Player.Location, good)
+	cost := price * units
 	if err := w.Pay(cost); err != nil {
 		return err
 	}
@@ -224,7 +282,7 @@ func (w *World) Buy(good string, units int) error {
 	w.Player.Stock[good] += units
 	w.Player.Heat = min(100, w.Player.Heat+1)
 	w.Log("A quiet purchase", fmt.Sprintf("%d %ss of %s for $%d, at $%d each. Holding stock draws attention until it is sold.",
-		units, g.Unit, g.InBulk(), cost, g.Price), "business")
+		units, g.Unit, g.InBulk(), cost, price), "business")
 	return nil
 }
 
@@ -241,11 +299,12 @@ func (w *World) Sell(good string, units int) error {
 	if units <= 0 || units > held {
 		units = held
 	}
-	takings := g.Price * units
+	price := w.PriceAt(w.Player.Location, good)
+	takings := price * units
 	w.Player.Stock[good] = held - units
 	w.Earn(takings)
 	w.Log("The goods move on", fmt.Sprintf("%d %ss of %s sold for $%d, at $%d each.",
-		units, g.Unit, g.InBulk(), takings, g.Price), "business")
+		units, g.Unit, g.InBulk(), takings, price), "business")
 	return nil
 }
 

@@ -12,7 +12,11 @@ func trader(t *testing.T) *World {
 
 func TestBuyingAndSellingMovesMoneyAndStock(t *testing.T) {
 	w := trader(t)
-	price := w.Good("moonshine").Price
+	// The price is a fact about the floor now, not about the city: the
+	// waterfront is where it comes ashore and the exchange is where the buyers
+	// are, and the difference between them is the whole of the trade. This test
+	// is about money and stock moving, so it asks the floor it is standing on.
+	price := w.PriceAt(w.Player.Location, "moonshine")
 	cash := w.Player.Cash
 	if err := w.Buy("moonshine", 0); err != nil {
 		t.Fatal(err)
@@ -24,7 +28,7 @@ func TestBuyingAndSellingMovesMoneyAndStock(t *testing.T) {
 		t.Fatalf("cash is %d, expected %d", w.Player.Cash, cash-price*Lot)
 	}
 	// Selling into a higher price is where the profit comes from.
-	w.Good("moonshine").Price = price * 2
+	w.Good("moonshine").Price = w.Good("moonshine").Price * 2
 	if err := w.Sell("moonshine", 0); err != nil {
 		t.Fatal(err)
 	}

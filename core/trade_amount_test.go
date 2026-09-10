@@ -28,7 +28,9 @@ func runner(t *testing.T) (*World, string) {
 
 func TestYouBuyTheNumberYouName(t *testing.T) {
 	w, good := runner(t)
-	g := w.Good(good)
+	// What this floor charges, which is not what the city's price says: a
+	// route is two addresses where the same crate is worth different money.
+	price := w.PriceAt(w.Player.Location, good)
 	cash := w.Player.Cash
 	if err := w.Buy(good, 7); err != nil {
 		t.Fatal(err)
@@ -36,8 +38,8 @@ func TestYouBuyTheNumberYouName(t *testing.T) {
 	if w.Holding(good) != 7 {
 		t.Fatalf("bought 7 and hold %d", w.Holding(good))
 	}
-	if w.Player.Cash != cash-g.Price*7 {
-		t.Fatalf("7 at $%d cost $%d", g.Price, cash-w.Player.Cash)
+	if w.Player.Cash != cash-price*7 {
+		t.Fatalf("7 at $%d cost $%d", price, cash-w.Player.Cash)
 	}
 	// Nothing named is still the lot, so every existing caller is unchanged.
 	if err := w.Buy(good, 0); err != nil {
@@ -53,7 +55,7 @@ func TestYouSellTheNumberYouName(t *testing.T) {
 	if err := w.Buy(good, 12); err != nil {
 		t.Fatal(err)
 	}
-	g := w.Good(good)
+	price := w.PriceAt(w.Player.Location, good)
 	cash := w.Player.Cash
 	if err := w.Sell(good, 5); err != nil {
 		t.Fatal(err)
@@ -61,8 +63,8 @@ func TestYouSellTheNumberYouName(t *testing.T) {
 	if w.Holding(good) != 7 {
 		t.Fatalf("sold 5 of 12 and hold %d", w.Holding(good))
 	}
-	if w.Player.Cash != cash+g.Price*5 {
-		t.Fatalf("5 at $%d fetched $%d", g.Price, w.Player.Cash-cash)
+	if w.Player.Cash != cash+price*5 {
+		t.Fatalf("5 at $%d fetched $%d", price, w.Player.Cash-cash)
 	}
 	// Nothing named still sells the lot of it, which is what selling meant.
 	if err := w.Sell(good, 0); err != nil {
@@ -75,8 +77,8 @@ func TestYouSellTheNumberYouName(t *testing.T) {
 
 func TestTheTradeRefusesWhatYouCannotDo(t *testing.T) {
 	w, good := runner(t)
-	g := w.Good(good)
-	w.Player.Cash = g.Price * 3
+	price := w.PriceAt(w.Player.Location, good)
+	w.Player.Cash = price * 3
 	if w.TradeReadiness(good, "buy", 4) == "" {
 		t.Fatal("bought four with the price of three")
 	}
