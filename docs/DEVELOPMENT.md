@@ -6040,3 +6040,34 @@ three distinct voices now, and the same break fails it.
 Balance unchanged: deaths 0/0/50/82/83, median cash 12378/14050/7230/90/586.
 
 Evidence: `core/threats_test.go`, two breaks verified.
+
+## The street is not scenery any more, so the bar says what it is
+
+From the inbox: "the little bar that explains that you're traveling between
+buildings is at the bottom of the page often below the fold."
+
+It was, and it said the name of the place and a number of minutes. That was fine
+while the street was scenery. It is not scenery now: the ambush work made the
+street between two addresses the one stretch of the city with no walls, no door
+and nobody who knows you, and the plating work exists entirely because of that.
+
+`Crossing` is the core stating what a journey is before the player sets off:
+where to, how long, on foot or driving, how much plate is on the car, and
+whether anybody with a price on the player is known to be looking. The bar sits
+at the top of the city pane where the eye already is, and goes red when somebody
+is out looking for you.
+
+The map half of that message is still open.
+
+**And a piece of bookkeeping worth writing down.** The inbox entry about typing
+your own stake read "not started" for far longer than it was true — the work
+landed in 5f5e30d and I never moved the entry. Checking it properly turned up
+that half of it genuinely was not finished: the holder's button to set the house
+limit was offered with no field on it, so it sent an amount of nothing and
+`SetLimit` refused it every single time. A button that cannot be pressed
+successfully is worse than no button, because the player spends the trip finding
+out. It has a field now, bounded by the same floor and ceiling the rule uses.
+
+Balance unchanged: deaths 0/0/50/82/83, median cash 12378/14050/7230/90/586.
+
+Evidence: `core/crossing_test.go`, two breaks verified.

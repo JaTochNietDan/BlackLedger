@@ -172,14 +172,6 @@ This all feels a bit haphazard. Make sure you are keeping track of what you are 
 
 ---
 
-When gambling you should be able to actually choose how much to gamble, not use
-set amounts, up to a max limit. The max limit should be defined by the casino
-owner dynamically, whether by you the owner by or by someone else who owns it.
-
-— not started
-
----
-
 We should also add ambient sounds and sounds to the slot machines and whatnot. I
 also want you to flesh out the slot machine a lot more, make it much nicer like
 you did for blackjack and roulette. Right now it looks scraggy.
@@ -225,13 +217,32 @@ We should try to improve the images being displayed on the newspaper. Having a p
 
 --- 
 
-The walking between buildings simulation is not that great right now because we don't have the map working properly and the little bar that explains that you're traveling between buildings is at the bottom of the page often below the fold.
-
----
-
 When inside a building you own the top buttons should probably be for owner management and under a separate subtitle for management actions.
 
 ## Inbox — answered
+
+When gambling you should be able to actually choose how much to gamble, not use
+set amounts, up to a max limit. The max limit should be defined by the casino
+owner dynamically, whether by you the owner by or by someone else who owns it.
+
+— built: the stake is typed at every game in the room (5f5e30d), and the holder
+  sets the limit. This entry said "not started" for longer than it was true,
+  which is my bookkeeping and not the game's. Half of it was also not quite
+  finished when I looked: the button to set the limit was offered with no field
+  on it, so it sent an amount of nothing and was refused every time. It has a
+  field now.
+
+---
+
+The walking between buildings simulation is not that great right now because we don't have the map working properly and the little bar that explains that you're traveling between buildings is at the bottom of the page often below the fold.
+
+— half built: the bar is at the top of the city pane now and says something
+  worth reading — where you are going, how long, what you are crossing in, and
+  whether anybody is known to be looking for you while you are out in it. That
+  matters more than it did: the street is now the one stretch of the city where
+  a hit can catch you cold. The map itself is still open.
+
+---
 
 I don't see a lot of cursing from characters in this game, we should increase that since it's with the mafia style. Characters should be able to make threats to you too, I have not seen that yet.
 
