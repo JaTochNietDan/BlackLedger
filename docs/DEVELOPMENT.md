@@ -8161,3 +8161,29 @@ that fixed, the same break reports "somebody was on the door and 1 of your
 people were still put off".
 
 Baseline: deaths and cash unmoved from the last run.
+
+## The tests that stand down
+
+Last tick's door test skipped rather than failed, and that turned out to be a
+family rather than a one-off. Twenty-odd tests here look for something in a
+generated world and quietly stand down when it is not there: "no lieutenant in
+this world" five times, "this city has no forecourt" three, "no breakaway for
+this seed", "everybody in this city is known". Two tests skip in a normal run
+today, and both are deliberate opt-ins that want a local model.
+
+They are not wrong to be written that way — establishing a lieutenant by hand is
+not the thing under test. But the day the city stops making lieutenants, a dozen
+tests start proving nothing and nothing says so.
+`TestTheCityStillMakesWhatItsTestsLookFor` says so: it asserts the preconditions
+themselves, in the same seeds those suites use.
+
+**And its first version could not fail.** It counted anybody at or above
+lieutenant rank — which every family's head satisfies, so turning every
+lieutenant in the city into a soldier left it passing. It asks for a lieutenant
+below leader rank now, and that same break reports "seed 4: no family has a
+lieutenant, and five tests stand down when that is true".
+
+That is the fifth distinct way a guard has failed to guard this session: a
+needle too short, a break in the wrong direction, a rule that punished the
+ordinary case, a test that skipped, and now a precondition satisfied by the
+wrong thing. All five are in the brief.

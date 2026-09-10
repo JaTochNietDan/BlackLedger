@@ -111,6 +111,14 @@ and a local model that writes encounters and can be switched off.
 
 ## Fault shapes that keep biting
 
+- **A test that skips rather than fails.** A door test looked for one of the
+  player's own people to post, found none, and skipped — reporting a pass in
+  every summary while proving nothing, and passing with the rule it guarded
+  removed. Twenty-odd tests here stand down like that: "no lieutenant in this
+  world", "this city has no forecourt", "no breakaway for this seed".
+  `TestTheCityStillMakesWhatItsTestsLookFor` asserts those preconditions
+  directly, so a change to the city that empties them is one loud failure rather
+  than a dozen silent passes.
 - **A new rule that punishes the ordinary case.** Twice in two ticks: "below
   twenty trust" is every employee in the game, because everybody here starts at
   nothing and thinks nothing of a stranger; and paying exactly the going rate
