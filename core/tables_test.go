@@ -13,6 +13,7 @@ func gambler(t *testing.T) *World {
 }
 
 func TestTheHouseKeepsItsEdge(t *testing.T) {
+	t.Parallel()
 	const sessions = 6000
 	staked, returned := 0, 0
 	w := gambler(t)
@@ -40,6 +41,7 @@ func TestTheHouseKeepsItsEdge(t *testing.T) {
 }
 
 func TestBigWinsComeOutOfTheOwnersPocket(t *testing.T) {
+	t.Parallel()
 	var w *World
 	for seed := uint32(1); seed <= 4000; seed++ {
 		probe := gambler(t)
@@ -68,6 +70,7 @@ func TestBigWinsComeOutOfTheOwnersPocket(t *testing.T) {
 }
 
 func TestYouCannotBeatYourOwnHouse(t *testing.T) {
+	t.Parallel()
 	w := gambler(t)
 	small, _ := tableStake("small")
 	w.Properties["club"].Owner = "player:1"
@@ -97,6 +100,7 @@ func TestYouCannotBeatYourOwnHouse(t *testing.T) {
 }
 
 func TestLosingIsTheUsualOutcome(t *testing.T) {
+	t.Parallel()
 	w := gambler(t)
 	w.Player.Cash = 1000000
 	losses, wins := 0, 0

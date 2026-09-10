@@ -10,6 +10,7 @@ import (
 )
 
 func TestOrdinaryLeaderJobsServeTheirOwnFamily(t *testing.T) {
+	t.Parallel()
 	w := core.New(27)
 	for _, tc := range []struct {
 		speaker, beneficiary string
@@ -67,6 +68,7 @@ func TestWrongLeaderBeneficiaryIsCorrectedBeforeQueue(t *testing.T) {
 }
 
 func TestSpokenOfferNamesTheFactionReceivingCredit(t *testing.T) {
+	t.Parallel()
 	w := core.New(27)
 	for _, tc := range []struct {
 		body, beneficiary string

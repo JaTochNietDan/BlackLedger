@@ -10,6 +10,7 @@ import (
 const plainWeather = "Rain through the day and into the evening. The gutters on the lower streets are carrying more than they were built for."
 
 func TestAPolishThatAddsANumberIsRefused(t *testing.T) {
+	t.Parallel()
 	// The dangerous invention: a reader takes a number as fact and acts on it.
 	body, took := AcceptPolish(plainWeather,
 		"Rain fell for 11 hours across the district, and 4 streets were closed by standing water near the harbour.")
@@ -22,6 +23,7 @@ func TestAPolishThatAddsANumberIsRefused(t *testing.T) {
 }
 
 func TestAPolishThatAddsANameIsRefused(t *testing.T) {
+	t.Parallel()
 	if _, took := AcceptPolish(plainWeather,
 		"Rain through the day. Commissioner Vance said the drains would be looked at when there was money for it."); took {
 		t.Error("a rewrite put a named official into a paragraph about the weather")
@@ -29,6 +31,7 @@ func TestAPolishThatAddsANameIsRefused(t *testing.T) {
 }
 
 func TestAPolishThatAddressesTheReaderIsRefused(t *testing.T) {
+	t.Parallel()
 	if _, took := AcceptPolish(plainWeather,
 		"Rain through the day and into the evening. If you are going out tonight, take a coat and watch the low end of the harbour road."); took {
 		t.Error("the paper started talking to the reader")
@@ -36,6 +39,7 @@ func TestAPolishThatAddressesTheReaderIsRefused(t *testing.T) {
 }
 
 func TestAGoodPolishIsTaken(t *testing.T) {
+	t.Parallel()
 	better := "Rain from first light and no let up by dark. On the lower streets the gutters took more than they were built to take, and stood in the road for it."
 	body, took := AcceptPolish(plainWeather, better)
 	if !took {
@@ -47,6 +51,7 @@ func TestAGoodPolishIsTaken(t *testing.T) {
 }
 
 func TestTheModelExplainingItselfIsStripped(t *testing.T) {
+	t.Parallel()
 	body, took := AcceptPolish(plainWeather,
 		"Here is the rewritten paragraph in the requested register:\n\nRain from first light and no let up by dark, and the gutters on the lower streets took more than they were built to take.")
 	if !took {
@@ -58,6 +63,7 @@ func TestTheModelExplainingItselfIsStripped(t *testing.T) {
 }
 
 func TestALongRambleIsRefused(t *testing.T) {
+	t.Parallel()
 	long := ""
 	for i := 0; i < 40; i++ {
 		long += "Rain fell and the gutters carried it away again into the harbour. "
@@ -68,6 +74,7 @@ func TestALongRambleIsRefused(t *testing.T) {
 }
 
 func TestOnlyTodaysUnpolishedBriefIsOffered(t *testing.T) {
+	t.Parallel()
 	w := New(81)
 	w.Minute = 5 * 1440
 	w.CityPageDay()
@@ -90,6 +97,7 @@ func TestOnlyTodaysUnpolishedBriefIsOffered(t *testing.T) {
 }
 
 func TestARefusalIsFinal(t *testing.T) {
+	t.Parallel()
 	w := New(83)
 	w.CityPageDay()
 	s, _ := w.NextPolish()
@@ -110,6 +118,7 @@ func TestARefusalIsFinal(t *testing.T) {
 // eight sentences from one that invented a councilman, and those want opposite
 // answers. A refusal nobody can read is a refusal nobody can act on.
 func TestARefusedRewriteSaysWhichRuleTurnedItDown(t *testing.T) {
+	t.Parallel()
 	const original = "Clear over Bellwether, and warm enough by afternoon that the benches on the front were taken by eleven."
 	for _, c := range []struct{ rewritten, expect string }{
 		{"Clear over Bellwether today. 11 arrests were made on the front by afternoon, police said.", "figure"},
@@ -144,6 +153,7 @@ func TestARefusedRewriteSaysWhichRuleTurnedItDown(t *testing.T) {
 // their numbers. "Seventeen arrests were made in the district overnight" and "a
 // dozen shops closed early" both went straight into the paper as fact.
 func TestAnInventedQuantityIsCaughtEvenWhenItIsSpelled(t *testing.T) {
+	t.Parallel()
 	const original = "Cloud over the city and no sign of it lifting. The forecast says the same again tomorrow."
 	for _, rewritten := range []string{
 		"Cloud over the city and no sign of it lifting. Seventeen arrests were made in the district overnight, police said.",

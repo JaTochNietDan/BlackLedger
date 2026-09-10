@@ -10,6 +10,7 @@ func embattled(seed uint32) *World {
 }
 
 func TestABreakawayTakesGroundStrengthAndMoney(t *testing.T) {
+	t.Parallel()
 	w := embattled(5)
 	parent := w.faction("bellandi")
 	holdings := len(w.FamilyHoldings("bellandi"))
@@ -49,6 +50,7 @@ func TestABreakawayTakesGroundStrengthAndMoney(t *testing.T) {
 }
 
 func TestAFamilyKeepsItsLastHolding(t *testing.T) {
+	t.Parallel()
 	w := embattled(6)
 	for _, id := range w.FamilyHoldings("bellandi")[1:] {
 		w.Properties[id].Owner = "independent"
@@ -59,6 +61,7 @@ func TestAFamilyKeepsItsLastHolding(t *testing.T) {
 }
 
 func TestHealthyFamiliesHoldTogether(t *testing.T) {
+	t.Parallel()
 	w := New(7) // full strength, no war
 	if w.Splinter(w.faction("bellandi")) {
 		t.Fatal("a family at full strength and at peace still split")
@@ -66,6 +69,7 @@ func TestHealthyFamiliesHoldTogether(t *testing.T) {
 }
 
 func TestNewOrganizationsHaveDistinctNames(t *testing.T) {
+	t.Parallel()
 	w := embattled(8)
 	seen := map[string]bool{}
 	for _, f := range w.Factions {
@@ -95,6 +99,7 @@ func TestNewOrganizationsHaveDistinctNames(t *testing.T) {
 }
 
 func TestAnOrganizationHoldingNothingEventuallyEnds(t *testing.T) {
+	t.Parallel()
 	w := embattled(9)
 	if !w.Splinter(w.faction("bellandi")) {
 		t.Skip("no breakaway for this seed")
@@ -118,6 +123,7 @@ func TestAnOrganizationHoldingNothingEventuallyEnds(t *testing.T) {
 }
 
 func TestAFamilyWithNobodyLeftToFightFractures(t *testing.T) {
+	t.Parallel()
 	// Observed in a 1500-command campaign: Bellandi ended holding everything at
 	// full strength with Russo reduced to a shell, and nothing further could
 	// happen in that city.

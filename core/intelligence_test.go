@@ -17,6 +17,7 @@ func enquirer(t *testing.T) *World {
 }
 
 func TestAStrangerKnowsNothingAboutAnybody(t *testing.T) {
+	t.Parallel()
 	w := enquirer(t)
 	for _, f := range w.PublicFactions() {
 		if w.Intelligence(f.ID) != 0 {
@@ -35,6 +36,7 @@ func TestAStrangerKnowsNothingAboutAnybody(t *testing.T) {
 }
 
 func TestANetworkHearsTheOrdinaryThings(t *testing.T) {
+	t.Parallel()
 	w := enquirer(t)
 	w.Player.Contacts = 2
 	f := w.PublicFactions()[0]
@@ -53,6 +55,7 @@ func TestANetworkHearsTheOrdinaryThings(t *testing.T) {
 }
 
 func TestSomebodyInsideIsWorthMoreThanAnyNetwork(t *testing.T) {
+	t.Parallel()
 	w := enquirer(t)
 	w.Player.Contacts = 2
 	id := w.Factions[0].ID
@@ -78,6 +81,7 @@ func TestSomebodyInsideIsWorthMoreThanAnyNetwork(t *testing.T) {
 }
 
 func TestAskingAroundBuysAWeekOfKnowingMore(t *testing.T) {
+	t.Parallel()
 	w := enquirer(t)
 	w.Player.Contacts = 2
 	id := w.Factions[0].ID
@@ -113,6 +117,7 @@ func TestAskingAroundBuysAWeekOfKnowingMore(t *testing.T) {
 }
 
 func TestNobodyToAskMeansNobodyToAsk(t *testing.T) {
+	t.Parallel()
 	w := enquirer(t)
 	if w.EnquiryReadiness(w.Factions[0].ID) == "" {
 		t.Fatal("somebody with no contacts asked around")
@@ -127,6 +132,7 @@ func TestNobodyToAskMeansNobodyToAsk(t *testing.T) {
 }
 
 func TestYouAlwaysKnowWhatTheyThinkOfYouAndYourOwnBooks(t *testing.T) {
+	t.Parallel()
 	w := enquirer(t)
 	w.Factions[0].Goodwill = -40
 	for _, f := range w.PublicFactions() {
@@ -149,6 +155,7 @@ func TestYouAlwaysKnowWhatTheyThinkOfYouAndYourOwnBooks(t *testing.T) {
 // means are all things the city already knew.
 
 func TestAnOrganizationSaysWhatItHoldsAndWhoItIsFighting(t *testing.T) {
+	t.Parallel()
 	w, _ := testator(t)
 	w.Antagonize("bellandi", "russo", 90)
 	for i := range w.Conflicts {
@@ -190,6 +197,7 @@ func TestAnOrganizationSaysWhatItHoldsAndWhoItIsFighting(t *testing.T) {
 }
 
 func TestStandingIsSaidInWordsNotNumbers(t *testing.T) {
+	t.Parallel()
 	for _, c := range []struct {
 		goodwill int
 		want     string
@@ -203,6 +211,7 @@ func TestStandingIsSaidInWordsNotNumbers(t *testing.T) {
 }
 
 func TestWhatYouCannotCountYouAreNotTold(t *testing.T) {
+	t.Parallel()
 	// Counting somebody's people needs an informant. Their premises do not.
 	w := proprietor(t)
 	w.Player.Enquiries = nil

@@ -147,14 +147,18 @@ Do not claim an effect you have not measured.
 
 ### Gates
 
-**`mise run quick` (~70s) while you are working.** The core, API, sim and store
+**`mise run quick` (~25s) while you are working.** The core, API, sim and store
 suites under `-short`, plus gofmt and tsc. The balance measurements skip: they
-are 54 files running tens of thousands of simulated days, 676 seconds of test
-time against a suite that finishes in 117 because they run in parallel with each
-other, and they answer "did I move the balance" rather than "did I break
-something".
+are 54 files running tens of thousands of simulated days and they answer "did I
+move the balance" rather than "did I break something".
 
-**`mise run gate` (~120s) before committing.** All of it, balance included: the
+Every test in the project calls `t.Parallel()`. One did before this, so a
+thousand tests summing 62 seconds ran one after another and took 69. The
+exceptions are eighteen director and speech tests that reach for an environment
+variable, which is process-wide: Go's own `t.Setenv` refuses to be called in a
+parallel test for exactly that reason.
+
+**`mise run gate` (~63s) before committing.** All of it, balance included: the
 core suite and the API suites start first and the format check, vet, prettier,
 the build and the 56 node tests run while they go.
 

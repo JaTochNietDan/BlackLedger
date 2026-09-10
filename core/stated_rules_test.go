@@ -16,6 +16,7 @@ import (
 // Read as a property: an action that declares no minutes must not advance the
 // clock, and one that declares minutes must advance it by what it said.
 func TestAnActionCostsTheTimeItSaysAndNoOther(t *testing.T) {
+	t.Parallel()
 	offered, _ := sweepCities(t)
 	if len(offered) < 50 {
 		t.Fatalf("the sweep only produced %d kinds of action", len(offered))
@@ -75,6 +76,7 @@ func TestAnActionCostsTheTimeItSaysAndNoOther(t *testing.T) {
 // door; past M they take the premises." The numbers in that sentence have to be
 // the numbers the game uses.
 func TestTheThresholdsInTheRulesAreTheOnesTheGameUses(t *testing.T) {
+	t.Parallel()
 	rules := GuideRules()
 	stated := ""
 	for _, r := range rules {
@@ -98,6 +100,7 @@ func TestTheThresholdsInTheRulesAreTheOnesTheGameUses(t *testing.T) {
 // they left and cannot be dealt with until they arrive — including your own,
 // when you send them somewhere."
 func TestNobodyOnTheStreetCanBeDealtWith(t *testing.T) {
+	t.Parallel()
 	w := New(29)
 	w.District = 2
 	w.Player.Cash, w.Player.Respect = 8000, 120

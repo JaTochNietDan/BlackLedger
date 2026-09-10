@@ -7,6 +7,7 @@ import "testing"
 // are worth — and the one the whole game is played on.
 
 func TestTheBestFiveOfSevenIsWhatYouHave(t *testing.T) {
+	t.Parallel()
 	cases := []struct {
 		what  string
 		cat   int
@@ -40,6 +41,7 @@ func TestTheBestFiveOfSevenIsWhatYouHave(t *testing.T) {
 }
 
 func TestWhatYouHoldStillDecidesIt(t *testing.T) {
+	t.Parallel()
 	board := hand("9h", "9d", "5h", "2c", "Kd")
 	mine := BestOfSeven(hand("9c", "5s"), board)
 	theirs := BestOfSeven(hand("Ah", "Qs"), board)
@@ -55,6 +57,7 @@ func TestWhatYouHoldStillDecidesIt(t *testing.T) {
 }
 
 func TestTheStreetsComeInOrder(t *testing.T) {
+	t.Parallel()
 	street, cards := Preflop, 0
 	got := []string{street}
 	for street != Shown {
@@ -80,6 +83,7 @@ func TestTheStreetsComeInOrder(t *testing.T) {
 // grows. This walks one from the seat to the showdown and says what the table
 // looked like at each step.
 func TestAHandGoesPreflopFlopTurnRiver(t *testing.T) {
+	t.Parallel()
 	w, _ := backroom(t)
 	if err := w.SitInTheBackRoom(BackRoom, 50); err != nil {
 		t.Fatalf("no game: %v", err)
@@ -121,6 +125,7 @@ func TestAHandGoesPreflopFlopTurnRiver(t *testing.T) {
 // A hand nobody is left contesting is over where it stands. There is no reason
 // to deal a river to somebody playing against nobody.
 func TestAHandEverybodyElseThrewInIsOverWhereItStands(t *testing.T) {
+	t.Parallel()
 	w, _ := backroom(t)
 	if err := w.SitInTheBackRoom(BackRoom, 50); err != nil {
 		t.Fatalf("no game: %v", err)
@@ -146,6 +151,7 @@ func TestAHandEverybodyElseThrewInIsOverWhereItStands(t *testing.T) {
 // so asked about two of a suit it called them a flush, and a player holding the
 // queen and three of diamonds was told they had one.
 func TestTwoCardsAreNotAFlush(t *testing.T) {
+	t.Parallel()
 	if got := BestOfSeven(hand("Qd", "3d"), nil); got.Category != HighCard {
 		t.Errorf("the queen and three of diamonds is %s", got.Name())
 	}
@@ -161,6 +167,7 @@ func TestTwoCardsAreNotAFlush(t *testing.T) {
 // nil slice arrives in the browser as null, the screen counts its length, and
 // the whole page goes blank the moment anybody sits down.
 func TestTheBoardIsAlwaysARow(t *testing.T) {
+	t.Parallel()
 	w, _ := backroom(t)
 	if err := w.SitInTheBackRoom(BackRoom, 50); err != nil {
 		t.Fatal(err)

@@ -21,6 +21,7 @@ func warlord(t *testing.T) (*World, *Faction, string) {
 }
 
 func TestAManDoesNotTakeGround(t *testing.T) {
+	t.Parallel()
 	w := proprietor(t)
 	own(w, "laundry")
 	w.Player.Respect = 5
@@ -35,6 +36,7 @@ func TestAManDoesNotTakeGround(t *testing.T) {
 }
 
 func TestYouOnlyMoveOnPeopleYouAreAtOddsWith(t *testing.T) {
+	t.Parallel()
 	w, holder, target := warlord(t)
 	if w.MoveOnReadiness(target) != "" {
 		t.Fatal("could not move on a rival at war:", w.MoveOnReadiness(target))
@@ -55,6 +57,7 @@ func TestYouOnlyMoveOnPeopleYouAreAtOddsWith(t *testing.T) {
 }
 
 func TestYouHaveToBeThereAndAbleToStand(t *testing.T) {
+	t.Parallel()
 	w, _, target := warlord(t)
 	w.Player.Location = "room"
 	if w.MoveOnReadiness(target) == "" {
@@ -80,6 +83,7 @@ func TestYouHaveToBeThereAndAbleToStand(t *testing.T) {
 }
 
 func TestAMoveIsTheSameRaidTheCityRuns(t *testing.T) {
+	t.Parallel()
 	const runs = 400
 	took, repelled, hurt, died := 0, 0, 0, 0
 	for seed := uint32(1); seed <= runs; seed++ {
@@ -118,6 +122,7 @@ func TestAMoveIsTheSameRaidTheCityRuns(t *testing.T) {
 }
 
 func TestTakingGroundIsWorthSomethingAndCostsStanding(t *testing.T) {
+	t.Parallel()
 	found := false
 	for seed := uint32(1); seed <= 400 && !found; seed++ {
 		w, holder, target := warlord(t)
@@ -151,6 +156,7 @@ func TestTakingGroundIsWorthSomethingAndCostsStanding(t *testing.T) {
 }
 
 func TestBeingDrivenOffCostsSomebodyWhoWent(t *testing.T) {
+	t.Parallel()
 	found := false
 	for seed := uint32(1); seed <= 500 && !found; seed++ {
 		w, holder, target := warlord(t)

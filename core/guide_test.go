@@ -13,6 +13,7 @@ import (
 // one is the game reporting on itself.
 
 func TestTheGuideAlwaysSaysSomethingTrue(t *testing.T) {
+	t.Parallel()
 	// On a brand new campaign every step is either open, done, or refused with
 	// a reason. A blank is a screen that says nothing.
 	w := New(1)
@@ -42,6 +43,7 @@ func TestTheGuideAlwaysSaysSomethingTrue(t *testing.T) {
 }
 
 func TestTheGuideFollowsTheGameRatherThanDescribingIt(t *testing.T) {
+	t.Parallel()
 	// The proof that it cannot rot: change the world and the guide changes,
 	// because it asks the same readiness the buttons ask.
 	w := New(2)
@@ -87,6 +89,7 @@ func TestTheGuideFollowsTheGameRatherThanDescribingIt(t *testing.T) {
 }
 
 func TestTheRulesAreShortAndTrue(t *testing.T) {
+	t.Parallel()
 	rules := GuideRules()
 	if len(rules) < 4 {
 		t.Fatalf("%d rules", len(rules))
@@ -104,6 +107,7 @@ func TestTheRulesAreShortAndTrue(t *testing.T) {
 // sentence does not, the guide is lying to a new player about the only
 // thresholds this game promises are public.
 func TestTheRulesQuoteNumbersTheGameStillUses(t *testing.T) {
+	t.Parallel()
 	joined := strings.Join(GuideRules(), " ")
 	for _, quoted := range []struct {
 		what  string
@@ -139,6 +143,7 @@ func TestTheRulesQuoteNumbersTheGameStillUses(t *testing.T) {
 // between buildings now, and somebody who reads the rules and then travels
 // across town to a room the screen named will find it empty.
 func TestTheRulesSayThatPeopleMove(t *testing.T) {
+	t.Parallel()
 	joined := strings.ToLower(strings.Join(GuideRules(), " "))
 	for _, want := range []string{"walk", "street"} {
 		if !strings.Contains(joined, want) {
@@ -152,6 +157,7 @@ func TestTheRulesSayThatPeopleMove(t *testing.T) {
 // the payment, the log line, the button and this sentence — beside an
 // unrelated 45 for how long the job takes.
 func TestTheFirstStepQuotesTheFirstJob(t *testing.T) {
+	t.Parallel()
 	w := New(4)
 	w.Player.Location = "bar"
 	var button Action
@@ -192,6 +198,7 @@ func TestTheFirstStepQuotesTheFirstJob(t *testing.T) {
 // while the action list correctly offered him three things: sit it out, pay a
 // lawyer, or name somebody.
 func TestTheGuideKnowsWhenYouAreInACell(t *testing.T) {
+	t.Parallel()
 	w := New(4)
 	w.Player.Cash, w.Player.Respect = 6000, OrganizationStanding
 	w.Player.Location = "bar"
@@ -239,6 +246,7 @@ func TestTheGuideKnowsWhenYouAreInACell(t *testing.T) {
 
 // And a guide for somebody who is dead is a guide to nothing.
 func TestTheGuideKnowsWhenYouAreDead(t *testing.T) {
+	t.Parallel()
 	w := New(4)
 	w.Player.Cash = 6000
 	w.Die("Shot on the steps of the Monarch.")
@@ -256,6 +264,7 @@ func TestTheGuideKnowsWhenYouAreDead(t *testing.T) {
 // go on saying six. Every figure the guide states now comes from the constant
 // the rule uses.
 func TestTheGuideStatesNoFigureOfItsOwn(t *testing.T) {
+	t.Parallel()
 	w := proprietor(t)
 	w.Player.Respect = PremisesRespect - 1
 	found := false

@@ -13,6 +13,7 @@ import "testing"
 // what the hour itself costs is subtracted out and the fee stands alone.
 
 func TestBailTakesTheMoneyOnce(t *testing.T) {
+	t.Parallel()
 	w, n := heldMan(t, 3)
 	fee := 3 * BailDaily
 
@@ -60,6 +61,7 @@ var prefixChain = []string{
 }
 
 func TestNothingInThePrefixChainDeclaresACost(t *testing.T) {
+	t.Parallel()
 	seen := map[string]bool{}
 	for _, a := range everyAction(t) {
 		for _, prefix := range prefixChain {

@@ -3,6 +3,7 @@ package core
 import "testing"
 
 func TestOwnedResidenceSurvivesMovingButNotDeath(t *testing.T) {
+	t.Parallel()
 	w := New(27)
 	w.District = 2
 	w.Player.Cash = 8000
@@ -35,6 +36,7 @@ func TestOwnedResidenceSurvivesMovingButNotDeath(t *testing.T) {
 }
 
 func TestRentingBackAndForthCannotFarmRespect(t *testing.T) {
+	t.Parallel()
 	w := New(27)
 	w.District = 1
 	w.Player.Cash = 1000

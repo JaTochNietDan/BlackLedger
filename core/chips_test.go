@@ -18,6 +18,7 @@ func clothPlayer(t *testing.T) *World {
 }
 
 func TestTheClothTakesAsManyChipsAsYouPutOnIt(t *testing.T) {
+	t.Parallel()
 	w := clothPlayer(t)
 	cash := w.Player.Cash
 	chips := []Chip{{Bet: "red", Amount: 20}, {Bet: "number:17", Amount: 5}, {Bet: "even", Amount: 10}}
@@ -43,6 +44,7 @@ func TestTheClothTakesAsManyChipsAsYouPutOnIt(t *testing.T) {
 }
 
 func TestEveryChipIsWeighedAgainstTheHouseLimit(t *testing.T) {
+	t.Parallel()
 	w := clothPlayer(t)
 	limit := w.TableLimit("club")
 	// The limit is per bet, the way a table's is: two chips at the limit are
@@ -64,6 +66,7 @@ func TestEveryChipIsWeighedAgainstTheHouseLimit(t *testing.T) {
 }
 
 func TestTheWholeClothComesOffYourCashAtOnce(t *testing.T) {
+	t.Parallel()
 	w := clothPlayer(t)
 	cash := w.Player.Cash
 	// Red and black together: whatever the pocket, one of them comes back and
@@ -86,6 +89,7 @@ func TestTheWholeClothComesOffYourCashAtOnce(t *testing.T) {
 }
 
 func TestOneChipIsStillTheOldGame(t *testing.T) {
+	t.Parallel()
 	w := clothPlayer(t)
 	cash := w.Player.Cash
 	if err := w.PlayWheel("club", "red", 40); err != nil {

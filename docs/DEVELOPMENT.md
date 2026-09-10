@@ -7708,3 +7708,34 @@ the order now — the work is below the picture and full width — which is what
 was always about.
 
 No balance run this tick: nothing here can move it.
+
+## One line in a thousand tests
+
+"Please investigate anything you can do to increase your ability to iterate and
+develop efficiently. Find bottlenecks and improve them."
+
+Second round, and this one was the whole of it. Measured: the short core suite
+was 1,017 tests summing 61.9 seconds of test time and taking 69 seconds of wall
+clock — because exactly one of them called `t.Parallel()`. They were running one
+after another on a machine with cores to spare.
+
+| | before | after |
+| --- | --- | --- |
+| `mise run quick` | 70s | 25s |
+| `mise run gate` | 118s | 63s |
+| `go test ./core` | 117s | 64s |
+| `go test -short ./core` | 69s | 25s |
+
+1,017 core tests and 128 elsewhere gained the line. Eighteen did not: the
+director and speech tests reach for an environment variable, which is
+process-wide state, and Go's own `t.Setenv` refuses to be called in a parallel
+test for exactly that reason. Those are named and stay serial.
+
+Checked rather than hoped: `-race` is clean across every package, the full suite
+gives the same result run twice, and the gate passes end to end. Nothing in this
+project's tests shares mutable package state — every one of them builds its own
+world from a seed — which is why a mechanical change of this size was safe, and
+the race detector is the evidence rather than my reading of it.
+
+A tick now costs 25 seconds while iterating and 63 before a commit, against 210
+when this started.

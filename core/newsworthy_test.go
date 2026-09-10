@@ -9,6 +9,7 @@ import "testing"
 // what leads an edition, so none of them ever could.
 
 func TestEveryKindThePaperFilesHasAPlaceOnThePage(t *testing.T) {
+	t.Parallel()
 	// Every kind passed to Report anywhere in the core.
 	filed := []string{"arrest", "attack", "attempt", "business", "civic", "collapse",
 		"killing", "obituary", "police", "politics", "recovery", "robbery",
@@ -21,6 +22,7 @@ func TestEveryKindThePaperFilesHasAPlaceOnThePage(t *testing.T) {
 }
 
 func TestAKillingLeadsOverAnArrestOverTheWeather(t *testing.T) {
+	t.Parallel()
 	if !(Newsworthiness("killing") > Newsworthiness("arrest")) {
 		t.Error("an arrest leads over a killing")
 	}
@@ -37,6 +39,7 @@ func TestAKillingLeadsOverAnArrestOverTheWeather(t *testing.T) {
 }
 
 func TestRankingThePaperDoesNotChangeWhatThePoliceNotice(t *testing.T) {
+	t.Parallel()
 	// The balance of the game depends on scrutiny. Ranking the front page must
 	// not touch it: a column about the price of coal still costs nothing, and a
 	// killing still costs what it always did.
@@ -52,6 +55,7 @@ func TestRankingThePaperDoesNotChangeWhatThePoliceNotice(t *testing.T) {
 }
 
 func TestTheLeadIsTheBiggestStoryNotTheLatest(t *testing.T) {
+	t.Parallel()
 	w := New(131)
 	w.Report("civic", "A CLEAR DAY", "Clear over Bellwether.")
 	w.Report("killing", "A MAN IS FOUND", "Somebody was killed at noon.")

@@ -154,6 +154,19 @@ You seem to be taking a long time to develop each iteration on the loop. Much lo
 
 Please investigate anything you can do to increase your ability to iterate and develop efficiently. Find bottlenecks and improve them.
 
+— built, in two rounds, and measured both times. First: the balance suites are
+  54 files of tens of thousands of simulated days answering "did I move the
+  balance", which is not the question while a change is still being written, so
+  they skip under `-short` and `mise run quick` was born. Second, and this was
+  the whole of it: exactly one test in the project called `t.Parallel()`, so a
+  thousand tests summing 62 seconds of work ran one after another and took 69 on
+  a machine with cores to spare. Every test has the line now except eighteen
+  that reach for an environment variable, which is process-wide. Iterating went
+  from 120 seconds to 25, and the full gate from 118 to 63; a tick that used to
+  cost 210 seconds of waiting costs 63. `-race` is clean across every package,
+  which is the evidence for a mechanical change of that size rather than my
+  reading of it.
+
 ---
 
 Now when gambling for some reason you changed it back to "play the nickle machine" which doesn't even show our slots page it just seems to run some background simulation and it doesn't allow you to set your own bet as we fleshed out prior.

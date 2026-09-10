@@ -6,6 +6,7 @@ import (
 )
 
 func TestProposalSchemaRestrictsFollowUpIdentity(t *testing.T) {
+	t.Parallel()
 	w := core.New(27)
 	c := &core.ArrangementMemory{Speaker: "mara", Beneficiary: ""}
 	s := proposalSchema(w, "collection", c)

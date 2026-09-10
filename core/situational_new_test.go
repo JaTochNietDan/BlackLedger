@@ -14,6 +14,7 @@ func offers(w *World) map[string]SituationalOperation {
 }
 
 func TestAQuietLifeOffersNothing(t *testing.T) {
+	t.Parallel()
 	w := New(151)
 	w.MigrateLivingWorld()
 	for i := range w.Conflicts {
@@ -31,6 +32,7 @@ func TestAQuietLifeOffersNothing(t *testing.T) {
 }
 
 func TestCratesAndAWarIsASituation(t *testing.T) {
+	t.Parallel()
 	w := New(151)
 	w.MigrateLivingWorld()
 	w.Properties["laundry"].Owner = fmt.Sprintf("player:%d", w.Life)
@@ -53,6 +55,7 @@ func TestCratesAndAWarIsASituation(t *testing.T) {
 }
 
 func TestAQuarrelYouKnowAboutIsASituation(t *testing.T) {
+	t.Parallel()
 	w := New(151)
 	w.MigrateLivingWorld()
 	people := w.People()
@@ -72,6 +75,7 @@ func TestAQuarrelYouKnowAboutIsASituation(t *testing.T) {
 }
 
 func TestWorkYouPromisedIsASituation(t *testing.T) {
+	t.Parallel()
 	w, giver := petitioner(t)
 	if _, ok := offers(w)["obligation"]; ok {
 		t.Fatal("a player who owed nobody anything was reminded of it")
@@ -89,6 +93,7 @@ func TestWorkYouPromisedIsASituation(t *testing.T) {
 }
 
 func TestAnEnemyPastTalkingIsASituation(t *testing.T) {
+	t.Parallel()
 	w := New(151)
 	w.MigrateLivingWorld()
 	w.Factions[0].Goodwill = -54
@@ -106,6 +111,7 @@ func TestAnEnemyPastTalkingIsASituation(t *testing.T) {
 }
 
 func TestEveryNewSituationHasAPriceALabelAndAnOutcome(t *testing.T) {
+	t.Parallel()
 	effects := SituationalEffects()
 	for _, id := range []string{"consignment", "grievance", "obligation", "warning_off"} {
 		effect, ok := effects[id]
@@ -122,6 +128,7 @@ func TestEveryNewSituationHasAPriceALabelAndAnOutcome(t *testing.T) {
 }
 
 func TestASituationsPriceMatchesWhatItPays(t *testing.T) {
+	t.Parallel()
 	// The catalog and the offer have to agree, or a proposal validates against
 	// one number and pays another.
 	w := New(151)

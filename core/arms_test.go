@@ -11,6 +11,7 @@ func armed(t *testing.T) *World {
 }
 
 func TestArmsComeOffABoatAndNowhereElse(t *testing.T) {
+	t.Parallel()
 	w := armed(t)
 	if w.ArmsReadiness("weapon") != "" {
 		t.Fatal("the waterfront refused to sell:", w.ArmsReadiness("weapon"))
@@ -27,6 +28,7 @@ func TestArmsComeOffABoatAndNowhereElse(t *testing.T) {
 }
 
 func TestBuyingArmsWorksUpwardAndRunsOut(t *testing.T) {
+	t.Parallel()
 	w := armed(t)
 	w.Player.Cash = 100000
 	for tier := 1; tier < len(weapons); tier++ {
@@ -55,6 +57,7 @@ func TestBuyingArmsWorksUpwardAndRunsOut(t *testing.T) {
 }
 
 func TestArmourReducesWhatViolenceCostsWithoutMakingItFree(t *testing.T) {
+	t.Parallel()
 	bare, vested := New(91), New(91)
 	vested.Player.Armour = len(armour) - 1
 	for _, injury := range []int{10, 30, 65} {
@@ -73,6 +76,7 @@ func TestArmourReducesWhatViolenceCostsWithoutMakingItFree(t *testing.T) {
 }
 
 func TestAWeaponShiftsOddsWithoutGuaranteeingAnything(t *testing.T) {
+	t.Parallel()
 	unarmed, carrying := New(93), New(93)
 	carrying.Player.Weapon = len(weapons) - 1
 	for _, w := range []*World{unarmed, carrying} {
@@ -92,6 +96,7 @@ func TestAWeaponShiftsOddsWithoutGuaranteeingAnything(t *testing.T) {
 }
 
 func TestASearchTakesTheHardware(t *testing.T) {
+	t.Parallel()
 	w := armed(t)
 	w.Player.Weapon, w.Player.Armour = 2, 1
 	if !w.SeizeArms() {
@@ -115,6 +120,7 @@ func TestASearchTakesTheHardware(t *testing.T) {
 }
 
 func TestArmourHelpsSurviveAnAttackAtHome(t *testing.T) {
+	t.Parallel()
 	died := map[int]int{}
 	for _, plate := range []int{0, 2} {
 		for i := uint32(1); i <= 400; i++ {

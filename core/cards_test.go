@@ -11,6 +11,7 @@ func player(t *testing.T) *World {
 }
 
 func TestAHandIsOnTheTableUntilItIsSettled(t *testing.T) {
+	t.Parallel()
 	w := player(t)
 	if w.HandDescription()["playing"] != false {
 		t.Fatal("a hand existed before anybody sat down")
@@ -48,6 +49,7 @@ func TestAHandIsOnTheTableUntilItIsSettled(t *testing.T) {
 }
 
 func TestGoingOverEndsItImmediately(t *testing.T) {
+	t.Parallel()
 	w := player(t)
 	found := false
 	for seed := uint32(1); seed <= 600 && !found; seed++ {
@@ -80,6 +82,7 @@ func TestGoingOverEndsItImmediately(t *testing.T) {
 // of the thing that now owns it, and asked harder — soften could only ever
 // rescue one ace, and a hand can hold four.
 func TestAnAceComesDownRatherThanKillingYou(t *testing.T) {
+	t.Parallel()
 	ace := Card{Rank: "A", Suit: "spades", Value: 11}
 	seven := Card{Rank: "7", Suit: "hearts", Value: 7}
 	king := Card{Rank: "K", Suit: "clubs", Value: 10}
@@ -105,6 +108,7 @@ func TestAnAceComesDownRatherThanKillingYou(t *testing.T) {
 // total and a list of cards is keeping the same fact twice, and this is the
 // check that they cannot drift.
 func TestAHandIsWorthExactlyWhatIsLyingOnTheTable(t *testing.T) {
+	t.Parallel()
 	w := New(53)
 	w.District = 2
 	w.Player.Cash, w.Player.Respect, w.Player.Health = 20000, 200, 100
@@ -130,6 +134,7 @@ func TestAHandIsWorthExactlyWhatIsLyingOnTheTable(t *testing.T) {
 
 // And every card is a real card: something a deck actually contains.
 func TestEveryCardDealtIsACardThatExists(t *testing.T) {
+	t.Parallel()
 	w := New(11)
 	seenRanks, seenSuits := map[string]bool{}, map[string]bool{}
 	for i := 0; i < 4000; i++ {
@@ -167,6 +172,7 @@ func TestEveryCardDealtIsACardThatExists(t *testing.T) {
 // on, or the game the player sits down to and the game an owner's books model
 // are different games.
 func TestTheEdgeAtTheTableMatchesTheEdgeInTheBooks(t *testing.T) {
+	t.Parallel()
 	// A player standing on seventeen or better, which is what most people do.
 	const hands = 20000
 	staked, returned := 0, 0
@@ -199,6 +205,7 @@ func TestTheEdgeAtTheTableMatchesTheEdgeInTheBooks(t *testing.T) {
 }
 
 func TestTheDealerDrawsToSixteenAndStandsOnSeventeen(t *testing.T) {
+	t.Parallel()
 	for seed := uint32(1); seed <= 400; seed++ {
 		w := player(t)
 		w.RNG = seed * 2654435761
@@ -215,6 +222,7 @@ func TestTheDealerDrawsToSixteenAndStandsOnSeventeen(t *testing.T) {
 }
 
 func TestYouCannotSitAtYourOwnTablesOrOnesYouCannotAfford(t *testing.T) {
+	t.Parallel()
 	w := player(t)
 	w.Player.Cash = 10
 	if err := w.Deal("club", 50); err == nil {
@@ -229,6 +237,7 @@ func TestYouCannotSitAtYourOwnTablesOrOnesYouCannotAfford(t *testing.T) {
 }
 
 func TestATieGivesTheMoneyBack(t *testing.T) {
+	t.Parallel()
 	pushed := false
 	for seed := uint32(1); seed <= 2000 && !pushed; seed++ {
 		w := player(t)
@@ -264,6 +273,7 @@ func TestATieGivesTheMoneyBack(t *testing.T) {
 // it twenty-six and took the money. Keeping the cards makes the hand's value a
 // question about all of them, which is the only way the answer is right.
 func TestAnAceAlreadyInTheHandStillComesDownLater(t *testing.T) {
+	t.Parallel()
 	ace := Card{Rank: "A", Suit: "spades", Value: 11}
 	five := Card{Rank: "5", Suit: "hearts", Value: 5}
 	ten := Card{Rank: "10", Suit: "clubs", Value: 10}
@@ -284,6 +294,7 @@ func TestAnAceAlreadyInTheHandStillComesDownLater(t *testing.T) {
 // the instant it settled, so the felt vanished before it had said anything and
 // the only account of it was a line in the ledger.
 func TestASettledHandStaysOnTheTableAndSaysWhatHappened(t *testing.T) {
+	t.Parallel()
 	w := player(t)
 	if err := w.Deal("club", 50); err != nil {
 		t.Fatal(err)

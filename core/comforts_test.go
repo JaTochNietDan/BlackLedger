@@ -14,6 +14,7 @@ func resident(t *testing.T) *World {
 }
 
 func TestComfortsCanOnlyBeFittedWhereYouLive(t *testing.T) {
+	t.Parallel()
 	w := resident(t)
 	if w.FitReadiness(w.Player.Home, "door") != "" {
 		t.Fatal("could not fit a door at home:", w.FitReadiness(w.Player.Home, "door"))
@@ -38,6 +39,7 @@ func TestComfortsCanOnlyBeFittedWhereYouLive(t *testing.T) {
 }
 
 func TestComfortsStayWithTheBuilding(t *testing.T) {
+	t.Parallel()
 	w := resident(t)
 	w.Fit(w.Player.Home, "door")
 	w.Fit(w.Player.Home, "telephone")
@@ -64,6 +66,7 @@ func TestComfortsStayWithTheBuilding(t *testing.T) {
 }
 
 func TestADoorThatHoldsCountsAsAGuard(t *testing.T) {
+	t.Parallel()
 	w := resident(t)
 	before := w.Guard()
 	w.Fit(w.Player.Home, "door")
@@ -73,6 +76,7 @@ func TestADoorThatHoldsCountsAsAGuard(t *testing.T) {
 }
 
 func TestATelephoneCountsAsAContact(t *testing.T) {
+	t.Parallel()
 	w := resident(t)
 	w.Player.Contacts = 1
 	if w.Reach() != 1 {
@@ -85,6 +89,7 @@ func TestATelephoneCountsAsAContact(t *testing.T) {
 }
 
 func TestASafeKeepsMoneyOutOfReach(t *testing.T) {
+	t.Parallel()
 	w := resident(t)
 	w.Player.Cash = 3000
 	if w.Reachable() != 3000 || w.Sheltered() != 0 {
@@ -112,6 +117,7 @@ func TestASafeKeepsMoneyOutOfReach(t *testing.T) {
 }
 
 func TestACellarHidesStockAndAWarrantFindsIt(t *testing.T) {
+	t.Parallel()
 	w := resident(t)
 	w.Fit(w.Player.Home, "cellar")
 	if w.Concealed() != CellarHold {
@@ -130,6 +136,7 @@ func TestACellarHidesStockAndAWarrantFindsIt(t *testing.T) {
 }
 
 func TestACellarAndAFalseFloorAreDifferentHidingPlaces(t *testing.T) {
+	t.Parallel()
 	w := resident(t)
 	w.Fit(w.Player.Home, "cellar")
 	w.Player.Car, w.Player.CarWear = 2, 100
@@ -147,6 +154,7 @@ func TestACellarAndAFalseFloorAreDifferentHidingPlaces(t *testing.T) {
 }
 
 func TestComfortsJoinTheDailyBill(t *testing.T) {
+	t.Parallel()
 	w := resident(t)
 	before := w.DailyCost()
 	total := 0
@@ -162,6 +170,7 @@ func TestComfortsJoinTheDailyBill(t *testing.T) {
 }
 
 func TestNobodyInheritsAFittedHome(t *testing.T) {
+	t.Parallel()
 	w := resident(t)
 	w.Fit(w.Player.Home, "safe")
 	home := w.Player.Home
@@ -182,6 +191,7 @@ func TestNobodyInheritsAFittedHome(t *testing.T) {
 }
 
 func TestAnOlderSaveHasAnEmptyHome(t *testing.T) {
+	t.Parallel()
 	w := resident(t)
 	w.MigrateLivingWorld()
 	if len(w.Comforts(w.Player.Home)) != 0 || w.ComfortUpkeep() != 0 {
@@ -193,6 +203,7 @@ func TestAnOlderSaveHasAnEmptyHome(t *testing.T) {
 }
 
 func TestEveryComfortIsWorthWhatItCosts(t *testing.T) {
+	t.Parallel()
 	// Each one has to change something measurable, or it is decoration with a
 	// price on it.
 	for _, c := range comforts {

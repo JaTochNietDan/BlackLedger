@@ -42,6 +42,7 @@ func mediator(t *testing.T, hostility int, hotLeader bool) *World {
 }
 
 func TestNobodyComesToARoomForANobody(t *testing.T) {
+	t.Parallel()
 	w := mediator(t, 70, false)
 	w.Player.Respect = 0
 	if w.SitdownReadiness() == "" {
@@ -65,6 +66,7 @@ func TestNobodyComesToARoomForANobody(t *testing.T) {
 }
 
 func TestThereIsNothingToMediateInAQuietCity(t *testing.T) {
+	t.Parallel()
 	w := mediator(t, 10, false)
 	for i := range w.Conflicts {
 		w.Conflicts[i].Hostility, w.Conflicts[i].State = 5, "cold"
@@ -78,6 +80,7 @@ func TestThereIsNothingToMediateInAQuietCity(t *testing.T) {
 }
 
 func TestPressingASettleableQuarrelEndsIt(t *testing.T) {
+	t.Parallel()
 	w := mediator(t, 55, false)
 	if err := w.CallSitdown(); err != nil {
 		t.Fatal(err)
@@ -105,6 +108,7 @@ func TestPressingASettleableQuarrelEndsIt(t *testing.T) {
 }
 
 func TestPressingAQuarrelSomebodyCameToFinishIsTheWorstRoomInTheCity(t *testing.T) {
+	t.Parallel()
 	w := mediator(t, 80, true)
 	q, ok := w.OpenQuarrel()
 	if !ok || !q.Trap {
@@ -140,6 +144,7 @@ func TestPressingAQuarrelSomebodyCameToFinishIsTheWorstRoomInTheCity(t *testing.
 }
 
 func TestAWarmQuarrelIsNotATrapHoweverBadTheLeader(t *testing.T) {
+	t.Parallel()
 	w := mediator(t, TrapHostility-5, true)
 	q, ok := w.OpenQuarrel()
 	if !ok || q.Trap {
@@ -148,6 +153,7 @@ func TestAWarmQuarrelIsNotATrapHoweverBadTheLeader(t *testing.T) {
 }
 
 func TestYouOnlyKnowItIsATrapIfSomebodyToldYou(t *testing.T) {
+	t.Parallel()
 	w := mediator(t, 80, true)
 	w.Player.Contacts = 0
 	q, _ := w.OpenQuarrel()
@@ -169,6 +175,7 @@ func TestYouOnlyKnowItIsATrapIfSomebodyToldYou(t *testing.T) {
 }
 
 func TestListeningIsSafeAndSettlesLittle(t *testing.T) {
+	t.Parallel()
 	w := mediator(t, 80, true) // even in the worst room
 	w.CallSitdown()
 	c := w.Conflict(w.Event.Actor, w.Event.Target)
@@ -185,6 +192,7 @@ func TestListeningIsSafeAndSettlesLittle(t *testing.T) {
 }
 
 func TestTakingASideMakesOneEnemyAndOneFriend(t *testing.T) {
+	t.Parallel()
 	w := mediator(t, 55, false)
 	w.CallSitdown()
 	a, b := w.faction(w.Event.Actor), w.faction(w.Event.Target)
@@ -206,6 +214,7 @@ func TestTakingASideMakesOneEnemyAndOneFriend(t *testing.T) {
 }
 
 func TestLeavingCostsStandingWithBoth(t *testing.T) {
+	t.Parallel()
 	w := mediator(t, 55, false)
 	w.CallSitdown()
 	a, b := w.faction(w.Event.Actor), w.faction(w.Event.Target)
@@ -222,6 +231,7 @@ func TestLeavingCostsStandingWithBoth(t *testing.T) {
 }
 
 func TestTheFeeIsPaidWhateverHappens(t *testing.T) {
+	t.Parallel()
 	w := mediator(t, 55, false)
 	cash := w.Player.Cash
 	if err := w.CallSitdown(); err != nil {
@@ -244,6 +254,7 @@ func TestTheFeeIsPaidWhateverHappens(t *testing.T) {
 // standing, so the city named a room three streets from the one the player was
 // sitting in.
 func TestWhoeverDiesAtASitdownDiedInTheRoom(t *testing.T) {
+	t.Parallel()
 	w := mediator(t, 95, true) // hostile, and one side led by somebody who does not wait
 	for i := range w.NPCs {
 		if w.NPCs[i].Location == SitdownGround {
@@ -299,6 +310,7 @@ func TestWhoeverDiesAtASitdownDiedInTheRoom(t *testing.T) {
 // families were sitting exactly on the boundary, which no fixture had put them
 // on.
 func TestAnAgreedMeetingIsNotCalledOffByOnePoint(t *testing.T) {
+	t.Parallel()
 	w := mediator(t, 40, false)
 	w.Player.Cash, w.Player.Respect = 5000, 60
 	q, ok := w.OpenQuarrel()
@@ -326,6 +338,7 @@ func TestAnAgreedMeetingIsNotCalledOffByOnePoint(t *testing.T) {
 
 // And the refusal, when it is a refusal, says which door is shut.
 func TestARefusedMeetingNamesWhoWouldNotCome(t *testing.T) {
+	t.Parallel()
 	w := mediator(t, 40, false)
 	w.Player.Cash, w.Player.Respect = 5000, 60
 	q, _ := w.OpenQuarrel()

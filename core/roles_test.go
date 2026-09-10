@@ -10,6 +10,7 @@ func cityWithJobs(t *testing.T) *World {
 }
 
 func TestSomebodyIsDoingEveryJobOnTheFirstMorning(t *testing.T) {
+	t.Parallel()
 	w := cityWithJobs(t)
 	for _, r := range roles {
 		holder := w.Holder(r.ID)
@@ -26,6 +27,7 @@ func TestSomebodyIsDoingEveryJobOnTheFirstMorning(t *testing.T) {
 }
 
 func TestNobodyIsFixed(t *testing.T) {
+	t.Parallel()
 	w := cityWithJobs(t)
 	for _, r := range roles {
 		before := w.Holder(r.ID)
@@ -56,6 +58,7 @@ func TestNobodyIsFixed(t *testing.T) {
 }
 
 func TestNobodyDoesTwoJobsAtOnce(t *testing.T) {
+	t.Parallel()
 	w := cityWithJobs(t)
 	// Empty every job at once and see who fills them.
 	for _, r := range roles {
@@ -76,6 +79,7 @@ func TestNobodyDoesTwoJobsAtOnce(t *testing.T) {
 }
 
 func TestFillingIsIdempotent(t *testing.T) {
+	t.Parallel()
 	w := cityWithJobs(t)
 	before := len(w.NPCs)
 	holders := map[string]string{}
@@ -96,6 +100,7 @@ func TestFillingIsIdempotent(t *testing.T) {
 }
 
 func TestScenesSpeakThroughWhoeverHasTheJob(t *testing.T) {
+	t.Parallel()
 	w := cityWithJobs(t)
 	w.Kill("mara", "Shot.")
 	w.FillRoles()
@@ -119,6 +124,7 @@ func TestScenesSpeakThroughWhoeverHasTheJob(t *testing.T) {
 }
 
 func TestNobodyIsDoingAJobNobodyCanDo(t *testing.T) {
+	t.Parallel()
 	w := cityWithJobs(t)
 	// Kill everybody who is not in an organization, so the only candidates are
 	// people the city would have to invent.

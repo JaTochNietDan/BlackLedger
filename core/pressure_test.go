@@ -12,6 +12,7 @@ func quietCity(t *testing.T) *World {
 }
 
 func TestAQuietCityCoolsAndALoudOneDoesNot(t *testing.T) {
+	t.Parallel()
 	w := quietCity(t)
 	w.Attention = 40
 	for i := 0; i < 10; i++ {
@@ -32,6 +33,7 @@ func TestAQuietCityCoolsAndALoudOneDoesNot(t *testing.T) {
 }
 
 func TestWhatThePaperCarriesIsWhatTheCityCounts(t *testing.T) {
+	t.Parallel()
 	w := quietCity(t)
 	w.Minute = 5000
 	w.Report("killing", "SOMEBODY KILLED", "It happened.")
@@ -60,6 +62,7 @@ func TestWhatThePaperCarriesIsWhatTheCityCounts(t *testing.T) {
 }
 
 func TestACrackdownIsAnnouncedOnceAndLiftsOnce(t *testing.T) {
+	t.Parallel()
 	w := quietCity(t)
 	w.Attention = ScrutinyCrackdown - 1
 	w.Minute = 5000
@@ -101,6 +104,7 @@ func TestACrackdownIsAnnouncedOnceAndLiftsOnce(t *testing.T) {
 }
 
 func TestACrackdownBringsThePoliceSooner(t *testing.T) {
+	t.Parallel()
 	w := quietCity(t)
 	if w.ScrutinyRaidShift() != 0 {
 		t.Fatal("a quiet city brought anybody sooner")
@@ -134,6 +138,7 @@ func TestACrackdownBringsThePoliceSooner(t *testing.T) {
 }
 
 func TestACrackdownMakesTheBuildingDearerAndFussier(t *testing.T) {
+	t.Parallel()
 	w := quietCity(t)
 	o, _ := OfficialByID("mayor")
 	if w.ScrutinyPremium() != 0 || w.OfficialOpening(o) != o.Opening || w.OfficialCeiling(o) != o.Ceiling {

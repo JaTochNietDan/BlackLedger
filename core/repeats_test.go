@@ -10,6 +10,7 @@ import (
 // the tests could see it because each individual story was correct.
 
 func TestThePaperDoesNotPrintTheSameStorySevenTimes(t *testing.T) {
+	t.Parallel()
 	w := New(141)
 	for i := 0; i < 7; i++ {
 		w.Report("robbery", "ROBBERY IN SAINT AGNES", "A man was robbed near Saint Agnes.")
@@ -32,6 +33,7 @@ func TestThePaperDoesNotPrintTheSameStorySevenTimes(t *testing.T) {
 }
 
 func TestTwoDifferentRobberiesAreTwoStories(t *testing.T) {
+	t.Parallel()
 	w := New(142)
 	w.Report("robbery", "ROBBERY IN SAINT AGNES", "A man was robbed near Saint Agnes.")
 	w.Report("robbery", "ROBBERY AT THE MONARCH", "The day's takings went out of the back.")
@@ -41,6 +43,7 @@ func TestTwoDifferentRobberiesAreTwoStories(t *testing.T) {
 }
 
 func TestYesterdaysStoryIsNotTodaysStory(t *testing.T) {
+	t.Parallel()
 	// The paper collapses a run within one issue. It does not reach back into
 	// yesterday's edition, which has gone out.
 	w := New(143)
@@ -53,6 +56,7 @@ func TestYesterdaysStoryIsNotTodaysStory(t *testing.T) {
 }
 
 func TestThePoliceLineIsNotPrintedTwice(t *testing.T) {
+	t.Parallel()
 	w := New(144)
 	doubled := w.unattributed("Saint Agnes",
 		"A man was robbed near Saint Agnes. Police have asked anybody who saw it to come forward.")
@@ -71,6 +75,7 @@ func TestThePoliceLineIsNotPrintedTwice(t *testing.T) {
 // half. A newspaper has no idea who is reading it.
 
 func TestOneDayIsOneIssueEvenWhenTheReaderChanges(t *testing.T) {
+	t.Parallel()
 	w := New(97)
 	w.News = nil
 	w.Minute = 11 * 1440

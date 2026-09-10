@@ -12,6 +12,7 @@ import "testing"
 // A family that runs an operation and holds nothing to pay for it goes broke,
 // and shrinks toward what it can actually afford.
 func TestAFamilyWithNoHoldingsRunsOutOfMoney(t *testing.T) {
+	t.Parallel()
 	w := withFamily(41, "vasco", "Vasco Company", "Ilse Vasco")
 	f := w.faction("vasco")
 	for _, id := range w.FamilyHoldings("vasco") {
@@ -40,6 +41,7 @@ func TestAFamilyWithNoHoldingsRunsOutOfMoney(t *testing.T) {
 // The other side of it: a family whose holdings cover the bill is not short and
 // does not shrink for want of money.
 func TestAFamilyThatCoversItsBillIsNotShort(t *testing.T) {
+	t.Parallel()
 	w := withFamily(41, "vasco", "Vasco Company", "Ilse Vasco")
 	f := w.faction("vasco")
 	f.Cash, f.Power, f.Peak = 5000, 20, 20
@@ -56,6 +58,7 @@ func TestAFamilyThatCoversItsBillIsNotShort(t *testing.T) {
 
 // Money is a quantity, not a sign. Nothing may drive a family below nothing.
 func TestAFamilyNeverHoldsLessThanNothing(t *testing.T) {
+	t.Parallel()
 	w := withFamily(41, "vasco", "Vasco Company", "Ilse Vasco")
 	f := w.faction("vasco")
 	for _, id := range w.FamilyHoldings("vasco") {
@@ -73,6 +76,7 @@ func TestAFamilyNeverHoldsLessThanNothing(t *testing.T) {
 // Repairs used to happen every morning for free. A family with nothing spare
 // watches its property go down instead, which is how a bad year compounds.
 func TestABrokeFamilyCannotRepairItsHoldings(t *testing.T) {
+	t.Parallel()
 	w := withFamily(41, "vasco", "Vasco Company", "Ilse Vasco")
 	f := w.faction("vasco")
 	held := w.FamilyHoldings("vasco")
@@ -103,6 +107,7 @@ func TestABrokeFamilyCannotRepairItsHoldings(t *testing.T) {
 // The player's organization is run by the player. This loop must never pay
 // their wages or repair their businesses for them.
 func TestThePlayersOwnOrganizationPaysItsOwnWay(t *testing.T) {
+	t.Parallel()
 	w := New(41)
 	w.Player.Cash, w.Player.Respect = 20000, 200
 	for _, id := range []string{"laundry", "garage", "casino"} {

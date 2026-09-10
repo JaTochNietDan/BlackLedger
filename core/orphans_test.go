@@ -45,6 +45,7 @@ func endTheFamily(t *testing.T) (*World, []string) {
 }
 
 func TestWhenAFamilyEndsNobodyStillAnswersToIt(t *testing.T) {
+	t.Parallel()
 	w, people := endTheFamily(t)
 	stranded := []string{}
 	for _, id := range people {
@@ -64,6 +65,7 @@ func TestWhenAFamilyEndsNobodyStillAnswersToIt(t *testing.T) {
 // And nothing anywhere should be able to find a member of a family that is not
 // in the world.
 func TestNobodyIsAMemberOfAnOrganizationThatIsGone(t *testing.T) {
+	t.Parallel()
 	w, _ := endTheFamily(t)
 	if left := w.Members("bellandi"); len(left) > 0 {
 		t.Errorf("%d people are still on the books of a family nobody can look up", len(left))
@@ -81,6 +83,7 @@ func TestNobodyIsAMemberOfAnOrganizationThatIsGone(t *testing.T) {
 // The city should say what happened to them, and say it correctly for one man
 // as well as for nine.
 func TestTheCityCountsWhoIsPutOnTheStreet(t *testing.T) {
+	t.Parallel()
 	w, people := endTheFamily(t)
 	said := ""
 	for _, r := range w.History {

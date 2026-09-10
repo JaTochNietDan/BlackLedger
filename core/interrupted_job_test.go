@@ -3,6 +3,7 @@ package core
 import "testing"
 
 func TestPausedArrangementKeepsTermsAndOnlyRemainingTime(t *testing.T) {
+	t.Parallel()
 	for _, tc := range []struct {
 		method           string
 		duration, reward int
@@ -44,6 +45,7 @@ func TestPausedArrangementKeepsTermsAndOnlyRemainingTime(t *testing.T) {
 }
 
 func TestPausedJobAbandonmentAndPoliceCompletion(t *testing.T) {
+	t.Parallel()
 	for _, abandon := range []bool{false, true} {
 		w := pressureWorld()
 		w.Player.Heat = 14
@@ -72,6 +74,7 @@ func TestPausedJobAbandonmentAndPoliceCompletion(t *testing.T) {
 }
 
 func TestUrgentWarningDoesNotSuspendJobAsRoutineConversation(t *testing.T) {
+	t.Parallel()
 	w := New(27)
 	w.Player.Contacts = 2
 	w.Plots = []Plot{{ID: "danger", Kind: "hit", Actor: "bellandi", Life: 1, Due: w.Minute + 120}}
@@ -84,6 +87,7 @@ func TestUrgentWarningDoesNotSuspendJobAsRoutineConversation(t *testing.T) {
 }
 
 func TestRepeatedDemandsPreserveRemainingWork(t *testing.T) {
+	t.Parallel()
 	w := pressureWorld()
 	e, _ := w.ValidateProposal(Proposal{Title: "A collection", Body: "Collect the agreed payment.", Speaker: "mara", Operation: "collection", Outcome: "Done."})
 	w.Event = e

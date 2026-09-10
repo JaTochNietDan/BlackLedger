@@ -27,6 +27,7 @@ func motorist(t *testing.T) *World {
 }
 
 func TestWhatACarIsWorthIsSaidInMinutesOnARealRoad(t *testing.T) {
+	t.Parallel()
 	w := motorist(t)
 	worth := w.CarWorth(1)
 	if worth.To == "" {
@@ -62,6 +63,7 @@ func TestWhatACarIsWorthIsSaidInMinutesOnARealRoad(t *testing.T) {
 }
 
 func TestAPlatedCarIsQuotedAtWhatItActuallyDoes(t *testing.T) {
+	t.Parallel()
 	w := motorist(t)
 	w.Player.Car, w.Player.CarWear = 1, 100
 	w.Player.Fuel, w.Player.Fuelled = FuelFull, max(1, w.Minute)

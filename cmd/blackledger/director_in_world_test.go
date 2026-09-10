@@ -7,6 +7,7 @@ import (
 )
 
 func TestGeneratedDialogueStaysInsideTheCity(t *testing.T) {
+	t.Parallel()
 	// Observed on qwen3.5:35b-a3b: the mediation brief said the disputing staff
 	// were "neither the player nor a new named character", and Elena Russo
 	// recited that restriction aloud to Alex as "Neither is you".
@@ -57,6 +58,7 @@ func roleWorld(name string) *core.World {
 }
 
 func TestSpeakerDoesNotHandThePlayerAFamilyRank(t *testing.T) {
+	t.Parallel()
 	// Observed on qwen3.5:35b-a3b: Elena Russo, who leads the Russo Outfit,
 	// opened with "Alex, as leader of the Russo Outfit, I need you to step in",
 	// attaching her own rank to the listener.

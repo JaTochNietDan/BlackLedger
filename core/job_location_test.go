@@ -6,6 +6,7 @@ import (
 )
 
 func TestJobLocationIsValidatedDisplayedAndRemembered(t *testing.T) {
+	t.Parallel()
 	w := New(27)
 	p := Proposal{Location: "garage", Title: "A local delivery", Body: "Carry the sealed message.", Speaker: "mara", Operation: "courier", Outcome: "Delivered."}
 	if _, err := w.ValidateProposal(p); err == nil {

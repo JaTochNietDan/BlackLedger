@@ -3,6 +3,7 @@ package core
 import "testing"
 
 func TestATemperamentIsTheSamePersonEveryTime(t *testing.T) {
+	t.Parallel()
 	a := New(7)
 	b := New(7)
 	for i := range a.NPCs {
@@ -20,6 +21,7 @@ func TestATemperamentIsTheSamePersonEveryTime(t *testing.T) {
 }
 
 func TestTheCityIsNotAllOneKindOfPerson(t *testing.T) {
+	t.Parallel()
 	seen := map[string]int{}
 	for seed := uint32(1); seed <= 200; seed++ {
 		w := New(seed)
@@ -44,6 +46,7 @@ func TestTheCityIsNotAllOneKindOfPerson(t *testing.T) {
 }
 
 func TestTemperamentChangesWhatSomebodyDoes(t *testing.T) {
+	t.Parallel()
 	w := New(3)
 	base := &NPC{ID: "x", Name: "Test Person", Ambition: 80, Skill: 60}
 	hot, careful := *base, *base
@@ -76,6 +79,7 @@ func nameWith(t *testing.T, id string) string {
 }
 
 func TestALoyalPersonWillNotMoveAgainstTheirOwn(t *testing.T) {
+	t.Parallel()
 	w, a, _ := quarrel(t)
 	// Give the quarrel to two people in the same organization, one of them
 	// loyal, and let it run long enough that anybody else would have acted.
@@ -121,6 +125,7 @@ func TestALoyalPersonWillNotMoveAgainstTheirOwn(t *testing.T) {
 }
 
 func TestAStrangerIsAStranger(t *testing.T) {
+	t.Parallel()
 	w := New(29)
 	w.MigrateLivingWorld()
 	w.Player.Contacts = 0
@@ -158,6 +163,7 @@ func TestAStrangerIsAStranger(t *testing.T) {
 }
 
 func TestWhatYouKnowIsWhatTheCityRecorded(t *testing.T) {
+	t.Parallel()
 	w := New(29)
 	w.MigrateLivingWorld()
 	var person *NPC
@@ -180,6 +186,7 @@ func TestWhatYouKnowIsWhatTheCityRecorded(t *testing.T) {
 }
 
 func TestTheCastIsOnlyPeopleYouKnow(t *testing.T) {
+	t.Parallel()
 	w := New(29)
 	w.MigrateLivingWorld()
 	w.Player.Contacts = 0

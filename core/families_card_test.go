@@ -16,6 +16,7 @@ import "testing"
 // has nobody left reads exactly like a family they know nothing about.
 
 func TestEveryFamilyCardSaysHowManyPeopleItHas(t *testing.T) {
+	t.Parallel()
 	w := New(43)
 	// Somebody inside one family and nobody inside the other. Knowledge is
 	// earned rather than stored: a contact network hears the ordinary things,
@@ -67,6 +68,7 @@ func TestEveryFamilyCardSaysHowManyPeopleItHas(t *testing.T) {
 }
 
 func TestAFamilyWithNobodyLeftSaysSoRatherThanGoingBlank(t *testing.T) {
+	t.Parallel()
 	w := New(43)
 	// Known inside out, and then emptied. Bellandi stays a stranger.
 	w.Player.Contacts = 5

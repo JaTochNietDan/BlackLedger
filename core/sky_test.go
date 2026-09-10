@@ -7,6 +7,7 @@ import "testing"
 // a fortnight of weather, and the streets do not dry the instant it stops.
 
 func TestTheSameDayHasTheSameWeatherEveryTimeItIsAsked(t *testing.T) {
+	t.Parallel()
 	w := &World{ID: "campaign-one", Minute: 5 * 1440}
 	first := w.Sky()
 	for i := 0; i < 50; i++ {
@@ -22,6 +23,7 @@ func TestTheSameDayHasTheSameWeatherEveryTimeItIsAsked(t *testing.T) {
 }
 
 func TestTwoCampaignsDoNotShareTheirWeather(t *testing.T) {
+	t.Parallel()
 	same := 0
 	for day := 0; day < 40; day++ {
 		if SkyOn(day, skySeed("campaign-one")) == SkyOn(day, skySeed("campaign-two")) {
@@ -34,6 +36,7 @@ func TestTwoCampaignsDoNotShareTheirWeather(t *testing.T) {
 }
 
 func TestTheStreetsAreStillWetTheDayAfterRain(t *testing.T) {
+	t.Parallel()
 	seed := skySeed("campaign-one")
 	found := false
 	for day := 1; day < 400; day++ {
@@ -53,6 +56,7 @@ func TestTheStreetsAreStillWetTheDayAfterRain(t *testing.T) {
 }
 
 func TestEveryKindOfWeatherHappens(t *testing.T) {
+	t.Parallel()
 	seen := map[string]int{}
 	seed := skySeed("campaign-one")
 	for day := 0; day < 400; day++ {
@@ -70,6 +74,7 @@ func TestEveryKindOfWeatherHappens(t *testing.T) {
 }
 
 func TestRainIsWetterThanFogAndClearIsDry(t *testing.T) {
+	t.Parallel()
 	seed := skySeed("campaign-one")
 	for day := 0; day < 400; day++ {
 		s := SkyOn(day, seed)

@@ -25,6 +25,7 @@ func crosser(t *testing.T) *World {
 }
 
 func TestTheCrossingSaysWhatYouAreCrossingItIn(t *testing.T) {
+	t.Parallel()
 	w := crosser(t)
 	on := w.Crossing("bar", "market")
 	if on["minutes"].(int) <= 0 {
@@ -54,6 +55,7 @@ func TestTheCrossingSaysWhatYouAreCrossingItIn(t *testing.T) {
 }
 
 func TestTheCrossingSaysWhoIsLookingForYou(t *testing.T) {
+	t.Parallel()
 	w := crosser(t)
 	quiet := w.Crossing("bar", "market")
 	if quiet["warned"].(bool) {
@@ -76,6 +78,7 @@ func TestTheCrossingSaysWhoIsLookingForYou(t *testing.T) {
 // was offered with no field on it, so it sent nothing and was refused every
 // time: "the max limit should be defined by the casino owner dynamically."
 func TestTheHolderCanActuallyNameTheLimit(t *testing.T) {
+	t.Parallel()
 	w := houseKeeper(t)
 	w.Event, w.District = nil, 9
 	a := actionByID(w.Actions("casino"), "limit")

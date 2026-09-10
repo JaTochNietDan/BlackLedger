@@ -10,6 +10,7 @@ import "testing"
 // seen, and that is what those trades are for.
 
 func TestSomeTradesKeepThingsOutOfSight(t *testing.T) {
+	t.Parallel()
 	hiding := 0
 	for kind, trade := range trades {
 		if trade.Hides < 0 {
@@ -35,6 +36,7 @@ func TestSomeTradesKeepThingsOutOfSight(t *testing.T) {
 // The wiring: what a business hides has to reach the attention holding stock
 // draws, or it is a number in a table nobody reads.
 func TestAYardFullOfTrucksHidesWhatACarCannot(t *testing.T) {
+	t.Parallel()
 	stocked := func(own string) (concealed, exposed, heat int) {
 		w := New(53)
 		w.District = 2
@@ -80,6 +82,7 @@ func TestAYardFullOfTrucksHidesWhatACarCannot(t *testing.T) {
 // this passing. What can be proved is the thing the fix rests on, over a kind
 // the city genuinely has two of.
 func TestOwningAnyOneOfAKindCountsAsOwningThatKind(t *testing.T) {
+	t.Parallel()
 	byKind := map[string][]string{}
 	for _, l := range Locations {
 		if l.Kind != "" {

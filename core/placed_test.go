@@ -8,6 +8,7 @@ import "testing"
 // more trouble than one holding two thousand against a bill of ninety.
 
 func TestHowAFamilyIsPlacedTellsTheFourStatesApart(t *testing.T) {
+	t.Parallel()
 	seen := map[string]bool{}
 	for _, c := range []struct {
 		name        string
@@ -44,6 +45,7 @@ func TestHowAFamilyIsPlacedTellsTheFourStatesApart(t *testing.T) {
 // The two figures behind it must be the ones the morning actually charges,
 // or a family can be described as comfortable on a bill it is not paying.
 func TestTheBillDescribedIsTheBillCharged(t *testing.T) {
+	t.Parallel()
 	w := withFamily(41, "vasco", "Vasco Company", "Ilse Vasco")
 	f := w.faction("vasco")
 	f.Cash, f.Power, f.Peak = 50000, 40, 40
@@ -60,6 +62,7 @@ func TestTheBillDescribedIsTheBillCharged(t *testing.T) {
 
 // And a family living within its income is not counting days at all.
 func TestAFamilyLivingWithinItsIncomeIsNotCountingDays(t *testing.T) {
+	t.Parallel()
 	w := withFamily(41, "vasco", "Vasco Company", "Ilse Vasco")
 	f := w.faction("vasco")
 	f.Cash, f.Power, f.Peak = 100, 8, 8

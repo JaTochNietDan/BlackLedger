@@ -12,6 +12,7 @@ func cityAtWar() *core.World {
 }
 
 func TestConflictWorkMustReferToTheConflict(t *testing.T) {
+	t.Parallel()
 	w := cityAtWar()
 	if w.Conflict("bellandi", "russo").State != "war" {
 		t.Fatal("the test world is not at war")
@@ -35,6 +36,7 @@ func TestConflictWorkMustReferToTheConflict(t *testing.T) {
 }
 
 func TestOrdinaryWorkIsNotAskedToMentionAnything(t *testing.T) {
+	t.Parallel()
 	w := cityAtWar()
 	for _, operation := range []string{"courier", "mediation", "collection"} {
 		if err := validateSituationalGrounding(w, core.Proposal{Operation: operation, Body: "Two staff cannot agree about the loading bay."}); err != nil {

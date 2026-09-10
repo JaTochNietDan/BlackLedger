@@ -12,6 +12,7 @@ func sampleProposal() core.Proposal {
 	return core.Proposal{Title: "An agreed payment", Body: "Collect the agreed payment for Russo Outfit.", Speaker: "elena", Operation: "collection", Outcome: "Payment collected.", Beneficiary: "russo"}
 }
 func TestCorpusValidatesAndFingerprintsExactInput(t *testing.T) {
+	t.Parallel()
 	b, _ := json.Marshal([]core.Proposal{sampleProposal()})
 	p, hash, err := ReadCorpus(strings.NewReader(string(b)))
 	if err != nil {
@@ -33,6 +34,7 @@ func TestCorpusValidatesAndFingerprintsExactInput(t *testing.T) {
 	}
 }
 func TestReplayConsumesOnceAndIsReproducible(t *testing.T) {
+	t.Parallel()
 	corpus := []core.Proposal{sampleProposal()}
 	a := RunRecorded(27, "investor", "replay", 100, false, corpus)
 	b := RunRecorded(27, "investor", "replay", 100, false, corpus)
@@ -44,6 +46,7 @@ func TestReplayConsumesOnceAndIsReproducible(t *testing.T) {
 	}
 }
 func TestReplayDoesNotSkipInvalidProposal(t *testing.T) {
+	t.Parallel()
 	p := sampleProposal()
 	p.Operation = "invented-operation"
 	r := RunRecorded(27, "investor", "replay", 100, false, []core.Proposal{p})

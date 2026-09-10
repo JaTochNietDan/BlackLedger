@@ -6,6 +6,7 @@ import (
 )
 
 func TestRecentOffersCannotBePitchedAgainVerbatim(t *testing.T) {
+	t.Parallel()
 	w := core.New(27)
 	w.Arrangements = []core.ArrangementMemory{{Life: 1, Title: "A dispute at the garage", Offer: "Share the tools fairly.", Status: "declined"}}
 	for _, p := range []core.Proposal{{Title: "  A DISPUTE at the garage "}, {Title: "Different title", Body: "“Share the tools fairly.”"}} {
@@ -23,6 +24,7 @@ func TestRecentOffersCannotBePitchedAgainVerbatim(t *testing.T) {
 }
 
 func TestRenamedPaymentStoryStillCountsAsRepetition(t *testing.T) {
+	t.Parallel()
 	old := "The Bluebird Laundry has a debt to settle. A supplier left a sealed payment under the counter last night, but the owner is too nervous to collect it himself. I need someone who can take it without drawing attention. You've handled quiet jobs before, and I trust you to keep it that way."
 	renamed := "The Blue Hour needs a payment collected discreetly. A bookmaker left a sealed envelope under the counter last night, but the owner is too nervous to collect it himself. I need someone who can take it without drawing attention. You’ve handled quiet jobs before, and I trust you to keep it that way."
 	if !recycledPassage(old, renamed) {
@@ -38,6 +40,7 @@ func TestRenamedPaymentStoryStillCountsAsRepetition(t *testing.T) {
 }
 
 func TestPendingAndCurrentOffersAlsoPreventRepetition(t *testing.T) {
+	t.Parallel()
 	w := core.New(27)
 	p := core.Proposal{Title: "A pending favor", Body: "Move the records discreetly."}
 	scene := &core.Scene{Title: p.Title, Body: p.Body, Kind: "proposal"}

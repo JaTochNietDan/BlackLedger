@@ -7,6 +7,7 @@ import (
 )
 
 func TestAttackPresentationContainsOnlyCommittedPublicResult(t *testing.T) {
+	t.Parallel()
 	w := New(27)
 	w.Player.Location = "laundry"
 	w.Properties["laundry"].Owner = "player:1"
@@ -34,6 +35,7 @@ func TestAttackPresentationContainsOnlyCommittedPublicResult(t *testing.T) {
 }
 
 func TestUnresolvedAttackDoesNotEmitOutcomeScene(t *testing.T) {
+	t.Parallel()
 	w := New(27)
 	w.Player.Security = 3
 	w.Retaliation()
@@ -48,6 +50,7 @@ func TestUnresolvedAttackDoesNotEmitOutcomeScene(t *testing.T) {
 }
 
 func TestPeacefulRecoveryDoesNotInventAnAttack(t *testing.T) {
+	t.Parallel()
 	w := New(27)
 	w.Player.Heat = 20
 	w.Player.Location = "market"

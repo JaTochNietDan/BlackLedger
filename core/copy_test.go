@@ -12,6 +12,7 @@ import (
 // of it was wrong about the world. All of it was wrong about English.
 
 func TestASentenceDoesNotBeginInLowerCase(t *testing.T) {
+	t.Parallel()
 	if got := Leads("the Rizzo Crew"); got != "The Rizzo Crew" {
 		t.Fatalf("a sentence begins %q", got)
 	}
@@ -24,6 +25,7 @@ func TestASentenceDoesNotBeginInLowerCase(t *testing.T) {
 }
 
 func TestAPluralNameTakesAPluralVerb(t *testing.T) {
+	t.Parallel()
 	if Agree("Cesare Ferro's people", "has", "have") != "have" {
 		t.Fatal("the paper says a family has had a poor few weeks when it is a plural name")
 	}
@@ -33,6 +35,7 @@ func TestAPluralNameTakesAPluralVerb(t *testing.T) {
 }
 
 func TestGrammarSurvivesAnOldSave(t *testing.T) {
+	t.Parallel()
 	// Whether a good's name is plural is a fact about the word, not about the
 	// market, so it must not be read out of the save. A campaign begun before
 	// anybody noticed still has to read correctly.
@@ -50,6 +53,7 @@ func TestGrammarSurvivesAnOldSave(t *testing.T) {
 }
 
 func TestTheSundayPageRunsOnASunday(t *testing.T) {
+	t.Parallel()
 	found := 0
 	for day := 0; day < 28; day++ {
 		w := New(12)
@@ -73,6 +77,7 @@ func TestTheSundayPageRunsOnASunday(t *testing.T) {
 }
 
 func TestAnObituarySaysWhatTheyWere(t *testing.T) {
+	t.Parallel()
 	w := New(13)
 	n := &NPC{ID: "x", Name: "Lorenz Zanetti", Role: "Lieutenant"}
 	_, body := w.obituary(n)
@@ -90,6 +95,7 @@ func TestAnObituarySaysWhatTheyWere(t *testing.T) {
 // were Lieutenant" after the obituary was fixed.
 
 func TestEveryPlaceThatSaysWhatSomebodyWasSaysItInEnglish(t *testing.T) {
+	t.Parallel()
 	w := New(14)
 	f := &w.Factions[0]
 	n := &NPC{ID: "y", Name: "Zora Erdos", Role: "Lieutenant", Faction: f.ID}
@@ -107,6 +113,7 @@ func TestEveryPlaceThatSaysWhatSomebodyWasSaysItInEnglish(t *testing.T) {
 // it was obvious that the name was the fault.
 
 func TestASplinterIsNamedLikeEveryOtherFamily(t *testing.T) {
+	t.Parallel()
 	for _, form := range splinterForms {
 		if strings.HasPrefix(form, "the ") {
 			t.Fatalf("a splinter would be named %q, which no sentence can begin with", form)
@@ -125,6 +132,7 @@ func TestASplinterIsNamedLikeEveryOtherFamily(t *testing.T) {
 // carrying its own article cannot be given another one.
 
 func TestAHiredHandIsNamedInASentence(t *testing.T) {
+	t.Parallel()
 	for _, tier := range contractTiers {
 		if tier.Noun == "" {
 			t.Fatalf("%q has no form fit for a sentence", tier.Label)
@@ -145,6 +153,7 @@ func TestAHiredHandIsNamedInASentence(t *testing.T) {
 // for $1100, at $220 each." The market lists a good by a name fit for a price
 // board, and that name cannot follow a count of units.
 func TestAGoodReadsCorrectlyAfterACount(t *testing.T) {
+	t.Parallel()
 	w := New(17)
 	for _, g := range w.Goods {
 		line := "5 " + g.Unit + "s of " + g.InBulk()
@@ -165,6 +174,7 @@ func TestAGoodReadsCorrectlyAfterACount(t *testing.T) {
 // fixes had landed. Two of these three faults were introduced by those fixes.
 
 func TestATitledOfficeTakesNoArticle(t *testing.T) {
+	t.Parallel()
 	w := New(18)
 	f := &w.Factions[0]
 	// The fix for "They were Lieutenant" gave every role an article, and this
@@ -184,6 +194,7 @@ func TestATitledOfficeTakesNoArticle(t *testing.T) {
 }
 
 func TestThePaperCountsInWords(t *testing.T) {
+	t.Parallel()
 	// "There were twice such incidents before the day was out." A frequency
 	// where a count belongs.
 	w := New(19)
@@ -209,6 +220,7 @@ func TestThePaperCountsInWords(t *testing.T) {
 }
 
 func TestAnObituaryCountsInWords(t *testing.T) {
+	t.Parallel()
 	if spelled(2) != "two" || spelled(12) != "twelve" {
 		t.Fatal("the paper is writing small numbers as figures")
 	}
@@ -222,6 +234,7 @@ func TestAnObituaryCountsInWords(t *testing.T) {
 // and the heads of organizations, but not the people holding the city's
 // standing jobs.
 func TestSomebodyWithAJobDoesNotSeizeACasino(t *testing.T) {
+	t.Parallel()
 	w := New(20)
 	for _, r := range roles {
 		n := w.NPC(r.Seed)
@@ -245,6 +258,7 @@ func TestSomebodyWithAJobDoesNotSeizeACasino(t *testing.T) {
 // faction, so the city described the mayor by what he did not belong to rather
 // than by the office he held.
 func TestTheCityNamesAnOfficeWhenSomebodyHoldsOne(t *testing.T) {
+	t.Parallel()
 	w := New(24)
 	for _, o := range Officials() {
 		n := w.NPC(o.ID)
@@ -269,6 +283,7 @@ func TestTheCityNamesAnOfficeWhenSomebodyHoldsOne(t *testing.T) {
 // premises, 8 of its people stayed and 0 would not." A zero written as a figure
 // reads like a report from a machine.
 func TestTakingAnOrganizationReadsLikeProse(t *testing.T) {
+	t.Parallel()
 	if spelled(0) != "no" {
 		t.Fatalf("zero reads as %q", spelled(0))
 	}

@@ -26,6 +26,7 @@ func short(t *testing.T) *World {
 }
 
 func TestThePawnbrokerIsARealAddress(t *testing.T) {
+	t.Parallel()
 	id := ""
 	for _, l := range Locations {
 		if l.Kind == "pawn" {
@@ -56,6 +57,7 @@ func TestThePawnbrokerIsARealAddress(t *testing.T) {
 }
 
 func TestYouCanPawnTheSuitOffYourBackAndGetItBack(t *testing.T) {
+	t.Parallel()
 	w := short(t)
 	w.Player.Dress, w.Player.DressWear = 2, 100
 	w.Player.Cash = 5
@@ -95,6 +97,7 @@ func TestYouCanPawnTheSuitOffYourBackAndGetItBack(t *testing.T) {
 }
 
 func TestATicketRunsOutAndTheThingIsSold(t *testing.T) {
+	t.Parallel()
 	w := short(t)
 	w.Player.Car, w.Player.CarWear = 2, 100
 	w.Player.Fuel, w.Player.Fuelled = FuelFull, max(1, w.Minute)
@@ -118,6 +121,7 @@ func TestATicketRunsOutAndTheThingIsSold(t *testing.T) {
 }
 
 func TestWhatIsTakenOffTheStreetPassesThroughTheShop(t *testing.T) {
+	t.Parallel()
 	w := New(67)
 	w.Event, w.District = nil, 9
 	shop := w.thePawnshop()

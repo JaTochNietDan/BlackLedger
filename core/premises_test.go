@@ -10,6 +10,7 @@ import (
 // soap, one had a press broken and one had a still running in the back.
 
 func TestAPlaceSaysTheMostImportantTrueThingAboutItself(t *testing.T) {
+	t.Parallel()
 	w, member := testator(t)
 	prop := w.Properties["laundry"]
 	trade, _ := TradeOf("laundry")
@@ -59,6 +60,7 @@ func TestAPlaceSaysTheMostImportantTrueThingAboutItself(t *testing.T) {
 }
 
 func TestAPasserByOnlySeesWhatIsVisibleFromTheStreet(t *testing.T) {
+	t.Parallel()
 	w, _ := testator(t)
 	// Somebody else's premises, out of supplies and in trouble.
 	prop := w.Properties["club"]
@@ -78,6 +80,7 @@ func TestAPasserByOnlySeesWhatIsVisibleFromTheStreet(t *testing.T) {
 }
 
 func TestEveryAddressCanBeAskedAboutItself(t *testing.T) {
+	t.Parallel()
 	w, _ := testator(t)
 	for _, l := range Locations {
 		// It must never panic and never contradict itself.
@@ -95,6 +98,7 @@ func TestEveryAddressCanBeAskedAboutItself(t *testing.T) {
 // trading at everything it could. The sentence promises a share of what the
 // place could earn; the number has to be that share.
 func TestWhatAPlaceIsTradingAtIsWhatItActuallyEarns(t *testing.T) {
+	t.Parallel()
 	// Gross, not net: the day's rent and wages are the same whatever state the
 	// building is in, so measuring the cash left over would compare the wrong
 	// thing and make a wrecked laundry look worse than it trades.

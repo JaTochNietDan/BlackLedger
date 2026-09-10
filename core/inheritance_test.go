@@ -42,6 +42,7 @@ func builtSomething(t *testing.T, seed uint32) *World {
 }
 
 func TestWhatYouBuiltBecomesSomethingTheNextLifeCanDealWith(t *testing.T) {
+	t.Parallel()
 	w := builtSomething(t, 37)
 	mine := w.PlayerOrganizationID()
 	held := len(w.FamilyHoldings(mine))
@@ -128,6 +129,7 @@ func keysOf(m map[string]bool) []string {
 // Bellandi opens at ninety. Provoking them at the club is the reason. This
 // counts what happens to a new arrival who does it, over many cities.
 func TestAStrongFamilyWillKillANewArrivalWhoProvokesThem(t *testing.T) {
+	t.Parallel()
 	died, survived, refused := 0, 0, 0
 	for i := 0; i < 120; i++ {
 		w := New(uint32(4000 + i*13))

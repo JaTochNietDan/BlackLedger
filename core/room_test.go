@@ -10,6 +10,7 @@ import (
 // about, and it says who is in the room to be acted on.
 
 func TestWorkAimedAtSomebodyKnowsWhoItIsAimedAt(t *testing.T) {
+	t.Parallel()
 	w := proprietor(t)
 	own(w, "laundry", "garage")
 	w.District = 2
@@ -67,6 +68,7 @@ func TestWorkAimedAtSomebodyKnowsWhoItIsAimedAt(t *testing.T) {
 }
 
 func TestTheRoomKnowsWhoIsStandingInIt(t *testing.T) {
+	t.Parallel()
 	w := proprietor(t)
 	w.Player.Cash, w.Player.Respect = 40000, 200
 	w.Player.Location = "bar"
@@ -122,6 +124,7 @@ func TestTheRoomKnowsWhoIsStandingInIt(t *testing.T) {
 }
 
 func TestYourOwnPeopleAreListedFirst(t *testing.T) {
+	t.Parallel()
 	w, member := testator(t)
 	// Put everybody in one room so the ordering is the only thing being tested.
 	for i := range w.NPCs {
@@ -162,6 +165,7 @@ func indexByte(s string, b byte) int {
 // with something true.
 
 func TestEverybodyInThisCityIsDoingSomething(t *testing.T) {
+	t.Parallel()
 	w, member := testator(t)
 	w.District = 2
 	w.Player.Cash = 40000
@@ -220,6 +224,7 @@ func TestEverybodyInThisCityIsDoingSomething(t *testing.T) {
 // has never met.
 
 func TestTheCityIsOrderedByWhoMattersToYou(t *testing.T) {
+	t.Parallel()
 	w, member := testator(t)
 	w.Populate()
 	w.Player.Cash, w.Player.Respect, w.District = 60000, 200, 2
@@ -299,6 +304,7 @@ func TestTheCityIsOrderedByWhoMattersToYou(t *testing.T) {
 }
 
 func TestTheCityScreenTellsYouNothingAboutAStranger(t *testing.T) {
+	t.Parallel()
 	w, _ := testator(t)
 	w.Populate()
 	strangers := 0

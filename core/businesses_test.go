@@ -9,6 +9,7 @@ import "testing"
 // whole table rather than over the four, so a fifth cannot be added without it.
 
 func TestEveryTradeInTheCityCanActuallyBeRun(t *testing.T) {
+	t.Parallel()
 	if len(trades) < 9 {
 		t.Fatalf("the city knows %d kinds of business, so this is testing less than it was written for", len(trades))
 	}
@@ -73,6 +74,7 @@ func TestEveryTradeInTheCityCanActuallyBeRun(t *testing.T) {
 // The point of adding them is that they are not the same business four times.
 // Every trade has its own trouble and its own words for what it runs on.
 func TestNoTwoTradesHaveTheSameTrouble(t *testing.T) {
+	t.Parallel()
 	troubles, supplies := map[string]string{}, map[string]string{}
 	for id, trade := range trades {
 		if other, same := troubles[trade.Trouble]; same {
@@ -95,6 +97,7 @@ func TestNoTwoTradesHaveTheSameTrouble(t *testing.T) {
 // never bought. The rule underneath was general the whole time; only the button
 // was not.
 func TestEverySomewhereThatEarnsCanBeTakenOver(t *testing.T) {
+	t.Parallel()
 	w := New(9)
 	w.District = 2
 	w.Player.Cash, w.Player.Respect, w.Player.Health = 40000, 90, 100
@@ -126,6 +129,7 @@ func TestEverySomewhereThatEarnsCanBeTakenOver(t *testing.T) {
 
 // And once it is yours, it is a business you can actually run.
 func TestABusinessYouHoldCanBeRun(t *testing.T) {
+	t.Parallel()
 	w := New(9)
 	w.District = 2
 	w.Player.Cash, w.Player.Respect, w.Player.Health = 40000, 90, 100
@@ -154,6 +158,7 @@ func TestABusinessYouHoldCanBeRun(t *testing.T) {
 // them was ever meant to be bought — and "Establish protection, $0" on the
 // exchange is the interface offering a business for free.
 func TestSomewhereWithNoPriceIsNotForSale(t *testing.T) {
+	t.Parallel()
 	w := New(9)
 	w.District = 2
 	w.Player.Cash, w.Player.Respect, w.Player.Health = 40000, 90, 100

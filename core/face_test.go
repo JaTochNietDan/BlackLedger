@@ -14,6 +14,7 @@ import (
 // are looking at, so the core owns the number and refuses a bad one.
 
 func TestAPlayerCanChooseTheirOwnFace(t *testing.T) {
+	t.Parallel()
 	w := New(7)
 	if w.Player.Face != 0 {
 		t.Fatalf("a new life arrives with a face already picked: %d", w.Player.Face)
@@ -36,6 +37,7 @@ func TestAPlayerCanChooseTheirOwnFace(t *testing.T) {
 }
 
 func TestTheCoreRefusesAFaceThatIsNotThere(t *testing.T) {
+	t.Parallel()
 	w := New(7)
 	for _, bad := range []string{"25", "-1", "", "four", "999"} {
 		if _, err := Execute(w, Command{Revision: w.Revision, Kind: "face", Choice: bad}); err == nil {
@@ -52,6 +54,7 @@ func TestTheCoreRefusesAFaceThatIsNotThere(t *testing.T) {
 // Choosing a face is not something you do in a room, and it must not cost a
 // minute of anybody's evening.
 func TestChoosingAFaceCostsNothingAndTakesNoTime(t *testing.T) {
+	t.Parallel()
 	w := New(7)
 	w.Player.Cash = 500
 	next, err := Execute(w, Command{Revision: w.Revision, Kind: "face", Choice: "3"})
@@ -68,6 +71,7 @@ func TestChoosingAFaceCostsNothingAndTakesNoTime(t *testing.T) {
 // languages agreeing by hand is exactly the kind of thing that quietly stops
 // being true, so it is asked here.
 func TestTheCoreAndTheSheetAgreeOnHowManyFacesThereAre(t *testing.T) {
+	t.Parallel()
 	source, err := os.ReadFile("../src/Portrait.tsx")
 	if err != nil {
 		t.Skipf("no view to compare against: %v", err)

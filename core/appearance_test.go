@@ -14,6 +14,7 @@ func dressed(t *testing.T) *World {
 }
 
 func TestClothesAreSoldAtTheExchangeAndNowhereElse(t *testing.T) {
+	t.Parallel()
 	w := dressed(t)
 	if w.DressReadiness() != "" {
 		t.Fatal("the exchange refused to sell:", w.DressReadiness())
@@ -30,6 +31,7 @@ func TestClothesAreSoldAtTheExchangeAndNowhereElse(t *testing.T) {
 }
 
 func TestDressWorksUpwardAndRunsOut(t *testing.T) {
+	t.Parallel()
 	w := dressed(t)
 	w.Player.Cash = 100000
 	for tier := 1; tier < len(attires); tier++ {
@@ -46,6 +48,7 @@ func TestDressWorksUpwardAndRunsOut(t *testing.T) {
 }
 
 func TestPresenceIsWhatYouHaveDonePlusWhatYouAreWearing(t *testing.T) {
+	t.Parallel()
 	w := dressed(t)
 	w.Player.Respect = 10
 	if w.Presence() != 10 {
@@ -60,6 +63,7 @@ func TestPresenceIsWhatYouHaveDonePlusWhatYouAreWearing(t *testing.T) {
 }
 
 func TestWearTakesStandingAwayAndRuinRemovesItEntirely(t *testing.T) {
+	t.Parallel()
 	w := dressed(t)
 	w.Player.Cash = 100000
 	w.BuyAttire()
@@ -82,6 +86,7 @@ func TestWearTakesStandingAwayAndRuinRemovesItEntirely(t *testing.T) {
 }
 
 func TestABeatingCostsTheSuitAsWellAsTheHealth(t *testing.T) {
+	t.Parallel()
 	w := dressed(t)
 	w.Player.Cash = 100000
 	w.BuyAttire()
@@ -94,6 +99,7 @@ func TestABeatingCostsTheSuitAsWellAsTheHealth(t *testing.T) {
 }
 
 func TestWorkingClothesCannotBeRuined(t *testing.T) {
+	t.Parallel()
 	w := dressed(t)
 	w.Ruin(80)
 	if w.DressCondition() != 100 || w.Standing() != 0 {
@@ -102,6 +108,7 @@ func TestWorkingClothesCannotBeRuined(t *testing.T) {
 }
 
 func TestGoodClothesWearOutAndAreNoticed(t *testing.T) {
+	t.Parallel()
 	w := dressed(t)
 	w.Player.Cash = 100000
 	w.BuyAttire()
@@ -118,6 +125,7 @@ func TestGoodClothesWearOutAndAreNoticed(t *testing.T) {
 }
 
 func TestShabbyClothesDrawNoAttention(t *testing.T) {
+	t.Parallel()
 	w := dressed(t)
 	w.Player.Cash = 100000
 	w.BuyAttire()
@@ -132,6 +140,7 @@ func TestShabbyClothesDrawNoAttention(t *testing.T) {
 }
 
 func TestPressingIsFreeAtALaundryOfYourOwn(t *testing.T) {
+	t.Parallel()
 	w := dressed(t)
 	w.Player.Cash = 100000
 	w.BuyAttire()
@@ -151,6 +160,7 @@ func TestPressingIsFreeAtALaundryOfYourOwn(t *testing.T) {
 }
 
 func TestPressingCostsMoneyAtHomeAndNeverFullyRestoresARuinedSuit(t *testing.T) {
+	t.Parallel()
 	w := dressed(t)
 	w.Player.Cash = 100000
 	w.BuyAttire()
@@ -174,6 +184,7 @@ func TestPressingCostsMoneyAtHomeAndNeverFullyRestoresARuinedSuit(t *testing.T) 
 }
 
 func TestTheHighTablesJudgeYouAtTheDoor(t *testing.T) {
+	t.Parallel()
 	w := dressed(t)
 	w.Player.Cash = 100000
 	w.Player.Location = "club"
@@ -201,6 +212,7 @@ func TestTheHighTablesJudgeYouAtTheDoor(t *testing.T) {
 }
 
 func TestClothesDoNotSurviveTheirOwner(t *testing.T) {
+	t.Parallel()
 	w := dressed(t)
 	w.Player.Cash = 100000
 	w.BuyAttire()
@@ -216,6 +228,7 @@ func TestClothesDoNotSurviveTheirOwner(t *testing.T) {
 }
 
 func TestAnOlderSaveIsWearingItsSuitInGoodOrder(t *testing.T) {
+	t.Parallel()
 	w := dressed(t)
 	w.Player.Dress, w.Player.DressWear = 2, 0
 	w.MigrateLivingWorld()

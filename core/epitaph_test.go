@@ -13,6 +13,7 @@ import (
 // The most dramatic screen in the game had rotted the way the Guide had.
 
 func TestTheDeadSayWhatBecameOfWhatTheyBuilt(t *testing.T) {
+	t.Parallel()
 	w, member := testator(t)
 	w.Player.Respect, w.Player.Earned = 180, 44000
 	name := w.Player.Name
@@ -48,6 +49,7 @@ func TestTheDeadSayWhatBecameOfWhatTheyBuilt(t *testing.T) {
 }
 
 func TestSomebodyWhoHadNobodyLeavesNothingBehind(t *testing.T) {
+	t.Parallel()
 	w := proprietor(t)
 	own(w, "laundry")
 	w.Die("Shot on the way home.")
@@ -69,6 +71,7 @@ func TestSomebodyWhoHadNobodyLeavesNothingBehind(t *testing.T) {
 }
 
 func TestWhatSurvivesTheCityIsSaidPlainly(t *testing.T) {
+	t.Parallel()
 	w, _ := testator(t)
 	w.Offshore = 0
 	w.Die("Shot on the way home.")
@@ -94,6 +97,7 @@ func TestWhatSurvivesTheCityIsSaidPlainly(t *testing.T) {
 //
 // The branch nobody had seen is the other one: dying with nobody to inherit.
 func TestDyingWithNobodyLeavesThePremisesStandingInTheirName(t *testing.T) {
+	t.Parallel()
 	w := New(52)
 	w.Player.Name = "Alex Varga"
 	// Two premises and no one to take them on.

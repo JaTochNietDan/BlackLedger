@@ -13,6 +13,7 @@ func house(t *testing.T) (*World, *Faction) {
 }
 
 func TestALoyalLieutenantNeverMovesOnTheirOwnLeader(t *testing.T) {
+	t.Parallel()
 	w, f := house(t)
 	members := w.Members(f.ID)
 	if len(members) < 2 {
@@ -35,6 +36,7 @@ func TestALoyalLieutenantNeverMovesOnTheirOwnLeader(t *testing.T) {
 }
 
 func TestAGrievanceAgainstYourOwnLeaderIsWorthMoreThanAmbition(t *testing.T) {
+	t.Parallel()
 	w, f := house(t)
 	members := w.Members(f.ID)
 	leader, challenger := members[0], members[1]
@@ -47,6 +49,7 @@ func TestAGrievanceAgainstYourOwnLeaderIsWorthMoreThanAmbition(t *testing.T) {
 }
 
 func TestNobodyMovesOnALeaderWhoIsWinningWithoutAReason(t *testing.T) {
+	t.Parallel()
 	w, f := house(t)
 	f.Power, f.Peak = 100, 100 // winning
 	members := w.Members(f.ID)
@@ -70,6 +73,7 @@ func TestNobodyMovesOnALeaderWhoIsWinningWithoutAReason(t *testing.T) {
 }
 
 func TestTheWeekAfterIsWhereTheDramaIs(t *testing.T) {
+	t.Parallel()
 	const runs = 400
 	purged, walkedOut, resented := 0, 0, 0
 	for seed := uint32(1); seed <= runs; seed++ {
@@ -115,6 +119,7 @@ func TestTheWeekAfterIsWhereTheDramaIs(t *testing.T) {
 }
 
 func TestACoupLeavesTheOrganizationWorseOff(t *testing.T) {
+	t.Parallel()
 	const runs = 300
 	weakened, upheaval := 0, 0
 	for seed := uint32(1); seed <= runs; seed++ {

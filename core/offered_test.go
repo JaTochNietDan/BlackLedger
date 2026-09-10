@@ -18,6 +18,7 @@ import (
 // available, press it on a copy, and require it to succeed or to fail for a
 // reason the card had already given.
 func TestEveryActionOfferedCanActuallyBeTaken(t *testing.T) {
+	t.Parallel()
 	w := proprietor(t)
 	own(w, "laundry", "garage", "casino")
 	w.District = 2
@@ -81,6 +82,7 @@ func TestEveryActionOfferedCanActuallyBeTaken(t *testing.T) {
 // job. So it asks two campaigns: one that has everything and one that needs
 // everything, and an action is honest if it is usable in either.
 func TestNoActionIsOfferedOnlyWhereItIsRefused(t *testing.T) {
+	t.Parallel()
 	seen, usable := map[string]string{}, map[string]bool{}
 	for _, shape := range []string{"comfortable", "needy"} {
 		w := proprietor(t)

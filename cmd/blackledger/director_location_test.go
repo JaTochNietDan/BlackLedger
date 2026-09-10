@@ -9,6 +9,7 @@ import (
 )
 
 func TestDirectorLocationConstraints(t *testing.T) {
+	t.Parallel()
 	w := core.New(27)
 	for _, location := range []string{"", "missing", "garage"} {
 		if validateJobLocation(w, core.Proposal{Location: location}) == nil {
@@ -38,6 +39,7 @@ func TestDirectorLocationConstraints(t *testing.T) {
 }
 
 func TestStructuredMemoryWinsOverAmbiguousOldDialogue(t *testing.T) {
+	t.Parallel()
 	w := core.New(27)
 	w.District = 1
 	m := &core.ArrangementMemory{Location: "laundry", Offer: "A call from Russo Motor Works", Operation: "courier"}

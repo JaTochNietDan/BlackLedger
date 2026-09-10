@@ -11,6 +11,7 @@ func seat(w *World, actor, where string) {
 }
 
 func TestBusinessTruceHasLimitedScopeAndExpires(t *testing.T) {
+	t.Parallel()
 	w := New(27)
 	w.Player.Cash = 300
 	w.District = 1
@@ -61,6 +62,7 @@ func TestBusinessTruceHasLimitedScopeAndExpires(t *testing.T) {
 }
 
 func TestBusinessTrucePaymentAndNewLife(t *testing.T) {
+	t.Parallel()
 	w := New(27)
 	seat(w, "bellandi", "club")
 	w.OpenAudience("club")

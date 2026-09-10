@@ -20,6 +20,7 @@ func editor(t *testing.T) *World {
 }
 
 func TestNobodyAtThatPaperTakesYourCalls(t *testing.T) {
+	t.Parallel()
 	w := proprietor(t)
 	w.Player.Location = HeraldPlace
 	w.ensureOfficials()
@@ -42,6 +43,7 @@ func TestNobodyAtThatPaperTakesYourCalls(t *testing.T) {
 }
 
 func TestAStoryThatNeverRunsDidNotHappen(t *testing.T) {
+	t.Parallel()
 	w := editor(t)
 	w.Player.Heat = 40
 	w.Attention = 50
@@ -82,6 +84,7 @@ func TestAStoryThatNeverRunsDidNotHappen(t *testing.T) {
 }
 
 func TestSomebodyInThatBuildingEventuallyNotices(t *testing.T) {
+	t.Parallel()
 	// Every story pulled is a permanent fact about the player held by a man on
 	// a weekly retainer, and over enough of them it comes apart.
 	const runs = 400
@@ -107,6 +110,7 @@ func TestSomebodyInThatBuildingEventuallyNotices(t *testing.T) {
 }
 
 func TestAStoryAboutSomebodyElseCostsThemAndTheWholeCity(t *testing.T) {
+	t.Parallel()
 	w := editor(t)
 	f := w.faction("bellandi")
 	holdings := w.FamilyHoldings("bellandi")
@@ -145,6 +149,7 @@ func TestAStoryAboutSomebodyElseCostsThemAndTheWholeCity(t *testing.T) {
 }
 
 func TestSometimesTheyFindOutWhoPaidForIt(t *testing.T) {
+	t.Parallel()
 	const runs = 400
 	traced := 0
 	for seed := uint32(1); seed <= runs; seed++ {
@@ -165,6 +170,7 @@ func TestSometimesTheyFindOutWhoPaidForIt(t *testing.T) {
 }
 
 func TestTheCheapestStandingInThisCity(t *testing.T) {
+	t.Parallel()
 	w := editor(t)
 	w.Player.Heat, w.Player.Respect = 30, 60
 	stories := len(w.News)
@@ -184,6 +190,7 @@ func TestTheCheapestStandingInThisCity(t *testing.T) {
 }
 
 func TestAnEditorIsAPersonLikeTheOthers(t *testing.T) {
+	t.Parallel()
 	w := editor(t)
 	if !w.TheEditor() {
 		t.Fatal("nobody is taking the money")

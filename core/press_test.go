@@ -10,6 +10,7 @@ func pressroom(t *testing.T) *World {
 }
 
 func TestAStoryAboutPremisesIsAPictureOfThePremises(t *testing.T) {
+	t.Parallel()
 	w := pressroom(t)
 	s := Story{Headline: "ROBBERY AT THE MONARCH", Kind: "robbery"}
 	subject := w.SubjectOf(s)
@@ -19,6 +20,7 @@ func TestAStoryAboutPremisesIsAPictureOfThePremises(t *testing.T) {
 }
 
 func TestAStoryAboutSomebodyIsAPictureOfThem(t *testing.T) {
+	t.Parallel()
 	w := pressroom(t)
 	person := w.NPC("vittorio")
 	s := Story{Headline: upper(person.Name) + " KILLED", Kind: "killing"}
@@ -29,6 +31,7 @@ func TestAStoryAboutSomebodyIsAPictureOfThem(t *testing.T) {
 }
 
 func TestPremisesWinWhenAHeadlineNamesBoth(t *testing.T) {
+	t.Parallel()
 	w := pressroom(t)
 	person := w.NPC("vittorio")
 	s := Story{Headline: upper(person.Name) + " KILLED AT THE MONARCH", Kind: "killing"}
@@ -38,6 +41,7 @@ func TestPremisesWinWhenAHeadlineNamesBoth(t *testing.T) {
 }
 
 func TestTheDeadStillGetTheirPicture(t *testing.T) {
+	t.Parallel()
 	w := pressroom(t)
 	person := w.NPC("vittorio")
 	name := person.Name
@@ -49,6 +53,7 @@ func TestTheDeadStillGetTheirPicture(t *testing.T) {
 }
 
 func TestAnythingElseIsAPictureOfTheCity(t *testing.T) {
+	t.Parallel()
 	w := pressroom(t)
 	for _, headline := range []string{"OPEN WAR ON THE WATERFRONT", "POLICE PRESSURE MOUNTS", ""} {
 		subject := w.SubjectOf(Story{Headline: headline, Kind: "war"})
@@ -59,6 +64,7 @@ func TestAnythingElseIsAPictureOfTheCity(t *testing.T) {
 }
 
 func TestEveryStoryTheCityFilesGetsAPicture(t *testing.T) {
+	t.Parallel()
 	// A city left to run, and every story it printed checked: none of them may
 	// come back without something to draw.
 	const runs, days = 60, 120
@@ -98,6 +104,7 @@ func TestEveryStoryTheCityFilesGetsAPicture(t *testing.T) {
 }
 
 func TestTheSameStoryIsAlwaysTheSamePicture(t *testing.T) {
+	t.Parallel()
 	w := pressroom(t)
 	s := Story{Headline: "ROBBERY AT THE MONARCH", Kind: "robbery"}
 	first := w.SubjectOf(s)

@@ -34,6 +34,7 @@ func counterWorld(t *testing.T, trust int) (*World, string) {
 }
 
 func TestSomebodyBehindYourCounterNoticesWhatIsComing(t *testing.T) {
+	t.Parallel()
 	told, quiet := 0, 0
 	for seed := uint32(1); seed <= 300; seed++ {
 		w, _ := counterWorld(t, 80)
@@ -64,6 +65,7 @@ func TestSomebodyBehindYourCounterNoticesWhatIsComing(t *testing.T) {
 // And they only see their own street. A plot against a business across the city
 // is not something the man at your laundry counter knows about.
 func TestTheyOnlySeeTheirOwnStreet(t *testing.T) {
+	t.Parallel()
 	w, _ := counterWorld(t, 100)
 	w.Plots[len(w.Plots)-1].Target = "butcher"
 	for i := 0; i < 60; i++ {
@@ -77,6 +79,7 @@ func TestTheyOnlySeeTheirOwnStreet(t *testing.T) {
 // A room with nobody in it tells you nothing, which is what being short-handed
 // costs beyond the takings.
 func TestAnEmptyCounterSeesNothing(t *testing.T) {
+	t.Parallel()
 	w, id := counterWorld(t, 100)
 	prop := w.Properties[id]
 	prop.Hands, prop.Staff = nil, 0
@@ -92,6 +95,7 @@ func TestAnEmptyCounterSeesNothing(t *testing.T) {
 // business that is expecting it takes less: the shutters come down, the stock
 // goes out the back, and whoever comes finds a room that is ready for them.
 func TestAWarnedBusinessTakesLess(t *testing.T) {
+	t.Parallel()
 	hit := func(warned bool) int {
 		w, id := counterWorld(t, 80)
 		p := w.Plots[len(w.Plots)-1]
@@ -114,6 +118,7 @@ func TestAWarnedBusinessTakesLess(t *testing.T) {
 // And an empty counter cannot be ready for anything, however much warning there
 // was.
 func TestAnEmptyCounterCannotBeReady(t *testing.T) {
+	t.Parallel()
 	w, id := counterWorld(t, 80)
 	p := w.Plots[len(w.Plots)-1]
 	p.Known = true

@@ -23,6 +23,7 @@ func shooter(t *testing.T) *World {
 // and a run that came out at 1.75% sent me looking for a fault in the dice that
 // was not there. Two million puts the error at 0.07%.
 func TestThePassLineKeepsItsRealEdge(t *testing.T) {
+	t.Parallel()
 	const rounds = 2000000
 	w := shooter(t)
 	w.Player.Cash = 1000000000
@@ -49,6 +50,7 @@ func TestThePassLineKeepsItsRealEdge(t *testing.T) {
 }
 
 func TestSevenOnTheComeOutWinsAndTwoLoses(t *testing.T) {
+	t.Parallel()
 	w := shooter(t)
 	wins, losses, points := 0, 0, 0
 	for i := 0; i < 4000; i++ {
@@ -88,6 +90,7 @@ func TestSevenOnTheComeOutWinsAndTwoLoses(t *testing.T) {
 }
 
 func TestThePointHasToBeMadeBeforeTheSeven(t *testing.T) {
+	t.Parallel()
 	w := shooter(t)
 	made, sevened := 0, 0
 	for i := 0; i < 2000; i++ {
@@ -123,6 +126,7 @@ func TestThePointHasToBeMadeBeforeTheSeven(t *testing.T) {
 }
 
 func TestTheDontIsTheOtherSideOfTheSameGame(t *testing.T) {
+	t.Parallel()
 	const rounds = 2000000
 	w := shooter(t)
 	w.Player.Cash = 1000000000
@@ -148,6 +152,7 @@ func TestTheDontIsTheOtherSideOfTheSameGame(t *testing.T) {
 }
 
 func TestTheRoomOffersTheDice(t *testing.T) {
+	t.Parallel()
 	w := shooter(t)
 	a := actionByID(w.Actions("club"), "dice")
 	if a == nil {

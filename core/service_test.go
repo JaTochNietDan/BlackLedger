@@ -14,6 +14,7 @@ func recruit(t *testing.T) (*World, *Faction) {
 }
 
 func TestNobodyTakesOnSomebodyTheyDoNotWant(t *testing.T) {
+	t.Parallel()
 	w, f := recruit(t)
 	if w.ServeReadiness(f.ID) != "" {
 		t.Fatal("could not go to work for them:", w.ServeReadiness(f.ID))
@@ -35,6 +36,7 @@ func TestNobodyTakesOnSomebodyTheyDoNotWant(t *testing.T) {
 }
 
 func TestAManWithHisOwnThingDoesNotComeUpThroughSomebodyElses(t *testing.T) {
+	t.Parallel()
 	w, f := recruit(t)
 	own(w, "laundry", "garage")
 	w.Player.Respect = OrganizationStanding
@@ -57,6 +59,7 @@ func TestAManWithHisOwnThingDoesNotComeUpThroughSomebodyElses(t *testing.T) {
 }
 
 func TestAnsweringToSomebodyPaysAndMakesTheirEnemiesYours(t *testing.T) {
+	t.Parallel()
 	w, f := recruit(t)
 	other := &w.Factions[1]
 	c := w.Conflict(f.ID, other.ID)
@@ -92,6 +95,7 @@ func TestAnsweringToSomebodyPaysAndMakesTheirEnemiesYours(t *testing.T) {
 }
 
 func TestComingUpTakesWorkAndPaysBetter(t *testing.T) {
+	t.Parallel()
 	w, f := recruit(t)
 	w.Serve(f.ID)
 	base := w.ServicePay()
@@ -122,6 +126,7 @@ func TestComingUpTakesWorkAndPaysBetter(t *testing.T) {
 }
 
 func TestWalkingOutIsNotForgiven(t *testing.T) {
+	t.Parallel()
 	w, f := recruit(t)
 	w.Serve(f.ID)
 	goodwill := f.Goodwill
@@ -143,6 +148,7 @@ func TestWalkingOutIsNotForgiven(t *testing.T) {
 }
 
 func TestWhoeverYouAnsweredToCanStopExisting(t *testing.T) {
+	t.Parallel()
 	w, f := recruit(t)
 	w.Serve(f.ID)
 	w.Dissolve(f.ID)
@@ -153,6 +159,7 @@ func TestWhoeverYouAnsweredToCanStopExisting(t *testing.T) {
 }
 
 func TestNobodyInheritsAJob(t *testing.T) {
+	t.Parallel()
 	w, f := recruit(t)
 	w.Serve(f.ID)
 	w.Player.Alive = false
@@ -168,6 +175,7 @@ func TestNobodyInheritsAJob(t *testing.T) {
 // Most people are never offered an arrangement with a beneficiary. Harm done to
 // somebody's enemies has to count, or coming up is a path only the lucky find.
 func TestHarmToTheirEnemiesIsWorkForThem(t *testing.T) {
+	t.Parallel()
 	w, f := recruit(t)
 	w.Serve(f.ID)
 	other := w.Factions[1].ID

@@ -19,6 +19,7 @@ func pageOf(w *World) []Story {
 }
 
 func TestTheCityPagePrintsSomethingOnAQuietDay(t *testing.T) {
+	t.Parallel()
 	w := New(71)
 	w.CityPageDay()
 	page := pageOf(w)
@@ -36,6 +37,7 @@ func TestTheCityPagePrintsSomethingOnAQuietDay(t *testing.T) {
 }
 
 func TestTheCityPageCostsTheCityNothing(t *testing.T) {
+	t.Parallel()
 	// A column about the price of coal is not a reason for anybody to look
 	// harder at anybody.
 	if scrutinyWeight["civic"] != 0 {
@@ -54,6 +56,7 @@ func TestTheCityPageCostsTheCityNothing(t *testing.T) {
 }
 
 func TestTheCityPageNeverLeads(t *testing.T) {
+	t.Parallel()
 	w := New(71)
 	w.CityPageDay()
 	w.Report("killing", "A MAN IS FOUND", "Somebody was killed.")
@@ -68,6 +71,7 @@ func TestTheCityPageNeverLeads(t *testing.T) {
 }
 
 func TestTheSameDayPrintsTheSamePage(t *testing.T) {
+	t.Parallel()
 	a, b := New(71), New(72)
 	b.ID = a.ID
 	a.Minute, b.Minute = 9*1440, 9*1440
@@ -85,6 +89,7 @@ func TestTheSameDayPrintsTheSamePage(t *testing.T) {
 }
 
 func TestTheCityPageSaysWhatTheSkyIsDoing(t *testing.T) {
+	t.Parallel()
 	// The weather in the paper has to be the weather the world had, or the
 	// paper is making things up — which is the one thing it may not do.
 	seed := skySeed("weather-campaign")
@@ -113,6 +118,7 @@ func TestTheCityPageSaysWhatTheSkyIsDoing(t *testing.T) {
 }
 
 func TestFillerGivesUpItsPlaceBeforeNews(t *testing.T) {
+	t.Parallel()
 	// Two briefs a day would fill the archive in four months, and a player
 	// reading back through the paper would find nothing but the weather.
 	w := New(73)
@@ -141,6 +147,7 @@ func TestFillerGivesUpItsPlaceBeforeNews(t *testing.T) {
 // same week. The pick was randomised per day, and nothing ever looked at what
 // had already been printed.
 func TestTheCityPageDoesNotRepeatItselfAllWeek(t *testing.T) {
+	t.Parallel()
 	w := New(88)
 	w.News = nil
 	for day := 0; day < 21; day++ {
@@ -187,6 +194,7 @@ func TestTheCityPageDoesNotRepeatItselfAllWeek(t *testing.T) {
 // in this city with nothing to say about its evenings is missing something it
 // can see.
 func TestThePaperCanSeeTheEvening(t *testing.T) {
+	t.Parallel()
 	w := New(41)
 	// Everybody out.
 	for i := range w.NPCs {

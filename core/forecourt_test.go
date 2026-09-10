@@ -40,6 +40,7 @@ func forecourtCity(t *testing.T, seed uint32) (*World, *NPC) {
 }
 
 func TestLosingACarIsAReasonToGoToTheForecourt(t *testing.T) {
+	t.Parallel()
 	w, mark := forecourtCity(t, 41)
 	w.SetOut()
 	if mark.Heading == "" {
@@ -62,6 +63,7 @@ func TestLosingACarIsAReasonToGoToTheForecourt(t *testing.T) {
 // So this measures the traffic, and holds the replacement time as a floor so
 // the fix cannot buy a room full of people at the price of a city on foot.
 func TestAForecourtHasPeopleInItAfterCarsAreLost(t *testing.T) {
+	t.Parallel()
 	standing, slowest, never, cities := 0, 0, 0, 0
 	for _, seed := range []uint32{41, 77, 109, 233, 311} {
 		w := New(seed)

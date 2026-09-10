@@ -22,6 +22,7 @@ func baize(t *testing.T) *World {
 }
 
 func TestTheGreenBaizeHasFundsYouCanSee(t *testing.T) {
+	t.Parallel()
 	w := baize(t)
 	if !RunsAGame(BackRoom) {
 		t.Fatal("the room with a card game behind it does not run a game")
@@ -43,6 +44,7 @@ func TestTheGreenBaizeHasFundsYouCanSee(t *testing.T) {
 }
 
 func TestYouCanPutMoneyInTheBaizeAndTakeItOut(t *testing.T) {
+	t.Parallel()
 	w := baize(t)
 	cash := w.Player.Cash
 	if reason := w.BankrollReadiness(BackRoom, 600); reason != "" {
@@ -78,6 +80,7 @@ func TestYouCanPutMoneyInTheBaizeAndTakeItOut(t *testing.T) {
 }
 
 func TestBothWaysAreOfferedWhereTheRoomIs(t *testing.T) {
+	t.Parallel()
 	w := baize(t)
 	find := func(id string) *Action {
 		for _, a := range w.Actions(BackRoom) {
@@ -108,6 +111,7 @@ func TestBothWaysAreOfferedWhereTheRoomIs(t *testing.T) {
 // The seat charge is the room's money, so it goes into the room's till rather
 // than into the holder's pocket. That is what makes the till worth looking at.
 func TestWhatTheTableTakesGoesIntoTheTill(t *testing.T) {
+	t.Parallel()
 	w := baize(t)
 	cash, till := w.Player.Cash, w.Properties[BackRoom].Bankroll
 	for day := 0; day < 30; day++ {

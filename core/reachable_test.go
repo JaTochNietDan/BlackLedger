@@ -177,6 +177,7 @@ var mustBeLive = []string{
 }
 
 func TestEveryButtonTheGameOffersCanBePressedSomewhere(t *testing.T) {
+	t.Parallel()
 	offered, enabled := sweepCities(t)
 	dead := []string{}
 	for k := range offered {

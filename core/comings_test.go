@@ -9,6 +9,7 @@ import "testing"
 // that changes behind your back rather than a place you are standing in.
 
 func TestYouSeeSomebodyLeaveTheRoomYouAreStandingIn(t *testing.T) {
+	t.Parallel()
 	w := New(4)
 	w.Player.Location = "bar"
 	n := w.NPC("mara")
@@ -33,6 +34,7 @@ func TestYouSeeSomebodyLeaveTheRoomYouAreStandingIn(t *testing.T) {
 }
 
 func TestYouSeeSomebodyComeIn(t *testing.T) {
+	t.Parallel()
 	w := New(4)
 	n := w.NPC("mara")
 	n.Role, n.Location = "Runs Bluebird Laundry", "bar"
@@ -52,6 +54,7 @@ func TestYouSeeSomebodyComeIn(t *testing.T) {
 }
 
 func TestNothingIsRemarkedOnInARoomYouAreNotIn(t *testing.T) {
+	t.Parallel()
 	w := New(4)
 	// The Bellwether Herald: an address with nobody in it who has anywhere to
 	// be, so anything reported here came from another room.
@@ -74,6 +77,7 @@ func TestNothingIsRemarkedOnInARoomYouAreNotIn(t *testing.T) {
 // The player has to be able to read this after the fact: it belongs on the
 // result of the command that the time passed during, beside what they did.
 func TestWhatHappenedInTheRoomIsReportedWithTheAction(t *testing.T) {
+	t.Parallel()
 	w := New(4)
 	w.Player.Location = "bar"
 	n := w.NPC("mara")
@@ -102,6 +106,7 @@ func TestWhatHappenedInTheRoomIsReportedWithTheAction(t *testing.T) {
 // to a room she was not in. An interface that is confidently wrong about where
 // somebody is, is worse than one that says nothing.
 func TestSomebodyOutWalkingIsNotReportedAsBeingSomewhere(t *testing.T) {
+	t.Parallel()
 	w := New(4)
 	n := w.NPC("mara")
 	n.Role, n.Location = "Runs Bluebird Laundry", "bar"
@@ -140,6 +145,7 @@ func TestSomebodyOutWalkingIsNotReportedAsBeingSomewhere(t *testing.T) {
 
 // And once she gets there the report goes back to being ordinary.
 func TestArrivingPutsSomebodyBackInARoom(t *testing.T) {
+	t.Parallel()
 	w := New(4)
 	n := w.NPC("mara")
 	n.Role, n.Location = "Runs Bluebird Laundry", "bar"
@@ -161,6 +167,7 @@ func TestArrivingPutsSomebodyBackInARoom(t *testing.T) {
 // walked out. Buying a coffee for a man who is halfway across the city is not
 // something the player should be able to press.
 func TestYouCannotDealWithSomebodyWhoHasWalkedOut(t *testing.T) {
+	t.Parallel()
 	w := New(4)
 	w.Player.Location = "bar"
 	n := w.NPC("mara")

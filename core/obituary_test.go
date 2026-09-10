@@ -29,6 +29,7 @@ func anyLieutenant(w *World) *NPC {
 }
 
 func TestTheObituaryComesTheMorningAfter(t *testing.T) {
+	t.Parallel()
 	w := New(91)
 	n := anyLieutenant(w)
 	if n == nil {
@@ -61,6 +62,7 @@ func TestTheObituaryComesTheMorningAfter(t *testing.T) {
 }
 
 func TestAnObituaryNeverSaysWhoArrangedIt(t *testing.T) {
+	t.Parallel()
 	w := New(92)
 	victim, killer := anyLieutenant(w), (*NPC)(nil)
 	if victim == nil {
@@ -88,6 +90,7 @@ func TestAnObituaryNeverSaysWhoArrangedIt(t *testing.T) {
 }
 
 func TestNobodyGetsAColumnForBeingNobody(t *testing.T) {
+	t.Parallel()
 	w := New(93)
 	// A soldier with no standing, nobody has met, running nothing.
 	unknown := &NPC{ID: "nobody-at-all", Name: "A Nobody", Rank: RankSoldier}
@@ -106,6 +109,7 @@ func TestNobodyGetsAColumnForBeingNobody(t *testing.T) {
 }
 
 func TestAnObituaryCostsTheCityNothing(t *testing.T) {
+	t.Parallel()
 	// The killing was counted yesterday. Counting it again would have the city
 	// look hardest at the people who are mourned most.
 	if scrutinyWeight["obituary"] != 0 {
@@ -114,6 +118,7 @@ func TestAnObituaryCostsTheCityNothing(t *testing.T) {
 }
 
 func TestAnObituarySaysWhatThePersonWas(t *testing.T) {
+	t.Parallel()
 	w := New(94)
 	n := anyLieutenant(w)
 	if n == nil {
@@ -136,6 +141,7 @@ func TestAnObituarySaysWhatThePersonWas(t *testing.T) {
 }
 
 func TestTheObituaryDoesNotPrintTheFamilyTwice(t *testing.T) {
+	t.Parallel()
 	// "They were Russo boss of Russo Outfit" is what came out the first time.
 	if sharesAName("Russo boss", "Russo Outfit") != true {
 		t.Error("a role carrying the family's name was not recognised")
@@ -146,6 +152,7 @@ func TestTheObituaryDoesNotPrintTheFamilyTwice(t *testing.T) {
 }
 
 func TestOnePersonIsNotOnePeople(t *testing.T) {
+	t.Parallel()
 	w := New(95)
 	n := anyLieutenant(w)
 	if n == nil {
@@ -162,6 +169,7 @@ func TestOnePersonIsNotOnePeople(t *testing.T) {
 }
 
 func TestTheObituaryNamesTheirOwnPlaceFirst(t *testing.T) {
+	t.Parallel()
 	// It named a holding on the other side of the city while the man was found
 	// at the door of one he ran, which reads as the paper picking a building at
 	// random — which is what it was doing.

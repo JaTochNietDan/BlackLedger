@@ -20,6 +20,7 @@ func civicAbout(w *World, name string) []Story {
 }
 
 func TestAFamilyLosingGroundIsNoticed(t *testing.T) {
+	t.Parallel()
 	w := New(111)
 	f := &w.Factions[0]
 	f.Power -= FortuneShift + 4
@@ -34,6 +35,7 @@ func TestAFamilyLosingGroundIsNoticed(t *testing.T) {
 }
 
 func TestTheSameSlideIsNotReportedEveryMorning(t *testing.T) {
+	t.Parallel()
 	w := New(112)
 	f := &w.Factions[0]
 	f.Power -= FortuneShift + 2
@@ -48,6 +50,7 @@ func TestTheSameSlideIsNotReportedEveryMorning(t *testing.T) {
 }
 
 func TestASmallDriftIsNotNews(t *testing.T) {
+	t.Parallel()
 	w := New(113)
 	f := &w.Factions[0]
 	f.Power -= FortuneShift - 1
@@ -58,6 +61,7 @@ func TestASmallDriftIsNotNews(t *testing.T) {
 }
 
 func TestThePaperNeverPrintsTheNumber(t *testing.T) {
+	t.Parallel()
 	// "Power 41" is a statistic. A paper writes about what people have noticed.
 	w := New(114)
 	for i := range w.Factions {
@@ -78,6 +82,7 @@ func TestThePaperNeverPrintsTheNumber(t *testing.T) {
 }
 
 func TestThePlayersOwnOutfitIsNotNewsToThePlayer(t *testing.T) {
+	t.Parallel()
 	w := New(115)
 	w.Factions = append(w.Factions, Faction{
 		ID: w.PlayerOrganizationID(), Name: "Ward's people", Power: 60, Reported: 60,

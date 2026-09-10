@@ -16,6 +16,7 @@ import (
 // makes for itself, and making families is most of what it does.
 
 func TestATheftReadsForEveryKindOfFamilyName(t *testing.T) {
+	t.Parallel()
 	for _, name := range []string{
 		"Bellandi Family",
 		"Russo Outfit",

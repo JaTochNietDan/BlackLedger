@@ -47,6 +47,7 @@ func disagrees(text string) string {
 }
 
 func TestNothingTheCityWritesDisagreesWithAPluralFamily(t *testing.T) {
+	t.Parallel()
 	w := New(21)
 	// A family that answers to a person's name, exactly as succession makes one.
 	w.Factions = append(w.Factions, Faction{
@@ -113,6 +114,7 @@ func TestNothingTheCityWritesDisagreesWithAPluralFamily(t *testing.T) {
 // by making everything plural would read just as wrong for the two families
 // every campaign starts with.
 func TestASingularFamilyKeepsItsSingularVerb(t *testing.T) {
+	t.Parallel()
 	for _, c := range []struct{ name, want string }{
 		{"Bellandi Family", "does not"},
 		{"Russo Outfit", "does not"},

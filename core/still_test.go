@@ -12,6 +12,7 @@ func distiller(t *testing.T) *World {
 }
 
 func TestAStillNeedsSomewhereToHideItAndSomebodyToWorkIt(t *testing.T) {
+	t.Parallel()
 	w := distiller(t)
 	if reason := w.StillReadiness("laundry"); reason != "" {
 		t.Fatal("a staffed laundry could not hide one:", reason)
@@ -35,6 +36,7 @@ func TestAStillNeedsSomewhereToHideItAndSomebodyToWorkIt(t *testing.T) {
 }
 
 func TestAStillMakesStockAndTheStockIsTheRisk(t *testing.T) {
+	t.Parallel()
 	w := distiller(t)
 	if err := w.BuildStill("laundry"); err != nil {
 		t.Fatal(err)
@@ -60,6 +62,7 @@ func TestAStillMakesStockAndTheStockIsTheRisk(t *testing.T) {
 }
 
 func TestAStillStopsWhenThereIsNowhereToPutTheOutput(t *testing.T) {
+	t.Parallel()
 	w := distiller(t)
 	if err := w.BuildStill("laundry"); err != nil {
 		t.Fatal(err)
@@ -80,6 +83,7 @@ func TestAStillStopsWhenThereIsNowhereToPutTheOutput(t *testing.T) {
 }
 
 func TestASearchThatFindsAStillCostsFarMore(t *testing.T) {
+	t.Parallel()
 	plain, distilling := distiller(t), distiller(t)
 	for _, w := range []*World{plain, distilling} {
 		w.Player.Heat = 60
@@ -110,6 +114,7 @@ func TestASearchThatFindsAStillCostsFarMore(t *testing.T) {
 }
 
 func TestTakingItOutIsAWayToStopBeingWorthWatching(t *testing.T) {
+	t.Parallel()
 	w := distiller(t)
 	if err := w.BuildStill("laundry"); err != nil {
 		t.Fatal(err)
@@ -130,6 +135,7 @@ func TestTakingItOutIsAWayToStopBeingWorthWatching(t *testing.T) {
 }
 
 func TestThievesPreferCratesToATill(t *testing.T) {
+	t.Parallel()
 	stolen := 0
 	for i := uint32(1); i <= 300; i++ {
 		w := New(i * 2654435761)

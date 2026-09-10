@@ -16,6 +16,7 @@ func mugger(t *testing.T) (*World, *NPC) {
 }
 
 func TestYouDoNotWalkUpToAStranger(t *testing.T) {
+	t.Parallel()
 	w := New(101)
 	w.MigrateLivingWorld()
 	w.Player.Location, w.Player.Contacts = "club", 0
@@ -34,6 +35,7 @@ func TestYouDoNotWalkUpToAStranger(t *testing.T) {
 }
 
 func TestNotYourOwnCrew(t *testing.T) {
+	t.Parallel()
 	w, _ := mugger(t)
 	w.Player.Crew = []Crew{{ID: "leo", Name: "Leo Carver", Loyalty: 80}}
 	if n := w.NPC("leo"); n != nil {
@@ -50,6 +52,7 @@ func TestNotYourOwnCrew(t *testing.T) {
 }
 
 func TestWhatSomebodyIsCarryingComesFromWhoTheyAre(t *testing.T) {
+	t.Parallel()
 	w, mark := mugger(t)
 	soldier := *mark
 	soldier.Rank, soldier.Faction = RankSoldier, ""
@@ -82,6 +85,7 @@ func TestWhatSomebodyIsCarryingComesFromWhoTheyAre(t *testing.T) {
 }
 
 func TestStandingMakesYouBetterAtThisAndWorseAtGettingAway(t *testing.T) {
+	t.Parallel()
 	w, _ := mugger(t)
 	w.Player.Respect = RecognisedAt - 1
 	if w.Recognised(w.OwnHands()) {
@@ -100,6 +104,7 @@ func TestStandingMakesYouBetterAtThisAndWorseAtGettingAway(t *testing.T) {
 }
 
 func TestTakingItOffSomebodyIsMoneyAndAGrievance(t *testing.T) {
+	t.Parallel()
 	const runs = 400
 	took, madeEnemy, hurt := 0, 0, 0
 	for seed := uint32(1); seed <= runs; seed++ {
@@ -139,6 +144,7 @@ func TestTakingItOffSomebodyIsMoneyAndAGrievance(t *testing.T) {
 }
 
 func TestBeingRecognisedIsWhatItCosts(t *testing.T) {
+	t.Parallel()
 	const runs = 300
 	quiet, known := 0, 0
 	for _, respect := range []int{0, 80} {
@@ -165,6 +171,7 @@ func TestBeingRecognisedIsWhatItCosts(t *testing.T) {
 }
 
 func TestRobbingAManWithATitleIsNotRobbingAMan(t *testing.T) {
+	t.Parallel()
 	w := New(101)
 	w.MigrateLivingWorld()
 	w.Player.Location, w.Player.Health, w.Player.Cash, w.Player.Respect = CityHall, 100, 20000, 60
@@ -214,6 +221,7 @@ func TestRobbingAManWithATitleIsNotRobbingAMan(t *testing.T) {
 }
 
 func TestSendingSomebodyKeepsYourNameOutOfIt(t *testing.T) {
+	t.Parallel()
 	w, mark := mugger(t)
 	w.Player.Respect = 80
 	w.Player.Crew = []Crew{{ID: "leo", Name: "Leo Carver", Loyalty: 90}}

@@ -13,6 +13,7 @@ func morgue(t *testing.T) *World {
 }
 
 func TestEveryPlaceInTheCityHasItsOwnWaysOfDying(t *testing.T) {
+	t.Parallel()
 	for _, l := range Locations {
 		options := mannerByPlace[l.ID]
 		if len(options) < 3 {
@@ -29,6 +30,7 @@ func TestEveryPlaceInTheCityHasItsOwnWaysOfDying(t *testing.T) {
 }
 
 func TestTheSamePlaceDoesNotReadTheSameTwice(t *testing.T) {
+	t.Parallel()
 	w := morgue(t)
 	victim := w.NPC("vittorio")
 	seen := map[string]bool{}
@@ -41,6 +43,7 @@ func TestTheSamePlaceDoesNotReadTheSameTwice(t *testing.T) {
 }
 
 func TestTheHourIsInIt(t *testing.T) {
+	t.Parallel()
 	w := morgue(t)
 	victim := w.NPC("vittorio")
 	hours := map[string]bool{}
@@ -58,6 +61,7 @@ func TestTheHourIsInIt(t *testing.T) {
 }
 
 func TestWhoDidItLeavesAMark(t *testing.T) {
+	t.Parallel()
 	w := morgue(t)
 	victim := w.NPC("vittorio")
 	marks := map[string]bool{}
@@ -81,6 +85,7 @@ func TestWhoDidItLeavesAMark(t *testing.T) {
 }
 
 func TestSomebodyKilledNowhereStillGetsADescription(t *testing.T) {
+	t.Parallel()
 	w := morgue(t)
 	stray := &NPC{ID: "stray", Name: "A Stranger", Location: "transit"}
 	w.NPCs = append(w.NPCs, *stray)
@@ -91,6 +96,7 @@ func TestSomebodyKilledNowhereStillGetsADescription(t *testing.T) {
 }
 
 func TestKillByPutsTheMannerInTheRecordAndThePaper(t *testing.T) {
+	t.Parallel()
 	w := morgue(t)
 	killer := w.NPC("elena")
 	if !w.KillBy("vittorio", killer, "It was over an old debt.") {
@@ -122,6 +128,7 @@ func TestKillByPutsTheMannerInTheRecordAndThePaper(t *testing.T) {
 }
 
 func TestACommissionedKillingSaysWhatTheFeeBought(t *testing.T) {
+	t.Parallel()
 	w := morgue(t)
 	victim := w.NPC("vittorio")
 	seen := map[string]bool{}

@@ -24,6 +24,7 @@ func robbable(t *testing.T) (*World, *NPC) {
 }
 
 func TestRobbingAManLeavesHimWithLess(t *testing.T) {
+	t.Parallel()
 	w, mark := robbable(t)
 	before := w.Pockets(mark)
 	if before <= 0 {
@@ -42,6 +43,7 @@ func TestRobbingAManLeavesHimWithLess(t *testing.T) {
 // the same rank in the same family who have had different weeks are not
 // carrying the same amount.
 func TestTwoMenOfTheSameRankCanCarryDifferentAmounts(t *testing.T) {
+	t.Parallel()
 	w, a := robbable(t)
 	w.NPCs = append(w.NPCs, NPC{ID: "other", Name: "Bruno Sala", Location: "bar",
 		Faction: "bellandi", Rank: RankSoldier, Trust: 30})
@@ -56,6 +58,7 @@ func TestTwoMenOfTheSameRankCanCarryDifferentAmounts(t *testing.T) {
 // people in it. Take everything the family earns from, and the men who answer
 // to it stop being paid and run down to nothing.
 func TestStarvingAFamilyEmptiesItsPeoplesPockets(t *testing.T) {
+	t.Parallel()
 	w := withFamily(41, "vasco", "Vasco Company", "Ilse Vasco")
 	f := w.faction("vasco")
 	f.Cash, f.Power, f.Peak = 3000, 60, 60
@@ -107,6 +110,7 @@ func TestStarvingAFamilyEmptiesItsPeoplesPockets(t *testing.T) {
 // Officials are on the city's books, not a family's, so a family's bad year
 // does not stop their salary.
 func TestAnOfficialIsPaidWhoeverIsStruggling(t *testing.T) {
+	t.Parallel()
 	w := New(67)
 	w.ensureOfficials()
 	var official *NPC

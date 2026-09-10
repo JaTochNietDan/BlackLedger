@@ -60,6 +60,7 @@ var omitted = map[string]string{
 }
 
 func TestEveryFieldOfTheWorldSurvivesBeingWrittenDown(t *testing.T) {
+	t.Parallel()
 	var before World
 	seed := 0
 	distinctive(reflect.ValueOf(&before).Elem(), &seed)
@@ -94,6 +95,7 @@ func TestEveryFieldOfTheWorldSurvivesBeingWrittenDown(t *testing.T) {
 }
 
 func TestEveryFieldOfThePlayerSurvivesBeingWrittenDown(t *testing.T) {
+	t.Parallel()
 	var before Person
 	seed := 100
 	distinctive(reflect.ValueOf(&before).Elem(), &seed)
@@ -121,6 +123,7 @@ func TestEveryFieldOfThePlayerSurvivesBeingWrittenDown(t *testing.T) {
 // And the same for every other thing the world stores a list of, because a
 // collision inside one of those is just as fatal and just as invisible.
 func TestEveryStoredRecordSurvivesBeingWrittenDown(t *testing.T) {
+	t.Parallel()
 	for _, sample := range []any{
 		&Property{}, &Faction{}, &NPC{}, &Crew{}, &Plot{}, &Task{}, &Record{},
 		&Death{}, &Story{}, &Good{}, &Contract{}, &Commission{}, &Grudge{},

@@ -10,6 +10,7 @@ import "testing"
 // him work, and the command was accepted.
 
 func TestYouCannotSendAManWhoIsDead(t *testing.T) {
+	t.Parallel()
 	w, leo := crewman(t)
 	w.Player.Cash = 3000
 	w.Kill(leo.ID, "Shot at the counter.")
@@ -27,6 +28,7 @@ func TestYouCannotSendAManWhoIsDead(t *testing.T) {
 }
 
 func TestYouCannotSendAManOutOfACell(t *testing.T) {
+	t.Parallel()
 	w, leo := crewman(t)
 	w.Player.Cash = 3000
 	leo.Held = w.Minute + 2880
@@ -45,6 +47,7 @@ func TestYouCannotSendAManOutOfACell(t *testing.T) {
 // so that the distinction is a decision on the record rather than an accident,
 // and so that reinstating the stricter rule has to be done deliberately.
 func TestBeingInAnotherBuildingIsNotOutOfReach(t *testing.T) {
+	t.Parallel()
 	w, leo := crewman(t)
 	w.Player.Cash = 3000
 	leo.Location = "club"
@@ -63,6 +66,7 @@ func TestBeingInAnotherBuildingIsNotOutOfReach(t *testing.T) {
 // "Recruit Leo Carver" was refused only because he was already in the crew, so
 // the moment death removed him the button offered to hire him again.
 func TestYouCannotRecruitAManWhoIsDead(t *testing.T) {
+	t.Parallel()
 	w, leo := crewman(t)
 	w.Player.Cash = 3000
 	w.Kill(leo.ID, "Shot twice outside the Mariner.")
@@ -87,6 +91,7 @@ func TestYouCannotRecruitAManWhoIsDead(t *testing.T) {
 // somebody out of a police cell to rob a business while the police were still
 // holding him. The one shared readiness function they all use never asked.
 func TestYouCannotSendAManFromACellToDoAJob(t *testing.T) {
+	t.Parallel()
 	w, leo := crewman(t)
 	w.Player.Cash = 3000
 	if w.DelegateReadiness() != "" {
@@ -117,6 +122,7 @@ func TestYouCannotSendAManFromACellToDoAJob(t *testing.T) {
 
 // The same question, for the same reason, about a man who is out walking.
 func TestYouCannotSendAManWhoIsAlreadyCrossingTheCity(t *testing.T) {
+	t.Parallel()
 	w, leo := crewman(t)
 	w.Player.Cash = 3000
 	leo.Heading, leo.Arrives, leo.Errand = "club", w.Minute+30, "somewhere of his own"

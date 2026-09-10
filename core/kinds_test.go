@@ -12,6 +12,7 @@ import "testing"
 // of addresses can share one.
 
 func TestEveryEarningAddressDeclaresWhatKindOfBusinessItIs(t *testing.T) {
+	t.Parallel()
 	for _, l := range Locations {
 		earns := PlaceIncome[l.ID] > 0
 		_, runs := TradeOf(l.ID)
@@ -32,6 +33,7 @@ func TestEveryEarningAddressDeclaresWhatKindOfBusinessItIs(t *testing.T) {
 // The point of the change: two addresses of the same kind run by the same
 // rules, and are not two copies of them.
 func TestTwoAddressesOfOneKindShareTheirTrade(t *testing.T) {
+	t.Parallel()
 	byKind := map[string][]string{}
 	for _, l := range Locations {
 		if l.Kind != "" {
@@ -64,6 +66,7 @@ func TestTwoAddressesOfOneKindShareTheirTrade(t *testing.T) {
 
 // And a world made of that city gives every one of them an inside.
 func TestEveryAddressOfAKindOpensAsAGoingConcern(t *testing.T) {
+	t.Parallel()
 	w := New(97)
 	for _, l := range Locations {
 		trade, runs := TradeOf(l.ID)
@@ -87,6 +90,7 @@ func TestEveryAddressOfAKindOpensAsAGoingConcern(t *testing.T) {
 // address where they mean a kind of business, and owning the second laundry in
 // town would have got the player none of it.
 func TestWhatAKindOfBusinessLetsYouDoIsTrueOfEveryOneOfThem(t *testing.T) {
+	t.Parallel()
 	kindOf := map[string]string{}
 	for _, l := range Locations {
 		if l.Kind != "" {

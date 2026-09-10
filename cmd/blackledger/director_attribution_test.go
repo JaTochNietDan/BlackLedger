@@ -22,6 +22,7 @@ func attributionWorld(barOwner string) *core.World {
 }
 
 func TestNeutralWorkDoesNotHandItsPeopleToAFamily(t *testing.T) {
+	t.Parallel()
 	// Observed live on qwen3.5:35b-a3b at Saint Agnes, which is independently
 	// owned: a neutral mediation described "two Bellandi staff", implying family
 	// standing that the neutral reward never moves.
@@ -42,6 +43,7 @@ func TestNeutralWorkDoesNotHandItsPeopleToAFamily(t *testing.T) {
 }
 
 func TestFamilyAttributionIsAllowedWhenEarnedOrOwned(t *testing.T) {
+	t.Parallel()
 	w := attributionWorld("independent")
 	// The family receiving the credit may own the people in its own job.
 	if err := validateFactionAttribution(w, core.Proposal{Location: "bar", Beneficiary: "bellandi", Body: "Two Bellandi staff are at odds over the storeroom."}); err != nil {
@@ -59,6 +61,7 @@ func TestFamilyAttributionIsAllowedWhenEarnedOrOwned(t *testing.T) {
 }
 
 func TestOrdinaryMentionsOfAFamilyRemainLegal(t *testing.T) {
+	t.Parallel()
 	w := attributionWorld("independent")
 	for _, text := range []string{
 		"Keep the Bellandi Family out of this.",
@@ -76,6 +79,7 @@ func TestOrdinaryMentionsOfAFamilyRemainLegal(t *testing.T) {
 }
 
 func TestTheLiveStoreroomOfferIsRejected(t *testing.T) {
+	t.Parallel()
 	// Generated live on qwen3.5:35b-a3b during a fresh playtest at 20d1c76:
 	// mechanically neutral mediation, independently owned Saint Agnes.
 	w := attributionWorld("independent")
@@ -102,6 +106,7 @@ func TestTheLiveStoreroomOfferIsRejected(t *testing.T) {
 }
 
 func TestOrganizationsNamedDuringPlayDoNotMatchOrdinaryWords(t *testing.T) {
+	t.Parallel()
 	// Splinters are named like "the Falcone Crew". Taking the first word would
 	// make the guard match "the men" and reject most ordinary dialogue.
 	w := attributionWorld("independent")

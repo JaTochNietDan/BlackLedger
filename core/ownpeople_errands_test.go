@@ -31,6 +31,7 @@ func ownOrganization(t *testing.T, seed uint32) *World {
 }
 
 func TestYourOwnPeopleMindYourGroundToo(t *testing.T) {
+	t.Parallel()
 	w := ownOrganization(t, 4)
 	mine := []*NPC{}
 	for i := range w.NPCs {
@@ -67,6 +68,7 @@ func TestYourOwnPeopleMindYourGroundToo(t *testing.T) {
 // at once, and the door was defended from the moment of the decision rather
 // than from the moment somebody was standing in it.
 func TestSomebodySentToADoorHasToGetThere(t *testing.T) {
+	t.Parallel()
 	w := ownOrganization(t, 4)
 	free := w.Unposted()
 	if len(free) == 0 {
@@ -116,6 +118,7 @@ func TestSomebodySentToADoorHasToGetThere(t *testing.T) {
 // A man already standing in the place is on the door at once: there is nowhere
 // for him to walk.
 func TestSomebodyAlreadyThereIsOnTheDoorAtOnce(t *testing.T) {
+	t.Parallel()
 	w := ownOrganization(t, 4)
 	free := w.Unposted()
 	if len(free) == 0 {
@@ -134,6 +137,7 @@ func TestSomebodyAlreadyThereIsOnTheDoorAtOnce(t *testing.T) {
 
 // And the address does not claim to be held by somebody who is not there yet.
 func TestADoorDoesNotClaimAManWhoIsStillWalking(t *testing.T) {
+	t.Parallel()
 	w := ownOrganization(t, 4)
 	for _, n := range w.Unposted() {
 		n.Location = "bar"

@@ -8,6 +8,7 @@ import "testing"
 // neither could be finished without it.
 
 func TestPeopleInThisCityOwnCars(t *testing.T) {
+	t.Parallel()
 	w := New(53)
 	w.District = 2
 	driving, people := 0, 0
@@ -32,6 +33,7 @@ func TestPeopleInThisCityOwnCars(t *testing.T) {
 // Who drives is who could afford one. A family head drives; somebody mending
 // nets at the docks does not.
 func TestWhoDrivesIsWhoCouldAffordTo(t *testing.T) {
+	t.Parallel()
 	w := New(53)
 	w.District = 2
 	high, low := 0, 0
@@ -65,6 +67,7 @@ func TestWhoDrivesIsWhoCouldAffordTo(t *testing.T) {
 // buys one, and the money reaches whoever holds the lot — which is the whole
 // point of the dealership existing at all.
 func TestTheCityBuysCarsAndTheForecourtTakesTheMargin(t *testing.T) {
+	t.Parallel()
 	lot := ""
 	for _, l := range Locations {
 		if l.Kind == "dealer" {
@@ -121,6 +124,7 @@ func TestTheCityBuysCarsAndTheForecourtTakesTheMargin(t *testing.T) {
 // leaves every campaign that predates them without a single driver, and a
 // trade that is never called sells nothing.
 func TestAnOldCampaignGetsTheCityOnTheRoad(t *testing.T) {
+	t.Parallel()
 	w := New(53)
 	w.Version = SaveVersion
 	for i := range w.NPCs {
@@ -140,6 +144,7 @@ func TestAnOldCampaignGetsTheCityOnTheRoad(t *testing.T) {
 
 // Somebody whose car was taken is not quietly handed another by the settling.
 func TestSettlingDoesNotReplaceACarThatWasTaken(t *testing.T) {
+	t.Parallel()
 	w := New(53)
 	w.District = 2
 	var driver *NPC
@@ -162,6 +167,7 @@ func TestSettlingDoesNotReplaceACarThatWasTaken(t *testing.T) {
 // And the day actually calls the trade. This is the seam that has caught me
 // before: a function that works and is never reached.
 func TestTheDayPutsCarsOnTheRoad(t *testing.T) {
+	t.Parallel()
 	w := New(53)
 	w.District = 2
 	lot := ""

@@ -12,6 +12,7 @@ import (
 // Herald, filed under days the player had no reason to go back and read.
 
 func TestComingHomeSaysWhatHappened(t *testing.T) {
+	t.Parallel()
 	w := New(31)
 	left := w.Minute
 	w.Minute += 1440
@@ -31,6 +32,7 @@ func TestComingHomeSaysWhatHappened(t *testing.T) {
 
 // Somebody who has been away four days does not need to be told it rained.
 func TestComingHomeLeavesOutTheWeather(t *testing.T) {
+	t.Parallel()
 	w := New(32)
 	left := w.Minute
 	w.Minute += 1440
@@ -44,6 +46,7 @@ func TestComingHomeLeavesOutTheWeather(t *testing.T) {
 
 // Nothing before the trip belongs in it. The player was here for that.
 func TestComingHomeDoesNotReportWhatYouWereThereFor(t *testing.T) {
+	t.Parallel()
 	w := New(33)
 	w.Report("killing", "BEFORE YOU LEFT", "b")
 	w.Minute += 1440
@@ -62,6 +65,7 @@ func TestComingHomeDoesNotReportWhatYouWereThereFor(t *testing.T) {
 
 // A returning player gets a summary, not the whole paper.
 func TestComingHomeIsASummaryNotAnArchive(t *testing.T) {
+	t.Parallel()
 	w := New(34)
 	left := w.Minute
 	w.Minute += 1440
@@ -80,6 +84,7 @@ func TestComingHomeIsASummaryNotAnArchive(t *testing.T) {
 
 // A previous life's news is not this one's.
 func TestComingHomeDoesNotReadAPreviousLifesPaper(t *testing.T) {
+	t.Parallel()
 	w := New(35)
 	left := w.Minute
 	w.Minute += 1440
@@ -94,6 +99,7 @@ func TestComingHomeDoesNotReadAPreviousLifesPaper(t *testing.T) {
 // Read out of a real save after a four-day trip: "Whatever was arranged for you
 // happened 1 times to a locked door." A count of one takes a singular noun.
 func TestOneIsNotPlural(t *testing.T) {
+	t.Parallel()
 	for _, c := range []struct {
 		n    int
 		want string
@@ -109,6 +115,7 @@ func TestOneIsNotPlural(t *testing.T) {
 // ON RUSSO OUTFIT". The paper collapses repeats within a day; a trip spans
 // several, and two days of the same headline is one thing to be told.
 func TestComingHomeDoesNotSayTheSameThingTwice(t *testing.T) {
+	t.Parallel()
 	w := New(36)
 	left := w.Minute
 	for day := 1; day <= 3; day++ {
@@ -130,6 +137,7 @@ func TestComingHomeDoesNotSayTheSameThingTwice(t *testing.T) {
 // reported him walking into it. The minute you leave is a minute you were there
 // for.
 func TestComingOutIsNotToldAboutYourOwnArrest(t *testing.T) {
+	t.Parallel()
 	w := New(41)
 	w.Player.Home = "room"
 	w.Confine(4, "what was found at the laundry")
@@ -155,6 +163,7 @@ func TestComingOutIsNotToldAboutYourOwnArrest(t *testing.T) {
 // release record used to say only that whatever it cost happened while the
 // player was not there to watch it.
 func TestComingOutSaysWhatHappened(t *testing.T) {
+	t.Parallel()
 	w := New(42)
 	w.Player.Home = "room"
 	w.Confine(6, "what was found at the laundry")
@@ -178,6 +187,7 @@ func TestComingOutSaysWhatHappened(t *testing.T) {
 // And the other end of the same fault: after talking his way out, the player
 // was told the paper had reported him talking his way out.
 func TestComingOutIsNotToldAboutYourOwnRelease(t *testing.T) {
+	t.Parallel()
 	w := New(43)
 	w.Player.Home = "room"
 	w.Confine(6, "what was found at the laundry")

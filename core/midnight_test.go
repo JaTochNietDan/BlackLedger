@@ -12,6 +12,7 @@ import "testing"
 // nightsWithAHand counts the days on which the city's own gambling actually
 // found somebody on a floor to play, running the clock the way the game does.
 func TestTheTablesFindSomebodyAtMidnight(t *testing.T) {
+	t.Parallel()
 	played, days := 0, 0
 	for _, seed := range []uint32{5, 23, 61, 97, 181} {
 		w := New(seed)
@@ -44,6 +45,7 @@ func TestTheTablesFindSomebodyAtMidnight(t *testing.T) {
 // question that matters is whether anybody is standing at their door when the
 // day turns over.
 func TestAFamilyShortOfPeopleTakesSomebodyOn(t *testing.T) {
+	t.Parallel()
 	took, cities := 0, 0
 	for _, seed := range []uint32{5, 23, 61, 97, 181} {
 		w := New(seed)

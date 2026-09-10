@@ -9,6 +9,7 @@ func approachProposal() Proposal {
 	return Proposal{Title: "A ledger before dawn", Body: "Move the ledger before the merchant's partners arrive.", Speaker: "mara", Operation: "courier", Outcome: "Delivered.", Beneficiary: "russo", Approaches: []Approach{{Method: "careful", Label: "Wait for the street to clear"}, {Method: "press", Label: "Make the delivery before closing"}}}
 }
 func TestApproachChangesRiskAndPaymentThroughPoliceInterruption(t *testing.T) {
+	t.Parallel()
 	for _, method := range []string{"careful", "press"} {
 		t.Run(method, func(t *testing.T) {
 			w := New(27)
@@ -41,6 +42,7 @@ func TestApproachChangesRiskAndPaymentThroughPoliceInterruption(t *testing.T) {
 	}
 }
 func TestInvalidDirectorApproachesAreRejected(t *testing.T) {
+	t.Parallel()
 	for _, options := range [][]Approach{{{Method: "kill", Label: "Attack someone"}}, {{Method: "careful", Label: "Wait"}, {Method: "careful", Label: "Wait again"}}, {{Method: "careful", Label: strings.Repeat("x", 66)}}, {{Method: "careful", Label: "Wait"}, {Method: "press", Label: "Hurry"}, {Method: "press", Label: "Again"}}} {
 		p := approachProposal()
 		p.Approaches = options
@@ -57,6 +59,7 @@ func TestInvalidDirectorApproachesAreRejected(t *testing.T) {
 	}
 }
 func TestInterruptedApproachDoesNotGrantCompletion(t *testing.T) {
+	t.Parallel()
 	w := New(27)
 	w.Properties["laundry"].Owner = "player:1"
 	w.NextPressure = 500
@@ -74,6 +77,7 @@ func TestInterruptedApproachDoesNotGrantCompletion(t *testing.T) {
 // thing on it that could not be scanned. The numbers belong on the choice as
 // numbers, and they have to be the numbers the command will actually apply.
 func TestEveryWayOfDoingAJobStatesItsTermsAsFigures(t *testing.T) {
+	t.Parallel()
 	w := New(27)
 	scene, err := w.ValidateProposal(approachProposal())
 	if err != nil {
@@ -118,6 +122,7 @@ func TestEveryWayOfDoingAJobStatesItsTermsAsFigures(t *testing.T) {
 // used to append "Not enough cash" to every disabled choice, which was a guess
 // that happened to be right; the core is the only thing that knows.
 func TestAChoiceOutOfReachSaysWhyItself(t *testing.T) {
+	t.Parallel()
 	w := New(27)
 	var err error
 	w.Event, err = w.ValidateProposal(approachProposal())
@@ -152,6 +157,7 @@ func TestAChoiceOutOfReachSaysWhyItself(t *testing.T) {
 // ninety characters three times and buried the words that actually differed.
 // Conditions belong to the scene; only what changes belongs on a choice.
 func TestWhatIsTrueOfTheJobIsSaidOnceNotOnEveryButton(t *testing.T) {
+	t.Parallel()
 	w := New(27)
 	proposal := approachProposal()
 	proposal.Location = "bar"

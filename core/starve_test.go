@@ -7,6 +7,7 @@ import "testing"
 // carries that through, end to end, using only what a player can do.
 
 func TestTakingAFamilysBusinessesStarvesIt(t *testing.T) {
+	t.Parallel()
 	w := withFamily(41, "vasco", "Vasco Company", "Ilse Vasco")
 	f := w.faction("vasco")
 	f.Cash, f.Power, f.Peak = 6000, 70, 70
@@ -51,6 +52,7 @@ func TestTakingAFamilysBusinessesStarvesIt(t *testing.T) {
 // against the same family over the same weeks, left alone — the control is the
 // only thing that says what the wrecking actually cost them.
 func TestWreckingAFamilysBusinessesCostsItMoney(t *testing.T) {
+	t.Parallel()
 	settle := func(wreck bool) (int, int, int) {
 		w := withFamily(41, "vasco", "Vasco Company", "Ilse Vasco")
 		f := w.faction("vasco")
@@ -84,6 +86,7 @@ func TestWreckingAFamilysBusinessesCostsItMoney(t *testing.T) {
 // cannot both repair and pay, and that is what a campaign against their money
 // actually looks like.
 func TestWreckingThemEveryWeekStarvesThem(t *testing.T) {
+	t.Parallel()
 	w := withFamily(41, "vasco", "Vasco Company", "Ilse Vasco")
 	f := w.faction("vasco")
 	f.Cash, f.Power, f.Peak = 6000, 70, 70

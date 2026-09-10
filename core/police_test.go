@@ -12,6 +12,7 @@ func watched(t *testing.T, heat int) *World {
 }
 
 func TestAttentionFadesWhenNothingIsAdded(t *testing.T) {
+	t.Parallel()
 	w := watched(t, 20)
 	w.PoliceDay()
 	// The constant was a flat CoolOff for everybody. How much a person is
@@ -35,6 +36,7 @@ func TestAttentionFadesWhenNothingIsAdded(t *testing.T) {
 }
 
 func TestARaidTakesStockCashAndCondition(t *testing.T) {
+	t.Parallel()
 	w := watched(t, 60)
 	w.Player.Stock = map[string]int{"moonshine": 15}
 	cash, condition := w.Player.Cash, w.Properties["laundry"].Condition
@@ -67,6 +69,7 @@ func TestARaidTakesStockCashAndCondition(t *testing.T) {
 }
 
 func TestPastAPointTheyTakeTheBusiness(t *testing.T) {
+	t.Parallel()
 	w := watched(t, ForfeitThreshold+5)
 	w.Raid()
 	if w.Own("laundry") {
@@ -78,6 +81,7 @@ func TestPastAPointTheyTakeTheBusiness(t *testing.T) {
 }
 
 func TestTheyOnlyComeWhenThereIsEnoughToComeFor(t *testing.T) {
+	t.Parallel()
 	quiet, loud := 0, 0
 	for i := uint32(1); i <= 400; i++ {
 		// Consecutive seeds give this generator nearly identical first draws,
@@ -111,6 +115,7 @@ func TestTheyOnlyComeWhenThereIsEnoughToComeFor(t *testing.T) {
 }
 
 func TestADetectiveWillNotBeSeenWithYouForever(t *testing.T) {
+	t.Parallel()
 	w := watched(t, 30)
 	cost := w.BribeCost()
 	cash := w.Player.Cash
@@ -139,6 +144,7 @@ func TestADetectiveWillNotBeSeenWithYouForever(t *testing.T) {
 }
 
 func TestWarCostsOrganizationsMoneyToo(t *testing.T) {
+	t.Parallel()
 	w := New(83)
 	w.Antagonize("bellandi", "russo", 100)
 	if w.Conflict("bellandi", "russo").State != "war" {

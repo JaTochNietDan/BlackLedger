@@ -24,6 +24,7 @@ func carrier(t *testing.T) *World {
 }
 
 func TestRunningTheRouteGetsYouNoticed(t *testing.T) {
+	t.Parallel()
 	w := carrier(t)
 	if w.Player.Runs != 0 {
 		t.Fatal("somebody who has never traded is already known for it")
@@ -41,6 +42,7 @@ func TestRunningTheRouteGetsYouNoticed(t *testing.T) {
 }
 
 func TestSomebodyElseWantsTheRoute(t *testing.T) {
+	t.Parallel()
 	w := carrier(t)
 	w.Player.Runs = RouteNotice * 2
 	for i := 0; i < 400 && !w.routePlotted(); i++ {
@@ -72,6 +74,7 @@ func TestSomebodyElseWantsTheRoute(t *testing.T) {
 }
 
 func TestTheyWarnYouOffWhenYouAreCarryingNothing(t *testing.T) {
+	t.Parallel()
 	w := carrier(t)
 	w.Player.Stock = map[string]int{}
 	before := len(w.History)

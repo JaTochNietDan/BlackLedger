@@ -16,6 +16,7 @@ import "testing"
 // files under names everybody knows.
 
 func TestThePopulationAddsUp(t *testing.T) {
+	t.Parallel()
 	check := func(what string, w *World) {
 		p := w.PopulationSummary()
 		living, organized := p["living"].(int), p["organized"].(int)

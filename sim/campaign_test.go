@@ -7,6 +7,7 @@ import (
 )
 
 func TestCampaignsAreReproducible(t *testing.T) {
+	t.Parallel()
 	for _, strategy := range []string{"worker", "investor", "defiant", "reckless"} {
 		for _, director := range []string{"authored", "fixture"} {
 			a, b := Run(27, strategy, director, 100, false), Run(27, strategy, director, 100, false)
@@ -17,6 +18,7 @@ func TestCampaignsAreReproducible(t *testing.T) {
 	}
 }
 func TestPoliciesExerciseTheirIntendedBehavior(t *testing.T) {
+	t.Parallel()
 	investor := Run(27, "investor", "authored", 100, false)
 	for _, milestone := range []string{"laundry", "crew", "housing", "security", "garage", "casino"} {
 		if investor.Milestones[milestone] == 0 {
@@ -37,6 +39,7 @@ func TestPoliciesExerciseTheirIntendedBehavior(t *testing.T) {
 	}
 }
 func TestPolicyCannotSeePrivateThreatChanges(t *testing.T) {
+	t.Parallel()
 	w := core.New(27)
 	before := Public(w)
 	w.Retaliation()
@@ -52,6 +55,7 @@ func TestPolicyCannotSeePrivateThreatChanges(t *testing.T) {
 }
 
 func TestDefiantInvestorRefusesPublicBusinessDemand(t *testing.T) {
+	t.Parallel()
 	v := View{Revision: 3, Event: &Event{ID: "demand", Kind: "business_pressure", Choices: []core.Choice{{ID: "pay"}, {ID: "resist"}}}}
 	compliant, err := Choose(v, "investor")
 	if err != nil {
@@ -67,6 +71,7 @@ func TestDefiantInvestorRefusesPublicBusinessDemand(t *testing.T) {
 }
 
 func TestInvestorRepairsCrewLoyaltyUsingPublicActions(t *testing.T) {
+	t.Parallel()
 	w := core.New(27)
 	w.Player.Crew = []core.Crew{{ID: "leo", Name: "Leo", Loyalty: 25}}
 	c, err := Choose(Public(w), "investor")
@@ -89,6 +94,7 @@ func TestInvestorRepairsCrewLoyaltyUsingPublicActions(t *testing.T) {
 }
 
 func TestDiplomatMaintainsPublicBusinessAgreements(t *testing.T) {
+	t.Parallel()
 	r := Run(27, "diplomat", "authored", 220, false)
 	if r.Error != "" {
 		t.Fatal(r.Error)

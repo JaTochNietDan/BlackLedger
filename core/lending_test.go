@@ -46,6 +46,7 @@ func defaulter(t *testing.T) (*World, *NPC) {
 }
 
 func TestNobodyBorrowsFromAStranger(t *testing.T) {
+	t.Parallel()
 	w, n := lender(t)
 	w.Player.Respect = LendStanding - 1
 	if w.LendReadiness(n.ID) == "" {
@@ -76,6 +77,7 @@ func TestNobodyBorrowsFromAStranger(t *testing.T) {
 }
 
 func TestLendingIsBoundedByWhatYouCanAffordToBeOwed(t *testing.T) {
+	t.Parallel()
 	w, _ := lender(t)
 	w.Player.Cash = 6000
 	lent, borrowers := 0, 0
@@ -110,6 +112,7 @@ func TestLendingIsBoundedByWhatYouCanAffordToBeOwed(t *testing.T) {
 }
 
 func TestSomebodyWhoCanPayPaysAndSomebodyWhoCannotIsADecision(t *testing.T) {
+	t.Parallel()
 	w, n := lender(t)
 	if err := w.Lend(n.ID); err != nil {
 		t.Fatal(err)
@@ -150,6 +153,7 @@ func TestSomebodyWhoCanPayPaysAndSomebodyWhoCannotIsADecision(t *testing.T) {
 }
 
 func TestAManWhoCannotPayIsAManStandingInFrontOfYou(t *testing.T) {
+	t.Parallel()
 	w, n := defaulter(t)
 	if l := w.LoanTo(n.ID); l.Missed != 1 {
 		t.Fatalf("missed %d times", l.Missed)
@@ -175,6 +179,7 @@ func TestAManWhoCannotPayIsAManStandingInFrontOfYou(t *testing.T) {
 }
 
 func TestCollectingWorksAndCostsSomethingEveryTime(t *testing.T) {
+	t.Parallel()
 	w, n := defaulter(t)
 	w.Player.Respect, w.Player.Heat = 60, 0
 	respect, heat, cash := w.Player.Respect, w.Player.Heat, w.Player.Cash
@@ -208,6 +213,7 @@ func TestCollectingWorksAndCostsSomethingEveryTime(t *testing.T) {
 }
 
 func TestAnotherWeekIsHowThisTradeMakesItsMoney(t *testing.T) {
+	t.Parallel()
 	w, n := defaulter(t)
 	owed, trust := w.LoanTo(n.ID).Owed, n.Trust
 	if err := w.Extend(n.ID); err != nil {
@@ -229,6 +235,7 @@ func TestAnotherWeekIsHowThisTradeMakesItsMoney(t *testing.T) {
 }
 
 func TestWritingItOffBuysTheOneThingMoneyCannot(t *testing.T) {
+	t.Parallel()
 	w, n := defaulter(t)
 	w.Aggrieve(n.ID, 50, "something older")
 	w.Player.Respect = 60
@@ -254,6 +261,7 @@ func TestWritingItOffBuysTheOneThingMoneyCannot(t *testing.T) {
 }
 
 func TestADebtDiesWithTheManCarryingIt(t *testing.T) {
+	t.Parallel()
 	w, n := lender(t)
 	w.Lend(n.ID)
 	l := w.LoanTo(n.ID)
@@ -270,6 +278,7 @@ func TestADebtDiesWithTheManCarryingIt(t *testing.T) {
 }
 
 func TestTheBookSurvivesBeingWrittenDown(t *testing.T) {
+	t.Parallel()
 	w, n := lender(t)
 	w.Lend(n.ID)
 	book := w.LoanDescription()
@@ -282,6 +291,7 @@ func TestTheBookSurvivesBeingWrittenDown(t *testing.T) {
 }
 
 func TestSomebodyPutAgainstAWallComesBackForIt(t *testing.T) {
+	t.Parallel()
 	// A collection is not free the moment it happens. Over enough days, the man
 	// it happened to is the one who picks the player out of a street.
 	const runs = 400
@@ -315,6 +325,7 @@ func TestSomebodyPutAgainstAWallComesBackForIt(t *testing.T) {
 }
 
 func TestARoomOfStrangersIsNotFifteenIdenticalButtons(t *testing.T) {
+	t.Parallel()
 	w, _ := lender(t)
 	// Put a crowd in one room, all of them plausible borrowers.
 	where := w.Player.Location
@@ -358,6 +369,7 @@ func TestARoomOfStrangersIsNotFifteenIdenticalButtons(t *testing.T) {
 }
 
 func TestNobodyWithATitleBorrowsFromSomebodyWithout(t *testing.T) {
+	t.Parallel()
 	w, _ := lender(t)
 	for _, role := range []string{"detective", "fixer"} {
 		id := w.HolderID(role)
@@ -381,6 +393,7 @@ func TestNobodyWithATitleBorrowsFromSomebodyWithout(t *testing.T) {
 // killing and the next morning the ledger claimed an asset that was in the
 // ground. That window is exactly when a player looks at their books.
 func TestADebtDiesWithTheManWhoOwedIt(t *testing.T) {
+	t.Parallel()
 	w := New(4)
 	w.Player.Cash, w.Player.Respect = 5000, OrganizationStanding
 	w.Player.Location = "bar"

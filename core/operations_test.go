@@ -12,6 +12,7 @@ func operator(t *testing.T) *World {
 }
 
 func TestABusinessComesAsAGoingConcern(t *testing.T) {
+	t.Parallel()
 	w := New(703)
 	// Over the addresses rather than the trade table: a trade belongs to a kind
 	// of business now, and "cabs" is not a place anybody can stand in.
@@ -42,6 +43,7 @@ func TestABusinessComesAsAGoingConcern(t *testing.T) {
 }
 
 func TestNeglectCostsCapacityWithoutClosingThePlace(t *testing.T) {
+	t.Parallel()
 	w := operator(t)
 	full := w.Capacity("laundry")
 	w.Properties["laundry"].Supply = 0
@@ -65,6 +67,7 @@ func TestNeglectCostsCapacityWithoutClosingThePlace(t *testing.T) {
 }
 
 func TestStaffCostWagesEveryDay(t *testing.T) {
+	t.Parallel()
 	w := operator(t)
 	trade := trades["laundry"]
 	if w.Wages() != trade.Hands*trade.Wage {
@@ -97,6 +100,7 @@ func TestStaffCostWagesEveryDay(t *testing.T) {
 }
 
 func TestTradingRunsSuppliesDownAndRestockingPutsThemBack(t *testing.T) {
+	t.Parallel()
 	w := operator(t)
 	start := w.Properties["laundry"].Supply
 	w.OperationsDay()
@@ -122,6 +126,7 @@ func TestTradingRunsSuppliesDownAndRestockingPutsThemBack(t *testing.T) {
 }
 
 func TestTroubleFindsThePlacesNobodyIsWatching(t *testing.T) {
+	t.Parallel()
 	watched, neglected := 0, 0
 	for i := uint32(1); i <= 300; i++ {
 		good := New(i * 2654435761)
@@ -156,6 +161,7 @@ func TestTroubleFindsThePlacesNobodyIsWatching(t *testing.T) {
 }
 
 func TestTroubleCanBeDealtWithAndEachTradeHasItsOwn(t *testing.T) {
+	t.Parallel()
 	w := operator(t)
 	if w.RemedyReadiness("laundry") == "" {
 		t.Fatal("a remedy was offered with nothing wrong")

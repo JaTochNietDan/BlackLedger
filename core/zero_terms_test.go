@@ -19,6 +19,7 @@ import (
 var zeroMoney = regexp.MustCompile(`\$0\b`)
 
 func TestNoDescriptionQuotesTermsOfZero(t *testing.T) {
+	t.Parallel()
 	w := New(7)
 	w.District = 2
 	w.Player.Location = "market"
@@ -43,6 +44,7 @@ func TestNoDescriptionQuotesTermsOfZero(t *testing.T) {
 // The car is the same shape without the dollar sign: a condition out of a
 // hundred, for a car that is not there.
 func TestServicingNoCarDoesNotQuoteItsCondition(t *testing.T) {
+	t.Parallel()
 	w := New(7)
 	w.District = 2
 	w.Player.Cash = 500
@@ -66,6 +68,7 @@ func TestServicingNoCarDoesNotQuoteItsCondition(t *testing.T) {
 // And the other half, so this is not just a rule about suppressing text: when
 // there IS something to state, the figure is still stated.
 func TestRealTermsAreStillQuoted(t *testing.T) {
+	t.Parallel()
 	w := New(7)
 	w.District = 2
 	w.Player.Cash = 4000

@@ -26,6 +26,7 @@ func testator(t *testing.T) (*World, *NPC) {
 }
 
 func TestWhatYouBuiltOutlivesYouIfAnybodyIsLeft(t *testing.T) {
+	t.Parallel()
 	w, member := testator(t)
 	name := member.Name
 	// Measured before they die: afterwards the player holds nothing and their
@@ -58,6 +59,7 @@ func TestWhatYouBuiltOutlivesYouIfAnybodyIsLeft(t *testing.T) {
 }
 
 func TestTheCitysOpinionOfTheManCarriesToTheThingHeLeft(t *testing.T) {
+	t.Parallel()
 	w, member := testator(t)
 	me := w.PlayerOrganizationID()
 	c := w.Conflict(w.Factions[0].ID, me)
@@ -76,6 +78,7 @@ func TestTheCitysOpinionOfTheManCarriesToTheThingHeLeft(t *testing.T) {
 }
 
 func TestNobodyIsLeftAnsweringToNothing(t *testing.T) {
+	t.Parallel()
 	// Somebody who had people leaves an organization; somebody who had none
 	// leaves nothing, and nobody is left pointing at an id that resolves to
 	// nothing either way.
@@ -106,6 +109,7 @@ func TestNobodyIsLeftAnsweringToNothing(t *testing.T) {
 }
 
 func TestTheNextArrivalMeetsWhatTheLastOneLeft(t *testing.T) {
+	t.Parallel()
 	w, member := testator(t)
 	w.Die("Shot.")
 	next, err := Execute(w, Command{RequestID: ID(), Revision: w.Revision, Kind: "new_life"})
@@ -136,6 +140,7 @@ func TestTheNextArrivalMeetsWhatTheLastOneLeft(t *testing.T) {
 }
 
 func TestAnInheritedOrganizationLivesLikeAnyOther(t *testing.T) {
+	t.Parallel()
 	const runs, days = 150, 90
 	survived, fought, gone := 0, 0, 0
 	for seed := uint32(1); seed <= runs; seed++ {

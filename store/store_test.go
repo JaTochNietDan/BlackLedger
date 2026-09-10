@@ -17,6 +17,7 @@ func testStore(t *testing.T) *Store {
 	return s
 }
 func TestIdempotentCommand(t *testing.T) {
+	t.Parallel()
 	s := testStore(t)
 	c := core.Command{RequestID: "duplicate-key", Revision: 0, Kind: "travel", Target: "bar"}
 	a, e := s.Command(c)
@@ -33,6 +34,7 @@ func TestIdempotentCommand(t *testing.T) {
 	}
 }
 func TestStaleRevision(t *testing.T) {
+	t.Parallel()
 	s := testStore(t)
 	_, _ = s.Command(core.Command{RequestID: "first-command", Revision: 0, Kind: "travel", Target: "bar"})
 	_, e := s.Command(core.Command{RequestID: "second-command", Revision: 0, Kind: "courier", Target: "bar"})
@@ -42,6 +44,7 @@ func TestStaleRevision(t *testing.T) {
 	}
 }
 func TestInterruptedIncidentReload(t *testing.T) {
+	t.Parallel()
 	path := filepath.Join(t.TempDir(), "test.sqlite3")
 	s, e := Open(path)
 	if e != nil {
@@ -64,6 +67,7 @@ func TestInterruptedIncidentReload(t *testing.T) {
 	}
 }
 func TestRejectedPayment(t *testing.T) {
+	t.Parallel()
 	s := testStore(t)
 	_, e := s.Command(core.Command{RequestID: "unaffordable", Revision: 0, Kind: "security", Target: "room"})
 	w, _ := s.Read()
@@ -73,6 +77,7 @@ func TestRejectedPayment(t *testing.T) {
 }
 
 func TestLegacyEstatePurchaseMigration(t *testing.T) {
+	t.Parallel()
 	w := core.New(27)
 	w.Version = 1
 	w.Player.Home = "estate"
@@ -108,6 +113,7 @@ func TestLegacyEstatePurchaseMigration(t *testing.T) {
 // This loads a campaign that has never heard of an address and asks whether it
 // comes back with one.
 func TestASaveThatNeverHeardOfAnAddressGetsOneOnLoad(t *testing.T) {
+	t.Parallel()
 	path := filepath.Join(t.TempDir(), "test.sqlite3")
 	s, e := Open(path)
 	if e != nil {

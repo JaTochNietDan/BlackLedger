@@ -11,6 +11,7 @@ func banker(t *testing.T) *World {
 }
 
 func TestBankingMoneyCostsSomethingToDo(t *testing.T) {
+	t.Parallel()
 	w := banker(t)
 	cash := w.Player.Cash
 	if err := w.Deposit(0); err != nil {
@@ -34,6 +35,7 @@ func TestBankingMoneyCostsSomethingToDo(t *testing.T) {
 }
 
 func TestMoneySentOutSurvivesThePersonWhoSentIt(t *testing.T) {
+	t.Parallel()
 	w := banker(t)
 	for i := 0; i < 3; i++ {
 		if err := w.Deposit(0); err != nil {
@@ -72,6 +74,7 @@ func TestMoneySentOutSurvivesThePersonWhoSentIt(t *testing.T) {
 }
 
 func TestReachingItAsAStrangerCostsMoreThanAStrangerHas(t *testing.T) {
+	t.Parallel()
 	w := New(509)
 	w.Offshore = 4000
 	w.Player.Location = "market"
@@ -104,6 +107,7 @@ func TestReachingItAsAStrangerCostsMoreThanAStrangerHas(t *testing.T) {
 }
 
 func TestAnEmptyAccountIsNotWorthReaching(t *testing.T) {
+	t.Parallel()
 	w := banker(t)
 	if w.AccessReadiness() == "" {
 		t.Fatal("access was offered with nothing out there")
@@ -125,6 +129,7 @@ func TestAnEmptyAccountIsNotWorthReaching(t *testing.T) {
 }
 
 func TestBankingIsALossNotASavingsPlan(t *testing.T) {
+	t.Parallel()
 	// Sending money out and bringing it back must never be worth doing for its
 	// own sake, or it becomes a way to launder value rather than a decision
 	// about what to leave behind.

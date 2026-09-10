@@ -17,6 +17,7 @@ import "testing"
 // core sends, so the two cannot drift again.
 
 func TestEveryGroupAnActionCanCarryHasATitle(t *testing.T) {
+	t.Parallel()
 	titled := map[string]bool{}
 	for _, g := range Groups() {
 		if g.Title == "" || g.Blurb == "" {

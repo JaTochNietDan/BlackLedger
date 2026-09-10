@@ -15,6 +15,7 @@ import (
 // every passage that starts a sentence with an organization's name is wrong at
 // once and all of them can be fixed together.
 func TestNoFamilyNameEverBeginsASentenceInLowerCase(t *testing.T) {
+	t.Parallel()
 	faults := map[string]int{}
 	total := 0
 	for _, seed := range []uint32{31, 47, 88, 103, 219} {

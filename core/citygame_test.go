@@ -9,6 +9,7 @@ import "testing"
 // standing in should still be a business.
 
 func TestTheCityPlaysCardsWithoutThePlayer(t *testing.T) {
+	t.Parallel()
 	w := New(404)
 	w.Event = nil
 	moved, played := 0, 0
@@ -45,6 +46,7 @@ func TestTheCityPlaysCardsWithoutThePlayer(t *testing.T) {
 // And the room takes something for the table, which is what a back room is for
 // from the owner's side.
 func TestTheHouseTakesSomethingForTheTable(t *testing.T) {
+	t.Parallel()
 	w := New(404)
 	w.Event, w.District = nil, 9
 	w.Player.Cash, w.Player.Health = 20000, 100
@@ -73,6 +75,7 @@ func TestTheHouseTakesSomethingForTheTable(t *testing.T) {
 // A hand nobody watches must not move the cards the player is about to be
 // dealt. Two streams, and the city's own games run on the city's.
 func TestTheCitysOwnCardsDoNotTouchThePlayersDeal(t *testing.T) {
+	t.Parallel()
 	deal := func(cityPlays bool) []Card {
 		w := New(404)
 		w.Event, w.District = nil, 9
@@ -108,6 +111,7 @@ func TestTheCitysOwnCardsDoNotTouchThePlayersDeal(t *testing.T) {
 // through the city's own machinery for two people falling out rather than a
 // second one written for cards.
 func TestABadNightAtCardsIsSomethingTwoPeopleFallOutOver(t *testing.T) {
+	t.Parallel()
 	w := New(404)
 	w.Event = nil
 	for day := 0; day < 60; day++ {

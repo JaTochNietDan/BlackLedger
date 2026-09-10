@@ -53,6 +53,7 @@ func liveSomewhere(w *World, prefixes []string) (bool, string) {
 }
 
 func TestTheGuideDoesNotOfferWhatTheButtonsRefuse(t *testing.T) {
+	t.Parallel()
 	// A player who has made a start and has almost nothing left, which is the
 	// ordinary state of a campaign at the end of a bad week.
 	for _, cash := range []int{51, 400, 4000} {
@@ -95,6 +96,7 @@ func TestTheGuideDoesNotOfferWhatTheButtonsRefuse(t *testing.T) {
 // So: the made-up sentence may only appear when there was genuinely nothing to
 // ask about.
 func TestTheGuideOnlyInventsAReasonWhenThereIsNothingToAsk(t *testing.T) {
+	t.Parallel()
 	invented := map[string][]string{
 		"There is nobody in this city for that yet":         nil,
 		"There is nowhere in this city for that yet":        nil,
@@ -135,6 +137,7 @@ func TestTheGuideOnlyInventsAReasonWhenThereIsNothingToAsk(t *testing.T) {
 
 // And the helper itself, both ways.
 func TestTheGuideReportsTheBriefestRealRefusal(t *testing.T) {
+	t.Parallel()
 	if got := shortest("nothing to ask", []string{"a long refusal indeed", "short one"}); got != "short one" {
 		t.Errorf("got %q, want the briefest real refusal", got)
 	}

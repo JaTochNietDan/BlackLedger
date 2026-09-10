@@ -10,6 +10,7 @@ import (
 // dying of it.
 
 func TestEveryFigureInTheTopBarExplainsItself(t *testing.T) {
+	t.Parallel()
 	w, _ := testator(t)
 	stats := w.Dashboard()
 	if len(stats) < 6 {
@@ -36,6 +37,7 @@ func TestEveryFigureInTheTopBarExplainsItself(t *testing.T) {
 // The explanations carry the real thresholds, so they cannot drift from the
 // rules the way written copy does.
 func TestTheExplanationsCarryTheRealNumbers(t *testing.T) {
+	t.Parallel()
 	w, _ := testator(t)
 	for _, s := range w.Dashboard() {
 		switch s.ID {
@@ -56,6 +58,7 @@ func TestTheExplanationsCarryTheRealNumbers(t *testing.T) {
 }
 
 func TestAFigureWorthWorryingAboutSaysSo(t *testing.T) {
+	t.Parallel()
 	w, _ := testator(t)
 	w.Player.Heat, w.Player.Health = RaidThreshold+5, 20
 	warned := map[string]bool{}
@@ -76,6 +79,7 @@ func TestAFigureWorthWorryingAboutSaysSo(t *testing.T) {
 }
 
 func TestTheCityIsSaidTheSameWayEverywhere(t *testing.T) {
+	t.Parallel()
 	// The bar and the city description must not disagree about the word.
 	w, _ := testator(t)
 	for _, level := range []int{0, 40, 70, 95} {
@@ -90,6 +94,7 @@ func TestTheCityIsSaidTheSameWayEverywhere(t *testing.T) {
 }
 
 func TestMoneyIsWrittenTheWayPeopleReadIt(t *testing.T) {
+	t.Parallel()
 	for _, c := range []struct {
 		n    int
 		want string
@@ -106,6 +111,7 @@ func TestMoneyIsWrittenTheWayPeopleReadIt(t *testing.T) {
 // cell: six figures, identical to a free man's, while the most important fact
 // about the next five days was two clicks away on another screen.
 func TestTheTopBarSaysWhenThePoliceHaveYou(t *testing.T) {
+	t.Parallel()
 	w := New(4)
 	w.Player.Cash, w.Player.Respect = 6000, OrganizationStanding
 	w.Player.Location = "bar"

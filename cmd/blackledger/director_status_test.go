@@ -15,6 +15,7 @@ import (
 // the rest of a hundred-and-thirty-day campaign.
 
 func TestARefusedDraftIsNotAnOutage(t *testing.T) {
+	t.Parallel()
 	reason := errors.New(`proposal repeats a recent offer "A warning from the Bellandi"; write a distinct task and title rather than swapping names`)
 	var refused error = proposalRejected{reason}
 	var as proposalRejected
@@ -42,6 +43,7 @@ func TestARefusedDraftIsNotAnOutage(t *testing.T) {
 }
 
 func TestAStatusLineSurvivesAnEmptyReason(t *testing.T) {
+	t.Parallel()
 	if got := firstSentence("   "); got != "no reason was given." {
 		t.Fatalf("an empty reason reads as %q", got)
 	}

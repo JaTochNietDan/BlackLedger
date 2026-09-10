@@ -21,6 +21,7 @@ func keeper(t *testing.T) *World {
 }
 
 func TestAFullRoomEarnsMoreThanAnEmptyOne(t *testing.T) {
+	t.Parallel()
 	w := keeper(t)
 	clearRoom(w, "laundry")
 	empty := w.Footfall("laundry")
@@ -41,6 +42,7 @@ func TestAFullRoomEarnsMoreThanAnEmptyOne(t *testing.T) {
 }
 
 func TestYourOwnManOnTheDoorIsNotACustomer(t *testing.T) {
+	t.Parallel()
 	w := keeper(t)
 	clearRoom(w, "laundry")
 	// Somebody of yours, standing in your own laundry.
@@ -58,6 +60,7 @@ func TestYourOwnManOnTheDoorIsNotACustomer(t *testing.T) {
 }
 
 func TestTheRoomReachesTheLedger(t *testing.T) {
+	t.Parallel()
 	w := keeper(t)
 	clearRoom(w, "laundry")
 	quiet := w.Trading("laundry")

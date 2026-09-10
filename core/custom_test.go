@@ -15,6 +15,7 @@ func shopkeeper(t *testing.T) *World {
 }
 
 func TestAPlaceTakenOnHasATradeAlready(t *testing.T) {
+	t.Parallel()
 	w := shopkeeper(t)
 	if w.Custom("laundry") != CustomStart {
 		t.Fatalf("a laundry came with %d%% trade", w.Custom("laundry"))
@@ -29,6 +30,7 @@ func TestAPlaceTakenOnHasATradeAlready(t *testing.T) {
 }
 
 func TestRunningItProperlyBuildsATradeAndNeglectLosesIt(t *testing.T) {
+	t.Parallel()
 	w := shopkeeper(t)
 	for i := 0; i < 30; i++ {
 		w.CustomDay()
@@ -65,6 +67,7 @@ func TestRunningItProperlyBuildsATradeAndNeglectLosesIt(t *testing.T) {
 }
 
 func TestSkimmingHardCostsTheShop(t *testing.T) {
+	t.Parallel()
 	clean := shopkeeper(t)
 	hard := shopkeeper(t)
 	hard.Properties["laundry"].Mode = "hard"
@@ -78,6 +81,7 @@ func TestSkimmingHardCostsTheShop(t *testing.T) {
 }
 
 func TestUsingTheBooksIsWhatTradeIsSpentOn(t *testing.T) {
+	t.Parallel()
 	w := shopkeeper(t)
 	before := w.Custom("laundry")
 	if err := w.Launder("laundry"); err != nil {
@@ -89,6 +93,7 @@ func TestUsingTheBooksIsWhatTradeIsSpentOn(t *testing.T) {
 }
 
 func TestASearchInDaylightIsTheEndOfAShopsStanding(t *testing.T) {
+	t.Parallel()
 	w := shopkeeper(t)
 	w.Properties["laundry"].Income = 20
 	before := w.Custom("laundry")
@@ -100,6 +105,7 @@ func TestASearchInDaylightIsTheEndOfAShopsStanding(t *testing.T) {
 }
 
 func TestNobodyOffersStandingWorkToAPlaceWithNoStanding(t *testing.T) {
+	t.Parallel()
 	w := shopkeeper(t)
 	if w.OrderReadiness("laundry") == "" {
 		t.Fatal("a place at half trade was offered a standing order")
@@ -123,6 +129,7 @@ func TestNobodyOffersStandingWorkToAPlaceWithNoStanding(t *testing.T) {
 }
 
 func TestAnOrderThatCannotBeFilledIsLostAndCostsMore(t *testing.T) {
+	t.Parallel()
 	w := shopkeeper(t)
 	w.Properties["laundry"].Custom = 80
 	w.TakeOrder("laundry")
@@ -145,6 +152,7 @@ func TestAnOrderThatCannotBeFilledIsLostAndCostsMore(t *testing.T) {
 }
 
 func TestTradeReachesWhatTheBusinessEarns(t *testing.T) {
+	t.Parallel()
 	const days = 20
 	rate := func(custom int) float64 {
 		w := shopkeeper(t)

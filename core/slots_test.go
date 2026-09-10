@@ -7,6 +7,7 @@ import "testing"
 // can take money off people all day without being a casino.
 
 func TestTheMachineKeepsAKnownShareOfWhatGoesThroughIt(t *testing.T) {
+	t.Parallel()
 	// Worked out over every one of the eight thousand lines the drums can show,
 	// from the strip and the paytable, so the number on the wall cannot drift
 	// away from the machine underneath it.
@@ -26,6 +27,7 @@ func TestTheMachineKeepsAKnownShareOfWhatGoesThroughIt(t *testing.T) {
 }
 
 func TestThreeOfAKindPaysWhatTheStripSays(t *testing.T) {
+	t.Parallel()
 	for _, s := range ReelStrip() {
 		if got := MachinePays([3]Symbol{s, s, s}); got != s.Pays {
 			t.Errorf("three %s paid %d and the strip says %d", s.ID, got, s.Pays)
@@ -68,6 +70,7 @@ func plumOf(t *testing.T) Symbol {
 // The money, both ways: what the player puts in leaves them, what comes back
 // comes out of whoever holds the room.
 func TestAPullTakesTheStakeAndTheHousePaysTheWins(t *testing.T) {
+	t.Parallel()
 	w := New(17)
 	w.District = 2
 	w.Player.Cash, w.Player.Respect, w.Player.Health = 3000, 40, 100
@@ -105,6 +108,7 @@ func TestAPullTakesTheStakeAndTheHousePaysTheWins(t *testing.T) {
 // And you cannot play your own machine, which is the difference between owning
 // one and standing in front of one.
 func TestYouDoNotPlayYourOwnMachine(t *testing.T) {
+	t.Parallel()
 	w := New(17)
 	w.District = 2
 	w.Player.Cash = 3000
@@ -121,6 +125,7 @@ func TestYouDoNotPlayYourOwnMachine(t *testing.T) {
 // The wiring: the button is offered where there is a machine, it is not offered
 // where there is not, and pressing it plays the machine.
 func TestTheMachineCanActuallyBePlayedFromTheRoom(t *testing.T) {
+	t.Parallel()
 	w := New(17)
 	w.District = 2
 	w.Player.Cash, w.Player.Respect, w.Player.Health = 3000, 40, 100
@@ -162,6 +167,7 @@ func TestTheMachineCanActuallyBePlayedFromTheRoom(t *testing.T) {
 // a bandit in it were a casino, there would be no reason for the city to have
 // anything but casinos.
 func TestMachinesStandInRoomsThatAreNotCasinos(t *testing.T) {
+	t.Parallel()
 	casinos, machines, both := 0, 0, 0
 	for _, l := range Locations {
 		tables, bandits := HasTables(l.ID), HasMachines(l.ID)

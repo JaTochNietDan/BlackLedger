@@ -11,6 +11,7 @@ func ownedBusiness(t *testing.T) *World {
 }
 
 func TestHowABusinessIsRunChangesWhatItEarns(t *testing.T) {
+	t.Parallel()
 	earned := map[string]int{}
 	for _, mode := range []string{"clean", "standard", "hard"} {
 		w := ownedBusiness(t)
@@ -29,6 +30,7 @@ func TestHowABusinessIsRunChangesWhatItEarns(t *testing.T) {
 }
 
 func TestSkimmingCostsAttentionAndCondition(t *testing.T) {
+	t.Parallel()
 	w := ownedBusiness(t)
 	if err := w.SetMode("laundry", "hard"); err != nil {
 		t.Fatal(err)
@@ -57,6 +59,7 @@ func TestSkimmingCostsAttentionAndCondition(t *testing.T) {
 }
 
 func TestSkimmingBringsAFamilyDemandSooner(t *testing.T) {
+	t.Parallel()
 	hard, quiet := ownedBusiness(t), ownedBusiness(t)
 	if err := hard.SetMode("laundry", "hard"); err != nil {
 		t.Fatal(err)
@@ -72,6 +75,7 @@ func TestSkimmingBringsAFamilyDemandSooner(t *testing.T) {
 }
 
 func TestABusinessIsOnlyRunByWhoeverOwnsIt(t *testing.T) {
+	t.Parallel()
 	w := New(4)
 	if err := w.SetMode("club", "hard"); err == nil {
 		t.Fatal("the player set the operating mode of a family's premises")
@@ -94,6 +98,7 @@ func TestABusinessIsOnlyRunByWhoeverOwnsIt(t *testing.T) {
 }
 
 func TestTheChoiceIsOfferedWhereItApplies(t *testing.T) {
+	t.Parallel()
 	w := ownedBusiness(t)
 	w.Player.Location = "laundry"
 	offered := map[string]Action{}
@@ -122,6 +127,7 @@ func TestTheChoiceIsOfferedWhereItApplies(t *testing.T) {
 }
 
 func TestOlderSavesKeepEarningWhatTheyEarned(t *testing.T) {
+	t.Parallel()
 	// A property with no recorded mode runs the ordinary way.
 	w := ownedBusiness(t)
 	w.Properties["laundry"].Mode = ""

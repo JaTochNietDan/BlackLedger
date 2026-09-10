@@ -12,6 +12,7 @@ func traveller(t *testing.T) *World {
 }
 
 func TestJourneysAreBookedAtTheExchangeAndNowhereElse(t *testing.T) {
+	t.Parallel()
 	w := traveller(t)
 	if w.TripReadiness("halloway") != "" {
 		t.Fatal("the exchange would not sell a ticket:", w.TripReadiness("halloway"))
@@ -28,6 +29,7 @@ func TestJourneysAreBookedAtTheExchangeAndNowhereElse(t *testing.T) {
 }
 
 func TestTheCityRunsWhileYouAreNotInIt(t *testing.T) {
+	t.Parallel()
 	w := traveller(t)
 	minute := w.Minute
 	if err := w.Trip("halloway"); err != nil {
@@ -46,6 +48,7 @@ func TestTheCityRunsWhileYouAreNotInIt(t *testing.T) {
 }
 
 func TestBeingNowhereAnybodyIsLookingLowersAttention(t *testing.T) {
+	t.Parallel()
 	w := traveller(t)
 	w.Player.Heat = 60
 	if err := w.Trip("halloway"); err != nil {
@@ -68,6 +71,7 @@ func TestBeingNowhereAnybodyIsLookingLowersAttention(t *testing.T) {
 }
 
 func TestCountryPricesAreWorthTheFareOnlyIfYouCanHideTheLoad(t *testing.T) {
+	t.Parallel()
 	// The crates are bought at the other end and the run home is the risk, so
 	// the honest measure is what a season of these trips is worth rather than
 	// whether any one of them arrives.
@@ -111,6 +115,7 @@ func TestCountryPricesAreWorthTheFareOnlyIfYouCanHideTheLoad(t *testing.T) {
 }
 
 func TestSomewhereToPutItIsWhatDecidesTheLoadAndWhatSurvives(t *testing.T) {
+	t.Parallel()
 	w := traveller(t)
 	plain := w.CarryLimit()
 	w.Player.Car, w.Player.CarWear = 2, 100
@@ -145,6 +150,7 @@ func TestSomewhereToPutItIsWhatDecidesTheLoadAndWhatSurvives(t *testing.T) {
 }
 
 func TestTheBankIsCheaperInPerson(t *testing.T) {
+	t.Parallel()
 	w := traveller(t)
 	w.Offshore = 2000
 	if w.Player.Offshore {
@@ -174,6 +180,7 @@ func TestTheBankIsCheaperInPerson(t *testing.T) {
 }
 
 func TestHallowayIsWhereYouMeetSomebody(t *testing.T) {
+	t.Parallel()
 	w := traveller(t)
 	w.Player.Contacts = 1
 	if err := w.Trip("halloway"); err != nil {
@@ -194,6 +201,7 @@ func TestHallowayIsWhereYouMeetSomebody(t *testing.T) {
 }
 
 func TestYouCannotTravelInNoConditionToTravel(t *testing.T) {
+	t.Parallel()
 	w := traveller(t)
 	w.Player.Health = 20
 	for _, id := range []string{"rockridge", "kingsport", "halloway"} {
@@ -204,6 +212,7 @@ func TestYouCannotTravelInNoConditionToTravel(t *testing.T) {
 }
 
 func TestTheQuotedPriceIsThePriceCharged(t *testing.T) {
+	t.Parallel()
 	for _, id := range []string{"rockridge", "kingsport", "halloway"} {
 		w := traveller(t)
 		w.Offshore = 2000
@@ -224,6 +233,7 @@ func TestTheQuotedPriceIsThePriceCharged(t *testing.T) {
 // that nothing else in the game does, and what it costs: whatever was arranged
 // for the player happens to the house instead of to them.
 func TestLeavingTownIsAWayToSurviveAWeek(t *testing.T) {
+	t.Parallel()
 	const runs = 300
 	stayed, left, wrecked := 0, 0, 0
 	for seed := uint32(1); seed <= runs; seed++ {

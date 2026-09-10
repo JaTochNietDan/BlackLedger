@@ -18,6 +18,7 @@ func sitter(t *testing.T) *World {
 }
 
 func TestSittingDownLeavesNothingOnTheTable(t *testing.T) {
+	t.Parallel()
 	w := sitter(t)
 	if err := w.PullHandle("club", 5); err != nil {
 		t.Fatal(err)
@@ -43,6 +44,7 @@ func TestSittingDownLeavesNothingOnTheTable(t *testing.T) {
 }
 
 func TestYouCannotGetUpInTheMiddleOfAHand(t *testing.T) {
+	t.Parallel()
 	w := sitter(t)
 	if err := w.Sit("club"); err != nil {
 		t.Fatal(err)
@@ -70,6 +72,7 @@ func TestYouCannotGetUpInTheMiddleOfAHand(t *testing.T) {
 }
 
 func TestTheRoomOffersASeatRatherThanAGame(t *testing.T) {
+	t.Parallel()
 	w := sitter(t)
 	sit := actionByID(w.Actions("club"), "sit")
 	if sit == nil || sit.Disabled {
@@ -86,6 +89,7 @@ func TestTheRoomOffersASeatRatherThanAGame(t *testing.T) {
 }
 
 func TestASeatIsTakenWhereTheGameIs(t *testing.T) {
+	t.Parallel()
 	w := sitter(t)
 	if err := w.Sit("club"); err != nil {
 		t.Fatal(err)

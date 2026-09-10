@@ -30,6 +30,7 @@ func host(t *testing.T) *World {
 }
 
 func TestPuttingOnANightFillsTheRoom(t *testing.T) {
+	t.Parallel()
 	w := host(t)
 	a := actionByID(w.Actions("club"), "night")
 	if a == nil {
@@ -69,6 +70,7 @@ func TestPuttingOnANightFillsTheRoom(t *testing.T) {
 }
 
 func TestANightIsOneNight(t *testing.T) {
+	t.Parallel()
 	w := host(t)
 	if err := w.PutOnANight("club"); err != nil {
 		t.Fatal(err)
@@ -87,6 +89,7 @@ func TestANightIsOneNight(t *testing.T) {
 }
 
 func TestYouCannotPutANightOnSomebodyElsesRoom(t *testing.T) {
+	t.Parallel()
 	w := host(t)
 	w.Player.Location = "bar"
 	if w.NightReadiness("bar") == "" {

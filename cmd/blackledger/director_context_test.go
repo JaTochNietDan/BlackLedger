@@ -6,6 +6,7 @@ import (
 )
 
 func TestBriefsPreserveCanonicalResultsWithoutMutatingStoryMemory(t *testing.T) {
+	t.Parallel()
 	w := core.New(27)
 	w.Arrangements = []core.ArrangementMemory{{Life: 1, Title: "Old task", Offer: "A detailed old offer.", Status: "completed", Result: "Delivered."}}
 	b := arrangementBriefs(w)
@@ -29,6 +30,7 @@ func TestBriefsPreserveCanonicalResultsWithoutMutatingStoryMemory(t *testing.T) 
 }
 
 func TestFocusedContextKeepsConnectionAndCorrection(t *testing.T) {
+	t.Parallel()
 	w := core.New(27)
 	for i := 0; i < 12; i++ {
 		w.Arrangements = append(w.Arrangements, core.ArrangementMemory{Life: 1, Title: "Earlier task", Offer: "Old prose", Status: "completed", Result: "Completed"})
@@ -44,6 +46,7 @@ func TestFocusedContextKeepsConnectionAndCorrection(t *testing.T) {
 }
 
 func TestFocusedFollowUpUsesRelevantContactAndCurrentOwnership(t *testing.T) {
+	t.Parallel()
 	w := core.New(27)
 	w.District = 1
 	w.Properties["garage"].Owner = "player:1"
@@ -64,6 +67,7 @@ func TestFocusedFollowUpUsesRelevantContactAndCurrentOwnership(t *testing.T) {
 }
 
 func TestDirectorAttributesFormerLifeWithoutGivingNewPersonItsAchievements(t *testing.T) {
+	t.Parallel()
 	w := core.New(27)
 	w.Arrangements = []core.ArrangementMemory{{Life: 1, Speaker: "mara", Operation: "mediation", Status: "completed", Offer: "An unverified allegation.", Result: "You completed the mediation."}}
 	w.Log("Work finished", "You completed the mediation.", "result")
@@ -99,6 +103,7 @@ func TestDirectorAttributesFormerLifeWithoutGivingNewPersonItsAchievements(t *te
 }
 
 func TestDirectorCallbackSeparatesClaimsAndNamesSpeakerHierarchy(t *testing.T) {
+	t.Parallel()
 	w := core.New(27)
 	w.Player.Crew = []core.Crew{{ID: "leo", Name: "Leo Carver", Loyalty: 65}}
 	m := core.ArrangementMemory{Life: w.Life, Speaker: "leo", Operation: "courier", Status: "completed", Offer: "The supplier secretly owns this building.", Result: "You completed the requested delivery."}

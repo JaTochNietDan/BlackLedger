@@ -43,6 +43,7 @@ func atWar(w *World) {
 }
 
 func TestAWarKeepsPeopleAtHome(t *testing.T) {
+	t.Parallel()
 	evening := func(w *World) int {
 		for i := 0; i < 40 && !Evening(w.Minute); i++ {
 			w.Advance(60)
@@ -71,6 +72,7 @@ func TestAWarKeepsPeopleAtHome(t *testing.T) {
 }
 
 func TestAWarCostsAnOwnerWhoIsNotInIt(t *testing.T) {
+	t.Parallel()
 	peace := townsman(t)
 	war := townsman(t)
 	atWar(war)
@@ -133,6 +135,7 @@ func findable(moved map[string]int, place map[string]map[int]map[string]int) flo
 // guard holds the city at peace; this one holds a war open for the whole
 // fortnight and says the rhythm bends without breaking.
 func TestAWarThinsTheStreetWithoutErasingIt(t *testing.T) {
+	t.Parallel()
 	quiet, _, quietPlace := weekUnder(t, 404, 14, keepPeace)
 	loud, _, loudPlace := weekUnder(t, 404, 14, keepWar)
 	peace, war := findable(quiet, quietPlace), findable(loud, loudPlace)

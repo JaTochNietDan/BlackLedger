@@ -7,6 +7,7 @@ import "testing"
 // offer has a home, and every home the core names is one the interface knows.
 
 func TestEveryActionBelongsSomewhere(t *testing.T) {
+	t.Parallel()
 	known := map[string]bool{}
 	for _, g := range Groups() {
 		known[g.ID] = true
@@ -48,6 +49,7 @@ func TestEveryActionBelongsSomewhere(t *testing.T) {
 }
 
 func TestAnActionNobodyClassifiedIsStillOffered(t *testing.T) {
+	t.Parallel()
 	// A group table is a thing somebody forgets to update. Whatever happens, an
 	// action must still reach the player rather than vanishing into a group the
 	// interface does not render.
@@ -64,6 +66,7 @@ func TestAnActionNobodyClassifiedIsStillOffered(t *testing.T) {
 }
 
 func TestThingsThatBelongTogetherAreTogether(t *testing.T) {
+	t.Parallel()
 	// The grouping is a judgement, so these are the judgements, written down.
 	for _, c := range []struct{ id, group string }{
 		{"courier", "work"}, {"dockwork", "work"},
@@ -92,6 +95,7 @@ func TestThingsThatBelongTogetherAreTogether(t *testing.T) {
 // that was meant: is this action's group a decision somebody made, or the
 // fallback?
 func TestNoOfferedActionIsThereByDefault(t *testing.T) {
+	t.Parallel()
 	w := proprietor(t)
 	own(w, "laundry", "garage", "casino")
 	w.District = 2

@@ -34,6 +34,7 @@ var (
 )
 
 func TestNoHookIsWrittenBelowAnEarlyReturn(t *testing.T) {
+	t.Parallel()
 	files, err := filepath.Glob("../../src/*.tsx")
 	if err != nil || len(files) == 0 {
 		t.Skip("no interface sources beside this build")
@@ -71,6 +72,7 @@ func TestNoHookIsWrittenBelowAnEarlyReturn(t *testing.T) {
 // (a pending request being retried, how much of the paper has been read) are
 // not preferences and are exempt by name.
 func TestEverySettingTheGameObeysCanBeChanged(t *testing.T) {
+	t.Parallel()
 	files, err := filepath.Glob("../../src/*.tsx")
 	if err != nil || len(files) == 0 {
 		t.Skip("no interface sources beside this build")
@@ -109,6 +111,7 @@ func TestEverySettingTheGameObeysCanBeChanged(t *testing.T) {
 // precision is worth testing directly: it has to keep catching the shape that
 // broke the game and stop reporting the shape that cannot.
 func TestTheHookGuardKnowsWhichReturnsMatter(t *testing.T) {
+	t.Parallel()
 	dangerous := []string{
 		` if(!world)return <div className="loading">BLACK LEDGER</div>;`,
 		`  if (!place) return null;`,
@@ -135,6 +138,7 @@ func TestTheHookGuardKnowsWhichReturnsMatter(t *testing.T) {
 // silently wears the wrong picture. This is the cheapest check that the two
 // sides still agree.
 func TestEveryTopBarFigureHasAnIconOfItsOwn(t *testing.T) {
+	t.Parallel()
 	art := source(t, "src/art.ts")
 	w := core.New(4)
 	w.Confine(5, "a still in the back")
@@ -154,6 +158,7 @@ func TestEveryTopBarFigureHasAnIconOfItsOwn(t *testing.T) {
 // player reading them together is reading a contradiction. Only one figure in
 // this game answers "of what it could", and it is the one the core computes.
 func TestOnlyOneFigureClaimsToBeWhatAPlaceCouldEarn(t *testing.T) {
+	t.Parallel()
 	body := source(t, "src/main.tsx")
 	if n := strings.Count(string(body), "of what it could"); n != 0 {
 		t.Errorf("the property panel claims %d times to say what a place could earn; that sentence belongs to the core's own note", n)
@@ -166,6 +171,7 @@ func TestOnlyOneFigureClaimsToBeWhatAPlaceCouldEarn(t *testing.T) {
 // reads "5 days" was checked in a browser, because a regular expression cannot
 // tell you what a player sees.
 func TestTheResultBandCanCountInDays(t *testing.T) {
+	t.Parallel()
 	body := source(t, "src/Outcome.tsx")
 	if !holds(body, "1440") {
 		t.Error("the result band has no idea what a day is, so a five-day sentence reads in hours")

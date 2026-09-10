@@ -28,6 +28,7 @@ func diplomat(t *testing.T) (*World, *Faction, *Faction) {
 }
 
 func TestNobodyMakesThisArrangementWithAMan(t *testing.T) {
+	t.Parallel()
 	w := proprietor(t)
 	own(w, "laundry")
 	w.Player.Respect = 5
@@ -38,6 +39,7 @@ func TestNobodyMakesThisArrangementWithAMan(t *testing.T) {
 }
 
 func TestItTakesStandingAndASharedProblem(t *testing.T) {
+	t.Parallel()
 	w, friend, enemy := diplomat(t)
 	if w.PactReadiness(friend.ID) != "" {
 		t.Fatal("could not reach an understanding:", w.PactReadiness(friend.ID))
@@ -55,6 +57,7 @@ func TestItTakesStandingAndASharedProblem(t *testing.T) {
 }
 
 func TestYouHaveToKnowWhatYouAreAgreeingTo(t *testing.T) {
+	t.Parallel()
 	w, friend, _ := diplomat(t)
 	for _, n := range w.Members(friend.ID) {
 		n.Trust = 0
@@ -69,6 +72,7 @@ func TestYouHaveToKnowWhatYouAreAgreeingTo(t *testing.T) {
 }
 
 func TestStandingWithSomebodyPutsYouInTheirQuarrels(t *testing.T) {
+	t.Parallel()
 	w, friend, enemy := diplomat(t)
 	before := w.Conflict(enemy.ID, w.PlayerOrganizationID()).Hostility
 	cash, bill := w.Player.Cash, w.DailyCost()
@@ -97,6 +101,7 @@ func TestStandingWithSomebodyPutsYouInTheirQuarrels(t *testing.T) {
 }
 
 func TestNeitherOfYouMovesOnTheOther(t *testing.T) {
+	t.Parallel()
 	w, friend, _ := diplomat(t)
 	w.MakePact(friend.ID)
 	held := w.FamilyHoldings(friend.ID)
@@ -119,6 +124,7 @@ func TestNeitherOfYouMovesOnTheOther(t *testing.T) {
 }
 
 func TestSomebodyWhoStandsWithYouMayAnswerTheDoor(t *testing.T) {
+	t.Parallel()
 	const runs = 400
 	answered := 0
 	for seed := uint32(1); seed <= runs; seed++ {
@@ -143,6 +149,7 @@ func TestSomebodyWhoStandsWithYouMayAnswerTheDoor(t *testing.T) {
 }
 
 func TestAnUnderstandingNobodyPaysForLapses(t *testing.T) {
+	t.Parallel()
 	w, friend, _ := diplomat(t)
 	w.MakePact(friend.ID)
 	w.Player.Cash = 0
@@ -156,6 +163,7 @@ func TestAnUnderstandingNobodyPaysForLapses(t *testing.T) {
 }
 
 func TestNobodyInheritsSomebodyElsesFriends(t *testing.T) {
+	t.Parallel()
 	w, friend, _ := diplomat(t)
 	w.MakePact(friend.ID)
 	w.Player.Alive = false

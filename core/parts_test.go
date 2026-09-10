@@ -32,6 +32,7 @@ func stripper(t *testing.T) (*World, *NPC) {
 }
 
 func TestStrippingACarTakesItOffWhoeverOwnedIt(t *testing.T) {
+	t.Parallel()
 	w, mark := stripper(t)
 	cash, sore := w.Player.Cash, mark.Sore
 	if reason := w.StripReadiness("bar"); reason != "" {
@@ -58,6 +59,7 @@ func TestStrippingACarTakesItOffWhoeverOwnedIt(t *testing.T) {
 
 // Nothing to strip where nobody drives.
 func TestThereIsNothingToStripWhereNobodyDrives(t *testing.T) {
+	t.Parallel()
 	w, mark := stripper(t)
 	mark.Car = 0
 	if reason := w.StripReadiness("bar"); reason == "" {
@@ -71,6 +73,7 @@ func TestThereIsNothingToStripWhereNobodyDrives(t *testing.T) {
 // The buyer's half: parts go to a garage, and a garage with more of them coming
 // through does better trade. This is the link the inbox asked for.
 func TestGaragesDoBetterWhenThereAreMorePartsAbout(t *testing.T) {
+	t.Parallel()
 	w, _ := stripper(t)
 	before := map[string]int{}
 	for _, l := range Locations {
@@ -98,6 +101,7 @@ func TestGaragesDoBetterWhenThereAreMorePartsAbout(t *testing.T) {
 
 // And the city says it. A number nobody sees is not a link.
 func TestTheCitySaysACarWasStripped(t *testing.T) {
+	t.Parallel()
 	w, mark := stripper(t)
 	if err := w.StripCar("bar"); err != nil {
 		t.Fatal(err)
@@ -117,6 +121,7 @@ func TestTheCitySaysACarWasStripped(t *testing.T) {
 // caught me more than any other, so the button and the command are checked as
 // the interface actually uses them.
 func TestTakingACarApartIsSomethingThePlayerCanActuallyDo(t *testing.T) {
+	t.Parallel()
 	w, mark := stripper(t)
 	var button *Action
 	for i, a := range w.Actions("bar") {
@@ -150,6 +155,7 @@ func TestTakingACarApartIsSomethingThePlayerCanActuallyDo(t *testing.T) {
 // And your own bench is worth having: parts are worth more when you hold a
 // garage to take them to.
 func TestPartsAreWorthMoreWithAGarageOfYourOwn(t *testing.T) {
+	t.Parallel()
 	w, mark := stripper(t)
 	loose := w.PartsWorth(mark)
 	for _, l := range Locations {
@@ -169,6 +175,7 @@ func TestPartsAreWorthMoreWithAGarageOfYourOwn(t *testing.T) {
 // lives on is parts and glass; what a scrapyard lives on is what is left when
 // there are no parts worth having.
 func TestAWreckIsAYardsTradeAndNotAGaragesTest(t *testing.T) {
+	t.Parallel()
 	w := New(29)
 	yards, benches := map[string]int{}, map[string]int{}
 	for _, l := range Locations {

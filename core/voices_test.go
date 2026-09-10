@@ -7,6 +7,7 @@ import "testing"
 // in the speech service, and neither knew the other existed.
 
 func TestAVoiceMatchesThePaintingItComesOutOf(t *testing.T) {
+	t.Parallel()
 	women, men := 0, 0
 	for _, l := range Locations {
 		_ = l
@@ -41,6 +42,7 @@ func TestAVoiceMatchesThePaintingItComesOutOf(t *testing.T) {
 
 // The one the report was about.
 func TestHarlowSoundsLikeTheManInTheTrenchCoat(t *testing.T) {
+	t.Parallel()
 	w := New(23)
 	if w.NPC("harlow") == nil {
 		t.Skip("no detective in this city")
@@ -54,6 +56,7 @@ func TestHarlowSoundsLikeTheManInTheTrenchCoat(t *testing.T) {
 // And a voice never moves. Somebody who sounded one way yesterday sounds that
 // way for the rest of their life, whatever else happens to them.
 func TestAVoiceIsFixedForLife(t *testing.T) {
+	t.Parallel()
 	w := New(23)
 	n := &w.NPCs[3]
 	was := w.VoiceOf(n.ID)

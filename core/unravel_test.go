@@ -39,6 +39,7 @@ func midnight(t *testing.T, w *World) Record {
 }
 
 func TestTheBillsOnlyReportWhatActuallyWentWrong(t *testing.T) {
+	t.Parallel()
 	w := brokeAtMidnight(t)
 	first := midnight(t, w)
 	if !contains(first.Text, "Security leaves") {
@@ -68,6 +69,7 @@ func TestTheBillsOnlyReportWhatActuallyWentWrong(t *testing.T) {
 // the book, which for a player holding nothing read "You have $0 out already,
 // which is as much as you can afford to be owed".
 func TestBeingBrokeIsRefusedDifferentlyFromHavingLentTooMuch(t *testing.T) {
+	t.Parallel()
 	setup := func(cash int, out bool) string {
 		w := New(17)
 		w.Player.Location = "bar"

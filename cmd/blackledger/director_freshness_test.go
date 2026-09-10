@@ -46,6 +46,7 @@ func TestDirectorDiscardsOwnershipChangeDuringModelRequest(t *testing.T) {
 }
 
 func TestDirectorFreshnessAllowsProgressButRequiresAvailableNewContact(t *testing.T) {
+	t.Parallel()
 	before := core.New(27)
 	before.Player.Crew = []core.Crew{{ID: "leo", Loyalty: 65}}
 	proposal := core.Proposal{Speaker: "leo"}
@@ -70,6 +71,7 @@ func TestDirectorFreshnessAllowsProgressButRequiresAvailableNewContact(t *testin
 }
 
 func TestDirectorFreshnessPreservesCanonicalFollowupAfterStandingChange(t *testing.T) {
+	t.Parallel()
 	before := core.New(27)
 	before.Factions[1].Goodwill = 9
 	before.Arrangements = []core.ArrangementMemory{{ID: "finished", Life: before.Life, Speaker: "elena", Beneficiary: "russo", Status: "completed", Result: "Payment collected."}}

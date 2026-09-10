@@ -19,6 +19,7 @@ func walker(t *testing.T) *World {
 }
 
 func TestAQuietCityHasQuietStreets(t *testing.T) {
+	t.Parallel()
 	w := walker(t)
 	for seed := uint32(1); seed <= 300; seed++ {
 		w.WorldRNG = seed * 2654435761
@@ -29,6 +30,7 @@ func TestAQuietCityHasQuietStreets(t *testing.T) {
 }
 
 func TestAWarReachesTheStreet(t *testing.T) {
+	t.Parallel()
 	const runs = 400
 	seen, stray := 0, 0
 	for seed := uint32(1); seed <= runs; seed++ {
@@ -63,6 +65,7 @@ func TestAWarReachesTheStreet(t *testing.T) {
 }
 
 func TestWhatYouUnderstandDependsOnWhoYouKnow(t *testing.T) {
+	t.Parallel()
 	quiet := walker(t)
 	quiet.Conflicts[0].State, quiet.Conflicts[0].Hostility = "war", 80
 	quiet.Player.Contacts = 0
@@ -92,6 +95,7 @@ func TestWhatYouUnderstandDependsOnWhoYouKnow(t *testing.T) {
 }
 
 func TestAGrievanceIsSomethingYouCanWalkPast(t *testing.T) {
+	t.Parallel()
 	const runs = 400
 	seen := 0
 	for seed := uint32(1); seed <= runs; seed++ {
@@ -118,6 +122,7 @@ func TestAGrievanceIsSomethingYouCanWalkPast(t *testing.T) {
 }
 
 func TestNothingSmallEnoughToIgnoreIsShown(t *testing.T) {
+	t.Parallel()
 	w := walker(t)
 	people := w.People()
 	w.Resent(people[3].ID, people[4].ID, 5, "a slight")
@@ -130,6 +135,7 @@ func TestNothingSmallEnoughToIgnoreIsShown(t *testing.T) {
 }
 
 func TestThePoliceAreWhereThePoliceHaveAReasonToBe(t *testing.T) {
+	t.Parallel()
 	w := walker(t)
 	w.Player.Heat = RaidThreshold / 2
 	found := false
@@ -156,6 +162,7 @@ func TestThePoliceAreWhereThePoliceHaveAReasonToBe(t *testing.T) {
 }
 
 func TestPassingThroughReachesTheRecordAndCanHurt(t *testing.T) {
+	t.Parallel()
 	w := walker(t)
 	w.Conflicts[0].State, w.Conflicts[0].Hostility = "war", 80
 	hurt := false
@@ -197,6 +204,7 @@ func holdOnly(w *World, faction string, places ...string) {
 // to — that was the shape of the rule written when the city had one conflict
 // and everywhere was the same everywhere.
 func TestAWarAcrossTownStaysAcrossTown(t *testing.T) {
+	t.Parallel()
 	for seed := uint32(1); seed <= 400; seed++ {
 		w := walker(t)
 		w.WorldRNG = seed * 2654435761
@@ -213,6 +221,7 @@ func TestAWarAcrossTownStaysAcrossTown(t *testing.T) {
 
 // And a war fought where you are walking still reaches you.
 func TestAWarWhereYouAreWalkingStillReachesYou(t *testing.T) {
+	t.Parallel()
 	seen := 0
 	for seed := uint32(1); seed <= 400; seed++ {
 		w := walker(t)
@@ -234,6 +243,7 @@ func TestAWarWhereYouAreWalkingStillReachesYou(t *testing.T) {
 // worse than seeing it from the end of the street, and the difference has to be
 // big enough for a player to learn where not to walk.
 func TestTheFightingAtYourDoorIsWorseThanTheFightingDownTheRoad(t *testing.T) {
+	t.Parallel()
 	hit := func(a, b string) int {
 		caught := 0
 		for seed := uint32(1); seed <= 600; seed++ {

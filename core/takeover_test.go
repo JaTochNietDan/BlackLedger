@@ -24,6 +24,7 @@ func lieutenant(t *testing.T) (*World, *Faction, *NPC) {
 }
 
 func TestNobodyBelowALieutenantGetsCloseEnough(t *testing.T) {
+	t.Parallel()
 	w, f := recruit(t)
 	w.Serve(f.ID)
 	leader := w.Leader(f.ID)
@@ -41,6 +42,7 @@ func TestNobodyBelowALieutenantGetsCloseEnough(t *testing.T) {
 }
 
 func TestNobodyMovesOnAManWhoseOrganizationIsWinning(t *testing.T) {
+	t.Parallel()
 	w, f, _ := lieutenant(t)
 	f.Power = 100
 	if w.TakeoverReadiness() == "" {
@@ -49,6 +51,7 @@ func TestNobodyMovesOnAManWhoseOrganizationIsWinning(t *testing.T) {
 }
 
 func TestYouHaveToBeInTheRoomAndWorthFollowing(t *testing.T) {
+	t.Parallel()
 	w, _, leader := lieutenant(t)
 	w.Player.Location = "room"
 	if w.TakeoverReadiness() == "" {
@@ -67,6 +70,7 @@ func TestYouHaveToBeInTheRoomAndWorthFollowing(t *testing.T) {
 }
 
 func TestTakingItMeansTakingAllOfIt(t *testing.T) {
+	t.Parallel()
 	found := false
 	for seed := uint32(1); seed <= 400 && !found; seed++ {
 		w, f, leader := lieutenant(t)
@@ -115,6 +119,7 @@ func TestTakingItMeansTakingAllOfIt(t *testing.T) {
 }
 
 func TestBeingExpectedIsTheEndOfIt(t *testing.T) {
+	t.Parallel()
 	found := false
 	for seed := uint32(1); seed <= 400 && !found; seed++ {
 		w, f, leader := lieutenant(t)
@@ -146,6 +151,7 @@ func TestBeingExpectedIsTheEndOfIt(t *testing.T) {
 }
 
 func TestTheOddsAreWhatYouBringAgainstWhatHeHas(t *testing.T) {
+	t.Parallel()
 	w, f, leader := lieutenant(t)
 	base := w.takeoverOdds(leader, f)
 	w.Player.Respect = 100

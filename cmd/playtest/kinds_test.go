@@ -11,6 +11,7 @@ import (
 // it is read from the core rather than written out again.
 
 func TestTheWorkshopOffersEveryMomentTheCityCanShow(t *testing.T) {
+	t.Parallel()
 	offered := map[string]bool{}
 	for _, k := range kinds() {
 		offered[k["kind"].(string)] = true
@@ -26,6 +27,7 @@ func TestTheWorkshopOffersEveryMomentTheCityCanShow(t *testing.T) {
 }
 
 func TestTheHeaviestMomentIsOfferedFirst(t *testing.T) {
+	t.Parallel()
 	list := kinds()
 	if len(list) < 2 {
 		t.Fatal("the workshop offers nothing to compare")
@@ -42,6 +44,7 @@ func TestTheHeaviestMomentIsOfferedFirst(t *testing.T) {
 }
 
 func TestEveryMomentHoldsForLongerThanTheOneBelowIt(t *testing.T) {
+	t.Parallel()
 	// A robbery and a killing were once played for exactly the same two and a
 	// half seconds. The workshop shows the hold so that stays visible.
 	for _, k := range kinds() {

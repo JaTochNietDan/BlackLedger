@@ -21,6 +21,7 @@ func thief(t *testing.T) *World {
 }
 
 func TestATillIsNotFilledAgainByMorning(t *testing.T) {
+	t.Parallel()
 	w := thief(t)
 	if reason := w.RobberyReadiness("laundry"); reason != "" {
 		t.Fatalf("could not rob it once: %s", reason)
@@ -45,6 +46,7 @@ func TestATillIsNotFilledAgainByMorning(t *testing.T) {
 }
 
 func TestTheRowIsPickedOverForANight(t *testing.T) {
+	t.Parallel()
 	w := thief(t)
 	w.Player.Location = "bar"
 	mark, ok := w.StripTarget("bar")
@@ -88,6 +90,7 @@ func TestTheRowIsPickedOverForANight(t *testing.T) {
 }
 
 func TestTheRefusalSaysHowLongItWillBe(t *testing.T) {
+	t.Parallel()
 	w := thief(t)
 	if err := w.Rob("laundry"); err != nil {
 		t.Fatal(err)

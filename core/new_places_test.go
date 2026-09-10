@@ -11,6 +11,7 @@ import "testing"
 // So the repair is not a version migration and must not be gated like one.
 
 func TestASaveAtTheCurrentVersionStillGetsANewAddress(t *testing.T) {
+	t.Parallel()
 	w := New(31)
 	w.Version = SaveVersion
 	// A campaign that has never heard of the haulage yard, at the version this
@@ -42,6 +43,7 @@ func TestASaveAtTheCurrentVersionStillGetsANewAddress(t *testing.T) {
 // The crash itself: reading the world walks every address and would find
 // nothing where a property should be.
 func TestReadingTheWorldNeverFindsAnAddressWithNoRecord(t *testing.T) {
+	t.Parallel()
 	w := New(31)
 	w.Version = SaveVersion
 	for _, l := range Locations {
@@ -63,6 +65,7 @@ func TestReadingTheWorldNeverFindsAnAddressWithNoRecord(t *testing.T) {
 // And what a place earns is one table, so a business added later is not worth
 // nothing forever in a campaign that was already running.
 func TestEveryEarningPlaceHasItsIncomeInOneTable(t *testing.T) {
+	t.Parallel()
 	w := New(31)
 	for _, l := range Locations {
 		prop := w.Properties[l.ID]

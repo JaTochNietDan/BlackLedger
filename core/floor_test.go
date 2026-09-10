@@ -35,6 +35,7 @@ func floor(t *testing.T, seed uint32) (*World, *NPC) {
 }
 
 func TestTheFloorIsThePeopleStandingInTheRoom(t *testing.T) {
+	t.Parallel()
 	w, punter := floor(t, 31)
 	on := w.OnTheFloor("casino")
 	if len(on) != 1 || on[0].ID != punter.ID {
@@ -47,6 +48,7 @@ func TestTheFloorIsThePeopleStandingInTheRoom(t *testing.T) {
 
 // What the city loses is exactly what the house takes. Money must not appear.
 func TestWhatTheCityLosesAtTheTablesIsWhatTheHouseTakes(t *testing.T) {
+	t.Parallel()
 	w, _ := floor(t, 31)
 	w.Properties["casino"].Owner = "bellandi"
 	house := w.faction("bellandi")
@@ -82,6 +84,7 @@ func TestWhatTheCityLosesAtTheTablesIsWhatTheHouseTakes(t *testing.T) {
 // sitting down with, because that is the rule a stake calculation quietly drops
 // and nothing else notices.
 func TestNobodyPlaysWithMoneyTheyCannotStandToLose(t *testing.T) {
+	t.Parallel()
 	for _, purse := range []int{0, 4 * TableFloor / 2} {
 		w, punter := floor(t, 31)
 		w.Properties["casino"].Owner = "bellandi"

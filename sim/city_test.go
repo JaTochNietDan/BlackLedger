@@ -10,6 +10,7 @@ import "testing"
 // They fall. Nobody was watching long enough to see it.
 
 func TestACityLeftAloneKeepsMoving(t *testing.T) {
+	t.Parallel()
 	const cities, days = 12, 60
 	fell, formed, wars, changed := 0, 0, 0, 0
 	for seed := uint32(1); seed <= cities; seed++ {
@@ -33,6 +34,7 @@ func TestACityLeftAloneKeepsMoving(t *testing.T) {
 }
 
 func TestACityDoesNotCollapseIntoOneOwner(t *testing.T) {
+	t.Parallel()
 	const cities, days = 12, 60
 	worst, organised, empty, dead := 0, 0, 0, 0
 	for seed := uint32(1); seed <= cities; seed++ {
@@ -75,6 +77,7 @@ func TestACityDoesNotCollapseIntoOneOwner(t *testing.T) {
 // Layer 1 says organizations own income-earning property; layer 4 says war
 // creates the openings a player exploits. Neither is true of a map nobody wants.
 func TestOrganizationsGrowIntoTheCity(t *testing.T) {
+	t.Parallel()
 	const cities = 12
 	for _, days := range []int{60, 240} {
 		organised, worst := 0, 0

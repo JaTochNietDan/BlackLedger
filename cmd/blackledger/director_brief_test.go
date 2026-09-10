@@ -7,6 +7,7 @@ import (
 )
 
 func TestNarrativeBriefPreservesDirectionAndCompletedCallback(t *testing.T) {
+	t.Parallel()
 	w := core.New(27)
 	w.District = 1
 	m := &core.ArrangementMemory{Operation: "mediation", Offer: "A tool disagreement at Russo Motor Works", Status: "completed"}
@@ -32,6 +33,7 @@ func TestNarrativeBriefPreservesDirectionAndCompletedCallback(t *testing.T) {
 // own — a consignment came back as a story about collecting payment for fabric,
 // because nothing had told it what a consignment is.
 func TestEveryOfferableOperationHasABrief(t *testing.T) {
+	t.Parallel()
 	w := core.New(151)
 	w.MigrateLivingWorld()
 	catalog := []string{"courier", "collection", "mediation"}
@@ -55,6 +57,7 @@ func TestEveryOfferableOperationHasABrief(t *testing.T) {
 // The brief has to reach the model on whichever prompt is in use. It was sent
 // only on the focused one, and the default is the full one.
 func TestTheBriefReachesBothPrompts(t *testing.T) {
+	t.Parallel()
 	w := core.New(151)
 	w.MigrateLivingWorld()
 	focused := focusedContext(w, "consignment", nil, "", []string{""})

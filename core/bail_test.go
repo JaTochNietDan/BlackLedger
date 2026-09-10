@@ -54,6 +54,7 @@ func bailAction(t *testing.T, w *World) Action {
 }
 
 func TestBailIsRefusedOnTheButtonWhenItCannotBePaid(t *testing.T) {
+	t.Parallel()
 	w, _ := heldMan(t, 2)
 	if a := bailAction(t, w); a.Disabled {
 		t.Fatalf("a player who can afford it is refused: %q", a.Reason)
@@ -73,6 +74,7 @@ func TestBailIsRefusedOnTheButtonWhenItCannotBePaid(t *testing.T) {
 }
 
 func TestBailCountsOneDayAsOneDay(t *testing.T) {
+	t.Parallel()
 	w, _ := heldMan(t, 1)
 	a := bailAction(t, w)
 	if contains(a.Detail, "1 days") {
@@ -92,6 +94,7 @@ func TestBailCountsOneDayAsOneDay(t *testing.T) {
 // action wide. Everything else aimed at somebody in a cell stays refused, which
 // is the rule the sweep was written for.
 func TestOnlyBailReachesIntoACell(t *testing.T) {
+	t.Parallel()
 	w, n := heldMan(t, 2)
 	w.Player.Crew = []Crew{{n.ID, n.Name, 60}}
 	w.Player.Location = "bar"

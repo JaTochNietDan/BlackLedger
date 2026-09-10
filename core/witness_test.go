@@ -7,6 +7,7 @@ import "testing"
 // where, and nothing claims to have happened somewhere that does not exist.
 
 func TestTheLoudestMomentsAreWorthLookingAt(t *testing.T) {
+	t.Parallel()
 	for _, kind := range []string{"killing", "explosion", "gunfight", "raid", "seizure", "arrest", "attack"} {
 		if Gravity(kind) == 0 {
 			t.Errorf("%q is worth nothing to stop for", kind)
@@ -18,6 +19,7 @@ func TestTheLoudestMomentsAreWorthLookingAt(t *testing.T) {
 }
 
 func TestAKillingIsSomethingYouSee(t *testing.T) {
+	t.Parallel()
 	w := proprietor(t)
 	victim := w.NPC("mara")
 	if victim == nil {
@@ -58,6 +60,7 @@ func TestAKillingIsSomethingYouSee(t *testing.T) {
 }
 
 func TestARaidAndASeizureAreSomethingYouSee(t *testing.T) {
+	t.Parallel()
 	w := chargeable(t)
 	w.Player.Retainers = nil
 	w.VisualCues = nil
@@ -79,6 +82,7 @@ func TestARaidAndASeizureAreSomethingYouSee(t *testing.T) {
 }
 
 func TestGroundChangingHandsIsSomethingYouSee(t *testing.T) {
+	t.Parallel()
 	// Over enough raids one of them takes the ground, and when it does the
 	// player is taken there rather than told about it in a list.
 	seen := 0
@@ -105,6 +109,7 @@ func TestGroundChangingHandsIsSomethingYouSee(t *testing.T) {
 }
 
 func TestNothingHappensSomewhereThatDoesNotExist(t *testing.T) {
+	t.Parallel()
 	w := proprietor(t)
 	w.VisualCues = nil
 	w.Witness("killing", "a-place-with-no-address", "Something happened.", "SOMETHING HAPPENED")
@@ -126,6 +131,7 @@ func TestNothingHappensSomewhereThatDoesNotExist(t *testing.T) {
 // for; the interface simply never asked.
 
 func TestAKillingIsHeldLongerThanARobbery(t *testing.T) {
+	t.Parallel()
 	if Hold("killing") <= Hold("robbery") {
 		t.Fatalf("a killing is held %dms and a robbery %dms", Hold("killing"), Hold("robbery"))
 	}
@@ -141,6 +147,7 @@ func TestAKillingIsHeldLongerThanARobbery(t *testing.T) {
 }
 
 func TestAnybodyAMomentNamesCanBeDrawn(t *testing.T) {
+	t.Parallel()
 	// A scene about somebody that cannot show them is a scene about nobody, so
 	// every name a cue carries must resolve to a person the city holds.
 	w, _ := testator(t)

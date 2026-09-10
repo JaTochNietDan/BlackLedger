@@ -13,6 +13,7 @@ import (
 // In a cell. Everywhere but the precinct offers nothing at all, which is
 // deliberate, so this reads what the precinct and the ledger say instead.
 func TestTheCityReadsWhileThePlayerIsHeld(t *testing.T) {
+	t.Parallel()
 	read := 0
 	for _, seed := range []uint32{31, 88, 219} {
 		w := withFamily(seed, "estate:held", "Vera Kohl's people", "Vera Kohl")
@@ -39,6 +40,7 @@ func TestTheCityReadsWhileThePlayerIsHeld(t *testing.T) {
 
 // Dead, with whatever the city says about it afterwards.
 func TestTheCityReadsAfterThePlayerDies(t *testing.T) {
+	t.Parallel()
 	read := 0
 	for _, seed := range []uint32{31, 88, 219} {
 		w := withFamily(seed, "estate:gone", "Otto Reiss's people", "Otto Reiss")
@@ -63,6 +65,7 @@ func TestTheCityReadsAfterThePlayerDies(t *testing.T) {
 
 // A crowded board: as many organizations as the city allows.
 func TestACrowdedCityStillReads(t *testing.T) {
+	t.Parallel()
 	read := 0
 	for _, seed := range []uint32{31, 88, 219} {
 		w := New(seed)
@@ -95,6 +98,7 @@ func TestACrowdedCityStillReads(t *testing.T) {
 
 // Two names that collide when the same sentence has to hold both.
 func TestTwoFamiliesWithSimilarNamesStillRead(t *testing.T) {
+	t.Parallel()
 	read := 0
 	for _, seed := range []uint32{31, 88, 219} {
 		w := New(seed)
@@ -129,6 +133,7 @@ func TestTwoFamiliesWithSimilarNamesStillRead(t *testing.T) {
 // does not must come through untouched, or every seeded family would be
 // capitalised twice or mangled.
 func TestLeadsLeavesOrdinaryNamesAlone(t *testing.T) {
+	t.Parallel()
 	for _, c := range []struct{ in, want string }{
 		{"Bellandi Family", "Bellandi Family"},
 		{"Russo Outfit", "Russo Outfit"},

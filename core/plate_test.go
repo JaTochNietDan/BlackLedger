@@ -30,6 +30,7 @@ func plater(t *testing.T) *World {
 }
 
 func TestPlatingIsFittedAtAGarageAndNowhereElse(t *testing.T) {
+	t.Parallel()
 	w := plater(t)
 	garage := w.Player.Location
 	a := actionByID(w.Actions(garage), "plate")
@@ -58,6 +59,7 @@ func TestPlatingIsFittedAtAGarageAndNowhereElse(t *testing.T) {
 }
 
 func TestPlateIsWorthSomethingOnTheStreetAndNowhereElse(t *testing.T) {
+	t.Parallel()
 	w := plater(t)
 	garage := w.Player.Location
 	w.Player.Location = "transit"
@@ -84,6 +86,7 @@ func TestPlateIsWorthSomethingOnTheStreetAndNowhereElse(t *testing.T) {
 }
 
 func TestPlateSurvivesTheJourneyAndNotTheCar(t *testing.T) {
+	t.Parallel()
 	w := plater(t)
 	garage := w.Player.Location
 	if err := w.FitPlate(garage); err != nil {
@@ -109,6 +112,7 @@ func TestPlateSurvivesTheJourneyAndNotTheCar(t *testing.T) {
 }
 
 func TestPlateCostsYouSpeed(t *testing.T) {
+	t.Parallel()
 	w := plater(t)
 	garage := w.Player.Location
 	quick := w.Pace()
@@ -121,6 +125,7 @@ func TestPlateCostsYouSpeed(t *testing.T) {
 }
 
 func TestTheArmouredPackardIsActuallyArmoured(t *testing.T) {
+	t.Parallel()
 	w := plater(t)
 	w.Player.Car, w.Player.Plate = 3, 0
 	if w.Plating() == 0 {

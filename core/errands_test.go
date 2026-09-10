@@ -23,6 +23,7 @@ func walksOut(w *World, n *NPC) {
 // from a city that is supposed to be lived in.
 
 func TestSomebodyWhoIsNotWhereTheyWorkGoesToWork(t *testing.T) {
+	t.Parallel()
 	w := New(4)
 	n := w.NPC("mara")
 	n.Role, n.Location = "Runs Bluebird Laundry", "bar"
@@ -52,6 +53,7 @@ func TestSomebodyWhoIsNotWhereTheyWorkGoesToWork(t *testing.T) {
 }
 
 func TestAJourneyTakesTheTimeAJourneyTakes(t *testing.T) {
+	t.Parallel()
 	w := New(4)
 	n := w.NPC("mara")
 	n.Role, n.Location = "Runs Bluebird Laundry", "bar"
@@ -78,6 +80,7 @@ func TestAJourneyTakesTheTimeAJourneyTakes(t *testing.T) {
 }
 
 func TestNobodyWalksOutOfACell(t *testing.T) {
+	t.Parallel()
 	w := New(4)
 	n := w.NPC("mara")
 	n.Role, n.Location = "Runs Bluebird Laundry", "bar"
@@ -97,6 +100,7 @@ func TestNobodyWalksOutOfACell(t *testing.T) {
 // What the city view needs: who is out there, where they came from, where they
 // are going and why, in the words somebody watching the street would use.
 func TestTheStreetSaysWhoIsOnItAndWhy(t *testing.T) {
+	t.Parallel()
 	w := New(4)
 	n := w.NPC("mara")
 	n.Role, n.Location = "Runs Bluebird Laundry", "bar"
@@ -125,6 +129,7 @@ func TestTheStreetSaysWhoIsOnItAndWhy(t *testing.T) {
 
 // A grudge that has never made anybody do anything is a number in a save file.
 func TestSomebodyCarryingSomethingGoesToFindTheManTheyBlame(t *testing.T) {
+	t.Parallel()
 	w := New(4)
 	holder, target := w.NPC("mara"), w.NPC("leo")
 	holder.Location, target.Location = "bar", "club"
@@ -146,6 +151,7 @@ func TestSomebodyCarryingSomethingGoesToFindTheManTheyBlame(t *testing.T) {
 // You cannot go and find a man who is himself out on the street. Waiting until
 // he is somewhere is what stops two people walking past each other forever.
 func TestYouDoNotSetOutAfterSomebodyWhoIsAlreadyWalking(t *testing.T) {
+	t.Parallel()
 	w := New(4)
 	holder, target := w.NPC("mara"), w.NPC("leo")
 	holder.Location, target.Location = "bar", "club"
@@ -161,6 +167,7 @@ func TestYouDoNotSetOutAfterSomebodyWhoIsAlreadyWalking(t *testing.T) {
 // nobody ever does. Twenty seeds, three weeks each, counting how often the
 // street has somebody on it and how many journeys finish.
 func TestTheCityWalksWithoutBeingAlwaysInMotion(t *testing.T) {
+	t.Parallel()
 	journeys, sampled, occupied, mostAtOnce, crowd := 0, 0, 0, 0, 0
 	for seed := 0; seed < 20; seed++ {
 		w := New(uint32(seed) * 2654435761)
@@ -232,6 +239,7 @@ func TestTheCityWalksWithoutBeingAlwaysInMotion(t *testing.T) {
 // move because of it. This is the war becoming visible on the street rather
 // than only in the ledger.
 func TestWhenGroundChangesHandsSomebodyWalks(t *testing.T) {
+	t.Parallel()
 	w := New(4)
 	w.SetOut() // let the city settle into who minds what
 	for i := 0; i < 6; i++ {

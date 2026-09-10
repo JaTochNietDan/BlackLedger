@@ -21,6 +21,7 @@ func staffed(t *testing.T) (*World, string) {
 }
 
 func TestHiringTakesOnSomebodyWhoLivesHere(t *testing.T) {
+	t.Parallel()
 	w, id := staffed(t)
 	// A business the player has just taken over already has people in it, and
 	// they are people: the day settles that before anybody is hired.
@@ -61,6 +62,7 @@ func TestHiringTakesOnSomebodyWhoLivesHere(t *testing.T) {
 }
 
 func TestNobodyHoldsTwoJobs(t *testing.T) {
+	t.Parallel()
 	w, id := staffed(t)
 	own(w, "butcher")
 	w.EmptyChairs()
@@ -85,6 +87,7 @@ func TestNobodyHoldsTwoJobs(t *testing.T) {
 }
 
 func TestLettingSomebodyGoLetsThatPersonGo(t *testing.T) {
+	t.Parallel()
 	w, id := staffed(t)
 	w.EmptyChairs()
 	who := w.Properties[id].Hands[len(w.Properties[id].Hands)-1]
@@ -102,6 +105,7 @@ func TestLettingSomebodyGoLetsThatPersonGo(t *testing.T) {
 // The point of the staff being people: a position held by somebody who is dead
 // is not a position that is filled.
 func TestAPositionHeldByADeadPersonIsAnEmptyPosition(t *testing.T) {
+	t.Parallel()
 	w, id := staffed(t)
 	w.EmptyChairs()
 	prop := w.Properties[id]
@@ -123,6 +127,7 @@ func TestAPositionHeldByADeadPersonIsAnEmptyPosition(t *testing.T) {
 // of names in a save file. The people the player employs are behind that
 // counter in the daytime, where they can be found, talked to and taken.
 func TestThePeopleYouEmployAreWhereTheyWorkInTheDaytime(t *testing.T) {
+	t.Parallel()
 	w, id := staffed(t)
 	w.EmptyChairs()
 	hands := append([]string{}, w.Properties[id].Hands...)
@@ -150,6 +155,7 @@ func TestThePeopleYouEmployAreWhereTheyWorkInTheDaytime(t *testing.T) {
 
 // And what a player who employs people can ask about them.
 func TestYouCanAskWhoWorksForYou(t *testing.T) {
+	t.Parallel()
 	w, id := staffed(t)
 	own(w, "butcher")
 	w.EmptyChairs()
@@ -195,6 +201,7 @@ func poachable(t *testing.T) (*World, *NPC, string) {
 }
 
 func TestYouCanTakeSomebodyOffARivalsCounter(t *testing.T) {
+	t.Parallel()
 	w, n, mine := poachable(t)
 	was := w.EmployerOf(n.ID)
 	cash := w.Player.Cash
@@ -222,6 +229,7 @@ func TestYouCanTakeSomebodyOffARivalsCounter(t *testing.T) {
 }
 
 func TestARivalMindsHavingSomebodyTakenOffThem(t *testing.T) {
+	t.Parallel()
 	w, n, mine := poachable(t)
 	rival := w.faction(w.Properties[w.EmployerOf(n.ID)].Owner)
 	goodwill := rival.Goodwill
@@ -234,6 +242,7 @@ func TestARivalMindsHavingSomebodyTakenOffThem(t *testing.T) {
 }
 
 func TestYouCannotTakeOnSomebodyWithNowhereToPutThem(t *testing.T) {
+	t.Parallel()
 	w, n, _ := poachable(t)
 	// Fill the laundry back up, so there is no position going.
 	for w.HireReadiness("laundry") == "" {
@@ -249,6 +258,7 @@ func TestYouCannotTakeOnSomebodyWithNowhereToPutThem(t *testing.T) {
 // An action nobody can press is a feature in a file. This walks the same path
 // the interface walks.
 func TestTakingSomebodyOnIsOfferedWhereTheyAreStanding(t *testing.T) {
+	t.Parallel()
 	w, n, _ := poachable(t)
 	var offered *Action
 	for _, a := range w.Actions(w.Player.Location) {

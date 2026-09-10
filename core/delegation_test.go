@@ -12,6 +12,7 @@ func withCrew(t *testing.T, loyalty int) *World {
 }
 
 func TestYouCannotSendSomebodyYouDoNotHave(t *testing.T) {
+	t.Parallel()
 	w := withCrew(t, 80)
 	w.Player.Crew = nil
 	if _, ok := w.CrewHands(); ok {
@@ -26,6 +27,7 @@ func TestYouCannotSendSomebodyYouDoNotHave(t *testing.T) {
 }
 
 func TestNobodyGoesOutOnAJobForSomebodyTheyDoNotTrust(t *testing.T) {
+	t.Parallel()
 	w := withCrew(t, HandLoyalty-1)
 	if w.DelegateReadiness() == "" {
 		t.Fatal("a man on 39 loyalty went out on an errand like this")
@@ -42,6 +44,7 @@ func TestNobodyGoesOutOnAJobForSomebodyTheyDoNotTrust(t *testing.T) {
 }
 
 func TestYourOwnHandsAreBetterAtItThanAnybodyElses(t *testing.T) {
+	t.Parallel()
 	w := withCrew(t, 100)
 	w.Player.Respect, w.Player.Weapon = 80, 2
 	hand, _ := w.CrewHands()
@@ -54,6 +57,7 @@ func TestYourOwnHandsAreBetterAtItThanAnybodyElses(t *testing.T) {
 }
 
 func TestSendingSomebodyBuysLessStandingAndLessAttention(t *testing.T) {
+	t.Parallel()
 	w := withCrew(t, 100)
 	hand, _ := w.CrewHands()
 	if w.HandRespectFor(w.OwnHands(), 10) <= w.HandRespectFor(hand, 10) {
@@ -68,6 +72,7 @@ func TestSendingSomebodyBuysLessStandingAndLessAttention(t *testing.T) {
 }
 
 func TestTheRiskLandsOnWhoeverWasStandingThere(t *testing.T) {
+	t.Parallel()
 	// The player takes it in health.
 	mine := withCrew(t, 100)
 	mine.HandHurt(mine.OwnHands(), 20, "something")
@@ -91,6 +96,7 @@ func TestTheRiskLandsOnWhoeverWasStandingThere(t *testing.T) {
 }
 
 func TestSometimesTheManYouSentDoesNotComeBack(t *testing.T) {
+	t.Parallel()
 	const runs = 400
 	lost := 0
 	for seed := uint32(1); seed <= runs; seed++ {
@@ -112,6 +118,7 @@ func TestSometimesTheManYouSentDoesNotComeBack(t *testing.T) {
 }
 
 func TestASmallSetbackNeverKillsTheManYouSent(t *testing.T) {
+	t.Parallel()
 	for seed := uint32(1); seed <= 400; seed++ {
 		w := withCrew(t, 100)
 		w.RNG = seed * 2654435761
@@ -124,6 +131,7 @@ func TestASmallSetbackNeverKillsTheManYouSent(t *testing.T) {
 }
 
 func TestBothHandsAreOfferedAndBothAreRefusedForTheSameReasons(t *testing.T) {
+	t.Parallel()
 	w := withCrew(t, 100)
 	actions := map[string]Action{}
 	for _, a := range w.Actions("club") {

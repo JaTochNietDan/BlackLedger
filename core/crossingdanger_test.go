@@ -24,6 +24,7 @@ func crossing(t *testing.T) *World {
 func onTheRoad(w *World) { w.Player.Location = "transit" }
 
 func TestYouCanBeCaughtOnTheRoad(t *testing.T) {
+	t.Parallel()
 	w := crossing(t)
 	if w.InTransit() {
 		t.Fatal("a player standing in a bar is on the road")
@@ -44,6 +45,7 @@ func TestYouCanBeCaughtOnTheRoad(t *testing.T) {
 }
 
 func TestTheStreetIsTheWorstPlaceToBeFound(t *testing.T) {
+	t.Parallel()
 	room := crossing(t)
 	road := crossing(t)
 	onTheRoad(road)
@@ -71,6 +73,7 @@ func TestTheStreetIsTheWorstPlaceToBeFound(t *testing.T) {
 // A car is not cover. A plated one is, and that is the whole of what paying for
 // the plate buys.
 func TestAPlatedCarIsTheOnlyCoverOnTheRoad(t *testing.T) {
+	t.Parallel()
 	bare := crossing(t)
 	onTheRoad(bare)
 	bare.Player.Car, bare.Player.CarWear, bare.Player.Fuel = 2, 100, 40
@@ -107,6 +110,7 @@ func TestAPlatedCarIsTheOnlyCoverOnTheRoad(t *testing.T) {
 // What you are wearing is yours wherever you are, which is the difference
 // between armour and cover.
 func TestWhatYouAreWearingHelpsOnTheRoadAndInTheRoom(t *testing.T) {
+	t.Parallel()
 	for _, where := range []string{"a bar", "the road"} {
 		bare, worn := crossing(t), crossing(t)
 		if where == "the road" {
@@ -123,6 +127,7 @@ func TestWhatYouAreWearingHelpsOnTheRoadAndInTheRoom(t *testing.T) {
 // And the crossing says so before the player sets off, which is the half of
 // this that is worth anything to somebody deciding whether to go.
 func TestTheCrossingSaysWhatItIsWalkingInto(t *testing.T) {
+	t.Parallel()
 	w := crossing(t)
 	w.Plots = append(w.Plots, Plot{ID: ID(), Kind: "hit", Life: w.Life,
 		Due: w.Minute + 600, Actor: w.Factions[0].ID, Known: true, Strength: 40})
@@ -152,6 +157,7 @@ func TestTheCrossingSaysWhatItIsWalkingInto(t *testing.T) {
 // it falls out of the clock — but it is worth a number, because "can your car
 // affect this" is a fair question to want an answer to.
 func TestACarShortensHowLongYouAreFindable(t *testing.T) {
+	t.Parallel()
 	walking := crossing(t)
 	driving := crossing(t)
 	driving.Player.Car, driving.Player.CarWear, driving.Player.Fuel = 2, 100, 40

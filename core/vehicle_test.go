@@ -19,6 +19,7 @@ func driver(t *testing.T) *World {
 // Renamed and repointed with the rule it guards: this asserted that the motor
 // works sold cars, which was true of a city that had no forecourt in it.
 func TestCarsAreSoldAtTheForecourtAndNowhereElse(t *testing.T) {
+	t.Parallel()
 	w := driver(t)
 	if w.CarReadiness() != "" {
 		t.Fatal("the forecourt refused to sell:", w.CarReadiness())
@@ -35,6 +36,7 @@ func TestCarsAreSoldAtTheForecourtAndNowhereElse(t *testing.T) {
 }
 
 func TestACarBuysTimeAndNothingElseDoes(t *testing.T) {
+	t.Parallel()
 	w := driver(t)
 	walk := TravelMinutes("garage", "docks")
 	if w.Journey("garage", "docks") != walk {
@@ -57,6 +59,7 @@ func TestACarBuysTimeAndNothingElseDoes(t *testing.T) {
 }
 
 func TestACarInPoorOrderIsWorthLessAndAWreckIsWorthNothing(t *testing.T) {
+	t.Parallel()
 	w := driver(t)
 	w.BuyVehicle()
 	w.BuyVehicle() // the Hudson, with a false floor
@@ -82,6 +85,7 @@ func TestACarInPoorOrderIsWorthLessAndAWreckIsWorthNothing(t *testing.T) {
 }
 
 func TestAFalseFloorHidesStockFromAttentionAndFromASearch(t *testing.T) {
+	t.Parallel()
 	w := driver(t)
 	w.BuyVehicle()
 	w.BuyVehicle()
@@ -116,6 +120,7 @@ func TestAFalseFloorHidesStockFromAttentionAndFromASearch(t *testing.T) {
 }
 
 func TestACarCostsSomethingEveryDayAndLessAtYourOwnGarage(t *testing.T) {
+	t.Parallel()
 	w := driver(t)
 	before := w.DailyCost()
 	w.BuyVehicle()
@@ -135,6 +140,7 @@ func TestACarCostsSomethingEveryDayAndLessAtYourOwnGarage(t *testing.T) {
 }
 
 func TestServicingPutsACarBackOnTheRoad(t *testing.T) {
+	t.Parallel()
 	w := driver(t)
 	w.BuyVehicle()
 	w.Player.CarWear = 20
@@ -154,6 +160,7 @@ func TestServicingPutsACarBackOnTheRoad(t *testing.T) {
 }
 
 func TestDrivingToARobberyLeavesATrail(t *testing.T) {
+	t.Parallel()
 	onFoot, driven := 0, 0
 	for seed := uint32(1); seed <= 300; seed++ {
 		walk := New(seed * 2654435761)
@@ -174,6 +181,7 @@ func TestDrivingToARobberyLeavesATrail(t *testing.T) {
 }
 
 func TestAWarrantThatFindsTheFloorTakesTheCar(t *testing.T) {
+	t.Parallel()
 	taken, kept := 0, 0
 	for seed := uint32(1); seed <= 400; seed++ {
 		w := New(seed * 2654435761)
@@ -200,6 +208,7 @@ func TestAWarrantThatFindsTheFloorTakesTheCar(t *testing.T) {
 }
 
 func TestNobodyInheritsACar(t *testing.T) {
+	t.Parallel()
 	w := driver(t)
 	w.BuyVehicle()
 	w.Player.Alive = false
@@ -213,6 +222,7 @@ func TestNobodyInheritsACar(t *testing.T) {
 }
 
 func TestAnOlderSaveIsDrivingSomethingThatRuns(t *testing.T) {
+	t.Parallel()
 	w := driver(t)
 	w.Player.Car, w.Player.CarWear = 2, 0
 	w.MigrateLivingWorld()
@@ -229,6 +239,7 @@ func TestAnOlderSaveIsDrivingSomethingThatRuns(t *testing.T) {
 // button asking two different questions, which is the same fault that made
 // CarSource and CarWorkshop one function in the first place.
 func TestTheForecourtOffersTheCarsAndTheGarageDoesNot(t *testing.T) {
+	t.Parallel()
 	w := New(11)
 	w.District = 2
 	w.Player.Cash, w.Player.Respect, w.Player.Health = 4000, 40, 100

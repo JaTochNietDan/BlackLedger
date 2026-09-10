@@ -15,6 +15,7 @@ func chargeable(t *testing.T) *World {
 }
 
 func TestAFineIsNotACaseAndACaseIsNotAFine(t *testing.T) {
+	t.Parallel()
 	w, _ := testator(t)
 	if weight, _ := w.Charge(); weight != 0 {
 		t.Fatalf("a search of a laundry with nothing in it was worth %d", weight)
@@ -44,6 +45,7 @@ func TestAFineIsNotACaseAndACaseIsNotAFine(t *testing.T) {
 }
 
 func TestARaidThatFindsACaseTakesAPerson(t *testing.T) {
+	t.Parallel()
 	w := chargeable(t)
 	w.Raid()
 	if w.Event == nil || w.Event.Kind != "arrest" {
@@ -62,6 +64,7 @@ func TestARaidThatFindsACaseTakesAPerson(t *testing.T) {
 }
 
 func TestSomebodyRetainingACommissionerIsNotCharged(t *testing.T) {
+	t.Parallel()
 	w := chargeable(t)
 	w.Player.Retainers = []string{"commissioner"}
 	if w.RaidRelief() == 0 {
@@ -74,6 +77,7 @@ func TestSomebodyRetainingACommissionerIsNotCharged(t *testing.T) {
 }
 
 func TestGoingWithThemCostsTheDaysAndPaysTheStreet(t *testing.T) {
+	t.Parallel()
 	w := chargeable(t)
 	w.Raid()
 	e := w.Event
@@ -127,6 +131,7 @@ func TestGoingWithThemCostsTheDaysAndPaysTheStreet(t *testing.T) {
 }
 
 func TestTalkingIsTheFastWayOutAndTheOnlyOneNobodyForgets(t *testing.T) {
+	t.Parallel()
 	w := chargeable(t)
 	w.Raid()
 	e := w.Event
@@ -160,6 +165,7 @@ func TestTalkingIsTheFastWayOutAndTheOnlyOneNobodyForgets(t *testing.T) {
 }
 
 func TestGivingThemSomebodyElseIsSomethingEverybodyElseFindsOut(t *testing.T) {
+	t.Parallel()
 	w := chargeable(t)
 	// A second man, so there is somebody left to have an opinion about it.
 	for _, n := range w.Civilians() {
@@ -227,6 +233,7 @@ func TestGivingThemSomebodyElseIsSomethingEverybodyElseFindsOut(t *testing.T) {
 }
 
 func TestTheDoorOpensByItselfIfNobodyOpensIt(t *testing.T) {
+	t.Parallel()
 	w := chargeable(t)
 	w.Confine(3, "a still")
 	if !w.Held() {
@@ -244,6 +251,7 @@ func TestTheDoorOpensByItselfIfNobodyOpensIt(t *testing.T) {
 }
 
 func TestNobodyBringsWorkToAManInACell(t *testing.T) {
+	t.Parallel()
 	w := chargeable(t)
 	w.Confine(4, "a still")
 	w.Offers = []Offer{{Ready: w.Minute, Event: &Scene{ID: ID(), Kind: "job", Title: "Something to do", Body: "b", Choices: []Choice{{ID: "accept", Label: "Accept"}}}}}
@@ -262,6 +270,7 @@ func TestNobodyBringsWorkToAManInACell(t *testing.T) {
 }
 
 func TestNobodyBringsTheTakingsToAStationExceptYourOwnMan(t *testing.T) {
+	t.Parallel()
 	w := chargeable(t)
 	if w.CollectionShare("laundry") != 1 {
 		t.Fatal("a man standing in his own business did not get his own takings")
@@ -286,6 +295,7 @@ func TestNobodyBringsTheTakingsToAStationExceptYourOwnMan(t *testing.T) {
 }
 
 func TestACellIsTheOneThingItIsGoodFor(t *testing.T) {
+	t.Parallel()
 	// Nobody is robbed in the street, mugged, or visited at home while the
 	// police have them. It is the only protection in this game that is free.
 	w := chargeable(t)

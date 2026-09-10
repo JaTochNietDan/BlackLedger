@@ -28,6 +28,7 @@ func request(a *app, method, path, body string) *httptest.ResponseRecorder {
 	return out
 }
 func TestHTTPCommandsSurviveDuplicateAndRejectStaleInput(t *testing.T) {
+	t.Parallel()
 	a := testApp(t)
 	body := `{"kind":"travel","target":"bar","request_id":"first-journey","revision":0}`
 	first := request(a, "POST", "/api/action", body)
@@ -48,6 +49,7 @@ func TestHTTPCommandsSurviveDuplicateAndRejectStaleInput(t *testing.T) {
 	}
 }
 func TestHTTPPublicStateDoesNotDisclosePlot(t *testing.T) {
+	t.Parallel()
 	a := testApp(t)
 	a.s.Change(func(w *core.World) error { w.Retaliation(); return nil })
 	out := request(a, "GET", "/api/state", "")
@@ -65,6 +67,7 @@ func TestHTTPPublicStateDoesNotDisclosePlot(t *testing.T) {
 	}
 }
 func TestHTTPClosedSpeechAndForeignCommands(t *testing.T) {
+	t.Parallel()
 	a := testApp(t)
 	if request(a, "POST", "/api/speech", `{"event":"already-closed"}`).Code != 409 {
 		t.Fatal("closed conversation accepted")

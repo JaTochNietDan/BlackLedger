@@ -14,6 +14,7 @@ func launderer(t *testing.T) *World {
 }
 
 func TestTheBooksTradeMoneyForAttention(t *testing.T) {
+	t.Parallel()
 	w := launderer(t)
 	heat, cash := w.Player.Heat, w.Player.Cash
 	fee := w.LaunderFee("laundry")
@@ -35,6 +36,7 @@ func TestTheBooksTradeMoneyForAttention(t *testing.T) {
 }
 
 func TestTheBooksNeedTimeBetweenRounds(t *testing.T) {
+	t.Parallel()
 	w := launderer(t)
 	if err := w.Launder("laundry"); err != nil {
 		t.Fatal(err)
@@ -53,6 +55,7 @@ func TestTheBooksNeedTimeBetweenRounds(t *testing.T) {
 }
 
 func TestOnlyYourOwnCashBusinessLaunders(t *testing.T) {
+	t.Parallel()
 	w := launderer(t)
 	// Somebody else's premises are not your books.
 	w.Properties["laundry"].Owner = "bellandi"
@@ -92,6 +95,7 @@ func TestOnlyYourOwnCashBusinessLaunders(t *testing.T) {
 }
 
 func TestARundownBusinessExplainsLess(t *testing.T) {
+	t.Parallel()
 	good, poor := launderer(t), launderer(t)
 	poor.Properties["laundry"].Condition = 45
 	if poor.launderCapacity("laundry") >= good.launderCapacity("laundry") {

@@ -17,6 +17,7 @@ func buyer(t *testing.T) *World {
 }
 
 func TestWhatItCostsDependsOnWhoTheyAre(t *testing.T) {
+	t.Parallel()
 	w := buyer(t)
 	professional, _ := contractTier("professional")
 	leader := w.ContractPrice("vittorio", professional)
@@ -41,6 +42,7 @@ func TestWhatItCostsDependsOnWhoTheyAre(t *testing.T) {
 }
 
 func TestCommissioningTakesTheMoneyAndCommitsNothingYet(t *testing.T) {
+	t.Parallel()
 	w := buyer(t)
 	professional, _ := contractTier("professional")
 	fee := w.ContractPrice("vittorio", professional)
@@ -78,6 +80,7 @@ func TestCommissioningTakesTheMoneyAndCommitsNothingYet(t *testing.T) {
 }
 
 func TestAContractIsNeverVisibleToThePlayer(t *testing.T) {
+	t.Parallel()
 	w := buyer(t)
 	if err := w.Commission("vittorio", "specialist"); err != nil {
 		t.Fatal(err)
@@ -106,6 +109,7 @@ func TestAContractIsNeverVisibleToThePlayer(t *testing.T) {
 }
 
 func TestABetterHitmanSucceedsMoreOften(t *testing.T) {
+	t.Parallel()
 	rates := map[string]int{}
 	for _, tier := range []string{"cheap", "specialist"} {
 		for i := uint32(1); i <= 300; i++ {
@@ -131,6 +135,7 @@ func TestABetterHitmanSucceedsMoreOften(t *testing.T) {
 }
 
 func TestAFailedAttemptCanBeTracedBack(t *testing.T) {
+	t.Parallel()
 	traced, escaped := 0, 0
 	for i := uint32(1); i <= 400; i++ {
 		w := New(i * 2654435761)
@@ -156,6 +161,7 @@ func TestAFailedAttemptCanBeTracedBack(t *testing.T) {
 }
 
 func TestAKillingIsDescribedByWhereItHappened(t *testing.T) {
+	t.Parallel()
 	w := New(19)
 	seen := map[string]bool{}
 	for i := 0; i < 40; i++ {
@@ -173,6 +179,7 @@ func TestAKillingIsDescribedByWhereItHappened(t *testing.T) {
 }
 
 func TestKillingALeaderThroughAContractStillPromotesSomebody(t *testing.T) {
+	t.Parallel()
 	w := New(23)
 	deputy := w.Members("bellandi")[1].Name
 	w.Contracts = []Contract{{ID: ID(), Life: w.Life, Target: "vittorio", Tier: "specialist", Payer: "player", Due: w.Minute}}
@@ -189,6 +196,7 @@ func TestKillingALeaderThroughAContractStillPromotesSomebody(t *testing.T) {
 }
 
 func TestOrganizationsBuyTheSameServiceThePlayerCan(t *testing.T) {
+	t.Parallel()
 	booked, killed := 0, 0
 	for i := uint32(1); i <= 300; i++ {
 		w := New(i * 2654435761)
@@ -227,6 +235,7 @@ func TestOrganizationsBuyTheSameServiceThePlayerCan(t *testing.T) {
 }
 
 func TestAnOrganizationWillNotSpendMoneyItDoesNotHave(t *testing.T) {
+	t.Parallel()
 	w := New(29)
 	w.Antagonize("bellandi", "russo", 100)
 	for i := range w.Factions {
@@ -246,6 +255,7 @@ func TestAnOrganizationWillNotSpendMoneyItDoesNotHave(t *testing.T) {
 }
 
 func TestThePlayerCanSeeWhatTheyPaidFor(t *testing.T) {
+	t.Parallel()
 	w := buyer(t)
 	if len(w.PendingArrangements()) != 0 {
 		t.Fatal("arrangements existed before any were made")
@@ -285,6 +295,7 @@ func TestThePlayerCanSeeWhatTheyPaidFor(t *testing.T) {
 }
 
 func TestAResolutionThePlayerPaidForSaysSo(t *testing.T) {
+	t.Parallel()
 	for _, want := range []struct{ tier, phrase string }{{"specialist", "Your arrangement is settled"}, {"cheap", "Your arrangement failed"}} {
 		found := false
 		for seed := uint32(1); seed <= 400 && !found; seed++ {
@@ -310,6 +321,7 @@ func TestAResolutionThePlayerPaidForSaysSo(t *testing.T) {
 // choice declares, so a handler that also pays takes it twice and refuses
 // anything the player could only just afford.
 func TestNothingIsChargedTwice(t *testing.T) {
+	t.Parallel()
 	for _, probe := range []struct {
 		name    string
 		place   string
@@ -359,6 +371,7 @@ func TestNothingIsChargedTwice(t *testing.T) {
 // something you have a reason to say.
 
 func TestYouCanOnlyNameSomebodyYouHaveAReasonToName(t *testing.T) {
+	t.Parallel()
 	w, member := testator(t)
 	w.Populate()
 	all := len(w.People())
@@ -409,6 +422,7 @@ func TestYouCanOnlyNameSomebodyYouHaveAReasonToName(t *testing.T) {
 }
 
 func TestTheHeadsOfOrganizationsAreAlwaysNameable(t *testing.T) {
+	t.Parallel()
 	w := proprietor(t)
 	targets := map[string]bool{}
 	for _, n := range w.ContractTargets() {

@@ -38,6 +38,7 @@ func patron(t *testing.T) *World {
 }
 
 func TestYouCanPutOneOfYoursInACar(t *testing.T) {
+	t.Parallel()
 	w := patron(t)
 	who := w.Player.Crew[0]
 	a := actionByID(w.Actions(w.Player.Location), "car:"+who.ID)
@@ -65,6 +66,7 @@ func TestYouCanPutOneOfYoursInACar(t *testing.T) {
 }
 
 func TestYouCanPlateTheirCarAtAGarage(t *testing.T) {
+	t.Parallel()
 	w := patron(t)
 	who := w.Player.Crew[0]
 	if err := w.BuyCarFor(who.ID); err != nil {
@@ -95,6 +97,7 @@ func TestYouCanPlateTheirCarAtAGarage(t *testing.T) {
 }
 
 func TestACarOfTheirOwnIsWhatGetsThemOut(t *testing.T) {
+	t.Parallel()
 	const runs = 500
 	away := map[string]int{}
 	for _, kit := range []string{"walking", "driving", "plated"} {

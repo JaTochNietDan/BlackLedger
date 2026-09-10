@@ -8,6 +8,7 @@ import "testing"
 // show the city's minutes and never the player's decision.
 
 func TestTheResultSaysWhatWasDoneAndWhatItCost(t *testing.T) {
+	t.Parallel()
 	w := New(1)
 	w.Player.Location = "bar"
 	next, err := Execute(w, Command{Revision: w.Revision, RequestID: ID(), Kind: "courier", Target: "bar"})
@@ -39,6 +40,7 @@ func TestTheResultSaysWhatWasDoneAndWhatItCost(t *testing.T) {
 }
 
 func TestWhatItCostIsMeasuredAcrossTheWholeCommand(t *testing.T) {
+	t.Parallel()
 	// Not just the price on the button: whatever the day charged while the
 	// clock moved is part of what the decision cost, and the player should be
 	// told once rather than left to diff two screens.
@@ -63,6 +65,7 @@ func TestWhatItCostIsMeasuredAcrossTheWholeCommand(t *testing.T) {
 }
 
 func TestEveryOrdinaryActionReportsItself(t *testing.T) {
+	t.Parallel()
 	// Whatever the player presses, the result names it. A blank here is a
 	// screen that says something happened and will not say what.
 	w := New(3)
@@ -110,6 +113,7 @@ func TestEveryOrdinaryActionReportsItself(t *testing.T) {
 // though the pauper had just lost eight thousand dollars and every ounce of
 // standing they had. Nobody lost anything: they are two different people.
 func TestBeginningAgainIsNotReportedAsALoss(t *testing.T) {
+	t.Parallel()
 	w := New(1)
 	w.Player.Cash, w.Player.Respect = 9000, 70
 	w.Die("Shot on the steps of the Monarch.")

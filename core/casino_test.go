@@ -17,6 +17,7 @@ func houseKeeper(t *testing.T) *World {
 }
 
 func TestAnEmptyRoomAttractsNobody(t *testing.T) {
+	t.Parallel()
 	w := houseKeeper(t)
 	if w.Confidence("casino") != 0 || w.NightHandleAt("casino") != 0 {
 		t.Fatalf("a room with nothing behind the tables ran $%d of action", w.NightHandleAt("casino"))
@@ -28,6 +29,7 @@ func TestAnEmptyRoomAttractsNobody(t *testing.T) {
 }
 
 func TestWhatIsBehindTheTablesDecidesTheAction(t *testing.T) {
+	t.Parallel()
 	w := houseKeeper(t)
 	previous := 0
 	for _, float := range []int{250, 500, 1000, 1500, 3000} {
@@ -45,6 +47,7 @@ func TestWhatIsBehindTheTablesDecidesTheAction(t *testing.T) {
 }
 
 func TestARoomInPoorOrderRunsLessAction(t *testing.T) {
+	t.Parallel()
 	w := houseKeeper(t)
 	w.Properties["casino"].Bankroll = BankrollFull
 	full := w.NightHandleAt("casino")
@@ -60,6 +63,7 @@ func TestARoomInPoorOrderRunsLessAction(t *testing.T) {
 }
 
 func TestTheHouseEdgeShowsOverASeasonAndNotOverANight(t *testing.T) {
+	t.Parallel()
 	losses, nights := 0, 0
 	total := 0
 	for seed := uint32(1); seed <= 400; seed++ {
@@ -85,6 +89,7 @@ func TestTheHouseEdgeShowsOverASeasonAndNotOverANight(t *testing.T) {
 }
 
 func TestAThinFloatIsTheThingThatRuinsAHouse(t *testing.T) {
+	t.Parallel()
 	ruinedThin, ruinedDeep := 0, 0
 	for seed := uint32(1); seed <= 400; seed++ {
 		thin := houseKeeper(t)
@@ -117,6 +122,7 @@ func TestAThinFloatIsTheThingThatRuinsAHouse(t *testing.T) {
 }
 
 func TestBeingUnableToPayCostsTheRoomAndTheName(t *testing.T) {
+	t.Parallel()
 	w := houseKeeper(t)
 	w.Player.Respect = 20
 	prop := w.Properties["casino"]
@@ -155,6 +161,7 @@ func TestBeingUnableToPayCostsTheRoomAndTheName(t *testing.T) {
 }
 
 func TestWinningsOnlyReachThePlayerWhenTheyTakeThemOut(t *testing.T) {
+	t.Parallel()
 	w := houseKeeper(t)
 	w.Properties["casino"].Bankroll = 2000
 	cash := w.Player.Cash
@@ -172,6 +179,7 @@ func TestWinningsOnlyReachThePlayerWhenTheyTakeThemOut(t *testing.T) {
 }
 
 func TestFundingAndDrawingAreRefusedWhereTheyMakeNoSense(t *testing.T) {
+	t.Parallel()
 	w := houseKeeper(t)
 	if w.DrawReadiness("casino", 0) == "" {
 		t.Fatal("drew from an empty float")
@@ -186,6 +194,7 @@ func TestFundingAndDrawingAreRefusedWhereTheyMakeNoSense(t *testing.T) {
 }
 
 func TestAnOlderSaveHasMoneyBehindItsTables(t *testing.T) {
+	t.Parallel()
 	w := houseKeeper(t)
 	w.Properties["casino"].Bankroll = 0
 	w.MigrateLivingWorld()

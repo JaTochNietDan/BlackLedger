@@ -33,6 +33,7 @@ func leaderless(t *testing.T, faction string) *World {
 }
 
 func TestAnAudienceIsWithWhoeverLeadsTheFamilyNow(t *testing.T) {
+	t.Parallel()
 	for _, tc := range []struct{ faction, where string }{
 		{"bellandi", "club"},
 		{"russo", "garage"},
@@ -59,6 +60,7 @@ func TestAnAudienceIsWithWhoeverLeadsTheFamilyNow(t *testing.T) {
 }
 
 func TestADemandComesFromWhoeverLeadsTheFamilyNow(t *testing.T) {
+	t.Parallel()
 	w := leaderless(t, "bellandi")
 	// Own something visibly earning, and let a demand land. Which family
 	// collects is decided by who holds ground; what this asserts is that
@@ -98,6 +100,7 @@ func TestADemandComesFromWhoeverLeadsTheFamilyNow(t *testing.T) {
 // audience that opened without a leader would seat a stranger at the table and
 // let them set a family's terms.
 func TestAFamilyWithNobodyLeftGrantsNoAudience(t *testing.T) {
+	t.Parallel()
 	w := New(9)
 	for i := range w.NPCs {
 		if w.NPCs[i].Faction == "bellandi" {

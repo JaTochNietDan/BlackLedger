@@ -11,6 +11,7 @@ func robberWorld(t *testing.T) *World {
 }
 
 func TestRobberyNeedsSomethingWorthTakingThatIsNotYours(t *testing.T) {
+	t.Parallel()
 	w := robberWorld(t)
 	if w.RobberyReadiness("club") != "" {
 		t.Fatal("premises with takings were refused:", w.RobberyReadiness("club"))
@@ -32,6 +33,7 @@ func TestRobberyNeedsSomethingWorthTakingThatIsNotYours(t *testing.T) {
 }
 
 func TestASuccessfulRobberyPaysAndIsNoticed(t *testing.T) {
+	t.Parallel()
 	var w *World
 	for seed := uint32(1); seed <= 200; seed++ {
 		probe := robberWorld(t)
@@ -75,6 +77,7 @@ func TestASuccessfulRobberyPaysAndIsNoticed(t *testing.T) {
 }
 
 func TestAFailedRobberyHurts(t *testing.T) {
+	t.Parallel()
 	var w *World
 	for seed := uint32(1); seed <= 400; seed++ {
 		probe := robberWorld(t)
@@ -101,6 +104,7 @@ func TestAFailedRobberyHurts(t *testing.T) {
 }
 
 func TestTheCityRobsThePlayerBack(t *testing.T) {
+	t.Parallel()
 	robbed, named, anonymous := 0, 0, 0
 	for i := uint32(1); i <= 400; i++ {
 		w := New(i * 2654435761)
@@ -161,6 +165,7 @@ func contains(haystack, needle string) bool {
 }
 
 func TestCarryingNothingIsSafer(t *testing.T) {
+	t.Parallel()
 	empty, loaded := New(41), New(41)
 	empty.Player.Cash = 100
 	loaded.Player.Cash = 100
@@ -180,6 +185,7 @@ func TestCarryingNothingIsSafer(t *testing.T) {
 }
 
 func TestNobodyIsRobbedByANobody(t *testing.T) {
+	t.Parallel()
 	w := New(43)
 	for i := 0; i < 200; i++ {
 		thief := w.robber()

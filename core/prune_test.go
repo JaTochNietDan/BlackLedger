@@ -20,6 +20,7 @@ func crowded(t *testing.T) *World {
 }
 
 func TestThePersonSpeakingIsNotForgotten(t *testing.T) {
+	t.Parallel()
 	w := crowded(t)
 	w.NPCs = append(w.NPCs, NPC{ID: "teller", Name: "Ines Farrow", Location: "bar"})
 	w.Event = &Scene{ID: ID(), Kind: "proposal", Speaker: "teller", Title: "A quiet word", Body: "“There is work.”"}
@@ -37,6 +38,7 @@ func TestThePersonSpeakingIsNotForgotten(t *testing.T) {
 // asserted a dead debtor survived pruning, and it was measuring its own setup.
 
 func TestASuspendedArrangementKeepsItsSpeaker(t *testing.T) {
+	t.Parallel()
 	w := crowded(t)
 	w.NPCs = append(w.NPCs, NPC{ID: "patron", Name: "Vera Kohl", Location: "bar"})
 	w.SuspendedJob = &SuspendedJob{Scene: &Scene{ID: ID(), Kind: "proposal", Speaker: "patron"}, Remaining: 90}
@@ -50,6 +52,7 @@ func TestASuspendedArrangementKeepsItsSpeaker(t *testing.T) {
 // And the consequence, so this is not filed as a tidiness complaint: declining
 // an offer prints the name of whoever made it, straight off the lookup.
 func TestDecliningAnOfferFromAForgottenPersonDoesNotCrash(t *testing.T) {
+	t.Parallel()
 	w := crowded(t)
 	w.NPCs = append(w.NPCs, NPC{ID: "teller", Name: "Ines Farrow", Location: "bar"})
 	w.Event = &Scene{ID: ID(), Kind: "proposal", Speaker: "teller", Title: "A quiet word",
@@ -69,6 +72,7 @@ func TestDecliningAnOfferFromAForgottenPersonDoesNotCrash(t *testing.T) {
 // An old save can already have lost a speaker, and no migration puts somebody
 // back. The refusal has to survive reading it.
 func TestDecliningAnOfferWithNoSpeakerLeftReadsWithoutAName(t *testing.T) {
+	t.Parallel()
 	w := New(11)
 	w.NPCs = append(w.NPCs, NPC{ID: "teller", Name: "Ines Farrow", Location: "bar"})
 	w.Event = &Scene{ID: ID(), Kind: "proposal", Speaker: "teller", Title: "A quiet word",

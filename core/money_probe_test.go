@@ -8,6 +8,7 @@ import (
 // A probe, not an assertion: what does a family's money actually do over a
 // year, and is it a number worth making decisions from?
 func TestProbeFamilyMoney(t *testing.T) {
+	t.Parallel()
 	for _, days := range []int{30, 120, 400} {
 		var all []int
 		for _, seed := range []uint32{7, 31, 88, 149, 219} {
@@ -42,6 +43,7 @@ func TestProbeFamilyMoney(t *testing.T) {
 
 // The companion probe: what people carry, once they have money of their own.
 func TestProbePeopleMoney(t *testing.T) {
+	t.Parallel()
 	for _, days := range []int{30, 120, 400} {
 		var purses []int
 		broke, total := 0, 0

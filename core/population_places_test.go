@@ -12,6 +12,7 @@ import "testing"
 // So the test is about the city being inhabited, not about the count.
 
 func TestSomebodyWorksAtEveryAddressWorthWorkingAt(t *testing.T) {
+	t.Parallel()
 	worked := map[string]bool{}
 	for _, trade := range streetTrades {
 		worked[trade.place] = true
@@ -34,6 +35,7 @@ func TestSomebodyWorksAtEveryAddressWorthWorkingAt(t *testing.T) {
 
 // And every one of those roles has to be somewhere a person can actually be.
 func TestNobodyWorksAtAnAddressTheCityDoesNotHave(t *testing.T) {
+	t.Parallel()
 	for _, trade := range streetTrades {
 		if _, ok := PlaceByID(trade.place); !ok {
 			t.Errorf("a %s works at %q, which is not a place in this city", trade.role, trade.place)
@@ -45,6 +47,7 @@ func TestNobodyWorksAtAnAddressTheCityDoesNotHave(t *testing.T) {
 // looks. Roles repeat across addresses — there is more than one barman — but
 // no address should have the same job twice.
 func TestNoAddressHasTheSameJobTwice(t *testing.T) {
+	t.Parallel()
 	seen := map[string]bool{}
 	for _, trade := range streetTrades {
 		key := trade.place + "/" + trade.role
@@ -61,6 +64,7 @@ func TestNoAddressHasTheSameJobTwice(t *testing.T) {
 // ample for sixty-two: the failure is silent, because AddCivilian returns
 // nothing and the city is simply smaller than it meant to be.
 func TestTheCityFillsTheStreetItMeansTo(t *testing.T) {
+	t.Parallel()
 	short := 0
 	for _, seed := range []uint32{7, 31, 88, 149, 219, 401} {
 		w := New(seed)
@@ -83,6 +87,7 @@ func TestTheCityFillsTheStreetItMeansTo(t *testing.T) {
 // And nobody in the city shares a name with anybody else, however many there
 // are. Two Otto Reisses is two people the player cannot tell apart.
 func TestNoTwoPeopleInTheCityShareAName(t *testing.T) {
+	t.Parallel()
 	for _, seed := range []uint32{7, 31, 219} {
 		w := New(seed)
 		live(t, w, 3000)
@@ -106,6 +111,7 @@ func TestNoTwoPeopleInTheCityShareAName(t *testing.T) {
 // The trades are dealt out, so every way of making a living in this city is
 // somebody's before any of them is a second person's.
 func TestTheCityFillsEveryJobBeforeDoublingUpOnAny(t *testing.T) {
+	t.Parallel()
 	worst, worstSeed := 0, uint32(0)
 	for _, seed := range []uint32{7, 31, 88, 149, 219, 401, 555} {
 		w := New(seed)

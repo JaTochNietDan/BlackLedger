@@ -10,6 +10,7 @@ import "testing"
 // And a car has to end somewhere. A scrapyard is where.
 
 func TestARaidReachesWhatPeopleDrive(t *testing.T) {
+	t.Parallel()
 	// My first version counted cars among a family's surviving members before
 	// and after, and passed with twenty-two "lost" before a line of this
 	// existed — because somebody killed in a raid leaves the member list, so
@@ -66,6 +67,7 @@ func TestARaidReachesWhatPeopleDrive(t *testing.T) {
 // A car does not simply evaporate. Wherever one ends, it ends at a scrapyard,
 // and a scrapyard does better the more of them there are.
 func TestTheCityHasSomewhereACarEnds(t *testing.T) {
+	t.Parallel()
 	yards := 0
 	for _, l := range Locations {
 		if l.Kind == "scrapyard" {
@@ -86,6 +88,7 @@ func TestTheCityHasSomewhereACarEnds(t *testing.T) {
 // And a wreck is worth something to the yard. Stripping a car should reach the
 // scrapyard the way it reaches the garages: more wrecks, more trade.
 func TestAWreckIsWorthSomethingToTheYard(t *testing.T) {
+	t.Parallel()
 	w, _ := stripper(t)
 	before := map[string]int{}
 	for _, l := range Locations {

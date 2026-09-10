@@ -3,6 +3,7 @@ package core
 import "testing"
 
 func TestNewLifeCanEarnAndBuyFormerBusinessWithoutInheritance(t *testing.T) {
+	t.Parallel()
 	w := New(27)
 	w.Properties["laundry"].Owner = "player:1"
 	w.Properties["laundry"].Condition = 60
@@ -24,6 +25,7 @@ func TestNewLifeCanEarnAndBuyFormerBusinessWithoutInheritance(t *testing.T) {
 	}
 }
 func TestBuyoutDoesNotSeizeFactionProperty(t *testing.T) {
+	t.Parallel()
 	w := New(27)
 	w.Player.Location = "laundry"
 	w.Player.Respect = 100

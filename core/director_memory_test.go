@@ -3,6 +3,7 @@ package core
 import "testing"
 
 func TestArrangementMemoryTracksPoliceOutcome(t *testing.T) {
+	t.Parallel()
 	for _, decision := range []string{"pay", "abandon"} {
 		w := New(27)
 		w.Player.Heat = 14
@@ -29,6 +30,7 @@ func TestArrangementMemoryTracksPoliceOutcome(t *testing.T) {
 }
 
 func TestDirectorVarietyIncludesPendingAndDeclinedWork(t *testing.T) {
+	t.Parallel()
 	w := New(27)
 	if w.NextDirectorOperation() != "mediation" {
 		t.Fatal("unexpected opening brief")
@@ -57,6 +59,7 @@ func TestDirectorVarietyIncludesPendingAndDeclinedWork(t *testing.T) {
 }
 
 func TestInterruptedArrangementHasNoRememberedSuccess(t *testing.T) {
+	t.Parallel()
 	w := New(27)
 	w.Player.Contacts = 2
 	w.Retaliation()
@@ -69,6 +72,7 @@ func TestInterruptedArrangementHasNoRememberedSuccess(t *testing.T) {
 }
 
 func TestDirectorConnectionRequiresLatestSuccessfulCurrentLifeWork(t *testing.T) {
+	t.Parallel()
 	w := New(27)
 	scene, _ := w.ValidateProposal(approachProposal())
 	w.Event = scene
@@ -91,6 +95,7 @@ func TestDirectorConnectionRequiresLatestSuccessfulCurrentLifeWork(t *testing.T)
 }
 
 func TestFollowUpConnectionDoesNotBecomeEndlessChain(t *testing.T) {
+	t.Parallel()
 	w := New(27)
 	w.Arrangements = []ArrangementMemory{{ID: "first", Life: 1, Status: "completed", Speaker: "mara", Title: "Shift agreement", Result: "The mediation was completed."}}
 	if w.DirectorConnection() == nil {

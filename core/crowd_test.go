@@ -10,6 +10,7 @@ import (
 // standing in it at nine in the morning with two.
 
 func TestAFullRoomSaysSo(t *testing.T) {
+	t.Parallel()
 	w := New(21)
 	// Put most of the city in one room.
 	living := 0
@@ -33,6 +34,7 @@ func TestAFullRoomSaysSo(t *testing.T) {
 }
 
 func TestAnEmptyRoomSaysSo(t *testing.T) {
+	t.Parallel()
 	w := New(22)
 	for i := range w.NPCs {
 		w.NPCs[i].Location, w.NPCs[i].Heading = "market", ""
@@ -45,6 +47,7 @@ func TestAnEmptyRoomSaysSo(t *testing.T) {
 // An unremarkable room is not worth a sentence. A note on every room in the
 // city is a note the player stops reading.
 func TestAnOrdinaryRoomIsNotWorthASentence(t *testing.T) {
+	t.Parallel()
 	w := New(23)
 	living := w.living()
 	spread := 0
@@ -69,6 +72,7 @@ func TestAnOrdinaryRoomIsNotWorthASentence(t *testing.T) {
 // Somebody out on the street is in neither building, and must not be counted
 // into a room they have left.
 func TestSomebodyWalkingIsNotInTheRoom(t *testing.T) {
+	t.Parallel()
 	w := New(24)
 	for i := range w.NPCs {
 		w.NPCs[i].Location, w.NPCs[i].Heading = "bar", ""
@@ -84,6 +88,7 @@ func TestSomebodyWalkingIsNotInTheRoom(t *testing.T) {
 // The description is a description. It must never be the thing that decides
 // what can be done in a room.
 func TestTheRoomNoteChangesNothing(t *testing.T) {
+	t.Parallel()
 	w := New(25)
 	before := len(w.Actions("bar"))
 	for i := range w.NPCs {

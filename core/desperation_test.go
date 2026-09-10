@@ -21,6 +21,7 @@ import "testing"
 // existed.
 
 func TestADesperateFamilyPressesAQuarrelHarder(t *testing.T) {
+	t.Parallel()
 	w := New(41)
 	w.District = 2
 	a, b := w.faction("bellandi"), w.faction("russo")
@@ -63,6 +64,7 @@ func TestADesperateFamilyPressesAQuarrelHarder(t *testing.T) {
 // but only if there is ground to take, because money nobody can reach is not a
 // temptation.
 func TestARichNeighbourIsWorthMovingOn(t *testing.T) {
+	t.Parallel()
 	w := New(41)
 	w.District = 2
 	a, b := w.faction("bellandi"), w.faction("russo")
@@ -101,6 +103,7 @@ func TestARichNeighbourIsWorthMovingOn(t *testing.T) {
 // same way — and the world's stream reset to the same value before every turn.
 // The only difference is that one pair has missed payday.
 func TestTheQuarrelActuallyReadsTheMoney(t *testing.T) {
+	t.Parallel()
 	run := func(short int) int {
 		total := 0
 		for _, seed := range []uint32{13, 41, 77, 109, 233, 311} {

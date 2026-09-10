@@ -3,6 +3,7 @@ package core
 import "testing"
 
 func TestRussoAudienceCancelsOnlyRussoPlans(t *testing.T) {
+	t.Parallel()
 	w := New(27)
 	w.District = 1
 	w.Player.Location = "garage"
@@ -32,6 +33,7 @@ func TestRussoAudienceCancelsOnlyRussoPlans(t *testing.T) {
 	}
 }
 func TestAudienceFavorIsOptionalAndUsesNormalJobRules(t *testing.T) {
+	t.Parallel()
 	for _, decision := range []string{"accept", "decline"} {
 		w := New(27)
 		seat(w, "russo", "garage")
@@ -53,6 +55,7 @@ func TestAudienceFavorIsOptionalAndUsesNormalJobRules(t *testing.T) {
 	}
 }
 func TestLegacyAudienceAndUnaffordableTribute(t *testing.T) {
+	t.Parallel()
 	w := New(27)
 	seat(w, "bellandi", "club")
 	w.OpenAudience("club")

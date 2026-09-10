@@ -27,6 +27,7 @@ func boss(t *testing.T) (*World, *NPC) {
 }
 
 func TestNobodySignsOnWithAMan(t *testing.T) {
+	t.Parallel()
 	w := proprietor(t)
 	own(w, "laundry")
 	w.Player.Respect, w.Player.Contacts = 5, 3
@@ -41,6 +42,7 @@ func TestNobodySignsOnWithAMan(t *testing.T) {
 }
 
 func TestPuttingSomebodyOnCostsAndBinds(t *testing.T) {
+	t.Parallel()
 	w, candidate := boss(t)
 	if w.SignOnReadiness(candidate.ID) != "" {
 		t.Fatal("could not put anybody on:", w.SignOnReadiness(candidate.ID))
@@ -67,6 +69,7 @@ func TestPuttingSomebodyOnCostsAndBinds(t *testing.T) {
 }
 
 func TestYouCannotTakeOnSomebodyElsesPeople(t *testing.T) {
+	t.Parallel()
 	w, _ := boss(t)
 	for _, n := range w.Members("bellandi") {
 		w.Player.Location = n.Location
@@ -89,6 +92,7 @@ func TestYouCannotTakeOnSomebodyElsesPeople(t *testing.T) {
 }
 
 func TestYourPeopleMakeYouHarderToMoveOn(t *testing.T) {
+	t.Parallel()
 	w, candidate := boss(t)
 	before := w.PlayerStrength()
 	w.SignOn(candidate.ID)
@@ -103,6 +107,7 @@ func TestYourPeopleMakeYouHarderToMoveOn(t *testing.T) {
 }
 
 func TestARaidReachesYourOwnPeople(t *testing.T) {
+	t.Parallel()
 	found := false
 	for seed := uint32(1); seed <= 300 && !found; seed++ {
 		w, candidate := boss(t)
@@ -123,6 +128,7 @@ func TestARaidReachesYourOwnPeople(t *testing.T) {
 }
 
 func TestNeglectIsWhatCostsYouPeople(t *testing.T) {
+	t.Parallel()
 	w, candidate := boss(t)
 	w.SignOn(candidate.ID)
 	// Paid, and they settle.
@@ -144,6 +150,7 @@ func TestNeglectIsWhatCostsYouPeople(t *testing.T) {
 }
 
 func TestSomebodyFarEnoughDownLeaves(t *testing.T) {
+	t.Parallel()
 	const runs = 300
 	left, tookSomething := 0, 0
 	for seed := uint32(1); seed <= runs; seed++ {
@@ -175,6 +182,7 @@ func TestSomebodyFarEnoughDownLeaves(t *testing.T) {
 }
 
 func TestALoyalManDoesNotTakeYourBusiness(t *testing.T) {
+	t.Parallel()
 	w, candidate := boss(t)
 	candidate.Name = nameWith(t, "loyal")
 	w.SignOn(candidate.ID)
@@ -190,6 +198,7 @@ func TestALoyalManDoesNotTakeYourBusiness(t *testing.T) {
 }
 
 func TestPuttingSomebodyOutAndPayingAShare(t *testing.T) {
+	t.Parallel()
 	w, candidate := boss(t)
 	w.SignOn(candidate.ID)
 	candidate.Trust = 30

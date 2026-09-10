@@ -34,6 +34,7 @@ func striker(t *testing.T) (*World, *NPC) {
 }
 
 func TestYouCanGoAfterSomebodyYourself(t *testing.T) {
+	t.Parallel()
 	w, mark := striker(t)
 	if reason := w.StrikeReadiness(mark.ID); reason != "" {
 		t.Fatalf("standing in a room with them: %q", reason)
@@ -85,6 +86,7 @@ func TestYouCanGoAfterSomebodyYourself(t *testing.T) {
 // Being armed and wearing something has to matter, or "based on my skills and
 // equipment" is a sentence about nothing.
 func TestGoingInArmedIsBetterThanGoingInEmptyHanded(t *testing.T) {
+	t.Parallel()
 	armed, bare := 0, 0
 	for seed := uint32(1); seed <= 120; seed++ {
 		run, target := striker(t)
@@ -110,6 +112,7 @@ func TestGoingInArmedIsBetterThanGoingInEmptyHanded(t *testing.T) {
 // "If you send someone of your own then there's a chance they are killed or
 // captured and then they could be interrogated and give you up."
 func TestSendingYourOwnRisksThemRatherThanYou(t *testing.T) {
+	t.Parallel()
 	w, mark := striker(t)
 	w.Player.Crew = []Crew{{"leo", "Leo Carver", 90}}
 	if n := w.NPC("leo"); n != nil {
@@ -165,6 +168,7 @@ func TestSendingYourOwnRisksThemRatherThanYou(t *testing.T) {
 
 // The rules that stop it being a way to tidy up your own house.
 func TestThereAreNamesYouCannotGoAfterThisWay(t *testing.T) {
+	t.Parallel()
 	w, mark := striker(t)
 	if reason := w.StrikeReadiness("nobody-at-all"); reason == "" {
 		t.Error("you can go after somebody who does not exist")
@@ -185,6 +189,7 @@ func TestThereAreNamesYouCannotGoAfterThisWay(t *testing.T) {
 // The wiring: both buttons are offered where somebody is standing, and pressing
 // them plays out there and then.
 func TestBothWaysOfGoingAfterSomebodyAreOfferedInTheRoom(t *testing.T) {
+	t.Parallel()
 	w, mark := striker(t)
 	w.Player.Crew = []Crew{{"leo", "Leo Carver", 90}}
 	if n := w.NPC("leo"); n != nil {

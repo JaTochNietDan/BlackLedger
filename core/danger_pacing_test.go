@@ -3,6 +3,7 @@ package core
 import "testing"
 
 func TestRoutineOffersWaitForKnownDangerWithoutRevealingHiddenPlans(t *testing.T) {
+	t.Parallel()
 	for _, tc := range []struct {
 		name       string
 		known      bool
@@ -38,6 +39,7 @@ func TestRoutineOffersWaitForKnownDangerWithoutRevealingHiddenPlans(t *testing.T
 }
 
 func TestKnownThreatDoesNotBlockChosenNegotiation(t *testing.T) {
+	t.Parallel()
 	w := New(27)
 	w.Player.Location = "club"
 	w.Plots = []Plot{{ID: "threat", Life: 1, Kind: "hit", Actor: "bellandi", Known: true, Due: w.Minute + 240}}

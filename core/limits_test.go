@@ -20,6 +20,7 @@ func punter(t *testing.T) *World {
 }
 
 func TestARoomHasAHouseLimitAndItIsTheHoldersToSet(t *testing.T) {
+	t.Parallel()
 	w := punter(t)
 	// Nobody has said otherwise, so the room runs on what it is worth.
 	base := w.TableLimit("casino")
@@ -48,6 +49,7 @@ func TestARoomHasAHouseLimitAndItIsTheHoldersToSet(t *testing.T) {
 }
 
 func TestYouChooseWhatYouPutDown(t *testing.T) {
+	t.Parallel()
 	w := punter(t)
 	w.Properties["casino"].Owner = "bellandi"
 	limit := w.TableLimit("casino")
@@ -75,6 +77,7 @@ func TestYouChooseWhatYouPutDown(t *testing.T) {
 }
 
 func TestTheWheelAndTheMachinesTakeWhatYouChooseToo(t *testing.T) {
+	t.Parallel()
 	w := punter(t)
 	w.Properties["casino"].Owner = "bellandi"
 	if f := w.faction("bellandi"); f != nil {
@@ -115,6 +118,7 @@ func TestTheWheelAndTheMachinesTakeWhatYouChooseToo(t *testing.T) {
 // The wiring: the holder's own room offers it, and a typed figure comes through
 // the command layer rather than being a lot the room picked.
 func TestTheHolderSetsTheLimitThroughTheRoom(t *testing.T) {
+	t.Parallel()
 	w := punter(t)
 	w.Properties["casino"].Owner = "player:1"
 	var limit *Action
@@ -153,6 +157,7 @@ func TestTheHolderSetsTheLimitThroughTheRoom(t *testing.T) {
 // And a typed stake goes through the command layer, which is what the interface
 // actually presses.
 func TestATypedStakeReachesTheTable(t *testing.T) {
+	t.Parallel()
 	w := punter(t)
 	w.Properties["casino"].Owner = "bellandi"
 	next, err := Execute(w, Command{Revision: w.Revision, Kind: "play", Target: "casino", Amount: 143})

@@ -20,6 +20,7 @@ func broke(t *testing.T) *World {
 }
 
 func TestWhatYouCannotAffordIsStillOffered(t *testing.T) {
+	t.Parallel()
 	w := broke(t)
 	// Every business that can be bought, from a pocket with $40 in it. A home
 	// is not one: it is rented rather than taken over, and it offers its own
@@ -72,6 +73,7 @@ func TestWhatYouCannotAffordIsStillOffered(t *testing.T) {
 // And every refusal anywhere says what would change it, because a card that
 // says "no" and nothing else is worse than no card.
 func TestEveryRefusalSaysWhatWouldChangeIt(t *testing.T) {
+	t.Parallel()
 	w := broke(t)
 	silent, checked := []string{}, 0
 	for _, l := range Locations {

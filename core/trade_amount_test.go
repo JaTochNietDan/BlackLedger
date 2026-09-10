@@ -27,6 +27,7 @@ func runner(t *testing.T) (*World, string) {
 }
 
 func TestYouBuyTheNumberYouName(t *testing.T) {
+	t.Parallel()
 	w, good := runner(t)
 	// What this floor charges, which is not what the city's price says: a
 	// route is two addresses where the same crate is worth different money.
@@ -51,6 +52,7 @@ func TestYouBuyTheNumberYouName(t *testing.T) {
 }
 
 func TestYouSellTheNumberYouName(t *testing.T) {
+	t.Parallel()
 	w, good := runner(t)
 	if err := w.Buy(good, 12); err != nil {
 		t.Fatal(err)
@@ -76,6 +78,7 @@ func TestYouSellTheNumberYouName(t *testing.T) {
 }
 
 func TestTheTradeRefusesWhatYouCannotDo(t *testing.T) {
+	t.Parallel()
 	w, good := runner(t)
 	price := w.PriceAt(w.Player.Location, good)
 	w.Player.Cash = price * 3
@@ -95,6 +98,7 @@ func TestTheTradeRefusesWhatYouCannotDo(t *testing.T) {
 }
 
 func TestTheCardSaysWhatYouCanCarry(t *testing.T) {
+	t.Parallel()
 	w, good := runner(t)
 	buy := actionByID(w.Actions(w.Player.Location), "buy:"+good)
 	if buy == nil {

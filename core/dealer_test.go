@@ -9,6 +9,7 @@ import "testing"
 // the things in it actually come from.
 
 func TestOnlyAForecourtSellsCars(t *testing.T) {
+	t.Parallel()
 	lots := 0
 	for _, l := range Locations {
 		if CarSource(l.ID) {
@@ -32,6 +33,7 @@ func TestOnlyAForecourtSellsCars(t *testing.T) {
 // The money has to arrive somewhere. Buying a car from a family's forecourt
 // pays that family; buying from your own pays you back the margin.
 func TestBuyingACarPaysWhoeverHoldsTheForecourt(t *testing.T) {
+	t.Parallel()
 	lot := ""
 	for _, l := range Locations {
 		if l.Kind == "dealer" {
@@ -64,6 +66,7 @@ func TestBuyingACarPaysWhoeverHoldsTheForecourt(t *testing.T) {
 // And the player's own forecourt gives them the margin back rather than paying
 // a rival for their own car.
 func TestYourOwnForecourtSellsYouACarCheaply(t *testing.T) {
+	t.Parallel()
 	lot := ""
 	for _, l := range Locations {
 		if l.Kind == "dealer" {
@@ -94,6 +97,7 @@ func TestYourOwnForecourtSellsYouACarCheaply(t *testing.T) {
 // to both was the motor works. Moving sales to a forecourt moved servicing with
 // them, and a garage could no longer touch a car.
 func TestAGarageWorksOnCarsAndAForecourtSellsThem(t *testing.T) {
+	t.Parallel()
 	garages, lots := 0, 0
 	for _, l := range Locations {
 		works, sells := CarWorkshop(l.ID), CarSource(l.ID)
@@ -128,6 +132,7 @@ func TestAGarageWorksOnCarsAndAForecourtSellsThem(t *testing.T) {
 // And now that there are two garages, the rule I recorded last slice as latent
 // and unprovable can be caught failing.
 func TestEitherGarageWorksOnYourCar(t *testing.T) {
+	t.Parallel()
 	for _, l := range Locations {
 		if l.Kind != "garage" {
 			continue

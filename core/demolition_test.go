@@ -17,6 +17,7 @@ func bomber(t *testing.T) *World {
 }
 
 func TestChargesComeOffABoatAndNowhereElse(t *testing.T) {
+	t.Parallel()
 	w := bomber(t)
 	if w.ChargeReadiness() != "" {
 		t.Fatal("the waterfront refused:", w.ChargeReadiness())
@@ -33,6 +34,7 @@ func TestChargesComeOffABoatAndNowhereElse(t *testing.T) {
 }
 
 func TestHoldingOneIsTheMostConspicuousThingInTheCity(t *testing.T) {
+	t.Parallel()
 	w := bomber(t)
 	if err := w.BuyCharge(); err != nil {
 		t.Fatal(err)
@@ -65,6 +67,7 @@ func TestHoldingOneIsTheMostConspicuousThingInTheCity(t *testing.T) {
 }
 
 func TestYouCannotPlantWhatYouDoNotHaveOrWhereItMakesNoSense(t *testing.T) {
+	t.Parallel()
 	w := bomber(t)
 	if w.PlantReadiness("club") == "" {
 		t.Fatal("planted a charge without one")
@@ -90,6 +93,7 @@ func TestYouCannotPlantWhatYouDoNotHaveOrWhereItMakesNoSense(t *testing.T) {
 }
 
 func TestAChargeIsSpentWhetherItWorksOrNot(t *testing.T) {
+	t.Parallel()
 	for seed := uint32(1); seed <= 200; seed++ {
 		w := bomber(t)
 		w.RNG = seed * 2654435761
@@ -105,6 +109,7 @@ func TestAChargeIsSpentWhetherItWorksOrNot(t *testing.T) {
 }
 
 func TestABlastTakesTheBuildingAndWhatWasInIt(t *testing.T) {
+	t.Parallel()
 	w := bomber(t)
 	prop := w.Properties["club"]
 	prop.Condition, prop.Supply, prop.Staff, prop.Bankroll, prop.Still = 100, 40, 5, 900, true
@@ -131,6 +136,7 @@ func TestABlastTakesTheBuildingAndWhatWasInIt(t *testing.T) {
 }
 
 func TestSomebodyIsUsuallyStandingThere(t *testing.T) {
+	t.Parallel()
 	const runs = 400
 	killed := 0
 	for seed := uint32(1); seed <= runs; seed++ {
@@ -161,6 +167,7 @@ func TestSomebodyIsUsuallyStandingThere(t *testing.T) {
 }
 
 func TestTheCityUsesTheSameThingThePlayerDoes(t *testing.T) {
+	t.Parallel()
 	const runs, days = 300, 60
 	bombed, atWar := 0, 0
 	for seed := uint32(1); seed <= runs; seed++ {
@@ -192,6 +199,7 @@ func TestTheCityUsesTheSameThingThePlayerDoes(t *testing.T) {
 }
 
 func TestAnOrganizationThatHatesYouEnoughComesForYourBusiness(t *testing.T) {
+	t.Parallel()
 	const runs, days = 300, 60
 	hit := 0
 	for seed := uint32(1); seed <= runs; seed++ {

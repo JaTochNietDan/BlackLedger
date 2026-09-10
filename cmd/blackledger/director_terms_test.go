@@ -11,6 +11,7 @@ import (
 )
 
 func TestSpokenTermsKeepGeneratedDialogueConsistentWithChoiceDetails(t *testing.T) {
+	t.Parallel()
 	for _, text := range []string{
 		"Collect $25 from the mechanic; leave it before noon.", "Collect twenty-five dollars.", "Bring USD 25.", "Pay a hundred bucks.", "A €50 favor.",
 		"Finish in fifteen minutes.", "Take 2 hours.", "Wait one-day for a response.",

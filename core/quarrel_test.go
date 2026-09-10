@@ -21,6 +21,7 @@ func headlinesOfKind(w *World, kind string) []string {
 }
 
 func TestTwoWarsAreTwoDifferentHeadlines(t *testing.T) {
+	t.Parallel()
 	w := New(121)
 	a := &w.Factions[0]
 	b := &w.Factions[1]
@@ -36,6 +37,7 @@ func TestTwoWarsAreTwoDifferentHeadlines(t *testing.T) {
 }
 
 func TestAWarThatFinishedSomebodyReadsDifferently(t *testing.T) {
+	t.Parallel()
 	w := New(122)
 	a, b := &w.Factions[0], &w.Factions[1]
 
@@ -78,6 +80,7 @@ func TestAWarThatFinishedSomebodyReadsDifferently(t *testing.T) {
 }
 
 func TestTheEndOfAWarIsQuieterThanTheStart(t *testing.T) {
+	t.Parallel()
 	// The paper says a war has started loudly and says it is over calmly. If
 	// the ending carried the same weight, a city would look hardest at the
 	// moment the shooting stopped.
@@ -92,6 +95,7 @@ func TestTheEndOfAWarIsQuieterThanTheStart(t *testing.T) {
 }
 
 func TestAWarCoolingIntoAFeudIsReportedAsTheFightingStopping(t *testing.T) {
+	t.Parallel()
 	// A war does not only end by going cold. It usually decays into a feud
 	// first, and the first version of this printed "bad blood between them" on
 	// the day the shooting stopped — the wrong story at the wrong moment. Only

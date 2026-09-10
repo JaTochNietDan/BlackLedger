@@ -13,6 +13,7 @@ import "testing"
 // walking out of the room ends it.
 
 func TestTheBackRoomIsASeatLikeAnyOther(t *testing.T) {
+	t.Parallel()
 	w, _ := backroom(t)
 	if !Playable(BackRoom) {
 		t.Fatal("there is a card game behind the poolhall and nothing to sit down to")
@@ -35,6 +36,7 @@ func TestTheBackRoomIsASeatLikeAnyOther(t *testing.T) {
 }
 
 func TestYouCannotWalkOutOnMoneyYouHavePutIn(t *testing.T) {
+	t.Parallel()
 	w, _ := backroom(t)
 	if err := w.Sit(BackRoom); err != nil {
 		t.Fatal(err)
@@ -63,6 +65,7 @@ func TestYouCannotWalkOutOnMoneyYouHavePutIn(t *testing.T) {
 }
 
 func TestWalkingOutOfThePoolhallEndsTheSitting(t *testing.T) {
+	t.Parallel()
 	w, _ := backroom(t)
 	if err := w.Sit(BackRoom); err != nil {
 		t.Fatal(err)
@@ -77,6 +80,7 @@ func TestWalkingOutOfThePoolhallEndsTheSitting(t *testing.T) {
 // The seat is offered where the game is, and getting up is offered once you
 // have taken it.
 func TestTheSeatIsOfferedInTheBackRoom(t *testing.T) {
+	t.Parallel()
 	w, _ := backroom(t)
 	find := func(id string) *Action {
 		for _, a := range w.Actions(w.Player.Location) {

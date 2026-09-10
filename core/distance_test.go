@@ -11,6 +11,7 @@ import (
 // they were going.
 
 func TestEveryAddressSaysHowFarItIs(t *testing.T) {
+	t.Parallel()
 	w := proprietor(t)
 	w.District = 2
 	w.Player.Location = "bar"
@@ -36,6 +37,7 @@ func TestEveryAddressSaysHowFarItIs(t *testing.T) {
 }
 
 func TestDrivingIsNeverSlowerThanWalking(t *testing.T) {
+	t.Parallel()
 	w := proprietor(t)
 	w.District = 2
 	w.Player.Location = "room"
@@ -74,6 +76,7 @@ func TestDrivingIsNeverSlowerThanWalking(t *testing.T) {
 }
 
 func TestDistanceFollowsWhereYouAreStanding(t *testing.T) {
+	t.Parallel()
 	w := proprietor(t)
 	w.District = 2
 	w.Player.Location = "room"

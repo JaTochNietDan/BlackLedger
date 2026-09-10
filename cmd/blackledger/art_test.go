@@ -29,6 +29,7 @@ func artFile(t *testing.T, candidates ...string) bool {
 }
 
 func TestEveryAddressInTheCityHasAPicture(t *testing.T) {
+	t.Parallel()
 	root := "../.."
 	if _, err := os.Stat(filepath.Join(root, "public", "art")); err != nil {
 		t.Skip("no art tree beside this build")
@@ -74,6 +75,7 @@ func TestEveryAddressInTheCityHasAPicture(t *testing.T) {
 }
 
 func TestEveryAddressHasAnInsideToStandIn(t *testing.T) {
+	t.Parallel()
 	root := "../.."
 	if _, err := os.Stat(filepath.Join(root, "public", "art", "rooms")); err != nil {
 		t.Skip("no room art beside this build")
@@ -90,6 +92,7 @@ func TestEveryAddressHasAnInsideToStandIn(t *testing.T) {
 }
 
 func TestEveryMomentTheTheatreCanPlayHasAPlate(t *testing.T) {
+	t.Parallel()
 	root := "../.."
 	if _, err := os.Stat(filepath.Join(root, "public", "art", "scenes")); err != nil {
 		t.Skip("no scene art beside this build")
@@ -117,6 +120,7 @@ func TestEveryMomentTheTheatreCanPlayHasAPlate(t *testing.T) {
 // caught the hook below an early return. They fail if the theatre goes back to
 // covering the city, or if the street stops being able to spotlight one address.
 func TestTheCameraGoesToTheBuildingRatherThanOverTheCity(t *testing.T) {
+	t.Parallel()
 	css := rawSource(t, "src/style.css")
 	rule := regexp.MustCompile(`\.theatre\{[^}]*\}`)
 	found := rule.FindString(css)
@@ -140,6 +144,7 @@ func TestTheCameraGoesToTheBuildingRatherThanOverTheCity(t *testing.T) {
 // supposedly walking through. The last piece of the living city is seeing them
 // on it — placed between the two fronts according to how far along they are.
 func TestWalkersAreDrawnOnTheStreetAndNotOnlyListed(t *testing.T) {
+	t.Parallel()
 	street := source(t, "src/CityStreet.tsx")
 	body := street
 	for _, want := range []string{"walker-figure", "getBoundingClientRect", "progress"} {
@@ -167,6 +172,7 @@ func TestWalkersAreDrawnOnTheStreetAndNotOnlyListed(t *testing.T) {
 // bottom of the room, the addresses and the band that says where something
 // happened all ran below the fold and could not be reached at all.
 func TestEveryColumnInsideTheWorkspaceCanBeScrolled(t *testing.T) {
+	t.Parallel()
 	css := rawSource(t, "src/style.css")
 	sheet := css
 	if !regexp.MustCompile(`\.workspace\{[^}]*overflow:hidden`).MatchString(sheet) {
@@ -196,6 +202,7 @@ func TestEveryColumnInsideTheWorkspaceCanBeScrolled(t *testing.T) {
 // width of a receipt. Below the picture it has the whole width, and the cards
 // lay out across it instead of down it.
 func TestTheWorkInARoomSitsUnderThePictureAndAcross(t *testing.T) {
+	t.Parallel()
 	css := rawSource(t, "src/style.css")
 	sheet := css
 	stage := regexp.MustCompile(`\.interior-stage\{[^}]*\}`).FindString(sheet)
@@ -233,6 +240,7 @@ func TestTheWorkInARoomSitsUnderThePictureAndAcross(t *testing.T) {
 // And the column beside the map stops repeating the room. Two copies of the
 // same twenty-six cards is how the list got long enough to complain about.
 func TestTheColumnBesideTheMapDoesNotRepeatTheRoom(t *testing.T) {
+	t.Parallel()
 	source := source(t, "src/main.tsx")
 	main := source
 	if !holds(main, "here-instead") {
@@ -249,6 +257,7 @@ func TestTheColumnBesideTheMapDoesNotRepeatTheRoom(t *testing.T) {
 // beside it, and the two grids in a section (what you can do, and what you
 // cannot) settled on two different heights. Every card in a room is one size.
 func TestEveryActionCardInARoomIsTheSameSize(t *testing.T) {
+	t.Parallel()
 	css := rawSource(t, "src/style.css")
 	sheet := css
 	grid := regexp.MustCompile(`\.actions\.compact\{[^}]*\}`).FindString(sheet)
@@ -277,6 +286,7 @@ func TestEveryActionCardInARoomIsTheSameSize(t *testing.T) {
 // removes work from the room panel without giving it somewhere else to be is
 // how a button disappears.
 func TestPlayerWorkHasSomewhereToBe(t *testing.T) {
+	t.Parallel()
 	source := source(t, "src/main.tsx")
 	main := source
 	for _, home := range []string{
@@ -300,6 +310,7 @@ func TestPlayerWorkHasSomewhereToBe(t *testing.T) {
 // so and offered nothing. A name you can deal with now carries the work on its
 // own card, and a name you cannot carries the address they are standing at.
 func TestANameYouKnowCanBeDealtWithOrFound(t *testing.T) {
+	t.Parallel()
 	screen := source(t, "src/PeopleScreen.tsx")
 	s := screen
 	if !strings.Contains(s, "a.subject === who.id") {
@@ -322,6 +333,7 @@ func TestANameYouKnowCanBeDealtWithOrFound(t *testing.T) {
 // and the felt only arranges what it was told. Camera shake and noise elsewhere
 // are presentation; a number on a table is a fact.
 func TestNothingThatDrawsAGameRollsForAnything(t *testing.T) {
+	t.Parallel()
 	for _, name := range []string{"Tables.tsx", "Casino.tsx", "cards.ts"} {
 		drawn := source(t, "src/"+name)
 		if holds(drawn, "Math.random") {
@@ -350,6 +362,7 @@ func TestNothingThatDrawsAGameRollsForAnything(t *testing.T) {
 // ball in the pocket: on a frozen clock it never finishes and holds its first
 // frame for ever, which is a ball that never lands.
 func TestTheBallsRestingPlaceDoesNotDependOnAnimation(t *testing.T) {
+	t.Parallel()
 	tables := source(t, "src/Tables.tsx")
 	s := tables
 	if !strings.Contains(s, "el.style.transform = to;") {
@@ -387,6 +400,7 @@ func TestTheBallsRestingPlaceDoesNotDependOnAnimation(t *testing.T) {
 // exactly what happened the first time a chip was laid in the flow of a line
 // rather than pinned to the corner of a cell.
 func TestTheChipsRingCannotEscapeTheChip(t *testing.T) {
+	t.Parallel()
 	css := rawSource(t, "src/style.css")
 	sheet := css
 	chip := regexp.MustCompile(`\n\.chip\{[^}]*\}`).FindString(sheet)
@@ -411,6 +425,7 @@ func TestTheChipsRingCannotEscapeTheChip(t *testing.T) {
 // go into and come out of, never a panel drawn beside the staffing figures and
 // the supply count.
 func TestEveryGameGetsAScreenOfItsOwn(t *testing.T) {
+	t.Parallel()
 	main := source(t, "src/main.tsx")
 	// Both takeovers hang off the same fact — the player has taken a seat the
 	// world knows about — and both are dismissed by getting up.
@@ -445,6 +460,7 @@ func TestEveryGameGetsAScreenOfItsOwn(t *testing.T) {
 // last one came down. The rule now is the brief's own: the resting state is
 // correct without animation, and the blur is the only thing the animation does.
 func TestADrumIsAlreadyShowingWhereItWillStop(t *testing.T) {
+	t.Parallel()
 	tables := source(t, "src/Tables.tsx")
 	if !holds(tables, "drumFaces(strip, line, !!machine.pulled)") {
 		t.Error("the case works out its own faces again instead of asking where the drums land")
@@ -469,6 +485,7 @@ func TestADrumIsAlreadyShowingWhereItWillStop(t *testing.T) {
 // you cannot do yet" and started closed. They start open. The toggle stays,
 // because a way to tidy a long list is not the same thing as a wall.
 func TestNothingYouCannotDoYetIsHiddenByDefault(t *testing.T) {
+	t.Parallel()
 	list := source(t, "src/ActionList.tsx")
 	if !holds(list, "const [open, setOpen] = useState(true)") {
 		t.Error("the work you cannot do with somebody standing here is folded away again")
@@ -493,6 +510,7 @@ func TestNothingYouCannotDoYetIsHiddenByDefault(t *testing.T) {
 // is row one now, and the three explicit rows moved down to make space. This
 // guard is about the placement, because that is the whole of what went wrong.
 func TestTheRoomSaysWhereYouAreAtTheTopOfIt(t *testing.T) {
+	t.Parallel()
 	css := rawSource(t, "src/style.css")
 	for _, rule := range []string{
 		".room-holder{grid-column:1;grid-row:1",

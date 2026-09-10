@@ -12,6 +12,7 @@ import "testing"
 // What a business is worth as a front is a fact about the trade.
 
 func TestWhatABusinessHidesDependsOnWhatTradeItIs(t *testing.T) {
+	t.Parallel()
 	seen := map[int]string{}
 	for kind, trade := range trades {
 		if trade.Cover <= 0 {
@@ -37,6 +38,7 @@ func TestWhatABusinessHidesDependsOnWhatTradeItIs(t *testing.T) {
 // And the room's own books have to be the ones doing it. Two businesses of
 // different kinds, in the same condition, must not absorb the same attention.
 func TestTwoDifferentBusinessesDoNotLaunderAlike(t *testing.T) {
+	t.Parallel()
 	w := New(53)
 	w.District = 2
 	w.Player.Cash, w.Player.Respect, w.Player.Heat = 40000, 200, 60
@@ -54,6 +56,7 @@ func TestTwoDifferentBusinessesDoNotLaunderAlike(t *testing.T) {
 // A casino is a cash business and could not launder at all, because the gate
 // asked what kind of ROOM it was. It asks what trade is run there now.
 func TestACasinoCanPutMoneyThroughItsOwnBooks(t *testing.T) {
+	t.Parallel()
 	w := New(53)
 	w.District = 2
 	w.Player.Cash, w.Player.Respect, w.Player.Heat = 40000, 200, 40
@@ -73,6 +76,7 @@ func TestACasinoCanPutMoneyThroughItsOwnBooks(t *testing.T) {
 // by what the room looks like: the player would be refused something the rules
 // say they may do, and never see why.
 func TestTheButtonIsOfferedWhereverTheTradeAllowsIt(t *testing.T) {
+	t.Parallel()
 	for _, l := range Locations {
 		trade, runs := TradeOf(l.ID)
 		w := New(53)

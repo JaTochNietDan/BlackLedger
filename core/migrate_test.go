@@ -32,6 +32,7 @@ func legacyWorld() *World {
 }
 
 func TestMigrationNeverTakesPropertyThatIsHeld(t *testing.T) {
+	t.Parallel()
 	w := legacyWorld()
 	w.MigrateLivingWorld()
 	if !w.Own("estate") {
@@ -45,6 +46,7 @@ func TestMigrationNeverTakesPropertyThatIsHeld(t *testing.T) {
 }
 
 func TestMigrationGivesEveryOrganizationSomethingToLose(t *testing.T) {
+	t.Parallel()
 	w := legacyWorld()
 	w.MigrateLivingWorld()
 	for _, f := range w.Factions {
@@ -64,6 +66,7 @@ func TestMigrationGivesEveryOrganizationSomethingToLose(t *testing.T) {
 }
 
 func TestMigrationGivesOrganizationsPeople(t *testing.T) {
+	t.Parallel()
 	w := legacyWorld()
 	w.MigrateLivingWorld()
 	for _, f := range w.Factions {
@@ -87,6 +90,7 @@ func TestMigrationGivesOrganizationsPeople(t *testing.T) {
 }
 
 func TestMigrationIsIdempotent(t *testing.T) {
+	t.Parallel()
 	once := legacyWorld()
 	once.MigrateLivingWorld()
 	twice := legacyWorld()
@@ -106,6 +110,7 @@ func TestMigrationIsIdempotent(t *testing.T) {
 }
 
 func TestMigrationDoesNotChargeOrAdvanceThePlayer(t *testing.T) {
+	t.Parallel()
 	w := legacyWorld()
 	cash, minute, respect, revision := w.Player.Cash, w.Minute, w.Player.Respect, w.Revision
 	w.MigrateLivingWorld()
@@ -115,6 +120,7 @@ func TestMigrationDoesNotChargeOrAdvanceThePlayer(t *testing.T) {
 }
 
 func TestAMigratedCampaignCanActuallyFightAWar(t *testing.T) {
+	t.Parallel()
 	// Measured across seeds rather than one: a single campaign may legitimately
 	// stalemate, and tying the assertion to one random stream makes the test
 	// fail whenever an unrelated system draws from it.

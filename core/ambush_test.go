@@ -48,6 +48,7 @@ func hit(w *World) Plot {
 }
 
 func TestAHitFindsYouWhereYouAre(t *testing.T) {
+	t.Parallel()
 	const runs = 200
 	untouched := 0
 	for seed := uint32(1); seed <= runs; seed++ {
@@ -69,6 +70,7 @@ func TestAHitFindsYouWhereYouAre(t *testing.T) {
 }
 
 func TestACrowdedRoomIsNotAnEmptyStreet(t *testing.T) {
+	t.Parallel()
 	const runs = 400
 	// Deliberately below the number of people it takes for the room to warn
 	// you. A scene raised is a player still standing, so counting survivors of
@@ -119,6 +121,7 @@ func TestACrowdedRoomIsNotAnEmptyStreet(t *testing.T) {
 }
 
 func TestABusyRoomSeesThemComing(t *testing.T) {
+	t.Parallel()
 	w := marked(7)
 	w.Player.Location = "bar"
 	clearRoom(w, "bar")
@@ -132,6 +135,7 @@ func TestABusyRoomSeesThemComing(t *testing.T) {
 }
 
 func TestYouStillGetTheChoiceAwayFromHome(t *testing.T) {
+	t.Parallel()
 	w := marked(3)
 	w.Player.Location, w.Player.Contacts = "bar", 3
 	w.Player.Security = 2
@@ -158,6 +162,7 @@ func TestYouStillGetTheChoiceAwayFromHome(t *testing.T) {
 }
 
 func TestTheyTakeItOutOnTheHouseOnlyWhenTheyCannotReachYou(t *testing.T) {
+	t.Parallel()
 	w := marked(11)
 	w.Player.HeldUntil = w.Minute + 2*1440
 	w.Player.Location = "precinct"

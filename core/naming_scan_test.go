@@ -72,6 +72,7 @@ func withFamily(seed uint32, id, name, leader string) *World {
 
 // A name that carries "the " must not begin a sentence in lower case.
 func TestNoSentenceBeginsWithALowerCaseArticle(t *testing.T) {
+	t.Parallel()
 	// Several cities, because one run's luck is not evidence: a sentence only
 	// gets written when the world happens to do the thing that writes it.
 	total := 0
@@ -100,6 +101,7 @@ func TestNoSentenceBeginsWithALowerCaseArticle(t *testing.T) {
 
 // A name ending in s takes one possessive form, consistently.
 func TestAPossessiveOnANameEndingInSIsSpelledOneWay(t *testing.T) {
+	t.Parallel()
 	w := withFamily(33, "estate:reiss", "Otto Reiss's people", "Otto Reiss")
 	live(t, w, 4000)
 	apostropheOnly, withS, found := 0, 0, 0
@@ -123,6 +125,7 @@ func TestAPossessiveOnANameEndingInSIsSpelledOneWay(t *testing.T) {
 
 // And the player's own organization, which appears in prose a rival's does not.
 func TestThePlayersOwnOrganizationReadsInEverySentence(t *testing.T) {
+	t.Parallel()
 	w := New(37)
 	w.District = 2
 	w.Player.Cash = 8000

@@ -12,6 +12,7 @@ import (
 // on the road.
 
 func TestStrippingACarGoesThroughTheRestOfTheRow(t *testing.T) {
+	t.Parallel()
 	w, mark := stripper(t)
 	// Somebody else parked in the same street who is not the one being taken.
 	var other *NPC
@@ -40,6 +41,7 @@ func TestStrippingACarGoesThroughTheRestOfTheRow(t *testing.T) {
 
 // The money side. A broken car is a bill, and somebody in this city is paid it.
 func TestABrokenCarPutsWorkAndMoneyThroughAGarage(t *testing.T) {
+	t.Parallel()
 	w := New(61)
 	w.Properties["garage"].Owner = "player:1"
 	var mark *NPC
@@ -77,6 +79,7 @@ func TestABrokenCarPutsWorkAndMoneyThroughAGarage(t *testing.T) {
 // And the link running the other way: a garage in a city with no money in it
 // has the same crimes and less work, because the work goes unpaid for.
 func TestSomebodyWhoCannotFindTheFeeKeepsDrivingItBroken(t *testing.T) {
+	t.Parallel()
 	w := New(61)
 	w.Properties["garage"].Owner = "player:1"
 	var mark *NPC
@@ -108,6 +111,7 @@ func TestSomebodyWhoCannotFindTheFeeKeepsDrivingItBroken(t *testing.T) {
 // Same scaffold as the burning test, and the same rule: follow named people who
 // are alive at both ends, because the dead leave the member list.
 func TestARaidLeavesCarsNeedingWork(t *testing.T) {
+	t.Parallel()
 	broken, watched := 0, 0
 	for _, seed := range []uint32{11, 41, 77, 109, 233, 311} {
 		w := New(seed)
@@ -161,6 +165,7 @@ func TestARaidLeavesCarsNeedingWork(t *testing.T) {
 // in now, so the bench has people at it who are there for a reason — and that
 // is a room the player can walk into and meet somebody.
 func TestABrokenCarTakesItsOwnerToTheGarage(t *testing.T) {
+	t.Parallel()
 	w := New(61)
 	w.District = 2
 	var mark *NPC
@@ -186,6 +191,7 @@ func TestABrokenCarTakesItsOwnerToTheGarage(t *testing.T) {
 
 // And the money only moves when they are actually standing at the bench.
 func TestNobodyIsBilledForWorkTheyNeverBroughtIn(t *testing.T) {
+	t.Parallel()
 	w := New(61)
 	w.Properties["garage"].Owner = "player:1"
 	var mark *NPC
@@ -221,6 +227,7 @@ func TestNobodyIsBilledForWorkTheyNeverBroughtIn(t *testing.T) {
 // bench nobody visits is a number in a ledger; a bench with somebody at it is a
 // room worth walking into.
 func TestAGarageHasPeopleInItOnAnOrdinaryDay(t *testing.T) {
+	t.Parallel()
 	visits, cities := 0, 0
 	for _, seed := range []uint32{5, 23, 61, 97, 181} {
 		w := New(seed)
@@ -258,6 +265,7 @@ func TestAGarageHasPeopleInItOnAnOrdinaryDay(t *testing.T) {
 // reads as holding court unless somebody says otherwise, and what he is
 // actually doing is waiting on a windscreen.
 func TestTheRoomSaysWhyTheyAreAtTheBench(t *testing.T) {
+	t.Parallel()
 	w := New(61)
 	w.District = 2
 	var mark *NPC

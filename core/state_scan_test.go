@@ -70,6 +70,7 @@ func scan(t *testing.T, w *World, what string) int {
 
 // A family that holds nothing, and one with nobody left to hold it.
 func TestACityWithHollowedOutFamiliesStillReads(t *testing.T) {
+	t.Parallel()
 	read := 0
 	for _, seed := range []uint32{31, 47, 88, 103, 219} {
 		w := withFamily(seed, "estate:hollow", "Vera Kohl's people", "Vera Kohl")
@@ -96,6 +97,7 @@ func TestACityWithHollowedOutFamiliesStillReads(t *testing.T) {
 
 // One organization left standing in the whole city.
 func TestACityDownToOneOrganizationStillReads(t *testing.T) {
+	t.Parallel()
 	read := 0
 	for _, seed := range []uint32{31, 88, 219} {
 		w := withFamily(seed, "estate:last", "Bruno Duarte's people", "Bruno Duarte")
@@ -113,6 +115,7 @@ func TestACityDownToOneOrganizationStillReads(t *testing.T) {
 // A player with nothing at all, which is where every life begins and where a
 // bad one ends.
 func TestAPlayerWithNothingStillReads(t *testing.T) {
+	t.Parallel()
 	read := 0
 	for _, seed := range []uint32{31, 88, 219} {
 		w := New(seed)
@@ -128,6 +131,7 @@ func TestAPlayerWithNothingStillReads(t *testing.T) {
 // Five times longer than anything measured before: does the city repeat itself,
 // run out of names, or degrade?
 func TestALongCityDoesNotRepeatItself(t *testing.T) {
+	t.Parallel()
 	w := withFamily(59, "estate:long", "Otto Reiss's people", "Otto Reiss")
 	live(t, w, 20000)
 	read := scan(t, w, "20000 half-hours")

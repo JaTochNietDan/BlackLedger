@@ -7,6 +7,7 @@ import "testing"
 // a shop selling something no vehicle in this city consumed.
 
 func TestACarBurnsWhatItIsDriven(t *testing.T) {
+	t.Parallel()
 	w := New(31)
 	w.District = 2
 	w.Player.Cash, w.Player.Respect, w.Player.Health = 4000, 40, 100
@@ -36,6 +37,7 @@ func TestACarBurnsWhatItIsDriven(t *testing.T) {
 // Somebody who never had a tank filled gets one; somebody who ran theirs dry
 // does not get it back for free by reloading the game.
 func TestSettlingFuelCannotRefillATankSomebodyEmptied(t *testing.T) {
+	t.Parallel()
 	w := New(31)
 	w.Player.Car = 1
 	w.SettleFuel()
@@ -50,6 +52,7 @@ func TestSettlingFuelCannotRefillATankSomebodyEmptied(t *testing.T) {
 }
 
 func TestTheCityHasSomewhereToBuyPetrol(t *testing.T) {
+	t.Parallel()
 	stations := 0
 	for _, l := range Locations {
 		if l.Kind == "filling" {
@@ -68,6 +71,7 @@ func TestTheCityHasSomewhereToBuyPetrol(t *testing.T) {
 }
 
 func TestFillingUpCostsMoneyAndFillsTheTank(t *testing.T) {
+	t.Parallel()
 	w := New(31)
 	w.District = 2
 	w.Player.Cash, w.Player.Respect, w.Player.Health = 4000, 40, 100
@@ -111,6 +115,7 @@ func TestFillingUpCostsMoneyAndFillsTheTank(t *testing.T) {
 // The link that makes it a business: the city's own drivers run dry and go and
 // buy a tank, and the money lands with whoever holds the station.
 func TestTheCitysDriversBuyTheirPetrolSomewhere(t *testing.T) {
+	t.Parallel()
 	standing, sold, cities := 0, 0, 0
 	for _, seed := range []uint32{7, 29, 53, 101, 199} {
 		w := New(seed)

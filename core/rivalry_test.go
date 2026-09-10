@@ -17,6 +17,7 @@ func readyAttacker(t *testing.T) *World {
 }
 
 func TestFamiliesHoldPropertyBothSidesCanLose(t *testing.T) {
+	t.Parallel()
 	w := New(1)
 	bellandi := w.FamilyHoldings("bellandi")
 	russo := w.FamilyHoldings("russo")
@@ -39,6 +40,7 @@ func TestFamiliesHoldPropertyBothSidesCanLose(t *testing.T) {
 }
 
 func TestSabotageRequirementsAreStatedBeforeTheyAreEnforced(t *testing.T) {
+	t.Parallel()
 	w := New(2)
 	w.Player.Location = "club"
 	if w.SabotageReadiness("club") == "" {
@@ -69,6 +71,7 @@ func TestSabotageRequirementsAreStatedBeforeTheyAreEnforced(t *testing.T) {
 }
 
 func TestSuccessfulSabotageCostsTheFamilyRealStanding(t *testing.T) {
+	t.Parallel()
 	w := readyAttacker(t)
 	before := *w.faction("bellandi")
 	condition := w.Properties["club"].Condition
@@ -115,6 +118,7 @@ func TestSuccessfulSabotageCostsTheFamilyRealStanding(t *testing.T) {
 }
 
 func TestFailedSabotageInjuresWithoutDamagingTheHolding(t *testing.T) {
+	t.Parallel()
 	var w *World
 	for tries := 0; tries < 400; tries++ {
 		probe := readyAttacker(t)
@@ -155,6 +159,7 @@ func TestFailedSabotageInjuresWithoutDamagingTheHolding(t *testing.T) {
 }
 
 func TestFamiliesRebuildTheirHoldingsOverDays(t *testing.T) {
+	t.Parallel()
 	w := New(3)
 	f := w.faction("russo")
 	f.Peak = 58
@@ -183,6 +188,7 @@ func TestFamiliesRebuildTheirHoldingsOverDays(t *testing.T) {
 }
 
 func TestDamagedHoldingsEarnTheirFamilyLess(t *testing.T) {
+	t.Parallel()
 	whole, damaged := New(4), New(4)
 	holding := whole.FamilyHoldings("bellandi")[0]
 	damaged.Properties[holding].Condition = 40
@@ -195,6 +201,7 @@ func TestDamagedHoldingsEarnTheirFamilyLess(t *testing.T) {
 }
 
 func TestIncitingARivalryNeedsContactsAndStanding(t *testing.T) {
+	t.Parallel()
 	w := New(11)
 	w.Player.Location = "club"
 	if w.InciteReadiness("club") == "" {
@@ -218,6 +225,7 @@ func TestIncitingARivalryNeedsContactsAndStanding(t *testing.T) {
 }
 
 func TestSuccessfulIncitementHardensTheOtherQuarrel(t *testing.T) {
+	t.Parallel()
 	var w *World
 	for seed := 1; seed <= 200; seed++ {
 		probe := New(uint32(seed))
@@ -246,6 +254,7 @@ func TestSuccessfulIncitementHardensTheOtherQuarrel(t *testing.T) {
 }
 
 func TestOnlyVisibleQuarrelsAreReported(t *testing.T) {
+	t.Parallel()
 	w := New(12)
 	// Established families start uneasy but not yet newsworthy at war.
 	for _, c := range w.PublicConflicts() {
@@ -270,6 +279,7 @@ func TestOnlyVisibleQuarrelsAreReported(t *testing.T) {
 }
 
 func TestAnOrganizationHoldingNothingLosesItsStrength(t *testing.T) {
+	t.Parallel()
 	// Observed in a 1500-command campaign: Russo held nothing, had no income
 	// and no cash, and still sat at power 58, because a landless organization
 	// recovered toward the strength it had when it still owned property.
@@ -314,6 +324,7 @@ func TestAnOrganizationHoldingNothingLosesItsStrength(t *testing.T) {
 }
 
 func TestAnOrganizationWithPeopleCanFindSomewhereToStartAgain(t *testing.T) {
+	t.Parallel()
 	recovered := 0
 	for i := uint32(1); i <= 200; i++ {
 		w := New(i * 2654435761)
@@ -336,6 +347,7 @@ func TestAnOrganizationWithPeopleCanFindSomewhereToStartAgain(t *testing.T) {
 }
 
 func TestRecoveryNeverTakesWhatSomebodyHolds(t *testing.T) {
+	t.Parallel()
 	w := New(403)
 	w.Properties["laundry"].Owner = "player:1"
 	w.Properties["garage"].Owner = "former:Alex Varga"

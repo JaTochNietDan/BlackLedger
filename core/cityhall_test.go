@@ -14,6 +14,7 @@ func petitionerAtHall(t *testing.T) *World {
 }
 
 func TestThereIsSomebodyInThatBuilding(t *testing.T) {
+	t.Parallel()
 	w := petitionerAtHall(t)
 	for _, o := range Officials() {
 		n := w.NPC(o.ID)
@@ -38,6 +39,7 @@ func TestThereIsSomebodyInThatBuilding(t *testing.T) {
 }
 
 func TestArrangementsAreMadeAtTheExchangeAndNowhereElse(t *testing.T) {
+	t.Parallel()
 	w := petitionerAtHall(t)
 	if w.RetainerReadiness("mayor") != "" {
 		t.Fatal("could not reach the mayor:", w.RetainerReadiness("mayor"))
@@ -51,6 +53,7 @@ func TestArrangementsAreMadeAtTheExchangeAndNowhereElse(t *testing.T) {
 }
 
 func TestNobodyInThatBuildingIsSeenWithSomebodyTooHot(t *testing.T) {
+	t.Parallel()
 	w := petitionerAtHall(t)
 	o, _ := OfficialByID("mayor")
 	w.Player.Heat = o.Ceiling + 1
@@ -69,6 +72,7 @@ func TestNobodyInThatBuildingIsSeenWithSomebodyTooHot(t *testing.T) {
 }
 
 func TestACommissionerBuysRoomAndAMayorBuysMoney(t *testing.T) {
+	t.Parallel()
 	w := petitionerAtHall(t)
 	if w.RaidRelief() != 0 || w.LicenceTake() != 0 {
 		t.Fatal("somebody was getting the benefit without paying for it")
@@ -94,6 +98,7 @@ func TestACommissionerBuysRoomAndAMayorBuysMoney(t *testing.T) {
 }
 
 func TestSomebodyRicherCanOutbidYouWithoutSayingSo(t *testing.T) {
+	t.Parallel()
 	w := petitionerAtHall(t)
 	w.Retain("commissioner")
 	for i := range w.Factions {
@@ -120,6 +125,7 @@ func TestSomebodyRicherCanOutbidYouWithoutSayingSo(t *testing.T) {
 }
 
 func TestNobodyInThatBuildingGoesDownWithYou(t *testing.T) {
+	t.Parallel()
 	w := petitionerAtHall(t)
 	w.Retain("mayor")
 	o, _ := OfficialByID("mayor")
@@ -137,6 +143,7 @@ func TestNobodyInThatBuildingGoesDownWithYou(t *testing.T) {
 }
 
 func TestAnArrangementCanBeEndedAndCostsTheOpeningAgain(t *testing.T) {
+	t.Parallel()
 	w := petitionerAtHall(t)
 	o, _ := OfficialByID("commissioner")
 	cash := w.Player.Cash
@@ -157,6 +164,7 @@ func TestAnArrangementCanBeEndedAndCostsTheOpeningAgain(t *testing.T) {
 }
 
 func TestKillingAManWithATitleIsTheLoudestThingInTheCity(t *testing.T) {
+	t.Parallel()
 	w := petitionerAtHall(t)
 	w.Retain("commissioner")
 	heat := w.Player.Heat
@@ -183,6 +191,7 @@ func TestKillingAManWithATitleIsTheLoudestThingInTheCity(t *testing.T) {
 }
 
 func TestNobodyInheritsAnArrangement(t *testing.T) {
+	t.Parallel()
 	w := petitionerAtHall(t)
 	w.Retain("mayor")
 	w.Player.Alive = false
@@ -196,6 +205,7 @@ func TestNobodyInheritsAnArrangement(t *testing.T) {
 }
 
 func TestAnOlderSaveGetsAPeopleItNeverHad(t *testing.T) {
+	t.Parallel()
 	w := New(11)
 	w.NPCs = w.NPCs[:0]
 	w.MigrateLivingWorld()
@@ -210,6 +220,7 @@ func TestAnOlderSaveGetsAPeopleItNeverHad(t *testing.T) {
 }
 
 func TestALicenceIsWorthWhatItSays(t *testing.T) {
+	t.Parallel()
 	const days = 30
 	// Income is compared per elapsed minute rather than per campaign, because
 	// an encounter pauses the clock and the two runs do not stop in the same

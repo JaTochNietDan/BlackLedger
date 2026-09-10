@@ -24,6 +24,7 @@ func choice(t *testing.T, w **World, c string) {
 	*w = n
 }
 func TestReadingDoesNotAdvance(t *testing.T) {
+	t.Parallel()
 	w := New(27)
 	before, _ := json.Marshal(w)
 	for i := 0; i < 10; i++ {
@@ -35,6 +36,7 @@ func TestReadingDoesNotAdvance(t *testing.T) {
 	}
 }
 func TestTravel(t *testing.T) {
+	t.Parallel()
 	w := New(27)
 	act(t, &w, "travel", "bar")
 	if w.Player.Location != "bar" || w.Minute != 480+TravelMinutes("room", "bar") {
@@ -43,6 +45,7 @@ func TestTravel(t *testing.T) {
 }
 
 func TestPresentationRecordsSurviveHistoryRollover(t *testing.T) {
+	t.Parallel()
 	w := New(27)
 	// Distinct records: the ledger collapses the same thing happening twice in
 	// a day, so two hundred copies of one line no longer fill anything.
@@ -63,6 +66,7 @@ func TestPresentationRecordsSurviveHistoryRollover(t *testing.T) {
 	}
 }
 func TestUnavailableActions(t *testing.T) {
+	t.Parallel()
 	for _, c := range []Command{{Kind: "courier", Target: "bar"}, {Kind: "acquire", Target: "laundry"}, {Kind: "security", Target: "room"}, {Kind: "new_life"}} {
 		w := New(27)
 		_, e := Execute(w, c)
@@ -72,6 +76,7 @@ func TestUnavailableActions(t *testing.T) {
 	}
 }
 func TestEarlyProgression(t *testing.T) {
+	t.Parallel()
 	w := New(27)
 	act(t, &w, "travel", "bar")
 	for i := 0; i < 3; i++ {
@@ -92,6 +97,7 @@ func TestEarlyProgression(t *testing.T) {
 	}
 }
 func TestHiddenHit(t *testing.T) {
+	t.Parallel()
 	w := New(27)
 	act(t, &w, "travel", "club")
 	act(t, &w, "provoke", "club")
@@ -104,6 +110,7 @@ func TestHiddenHit(t *testing.T) {
 	}
 }
 func TestWarningAndInterruption(t *testing.T) {
+	t.Parallel()
 	w := New(27)
 	w.Player.Contacts = 2
 	w.Retaliation()
@@ -130,6 +137,7 @@ func TestWarningAndInterruption(t *testing.T) {
 // settle for when they were told where to find you and you were not there,
 // which TestWarningAllowsLeavingBeforeHit still guards.
 func TestAbsentPlayer(t *testing.T) {
+	t.Parallel()
 	w := New(27)
 	w.Player.Location = "bar"
 	condition := w.Properties["room"].Condition
@@ -143,6 +151,7 @@ func TestAbsentPlayer(t *testing.T) {
 	}
 }
 func TestTribute(t *testing.T) {
+	t.Parallel()
 	w := New(27)
 	w.Player.Cash = 300
 	act(t, &w, "travel", "club")
@@ -154,6 +163,7 @@ func TestTribute(t *testing.T) {
 	}
 }
 func TestStaleChoice(t *testing.T) {
+	t.Parallel()
 	w := New(27)
 	act(t, &w, "travel", "club")
 	act(t, &w, "audience", "club")
@@ -163,6 +173,7 @@ func TestStaleChoice(t *testing.T) {
 	}
 }
 func TestSecurityMatters(t *testing.T) {
+	t.Parallel()
 	for _, g := range []int{0, 3} {
 		w := New(50)
 		w.Player.Security = g
@@ -178,6 +189,7 @@ func TestSecurityMatters(t *testing.T) {
 	}
 }
 func TestDeathAndNewLife(t *testing.T) {
+	t.Parallel()
 	w := New(27)
 	id := w.ID
 	w.Properties["laundry"].Owner = "player:1"
@@ -188,6 +200,7 @@ func TestDeathAndNewLife(t *testing.T) {
 	}
 }
 func TestDelegate(t *testing.T) {
+	t.Parallel()
 	w := New(27)
 	w.Player.Crew = []Crew{{"leo", "Leo", 65}}
 	act(t, &w, "delegate", "room")
@@ -202,6 +215,7 @@ func TestDelegate(t *testing.T) {
 	}
 }
 func TestBills(t *testing.T) {
+	t.Parallel()
 	w := New(27)
 	w.Minute = 1439
 	w.Advance(1)
@@ -210,6 +224,7 @@ func TestBills(t *testing.T) {
 	}
 }
 func TestValidation(t *testing.T) {
+	t.Parallel()
 	w := New(27)
 	for _, p := range []Proposal{{}, {Speaker: "unknown"}, {Speaker: "mara", Operation: "kill_player"}} {
 		if _, e := w.ValidateProposal(p); e == nil {
@@ -230,6 +245,7 @@ func TestValidation(t *testing.T) {
 	}
 }
 func TestInterruptedRestNoFreeHealing(t *testing.T) {
+	t.Parallel()
 	w := New(27)
 	w.Player.Health = 25
 	w.Player.Security = 1
@@ -241,6 +257,7 @@ func TestInterruptedRestNoFreeHealing(t *testing.T) {
 	}
 }
 func TestInspectNotInfiniteRespect(t *testing.T) {
+	t.Parallel()
 	w := New(27)
 	w.Player.Location = "laundry"
 	w.Properties["laundry"].Owner = "player:1"
@@ -258,6 +275,7 @@ func BenchmarkAdvanceCityDay(b *testing.B) {
 }
 
 func TestScheduledIncomeExact(t *testing.T) {
+	t.Parallel()
 	w := New(27)
 	w.Properties["laundry"].Owner = "player:1"
 	// What a room takes now depends on who is standing in it, and this test is
@@ -273,6 +291,7 @@ func TestScheduledIncomeExact(t *testing.T) {
 	}
 }
 func TestScheduleStopsBeforePostAttackTask(t *testing.T) {
+	t.Parallel()
 	w := New(27)
 	w.Player.Security = 1
 	w.Retaliation()
@@ -284,6 +303,7 @@ func TestScheduleStopsBeforePostAttackTask(t *testing.T) {
 }
 
 func TestNewPersonDoesNotInheritRelationshipsOrPendingDirector(t *testing.T) {
+	t.Parallel()
 	w := New(27)
 	w.NPCs[0].Trust = 85
 	name := w.NPCs[0].Name
@@ -296,6 +316,7 @@ func TestNewPersonDoesNotInheritRelationshipsOrPendingDirector(t *testing.T) {
 }
 
 func TestDirectorCannotInventMechanicalCompletion(t *testing.T) {
+	t.Parallel()
 	w := New(27)
 	scene, err := w.ValidateProposal(Proposal{"", "A payment", "Please collect this payment.", "mara", "collection", "The rival is killed and you own his casino.", "", nil})
 	if err != nil {
@@ -310,6 +331,7 @@ func TestDirectorCannotInventMechanicalCompletion(t *testing.T) {
 }
 
 func TestInjuryReducesAttackSurvival(t *testing.T) {
+	t.Parallel()
 	survived := func(health int) int {
 		n := 0
 		for seed := uint32(1); seed < 1000; seed++ {
@@ -333,6 +355,7 @@ func TestInjuryReducesAttackSurvival(t *testing.T) {
 }
 
 func TestWarningAllowsLeavingBeforeHit(t *testing.T) {
+	t.Parallel()
 	w := New(27)
 	w.Player.Contacts = 2
 	w.Player.Health = 60
@@ -353,6 +376,7 @@ func TestWarningAllowsLeavingBeforeHit(t *testing.T) {
 }
 
 func TestCrewLoyaltyRefusalAndBonus(t *testing.T) {
+	t.Parallel()
 	w := New(27)
 	w.Player.Crew = []Crew{{"leo", "Leo", 29}}
 	before, _ := json.Marshal(w)
@@ -375,6 +399,7 @@ func TestCrewLoyaltyRefusalAndBonus(t *testing.T) {
 }
 
 func TestCrewBonusLimits(t *testing.T) {
+	t.Parallel()
 	for _, tc := range []struct {
 		cash, loyalty int
 		allowed       bool
@@ -393,6 +418,7 @@ func TestCrewBonusLimits(t *testing.T) {
 }
 
 func TestMissedWagesCauseRefusal(t *testing.T) {
+	t.Parallel()
 	w := New(27)
 	w.Minute = 1439
 	w.Player.Cash = 0

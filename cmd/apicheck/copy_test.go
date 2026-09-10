@@ -13,6 +13,7 @@ import (
 // ignored, and an ignored check is worse than none.
 
 func TestThePluralSubjectRuleKnowsWhatTheSubjectIs(t *testing.T) {
+	t.Parallel()
 	faults := []string{
 		"Franca Sabbatini's people has people asking where you sleep.",
 		"They were a soldier a week ago. Franca Sabbatini's people is short of people.",
@@ -40,6 +41,7 @@ func TestThePluralSubjectRuleKnowsWhatTheSubjectIs(t *testing.T) {
 }
 
 func TestTheCountRuleCountsToOne(t *testing.T) {
+	t.Parallel()
 	faults := []string{
 		"Whatever was arranged for you happened 1 times to a locked door.",
 		"$320 for the 1 days still on him.",
@@ -68,6 +70,7 @@ func TestTheCountRuleCountsToOne(t *testing.T) {
 // failed hypotheses and seven hundred attempts, because the state that produced
 // it was gone by the time anyone read the report.
 func TestARefusalBringsItsOwnEvidence(t *testing.T) {
+	t.Parallel()
 	s := &snapshot{Revision: 9, Minute: 41520}
 	s.Player.Location = "bar"
 	s.Player.Cash, s.Player.Health, s.Player.Heat, s.Player.Respect = 512, 74, 31, 60

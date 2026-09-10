@@ -16,6 +16,7 @@ import "testing"
 // what you have earned simply does not fade.
 
 func TestWhatYouOwnDecidesHowFastTheCityForgetsYou(t *testing.T) {
+	t.Parallel()
 	quiet, loud := 0, 0
 	for kind, trade := range trades {
 		if trade.Watched < 0 || trade.Watched > 3 {
@@ -45,6 +46,7 @@ func TestWhatYouOwnDecidesHowFastTheCityForgetsYou(t *testing.T) {
 // The measurement, with a control that shares the run of luck: the same player
 // with the same attention, differing only in which business they hold.
 func TestAWatchedBusinessKeepsYouInView(t *testing.T) {
+	t.Parallel()
 	cool := func(id string) int {
 		w := New(53)
 		w.District = 2
@@ -79,6 +81,7 @@ func TestAWatchedBusinessKeepsYouInView(t *testing.T) {
 // And it can never make attention climb. A drag on forgetting is bounded by
 // construction and this is the check that keeps it so.
 func TestBeingWatchedNeverRaisesAttentionByItself(t *testing.T) {
+	t.Parallel()
 	w := New(53)
 	w.District = 2
 	w.Player.Cash, w.Player.Respect = 40000, 200

@@ -53,6 +53,7 @@ func weekUnder(t *testing.T, seed uint32, days int, hold func(*World)) (moved ma
 }
 
 func TestMostOfTheCityGoesSomewhereInAWeek(t *testing.T) {
+	t.Parallel()
 	moved, _, place := week(t, 404, 7)
 	movers := 0
 	for id := range place {
@@ -66,6 +67,7 @@ func TestMostOfTheCityGoesSomewhereInAWeek(t *testing.T) {
 }
 
 func TestTheEveningLooksDifferentFromTheMorning(t *testing.T) {
+	t.Parallel()
 	_, byHour, _ := week(t, 404, 7)
 	busiest := func(hour int) string {
 		best, at := 0, ""
@@ -102,6 +104,7 @@ func TestTheEveningLooksDifferentFromTheMorning(t *testing.T) {
 // breaks is furniture — so the promise is measured at peace here and the
 // wartime floor is measured separately in TestAWarThinsTheStreetWithoutErasing.
 func TestAFaceIsFoundInTheSamePlaceAtTheSameHour(t *testing.T) {
+	t.Parallel()
 	moved, _, place := weekUnder(t, 404, 14, keepPeace)
 	reliable, samples := 0, 0
 	for id, hours := range place {
@@ -132,6 +135,7 @@ func TestAFaceIsFoundInTheSamePlaceAtTheSameHour(t *testing.T) {
 
 // Where somebody drinks must not drift, or the player cannot learn it.
 func TestWhereSomebodyDrinksNeverChanges(t *testing.T) {
+	t.Parallel()
 	for _, id := range []string{"mara", "leo", "harlow", "a-made-up-person"} {
 		want := haunt(id)
 		for i := 0; i < 50; i++ {
@@ -153,6 +157,7 @@ func TestWhereSomebodyDrinksNeverChanges(t *testing.T) {
 
 // Nobody who is needed somewhere is pulled off it by wanting a drink.
 func TestPeopleOnDutyDoNotGoOutDrinking(t *testing.T) {
+	t.Parallel()
 	w := New(4)
 	w.Minute = 720 // the evening
 	n := w.NPC("mara")

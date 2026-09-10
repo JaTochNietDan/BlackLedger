@@ -36,6 +36,7 @@ type recordedSuite struct {
 }
 
 func TestRecordedProposalsAreJudgedByCurrentGuards(t *testing.T) {
+	t.Parallel()
 	const path = "../../docs/director-qwen35-moe-focused-scenarios.json"
 	raw, err := os.ReadFile(path)
 	if err != nil {

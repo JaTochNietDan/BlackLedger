@@ -39,6 +39,7 @@ var (
 // worse than no test. What matters now is that every address gets its own
 // block, which is exactly what the renderer computes.
 func TestEveryAddressGetsItsOwnBlock(t *testing.T) {
+	t.Parallel()
 	source := source(t, "src/iso.ts")
 	body := source
 	pitch := blockPitch.FindStringSubmatch(string(body))
@@ -80,6 +81,7 @@ func TestEveryAddressGetsItsOwnBlock(t *testing.T) {
 // And the switch has to keep offering the card view while the city is built,
 // so a broken renderer never leaves the game unplayable.
 func TestTheCardViewIsStillReachable(t *testing.T) {
+	t.Parallel()
 	body := source(t, "src/main.tsx")
 	if !holds(body, "CityStreet") || !holds(body, "CityIso") {
 		t.Fatal("the city view and the card view are not both reachable")
@@ -91,6 +93,7 @@ func TestTheCardViewIsStillReachable(t *testing.T) {
 // card view remains reachable (checked above), and the addresses remain
 // reachable without a mouse or WebGL at all.
 func TestTheCityCanBeReadWithoutWebGL(t *testing.T) {
+	t.Parallel()
 	body := source(t, "src/CityIso.tsx")
 	source := body
 	if !holds(source, "iso-reader") {
@@ -111,6 +114,7 @@ func TestTheCityCanBeReadWithoutWebGL(t *testing.T) {
 // flat-shaded solid, which is correct behaviour and looks like a bug sitting
 // next to eleven painted buildings.
 func TestTheManifestAndTheArtAgree(t *testing.T) {
+	t.Parallel()
 	body, err := os.ReadFile("../../public/art/iso/isometric.json")
 	if err != nil {
 		t.Skip("no isometric art beside this build")
@@ -163,6 +167,7 @@ func TestTheManifestAndTheArtAgree(t *testing.T) {
 // goes to the address the core named and the effect plays over that building.
 // Two things have to stay true, and both are cheap to check in text.
 func TestMomentsPlayInTheCityAndGiveTheCameraBack(t *testing.T) {
+	t.Parallel()
 	body := source(t, "src/CityIso.tsx")
 	source := body
 	// Every kind of moment the core can witness must be drawn as something.
@@ -191,6 +196,7 @@ func TestMomentsPlayInTheCityAndGiveTheCameraBack(t *testing.T) {
 // scored falls through to a dull knock rather than silence, because silence
 // reads as a bug — but the loud ones have to be scored deliberately.
 func TestTheLoudMomentsAreScored(t *testing.T) {
+	t.Parallel()
 	body := source(t, "src/sound.ts")
 	source := body
 	for _, loud := range []string{"explosion", "killing", "gunfight", "raid", "arrest"} {
@@ -213,6 +219,7 @@ func TestTheLoudMomentsAreScored(t *testing.T) {
 // it is worse, because a placeholder reads as a mistake rather than as
 // distance. These have to be real painted cut-outs like everything else.
 func TestTheBlocksBetweenTheAddressesAreBuiltOn(t *testing.T) {
+	t.Parallel()
 	body, err := os.ReadFile("../../public/art/iso/isometric.json")
 	if err != nil {
 		t.Skip("no isometric art beside this build")
@@ -265,6 +272,7 @@ func TestTheBlocksBetweenTheAddressesAreBuiltOn(t *testing.T) {
 // land there was checked in the browser by recomputing every one of them
 // against its own block — none in a road, none under a building.
 func TestStreetDressingStandsOnThePavement(t *testing.T) {
+	t.Parallel()
 	source := source(t, "src/iso.ts")
 	body := source
 	if !holds(body, "export function dressing") {
@@ -295,6 +303,7 @@ func TestStreetDressingStandsOnThePavement(t *testing.T) {
 // tests/city-blocks.test.mjs); the pictures drawn on them did. Nothing here
 // can check pixels, so it checks that the multiplier is gone.
 func TestNoBuildingIsDrawnWiderThanItsGround(t *testing.T) {
+	t.Parallel()
 	// Line by line and unflattened: this is about what one statement ends with.
 	source := rawSource(t, "src/CityIso.tsx")
 	for _, line := range strings.Split(source, "\n") {

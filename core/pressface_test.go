@@ -39,6 +39,7 @@ func newsroom(t *testing.T) (*World, *NPC, *NPC) {
 }
 
 func TestAStoryIsAboutWhoItIsAboutRatherThanWhoIsListedFirst(t *testing.T) {
+	t.Parallel()
 	w, first, second := newsroom(t)
 	// A headline naming both of them, filed about the second one — which is
 	// exactly the shape of "you went after somebody".
@@ -58,6 +59,7 @@ func TestAStoryIsAboutWhoItIsAboutRatherThanWhoIsListedFirst(t *testing.T) {
 // A story filed with nobody named still reads its own headline, because that is
 // how every story written before this worked and they are still in the archive.
 func TestAStoryWithNobodyNamedStillFindsAFace(t *testing.T) {
+	t.Parallel()
 	w, who, _ := newsroom(t)
 	w.Report("attack", "SOMEBODY WENT AFTER "+strings.ToUpper(who.Name), "It was over quickly.")
 	if got := w.SubjectOf(w.News[len(w.News)-1]); got.ID != who.ID {
@@ -74,6 +76,7 @@ func TestAStoryWithNobodyNamedStillFindsAFace(t *testing.T) {
 // room, unless the story says otherwise, because "KILLED AT THE MONARCH" is a
 // photograph of The Monarch.
 func TestAStoryAboutSomebodyBeatsThePlaceInItsHeadline(t *testing.T) {
+	t.Parallel()
 	w, who, _ := newsroom(t)
 	headline := strings.ToUpper(who.Name) + " SHOT AT THE MONARCH"
 	w.Report("attack", headline, "Outside, in the road.")
@@ -90,6 +93,7 @@ func TestAStoryAboutSomebodyBeatsThePlaceInItsHeadline(t *testing.T) {
 // all say whose they are. This is the list, checked against the core rather
 // than against the prose: an attempt, a killing, an arrest and an obituary.
 func TestTheStoriesAboutPeopleAllSayWhoTheyAreAbout(t *testing.T) {
+	t.Parallel()
 	w, mark, _ := newsroom(t)
 	w.Player.Cash, w.Player.Health = 5000, 100
 	w.Player.Location = mark.Location

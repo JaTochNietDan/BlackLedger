@@ -11,6 +11,7 @@ import (
 // number that says nothing on its own was being sent with no way to read it.
 
 func TestTheDirectorIsToldHowEachFamilyIsPlaced(t *testing.T) {
+	t.Parallel()
 	w := core.New(41)
 	money := organizationMoney(w)
 	if len(money) == 0 {
@@ -37,6 +38,7 @@ func TestTheDirectorIsToldHowEachFamilyIsPlaced(t *testing.T) {
 // income is not counting days, and must not be given a number that invites a
 // speaker to talk about three months of runway nobody is thinking about.
 func TestOnlyAFamilyRunningDownCountsItsDays(t *testing.T) {
+	t.Parallel()
 	w := core.New(41)
 	var f *core.Faction
 	for i := range w.Factions {
@@ -74,6 +76,7 @@ func TestOnlyAFamilyRunningDownCountsItsDays(t *testing.T) {
 // Both briefs have to explain the four words, or the field is sent to a model
 // that has never been told what it means.
 func TestBothBriefsExplainWhatTheMoneyStatesMean(t *testing.T) {
+	t.Parallel()
 	for name, text := range map[string]string{"full": prompt, "focused": focusedPrompt} {
 		if !strings.Contains(text, "organization_money") {
 			t.Errorf("the %s brief never mentions organization_money", name)

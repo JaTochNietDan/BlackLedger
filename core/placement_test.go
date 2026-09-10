@@ -20,6 +20,7 @@ func shopper(t *testing.T) *World {
 // what that means, we should fix the wording on that to explain what that
 // actually entails."
 func TestBuyingABusinessSaysThatIsWhatItIs(t *testing.T) {
+	t.Parallel()
 	w := shopper(t)
 	w.Player.Location = "laundry"
 	a := actionByID(w.Actions("laundry"), "acquire")
@@ -44,6 +45,7 @@ func TestBuyingABusinessSaysThatIsWhatItIs(t *testing.T) {
 // "Why does it seem like you can send Leo Carver on collections in practically
 // every single building's action menu?"
 func TestOrdersToYourOwnPeopleFollowYou(t *testing.T) {
+	t.Parallel()
 	w := shopper(t)
 	w.Player.Location = "bar"
 	w.Player.Crew = []Crew{{"street-24", "Dita Toth", 60}}
@@ -61,6 +63,7 @@ func TestOrdersToYourOwnPeopleFollowYou(t *testing.T) {
 // "I don't think 'moving against X business yourself' should required respect,
 // that doesn't make sense."
 func TestGoingInYourselfAsksNothingAboutYourName(t *testing.T) {
+	t.Parallel()
 	w := shopper(t)
 	w.Player.Respect = 0
 	w.Player.Crew = []Crew{{"street-24", "Dita Toth", 60}}

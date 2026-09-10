@@ -23,6 +23,7 @@ import (
 // true, and stays.
 
 func TestWorkYouDoYourselfIsNotDescribedAsSendingSomebody(t *testing.T) {
+	t.Parallel()
 	w := New(3)
 	w.District = 2
 	w.Player.Cash = 2000
@@ -66,6 +67,7 @@ func TestWorkYouDoYourselfIsNotDescribedAsSendingSomebody(t *testing.T) {
 // different acts. The family is still in the description, where robbery and
 // mugging keep the same kind of detail.
 func TestBothHalvesOfAPairNameTheSameTarget(t *testing.T) {
+	t.Parallel()
 	w := New(3)
 	w.District = 2
 	w.Player.Cash = 2000
@@ -104,6 +106,7 @@ func TestBothHalvesOfAPairNameTheSameTarget(t *testing.T) {
 // written into three strings, and hiring whoever actually drives is what made
 // it visible.
 func TestOneCrewIsCalledByOneName(t *testing.T) {
+	t.Parallel()
 	w := New(3)
 	w.District = 2
 	w.Player.Cash = 2000

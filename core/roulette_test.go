@@ -11,6 +11,7 @@ import (
 // zero and nothing else, and that is a property you can measure.
 
 func TestTheWheelIsThirtySevenPocketsAndTheZeroBelongsToNobody(t *testing.T) {
+	t.Parallel()
 	if Pockets != 37 {
 		t.Fatalf("the wheel has %d pockets", Pockets)
 	}
@@ -48,6 +49,7 @@ func TestTheWheelIsThirtySevenPocketsAndTheZeroBelongsToNobody(t *testing.T) {
 // pocket in thirty-seven and it is the same for every bet on the cloth, which
 // is what tells you nothing has been shaded.
 func TestEveryBetOnTheClothHasTheSameEdgeAndItIsTheZero(t *testing.T) {
+	t.Parallel()
 	for _, bet := range RouletteBets() {
 		staked, returned := 0, 0
 		for pocket := 0; pocket < Pockets; pocket++ {
@@ -66,6 +68,7 @@ func TestEveryBetOnTheClothHasTheSameEdgeAndItIsTheZero(t *testing.T) {
 // And the money moves once, for the right amount. A dollar on a number that
 // comes in is thirty-six dollars back, not thirty-five.
 func TestAWinningNumberPaysThirtyFiveToOneAndReturnsTheStake(t *testing.T) {
+	t.Parallel()
 	for pocket := 0; pocket < Pockets; pocket++ {
 		w := wheelRoom(t)
 		before := w.Player.Cash
@@ -90,6 +93,7 @@ func TestAWinningNumberPaysThirtyFiveToOneAndReturnsTheStake(t *testing.T) {
 
 // A losing spin takes the stake once and no more.
 func TestALosingSpinTakesTheStakeOnce(t *testing.T) {
+	t.Parallel()
 	w := wheelRoom(t)
 	stake, _ := tableStake("small")
 	before := w.Player.Cash
@@ -107,6 +111,7 @@ func TestALosingSpinTakesTheStakeOnce(t *testing.T) {
 
 // The room cannot have a hand of cards and a wheel going at once.
 func TestTheWheelWaitsForTheCardsToBeFinished(t *testing.T) {
+	t.Parallel()
 	w := wheelRoom(t)
 	if err := w.Deal("casino", 50); err != nil {
 		t.Fatalf("dealing: %v", err)
@@ -158,6 +163,7 @@ func seedForPocket(t *testing.T, w *World, pocket int) uint32 {
 // Target names the room and is what the action lookup searches, so a bet put
 // there would send the game looking for a wheel in a place called "red".
 func TestTheWheelCanBePlayedAsACommand(t *testing.T) {
+	t.Parallel()
 	w := wheelRoom(t)
 	before := w.Player.Cash
 	next, err := Execute(w, Command{RequestID: ID(), Revision: w.Revision,
@@ -186,6 +192,7 @@ func TestTheWheelCanBePlayedAsACommand(t *testing.T) {
 
 // And the button is there to be pressed, naming its price, declaring no cost.
 func TestTheWheelIsOfferedInARoomWithTables(t *testing.T) {
+	t.Parallel()
 	w := wheelRoom(t)
 	var wheel *Action
 	for i, a := range w.Actions("casino") {
@@ -221,6 +228,7 @@ func TestTheWheelIsOfferedInARoomWithTables(t *testing.T) {
 // interface reads and the wheel was not, so a spin happened and nothing outside
 // the ledger could ever say what the ball did.
 func TestTheWorldTellsTheInterfaceWhatTheWheelDid(t *testing.T) {
+	t.Parallel()
 	w := wheelRoom(t)
 	quiet, ok := w.Public()["wheel"].(map[string]any)
 	if !ok {

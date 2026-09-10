@@ -8,6 +8,7 @@ import (
 )
 
 func TestThePaperPrintsWhatTheCityCanSee(t *testing.T) {
+	t.Parallel()
 	w := New(51)
 	w.Player.Location = "club"
 	w.Player.Respect = 40
@@ -52,6 +53,7 @@ func TestThePaperPrintsWhatTheCityCanSee(t *testing.T) {
 }
 
 func TestThePaperNeverPrintsWhatIsHidden(t *testing.T) {
+	t.Parallel()
 	w := New(53)
 	w.Player.Cash = 50000
 	w.Player.Location = "market"
@@ -84,6 +86,7 @@ func TestThePaperNeverPrintsWhatIsHidden(t *testing.T) {
 }
 
 func TestThePlayersOwnCrimesAreReportedWithoutTheirName(t *testing.T) {
+	t.Parallel()
 	var w *World
 	for seed := uint32(1); seed <= 300; seed++ {
 		probe := New(57)
@@ -131,6 +134,7 @@ func TestThePlayersOwnCrimesAreReportedWithoutTheirName(t *testing.T) {
 }
 
 func TestANewPersonReadsTheirOwnEdition(t *testing.T) {
+	t.Parallel()
 	w := New(59)
 	w.Kill("elena", "Shot at the exchange.")
 	if len(w.Edition()) == 0 {
@@ -158,6 +162,7 @@ func TestANewPersonReadsTheirOwnEdition(t *testing.T) {
 }
 
 func TestTheArchiveIsBounded(t *testing.T) {
+	t.Parallel()
 	w := New(61)
 	for i := 0; i < newsCapacity*3; i++ {
 		w.Report("war", fmt.Sprintf("HEADLINE %d", i), "Body.")
@@ -171,6 +176,7 @@ func TestTheArchiveIsBounded(t *testing.T) {
 }
 
 func TestADeadProtagonistsArrangementsDieWithThem(t *testing.T) {
+	t.Parallel()
 	w := New(63)
 	w.Player.Cash = 50000
 	w.Player.Location = "market"
@@ -195,6 +201,7 @@ func TestADeadProtagonistsArrangementsDieWithThem(t *testing.T) {
 // file gets a standfirst and a desk that filed it, or the paper prints a line
 // that says nothing.
 func TestEveryKindOfStoryIsSetLikeANewspaper(t *testing.T) {
+	t.Parallel()
 	kinds := []string{"police", "politics", "robbery", "business", "killing", "attack",
 		"war", "seizure", "split", "recovery", "collapse", "attempt", "arrest"}
 	w := proprietor(t)
@@ -220,6 +227,7 @@ func TestEveryKindOfStoryIsSetLikeANewspaper(t *testing.T) {
 }
 
 func TestThePaperCarriesADate(t *testing.T) {
+	t.Parallel()
 	if got := Dateline(480); got != "Tuesday, March 3, 1953" {
 		t.Fatalf("day one is %q", got)
 	}
@@ -243,6 +251,7 @@ func TestThePaperCarriesADate(t *testing.T) {
 // read what it remembered.
 
 func TestThePaperKeepsItsBackIssues(t *testing.T) {
+	t.Parallel()
 	w := proprietor(t)
 	w.News = nil
 	// Three days of a life, then a death, then two days of the next.
@@ -286,6 +295,7 @@ func TestThePaperKeepsItsBackIssues(t *testing.T) {
 }
 
 func TestTheBiggestStoryOfTheDayLeads(t *testing.T) {
+	t.Parallel()
 	w := proprietor(t)
 	w.News = nil
 	w.Minute = 3 * 1440
@@ -308,6 +318,7 @@ func TestTheBiggestStoryOfTheDayLeads(t *testing.T) {
 }
 
 func TestTheArchiveIsWorthKeeping(t *testing.T) {
+	t.Parallel()
 	// Sixty stories was about three months, which is one life and nothing
 	// across several. Whatever the cap is, it must hold a campaign.
 	if newsCapacity < 200 {
@@ -332,6 +343,7 @@ func TestTheArchiveIsWorthKeeping(t *testing.T) {
 // A paper that prints nothing for three weeks is not a paper.
 
 func TestThePaperComesOutEveryDay(t *testing.T) {
+	t.Parallel()
 	const days = 40
 	w := proprietor(t)
 	w.News = nil
@@ -365,6 +377,7 @@ func TestThePaperComesOutEveryDay(t *testing.T) {
 }
 
 func TestTheOrdinaryEditionCostsTheCityNothing(t *testing.T) {
+	t.Parallel()
 	// Filling the paper must not make the police look harder at anybody.
 	w := proprietor(t)
 	w.News = nil
@@ -383,6 +396,7 @@ func TestTheOrdinaryEditionCostsTheCityNothing(t *testing.T) {
 }
 
 func TestARealDayIsNotPaddedWithThePriceOfCoal(t *testing.T) {
+	t.Parallel()
 	w := proprietor(t)
 	w.News = nil
 	w.Minute = 5 * 1440
@@ -404,6 +418,7 @@ func TestARealDayIsNotPaddedWithThePriceOfCoal(t *testing.T) {
 }
 
 func TestTheOrdinaryEditionIsTrue(t *testing.T) {
+	t.Parallel()
 	// Everything in it is read out of state the city already holds. If the
 	// price is $40 the paper says $40.
 	w := proprietor(t)

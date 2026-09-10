@@ -3,6 +3,7 @@ package core
 import "testing"
 
 func TestEveryOrganizationHasPeopleWhoCouldReplaceItsLeader(t *testing.T) {
+	t.Parallel()
 	w := New(1)
 	for _, f := range w.Factions {
 		members := w.Members(f.ID)
@@ -29,6 +30,7 @@ func TestEveryOrganizationHasPeopleWhoCouldReplaceItsLeader(t *testing.T) {
 }
 
 func TestKillingALeaderPromotesSomebody(t *testing.T) {
+	t.Parallel()
 	w := New(2)
 	before := *w.faction("bellandi") // copy: faction() returns a live pointer
 	deputy := w.Members("bellandi")[1]
@@ -61,6 +63,7 @@ func TestKillingALeaderPromotesSomebody(t *testing.T) {
 }
 
 func TestAnOrganizationCanBeLeftWithNobody(t *testing.T) {
+	t.Parallel()
 	w := New(3)
 	f := w.faction("russo")
 	power := f.Power
@@ -76,6 +79,7 @@ func TestAnOrganizationCanBeLeftWithNobody(t *testing.T) {
 }
 
 func TestTheDeadDoNotActOrDieTwice(t *testing.T) {
+	t.Parallel()
 	w := New(4)
 	if !w.Kill("elena", "An accident that was not one.") {
 		t.Fatal("could not kill a living person")
@@ -94,6 +98,7 @@ func TestTheDeadDoNotActOrDieTwice(t *testing.T) {
 }
 
 func TestLosingOrdinaryMembersStillCostsStrength(t *testing.T) {
+	t.Parallel()
 	w := New(5)
 	f := w.faction("bellandi")
 	power := f.Power
@@ -109,6 +114,7 @@ func TestLosingOrdinaryMembersStillCostsStrength(t *testing.T) {
 }
 
 func TestNobodyMovesOnALeaderWhoIsWinning(t *testing.T) {
+	t.Parallel()
 	w := New(6) // full strength
 	if w.ConsiderInternalMove(w.faction("bellandi")) {
 		t.Fatal("a deputy moved on a leader whose organization was still strong")
@@ -116,6 +122,7 @@ func TestNobodyMovesOnALeaderWhoIsWinning(t *testing.T) {
 }
 
 func TestAFailingOrganizationCanLoseItsLeaderFromInside(t *testing.T) {
+	t.Parallel()
 	moved, succeeded, failed := 0, 0, 0
 	for seed := uint32(1); seed <= 400; seed++ {
 		w := New(seed)
@@ -155,6 +162,7 @@ func TestAFailingOrganizationCanLoseItsLeaderFromInside(t *testing.T) {
 }
 
 func TestViolenceReachesEveryRank(t *testing.T) {
+	t.Parallel()
 	ranks := map[int]int{}
 	for seed := uint32(1); seed <= 600; seed++ {
 		w := New(seed)
@@ -174,6 +182,7 @@ func TestViolenceReachesEveryRank(t *testing.T) {
 }
 
 func TestPeopleKeepDistinctVoices(t *testing.T) {
+	t.Parallel()
 	w := New(31)
 	used := map[string][]string{}
 	for _, n := range w.People() {
@@ -209,6 +218,7 @@ func TestPeopleKeepDistinctVoices(t *testing.T) {
 }
 
 func TestABreakawayBringsItsOwnPeople(t *testing.T) {
+	t.Parallel()
 	w := embattled(41)
 	if !w.Splinter(w.faction("bellandi")) {
 		t.Skip("no breakaway for this seed")
@@ -227,6 +237,7 @@ func TestABreakawayBringsItsOwnPeople(t *testing.T) {
 }
 
 func TestVoicesMatchHowPeopleAreNamed(t *testing.T) {
+	t.Parallel()
 	womens := map[string]bool{}
 	for _, v := range womensVoices {
 		womens[v] = true

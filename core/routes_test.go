@@ -13,6 +13,7 @@ import "testing"
 // where a hit can catch you cold, and the reason anybody plates a car.
 
 func TestTheSameCrateIsWorthDifferentMoneyInDifferentPlaces(t *testing.T) {
+	t.Parallel()
 	w := New(79)
 	w.Event, w.District = nil, 9
 	found := false
@@ -36,6 +37,7 @@ func TestTheSameCrateIsWorthDifferentMoneyInDifferentPlaces(t *testing.T) {
 }
 
 func TestARouteIsWorthWalking(t *testing.T) {
+	t.Parallel()
 	w := New(79)
 	w.Event, w.District = nil, 9
 	w.Player.Cash, w.Player.Health = 5000, 100
@@ -57,6 +59,7 @@ func TestARouteIsWorthWalking(t *testing.T) {
 }
 
 func TestTheCardQuotesThePriceWhereYouAreStanding(t *testing.T) {
+	t.Parallel()
 	w := New(79)
 	w.Event, w.District = nil, 9
 	w.Player.Cash, w.Player.Health = 5000, 100

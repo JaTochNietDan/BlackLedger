@@ -30,6 +30,7 @@ func offered(w *World, kind string) (Action, bool) {
 }
 
 func TestTheWorkThatIsNotAboutTheRoomIsOfferedWhereverYouStand(t *testing.T) {
+	t.Parallel()
 	rooms := []string{"bar", "laundry", "docks", "room", "garage", "casino", "market"}
 	for _, kind := range []string{"contract", "investigate", "enquire:bellandi", "pact:russo", "bribe", "lie_low"} {
 		for _, room := range rooms {
@@ -50,6 +51,7 @@ func TestTheWorkThatIsNotAboutTheRoomIsOfferedWhereverYouStand(t *testing.T) {
 // up at the place the player is standing, so an action that is not there is an
 // action that cannot be pressed however it is drawn.
 func TestAPriceCanBePutOnANameFromAnywhere(t *testing.T) {
+	t.Parallel()
 	w := standing(t, "docks")
 	if len(w.ContractTargets()) == 0 {
 		t.Fatal("nobody in this city can be named")
@@ -66,6 +68,7 @@ func TestAPriceCanBePutOnANameFromAnywhere(t *testing.T) {
 // The room's own panel must not carry them. A fishmonger offering an
 // understanding with the Russo family is the fault this is fixing.
 func TestTheRoomsOwnPanelLeavesThatWorkOut(t *testing.T) {
+	t.Parallel()
 	w := standing(t, "market")
 	for _, a := range w.Actions("market") {
 		if a.Anywhere && a.Group == GroupOf("repair") {
@@ -84,6 +87,7 @@ func TestTheRoomsOwnPanelLeavesThatWorkOut(t *testing.T) {
 // city to give an order you are not going to carry out yourself is not a
 // decision, it is a journey.
 func TestOrdersAimedAtAPlaceCanBeGivenFromAnywhere(t *testing.T) {
+	t.Parallel()
 	w := standing(t, "bar")
 	w.Player.Crew = []Crew{{"leo", "Leo Carver", 90}}
 	w.Player.Contacts = 3
@@ -140,6 +144,7 @@ func TestOrdersAimedAtAPlaceCanBeGivenFromAnywhere(t *testing.T) {
 // between the two buttons, and it must not quietly become a third way to
 // teleport.
 func TestGoingInYourselfStillMeansGoingThere(t *testing.T) {
+	t.Parallel()
 	w := standing(t, "bar")
 	w.Player.Crew = []Crew{{"leo", "Leo Carver", 90}}
 	for _, l := range Locations {

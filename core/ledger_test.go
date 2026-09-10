@@ -10,6 +10,7 @@ import "testing"
 // it across a whole campaign.
 
 func TestTheLedgerDoesNotSayTheSameThingFiftyTimes(t *testing.T) {
+	t.Parallel()
 	w := New(31)
 	w.History = nil
 	for i := 0; i < 49; i++ {
@@ -26,6 +27,7 @@ func TestTheLedgerDoesNotSayTheSameThingFiftyTimes(t *testing.T) {
 // A collapsed repeat must still read as something that just happened: the
 // result panel after an action is built by diffing record ids.
 func TestACollapsedRepeatIsStillANewOutcome(t *testing.T) {
+	t.Parallel()
 	w := New(32)
 	w.History = nil
 	w.Log("Envelope delivered", "Mara pays $45.", "work")
@@ -48,6 +50,7 @@ func TestACollapsedRepeatIsStillANewOutcome(t *testing.T) {
 // Yesterday's errand is not today's, and a different amount is a different
 // event.
 func TestTheLedgerKeepsWhatIsActuallyDifferent(t *testing.T) {
+	t.Parallel()
 	w := New(33)
 	w.History = nil
 	w.Log("Envelope delivered", "Mara pays $45.", "work")

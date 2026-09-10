@@ -28,6 +28,7 @@ func quarrel(t *testing.T) (*World, *NPC, *NPC) {
 }
 
 func TestNobodyResentsNobody(t *testing.T) {
+	t.Parallel()
 	w, a, _ := quarrel(t)
 	w.Resent(a.ID, a.ID, 40, "themselves")
 	w.Resent(a.ID, "somebody-who-does-not-exist", 40, "nothing")
@@ -39,6 +40,7 @@ func TestNobodyResentsNobody(t *testing.T) {
 }
 
 func TestAGrudgeAccumulatesAndFades(t *testing.T) {
+	t.Parallel()
 	w, a, b := quarrel(t)
 	w.Resent(a.ID, b.ID, 20, "the first thing")
 	w.Resent(a.ID, b.ID, 20, "the second thing")
@@ -60,6 +62,7 @@ func TestAGrudgeAccumulatesAndFades(t *testing.T) {
 }
 
 func TestTheDeadCarryNothingAndAreOwedNothing(t *testing.T) {
+	t.Parallel()
 	w, a, b := quarrel(t)
 	w.Resent(a.ID, b.ID, 50, "something")
 	w.Resent(b.ID, a.ID, 50, "something else")
@@ -71,6 +74,7 @@ func TestTheDeadCarryNothingAndAreOwedNothing(t *testing.T) {
 }
 
 func TestSomebodyWithAHeavyGrudgeActsOnIt(t *testing.T) {
+	t.Parallel()
 	const runs, days = 300, 10
 	acted, killed := 0, 0
 	for seed := uint32(1); seed <= runs; seed++ {
@@ -98,6 +102,7 @@ func TestSomebodyWithAHeavyGrudgeActsOnIt(t *testing.T) {
 }
 
 func TestNobodyActsOnSomethingSmall(t *testing.T) {
+	t.Parallel()
 	w, a, b := quarrel(t)
 	a.Ambition = 100
 	w.Resent(a.ID, b.ID, GrudgeActs-20, "a slight")
@@ -110,6 +115,7 @@ func TestNobodyActsOnSomethingSmall(t *testing.T) {
 }
 
 func TestAKillingGivesTheOrganizationsAReason(t *testing.T) {
+	t.Parallel()
 	const runs, days = 300, 10
 	settled, escalated, warred := 0, 0, 0
 	for seed := uint32(1); seed <= runs; seed++ {
@@ -147,6 +153,7 @@ func TestAKillingGivesTheOrganizationsAReason(t *testing.T) {
 }
 
 func TestWarIsItsOwnReasonAndStopsBeingOneWhenItEnds(t *testing.T) {
+	t.Parallel()
 	w, a, b := quarrel(t)
 	c := w.Conflict(a.Faction, b.Faction)
 	c.State = "war"
@@ -169,6 +176,7 @@ func TestWarIsItsOwnReasonAndStopsBeingOneWhenItEnds(t *testing.T) {
 }
 
 func TestTheSaveStaysBounded(t *testing.T) {
+	t.Parallel()
 	w, _, _ := quarrel(t)
 	living := []string{}
 	for i := range w.NPCs {
@@ -188,6 +196,7 @@ func TestTheSaveStaysBounded(t *testing.T) {
 }
 
 func TestYouOnlyHearAboutThisIfSomebodyTellsYou(t *testing.T) {
+	t.Parallel()
 	w, a, b := quarrel(t)
 	w.Resent(a.ID, b.ID, GrudgeCap, "an old debt")
 	w.Player.Contacts = 0

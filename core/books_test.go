@@ -8,6 +8,7 @@ import "testing"
 // it was.
 
 func TestTheBooksAddUpToWhatTheDayActuallyCosts(t *testing.T) {
+	t.Parallel()
 	w, _ := testator(t)
 	w.Player.Cash, w.Player.Security = 40000, 2
 	w.Player.Crew = []Crew{{ID: "leo", Name: "Leo Carver", Loyalty: 70}}
@@ -45,6 +46,7 @@ func TestTheBooksAddUpToWhatTheDayActuallyCosts(t *testing.T) {
 }
 
 func TestTheBooksSayWhereTheMoneyIs(t *testing.T) {
+	t.Parallel()
 	w, _ := testator(t)
 	w.Player.Cash, w.District, w.Player.Respect = 40000, 2, 90
 	// Money out on the street belongs in the books at what it comes back at.
@@ -80,6 +82,7 @@ func TestTheBooksSayWhereTheMoneyIs(t *testing.T) {
 }
 
 func TestNothingIsListedThatCostsNothing(t *testing.T) {
+	t.Parallel()
 	// A page of zeroes is noise. Somebody with no car, no crew and no
 	// arrangements should not read lines about any of them.
 	w := proprietor(t)

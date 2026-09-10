@@ -13,6 +13,7 @@ import (
 // for the strategies that do not — a number about the strategies, not the city.
 
 func TestThePlayersOwnOrganizationIsNotTheCityMoving(t *testing.T) {
+	t.Parallel()
 	w := core.New(101)
 	eyes := watch(w)
 	var got WorldMeasures
@@ -48,6 +49,7 @@ func TestThePlayersOwnOrganizationIsNotTheCityMoving(t *testing.T) {
 }
 
 func TestAWarIsCountedOnceAndPlacedCorrectly(t *testing.T) {
+	t.Parallel()
 	w := core.New(102)
 	eyes := watch(w)
 	var got WorldMeasures
@@ -75,6 +77,7 @@ func TestAWarIsCountedOnceAndPlacedCorrectly(t *testing.T) {
 }
 
 func TestBuyingPremisesIsNotTheCityMovingThem(t *testing.T) {
+	t.Parallel()
 	w := core.New(103)
 	eyes := watch(w)
 	var got WorldMeasures

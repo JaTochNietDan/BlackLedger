@@ -26,6 +26,7 @@ func priced(t *testing.T, w *World, place, kind string) Action {
 }
 
 func TestWorkThatPaysItsOwnFeeStillShowsAPrice(t *testing.T) {
+	t.Parallel()
 	w := New(53)
 	w.District = 2
 	w.Player.Cash, w.Player.Respect, w.Player.Health = 40000, 200, 100
@@ -63,6 +64,7 @@ func TestWorkThatPaysItsOwnFeeStillShowsAPrice(t *testing.T) {
 // The other half, and the reason Cost has to stay nothing: declaring a price
 // must not take the money twice.
 func TestDeclaringAPriceDoesNotChargeItTwice(t *testing.T) {
+	t.Parallel()
 	w := New(53)
 	w.District = 2
 	w.Player.Cash, w.Player.Respect, w.Player.Health = 40000, 200, 100
@@ -106,6 +108,7 @@ var paysItsOwnWay = []string{
 }
 
 func TestEveryPricedActionKeepsItsPrice(t *testing.T) {
+	t.Parallel()
 	w := New(59)
 	w.District = 2
 	w.Player.Cash, w.Player.Respect, w.Player.Health = 60000, 200, 100

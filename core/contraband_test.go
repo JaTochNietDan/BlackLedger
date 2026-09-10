@@ -11,6 +11,7 @@ func trader(t *testing.T) *World {
 }
 
 func TestBuyingAndSellingMovesMoneyAndStock(t *testing.T) {
+	t.Parallel()
 	w := trader(t)
 	// The price is a fact about the floor now, not about the city: the
 	// waterfront is where it comes ashore and the exchange is where the buyers
@@ -41,6 +42,7 @@ func TestBuyingAndSellingMovesMoneyAndStock(t *testing.T) {
 }
 
 func TestTradeNeedsAMarketAndTheMeans(t *testing.T) {
+	t.Parallel()
 	w := trader(t)
 	w.Player.Cash = 10
 	if w.TradeReadiness("moonshine", "buy", 0) == "" {
@@ -72,6 +74,7 @@ func TestTradeNeedsAMarketAndTheMeans(t *testing.T) {
 }
 
 func TestCarryingGoodsDrawsAttention(t *testing.T) {
+	t.Parallel()
 	w := trader(t)
 	if err := w.Buy("moonshine", 0); err != nil {
 		t.Fatal(err)
@@ -103,6 +106,7 @@ func TestCarryingGoodsDrawsAttention(t *testing.T) {
 }
 
 func TestASearchTakesWhatIsBeingCarried(t *testing.T) {
+	t.Parallel()
 	w := trader(t)
 	if err := w.Buy("moonshine", 0); err != nil {
 		t.Fatal(err)
@@ -119,6 +123,7 @@ func TestASearchTakesWhatIsBeingCarried(t *testing.T) {
 }
 
 func TestPricesMoveAndStayWithinReach(t *testing.T) {
+	t.Parallel()
 	w := New(11)
 	moved := false
 	start := w.Good("moonshine").Price
@@ -139,6 +144,7 @@ func TestPricesMoveAndStayWithinReach(t *testing.T) {
 }
 
 func TestWarMakesGoodsDearer(t *testing.T) {
+	t.Parallel()
 	peace, war := New(12), New(12)
 	war.Antagonize("bellandi", "russo", 100)
 	if war.Conflict("bellandi", "russo").State != "war" {
@@ -157,6 +163,7 @@ func TestWarMakesGoodsDearer(t *testing.T) {
 }
 
 func TestOlderSavesCarryNothing(t *testing.T) {
+	t.Parallel()
 	w := New(13)
 	w.Player.Stock = nil
 	if w.Carrying() != 0 || w.Holding("moonshine") != 0 {

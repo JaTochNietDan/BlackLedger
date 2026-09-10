@@ -29,6 +29,7 @@ func crewman(t *testing.T) (*World, *NPC) {
 }
 
 func TestSendingSomebodyOnCollectionsSendsThemSomewhere(t *testing.T) {
+	t.Parallel()
 	w, leo := crewman(t)
 	w.Properties["laundry"].Owner = "player:1"
 	w.Player.Cash = 2000
@@ -61,6 +62,7 @@ func TestSendingSomebodyOnCollectionsSendsThemSomewhere(t *testing.T) {
 
 // With nothing of the player's to collect from, the work still has an address.
 func TestCollectionsHaveAnAddressEvenWithNoPremises(t *testing.T) {
+	t.Parallel()
 	w, leo := crewman(t)
 	leo.Location = "club"
 	next, err := Execute(w, Command{RequestID: ID(), Revision: w.Revision, Kind: "delegate", Target: "bar"})
@@ -78,6 +80,7 @@ func TestCollectionsHaveAnAddressEvenWithNoPremises(t *testing.T) {
 
 // The round still pays what it paid, and he comes back from where he went.
 func TestHeComesBackFromWhereHeWent(t *testing.T) {
+	t.Parallel()
 	w, leo := crewman(t)
 	w.Properties["laundry"].Owner = "player:1"
 	from := "bar"
@@ -111,6 +114,7 @@ func TestHeComesBackFromWhereHeWent(t *testing.T) {
 
 // While he is doing the round, the city says so rather than reciting his job.
 func TestAManOnARoundIsDoingTheRoundNotHisJob(t *testing.T) {
+	t.Parallel()
 	w, leo := crewman(t)
 	w.Properties["laundry"].Owner = "player:1"
 	leo.Location = "bar"

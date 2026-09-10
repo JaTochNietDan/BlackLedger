@@ -20,6 +20,7 @@ func own(w *World, ids ...string) {
 }
 
 func TestAManWithOneShopIsStillAMan(t *testing.T) {
+	t.Parallel()
 	w := proprietor(t)
 	own(w, "laundry")
 	w.Player.Respect = 80
@@ -40,6 +41,7 @@ func TestAManWithOneShopIsStillAMan(t *testing.T) {
 }
 
 func TestTwoPremisesAndANameIsAnOrganization(t *testing.T) {
+	t.Parallel()
 	w := proprietor(t)
 	own(w, "laundry", "garage")
 	w.Player.Respect = OrganizationStanding
@@ -72,6 +74,7 @@ func TestTwoPremisesAndANameIsAnOrganization(t *testing.T) {
 }
 
 func TestStrengthComesFromWhatTheyActuallyHave(t *testing.T) {
+	t.Parallel()
 	w := proprietor(t)
 	own(w, "laundry", "garage")
 	w.Player.Respect = 30
@@ -97,6 +100,7 @@ func TestStrengthComesFromWhatTheyActuallyHave(t *testing.T) {
 }
 
 func TestEverybodyInTheCityHasAViewOnANewOrganization(t *testing.T) {
+	t.Parallel()
 	w := proprietor(t)
 	own(w, "laundry", "garage")
 	w.Player.Respect = OrganizationStanding
@@ -122,6 +126,7 @@ func TestEverybodyInTheCityHasAViewOnANewOrganization(t *testing.T) {
 }
 
 func TestARaidOnThePlayerTakesTheirOwnMoney(t *testing.T) {
+	t.Parallel()
 	w := proprietor(t)
 	own(w, "laundry", "garage")
 	w.Player.Respect = OrganizationStanding
@@ -142,6 +147,7 @@ func TestARaidOnThePlayerTakesTheirOwnMoney(t *testing.T) {
 }
 
 func TestARaidOnThePlayerCanReachTheirCrew(t *testing.T) {
+	t.Parallel()
 	found := false
 	for seed := uint32(1); seed <= 300 && !found; seed++ {
 		w := proprietor(t)
@@ -168,6 +174,7 @@ func TestARaidOnThePlayerCanReachTheirCrew(t *testing.T) {
 }
 
 func TestTheCityDoesNotRepairThePlayersPremisesForFree(t *testing.T) {
+	t.Parallel()
 	w := proprietor(t)
 	own(w, "laundry", "garage")
 	w.Player.Respect = OrganizationStanding
@@ -182,6 +189,7 @@ func TestTheCityDoesNotRepairThePlayersPremisesForFree(t *testing.T) {
 }
 
 func TestAnOrganizationEndsWithThePersonItBelongedTo(t *testing.T) {
+	t.Parallel()
 	w := proprietor(t)
 	own(w, "laundry", "garage")
 	w.Player.Respect = OrganizationStanding
@@ -206,6 +214,7 @@ func TestAnOrganizationEndsWithThePersonItBelongedTo(t *testing.T) {
 }
 
 func TestABadMonthDoesNotEndTheirOrganization(t *testing.T) {
+	t.Parallel()
 	w := proprietor(t)
 	own(w, "laundry", "garage")
 	w.Player.Respect = OrganizationStanding

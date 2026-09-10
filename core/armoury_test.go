@@ -15,6 +15,7 @@ func dealer(t *testing.T) *World {
 }
 
 func TestARoomLikeThatGoesUnderABusinessAndOnlyOne(t *testing.T) {
+	t.Parallel()
 	w := dealer(t)
 	if w.ArmouryReadiness("club") == "" || w.ArmouryReadiness("casino") == "" {
 		t.Fatal("a casino floor took an armoury")
@@ -35,6 +36,7 @@ func TestARoomLikeThatGoesUnderABusinessAndOnlyOne(t *testing.T) {
 }
 
 func TestGunsComeOffABoatAndAreNotSoldOnAPublicFloor(t *testing.T) {
+	t.Parallel()
 	if !TradesAt("docks", "arms") {
 		t.Fatal("the waterfront did not deal in arms")
 	}
@@ -47,6 +49,7 @@ func TestGunsComeOffABoatAndAreNotSoldOnAPublicFloor(t *testing.T) {
 }
 
 func TestCratesGoIntoTheRoomAndOutOfYourHands(t *testing.T) {
+	t.Parallel()
 	w := dealer(t)
 	w.BuildArmoury("laundry")
 	if w.StockReadiness() == "" {
@@ -76,6 +79,7 @@ func TestCratesGoIntoTheRoomAndOutOfYourHands(t *testing.T) {
 }
 
 func TestTheCustomerIsAWar(t *testing.T) {
+	t.Parallel()
 	w := dealer(t)
 	w.BuildArmoury("laundry")
 	w.Properties["laundry"].Crates = 40
@@ -110,6 +114,7 @@ func TestTheCustomerIsAWar(t *testing.T) {
 }
 
 func TestNobodyBuysWhatTheyCannotAffordAndAnEmptyRoomSellsNothing(t *testing.T) {
+	t.Parallel()
 	w := dealer(t)
 	w.BuildArmoury("laundry")
 	w.Conflicts[0].State, w.Conflicts[0].Hostility = "war", 80
@@ -131,6 +136,7 @@ func TestNobodyBuysWhatTheyCannotAffordAndAnEmptyRoomSellsNothing(t *testing.T) 
 }
 
 func TestArmingOneSideIsSomethingTheOtherSideFindsOut(t *testing.T) {
+	t.Parallel()
 	const runs = 300
 	noticed := 0
 	for seed := uint32(1); seed <= runs; seed++ {
@@ -160,6 +166,7 @@ func TestArmingOneSideIsSomethingTheOtherSideFindsOut(t *testing.T) {
 }
 
 func TestAWarrantThatFindsTheRoomTakesEverything(t *testing.T) {
+	t.Parallel()
 	w := dealer(t)
 	w.BuildArmoury("laundry")
 	w.Properties["laundry"].Crates = 40
@@ -183,6 +190,7 @@ func TestAWarrantThatFindsTheRoomTakesEverything(t *testing.T) {
 }
 
 func TestTheInterfaceIsToldWhatIsUnderTheFloor(t *testing.T) {
+	t.Parallel()
 	w := dealer(t)
 	if w.ArmouryDescription()["held"] != false {
 		t.Fatal("a player with no room was told they had one")

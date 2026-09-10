@@ -21,6 +21,7 @@ func caller(t *testing.T) *World {
 }
 
 func TestAFamilyLeadKeepsTheirOwnSeat(t *testing.T) {
+	t.Parallel()
 	w := caller(t)
 	lead := w.Leader("bellandi")
 	if lead == nil {
@@ -41,6 +42,7 @@ func TestAFamilyLeadKeepsTheirOwnSeat(t *testing.T) {
 }
 
 func TestYouAreReceivedByWhoeverIsActuallyThere(t *testing.T) {
+	t.Parallel()
 	w := caller(t)
 	lead := w.Leader("bellandi")
 	if lead == nil {
@@ -74,6 +76,7 @@ func TestYouAreReceivedByWhoeverIsActuallyThere(t *testing.T) {
 }
 
 func TestSomebodyOfTheirsCanSpeakForThem(t *testing.T) {
+	t.Parallel()
 	w := caller(t)
 	lead := w.Leader("bellandi")
 	lead.Location = "filling"

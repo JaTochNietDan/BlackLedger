@@ -27,6 +27,7 @@ func petitioner(t *testing.T) (*World, *NPC) {
 }
 
 func TestNobodyAsksForAnythingWhereNobodyIs(t *testing.T) {
+	t.Parallel()
 	w, giver := petitioner(t)
 	giver.Location = "estate"
 	if _, ok := w.AvailableCommission("bar"); ok {
@@ -38,6 +39,7 @@ func TestNobodyAsksForAnythingWhereNobodyIs(t *testing.T) {
 }
 
 func TestPeopleWhoWantYouDeadDoNotHandYouWork(t *testing.T) {
+	t.Parallel()
 	w, giver := petitioner(t)
 	if _, ok := w.AvailableCommission("bar"); !ok {
 		t.Fatal("nobody offered anything to begin with")
@@ -49,6 +51,7 @@ func TestPeopleWhoWantYouDeadDoNotHandYouWork(t *testing.T) {
 }
 
 func TestWorkComesFromWhatTheOrganizationIsLivingThrough(t *testing.T) {
+	t.Parallel()
 	w, giver := petitioner(t)
 	f := w.faction(giver.Faction)
 	rival := w.Rival(f.ID)
@@ -80,6 +83,7 @@ func TestWorkComesFromWhatTheOrganizationIsLivingThrough(t *testing.T) {
 }
 
 func TestADrainCreditsOnlyWhatThePlayerTook(t *testing.T) {
+	t.Parallel()
 	w, giver := petitioner(t)
 	f := w.faction(giver.Faction)
 	rival := w.Rival(f.ID)
@@ -106,6 +110,7 @@ func TestADrainCreditsOnlyWhatThePlayerTook(t *testing.T) {
 }
 
 func TestWorkIsPaidWhenItIsDoneAndChargedWhenItIsNot(t *testing.T) {
+	t.Parallel()
 	w, giver := petitioner(t)
 	f := w.faction(giver.Faction)
 	f.Goodwill = 0
@@ -148,6 +153,7 @@ func TestWorkIsPaidWhenItIsDoneAndChargedWhenItIsNot(t *testing.T) {
 }
 
 func TestOnlySoMuchWorkAtOnce(t *testing.T) {
+	t.Parallel()
 	w, giver := petitioner(t)
 	for i := 0; i < MaxCommissions; i++ {
 		w.Commissions = append(w.Commissions, Commission{ID: ID(), PatronID: "nobody" + string(rune('a'+i)),
@@ -162,6 +168,7 @@ func TestOnlySoMuchWorkAtOnce(t *testing.T) {
 }
 
 func TestOneOrganizationAsksForOneThingAtATime(t *testing.T) {
+	t.Parallel()
 	w, _ := petitioner(t)
 	if err := w.TakeCommission("bar"); err != nil {
 		t.Fatal(err)
@@ -172,6 +179,7 @@ func TestOneOrganizationAsksForOneThingAtATime(t *testing.T) {
 }
 
 func TestNobodyInheritsAnObligation(t *testing.T) {
+	t.Parallel()
 	w, _ := petitioner(t)
 	w.TakeCommission("bar")
 	w.Player.Alive = false
@@ -185,6 +193,7 @@ func TestNobodyInheritsAnObligation(t *testing.T) {
 }
 
 func TestTheInterfaceIsToldSomethingTrue(t *testing.T) {
+	t.Parallel()
 	w, _ := petitioner(t)
 	w.TakeCommission("bar")
 	public := w.PublicCommissions()
@@ -203,6 +212,7 @@ func TestTheInterfaceIsToldSomethingTrue(t *testing.T) {
 // A commission has to survive being written to a save and read back, or a
 // deadline stops meaning anything the moment the player closes the game.
 func TestWorkSurvivesBeingWrittenDown(t *testing.T) {
+	t.Parallel()
 	w, _ := petitioner(t)
 	if err := w.TakeCommission("bar"); err != nil {
 		t.Fatal(err)

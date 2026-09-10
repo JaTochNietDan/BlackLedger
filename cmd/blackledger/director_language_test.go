@@ -6,6 +6,7 @@ import (
 )
 
 func TestMixedScriptChoiceIsRejectedWithoutDamagingAccents(t *testing.T) {
+	t.Parallel()
 	for _, label := range []string{"Use the back通道", "Пройти quietly"} {
 		if validateChoiceScript(core.Proposal{Approaches: []core.Approach{{Label: label}}}) == nil {
 			t.Fatal("mixed script accepted", label)
@@ -19,6 +20,7 @@ func TestMixedScriptChoiceIsRejectedWithoutDamagingAccents(t *testing.T) {
 }
 
 func TestSceneTitleNamesTheSituationRatherThanRepeatingAChoice(t *testing.T) {
+	t.Parallel()
 	// Observed on qwen3.5:35b-a3b: a new-life mediation was titled with its own
 	// approach label, "Quietly listen to both sides".
 	repeated := core.Proposal{Title: "Quietly listen to both sides", Approaches: []core.Approach{{Method: "careful", Label: "Quietly listen to both sides"}}}
@@ -44,6 +46,7 @@ func TestSceneTitleNamesTheSituationRatherThanRepeatingAChoice(t *testing.T) {
 }
 
 func TestEveryApproachNeedsALabelThePlayerCanPress(t *testing.T) {
+	t.Parallel()
 	// Observed live on qwen3.5:35b-a3b: a war-derived offer came back with an
 	// empty first approach label, which renders as an unpressable button.
 	if validateApproachLabels(core.Proposal{Approaches: []core.Approach{{Method: "careful", Label: ""}}}) == nil {
@@ -64,6 +67,7 @@ func TestEveryApproachNeedsALabelThePlayerCanPress(t *testing.T) {
 }
 
 func TestAnApproachLabelDoesNotStopMidPhrase(t *testing.T) {
+	t.Parallel()
 	// Observed live: the model wrote up to the 45-character limit and the label
 	// was cut at "Drive directly to the exchange and hand it to".
 	for _, label := range []string{

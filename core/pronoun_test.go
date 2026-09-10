@@ -28,6 +28,7 @@ import (
 var gendered = regexp.MustCompile(`\b(he|him|his|himself|she|her|hers|herself|man|men|woman|women|boy|boys|girl|girls|gentleman|gentlemen|lady|ladies)\b`)
 
 func TestNobodyInThisCityHasAGenderTheGameNeverGaveThem(t *testing.T) {
+	t.Parallel()
 	names, err := filepath.Glob("*.go")
 	if err != nil {
 		t.Fatal(err)

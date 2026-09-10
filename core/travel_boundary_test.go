@@ -6,6 +6,7 @@ import (
 )
 
 func TestTravelArrivalAtDecisionBoundaryIsNotLost(t *testing.T) {
+	t.Parallel()
 	w := pressureWorld()
 	w.District = 1
 	w.Player.Location = "bar"
@@ -24,6 +25,7 @@ func TestTravelArrivalAtDecisionBoundaryIsNotLost(t *testing.T) {
 	}
 }
 func TestPartialTravelExplainsWherePlayerRemains(t *testing.T) {
+	t.Parallel()
 	w := pressureWorld()
 	w.District = 1
 	w.Player.Location = "bar"
@@ -42,6 +44,7 @@ func TestPartialTravelExplainsWherePlayerRemains(t *testing.T) {
 }
 
 func TestPreparedEncounterDeliveredOnArrival(t *testing.T) {
+	t.Parallel()
 	for _, dueAtArrival := range []bool{false, true} {
 		w := New(27)
 		duration := TravelMinutes("room", "bar")
@@ -72,6 +75,7 @@ func TestPreparedEncounterDeliveredOnArrival(t *testing.T) {
 }
 
 func TestArrivalEncounterWaitsBehindUrgentIncident(t *testing.T) {
+	t.Parallel()
 	w := pressureWorld()
 	w.District = 1
 	w.Player.Location = "bar"

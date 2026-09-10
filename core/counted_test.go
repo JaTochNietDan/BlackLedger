@@ -12,6 +12,7 @@ import (
 // Agree, spelled, withArticle — and nothing that agrees a noun with a number.
 
 func TestCountedAgreesTheNounWithTheNumber(t *testing.T) {
+	t.Parallel()
 	for _, c := range []struct {
 		n    int
 		want string
@@ -29,6 +30,7 @@ func TestCountedAgreesTheNounWithTheNumber(t *testing.T) {
 var singularOne = regexp.MustCompile(`\b1 [a-z]+s\b`)
 
 func TestNoDescriptionCountsOneOfSomethings(t *testing.T) {
+	t.Parallel()
 	w := New(6)
 	w.District = 2
 	w.Player.Cash = 5000
@@ -55,6 +57,7 @@ func TestNoDescriptionCountsOneOfSomethings(t *testing.T) {
 
 // The Herald counts stories, and the verb has to follow the number too.
 func TestOneStoryIsAboutYouAndTwoStoriesAre(t *testing.T) {
+	t.Parallel()
 	w := New(6)
 	w.District = 2
 	w.Player.Location = "herald"

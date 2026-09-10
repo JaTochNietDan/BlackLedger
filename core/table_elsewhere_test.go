@@ -11,6 +11,7 @@ import "testing"
 // had been storing the room on the hand the whole time.
 
 func TestARefusedTableSaysWhereTheHandIs(t *testing.T) {
+	t.Parallel()
 	w := New(5)
 	w.Player.Cash = 400
 	w.District = 2 // the casino is not in the first district
@@ -70,6 +71,7 @@ func TestARefusedTableSaysWhereTheHandIs(t *testing.T) {
 // And where the hand is, the refusal does not send the player to the room they
 // are already standing in.
 func TestTheRefusalWhereTheHandIsDoesNotSendYouAnywhere(t *testing.T) {
+	t.Parallel()
 	w := New(5)
 	w.Player.Cash = 400
 	w.District = 2

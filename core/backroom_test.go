@@ -53,6 +53,7 @@ func playOut(t *testing.T, w *World) {
 }
 
 func TestTheBackRoomSeatsPeopleWhoLiveHere(t *testing.T) {
+	t.Parallel()
 	w, seated := backroom(t)
 	if err := w.SitInTheBackRoom(BackRoom, 50); err != nil {
 		t.Fatalf("nobody could get a game: %v", err)
@@ -92,6 +93,7 @@ func TestTheBackRoomSeatsPeopleWhoLiveHere(t *testing.T) {
 }
 
 func TestEveryCardOnTheTableIsADifferentCard(t *testing.T) {
+	t.Parallel()
 	for seed := uint32(1); seed <= 200; seed++ {
 		w, _ := backroom(t)
 		w.RNG = seed * 2654435761
@@ -115,6 +117,7 @@ func TestEveryCardOnTheTableIsADifferentCard(t *testing.T) {
 }
 
 func TestTheBestHandTakesThePot(t *testing.T) {
+	t.Parallel()
 	w, _ := backroom(t)
 	if err := w.SitInTheBackRoom(BackRoom, 50); err != nil {
 		t.Fatalf("nobody could get a game: %v", err)
@@ -155,6 +158,7 @@ func hand(s ...string) []Card {
 }
 
 func TestAHandIsWorthWhatItIsWorth(t *testing.T) {
+	t.Parallel()
 	cases := []struct {
 		what string
 		cat  int
@@ -203,6 +207,7 @@ func TestAHandIsWorthWhatItIsWorth(t *testing.T) {
 // way as everybody else at the table should come out level, because the only
 // thing moving the money is the cards.
 func TestTheBackRoomTakesNoRake(t *testing.T) {
+	t.Parallel()
 	const hands = 3000
 	table, mine := 0, 0
 	for seed := uint32(1); seed <= hands; seed++ {
@@ -265,6 +270,7 @@ func TestTheBackRoomTakesNoRake(t *testing.T) {
 // stop. Both numbers are here because the first is the game being fair and the
 // second is the game being a game.
 func TestFoldingIsWorthMoreThanTheCardsAre(t *testing.T) {
+	t.Parallel()
 	run := func(fold, bet bool) int {
 		total := 0
 		for seed := uint32(1); seed <= 3000; seed++ {
@@ -323,6 +329,7 @@ func TestFoldingIsWorthMoreThanTheCardsAre(t *testing.T) {
 // Random hands almost never tie — none did in four thousand — so the split has
 // to be put on the table by hand or it is a branch nobody has ever run.
 func TestATiedPotIsSplitRatherThanGivenAway(t *testing.T) {
+	t.Parallel()
 	w, _ := backroom(t)
 	if err := w.SitInTheBackRoom(BackRoom, 50); err != nil {
 		t.Fatalf("no game: %v", err)
@@ -358,6 +365,7 @@ func TestATiedPotIsSplitRatherThanGivenAway(t *testing.T) {
 // where the game is, the ante the player typed is the ante taken, and the two
 // buttons of a hand both work.
 func TestTheGameCanBePlayedThroughTheSamePathAsEverythingElse(t *testing.T) {
+	t.Parallel()
 	w, _ := backroom(t)
 	offered := func(kind string) *Action {
 		for _, a := range w.Actions(w.Player.Location) {
@@ -419,6 +427,7 @@ func TestTheGameCanBePlayedThroughTheSamePathAsEverythingElse(t *testing.T) {
 // somebody folds stays in the pot, and the pot is always exactly what everybody
 // put in it.
 func TestWhatIsFoldedStaysInThePot(t *testing.T) {
+	t.Parallel()
 	w, seated := backroom(t)
 	cash, purses := w.Player.Cash, 0
 	for _, id := range seated {
@@ -455,6 +464,7 @@ func TestWhatIsFoldedStaysInThePot(t *testing.T) {
 // The table has to talk, or the player is reading a spreadsheet. Every seat
 // says what it did, and nobody's cards are visible until the hand is over.
 func TestTheTableSaysWhatItDid(t *testing.T) {
+	t.Parallel()
 	w, _ := backroom(t)
 	if err := w.SitInTheBackRoom(BackRoom, 50); err != nil {
 		t.Fatalf("no game: %v", err)
@@ -485,6 +495,7 @@ func TestTheTableSaysWhatItDid(t *testing.T) {
 // the button is decoration: with the fold not recorded, a player could throw in
 // the best hand at the table and still be paid for it.
 func TestAHandThrownInWinsNothingHoweverGoodItWas(t *testing.T) {
+	t.Parallel()
 	w, _ := backroom(t)
 	if err := w.SitInTheBackRoom(BackRoom, 50); err != nil {
 		t.Fatalf("no game: %v", err)
@@ -513,6 +524,7 @@ func TestAHandThrownInWinsNothingHoweverGoodItWas(t *testing.T) {
 // rename here that is not a rename there is a blank screen at a table with
 // money on it, and nothing else in the build would notice.
 func TestTheTablePublishesEverythingTheScreenReads(t *testing.T) {
+	t.Parallel()
 	w, _ := backroom(t)
 	if err := w.SitInTheBackRoom(BackRoom, 50); err != nil {
 		t.Fatalf("no game: %v", err)
@@ -547,6 +559,7 @@ func TestTheTablePublishesEverythingTheScreenReads(t *testing.T) {
 // in a week was one person, at nine in the morning, so the back room was a
 // feature nobody could ever have used.
 func TestThereIsSomebodyInTheBackRoomToPlayAgainst(t *testing.T) {
+	t.Parallel()
 	w := New(404)
 	night, day, most := 0, 0, 0
 	for step := 0; step < 24*7; step++ {
@@ -581,6 +594,7 @@ func TestThereIsSomebodyInTheBackRoomToPlayAgainst(t *testing.T) {
 // to remember you, and a man you paid has a reason to like you. Until this,
 // both walked away with nothing on their mind.
 func TestTakingSomebodysMoneyAtCardsIsSomethingTheyRemember(t *testing.T) {
+	t.Parallel()
 	w, _ := backroom(t)
 	if err := w.SitInTheBackRoom(BackRoom, 300); err != nil {
 		t.Fatalf("no game: %v", err)
@@ -607,6 +621,7 @@ func TestTakingSomebodysMoneyAtCardsIsSomethingTheyRemember(t *testing.T) {
 }
 
 func TestLosingToSomebodyAtCardsIsAlsoSomethingTheyRemember(t *testing.T) {
+	t.Parallel()
 	w, _ := backroom(t)
 	if err := w.SitInTheBackRoom(BackRoom, 300); err != nil {
 		t.Fatalf("no game: %v", err)
@@ -634,6 +649,7 @@ func TestLosingToSomebodyAtCardsIsAlsoSomethingTheyRemember(t *testing.T) {
 // not carrying it around a week later, or the whole city ends up sore at a
 // player who plays cards.
 func TestASmallLossIsNotHeldAgainstAnybody(t *testing.T) {
+	t.Parallel()
 	w, _ := backroom(t)
 	if err := w.SitInTheBackRoom(BackRoom, 10); err != nil {
 		t.Fatalf("no game: %v", err)
@@ -658,6 +674,7 @@ func TestASmallLossIsNotHeldAgainstAnybody(t *testing.T) {
 // out of people willing and able to sit down, which is the natural end of a
 // game with no house behind it: the house never runs out, and these people do.
 func TestARoomYouHaveCleanedOutHasNoGameLeftInIt(t *testing.T) {
+	t.Parallel()
 	w, seated := backroom(t)
 	hands, sore := 0, 0
 	for hands < 40 {
@@ -703,6 +720,7 @@ func TestARoomYouHaveCleanedOutHasNoGameLeftInIt(t *testing.T) {
 // your hand rather than believing you, because what he wants back is what you
 // took. That has to be visible in the money, not in a sentence.
 func TestSomebodyYouTookMoneyOffPlaysYouHarder(t *testing.T) {
+	t.Parallel()
 	round := func(sore int) (int, int) {
 		called, raised := 0, 0
 		for seed := uint32(1); seed <= 1200; seed++ {
@@ -760,6 +778,7 @@ func TestSomebodyYouTookMoneyOffPlaysYouHarder(t *testing.T) {
 // end earlier. The first version of this asked about the money moving and had
 // to be corrected — that was true of the draw and is not true here.
 func TestATableWithAGrudgeCostsYou(t *testing.T) {
+	t.Parallel()
 	run := func(sore int) (int, int) {
 		total, swing := 0, 0
 		for seed := uint32(1); seed <= 2000; seed++ {
@@ -819,6 +838,7 @@ func TestATableWithAGrudgeCostsYou(t *testing.T) {
 // A player sitting down against people they have cleaned out before should be
 // told so before the money goes in, not after.
 func TestYouAreToldWhoAtTheTableRemembersYou(t *testing.T) {
+	t.Parallel()
 	w, seated := backroom(t)
 	w.NPC(seated[1]).Sore = SoreAtCards
 	if err := w.SitInTheBackRoom(BackRoom, 50); err != nil {

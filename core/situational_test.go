@@ -6,6 +6,7 @@ import (
 )
 
 func TestAQuietCityOffersNoConflictWork(t *testing.T) {
+	t.Parallel()
 	w := New(101)
 	if len(w.SituationalOperations()) != 0 {
 		t.Fatalf("a city with no war, no seizure and no succession offered %v", w.SituationalOperations())
@@ -18,6 +19,7 @@ func TestAQuietCityOffersNoConflictWork(t *testing.T) {
 }
 
 func TestWarCreatesWorkThatOnlyAWarCouldCreate(t *testing.T) {
+	t.Parallel()
 	w := New(103)
 	w.Antagonize("bellandi", "russo", 100)
 	if w.Conflict("bellandi", "russo").State != "war" {
@@ -45,6 +47,7 @@ func TestWarCreatesWorkThatOnlyAWarCouldCreate(t *testing.T) {
 }
 
 func TestGroundChangingHandsCreatesSomethingToRecover(t *testing.T) {
+	t.Parallel()
 	w := New(107)
 	place, _ := PlaceByID("club")
 	w.Report("seizure", upper(place.Name)+" CHANGES HANDS", "It changed hands.")
@@ -71,6 +74,7 @@ func TestGroundChangingHandsCreatesSomethingToRecover(t *testing.T) {
 }
 
 func TestANewLeaderLeavesArrangementsUnsettled(t *testing.T) {
+	t.Parallel()
 	w := New(109)
 	deputy := w.Members("bellandi")[1].Name
 	w.Kill("vittorio", "Shot at the club.")
@@ -92,6 +96,7 @@ func TestANewLeaderLeavesArrangementsUnsettled(t *testing.T) {
 }
 
 func TestConflictWorkDoesNotCrowdOutEverythingElse(t *testing.T) {
+	t.Parallel()
 	w := New(113)
 	w.Antagonize("bellandi", "russo", 100)
 	seen := map[string]int{}
@@ -124,6 +129,7 @@ func TestConflictWorkDoesNotCrowdOutEverythingElse(t *testing.T) {
 }
 
 func TestEveryOperationHasWordsForItsButtonAndItsLedger(t *testing.T) {
+	t.Parallel()
 	// The conflict-derived operations were added without labels, which rendered
 	// as an unpressable blank choice in a live offer.
 	operations := []string{"courier", "mediation", "collection"}
@@ -145,6 +151,7 @@ func TestEveryOperationHasWordsForItsButtonAndItsLedger(t *testing.T) {
 }
 
 func TestABusinessInTroubleIsAReasonForWork(t *testing.T) {
+	t.Parallel()
 	w := New(811)
 	w.Properties["laundry"].Owner = "player:1"
 	if w.hasSituational("supply") {
@@ -167,6 +174,7 @@ func TestABusinessInTroubleIsAReasonForWork(t *testing.T) {
 }
 
 func TestStockThatHasToMoveIsAReasonForWork(t *testing.T) {
+	t.Parallel()
 	w := New(817)
 	if w.hasSituational("distribution") {
 		t.Fatal("an empty pocket generated distribution work")

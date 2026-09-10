@@ -53,6 +53,7 @@ func attackRan(w *World, attack func(w *World, place string) int, place string) 
 }
 
 func TestAFamilyAndThePlayerAgreeWhatAnAttackCosts(t *testing.T) {
+	t.Parallel()
 	player := func(w *World, place string) int {
 		if err := w.SabotageBy(place, w.OwnHands()); err != nil {
 			return 1
@@ -106,6 +107,7 @@ func apart(t *testing.T, what string, player, family, tolerance float64) {
 // it raided. Those are different constants, so this measures what each one
 // actually costs.
 func TestAFamilyAndThePlayerAgreeWhatAnAttackTakes(t *testing.T) {
+	t.Parallel()
 	taken := func(runs int, attack func(w *World) (before, after int, ok bool)) float64 {
 		total, counted := 0, 0
 		for i := 0; i < runs; i++ {
@@ -157,6 +159,7 @@ func bigger(a, b float64) float64 {
 // ever fail one way — half a check, and it happened to be the half that was
 // green.
 func TestTheComparisonWorksInBothDirections(t *testing.T) {
+	t.Parallel()
 	if bigger(10, 100) != 100 {
 		t.Error("a larger family figure is not taken as the larger")
 	}

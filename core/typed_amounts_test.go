@@ -6,6 +6,7 @@ import "testing"
 // not in fixed lots. The lot survives only as what the field starts on.
 
 func TestTheFloatTakesTheFigureYouType(t *testing.T) {
+	t.Parallel()
 	w := houseKeeper(t)
 	cash := w.Player.Cash
 	if err := w.Bankroll("casino", 700); err != nil {
@@ -23,6 +24,7 @@ func TestTheFloatTakesTheFigureYouType(t *testing.T) {
 }
 
 func TestAFigureNobodyTypedIsStillTheLot(t *testing.T) {
+	t.Parallel()
 	w := houseKeeper(t)
 	cash := w.Player.Cash
 	if err := w.Bankroll("casino", 0); err != nil {
@@ -34,6 +36,7 @@ func TestAFigureNobodyTypedIsStillTheLot(t *testing.T) {
 }
 
 func TestTheFloatRefusesWhatIsNotThere(t *testing.T) {
+	t.Parallel()
 	w := houseKeeper(t)
 	w.Player.Cash = 400
 	if w.BankrollReadiness("casino", 900) == "" {
@@ -54,6 +57,7 @@ func TestTheFloatRefusesWhatIsNotThere(t *testing.T) {
 }
 
 func TestMoneyLeavesAndComesHomeInTypedFigures(t *testing.T) {
+	t.Parallel()
 	w := banker(t)
 	cash := w.Player.Cash
 	if err := w.Deposit(1200); err != nil {
@@ -85,6 +89,7 @@ func TestMoneyLeavesAndComesHomeInTypedFigures(t *testing.T) {
 }
 
 func TestTheInterfaceOffersAFieldForEachOfThem(t *testing.T) {
+	t.Parallel()
 	w := houseKeeper(t)
 	w.Event, w.District = nil, 9
 	w.Properties["casino"].Bankroll = 800

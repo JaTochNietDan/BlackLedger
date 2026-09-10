@@ -13,6 +13,7 @@ func familiarityWorld(life int, arrangements ...core.ArrangementMemory) *core.Wo
 }
 
 func TestStrangersDoNotClaimPriorDealingsWithThePlayer(t *testing.T) {
+	t.Parallel()
 	// Observed on qwen3.5:35b-a3b: Mara greeted a brand-new life-two protagonist
 	// with "I need you back at The Mariner", inheriting the dead Alex's standing.
 	w := familiarityWorld(2, core.ArrangementMemory{Life: 1, Speaker: "mara", Status: "completed", Title: "Alex's old mediation"})
@@ -43,6 +44,7 @@ func TestStrangersDoNotClaimPriorDealingsWithThePlayer(t *testing.T) {
 }
 
 func TestFirstMeetingProseAndOrdinaryDirectionsAreAccepted(t *testing.T) {
+	t.Parallel()
 	w := familiarityWorld(2, core.ArrangementMemory{Life: 1, Speaker: "mara", Status: "completed"})
 	for _, text := range []string{
 		"Two staff members are arguing over who controls the rear loading bay.",
@@ -62,6 +64,7 @@ func TestFirstMeetingProseAndOrdinaryDirectionsAreAccepted(t *testing.T) {
 }
 
 func TestArrangementsInThisLifeEarnFamiliarLanguage(t *testing.T) {
+	t.Parallel()
 	body := "Welcome back. Two staff members are arguing over the work area."
 	completed := familiarityWorld(1, core.ArrangementMemory{Life: 1, Speaker: "mara", Status: "completed"})
 	if err := validateEarnedFamiliarity(completed, core.Proposal{Speaker: "mara", Body: body}); err != nil {
@@ -85,6 +88,7 @@ func TestArrangementsInThisLifeEarnFamiliarLanguage(t *testing.T) {
 }
 
 func TestFamiliarityIsCheckedInTitlesAndApproachLabels(t *testing.T) {
+	t.Parallel()
 	w := familiarityWorld(2)
 	if validateEarnedFamiliarity(w, core.Proposal{Speaker: "mara", Title: "Welcome back to The Mariner"}) == nil {
 		t.Fatal("title familiarity accepted")

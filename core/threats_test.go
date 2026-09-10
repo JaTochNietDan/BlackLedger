@@ -34,6 +34,7 @@ func sore(t *testing.T) (*World, *NPC) {
 }
 
 func TestSomebodyWithSomethingAgainstYouSaysSo(t *testing.T) {
+	t.Parallel()
 	w, n := sore(t)
 	if said := w.Threat(n); said != "" {
 		t.Fatalf("somebody with nothing against you threatened you: %q", said)
@@ -68,6 +69,7 @@ func TestSomebodyWithSomethingAgainstYouSaysSo(t *testing.T) {
 }
 
 func TestTheCityDoesSwear(t *testing.T) {
+	t.Parallel()
 	// Not one line in five hundred, which is what "increase the cursing" means.
 	seen, salty := 0, 0
 	words := []string{"hell", "damn", "christ", "bastard", "son of a", "goddamn"}
@@ -106,6 +108,7 @@ func TestTheCityDoesSwear(t *testing.T) {
 }
 
 func TestBadBloodIsNewsAndStopsBeingNews(t *testing.T) {
+	t.Parallel()
 	w := New(29)
 	w.Event, w.District = nil, 9
 	w.Player.Contacts = 5 // reach enough to hear gossip at all

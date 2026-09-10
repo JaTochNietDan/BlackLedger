@@ -7,6 +7,7 @@ import (
 )
 
 func TestDirectorContactsGrowWithOrganization(t *testing.T) {
+	t.Parallel()
 	w := core.New(27)
 	check := func(want ...string) {
 		t.Helper()
@@ -35,6 +36,7 @@ func TestDirectorContactsGrowWithOrganization(t *testing.T) {
 }
 
 func TestDirectorContactRecencyIgnoresPreviousLives(t *testing.T) {
+	t.Parallel()
 	w := core.New(27)
 	w.Life = 2
 	w.Player.Crew = []core.Crew{{ID: "leo", Name: "Leo Carver", Loyalty: 65}}
@@ -45,6 +47,7 @@ func TestDirectorContactRecencyIgnoresPreviousLives(t *testing.T) {
 }
 
 func TestTheDirectorDoesNotSpeakThroughTheDead(t *testing.T) {
+	t.Parallel()
 	w := core.New(21)
 	w.Factions[0].Goodwill = 40 // the Bellandi leader would otherwise be eligible
 	before := eligibleDirectorSpeakers(w)
@@ -76,6 +79,7 @@ func TestTheDirectorDoesNotSpeakThroughTheDead(t *testing.T) {
 }
 
 func TestMaraCanDieAndStopsBeingAvailable(t *testing.T) {
+	t.Parallel()
 	w := core.New(22)
 	if !eligibleDirectorSpeakers(w)["mara"] {
 		t.Fatal("the starting contact was not eligible")

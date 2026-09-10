@@ -20,6 +20,7 @@ func pressureWorld() *World {
 	return w
 }
 func TestPressureInterruptsAtScheduledMinute(t *testing.T) {
+	t.Parallel()
 	w := pressureWorld()
 	w.Advance(120)
 	if w.Minute != 510 || w.Event == nil || w.Event.Kind != "business_pressure" || w.Event.Target != "laundry" {
@@ -31,6 +32,7 @@ func TestPressureInterruptsAtScheduledMinute(t *testing.T) {
 	}
 }
 func TestPressurePaymentIsSpecificNotBlanketProtection(t *testing.T) {
+	t.Parallel()
 	w := pressureWorld()
 	w.Retaliation()
 	w.Advance(30)
@@ -44,6 +46,7 @@ func TestPressurePaymentIsSpecificNotBlanketProtection(t *testing.T) {
 	}
 }
 func TestRefusingCreatesHiddenConsequences(t *testing.T) {
+	t.Parallel()
 	w := pressureWorld()
 	w.Advance(30)
 	next, err := Execute(w, Command{Kind: "choice", Event: w.Event.ID, Choice: "resist", Revision: w.Revision})
@@ -63,6 +66,7 @@ func TestRefusingCreatesHiddenConsequences(t *testing.T) {
 	}
 }
 func TestBusinessDamageUsesAvailableCrewNotHomeGuards(t *testing.T) {
+	t.Parallel()
 	for _, tc := range []struct {
 		name string
 		crew bool
@@ -86,6 +90,7 @@ func TestBusinessDamageUsesAvailableCrewNotHomeGuards(t *testing.T) {
 	}
 }
 func TestNoDemandWithoutBusiness(t *testing.T) {
+	t.Parallel()
 	w := New(27)
 	w.NextPressure = 500
 	w.Advance(60)
@@ -95,6 +100,7 @@ func TestNoDemandWithoutBusiness(t *testing.T) {
 }
 
 func TestBusinessPlotDoesNotPreventPersonalHit(t *testing.T) {
+	t.Parallel()
 	w := pressureWorld()
 	w.Plots = []Plot{{ID: ID(), Kind: "sabotage", Life: w.Life, Actor: "russo", Target: "laundry", Due: 900}}
 	w.Retaliation()
@@ -104,6 +110,7 @@ func TestBusinessPlotDoesNotPreventPersonalHit(t *testing.T) {
 	}
 }
 func TestInvestigationNamesRealActorAndTarget(t *testing.T) {
+	t.Parallel()
 	w := pressureWorld()
 	w.Plots = []Plot{{ID: ID(), Kind: "sabotage", Life: w.Life, Actor: "russo", Target: "laundry", Due: 900}}
 	w.Investigate()
@@ -113,6 +120,7 @@ func TestInvestigationNamesRealActorAndTarget(t *testing.T) {
 	}
 }
 func TestOpportunityDoesNotRevealHiddenPlans(t *testing.T) {
+	t.Parallel()
 	w := New(27)
 	before, _ := json.Marshal(w.NextOpportunity())
 	w.Retaliation()
@@ -129,6 +137,7 @@ func TestOpportunityDoesNotRevealHiddenPlans(t *testing.T) {
 }
 
 func TestPoliceStopDefersJobRewardUntilDecision(t *testing.T) {
+	t.Parallel()
 	for _, decision := range []string{"pay", "abandon"} {
 		t.Run(decision, func(t *testing.T) {
 			w := New(27)
@@ -162,6 +171,7 @@ func TestPoliceStopDefersJobRewardUntilDecision(t *testing.T) {
 }
 
 func TestGeneratedFactionWorkHasValidatedPoliticalEffect(t *testing.T) {
+	t.Parallel()
 	w := New(27)
 	if _, err := w.ValidateProposal(Proposal{Title: "A job", Body: "Help them.", Speaker: "mara", Operation: "courier", Outcome: "Done.", Beneficiary: "invented-family"}); err == nil {
 		t.Fatal("unknown faction accepted")
@@ -195,6 +205,7 @@ func TestGeneratedFactionWorkHasValidatedPoliticalEffect(t *testing.T) {
 }
 
 func TestAllyPressureReportsBothRelationships(t *testing.T) {
+	t.Parallel()
 	w := pressureWorld()
 	w.Advance(30)
 	before := w.Player.Cash
@@ -217,6 +228,7 @@ func TestAllyPressureReportsBothRelationships(t *testing.T) {
 }
 
 func TestBookReviewDoesNotAdvanceCity(t *testing.T) {
+	t.Parallel()
 	w := pressureWorld()
 	w.Player.Location = "laundry"
 	w.Properties["laundry"].Condition = 85
@@ -233,6 +245,7 @@ func TestBookReviewDoesNotAdvanceCity(t *testing.T) {
 }
 
 func TestFriendlyHighIncomeDistrictDoesNotSilenceHostileFamily(t *testing.T) {
+	t.Parallel()
 	w := pressureWorld()
 	w.Properties["casino"].Owner = "player:1"
 	w.Factions[1].Goodwill = 40
@@ -243,6 +256,7 @@ func TestFriendlyHighIncomeDistrictDoesNotSilenceHostileFamily(t *testing.T) {
 	}
 }
 func TestHostileHighIncomeDistrictStillMakesItsOwnClaim(t *testing.T) {
+	t.Parallel()
 	w := pressureWorld()
 	w.Properties["casino"].Owner = "player:1"
 	w.Factions[0].Goodwill = 40
@@ -253,6 +267,7 @@ func TestHostileHighIncomeDistrictStillMakesItsOwnClaim(t *testing.T) {
 	}
 }
 func TestGoodRelationsInAllOwnedDistrictsPreservePeace(t *testing.T) {
+	t.Parallel()
 	w := pressureWorld()
 	w.Properties["casino"].Owner = "player:1"
 	w.Factions[0].Goodwill, w.Factions[1].Goodwill = 25, 25
@@ -268,6 +283,7 @@ func TestGoodRelationsInAllOwnedDistrictsPreservePeace(t *testing.T) {
 }
 
 func TestSustainedDefianceEscalatesForEitherFamily(t *testing.T) {
+	t.Parallel()
 	for _, actor := range []string{"bellandi", "russo"} {
 		w := pressureWorld()
 		e := &Scene{Actor: actor, Target: "laundry"}
@@ -312,6 +328,7 @@ func TestSustainedDefianceEscalatesForEitherFamily(t *testing.T) {
 }
 
 func TestRussoWarningNamesActualFamilyAndCanBeNegotiated(t *testing.T) {
+	t.Parallel()
 	w := New(27)
 	w.Player.Contacts = 2
 	w.RetaliationFrom("russo")
@@ -330,6 +347,7 @@ func TestRussoWarningNamesActualFamilyAndCanBeNegotiated(t *testing.T) {
 }
 
 func TestFavorCanCreateRussoFeud(t *testing.T) {
+	t.Parallel()
 	w := New(27)
 	w.Factions[1].Goodwill = -28
 	w.ResolveBeneficiary("bellandi")
@@ -339,6 +357,7 @@ func TestFavorCanCreateRussoFeud(t *testing.T) {
 }
 
 func TestKnownThreatsRevealOnlyDiscoveredCurrentLifePlans(t *testing.T) {
+	t.Parallel()
 	w := New(27)
 	w.RetaliationFrom("russo")
 	if len(w.KnownThreats()) != 0 {
@@ -363,6 +382,7 @@ func TestKnownThreatsRevealOnlyDiscoveredCurrentLifePlans(t *testing.T) {
 }
 
 func TestDefensiveContributionReportsActualDamageAvoided(t *testing.T) {
+	t.Parallel()
 	for _, tc := range []struct {
 		condition, strength, want int
 		credited                  bool

@@ -34,6 +34,7 @@ func marked2(t *testing.T) (*World, *NPC) {
 }
 
 func TestSomebodyWithAGrudgeTalksToThePolice(t *testing.T) {
+	t.Parallel()
 	w, n := marked2(t)
 	heat := w.Player.Heat
 	spoke := false
@@ -54,6 +55,7 @@ func TestSomebodyWithAGrudgeTalksToThePolice(t *testing.T) {
 }
 
 func TestTheNameComesBackIfYouCanReach(t *testing.T) {
+	t.Parallel()
 	w, n := marked2(t)
 	for i := 0; i < 400; i++ {
 		w.WorldRNG = uint32(i*2654435761 + 11)
@@ -90,6 +92,7 @@ func TestTheNameComesBackIfYouCanReach(t *testing.T) {
 }
 
 func TestNobodyWithNothingAgainstYouTalks(t *testing.T) {
+	t.Parallel()
 	w := New(89)
 	w.Event, w.District = nil, 9
 	w.Player.Health, w.Player.Runs = 100, RouteNotice*2
@@ -110,6 +113,7 @@ func TestNobodyWithNothingAgainstYouTalks(t *testing.T) {
 // would say anything about it, and the informant path could not be exercised at
 // all.
 func TestAMuggedManHoldsItAgainstYou(t *testing.T) {
+	t.Parallel()
 	w := New(97)
 	w.Event, w.District = nil, 9
 	w.Player.Cash, w.Player.Health, w.Player.Respect = 500, 100, 30

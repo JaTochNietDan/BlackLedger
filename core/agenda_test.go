@@ -3,6 +3,7 @@ package core
 import "testing"
 
 func TestPeopleActOnTheirOwnAmbition(t *testing.T) {
+	t.Parallel()
 	// This once asked whether any city was ever silent for twenty days. In a
 	// city of eight that was a fair question; in a city of thirty-five it is
 	// not, because a city where nothing happens anywhere for three weeks is a
@@ -35,6 +36,7 @@ func TestPeopleActOnTheirOwnAmbition(t *testing.T) {
 }
 
 func TestTheOneAtTheTopDoesNotDoThisPersonally(t *testing.T) {
+	t.Parallel()
 	w := New(601)
 	leader := w.Members("bellandi")[0]
 	if leader.Rank != RankLeader {
@@ -52,6 +54,7 @@ func TestTheOneAtTheTopDoesNotDoThisPersonally(t *testing.T) {
 }
 
 func TestNobodyRobsTheirOwnOrganization(t *testing.T) {
+	t.Parallel()
 	w := New(603)
 	holdings := w.FamilyHoldings("bellandi")
 	if len(holdings) == 0 {
@@ -74,6 +77,7 @@ func TestNobodyRobsTheirOwnOrganization(t *testing.T) {
 }
 
 func TestThePlayersBusinessIsATargetLikeAnyOther(t *testing.T) {
+	t.Parallel()
 	robbed, protectedRobbed := 0, 0
 	for i := uint32(1); i <= 300; i++ {
 		w := New(i * 2654435761)
@@ -114,6 +118,7 @@ func TestThePlayersBusinessIsATargetLikeAnyOther(t *testing.T) {
 }
 
 func TestSomebodyWithNothingCanMakeThemselvesSomebody(t *testing.T) {
+	t.Parallel()
 	w := New(607)
 	// An unaffiliated person with the makings of an operator, and premises
 	// standing without an owner.

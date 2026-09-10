@@ -16,6 +16,7 @@ import (
 // wheel to somebody else the player hired a man they had buried.
 
 func TestYouHireThePersonTheButtonNamed(t *testing.T) {
+	t.Parallel()
 	w := New(4)
 	w.Player.Location = "bar"
 	w.Player.Respect = 20

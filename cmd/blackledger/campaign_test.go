@@ -9,6 +9,7 @@ import (
 
 // Full command/API/store route; no injected money, reputation or death state.
 func TestHTTPRiseFallAndNewLife(t *testing.T) {
+	t.Parallel()
 	a := testApp(t)
 	count := 0
 	state := func() *core.World {

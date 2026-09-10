@@ -24,6 +24,7 @@ func postAndArrive(t *testing.T, w *World, id string) {
 }
 
 func TestNobodyStandsOnADoorThatIsNotYours(t *testing.T) {
+	t.Parallel()
 	w, _ := doorman(t)
 	for _, id := range []string{"club", "market", "room"} {
 		if w.PostReadiness(id) == "" {
@@ -36,6 +37,7 @@ func TestNobodyStandsOnADoorThatIsNotYours(t *testing.T) {
 }
 
 func TestAManCanOnlyBeInOnePlace(t *testing.T) {
+	t.Parallel()
 	w, member := doorman(t)
 	postAndArrive(t, w, "laundry")
 	if posted := w.PostedAt("laundry"); posted == nil || posted.ID != member.ID {
@@ -66,6 +68,7 @@ func TestAManCanOnlyBeInOnePlace(t *testing.T) {
 }
 
 func TestADeadManComesOffTheDoorByHimself(t *testing.T) {
+	t.Parallel()
 	w, member := doorman(t)
 	w.Post("laundry")
 	member.Dead = true
@@ -85,6 +88,7 @@ func TestADeadManComesOffTheDoorByHimself(t *testing.T) {
 }
 
 func TestAManOnTheDoorIsWorthSomethingAgainstARaid(t *testing.T) {
+	t.Parallel()
 	w, member := doorman(t)
 	if w.PostingDefenceAt("laundry") != 0 {
 		t.Fatal("an empty door was worth something")
@@ -127,6 +131,7 @@ func TestAManOnTheDoorIsWorthSomethingAgainstARaid(t *testing.T) {
 }
 
 func TestAManOnTheDoorTurnsAwayTheStreet(t *testing.T) {
+	t.Parallel()
 	const runs = 400
 	robbed := func(post bool) int {
 		hit := 0
@@ -163,6 +168,7 @@ func TestAManOnTheDoorTurnsAwayTheStreet(t *testing.T) {
 }
 
 func TestTheManOnTheDoorIsTheOneWhoPaysForIt(t *testing.T) {
+	t.Parallel()
 	// A raid that gets through reaches him before it reaches anybody else. Over
 	// enough raids on a place that falls, he is the one it costs.
 	const runs = 300

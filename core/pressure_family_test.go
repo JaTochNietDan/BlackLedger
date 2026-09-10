@@ -20,6 +20,7 @@ func pressured(t *testing.T, w *World, place string) {
 }
 
 func TestADemandComesFromAFamilyThatStillExists(t *testing.T) {
+	t.Parallel()
 	w := New(9)
 	// The city does what it does: one of the two original families is gone.
 	w.Dissolve("bellandi")
@@ -37,6 +38,7 @@ func TestADemandComesFromAFamilyThatStillExists(t *testing.T) {
 }
 
 func TestTheLastFamilyStandingDoesNotCrashTheCity(t *testing.T) {
+	t.Parallel()
 	w := New(9)
 	w.Dissolve("bellandi")
 	// A second-district premises: the old code indexed Factions[1], and there
@@ -64,6 +66,7 @@ func TestTheLastFamilyStandingDoesNotCrashTheCity(t *testing.T) {
 // Whose street it is, is a question about ground. A family that has taken a
 // district over collects there; the family that used to has no claim left.
 func TestTheFamilyHoldingTheStreetIsTheOneThatCollects(t *testing.T) {
+	t.Parallel()
 	w := New(9)
 	club, _ := PlaceByID("club")
 	// Russo takes the whole district off Bellandi.
@@ -87,6 +90,7 @@ func TestTheFamilyHoldingTheStreetIsTheOneThatCollects(t *testing.T) {
 // operates in get different claimants while there are families to spare, which
 // is what keeps a truce with one from suppressing the other's demand.
 func TestSeparateDistrictsHaveSeparateClaimants(t *testing.T) {
+	t.Parallel()
 	w := New(9)
 	claims := w.Claimants()
 	if len(claims) < 2 {
