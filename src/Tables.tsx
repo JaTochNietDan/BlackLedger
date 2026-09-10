@@ -264,3 +264,80 @@ export function Wheel({wheel, stakes, money, spin, turn = 0}:{
     </div>
   );
 }
+
+export interface MachineState {
+  pulled:boolean; place?:string; stake?:number; line?:string[]; pays?:number; won?:boolean;
+  stops:number; edge:number; two_cherries:number; one_cherry:number;
+  strip:{id:string; face:string; stops:number; pays:number}[];
+}
+
+// The bandit. Three drums, a handle, and the paytable painted on the machine —
+// which is the core's own strip, so a face the core cannot deal is a face
+// nobody can see. The drums roll while the pull is being resolved and stop one
+// after another, left to right, the way the real ones do; where they stop is
+// the core's answer and nothing else.
+export function Machine({machine, stakes, money, pull, turn = 0}:{
+  machine:MachineState; stakes:{id:string; amount:number}[]; money:(n:number)=>string;
+  pull:(stakeID:string)=>void; turn?:number;
+}) {
+  const [rolling, setRolling] = useState([false, false, false]);
+  const seen = useRef(-1);
+  useEffect(() => {
+    if (!machine.pulled || turn === seen.current) return;
+    seen.current = turn;
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    setRolling([true, true, true]);
+    const stops = [0, 1, 2].map((i) => setTimeout(
+      () => setRolling(r => r.map((was, at) => (at === i ? false : was))), 700 + i * 450));
+    return () => stops.forEach(clearTimeout);
+  }, [turn, machine.pulled]);
+
+  const strip = machine.strip || [];
+  const faceOf = (id?: string) => strip.find(s => s.id === id)?.face ?? '—';
+  const line = machine.line ?? [];
+  const settled = machine.pulled && !rolling.some(Boolean);
+
+  return (
+    <div className="felt machine-felt">
+      <div className="felt-head"><span>{machine.place ?? 'The machine'}</span>
+        <b>keeps {machine.edge} in every 100</b></div>
+      <div className="bandit">
+        <div className="bandit-window">
+          {[0, 1, 2].map(i => (
+            <div key={i} className={'drum' + (rolling[i] ? ' rolling' : '')}>
+              <span>{rolling[i] ? faceOf(strip[(i * 3 + 1) % Math.max(1, strip.length)]?.id) : faceOf(line[i])}</span>
+            </div>
+          ))}
+        </div>
+        {settled && <p className={'felt-result' + (machine.won ? ' won' : '')}>
+          {machine.won
+            ? `Pays ${machine.pays} to 1 — ${money((machine.stake ?? 0) * (machine.pays ?? 0))} in the tray`
+            : 'Nothing. The machine keeps it.'}
+        </p>}
+        <div className="bandit-handle" aria-hidden="true"><i/></div>
+      </div>
+
+      <table className="paytable">
+        <tbody>
+          {strip.map(s => (
+            <tr key={s.id}><th>{s.face} {s.face} {s.face}</th><td>{s.pays} to 1</td></tr>
+          ))}
+          <tr><th>Two cherries</th><td>{machine.two_cherries} to 1</td></tr>
+          <tr><th>One cherry</th><td>{machine.one_cherry} to 1</td></tr>
+        </tbody>
+      </table>
+
+      <div className="felt-actions">
+        {stakes.map(s => (
+          <button key={s.id} onClick={() => pull(s.id)} disabled={rolling.some(Boolean)}>
+            Pull for {money(s.amount)}
+          </button>
+        ))}
+      </div>
+      <p className="felt-note">
+        Three drums of {machine.stops}, the same strip on each. Everything it pays is on the
+        machine, and what it keeps is what is left over.
+      </p>
+    </div>
+  );
+}

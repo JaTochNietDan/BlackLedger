@@ -1083,3 +1083,28 @@ body{height:100%;overflow:hidden;margin:0;background:var(--bg);color:var(--ink);
 
 .card-felt .seat-name{width:58px;color:#a8c6b3}
 .card-felt .seat-total{font:22px var(--serif);color:#f4efdd}
+
+/* The bandit: three drums in a window, the paytable on the machine, and a
+   handle down the side. */
+.machine-felt{background:radial-gradient(120% 90% at 50% 0%,#2b2119 0%,#1b1510 60%,#120e0a 100%);
+  border-color:#3a2a1c}
+.bandit{position:relative;margin:12px auto 0;max-width:420px;padding:18px 26px 22px;
+  background:linear-gradient(#5c4327,#3a2a1a 60%,#241a10);border:2px solid #c9a24a;border-radius:10px 10px 6px 6px;
+  box-shadow:inset 0 2px 0 rgba(255,222,170,.25),0 10px 28px rgba(0,0,0,.55)}
+.bandit-window{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:10px;
+  background:#0d0a06;border:2px solid #7a5730;border-radius:6px;box-shadow:inset 0 0 18px #000}
+.drum{height:74px;display:grid;place-items:center;border-radius:4px;
+  background:linear-gradient(#f6f1e2,#ded5bf 50%,#f6f1e2);color:#241708;
+  font:15px var(--serif);letter-spacing:.04em;text-align:center;overflow:hidden;
+  box-shadow:inset 0 6px 10px rgba(0,0,0,.3),inset 0 -6px 10px rgba(0,0,0,.3)}
+.drum.rolling{animation:drumroll .18s linear infinite;color:#6c6152}
+@keyframes drumroll{from{transform:translateY(-8%)}to{transform:translateY(8%)}}
+.bandit-handle{position:absolute;right:-14px;top:26px;width:10px;height:96px;border-radius:5px;
+  background:linear-gradient(#c9a24a,#7a5730)}
+.bandit-handle i{position:absolute;top:-12px;left:-6px;width:22px;height:22px;border-radius:50%;
+  background:radial-gradient(circle at 34% 30%,#e2554b,#8e2b2b)}
+.paytable{width:100%;max-width:420px;margin:14px auto 0;border-collapse:collapse;font-size:11px}
+.paytable th{text-align:left;font-weight:400;color:#d9d3bd;padding:3px 6px;letter-spacing:.06em}
+.paytable td{text-align:right;color:var(--gold);padding:3px 6px}
+.paytable tr:nth-child(even){background:rgba(255,255,255,.03)}
+@media(prefers-reduced-motion:reduce){.drum.rolling{animation:none}}

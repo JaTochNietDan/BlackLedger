@@ -150,4 +150,11 @@ better to display actions below the interior render when inside a building or
 something like that. I want you to experiment, think it through and really clean
 it up
 
+Ok this is much better. It may be worth adding a couple more casino games. It
+could be a reason to have other casinos, to have other casino games like slot
+machines and whatnot, any other common games you can think of adding.
+
+Add a gas station business to the inbox, probably multiple locations. Sells gas
+that cars need and it sells other stuff that usual gas stations sell.
+
 Ultiamtely the expectation is that I don't have to think of all of these concepts, you, the agent will think of these too and build them out and playtest and simulate them yourself.

@@ -267,6 +267,11 @@ func (w *World) apply(c Command) error {
 				return err
 			}
 			w.Advance(a.Minutes)
+		} else if machine, ok := strings.CutPrefix(c.Kind, "pull:"); ok {
+			if err := w.PullHandle(target, machine); err != nil {
+				return err
+			}
+			w.Advance(a.Minutes)
 		} else if with, ok := strings.CutPrefix(c.Kind, "pact:"); ok {
 			if err := w.MakePact(with); err != nil {
 				return err

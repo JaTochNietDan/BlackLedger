@@ -455,6 +455,9 @@ type World struct {
 	// A hand on the table that has not been settled. Absent whenever nobody is
 	// sitting at one, which is nearly always.
 	Hand  *TableHand `json:"hand,omitempty"`
+	// Where the drums stopped on the last pull, so a machine can be drawn
+	// rather than described.
+	Reels *Pull `json:"reels,omitempty"`
 	// The last turn of the wheel. Absent in saves written before the room had
 	// one, which reads as a wheel nobody has played.
 	Spin *Spin `json:"spin,omitempty"`
@@ -1021,6 +1024,17 @@ func (w *World) Actions(id string) []Action {
 			fmt.Sprintf("You are showing %d and the dealer is showing %d. Over %d and it is finished.", w.Hand.Player, w.Hand.Dealer, Bust))
 		add("stand", "Stand on "+fmt.Sprint(w.Hand.Player), 5, 0, "",
 			fmt.Sprintf("The dealer draws to %d and stands on %d. A tie gives your money back.", DealerStands-1, DealerStands))
+	}
+	// The machines. Not a table: no dealer, no floor, no minimum — just a wall
+	// and whatever is in your pocket, which is why they are in rooms that are
+	// not casinos at all.
+	if HasMachines(id) {
+		for _, stake := range SlotStakes() {
+			// Cost is zero: PullHandle takes the money itself.
+			asks("pull:"+stake.ID, stake.Label, 15, stake.Amount, w.PullReadiness(id, stake),
+				fmt.Sprintf("$%d a pull on three drums of twenty. Three of a kind pays what is written on the machine, up to %d to 1 for the sevens, and a cherry on its own gives you your money back. The machine keeps about %d in every hundred that goes through it.",
+					stake.Amount, sevenPays(), MachineEdge()))
+		}
 	}
 	if HasTables(id) && !w.Own(id) {
 		for _, stake := range tableStakes {
@@ -1693,7 +1707,7 @@ func (w *World) Public() map[string]any {
 	if len(history) > 60 {
 		history = history[len(history)-60:]
 	}
-	return map[string]any{"id": w.ID, "version": w.Version, "revision": w.Revision, "life": w.Life, "minute": w.Minute, "sky": w.Sky(), "player": w.Player, "district": w.District, "factions": w.PublicFactions(), "npcs": w.People(), "locations": locs, "event": scene, "history": history, "dead": w.Dead, "tasks": w.Tasks, "director": w.Director, "last_result": w.LastResult, "daily_cost": w.DailyCost(), "books": w.Books(), "guide": w.Guide(), "rules": GuideRules(), "groups": Groups(), "income": income, "security": w.Guard(), "opportunity": w.NextOpportunity(), "known_threats": w.KnownThreats(), "business_truces": w.ActiveBusinessTruces(), "conflicts": w.PublicConflicts(), "goods": w.Goods, "arms": w.ArmsDescription(), "appearance": w.AppearanceDescription(), "vehicle": w.VehicleDescription(), "residence": w.ResidenceDescription(), "offshore": map[string]any{"balance": w.Offshore, "reachable": w.Player.Offshore}, "newspaper": w.Edition(), "editions": w.Editions(), "arrangements": w.PendingArrangements(), "commissions": w.PublicCommissions(), "grudges": w.GrudgeSummary(), "cast": w.Cast(), "everyone": w.Everyone(), "retainers": w.RetainerDescription(), "armoury": w.ArmouryDescription(), "population": w.PopulationSummary(), "hand": w.HandDescription(), "wheel": w.WheelDescription(), "roles": w.RoleDescription(), "organization": w.PlayerOrganizationDescription(), "own_people": w.OwnPeopleDescription(), "pacts": w.PactDescription(), "book": w.LoanDescription(), "press": w.PressDescription(), "service": w.ServiceDescription(), "city": w.ScrutinyDescription(), "dashboard": w.Dashboard(), "epitaph": w.Epitaph(), "street": w.OnTheStreet(), "street_note": w.StreetNote()}
+	return map[string]any{"id": w.ID, "version": w.Version, "revision": w.Revision, "life": w.Life, "minute": w.Minute, "sky": w.Sky(), "player": w.Player, "district": w.District, "factions": w.PublicFactions(), "npcs": w.People(), "locations": locs, "event": scene, "history": history, "dead": w.Dead, "tasks": w.Tasks, "director": w.Director, "last_result": w.LastResult, "daily_cost": w.DailyCost(), "books": w.Books(), "guide": w.Guide(), "rules": GuideRules(), "groups": Groups(), "income": income, "security": w.Guard(), "opportunity": w.NextOpportunity(), "known_threats": w.KnownThreats(), "business_truces": w.ActiveBusinessTruces(), "conflicts": w.PublicConflicts(), "goods": w.Goods, "arms": w.ArmsDescription(), "appearance": w.AppearanceDescription(), "vehicle": w.VehicleDescription(), "residence": w.ResidenceDescription(), "offshore": map[string]any{"balance": w.Offshore, "reachable": w.Player.Offshore}, "newspaper": w.Edition(), "editions": w.Editions(), "arrangements": w.PendingArrangements(), "commissions": w.PublicCommissions(), "grudges": w.GrudgeSummary(), "cast": w.Cast(), "everyone": w.Everyone(), "retainers": w.RetainerDescription(), "armoury": w.ArmouryDescription(), "population": w.PopulationSummary(), "hand": w.HandDescription(), "wheel": w.WheelDescription(), "machine": w.MachineDescription(), "roles": w.RoleDescription(), "organization": w.PlayerOrganizationDescription(), "own_people": w.OwnPeopleDescription(), "pacts": w.PactDescription(), "book": w.LoanDescription(), "press": w.PressDescription(), "service": w.ServiceDescription(), "city": w.ScrutinyDescription(), "dashboard": w.Dashboard(), "epitaph": w.Epitaph(), "street": w.OnTheStreet(), "street_note": w.StreetNote()}
 }
 func (w *World) hasRecord(title string) bool {
 	for _, r := range w.History {

@@ -46,13 +46,17 @@ function Work({title, blurb, actions, render}: {
   </section>;
 }
 
-export function Interior({place, people, actions, render, onLeave, onTables, groups, comings, minute}: {
+export function Interior({place, people, actions, render, onLeave, onTables, felt, groups, comings, minute}: {
   place: Place; people: Presence[]; actions: Action[];
   render: (a: Action) => ReactElement; onLeave: () => void;
   // A room with tables in it offers one way in and the tables take the screen.
   // The cards and the wheel are not premises work to be listed between hiring
   // and restocking: they are a place you sit down.
   onTables?: () => void;
+  // Whether that way in leads to a felt or to a wall of machines. The room's own
+  // action list has had both taken out of it by the time it reaches here, so it
+  // cannot work this out for itself.
+  felt?: boolean;
   // The core's own ordering of what work is for. Without it the room had one
   // heading called "everything else here" with fifteen cards under it, which is
   // a list, not an order.
@@ -195,8 +199,10 @@ export function Interior({place, people, actions, render, onLeave, onTables, gro
         {needle && found.length === 0 && <p className="nothing-here">Nothing here matches “{query}”.</p>}
 
         {onTables && <button className="action primary sit-down-here" onClick={onTables}>
-          <span><strong>Sit down at the tables</strong>
-          <span className="desc">The cards and the wheel, played out at the table until you get up.</span></span>
+          <span><strong>{felt ? 'Sit down at the tables' : 'Play the machines'}</strong>
+          <span className="desc">{felt
+            ? 'The cards and the wheel, played out at the table until you get up.'
+            : 'Three drums and a handle, against the wall where they always are.'}</span></span>
         </button>}
 
         <Work title="These premises" blurb="The same work, in the same order, in every building"

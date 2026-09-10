@@ -1,8 +1,8 @@
 import {useEffect, useRef, useState} from 'react';
 import type {Action, Presence, Record as Entry} from './types';
-import {CardTable, Wheel} from './Tables';
+import {CardTable, Machine, Wheel} from './Tables';
 import {Portrait} from './Portrait';
-import type {HandState, WheelState} from './Tables';
+import type {HandState, MachineState, WheelState} from './Tables';
 
 // Sitting down at a table is not a thing you do out of the corner of a sidebar.
 // The felt used to be drawn in the property panel beside the ownership figures
@@ -23,16 +23,17 @@ import type {HandState, WheelState} from './Tables';
 // which no city has, and every card played comes back "that action is not
 // available here". The target is the id of the room the player is standing in.
 export function isTableAction(id: string) {
-  return id.startsWith('play:') || id.startsWith('wheel:') || id === 'hit' || id === 'stand';
+  return id.startsWith('play:') || id.startsWith('wheel:') || id.startsWith('pull:') ||
+    id === 'hit' || id === 'stand';
 }
 
 export function hasTables(actions: Action[]) {
   return actions.some(a => isTableAction(a.id));
 }
 
-type Game = 'cards' | 'wheel';
+type Game = 'cards' | 'wheel' | 'machine';
 
-export function Casino({place, actions, people, hand, wheel, cash, money, revision, records, act, onLeave}: {
+export function Casino({place, actions, people, hand, wheel, machine, cash, money, revision, records, act, onLeave}: {
   place: string;
   actions: Action[];
   // Who else is in the room. A floor with nobody on it is a room: the city
@@ -40,6 +41,9 @@ export function Casino({place, actions, people, hand, wheel, cash, money, revisi
   // whose money the house takes on the nights the player is not here.
   people: Presence[];
   hand: HandState;
+  // The machines against the wall. A room can have those and no tables at all,
+  // which is the whole point of them.
+  machine: MachineState;
   wheel: WheelState;
   cash: number;
   money: (n: number) => string;
@@ -54,6 +58,10 @@ export function Casino({place, actions, people, hand, wheel, cash, money, revisi
   // were last looking at.
   const [game, setGame] = useState<Game>(hand.playing ? 'cards' : 'wheel');
   useEffect(() => { if (hand.playing) setGame('cards') }, [hand.playing]);
+  // A room with nothing but machines opens on them.
+  useEffect(() => {
+    if (!hand.playing && !actions.some(a => a.id.startsWith('play:') || a.id.startsWith('wheel:'))) setGame('machine');
+  }, [actions, hand.playing]);
 
   // What the night has done so far. The ledger has all of this and always did;
   // what it did not have is a player watching one hand turn into the next.
@@ -68,6 +76,10 @@ export function Casino({place, actions, people, hand, wheel, cash, money, revisi
 
   const stakes = (prefix: string) => actions.filter(a => a.id.startsWith(prefix));
   const dealt = hand.playing;
+  const machines = stakes('pull:');
+  // A poolhall with a bandit against the wall is not a casino, and the room
+  // should not offer a felt it does not have.
+  const tables = actions.some(a => a.id.startsWith('play:') || a.id.startsWith('wheel:'));
 
   return <div className="modal-shade table-shade">
     <section className="casino" role="dialog" aria-modal="true" aria-label={'The tables at ' + place}>
@@ -91,8 +103,10 @@ export function Casino({place, actions, people, hand, wheel, cash, money, revisi
       </div>}
 
       <nav className="casino-games" aria-label="Games">
-        <button aria-pressed={game === 'cards'} onClick={() => setGame('cards')}>Blackjack</button>
-        <button aria-pressed={game === 'wheel'} onClick={() => setGame('wheel')} disabled={dealt}>Roulette</button>
+        {tables && <button aria-pressed={game === 'cards'} onClick={() => setGame('cards')}>Blackjack</button>}
+        {tables && <button aria-pressed={game === 'wheel'} onClick={() => setGame('wheel')} disabled={dealt}>Roulette</button>}
+        {machines.length > 0 && <button aria-pressed={game === 'machine'} onClick={() => setGame('machine')}
+          disabled={dealt}>The machines</button>}
       </nav>
 
       <div className="casino-floor">
@@ -111,6 +125,10 @@ export function Casino({place, actions, people, hand, wheel, cash, money, revisi
                   {stakes('play:').every(a => a.disabled) && <p className="felt-refused">{stakes('play:')[0]?.reason}</p>}
                 </div>}
               </div>
+            : game === 'machine'
+            ? <Machine machine={machine} money={money} turn={revision}
+                       stakes={machines.filter(a => !a.disabled).map(a => ({id: a.id.slice(5), amount: a.asks ?? 0}))}
+                       pull={id => act({kind: 'pull:' + id})}/>
             : <Wheel wheel={wheel} money={money} turn={revision}
                      stakes={stakes('wheel:').filter(a => !a.disabled).map(a => ({id: a.id.slice(6), amount: a.asks ?? 0}))}
                      spin={(stake, bet) => act({kind: 'wheel:' + stake, choice: bet})}/>}
