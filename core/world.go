@@ -78,6 +78,9 @@ type Person struct {
 	// Fitted to the car rather than to the person: a new one off the lot is
 	// bare, whatever the last one was carrying.
 	Plate int `json:"plate,omitempty"`
+	// How much of the underground trade this person is seen to be running.
+	// Built by loads that crossed the city and faded by the days they did not.
+	Runs int `json:"runs,omitempty"`
 	// Explosives in hand. Absent in saves from before anybody could buy any.
 	Charges int `json:"charges,omitempty"`
 	// Standing arrangements with people in the building. Absent in saves from
@@ -1849,6 +1852,7 @@ func (w *World) Advance(minutes int) {
 			w.StillDay()
 			w.CasinoDay()
 			w.TableNight()
+			w.RouteDay()
 			w.PawnDay()
 			w.CarDay()
 			w.CarTrade()
@@ -1930,6 +1934,8 @@ func (w *World) Advance(minutes int) {
 				w.Plots = append(w.Plots[:j], w.Plots[j+1:]...)
 				if copy.Kind == "sabotage" {
 					w.ResolveSabotage(copy)
+				} else if copy.Kind == "route" {
+					w.TakeTheRoute(copy)
 				} else {
 					w.Attack(copy)
 				}
@@ -1953,6 +1959,11 @@ func (w *World) KnownThreats() []string {
 			continue
 		}
 		text := w.factionName(p.Actor) + " has commissioned an attack against you. Consider leaving home, arranging security, or negotiating."
+		if p.Kind == "route" {
+			text = w.factionName(p.Actor) + " wants the trade you are running. They will take a load off you in the street rather than come to your door."
+			out = append(out, text)
+			continue
+		}
 		if p.Kind == "sabotage" {
 			l, ok := PlaceByID(p.Target)
 			if !ok {

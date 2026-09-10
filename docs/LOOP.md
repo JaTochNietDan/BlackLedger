@@ -132,7 +132,7 @@ they go. `go test ./core` alone is ~90s; the balance tests run in parallel with
 each other and the run is race-clean.
 
 Balance baseline, six strategies (worker/investor/defiant/reckless/thief/smuggler):
-deaths 0/0/51/82/77/0, median cash 12405/14156/7230/90/547/5500.
+deaths 0/0/51/82/77/0, median cash 12405/14156/7230/90/547/5123.
 `mise run simulate > <scratchpad>/sim.json` then **parse** the JSON; grepping it
 is useless. Each strategy also reports `mean_heat`, `seizures` and `runs_hurt`,
 because deaths and cash cannot tell a safe policy from one whose money is taken

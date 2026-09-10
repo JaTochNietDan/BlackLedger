@@ -303,6 +303,10 @@ func (w *World) Sell(good string, units int) error {
 	takings := price * units
 	w.Player.Stock[good] = held - units
 	w.Earn(takings)
+	// A load that crossed the city is what gets a man noticed. Selling is the
+	// half that shows: buying is somebody with money, selling is somebody with
+	// a trade.
+	w.RouteRun(units)
 	w.Log("The goods move on", fmt.Sprintf("%d %ss of %s sold for $%d, at $%d each.",
 		units, g.Unit, g.InBulk(), takings, price), "business")
 	return nil

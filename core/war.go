@@ -374,6 +374,7 @@ func (w *World) FactionTurn() {
 	w.dissolve()
 	w.considerReestablish()
 	w.ConsiderExpansion()
+	w.ConsiderRoute()
 	w.considerSplinters()
 	w.ConsiderFactionContracts()
 	for i := range w.Factions {

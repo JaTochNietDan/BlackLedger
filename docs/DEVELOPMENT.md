@@ -6567,3 +6567,45 @@ Balance, six strategies: deaths 0/0/51/82/77/0, median cash
 12405/14156/7230/90/547/5500.
 
 Evidence: `sim/campaign.go`, `cmd/simulate/main.go`.
+
+## A rival who wants the route
+
+Of the three risks layer 6 asks for — "seizure, informants, a rival who wants
+the route" — one existed. A policy running the trade over a hundred campaigns
+carried thirty-seven attention, lost the goods fourteen times and was never once
+hurt, because nobody in the city had an opinion about a man carrying crates
+through it.
+
+Selling is what gets somebody noticed. Buying is a man with money; selling is a
+man with a trade, so `Player.Runs` builds on loads that cross the city and fades
+two a day, because a trade you have stopped running stops being your trade. Past
+thirty units the word is out, and the strongest organization that is not the
+player's decides a trade worth running is a trade worth taking.
+
+They come for the load rather than for the man. If he is carrying, they take it
+in the street and leave him standing, and they are richer and stronger for it.
+If he is not, they say what they came to say and the word cools by half. Either
+way it costs the player standing and it costs that family goodwill, so answering
+it is a quarrel that already exists — which is what the layer means by
+contraband being "a common cause of war".
+
+| smuggler, 100 campaigns | Before | After |
+|---|---|---|
+| Seizures | 14 | 65 |
+| Median final cash | 5,500 | 5,123 |
+| Deaths | 0 | 0 |
+
+Still worth running and no longer unopposed. Nobody else's numbers moved.
+
+**A break that landed in the wrong place, and the fix.** I first broke the
+seizure by zeroing the count it returns rather than the call itself, and the
+test passed: the goods were still gone, and the test was asking about the goods.
+Breaking the call instead fails it with "they came for the load and left 6 of
+it". The gender guard also caught "taken from a man on foot", which is the third
+time tonight it has earned its place.
+
+Informants are the risk still missing.
+
+Balance: deaths 0/0/51/82/77/0, median cash 12405/14156/7230/90/547/5123.
+
+Evidence: `core/route_rival_test.go`, two breaks verified.
