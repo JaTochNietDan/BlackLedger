@@ -260,6 +260,12 @@ func BenchmarkAdvanceCityDay(b *testing.B) {
 func TestScheduledIncomeExact(t *testing.T) {
 	w := New(27)
 	w.Properties["laundry"].Owner = "player:1"
+	// What a room takes now depends on who is standing in it, and this test is
+	// about the clock paying out on schedule rather than about the room. An
+	// ordinary room is the middle of the city — three people — so the figure it
+	// has always asserted is the figure for an ordinary morning.
+	clearRoom(w, "laundry")
+	fill(w, "laundry", TypicalRoom)
 	cash := w.Player.Cash
 	w.Advance(60)
 	if w.Player.Cash != cash+14 {

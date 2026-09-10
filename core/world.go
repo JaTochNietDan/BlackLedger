@@ -1821,7 +1821,10 @@ func (w *World) Advance(minutes int) {
 		w.Minute = next
 		for id, prop := range w.Properties {
 			if w.Own(id) {
-				prop.Carry += float64(prop.Income*prop.Condition*elapsed) * operatingMode(prop.Mode).Take * w.Capacity(id) * w.TradeMultiplier(id) * (1 + w.LicenceTake()) * w.CollectionShare(id) / 6000
+				// The room itself. A bar at nine at night holds twenty-five
+				// people and at four in the morning holds none, and until this
+				// was written both nights paid the same.
+				prop.Carry += float64(prop.Income*prop.Condition*elapsed) * operatingMode(prop.Mode).Take * w.Capacity(id) * w.TradeMultiplier(id) * w.RoomTrade(id) * (1 + w.LicenceTake()) * w.CollectionShare(id) / 6000
 				n := int(prop.Carry + 1e-9)
 				prop.Carry -= float64(n)
 				w.Earn(n)

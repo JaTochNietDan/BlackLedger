@@ -6762,3 +6762,53 @@ exist. So are the two things a newspaper can be made to do, which need the paper
 to take your calls first.
 
 Evidence: `core/offered_test.go`, one break verified.
+
+## The room reaches the ledger
+
+Measured over twenty days of one city: at ten in the morning the market holds
+twelve people and the bar seven. At nine at night the bar, the club and the
+casino hold twenty-five each and the docks and the butcher are empty.
+
+The city has a real rhythm — people go to their posts in the morning and to the
+places that sell a drink in the evening, a lead holds court at the family's own
+seat, somebody walks across town over a grudge, a family takes over the shop
+across the road — and none of it reached the money. A butcher earned exactly the
+same at three in the morning as at noon.
+
+`Footfall` is who is in a room as custom: not the player, not somebody of theirs
+standing on the door, and not anybody out on the street between two addresses. A
+man you pay to stand there is staff, not somebody who came in and spent
+anything. `RoomTrade` turns that into a factor against the city's ordinary three
+per address, at two percent a head, bounded at 0.75 and 1.45 — a shop with
+nobody in it still has a door and a standing order, and a room with thirty
+people in it is a good night rather than a different business.
+
+It multiplies what custom, capacity and condition already decide rather than
+replacing any of them.
+
+| 100 campaigns | Before | After |
+|---|---|---|
+| investor | 14,156 | 14,231 |
+| defiant | 7,230 | 7,544 |
+| thief | 567 | 1,403 |
+| smuggler | 5,160 | 5,505 |
+| racketeer | 2,008 | 1,936 |
+
+Everything that owns premises earns a little more, because a policy that spends
+its evenings out is standing in the rooms that fill up. The thief moves most,
+from 567 to 1,403, which is the same effect on a small base: it robs the busy
+rooms and holds a laundry that is now worth more on the days it is busy.
+
+**Two test changes, with the reason.** Two tests assert money to the dollar and
+are about something else entirely — the clock paying out on schedule, and a
+paused job keeping its terms. What a room takes now depends on who is in it, so
+both hold the laundry at the city's ordinary three, where the room is worth
+exactly what it says. The figures they have always asserted are unchanged.
+
+Two breaks verified: the factor flattened to one, and your own man counted as a
+customer.
+
+Balance, seven strategies: deaths 0/0/52/82/77/0/38, median cash
+12405/14231/7544/90/1403/5505/1936.
+
+Evidence: `core/footfall_test.go`.

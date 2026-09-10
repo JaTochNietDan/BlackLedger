@@ -11,6 +11,12 @@ func pressureWorld() *World {
 	w.Properties["laundry"].Owner = "player:1"
 	w.Player.Cash = 200
 	w.NextPressure = w.Minute + 30
+	// What a room takes now depends on who is standing in it. Every test built
+	// on this world asserts money to the dollar and is about something else —
+	// pressure, a paused job, a resumed one — so the laundry is held at the
+	// city's ordinary three, where the room is worth exactly what it says.
+	clearRoom(w, "laundry")
+	fill(w, "laundry", TypicalRoom)
 	return w
 }
 func TestPressureInterruptsAtScheduledMinute(t *testing.T) {

@@ -104,5 +104,5 @@ func (w *World) Trading(id string) float64 {
 	if prop == nil {
 		return 0
 	}
-	return w.Capacity(id) * w.TradeMultiplier(id) * float64(prop.Condition) / 100
+	return w.Capacity(id) * w.TradeMultiplier(id) * w.RoomTrade(id) * float64(prop.Condition) / 100
 }
