@@ -40,8 +40,10 @@ which half is standing.
 2. **Cars.** Speed is stated honestly already: the forecourt quotes a real
    journey from where the player is standing, in minutes on foot against
    minutes in the car being sold, and says when plate is weighing the figure
-   down. Still open: pictures of what you are buying. Plate is built for the
-   player's own car and for your people's (`core/plate.go`, `core/theirs.go`).
+   down. Pictures are in too — three painted offline by `tools/cars.py` and
+   shipped as files, drawn by `paintedCar` in `src/cityAssets.ts`, so that line
+   was stale. Plate is built for the player's own car and for your people's
+   (`core/plate.go`, `core/theirs.go`). Nothing here is left open.
 3. **A back-room card game** whose other players are people from the city.
    Built: Texas hold'em behind the poolhall, no house and no edge,
    seats filled from whoever is in the room, four streets of betting with one
