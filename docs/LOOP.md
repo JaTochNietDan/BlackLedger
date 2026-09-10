@@ -51,7 +51,9 @@ which half is standing.
    casino does; what a night costs somebody is remembered: a heavy loser is
    sore, somebody you paid thinks better of you, and a room can be emptied.
    A grudge changes how somebody plays the player: they call light, raise on
-   less and bluff more. Still open: sound.
+   less and bluff more. Sound is in: the room hum while you are in there, a
+   card for every card the core deals, and chips when the pot grows, one for
+   each ante's worth. Nothing here is left open.
 4. **The rest of the open inbox.** Checked this tick and nearly all of it is
    built: the wording, the roulette cloth and multiple chips, the travel bar,
    cursing and threats, the bad blood box, the family lead, and Leo Carver's
