@@ -84,6 +84,10 @@ func (w *World) SetMode(id, mode string) error {
 // BusinessDay applies the standing consequences of how each owned business is
 // run. Called once per game day, alongside the player's bills.
 func (w *World) BusinessDay() {
+	// The dead do not come in. A position held by somebody who is not coming in
+	// is not a position that is filled, and the count has to say so or the
+	// place goes on handling work nobody is there to do.
+	w.EmptyChairs()
 	heat, worn := 0, []string{}
 	for _, l := range Locations {
 		prop := w.Properties[l.ID]

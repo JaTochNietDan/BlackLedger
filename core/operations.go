@@ -259,8 +259,17 @@ func (w *World) Hire(id string) error {
 	prop := w.Properties[id]
 	prop.Staff++
 	place, _ := PlaceByID(id)
+	// Somebody from this city stands behind that counter. A pair of hands with
+	// nobody attached to them could not be talked to, poached, robbed, killed
+	// or arrested, which made a business the one thing in Bellwether that did
+	// not happen to people.
+	taken := ""
+	if who := w.takeOn(id); who != "" {
+		w.putToWork(who, id)
+		taken = " " + w.NPC(who).Name + " takes it."
+	}
 	w.Log("Another pair of hands at "+place.Name,
-		fmt.Sprintf("%d of %d positions filled. Wages are now $%d a day across your businesses.", prop.Staff, trade.Hands, w.Wages()), "business")
+		fmt.Sprintf("%d of %d positions filled.%s Wages are now $%d a day across your businesses.", prop.Staff, trade.Hands, taken, w.Wages()), "business")
 	return nil
 }
 
@@ -283,9 +292,15 @@ func (w *World) LayOff(id string) error {
 	trade, _ := TradeOf(id)
 	prop := w.Properties[id]
 	prop.Staff--
+	gone := ""
+	if len(prop.Hands) > 0 {
+		gone = " " + w.NPC(prop.Hands[len(prop.Hands)-1]).Name + " is told."
+	}
+	w.letGo(id)
 	place, _ := PlaceByID(id)
+	_ = gone
 	w.Log("Somebody is let go at "+place.Name,
-		fmt.Sprintf("%d of %d positions filled. It handles less, and wages are now $%d a day.", prop.Staff, trade.Hands, w.Wages()), "business")
+		fmt.Sprintf("%d of %d positions filled.%s It handles less, and wages are now $%d a day.", prop.Staff, trade.Hands, gone, w.Wages()), "business")
 	return nil
 }
 

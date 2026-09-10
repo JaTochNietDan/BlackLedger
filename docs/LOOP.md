@@ -61,8 +61,12 @@ which half is standing.
    poolhall, and a falling-out for whoever is cleaned out (`core/citygame.go`).
    An unwatched game runs on a third RNG stream of its own — shuffling off
    `WorldRNG` moved everything else the city does off-screen. Still open: the
-   same for the other rooms, and whether the city should gamble at the tables
-   it does not own.
+   same for the other rooms. The city already gambles at every room that runs a
+   float (`core/floor.go`), which this tick checked rather than rebuilt.
+6. **The people behind the counter.** `Property.Hands` names the staff of every
+   business the player holds (`core/hands.go`). Still open: poaching somebody
+   off a rival's counter, and what a business does when it cannot find anybody
+   in the city to hire.
 
 ---
 
@@ -148,7 +152,7 @@ each other and the run is race-clean.
 
 Balance baseline, seven strategies
 (worker/investor/defiant/reckless/thief/smuggler/racketeer):
-deaths 0/0/51/82/78/0/38, median cash 12585/14229/7376/90/1451/5361/2589.
+deaths 0/0/51/82/78/0/37, median cash 12585/14307/7408/90/1410/5303/2203.
 `mise run simulate > <scratchpad>/sim.json` then **parse** the JSON; grepping it
 is useless. Each strategy also reports `mean_heat`, `seizures` and `runs_hurt`,
 because deaths and cash cannot tell a safe policy from one whose money is taken

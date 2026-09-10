@@ -7230,3 +7230,40 @@ answered in `docs/LIVING_WORLD.md` — the wording, the roulette cloth and
 multiple chips, the travel bar, cursing and threats, the bad blood box, the
 family lead, and Leo Carver's collections. What is genuinely left is one
 question: whether the map is the right way to move around the city at all.
+
+## The people behind the counter
+
+A business's staff was a number. You hired a pair of hands, the wage bill went
+up, and nobody in Bellwether had a job: the person behind the counter of a place
+the player owned did not exist, and could not be talked to, poached, robbed,
+killed or arrested. A business was the one thing in this city that did not
+happen to people.
+
+`Property.Hands` is who fills those positions. The count stays, because
+everything that reads it — what a place can handle, the wage bill, whether it is
+short-handed — is right to read a count; it is now the length of a list of
+people who live here. Hiring takes on somebody from the city, `EmployerOf`
+answers where anybody works, `AtWork` is everybody the player employs, and
+`EmptyChairs` runs every business day: the dead come off the books and the
+position with them, and any position without a name gets one, which is also how
+a save written before this and a business just taken over acquire their people.
+
+Three things measuring caught that reading would not:
+
+- **A laundry that hired a rival family's soldier had a position filled by
+  somebody who was never in the room.** The city sends family people off to mind
+  their own holdings. One of three hands was never once behind the counter in a
+  week of daytimes. Nobody another family holds is looking for a counter job.
+- **The same for anybody who already holds a position.** A driver taken on at
+  the laundry had the laundry written down as their post and went on standing in
+  the bar all week, because a role holder is exempt from the errand that would
+  walk them there.
+- **Writing down where somebody works and leaving them across the city** is how
+  a counter ends up staffed by nobody. They start today.
+
+The room panel names them now instead of counting them, and says who is out.
+
+Baseline: deaths 0/0/51/82/78/0/37, median cash
+12585/14307/7408/90/1410/5303/2203. Small movement across most of them, which is
+what naming the staff does: the same people are now unavailable for whatever
+else the city would have had them doing.
