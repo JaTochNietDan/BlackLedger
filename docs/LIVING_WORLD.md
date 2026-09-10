@@ -150,6 +150,12 @@ Ensure efficiency of development loops by increasing efficiency of your workflow
 
 ## Inbox — open
 
+You seem to be taking a long time to develop each iteration on the loop. Much longer than your progress before.
+
+Please investigate anything you can do to increase your ability to iterate and develop efficiently. Find bottlenecks and improve them.
+
+---
+
 Now when gambling for some reason you changed it back to "play the nickle machine" which doesn't even show our slots page it just seems to run some background simulation and it doesn't allow you to set your own bet as we fleshed out prior.
 
 We used to have "sit down at the tables" when you were at a casino which is much nicer. No idea why you changed to this weird action button thing again that doesn't even show our fancy interface.
@@ -190,6 +196,21 @@ We should probably show options like "buy kerrigan haulage" before you can affor
 
 Let's verify, can you be attacked while traversing the map? Can your car affect this, whether it's armored, etc? This should all be the case.
 
+— verified, and the answer is yes on every count. It is in numbers now rather
+  than in an assurance, because "this should all be the case" is a thing that
+  should stay true: an attack that finds you kills on 53% in a bar, 78% in an
+  empty room and 88% out on the road. On the road it is 88% on foot, 88% in an
+  ordinary car and 62% in a plated one — a car is not cover and a plated one is,
+  which is the whole of what paying for the plate buys, and it is worth nothing
+  when you are standing in a bar because you are not in it. What you are wearing
+  helps in both places. Nobody warns you out there: the people who watch your
+  door are at your door, so the street is the one place an attack arrives
+  without a moment to decide first. A car also shortens how long you are
+  findable — five crossings out of the bar are 205 minutes on foot and 123
+  driving — and a wreck or a dry tank is worth neither, because it is not a car
+  you are driving. The crossing says all of this before you set off and reads
+  differently on foot and in a plated car.
+
 ---
 
 When playing the slot machine we should show actual images for the stuff on the rollers. Also it seems to swap the results on the rollers at the end which is odd, they just flip around at random mid-end game. For example it shows 7-7- as it progresses then at the very end it flips to "bell", "lemon", "cherry". Sort that out.
@@ -226,6 +247,10 @@ They could have knowledge of where you live but not where you currently are, and
 We don't want it to be a situation where we can just talk to one singular character and find out people's locations by paying a fee, that's too simplistic. We want a dynamic knowledge situation and bargainning situation. Some people may not want to give us that information and even asking them could affect our reputation with them. 
 
 I want you to think through this and consider what makes the most sense.
+
+---
+
+Taking over businesses should be a lot more expensive and high level stuff that you build up to over time.
 
 ## Inbox — answered
 

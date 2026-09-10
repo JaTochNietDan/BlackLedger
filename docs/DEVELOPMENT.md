@@ -7485,3 +7485,47 @@ works at the butcher".
 
 Baseline unmoved: deaths 0/0/52/82/78/0/37, median cash
 12585/14129/7418/90/1063/5332/2080.
+
+## Can you be caught on the road
+
+"Let's verify, can you be attacked while traversing the map? Can your car affect
+this, whether it's armored, etc? This should all be the case."
+
+It is the case. The tick's work was turning that from an assurance into numbers
+that stay true, in `core/crossingdanger_test.go`:
+
+| where the player is | an attack that finds them kills on |
+| --- | --- |
+| a bar with people in it | 53% |
+| an empty room | 78% |
+| out on the road | 88% |
+
+| on the road | |
+| --- | --- |
+| on foot | 88% |
+| in an ordinary car | 88% |
+| in a plated car | 62% |
+
+A car is not cover and a plated one is, which is the whole of what paying for
+the plate buys; it is worth nothing standing in a bar, because you are not in
+it. What you are wearing helps in both places. Nobody warns you out there — the
+people who watch your door are at your door — so the street is the one place an
+attack arrives without a moment to decide first. And a car shortens how long you
+are findable: five crossings out of the bar are 205 minutes on foot and 123
+driving, while a wreck or a dry tank is worth neither, because it is not a car
+you are driving.
+
+**A guard that could not fail.** The first version compared the road against a
+bar and passed with the street's exposure set to nothing — because a bar with
+drinkers in it is cover and a road is not, so the road came out worse either
+way. It compares against an empty room as well now, which is the part that is
+about the street rather than about the people in the bar, and setting the
+exposure to nothing fails it.
+
+Two things about the test's own setup that are worth knowing about the city: a
+car needs condition and fuel before it is a car you are driving, and a tank
+nobody has ever filled reads as full rather than empty, which is what keeps
+every save written before petrol existed from standing at the kerb.
+
+Baseline unmoved: deaths 0/0/52/82/78/0/37, median cash
+12585/14129/7418/90/1063/5332/2080.
