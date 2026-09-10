@@ -68,9 +68,14 @@ which half is standing.
 6. **The people behind the counter.** `Property.Hands` names the staff of every
    business at an address anybody holds, and somebody standing in front of you
    who works for a rival can be offered a place at one of yours
-   (`core/hands.go`). Still open: what a business does when the city has nobody
-   left to hire, and whether the people you employ should be worth talking to
-   for what they know about the room they stand in.
+   (`core/hands.go`). A place a week behind on its wages is offered nobody and
+   its position count does not reset, so emptying a counter by not paying it
+   is a thing that stays done until the money does. Checked and not built:
+   running the city dry of people to hire — sixty days of a city playing itself
+   leaves eight held addresses, twenty-nine hands and forty-seven people still
+   free, so a rule for it would be a rule that never fires. Still open: whether
+   the people you employ should be worth talking to for what they know about
+   the room they stand in.
 
 ---
 
