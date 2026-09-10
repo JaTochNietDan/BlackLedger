@@ -8,6 +8,7 @@ import "testing"
 // and that when the city does reach them it keeps speaking afterwards.
 
 func TestACityKeepsTalkingAfterItLosesItsTalkers(t *testing.T) {
+	t.Parallel()
 	const runs, days = 120, 60
 	recovered, gaps, sameFace := 0, 0, 0
 	for seed := uint32(1); seed <= runs; seed++ {
@@ -68,6 +69,7 @@ func TestACityKeepsTalkingAfterItLosesItsTalkers(t *testing.T) {
 // And nothing about being replaced is remembered: a stranger doing the fixer's
 // job does not inherit what the last one thought of the player.
 func TestASuccessorStartsAsAStranger(t *testing.T) {
+	t.Parallel()
 	w := New(179)
 	w.MigrateLivingWorld()
 	before := w.Holder("fixer")

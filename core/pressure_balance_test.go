@@ -7,6 +7,7 @@ import "testing"
 // having said so.
 
 func TestAViolentCityBecomesAHarderCity(t *testing.T) {
+	t.Parallel()
 	const runs, days = 150, 120
 	measure := func(loud bool) (peak, ended, crackdowns int) {
 		for seed := uint32(1); seed <= runs; seed++ {

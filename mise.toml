@@ -32,6 +32,30 @@ run = [
   "npm run build",
 ]
 
+# One command for a tick's gate, with the slow half started first and the fast
+# checks running while it goes. `verify` runs its steps in order, so a tick that
+# wanted all of it waited about three minutes with one core busy; this finishes
+# in the time the core suite takes on its own.
+[tasks.gate]
+description = "Everything verify checks, with the slow and fast halves overlapped"
+run = """
+set -e
+go test ./core -count=1 > .runtime/gate-core.log 2>&1 &
+core=$!
+go test ./cmd/... ./sim ./store -count=1 > .runtime/gate-rest.log 2>&1 &
+rest=$!
+gofmt -l core cmd store sim
+go vet ./...
+npx tsc --noEmit
+npm run build >/dev/null
+npm test >/dev/null
+wait $rest || { cat .runtime/gate-rest.log; exit 1; }
+wait $core || { cat .runtime/gate-core.log; exit 1; }
+tail -1 .runtime/gate-core.log
+tail -1 .runtime/gate-rest.log
+echo "[gate] all clear"
+"""
+
 [tasks.race]
 description = "The full race-detector run"
 run = "go test -race ./core/ ./store/ ./sim/ ./cmd/blackledger/ -count=1"

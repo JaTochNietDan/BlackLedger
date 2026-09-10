@@ -78,6 +78,7 @@ func circuit(seed uint32, car, days int) (int, int) {
 }
 
 func TestACarPaysForItselfInWorkDone(t *testing.T) {
+	t.Parallel()
 	const runs, days = 24, 16
 	walked, drove, walkJobs, driveJobs := 0, 0, 0, 0
 	for i := uint32(1); i <= runs; i++ {
@@ -103,6 +104,7 @@ func TestACarPaysForItselfInWorkDone(t *testing.T) {
 // armoured Packard is the fastest thing in the city and the most described, so
 // somebody who commits crimes in one pays for the speed in police attention.
 func TestTheBestCarIsNotAlwaysTheRightCar(t *testing.T) {
+	t.Parallel()
 	const runs = 300
 	heat := map[int]int{}
 	for _, tier := range []int{0, 1, 2, 3} {

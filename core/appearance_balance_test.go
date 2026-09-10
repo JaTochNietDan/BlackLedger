@@ -10,6 +10,7 @@ import "testing"
 // looks after it. It has to stop being worth anything inside a season, or the
 // pressing action and the laundry tie-in are decoration.
 func TestASuitIsAConsumable(t *testing.T) {
+	t.Parallel()
 	total, runs := 0, 200
 	for i := 0; i < runs; i++ {
 		w := New(uint32(i*2654435761 + 1))
@@ -36,6 +37,7 @@ func TestASuitIsAConsumable(t *testing.T) {
 // the high tables the suit unlocks. The suit should cost enough to notice and
 // not enough to be a trap.
 func TestKeepingUpAppearancesCostsRealMoney(t *testing.T) {
+	t.Parallel()
 	pressings, heat := 0, 0
 	const days = 180
 	w := New(7)
@@ -68,6 +70,7 @@ func TestKeepingUpAppearancesCostsRealMoney(t *testing.T) {
 // are genuinely interchangeable at the door, so a new arrival with money has a
 // route in and a known figure in working clothes is not shut out.
 func TestTheDoorIsOpenedByEitherHalfOfStanding(t *testing.T) {
+	t.Parallel()
 	high, _ := tableStake("high")
 
 	reputation := New(3)

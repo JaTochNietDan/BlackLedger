@@ -6,6 +6,7 @@ import "testing"
 // now be won, and what winning it takes.
 
 func TestAWarCanNowBeWonAndCostsToWin(t *testing.T) {
+	t.Parallel()
 	const runs, days = 200, 60
 	measure := func(fight bool) (won, lost, bled, hurt int) {
 		for seed := uint32(1); seed <= runs; seed++ {

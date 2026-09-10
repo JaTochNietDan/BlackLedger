@@ -6,6 +6,7 @@ import "testing"
 // actually is: a week of the city running without you, and the bill afterwards.
 
 func TestAWeekInsideIsAWeekTheCityHadWithoutYou(t *testing.T) {
+	t.Parallel()
 	const runs, days = 200, 7
 	measure := func(inside bool) (cash, condition, ground, supply int) {
 		for seed := uint32(1); seed <= runs; seed++ {
@@ -76,6 +77,7 @@ func TestAWeekInsideIsAWeekTheCityHadWithoutYou(t *testing.T) {
 }
 
 func TestTalkingIsWorthMoreThanTimeAndCostsMoreThanMoney(t *testing.T) {
+	t.Parallel()
 	// Three ways out of the same sentence, measured against each other over the
 	// same campaigns, so the comparison is what it costs rather than what
 	// happened to the city that week.

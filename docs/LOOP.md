@@ -121,7 +121,10 @@ Do not claim an effect you have not measured.
 
 ### Gates
 
-`go test ./core` (~140s) · `mise run verify` · `npm test` (45 pass)
+`mise run gate` (~90s) is all of it: the core suite and the API suites start
+first and the format check, vet, tsc, the build and the 45 node tests run while
+they go. `go test ./core` alone is ~90s; the balance tests run in parallel with
+each other and the run is race-clean.
 
 Balance baseline, five strategies (worker/investor/defiant/reckless/thief):
 deaths 0/0/50/82/82, median cash 12360/13903/7223/90/586.

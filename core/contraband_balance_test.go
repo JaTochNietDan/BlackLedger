@@ -7,6 +7,7 @@ import "testing"
 // existence of a market. A trader who waits for a good price should do better,
 // and holding stock should cost attention either way.
 func TestTheTradeRewardsJudgementRatherThanExistence(t *testing.T) {
+	t.Parallel()
 	const campaigns, cycles = 150, 30
 
 	blind, patient := 0, 0

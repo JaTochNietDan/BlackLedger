@@ -6,6 +6,7 @@ import "testing"
 // walk out. This measures whether keeping them is worth the bill.
 
 func TestPeopleAreWorthWhatTheyCost(t *testing.T) {
+	t.Parallel()
 	const runs, days = 200, 60
 	measure := func(hire int, pay bool) (survived, holdings, lost int) {
 		for seed := uint32(1); seed <= runs; seed++ {

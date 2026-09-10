@@ -6,6 +6,7 @@ import "testing"
 // what it is worth against the career of buying premises one at a time.
 
 func TestTakingItIsTheFastestWayUpAndTheMostLikelyToEndYou(t *testing.T) {
+	t.Parallel()
 	const runs = 500
 	took, thrownOut, killed := 0, 0, 0
 	holdings := 0
@@ -43,6 +44,7 @@ func TestTakingItIsTheFastestWayUpAndTheMostLikelyToEndYou(t *testing.T) {
 // And what it takes to be worth following: the same attempt by somebody with a
 // name and by somebody without.
 func TestAManWithANameTakesItAndAManWithoutDoesNot(t *testing.T) {
+	t.Parallel()
 	const runs = 400
 	rate := func(respect, weapon int) int {
 		took := 0

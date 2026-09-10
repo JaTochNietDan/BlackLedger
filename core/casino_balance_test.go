@@ -47,6 +47,7 @@ func keepFloat(seed uint32, target, days int) (int, bool) {
 }
 
 func TestFundingTheTablesIsADecisionWithMoneyOnBothSides(t *testing.T) {
+	t.Parallel()
 	const runs, days = 120, 40
 	dark, thin, deep := 0, 0, 0
 	thinBust, deepBust := 0, 0
@@ -87,6 +88,7 @@ func TestFundingTheTablesIsADecisionWithMoneyOnBothSides(t *testing.T) {
 // does not. An owner who never touches the float earns strictly less than
 // before; one who runs it properly earns most of it back and carries the risk.
 func TestARoomIsWorthLessThanItWasAndMoreThanItCosts(t *testing.T) {
+	t.Parallel()
 	const days = 40
 	floorTake := New(1).Properties["casino"].Income * 24 * days
 	deep, _ := keepFloat(9, BankrollFull*2, days)

@@ -8,6 +8,7 @@ import "testing"
 // TestADoorIsWorthPayingForEveryDay measures what a door that holds is worth
 // when somebody comes for the player at home.
 func TestADoorIsWorthPayingForEveryDay(t *testing.T) {
+	t.Parallel()
 	const runs = 500
 	openDoor, heldDoor := 0, 0
 	for seed := uint32(1); seed <= runs; seed++ {
@@ -35,6 +36,7 @@ func TestADoorIsWorthPayingForEveryDay(t *testing.T) {
 // TestASafeIsWorthPayingForEveryDay measures what stays in the player's hands
 // across a run of police raids at the attention where raids happen.
 func TestASafeIsWorthPayingForEveryDay(t *testing.T) {
+	t.Parallel()
 	const runs = 400
 	exposed, behind := 0, 0
 	for seed := uint32(1); seed <= runs; seed++ {
@@ -62,6 +64,7 @@ func TestASafeIsWorthPayingForEveryDay(t *testing.T) {
 // TestACellarIsWorthPayingForEveryDay measures the attention a hidden hoard
 // does not draw, and confirms the warrant that finds it is the price.
 func TestACellarIsWorthPayingForEveryDay(t *testing.T) {
+	t.Parallel()
 	const runs, days = 200, 20
 	open, hidden := 0, 0
 	for seed := uint32(1); seed <= runs; seed++ {
@@ -95,6 +98,7 @@ func comfortCost(id string) int {
 // TestATelephoneIsWorthPayingForEveryDay measures how often somebody living
 // alone with one contact gets a scene instead of a killing.
 func TestATelephoneIsWorthPayingForEveryDay(t *testing.T) {
+	t.Parallel()
 	const runs = 500
 	silent, wired := 0, 0
 	for seed := uint32(1); seed <= runs; seed++ {

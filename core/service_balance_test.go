@@ -7,6 +7,7 @@ import "testing"
 // the same weeks, starting from the same ninety dollars.
 
 func TestAWageIsASlowerLivingThanAShop(t *testing.T) {
+	t.Parallel()
 	const runs, days = 150, 45
 	measure := func(serve bool) (earned, deaths int) {
 		for seed := uint32(1); seed <= runs; seed++ {
@@ -53,6 +54,7 @@ func TestAWageIsASlowerLivingThanAShop(t *testing.T) {
 
 // And coming up is what makes it worth staying: a lieutenant takes a share.
 func TestALieutenantTakesAShare(t *testing.T) {
+	t.Parallel()
 	w, f := recruit(t)
 	w.Serve(f.ID)
 	bottom := w.ServicePay()

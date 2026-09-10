@@ -7,6 +7,7 @@ import "testing"
 // him against somebody else does to the city everybody lives in.
 
 func TestAManAtTheHeraldIsWorthWhatTheCityDoesNotRead(t *testing.T) {
+	t.Parallel()
 	const runs, days = 200, 40
 	measure := func(paid bool) (scrutiny, heat, crackdowns, cash int) {
 		for seed := uint32(1); seed <= runs; seed++ {
@@ -67,6 +68,7 @@ func TestAManAtTheHeraldIsWorthWhatTheCityDoesNotRead(t *testing.T) {
 }
 
 func TestRunningSomethingAboutSomebodyElseHeatsTheWholeCity(t *testing.T) {
+	t.Parallel()
 	// The point of the mechanic: it works, and it works on a city you also live
 	// in. Measured over the same campaigns with and without.
 	const runs, days = 200, 30

@@ -6,6 +6,7 @@ import "testing"
 // attention, and punish somebody who lets it pile up. It must never be free
 // money, because it is the highest-yield thing in the game.
 func TestAStillPaysForMovingTheStockNotForOwningIt(t *testing.T) {
+	t.Parallel()
 	const campaigns, days = 120, 40
 
 	type outcome struct{ cash, heat, raided, seized int }

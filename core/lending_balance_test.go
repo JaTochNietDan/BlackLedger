@@ -7,6 +7,7 @@ import "testing"
 // street beats money in a pocket at all.
 
 func TestMoneyOnTheStreetBeatsMoneyInAPocket(t *testing.T) {
+	t.Parallel()
 	const runs, days = 200, 45
 	measure := func(lend bool) (cash, respect, heat, bad int) {
 		for seed := uint32(1); seed <= runs; seed++ {
@@ -68,6 +69,7 @@ func TestMoneyOnTheStreetBeatsMoneyInAPocket(t *testing.T) {
 }
 
 func TestTheThreeAnswersToAManWhoCannotPay(t *testing.T) {
+	t.Parallel()
 	const runs = 300
 	measure := func(answer string) (cash, respect, heat, trust, sore int) {
 		for seed := uint32(1); seed <= runs; seed++ {

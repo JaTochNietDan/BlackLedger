@@ -7,6 +7,7 @@ import "testing"
 // quarrels and occasionally a war nobody was told the reason for.
 
 func TestACityLeftAloneKillsItsOwnPeople(t *testing.T) {
+	t.Parallel()
 	const runs, days = 200, 120
 	killings, wars, quiet := 0, 0, 0
 	for seed := uint32(1); seed <= runs; seed++ {
@@ -57,6 +58,7 @@ func TestACityLeftAloneKillsItsOwnPeople(t *testing.T) {
 // outcome: nobody should be resenting anybody in a city where nothing has
 // happened yet.
 func TestGrudgesComeFromThingsThatHappened(t *testing.T) {
+	t.Parallel()
 	fresh := New(5)
 	fresh.MigrateLivingWorld()
 	if len(fresh.Grudges) != 0 {
@@ -87,6 +89,7 @@ func TestGrudgesComeFromThingsThatHappened(t *testing.T) {
 // TestTheSaveNeverRunsAway is the bound that matters: a hundred and twenty days
 // of a city resenting itself has to still fit in a save file.
 func TestTheSaveNeverRunsAway(t *testing.T) {
+	t.Parallel()
 	worst := 0
 	for seed := uint32(1); seed <= 100; seed++ {
 		w := New(seed)

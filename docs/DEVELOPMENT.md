@@ -5747,3 +5747,38 @@ core rule; the wording is checked by asserting the label and what the
 description has to mention.
 
 Evidence: `core/placement_test.go`, and the six guards that caught the zero.
+
+## The gate stopped costing three minutes
+
+From the inbox, filed as a standing instruction: "Ensure efficiency of
+development loops by increasing efficiency of your workflow in any way that you
+can accomplish."
+
+Two things were paid for on every single tick.
+
+**The core suite ran everything in sequence.** 945 tests, none of them parallel,
+and the fifty-four balance tests are most of the time: the slowest is nearly
+sixteen seconds on its own and the top ten come to about a minute. They are also
+the tests with the least reason to be sequential — each one builds its own
+worlds from its own seeds and none of them writes package state. `t.Parallel()`
+on all fifty-four takes the suite from 140s to 90s.
+
+That is worth checking properly rather than trusting: three consecutive clean
+runs, and a full `-race` run over the parallel suite, also clean. Cutting
+iterations would have been the other way to make balance tests faster, and it
+would have bought speed with evidence.
+
+**`verify` ran its steps one at a time**, so the machine sat on one core for
+three minutes while the core suite went and then started the type check. There
+is a `gate` task now: the core suite and the API suites start in the background,
+and the format check, vet, `tsc`, the build and the node tests run while they
+go. The whole gate finishes in the time the core suite takes on its own.
+
+| | Before | After |
+|---|---|---|
+| `go test ./core` | 140s | 90s |
+| A full gate | ~200s serial | 90s |
+
+`verify` is unchanged and still there for anything that wants the steps in
+order. Nothing about what is checked has changed — this is the same work, done
+at the same time as itself.
