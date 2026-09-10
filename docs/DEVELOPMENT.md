@@ -6101,3 +6101,30 @@ never being named.
 Balance unchanged: deaths 0/0/50/82/83, median cash 12378/14050/7230/90/586.
 
 Evidence: `core/worth_test.go`, `public/art/cars/`.
+
+## The paper prints a picture of who it is about
+
+From the inbox: "We should try to improve the images being displayed on the
+newspaper. Having a portrait of an affected person or building would be great."
+
+The cut was a drawn silhouette — a generic man, or a generic pair of houses —
+picked by the story's kind. Meanwhile the city has a painted face for everybody
+in it and a painted front or cut-out for its addresses, and the story already
+carries what it is about: `Subject` names the person or the place by id.
+
+So the cut is that picture, screened and inked: greyscale, hard contrast, and a
+dot grid over it, which is what a halftone is. It reads as something a press
+ran rather than a photograph pasted into a 1930s page.
+
+**One thing to get right.** The first version laid the picture over the drawn
+plate with multiply blending, keeping the plate as a frame. That does not work:
+the plate's silhouette is solid black, so the generic man would have shown
+through the actual man's face whatever the blending mode. The two are never
+drawn together now — a picture when there is one, the plate when there is not,
+and the frame belongs to whichever is showing.
+
+No core change and no new art: this is the paper using pictures the game already
+ships.
+
+Evidence: the live edition carries person and place subjects with real ids, so
+both paths are exercised by the current save.

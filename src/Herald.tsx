@@ -1,11 +1,43 @@
 import {useEffect,useState} from 'react';
 import type {Snapshot} from './types';
 import {pressPlate} from './art';
+import type {PressSubject} from './art';
+import {pressFace} from './Portrait';
+import {paintedAsset} from './cityAssets';
 
 // The Herald was a rolling list: one flat run of the current life's stories,
 // oldest silently evicted, and a previous protagonist's era unreachable. A city
 // that remembers ought to let somebody read what it remembered — so the paper
 // is an archive of issues now, one a day, and you can walk back through them.
+
+// The cut. A newspaper prints a picture of the man or the building it is
+// writing about, and this printed a silhouette of a generic man or a generic
+// pair of houses — "we should try to improve the images being displayed on the
+// newspaper. Having a portrait of an affected person or building would be
+// great." The city already has a painted face for everybody in it and a painted
+// front for most of its addresses; this uses them, screened and inked so they
+// read as print rather than as a photograph pasted into a 1930s page.
+//
+// The drawn plate stays underneath as the fallback, for a subject with no
+// picture and for the moment before one loads.
+function PressCut({kind, subject, headline}: {kind:string; subject:PressSubject; headline:string}) {
+  const face = subject.kind === 'person' ? pressFace(subject.id) : null;
+  const front = subject.kind === 'place' && subject.id ? paintedAsset(subject.id) : null;
+  const picture = face !== null || !!front;
+  return <figure className={'cut' + (picture ? ' photographed' : '')}>
+    {/* Either a picture or the drawn plate, never both: the plate's silhouette
+        is solid black, and laying a photograph over it leaves the shape showing
+        through whatever the blending mode. */}
+    {picture
+      ? <span className="screen">
+          {face !== null
+            ? <span className="printed printed-face" style={{backgroundPosition: face}}/>
+            : <img className="printed" src={front!} alt="" loading="lazy"/>}
+        </span>
+      : <span className="plate" dangerouslySetInnerHTML={{__html: pressPlate(kind, subject, headline)}}/>}
+    {subject.kind !== 'city' && <figcaption>{subject.name}</figcaption>}
+  </figure>;
+}
 
 export function Herald({world}: {world: Snapshot}) {
   const issues = world.editions || [];
@@ -69,9 +101,7 @@ export function Herald({world}: {world: Snapshot}) {
       </div>
       <div className="columns">
         {issue.stories.filter(s => s.kind !== 'civic' && s.kind !== 'obituary').map((s, i) => <article className={i === 0 ? 'lead' : ''} key={s.id}>
-          {s.subject && <figure className="cut" dangerouslySetInnerHTML={{__html:
-            pressPlate(s.kind, s.subject, s.headline) +
-            (s.subject.kind !== 'city' ? `<figcaption>${s.subject.name}</figcaption>` : '')}}/>}
+          {s.subject && <PressCut kind={s.kind} subject={s.subject} headline={s.headline}/>}
           <h2>{s.headline}</h2>
           {s.standfirst && <p className="standfirst">{s.standfirst}</p>}
           <p className="byline">{s.byline} · {s.time}</p>

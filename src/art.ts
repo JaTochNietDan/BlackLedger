@@ -76,7 +76,7 @@ let current=state.locations.find(l=>l.id===state.player.location)||state.locatio
 // block of whatever the story is about, screened with halftone dots the way a
 // 1930s press would have printed it. Deterministic from the story, so the same
 // story always carries the same picture.
-type PressSubject = {kind:string;id?:string;name:string};
+export type PressSubject = {kind:string;id?:string;name:string};
 
 function pressHash(seed:string){let h=2166136261;for(const c of seed){h^=c.charCodeAt(0);h=Math.imul(h,16777619)}return Math.abs(h)}
 

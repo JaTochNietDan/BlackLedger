@@ -1195,3 +1195,21 @@ body{height:100%;overflow:hidden;margin:0;background:var(--bg);color:var(--ink);
 
 /* A car card shows the car. */
 .action.car-card img{display:block;width:100%;height:120px;object-fit:cover;border:1px solid #465243;margin-bottom:9px;filter:saturate(.8) contrast(1.05)}
+
+/* The newspaper cut. The painted face or front, screened and inked so it reads
+   as something a press ran rather than a photograph pasted into the page. The
+   drawn plate is the fallback for a subject with no picture, and the two are
+   never laid over each other: the plate's silhouette is solid black. */
+.cut{position:relative;margin:0 0 10px}
+.cut .plate,.cut .plate svg{display:block;width:100%}
+.cut .screen{position:relative;display:block;width:100%;aspect-ratio:112/80;overflow:hidden;
+  background:#efe7d8;border:2px solid #14100c}
+.cut .printed{display:block;width:100%;height:100%;object-fit:cover;
+  background-size:600% 400%;background-repeat:no-repeat;
+  filter:grayscale(1) contrast(1.5) brightness(1.08)}
+.cut .printed-face{background-image:url('/art/faces-noir-v1.png')}
+/* The screen: a dot grid over the picture, which is what a halftone is. */
+.cut.photographed .screen::after{content:'';position:absolute;inset:0;pointer-events:none;
+  background-image:radial-gradient(#14100c 42%,transparent 44%);background-size:3px 3px;
+  opacity:.3;mix-blend-mode:multiply}
+.cut figcaption{position:relative}

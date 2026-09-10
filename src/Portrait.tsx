@@ -61,3 +61,14 @@ export function Portrait({id, size, face}: {id: string; size?: 'small' | 'tiny';
     }}/>
   </span>;
 }
+
+// Where somebody's face sits on the sheet, as a CSS background-position. The
+// newspaper needs the same face the rest of the game shows them by, and needs
+// it as a value rather than as an element.
+export function pressFace(id?: string): string | null {
+  if (!id) return null;
+  const cell = painted[id];
+  if (cell) return `${cell[0] * 50}% ${cell[1] * 100}%`;
+  const n = faceFor(id);
+  return `${(n % CAST_COLS) * 100 / (CAST_COLS - 1)}% ${Math.floor(n / CAST_COLS) * 100 / (CAST_ROWS - 1)}%`;
+}

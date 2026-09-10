@@ -217,13 +217,21 @@ family to keep them more protected from attacks.
 
 ---
 
-We should try to improve the images being displayed on the newspaper. Having a portrait of an affected person or building would be great. Some other black and white dramatization of something would also be great if plausible.
-
---- 
-
 When inside a building you own the top buttons should probably be for owner management and under a separate subtitle for management actions.
 
 ## Inbox — answered
+
+We should try to improve the images being displayed on the newspaper. Having a portrait of an affected person or building would be great. Some other black and white dramatization of something would also be great if plausible.
+
+— built: the cut is a picture of the person or the building the story is about.
+  The city already had a painted face for everybody in it and a painted front
+  for its addresses; the paper screens and inks them so they read as something a
+  press ran. The drawn plate is still there as the fallback for a subject with
+  no picture — and it is a fallback rather than an underlay, because a
+  silhouette is solid black and a photograph laid over one leaves the shape
+  showing through whatever the blending mode.
+
+---
 
 When gambling you should be able to actually choose how much to gamble, not use
 set amounts, up to a max limit. The max limit should be defined by the casino
