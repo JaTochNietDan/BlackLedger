@@ -19,7 +19,13 @@ func TestCampaignsAreReproducible(t *testing.T) {
 }
 func TestPoliciesExerciseTheirIntendedBehavior(t *testing.T) {
 	t.Parallel()
-	investor := Run(27, "investor", "authored", 100, false)
+	// Two hundred commands rather than a hundred: premises cost four times what
+	// they did and each one held raises the next, so a campaign that used to
+	// hold a casino by its hundredth decision now spends the first half of that
+	// earning the money for it. The milestones are the same and the ladder is
+	// longer, which is the whole of what "expensive and high level stuff that
+	// you build up to over time" asks for.
+	investor := Run(27, "investor", "authored", 200, false)
 	for _, milestone := range []string{"laundry", "crew", "housing", "security", "garage", "casino"} {
 		if investor.Milestones[milestone] == 0 {
 			t.Fatal("investor never reached", milestone)

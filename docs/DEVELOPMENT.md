@@ -7809,3 +7809,47 @@ Next, in order: asking somebody who might know, which is where the bargaining
 lives — their trust, their loyalty to the target, and a cost to their opinion of
 you for asking about their own. Then the same limitation on the city's own
 killers, who should know where you live and not where you are.
+
+## What a freehold costs
+
+"Taking over businesses should be a lot more expensive and high level stuff that
+you build up to over time."
+
+It was neither. A laundry was $180 against a careful campaign that ends with
+$12,500 in the bank, so the business layer opened on the second afternoon, and
+every address after the first cost exactly what the first one did — holding four
+premises made the fifth no harder to buy.
+
+`Freehold` is four, and `AnotherOne` adds 45% of the listing for each premises
+already held. The cheapest door in the city is $720; the haulage yard is $3,920,
+then $5,684, then $7,448 as you take the city.
+
+**The fault that made it possible.** At eight times the price, six of the seven
+strategies ended every campaign with $195 and no deaths — completely stalled. A
+location published its *listed* price while the command charged the real one, so
+a policy that had enough for the listing tried to buy, was told "not enough
+cash", and tried again forever. It was invisible while the two numbers agreed.
+The price a place publishes is the price it costs now, and the same policies
+save up for it instead.
+
+Measured after, at four times:
+
+| strategy | before | after |
+| --- | --- | --- |
+| worker | 12585 | 12585 |
+| investor | 14129 | 2367 |
+| defiant | 7418 | 5857 |
+| thief | 1063 | 1050 |
+| smuggler | 5332 | 3563 |
+| racketeer | 2080 | 1086 |
+
+Every policy still reaches every milestone it used to — the investor holds a
+casino in 99 runs of a hundred — and ends with a fraction of the money, which is
+what building up to something costs. Deaths moved too, and honestly: the defiant
+went from 52 to 0 and the racketeer from 38 to 53, because a policy saving for a
+freehold spends its run on courier work rather than on picking fights.
+
+Four tests changed, all of them reading the price off the game now rather than
+typing it: two campaign walkthroughs earn longer before the laundry, the
+investor's run is 200 commands rather than 100, and the buyout test asks
+`AcquisitionCost` what full payment is so it stays about paying it in full.

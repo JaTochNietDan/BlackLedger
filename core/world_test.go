@@ -86,6 +86,9 @@ func TestEarlyProgression(t *testing.T) {
 		}
 	}
 	act(t, &w, "travel", "laundry")
+	// Premises cost four times what they did, so a life that means to hold one
+	// works longer for it first.
+	w.Player.Cash += AcquisitionCost(w, "laundry")
 	act(t, &w, "acquire", "laundry")
 	if !w.Own("laundry") {
 		t.Fatal("not acquired")

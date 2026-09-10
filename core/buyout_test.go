@@ -14,11 +14,16 @@ func TestNewLifeCanEarnAndBuyFormerBusinessWithoutInheritance(t *testing.T) {
 	}
 	w.Player.Location = "laundry"
 	w.Player.Respect = 6
-	w.Player.Cash = 359
+	// A laundry off a former organization is twice its listed price, and the
+	// listed price is four times what it was: premises are meant to be built up
+	// to. The figures are read off the game rather than typed, so this test
+	// stays about paying the full price rather than about what the price is.
+	full := AcquisitionCost(w, "laundry")
+	w.Player.Cash = full - 1
 	if _, err := Execute(w, Command{Kind: "acquire", Target: "laundry", Revision: w.Revision}); err == nil {
 		t.Fatal("buyout accepted without full payment")
 	}
-	w.Player.Cash = 360
+	w.Player.Cash = full
 	act(t, &w, "acquire", "laundry")
 	if !w.Own("laundry") || w.Player.Cash != 0 || w.Properties["laundry"].Condition != 60 || w.Properties["laundry"].Income != 12 {
 		t.Fatal("buyout failed to preserve the changed city or charge its price")

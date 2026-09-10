@@ -337,6 +337,20 @@ I want you to think through this and consider what makes the most sense.
 
 Taking over businesses should be a lot more expensive and high level stuff that you build up to over time.
 
+— built, and measured against what a campaign actually earns rather than
+  guessed. A freehold is four times its old listing and every premises already
+  held raises the price of the next by nearly half, so the cheapest door in the
+  city is $720 against a careful fortnight's $12,500, and the haulage yard goes
+  $3,920, then $5,684, then $7,448 as you take the city. The investor still
+  holds a casino in 99 runs of a hundred; it just ends them with $2,367 in hand
+  rather than $14,129, which is what building up to something costs.
+— the measurement found a real fault on the way. A location published its listed
+  price while the command charged the real one, so a policy with enough for the
+  listing tried, was told "not enough cash", and tried again forever: at four
+  times the price six of the seven strategies stalled at $195 and never did
+  anything else. The price a place publishes is now the price it costs. Without
+  that, this change was impossible rather than merely expensive.
+
 ## Inbox — answered
 
 We should also add ambient sounds and sounds to the slot machines and whatnot. I

@@ -2093,7 +2093,7 @@ func (w *World) Public() map[string]any {
 		if w.Own(l.ID) {
 			income += float64(prop.Income*prop.Condition) / 100
 		}
-		locs = append(locs, map[string]any{"id": l.ID, "name": l.Name, "type": l.Type, "district": l.District, "x": l.X, "y": l.Y, "cost": l.Cost, "blurb": l.Blurb, "owner": prop.Owner, "holder": w.HolderName(l.ID), "staff": prop.Staff, "hands": w.HandsDescription(l.ID), "supply": prop.Supply, "trouble": prop.Trouble, "shy": w.Shy(l.ID), "curtains": w.Curtains(l.ID), "trade": w.CustomDescription(l.ID), "posted": w.PostingDescription(l.ID), "people": w.PeopleHere(l.ID), "note": w.PlaceNote(l.ID), "room": w.RoomNote(l.ID), "note_warn": w.PlaceWarn(l.ID), "away": w.Away(l.ID), "travel_note": w.TravelNote(l.ID), "crossing": w.Crossing(w.Player.Location, l.ID), "still": prop.Still, "bankroll": prop.Bankroll, "handle": w.NightHandleAt(l.ID), "capacity": w.Capacity(l.ID), "trading": w.Trading(l.ID), "condition": prop.Condition, "income": prop.Income, "owned": w.Own(l.ID), "locked": l.District > w.District, "actions": w.Actions(l.ID)})
+		locs = append(locs, map[string]any{"id": l.ID, "name": l.Name, "type": l.Type, "district": l.District, "x": l.X, "y": l.Y, "cost": AcquisitionCost(w, l.ID), "blurb": l.Blurb, "owner": prop.Owner, "holder": w.HolderName(l.ID), "staff": prop.Staff, "hands": w.HandsDescription(l.ID), "supply": prop.Supply, "trouble": prop.Trouble, "shy": w.Shy(l.ID), "curtains": w.Curtains(l.ID), "trade": w.CustomDescription(l.ID), "posted": w.PostingDescription(l.ID), "people": w.PeopleHere(l.ID), "note": w.PlaceNote(l.ID), "room": w.RoomNote(l.ID), "note_warn": w.PlaceWarn(l.ID), "away": w.Away(l.ID), "travel_note": w.TravelNote(l.ID), "crossing": w.Crossing(w.Player.Location, l.ID), "still": prop.Still, "bankroll": prop.Bankroll, "handle": w.NightHandleAt(l.ID), "capacity": w.Capacity(l.ID), "trading": w.Trading(l.ID), "condition": prop.Condition, "income": prop.Income, "owned": w.Own(l.ID), "locked": l.District > w.District, "actions": w.Actions(l.ID)})
 	}
 	var scene any = nil
 	if e := w.Event; e != nil {
@@ -2263,15 +2263,42 @@ func reachesTheUnreachable(id string) bool {
 
 // AcquisitionCost is what taking a premises costs. Buying out what is left of a
 // dead organization costs twice what an unclaimed door does.
+// Freehold is what a place's listed price is multiplied by. "Taking over
+// businesses should be a lot more expensive and high level stuff that you build
+// up to over time." It was neither: a laundry was $180 against a careful
+// campaign that ends with twelve thousand in the bank, so the whole business
+// layer opened on the second afternoon.
+const Freehold = 4
+
+// AnotherOne is what each premises already held adds to the price of the next,
+// as a share. The city can see who is buying and prices accordingly, which is
+// what turns a list of addresses into a thing you build up to: every address
+// after the first used to cost exactly what the first one did.
+const AnotherOne = .45
+
+// AcquisitionCost is what the keys cost today. A place somebody's organization
+// has fallen out of is dearer, because a receiver is not a neighbour.
 func AcquisitionCost(w *World, id string) int {
 	place, ok := PlaceByID(id)
 	if !ok {
 		return 0
 	}
+	cost := float64(place.Cost * Freehold)
 	if prop := w.Properties[id]; prop != nil && strings.HasPrefix(prop.Owner, "former:") {
-		return place.Cost * 2
+		cost *= 2
 	}
-	return place.Cost
+	return int(cost * (1 + AnotherOne*float64(w.Holdings())))
+}
+
+// Holdings is how many premises the player already has their name on.
+func (w *World) Holdings() int {
+	n := 0
+	for _, l := range Locations {
+		if w.Own(l.ID) && l.Cost > 0 {
+			n++
+		}
+	}
+	return n
 }
 
 // AcquireReadiness explains why a premises cannot be taken, or returns "".

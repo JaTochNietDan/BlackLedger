@@ -71,7 +71,10 @@ func TestHTTPRiseFallAndNewLife(t *testing.T) {
 	earn(2)
 	command("recruit", "bar", "")
 	settle()
-	earn(2)
+	// The keys to a laundry cost four times what they did, so the walk to it is
+	// longer: a freehold is meant to be a thing a player builds up to rather
+	// than an afternoon's courier work.
+	earn(14)
 	travel("laundry")
 	command("acquire", "laundry", "")
 	settle()
