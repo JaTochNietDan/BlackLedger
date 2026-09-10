@@ -23,7 +23,22 @@ package core
 
 // Haunts are the places somebody goes when the day's work is done. All three
 // sell a drink; two of them will also take a bet.
-var haunts = []string{"bar", "club", "casino"}
+// Where the city goes of an evening. The poolhall is on this list because the
+// back room is behind it and a game needs three people in the room: measured
+// before it was added, the most anybody ever saw in the poolhall in a week was
+// one person, at nine in the morning, which made a whole card game unplayable
+// in a city that had one. The other fault shape in the brief, a content table
+// written for a smaller city, wearing the clothes of a feature that works.
+var haunts = []string{"bar", "club", "casino", "poolhall"}
+
+// How the evening divides. A poolhall is not a bar: a few people go, not a
+// quarter of the city. Splitting the evening four equal ways moved twenty
+// people a night out of the drinking places, and the drop in their takings was
+// enough that a diplomat who used to buy the casino inside 220 commands could
+// no longer afford one on any seed. One share in twelve is enough to get a
+// three handed game up most evenings and small enough that the rest of the
+// city's night is where it was.
+var haunted = map[string]int{"bar": 4, "club": 4, "casino": 3, "poolhall": 1}
 
 // Evening reports which half of the day it is. Everything that cares asks here.
 func Evening(minute int) bool { return minute%1440 >= 720 }
@@ -39,7 +54,17 @@ func haunt(id string) string {
 	if sum < 0 {
 		sum = -sum
 	}
-	return haunts[sum%len(haunts)]
+	total := 0
+	for _, id := range haunts {
+		total += haunted[id]
+	}
+	at := sum % total
+	for _, id := range haunts {
+		if at -= haunted[id]; at < 0 {
+			return id
+		}
+	}
+	return haunts[0]
 }
 
 // keepsPost is true for the people whose position is not theirs to choose. A

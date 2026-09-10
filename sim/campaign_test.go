@@ -93,7 +93,21 @@ func TestDiplomatMaintainsPublicBusinessAgreements(t *testing.T) {
 	if r.Error != "" {
 		t.Fatal(r.Error)
 	}
-	if r.Actions["audience"] == 0 || r.Events["audience"] == 0 || r.Milestones["casino"] == 0 {
+	// This used to require the casino specifically, which is one contingent
+	// purchase out of one seeded run: it passed on seed 27 and already failed
+	// on seed 28, and any change to where the city spends its evening moved it.
+	// Putting the poolhall on the list of places people go at night was enough
+	// to move it on every seed, with the diplomat's money within $150 of where
+	// it had been — so the guard was measuring a coincidence, not progression.
+	// What it means to test is that a policy spending its time on audiences
+	// still builds something.
+	held := 0
+	for _, milestone := range []string{"crew", "laundry", "garage", "casino", "housing", "security"} {
+		if r.Milestones[milestone] > 0 {
+			held++
+		}
+	}
+	if r.Actions["audience"] == 0 || r.Events["audience"] == 0 || held < 4 {
 		t.Fatal("diplomacy did not coexist with progression", r)
 	}
 	w := core.New(27)

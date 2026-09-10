@@ -44,8 +44,9 @@ which half is standing.
    Built: five card draw behind the poolhall, one draw, no house and no edge,
    seats filled from whoever is in the room, and a round of betting after the
    draw with one raise, folding, and bluffing off `Ambition` (`core/backroom.go`).
-   Still open: a screen for it, since the interface has only the published
-   table so far.
+   Screen in `src/Tables.tsx`, drawn inside the poolhall rather than as a
+   takeover. Still open: sound, and what a losing night does to how somebody
+   at that table treats the player afterwards.
 4. **The rest of the open inbox.** Wording ("establish protection" for buying a
    business), the roulette table beside the wheel rather than under it and
    multiple chips down at once, newspaper pictures, the travel bar below the
@@ -137,7 +138,7 @@ each other and the run is race-clean.
 
 Balance baseline, seven strategies
 (worker/investor/defiant/reckless/thief/smuggler/racketeer):
-deaths 0/0/52/82/78/0/38, median cash 12405/14209/7544/90/1444/5505/1936.
+deaths 0/0/51/82/78/0/38, median cash 12585/14229/7376/90/1444/5361/2589.
 `mise run simulate > <scratchpad>/sim.json` then **parse** the JSON; grepping it
 is useless. Each strategy also reports `mean_heat`, `seizures` and `runs_hurt`,
 because deaths and cash cannot tell a safe policy from one whose money is taken

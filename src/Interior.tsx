@@ -46,8 +46,13 @@ function Work({title, blurb, actions, render}: {
   </section>;
 }
 
-export function Interior({place, people, actions, render, onLeave, onTables, felt, groups, comings, minute}: {
+export function Interior({place, people, actions, render, onLeave, onTables, felt, backroom, groups, comings, minute}: {
   place: Place; people: Presence[]; actions: Action[];
+  // The game behind the room, when there is one on. A hand of cards against
+  // people who live here is not premises work to be listed between hiring and
+  // restocking, and it is not the takeover the casino gets either: the player
+  // is standing in the poolhall, and the table is in front of them.
+  backroom?: ReactElement;
   render: (a: Action) => ReactElement; onLeave: () => void;
   // A room with tables in it offers one way in and the tables take the screen.
   // The cards and the wheel are not premises work to be listed between hiring
@@ -216,6 +221,8 @@ export function Interior({place, people, actions, render, onLeave, onTables, fel
           </div>
         </div>
         {needle && found.length === 0 && <p className="nothing-here">Nothing here matches “{query}”.</p>}
+
+        {backroom}
 
         {onTables && <button className="action primary sit-down-here" onClick={onTables}>
           <span><strong>{felt ? 'Sit down at the tables' : 'Play the machines'}</strong>

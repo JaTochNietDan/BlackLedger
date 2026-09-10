@@ -7059,3 +7059,49 @@ Wired the same way as the rest: `bet` with the amount the player typed, `call`
 and `fold`, all filed under the tables, and the published table now carries what
 each seat put in and what each seat said, with nobody's cards visible until the
 hand is over. Baseline unmoved: no campaign policy walks into the back room.
+
+## A screen for the back room, and the room having nobody in it
+
+`src/Tables.tsx` gains `BackRoom`, drawn inside the poolhall rather than as a
+takeover: the casino takes the screen because sitting at its tables is where you
+are for the rest of the evening, and a hand of cards is not. The other felts have
+a house on one side and are staged that way, a dealer at the top and the player
+at the bottom. This one has four people round it and no house at all, so the
+seats are a row: each says what they bought in the draw, what they put in, and
+what they said when the money went round, because those three are the whole of
+what the player has to read before deciding whether to pay. The player's own
+cards are buttons — picking up to three to throw is the draw — and nobody's hand
+is drawn until it is turned over.
+
+`TestTheTablePublishesEverythingTheScreenReads` names the keys the view takes off
+the table. A rename in the core that is not a rename in the view is a blank
+screen at a table with money on it, and nothing else in the build would notice.
+
+### The game nobody could have played
+
+Checking the live city rather than the tests: nobody was in the poolhall. Over a
+whole simulated week the most anybody ever stood in it was one person, at nine in
+the morning, and the game needs two. The back room was unplayable in a city that
+had one. `haunts` in `core/routine.go` listed three addresses — bar, club, casino
+— and the city has twenty-six: the brief's first fault shape, a content table
+written for a smaller city, wearing the clothes of a working feature.
+
+Adding the poolhall as a fourth equal share moved twenty people a night out of
+the drinking places. Their takings fell far enough that a diplomat who used to
+buy a casino inside 220 commands could no longer afford one on any seed. So the
+evening is weighted instead: bar 4, club 4, casino 3, poolhall 1. A poolhall is
+not a bar. Measured after: at most five people in the back room, a game available
+on 54 evening hours of a week against 30 daytime ones.
+
+### A guard changed, with the reason
+
+`TestDiplomatMaintainsPublicBusinessAgreements` required the casino milestone
+from one seeded 220-command run. It passed on seed 27 and already failed on seed
+28, and any change to where the city spends its evening moved it — with the
+diplomat's final money within $150 of where it had been. It was measuring a
+coincidence. It now asks that a policy spending its time on audiences still
+builds four of the six things there are to build.
+
+Baseline: deaths 0/0/51/82/78/0/38, median cash
+12585/14229/7376/90/1444/5361/2589. The evening moving changed six of the seven
+by a little, which is what a fourth night spot does.

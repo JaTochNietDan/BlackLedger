@@ -517,3 +517,70 @@ func TestAHandThrownInWinsNothingHoweverGoodItWas(t *testing.T) {
 		t.Fatalf("a folded hand was described as %q", g.Outcome)
 	}
 }
+
+// The view invents nothing, which only holds if the core publishes everything
+// the view reads. These are the names src/Tables.tsx takes off the table: a
+// rename here that is not a rename there is a blank screen at a table with
+// money on it, and nothing else in the build would notice.
+func TestTheTablePublishesEverythingTheScreenReads(t *testing.T) {
+	w, _ := backroom(t)
+	if err := w.SitInTheBackRoom(BackRoom, 50); err != nil {
+		t.Fatalf("no game: %v", err)
+	}
+	table := w.CardsDescription()
+	for _, key := range []string{"place", "ante", "pot", "mine", "hand", "seats",
+		"drawn", "bet", "my_bet", "facing", "folded", "done", "outcome", "won"} {
+		if _, ok := table[key]; !ok {
+			t.Errorf("the screen reads %q off the table and the core does not send it", key)
+		}
+	}
+	seats, ok := table["seats"].([]map[string]any)
+	if !ok || len(seats) == 0 {
+		t.Fatal("the table has no seats on it")
+	}
+	for _, key := range []string{"who", "name", "threw", "in", "folded", "said"} {
+		if _, ok := seats[0][key]; !ok {
+			t.Errorf("the screen reads %q off a seat and the core does not send it", key)
+		}
+	}
+	// And nothing at all when nobody is playing, because the screen tests for
+	// the table's presence to decide whether to draw one.
+	w.Game = nil
+	if w.CardsDescription() != nil {
+		t.Error("an empty back room published a table")
+	}
+}
+
+// A game needs people in the room. Measured before the poolhall was put on the
+// list of places the city goes of an evening: the most anybody ever stood in it
+// in a week was one person, at nine in the morning, so the back room was a
+// feature nobody could ever have used.
+func TestThereIsSomebodyInTheBackRoomToPlayAgainst(t *testing.T) {
+	w := New(404)
+	night, day, most := 0, 0, 0
+	for step := 0; step < 24*7; step++ {
+		w.Advance(60)
+		n := w.InTheRoom(BackRoom)
+		if n > most {
+			most = n
+		}
+		if n < 2 {
+			continue
+		}
+		if Evening(w.Minute) {
+			night++
+		} else {
+			day++
+		}
+	}
+	t.Logf("in a week: at most %d in the back room, a game on %d evening hours and %d daytime hours", most, night, day)
+	if night == 0 {
+		t.Fatal("there was never an evening hour in a week when two people were in the back room")
+	}
+	// A back room is an evening. Some daytime hours are honest — a poolhall
+	// with two people in it at noon is a poolhall — but if the day is as busy
+	// as the night then the city has stopped going to work.
+	if day >= night {
+		t.Fatalf("a game was on for %d daytime hours against %d evening ones", day, night)
+	}
+}
