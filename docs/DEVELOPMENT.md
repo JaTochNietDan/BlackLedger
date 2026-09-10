@@ -5967,3 +5967,34 @@ description, which is the second time it has earned its place this session.
 Balance unchanged: deaths 0/0/50/82/83, median cash 12378/14050/7230/90/586.
 
 Evidence: `core/plate_test.go`.
+
+## A car for one of your own
+
+The other half of the same inbox line: "We could probably also extend to be able
+to provide cars, and armor the cars for people in our family to keep them more
+protected from attacks."
+
+What makes this worth building rather than a number on somebody else's sheet is
+where it lands. Sending one of your own after somebody is the one decision in
+the game whose entire point is that it is not you taking the risk, and when it
+goes wrong there are three endings: they are killed, they are taken alive and
+your name comes out of it, or they get out with nothing. The difference between
+the second and the third is whether there was something running at the kerb.
+
+| 500 jobs that went wrong | Got away |
+|---|---|
+| On foot | 120 |
+| A car at the kerb | 175 |
+| A plated car | 231 |
+
+Buying is on the forecourt, for anybody of yours standing on it with you, at the
+lot price — less the margin if the lot is yours, which is the same rule the
+player's own car already followed. Plating is at the garage, the same two stages
+and the same price as your own. Both nudge their trust: somebody paying for that
+is not a thing people forget.
+
+Two breaks verified, one per half: the car, and the plate on top of it.
+
+Balance unchanged: deaths 0/0/50/82/83, median cash 12378/14050/7230/90/586.
+
+Evidence: `core/theirs_test.go`.

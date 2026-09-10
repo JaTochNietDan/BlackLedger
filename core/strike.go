@@ -194,7 +194,10 @@ func (w *World) itWentWrong(n *NPC, hand Hand, where string, family *Faction) {
 	// is the one where they are still breathing.
 	who := w.Player.Crew[0]
 	w.Player.Heat = min(100, w.Player.Heat+SentHeat)
-	roll := w.Random()
+	// What was waiting at the kerb. A man with something running gets off the
+	// street; a man on foot is still on it when the doors open. This is the
+	// whole of what buying one of your own a car is for.
+	roll := w.Random() + w.GetsOut(who.ID)
 	switch {
 	case roll < HandDies:
 		w.Kill(who.ID, fmt.Sprintf("Shot at %s, going for %s on somebody else's word.", where, n.Name))

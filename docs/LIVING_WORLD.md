@@ -210,8 +210,14 @@ family to keep them more protected from attacks.
   which is the one stretch of the city where nothing else protects anybody: of
   600 unwarned hits out there, 71 survived bare, 149 with the doors plated and
   225 with the glass in too. It costs speed, because plate is weight.
-— still to do: pictures of what you are buying, what a car is worth in speed
-  stated honestly, and cars and plate for your own people.
+— and cars for your own people are built. Buy one of yours a car on the
+  forecourt and have a garage plate it, and it is what gets them out when a job
+  goes wrong: of 500 jobs that went the other way, 120 walked away from it on
+  foot, 175 with a car at the kerb and 231 with a plated one. It is the same
+  three endings as before — killed, taken alive with your name coming out of it,
+  or out with nothing — and a car moves them toward the last.
+— still to do: pictures of what you are buying, and what a car is worth in speed
+  stated honestly.
 
 ---
 

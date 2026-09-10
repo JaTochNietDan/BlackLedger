@@ -177,6 +177,10 @@ type NPC struct {
 	// one customer, nothing could be stolen off anybody, and a garage had
 	// nothing to repair. Absent in saves written before the city drove.
 	Car int `json:"car,omitempty"`
+	// Plate somebody has paid to put on that car. Almost always nobody: the
+	// city does not plate its own, and the player is the only person in it who
+	// buys anybody else protection.
+	Plate int `json:"plate,omitempty"`
 	// The minute they got it, so somebody who has never had a car can be told
 	// from somebody whose car was taken. Without it, settling a city would
 	// quietly hand a replacement to anybody who had just lost one.
@@ -989,6 +993,19 @@ func (w *World) Actions(id string) []Action {
 		// Plate. The one thing worth having on the street between two
 		// addresses, where there are no walls, no door and nobody who knows
 		// you — which is where a car is.
+		for _, who := range w.PeopleHere(id) {
+			if !who.Yours {
+				continue
+			}
+			n := w.NPC(who.ID)
+			if n == nil || n.Car == 0 || w.TheirPlating(who.ID) >= PlateStages {
+				continue
+			}
+			asks("plate:"+who.ID, "Plate "+who.Name+"'s car", PlateMinutes, PlateCost, w.TheirPlateReadiness(who.ID),
+				fmt.Sprintf("$%d and %d hours on the bench. %d of %d stages on it. Worth something to them on the street and nothing to them indoors, same as yours.",
+					PlateCost, PlateMinutes/60, w.TheirPlating(who.ID), PlateStages))
+			about(who.ID)
+		}
 		asks("plate", w.PlateLabel(), PlateMinutes, PlateCost, w.PlateReadiness(id),
 			fmt.Sprintf("$%d and %d hours on the bench. Worth %d%% against somebody who pulls level with you out on the street, and nothing at all to somebody who walks in a door after you. Plate is weight: it costs %d%% of what the car is worth for speed. Currently %d of %d stages on it.",
 				PlateCost, PlateMinutes/60, int(PlateCover*100), int(PlateWeight*100), w.Plating(), PlateStages))
@@ -1112,6 +1129,20 @@ func (w *World) Actions(id string) []Action {
 	// offered it at all. A button and its rule have to be asking the same
 	// question.
 	if CarSource(id) {
+		// One of your own, standing on the lot with you. A car for somebody
+		// else is not a number on their sheet: it is what gets them off the
+		// street when a job goes wrong.
+		for _, who := range w.PeopleHere(id) {
+			if !who.Yours {
+				continue
+			}
+			if n := w.NPC(who.ID); n == nil || n.Car > 0 {
+				continue
+			}
+			asks("car:"+who.ID, "Put "+who.Name+" in a car", TheirCarMinutes, w.TheirCarPrice(), w.TheirCarReadiness(who.ID),
+				fmt.Sprintf("$%d off the lot. They get where they are sent faster and away from it quicker, which is worth most on the night something goes wrong.", w.TheirCarPrice()))
+			about(who.ID)
+		}
 		if next, ok := nextVehicle(p.Car); ok {
 			hides := "Nothing to hide anything in."
 			if next.Compartment > 0 {
