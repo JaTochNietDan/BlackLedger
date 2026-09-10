@@ -202,6 +202,17 @@ When I went after Tila myself, the newspaper info on the attempt showed the wron
 
 We should probably show options like "buy kerrigan haulage" before you can afford it instead of having it hidden. We probably should just show all hidden options tbh. Not sure if hiding them is productive.
 
+— built, and the core was already doing its half. Measured: every one of the 17
+  businesses for sale is offered to a player with $40 in their pocket, refused
+  rather than absent, with the price on the card; and all 251 refusals across
+  the city say what would change them, which is what makes a refused card worth
+  more than an absent one. What hid them was the panel, which folded refusals
+  behind a "Show N you cannot do yet" and started closed. They start open now,
+  in the room and beside a person. The toggle stays, because a way to tidy a
+  long list is not the same thing as a wall to get past. A home you cannot
+  afford is offered the same way, since wanting somewhere better to live is the
+  same kind of wanting.
+
 ---
 
 Let's verify, can you be attacked while traversing the map? Can your car affect this, whether it's armored, etc? This should all be the case.

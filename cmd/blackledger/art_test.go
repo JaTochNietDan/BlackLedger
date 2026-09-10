@@ -442,3 +442,26 @@ func TestADrumIsAlreadyShowingWhereItWillStop(t *testing.T) {
 		t.Error("the tray no longer waits for the drums")
 	}
 }
+
+// "We should probably show options like 'buy kerrigan haulage' before you can
+// afford it instead of having it hidden. We probably should just show all
+// hidden options tbh. Not sure if hiding them is productive."
+//
+// The core was already offering every one of them, refused with a sentence
+// saying what would change it — 251 refusals across the city, all of them
+// explained. What hid them was the panel, which folded them behind a "Show N
+// you cannot do yet" and started closed. They start open. The toggle stays,
+// because a way to tidy a long list is not the same thing as a wall.
+func TestNothingYouCannotDoYetIsHiddenByDefault(t *testing.T) {
+	list := source(t, "src/ActionList.tsx")
+	if !holds(list, "const [open, setOpen] = useState(true)") {
+		t.Error("the work you cannot do with somebody standing here is folded away again")
+	}
+	if !holds(list, "const showBlocked = !hidBlocked[s.id] || !!needle") {
+		t.Error("a room's refusals are folded away again")
+	}
+	// And the toggle is still there, reading the right way round.
+	if !holds(list, "{showBlocked ? 'Hide' : 'Show'} {s.blocked.length} you cannot do yet") {
+		t.Error("there is no way to tidy a long list of refusals away")
+	}
+}

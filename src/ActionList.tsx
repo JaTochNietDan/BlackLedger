@@ -32,7 +32,13 @@ function Person({
   actions: Action[];
   render: (a: Action) => ReactElement;
 }) {
-  const [open, setOpen] = useState(false);
+  // Open. "We should probably show options like 'buy kerrigan haulage' before
+  // you can afford it instead of having it hidden. We probably should just show
+  // all hidden options tbh." An action you cannot take yet is a thing to want,
+  // and every refusal in this game is a sentence saying what would change it —
+  // so a refused card is worth more than an absent one. The toggle stays, as a
+  // way to tidy rather than a wall to get past.
+  const [open, setOpen] = useState(true);
   const available = actions.filter(a => !a.disabled);
   const blocked = actions.filter(a => a.disabled);
   const notes = [
@@ -93,7 +99,9 @@ export function ActionList({
   here?: boolean;
 }) {
   const [query, setQuery] = useState('');
-  const [openBlocked, setOpenBlocked] = useState<Record<string, boolean>>({});
+  // Refusals are shown, and a section can be folded away rather than opened up.
+  // Keyed by section so the state is per group, and absent means shown.
+  const [hidBlocked, setHidBlocked] = useState<Record<string, boolean>>({});
   const [showRoom, setShowRoom] = useState(false);
 
   const needle = query.trim().toLowerCase();
@@ -182,7 +190,7 @@ export function ActionList({
       )}
 
       {sections.map(s => {
-        const showBlocked = openBlocked[s.id] || !!needle;
+        const showBlocked = !hidBlocked[s.id] || !!needle;
         return (
           <section className="action-group" key={s.id}>
             <h4>
@@ -200,7 +208,7 @@ export function ActionList({
                   <button
                     className="reveal-blocked"
                     aria-expanded={showBlocked}
-                    onClick={() => setOpenBlocked(o => ({...o, [s.id]: !o[s.id]}))}
+                    onClick={() => setHidBlocked(o => ({...o, [s.id]: !o[s.id]}))}
                   >
                     {showBlocked ? 'Hide' : 'Show'} {s.blocked.length} you cannot do yet
                   </button>

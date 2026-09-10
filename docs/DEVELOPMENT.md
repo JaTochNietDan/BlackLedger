@@ -7616,3 +7616,34 @@ offline the way the exteriors and interiors are.
 
 Baseline unmoved: deaths 0/0/52/82/78/0/37, median cash
 12585/14129/7418/90/1063/5332/2080.
+
+## Nothing worth wanting is hidden
+
+"We should probably show options like 'buy kerrigan haulage' before you can
+afford it instead of having it hidden. We probably should just show all hidden
+options tbh. Not sure if hiding them is productive."
+
+The core was already doing its half, and it is worth having measured rather than
+assumed: every one of the 17 businesses for sale is offered to a player with $40
+in their pocket, refused rather than absent, with the price on the card. All 251
+refusals across the city say what would change them. A refused card is worth
+more than an absent one precisely because of that sentence — it is the only
+thing in the game that says what to save for.
+
+What hid them was the panel. `ActionList` folded refusals behind "Show N you
+cannot do yet" and started closed, in both places it draws them: the work
+available with a person standing here, and a room's own groups. They start open.
+The toggle stays and reads the other way round, because a way to tidy a long
+list is not the same thing as a wall to get past.
+
+The measurement caught my own wrong assumption on the way: the first version of
+the guard asked every address with a price to offer `acquire`, and Ashbury Court
+is a home. A home is rented rather than taken over and offers its own refusal,
+so the guard asks about businesses and then asks the home separately.
+
+Breaking it fails properly both ways: closing the fold by default fails the view
+guard, and dropping refused work from `Actions` reports that Bluebird Laundry is
+for sale at $180 and a player with $40 is not shown it at all.
+
+Baseline unmoved: deaths 0/0/52/82/78/0/37, median cash
+12585/14129/7418/90/1063/5332/2080.
