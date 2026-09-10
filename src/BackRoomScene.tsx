@@ -1,5 +1,7 @@
+import {useEffect, useRef} from 'react';
 import {BackRoom} from './Tables';
 import type {CardsState} from './Tables';
+import {playTable, roomTone} from './sound';
 import type {Action} from './types';
 
 // The room behind the poolhall takes the screen.
@@ -37,6 +39,52 @@ export function BackRoomScene({
   onLeave: () => void;
 }) {
   const dealt = !!cards && !cards.done;
+
+  // The room behind the poolhall, out loud. It was the one table in the game
+  // with nothing to hear: the casino has had a floor under it and a card on
+  // every deal since the tables took the screen, and this had silence.
+  //
+  // The hum runs while the player is in here and stops when they come back
+  // out, the same as the casino floor, because a noise that goes on after you
+  // have left the room is a noise nobody asked for.
+  useEffect(() => {
+    roomTone(true);
+    return () => roomTone(false);
+  }, []);
+
+  // A card for every card that lands, so the flop sounds like three of them
+  // and the turn like one. Off the board the core sent rather than off a timer
+  // of the interface's own: what is heard is what happened.
+  const board = cards?.board?.length ?? 0;
+  const seenBoard = useRef<number | null>(null);
+  useEffect(() => {
+    if (seenBoard.current === null || board < seenBoard.current) {
+      // The first look, and the start of every new hand. Sitting down is not a
+      // thing that just happened and a cleared board is not cards being taken
+      // off the table.
+      seenBoard.current = board;
+      return;
+    }
+    const fresh = board - seenBoard.current;
+    seenBoard.current = board;
+    for (let i = 0; i < fresh; i++) setTimeout(() => playTable('card'), i * 90);
+  }, [board]);
+
+  // And chips when the middle grows, one for each raise's worth rather than
+  // one for the lot: a big bet is a longer noise than a call.
+  const pot = cards?.pot ?? 0;
+  const ante = cards?.ante || 1;
+  const seenPot = useRef<number | null>(null);
+  useEffect(() => {
+    if (seenPot.current === null || pot < seenPot.current) {
+      seenPot.current = pot;
+      return;
+    }
+    const added = pot - seenPot.current;
+    seenPot.current = pot;
+    if (added > 0) playTable('chips', Math.round(added / ante));
+  }, [pot, ante]);
+
   return (
     <div className="modal-shade table-shade">
       <section

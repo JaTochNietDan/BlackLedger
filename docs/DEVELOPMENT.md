@@ -8545,3 +8545,28 @@ what it was always for.
 
 Read off 8791 after the restart: Saint Agnes 0 min, four addresses at 15, three
 at 25.
+
+## The back room out loud
+
+The last thing open on the card game, and the one table in the whole game with
+nothing to hear. The casino floor has had a hum under it and a card on every
+deal since the tables took the screen. The room behind the poolhall takes the
+screen the same way and had silence, which at a card table reads as something
+broken rather than as quiet.
+
+Three things, all off what the core sent rather than off a clock of the
+interface's own. The room hum runs while the player is in there and stops when
+they come back out, the same terms as the casino: a noise that goes on after you
+have left is a noise nobody asked for. A card lands for every card the core
+deals, so the flop sounds like three of them and the turn like one. And chips go
+into the middle when the pot grows, one for each ante's worth, so a raise is a
+longer noise than a call — clay on baize is higher and drier than brass in a
+tray, so it is not the coin the bandit uses.
+
+Two states that are not events had to be said out loud: the first look, so
+sitting down does not play the hand that was already on the table, and a board
+that has shrunk, so a new hand being dealt is not heard as cards landing.
+
+Every one of the five broken in turn and each fails its own line: no hum, no
+card, the count taken from something other than the core's board, the first look
+treated as a deal, and the chips unscored in the synthesiser.

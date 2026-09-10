@@ -229,6 +229,13 @@ export function playTable(kind: string, count = 1) {
     case 'card':
       clunk(ctx, at, 620, 0.12);
       break;
+    // Chips going into the middle. Higher and drier than a coin in a tray,
+    // because clay on baize is not brass on steel, and one for each rather
+    // than one for the lot: a raise sounds like more money than a call.
+    case 'chips':
+      for (let i = 0; i < Math.max(1, Math.min(8, count)); i++)
+        clunk(ctx, at + i * 0.055 + Math.random() * 0.02, 780 + Math.random() * 120, 0.09);
+      break;
     case 'dice':
       for (let i = 0; i < 5; i++)
         clunk(ctx, at + i * 0.06 + Math.random() * 0.02, 420 + Math.random() * 200, 0.1);

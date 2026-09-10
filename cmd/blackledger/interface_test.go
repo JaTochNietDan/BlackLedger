@@ -207,3 +207,39 @@ func TestTheCityListSaysWhatEachJourneyCosts(t *testing.T) {
 		t.Fatal("an address that is not open to the player is ordered as though it were")
 	}
 }
+
+// Every table in the game makes a noise except the one behind the poolhall. The
+// casino floor has had a hum under it and a card on every deal since the tables
+// took the screen; the back room, which takes the screen the same way, had
+// silence — and silence at a card table reads as a thing that is broken.
+func TestTheBackRoomIsNotSilent(t *testing.T) {
+	t.Parallel()
+	src := source(t, "src/BackRoomScene.tsx")
+	if !holds(src, "roomTone(true)") || !holds(src, "return () => roomTone(false)") {
+		t.Fatal("the back room has no room under it, or leaves it running after the player walks out")
+	}
+	if !holds(src, "playTable('card')") {
+		t.Fatal("cards land on the table in silence")
+	}
+	if !holds(src, "playTable('chips'") {
+		t.Fatal("money goes into the middle in silence")
+	}
+	// Off what the core sent, never off a clock of the interface's own: the
+	// board is the count of cards the core has dealt.
+	if !holds(src, "cards?.board?.length ?? 0") {
+		t.Fatal("the cards are counted by something other than what the core dealt")
+	}
+	// And the first look is not a thing that just happened, the way sitting
+	// down used to deal a card the moment the room opened.
+	if !holds(src, "seenBoard.current === null") || !holds(src, "seenPot.current === null") {
+		t.Fatal("walking into the room plays the hand that was already on the table")
+	}
+	// A new hand clears the board, and cards coming off the table are not cards
+	// landing on it.
+	if !holds(src, "board < seenBoard.current") {
+		t.Fatal("the board being cleared for a new hand is heard as cards being dealt")
+	}
+	if !holds(source(t, "src/sound.ts"), "case 'chips':") {
+		t.Fatal("nothing knows what chips sound like")
+	}
+}
