@@ -242,5 +242,27 @@
   "y": 786,
   "cost": 460,
   "blurb": "Six acres of what the city used to drive, stacked four high. Everything ends up here, and somebody pays for the privilege of leaving it."
+ },
+ {
+  "id": "filling",
+  "name": "Kessler's Filling Station",
+  "type": "work",
+  "kind": "filling",
+  "district": 0,
+  "x": 821,
+  "y": 95,
+  "cost": 420,
+  "blurb": "Two pumps, a tin roof and a rack of everything a person remembers wanting once they have stopped: oil, cigarettes, a map of a city they already live in."
+ },
+ {
+  "id": "pumps",
+  "name": "The Viaduct Pumps",
+  "type": "work",
+  "kind": "filling",
+  "district": 2,
+  "x": 476,
+  "y": 786,
+  "cost": 360,
+  "blurb": "Under the arches on the way out of town, open when nowhere else is, which is worth more than the petrol."
  }
 ]

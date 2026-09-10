@@ -40,6 +40,24 @@ func circuit(seed uint32, car, days int) (int, int) {
 			}
 			continue
 		}
+		// A driver buys petrol. The car in this comparison now has a tank that
+		// goes down, so the driving life includes the detour to a forecourt and
+		// the price of filling it — which is the honest question: does a car
+		// buy time NET of keeping it running? The walking life never does this,
+		// because a person on foot has nothing to fill.
+		if car > 0 && w.Fuel() < FuelFull/4 {
+			station := w.theStation()
+			if station != "" && w.Player.Location != station {
+				if !try("travel", station) {
+					stuck++
+					continue
+				}
+			}
+			if !try("fill", station) {
+				stuck++
+			}
+			continue
+		}
 		stop := stops[i%len(stops)]
 		if w.Player.Location != stop.place && !try("travel", stop.place) {
 			stuck++

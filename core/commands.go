@@ -246,6 +246,11 @@ func (w *World) apply(c Command) error {
 			return err
 		}
 		if c.Kind == "travel" {
+			// What the journey costs the tank, taken before the clock moves so
+			// a car that runs dry on the way is dry when they arrive.
+			if w.Driving() {
+				w.Burn(a.Minutes)
+			}
 			p.Location = "transit"
 			w.Advance(a.Minutes)
 			if p.Alive && w.Minute-oldTime >= a.Minutes {
@@ -264,6 +269,11 @@ func (w *World) apply(c Command) error {
 			}
 		} else if id, ok := strings.CutPrefix(c.Kind, "serve:"); ok {
 			if err := w.Serve(id); err != nil {
+				return err
+			}
+			w.Advance(a.Minutes)
+		} else if c.Kind == "fill" {
+			if err := w.FillUp(target); err != nil {
 				return err
 			}
 			w.Advance(a.Minutes)

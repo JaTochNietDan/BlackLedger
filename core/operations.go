@@ -117,6 +117,12 @@ var trades = map[string]Trade{
 		Remedy:  "Get the paperwork straight", RemedyDetail: "New documents, and the pair of them off the lot.", RemedyCost: 260,
 		Cover:   12, Watched: 1, Hides: 5,
 	},
+	"filling": {
+		Hands: 3, Wage: 8, Drain: 7, Restock: 210, RestockAmount: 45, Supplies: "petrol and the rack behind the counter",
+		Trouble: "The tanker did not come, and the pumps are running on what is in the ground.",
+		Remedy:  "Pay somebody to bring a load out of hours", RemedyDetail: "A tanker at four in the morning, and nobody writes it down.", RemedyCost: 190,
+		Cover:   9, Watched: 1, Hides: 4,
+	},
 	"cabs": {
 		Hands: 8, Wage: 9, Drain: 10, Restock: 280, RestockAmount: 50, Supplies: "fuel and tyres",
 		Trouble: "Two cars are off the road and the dispatcher is turning work away.",

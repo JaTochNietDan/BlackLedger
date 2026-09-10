@@ -84,6 +84,12 @@ type Person struct {
 	Enquiries map[string]int `json:"enquiries,omitempty"`
 	// Whose organization the player answers to, and how much work they have
 	// done for them. Absent for somebody who answers to nobody.
+	// What is in the tank, and when it was last touched. The minute is what
+	// tells a car nobody has ever filled from a car somebody ran dry — without
+	// it, settling the world would hand a free tank to anybody who had just
+	// used theirs up.
+	Fuel    int    `json:"fuel,omitempty"`
+	Fuelled int    `json:"fuelled,omitempty"`
 	Serves  string `json:"serves,omitempty"`
 	Service int    `json:"service,omitempty"`
 	// The face the player picked for themselves, one-based into the cast, and
@@ -175,6 +181,9 @@ type NPC struct {
 	// thief working a street does not take every car on it; the rest are left
 	// needing a garage, and that work is what a garage actually lives on.
 	Hurt bool `json:"hurt,omitempty"`
+	// Whether they are running on fumes. A car that needs petrol is a reason to
+	// be at a forecourt, which is what makes one worth holding.
+	Dry bool `json:"dry,omitempty"`
 	// The minute this person was last paid. It exists so that having nothing
 	// can be told from never having been given anything: a man robbed down to
 	// nothing must not be quietly refilled by the same pass that settles a
@@ -1025,6 +1034,19 @@ func (w *World) Actions(id string) []Action {
 		add("stand", "Stand on "+fmt.Sprint(w.Hand.Player), 5, 0, "",
 			fmt.Sprintf("The dealer draws to %d and stands on %d. A tie gives your money back.", DealerStands-1, DealerStands))
 	}
+	if Pumps(id) {
+		short := FuelFull - w.Fuel()
+		detail := fmt.Sprintf("$%d for what the tank is short. It reads %d of %d.", w.FuelFee(id), w.Fuel(), FuelFull)
+		if w.Own(id) {
+			detail = fmt.Sprintf("Your own pumps, at what the petrol cost you: $%d. It reads %d of %d.", w.FuelFee(id), w.Fuel(), FuelFull)
+		}
+		if p.Car == 0 {
+			detail = "What a forecourt is for, once there is something of yours to put it in."
+		} else if short == 0 {
+			detail = fmt.Sprintf("It reads %d of %d. There is nowhere for it to go.", w.Fuel(), FuelFull)
+		}
+		asks("fill", "Fill the tank", FillMinutes, w.FuelFee(id), w.FillReadiness(id), detail)
+	}
 	// The machines. Not a table: no dealer, no floor, no minimum — just a wall
 	// and whatever is in your pocket, which is why they are in rooms that are
 	// not casinos at all.
@@ -1572,6 +1594,8 @@ func (w *World) Advance(minutes int) {
 			w.CarDay()
 			w.CarTrade()
 			w.RepairsDay()
+			w.DryDay()
+			w.PumpDay()
 			w.ChargeDay()
 			w.DemolitionDay()
 			w.CityHallDay()
@@ -1930,6 +1954,7 @@ var PlaceIncome = map[string]int{
 	// A forecourt earns steadily on servicing and part-exchange; the money in
 	// it is the cars, and that is settled when one is sold.
 	"dealer": 22, "archway": 21,
+	"filling": 19, "pumps": 16,
 	// A yard earns on what everybody else is finished with.
 	"scrapyard": 18,
 }

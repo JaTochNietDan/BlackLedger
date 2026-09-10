@@ -146,6 +146,16 @@ func (w *World) wanted(n *NPC) (errand, bool) {
 			}
 		}
 	}
+	// Running on fumes. Petrol is the errand a driver runs oftenest, which is
+	// why a station is worth holding: it is not a shop people visit when
+	// something has gone wrong, it is a shop they cannot avoid.
+	if n.Dry && n.Car > 0 && n.Purse >= FuelPrice {
+		if id := w.theStation(); id != "" && id != n.Location {
+			if place, ok := PlaceByID(id); ok {
+				return errand{id, "wanting petrol at " + place.Name}, true
+			}
+		}
+	}
 	// A car with the glass out of it. Somebody who can find the fee takes it in
 	// rather than driving it broken, which is why a garage has anybody at the
 	// counter at all: the trade is people standing there, not a figure moving
@@ -257,6 +267,7 @@ func (w *World) Arrivals() {
 		// is dark and everybody who came that day has gone home.
 		w.putRight(n)
 		w.sellCarTo(n)
+		w.fillFor(n)
 		w.noticed(n, false)
 	}
 }

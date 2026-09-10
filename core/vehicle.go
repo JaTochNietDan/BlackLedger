@@ -72,7 +72,9 @@ func (w *World) CarCondition() int {
 
 // Driving reports whether the player has something that actually runs.
 func (w *World) Driving() bool {
-	return w.Player.Car > 0 && w.CarCondition() >= Wreck
+	// And there has to be something in it. A car with a dry tank is where you
+	// left it, which is the whole reason a filling station is a business.
+	return w.Player.Car > 0 && w.CarCondition() >= Wreck && w.Fuel() > 0
 }
 
 // Pace is the share of a walking journey the player's current transport takes.
@@ -232,6 +234,8 @@ func (w *World) BuyVehicle() error {
 		}
 	}
 	w.Player.Car, w.Player.CarWear = next.Tier, 100
+	// A car off the lot comes with a tank in it.
+	w.Player.Fuel, w.Player.Fuelled = FuelFull, max(1, w.Minute)
 	w.Log("Off the lot at Russo Motor Works", fmt.Sprintf("%s, $%d. $%d a day to keep on the road. %s", next.Label, next.Cost, w.CarUpkeep(), next.Detail), "personal")
 	return nil
 }
@@ -296,7 +300,7 @@ func (w *World) LoseCar(reason string) bool {
 func (w *World) VehicleDescription() map[string]any {
 	return map[string]any{
 		"car":       VehicleByTier(w.Player.Car).Label,
-		"condition": w.CarCondition(),
+		"condition": w.CarCondition(), "fuel": w.Fuel(), "tank": FuelFull,
 		"pace":      w.Pace(),
 		"concealed": w.Concealed(),
 		"exposed":   w.Exposed(),
