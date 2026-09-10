@@ -133,7 +133,7 @@ each other and the run is race-clean.
 
 Balance baseline, seven strategies
 (worker/investor/defiant/reckless/thief/smuggler/racketeer):
-deaths 0/0/52/82/77/0/38, median cash 12405/14231/7544/90/1403/5505/1936.
+deaths 0/0/52/82/77/0/38, median cash 12405/14209/7544/90/1403/5505/1936.
 `mise run simulate > <scratchpad>/sim.json` then **parse** the JSON; grepping it
 is useless. Each strategy also reports `mean_heat`, `seizures` and `runs_hurt`,
 because deaths and cash cannot tell a safe policy from one whose money is taken

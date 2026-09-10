@@ -71,6 +71,12 @@ func (w *World) routine(n *NPC) (errand, bool) {
 		return errand{}, false
 	}
 	if Evening(w.Minute) {
+		// Nobody walks to a bar on the night two families are shooting at each
+		// other. Most people stay where they are, which is what a war costs an
+		// owner who is not in it.
+		if w.CityAtWar() && w.staysIn(n) {
+			return errand{}, false
+		}
 		where := haunt(n.ID)
 		// Unless somebody has put a night on within walking distance, which is
 		// the whole of what paying for a band buys. One night: tomorrow they

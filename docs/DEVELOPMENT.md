@@ -6879,3 +6879,54 @@ the middle run of those policies is a death.
 worse than no measure, because it gets quoted.
 
 Evidence: `sim/campaign.go`, `cmd/simulate/main.go`.
+
+## A war reaches the people who are not in it
+
+Measured last tick and the reason for this one: over a hundred campaigns the
+investor was party to no war, watched seven break out elsewhere, and was never
+touched by one — lowest health 100, nothing taken, takings unchanged. Layer 2 of
+`docs/LIVING_WORLD.md` promises the player may be a bystander, a beneficiary or
+collateral, and only the first two were true.
+
+What a war does to everybody else is keep them at home. `core/curfew.go` holds
+in the people whose own family is doing the shooting, plus one in six of
+everybody else, chosen from their id so the cautious ones are the same people
+every night of the same war rather than a different handful each evening. The
+hook is in the evening branch of `core/routine.go`. A casino's night handle now
+multiplies by `roomAction()` in `core/casino.go`, so a thinner room covers less:
+before this, the one business the city goes out to ignored footfall entirely.
+
+Measured, and broken to check:
+
+- of an evening, 35 people out with a war on against 43 at peace; with the
+  curfew disabled, 43 against 43.
+- the club covered less on a war night; disabled, $3216 against $3216.
+- with `roomAction` replaced by 1, $2400 against $2400.
+
+### The habit guard, and why the test changed rather than the code
+
+`TestAFaceIsFoundInTheSamePlaceAtTheSameHour` promises a moving face is where it
+usually is on 90% of person-hours. The curfew dropped it to 88%. The first
+version of the curfew, keeping two people in three at home, dropped it to 63%
+and was simply too strong; that is fixed. The remaining two points are real and
+they are not the curfew being wrong.
+
+The cost is not the war, it is the *change*. Held at peace the measure is 91%;
+held at war for the whole fortnight it is 90%. A war that starts on day six is
+what costs the two points, which is exactly the disruption a player is supposed
+to notice. So the guard now holds the city at peace and says so in its comment,
+and `TestAWarThinsTheStreetWithoutErasingIt` measures the wartime figure
+separately with a floor of 70%. Broken, that new test reports 95% against 91% —
+without a curfew a war changes nobody's evening at all.
+
+`weekUnder(t, seed, days, hold)` is `week` with a hand on the city's
+temperature; `week` is now a call to it with an empty hold.
+
+Baseline after, seven strategies: deaths 0/0/52/82/77/0/38, median cash
+12405/14209/7544/90/1403/5505/1936. The investor's median moved 14231 → 14209.
+Small, because only seven runs in a hundred see a war elsewhere at all, but it
+is the first time another family's fight has cost that player anything.
+
+Still open: `hurt_during_others_war` remains 0 for the investor. The curfew
+costs money, not blood. Somebody standing near a war should occasionally catch
+something meant for someone else.

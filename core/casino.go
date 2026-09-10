@@ -65,8 +65,26 @@ func (w *World) NightHandleAt(id string) int {
 	if prop == nil || !HasBankroll(id) || !w.Own(id) {
 		return 0
 	}
-	handle := float64(NightHandle) * w.Capacity(id) * float64(prop.Condition) / 100 * w.Confidence(id) * operatingMode(prop.Mode).Take
+	// And who is actually in the room. A room's action is the people in it, and
+	// the one business in this city that people go out to was the one whose
+	// takings ignored them entirely — so a war that emptied every bar in the
+	// city left a casino covering exactly as much as it had the night before.
+	handle := float64(NightHandle) * w.Capacity(id) * float64(prop.Condition) / 100 * w.Confidence(id) * operatingMode(prop.Mode).Take * w.roomAction(id)
 	return int(handle)
+}
+
+// roomAction is what the floor is worth tonight. Same shape as the trade a shop
+// does, and bounded the same way: a full room is a good night rather than a
+// different house.
+func (w *World) roomAction(id string) float64 {
+	factor := 1 + float64(w.Footfall(id)-TypicalRoom)*PerHead
+	if factor < QuietRoom {
+		return QuietRoom
+	}
+	if factor > BusyRoom {
+		return BusyRoom
+	}
+	return factor
 }
 
 // CasinoDay runs one night at every casino the player owns. Money won and lost
