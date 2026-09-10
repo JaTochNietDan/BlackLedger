@@ -64,6 +64,11 @@ func (w *World) TakePurse(n *NPC) int {
 	return took
 }
 
+// MuggedSore is what somebody holds against the person who took their wallet
+// in the street. Less than a car, more than nothing, and two of them puts a man
+// past the weight at which he does something about it.
+const MuggedSore = 28
+
 // MuggingTarget finds who is here and worth taking something off. Only somebody
 // the player knows: you do not walk up to a stranger in this city.
 func (w *World) MuggingTarget(location string) (*NPC, bool) {
@@ -153,6 +158,12 @@ func (w *World) Mug(location string, hand Hand) error {
 	}
 
 	w.Earn(purse)
+	// The man himself, not only his family. Aggrieve is what reaches the
+	// protagonist — it is the reason a man who lost his car is the one who
+	// comes looking later — and taking somebody's wallet in the street had gone
+	// through it without touching him. Measured: a policy that mugged five
+	// hundred and seventy people made not one enemy who would say so.
+	w.Aggrieve(mark.ID, MuggedSore, "the night you took what was in their pockets")
 	// A wallet is not all of what somebody is carrying. The watch goes over a
 	// counter, which is what a pawnbroker is for.
 	w.FenceAbout(FenceTrade)

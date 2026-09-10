@@ -103,3 +103,33 @@ func TestNobodyWithNothingAgainstYouTalks(t *testing.T) {
 		}
 	}
 }
+
+// Taking somebody's wallet in the street had gone through answerFor, which
+// reaches their family, and never through Aggrieve, which reaches them. So a
+// policy that mugged five hundred and seventy people made not one enemy who
+// would say anything about it, and the informant path could not be exercised at
+// all.
+func TestAMuggedManHoldsItAgainstYou(t *testing.T) {
+	w := New(97)
+	w.Event, w.District = nil, 9
+	w.Player.Cash, w.Player.Health, w.Player.Respect = 500, 100, 30
+	mark := ""
+	for _, l := range Locations {
+		w.Player.Location = l.ID
+		if n, ok := w.MuggingTarget(l.ID); ok && w.MuggingReadiness(l.ID) == "" {
+			mark = n.ID
+			break
+		}
+	}
+	if mark == "" {
+		t.Skip("nobody in this city worth walking up to")
+	}
+	before := w.NPC(mark).Sore
+	// However it goes, they know it happened to them.
+	if err := w.Mug(w.Player.Location, w.OwnHands()); err != nil {
+		t.Fatal(err)
+	}
+	if w.NPC(mark).Sore <= before {
+		t.Fatalf("somebody was robbed in the street and holds %d against anybody", w.NPC(mark).Sore)
+	}
+}

@@ -6645,3 +6645,48 @@ the tests show, not what the campaign numbers show.
 Balance: deaths 0/0/51/82/76/0, median cash 12405/14156/7230/90/567/5160.
 
 Evidence: `core/informant_test.go`.
+
+## The probe that was missing, and what building it found
+
+Last slice ended with a limit stated rather than hidden: the informant was
+unit-tested but the campaign figures could not see it, because the policy that
+runs the route makes no enemies and the policy that makes enemies never trades.
+A policy that does both is the probe it needed.
+
+The racketeer does both. It buys at the waterfront, walks the load to the
+exchange, and takes tills and pockets on the way, which is what makes the
+enemies an informant is made of.
+
+**Building it found a real gap.** Over sixty campaigns it mugged five hundred
+and seventy people and made not one enemy who would say anything about it.
+Taking somebody's wallet in the street went through `answerFor`, which reaches
+their family, and never through `Aggrieve`, which reaches *them* — and this
+game's own comment on that function says it is "the one that reaches the
+protagonist, and it is what makes a man who lost his car the one who comes
+looking for you later". A man who lost his wallet was not that man. He is now,
+at twenty-eight, which is less than a car and enough that being done twice puts
+somebody past the weight at which they act.
+
+| 100 campaigns | Deaths | Cash | Heat | Seizures | Informed | Hurt |
+|---|---|---|---|---|---|---|
+| investor | 0 | 14,156 | 0 | 0 | 0 | 0 |
+| thief | 76 | 567 | 58 | 0 | 0 | 95 |
+| smuggler | 0 | 5,160 | 37 | 59 | 0 | 0 |
+| racketeer | 38 | 2,008 | 63 | 0 | 46 | 81 |
+
+Forty-six informants over a hundred campaigns, where there had been none in the
+harness's history. The three dangers are now four distinguishable shapes: the
+investor is untouched, the thief is beaten and killed, the smuggler is searched
+and robbed, and the racketeer — who does both — is the only one anybody in the
+city ever talks about.
+
+The thief's own numbers did not move for the grudge change: 76 deaths against
+77, 567 cash against 547.
+
+Two breaks verified: the mugging grudge, and the two halves of the informant
+from last slice.
+
+Balance, seven strategies: deaths 0/0/51/82/76/0/38, median cash
+12405/14156/7230/90/567/5160/2008.
+
+Evidence: `core/informant_test.go`, `sim/campaign.go`.

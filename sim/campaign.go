@@ -63,7 +63,9 @@ type Report struct {
 	Heat   int `json:"heat"`
 	Health int `json:"health"`
 	// Times the goods were taken, by a search or in the street.
-	Seizures     int            `json:"seizures"`
+	Seizures int `json:"seizures"`
+	// Times somebody in the city told the police about them.
+	Informed     int            `json:"informed"`
 	Milestones   map[string]int `json:"milestone_commands"`
 	Actions      map[string]int `json:"action_counts"`
 	Events       map[string]int `json:"event_counts"`
@@ -393,6 +395,68 @@ func Choose(v View, strategy string) (core.Command, error) {
 			}
 		}
 	}
+	// The racketeer does both, which is the only way to exercise an informant:
+	// somebody has to hate them and they have to be doing something worth
+	// telling the police about, and no policy here satisfied both halves at
+	// once. It trades like the smuggler and takes tills like the thief.
+	if strategy == "racketeer" && v.Player.Respect >= 6 && v.Player.Security >= 1 {
+		if v.Player.Health < 85 {
+			if c, ok := v.at(v.Player.Home, "rest"); ok {
+				return c, nil
+			}
+		}
+		here := v.Player.Location
+		if here == "market" || here == "docks" {
+			for _, g := range v.Goods {
+				if held := v.Player.Stock[g.ID]; held > 0 {
+					if c, ok := v.action(here, "sell:"+g.ID); ok {
+						c.Amount = min(held, v.most(here, c.Kind))
+						if c.Amount > 0 {
+							return c, nil
+						}
+					}
+				}
+			}
+			if v.Player.Heat < 40 && v.Player.Cash > 600 && here == "docks" {
+				for _, g := range v.Goods {
+					c, ok := v.action(here, "buy:"+g.ID)
+					if !ok {
+						continue
+					}
+					c.Amount = min(v.most(here, c.Kind), max(1, (v.Player.Cash-500)/max(1, 40)))
+					if c.Amount > 0 {
+						return c, nil
+					}
+				}
+			}
+		}
+		carrying := 0
+		for _, g := range v.Goods {
+			carrying += v.Player.Stock[g.ID]
+		}
+		if carrying > 0 && here != "market" {
+			if c, ok := v.at("market", "wait"); ok && c.Kind == "travel" {
+				return c, nil
+			}
+		}
+		// And on the way, take whatever is going. This is what makes enemies.
+		for _, l := range v.Locations {
+			if l.Owned || l.Locked || l.Income <= 0 || l.Shy > 0 {
+				continue
+			}
+			if c, ok := v.action(here, "rob"); ok && l.ID == here {
+				return c, nil
+			}
+		}
+		if c, ok := v.action(here, "mug"); ok {
+			return c, nil
+		}
+		if carrying == 0 && v.Player.Cash > 900 && here != "docks" {
+			if c, ok := v.at("docks", "wait"); ok && c.Kind == "travel" {
+				return c, nil
+			}
+		}
+	}
 	if strategy == "thief" && v.Player.Respect >= 6 && v.Player.Security >= 1 {
 		// A robbery that goes wrong is a beating, and two in a row is a death,
 		// so this one waits until it is whole before trying another.
@@ -560,6 +624,9 @@ func RunRecorded(seed uint32, strategy, director string, limit int, trace bool, 
 	for _, entry := range w.History {
 		if entry.Title == "The goods are gone" {
 			r.Seizures += max(1, entry.Count)
+		}
+		if entry.Title == "Somebody talked" {
+			r.Informed += max(1, entry.Count)
 		}
 	}
 	r.Alive = w.Player.Alive

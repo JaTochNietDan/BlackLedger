@@ -23,7 +23,7 @@ func main() {
 	runs := flag.Int("runs", 100, "campaigns per strategy")
 	steps := flag.Int("steps", 200, "maximum commands per campaign")
 	first := flag.Uint("seed", 1, "first simulation seed; later runs use a Weyl stride")
-	profiles := flag.String("strategies", "worker,investor,defiant,reckless,thief,smuggler", "comma-separated player policies")
+	profiles := flag.String("strategies", "worker,investor,defiant,reckless,thief,smuggler,racketeer", "comma-separated player policies")
 	director := flag.String("director", "authored", "authored, fixture or replay (no model calls)")
 	corpusPath := flag.String("corpus", "", "JSON proposal array required for replay")
 	trace := flag.Bool("trace", false, "include each pre-command public state and command")
@@ -63,7 +63,7 @@ func main() {
 	}
 	strategies := strings.Split(*profiles, ",")
 	for _, p := range strategies {
-		if p != "worker" && p != "investor" && p != "reckless" && p != "defiant" && p != "diplomat" && p != "thief" && p != "smuggler" {
+		if p != "worker" && p != "investor" && p != "reckless" && p != "defiant" && p != "diplomat" && p != "thief" && p != "smuggler" && p != "racketeer" {
 			fmt.Fprintln(os.Stderr, "unknown strategy", p)
 			os.Exit(2)
 		}
@@ -154,19 +154,21 @@ func main() {
 		// What the city took, as against what the player kept. A policy whose
 		// money is taken rather than whose life is looked identical to a safe
 		// one in this report.
-		heat, seizures, hurt := 0, 0, 0
+		heat, seizures, hurt, informed := 0, 0, 0, 0
 		for _, r := range reports {
 			if r.Strategy != p {
 				continue
 			}
 			heat += r.Heat
 			seizures += r.Seizures
+			informed += r.Informed
 			if r.Health < 100 {
 				hurt++
 			}
 		}
 		summaries[p] = map[string]any{"runs": *runs, "deaths": deaths, "errors": errors,
 			"mean_heat": heat / max(1, *runs), "seizures": seizures, "runs_hurt": hurt,
+			"informed":          informed,
 			"median_final_cash": cash[len(cash)/2], "median_game_minutes": span,
 			"median_game_days": math.Round(days*10) / 10, "milestones": ms, "city": city,
 			"city_measures_meaningful": days >= livingWorldHorizon,
