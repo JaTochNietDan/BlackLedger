@@ -85,3 +85,66 @@ func TestNoTwoTradesHaveTheSameTrouble(t *testing.T) {
 		supplies[trade.Supplies] = id
 	}
 }
+
+// "How do I buy businesses, I don't see where I can buy any of them."
+//
+// Because the whole business block — buying, hiring, restocking, the operating
+// modes, repairs, the books — was gated on three addresses by name: the laundry,
+// the garage and the casino, which is every business this city had when that
+// line was written. Everything added since could be walked into and robbed and
+// never bought. The rule underneath was general the whole time; only the button
+// was not.
+func TestEverySomewhereThatEarnsCanBeTakenOver(t *testing.T) {
+	w := New(9)
+	w.District = 2
+	w.Player.Cash, w.Player.Respect, w.Player.Health = 40000, 90, 100
+	missing, offered := []string{}, 0
+	for _, l := range Locations {
+		prop := w.Properties[l.ID]
+		if prop == nil || prop.Income <= 0 {
+			continue
+		}
+		w.Player.Location = l.ID
+		found := false
+		for _, a := range w.Actions(l.ID) {
+			if a.ID == "acquire" {
+				found, offered = true, offered+1
+				if a.Disabled && a.Reason == "There is nothing here to take over" {
+					t.Errorf("%s earns $%d an hour and says there is nothing to take over", l.ID, prop.Income)
+				}
+			}
+		}
+		if !found && !w.Own(l.ID) {
+			missing = append(missing, l.ID)
+		}
+	}
+	t.Logf("%d earning addresses offer a way in", offered)
+	if len(missing) > 0 {
+		t.Errorf("these earn and cannot be bought anywhere: %v", missing)
+	}
+}
+
+// And once it is yours, it is a business you can actually run.
+func TestABusinessYouHoldCanBeRun(t *testing.T) {
+	w := New(9)
+	w.District = 2
+	w.Player.Cash, w.Player.Respect, w.Player.Health = 40000, 90, 100
+	for _, id := range []string{"restaurant", "butcher", "cabstand", "pumps"} {
+		if w.Properties[id] == nil {
+			continue
+		}
+		w.Properties[id].Owner = "player:1"
+		w.Player.Location = id
+		want := map[string]bool{"inspect": false, "restock": false, "operate:hard": false, "repair": false}
+		for _, a := range w.Actions(id) {
+			if _, ours := want[a.ID]; ours {
+				want[a.ID] = true
+			}
+		}
+		for kind, there := range want {
+			if !there {
+				t.Errorf("%s is yours and offers no %s", id, kind)
+			}
+		}
+	}
+}

@@ -1201,7 +1201,13 @@ func (w *World) Actions(id string) []Action {
 			fmt.Sprintf("Go in with your crew against %s. Damages the property, weakens %s and costs you standing with them. They will retaliate, and a failed attempt injures you.", l.Name, f.Name))
 		_ = f
 	}
-	if id == "laundry" || id == "garage" || id == "casino" {
+	// Somewhere that earns is somewhere that can be held, run and taken. This
+	// asked for three addresses by name — the laundry, the garage and the
+	// casino, which was every business in the city on the day it was written —
+	// so a restaurant, a butcher, a cab company, a scrapyard, a forecourt and
+	// two filling stations could be walked into and robbed and never bought.
+	// The rule underneath was general the whole time. Only the button was not.
+	if prop := w.Properties[id]; prop != nil && prop.Income > 0 {
 		if w.Own(id) {
 			add("inspect", "Review the books", 0, 0, "", "Read current income and repair needs without advancing time.")
 			if trade, running := TradeOf(id); running {
@@ -1942,12 +1948,18 @@ func (w *World) AcquireReadiness(id string) string {
 	if !w.CanAcquire(id) {
 		return "This property belongs to another organization"
 	}
+	// What it takes to be given the keys, by what the place is rather than by
+	// its name: a room that runs games wants somebody the city has heard of, a
+	// yard with machinery in it wants more than nothing, and the rest want you
+	// to have done something.
 	req := 6
-	switch id {
-	case "garage":
-		req = 10
-	case "casino":
-		req = 20
+	if place, ok := PlaceByID(id); ok {
+		switch {
+		case place.Type == "casino":
+			req = 20
+		case place.Kind == "garage" || place.Kind == "scrapyard" || place.Kind == "dealer":
+			req = 10
+		}
 	}
 	if w.Player.Respect < req {
 		return fmt.Sprintf("Earn %d respect first", req)
