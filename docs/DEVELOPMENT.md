@@ -7911,3 +7911,39 @@ The campaign death rates did not move: 0/0/0/82/69/0/53 before and after. That i
 the honest reading rather than a disappointment — the strategies spend their
 lives in public rooms, so they are seen constantly. This is cover for a player
 who chooses to use it, not a general softening.
+
+## Painting the drums
+
+"When playing the slot machine we should show actual images for the stuff on the
+rollers."
+
+The drums showed the core's own words — `7`, `BAR`, `CHERRY` — set in a row,
+which is a list of symbols rather than a machine. `src/reels.ts` paints all seven:
+a red seven with the shoulder a cast seven has, a gold bar seen slightly from
+above so it reads as a bar and not a box, a bell with its clapper, a plum with a
+leaf, an orange, a lemon, and two cherries on one stem. Drawn rather than
+photographed, the same way the city and the top bar are, so they cost nothing to
+load and match the rest of the game.
+
+The core still owns which symbol is on the payline and what it pays. This only
+decides what that symbol looks like, and one it has never heard of falls back to
+the word rather than to a blank drum, so a symbol added to the strip shows up as
+itself.
+
+**Two bad needles in one guard.** `TestEverySymbolOnTheStripIsPainted` asks that
+every symbol the core has is painted. Written as `holds(reels, "cherry:")` it
+matched `notcherry:`, so renaming a symbol passed. Leading the needle with a
+space did not help either, because `flat` trims — which is worth knowing about
+every guard written with `holds`. It matches a key at the start of a line
+against the raw source now, and renaming `cherry` reports that the strip has one
+on it and nothing paints one.
+
+### The inbox, filed
+
+Ten entries were sitting in the open section with their answers written under
+them. Two are genuinely open — the standing "keeping track and not regressing",
+and whether the map is the right way to move around the city — and the rest are
+filed. One of them, the back room, had lost its hold'em answer to a replacement
+that silently matched nothing in an earlier tick; it has it now. Reading the
+inbox at the start of a tick is cheap again, which is the point of the section
+existing.

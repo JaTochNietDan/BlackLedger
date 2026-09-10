@@ -1,5 +1,6 @@
 import {useEffect, useRef, useState} from 'react';
 import {playTable} from './sound';
+import {reelArt} from './reels';
 import {
   Card,
   pipOf,
@@ -14,6 +15,7 @@ import {
   wheelPaint,
   reelWindow,
   drumFaces,
+  drumIDs,
 } from './cards';
 
 // The tables, drawn as tables. Blackjack was two numbers in a sentence and
@@ -568,6 +570,9 @@ export function Machine({
   // do not have — and showing where each drum is going to stop from the moment
   // the handle goes down, so nothing changes when it gets there.
   const windows = drumFaces(strip, line, !!machine.pulled);
+  // And which symbol each of those faces is, so the drum can be painted rather
+  // than spelled: "we should show actual images for the stuff on the rollers."
+  const painted = drumIDs(strip, line, !!machine.pulled);
   // The tray and the line under it wait for the last drum, because what a pull
   // paid is not a thing to announce while the drums are still going.
   const settled = machine.pulled && !rolling.some(Boolean);
@@ -592,11 +597,26 @@ export function Machine({
             <span className="payline" aria-hidden="true" />
             {[0, 1, 2].map(i => (
               <div key={i} className={'drum' + (rolling[i] ? ' rolling' : '')}>
-                {windows[i].map((face, at) => (
-                  <span key={at} className={'stop' + (at === 1 ? ' on-line' : '')}>
-                    {face}
-                  </span>
-                ))}
+                {windows[i].map((face, at) => {
+                  const art = reelArt(painted[i][at]);
+                  return (
+                    <span
+                      key={at}
+                      className={'stop' + (at === 1 ? ' on-line' : '') + (art ? ' painted' : '')}
+                      aria-label={face}
+                    >
+                      {art ? (
+                        <svg
+                          viewBox="0 0 50 50"
+                          aria-hidden="true"
+                          dangerouslySetInnerHTML={{__html: art}}
+                        />
+                      ) : (
+                        face
+                      )}
+                    </span>
+                  );
+                })}
               </div>
             ))}
           </div>

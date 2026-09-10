@@ -170,6 +170,11 @@ export function reelWindow(strip: Reel[], landed: string, nudge = 0): string[] {
 // A drum shows where it is going to stop from the moment the handle goes down.
 // The blur is the animation's job and the face underneath is already right, so
 // there is nothing left to snap to.
+export function drumIDs(strip: Reel[], line: string[], pulled: boolean): string[][] {
+  const idOf = (face: string) => strip.find(s => s.face === face)?.id ?? '';
+  return drumFaces(strip, line, pulled).map(w => w.map(idOf));
+}
+
 export function drumFaces(strip: Reel[], line: string[], pulled: boolean): string[][] {
   const faceOf = (id?: string) => strip.find(s => s.id === id)?.face ?? '—';
   return [0, 1, 2].map(i =>

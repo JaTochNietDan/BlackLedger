@@ -150,25 +150,6 @@ Ensure efficiency of development loops by increasing efficiency of your workflow
 
 ## Inbox — open
 
-You seem to be taking a long time to develop each iteration on the loop. Much longer than your progress before.
-
-Please investigate anything you can do to increase your ability to iterate and develop efficiently. Find bottlenecks and improve them.
-
-— built, in two rounds, and measured both times. First: the balance suites are
-  54 files of tens of thousands of simulated days answering "did I move the
-  balance", which is not the question while a change is still being written, so
-  they skip under `-short` and `mise run quick` was born. Second, and this was
-  the whole of it: exactly one test in the project called `t.Parallel()`, so a
-  thousand tests summing 62 seconds of work ran one after another and took 69 on
-  a machine with cores to spare. Every test has the line now except eighteen
-  that reach for an environment variable, which is process-wide. Iterating went
-  from 120 seconds to 25, and the full gate from 118 to 63; a tick that used to
-  cost 210 seconds of waiting costs 63. `-race` is clean across every package,
-  which is the evidence for a mechanical change of that size rather than my
-  reading of it.
-
----
-
 Now when gambling for some reason you changed it back to "play the nickle machine" which doesn't even show our slots page it just seems to run some background simulation and it doesn't allow you to set your own bet as we fleshed out prior.
 
 We used to have "sit down at the tables" when you were at a casino which is much nicer. No idea why you changed to this weird action button thing again that doesn't even show our fancy interface.
@@ -188,6 +169,72 @@ This all feels a bit haphazard. Make sure you are keeping track of what you are 
   message, and the label no longer exists anywhere the game can offer it — a
   stale bundle is the only way to still see it, which is worth knowing. The
   standing half of this, keeping track and not regressing, stays open forever.
+
+---
+
+## Inbox — answered
+
+When playing the slot machine we should show actual images for the stuff on the rollers. Also it seems to swap the results on the rollers at the end which is odd, they just flip around at random mid-end game. For example it shows 7-7- as it progresses then at the very end it flips to "bell", "lemon", "cherry". Sort that out.
+
+— half built: the flipping is fixed, and it was a real fault rather than an
+  animation quirk. The case asked "has everything stopped, or is this drum still
+  going?" and showed the result only then — so a drum that had stopped while the
+  others were still turning satisfied neither half and fell back to the first
+  symbol on the strip, and when the last drum came down all three jumped to the
+  real result at once. Every drum shows where it is going to stop from the
+  moment the handle goes down; the blur is all the animation does, which is the
+  rule this project already had written down about never relying on watching
+  motion. The tray still waits for the last drum, because what a pull paid is
+  not a thing to announce while they are going. Actual images on the rollers are
+  built. Every symbol on the core's strip is painted now — a red seven, a gold
+  bar, a bell with its clapper, a plum with a leaf, an orange, a lemon and two
+  cherries on one stem — drawn the way the city and the top bar are rather than
+  photographed, so they cost nothing to load and match the rest of the game. The
+  core still owns which symbol is on the payline and what it pays; this only
+  decides what that symbol looks like, and one it has never heard of falls back
+  to the word rather than to a blank drum.
+
+---
+
+Playing the game in the back room at the Green Baize is weird. It should again be a separate scene that takes up the screen when you're playing it and you have to leave it rather than right now it just lives in a small box above the action bar. That's silly stuff. We need to stop doing that in future and always dedicate these games to their own screen.
+
+I'd also prefer if this game was the Texas Hold Em version as it's better to play so we can fix that maybe.
+
+— half built: the back room takes the screen. Sitting in on the game is a seat
+  the world knows about, exactly as it is at the tables — you go through, the
+  city waits, you cannot get up with money in the middle of the table, and
+  walking out of the poolhall ends the sitting. The felt is gone from the room's
+  panel and the verbs of a hand are gone from its action list. The standing rule
+  in this message, that a game always gets its own screen, is written down as a
+  guard that fails if either takeover stops being mounted or the room is handed
+  a table again.
+— and built: the game is Texas hold'em. Two cards each, three on the table, then
+  one, then one, with a round of betting on every street — four times the
+  decision the draw gave. The best five of the seven a player can see wins, and
+  the board being most of everybody's hand is what makes reading the other seats
+  the game. Measured over 3,000 hands at a $50 ante: calling everything is
+  -$67,112, folding what is beaten is -$33,812, and folding and betting the good
+  ones is +$48,338 — a wider gap than the draw's, which is the reason to prefer
+  it.
+
+---
+
+You seem to be taking a long time to develop each iteration on the loop. Much longer than your progress before.
+
+Please investigate anything you can do to increase your ability to iterate and develop efficiently. Find bottlenecks and improve them.
+
+— built, in two rounds, and measured both times. First: the balance suites are
+  54 files of tens of thousands of simulated days answering "did I move the
+  balance", which is not the question while a change is still being written, so
+  they skip under `-short` and `mise run quick` was born. Second, and this was
+  the whole of it: exactly one test in the project called `t.Parallel()`, so a
+  thousand tests summing 62 seconds of work ran one after another and took 69 on
+  a machine with cores to spare. Every test has the line now except eighteen
+  that reach for an environment variable, which is process-wide. Iterating went
+  from 120 seconds to 25, and the full gate from 118 to 63; a tick that used to
+  cost 210 seconds of waiting costs 63. `-race` is clean across every package,
+  which is the evidence for a mechanical change of that size rather than my
+  reading of it.
 
 ---
 
@@ -253,38 +300,6 @@ Let's verify, can you be attacked while traversing the map? Can your car affect 
   driving — and a wreck or a dry tank is worth neither, because it is not a car
   you are driving. The crossing says all of this before you set off and reads
   differently on foot and in a plated car.
-
----
-
-When playing the slot machine we should show actual images for the stuff on the rollers. Also it seems to swap the results on the rollers at the end which is odd, they just flip around at random mid-end game. For example it shows 7-7- as it progresses then at the very end it flips to "bell", "lemon", "cherry". Sort that out.
-
-— half built: the flipping is fixed, and it was a real fault rather than an
-  animation quirk. The case asked "has everything stopped, or is this drum still
-  going?" and showed the result only then — so a drum that had stopped while the
-  others were still turning satisfied neither half and fell back to the first
-  symbol on the strip, and when the last drum came down all three jumped to the
-  real result at once. Every drum shows where it is going to stop from the
-  moment the handle goes down; the blur is all the animation does, which is the
-  rule this project already had written down about never relying on watching
-  motion. The tray still waits for the last drum, because what a pull paid is
-  not a thing to announce while they are going. Actual images on the rollers are
-  still open — they want drawing offline, the way the exteriors and interiors
-  are.
-
----
-
-Playing the game in the back room at the Green Baize is weird. It should again be a separate scene that takes up the screen when you're playing it and you have to leave it rather than right now it just lives in a small box above the action bar. That's silly stuff. We need to stop doing that in future and always dedicate these games to their own screen.
-
-I'd also prefer if this game was the Texas Hold Em version as it's better to play so we can fix that maybe.
-
-— half built: the back room takes the screen. Sitting in on the game is a seat
-  the world knows about, exactly as it is at the tables — you go through, the
-  city waits, you cannot get up with money in the middle of the table, and
-  walking out of the poolhall ends the sitting. The felt is gone from the room's
-  panel and the verbs of a hand are gone from its action list. The standing rule
-  in this message, that a game always gets its own screen, is written down as a
-  guard that fails if either takeover stops being mounted or the room is handed
-  a table again. Texas Hold'em is still open and is the next thing here.
 
 ---
 
@@ -363,7 +378,7 @@ Taking over businesses should be a lot more expensive and high level stuff that 
   anything else. The price a place publishes is now the price it costs. Without
   that, this change was impossible rather than merely expensive.
 
-## Inbox — answered
+---
 
 We should also add ambient sounds and sounds to the slot machines and whatnot. I
 also want you to flesh out the slot machine a lot more, make it much nicer like

@@ -549,3 +549,32 @@ func TestAnActionAboutTwoPeopleCarriesBothNames(t *testing.T) {
 		t.Error("an action with a figure in it drops the second name it was given")
 	}
 }
+
+// "When playing the slot machine we should show actual images for the stuff on
+// the rollers."
+//
+// The drums showed the core's own words set in a row, which is a list of
+// symbols rather than a machine. Every symbol on the core's strip is painted
+// now, and a symbol the view has never heard of falls back to its word rather
+// than to a blank drum — so adding one to the strip shows up as itself.
+func TestEverySymbolOnTheStripIsPainted(t *testing.T) {
+	// Raw and anchored to the start of a line. Asking `holds` for "cherry:"
+	// matched "notcherry:", and leading the needle with a space did not help
+	// because flattening trims it — so renaming a symbol passed the guard.
+	reels := rawSource(t, "src/reels.ts")
+	for _, s := range core.ReelStrip() {
+		key := regexp.MustCompile(`(?m)^\s*` + regexp.QuoteMeta(s.ID) + `:`)
+		if !key.MatchString(reels) {
+			t.Errorf("the strip has a %q on it and nothing paints one", s.ID)
+		}
+	}
+	// The drums ask what to paint rather than working it out, and the fallback
+	// is the word.
+	tables := source(t, "src/Tables.tsx")
+	if !holds(tables, "const art = reelArt(painted[i][at])") {
+		t.Error("the case decides for itself what a symbol looks like")
+	}
+	if !holds(tables, "art ? (") || !holds(tables, ") : (") {
+		t.Error("a symbol nothing paints leaves the drum blank")
+	}
+}

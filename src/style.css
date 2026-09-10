@@ -1295,3 +1295,8 @@ body{height:100%;overflow:hidden;margin:0;background:var(--bg);color:var(--ink);
 /* Somebody the player cannot place. Not an error and not a warning: it is the
    ordinary state of most of a city you have not walked around lately. */
 .not-found {margin: 6px 0 0; font-size: 11px; color: var(--muted); font-style: italic}
+
+/* A drum shows a painting rather than a word. The window is the same size
+   either way, so a symbol this file cannot paint still lines up. */
+.bandit-window .stop.painted {display: flex; align-items: center; justify-content: center; padding: 0}
+.bandit-window .stop.painted svg {width: 84%; height: 84%; display: block}
