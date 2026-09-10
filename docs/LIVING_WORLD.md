@@ -157,4 +157,21 @@ machines and whatnot, any other common games you can think of adding.
 Add a gas station business to the inbox, probably multiple locations. Sells gas
 that cars need and it sells other stuff that usual gas stations sell.
 
+When setting up the funding on a casino that you own, you should be able to set
+that to an actual number by entering it, not having to use a pre-set amount. We
+definitely want more level of detail with business management like that. It
+should be as dynamic and user settable as possible. Like deposit or withdraw
+money.
+
+When gambling you should be able to actually choose how much to gamble, not use
+set amounts, up to a max limit. The max limit should be defined by the casino
+owner dynamically, whether by you the owner by or by someone else who owns it.
+
+We should also add ambient sounds and sounds to the slot machines and whatnot. I
+also want you to flesh out the slot machine a lot more, make it much nicer like
+you did for blackjack and roulette. Right now it looks scraggy.
+
+Can people only make attempts on your life while you're at home? They always
+seem to hit my home when I'm not there and they are coming after me.
+
 Ultiamtely the expectation is that I don't have to think of all of these concepts, you, the agent will think of these too and build them out and playtest and simulate them yourself.

@@ -20,6 +20,10 @@ const painted: {[id: string]: [number, number]} = {
 // The generated sheet: 6 across, 4 down.
 const CAST_COLS = 6, CAST_ROWS = 4, CAST = CAST_COLS * CAST_ROWS;
 
+// The core says which face somebody wears, because the voice they speak in is
+// chosen from the same answer and only one side of the wall can be the author
+// of it. This is the fallback for anywhere the core has not said — the same
+// arithmetic it uses, kept so a portrait never comes out blank.
 function faceFor(id: string) {
   let h = 2166136261;
   for (const c of id) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619) }

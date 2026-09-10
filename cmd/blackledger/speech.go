@@ -13,17 +13,22 @@ import (
 
 // A small process-local cache avoids resynthesizing queued encounters and replays.
 // Nothing here advances time or changes the saved campaign.
-func (a *app) voiceData(ctx context.Context, scene *core.Scene, speaker string) ([]byte, error) {
+func (a *app) voiceData(ctx context.Context, scene *core.Scene, speaker, profile string) ([]byte, error) {
 	a.voiceMu.Lock()
 	defer a.voiceMu.Unlock()
 	if err := ctx.Err(); err != nil {
 		return nil, err
 	}
-	key := scene.ID + "\x00" + speaker + "\x00" + scene.Body
+	key := scene.ID + "\x00" + speaker + "\x00" + profile + "\x00" + scene.Body
 	if data, ok := a.voiceCache[key]; ok {
 		return data, nil
 	}
-	payload, _ := json.Marshal(map[string]string{"text": scene.Body, "speaker": speaker, "voice": "warm"})
+	// The voice the core picked, which follows the painting the interface draws.
+	// Without it the speech service hashes the name for itself and a detective
+	// painted in a trench coat speaks in a woman's voice.
+	payload, _ := json.Marshal(map[string]string{
+		"text": scene.Body, "speaker": speaker, "voice": "warm", "profile": profile,
+	})
 	req, _ := http.NewRequestWithContext(ctx, "POST", env("AFTERLIGHT_DIRECTOR_URL", "http://127.0.0.1:8787")+"/speech", bytes.NewReader(payload))
 	req.Header.Set("Content-Type", "application/json")
 	res, err := a.client.Do(req)
@@ -85,7 +90,7 @@ func (a *app) speech(w http.ResponseWriter, r *http.Request) {
 	}
 	ctx, cancel := context.WithTimeout(r.Context(), 25*time.Second)
 	defer cancel()
-	data, err := a.voiceData(ctx, scene, person.Name)
+	data, err := a.voiceData(ctx, scene, person.Name, state.VoiceOf(person.ID))
 	if err != nil {
 		fail(w, 503, err)
 		return

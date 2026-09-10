@@ -1,7 +1,6 @@
 import {useEffect, useRef, useState} from 'react';
 import type {Action, Presence, Record as Entry} from './types';
 import {CardTable, Machine, Wheel} from './Tables';
-import {Portrait} from './Portrait';
 import type {HandState, MachineState, WheelState} from './Tables';
 
 // Sitting down at a table is not a thing you do out of the corner of a sidebar.
@@ -36,9 +35,10 @@ type Game = 'cards' | 'wheel' | 'machine';
 export function Casino({place, actions, people, hand, wheel, machine, cash, money, revision, records, act, onLeave}: {
   place: string;
   actions: Action[];
-  // Who else is in the room. A floor with nobody on it is a room: the city
-  // already knows where everybody is standing, and these are the same people
-  // whose money the house takes on the nights the player is not here.
+  // Who else is in the room. Not drawn here any more — the room itself shows
+  // that, and a row of faces you cannot deal with is furniture on a screen that
+  // is meant to be a game. Kept so the takeover can say the floor is busy if it
+  // ever has something to say about it.
   people: Presence[];
   hand: HandState;
   // The machines against the wall. A room can have those and no tables at all,
@@ -94,13 +94,6 @@ export function Casino({place, actions, people, hand, wheel, machine, cash, mone
           {dealt ? 'Finish the hand to leave' : 'Get up and leave ↩'}
         </button>
       </header>
-
-      {people.length > 0 && <div className="casino-crowd" aria-label="On the floor">
-        {people.slice(0, 8).map(w => <span key={w.id} className="floor-face" title={w.role || w.standing}>
-          <Portrait id={w.id} size="tiny"/><small>{w.name}</small>
-        </span>)}
-        <small className="subtle">{people.length === 1 ? 'One other person on the floor' : people.length + ' others on the floor'}</small>
-      </div>}
 
       <nav className="casino-games" aria-label="Games">
         {tables && <button aria-pressed={game === 'cards'} onClick={() => setGame('cards')}>Blackjack</button>}

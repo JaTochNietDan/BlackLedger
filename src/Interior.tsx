@@ -149,7 +149,7 @@ export function Interior({place, people, actions, render, onLeave, onTables, fel
               float and neither is anybody in here. */}
           <span className="stander-shadow" aria-hidden="true"/>
           <span className="stander-hat" aria-hidden="true"/>
-          <Portrait id={who.id} size="small"/>
+          <Portrait id={who.id} face={who.face} size="small"/>
           <span className="stander-coat" aria-hidden="true"/>
           <span className="stander-name">{who.name.split(' ')[0]}</span>
         </button>;
@@ -161,7 +161,7 @@ export function Interior({place, people, actions, render, onLeave, onTables, fel
     <div className="room-people" role="list">
       {people.map(p => <button key={p.id} role="listitem" className={'room-chip' + (p.id === picked ? ' picked' : '') + (p.yours ? ' yours' : '') + (p.overdue || p.sore ? ' sour' : '')}
         aria-pressed={p.id === picked} onClick={() => setPicked(p.id === picked ? '' : p.id)}>
-        <Portrait id={p.id} size="tiny"/>
+        <Portrait id={p.id} face={p.face} size="tiny"/>
         <span className="chip-name"><b>{p.name}</b><small>{p.standing}</small></span>
         {withSomething.has(p.id) && <i aria-hidden="true" title="You have business with them">·</i>}
       </button>)}
@@ -171,7 +171,7 @@ export function Interior({place, people, actions, render, onLeave, onTables, fel
     <div className="room-work">
       {who ? <section className="picked-person only">
         <header>
-          <Portrait id={who.id} size="small"/>
+          <Portrait id={who.id} face={who.face} size="small"/>
           <div className="picked-who">
           <b>{who.name}</b>
           <small>{who.standing}{who.temperament ? ` · ${who.temperament}` : ''}</small>

@@ -33,7 +33,7 @@ function Card({who, at, actions, render, onFind}: {
   const theirs = (actions || []).filter(a => a.subject === who.id);
   const here = !!at && who.where_id === at && !who.walking;
   return <article className={'person-card' + (who.yours ? ' yours' : '') + (who.overdue || who.sore ? ' sour' : '') + (who.walking ? ' walking' : '')}>
-    <Portrait id={who.id} size="small"/>
+    <Portrait id={who.id} face={who.face} size="small"/>
     <div className="person-of">
       <b>{who.name}</b>
       <small>{who.standing}{who.temperament ? ` · ${who.temperament}` : ''}</small>

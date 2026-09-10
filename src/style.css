@@ -1108,3 +1108,11 @@ body{height:100%;overflow:hidden;margin:0;background:var(--bg);color:var(--ink);
 .paytable td{text-align:right;color:var(--gold);padding:3px 6px}
 .paytable tr:nth-child(even){background:rgba(255,255,255,.03)}
 @media(prefers-reduced-motion:reduce){.drum.rolling{animation:none}}
+/* The handle is the control. */
+.bandit-handle{position:absolute;right:-16px;top:22px;width:14px;height:104px;border-radius:7px;padding:0;
+  border:1px solid #7a5730;background:linear-gradient(#c9a24a,#7a5730);cursor:pointer}
+.bandit-handle:hover:not(:disabled){background:linear-gradient(#e0bd6a,#8a6336)}
+.bandit-handle:disabled{opacity:.6}
+.bandit-handle i{position:absolute;top:-14px;left:-6px;width:26px;height:26px;border-radius:50%;
+  background:radial-gradient(circle at 34% 30%,#e2554b,#8e2b2b);box-shadow:0 2px 5px rgba(0,0,0,.5)}
+.bandit-stakes{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:14px;flex-wrap:wrap}

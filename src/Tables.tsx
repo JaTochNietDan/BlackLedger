@@ -292,10 +292,14 @@ export function Machine({machine, stakes, money, pull, turn = 0}:{
     return () => stops.forEach(clearTimeout);
   }, [turn, machine.pulled]);
 
+  // Which of the house's machines you are standing at. A nickel machine and a
+  // dollar machine are two different machines against the same wall.
+  const [which, setWhich] = useState(0);
   const strip = machine.strip || [];
   const faceOf = (id?: string) => strip.find(s => s.id === id)?.face ?? '—';
   const line = machine.line ?? [];
   const settled = machine.pulled && !rolling.some(Boolean);
+  const here = stakes[Math.min(which, Math.max(0, stakes.length - 1))];
 
   return (
     <div className="felt machine-felt">
@@ -314,7 +318,26 @@ export function Machine({machine, stakes, money, pull, turn = 0}:{
             ? `Pays ${machine.pays} to 1 — ${money((machine.stake ?? 0) * (machine.pays ?? 0))} in the tray`
             : 'Nothing. The machine keeps it.'}
         </p>}
-        <div className="bandit-handle" aria-hidden="true"><i/></div>
+        {/* The handle is the handle. Drawing one beside a row of buttons and
+            expecting somebody to press the buttons is a picture of a machine,
+            not a machine. */}
+        {here && <button className="bandit-handle" disabled={rolling.some(Boolean)}
+          onClick={() => pull(here.id)}
+          aria-label={`Pull the handle for ${money(here.amount)}`}
+          title={`Pull the handle — ${money(here.amount)}`}><i/></button>}
+      </div>
+
+      <div className="bandit-stakes">
+        {stakes.map((s, i) => (
+          <button key={s.id} className={'chip-choice' + (i === which ? ' chosen' : '')}
+                  aria-pressed={i === which} onClick={() => setWhich(i)}>
+            <Chip amount={s.amount} money={money}/>
+          </button>
+        ))}
+        <button className="spin-it" disabled={!here || rolling.some(Boolean)}
+                onClick={() => here && pull(here.id)}>
+          {rolling.some(Boolean) ? 'The drums are still going' : `Pull for ${money(here ? here.amount : 0)}`}
+        </button>
       </div>
 
       <table className="paytable">
@@ -327,13 +350,6 @@ export function Machine({machine, stakes, money, pull, turn = 0}:{
         </tbody>
       </table>
 
-      <div className="felt-actions">
-        {stakes.map(s => (
-          <button key={s.id} onClick={() => pull(s.id)} disabled={rolling.some(Boolean)}>
-            Pull for {money(s.amount)}
-          </button>
-        ))}
-      </div>
       <p className="felt-note">
         Three drums of {machine.stops}, the same strip on each. Everything it pays is on the
         machine, and what it keeps is what is left over.

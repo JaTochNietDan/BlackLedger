@@ -48,6 +48,9 @@ type Presence struct {
 	// Where they are, for anything looking at the city rather than at one room.
 	Where   string `json:"where,omitempty"`
 	WhereID string `json:"where_id,omitempty"`
+	// Face is one-based into the cast sheet, so nothing at all means the core
+	// did not say and the interface should fall back to its own reading.
+	Face int `json:"face,omitempty"`
 	// Why this person is worth the player's attention, in the order the
 	// interface should group them: "yours", "crew", "owes", "sore", "job",
 	// "organization", or "street".
@@ -216,6 +219,10 @@ func (w *World) see(n *NPC) Presence {
 		Known:   known,
 		Because: w.because(n),
 		WhereID: n.Location,
+		// Which painting is of this person. The interface used to work this out
+		// for itself, which is how a face and a voice came to be two unrelated
+		// hashes of two different strings.
+		Face: FaceOf(n.ID) + 1,
 	}
 	if place, ok := PlaceByID(n.Location); ok {
 		p.Where = place.Name
