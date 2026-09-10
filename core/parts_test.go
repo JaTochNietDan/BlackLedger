@@ -162,3 +162,35 @@ func TestPartsAreWorthMoreWithAGarageOfYourOwn(t *testing.T) {
 		t.Errorf("parts are worth %d with a garage of your own and %d without", own, loose)
 	}
 }
+
+// A burned-out shell is not a box of parts. A raid used to lift every garage
+// and every yard by the same one point, which says a car that went up in the
+// street is worth the same to a bench as a car taken apart on it. What a garage
+// lives on is parts and glass; what a scrapyard lives on is what is left when
+// there are no parts worth having.
+func TestAWreckIsAYardsTradeAndNotAGaragesTest(t *testing.T) {
+	w := New(29)
+	yards, benches := map[string]int{}, map[string]int{}
+	for _, l := range Locations {
+		switch l.Kind {
+		case "scrapyard":
+			yards[l.ID] = w.Custom(l.ID)
+		case "garage":
+			benches[l.ID] = w.Custom(l.ID)
+		}
+	}
+	if len(yards) == 0 || len(benches) == 0 {
+		t.Fatal("this city has no yard or no bench")
+	}
+	w.WreckArrives()
+	for id, was := range yards {
+		if w.Custom(id) <= was {
+			t.Errorf("a car burned and %s saw no more work", id)
+		}
+	}
+	for id, was := range benches {
+		if w.Custom(id) != was {
+			t.Errorf("a car burned to nothing and %s took %d of trade off it", id, w.Custom(id)-was)
+		}
+	}
+}

@@ -20,6 +20,11 @@ const (
 	// PartsTrade is how much better a garage does for every car going to
 	// pieces in this city. Trade is capped, so this cannot run away.
 	PartsTrade = 3
+	// WreckTrade is what a burned-out shell is worth to the yard that ends up
+	// with it. It is worth nothing at all to a garage: a bench lives on parts
+	// and glass, and there are no parts worth having on a car that went up in
+	// the street.
+	WreckTrade = 2
 )
 
 // StripTarget finds a car worth taking apart: somebody standing here, who the
@@ -123,6 +128,19 @@ func (w *World) PartsAbout(delta int) {
 			w.ShiftCustom(l.ID, "parts coming in off the street", delta)
 		case "scrapyard":
 			w.ShiftCustom(l.ID, "more of the city arriving on a low-loader", delta)
+		}
+	}
+}
+
+// WreckArrives is a car that is not coming back: burned in the street, or what
+// is left of one after a raid. Somebody has to take it away, and the only trade
+// in this city that wants it is the yard. A raid used to lift every garage and
+// every yard by the same one point, which says a shell is worth what a stripped
+// car is worth — and it is not, to anybody.
+func (w *World) WreckArrives() {
+	for _, l := range Locations {
+		if l.Kind == "scrapyard" {
+			w.ShiftCustom(l.ID, "another one in off a low-loader", WreckTrade)
 		}
 	}
 }

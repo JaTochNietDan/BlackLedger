@@ -172,7 +172,8 @@ func (w *World) contestAt(attacker, defender *Faction, weakest string) {
 		if driver := w.parkedAt(weakest, defender.ID); driver != nil {
 			label := VehicleByTier(driver.Car).Label
 			driver.Car = 0
-			w.PartsAbout(1)
+			// Not parts: a shell. The yard takes it and the benches see nothing.
+			w.WreckArrives()
 			w.Log("A car burns at "+place.Name,
 				fmt.Sprintf("%s's %s went up in the street while %s were in the building. %s is walking.",
 					driver.Name, label, Leads(attacker.Name), driver.Name), "danger")
