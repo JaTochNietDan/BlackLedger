@@ -170,6 +170,17 @@ This all feels a bit haphazard. Make sure you are keeping track of what you are 
   stale bundle is the only way to still see it, which is worth knowing. The
   standing half of this, keeping track and not regressing, stays open forever.
 
+— on whether the map is the right way to move around the city: measured before
+  answering. Six hundred and fifty journeys between the city's addresses run
+  from ten minutes to a hundred and twenty-five over twenty-three distinct
+  lengths, so where a place is decides most of what going there costs and the
+  map is carrying a real fact rather than decorating one. What was wrong was
+  the other way in: the plain list of addresses behind the drawing was
+  twenty-six names in no order with nothing on them. It is nearest first now,
+  with the journey in minutes on each row, what is yours marked, and what is
+  shut to you at the bottom. If the map should still go, it is a bigger
+  question than the one this answered — say so and it goes back on the list.
+
 ---
 
 ## Inbox — answered

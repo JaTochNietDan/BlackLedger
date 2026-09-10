@@ -55,9 +55,12 @@ which half is standing.
 4. **The rest of the open inbox.** Checked this tick and nearly all of it is
    built: the wording, the roulette cloth and multiple chips, the travel bar,
    cursing and threats, the bad blood box, the family lead, and Leo Carver's
-   collections are all answered in `docs/LIVING_WORLD.md`. What is genuinely
-   left from the user's words is one question: **whether the map is the right
-   way to move around the city at all**.
+   collections are all answered in `docs/LIVING_WORLD.md`. What was genuinely
+   left from the user's words was one question — **whether the map is the right
+   way to move around the city at all** — and it is measured and part-answered
+   in `docs/LIVING_WORLD.md`: the geography is load-bearing, so the map stays,
+   and the plain list of addresses behind it is now nearest-first with the
+   journey on each row.
 5. **The city playing its own games.** Built: one hand a night among whoever
    spends the evening in the back room, a seat charge to whoever holds the
    poolhall, and a falling-out for whoever is cleaned out (`core/citygame.go`).
