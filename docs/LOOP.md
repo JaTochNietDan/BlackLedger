@@ -111,6 +111,15 @@ and a local model that writes encounters and can be switched off.
 
 ## Fault shapes that keep biting
 
+- **A new rule that punishes the ordinary case.** Twice in two ticks: "below
+  twenty trust" is every employee in the game, because everybody here starts at
+  nothing and thinks nothing of a stranger; and paying exactly the going rate
+  was worth half of the floor's temptation. Both emptied a laundry over a month
+  with nothing having happened. `TestAPlayerWhoDoesNothingLosesNothing` is
+  written for the city rather than for a rule: a player who owns two businesses,
+  pays the rate and wrongs nobody still has them and their people 45 days later.
+  Both mistakes, re-made, fail it.
+
 - **A content table written for the smaller city.** Three ids by name gated the
   entire business block; the same shape hid the car button and the respect
   requirement. Ask what table was written for a world that has since grown.

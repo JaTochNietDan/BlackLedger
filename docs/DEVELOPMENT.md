@@ -8069,3 +8069,25 @@ who left went straight onto somebody else's books.
 
 Baseline unmoved: no campaign policy sets a wage, so every business in a
 simulated run pays the rate and keeps its people.
+
+## A guard written for the city rather than for a rule
+
+Twice in two ticks a new rule punished a player who had done nothing. "Below
+twenty trust" was every employee in the game. Paying exactly the going rate was
+worth half of the floor's temptation. Both times a laundry emptied itself over a
+month with nothing having happened, and both times the test that caught it was
+written for the rule — so it only existed because I happened to write that rule
+that day.
+
+`TestAPlayerWhoDoesNothingLosesNothing` is written for the city. A player who
+owns two businesses, pays the rate, wrongs nobody and does nothing at all still
+owns them 45 days later, with the same number of people behind their counters,
+the count matching the names, alive, and with nobody in the city holding
+anything against them.
+
+It is verified the only way a guard like this can be: both mistakes were re-made
+in the code, and both fail it — the trust score reports "laundry went from 3
+hands to 1 with nothing having happened", and last tick's exact wage formula
+reports the same of the butcher.
+
+The fault shape is now in the brief where the next tick will read it.
