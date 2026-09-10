@@ -334,6 +334,29 @@ func (w *World) apply(c Command) error {
 				return err
 			}
 			w.Advance(a.Minutes)
+		} else if c.Kind == "cards" {
+			if err := w.SitInTheBackRoom(p.Location, w.BackRoomAnte(c.Amount)); err != nil {
+				return err
+			}
+			w.Advance(a.Minutes)
+		} else if c.Kind == "change" {
+			// Which of the five they are throwing, by position, because the
+			// interface shows them in the order they were dealt.
+			var throw []int
+			for _, f := range strings.Split(c.Choice, ",") {
+				if f = strings.TrimSpace(f); f == "" {
+					continue
+				}
+				n, err := strconv.Atoi(f)
+				if err != nil {
+					return fmt.Errorf("that is not a card in your hand")
+				}
+				throw = append(throw, n)
+			}
+			if err := w.ChangeCards(throw); err != nil {
+				return err
+			}
+			w.Advance(a.Minutes)
 		} else if c.Kind == "roll" {
 			if err := w.RollAgain(); err != nil {
 				return err

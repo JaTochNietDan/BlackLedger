@@ -40,8 +40,11 @@ which half is standing.
 2. **Cars.** Still open: pictures of what you are buying, and what a car is
    worth in speed stated honestly. Plate is built for the player's own car and
    for your people's (`core/plate.go`, `core/theirs.go`).
-3. **A back-room card game** whose other players are people from the city, which
-   is the ambitious one. Craps is built.
+3. **A back-room card game** whose other players are people from the city.
+   Built: five card draw behind the poolhall, one draw, no house and no edge,
+   seats filled from whoever is in the room (`core/backroom.go`). Still open:
+   a round of betting, so folding and raising are decisions; and a screen for
+   it, since the interface has only the published table so far.
 4. **The rest of the open inbox.** Wording ("establish protection" for buying a
    business), the roulette table beside the wheel rather than under it and
    multiple chips down at once, newspaper pictures, the travel bar below the

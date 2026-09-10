@@ -6969,3 +6969,49 @@ a war elsewhere at all, a war lasts a day or two, a journey rolls a scene 16% of
 the time, and a distant one catches you 18% of that. Making a bystander bleed
 needs a war that lasts, or a reason for the player to be near it, not a bigger
 number here.
+
+## The back room: the first game in this city with no house in it
+
+Every table so far is the house. Blackjack, the wheel, the dice and the machines
+all have an edge, a settlement and nobody on the other side of them — the player
+wins money from a room rather than from a person. `core/backroom.go` is five
+card draw in the room behind the poolhall, one draw, best hand takes the pot,
+and the other players are whoever is actually standing in that room. Nobody is
+invented for it: an empty back room has no game, which is what makes the game
+worth walking somewhere for. The money comes out of their purses and goes back
+into them.
+
+New: a real fifty-two card deck shuffled without replacement, because blackjack
+draws with replacement and that would put five aces in a hand; `pokerRank`,
+because blackjack's `Value` makes a jack, a queen, a king and a ten the same
+card; `Rank` and `HandRank.Beats` for the nine categories with the wheel playing
+as a five high.
+
+Three things the measurements caught that reading would not have:
+
+- **The room could throw four cards and the player only three.** Not a house
+  edge — there is no house — but the same thing in a different coat, and it was
+  worth 10% of the ante a hand. Three for everybody now.
+- **A tie handed the pot to the room** and gave the player their ante back,
+  which is not a split. Worth 5.5% of the ante a hand.
+- **Random hands never tie.** None in four thousand, so the split had to be put
+  on the table by hand or it was a branch that had never run once.
+
+Measured over 20,000 hands with the player playing exactly the way the room
+plays: the player takes 24.3% of pots where four equal seats would take 25%, and
+the money at the table conserves to the dollar on every hand. Standing pat
+against a room that draws wins 10.6% of 4,000 hands, so how the hand is played
+is most of the game. The gate runs the 3,000-hand version.
+
+Wired through the same path as everything else: a `cards` action in the back
+room taking the ante the player typed, a `change` action naming which of the
+five to throw, both filed under the tables, and `CardsDescription` publishing
+the table with nobody's hand visible until it is turned over.
+
+Baseline unmoved: deaths 0/0/52/82/78/0/38, median cash
+12405/14209/7544/90/1444/5505/1936. Nothing in the campaign policies plays
+cards, which is the honest reading — a new room does not change a policy that
+never walks into it.
+
+Next on this: there is no betting round yet, so the only decision is the draw.
+Who bets what, and who folds, is where the people at the table become people.
