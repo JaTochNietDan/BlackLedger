@@ -8264,3 +8264,33 @@ moves.
 
 Baseline: deaths 0/0/0/82/75/0/47/0, median cash
 12585/2367/5815/90/1091/3563/980/470.
+
+## The other half of capacity
+
+Last tick's finding, answered. `Capacity` said what a place loses for being
+short-handed, out of stock or in trouble, and there was no other half — so a
+business kept properly earned exactly what a business scraping by earned. Every
+decision about the people behind the counter was a way to avoid losing money
+rather than a way to make any.
+
+`WellRun` is the other half. A place with somebody running it does better by
+`InCharge`; people who think well of the person paying them are worth up to
+`Liked` on top. Both are small on purpose: a manager is worth having, not worth
+more than the people doing the work, and the whole of it is about a fifth rather
+than a different order of business. A laundry run by somebody works at 1.13
+against 1.00; one whose people think well of the player, 1.08.
+
+The ordinary case is untouched, and a test says so: a fully staffed, fully
+stocked business with no trouble still works at exactly 1.00. This is an upside
+for care, not a tax on everybody who has not read the manual — which is the
+fault shape from three ticks ago, reached for again and caught by asking.
+
+Measured end to end: the publican's median over a hundred campaigns went from
+$470 to $915. Every other policy is unchanged bar the thief, $1,091 to $1,050,
+which is the world stream moving rather than anything about businesses.
+
+**And it is still losing to the investor's $2,367**, which is the honest state of
+it. Care pays now, and inside two hundred commands it does not pay as well as
+buying the next place — which is defensible, because expansion ought to be
+strong early, and is exactly the sort of claim that should be measured rather
+than assumed. The publican test says so every time the balance moves.

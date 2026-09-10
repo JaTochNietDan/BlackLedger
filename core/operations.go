@@ -176,8 +176,47 @@ func (w *World) Capacity(id string) float64 {
 	if prop.Trouble {
 		capacity *= .55
 	}
-	return capacity
+	return capacity * w.WellRun(id)
 }
+
+// WellRun is the other half of Capacity, and it did not exist. Everything above
+// says what a place loses for being short-handed, out of stock or in trouble,
+// so a business kept properly earned exactly what a business scraping by
+// earned: every decision about the people behind the counter was a way to avoid
+// losing money rather than a way to make any. Measured, a policy that put
+// somebody in charge and paid over the rate ended a hundred campaigns with a
+// median of $470 against $2,367 for one that bought premises and walked away.
+//
+// A place with somebody running it and people who think well of the person
+// paying them does better. Both are small: a manager is worth having, not worth
+// more than the people doing the work, and the whole of it is a fifth on top
+// rather than a different order of business.
+func (w *World) WellRun(id string) float64 {
+	prop := w.Properties[id]
+	if prop == nil || len(prop.Hands) == 0 {
+		return 1
+	}
+	well := 1.0
+	if w.RunsIt(id) != nil {
+		well += InCharge
+	}
+	trust := 0
+	for _, who := range prop.Hands {
+		if n := w.NPC(who); n != nil {
+			trust += n.Trust
+		}
+	}
+	well += Liked * float64(trust) / float64(100*len(prop.Hands))
+	return well
+}
+
+const (
+	// InCharge is what somebody running the place is worth to what it handles.
+	InCharge = .12
+	// Liked is what people who think well of the person paying them are worth,
+	// at the top of what anybody thinks of anybody.
+	Liked = .1
+)
 
 // Wages is what the people working the player's businesses cost each day.
 func (w *World) Wages() int {
