@@ -120,3 +120,90 @@ func TestWhatTheySayComesFromWhatIsActuallyHappening(t *testing.T) {
 		t.Fatalf("somebody casing the place is not mentioned: %q", uneasy)
 	}
 }
+
+// And asking is worth something afterwards. The word from your own counter is
+// how a business that is about to be attacked finds out in time, and a place
+// that saw them coming takes a third of the damage — but the walk that marked
+// the plan known ran over copies of the plans rather than the plans, so the
+// player was told about the car across the road and the world went on not
+// knowing. Investigating recorded it; being told by your own people did not.
+func TestAskingTheCounterIsWorthSomethingAfterwards(t *testing.T) {
+	t.Parallel()
+	w, id := employer(t)
+	rival := w.Factions[0].ID
+	if rival == w.PlayerOrganizationID() {
+		rival = w.Factions[1].ID
+	}
+	w.Plots = append(w.Plots, Plot{ID: ID(), Kind: "sabotage", Life: w.Life,
+		Due: w.Minute + 4320, Actor: rival, Target: id, Strength: 35})
+	if err := w.AskTheCounter(w.Properties[id].Hands[0]); err != nil {
+		t.Fatal(err)
+	}
+	for _, p := range w.Plots {
+		if p.Target != id {
+			continue
+		}
+		if !p.Known {
+			t.Fatal("the player was told about the car across the road and the world did not write it down")
+		}
+		return
+	}
+	t.Fatal("the plan against the laundry is gone from the world entirely")
+}
+
+// Somebody who has not been paid says so, and says it first. Three nights of
+// rules about wages and the person standing behind the counter would tell you
+// about the footfall and the stock and never mention the money.
+func TestSomebodyWhoIsNotBeingPaidSaysSo(t *testing.T) {
+	t.Parallel()
+	w, id := employer(t)
+	w.Properties[id].Unpaid = PatienceRunsOut + 2
+	if err := w.AskTheCounter(w.Properties[id].Hands[0]); err != nil {
+		t.Fatal(err)
+	}
+	said := w.History[len(w.History)-1].Text
+	if !strings.Contains(said, "paid") {
+		t.Fatalf("nobody there has been paid for nine nights and they talk about the weather: %q", said)
+	}
+}
+
+// And somebody who is being paid does not bring it up, which is the ordinary
+// case.
+func TestSomebodyWhoIsPaidDoesNotMentionIt(t *testing.T) {
+	t.Parallel()
+	w, id := employer(t)
+	if err := w.AskTheCounter(w.Properties[id].Hands[0]); err != nil {
+		t.Fatal(err)
+	}
+	if said := w.History[len(w.History)-1].Text; strings.Contains(said, "paid") {
+		t.Fatalf("somebody who is paid on time complains about the money: %q", said)
+	}
+}
+
+// What asking is worth, as a number. A place that saw them coming takes a third
+// of it, or nine less for every pair of hands standing in it, whichever is
+// kinder — and until the walk above was fixed, asking bought none of that.
+func TestAskingTheCounterIsWorthConditionWhenTheyCome(t *testing.T) {
+	t.Parallel()
+	asked, id := employer(t)
+	silent, _ := employer(t)
+	rival := asked.Factions[0].ID
+	if rival == asked.PlayerOrganizationID() {
+		rival = asked.Factions[1].ID
+	}
+	plot := Plot{ID: ID(), Kind: "sabotage", Life: asked.Life,
+		Due: asked.Minute + 4320, Actor: rival, Target: id, Strength: 60}
+	asked.Plots = append(asked.Plots, plot)
+	silent.Plots = append(silent.Plots, plot)
+	if err := asked.AskTheCounter(asked.Properties[id].Hands[0]); err != nil {
+		t.Fatal(err)
+	}
+	asked.ResolveSabotage(asked.Plots[len(asked.Plots)-1])
+	silent.ResolveSabotage(silent.Plots[len(silent.Plots)-1])
+	warned, blind := asked.Properties[id].Condition, silent.Properties[id].Condition
+	t.Logf("a laundry that asked its own people is at %d%% after the attack; one that did not is at %d%%",
+		warned, blind)
+	if warned <= blind {
+		t.Fatalf("asking bought nothing when they came: %d%% against %d%%", warned, blind)
+	}
+}

@@ -8487,3 +8487,28 @@ the payload half.
 
 Checked on 8791 after the restart: seventeen trading addresses, each reporting
 its staff against its positions and its unpaid nights.
+
+## The word from your own counter was worth nothing
+
+Asking somebody behind your counter what they have seen is how a business finds
+out it is about to be attacked. A place that saw them coming takes a third of
+the damage, or nine less for every pair of hands standing in it.
+
+It bought none of that. The walk that marked the plan known ranged over the
+plans by value, so `p.Known = true` was written to a copy and thrown away. The
+player was told about the car across the road three afternoons running and the
+world went on not knowing. Investigating recorded it; being told by your own
+people did not, which made the whole action flavour.
+
+Measured, on a laundry attacked at strength sixty: asked, 67% condition
+afterwards; silent, 40%. Ranging by value again puts both at 40%.
+
+The same trip added the sentence three nights of wage rules had left out.
+Somebody who has not been paid says so, before the footfall and before the
+stock, and says it plainly once the word is out. Somebody who is paid on time
+does not bring it up.
+
+Then the rest of the codebase was searched for the same shape: twelve writes to
+a loop variable ranged by value. Eleven are the copy-mutate-append idiom, where
+the mutated copy is what gets kept — grudges fading, loans falling due, chips
+settling. This was the only one where the write was lost.

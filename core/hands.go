@@ -427,14 +427,27 @@ func (w *World) AskTheCounter(who string) error {
 	prop := w.Properties[at]
 
 	said := []string{}
-	// The thing worth saying first, if there is one.
-	for _, p := range w.Plots {
-		if p.Life == w.Life && p.Target == at && !p.Known {
-			p.Known = true
+	// The thing worth saying first, if there is one. By the index, because a
+	// range over the plans hands out copies of them: the player was told about
+	// the car across the road and the world went on not knowing, so a place
+	// that had been warned by its own people took the full damage anyway.
+	for i := range w.Plots {
+		p := &w.Plots[i]
+		if p.Life != w.Life || p.Target != at {
+			continue
 		}
-		if p.Life == w.Life && p.Target == at {
-			said = append(said, "There has been a car across the road three afternoons running, and nobody gets out of it.")
-			break
+		p.Known = true
+		said = append(said, "There has been a car across the road three afternoons running, and nobody gets out of it.")
+		break
+	}
+	// Then the money, before anything about the work. Somebody who has not
+	// been paid for a week is not going to open with the footfall.
+	if prop.Unpaid > 0 {
+		if w.wordIsOut(at) {
+			said = append(said, fmt.Sprintf("Nobody here has been paid in %s. They say it plainly, and they say it first.",
+				plural(prop.Unpaid, "night", "nights")))
+		} else {
+			said = append(said, fmt.Sprintf("The wages are %s behind.", plural(prop.Unpaid, "night", "nights")))
 		}
 	}
 	switch {
