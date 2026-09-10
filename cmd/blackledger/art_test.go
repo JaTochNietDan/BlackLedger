@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -204,9 +205,24 @@ func TestTheWorkInARoomSitsUnderThePictureAndAcross(t *testing.T) {
 	if !strings.Contains(stage, "grid-template-columns:minmax(0,1fr);") {
 		t.Errorf("the room still puts the work in a column beside the picture: %s", stage)
 	}
-	work := regexp.MustCompile(`\.room-work\{[^}]*\}`).FindString(sheet)
-	if !strings.Contains(work, "grid-row:3") || !strings.Contains(work, "grid-column:1") {
-		t.Errorf("the work is not the row under the picture: %s", work)
+	// Below the picture and in the same column, asked as an order rather than
+	// as a row number: putting the head of the room in row one moved all three
+	// of these down and failed a guard that was only ever about which comes
+	// first.
+	row := func(selector string) int {
+		rule := regexp.MustCompile(regexp.QuoteMeta(selector) + `\{[^}]*\}`).FindString(sheet)
+		found := regexp.MustCompile(`grid-row:(\d+)`).FindStringSubmatch(rule)
+		if found == nil {
+			t.Fatalf("%s has no row of its own, so it falls wherever the grid puts it", selector)
+		}
+		n, _ := strconv.Atoi(found[1])
+		if !strings.Contains(rule, "grid-column:1") {
+			t.Errorf("%s is not full width: %s", selector, rule)
+		}
+		return n
+	}
+	if room, work := row(".room"), row(".room-work"); work <= room {
+		t.Errorf("the work is on row %d and the picture on row %d, so it is not under it", work, room)
 	}
 	compact := regexp.MustCompile(`\.actions\.compact\{[^}]*\}`).FindString(sheet)
 	if !strings.Contains(compact, "repeat(auto-fill") {
@@ -463,5 +479,41 @@ func TestNothingYouCannotDoYetIsHiddenByDefault(t *testing.T) {
 	// And the toggle is still there, reading the right way round.
 	if !holds(list, "{showBlocked ? 'Hide' : 'Show'} {s.blocked.length} you cannot do yet") {
 		t.Error("there is no way to tidy a long list of refusals away")
+	}
+}
+
+// "When inside a building it shows this info at the bottom of the action list
+// which is wrong. It'd probably be better to have a more fleshed out display of
+// current building your in with the name and stuff up higher in the fold in a
+// consistent place when you're inside."
+//
+// The interior is a grid with explicit rows for the picture, the people and the
+// work, and the strip naming the room had no row of its own — so it auto-placed
+// into an implicit row after all three and came out under the action list. It
+// is row one now, and the three explicit rows moved down to make space. This
+// guard is about the placement, because that is the whole of what went wrong.
+func TestTheRoomSaysWhereYouAreAtTheTopOfIt(t *testing.T) {
+	css := rawSource(t, "src/style.css")
+	for _, rule := range []string{
+		".room-holder{grid-column:1;grid-row:1",
+		".room{grid-column:1;grid-row:2",
+		".room-people{grid-column:1;grid-row:3",
+		".room-work{grid-column:1;grid-row:4",
+	} {
+		if !strings.Contains(css, rule) {
+			t.Errorf("the interior no longer places %q, so it falls wherever the grid puts it", rule)
+		}
+	}
+	// Four rows to put them in, or the last one auto-places again.
+	if !strings.Contains(css, "grid-template-rows:auto auto auto 1fr") {
+		t.Error("the interior grid has no row for the head of the room")
+	}
+	// And it says more than a name: who holds it, and the figures a player
+	// standing in a business wants in the same place in every room.
+	room := source(t, "src/Interior.tsx")
+	for _, fact := range []string{"Condition", "Working at", "On the books", "Earns"} {
+		if !holds(room, fact) {
+			t.Errorf("the head of the room does not say %q", fact)
+		}
 	}
 }

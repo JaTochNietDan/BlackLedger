@@ -7681,3 +7681,30 @@ Two things I tried that made it worse, kept here so they are not tried again:
 
 `tools/baseline.py` prints the seven-strategy figures, so `mise run simulate`
 reports them itself instead of every tick retyping the same parser.
+
+## The head of the room
+
+"When inside a building it shows this info at the bottom of the action list
+which is wrong. It'd probably be better to have a more fleshed out display of
+current building your in with the name and stuff up higher in the fold in a
+consistent place when you're inside."
+
+The cause is worth writing down because nothing in the markup looked wrong. The
+interior is a grid with explicit rows for the picture, the people and the work,
+and the strip naming the room had no row of its own — so CSS auto-placed it into
+an implicit row *after* all three, which put it under the action list. It was
+written first in the JSX and drawn last on the screen.
+
+It is row one now, above the picture, and the three explicit rows moved down to
+make space for it. It says more than a name: who holds it, and the figures a
+player standing in a business wants in the same place in every room — condition,
+what it is working at, how many are on the books, what it earns an hour — laid
+out as figures rather than joined with middots at the end of a sentence.
+
+**A guard that was about the wrong thing.** `TestTheWorkInARoomSitsUnderThePictureAndAcross`
+required `.room-work` to be on row 3 specifically, so inserting a row above the
+picture failed it while the work was still exactly where it belongs. It asks for
+the order now — the work is below the picture and full width — which is what it
+was always about.
+
+No balance run this tick: nothing here can move it.

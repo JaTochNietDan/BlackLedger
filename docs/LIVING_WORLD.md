@@ -184,6 +184,15 @@ The Golden Lily
 INDEPENDENT
 95% condition
 
+— built, and the cause was worth knowing: the interior is a grid with explicit
+  rows for the picture, the people and the work, and the strip naming the room
+  had no row of its own. CSS auto-placed it into an implicit row after all three,
+  which is why it came out under the action list. It is row one now, above the
+  picture, in the same place in every room. It says more than a name, too: who
+  holds it, and the figures a player standing in a business wants — condition,
+  what it is working at, how many are on the books and what it earns an hour —
+  laid out as figures rather than joined with middots at the end of a sentence.
+
 ---
 
 When I went after Tila myself, the newspaper info on the attempt showed the wrong portait.

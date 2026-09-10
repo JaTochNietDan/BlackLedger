@@ -167,15 +167,15 @@ body{height:100%;overflow:hidden;margin:0;background:var(--bg);color:var(--ink);
    with twenty-six things to do in it into ten feet of scrolling in a slot the
    width of a receipt. Below the picture it has the whole width to lay out in,
    and what fits on one screen roughly quadruples. */
-.interior-stage{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto 1fr;gap:0;flex:1;min-height:0;background:#0e1413}
-.room{grid-column:1;grid-row:1;background:#0b0f0f;border-bottom:1px solid var(--line);position:relative}
+.interior-stage{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto auto 1fr;gap:0;flex:1;min-height:0;background:#0e1413}
+.room{grid-column:1;grid-row:2;background:#0b0f0f;border-bottom:1px solid var(--line);position:relative}
 /* The hour of the day, over the backdrop and under the people: a room at three
    in the morning is not the room at noon. */
 .room-light{position:absolute;inset:0;pointer-events:none;z-index:1}
 .room .stander{z-index:2}
 .room .interior{display:block;width:100%;height:auto;max-height:38vh}
 
-.room-people{grid-column:1;grid-row:2;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:7px;padding:14px 18px;align-content:flex-start;overflow:auto}
+.room-people{grid-column:1;grid-row:3;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:7px;padding:14px 18px;align-content:flex-start;overflow:auto}
 .room-chip{background:#16211f;border:1px solid var(--line);border-left:2px solid #3f4d44;padding:7px 10px;text-align:left;max-width:210px;position:relative}
 .room-chip.yours{border-left-color:var(--gold)}
 .room-chip.sour{border-left-color:#8a5a4d}
@@ -183,7 +183,7 @@ body{height:100%;overflow:hidden;margin:0;background:var(--bg);color:var(--ink);
 .room-chip b{display:block;font:13px var(--serif);font-weight:400}
 .room-chip small{display:block;font-size:10px;color:var(--muted);line-height:1.35}
 .room-chip i{position:absolute;top:4px;right:7px;color:var(--gold);font-style:normal}
-.room-work{grid-column:1;grid-row:3;background:var(--panel);padding:16px 22px 26px;overflow:auto;min-height:0}
+.room-work{grid-column:1;grid-row:4;background:var(--panel);padding:16px 22px 26px;overflow:auto;min-height:0}
 .picked-person{border-bottom:1px solid var(--line);padding-bottom:16px;margin-bottom:6px}
 .picked-person header b{font:19px var(--serif);font-weight:400;display:block}
 .picked-person header small{display:block;font-size:11px;color:var(--muted)}
@@ -589,7 +589,7 @@ body{height:100%;overflow:hidden;margin:0;background:var(--bg);color:var(--ink);
 /* The stage is an explicitly placed grid, so this has to claim the room's own
    cell: auto-placement put it a thousand pixels below the fold, present in the
    page and invisible to the player. */
-.room-traffic{grid-column:1;grid-row:1;align-self:start;justify-self:start;z-index:3;margin:14px 0 0 16px;
+.room-traffic{grid-column:1;grid-row:2;align-self:start;justify-self:start;z-index:3;margin:14px 0 0 16px;
   display:flex;flex-direction:column;gap:3px;padding:9px 13px;background:#0c1211e8;border-left:2px solid var(--gold);max-width:min(460px,60%)}
 .room-traffic p{margin:0;font-size:12px;color:#c9cfc4;display:flex;gap:8px;align-items:baseline}
 .room-traffic i{font-style:normal;color:var(--gold);font-size:13px}
@@ -1143,11 +1143,25 @@ body{height:100%;overflow:hidden;margin:0;background:var(--bg);color:var(--ink);
 .actions.compact .sum-action{min-height:0}
 
 /* Whose room this is, said once at the top of it. */
-.room-holder{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;padding:7px 11px;margin-bottom:8px;background:#16211fcc;border-left:2px solid var(--line)}
+/* The head of the room. It had no row of its own in the interior grid, which
+   has explicit rows for the art, the people and the work — so it auto-placed
+   into an implicit row after all of them and appeared at the bottom of the
+   action list: "when inside a building it shows this info at the bottom of the
+   action list which is wrong. It'd probably be better to have a more fleshed
+   out display of current building your in with the name and stuff up higher in
+   the fold in a consistent place when you're inside." It is row one now, above
+   the picture, in the same place in every room. */
+.room-holder{grid-column:1;grid-row:1;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;
+  padding:10px 16px;background:#16211fcc;border-bottom:1px solid var(--line);
+  border-left:2px solid var(--line)}
 .room-holder.yours{border-left-color:var(--gold)}
-.room-holder b{font:15px var(--serif);font-weight:400}
+.room-holder b{font:19px var(--serif);font-weight:400;margin-right:2px}
 .room-holder span{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
-.room-holder small{font-size:11px;color:var(--muted)}
+.room-holder .room-facts{display:flex;gap:14px;flex-wrap:wrap;margin-left:auto}
+.room-holder .room-facts i{font-style:normal;font-size:11px;color:var(--muted);
+  font-variant-numeric:tabular-nums}
+.room-holder .room-facts i b{font:12px var(--sans);font-weight:600;color:var(--ink);margin:0 0 0 5px}
+.room-holder small{font-size:11px;color:var(--muted);flex-basis:100%}
 
 /* The dice. A pair, a point box, and three bets that are all real. */
 .dice-table{display:flex;align-items:center;justify-content:center;gap:28px;padding:22px 0}

@@ -182,22 +182,42 @@ export function Interior({
   // here should be read: "when inside a building you can't see who the family
   // that owns it (if any) is anymore."
   const held = place.owned ? 'Yours' : place.holder || 'Independent';
-  const state = [
-    place.condition < 100 ? `${place.condition}% condition` : '',
-    place.owned && typeof place.trading === 'number'
-      ? `working at ${Math.round(place.trading * 100)}%`
-      : '',
-    place.note || '',
-  ]
-    .filter(Boolean)
-    .join(' · ');
+  // What is true of this room, as figures rather than as a sentence. The strip
+  // used to join them with middots and read as an afterthought; a player
+  // standing in a business wants the same three or four facts in the same place
+  // in every room, which is what "a more fleshed out display" is asking for.
+  const facts: {what: string; is: string; warn?: boolean}[] = [];
+  if (place.condition < 100 || place.owned) {
+    facts.push({what: 'Condition', is: place.condition + '%', warn: place.condition < 70});
+  }
+  if (place.owned && typeof place.trading === 'number') {
+    facts.push({
+      what: 'Working at',
+      is: Math.round(place.trading * 100) + '%',
+      warn: place.trading < 0.8,
+    });
+  }
+  if (place.owned && place.staff !== undefined) {
+    facts.push({what: 'On the books', is: String(place.staff)});
+  }
+  if (place.owned && place.income > 0) {
+    facts.push({what: 'Earns', is: '$' + place.income + '/hr'});
+  }
 
   return (
     <div className="interior-stage">
       <div className={'room-holder' + (place.owned ? ' yours' : '')}>
         <b>{place.name}</b>
         <span>{held}</span>
-        {state && <small className={place.note_warn ? 'warning' : ''}>{state}</small>}
+        <div className="room-facts">
+          {facts.map(f => (
+            <i key={f.what}>
+              {f.what}
+              <b className={f.warn ? 'warning' : ''}>{f.is}</b>
+            </i>
+          ))}
+        </div>
+        {place.note && <small className={place.note_warn ? 'warning' : ''}>{place.note}</small>}
       </div>
       {!!traffic.length && (
         <div className="room-traffic" role="status">
