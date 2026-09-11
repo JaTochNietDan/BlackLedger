@@ -11199,3 +11199,36 @@ check does bite, and the rule is shown to be load-bearing rather than assumed.
 The balance baseline does not move, because no policy asks for anything yet.
 That is the next thing to teach the harness rather than a reason to doubt the
 feature — and it is exactly the gap that has been closing all night.
+
+## The demand landed where it should have, without tuning
+
+Last tick's note said no policy asks for a share yet and that teaching the
+harness was the next job. It was not: the exploring policy takes whatever it has
+taken least, so it found the card on its own the first time it stood in a
+family's business with a name worth anything. Twenty demands across twenty
+campaigns, and the harness's coverage went from 100 kinds to 103 with no change
+to any policy.
+
+Priced, it sits where a move like that ought to:
+
+| $/min over standing still | action |
+|---|---|
+| 3.96 | rob a business |
+| 3.56 | mug somebody |
+| 3.01 | take a parked car apart |
+| **1.33** | **ask a family for a share** |
+| 0.86 | a shift on Pier 14 |
+
+Better than honest work and worse than robbing them outright, which is the right
+shape: it is safer than a robbery, it draws no police attention at all, and what
+it costs is their opinion of you rather than the city's.
+
+And it bounds itself. Asking takes eighteen points of their standing whether
+they pay or not, so a family at the point of sending demands is at the bottom of
+their scale after seven of them: $588 out of their $4,500, and then a family
+that hates you completely, which the existing machinery already knows what to do
+with. Nothing in the rules stops an eighth demand. The consequence does, which
+is how everything else in this city works.
+
+A feature that lands in the right place in the economy without a single number
+being tuned is worth recording, because most of tonight was the opposite.
