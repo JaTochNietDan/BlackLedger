@@ -10407,3 +10407,51 @@ policy does not yet do: hold a business (hire, restock, remedy, launder, the
 night, the window), sit at a table (fold, call, deal, hit, stand), or take a
 boat that only lands at a pier you own. That is the next reach rather than a
 gap in this one.
+
+## Six faults, none of them in the game
+
+The exploring policy went from nineteen kinds of action to eighty-one in one
+tick, and every step of that was a fault in the policy that had looked like the
+game being closed.
+
+It never bought a business. Left to take whatever it had taken least, it earned
+at the docks, spent what it earned on the first priced card it walked past, and
+was poor again by the time it stood anywhere with a deed for sale — a laundry
+wants about $1,500 in hand and it carried four hundred. The first business is a
+goal now rather than an accident: work until it can afford one, walk to the
+cheapest thing for sale, buy it. That opened `acquire` and `repair`.
+
+It never left a room. "Take what you have taken least" always has an answer, so
+the rule underneath it about walking on when a room has nothing new had not run
+once in forty days of play. Staying only for something it has *never* done took
+it from thirty kinds to fifty-five and opened hiring, restocking, laying
+somebody off, reading the books and laundering.
+
+And seven runs in eight ended on an error. A card with a field on it wants a
+number, and sending none is refused: "a house limit runs from $20 to $5000",
+"nobody stands behind a counter for less than $3 a day". That is why it stopped
+at a little under eight days however many steps it was given. The card states
+its own range and the smallest figure in it is always a legal answer.
+
+| | before this tick | after |
+|---|---|---|
+| kinds of action | 19 | 81 |
+| distinct ids | 45 | 132 |
+| median life | 2.2 days | 69.6 days |
+| deaths | 10 of 10 | 0 of 8 |
+| runs ending in an error | 7 of 8 | 0 of 8 |
+
+Across all nine policies the harness now plays 81 of the game's 115 kinds,
+against 21 before any of this. The pin is 77, measured on the smaller sample the
+guard runs.
+
+Thirty-four kinds are still never played, and the list is now short enough to
+read: most of them are a seat at a card table (`deal`, `call`, `fold`, `bet`,
+`cards`, `sit_out`, `cashout`), a car and the things that follow from one
+(`car`, `plate`, `service`, `scrap`, `fill`), or something that needs a specific
+holding on a specific night (`landing`, `window:`, `pawn:`, `redeem:`). Those
+are reachable and simply not yet wanted.
+
+The thing worth carrying out of this: five separate times tonight a measurement
+was read as a fact about the game — the early game is lethal, the city is
+closed, a policy cannot afford to explore — and five times it was the instrument.

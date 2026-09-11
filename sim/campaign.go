@@ -468,10 +468,68 @@ func Choose(v View, strategy string) (core.Command, error) {
 		// offered were the free ones and eight runs reached six kinds of thing
 		// — fewer than the eight policies with plans. A policy that means to
 		// see the whole game has to be able to afford the whole game.
-		if v.Player.Cash < 400 {
+		if v.Player.Cash < 1500 {
 			if c, ok := v.at("docks", "dockwork"); ok {
 				return c, nil
 			}
+		}
+		// A room of its own, first, before anything else is interesting.
+		//
+		// Everything a business can do — hiring, the wage, restocking, putting
+		// the trouble right, laundering, a night, the window, the boat — needs
+		// the player to hold the place, and none of it had ever been played by
+		// any policy in this harness. Left to wander and take whatever it had
+		// taken least, this one never bought anything at all in eight campaigns
+		// of forty days: it earns at the docks, spends what it earns on the
+		// first priced card it walks past, and is poor again by the time it is
+		// standing somewhere with a deed for sale. A laundry wants about $1,500
+		// in hand and it was carrying four hundred.
+		//
+		// So the first business is a goal rather than an accident. Work until
+		// it can afford one, walk to the cheapest thing for sale, buy it. After
+		// that the whole branch is offered wherever it stands and the ordinary
+		// rule can have it back.
+		holds := 0
+		for _, p := range v.Locations {
+			if p.Owned {
+				holds++
+			}
+		}
+		if holds == 0 {
+			if v.Player.Cash < 1500 {
+				if c, ok := v.at("docks", "dockwork"); ok {
+					return c, nil
+				}
+			}
+			cheapest, price := "", 0
+			for _, p := range v.Locations {
+				if p.Owned || p.Locked || p.Cost <= 0 || p.Income <= 0 {
+					continue
+				}
+				if cheapest == "" || p.Cost < price {
+					cheapest, price = p.ID, p.Cost
+				}
+			}
+			if cheapest != "" {
+				if c, ok := v.at(cheapest, "acquire"); ok {
+					return c, nil
+				}
+			}
+		}
+		// And any other room of its own, whenever one is offered.
+		//
+		// Everything a business can do — hiring, the wage, restocking, putting
+		// the trouble right, laundering, a night, the window, the boat — needs
+		// the player to hold the place, and none of it had ever been played by
+		// any policy in this harness. Left to "take whatever you have taken
+		// least", this one never bought anything at all: it earns at the docks,
+		// spends what it earns on the first priced card it meets, and is poor
+		// again by the time it is standing somewhere with a deed for sale.
+		//
+		// So buying is not one card among many. It is the thing that opens the
+		// rest of the game, and a policy meant to see the game takes it.
+		if c, ok := v.action(v.Player.Location, "acquire"); ok {
+			return c, nil
 		}
 		best, fewest := "", 0
 		here := v.place(v.Player.Location)
@@ -503,15 +561,43 @@ func Choose(v View, strategy string) (core.Command, error) {
 				best, fewest = a.ID, n
 			}
 		}
-		if best != "" {
-			c, ok := v.action(v.Player.Location, best)
-			if ok {
+		// Only if it is something this campaign has never done. Taking the
+		// least-done card instead meant there was always something to take
+		// here, so the walking-on rule below never ran once and the policy
+		// spent forty days in whichever room it happened to be standing in.
+		if best != "" && fewest == 0 {
+			if c, ok := v.action(v.Player.Location, best); ok {
+				// A card with a field on it wants a number, and sending none
+				// is refused. Seven runs in eight ended on exactly that —
+				// "a house limit runs from $20 to $5000", "nobody stands
+				// behind a counter for less than $3 a day" — which is why the
+				// policy stopped at a bit under eight days however many steps
+				// it was given. The card states its own range; the smallest
+				// figure in it is always a legal answer.
+				for _, a := range here.Actions {
+					if a.ID == best && a.Sum != nil {
+						c.Amount = a.Sum.Least
+					}
+				}
 				return c, nil
 			}
 		}
-		// Nothing left here that it has not done. Somewhere else, and the place
-		// it has stood in least.
+		// Nothing left here that it has not done. Somewhere else — and a room
+		// of its own first, because hiring, restocking, putting the trouble
+		// right and reading the books are only offered to somebody standing in
+		// the place they hold. Buying one and never going back reached two of
+		// that branch out of a dozen.
 		where, stood := "", 0
+		for _, p := range v.Locations {
+			if p.ID == v.Player.Location || p.Locked || !p.Owned {
+				continue
+			}
+			if n := v.Stood[p.ID]; where == "" || n < stood {
+				where, stood = p.ID, n
+			}
+		}
+		// And anywhere at all, when it has stood in all of its own more than
+		// it has stood in somewhere it has never been.
 		for _, p := range v.Locations {
 			if p.ID == v.Player.Location || p.Locked {
 				continue

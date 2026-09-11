@@ -20,8 +20,8 @@ import "testing"
 // purpose and its cash column should be read as what happens to somebody who
 // does everything once.
 //
-// Getting it to work took three passes and the last one was worth all of the
-// others. It starved, then it died in a day and a half, and then it turned out
+// Getting it to work took six passes and every one of them was a fault in the
+// policy rather than a fact about the game. It starved, then it died in a day and a half, and then it turned out
 // that both of its rules were reading an action id that carries a person's name
 // after a colon: the list of things that get you killed never matched
 // `strike:person-8`, and "taken fewest times" counted every person in the room
@@ -34,7 +34,7 @@ import "testing"
 // that reaches further gets recognised; a drop is a policy that stopped
 // reaching, which is how a whole area of the game goes unpriced without
 // anybody noticing.
-const kindsTheHarnessPlays = 34
+const kindsTheHarnessPlays = 77
 
 func TestTheHarnessPlaysEnoughOfTheGame(t *testing.T) {
 	t.Parallel()
