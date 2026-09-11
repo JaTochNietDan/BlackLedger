@@ -35,8 +35,12 @@ which half is standing.
 ## The queue
 
 1. **Sound, and a better bandit.** `src/sound.ts` synthesises noises in-browser
-   with no assets. The slot machine wants a real case, a payline, a coin tray
-   and strips that roll rather than one face per drum, plus ambient room sound.
+   with no assets. All of it is built: the case, the payline, the coin tray, the
+   room's own hum, and drums that travel through a run of the strip and come to
+   rest on the faces the core dealt. Two things caught the drums out and are
+   written in the fault shapes — a transition driven in the wrong frame order,
+   and a second `.drum` rule inheriting `display:grid` from an earlier one.
+   Nothing here is left open.
 2. **Cars.** Speed is stated honestly already: the forecourt quotes a real
    journey from where the player is standing, in minutes on foot against
    minutes in the car being sold, and says when plate is weighing the figure
@@ -71,9 +75,10 @@ which half is standing.
    of those rooms now, the poolhall and the bar — a game with no house belongs
    where there are people of an evening and nobody holding a float.
    An unwatched game runs on a third RNG stream of its own — shuffling off
-   `WorldRNG` moved everything else the city does off-screen. Still open: the
-   same for the other rooms. The city already gambles at every room that runs a
-   float (`core/floor.go`), which this tick checked rather than rebuilt.
+   `WorldRNG` moved everything else the city does off-screen. The city already
+   gambles at every room that runs a float (`core/floor.go`). Nothing here is
+   left open: a game with no house belongs where there are people of an evening
+   and nobody holding one, which is the poolhall and the bar, and both have it.
 6. **The people behind the counter.** `Property.Hands` names the staff of every
    business at an address anybody holds, and somebody standing in front of you
    who works for a rival can be offered a place at one of yours
@@ -85,6 +90,19 @@ which half is standing.
    free, so a rule for it would be a rule that never fires. Still open: whether
    the people you employ should be worth talking to for what they know about
    the room they stand in.
+
+---
+
+7. **Businesses that link to each other.** Four of the thirteen trades reach
+   past their own income: a garage halves the car's upkeep and repairs, a
+   haulier takes a third off stocking everything else, a cab yard is a ride when
+   your own car cannot take you, and a scrapyard buys what is left of it, better
+   when the yard is yours. Two more were already linked and were checked rather
+   than rebuilt: laundering needs a business, and a forecourt you hold sells you
+   a car without the margin. Still open: the pawnbroker, the butcher, the
+   restaurant, the burlesque, the poolhall and the casinos — several of which
+   are linked to the city rather than to the player, which is a different thing
+   and worth keeping straight.
 
 ---
 
@@ -116,6 +134,15 @@ and a local model that writes encounters and can be switched off.
   learning who sent them.
 - **Identity.** One decision picks a person's face and their voice
   (`core/voices.go`); the server sends the voice with the line.
+- **A night at cards.** The back room is a sitting, not a hand: money goes on
+  the table, everybody plays out of what is in front of them, the ante is a
+  twentieth of the buy-in but never more than a quarter of the shortest stack,
+  the cleaned-out go home and whoever is in the room takes the empty chair.
+  Getting up or walking out picks your money up.
+- **Arms.** Every gun and vest is on the counter at the docks at its own price,
+  in any order. What you carry shifts an attempt on somebody — 17 in 200 with
+  empty hands against 58 with a Thompson — and so does what you put in the hand
+  of whoever you send. A search reaches whoever is standing with you.
 - **Businesses.** Every address that earns can be bought and run. A place with
   no price does not change hands. Twenty-six addresses, twelve kinds; the
   pawnbroker is where what is taken off the street turns into money and where
@@ -156,6 +183,43 @@ and a local model that writes encounters and can be switched off.
   arrivals cancels every journey shorter than the jump. Use `aDay(w)`.
 - **The interface stating a rule the core does not have.** "Insurance pays 2 to
   1" on a cloth with no insurance.
+- **Two cards in one room under one name.** A command is matched to a card by
+  its id and the match takes the last one that fits, so two cards with the same
+  id means the wrong card's price, minutes and label are used whatever was
+  pressed. It put somebody who asked for the machines into a hand of cards, and
+  asking two people where two marks were was offered twice as `about:<who>`.
+  `TestNoTwoCardsInARoomShareAName` rules it out everywhere: 615 cards, each
+  named once in its room. An id can carry two names — `arms:weapon:3`,
+  `sit:back`, `about:leo:vittorio` — and guards that parse the subject out of an
+  id have to expect that.
+- **A branch in a switch that can never be reached.** A cab's line was written
+  after the bare "on foot" case and being warned matched both, so the first one
+  won for ever. Caught by reading the code back, not by a test. When a case is
+  added to a switch whose earlier cases are broader, it goes above them.
+- **Something named by a person where a role was meant.** Three faults in one
+  night: the second job crashed the request when the fixer was dead, ten strings
+  went on buying coffee for a woman the player had killed, and an office stayed
+  empty for the rest of the campaign because the check asked whether the man
+  existed rather than whether the desk was filled — and a dead man exists.
+  `TestTheCityOutlivesEverybodyItWasWrittenWith` buries every seeded holder and
+  runs a fortnight; `TestNothingTheCityShowsNamesTheFirstHolderByName` reads
+  every card in the city and fails on any that names one of them.
+- **Teeth with no page.** A rule with real consequences that the player has no
+  way to see coming. The wage rules that emptied a counter, the gun in somebody's
+  coat, the man about to walk out with one of your businesses, and how a
+  business is being run. Two sweeps in the log compare every field on a business
+  and on a person against what the room and the card actually say; the answer is
+  judgement, but the diff is mechanical and worth re-running after anything is
+  added.
+- **A measurement that reads the wrong thing and says nothing is there.** The
+  police looked as though they never came, because the probe counted log lines by
+  titles that do not exist — they say "They came to the door" and "Turned over
+  at", never "raid". Before believing a system does nothing, check the
+  measurement can see it doing something.
+- **A guard whose sample cannot show the fault.** "Against your a pair" was
+  guarded with a hand that has no article, so the sentence read the same either
+  way and putting the fault back left it passing. Pick the sample that can
+  fail.
 
 ---
 
@@ -261,6 +325,11 @@ without animation and measure the geometry.
 
 - Never touch `.runtime/campaign.sqlite3` for testing.
 - Use mise, never brew.
+- **Ask of every change: is the new thing strictly better than the old?** A gun
+  bought for one of your own carried no risk at all for an hour, because the
+  search took what was in the player's coat and left what was in theirs. This
+  file keeps asking that question of the game and it has to be asked of the
+  change too, in the tick that makes it.
 - Restart the live game on 8791 every tick, backing the save up first, and curl
   it afterwards: build to `.runtime/blackledger-ops.new`, `pkill -f
   blackledger-ops`, `mv` into place, `nohup` it. **Then `grep -c panic
