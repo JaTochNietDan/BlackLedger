@@ -148,7 +148,9 @@ and a local model that writes encounters and can be switched off.
 - **Businesses.** Every address that earns can be bought and run. A place with
   no price does not change hands. Twenty-six addresses, twelve kinds; the
   pawnbroker is where what is taken off the street turns into money and where
-  somebody short pawns the suit off their back.
+  somebody short pawns the suit off their back. Its window holds what the city
+  could not redeem, at 60% of new less wear; hold the counter and you take that
+  stock at what it lent instead.
 
 ---
 

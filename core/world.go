@@ -499,6 +499,10 @@ type World struct {
 	// Things of the player's sitting behind a pawnbroker's counter. Tied to one
 	// protagonist: nobody inherits somebody else's ticket.
 	Tickets []Ticket `json:"tickets"`
+	// What the city could not redeem, on the pawnbroker's shelf. Not tied to a
+	// protagonist: the window is the shop's, and a new life walks past the same
+	// window the last one did.
+	Window []Shelf `json:"window"`
 	// Standing work an organization has asked for. Tied to one protagonist:
 	// nobody inherits somebody else's obligations.
 	Commissions []Commission `json:"commissions"`
@@ -1280,8 +1284,30 @@ func (w *World) Actions(id string) []Action {
 				continue
 			}
 			add("pawn:"+kind, "Leave "+lowerFirst(what)+" over the counter", PawnMinutes, 0, w.PawnReadiness(kind),
-				fmt.Sprintf("$%d now, and $%d to get it back inside %d days. After that it belongs to whoever buys it.",
-					w.PawnValue(kind), max(w.PawnValue(kind)+1, w.PawnValue(kind)*PawnBack/100), PawnDays))
+				fmt.Sprintf("$%d now, and $%d to get it back inside %d days. After that it is in the window at $%d, where anybody can have it, you included.",
+					w.PawnValue(kind), max(w.PawnValue(kind)+1, w.PawnValue(kind)*PawnBack/100), PawnDays,
+					askFor(kind, tierOf(w, kind), wearOf(w, kind))))
+		}
+		// The window itself. What the city could not redeem, with a price on
+		// it. Hold the counter and the price is what it lent rather than what
+		// it asks, which is the trade a pawnbroker is.
+		mine := w.Own(id)
+		labels := w.WindowLabels()
+		for _, shelf := range w.Window {
+			whose := "Somebody could not come back for it."
+			if shelf.Whose != "" {
+				whose = shelf.Whose + " could not come back for it."
+			}
+			if shelf.Yours {
+				whose = "It was yours until the ticket ran out."
+			}
+			margin := ""
+			if mine && shelf.Ask > shelf.Lent {
+				margin = fmt.Sprintf(" Your counter, so you pay the $%d it lent rather than the $%d it asks.", shelf.Lent, shelf.Ask)
+			}
+			asks("window:"+shelf.ID, labels[shelf.ID],
+				WindowMinutes, w.WindowPrice(shelf.ID), w.WindowReadiness(shelf.ID),
+				fmt.Sprintf("$%d, %d%% worn. %s%s", w.WindowPrice(shelf.ID), shelf.Wear, whose, margin))
 		}
 	}
 	// A yard takes what is left of a car. Buying the next one used to overwrite
@@ -2157,6 +2183,7 @@ func (w *World) Advance(minutes int) {
 			w.BackRoomNight()
 			w.RouteDay()
 			w.PawnDay()
+			w.WindowDay()
 			w.CarDay()
 			w.CarTrade()
 			w.RepairsDay()

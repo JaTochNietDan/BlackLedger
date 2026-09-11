@@ -458,6 +458,10 @@ func (w *World) apply(c Command) error {
 				}
 				w.Advance(a.Minutes)
 			}
+		} else if id, ok := strings.CutPrefix(c.Kind, "window:"); ok {
+			if err := w.BuyFromWindow(id); err != nil {
+				return err
+			}
 		} else if kind, ok := strings.CutPrefix(c.Kind, "pawn:"); ok {
 			if err := w.Pawn(kind); err != nil {
 				return err

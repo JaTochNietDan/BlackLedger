@@ -238,7 +238,16 @@ func (w *World) PawnDay() {
 			what = AttireByTier(t.Tier).Label
 		}
 		w.FenceAbout(FenceTrade)
-		w.Log("It went in the window", fmt.Sprintf("%s. The ticket ran out and Ackerman sold it to somebody else, which is what a ticket running out means.", what), "personal")
+		// It goes in the window, and the window is a place. The log used to say
+		// it had been "sold to somebody else", which was the end of it — a
+		// decision announced to the player with nothing on the other side of
+		// it. The thing is on a shelf with a price on it now.
+		w.shelve(Shelf{
+			Kind: t.Kind, Tier: t.Tier, Wear: t.Wear,
+			Ask: askFor(t.Kind, t.Tier, t.Wear), Lent: t.Lent, Yours: true,
+		})
+		w.Log("It went in the window", fmt.Sprintf("%s. The ticket ran out, so %s has it on the shelf at $%d. It is not yours any more, but it is still there.",
+			what, w.theBroker(), askFor(t.Kind, t.Tier, t.Wear)), "personal")
 	}
 }
 

@@ -9659,3 +9659,78 @@ set, so a formatter run rewrites thousands of unrelated lines.
 Nineteen left, in eight small blocks: the card, the address art, the city view
 switch, the paper's grain, the room and its chips, the felt result and the work
 heading. Each is a one-line edit with the same proof available.
+
+## The pawnbroker's window
+
+Queue item seven asks which trades reach past their own income. The pawnbroker
+was listed as not reaching, and half of that was wrong: every mugging and every
+robbery already calls `FenceAbout`, which pushes the shop's custom up. Measured
+before building anything on top of it — twenty jobs take the shop from 50% to
+100% custom, worth about $1,200 a week. That link is real and it is the city's
+side.
+
+What was missing was the player's side, and the shape of it was already in the
+code saying no. A ticket running out logged "Ackerman sold it to somebody else",
+and that was the end of the thing. It is a wall: a decision announced to the
+player with nothing on the other side of it. The thing did not evaporate. It
+went in the window, and a window is somewhere you can stand.
+
+So the window is real. What this city could not redeem sits on a shelf with a
+price on it — 60% of new, less wear — and anybody with the money can have it,
+the player included, and the thing that was theirs last week included. That
+turns forfeiture from a loss into a bad trade, which is what a pawnbroker is.
+
+The ownership link is the margin itself. The counter lends 35% and asks 60%, and
+the difference is the whole trade. Hold the shop and you take what is on the
+shelf at what it lent, not at what it asks. That is the same shape as the four
+links that already work: a garage halves the car's upkeep, a haulier takes a
+third off stocking, a yard buys the wreck better when it is yours.
+
+### Three things measured rather than assumed
+
+**Nobody in this city could have stocked it.** The first rule asked a modelled
+person to be broke and to own a car. Fifteen people drive, and the thinnest
+purse among them is $164 — a man with a car is not the man pawning one. The rule
+could never fire. So most of the shelf comes from the city at large, unnamed:
+there are a few hundred people this game does not model and a pawnbroker's
+window is full of their things. The named case is kept for when a modelled
+person really is that short, which is rare and worth something for being rare.
+
+**A daily feature must not spend the city's randomness.** Four world draws a day
+broke two tests that have nothing to do with pawnbrokers — whether a manager
+keeps a bar stocked, and what a table pays into a till. Both read the world
+stream in absolute terms, so anything that consumes it moves them. Taking the
+draws unconditionally was not enough; the stream still shifts. The window is
+derived from the campaign id and the day instead, the same trick the evening
+haunt and the shift change already use: fixed for this city on this day,
+identical on a replay, costing the stream nothing. The simulation's cash figures
+came out byte-identical to the run before the feature, which is the proof.
+
+**A hash used as randomness has to avalanche.** The first version ran the
+campaign id through `sum*131 + c` over a start made of the day and a salt, which
+is an affine map of that start. Every answer marched in step with the day and
+the shelf filled with four of the same suit at almost the same price. With a
+proper mixing step the shelf holds a tailored suit, a Hudson, two pressed suits
+and a Ford. A counter in a disguise is not a substitute for a die.
+
+### The guards, and which ones bit
+
+Six, and they were broken one at a time. The city-stocking, forfeit, ownership
+and shelf-size rules all fail when removed. Two did not, and both were rewritten:
+
+- The shelf-size test let two hundred days run, but the daily stocking stops at
+  the shelf's size and can never overfill it. What can is forfeiture, which puts
+  a thing in the window whether there is room or not, because a shop does not
+  decline to take what it has already lent against. Tested through that path, it
+  bites.
+- Two cards in a room under one name — the oldest fault here — happened
+  immediately: two "second-hand pressed suit" cards at different prices. The
+  condition word separates most, the price separates the rest, and anything
+  still identical is numbered, so uniqueness is guaranteed rather than likely.
+
+### Noted, not done
+
+`TicketDescription` says it is "for the interface" and nothing in the view calls
+it. A second such method was written for the window and deleted rather than
+shipped. Whether the pawnshop panel should draw the shelf is a real question and
+a separate one; the cards carry everything a player needs to act.
