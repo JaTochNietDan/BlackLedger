@@ -338,6 +338,34 @@ func TestEveryBlockAtTheFootOfAPersonsCardSpansIt(t *testing.T) {
 	}
 }
 
+// And the column the portrait sits in is the portrait's width, not whatever its
+// widest neighbour happens to be.
+//
+// The guard above asks that every block at the foot of the card span both
+// columns, which is the right rule and a rule somebody has to remember for
+// every block written after it. The column itself was `auto`, so one block that
+// forgot it widened the portrait's column and pushed the card's text sideways.
+// A column with a width of its own cannot be widened by anything, which makes
+// the rule above a second line rather than the only one.
+func TestThePortraitsColumnIsTheWidthOfAPortrait(t *testing.T) {
+	t.Parallel()
+	style := source(t, "src/style.css")
+	rule := regexp.MustCompile(`\.person-card\{[^}]*grid-template-columns:([^;}]+)`)
+	m := rule.FindStringSubmatch(style)
+	if m == nil {
+		t.Fatal("the person's card is not laid out as a grid with columns of its own")
+	}
+	if strings.HasPrefix(strings.TrimSpace(m[1]), "auto") {
+		t.Fatalf("the portrait's column is %q, so its widest child decides how wide it is", m[1])
+	}
+	// And the width is the portrait's own, wherever that is written down, rather
+	// than a number that drifts from the picture it holds.
+	if !strings.Contains(style, "--portrait-small:") ||
+		!strings.Contains(style, ".portrait-small,.portrait-wrap.portrait-small{width:var(--portrait-small)") {
+		t.Fatal("the small portrait's width is not one number the card can read")
+	}
+}
+
 // The drums turn. They used to show where they were going to stop from the
 // moment the handle went down and shake on the spot for a second, which is a
 // machine trembling rather than a machine spinning: "it should scroll through

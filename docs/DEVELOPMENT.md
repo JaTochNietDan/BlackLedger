@@ -11362,3 +11362,31 @@ seven.
 
 What no test here can say is whether the travel *looks* right — speed, easing,
 whether it reads as a machine. That needs eyes and is written up as such.
+
+## A column as wide as its widest child
+
+The last open inbox item was a sentence pushing a card's text sideways: a person
+on the people screen with no known address reads "Nobody has told you where to
+find them", and that line moved everything else right.
+
+The card is a two-column grid, portrait then text. The sentence was landing in
+the portrait's column, and the column was `auto` — in a grid that means as wide
+as its widest child. One line of prose in the wrong column is therefore a column
+as wide as the line.
+
+That had already been fixed once, by telling every block at the foot of the card
+to span both columns and guarding that each one does. The guard reads the card's
+own source rather than a list written here, so a block added tomorrow is checked
+too, and it passes. It is still a rule a person has to satisfy for every block
+they write, and the only thing standing between the card and the same fault.
+
+The column has a width of its own now, the small portrait's, kept as one number
+that the grid and the picture both read. A column with a width cannot be widened
+by anything that lands in it. The span rule stays as the second line rather than
+the only one. Both guards fail when their half is undone: the column reported as
+`auto minmax(0,1fr)`, and a foot block with nothing placing it.
+
+Worth saying plainly, because this loop has no browser: this was read out of the
+stylesheet, not off a screen. That is enough here in a way it was not for the
+drums last tick. Whether a fixed column can be widened is a fact about the grid.
+Whether a spinning drum looks like a machine is not.

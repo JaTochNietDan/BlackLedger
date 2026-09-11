@@ -196,6 +196,24 @@ When playing slots, it should scroll through the items before displaying the fin
 
 "Nobody has told you where to find them" on the people screen messes up the panel, it pushes the other text to the right.
 
+— answered. The card is a two-column grid: the portrait, then everything about
+  them. The sentence was landing in the portrait's column, and that column was
+  `auto`, which in a grid means as wide as its widest child. So one line of
+  prose in the wrong column made the column as wide as the line and shoved the
+  rest of the card's text across.
+
+  The first fix was to tell every block at the foot of the card to span both
+  columns, with a guard that reads the card itself and checks each one. That is
+  the right rule and it is a rule somebody has to remember every time a block is
+  added. So the column has a width of its own now — the small portrait's, which
+  is one number the card and the picture both read — and nothing can widen it.
+  The span rule stays as the second line rather than the only one. Both are
+  guarded, and both guards fail when the change is undone.
+
+  Read out of the stylesheet rather than off a screen: there is no browser on
+  this loop. What a fixed column cannot do is a fact about the grid, not about
+  the rendering, so this one does not need eyes the way the drums do.
+
 ---
 
 What we talked about before, making it so that hidden actions are not hidden anymore, just showed as lower priority in the list (not changing location of sub sections, just putting unavailable actions at the end of the list in each subsection
