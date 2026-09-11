@@ -20,9 +20,10 @@ const (
 	NightCost = 260
 	// NightMinutes is the afternoon it takes to arrange.
 	NightMinutes = 90
-	// NightLasts is how long the word holds. One night, and the next evening
-	// the city is back where it was.
-	NightLasts = 1440
+	// NightLasts is the evening itself: half a day, from the hour the crowd
+	// sets off to midnight. One night, and the next evening the city is back
+	// where it was.
+	NightLasts = 720
 	// NightDraw is how far somebody will come for it. A person drinks near
 	// where they are; a band is a reason to walk a bit further and not a reason
 	// to cross the city.
@@ -41,10 +42,32 @@ func PlaysHost(id string) bool {
 	return ok && place.Type == "burlesque"
 }
 
-// NightOn reports whether a place is holding one tonight.
+// nightFrom is the hour the crowd sets off for the evening a night arranged
+// at this minute pays for. Word that goes round before the crowd has left is
+// word for tonight; word that goes round after it has is word for tomorrow,
+// because tonight is already decided and the room would be paying for an
+// evening that had begun without it.
+func nightFrom(minute int) int {
+	day := minute - minute%1440
+	if minute%1440 <= EveningFrom {
+		return day + EveningFrom
+	}
+	return day + 1440 + EveningFrom
+}
+
+// NightOn reports whether a place is holding one this evening. It is a window
+// and not a deadline: a deadline cannot say which evening was bought, and the
+// two differ whenever the afternoon spent arranging one runs past the hour the
+// city goes out.
 func (w *World) NightOn(id string) bool {
 	prop := w.Properties[id]
-	return prop != nil && prop.Night > w.Minute
+	return prop != nil && prop.Night <= w.Minute && w.Minute < prop.Night+NightLasts
+}
+
+// nightBooked reports whether one is on or paid for and still to come.
+func (w *World) nightBooked(id string) bool {
+	prop := w.Properties[id]
+	return prop != nil && prop.Night > 0 && w.Minute < prop.Night+NightLasts
 }
 
 // NightReadiness explains why a night cannot be put on, or returns "".
@@ -55,7 +78,7 @@ func (w *World) NightReadiness(id string) string {
 	if !PlaysHost(id) {
 		return "Nobody comes out for an evening at a place like this"
 	}
-	if w.NightOn(id) {
+	if w.nightBooked(id) {
 		return "There is one on already"
 	}
 	if w.Player.Cash < NightCost {
@@ -73,24 +96,62 @@ func (w *World) PutOnANight(id string) error {
 		return err
 	}
 	prop := w.Properties[id]
-	prop.Night = w.Minute + NightLasts
+	prop.Night = nightFrom(w.Minute + NightMinutes)
 	place, _ := PlaceByID(id)
+	when := "tonight"
+	if prop.Night >= w.Minute+1440 {
+		when = "tomorrow evening"
+	}
 	w.Log("A night at "+place.Name,
-		fmt.Sprintf("$%d on a band, a barrel and the word going round. People who drink elsewhere will drink here tonight, and what a room takes is who is standing in it.", NightCost), "business")
+		fmt.Sprintf("$%d on a band, a barrel and the word going round. People who drink elsewhere will drink here %s, and what a room takes is who is standing in it.", NightCost, when), "business")
 	w.Report("business", "MUSIC AT "+upper(place.Name),
-		fmt.Sprintf("%s is holding an evening tonight. Word has gone round the district.", place.Name))
+		fmt.Sprintf("%s is holding an evening %s. Word has gone round the district.", place.Name, when))
 	return nil
 }
 
-// theNight is where a night is on, and near enough to walk to from here.
-func (w *World) theNight(from string) string {
+// NightPull is how much of a room two doors down a band takes, in people per
+// hundred. The rest of the hundred is lost across the walk: somebody at the far
+// edge of the draw mostly stays where they are.
+const NightPull = 80
+
+// comes decides whether one person walks the extra distance, from their id and
+// nothing else, so the same night draws the same faces in a replayed game.
+// Nearness is the whole of it. A band took every single drinker out of both
+// rooms inside the radius and left them dark, which is not a night out, it is a
+// switch; a draw that falls off with the walk leaves the near room thin and the
+// far room barely touched, and makes the radius a pull rather than a cliff.
+func comes(id string, minutes int) bool {
+	share := NightPull - NightPull*minutes/(2*NightDraw)
+	sum := 0
+	for i := 0; i < len(id); i++ {
+		sum = sum*37 + int(id[i])
+	}
+	if sum < 0 {
+		sum = -sum
+	}
+	return sum%100 < share
+}
+
+// theNight is where a night is on, near enough to walk to, nearest of them if
+// more than one room has paid for a band, and worth the walk to this person.
+//
+// It is asked from the room somebody would have drunk in, not from the desk
+// they are standing at when the question comes up. A night takes trade off the
+// room that would have had it, so the distance that matters is between the two
+// rooms. Measured from the desk instead, a district with a band in it drew
+// nobody at all whenever the day's work happened to be across town.
+func (w *World) theNight(from, who string) string {
+	best, near := "", 0
 	for _, l := range Locations {
 		if !w.NightOn(l.ID) || l.ID == from {
 			continue
 		}
-		if TravelMinutes(from, l.ID) <= NightDraw {
-			return l.ID
+		if d := TravelMinutes(from, l.ID); d <= NightDraw && (best == "" || d < near) {
+			best, near = l.ID, d
 		}
 	}
-	return ""
+	if best == "" || !comes(who, near) {
+		return ""
+	}
+	return best
 }

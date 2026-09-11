@@ -97,10 +97,12 @@ which half is standing.
    past their own income: a garage halves the car's upkeep and repairs, a
    haulier takes a third off stocking everything else, a cab yard is a ride when
    your own car cannot take you, and a scrapyard buys what is left of it, better
-   when the yard is yours. Two more were already linked and were checked rather
-   than rebuilt: laundering needs a business, and a forecourt you hold sells you
-   a car without the margin. Still open: the pawnbroker, the butcher, the
-   restaurant, the burlesque, the poolhall and the casinos — several of which
+   when the yard is yours. Three more were already linked and were checked rather
+   than rebuilt: laundering needs a business, a forecourt you hold sells you a
+   car without the margin, and the burlesque can put a night on — though that
+   one turned out to be linked on paper only and took a tick to make true.
+   Still open: the pawnbroker, the butcher, the restaurant, the poolhall and
+   the casinos — several of which
    are linked to the city rather than to the player, which is a different thing
    and worth keeping straight.
 

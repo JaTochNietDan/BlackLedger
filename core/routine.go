@@ -41,7 +41,12 @@ var haunts = []string{"bar", "club", "casino", "poolhall"}
 var haunted = map[string]int{"bar": 4, "club": 4, "casino": 3, "poolhall": 1}
 
 // Evening reports which half of the day it is. Everything that cares asks here.
-func Evening(minute int) bool { return minute%1440 >= 720 }
+// EveningFrom is the minute of the day the city stops working and goes out.
+// It is also when the clock sends everybody who is going anywhere, so it is
+// the hour a night either catches or misses.
+const EveningFrom = 720
+
+func Evening(minute int) bool { return minute%1440 >= EveningFrom }
 
 // haunt is where this person drinks, fixed for life. It is derived from their
 // id rather than stored, so it survives every save ever written and cannot
@@ -106,7 +111,7 @@ func (w *World) routine(n *NPC) (errand, bool) {
 		// Unless somebody has put a night on within walking distance, which is
 		// the whole of what paying for a band buys. One night: tomorrow they
 		// are back where they always are.
-		if on := w.theNight(n.Location); on != "" {
+		if on := w.theNight(where, n.ID); on != "" {
 			where = on
 		}
 		if where == n.Post || where == n.Location {

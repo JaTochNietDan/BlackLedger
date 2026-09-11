@@ -9476,3 +9476,75 @@ And one line in the rules that are not negotiable: ask of every change whether
 the new thing is strictly better than the old, in the tick that makes it. That
 is the question this file keeps asking of the game, and the one I did not ask of
 my own change an hour before it cost a tick to undo.
+
+## The band nobody heard
+
+The brief listed the burlesque among the trades that do not reach past their own
+income. It was wrong: a burlesque has been a valid host for putting a night on
+since the feature was built. So the tick started by checking whether the link
+worked rather than building a second one, and it did not. A night was put on and
+the room stayed empty, while thirty people drank at the bar as usual.
+
+Two faults sat on top of each other, and only the second one was fatal.
+
+The word was held as a deadline — the minute it was bought plus a flat day. The
+clock sends everybody who is going anywhere twice a day, at noon and midnight,
+so the evening is decided at minute 720 of the day. A night bought at 720 and
+held for 1440 minutes expires at 720 the next day: the exact minute of the next
+evening's departure, and the comparison was strictly greater than. It covered no
+evening at all. Worse, the ninety minutes spent arranging one could carry the
+purchase past that day's departure, so the night was for an evening that had
+already been decided.
+
+A single deadline cannot say which evening was bought, so it is now a window: a
+night records the hour the crowd sets off for the evening it pays for, and runs
+for the half-day after it. Bought before the city goes out it is tonight; bought
+after, the log and the paper both say tomorrow evening, which is what a band
+booked at nine o'clock is.
+
+The second fault was the draw. It was measured from wherever a person happened
+to be standing when the question came up — their desk, in the daytime — rather
+than from the room they would have drunk in. Nobody in the city works near the
+burlesque: zero of eighty-six posts sit inside the forty-minute draw, so a band
+in that district could never pull anybody, whatever the clock did. The draw is
+now measured between the two rooms, which is the only distance that means
+anything: a night takes trade off the room that would have had it.
+
+With both fixed, forty-four people came and the casino and the club went
+completely dark. That is not a night out, it is a switch, and $260 to empty a
+rival's room is a dominant move. So the draw falls off with the walk: eighty in
+a hundred at the door, down to forty at the far edge, decided from a person's id
+so a replayed game draws the same faces. The near room gives up most of its
+crowd, the far room a fifth, and both stay lit. Nineteen came instead of
+forty-four, and the evening was worth $652 against a $260 band — a real option
+for an owner, not a lever.
+
+### The guard that could not fail, three times over
+
+The feature had a test. It passed throughout, because it put its night on in the
+club: a room the whole city already walks to, whose neighbourhood is full of
+desks, in a city whose seed happened to make the desk-based draw work. A guard
+that picks the easy room proves nothing about the hard one.
+
+Breaking each of the four rules in turn to see which the new guards caught was
+worth more than writing them. The first pass caught one of three. The room-fill
+test passed on a single seed with the draw measured from the desk, so it now
+runs five cities. The falloff test watched a room go dark, which it never can —
+a room holds people posted to it who go nowhere — so the falloff is tested as
+the pure function it is. The room-level test read its two rooms by walking the
+clock once each, which read two different evenings and gave a different answer
+depending on map iteration order; it reads both on one pass now. And the rule
+that a drinker takes the nearest of several nights passed with the rule deleted,
+because the city's address list happens to put the right answer first — asked
+from every host room in turn instead, it fails as it should.
+
+Four rules, four breaks, four failures. The order matters: a guard written and
+never broken is a guard that has only ever been observed passing.
+
+### Still standing
+
+An ordinary day at the burlesque earns nothing at all. Nobody has a habit of
+going there, so a room bought for its own sake pays for itself only on the
+nights its owner pays for a band. That may be exactly what a burlesque is, but
+it means the purchase is a treadmill rather than a holding, and it is the next
+question worth asking about that address.
