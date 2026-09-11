@@ -195,14 +195,26 @@ export function drumFaces(strip: Reel[], line: string[], pulled: boolean): strin
 // are decided before a pixel moves — nothing is picked here, and nothing snaps
 // at the end, which is the fault this machine had before the shake.
 //
-// Walked from a different offset on each drum so three drums do not turn
-// through the same symbols in step.
+// What travels past is the strip itself, in the order it is painted on the
+// drum, and started from a different place on each one so three drums do not
+// turn through the same symbols in step.
+//
+// It used to be an arithmetic sequence, `stops[(n * 7 + i * 5 + 1) % len]`,
+// which is only a strip if the stride and the strip's length share no factor.
+// This machine has seven faces and the stride was seven, so `n * 7 % 7` is zero
+// for every n and each drum turned past one symbol repeated twenty times. The
+// column moved and nothing scrolled through the items, which is half of the
+// fault this function was written to fix.
 export function drumRun(strip: Reel[], window: string[], i: number, turns: number): string[] {
   const stops = strip.map(s => s.face);
   if (stops.length === 0) return window;
+  // Behind the window is the strip coming up to it, so the drum is walked
+  // backwards from where it lands.
+  let at = Math.max(0, stops.indexOf(window[0])) - i;
   const out = [...window];
   for (let n = 0; n < turns; n++) {
-    out.push(stops[(n * 7 + i * 5 + 1) % stops.length]);
+    at = (((at - 1) % stops.length) + stops.length) % stops.length;
+    out.push(stops[at]);
   }
   return out;
 }

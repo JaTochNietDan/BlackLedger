@@ -11332,3 +11332,33 @@ file already warns is worthless. A command needs both a `request_id` of at least
 eight characters and the current `revision`; without them the server answers 409
 and the command path is never touched at all. Curling it properly this tick:
 0 panics.
+
+## A drum that turned, past one symbol, twenty times
+
+The slots item in the inbox has two halves. The drums used to shake on the spot
+with the result already showing; that was fixed, and there is a guard on the CSS
+asking that the column travel rather than tremble. It passes. The other half —
+"it should scroll through the items" — was still broken, and no test asked.
+
+Behind the three faces a drum lands on sits a run of the strip for it to travel
+past, and that run was `stops[(n * 7 + i * 5 + 1) % stops.length]`. An
+arithmetic sequence is only a strip if the stride and the length share no
+factor. `core/slots.go` carries seven faces. The stride was seven. So `n * 7 % 7`
+is zero for every n, and each drum spun a solid column of one symbol: BAR twenty
+times on the first drum, CHERRY on the second, ORANGE on the third.
+
+The guard that existed asked whether the three drums showed the same symbols as
+*each other*. They did not, because the `i * 5` term still separated them. It
+never asked whether one drum showed anything but itself — the same too-narrow
+shape this file has now recorded several times, where a measure of the
+difference between things passes while each thing is constant.
+
+The run is the strip now, walked backwards from where the drum lands, one face
+apart per drum so the three stay out of step. Two guards: the machine's own
+seven faces, and every strip length from two to twenty-four, because the fault
+is invisible at any length coprime with the old stride and a strip of six or
+fourteen would bring it straight back. Both fail on the old code, at one face of
+seven.
+
+What no test here can say is whether the travel *looks* right — speed, easing,
+whether it reads as a machine. That needs eyes and is written up as such.

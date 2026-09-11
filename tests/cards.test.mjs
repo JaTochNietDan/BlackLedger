@@ -247,3 +247,52 @@ test('the run is painted by the same ids as the faces', () => {
     assert.equal(ids[i], want ? want.id : '', 'the drum is painted as something it is not');
   });
 });
+
+// A drum has to turn through the strip, not past one symbol twenty times.
+//
+// The run used to be an arithmetic sequence with a stride of seven on a strip
+// of seven faces, so every step landed on the same face and each drum spun a
+// solid column of one symbol. It moved, which is what the guard on the CSS
+// asks, and it did not scroll through the items, which is what was asked for.
+test('a drum turns through the whole strip on its way down', () => {
+  const strip = [
+    {id: 'seven', face: '7', stops: 1, pays: 100},
+    {id: 'bar', face: 'BAR', stops: 2, pays: 50},
+    {id: 'bell', face: 'BELL', stops: 3, pays: 25},
+    {id: 'plum', face: 'PLUM', stops: 4, pays: 14},
+    {id: 'orange', face: 'ORANGE', stops: 4, pays: 12},
+    {id: 'lemon', face: 'LEMON', stops: 4, pays: 10},
+    {id: 'cherry', face: 'CHERRY', stops: 2, pays: 25},
+  ];
+  const window = ['BAR', 'BELL', 'PLUM'];
+  for (let i = 0; i < 3; i++) {
+    const travelled = new Set(drumRun(strip, window, i, 20).slice(window.length));
+    assert.equal(
+      travelled.size,
+      strip.length,
+      `drum ${i} turned past ${travelled.size} of ${strip.length} faces`,
+    );
+  }
+  // And the three are not in step, or the machine turns like one drum.
+  const runs = new Set([0, 1, 2].map(i => drumRun(strip, window, i, 20).join('/')));
+  assert.equal(runs.size, 3, 'the three drums turned through the same symbols together');
+});
+
+// The strip the machine actually carries, rather than one written for a test:
+// the fault above only showed on a strip whose length shared a factor with the
+// stride, and the one in core/slots.go is exactly that strip.
+test('every strip length turns through everything it has', () => {
+  for (let n = 2; n <= 24; n++) {
+    const strip = Array.from({length: n}, (_, k) => ({
+      id: 's' + k,
+      face: 'F' + k,
+      stops: 1,
+      pays: 1,
+    }));
+    const window = [strip[0].face, strip[1].face, strip[0].face];
+    for (let i = 0; i < 3; i++) {
+      const travelled = new Set(drumRun(strip, window, i, n * 2).slice(window.length));
+      assert.equal(travelled.size, n, `a strip of ${n} turned past ${travelled.size} faces`);
+    }
+  }
+});
