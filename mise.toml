@@ -83,7 +83,7 @@ description = "The full race-detector run"
 run = "go test -race ./core/ ./store/ ./sim/ ./cmd/blackledger/ -count=1"
 
 [tasks.simulate]
-description = "Headless campaigns at scale, with the seven-strategy baseline printed"
+description = "Headless campaigns at scale, with the balance baseline printed"
 run = """
 set -e
 go run ./cmd/simulate > .runtime/sim.json

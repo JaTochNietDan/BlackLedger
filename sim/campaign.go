@@ -58,6 +58,12 @@ type View struct {
 	Locations      []Place        `json:"locations"`
 	Event          *Event         `json:"event"`
 	District       int            `json:"district"`
+	// What this campaign has already done, so a policy can prefer what it has
+	// not. Only the magpie reads them; they are filled in the run loop rather
+	// than by Public, because they are a fact about the run and not about the
+	// world.
+	Tried map[string]int `json:"-"`
+	Stood map[string]int `json:"-"`
 }
 type Step struct {
 	Number  int          `json:"number"`
@@ -427,6 +433,92 @@ func Choose(v View, strategy string) (core.Command, error) {
 			}
 		}
 	}
+	// violent is the handful of things that get somebody killed. Named here rather
+	// than guessed at, because a policy that avoids anything that sounds dangerous
+	// would avoid most of the game.
+	var violent = map[string]bool{
+		"mug": true, "strike": true, "charge": true, "plant": true,
+		"sabotage": true, "provoke": true, "takeover": true, "rob": true,
+		"rob:crew": true, "dockwork": false,
+	}
+
+	// The magpie takes whatever it has taken least.
+	//
+	// Every other policy here is a person with a plan, and between the eight of
+	// them they exercise 78 of the game's 116 kinds of action. Ninety-four kinds
+	// were never taken by any of eight hundred campaigns — which does not mean
+	// they are unreachable, it means no policy was written to want them, and
+	// every balance figure this harness has ever printed was silent about all
+	// of them. A window at a pawnbroker, a boat at a pier, a night at a room you
+	// host and a meeting between two families had all been added and priced
+	// without one campaign ever touching them.
+	//
+	// So this one has no plan. It looks at everything offered in the room it is
+	// standing in, takes whichever it has taken fewest times, and walks
+	// somewhere else when the room is exhausted. It plays badly on purpose: the
+	// point is coverage, not a score, and its cash column should be read as
+	// what happens to somebody who does everything once rather than as a
+	// strategy anybody would follow.
+	if strategy == "magpie" {
+		// Poor first, curious second.
+		//
+		// The first version of this only ever took whatever it had taken least
+		// in the room it was standing in, and it starved: with no income
+		// everything with a price on it is refused, so the only cards left
+		// offered were the free ones and eight runs reached six kinds of thing
+		// — fewer than the eight policies with plans. A policy that means to
+		// see the whole game has to be able to afford the whole game.
+		if v.Player.Cash < 400 {
+			if c, ok := v.at("docks", "dockwork"); ok {
+				return c, nil
+			}
+		}
+		best, fewest := "", 0
+		here := v.place(v.Player.Location)
+		for _, a := range here.Actions {
+			if a.Disabled || a.ID == "travel" {
+				continue
+			}
+			// Not the ones that end the run or undo the point of it.
+			if a.ID == "rest" && v.Player.Health > 92 {
+				continue
+			}
+			// Curious, not suicidal. Taking every attempt on a person the
+			// moment it was offered gave this a median life of a day and a
+			// half, which explores nothing: it reached nine kinds of action
+			// nobody else reached and then died before it could reach a tenth.
+			// It will still do all of them — it simply waits until it is in a
+			// condition to survive them.
+			if violent[a.ID] && v.Player.Health < 100 {
+				continue
+			}
+			if n := v.Tried[a.ID]; best == "" || n < fewest {
+				best, fewest = a.ID, n
+			}
+		}
+		if best != "" {
+			c, ok := v.action(v.Player.Location, best)
+			if ok {
+				return c, nil
+			}
+		}
+		// Nothing left here that it has not done. Somewhere else, and the place
+		// it has stood in least.
+		where, stood := "", 0
+		for _, p := range v.Locations {
+			if p.ID == v.Player.Location || p.Locked {
+				continue
+			}
+			if n := v.Stood[p.ID]; where == "" || n < stood {
+				where, stood = p.ID, n
+			}
+		}
+		if where != "" {
+			if c, ok := v.at(where, "travel"); ok {
+				return c, nil
+			}
+		}
+	}
 	// The publican runs the businesses rather than only buying them. Twelve
 	// ticks of work — hiring, the wage, putting somebody in charge, restocking,
 	// the people who walk out and the families who come for them — reached no
@@ -648,6 +740,7 @@ func RunRecorded(seed uint32, strategy, director string, limit int, trace bool, 
 	start := w.Minute
 	nextOffer := start + 240
 	cursor := 0
+	stood := map[string]int{}
 	for i := 0; i < limit && w.Player.Alive; i++ {
 		// This is a deterministic test provider, not the real AI director. It uses the same validator.
 		if (director == "fixture" || (director == "replay" && cursor < len(corpus))) && w.Minute >= nextOffer && w.Event == nil && len(w.Offers) == 0 {
@@ -668,6 +761,7 @@ func RunRecorded(seed uint32, strategy, director string, limit int, trace bool, 
 			nextOffer = w.Minute + 240
 		}
 		v := Public(w)
+		v.Tried, v.Stood = r.Actions, stood
 		c, err := Choose(v, strategy)
 		if err != nil {
 			r.Error = err.Error()
@@ -676,6 +770,7 @@ func RunRecorded(seed uint32, strategy, director string, limit int, trace bool, 
 		if trace {
 			r.Trace = append(r.Trace, Step{i + 1, w.Minute, w.Player.Cash, w.Player.Health, c})
 		}
+		stood[w.Player.Location]++
 		n, err := core.Execute(w, c)
 		if err != nil {
 			r.Error = fmt.Sprintf("command %d %s: %v", i+1, c.Kind, err)

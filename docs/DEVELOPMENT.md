@@ -10315,3 +10315,47 @@ So the count is pinned at forty-one. A conversion drops it and the failure says
 what to check: whether the handler still calls `Pay`. Raising the pin is how a
 new self-paying action gets added, and lowering it is a question rather than a
 formality.
+
+## What the harness was never playing
+
+Every balance figure this project prints comes out of the simulated campaigns,
+so anything the campaigns never do has never been priced. Counted across the
+eight hundred runs of the last baseline: the eight policies took 78 of the
+game's 116 kinds of action, and ninety-four kinds were never touched by any of
+them.
+
+That does not mean they are unreachable. It means nobody wrote a policy that
+wanted them. The difference matters, because the window at the pawnbroker, the
+boat at the pier, a night at a room you host and a meeting between two families
+were all built this session and had their cash columns read after every change,
+and not one campaign ever took any of them. Those numbers were honest about what
+they measured and silent about what had just been added.
+
+So there is a ninth policy with no plan. The magpie works the docks until it can
+afford to be curious, then takes whichever card in the room it has taken fewest
+times, and moves on when the room has nothing new in it.
+
+It took two corrections, both from measuring rather than reasoning:
+
+**It starved.** The first version only ever took what it had taken least, and
+with no income everything with a price on it is refused — so the only cards left
+were the free ones and it reached six kinds of thing, fewer than the policies
+with plans. A policy meant to see the whole game has to be able to afford the
+whole game.
+
+**It died in a day and a half.** Taking every attempt on a person the moment it
+was offered gave it a median life of 1.4 game days, which explores nothing. It
+still does all of them; it waits until it is in a condition to survive them. That
+raised the median to 2.2 days and the action ids it reaches from 28 to 45.
+Further tuning stopped buying much, so it stopped.
+
+It is short-lived and dies in nearly every run, which is stated rather than
+hidden: its cash column reads $432 and should be read as what happens to
+somebody who does everything once, not as a strategy. What it is worth is
+breadth in the early game — nine kinds of action nothing else here ever took,
+among them buying arms, paying a bribe, lending money, fitting out a home, and
+sitting through an audience.
+
+The breadth is pinned at twenty-nine kinds. A drop means a policy stopped
+reaching, which is how a whole area of the game goes unpriced without anybody
+noticing — which is precisely what had already happened.
