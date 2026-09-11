@@ -9223,3 +9223,25 @@ it on the line.
 Two refusals in the playtest that were correct and read as faults until they
 were chased: travel to a locked district, and no way to pick your money up in
 the middle of a hand. Both are the game saying no for a good reason.
+
+## Reading the city back
+
+"Against your a pair" was found by eye, on a felt, in a playtest. There are
+fourteen hundred sentences in this city and nobody is going to read them all
+twice, so this reads them instead: every label, every detail, every refusal and
+every room's note, looked over for the family of defect that one belonged to.
+
+A format verb that was never filled. An article doubled onto a name. Two spaces.
+A space before a full stop. A negative figure written as a price. A sentence
+that starts in the middle. 1,483 sentences read, none of them malformed.
+
+A sweep that finds nothing is either a clean city or a broken reader, and there
+is no way to tell those apart from the outside — so the reader is shown one of
+each defect first, and a handful of ordinary sentences it must not cry wolf
+over. "Buy a used Ford" was the only thing the first draft flagged, on a rule
+about articles before vowels that is wrong about English, and that rule is gone.
+
+Injecting a doubled article into a real card fails the sweep in every room that
+offers it. Injecting an unfilled format verb cannot be done that way at all: the
+compiler's own vet catches it before a test can run, which is a better guard
+than this one and worth knowing about.
