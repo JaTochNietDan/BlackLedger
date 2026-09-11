@@ -38,12 +38,22 @@ the decision. The difference is not a correction, it is the opposite answer:
 `delegate` is the best rate a publican has at $3.24 a minute, because the round
 costs the crew two hours and the player fifteen minutes.
 
-What is still unattributed is the felt. A bet and its settlement are separate
-commands, so `play` reads as the worst rate in the game and `stand` as the best.
-They net out — across eight hundred and twenty commands at the tables the house
-keeps about sixty cents a command net of ambient income, break-even within
-variance — but the two halves are not joined up here. Anything else that decides
-now and pays later will read as free until the trace says otherwise.
+**The felt.** A stake leaves on one command and comes back on another, so read
+separately the two halves were the worst and the best rates in the whole table
+and neither was a thing anybody decides. What a player decides is to gamble, and
+the rest is how a hand is played, so they are reported as one row per game.
+Joined up, all four read between eleven and fifty-one cents a minute against the
+player — which is what a house edge looks like, and is the first time this
+project could see one.
+
+Worth noticing in passing: the dice are the worst of the four by the minute, and
+the core says in its own words that the pass line keeps about 1.4 in a hundred
+and is "the best price in the building". Both are true. A house edge and what an
+hour at that table costs you are different questions, and only the second one is
+about how you spend an evening.
+
+Anything else in this game that decides now and pays later will still read as
+free until the trace carries it.
 """
 
 import collections
@@ -58,6 +68,29 @@ FLOOR = 40
 # landed on and given to the one that sent for it.
 DEFERRED = "delegate"
 
+# The felt. A stake leaves on one command and comes back on another, so read
+# separately the halves are the worst and the best rates in the game and neither
+# is a thing anybody decides. What a player decides is to gamble; the rest is
+# how a hand is played. They are reported as one row.
+FELT = {
+    "play": "cards",
+    "hit": "cards",
+    "stand": "cards",
+    "draw": "cards",
+    "cards": "cards",
+    "deal": "cards",
+    "call": "cards",
+    "fold": "cards",
+    "bet": "cards",
+    "sit": "cards",
+    "cashout": "cards",
+    "sit_out": "cards",
+    "wheel": "the wheel",
+    "dice": "the dice",
+    "roll": "the dice",
+    "pull": "the machines",
+}
+
 
 def main():
     runs = json.load(open(sys.argv[1]))["campaigns"]
@@ -68,6 +101,7 @@ def main():
         trace = r.get("trace") or []
         for a, b in zip(trace, trace[1:]):
             kind = (a["command"].get("kind") or "").split(":")[0]
+            kind = FELT.get(kind, kind)
             minutes = b["minute"] - a["minute"]
             if minutes <= 0:
                 continue

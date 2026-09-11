@@ -10853,3 +10853,34 @@ What is still unjoined is the felt: a bet and its settlement remain two commands
 and the tool says so rather than guessing. Anything else in this game that
 decides now and pays later will read as free until the trace carries it, which
 is the shape of fix this tick demonstrates rather than finishes.
+
+## The house edge, visible for the first time
+
+The last thing the rates table could not see was the felt. A stake leaves on one
+command and comes back on another, so `stand` read as the best rate in the game
+at $11.32 a minute and `play` as one of the worst. Both were the same artefact
+seen from either end, and neither is a thing anybody decides: what a player
+decides is to gamble, and the rest is how a hand is played.
+
+Reported as one row per game, all four read as small negatives:
+
+| | $/min against the player | commands |
+|---|---|---|
+| the machines | 0.11 | 116 |
+| the wheel | 0.15 | 114 |
+| cards | 0.22 | 453 |
+| the dice | 0.51 | 181 |
+
+That is what a house edge looks like, and it is the first time this project has
+been able to see one rather than infer it from the code.
+
+One thing worth noticing from it. The dice are the worst of the four by the
+minute, and `core/citygame.go` says in its own words that the pass line keeps
+about 1.4 in a hundred, "the best price in the building". Both are true. The
+house's edge and what an hour at that table costs a player are different
+questions, and only the second is about how somebody spends an evening.
+
+The top of the table is unchanged by any of this, which matters: mugging at $5.04
+a minute, robbing at $3.58 and stripping a car at $3.21 still lead it, so the
+headline that crime pays about six times honest work by the minute survived
+every correction made to the instrument that produced it.
