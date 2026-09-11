@@ -8984,3 +8984,46 @@ that goes past the window is painted by the same id as the ones it stops on.
 One existing guard had to be re-spelled rather than reverted: it asked the case
 to look up `painted[i][at]`, and the drum now paints the whole run it travels
 rather than only the three it stops on.
+
+## Fourteen painted fronts nobody could see, and one door too many
+
+Reported: "a lot of the building previews are empty in the addresses view."
+
+Twenty-one fronts had been painted and seven of them were named in a list in the
+view. The other fourteen sat on disk while the address book drew a wireframe box
+over them — the pictures existed the whole time. A list of ids written by hand
+beside the files it describes is the same fault as a content table written for
+the smaller city, so the list is the files now: `public/art/fronts.json`, and a
+guard holding the manifest, the pictures and the city's addresses together. No
+address in this city is short of art; twenty-one of twenty-six have a painted
+front and the rest are models or previews.
+
+Reported in the same breath: "why is there 'Go through to the back room' and
+'Buy into the game in the back room'? Seems like only one of those should exist
+right?" Two doors into the same room. Going through is how you get in, and what
+you put on the table is named at the table, the way the casino works. Two guards
+that assumed both doors were updated with the reason.
+
+## The drums, again
+
+"The drums are not animated at all they are fuked lol." Two faults, both mine,
+and the second is the one that made it look broken.
+
+The animation was a transition, which has to be told where the column is in one
+frame and that it may move in the next. Setting both at once animated the jump
+*back* to the start of the run, so the drum crept a few pixels and stopped. It
+is a keyframe now — the class goes on and it runs, and there is no frame order
+to get wrong.
+
+Then the real one. Two rules in the stylesheet name `.drum`, and the older one
+makes it a centred grid. The new rule set a height, a position and an overflow
+and never said otherwise, so the column of symbols was centred in the window
+rather than hanging from the top of it: the drum rested showing the middle of
+its run instead of the faces it landed on. A guard now reads every `.drum` rule
+and requires the last one to say `display:block`.
+
+Worth writing down: I could not look at this. The browser extension is not
+connected, so both attempts were reasoned rather than seen, and the first one
+shipped broken. A change to how something moves needs eyes on it, and without
+them the honest move is a mechanism with fewer moving parts — which is what the
+keyframe is.

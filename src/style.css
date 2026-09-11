@@ -1125,7 +1125,7 @@ body{height:100%;overflow:hidden;margin:0;background:var(--bg);color:var(--ink);
 .paytable th{text-align:left;font-weight:400;color:#d9d3bd;padding:3px 6px;letter-spacing:.06em}
 .paytable td{text-align:right;color:var(--gold);padding:3px 6px}
 .paytable tr:nth-child(even){background:rgba(255,255,255,.03)}
-@media(prefers-reduced-motion:reduce){.drum-strip{transition:none}.drum.rolling .drum-strip{filter:none}}
+@media(prefers-reduced-motion:reduce){.drum.rolling .drum-strip{animation:none;filter:none}}
 /* The handle is the control. */
 .bandit-handle{position:absolute;right:-16px;top:22px;width:14px;height:104px;border-radius:7px;padding:0;
   border:1px solid #7a5730;background:linear-gradient(#c9a24a,#7a5730);cursor:pointer}
@@ -1263,14 +1263,27 @@ body{height:100%;overflow:hidden;margin:0;background:var(--bg);color:var(--ink);
    final result. Right now they just shake but the result is shown already."
    The column carries the three it lands on and a run of the strip behind them,
    and it travels the run and comes to rest on the three. */
-.drum{height:96px;border-radius:4px;position:relative;
+/* `display:block` on purpose. An older rule above sets the drum to a centred
+   grid, and this one did not say otherwise — so the column of symbols was
+   centred in the window instead of hanging from the top of it, and the drum
+   rested showing the middle of the run rather than the faces it landed on. */
+.drum{height:96px;display:block;border-radius:4px;position:relative;
   background:linear-gradient(#cdc4ad,#f6f1e2 18%,#fffcf2 50%,#f6f1e2 82%,#cdc4ad);color:#241708;
   overflow:hidden;box-shadow:inset 0 8px 12px rgba(0,0,0,.35),inset 0 -8px 12px rgba(0,0,0,.35)}
 /* Slowing into the stop rather than halting at it, which is the difference
-   between a drum and a slideshow. The duration is set per drum on the element,
-   because each one runs longer than the one before it. */
-.drum-strip{display:grid;grid-auto-rows:32px;will-change:transform;
-  transition-property:transform;transition-timing-function:cubic-bezier(.13,.72,.23,1)}
+   between a drum and a slideshow. How far it starts back and how long it takes
+   are set per drum on the element, because each one runs longer than the one
+   before it.
+
+   A keyframe rather than a transition. A transition has to be told where the
+   column is in one frame and that it may move in the next, and getting that
+   order wrong animates the jump back to the start instead of the travelling:
+   the drum crept a few pixels and stopped. An animation needs no such order —
+   the class goes on and it runs. */
+.drum-strip{display:grid;grid-auto-rows:32px;will-change:transform;transform:translateY(0)}
+.drum.rolling .drum-strip{animation-name:drumspin;animation-fill-mode:both;
+  animation-timing-function:cubic-bezier(.16,.62,.24,1)}
+@keyframes drumspin{from{transform:translateY(calc(var(--run) * -1))}to{transform:translateY(0)}}
 .drum .stop{height:32px;display:grid;place-items:center;font:11px var(--serif);letter-spacing:.04em;
   color:#6c6152;border-top:1px solid rgba(0,0,0,.08)}
 .drum .stop:first-child{border-top:0}

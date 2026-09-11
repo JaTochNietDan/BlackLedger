@@ -1327,9 +1327,15 @@ func (w *World) Actions(id string) []Action {
 				add("cashout", "Pick your money up and leave", 10, 0, "",
 					fmt.Sprintf("You take the $%d in front of you off the table. %s played so far.",
 						g.Stack, upper1(plural(g.Hands, "hand", "hands"))))
-			} else {
+			} else if w.Seated == id && w.SeatedTo == Backroom {
+				// Only once the player is through the door. The room offered
+				// both "Go through to the back room" and "Buy into the game in
+				// the back room", which are two doors into the same room:
+				// "seems like only one of those should exist right?" Going
+				// through is how you get in, and what you put on the table is
+				// named at the table, the same way the casino works.
 				buy := w.BackRoomBuyIn(id, 0)
-				asks("cards", "Buy into the game in the back room", 40, 0,
+				asks("cards", "Put money on the table", 40, 0,
 					w.BackRoomReadiness(id, buy),
 					fmt.Sprintf("What you put on the table is what you can lose, and a twentieth of it is the ante — $%d buys in at $%d a hand. You play out of what is in front of you, hand after hand, until you are cleaned out or you pick it up.",
 						buy, w.TableAnteAt(id, buy)))

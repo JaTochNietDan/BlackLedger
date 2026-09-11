@@ -240,7 +240,7 @@ func TestASittingPlayedThroughTheCommands(t *testing.T) {
 // taking it there left the player standing in the room with a hand of cards
 // going on somewhere the screen could not draw: "I set the amount I want to buy
 // in but it just ran a simulation instead of letting me play the game."
-func TestBuyingInSitsYouDown(t *testing.T) {
+func TestThereIsOneWayIntoTheBackRoom(t *testing.T) {
 	t.Parallel()
 	w := New(61)
 	w.Event, w.District = nil, 9
@@ -252,21 +252,54 @@ func TestBuyingInSitsYouDown(t *testing.T) {
 		w.Advance(60)
 		w.Event = nil
 	}
-	// Straight from the room, with no seat taken first.
-	if w.Seated != "" {
-		t.Fatal("the player is already at a table")
+	w.Event = nil
+	// Standing in the room there is a door and nothing else. It used to offer
+	// both "Go through to the back room" and "Buy into the game in the back
+	// room", which are two doors into the same room: "seems like only one of
+	// those should exist right?"
+	door, money := false, false
+	for _, a := range w.Actions("bar") {
+		door = door || a.ID == "sit:"+Backroom
+		money = money || a.ID == "cards"
 	}
-	if err := w.apply(Command{Kind: "cards", Target: "bar", Amount: 600,
-		RequestID: "buyinfromtheroom"}); err != nil {
+	if !door {
+		t.Fatal("there is no way through to the back room")
+	}
+	if money {
+		t.Fatal("the room offers a way through and a way to buy in, which are the same door twice")
+	}
+	// Through the door, the table is where the money goes.
+	if err := w.apply(Command{Kind: "sit:" + Backroom, Target: "bar",
+		RequestID: "throughthedoor"}); err != nil {
 		t.Fatal(err)
 	}
-	if w.Game == nil {
-		t.Fatal("no hand was dealt")
+	if w.Seated != "bar" || w.SeatedTo != Backroom {
+		t.Fatalf("went through the door and ended up at %q %q", w.Seated, w.SeatedTo)
 	}
-	if w.Seated != "bar" {
-		t.Fatalf("money is on the table at the bar and the player is seated at %q", w.Seated)
+	if w.Game != nil {
+		t.Fatal("walking in dealt a hand nobody paid for")
 	}
-	if w.SeatedTo != Backroom {
-		t.Fatalf("the player bought into a card game and is sitting at the %q", w.SeatedTo)
+	found := false
+	for _, a := range w.Actions("bar") {
+		if a.ID == "cards" {
+			found = true
+			if a.Sum == nil {
+				t.Fatal("the table does not let the player say what they are putting on it")
+			}
+		}
+	}
+	if !found {
+		t.Fatal("through the door and there is nothing to put money on")
+	}
+	if err := w.apply(Command{Kind: "cards", Target: "bar", Amount: 600,
+		RequestID: "moneyonthetable"}); err != nil {
+		t.Fatal(err)
+	}
+	if w.Game == nil || w.Game.BuyIn != 600 {
+		t.Fatal("the money did not go on the table")
+	}
+	// And they are still sitting where they were.
+	if w.Seated != "bar" || w.SeatedTo != Backroom {
+		t.Fatalf("putting money down moved the player to %q %q", w.Seated, w.SeatedTo)
 	}
 }

@@ -351,10 +351,20 @@ func TestTheDrumsTravelToWhereTheyStop(t *testing.T) {
 	if holds(style, "@keyframes drumroll") {
 		t.Fatal("the drums still shake on the spot")
 	}
-	if !holds(style, ".drum-strip{") || !holds(style, "transition-property:transform") {
+	if !holds(style, ".drum-strip{") || !holds(style, "@keyframes drumspin{") {
 		t.Fatal("nothing about the drum travels")
 	}
-	if !holds(felt, "transform: `translateY(${-away[i] * DrumStop}px)`") {
+	// A keyframe rather than a transition. A transition has to be told where the
+	// column is in one frame and that it may move in the next, and the wrong
+	// order animates the jump back to the start: the drum crept a few pixels and
+	// stopped — "the drums are not animated at all they are fuked lol".
+	if holds(style, "transition-property:transform;transition-timing-function") {
+		t.Fatal("the drum is back on a transition, which has to be driven in the right frame order")
+	}
+	if !holds(style, "from{transform:translateY(calc(var(--run) * -1))}to{transform:translateY(0)}") {
+		t.Fatal("the column does not travel from the start of its run to its rest")
+	}
+	if !holds(felt, "'--run': `${TurnsADrum * DrumStop}px`") {
 		t.Fatal("the column is not moved by whole stops")
 	}
 	// The stop height in the stylesheet has to match the one the column is
@@ -372,7 +382,25 @@ func TestTheDrumsTravelToWhereTheyStop(t *testing.T) {
 		t.Fatal("the run does not begin with the faces the drum lands on")
 	}
 	// Somebody who has asked for less motion gets none.
-	if !holds(style, "@media(prefers-reduced-motion:reduce){.drum-strip{transition:none}") {
+	if !holds(style, "@media(prefers-reduced-motion:reduce){.drum.rolling .drum-strip{animation:none") {
 		t.Fatal("a player who asked for no motion still gets a spinning drum")
+	}
+}
+
+// Two rules in this stylesheet name the drum, and the first one makes it a
+// centred grid. The second has to say otherwise or the column of symbols is
+// centred in the window rather than hanging from the top of it, and the drum
+// comes to rest showing the middle of its run rather than what it landed on.
+func TestTheDrumIsNotACentredGrid(t *testing.T) {
+	t.Parallel()
+	style := rawSource(t, "src/style.css")
+	rules := regexp.MustCompile(`(?m)^\.drum\{[^}]*`).FindAllString(style, -1)
+	if len(rules) < 2 {
+		t.Skipf("only %d rule names the drum, so nothing can override anything", len(rules))
+	}
+	last := rules[len(rules)-1]
+	if !strings.Contains(last, "display:block") {
+		t.Fatalf("an earlier rule makes the drum a centred grid and the last one does not "+
+			"say otherwise: %q", flat(last))
 	}
 }

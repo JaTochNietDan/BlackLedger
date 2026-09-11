@@ -619,3 +619,67 @@ func TestTheRoomSaysWhoHasTheKeys(t *testing.T) {
 		t.Error("a business run by somebody does not say who")
 	}
 }
+
+// Every address the city has is drawn as something. Twenty-one fronts were
+// painted and seven of them were named in a list in the view, so the other
+// fourteen sat on disk while the address book drew a wireframe box over them:
+// "a lot of the building previews are empty in the addresses view."
+//
+// A list of ids written by hand beside the files it describes is the same fault
+// as a content table written for the smaller city. The list is the files now,
+// and this holds the three of them together: the manifest, the pictures, and
+// the city's own addresses.
+func TestEveryPaintedFrontIsActuallyShown(t *testing.T) {
+	t.Parallel()
+	var manifest []struct {
+		ID   string `json:"id"`
+		File string `json:"file"`
+	}
+	body, err := os.ReadFile("../../public/art/fronts.json")
+	if err != nil {
+		t.Skip("no interface sources beside this build")
+	}
+	if err := json.Unmarshal(body, &manifest); err != nil {
+		t.Fatal(err)
+	}
+	if len(manifest) < 20 {
+		t.Fatalf("the manifest names %d fronts and the city has %d addresses",
+			len(manifest), len(core.Locations))
+	}
+	listed := map[string]bool{}
+	for _, f := range manifest {
+		listed[f.ID] = true
+		// The manifest is relative to /art/, which is how the view reads it.
+		if _, err := os.Stat("../../public/art/" + f.File); err != nil {
+			t.Errorf("the manifest names %q and there is no picture at %s", f.ID, f.File)
+		}
+	}
+	// And nothing painted is left out of it.
+	files, err := filepath.Glob("../../public/art/fronts/front-*.jpg")
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, path := range files {
+		id := strings.TrimSuffix(strings.TrimPrefix(filepath.Base(path), "front-"), "-v1.jpg")
+		if !listed[id] {
+			t.Errorf("%q has a painted front and nothing shows it", id)
+		}
+	}
+	// And the view reads the manifest rather than a list of its own.
+	assets := source(t, "src/cityAssets.ts")
+	if !holds(assets, "import fronts from '../public/art/fronts.json'") {
+		t.Error("the view does not read the painted fronts from the files")
+	}
+	if regexp.MustCompile(`const fronts = \[`).MatchString(assets) {
+		t.Error("the view still keeps its own list of which addresses are painted")
+	}
+	// Every address in the city is drawn as something: a model, a preview, a
+	// painted front, or the wireframe of last resort.
+	drawn := 0
+	for _, l := range core.Locations {
+		if listed[l.ID] {
+			drawn++
+		}
+	}
+	t.Logf("%d of the city's %d addresses have a painted front", drawn, len(core.Locations))
+}

@@ -435,6 +435,12 @@ func TestTheGameCanBePlayedThroughTheSamePathAsEverythingElse(t *testing.T) {
 		}
 		return nil
 	}
+	// Through the door first: the table is only offered to somebody sitting at
+	// it, because the room offering both a way in and a way to buy in was the
+	// same door twice.
+	if err := w.Sit(BackRoom, Backroom); err != nil {
+		t.Fatal(err)
+	}
 	sit := offered("cards")
 	if sit == nil {
 		t.Fatal("the back room offers no game to sit in on")

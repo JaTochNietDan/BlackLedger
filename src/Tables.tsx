@@ -1,4 +1,5 @@
 import {useEffect, useRef, useState} from 'react';
+import type {CSSProperties} from 'react';
 import {playTable} from './sound';
 import {reelArt} from './reels';
 import {
@@ -544,18 +545,13 @@ export function Machine({
   // with the answer already on them; they travel now, and this is how far each
   // one still has to go: TurnsADrum stops back at the moment the handle drops,
   // nought when it has landed.
-  const [away, setAway] = useState([0, 0, 0]);
+
   const seen = useRef(-1);
   useEffect(() => {
     if (!machine.pulled || turn === seen.current) return;
     seen.current = turn;
     if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     setRolling([true, true, true]);
-    // Put the column back to where it starts, then let it travel on the next
-    // frame: a transform that changes in the same frame it is set does not
-    // animate, it jumps.
-    setAway([TurnsADrum, TurnsADrum, TurnsADrum]);
-    const off = requestAnimationFrame(() => setAway([0, 0, 0]));
     playTable('handle');
     const stops = [0, 1, 2].map(i =>
       setTimeout(
@@ -568,10 +564,7 @@ export function Machine({
         700 + i * 450,
       ),
     );
-    return () => {
-      cancelAnimationFrame(off);
-      stops.forEach(clearTimeout);
-    };
+    return () => stops.forEach(clearTimeout);
   }, [turn, machine.pulled]);
 
   // Which of the house's machines you are standing at. A nickel machine and a
@@ -617,12 +610,18 @@ export function Machine({
                 <div key={i} className={'drum' + (rolling[i] ? ' rolling' : '')}>
                   <div
                     className="drum-strip"
-                    style={{
-                      transform: `translateY(${-away[i] * DrumStop}px)`,
-                      // Each drum runs longer than the one before it, which is
-                      // how a machine comes to rest rather than stopping dead.
-                      transitionDuration: rolling[i] ? `${700 + i * 450}ms` : '0ms',
-                    }}
+                    style={
+                      {
+                        // How far back the column starts, and how long it takes
+                        // to arrive. A keyframe rather than a transition,
+                        // because a transition has to be told where the column
+                        // is before it is told it may move — and told in an
+                        // earlier frame, or it animates the wrong move and the
+                        // drum creeps a few pixels and stops.
+                        '--run': `${TurnsADrum * DrumStop}px`,
+                        animationDuration: `${700 + i * 450}ms`,
+                      } as CSSProperties
+                    }
                   >
                     {faces.map((face, at) => {
                       const art = reelArt(ids[at]);
