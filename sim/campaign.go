@@ -1026,6 +1026,18 @@ func Choose(v View, strategy string) (core.Command, error) {
 				return c, nil
 			}
 		}
+		// And somebody to go with them. Moving on a rival's holding is the one
+		// road to promotion anybody can walk without being offered something
+		// first — harm done to whoever your family is at odds with is work done
+		// for them — and it needs a crew. The policy was written with that
+		// branch in it and the branch never fired once, because the ladder that
+		// recruits sits at the bottom of this function and everything above it
+		// matched first.
+		if len(v.Player.Crew) == 0 && v.Player.Cash >= 200 {
+			if c, ok := v.at("bar", "recruit"); ok {
+				return c, nil
+			}
+		}
 		// The chair, once there is one to take.
 		if c, ok := v.action(v.Player.Location, "takeover"); ok {
 			return c, nil
@@ -1097,11 +1109,19 @@ func Choose(v View, strategy string) (core.Command, error) {
 		// And the work itself: harm done to whoever they are at odds with is
 		// work done for them, which is the only road anybody walks without
 		// being offered something first.
-		for _, p := range v.Locations {
-			for _, a := range p.Actions {
-				if a.ID == "sabotage" && !a.Disabled {
-					if c, ok := v.at(p.ID, a.ID); ok {
-						return c, nil
+		//
+		// Only once somebody is actually answering to a family, in one piece,
+		// and not every hour. Unconditional it fired a hundred and eighty-seven
+		// times in a hundred campaigns and killed every single one of them —
+		// walking into a rival's holding is not a way to pass an afternoon, and
+		// doing it for nobody earns nothing at all.
+		if v.Player.Serves != "" && v.Player.Health >= 70 && v.Minute%360 < 60 {
+			for _, p := range v.Locations {
+				for _, a := range p.Actions {
+					if a.ID == "sabotage" && !a.Disabled {
+						if c, ok := v.at(p.ID, a.ID); ok {
+							return c, nil
+						}
 					}
 				}
 			}

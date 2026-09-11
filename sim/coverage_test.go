@@ -71,7 +71,11 @@ import "testing"
 // move on a rival's holding — are the rarest things any policy does, a handful
 // of times in a hundred campaigns each, and at four seeds a policy they sit on
 // the edge of being sampled at all rather than having become unreachable.
-const kindsTheHarnessPlays = 97
+// Ninety-eight once the soldier had a crew to go with. At eight seeds a policy
+// rather than four the figure is 105, and only two kinds are genuinely never
+// played — moving on a rival's holding and weighing a car in — so this pin is a
+// floor on a narrow sample rather than a measure of what the harness can reach.
+const kindsTheHarnessPlays = 98
 
 func TestTheHarnessPlaysEnoughOfTheGame(t *testing.T) {
 	t.Parallel()

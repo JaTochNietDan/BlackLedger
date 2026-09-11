@@ -12706,3 +12706,36 @@ a rival's holding — each a handful of times in a hundred campaigns, and at fou
 seeds a policy they sit on the edge of being sampled rather than having become
 unreachable. Said as a caveat rather than buried, because a coverage number that
 moves by three is not the same kind of evidence as one that moves by thirty-three.
+
+## Somebody to go with
+
+Last night's three lost kinds were called sampling noise, and checking that was
+this tick's first job: at eight seeds a policy rather than four the harness
+reaches **105 kinds** and only two are genuinely never played — moving on a
+rival's holding, and weighing a car in at a yard. The claim held.
+
+Moving on a holding is the one that matters. It is the only road to promotion
+anybody can walk without being offered something first: harm done to whoever
+your family is at odds with is work done for them. The soldier was written with
+that branch in it **and the branch had never fired once**, because it needs a
+crew and the ladder that recruits sits at the bottom of the harness, under
+everything that matched first. The same fault as the home and the guard, two
+nights running, in the same policy.
+
+Giving it somebody to go with fired the branch a hundred and eighty-seven times
+and killed **every single campaign** — walking into a rival's holding is not a
+way to pass an afternoon, and doing it for nobody earns nothing at all. Gated on
+actually answering to a family, being in one piece, and an hour in six:
+
+| | before | with a crew | gated |
+|---|---|---|---|
+| survived | 31 of 100 | 0 of 100 | **80 of 100** |
+| median cash | $23,447 | $180 | $13,406 |
+
+The crew is what did that. A man with a home, a guard and somebody beside him
+survives four campaigns in five where he used to survive one in three.
+
+Moving on a holding is still never played, and the reason is worth stating
+plainly rather than counting as solved: it is gated behind going to work for a
+family, which happens five times in a hundred campaigns. The road exists, the
+harness can now walk it, and almost nobody gets far enough to.
