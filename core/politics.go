@@ -5,6 +5,15 @@ import (
 	"sort"
 )
 
+const (
+	// PressureFloor is the least a family will take for an understanding about
+	// a business, and what the demand used to be for every business in the
+	// city whatever it earned.
+	PressureFloor = 60
+	// PressureCeiling is the most. A claim on one shop is a claim on one shop.
+	PressureCeiling = 220
+)
+
 // BusinessPressure is an authored political decision grounded in current ownership.
 // The schedule is private; the player sees only the delivered demand.
 func (w *World) BusinessPressure() {
@@ -65,12 +74,35 @@ func (w *World) BusinessPressure() {
 		rival = f
 	}
 	w.Event = &Scene{ID: ID(), Kind: "business_pressure", Source: "authored", Minute: w.Minute, Speaker: speaker, Actor: f.ID, Target: target.ID, Title: "A claim on your earnings", Body: fmt.Sprintf("“%s is doing business under your name now. My people expect a share. Pay for an understanding, or explain why I should tolerate a competitor.”", target.Name), Choices: []Choice{
-		{ID: "pay", Label: "Pay $60 for an understanding", Cost: 60, Detail: "Improves this family's standing by 12. Postpones the next demand; existing personal threats remain."},
+		{ID: "pay", Label: fmt.Sprintf("Pay $%d for an understanding", w.TheirShare(target.ID)), Cost: w.TheirShare(target.ID),
+			Detail: fmt.Sprintf("A week of what %s takes. Improves this family's standing by 12. Postpones the next demand; existing personal threats remain.", target.Name)},
 		{ID: "resist", Label: "Refuse their claim", Detail: "Gain 2 respect; lose 20 standing. The family may retaliate against your business. Repeated defiance can put your life at risk."},
 		{ID: "ally", Label: "Seek backing from " + rival.Name, Cost: 35, Detail: "Pay $35 for an introduction. Gain 12 standing with their rival; lose 12 with this family. Business retaliation remains possible; a deepening feud can also put your life at risk."},
 	}}
 	w.Log("A family wants a share", f.Name+" has delivered a demand concerning "+target.Name+".", "politics")
 }
+
+// TheirShare is what a family wants for an understanding about one business.
+//
+// It was sixty dollars, flat, whether the place was a two-room laundry or the
+// best casino in the city, and whether you held one address or six. The scene
+// has always said "my people expect a share" and the number was a fee — the
+// same shape of fault as a card that names a dead man: the words describe a
+// rule the code does not have.
+//
+// A week of what the place takes is a share. It is floored at what the demand
+// used to be, so nothing about this makes a family cheaper to deal with, and it
+// is capped, because a claim on one shop is a claim on one shop: a family that
+// could ask for a month of a casino's takings would be running the business
+// rather than leaning on it.
+func (w *World) TheirShare(id string) int {
+	prop := w.Properties[id]
+	if prop == nil {
+		return PressureFloor
+	}
+	return min(PressureCeiling, max(PressureFloor, prop.Income*7))
+}
+
 func (w *World) ResolvePressure(e *Scene, choice string) error {
 	if !w.Own(e.Target) {
 		return fmt.Errorf("the business is no longer yours")
@@ -87,10 +119,11 @@ func (w *World) ResolvePressure(e *Scene, choice string) error {
 	f := &w.Factions[actor]
 	switch choice {
 	case "pay":
-		f.Cash += 60
+		share := w.TheirShare(e.Target)
+		f.Cash += share
 		f.Goodwill = min(100, f.Goodwill+12)
 		w.NextPressure = w.Minute + 1440
-		w.Log("A purchased understanding", "You pay $60 to "+f.Name+". The next business demand is postponed for a day; personal threats are unchanged.", "politics")
+		w.Log("A purchased understanding", fmt.Sprintf("You pay $%d to %s, which is a week of what the place takes. The next business demand is postponed for a day; personal threats are unchanged.", share, f.Name), "politics")
 	case "resist", "ally":
 		if choice == "resist" {
 			w.Player.Respect += 2

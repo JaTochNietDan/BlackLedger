@@ -24,6 +24,7 @@ func TestPausedArrangementKeepsTermsAndOnlyRemainingTime(t *testing.T) {
 				t.Fatal("paused job considered complete")
 			}
 			w = w.Clone()
+			paid := w.TheirShare(w.Event.Target)
 			choice(t, &w, "pay")
 			if w.Event == nil || w.Event.Kind != "resume_job" || w.Minute != start+30 {
 				t.Fatal("missing resume decision")
@@ -33,7 +34,10 @@ func TestPausedArrangementKeepsTermsAndOnlyRemainingTime(t *testing.T) {
 			if w.Minute != start+tc.duration || w.SuspendedJob != nil || w.Event != nil || w.Arrangements[0].Status != "completed" {
 				t.Fatal("incorrect resumed completion")
 			}
-			want := 200 - 60 + tc.reward + 14*tc.duration/60
+			// The demand is a week of what the place takes rather than a flat
+			// sixty, so the arithmetic asks the world what was paid instead of
+			// restating a number that has stopped being one.
+			want := 200 - paid + tc.reward + 14*tc.duration/60
 			if w.Player.Cash != want {
 				t.Fatalf("cash %d, want %d", w.Player.Cash, want)
 			}

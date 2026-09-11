@@ -41,7 +41,19 @@ func TestPressurePaymentIsSpecificNotBlanketProtection(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if next.Player.Cash != before-60 || next.Factions[0].Goodwill != 12 || next.NextPressure != next.Minute+1440 || len(next.Plots) != 1 {
+	// A week of what the place takes, rather than a flat sixty for a laundry
+	// and a casino alike. The rest of the rule is unchanged and this still
+	// asserts it: paying buys standing with that family and a day without
+	// another demand, and the plot against the player personally is untouched,
+	// because an understanding about a business is not protection for a man.
+	share := w.TheirShare(w.Event.Target)
+	if share <= 0 {
+		t.Fatalf("the family asked for $%d", share)
+	}
+	if next.Player.Cash != before-share {
+		t.Fatalf("paid $%d where the share is $%d", before-next.Player.Cash, share)
+	}
+	if next.Factions[0].Goodwill != 12 || next.NextPressure != next.Minute+1440 || len(next.Plots) != 1 {
 		t.Fatal("payment rules or personal threat changed")
 	}
 }
@@ -399,5 +411,56 @@ func TestDefensiveContributionReportsActualDamageAvoided(t *testing.T) {
 		if strings.Contains(text, "Leo Carver helped defend") != tc.credited {
 			t.Fatal("incorrect defensive credit", text)
 		}
+	}
+}
+
+// A share is not a fee.
+//
+// The demand was sixty dollars flat — the same for a two-room laundry and the
+// best casino in the city, and the same whether you held one address or six —
+// while the family's own words in the scene are "my people expect a share". A
+// publican who ends a campaign with $27,516 paid nine of those over a month,
+// which is two per cent of what they made and nothing at all to decide about.
+func TestAFamilyAsksForAShareAndNotAFee(t *testing.T) {
+	t.Parallel()
+	w := New(53)
+	w.Event, w.District = nil, 9
+	w.Player.Health, w.Player.Cash = 100, 50000
+
+	// A small place and a big one.
+	small, big := "", ""
+	for _, l := range Locations {
+		prop := w.Properties[l.ID]
+		if prop == nil || prop.Income <= 0 || l.Cost <= 0 {
+			continue
+		}
+		if small == "" || prop.Income < w.Properties[small].Income {
+			small = l.ID
+		}
+		if big == "" || prop.Income > w.Properties[big].Income {
+			big = l.ID
+		}
+	}
+	if small == "" || small == big {
+		t.Fatal("this city has no two businesses of different sizes")
+	}
+	cheap, dear := w.TheirShare(small), w.TheirShare(big)
+	t.Logf("%s earns %d a day and they want $%d; %s earns %d and they want $%d",
+		small, w.Properties[small].Income, cheap, big, w.Properties[big].Income, dear)
+	if cheap >= dear {
+		t.Fatalf("they want $%d for %s and $%d for %s, which is a fee rather than a share",
+			cheap, small, dear, big)
+	}
+	// Never cheaper than the flat demand used to be.
+	if cheap < PressureFloor {
+		t.Fatalf("a family settled for $%d where the old demand was $%d", cheap, PressureFloor)
+	}
+	// And a claim on one shop stays a claim on one shop.
+	if dear > PressureCeiling {
+		t.Fatalf("a family asked $%d for an understanding about a single address", dear)
+	}
+	// Somewhere that earns nothing is still worth the floor to be left alone.
+	if quiet := w.TheirShare("precinct"); quiet != PressureFloor {
+		t.Fatalf("they want $%d about a police station", quiet)
 	}
 }

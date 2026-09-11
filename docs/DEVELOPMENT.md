@@ -10737,3 +10737,49 @@ The baseline task runs at four hundred now and prints days alongside deaths and
 cash, so the length a number was taken at is never invisible again. It costs
 three minutes a run instead of forty seconds, which is the right trade for
 numbers that mean something.
+
+## A share, and a prediction that came true
+
+Two things this tick, both of them consequences of measuring on campaigns long
+enough to see anything.
+
+**The prediction.** A session some time ago found that the harness had never
+seen a business run out of stock — eight hundred campaigns, 1,446 acquisitions,
+zero restocks — worked out that the cause was the horizon rather than the
+policy, wrote the branch anyway and said in the log: "that branch does not fire
+today. It will the day the horizon grows." The horizon grew this morning. Nine
+hundred campaigns at four hundred commands: **95 restocks, 109 hires, 51
+remedies, 88 inspections, 88 launderings**, all of which were zero. The whole
+business layer is being played by the balance harness for the first time, and no
+campaign errors under it.
+
+**A family's claim was a fee.** With the layer finally visible, the publican
+turns out to reach every milestone in ninety-eight campaigns of a hundred, end
+richest at $27,516, and finish with zero police attention and zero seizures.
+Nothing in the city ever costs it anything. It is pressured often enough — 910
+demands across a hundred campaigns, about nine each — and pays every one, and
+the demand is sixty dollars.
+
+Sixty dollars flat, for a two-room laundry and for the best casino in the city
+alike, and the same whether you hold one address or six. Nine of them over a
+month is two per cent of what that campaign made: not a decision, a rounding.
+Meanwhile the scene's own words have always been "my people expect a share".
+That is the same fault shape as a card naming a dead man — the prose describes a
+rule the code does not have — and it is the seventh instance of it this session.
+
+A week of what the place takes is a share. Floored at the old sixty, so no
+family is cheaper to deal with than before, and capped at $220, because a claim
+on one shop is a claim on one shop and a family asking for a month of a casino's
+takings would be running it rather than leaning on it. A laundry earning $14 a
+day is worth $98; a haulage yard at $40 a day is worth the cap.
+
+It costs the holders about five per cent of their final cash instead of two —
+the publican $27,516 to $26,087, the investor $20,069 to $19,329. Directional
+rather than dramatic, which is what a floored and capped share should be. Three
+rules, three breaks, three failures.
+
+**And one campaign in nine hundred that had nothing to do.** A policy taken in
+and held ended with "no policy action at precinct": it cannot walk to the bar or
+the pier from a cell, and every rule above that had nothing to say. A cell has
+things to do in it. The last resort is now whatever the room offers, which is
+what a person in one would do.

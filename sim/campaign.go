@@ -878,6 +878,22 @@ func Choose(v View, strategy string) (core.Command, error) {
 	if c, ok := v.at(v.earn()); ok {
 		return c, nil
 	}
+	// Whatever this room offers, rather than nothing at all.
+	//
+	// One campaign in nine hundred ended with "no policy action at precinct": a
+	// policy taken in and held has no ladder to climb and cannot walk to the
+	// bar or the pier, so every rule above this had nothing to say and the run
+	// stopped. A cell has things to do in it — sit the sentence out, talk, send
+	// for a lawyer — and a policy that will not do any of them is a hole in the
+	// harness rather than a fact about the game.
+	for _, a := range v.place(v.Player.Location).Actions {
+		if a.Disabled || a.ID == "travel" {
+			continue
+		}
+		if c, ok := v.action(v.Player.Location, a.ID); ok {
+			return c, nil
+		}
+	}
 	return core.Command{}, fmt.Errorf("no policy action at %s", v.Player.Location)
 }
 func Run(seed uint32, strategy, director string, limit int, trace bool) Report {
