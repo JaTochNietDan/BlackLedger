@@ -109,6 +109,14 @@ func (w *World) StripCar(location string) error {
 	// of why anybody would hold one.
 	w.PartsAbout(PartsTrade)
 
+	// And if one of those garages is yours, the parts go into it rather than
+	// only into the trade. A bench lives on parts, the player was tearing them
+	// off a car in the street, and the only thing that ever happened to them
+	// was a figure in the log: every garage in the city got a little busier,
+	// yours included, and yours still had to be restocked for cash. Same
+	// distance between two halves as a still and a bar.
+	onTheBench := w.OntoTheBench()
+
 	// Nobody takes one car apart in a quiet street and leaves the rest of the
 	// row untouched. What is still there in the morning is still there with the
 	// glass out of it, and that is a garage's actual trade.
@@ -118,6 +126,12 @@ func (w *World) StripCar(location string) error {
 	w.Log(label+" in pieces at "+place.Name,
 		fmt.Sprintf("%s's car went for parts. $%d for the night's work, and %s will know by morning that it was somebody.",
 			mark.Name, worth, mark.Name), "danger")
+	if onTheBench != "" {
+		bench, _ := PlaceByID(onTheBench)
+		w.Log("Parts onto the bench at "+bench.Name,
+			fmt.Sprintf("What came off it went into your own store rather than somebody else's. %s is stocked to %d.",
+				bench.Name, w.Properties[onTheBench].Supply), "business")
+	}
 	if glass > 0 {
 		w.Log("Glass in the road at "+place.Name,
 			fmt.Sprintf("%s in the street were gone through and left where they stood. Somebody will be paid to put them right.", plural(glass, "more car", "more cars")), "danger")
@@ -125,6 +139,56 @@ func (w *World) StripCar(location string) error {
 	w.Report("theft", "CAR STRIPPED IN "+upper(place.Name),
 		w.unattributed(place.Name, fmt.Sprintf("A car was taken apart in the street at %s overnight. Garages in the district report no shortage of work.", place.Name)))
 	return nil
+}
+
+// PartsHaul is how much of a garage's store one car off the street fills. A
+// full restock is forty, so three cars is a bench kept running on nothing but
+// what the city was parking in the street.
+const PartsHaul = 14
+
+// TradeRestockAmount is how full a trade's store goes when it is filled, for a
+// card that has to say so before anybody presses it.
+func TradeRestockAmount(kind string) int {
+	trade, ok := trades[kind]
+	if !ok {
+		return 0
+	}
+	return trade.RestockAmount
+}
+
+// TheThinnestBench is the garage of the player's with the least on its shelves
+// and room for more, or "" if they hold none that needs anything. Parts go
+// where they are needed rather than where there is room.
+func (w *World) TheThinnestBench() string {
+	full := TradeRestockAmount("garage")
+	if full == 0 {
+		return ""
+	}
+	bench := ""
+	for _, l := range Locations {
+		if l.Kind != "garage" || !w.Own(l.ID) {
+			continue
+		}
+		prop := w.Properties[l.ID]
+		if prop == nil || prop.Supply >= full {
+			continue
+		}
+		if bench == "" || prop.Supply < w.Properties[bench].Supply {
+			bench = l.ID
+		}
+	}
+	return bench
+}
+
+// OntoTheBench puts what came off a car into that garage, and names it.
+func (w *World) OntoTheBench() string {
+	bench := w.TheThinnestBench()
+	if bench == "" {
+		return ""
+	}
+	full := TradeRestockAmount("garage")
+	w.Properties[bench].Supply = min(full, w.Properties[bench].Supply+PartsHaul)
+	return bench
 }
 
 // PartsAbout is what more cars going to pieces does to the trades that live off

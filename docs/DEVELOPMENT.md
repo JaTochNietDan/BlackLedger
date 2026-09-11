@@ -11737,3 +11737,32 @@ three nights all passed on the new card without being touched — its sentence
 reads, it takes no money it does not name, it spends the half hour it says, and
 it works when pressed. That is the first new thing built since they existed, and
 they covered it the moment it landed.
+
+## The other end of a car in pieces
+
+Last night's link — a still filling a bar of your own — was found by asking what
+the player produces that only a stranger will buy. The same question asked twice
+gives the same answer in a different trade.
+
+A bench lives on parts. The player tears them off a car in the street at night,
+and what happened to them was a figure in the log and a nudge to every garage in
+the city's custom. *Every* garage, which includes the ones belonging to whoever
+the player is at war with. A garage of their own still had to be restocked for
+cash, off exactly the shelves those parts should have gone onto.
+
+They go onto the bench now, at whichever garage of the player's has the least on
+it — parts go where they are needed rather than where there is room. Fourteen of
+the forty a full store holds, so three cars keeps a bench running on nothing but
+what the city was parking in the street. The card names the garage and how full
+it is before the crowbar comes out, because a player choosing between a night's
+cash and a night's stock needs to know which one they are getting.
+
+Somebody who owns no garage loses nothing. The parts still pay, the trade still
+lifts across the city, and no shelf fills by itself — guarded, because a link
+that quietly changes the game for people who never opted into it is not a link.
+
+Nothing in the simulation moved, and for the same reason as last night: no
+policy owns a garage and strips cars. Two links in two nights that the harness
+cannot price is a thing worth saying out loud rather than burying — the measures
+are silent on both, and what stands behind them is the guard and the reading,
+not the numbers.

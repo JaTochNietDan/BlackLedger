@@ -1554,8 +1554,16 @@ func (w *World) Actions(id string) []Action {
 		}
 	}
 	if mark, ok := w.StripTarget(id); ok {
+		// A bench of the player's that the parts would go onto, said before
+		// the crowbar comes out rather than after.
+		bench := ""
+		if id := w.TheThinnestBench(); id != "" {
+			place, _ := PlaceByID(id)
+			bench = fmt.Sprintf(" What comes off it goes onto the bench at %s, which is stocked to %d of %d.",
+				place.Name, w.Properties[id].Supply, TradeRestockAmount("garage"))
+		}
 		add("strip", "Take "+mark.Name+"'s car apart", 60, 0, w.StripReadiness(id),
-			fmt.Sprintf("$%d for what comes off it. They will be walking, and they will know by morning that it was somebody. Every garage in the city has more work the more of this there is.", w.PartsWorth(mark)))
+			fmt.Sprintf("$%d for what comes off it. They will be walking, and they will know by morning that it was somebody. Every garage in the city has more work the more of this there is.%s", w.PartsWorth(mark), bench))
 	}
 	if mark, ok := w.MuggingTarget(id); ok {
 		// People carry their own money now, so somebody can genuinely have

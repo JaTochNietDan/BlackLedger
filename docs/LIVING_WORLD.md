@@ -763,6 +763,19 @@ creating and I want you to be continuously autonomously creating
 
 ---
 
+A car in pieces and a bench of yours, joined (standing instruction; the inbox is
+empty).
+
+— built: what comes off a car taken apart in the street now goes onto the bench
+  at a garage of yours, the thinnest one first, rather than only paying cash and
+  nudging every garage in the city — rivals' included. The card says which
+  garage and how full it is before the crowbar comes out. Somebody with no
+  garage loses nothing: the parts still pay, the trade still lifts, and no
+  shelf fills by itself. Three cars keeps a bench running on nothing but what
+  the city was parking in the street.
+
+---
+
 A still and a bar, joined (taken from the standing instruction rather than the
 inbox, which is empty).
 
