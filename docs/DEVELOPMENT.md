@@ -10783,3 +10783,41 @@ and held ended with "no policy action at precinct": it cannot walk to the bar or
 the pier from a cell, and every rule above that had nothing to say. A cell has
 things to do in it. The last resort is now whatever the room offers, which is
 what a person in one would do.
+
+## The rates table cannot see money that arrives late
+
+The question was why a publican finishes a campaign with zero police attention
+and zero seizures. The answer is the dull one: it does nothing criminal. Its
+whole command list is delegating, resting, dock work, travelling, hiring, paying
+wages, repairing and buying. Attention in this game is a drag on forgetting
+rather than something a holding generates, so a legitimate operator never
+acquires any to slow the fade of. That is coherent and nothing needs changing.
+
+What the looking turned up instead was a fault in the instrument built two ticks
+ago, and it is worth more than the question was.
+
+Two thirds of a publican's commands are `delegate` and `rest`. Put through the
+rates table, resting pays $0.96 a minute and accounts for $313,065 of the
+policy's money, while delegating pays *minus* six cents a minute and appears to
+do nothing at all. The obvious reading — a publican's economy is sitting still,
+and sending the crew out is pointless — is wrong in both halves.
+
+Sending somebody on collections pays $65, **two hours after the decision**. The
+crew walks a round and the money lands during whatever command happens to be
+running when they get back, which for a policy that rests four hours at a time
+is resting. A publican sends about 140 rounds a campaign; $109,265 of collections
+across twelve campaigns landed while the player was asleep and read as up to 35%
+of what resting appeared to pay.
+
+The table attributes a cash change to whatever command was running when it
+landed. Anything that decides now and pays later reads as free, and whatever is
+running when it pays reads as generous. The gambling rows had the same shape and
+were caught at the time because a bet and its settlement are obviously two
+halves of one thing; collections are not obviously anything, which is why this
+one got as far as a conclusion.
+
+The tool says so now, in its own documentation, with both examples and the
+sentence not to take away from it. That is the eighth time this session a
+measurement has been read as a fact about the game and turned out to be the
+instrument, and the first where the instrument was one built two ticks earlier
+in this same session.

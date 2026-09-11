@@ -25,11 +25,25 @@ the floor here and a hundred runs is what makes it steady. The first version of
 this measurement was read off twelve runs and its top row was a gambling
 outcome.
 
-A note on the tables: a bet and its settlement are separate commands, so
-`play` reads deeply negative and `stand` reads as the best rate in the game.
-They net out. Measured across eight hundred and twenty commands at the tables
-and machines, the house keeps about sixty cents a command net of ambient income,
-which is break-even within variance.
+**It cannot see deferred money, and this matters more than it sounds.** The
+measure attributes a cash change to whatever command was running when it
+landed, and several things in this game pay later than they are decided. Two
+that will mislead anybody reading the table cold:
+
+A bet and its settlement are separate commands, so `play` reads as the worst
+rate in the game and `stand` as the best. They net out — across eight hundred
+and twenty commands at the tables and machines the house keeps about sixty cents
+a command net of ambient income, which is break-even within variance.
+
+Sending somebody on collections pays $65 two hours after the decision, so
+`delegate` reads as costing six cents a minute and doing nothing. A publican
+sends 140 rounds a campaign; $109,265 of collections across twelve campaigns
+landed while the player was asleep and read as up to 35% of what resting
+appeared to pay. "Resting is the publican's economy" is the wrong sentence to
+take away from this table, and it is the one the table says.
+
+So: an action that decides something now and pays for it later reads as free.
+Check what a command actually does before believing its row.
 """
 
 import collections
