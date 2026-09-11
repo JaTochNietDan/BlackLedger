@@ -195,6 +195,8 @@ func (w *World) SpinChips(id string, chips []Chip) error {
 	if err := w.Pay(total); err != nil {
 		return err
 	}
+	// Chips on the cloth is sitting down at it.
+	w.takeASeatFor(id, Floor)
 	// The player is at this table, so this is the player's stream.
 	pocket := int(w.Random() * Pockets)
 	if pocket >= Pockets {

@@ -1008,7 +1008,7 @@ func (w *World) Actions(id string) []Action {
 	case "bar":
 		add("courier", "Carry a discreet envelope", CourierMinutes, 0, "",
 			fmt.Sprintf("Earn $%d and %d respect. A reliable introduction to the neighborhood.", CourierPay, CourierRespect))
-		add("contact", "Buy Mara a coffee", 30, 10, need(p.Contacts >= 5, "Your information network is fully developed"), "Build trust and an information network. Contacts may warn you of trouble.")
+		add("contact", "Buy "+w.RoleName("fixer")+" a coffee", 30, 10, need(p.Contacts >= 5, "Your information network is fully developed"), "Build trust and an information network. Contacts may warn you of trouble.")
 		about(w.HolderID("fixer"))
 		if q, ok := w.OpenQuarrel(); ok {
 			warning := "You would be standing between them."
@@ -2130,7 +2130,7 @@ func (w *World) Advance(minutes int) {
 				plot.Known = true
 				actor := w.factionName(plot.Actor)
 				warning := fmt.Sprintf("%s %s people asking where you sleep.", Leads(actor), Agree(actor, "has", "have"))
-				w.Log("Mara has heard something", warning+" You may have very little time.", "danger")
+				w.Log(w.RoleName("fixer")+" has heard something", warning+" You may have very little time.", "danger")
 				if plot.Due > w.Minute {
 					w.Event = &Scene{ID: "warning-" + plot.ID, Title: "A call worth answering", Body: warning + " I cannot tell you exactly when they will come. Stop what you are doing and think about where you want to be tonight.", Speaker: w.HolderID("fixer"), Kind: "warning", Source: "authored", Minute: w.Minute, Choices: []Choice{{ID: "acknowledge", Label: "Put down the phone and prepare", Detail: "Clock stays paused. You can leave, arrange security or seek an audience. The threat remains."}}}
 					return
@@ -2254,7 +2254,7 @@ func (w *World) OfferIfReady() {
 		e.Source = "authored"
 		w.Event = e
 		w.RememberArrangement(e, "offered")
-		w.Log("A favor with a price", "Mara offers more sensitive work.", "story")
+		w.Log("A favor with a price", w.RoleName("fixer")+" offers more sensitive work.", "story")
 	}
 }
 

@@ -91,7 +91,7 @@ func (w *World) apply(c Command) error {
 		w.Event = nil
 		switch e.Kind {
 		case "warning":
-			w.Log("Time to prepare", "You heed Mara's warning. The threat remains; your next action is yours to choose.", "intel")
+			w.Log("Time to prepare", "You heed "+w.RoleName("fixer")+"'s warning. The threat remains; your next action is yours to choose.", "intel")
 		case "attack":
 			if c.Choice == "bargain" {
 				p.Respect = max(0, p.Respect-5)
@@ -778,7 +778,7 @@ func (w *World) apply(c Command) error {
 					w.Earn(CourierPay)
 					p.Respect += CourierRespect
 					p.JobCount++
-					w.Log("Envelope delivered", fmt.Sprintf("Mara pays $%d. A small favor, completed without questions.", CourierPay), "work")
+					w.Log("Envelope delivered", fmt.Sprintf("%s pays $%d. A small favor, completed without questions.", w.RoleName("fixer"), CourierPay), "work")
 				case "dockwork":
 					w.Earn(75)
 					p.Respect++
@@ -791,7 +791,7 @@ func (w *World) apply(c Command) error {
 					if fixer := w.Holder("fixer"); fixer != nil {
 						fixer.Trust += 5
 					}
-					w.Log("A useful conversation", "Mara will keep an ear open. Your information network improves.", "personal")
+					w.Log("A useful conversation", w.RoleName("fixer")+" will keep an ear open. Your information network improves.", "personal")
 				case "recruit":
 					// Whoever drives. The label and the readiness check were
 					// taught this when it turned out the button was naming a

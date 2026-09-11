@@ -84,6 +84,8 @@ func (w *World) Play(id, stakeID string) error {
 	if err := w.Pay(stake.Amount); err != nil {
 		return err
 	}
+	// Money on the felt is sitting down at it.
+	w.takeASeatFor(id, Floor)
 	house := w.faction(w.Properties[id].Owner)
 
 	// Expected return is under one: the house keeps roughly six percent of

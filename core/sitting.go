@@ -67,6 +67,29 @@ func (w *World) Sit(id, to string) error {
 	return nil
 }
 
+// takeASeatFor is what putting money down does: it sits the player at the thing
+// they are playing. Every game in this city is drawn on a screen the world
+// opens, and the world opens it because somebody is sitting at a table — so a
+// game entered any other way is a game played out of sight.
+//
+// It happened at the back room first, from the buy-in offered in the room's own
+// action list: "I set the amount I want to buy in but it just ran a simulation
+// instead of letting me play the game." The machines and the casino tables had
+// exactly the same hole, reached exactly the same way, and nobody had noticed
+// because the room's own list is not where most people press these.
+//
+// Nothing is done if the player is already sitting at that thing, so a second
+// pull does not clear the drums the first one stopped.
+func (w *World) takeASeatFor(id, to string) {
+	if w.Seated == id && w.SeatedTo == to {
+		return
+	}
+	if w.Player.Location != id {
+		return
+	}
+	_ = w.Sit(id, to)
+}
+
 // RiseReadiness explains why the player cannot get up, or returns "".
 func (w *World) RiseReadiness() string {
 	if w.Hand != nil && !w.Hand.Done {

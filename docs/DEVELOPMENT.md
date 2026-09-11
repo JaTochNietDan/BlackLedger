@@ -8913,3 +8913,24 @@ calling, and a table that folds to everything makes betting a made hand worth
 nothing over checking it. Removing the table's folding does not break it, which
 is worth knowing — betting a made hand pays because they call, not because they
 fold.
+
+## Two things named by name that should have been named by role
+
+Reported: "It still says buy Mara a coffee even though now it's Ivo Costa for me
+since I killed Mara." Ten strings named her — the coffee, the envelope she pays
+for, the warning she brings, the guide, both opportunities, and the second job
+she offers. The role was already filled by whoever holds it and the subject of
+every one of those actions was right the whole time. Only the words were wrong,
+which is the worst way for this to be wrong: the player is told one thing and
+the city does another.
+
+`RoleName` answers who holds a role, and a city with nobody in it says
+"somebody" rather than a dead woman's name. The seed data still names Mara Bell,
+because on the first morning she is the fixer.
+
+And the same shape at the tables, found by looking for it. Putting money down at
+a game did not sit the player at it, so a game entered from the room's own
+action list ran in the world with no screen to draw it — the back room, the
+machines, the felt, the cloth and the dice all had the hole, and only the back
+room had been reported. Money on a table is sitting down at it now, wherever the
+button was pressed, and one guard covers all five.

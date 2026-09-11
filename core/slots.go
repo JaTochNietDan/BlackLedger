@@ -163,6 +163,8 @@ func (w *World) PullHandle(id string, amount int) error {
 	if err := w.Pay(stake.Amount); err != nil {
 		return err
 	}
+	// Standing at the machine is the same decision as putting money in it.
+	w.takeASeatFor(id, Floor)
 	// The player is standing at this machine, so this is the player's stream.
 	stops := [3]int{}
 	for i := range stops {

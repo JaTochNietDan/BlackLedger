@@ -150,6 +150,14 @@ Ensure efficiency of development loops by increasing efficiency of your workflow
 
 ## Inbox — open
 
+What we talked about before, making it so that hidden actions are not hidden anymore, just showed as lower priority in the list (not changing location of sub sections, just putting unavailable actions at the end of the list in each subsection
+
+---
+
+It still says buy Mara a coffee even though now it's Ivo Costa for me since I killed Mara.
+
+---
+
 When playing poker the game should continue until you stop playing, right now it just requires you to leave the table and rejoin. Realistically it feels like it should be more like actual poker, where you have a buy in and whatnot and you play until people go bust or you can leave.
 
 — answered. There is money on the table now: you put a stake in front of you and

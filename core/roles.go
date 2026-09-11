@@ -147,3 +147,23 @@ func (w *World) RoleDescription() []map[string]any {
 	}
 	return out
 }
+
+// RoleName is who holds this role, by name, for every line of prose that used
+// to name the first holder and go on naming them for ever.
+//
+// Reported from the game: "It still says buy Mara a coffee even though now it's
+// Ivo Costa for me since I killed Mara." Ten strings named her: the coffee, the
+// envelope she pays for, the warning she brings, the guide, the opportunities,
+// and the second job she offers. The role was already filled by whoever holds
+// it — the subject of the action was right the whole time — and only the words
+// were wrong, which is the worst way for this to be wrong: the player is told
+// one thing and the city does another.
+//
+// The fallback names nobody, because a city with no fixer in it has nobody to
+// buy a coffee for, and "somebody" is what the room would say.
+func (w *World) RoleName(role string) string {
+	if n := w.Holder(role); n != nil {
+		return n.Name
+	}
+	return "somebody"
+}

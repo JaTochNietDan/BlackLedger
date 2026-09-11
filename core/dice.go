@@ -121,6 +121,8 @@ func (w *World) PlayDice(id, betID string, amount int) error {
 	if err := w.Pay(stake.Amount); err != nil {
 		return err
 	}
+	// Money on the line is sitting down at the table.
+	w.takeASeatFor(id, Floor)
 	w.Dice = &Craps{Place: id, Bet: betID, Down: stake.Amount}
 	w.throw()
 	return nil

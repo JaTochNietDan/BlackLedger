@@ -18,7 +18,7 @@ func (w *World) NextOpportunity() *Opportunity {
 		}
 	}
 	if p.JobCount == 0 {
-		return &Opportunity{"Make your first connection", "Mara has paid work at Saint Agnes. A small job starts your reputation.", "bar"}
+		return &Opportunity{"Make your first connection", w.RoleName("fixer") + " has paid work at Saint Agnes. A small job starts your reputation.", "bar"}
 	}
 	if p.Respect < PremisesRespect {
 		return &Opportunity{"Become a known face", "Earn 6 respect to recruit an associate or establish your first business.", "bar"}
@@ -42,7 +42,7 @@ func (w *World) NextOpportunity() *Opportunity {
 		return &Opportunity{"Bring someone into the fold", hand + " costs $90 to recruit and $12 a day. They can collect money or protect businesses.", "bar"}
 	}
 	if p.Contacts < 2 {
-		return &Opportunity{"Know who is asking about you", "Develop your information network through Mara. Good contacts can warn of personal danger.", "bar"}
+		return &Opportunity{"Know who is asking about you", "Develop your information network through " + w.RoleName("fixer") + ". Good contacts can warn of personal danger.", "bar"}
 	}
 	if w.District == 0 {
 		return &Opportunity{"Reach beyond Old Harbor", "With 10 respect and $100, establish contacts in Ashbury.", "apartment"}

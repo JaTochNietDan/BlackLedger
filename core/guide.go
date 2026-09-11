@@ -83,7 +83,7 @@ func (w *World) Guide() []Step {
 	steps := []Step{
 		step("Somewhere to start", fmt.Sprintf("Carry envelopes at Saint Agnes for $%d and %d respect. It costs nothing but the hour.", CourierPay, CourierRespect),
 			"", p.JobCount > 0),
-		step("Somebody who knows people", "Buy Mara a coffee. Contacts are how you hear that somebody is coming before they arrive.",
+		step("Somebody who knows people", "Buy "+w.RoleName("fixer")+" a coffee. Contacts are how you hear that somebody is coming before they arrive.",
 			need(p.Contacts >= 5, "Your information network is fully developed"), p.Contacts > 1),
 		step("Premises of your own", "A business earns while you are elsewhere, and is the only income that does.",
 			w.acquisitionReason(), owned > 0),

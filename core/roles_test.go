@@ -1,6 +1,9 @@
 package core
 
-import "testing"
+import (
+	"strings"
+	"testing"
+)
 
 func cityWithJobs(t *testing.T) *World {
 	t.Helper()
@@ -141,5 +144,73 @@ func TestNobodyIsDoingAJobNobodyCanDo(t *testing.T) {
 		if w.Holder(r.ID) == nil {
 			t.Fatalf("the city could not find anybody to be the %s", r.Title)
 		}
+	}
+}
+
+// "It still says buy Mara a coffee even though now it's Ivo Costa for me since
+// I killed Mara." The role was already filled by whoever holds it and the
+// subject of the action was right the whole time — only the words were wrong,
+// which is the worst way for this to be wrong: the player is told one thing and
+// the city does another.
+func TestNobodyIsNamedByNameWhereARoleIsMeant(t *testing.T) {
+	t.Parallel()
+	w := New(61)
+	w.Event, w.District = nil, 9
+	w.Player.Health, w.Player.Respect, w.Player.Cash = 100, 30, 5000
+	w.Player.Location = "bar"
+	first := w.Holder("fixer")
+	if first == nil {
+		t.Fatal("this city has no fixer to begin with")
+	}
+	// Bury them, the way the report did.
+	for i := range w.NPCs {
+		if w.NPCs[i].ID == first.ID {
+			w.NPCs[i].Dead = true
+		}
+	}
+	w.FillRoles()
+	now := w.Holder("fixer")
+	if now == nil || now.ID == first.ID {
+		t.Fatal("nobody took the role over, so this measures nothing")
+	}
+	if w.RoleName("fixer") != now.Name {
+		t.Fatalf("the fixer is %s and the city calls them %s", now.Name, w.RoleName("fixer"))
+	}
+	// Every line the player can read about the fixer names whoever holds it.
+	w.Event = nil
+	for _, a := range w.Actions("bar") {
+		if a.ID != "contact" {
+			continue
+		}
+		if strings.Contains(a.Label, first.Name) {
+			t.Fatalf("the buried fixer is still named on a button: %q", a.Label)
+		}
+		if !strings.Contains(a.Label, now.Name) {
+			t.Fatalf("the fixer is %s and the button says %q", now.Name, a.Label)
+		}
+	}
+	// And the guide, which is the other place that told the player who to go to.
+	for _, step := range w.Guide() {
+		if strings.Contains(step.What, first.Name) {
+			t.Fatalf("the guide still sends the player to the buried fixer: %q", step.What)
+		}
+	}
+}
+
+// A city with nobody in the role says somebody rather than a dead woman's name.
+func TestWithNoFixerAtAllTheCitySaysSomebody(t *testing.T) {
+	t.Parallel()
+	w := New(61)
+	w.Event, w.District = nil, 9
+	for i := range w.NPCs {
+		if w.NPCs[i].Role == "Fixer" {
+			w.NPCs[i].Dead = true
+		}
+	}
+	if w.Holder("fixer") != nil {
+		t.Fatal("somebody is still the fixer")
+	}
+	if name := w.RoleName("fixer"); name == "" || strings.Contains(name, "Mara") {
+		t.Fatalf("a city with no fixer calls them %q", name)
 	}
 }
