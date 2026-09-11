@@ -10593,3 +10593,45 @@ tables and machines and adjusted for the income accruing while you sit there,
 the house keeps about sixty cents a command — break-even within variance for
 that many hands, which is what a fair implementation of a small edge looks like
 at this sample size.
+
+## The envelope beats the pier, and capping it is not a one-tick change
+
+The first thing the rates table was pointed at: the game has two honest jobs and
+one of them is strictly worse.
+
+| | pay | minutes | $/min | respect | risk |
+|---|---|---|---|---|---|
+| Carry an envelope | $45 | 45 | 1.00 | 2 | none |
+| A shift on Pier 14 | $75 | 90 | 0.83 | 1 | one in seven costs 10 health |
+
+The envelope wins on money by the minute, on standing by a factor of four, and
+on not being hurt — and there is no limit on it. The first job in the game is
+better than the grind it is supposed to graduate into, in every respect, for
+ever. That is a real finding and it is measured rather than argued.
+
+Capping it was built, guarded and reverted, and the reason is worth more than
+the change would have been.
+
+Three envelopes a day, with the pier always there underneath, is the shape the
+fiction already has: a favour is not a career. It went in with three guards —
+the envelopes run out, they come back tomorrow, the pier never turns anybody
+away — and all three bite when broken.
+
+Then the whole simulated economy collapsed. Seven of the eight policies with
+plans ended their campaigns on the first afternoon with "no policy action at
+bar": every one of them treated carrying an envelope as an infinite job and had
+nothing to do when there was not one. Given the pier as a fallback they ran, and
+their cash fell through the floor — the investor from $2,408 to $726, the
+smuggler from $3,566 to $91, the defiant from $5,862 to $617. Only the worker,
+which lives on the docks, was untouched at $12,510.
+
+Which reads like a balance catastrophe and is not one. The fallback sends them
+walking to the waterfront and back between everything else they do, so most of
+what they lost is travel time rather than income. The measurement is confounded
+by the thing I added to take it.
+
+So: the finding stands and the change does not ship. A cap on the envelope needs
+the eight policies taught to earn before it can be priced at all, and pricing it
+on a harness that stalls without it would be the seventh time tonight the
+instrument was mistaken for the game. The pier and the envelope are written up
+here with their real numbers so the next attempt starts from them.
