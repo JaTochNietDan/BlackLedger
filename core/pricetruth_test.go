@@ -282,7 +282,7 @@ func TestEveryLiveCardWorksWhenPressed(t *testing.T) {
 	live, refused := 0, 0
 	for _, situation := range situations {
 		for seed := uint32(1); seed <= seeds; seed++ {
-			base := New(seed)
+			base := New(spread(seed))
 			base.Event, base.District = nil, 9
 			base.Player.Cash, base.Player.Respect, base.Player.Health = 400000, 200, 100
 			base.Player.Contacts = 5
@@ -344,9 +344,17 @@ func TestEveryLiveCardWorksWhenPressed(t *testing.T) {
 // with the clock's own money measured rather than allowed for — and then divide.
 // A card that raises standing and takes money has a price a point, and the paper
 // has to be the lowest of them or the sentence comes out.
-// harmed counts everybody in this city who is dead or carrying an injury, so a
-// card can be asked whether anybody was the worse for it without anybody
-// writing down which cards those are.
+// harmed counts what this city is carrying that somebody will pay for: the dead,
+// the injured, and the quarrels. A card can then be asked whether anybody was
+// the worse for it without anybody writing down which cards those are.
+//
+// The quarrels are the half this did not have at first, and leaving them out
+// certified a sentence that is not true. Putting a word in the right ear costs
+// $25 and buys a point of standing — cheaper a point than the paper — and
+// nobody is bleeding when the card resolves. What it does is leave two families
+// believing the other moved on them, which is a fight somebody else has later.
+// Reading only the dead and the hurt at the instant of the press calls that a
+// clean purchase.
 func harmed(w *World) int {
 	n := 0
 	for i := range w.NPCs {
@@ -356,6 +364,9 @@ func harmed(w *World) int {
 	}
 	if w.Player.Health < 100 {
 		n++
+	}
+	for _, c := range w.Conflicts {
+		n += c.Hostility
 	}
 	return n
 }
@@ -371,7 +382,7 @@ func TestThePaperIsTheCheapestStandingInTheCity(t *testing.T) {
 
 	best := map[string]buy{}
 	for seed := uint32(1); seed <= 3; seed++ {
-		base := New(seed)
+		base := New(spread(seed))
 		base.Event, base.District = nil, 9
 		base.Player.Cash, base.Player.Respect, base.Player.Health = 400000, 200, 100
 		base.Player.Contacts = 5
@@ -471,7 +482,7 @@ func TestNoTwoCardsInARoomShareAnID(t *testing.T) {
 	t.Parallel()
 	rooms, cards := 0, 0
 	for seed := uint32(1); seed <= 6; seed++ {
-		w := New(seed)
+		w := New(spread(seed))
 		w.Event, w.District = nil, 9
 		w.Player.Cash, w.Player.Respect, w.Player.Health = 400000, 300, 100
 		for _, id := range []string{"laundry", "garage", "casino", "poolhall"} {

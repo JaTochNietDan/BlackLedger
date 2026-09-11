@@ -53,3 +53,17 @@ func MalformedKinds() []string {
 	}
 	return out
 }
+
+// spread scatters a campaign number across the stream, for the guards that
+// sweep a run of seeds.
+//
+// The world's stream is a plain linear congruential generator started from the
+// campaign's own number, so the first draw for seed s is (1664525·s +
+// 1013904223) mod 2³², and the constant dominates until s is in the thousands:
+// seeds 1 to 200 open on 0.236 through 0.313, an eighth of the range. A sweep
+// over a couple of hundred small seeds is not a couple of hundred samples of
+// anything that turns on one early roll — a reprisal guard built that way had
+// thirty cities in a row take the same branch and concluded the other branch
+// was unreachable. Multiplying by a large odd constant costs nothing and puts
+// the opening draw anywhere.
+func spread(seed uint32) uint32 { return seed * 2654435761 }

@@ -12312,3 +12312,39 @@ small seed the first draw is dominated by the constant: **every seed under a few
 thousand opens on about 0.236**, which is under this chance. Seeds 1 to 30 are
 not thirty samples, they are one. Spread across the range they behave: 67 of 200
 cities, 33.5% against a stated 34%.
+
+## An eighth of the range
+
+Last night's reprisal guard found that thirty cities in a row took the same
+branch. The cause is arithmetic and it is not local to that guard.
+
+The world's stream is a plain linear congruential generator started from the
+campaign's own number, so the first draw for seed s is
+`(1664525·s + 1013904223) mod 2³²`, and 1664525 is small enough that the
+constant dominates until s reaches the thousands. **Seeds 1 to 200 open on 0.236
+through 0.313 — an eighth of the range.** A hundred and twenty-five loops in
+this test suite begin at `uint32(1)`.
+
+Scattering the seed inside `New` would fix all of them at once and breaks
+fourteen tests, most of them pinned numbers that would need re-measuring with
+judgement. That is more than one tick can do honestly, so it is written into the
+brief as arithmetic rather than done badly. What is done is the narrow sweeps —
+the ones running tens of seeds, where the band is tiny — which now multiply by a
+large odd constant.
+
+**One of them immediately disproved a sentence this log certified two nights
+ago.** "It is the cheapest respect in this city and the only kind nobody had to
+be hurt for", written above the paper's paragraph. On a proper sample, putting a
+word in the right ear costs $25 and buys a point of standing: $25 a point
+against the paper's $30. The guard that checked the claim passed because its
+sample was an eighth of the range and never once saw the card.
+
+The claim is true and the guard was wrong, which took a moment to see. Inciting
+leaves two families each believing the other moved on them. Nobody is bleeding
+when the card resolves, which is all the guard was looking at — the dead and the
+injured, at the instant of the press. The fight is somebody else's, later. So
+what a card costs the city now includes the quarrels it leaves behind, and a
+purchase that makes two families hate each other is not a clean one.
+
+That is twelve instrument faults, and this one is the worst kind: a guard that
+certified a sentence true on a sample that could not have shown it false.

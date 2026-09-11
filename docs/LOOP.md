@@ -371,7 +371,16 @@ and a local model that writes encounters and can be switched off.
   copy of the world the same number of minutes with nothing pressed and subtract
   that.
 
-Eleven times now a result has turned out to be a fact about the instrument
+- **A sweep over small seeds.** The world's stream is a plain linear
+  congruential generator started from the campaign's own number, so the first
+  draw for seed s is `(1664525·s + 1013904223) mod 2³²` and the constant
+  dominates until s reaches the thousands: seeds 1 to 200 open on 0.236 through
+  0.313, an eighth of the range. A hundred and twenty-five loops in this suite
+  start at `uint32(1)`. Anything that turns on an early roll is sampling one
+  point, not two hundred — multiply by `2654435761` and it costs nothing. Two
+  guards here were certifying claims their sample could not have disproved.
+
+Twelve times now a result has turned out to be a fact about the instrument
 rather than about the game, and every one of them was a reading taken at the
 wrong moment or over too narrow a sample.
 

@@ -11,7 +11,7 @@ func TestACityLeftAloneKillsItsOwnPeople(t *testing.T) {
 	const runs, days = 200, 120
 	killings, wars, quiet := 0, 0, 0
 	for seed := uint32(1); seed <= runs; seed++ {
-		w := New(seed)
+		w := New(spread(seed))
 		w.MigrateLivingWorld()
 		w.WorldRNG = seed * 2654435761
 		wars0 := 0
@@ -68,7 +68,7 @@ func TestGrudgesComeFromThingsThatHappened(t *testing.T) {
 	const runs, days = 200, 60
 	withHistory := 0
 	for seed := uint32(1); seed <= runs; seed++ {
-		w := New(seed)
+		w := New(spread(seed))
 		w.MigrateLivingWorld()
 		w.WorldRNG = seed * 2654435761
 		for day := 0; day < days; day++ {
@@ -92,7 +92,7 @@ func TestTheSaveNeverRunsAway(t *testing.T) {
 	heavy(t)
 	worst := 0
 	for seed := uint32(1); seed <= 100; seed++ {
-		w := New(seed)
+		w := New(spread(seed))
 		w.MigrateLivingWorld()
 		w.WorldRNG = seed * 2654435761
 		for day := 0; day < 120; day++ {

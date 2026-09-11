@@ -109,7 +109,7 @@ func TestNothingTheCitySaysWhileItRunsIsMalformed(t *testing.T) {
 		}
 	}
 	for seed := uint32(1); seed <= 40; seed++ {
-		w := New(seed)
+		w := New(spread(seed))
 		w.Event, w.District = nil, 9
 		w.Player.Health, w.Player.Respect, w.Player.Cash = 100, 120, 500000
 		for _, id := range []string{"laundry", "poolhall", "garage"} {

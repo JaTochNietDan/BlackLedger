@@ -125,7 +125,7 @@ func TestAFailingOrganizationCanLoseItsLeaderFromInside(t *testing.T) {
 	t.Parallel()
 	moved, succeeded, failed := 0, 0, 0
 	for seed := uint32(1); seed <= 400; seed++ {
-		w := New(seed)
+		w := New(spread(seed))
 		f := w.faction("bellandi")
 		f.Power = peak(f) / 3 // failing badly
 		// Whoever moves is whoever is most willing, so the test does not name
@@ -165,7 +165,7 @@ func TestViolenceReachesEveryRank(t *testing.T) {
 	t.Parallel()
 	ranks := map[int]int{}
 	for seed := uint32(1); seed <= 600; seed++ {
-		w := New(seed)
+		w := New(spread(seed))
 		if victim := w.casualty("bellandi"); victim != nil {
 			ranks[victim.Rank]++
 		}
@@ -248,7 +248,7 @@ func TestVoicesMatchHowPeopleAreNamed(t *testing.T) {
 	}
 	checked := 0
 	for seed := uint32(1); seed <= 60; seed++ {
-		w := New(seed)
+		w := New(spread(seed))
 		for i := 0; i < 4; i++ {
 			w.AddMember("bellandi", "Soldier", RankSoldier, "club")
 		}
