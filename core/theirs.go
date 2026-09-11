@@ -157,3 +157,64 @@ func (w *World) GetsOut(id string) float64 {
 	}
 	return DrivesOut + float64(w.TheirPlating(id))*PlatedOut
 }
+
+// Putting something in their hand.
+//
+// Sending one of your own was strictly worse than going yourself and there was
+// nothing to do about it: four attempts in sixty against eleven, and the only
+// thing that moved the number was how they felt about you. Loyalty is earned
+// slowly and cannot be bought at a counter, so somebody who preferred not to be
+// shot at had no way to make the safe option any good.
+//
+// A gun can be bought for them at the same counter as your own, at the same
+// price, and it is worth the same to them as it would be to you. What it buys
+// is the choice: go yourself and do it better, or pay for somebody else to do
+// it nearly as well and keep your own hands clean.
+
+// TheirArmsReadiness explains why one of your own cannot be armed, or "".
+func (w *World) TheirArmsReadiness(id string, tier int) string {
+	if !ArmsSource(w.Player.Location) {
+		return "Nobody sells this here"
+	}
+	n, ok := w.yours(id)
+	if !ok {
+		return "They are not one of yours"
+	}
+	list := weapons
+	if tier <= 0 || tier >= len(list) {
+		return "Nobody sells this here"
+	}
+	if n.Location != w.Player.Location || w.Travelling(n) {
+		return n.Name + " is not here to take it"
+	}
+	if tier == n.Weapon {
+		return "They are carrying it"
+	}
+	if tier < n.Weapon {
+		return "They are already carrying something better"
+	}
+	if w.Player.Cash < list[tier].Cost {
+		return "Not enough cash"
+	}
+	return ""
+}
+
+// BuyArmsFor puts one in their hand. Holding arms is a reason for the police to
+// take an interest in whoever is holding them, which is the player either way:
+// they are yours and so is the trouble.
+func (w *World) BuyArmsFor(id string, tier int) error {
+	if reason := w.TheirArmsReadiness(id, tier); reason != "" {
+		return fmt.Errorf("%s", reason)
+	}
+	n, _ := w.yours(id)
+	arm := weapons[tier]
+	if err := w.Pay(arm.Cost); err != nil {
+		return err
+	}
+	n.Weapon = arm.Tier
+	w.Player.Heat = min(100, w.Player.Heat+2)
+	w.Log("Something for "+n.Name,
+		fmt.Sprintf("%s, $%d, and it goes in their coat rather than yours. They are better to send than they were, and it is still your name on it if they are searched.",
+			arm.Label, arm.Cost), "personal")
+	return nil
+}

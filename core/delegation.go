@@ -74,7 +74,14 @@ func (w *World) HandEdge(hand Hand) float64 {
 	if !hand.Crew {
 		return float64(min(w.Presence(), 100))/400 + w.WeaponEdge()
 	}
-	return float64(w.Player.Crew[0].Loyalty)/500 - .08
+	// What they think of you, and what you put in their hand. A gun is worth
+	// the same to somebody you sent as it is to you: the odds it shifts are the
+	// odds of the same piece of work.
+	edge := float64(w.Player.Crew[0].Loyalty)/500 - .08
+	if n := w.NPC(w.Player.Crew[0].ID); n != nil {
+		edge += float64(n.Weapon) * WeaponWorth
+	}
+	return edge
 }
 
 // HandHurt is what a job going wrong costs, and to whom. The player takes it in

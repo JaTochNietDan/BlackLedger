@@ -1,6 +1,10 @@
 package core
 
-import "testing"
+import (
+	"fmt"
+	"strings"
+	"testing"
+)
 
 func withCrew(t *testing.T, loyalty int) *World {
 	t.Helper()
@@ -160,5 +164,129 @@ func TestBothHandsAreOfferedAndBothAreRefusedForTheSameReasons(t *testing.T) {
 		if a.ID == "rob:crew" && !a.Disabled {
 			t.Fatal("a disloyal crewman went anyway")
 		}
+	}
+}
+
+// Sending one of your own was strictly worse than going yourself and there was
+// nothing to do about it: four attempts in sixty against eleven, and the only
+// thing that moved the number was how they felt about you. Loyalty is earned
+// slowly and cannot be bought at a counter, so anybody who preferred not to be
+// shot at had no way to make the safe option any good.
+func attempts(t *testing.T, weapon int, own bool) int {
+	t.Helper()
+	done := 0
+	for seed := uint32(1); seed <= 200; seed++ {
+		w := New(seed * 2654435761)
+		w.Event, w.District = nil, 9
+		w.Player.Health, w.Player.Respect, w.Player.Cash = 100, 40, 20000
+		hand := w.Holder("driver")
+		if hand == nil {
+			t.Fatal("this city has nobody who could be sent")
+		}
+		w.Player.Crew = append(w.Player.Crew, Crew{ID: hand.ID, Name: hand.Name, Loyalty: 65})
+		var mark *NPC
+		for i := range w.NPCs {
+			n := &w.NPCs[i]
+			if !n.Dead && n.Faction != "" && n.Rank < RankLeader {
+				mark = n
+				break
+			}
+		}
+		if mark == nil {
+			t.Fatal("this city has nobody in a family to go after")
+		}
+		w.Player.Location = mark.Location
+		h := w.OwnHands()
+		if own {
+			w.Player.Weapon = weapon
+		} else {
+			hand.Weapon = weapon
+			sent, ok := w.CrewHands()
+			if !ok {
+				t.Fatal("nobody to send")
+			}
+			h = sent
+		}
+		if err := w.Strike(mark.ID, h); err != nil {
+			t.Fatalf("going after somebody standing in front of you was refused: %v", err)
+		}
+		if mark.Dead {
+			done++
+		}
+	}
+	return done
+}
+
+func TestArmingTheOneYouSendIsWorthSomething(t *testing.T) {
+	heavy(t)
+	bare := attempts(t, 0, false)
+	revolver := attempts(t, 1, false)
+	shotgun := attempts(t, 2, false)
+	thompson := attempts(t, 3, false)
+	t.Logf("200 sent each: empty handed %d, a revolver %d, a shotgun %d, a Thompson %d",
+		bare, revolver, shotgun, thompson)
+	if revolver <= bare || shotgun <= revolver || thompson <= shotgun {
+		t.Fatalf("putting something in their hand is worth nothing: %d, %d, %d, %d",
+			bare, revolver, shotgun, thompson)
+	}
+
+	// And going yourself is still better, with the same gun, or there would be
+	// no reason ever to take the risk.
+	mine := attempts(t, 3, true)
+	t.Logf("with the same Thompson: %d sent against %d gone yourself", thompson, mine)
+	if mine <= thompson {
+		t.Fatalf("going yourself buys nothing over sending an armed man: %d against %d", mine, thompson)
+	}
+	// Which is the trade: a man you armed does it nearly as well and you are
+	// not the one who was there.
+	if thompson*2 < mine {
+		t.Fatalf("an armed man you sent is worth %d against %d, which is not a choice", thompson, mine)
+	}
+}
+
+// The counter sells it to them, and only to your own.
+func TestTheCounterWillArmYourOwnPeople(t *testing.T) {
+	t.Parallel()
+	w := New(61)
+	w.Event, w.District = nil, 9
+	w.Player.Health, w.Player.Respect, w.Player.Cash = 100, 40, 20000
+	hand := w.Holder("driver")
+	if hand == nil {
+		t.Fatal("nobody to sign on")
+	}
+	hand.Faction, hand.Location = w.PlayerOrganizationID(), "docks"
+	w.Player.Location, w.Event = "docks", nil
+
+	offered := map[string]*Action{}
+	for i, a := range w.Actions("docks") {
+		if strings.HasPrefix(a.ID, "give:") {
+			offered[a.ID] = &w.Actions("docks")[i]
+		}
+	}
+	top := Armaments("weapon")[len(Armaments("weapon"))-1]
+	id := fmt.Sprintf("give:%s:%d", hand.ID, top.Tier)
+	if _, ok := offered[id]; !ok {
+		t.Fatalf("%s is standing on the dock and there is no way to put anything in their hand", hand.Name)
+	}
+	if err := w.BuyArmsFor(hand.ID, top.Tier); err != nil {
+		t.Fatal(err)
+	}
+	if hand.Weapon != top.Tier {
+		t.Fatalf("bought them %s and they are carrying tier %d", top.Label, hand.Weapon)
+	}
+	// Not for somebody who is not yours.
+	stranger := ""
+	for i := range w.NPCs {
+		if n := &w.NPCs[i]; !n.Dead && n.Faction != w.PlayerOrganizationID() {
+			stranger = n.ID
+			break
+		}
+	}
+	if err := w.BuyArmsFor(stranger, 1); err == nil {
+		t.Fatal("bought a gun for somebody who does not answer to the player")
+	}
+	// And nothing worse than what they carry.
+	if err := w.BuyArmsFor(hand.ID, 1); err == nil {
+		t.Fatal("bought them a revolver while they are carrying a Thompson")
 	}
 }

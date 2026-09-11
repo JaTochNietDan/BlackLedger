@@ -62,7 +62,12 @@ func (w *World) carrying(kind string) int {
 
 // WeaponEdge is how much a weapon shifts the odds of violence the player
 // starts. It is deliberately modest: being armed is an advantage, not a promise.
-func (w *World) WeaponEdge() float64 { return float64(w.Player.Weapon) * .07 }
+func (w *World) WeaponEdge() float64 { return float64(w.Player.Weapon) * WeaponWorth }
+
+// WeaponWorth is what one step up the scale shifts the odds of violence,
+// whoever is carrying it. The same for somebody the player sent as for the
+// player: the odds it moves are the odds of the same piece of work.
+const WeaponWorth = .07
 
 // Absorb reduces injury by what is being worn, never below a real cost. Armour
 // makes a beating survivable; it does not make it free.

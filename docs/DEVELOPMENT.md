@@ -9307,3 +9307,34 @@ Two other things measured and left alone. Sending one of your own succeeds less
 often than going yourself — four in sixty against eleven — and never costs you
 a scratch, which is the trade it should be. And the family is the worse for it
 every single time, whoever went.
+
+## Something for the man you send
+
+Last night's measurement of the violence found something worth fixing rather
+than guarding. Sending one of your own was strictly worse than going yourself —
+four attempts in sixty against eleven — and the only thing that moved the number
+was how they felt about you. Loyalty is earned slowly and cannot be bought at a
+counter, so anybody who preferred not to be the one standing there had no way to
+make the safe option any good.
+
+A gun can be bought for them, at the same counter and the same price as your
+own, and it is worth the same to them as it would be to you: the odds it shifts
+are the odds of the same piece of work. It goes in their coat rather than yours,
+and it is still your name on it if they are searched.
+
+| sent with | it went the way it was meant to, in 200 |
+|---|---|
+| empty hands | 16 |
+| a revolver | 20 |
+| a shotgun | 33 |
+| a Thompson | 46 |
+
+Against 58 going yourself with the same Thompson. So the choice is real in both
+directions: go and do it better, or pay for somebody to do it nearly as well and
+not be the one who was there. Both halves are guarded — taking the gun out of
+the sum makes all four numbers the same, and making a sent man better than going
+yourself fails on the other line.
+
+This is what the open counter was for. A player who has just decided to send
+somebody can buy the Thompson for them tonight, rather than buying a revolver
+and a shotgun first to get there.

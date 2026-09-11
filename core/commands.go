@@ -363,6 +363,17 @@ func (w *World) apply(c Command) error {
 				return err
 			}
 			w.Advance(a.Minutes)
+		} else if what, ok := strings.CutPrefix(c.Kind, "give:"); ok {
+			// "give:leo:3" — who it is for, and which one of them.
+			who, at, _ := strings.Cut(what, ":")
+			tier, err := strconv.Atoi(at)
+			if err != nil {
+				return fmt.Errorf("there is no such thing on the counter")
+			}
+			if err := w.BuyArmsFor(who, tier); err != nil {
+				return err
+			}
+			w.Advance(a.Minutes)
 		} else if what, ok := strings.CutPrefix(c.Kind, "arms:"); ok && strings.Contains(what, ":") {
 			// "arms:weapon:3" — which kind, and which one of them.
 			kind, at, _ := strings.Cut(what, ":")

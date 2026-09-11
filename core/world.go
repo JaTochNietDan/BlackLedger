@@ -180,6 +180,12 @@ type NPC struct {
 	// one customer, nothing could be stolen off anybody, and a garage had
 	// nothing to repair. Absent in saves written before the city drove.
 	Car int `json:"car,omitempty"`
+	// Weapon is what one of the player's own is carrying, on the same scale as
+	// the player's. Sending somebody was strictly worse than going yourself —
+	// four attempts in sixty against eleven — and the only thing that moved it
+	// was how they felt about you. A man you sent with nothing in his coat is a
+	// man you sent with nothing in his coat.
+	Weapon int `json:"weapon,omitempty"`
 	// Plate somebody has paid to put on that car. Almost always nobody: the
 	// city does not plate its own, and the player is the only person in it who
 	// buys anybody else protection.
@@ -1093,6 +1099,25 @@ func (w *World) Actions(id string) []Action {
 			asks(fmt.Sprintf("arms:armour:%d", arm.Tier), "Buy "+arm.Label, 45, arm.Cost,
 				w.ArmsReadiness("armour", arm.Tier),
 				fmt.Sprintf("$%d. %s Reduces what a beating costs you. A search takes it.", arm.Cost, arm.Detail))
+		}
+		// And something for whoever you would send. Sending somebody was
+		// strictly worse than going yourself with nothing to do about it: the
+		// only thing that moved it was how they felt about you, and that
+		// cannot be bought at a counter.
+		for _, who := range w.OwnPeople() {
+			if who.Location != id || w.Travelling(who) {
+				continue
+			}
+			for _, arm := range Armaments("weapon") {
+				asks(fmt.Sprintf("give:%s:%d", who.ID, arm.Tier),
+					"Buy "+who.Name+" "+arm.Label, 45, arm.Cost,
+					w.TheirArmsReadiness(who.ID, arm.Tier),
+					fmt.Sprintf("$%d. It goes in their coat rather than yours, and they are better to send for it. %s",
+						arm.Cost, arm.Detail))
+				if len(out) > 0 {
+					out[len(out)-1].Subject = who.ID
+				}
+			}
 		}
 	case "herald":
 		for _, o := range officials {
