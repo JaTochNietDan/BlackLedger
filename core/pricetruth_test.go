@@ -330,3 +330,124 @@ func TestEveryLiveCardWorksWhenPressed(t *testing.T) {
 		t.Fatalf("only %d live cards were pressed, so this measures nothing", live)
 	}
 }
+
+// "It is the cheapest respect in this city and the only kind nobody had to be
+// hurt for."
+//
+// That is written above `Puff` in core/newsroom.go, and it is the game making a
+// claim about itself across every other card it offers. Nothing could check a
+// sentence like that: the prose sweeps read whether a line is well formed, and
+// the price and clock sweeps read one card against its own declaration. This
+// reads one card against all the others.
+//
+// Same machinery as the sweeps above — press everything in a copy of the world,
+// with the clock's own money measured rather than allowed for — and then divide.
+// A card that raises standing and takes money has a price a point, and the paper
+// has to be the lowest of them or the sentence comes out.
+// harmed counts everybody in this city who is dead or carrying an injury, so a
+// card can be asked whether anybody was the worse for it without anybody
+// writing down which cards those are.
+func harmed(w *World) int {
+	n := 0
+	for i := range w.NPCs {
+		if who := &w.NPCs[i]; who.Dead || who.Hurt {
+			n++
+		}
+	}
+	if w.Player.Health < 100 {
+		n++
+	}
+	return n
+}
+
+func TestThePaperIsTheCheapestStandingInTheCity(t *testing.T) {
+	t.Parallel()
+	type buy struct {
+		id    string
+		spent int
+		gain  int
+	}
+	dearer := func(a, b buy) bool { return a.spent*b.gain > b.spent*a.gain }
+
+	best := map[string]buy{}
+	for seed := uint32(1); seed <= 3; seed++ {
+		base := New(seed)
+		base.Event, base.District = nil, 9
+		base.Player.Cash, base.Player.Respect, base.Player.Health = 400000, 200, 100
+		base.Player.Contacts = 5
+		base.Player.Car, base.Player.CarWear = 2, 20
+		// Somebody at the paper takes the player's calls, or the card this is
+		// about is never offered and the sweep measures the rest of the city
+		// against nothing.
+		base.ensureOfficials()
+		base.Player.Retainers = append(base.Player.Retainers, "editor")
+		for _, id := range []string{"laundry", "garage", "casino", "poolhall"} {
+			if p := base.Properties[id]; p != nil {
+				p.Owner = "player:1"
+			}
+		}
+		for _, l := range Locations {
+			if l.District > base.District {
+				continue
+			}
+			w := base.Clone()
+			w.Player.Location, w.Event = l.ID, nil
+			for _, a := range w.Actions(l.ID) {
+				if a.Disabled {
+					continue
+				}
+				try := w.Clone()
+				try.Player.Location, try.Event = l.ID, nil
+				cash, standing := try.Player.Cash, try.Player.Respect
+				next, err := Execute(try, Command{RequestID: ID(), Revision: try.Revision,
+					Kind: a.ID, Target: l.ID})
+				if err != nil {
+					continue
+				}
+				clock := w.Clone()
+				clock.Event = nil
+				was := clock.Player.Cash
+				clock.Advance(a.Minutes)
+				passing := was - clock.Player.Cash
+
+				// And nobody the worse for it. The sentence has two halves —
+				// cheapest, and the only kind nobody was hurt for — so a card
+				// that leaves somebody dead or hurt is not in the comparison at
+				// all. Read off the city rather than off a list of which cards
+				// are violent: going after somebody yourself came out at a
+				// dollar for nine points of standing, which is true and is not
+				// what the paper is being compared against.
+				if harmed(try) != harmed(next) {
+					continue
+				}
+				got := buy{a.ID, cash - next.Player.Cash - passing, next.Player.Respect - standing}
+				if got.gain <= 0 || got.spent <= 0 {
+					continue
+				}
+				if had, seen := best[got.id]; !seen || dearer(had, got) {
+					best[got.id] = got
+				}
+			}
+		}
+	}
+
+	paper, ok := best["puff"]
+	if !ok {
+		t.Fatal("the paper never sold a paragraph, so this measures nothing")
+	}
+	if len(best) < 3 {
+		t.Fatalf("only %d cards in this city buy standing for money, so this compares almost nothing", len(best))
+	}
+	for id, other := range best {
+		if id == "puff" {
+			continue
+		}
+		t.Logf("%-12s $%d for %d", id, other.spent, other.gain)
+		if dearer(paper, other) {
+			t.Errorf("%s buys standing at $%d for %d and the paper wants $%d for %d, "+
+				"so the paper is not the cheapest respect in this city",
+				id, other.spent, other.gain, paper.spent, paper.gain)
+		}
+	}
+	t.Logf("paper $%d for %d across %d cards that sell standing", paper.spent, paper.gain, len(best))
+}

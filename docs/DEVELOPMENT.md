@@ -11913,3 +11913,35 @@ Guarded three ways — a funeral is trade, a pauper is not, and a parlour of the
 player's is where the work goes — and all three read the city's own dead rather
 than building a corpse to order. Breaking the call out of the death path takes
 four funerals from 50% to 50%.
+
+## Checking a sentence the game says about itself
+
+Six kinds of action are still never played by the harness — pact, puff, scrap,
+serve, smear, spike — and three of those six need the same thing: somebody at
+the paper taking the player's calls. Looking at why led somewhere better than
+another policy.
+
+Written above `Puff` in core/newsroom.go: "It is the cheapest respect in this
+city and the only kind nobody had to be hurt for." That is the game making a
+claim about itself across every other card it offers, and nothing in this
+project could check a sentence like it. The prose sweeps read whether a line is
+well formed. The price and clock sweeps read one card against its own
+declaration. This reads one card against all the others.
+
+Same machinery, one more division. Press everything in a copy of the world with
+the clock's own money measured rather than allowed for, keep the cards that
+raise standing and take money, and divide. The paper wants $180 for six points.
+Recruiting somebody is $90 for two, moving house $180 for three, buying premises
+$2,688 for four. **The sentence is true**, and it is true by a clear margin
+rather than a hair.
+
+The first run said otherwise, and the reason is the half of the sentence I had
+not encoded. Going after somebody in the street came out at **a dollar for nine
+points** — which is also true, and is exactly the standing the sentence says
+nobody buys. So the comparison excludes any card that leaves somebody the worse
+for it, counted off the city's own dead and injured rather than off a list of
+which cards are violent. A list would have been wrong the first time somebody
+wrote a new way to hurt a person.
+
+Broken to check it bites: the paper at $480 instead of $180 is dearer than both
+recruiting and moving house, and the guard names both.
