@@ -11945,3 +11945,39 @@ wrote a new way to hurt a person.
 
 Broken to check it bites: the paper at $480 instead of $180 is dearer than both
 recruiting and moving house, and the guard names both.
+
+## What the trade table says about itself
+
+Last night's sweep checked one sentence the game writes about itself and found
+it true. The obvious next question is how many other such sentences there are,
+and the answer is: one above every trade in the city, and nowhere else. A
+trade's comment is the only place its cover and its hiding are ever explained.
+Nothing in this project tells a reader why a casino launders better than a yard
+of trucks. So a wrong comment is a wrong fact about the city with nowhere else
+to check it.
+
+Reading the eighteen trades against their own eighteen paragraphs, **three of
+them were wrong, and two of those three I wrote two nights ago.**
+
+- A saloon "explains cash about as well as a laundry". Twelve against eighteen.
+- The undertaker's casket was "the best place in the district for a thing to
+  sit". Six, against a bonded shed's eight and a yard of trucks' seven.
+- And its books "about as well as a laundry does". Thirteen against eighteen.
+
+All three now say what the numbers say — a public house covers better than a
+garage and well short of a laundry; a casket hides more than a cold room and
+less than a bonded shed — and the orderings every one of those paragraphs
+asserts are pinned in a guard.
+
+That guard is a hand-written list and this file usually says not to write one.
+It is right here because each line *is* a sentence somebody wrote in the source,
+quoted above it, and the list is the only thing that keeps the sentence true
+when somebody moves a number three months from now. What it cannot do is notice
+a nineteenth trade writing a claim and not adding a line, which is written down
+in the guard itself as its own weakness.
+
+The claims that came through clean: a casino covers more than anything else, a
+club more than anything but a casino, a bonded shed hides more than anything
+else and specifically more than a cold room and a yard of trucks, and a trading
+floor hides next to nothing. Broken to check it bites: a saloon at nineteen
+cover flags both the club's sentence and the saloon's own.

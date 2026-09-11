@@ -127,8 +127,10 @@ var trades = map[string]Trade{
 	},
 	// A public house. Not a club and not a restaurant: a room people are in
 	// every evening of their lives, which is why everything gets said in it.
-	// It explains cash about as well as a laundry and hides almost nothing,
-	// because a cellar is the first place anybody looks.
+	// It explains cash better than a garage does and nowhere near as well as a
+	// laundry — twelve against eighteen — and hides almost nothing, because a
+	// cellar is the first place anybody looks. It used to say "about as well as
+	// a laundry", which the table has never agreed with.
 	"saloon": {
 		Hands: 4, Wage: 7, Drain: 7, Restock: 160, RestockAmount: 45, Supplies: "the cellar and the glasses", Drink: 3,
 		Trouble: "The cellar has been flooded a week and what is being served is not worth drinking.",
@@ -140,10 +142,16 @@ var trades = map[string]Trade{
 		Remedy:  "Get the cold room running", RemedyDetail: "An engineer, and the stock replaced.", RemedyCost: 210, Cover: 8, Watched: 0, Hides: 4,
 	},
 	// An undertaker. The one trade in this city whose custom is made by
-	// everybody else's work: a coffin is the best place in the district for a
-	// thing to sit, a hearse is the only vehicle nobody stops, and the books
-	// explain cash about as well as a laundry does because a funeral is paid
+	// everybody else's work. A casket hides more than a butcher's cold room and
+	// less than a bonded shed at the wharf, and the books explain cash better
+	// than a garage's and well short of a laundry's, because a funeral is paid
 	// for in notes by people nobody wants to press.
+	//
+	// Both of those sentences were written the other way round first — "the
+	// best place in the district for a thing to sit", "about as well as a
+	// laundry" — and neither was true of the numbers beside them. A trade's
+	// comment is the only place its cover and its hiding are ever explained, so
+	// a wrong one is a wrong fact about the city.
 	"undertaker": {
 		Hands: 3, Wage: 8, Drain: 6, Restock: 140, RestockAmount: 40, Supplies: "caskets, brass and the cars",
 		Trouble: "A family was sent the wrong coffin and the street heard about it before the funeral did.",
