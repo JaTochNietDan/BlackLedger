@@ -152,21 +152,23 @@ Ensure efficiency of development loops by increasing efficiency of your workflow
 
 Most of what the harness measures is walking.
 
-Counted across a hundred campaigns each: the soldier spends **98% of its
-commands travelling**, the respectable 64%, the diplomat 62%, the racketeer 46%.
-The other nine are between 2% and 29%. The three worst are the three newest and
-they are all written the same way — scan every room for a card, go to the first
-room that has it — and the cure for that (look where you are standing first) is
-in and moved the figure by a single point.
+— part answered. The soldier is down from **99% of its commands to 12%**. The
+  cause was not scan order: `at(place, card)` walks to an address on the
+  strength of the address alone, so a branch naming a card that room is not
+  offering walks over, finds it refused, falls through to a branch that sends it
+  back, and does that for the whole campaign. Its crew branch was asking the bar
+  for a recruit the bar was not offering, and it crossed the city every forty
+  minutes for four hundred turns.
 
-It is not scan order. It is two goals in two places: a shift at the docks and a
-seat at a table are in different parts of town, and a policy that alternates
-them walks between them all campaign. What would fix it is batching — several
-shifts before crossing the city again — and that is a change to how every policy
-is written rather than a line in one of them.
+  The respectable and the diplomat are still at 65%, with the same shape in
+  their own branches — the paper, the seat at the table. Same fix, not done
+  tonight.
 
-Until then, every number those policies produce is mostly a measurement of where
-Bellwether put its buildings.
+  A general version of it was tried and backed out: making `at` itself refuse to
+  travel unless the card is ready there stopped every policy travelling at all,
+  because the refusals a journey *does* answer are worded a dozen ways and
+  matching them is guesswork. Asking `ready(place, card)` at the branch that
+  knows what it wants is the honest shape.
 
 ---
 

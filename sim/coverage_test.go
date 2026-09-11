@@ -75,7 +75,11 @@ import "testing"
 // rather than four the figure is 105, and only two kinds are genuinely never
 // played — moving on a rival's holding and weighing a car in — so this pin is a
 // floor on a narrow sample rather than a measure of what the harness can reach.
-const kindsTheHarnessPlays = 98
+// Ninety-seven once policies stopped walking to cards the room was not
+// offering. The soldier went from ninety-nine per cent of its commands being
+// journeys to twelve, which is a different campaign — it spends its turns doing
+// things now, and one rare kind fell below the four-seed sample as a result.
+const kindsTheHarnessPlays = 97
 
 func TestTheHarnessPlaysEnoughOfTheGame(t *testing.T) {
 	t.Parallel()

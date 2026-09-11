@@ -12803,3 +12803,38 @@ inbox rather than being half done tonight.
 What it means in the meantime is worth being blunt about: for the three policies
 that spend two thirds of their lives on the street, every number they produce is
 mostly a measurement of where Bellwether put its buildings.
+
+## Walking to a door that is not open
+
+Last night's headline was that the soldier spends 98% of its commands
+travelling, and last night's explanation — scanning rooms in the wrong order —
+was wrong. Looking where you are standing first had moved the figure by one
+point, which should have been the clue.
+
+Two things had to be sorted out before the real cause showed.
+
+**The director changes it completely.** Traced against the fixture director the
+soldier travels 9% of the time; against the authored one, which is what the
+baseline actually runs, it travels 99%. An hour went on believing the two
+measurements contradicted each other when they were measuring different games.
+
+**And then the trace said it plainly.** Bar, docks, bar, docks, every forty
+minutes, three hundred and ninety-two journeys in a row. `at(place, card)` walks
+to an address on the strength of the address alone. A branch naming a card that
+room is not offering walks over, finds it refused, falls through to the branch
+that sends it back, and does that until the campaign ends. The soldier's own
+crew branch was asking the bar for a recruit the bar was not offering.
+
+Asking whether the room is offering it before setting out takes the soldier from
+**99% to 12%**.
+
+A general version — making `at` itself refuse to travel unless the card is ready
+there — was written, measured, and backed out within the tick: it stopped every
+policy travelling at all. The refusals a journey legitimately answers are worded
+a dozen different ways ("that conversation happens at the paper", "you are not
+in the yard", "the crates would have to be carried into") and matching them is
+guesswork. The branch that knows what it wants is the right place to ask.
+
+The respectable and the diplomat are still at 65%, with the same shape around
+the paper and the seat at the table. Same fix, and it is in the inbox rather
+than rushed at the end of a long tick.

@@ -394,6 +394,26 @@ func (v View) at(target, kind string) (core.Command, bool) {
 	return v.action(target, kind)
 }
 
+// ready reports whether that address is offering that card right now, so a
+// policy can decide whether the walk is worth taking.
+//
+// `at` travels on the strength of the destination alone, which is right for a
+// card refused only because nobody is standing in front of it and wrong for
+// every other kind of refusal. A branch that names a card the room is not
+// offering walks across town, finds it refused, falls through to a branch that
+// sends it back, and does that for the whole campaign — the soldier oscillated
+// between the bar and the docks every forty minutes, three hundred and
+// ninety-two journeys in a row, ninety-nine per cent of its commands, because
+// its crew branch asked the bar for a recruit the bar was not offering.
+func (v View) ready(target, kind string) bool {
+	for _, a := range v.place(target).Actions {
+		if a.ID == kind {
+			return !a.Disabled
+		}
+	}
+	return false
+}
+
 // earn is where the money comes from when the next thing on the ladder costs
 // more than the player has.
 //
@@ -1069,12 +1089,12 @@ func Choose(v View, strategy string) (core.Command, error) {
 		// with no guard and no walls: ninety-eight campaigns in a hundred ended
 		// with the player killed outright — health nought, attention nought,
 		// nothing seized. Not worn down. Walked in on.
-		if v.Player.Home == "room" && v.Player.Cash >= 400 {
+		if v.Player.Home == "room" && v.Player.Cash >= 400 && v.ready("apartment", "move_home") {
 			if c, ok := v.at("apartment", "move_home"); ok {
 				return c, nil
 			}
 		}
-		if v.Player.Security < 1 && v.Player.Cash >= 300 {
+		if v.Player.Security < 1 && v.Player.Cash >= 300 && v.ready(v.Player.Home, "security") {
 			if c, ok := v.at(v.Player.Home, "security"); ok {
 				return c, nil
 			}
@@ -1086,7 +1106,7 @@ func Choose(v View, strategy string) (core.Command, error) {
 		// branch in it and the branch never fired once, because the ladder that
 		// recruits sits at the bottom of this function and everything above it
 		// matched first.
-		if len(v.Player.Crew) == 0 && v.Player.Cash >= 200 {
+		if len(v.Player.Crew) == 0 && v.Player.Cash >= 200 && v.ready("bar", "recruit") {
 			if c, ok := v.at("bar", "recruit"); ok {
 				return c, nil
 			}
