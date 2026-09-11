@@ -12474,3 +12474,27 @@ They are told now, and told what they were: "You were a lieutenant of theirs and
 you are nothing of theirs now." Guarded by ending a family under somebody who
 had done the work, and checking both that the books are cleared and that the
 sentence names the rank they lost.
+
+## What outlived the family
+
+Last night found the player still working for an organization that had ended. The
+same question asked of everything else keyed on a family's name found two more,
+and the sweep is the interesting part: build a city, give it a pact and a
+ceasefire with every family in it, run four months, and ask which of them point
+at a name that no longer exists.
+
+**Fourteen dangling references across forty cities.** When a family dissolves the
+code clears its quarrels, its plans and its people, and leaves alone what the
+player had agreed with it. So an understanding sat in the save pointing at
+nothing — and the books print the names of what the player has arranged, which
+for a name that resolves to nothing is "An unidentified family". A ceasefire with
+nobody sat there the same way.
+
+Neither cost the player money: the daily tribute is counted through a list that
+skips a pact whose family is missing, which is why this had never shown up as a
+number going wrong. It shows up as a sentence, in the one place the game writes
+down what you are party to.
+
+They end with the family now, and the player is told there is nothing left to
+keep. Across forty cities of four months: 71 understandings kept, 9 ended with
+the organization they were with. Removing the clean-up puts seven of them back.

@@ -327,6 +327,33 @@ func (w *World) dissolve() {
 		}
 	}
 	w.Plots = plots
+
+	// And whatever the player had agreed with them.
+	//
+	// The quarrels and the plans were cleaned up here and the agreements were
+	// not, so an understanding outlived the organization it was with: the books
+	// listed "An unidentified family" under what the player had arranged,
+	// because the name resolved to nothing and the ledger asked for it anyway.
+	// A ceasefire with nobody sat in the saved state for the rest of the
+	// campaign the same way.
+	pacts := w.Pacts[:0]
+	for _, p := range w.Pacts {
+		if !gone[p.With] {
+			pacts = append(pacts, p)
+			continue
+		}
+		if p.Life == w.Life {
+			w.Log("An understanding with nobody",
+				"Whoever you had that arrangement with is not an organization any more. There is nothing left to keep and nothing left to keep it with.",
+				"politics")
+		}
+	}
+	w.Pacts = pacts
+	for id := range w.BusinessTruces {
+		if gone[id] {
+			delete(w.BusinessTruces, id)
+		}
+	}
 }
 
 // considerReestablish gives an organization that still has people but no ground
