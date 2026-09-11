@@ -12769,3 +12769,37 @@ audience habit instead.
 
 Said as it is. The change is right and the number it was aimed at did not move,
 and the honest next question is what those sixty-five thousand journeys are for.
+
+## Ninety-eight per cent of it is walking
+
+Last night ended on a question: what are the soldier's sixty-five thousand
+journeys for? Asking it of every policy is the tick.
+
+| | travel |
+|---|---|
+| soldier | **98%** of its commands |
+| respectable | 64% |
+| diplomat | 62% |
+| racketeer | 46% |
+| the other nine | 2% to 29% |
+
+The soldier made 39,570 journeys out of 40,000 commands. It is not a policy; it
+is a man walking.
+
+The three worst are the three newest, all written by the same hand and in the
+same shape: scan every room for a card, go to the first room that has it. The
+list is in no order the player is in, so the room it picks is rarely the room
+they are standing in, and next turn the scan can pick another. Looking where you
+are standing before looking across town is obviously right and went in — **and
+it moved the figure by one point.**
+
+So that was not the cause. The cause is two goals in two places: a shift on the
+pier and a seat at a table are in different parts of town, and a policy that
+alternates them walks between them for the whole campaign. Fixing it means
+batching — several shifts before crossing the city again — which is a change to
+how every policy is written rather than a line in one of them, so it goes in the
+inbox rather than being half done tonight.
+
+What it means in the meantime is worth being blunt about: for the three policies
+that spend two thirds of their lives on the street, every number they produce is
+mostly a measurement of where Bellwether put its buildings.

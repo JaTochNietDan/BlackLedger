@@ -150,6 +150,26 @@ Ensure efficiency of development loops by increasing efficiency of your workflow
 
 ## Inbox — open
 
+Most of what the harness measures is walking.
+
+Counted across a hundred campaigns each: the soldier spends **98% of its
+commands travelling**, the respectable 64%, the diplomat 62%, the racketeer 46%.
+The other nine are between 2% and 29%. The three worst are the three newest and
+they are all written the same way — scan every room for a card, go to the first
+room that has it — and the cure for that (look where you are standing first) is
+in and moved the figure by a single point.
+
+It is not scan order. It is two goals in two places: a shift at the docks and a
+seat at a table are in different parts of town, and a policy that alternates
+them walks between them all campaign. What would fix it is batching — several
+shifts before crossing the city again — and that is a change to how every policy
+is written rather than a line in one of them.
+
+Until then, every number those policies produce is mostly a measurement of where
+Bellwether put its buildings.
+
+---
+
 A name has no ceiling, and the highest thing it explicitly gates is forty.
 
 — answered, and it was not the ceiling that was wrong. A shift on the pier paid

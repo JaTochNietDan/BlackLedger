@@ -301,6 +301,33 @@ const EditorMoney = 2200
 // its own steps rather than into the till.
 const CellarTopUp = 25
 
+// nearby is every room, with the one the player is standing in first.
+//
+// A policy that wants a card offered in several rooms scans the list and walks
+// to the first room that has it. The list is not in any order the player is in,
+// so the room it picks is rarely the room they are in — and next turn the scan
+// can pick a different one. The soldier spent **98% of its commands
+// travelling**, 39,570 journeys in a hundred campaigns, and the respectable and
+// the diplomat spend around two thirds of theirs the same way. Three policies,
+// all written the same way, all walking.
+//
+// Looking where you are standing before looking across town costs nothing and
+// is what anybody would do.
+func (v View) nearby() []Place {
+	out := make([]Place, 0, len(v.Locations))
+	for _, p := range v.Locations {
+		if p.ID == v.Player.Location {
+			out = append(out, p)
+		}
+	}
+	for _, p := range v.Locations {
+		if p.ID != v.Player.Location {
+			out = append(out, p)
+		}
+	}
+	return out
+}
+
 // family is what this organization thinks of the player, and zero for one
 // nobody has heard of.
 func (v View) family(id string) core.PublicFaction {
@@ -945,7 +972,7 @@ func Choose(v View, strategy string) (core.Command, error) {
 		}
 		// Whoever died working for them, before anything else. Six days is not
 		// long and the card is at one address.
-		for _, p := range v.Locations {
+		for _, p := range v.nearby() {
 			for _, a := range p.Actions {
 				if strings.HasPrefix(a.ID, "funeral:") && !a.Disabled {
 					if c, ok := v.at(p.ID, a.ID); ok {
@@ -1006,7 +1033,7 @@ func Choose(v View, strategy string) (core.Command, error) {
 		}
 		// People of their own, which is what makes a funeral possible at all.
 		if len(v.Player.Crew) > 0 {
-			for _, p := range v.Locations {
+			for _, p := range v.nearby() {
 				for _, a := range p.Actions {
 					if strings.HasPrefix(a.ID, "sign:") && !a.Disabled {
 						if c, ok := v.at(p.ID, a.ID); ok {
@@ -1068,7 +1095,7 @@ func Choose(v View, strategy string) (core.Command, error) {
 		if c, ok := v.action(v.Player.Location, "takeover"); ok {
 			return c, nil
 		}
-		for _, p := range v.Locations {
+		for _, p := range v.nearby() {
 			for _, a := range p.Actions {
 				if a.ID == "takeover" && !a.Disabled {
 					if c, ok := v.at(p.ID, a.ID); ok {
@@ -1095,7 +1122,7 @@ func Choose(v View, strategy string) (core.Command, error) {
 		// Hour" — so a policy that only looks at cards it could press right now
 		// never goes to find it. Walking to it is the first half of taking it.
 		if v.Player.Serves == "" {
-			for _, p := range v.Locations {
+			for _, p := range v.nearby() {
 				for _, a := range p.Actions {
 					id, ok := strings.CutPrefix(a.ID, "serve:")
 					if !ok {
@@ -1129,7 +1156,7 @@ func Choose(v View, strategy string) (core.Command, error) {
 		// eighty-seven of those campaigns ended with the player dead. One in
 		// six turns is enough to climb on and leaves the rest for earning.
 		if v.Player.Respect >= 6 && v.Minute%360 < 60 {
-			for _, p := range v.Locations {
+			for _, p := range v.nearby() {
 				for _, a := range p.Actions {
 					if a.ID == "audience" && !a.Disabled {
 						if c, ok := v.at(p.ID, a.ID); ok {
@@ -1149,7 +1176,7 @@ func Choose(v View, strategy string) (core.Command, error) {
 		// walking into a rival's holding is not a way to pass an afternoon, and
 		// doing it for nobody earns nothing at all.
 		if v.Player.Serves != "" && v.Player.Health >= 70 && v.Minute%360 < 60 {
-			for _, p := range v.Locations {
+			for _, p := range v.nearby() {
 				for _, a := range p.Actions {
 					if a.ID == "sabotage" && !a.Disabled {
 						if c, ok := v.at(p.ID, a.ID); ok {
@@ -1266,7 +1293,7 @@ func Choose(v View, strategy string) (core.Command, error) {
 	// enquired recently — and the enquiry runs out, so it is a thing to keep
 	// doing rather than a box to tick.
 	if strategy == "diplomat" {
-		for _, p := range v.Locations {
+		for _, p := range v.nearby() {
 			for _, a := range p.Actions {
 				if strings.HasPrefix(a.ID, "pact:") && !a.Disabled {
 					if c, ok := v.at(p.ID, a.ID); ok {
@@ -1278,7 +1305,7 @@ func Choose(v View, strategy string) (core.Command, error) {
 		// Nobody would agree to anything with somebody they know nothing
 		// about. Asked about whoever the player has asked about least.
 		want, fewest := "", 0
-		for _, p := range v.Locations {
+		for _, p := range v.nearby() {
 			for _, a := range p.Actions {
 				if !strings.HasPrefix(a.ID, "enquire:") || a.Disabled {
 					continue
@@ -1289,7 +1316,7 @@ func Choose(v View, strategy string) (core.Command, error) {
 			}
 		}
 		if want != "" {
-			for _, p := range v.Locations {
+			for _, p := range v.nearby() {
 				for _, a := range p.Actions {
 					if a.ID == want && !a.Disabled {
 						if c, ok := v.at(p.ID, want); ok {
