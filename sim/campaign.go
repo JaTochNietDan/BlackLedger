@@ -308,6 +308,32 @@ func (v View) at(target, kind string) (core.Command, bool) {
 	}
 	return v.action(target, kind)
 }
+
+// earn is where the money comes from when the next thing on the ladder costs
+// more than the player has.
+//
+// Every policy here reached for the same thing — carry an envelope at the bar —
+// and treated it as inexhaustible. It is a favour rather than a job, and the
+// moment there were only so many a day, seven of the eight ended their
+// campaigns on the first afternoon with nothing to do.
+//
+// The pier is the answer and the trick is not to commute to it. Sending them
+// back to the bar between every shift spent most of the day walking, which read
+// as the economy collapsing and was travel time. Somebody already standing on
+// the waterfront stays there.
+func (v View) earn() (string, string) {
+	switch v.Player.Location {
+	case "docks":
+		return "docks", "dockwork"
+	case "bar":
+		if _, ok := v.action("bar", "courier"); ok {
+			return "bar", "courier"
+		}
+		return "docks", "dockwork"
+	}
+	return "bar", "courier"
+}
+
 func Choose(v View, strategy string) (core.Command, error) {
 	if v.Event != nil {
 		priorities := []string{"approach:careful", "accept", "pay", "escape", "acknowledge", "leave", "decline"}
@@ -839,7 +865,7 @@ func Choose(v View, strategy string) (core.Command, error) {
 		}
 	}
 	if v.Player.Cash < cost {
-		target, kind = "bar", "courier"
+		target, kind = v.earn()
 	}
 	if kind == "expand" {
 		if c, ok := v.action(target, kind); ok {
@@ -849,7 +875,7 @@ func Choose(v View, strategy string) (core.Command, error) {
 	if c, ok := v.at(target, kind); ok {
 		return c, nil
 	}
-	if c, ok := v.at("bar", "courier"); ok {
+	if c, ok := v.at(v.earn()); ok {
 		return c, nil
 	}
 	return core.Command{}, fmt.Errorf("no policy action at %s", v.Player.Location)

@@ -821,6 +821,7 @@ func (w *World) apply(c Command) error {
 					w.Earn(CourierPay)
 					p.Respect += CourierRespect
 					p.JobCount++
+					w.carriedOne()
 					w.Log("Envelope delivered", fmt.Sprintf("%s pays $%d. A small favor, completed without questions.", w.RoleName("fixer"), CourierPay), "work")
 				case "dockwork":
 					w.Earn(75)

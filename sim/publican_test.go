@@ -75,7 +75,21 @@ func TestRunningWhatYouHoldCostsMoreThanItPaysSoFar(t *testing.T) {
 	if p == i && pCasino == iCasino {
 		t.Fatal("running a business and ignoring it come to exactly the same thing")
 	}
-	if pCasino > iCasino {
-		t.Fatalf("the publican expanded faster than the investor: %d casinos against %d", pCasino, iCasino)
+	// The claim this test is named for is about money, and money still makes
+	// it: a publican ends poorer than an investor inside two hundred commands.
+	if p >= i {
+		t.Fatalf("running what you hold now pays: the publican's median is $%d against the investor's $%d.\n"+
+			"    That is the deficiency this test exists to record, so the name and the reasoning\n"+
+			"    above it are what need changing, not this line.", p, i)
 	}
+	// It used to say the publican also expanded more slowly, and that stopped
+	// being true the day the fixer's envelopes ran out. Capping a favour at
+	// three a day takes the easy money away from a policy that spends its time
+	// carrying them and leaves the one that spends its time on its holdings
+	// where it was — so the publican now opens more rooms than the investor
+	// while still ending with less in hand. Expanding faster and being poorer
+	// for it is a different sentence from the one that was here, and it is the
+	// one the numbers now support.
+	t.Logf("the publican opens %d casinos to the investor's %d and ends $%d behind",
+		pCasino, iCasino, i-p)
 }

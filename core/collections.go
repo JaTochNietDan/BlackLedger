@@ -129,4 +129,42 @@ const (
 	CourierRespect = 2
 	// CourierMinutes is how long it takes, which is a different 45.
 	CourierMinutes = 45
+	// CourierADay is how many envelopes there are.
+	//
+	// There was no limit, and by the minute — the only honest way to compare
+	// two things that take different amounts of a day — the envelope beat the
+	// pier on every axis at once: $1.00 a minute against $0.83, two respect for
+	// forty-five minutes against one for ninety, and no chance of being hurt
+	// against one shift in seven costing ten health. The first job in the game
+	// was strictly better than the grind it is supposed to graduate into, so
+	// there was never a reason to work the docks at all.
+	//
+	// A favour is not a career. The fixer has a few envelopes and then they are
+	// gone until tomorrow, and the pier is what is always there.
+	CourierADay = 3
 )
+
+// EnvelopesLeft is how many favours the fixer still has today.
+func (w *World) EnvelopesLeft() int {
+	if w.Player.CarriedDay != w.Minute/1440 {
+		return CourierADay
+	}
+	return max(0, CourierADay-w.Player.Carried)
+}
+
+// CourierReadiness explains why there is no envelope, or returns "".
+func (w *World) CourierReadiness() string {
+	if w.EnvelopesLeft() <= 0 {
+		return "Nothing else needs carrying today. There is always the pier"
+	}
+	return ""
+}
+
+// carriedOne records an envelope against today.
+func (w *World) carriedOne() {
+	day := w.Minute / 1440
+	if w.Player.CarriedDay != day {
+		w.Player.CarriedDay, w.Player.Carried = day, 0
+	}
+	w.Player.Carried++
+}

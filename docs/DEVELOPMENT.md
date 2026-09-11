@@ -10635,3 +10635,53 @@ the eight policies taught to earn before it can be priced at all, and pricing it
 on a harness that stalls without it would be the seventh time tonight the
 instrument was mistaken for the game. The pier and the envelope are written up
 here with their real numbers so the next attempt starts from them.
+
+## The envelope is a favour now, and what that cost
+
+The last tick found that the game's two honest jobs were not a choice: carrying
+an envelope beat a shift on the pier on money by the minute, on standing by a
+factor of four, and on not being hurt, and there was no limit on it. The cap was
+built and reverted because the simulated economy appeared to collapse under it.
+
+It did not. The collapse was the fallback I had written to take the measurement:
+sending a policy back to the bar between every shift spent most of the day
+walking, and seven policies read as ruined when what they had lost was travel
+time. Teaching them to stay on the waterfront once they are on it is a change to
+the harness with no change to the game at all, and on its own it made three of
+them richer — the smuggler from $3,566 to $4,473, the racketeer from $1,658 to
+$2,576.
+
+With that fixed, three envelopes a day is a redistribution rather than a
+catastrophe:
+
+| | before | after |
+|---|---|---|
+| worker | $12,510 | $12,510 |
+| investor | $2,408 | $6,938 |
+| defiant | $5,862 | $3,606 |
+| smuggler | $3,566 | $3,431 |
+| racketeer | $1,658 | $2,868 |
+| publican | $1,739 | $3,594 |
+
+The policies that spend their day on their holdings do better; the ones that
+spent it carrying envelopes do worse. That is the shape the change was for.
+
+### The cost, said plainly
+
+The defiant went from never dying to dying in fifty-nine campaigns of a hundred.
+Its income was the unlimited envelope, and a policy whose whole idea is refusing
+to pay cannot afford the consequences of refusing when it is poor. That is a
+legible consequence rather than a surprise, and it is the price of the change.
+It is here rather than buried because a table of cash that omitted it would be
+the same kind of half-measurement this session has already made six times.
+
+### And a guard that recorded a deficiency, updated
+
+`TestRunningWhatYouHoldCostsMoreThanItPaysSoFar` asserted that a publican both
+ends poorer than an investor and expands more slowly. The first half is still
+true and is the claim the test is named for. The second stopped being true the
+moment the envelopes ran out: the publican now opens more rooms than the
+investor and still ends $3,344 behind. Expanding faster and being poorer for it
+is a different sentence from the one that was there, and it is the one the
+numbers support, so the assertion is about money now and the expansion count is
+logged rather than enforced.

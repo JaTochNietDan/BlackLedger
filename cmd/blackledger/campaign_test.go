@@ -61,10 +61,22 @@ func TestHTTPRiseFallAndNewLife(t *testing.T) {
 			t.Fatal("could not reach", target)
 		}
 	}
+	// Envelopes first, and the pier for the rest of it. The fixer has three
+	// favours a day; a campaign that wanted sixteen used to take them all from
+	// him and now works for most of its money, which is what this city looks
+	// like from the inside.
+	carried := 0
 	earn := func(jobs int) {
-		travel("bar")
 		for i := 0; i < jobs; i++ {
-			command("courier", "bar", "")
+			if carried < core.CourierADay {
+				travel("bar")
+				command("courier", "bar", "")
+				settle()
+				carried++
+				continue
+			}
+			travel("docks")
+			command("dockwork", "docks", "")
 			settle()
 		}
 	}

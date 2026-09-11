@@ -56,6 +56,11 @@ type Person struct {
 	Alive    bool   `json:"alive"`
 	Earned   int    `json:"earned"`
 	JobCount int    `json:"job_count"`
+	// Envelopes carried today, and the day that was. Absent in saves written
+	// before this, which reads as none carried, so an old campaign simply
+	// finds today's waiting for it.
+	Carried    int `json:"carried,omitempty"`
+	CarriedDay int `json:"carried_day,omitempty"`
 	// What the player is carrying. Absent in saves written before the trade
 	// existed, which is the same as carrying nothing.
 	Stock map[string]int `json:"stock,omitempty"`
@@ -1032,8 +1037,10 @@ func (w *World) Actions(id string) []Action {
 					days*BailDaily, plainly(days, "day", counted(days, "day", "days"))))
 		}
 	case "bar":
-		add("courier", "Carry a discreet envelope", CourierMinutes, 0, "",
-			fmt.Sprintf("Earn $%d and %d respect. A reliable introduction to the neighborhood.", CourierPay, CourierRespect))
+		add("courier", "Carry a discreet envelope", CourierMinutes, 0, w.CourierReadiness(),
+			fmt.Sprintf("Earn $%d and %d respect. A reliable introduction to the neighborhood. %s has %s today.",
+				CourierPay, CourierRespect, w.RoleName("fixer"),
+				plainly(w.EnvelopesLeft(), "one more", counted(w.EnvelopesLeft(), "envelope", "envelopes"))))
 		add("contact", "Buy "+w.RoleName("fixer")+" a coffee", 30, 10, need(p.Contacts >= 5, "Your information network is fully developed"), "Build trust and an information network. Contacts may warn you of trouble.")
 		about(w.HolderID("fixer"))
 		reason := need(p.Respect < PremisesRespect, fmt.Sprintf("Earn %d respect first", PremisesRespect))
