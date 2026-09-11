@@ -7,9 +7,9 @@ import "testing"
 // somebody only ever left over a grudge, so a well-run business was safe from
 // the city entirely and the wage was a lever with nothing pulling against it.
 
-func tempted(t *testing.T) (*World, string, string) {
+func tempted(t *testing.T, seed uint32) (*World, string, string) {
 	t.Helper()
-	w := New(61)
+	w := New(seed)
 	w.Event, w.District = nil, 9
 	w.Player.Cash, w.Player.Health = 20000, 100
 	own(w, "laundry")
@@ -71,25 +71,39 @@ func tookOne(w *World, from, rival string, days int) string {
 	return ""
 }
 
+// Somebody paid the least anybody stands there for, with a rival across town
+// who has an empty counter and the money to fill it.
+//
+// This asked one city whether a poach ever happened in sixty days. Whether it
+// happens is a roll, and one city is one roll: it passed on the number it was
+// written with and failed the moment campaign numbers stopped opening the
+// stream in the same eighth of its range. Forty cities, and the claim is that it
+// happens in a good share of them rather than in the one that was tried.
 func TestARivalComesForYourPeople(t *testing.T) {
 	t.Parallel()
-	w, id, rival := tempted(t)
-	trade, _ := TradeOf(id)
-	// Paid the least anybody stands there for, and nobody carrying anything
-	// against the player: the only reason to go is the money.
-	least, _ := WageBounds(trade.Wage)
-	if err := w.SetWage(id, least); err != nil {
-		t.Fatal(err)
+	took, tried := 0, 0
+	for n := uint32(1); n <= 40; n++ {
+		w, id, rival := tempted(t, spread(n))
+		trade, _ := TradeOf(id)
+		least, _ := WageBounds(trade.Wage)
+		if err := w.SetWage(id, least); err != nil {
+			t.Fatal(err)
+		}
+		tried++
+		if tookOne(w, id, rival, 60) != "" {
+			took++
+		}
 	}
-	filled := len(w.Properties[id].Hands)
-	if took := tookOne(w, id, rival, 60); took == "" {
-		t.Fatalf("a rival with an empty counter and $40,000 never took one of the %d you pay $%d a day", filled, least)
+	t.Logf("a rival took somebody in %d of %d cities in sixty days", took, tried)
+	if took*3 <= tried {
+		t.Fatalf("a rival with an empty counter and the money to fill it took somebody "+
+			"in only %d of %d cities, so paying the least costs nothing", took, tried)
 	}
 }
 
 func TestPayingWellKeepsThem(t *testing.T) {
 	t.Parallel()
-	w, id, _ := tempted(t)
+	w, id, _ := tempted(t, spread(1))
 	trade, _ := TradeOf(id)
 	_, most := WageBounds(trade.Wage)
 	if err := w.SetWage(id, most); err != nil {
@@ -106,7 +120,7 @@ func TestPayingWellKeepsThem(t *testing.T) {
 // underpaid is a reason to stop turning up whether or not anybody is hiring.
 func TestWhoTakesThemIsADifferentQuestionFromWhetherTheyGo(t *testing.T) {
 	t.Parallel()
-	w, id, _ := tempted(t)
+	w, id, _ := tempted(t, spread(1))
 	trade, _ := TradeOf(id)
 	least, _ := WageBounds(trade.Wage)
 	if err := w.SetWage(id, least); err != nil {
@@ -146,7 +160,7 @@ func TestWhoTakesThemIsADifferentQuestionFromWhetherTheyGo(t *testing.T) {
 // bled people for no reason anybody could name.
 func TestPayingTheRateTemptsNobody(t *testing.T) {
 	t.Parallel()
-	w, id, _ := tempted(t)
+	w, id, _ := tempted(t, spread(1))
 	trade, _ := TradeOf(id)
 	if w.WageAt(id) != trade.Wage {
 		t.Fatalf("a business nobody has touched pays $%d against a rate of $%d", w.WageAt(id), trade.Wage)

@@ -156,19 +156,19 @@ stream is a plain linear congruential generator started from the campaign's own
 number, so seeds 1 to 200 open on 0.236 through 0.313 and a hundred and
 twenty-five loops in the tests start at one.
 
-Tried, measured, and backed out rather than rushed: it turns thirteen tests red.
-Four were genuine faults and are fixed and shipped. Nine remain, each needing a
-judgement rather than a nudge, and they are the work:
+Tried, measured, and backed out twice rather than rushed. It turned thirteen
+tests red; seven of those are now fixed and shipped without it, each of them a
+guard that was wrong rather than a number that needed nudging. Six remain, and
+they are the work:
 
-- `TestARivalComesForYourPeople` — a rival with an empty counter never poaches.
-- `TestSomebodyOnTheDoorStopsTheQuietWord` — two of yours still put off.
 - `TestLeavingTownIsAWayToSurviveAWeek` — 300 of 300 survive staying, so a
-  journey buys nothing measurable; the danger needs to be real before the
+  journey buys nothing measurable; the danger has to be real before the
   comparison means anything.
-- `TestAMayorOnlyPaysForHimselfWithAPortfolio`, `TestARaidTakesStockCashAndCondition`,
-  `TestRefusingCreatesHiddenConsequences`, `TestTakingTheFamilyHandsYouFourWorkingBusinesses`,
-  `TestCountryPricesAreWorthTheFareOnlyIfYouCanHideTheLoad`, and the casino's
-  thin float, which is already re-pinned with a margin.
+- `TestAMayorOnlyPaysForHimselfWithAPortfolio`
+- `TestARaidTakesStockCashAndCondition`
+- `TestRefusingCreatesHiddenConsequences`
+- `TestTakingTheFamilyHandsYouFourWorkingBusinesses`
+- `TestCountryPricesAreWorthTheFareOnlyIfYouCanHideTheLoad`
 
 ---
 

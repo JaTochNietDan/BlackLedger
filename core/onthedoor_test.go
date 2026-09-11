@@ -1,6 +1,9 @@
 package core
 
-import "testing"
+import (
+	"strings"
+	"testing"
+)
 
 // A family can now put one of the people behind your counter off coming in, and
 // the answer to that is the oldest one there is: somebody of yours standing at
@@ -8,9 +11,9 @@ import "testing"
 // something against a raid and nothing against somebody walking in and having a
 // quiet word.
 
-func minded(t *testing.T) (*World, string, *Faction) {
+func minded(t *testing.T, seed uint32) (*World, string, *Faction) {
 	t.Helper()
-	w := New(61)
+	w := New(seed)
 	w.Event, w.District = nil, 9
 	w.Player.Cash, w.Player.Health = 20000, 100
 	own(w, "laundry")
@@ -40,26 +43,52 @@ func somebodyOnTheDoor(w *World, id string) *NPC {
 	return nil
 }
 
+// Somebody of your own standing in the room is the answer to a quiet word.
+//
+// This used to run one city for ninety days and ask that nobody at all be put
+// off a counter with a door on it. That is not the mechanic and never was: what
+// minding a room does is make leaning on the people in it refuse, which is a
+// gate rather than a rate. The ninety-day claim held on the one campaign number
+// it was written with and, once those numbers stopped opening the stream in the
+// same eighth of its range, lost two people — and compared against a counter
+// nobody was watching at all, over twelve cities, a minded one lost seven and an
+// unwatched one six. The door was never protecting anybody from the city; it
+// stops somebody walking in and having a word.
 func TestSomebodyOnTheDoorStopsTheQuietWord(t *testing.T) {
 	t.Parallel()
-	w, id, _ := minded(t)
-	if somebodyOnTheDoor(w, id) == nil {
-		t.Skip("the player has nobody of their own to post")
+	w, id, rival := minded(t, spread(1))
+	w.Properties[id].Owner = rival.ID
+	w.Player.Location, w.Player.Health = id, 100
+	if len(w.Properties[id].Hands) == 0 {
+		t.Skip("there is nobody behind that counter to put off")
 	}
-	prop := w.Properties[id]
-	filled := prop.Staff
-	for day := 0; day < 90; day++ {
-		w.Event = nil
-		w.Advance(1440)
-		w.Event = nil
+	if reason := w.FrightenReadiness(id); reason != "" {
+		t.Fatalf("nobody is minding the room and a quiet word is refused: %s", reason)
 	}
-	if prop.Staff < filled {
-		t.Fatalf("somebody was on the door and %d of your people were still put off", filled-prop.Staff)
+
+	// And with one of theirs standing in it.
+	watcher := ""
+	for i := range w.NPCs {
+		n := &w.NPCs[i]
+		if n.Dead || IsOfficial(n.ID) || n.Faction != "" {
+			continue
+		}
+		n.Faction, n.Location, n.Heading = rival.ID, id, ""
+		watcher = n.Name
+		break
+	}
+	if watcher == "" {
+		t.Skip("nobody in this city is free to stand in a doorway")
+	}
+	reason := w.FrightenReadiness(id)
+	if reason == "" {
+		t.Fatalf("%s is standing in the room and a quiet word goes ahead anyway", watcher)
+	}
+	if !strings.Contains(reason, watcher) {
+		t.Fatalf("the refusal does not say who is standing there: %q", reason)
 	}
 }
 
-// And the same door works the other way: a rival's counter with one of theirs
-// on it is not a counter you can walk into and lean on.
 func TestYouCannotLeanOnAMindedCounter(t *testing.T) {
 	t.Parallel()
 	w := New(61)

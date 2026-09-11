@@ -12381,3 +12381,36 @@ somebody and have him gone before lunch, which is the opposite of the reason the
 line exists. Whoever crossed this morning does not also decide this morning. That
 is a change to the game rather than to a test, and the test that found it was
 looking for a card that had already gone blank.
+
+## Three more, and one of them was guarding nothing
+
+Six of the nine left by last night. Three are done, and the third is the useful
+one.
+
+**A rival never came for anybody.** One city, sixty days, asking whether a poach
+ever happened. Whether it happens is a roll and one city is one roll. Forty
+cities: **a rival with an empty counter and the money to fill it takes somebody
+in 29 of them.**
+
+**A thin float's threshold sat on the measurement.** Forty bust months out of
+four hundred was both the figure the old sample produced and the line the test
+drew. Spread properly it is 37, so the line is at 25 now — what is guarded is
+that under-funding a room costs something, not the exact rate.
+
+**And somebody on the door was guarding nothing.** The test ran a city for
+ninety days and asked that nobody at all be put off a counter with a door on it.
+Compared against a counter nobody was watching — which nobody had ever done —
+twelve cities lost **seven from the minded one and six from the unwatched**.
+The door has never protected anybody from the city, because the city's poaching
+does not look at it.
+
+What it actually does is a gate, not a rate: with one of theirs standing in the
+room, leaning on the people behind that counter is refused, by name. That is the
+mechanic, it is deterministic, and the test asks it directly now. The ninety-day
+claim passed for as long as it did because one campaign number happened to lose
+nobody.
+
+Seven of the thirteen are fixed. The remaining six go back in the inbox, and the
+multiply that started all this is still not in the tree — two nights of taking
+bites out of it is the right pace for a change that moves every seeded number in
+the game.
