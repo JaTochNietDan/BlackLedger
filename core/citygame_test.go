@@ -1,6 +1,9 @@
 package core
 
-import "testing"
+import (
+	"strings"
+	"testing"
+)
 
 // The back room is a game only the player has ever played in. The people
 // standing in it have money, a reason to gamble it, and nothing else to do of
@@ -121,7 +124,10 @@ func TestABadNightAtCardsIsSomethingTwoPeopleFallOutOver(t *testing.T) {
 	}
 	cards := 0
 	for _, g := range w.Grudges {
-		if g.Because == "a night at cards in the back room" {
+		// The reason names the room now that there is more than one of them:
+		// "a night at cards behind The Mariner". The wording changed with the
+		// code, not the rule being guarded.
+		if strings.HasPrefix(g.Because, "a night at cards behind ") {
 			cards++
 		}
 	}
@@ -136,5 +142,90 @@ func TestABadNightAtCardsIsSomethingTwoPeopleFallOutOver(t *testing.T) {
 	other := len(w.Grudges) - cards
 	if other == 0 {
 		t.Fatalf("every one of this city's %d grudges is about a card game", len(w.Grudges))
+	}
+}
+
+// The game behind the poolhall was the only one in the city. A room with no
+// house in it belongs wherever there are people of an evening and nobody
+// holding a float, and the bar has four times the poolhall's evening crowd —
+// thirty-two people against six — so a three-handed game gets up there on
+// nights the poolhall's does not.
+func TestTheCityPlaysInEveryBackRoom(t *testing.T) {
+	t.Parallel()
+	if len(BackRooms()) < 2 {
+		t.Fatal("there is still only one room in this city with a game behind it")
+	}
+	// Every one of them has to be a room people are actually in after dark, or
+	// it is a table nobody ever sits at.
+	w := New(61)
+	w.Event, w.District = nil, 9
+	for _, at := range BackRooms() {
+		if _, ok := PlaceByID(at); !ok {
+			t.Fatalf("%s is not an address in this city", at)
+		}
+		if HasBankroll(at) {
+			t.Fatalf("%s runs a float, so a game with no house in it is two games for the same seats", at)
+		}
+		evenings := 0
+		for i := range w.NPCs {
+			if !w.NPCs[i].Dead && haunt(w.NPCs[i].ID) == at {
+				evenings++
+			}
+		}
+		if evenings < 3 {
+			t.Fatalf("%s has %d people in it of an evening, which will not make a three-handed game",
+				at, evenings)
+		}
+	}
+	for day := 0; day < 60; day++ {
+		w.Event = nil
+		w.Advance(1440)
+		w.Event = nil
+	}
+	t.Logf("sixty days: %d hands in the city's back rooms, $%d taken for the seats",
+		w.BackRoomHands, w.BackRoomTake)
+	if w.BackRoomHands < 60 {
+		t.Fatalf("two rooms and only %d hands in sixty days, which is one room's worth", w.BackRoomHands)
+	}
+}
+
+// And the seat money stays in the room it was taken in. The player holds the
+// poolhall here and not the bar, which the Russos have and which does not change
+// hands — so one table fills and the other pays a rival, and neither pays the
+// other. A hand played across town used to be worth money to the poolhall
+// because the poolhall was the only room the code could name.
+func TestTheSeatMoneyStaysInTheRoomItWasTakenIn(t *testing.T) {
+	t.Parallel()
+	w := New(61)
+	w.Event, w.District = nil, 9
+	w.Player.Health, w.Player.Respect = 100, 30
+	w.Player.Location, w.Player.Cash = BackRoom, 200000
+	if err := w.apply(Command{Kind: "acquire", Target: BackRoom, RequestID: "holdthehall"}); err != nil {
+		t.Fatal(err)
+	}
+	rival := w.Properties["bar"].Owner
+	if w.Own("bar") {
+		t.Fatal("the player holds the bar, so there is nobody else to pay")
+	}
+	theirs := 0
+	if f := w.faction(rival); f != nil {
+		theirs = f.Cash
+	}
+	for day := 0; day < 60; day++ {
+		w.Event = nil
+		w.Advance(1440)
+		w.Event = nil
+	}
+	after := 0
+	if f := w.faction(rival); f != nil {
+		after = f.Cash
+	}
+	t.Logf("sixty days: the poolhall's table has taken $%d; the bar's holder is $%d different",
+		w.Properties[BackRoom].Bankroll, after-theirs)
+	if w.Properties[BackRoom].Bankroll == 0 {
+		t.Fatal("the player holds the poolhall and its table has taken nothing")
+	}
+	if w.Properties["bar"].Bankroll != 0 {
+		t.Fatal("a room the player does not hold is filling a table of its own rather than paying its holder")
 	}
 }

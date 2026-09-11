@@ -8623,3 +8623,37 @@ thousand across seeds, while the wage's own contribution is the $904 of extra
 bill. The trust ladder is the deterministic part and that is what is guarded.
 
 Balance: publican $1,728 to $1,732, nothing else moved.
+
+## A second room with a room behind it
+
+The card game with no house in it existed at exactly one address, because the
+code said `id != BackRoom` in four places and `BackRoom` was the string
+"poolhall". The queue has wanted the same for the other rooms since it was
+built.
+
+A game with no house belongs where there are people of an evening and nobody
+holding a float. That is the poolhall and the bar. The club and the casino are
+left out deliberately: they run floats, the house edge is the point of them, and
+a no-house game in the same building would be two games competing for the same
+seats.
+
+The bar is the better room of the two. The city's evenings divide twelve ways
+and the bar takes four of them against the poolhall's one, so thirty-two people
+drink at Saint Agnes against six at the Green Baize, and a three-handed game
+gets up there on nights the poolhall's does not. Measured over sixty days of a
+city playing itself: 48 hands and $1,328 of seat money before, 108 hands and
+$3,248 after.
+
+The seat money stays in the room it was taken in. The Russos hold Saint Agnes
+and it does not change hands, so a player who holds the Green Baize fills their
+own till and pays a rival for every seat at the other table.
+
+Two guards had to be rewritten rather than reverted, both said so in place. The
+till guard compared one room's till against `BackRoomTake`, which is now the
+whole city's seat money across two rooms; it checks that the till filled, filled
+in whole seat charges, and that the same money is not also in the holder's
+hands. The grudge guard matched the reason string, which now names the room.
+
+Balance moved, and in a direction that makes sense: more money circulating among
+the city's people is more for a racketeer to take. Racketeer deaths 45 to 33 and
+cash $967 to $1,658; thief cash $1,049 to $1,090. Baseline updated.

@@ -17,8 +17,34 @@ import (
 // plays his hand the way somebody with his standing and his nerve would play it
 // is characterised by the game rather than by a paragraph about him.
 
-// BackRoom is where the game is. A poolhall has a room behind the room.
+// BackRoom is where the game started. A poolhall has a room behind the room.
 const BackRoom = "poolhall"
+
+// And it is not the only one. A game with no house in it belongs where there
+// are people of an evening and nobody holding a float: a room that runs tables
+// is already taking an edge off everybody in it, and a room that is empty after
+// dark has nobody to deal to. That is the poolhall and the bar — and the bar
+// has four times the poolhall's evening crowd, so the city's own game there
+// gets up on nights the poolhall's does not.
+//
+// The club and the casino are left out on purpose. They run floats, the house
+// edge is the point of them, and a no-house game in the same building would be
+// two games competing for the same seats.
+var backRooms = []string{BackRoom, "bar"}
+
+// HasBackRoom reports whether this address has a room behind the room.
+func HasBackRoom(id string) bool {
+	for _, at := range backRooms {
+		if at == id {
+			return true
+		}
+	}
+	return false
+}
+
+// BackRooms is every address with a game behind it, for the city's own night
+// and for the guards.
+func BackRooms() []string { return append([]string{}, backRooms...) }
 
 // Ante bounds. Low enough that anybody in the room can sit down, high enough
 // that losing is felt.
@@ -268,7 +294,7 @@ func BestAtTheTable(g *CardGame) HandRank {
 // cover the ante. Nobody is invented for this: an empty room has no game, which
 // is why the game is worth walking somewhere for.
 func (w *World) SitInTheBackRoom(place string, ante int) error {
-	if place != BackRoom {
+	if !HasBackRoom(place) {
 		return fmt.Errorf("there is no game here")
 	}
 	if w.Game != nil && !w.Game.Done {
@@ -530,7 +556,7 @@ func (w *World) BackRoomAnte(amount int) int {
 
 // BackRoomReadiness explains why there is no game to sit in on, or returns "".
 func (w *World) BackRoomReadiness(id string, ante int) string {
-	if id != BackRoom {
+	if !HasBackRoom(id) {
 		return "There is no game here"
 	}
 	if w.Game != nil && !w.Game.Done {

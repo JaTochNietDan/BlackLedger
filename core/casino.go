@@ -49,7 +49,7 @@ func HasBankroll(id string) bool {
 // took went straight into the holder's pocket without ever being anywhere they
 // could see it, which is what the note was about: "I don't see its current
 // funds or how to add to the funds or withdraw from the funds dynamically."
-func RunsAGame(id string) bool { return HasBankroll(id) || id == BackRoom }
+func RunsAGame(id string) bool { return HasBankroll(id) || HasBackRoom(id) }
 
 // Confidence is how much of its potential action a house attracts, which is
 // decided by what is behind the tables. A thin float is not a secret: the

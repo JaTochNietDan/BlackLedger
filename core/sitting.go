@@ -19,7 +19,7 @@ import "fmt"
 // Playable reports whether there is anything to sit down to here. The room
 // behind the poolhall counts: a hand of cards against people who live here is a
 // game you sit down to and leave, not a box above the action list.
-func Playable(id string) bool { return HasTables(id) || HasMachines(id) || id == BackRoom }
+func Playable(id string) bool { return HasTables(id) || HasMachines(id) || HasBackRoom(id) }
 
 // SitReadiness explains why no seat can be taken here, or returns "".
 func (w *World) SitReadiness(id string) string {

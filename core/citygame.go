@@ -31,10 +31,19 @@ const (
 // the moment the day turns over: the first version asked the second question
 // and played one hand in thirty days.
 func (w *World) BackRoomNight() {
+	for _, where := range backRooms {
+		w.nightAt(where)
+	}
+}
+
+// nightAt is one of those rooms. Whose evening this room is, rather than who is
+// standing in it at the moment the day turns over: the first version asked the
+// second question and played one hand in thirty days.
+func (w *World) nightAt(where string) {
 	var players []*NPC
 	for i := range w.NPCs {
 		n := &w.NPCs[i]
-		if !n.Dead && !w.Travelling(n) && haunt(n.ID) == BackRoom && w.Pockets(n) >= CityAnte+TableCharge {
+		if !n.Dead && !w.Travelling(n) && haunt(n.ID) == where && w.Pockets(n) >= CityAnte+TableCharge {
 			players = append(players, n)
 		}
 		if len(players) >= Players+1 {
@@ -50,7 +59,7 @@ func (w *World) BackRoomNight() {
 		n.Purse -= CityAnte
 		pot += CityAnte
 		hands[i] = deck[i*5 : i*5+5]
-		w.chargeForTheTable(n)
+		w.chargeForTheTable(n, where)
 	}
 	// Everybody plays their own hand the way the room plays a hand. Nobody
 	// bets: what is interesting off-screen is who won and who is short, and a
@@ -71,8 +80,9 @@ func (w *World) BackRoomNight() {
 	w.BackRoomHands++
 	// The player hears about it if it is their room or they were in it. A game
 	// nobody told them about is still a game, and the city is full of them.
-	if w.Own(BackRoom) || w.Player.Location == BackRoom {
-		w.Log("The back room", w.BackRoomNote(players[who], pot), "personal")
+	if w.Own(where) || w.Player.Location == where {
+		place, _ := PlaceByID(where)
+		w.Log("The back room at "+place.Name, w.BackRoomNote(players[who], pot), "personal")
 	}
 	// A bad night between two people who are not the player is the city's own
 	// business, and the city already has somewhere to put it. One person a
@@ -90,7 +100,8 @@ func (w *World) BackRoomNight() {
 		}
 	}
 	if worst >= 0 {
-		w.Resent(players[worst].ID, players[who].ID, SoreAtEachOther, "a night at cards in the back room")
+		place, _ := PlaceByID(where)
+		w.Resent(players[worst].ID, players[who].ID, SoreAtEachOther, "a night at cards behind "+place.Name)
 	}
 }
 
@@ -131,13 +142,13 @@ func keepFor(cards []Card, skill int) ([]Card, int) {
 // chargeForTheTable takes the seat money and gives it to whoever holds the
 // room. An address nobody holds keeps it, which is what an unowned back room
 // does with it.
-func (w *World) chargeForTheTable(n *NPC) {
+func (w *World) chargeForTheTable(n *NPC, where string) {
 	if w.Pockets(n) < TableCharge {
 		return
 	}
 	n.Purse -= TableCharge
 	w.BackRoomTake += TableCharge
-	prop := w.Properties[BackRoom]
+	prop := w.Properties[where]
 	if prop == nil {
 		return
 	}
@@ -145,7 +156,7 @@ func (w *World) chargeForTheTable(n *NPC) {
 	// Baize should be able to look at what the table has taken, add to it and
 	// draw it out, which they cannot do with money that has already gone into
 	// their own hands.
-	if w.Own(BackRoom) {
+	if w.Own(where) {
 		prop.Bankroll += TableCharge
 		return
 	}

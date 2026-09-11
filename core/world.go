@@ -1273,7 +1273,7 @@ func (w *World) Actions(id string) []Action {
 			if !HasTables(id) {
 				seat, what = "Play the machines", "Three drums and a handle, against the wall where they always are."
 			}
-			if id == BackRoom {
+			if HasBackRoom(id) {
 				seat, what = "Go through to the back room", "A hand of cards against whoever is in there, played out in front of you until you get up."
 			}
 			add("sit", seat, 0, 0, w.SitReadiness(id), what)
@@ -1292,7 +1292,7 @@ func (w *World) Actions(id string) []Action {
 	}
 	// The back room. Not a table: no house, no edge, and the money across it
 	// belongs to whoever is sitting in the room tonight.
-	if id == BackRoom {
+	if HasBackRoom(id) {
 		if g := w.Game; g != nil && !g.Done && g.Place == id {
 			switch {
 			case g.Facing:
@@ -2161,7 +2161,7 @@ func (w *World) Public() map[string]any {
 		if w.Own(l.ID) {
 			income += float64(prop.Income*prop.Condition) / 100
 		}
-		locs = append(locs, map[string]any{"id": l.ID, "name": l.Name, "type": l.Type, "district": l.District, "x": l.X, "y": l.Y, "cost": AcquisitionCost(w, l.ID), "blurb": l.Blurb, "owner": prop.Owner, "holder": w.HolderName(l.ID), "staff": prop.Staff, "hands": w.HandsDescription(l.ID), "wage": w.WageAt(l.ID), "runs": w.RunsItName(l.ID), "rate": tradeWage(l.ID), "positions": tradeHands(l.ID), "supply": prop.Supply, "unpaid": prop.Unpaid, "trouble": prop.Trouble, "shy": w.Shy(l.ID), "curtains": w.Curtains(l.ID), "trade": w.CustomDescription(l.ID), "posted": w.PostingDescription(l.ID), "people": w.PeopleHere(l.ID), "note": w.PlaceNote(l.ID), "room": w.RoomNote(l.ID), "note_warn": w.PlaceWarn(l.ID), "away": w.Away(l.ID), "travel_note": w.TravelNote(l.ID), "crossing": w.Crossing(w.Player.Location, l.ID), "still": prop.Still, "bankroll": prop.Bankroll, "handle": w.NightHandleAt(l.ID), "capacity": w.Capacity(l.ID), "trading": w.Trading(l.ID), "condition": prop.Condition, "income": prop.Income, "owned": w.Own(l.ID), "locked": l.District > w.District, "actions": w.Actions(l.ID)})
+		locs = append(locs, map[string]any{"id": l.ID, "name": l.Name, "type": l.Type, "district": l.District, "x": l.X, "y": l.Y, "cost": AcquisitionCost(w, l.ID), "blurb": l.Blurb, "owner": prop.Owner, "holder": w.HolderName(l.ID), "staff": prop.Staff, "hands": w.HandsDescription(l.ID), "wage": w.WageAt(l.ID), "runs": w.RunsItName(l.ID), "rate": tradeWage(l.ID), "positions": tradeHands(l.ID), "supply": prop.Supply, "unpaid": prop.Unpaid, "back_room": HasBackRoom(l.ID), "trouble": prop.Trouble, "shy": w.Shy(l.ID), "curtains": w.Curtains(l.ID), "trade": w.CustomDescription(l.ID), "posted": w.PostingDescription(l.ID), "people": w.PeopleHere(l.ID), "note": w.PlaceNote(l.ID), "room": w.RoomNote(l.ID), "note_warn": w.PlaceWarn(l.ID), "away": w.Away(l.ID), "travel_note": w.TravelNote(l.ID), "crossing": w.Crossing(w.Player.Location, l.ID), "still": prop.Still, "bankroll": prop.Bankroll, "handle": w.NightHandleAt(l.ID), "capacity": w.Capacity(l.ID), "trading": w.Trading(l.ID), "condition": prop.Condition, "income": prop.Income, "owned": w.Own(l.ID), "locked": l.District > w.District, "actions": w.Actions(l.ID)})
 	}
 	var scene any = nil
 	if e := w.Event; e != nil {

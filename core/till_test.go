@@ -120,12 +120,23 @@ func TestWhatTheTableTakesGoesIntoTheTill(t *testing.T) {
 		w.Event = nil
 	}
 	took := w.Properties[BackRoom].Bankroll - till
-	t.Logf("thirty days: the table took $%d, and the till holds $%d", w.BackRoomTake, w.Properties[BackRoom].Bankroll)
+	t.Logf("thirty days: the city's tables took $%d, and this room's till holds $%d",
+		w.BackRoomTake, w.Properties[BackRoom].Bankroll)
 	if w.BackRoomTake == 0 {
 		t.Fatal("nobody paid for a seat in a month")
 	}
-	if took < w.BackRoomTake {
-		t.Fatalf("the table took $%d and the till is only $%d fuller", w.BackRoomTake, took)
+	// This compared the till against `BackRoomTake` and required every dollar
+	// of it. That counter is the whole city's seat money and the city has more
+	// than one back room now, so the equality was against the takings of two
+	// rooms and could not hold. What it was guarding is that the room's own
+	// money ends up in the room's own till and nowhere else, which is what the
+	// three checks here say: the till filled, it filled in whole seat charges,
+	// and the same money is not also in the holder's hands.
+	if took <= 0 {
+		t.Fatal("a month of seats paid for and the room's till is no fuller")
+	}
+	if took%TableCharge != 0 {
+		t.Fatalf("the till gained $%d, which is not a number of seat charges", took)
 	}
 	// And it is not also in the player's pocket, because it is in one place.
 	if w.Player.Cash-cash >= w.BackRoomTake {

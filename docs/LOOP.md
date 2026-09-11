@@ -65,9 +65,11 @@ which half is standing.
    in `docs/LIVING_WORLD.md`: the geography is load-bearing, so the map stays,
    and the plain list of addresses behind it is now nearest-first with the
    journey on each row.
-5. **The city playing its own games.** Built: one hand a night among whoever
-   spends the evening in the back room, a seat charge to whoever holds the
-   poolhall, and a falling-out for whoever is cleaned out (`core/citygame.go`).
+5. **The city playing its own games.** Built: one hand a night in every room
+   with a game behind it, a seat charge to whoever holds that room, and a
+   falling-out for whoever is cleaned out (`core/citygame.go`). There are two
+   of those rooms now, the poolhall and the bar — a game with no house belongs
+   where there are people of an evening and nobody holding a float.
    An unwatched game runs on a third RNG stream of its own — shuffling off
    `WorldRNG` moved everything else the city does off-screen. Still open: the
    same for the other rooms. The city already gambles at every room that runs a
@@ -204,7 +206,7 @@ balance could have moved, then the live game and the commit.
 
 Balance baseline, seven strategies
 (worker/investor/defiant/reckless/thief/smuggler/racketeer/publican):
-deaths 0/0/0/82/75/0/45/0, median cash 12585/2407/5817/90/1049/3564/967/1732.
+deaths 0/0/0/82/75/0/33/0, median cash 12585/2407/5817/90/1090/3564/1658/1732.
 `mise run simulate > <scratchpad>/sim.json` then **parse** the JSON; grepping it
 is useless. Each strategy also reports `mean_heat`, `seizures` and `runs_hurt`,
 because deaths and cash cannot tell a safe policy from one whose money is taken
