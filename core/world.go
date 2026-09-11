@@ -1037,10 +1037,15 @@ func (w *World) Actions(id string) []Action {
 			anywhere()
 			continue
 		}
-		if id == p.Home {
-			asks("word:"+f.ID, "Send word to "+f.Name, WordMinutes, WordCost, w.SendWordReadiness(f.ID),
-				fmt.Sprintf("$%d, and somebody who can agree to something waits at their own room for the rest of the day.", WordCost))
-		}
+		// Sent from wherever the player is standing, like everything else in
+		// this loop. A telephone at home is what makes it cheap and certain;
+		// without one it is a runner, and neither of those is a thing you do at
+		// a counter. Asking around about a family and reaching an understanding
+		// with one are both already offered anywhere, and this belongs with
+		// them.
+		asks("word:"+f.ID, "Send word to "+f.Name, WordMinutes, WordCost, w.SendWordReadiness(f.ID),
+			fmt.Sprintf("$%d, and somebody who can agree to something makes their way to their own hall and waits there for the rest of the day.", WordCost))
+		anywhere()
 		asks("pact:"+f.ID, "Reach an understanding with "+f.Name, PactMinutes, PactOpening, w.PactReadiness(f.ID),
 			fmt.Sprintf("$%d to open and $%d a day. Neither of you moves on the other, they may answer when somebody comes for you, and every quarrel of theirs becomes yours.", PactOpening, PactTribute))
 		anywhere()

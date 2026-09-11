@@ -93,7 +93,11 @@ import "testing"
 // the others are along for what they are each good at; the union stops moving
 // by about the twelfth, no single campaign is worth more than a kind or two,
 // and it costs thirty seconds.
-const kindsTheHarnessPlays = 103
+// A hundred and seven once the telephone was offered wherever the player is
+// standing rather than only where they live, and the diplomat learned to use
+// it. A card only its own room can show is a card the policies cannot reach
+// from the branch that wants it.
+const kindsTheHarnessPlays = 105
 
 func TestTheHarnessPlaysEnoughOfTheGame(t *testing.T) {
 	t.Parallel()

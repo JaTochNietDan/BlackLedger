@@ -18,11 +18,6 @@ import "fmt"
 // Preference goes to whoever holds the premises, because a family's own ground
 // is where they receive people; failing that, anybody of theirs who is here.
 func (w *World) AudienceActor(location string) string {
-	// Somebody who said they would be here is here, whoever else is standing
-	// about. A seat you arranged is the one thing in this that is not luck.
-	if who := w.TheExpected(location); who != "" {
-		return who
-	}
 	if prop := w.Properties[location]; prop != nil && prop.Owner != "" {
 		if f := w.faction(prop.Owner); f != nil && f.ID != w.PlayerOrganizationID() {
 			if w.Speaker(f.ID, location) != nil {

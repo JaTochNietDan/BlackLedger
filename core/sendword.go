@@ -13,18 +13,6 @@ func (w *World) Expecting(id string) bool {
 	return w.Expected != nil && w.Expected[id] > w.Minute
 }
 
-// TheExpected names the family that said it would have somebody at this address
-// today, if any did. A seat arranged by telephone outranks whoever the room
-// happened to put in front of you.
-func (w *World) TheExpected(location string) string {
-	for id, until := range w.Expected {
-		if until > w.Minute && w.homeOf(id) == location && w.Leader(id) != nil {
-			return id
-		}
-	}
-	return ""
-}
-
 func (w *World) SendWordReadiness(id string) string {
 	f := w.faction(id)
 	if f == nil || id == w.PlayerOrganizationID() {
@@ -68,8 +56,31 @@ func (w *World) SendWord(id string) error {
 	if w.Fitted("telephone") {
 		how = "You telephone"
 	}
+	w.sendFor(id)
 	w.Log("Word sent to "+f.Name,
-		fmt.Sprintf("%s and somebody who can agree to something will be at %s for the rest of the day. $%d, and they know you want to talk before you are through the door.",
+		fmt.Sprintf("%s. Somebody who can agree to something is making their way to %s and will be there for the rest of the day. $%d, and they know you want to talk before you are through the door.",
 			how, place.Name, WordCost), "politics")
 	return nil
+}
+
+// sendFor starts whoever can agree to something walking to their own hall.
+//
+// The seat is not conjured into the room: they go on their own feet, take the
+// time it takes, and can be seen going, like everybody else on the street. It
+// has to be done here rather than left to the next time the city reconsiders
+// where people should be, because that happens twice a day and a message sent
+// at nine in the morning is about this morning.
+func (w *World) sendFor(id string) {
+	lead, hall := w.Leader(id), w.homeOf(id)
+	if lead == nil || hall == "" || lead.Location == hall {
+		return
+	}
+	place, ok := PlaceByID(hall)
+	if !ok {
+		return
+	}
+	lead.Heading = hall
+	lead.Errand = "expected at " + place.Name
+	lead.Sets = w.Minute
+	lead.Arrives = w.Minute + TravelMinutes(lead.Location, hall)
 }

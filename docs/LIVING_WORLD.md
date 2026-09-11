@@ -187,9 +187,36 @@ into.
 ---
 
 Teach the diplomat to telephone. It is the policy the feature was written for
-and it does not use it: 791 journeys for 26 seats, and a card that buys one
-outright sat unpressed through every campaign. Only the exploring policy ever
-pressed it. A feature no policy chooses is a feature nothing measures.
+and it does not use it.
+
+— done, and it took two corrections to the feature itself.
+
+  The first was a crash. A seat was being conjured into a room nobody was
+  standing in: the audience card asks who is across the table from you, and
+  with word sent there was a family expecting you and nobody of theirs there to
+  be it. Nil, every time the diplomat pressed the card. Nobody is conjured now
+  — whoever can agree to something walks to their own hall on their own feet,
+  takes the minutes it takes and can be seen going, and the seat opens when
+  they arrive. They have to be set off at the moment the call is made, because
+  the city reconsiders where people should be twice a day and a message sent at
+  nine in the morning is about this morning.
+
+  The second was the room. The card was offered only where the player lives,
+  and the view only carries a room's cards when the player is standing in it,
+  so no policy could see it from the branch that wanted it — the diplomat used
+  it twenty-three times in eight campaigns. Asking around about a family and
+  reaching an understanding with one are both already offered wherever the
+  player stands; this belongs with them. A telephone at home is what makes it
+  cheap and certain, and without one it is a runner, and neither is a thing you
+  do at a counter.
+
+  Eight campaigns, before and after:
+
+      travel    3127 -> 2392   (56% of commands -> 43%)
+      audience   309 -> 620
+      word         0 -> 126
+
+  Coverage 105 -> 107.
 
 ---
 

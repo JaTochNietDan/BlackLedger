@@ -42,8 +42,16 @@ func TestSendingWordGetsYouASeat(t *testing.T) {
 	if spent := before - w.Player.Cash; spent != WordCost {
 		t.Fatalf("sending word cost $%d and says $%d", spent, WordCost)
 	}
+	// Nobody is conjured into the room. Whoever can agree to something walks
+	// there on their own feet, which takes as long as it takes.
+	for minutes := 0; minutes < 240 && w.AudienceActor(where) != f.ID; minutes += 15 {
+		w.Advance(15)
+	}
 	if who := w.AudienceActor(where); who != f.ID {
-		t.Fatalf("nobody was waiting at %s after word was sent: got %q", where, who)
+		t.Fatalf("nobody came to %s in four hours after word was sent: got %q", where, who)
+	}
+	if lead := w.Leader(f.ID); lead == nil || lead.Location != where {
+		t.Fatalf("a seat with %s opened without anybody of theirs being in the room", f.Name)
 	}
 
 	// It is the rest of the day and not for ever.

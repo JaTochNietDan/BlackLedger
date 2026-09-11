@@ -1372,10 +1372,26 @@ func Choose(v View, strategy string) (core.Command, error) {
 			// hundred and ninety-one journeys bought twenty-six seats. Taking
 			// one only where the player already happens to be bought none at
 			// all in three campaigns, and the seat is the whole policy.
-			if v.BusinessTruces[actor] <= v.Minute {
-				if c, ok := v.at(venue, "audience"); ok {
+			if v.BusinessTruces[actor] > v.Minute {
+				continue
+			}
+			// Telephone first. Going to a family's own ground and hoping
+			// somebody who can speak for them is standing in it bought
+			// twenty-six seats for seven hundred and ninety-one journeys; a
+			// call from the place the player lives buys one outright and holds
+			// it for the rest of the day.
+			//
+			// No new field is read to know whether the call has been made. The
+			// card refuses itself once a family is expecting you, so it is
+			// ready exactly when it is worth pressing, and it comes back when
+			// the seat lapses.
+			if v.ready(v.Player.Location, "word:"+actor) {
+				if c, ok := v.action(v.Player.Location, "word:"+actor); ok {
 					return c, nil
 				}
+			}
+			if c, ok := v.at(venue, "audience"); ok {
+				return c, nil
 			}
 		}
 	}

@@ -12955,3 +12955,45 @@ this time was that four separate parts of one change each measured innocent and
 the whole measured guilty. That is not a bug in the change. That is arithmetic
 that does not add up, and it means the number is not measuring what its name
 says.
+
+## Nobody is conjured into the room
+
+The diplomat was the policy the telephone was written for and it never pressed
+the card. Teaching it to press it found two faults in the feature, both of which
+had survived a green gate.
+
+**A seat with nobody in it.** The audience card asks who is sitting across the
+table and puts their name on it. Sending word made a family expect you at their
+own hall without anybody of theirs being in it, so the card was built against
+nil and the campaign died on the spot. The fix is not a nil check. The seat is
+not something to conjure: whoever can agree to something walks to their own hall
+on their own feet, takes the minutes the walk takes, appears on the street like
+anybody else walking, and the seat opens when they arrive. The city already has
+this — an errand list that says where people ought to be — and the only thing
+this needed was to be set off at the moment the call is made rather than at the
+next reconsideration, because that happens twice a day and a message sent at
+nine in the morning is about this morning.
+
+**A card no policy could see.** It was offered at the player's home and nowhere
+else. A location's cards are only in the view when the player is standing in it,
+so a policy anywhere else in the city cannot tell whether the call is even
+possible — and a branch that walks home to find out is the oscillation that cost
+the soldier ninety-nine per cent of its commands. Asking around about a family
+and reaching an understanding with one are both already offered wherever the
+player stands. A telephone at home is what makes this cheap and certain; without
+one it is a runner. Neither is a thing anybody does at a counter, and it goes
+with its neighbours.
+
+Eight campaigns of the diplomat, before and after:
+
+    travel    3127 -> 2392   (56% of its commands -> 43%)
+    audience   309 -> 620
+    word         0 -> 126
+
+Coverage 105 to 107, pinned at 105.
+
+The general shape, which is the third time this week: a feature is only as built
+as the policies can reach. A card behind a room, a walk gated on a card the room
+is not offering, a coverage number resting on one campaign — every one of them
+was the harness being unable to get at something rather than the something being
+absent.
