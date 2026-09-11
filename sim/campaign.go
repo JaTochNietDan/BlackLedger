@@ -1056,6 +1056,11 @@ func RunRecorded(seed uint32, strategy, director string, limit int, trace bool, 
 // dockwork, strike, strike, strike, and health from seventy to twenty-two in
 // three commands.
 func root(id string) string {
+	for _, whole := range keepWhole {
+		if len(id) > len(whole) && id[:len(whole)] == whole {
+			return id
+		}
+	}
 	for i := 0; i < len(id); i++ {
 		if id[i] == ':' {
 			return id[:i]
@@ -1063,3 +1068,17 @@ func root(id string) string {
 	}
 	return id
 }
+
+// keepWhole are the ids whose colon separates a kind rather than a person.
+//
+// `strike:person-8` and `strike:person-9` are the same decision aimed at two
+// men and should count as one thing tried. `sit:floor` and `sit:back` are two
+// different rooms — the floor of a casino and the card game behind a poolhall —
+// and counting them as one meant that once the policy had sat at a table it
+// never went through to the back room, so dealing, betting, calling, folding
+// and picking your money up were all unreachable.
+//
+// There is no general way to tell a name from a kind in an id. This is the list
+// of the ones that are kinds, and it is short on purpose: anything added to it
+// is a claim that two cards under one root are two different decisions.
+var keepWhole = []string{"sit:", "arms:", "plate:", "fit:", "retain:"}

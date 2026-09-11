@@ -10932,3 +10932,42 @@ at 55 now and says plainly in its own comment that it is a floor for a small
 sample rather than the harness's coverage, and where the real number comes from.
 A guard that quotes a figure it cannot measure is the same fault as a list
 written by hand.
+
+## A seat kind is not a person's name
+
+Nearly everything the harness still never played was a seat at a card table:
+dealing, betting, calling, folding, putting money on the table. The exploring
+policy sat down twenty-nine times across thirty campaigns and never once played
+a hand.
+
+The cause was a rule written four ticks ago to fix the opposite problem. Half
+the action ids in this game carry a person after a colon — `strike:person-8` and
+`strike:person-9` are the same decision aimed at two men — so the policy counts
+what it has tried by the id's root. That was right, and it took the policy from
+dying in every run to surviving most.
+
+But `sit:floor` and `sit:back` are not one decision aimed at two people. They are
+the floor of a casino and the card game behind a poolhall, two different rooms
+with two different games in them, and counting them as one thing meant that once
+the policy had sat at a table it never went through to the back room again.
+Everything behind that door was unreachable.
+
+There is no general way to tell a name from a kind in an id. So there is a short
+list of the ids whose colon separates a kind — `sit:`, `arms:`, `plate:`,
+`fit:`, `retain:` — and it is short on purpose: anything added to it is a claim
+that two cards under one root are two different decisions.
+
+| | before | after |
+|---|---|---|
+| kinds of action | 98 | **107** of 114 |
+| median life | 92.7 days | 94.1 days |
+| the small sample the guard runs | 55 | 99 |
+
+Seven kinds are still never played and each has a plain reason: bailing somebody
+out, picking your money up off a table, scrapping a car, smearing a family,
+spiking a drink, stocking arms for your own people, and moving on a family to
+take it. Most need a state the policy does not seek — somebody of yours in a
+cell, a crew to arm, a family to serve and then betray.
+
+That the harness plays 107 of 114 kinds is worth stating against where this
+started: twenty-one, eight hours ago, with everything else silently unmeasured.

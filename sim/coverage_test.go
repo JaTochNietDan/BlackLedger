@@ -34,16 +34,17 @@ import "testing"
 // that reaches further gets recognised; a drop is a policy that stopped
 // reaching, which is how a whole area of the game goes unpriced without
 // anybody noticing.
-// This is a floor for a small sample, not the harness's coverage.
-//
 // Two seeds of each policy at seven hundred commands is what a test can afford
-// to run; the figure it produces moves whenever a policy's ladder gets longer,
-// because a policy climbing towards a car has not yet got to the top of it at
-// seven hundred. The harness's real coverage is measured by
-// `mise run simulate` and by longer traced runs — thirty campaigns of the
-// exploring policy at twenty-five hundred commands reach ninety-eight kinds,
-// which is the number to quote. This one exists to catch a fall.
-const kindsTheHarnessPlays = 55
+// to run, and it moves whenever a policy's ladder changes — it fell from 77 to
+// 55 when the exploring policy started saving for a car, and went to 99 the day
+// it learned to tell a seat kind from a person's name. The harness's fuller
+// coverage comes from longer traced runs: thirty campaigns at twenty-five
+// hundred commands reach 107 of the game's 114 kinds.
+//
+// This exists to catch a fall. Raising it is how a policy that reaches further
+// gets recognised; a drop is a policy that stopped reaching, which is how a
+// whole area of the game goes unpriced without anybody noticing.
+const kindsTheHarnessPlays = 99
 
 func TestTheHarnessPlaysEnoughOfTheGame(t *testing.T) {
 	t.Parallel()
