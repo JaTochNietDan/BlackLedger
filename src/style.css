@@ -1057,6 +1057,12 @@ body{height:100%;overflow:hidden;margin:0;background:var(--bg);color:var(--ink);
 .person-card .actions.compact{grid-column:1/3}
 .find-them{grid-column:1/3;justify-self:start;margin-top:10px;font-size:11px}
 .person-card .nothing-here{grid-column:1/3;margin:10px 0 0;font-size:11px}
+/* Where somebody was last seen, when the answer is nowhere. Every other block
+   at the foot of this card spans both columns and this one had no rule at all,
+   so it landed in the portrait's column and its sentence widened it: "Nobody
+   has told you where to find them" on the people screen messes up the panel, it
+   pushes the other text to the right. */
+.person-card .not-found{grid-column:1/3;margin:10px 0 0;font-size:11px;color:var(--muted);font-style:italic}
 
 /* On a person's card the work is a short list of what you can do with them, not
    a second reading of the room: label and terms, with the sentence on the

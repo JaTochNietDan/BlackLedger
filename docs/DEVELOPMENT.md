@@ -8934,3 +8934,19 @@ action list ran in the world with no screen to draw it — the back room, the
 machines, the felt, the cloth and the dice all had the hole, and only the back
 room had been reported. Money on a table is sitting down at it now, wherever the
 button was pressed, and one guard covers all five.
+
+## A sentence in the portrait's column
+
+Reported: "'Nobody has told you where to find them' on the people screen messes
+up the panel, it pushes the other text to the right."
+
+A person's card is a two-column grid — the portrait, then everything about them
+— and the portrait's column is sized to its widest child. Every block at the
+foot of the card spans both columns and this one had no rule at all, so it
+landed in the portrait's column and its sentence widened it, pushing the whole
+card's text sideways.
+
+The guard reads the foot blocks out of the card itself rather than from a list
+written beside it, so the next one added is checked too. It allows a block to be
+placed by any of the classes it carries, because the work list is placed as
+`.actions.compact` rather than by its own name.

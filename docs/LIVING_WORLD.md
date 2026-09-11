@@ -150,6 +150,14 @@ Ensure efficiency of development loops by increasing efficiency of your workflow
 
 ## Inbox — open
 
+When playing slots, it should scroll through the items before displaying the final result. Right now they just shake but the result is shown already. You should really try to animate it smooth and nicely.
+
+---
+
+"Nobody has told you where to find them" on the people screen messes up the panel, it pushes the other text to the right.
+
+---
+
 What we talked about before, making it so that hidden actions are not hidden anymore, just showed as lower priority in the list (not changing location of sub sections, just putting unavailable actions at the end of the list in each subsection
 
 ---

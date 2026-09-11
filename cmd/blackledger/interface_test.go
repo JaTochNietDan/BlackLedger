@@ -296,3 +296,44 @@ func TestTheScreenFollowsWhatWasSatDownTo(t *testing.T) {
 		t.Fatal("the screen is still chosen by what the room holds")
 	}
 }
+
+// A person's card is a two-column grid: the portrait, then everything about
+// them. Every block at the foot of it has to span both columns, because the
+// portrait's column is sized to its widest child — one block without the rule
+// put a sentence in that column and pushed the whole card's text sideways:
+// "Nobody has told you where to find them on the people screen messes up the
+// panel, it pushes the other text to the right."
+func TestEveryBlockAtTheFootOfAPersonsCardSpansIt(t *testing.T) {
+	t.Parallel()
+	card := source(t, "src/PeopleScreen.tsx")
+	style := source(t, "src/style.css")
+	// The foot of the card is everything the render block can put below the
+	// portrait and the name. Read out of the card itself rather than listed
+	// here, so a block added tomorrow is checked too.
+	from := strings.Index(card, "{!!render &&")
+	to := strings.Index(card, "</article>")
+	if from < 0 || to < 0 || to < from {
+		t.Fatal("the person's card is not shaped the way this guard reads it")
+	}
+	foot := card[from:to]
+	classes := regexp.MustCompile(`className="([a-z- ]+)"`).FindAllStringSubmatch(foot, -1)
+	if len(classes) < 3 {
+		t.Fatalf("%d blocks read at the foot of a person's card, so this measures nothing",
+			len(classes))
+	}
+	for _, m := range classes {
+		// A placing rule for the element, by any of the classes it carries: the
+		// work list is placed as `.actions.compact` rather than by its own
+		// name.
+		placed := false
+		for _, class := range strings.Fields(m[1]) {
+			placed = placed || strings.Contains(style, "."+class+"{grid-column:1/3") ||
+				strings.Contains(style, "."+class+".compact{grid-column:1/3") ||
+				strings.Contains(style, " ."+class+"{grid-column:1/3")
+		}
+		if !placed {
+			t.Fatalf("%q sits at the foot of a person's card and nothing puts it in the "+
+				"content column, so its text widens the portrait's column", m[1])
+		}
+	}
+}
