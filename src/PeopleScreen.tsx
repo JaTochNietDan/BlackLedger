@@ -60,6 +60,9 @@ function Card({
               them does and was bought and paid for. */}
           {who.carrying ? ` · carrying ${who.carrying.toLowerCase()}` : ''}
         </small>
+        {/* Somebody of yours on their way out. The game says "it had been
+            coming" the morning after; this is the part that comes before. */}
+        {who.restless && <small className="warning">thinking about leaving</small>}
         <small className="doing">
           {who.walking && (
             <i className="on-street" aria-hidden="true">

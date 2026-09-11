@@ -150,11 +150,22 @@ func (w *World) OwnPeopleDay() {
 	}
 	paid := w.Player.Cash >= w.DailyCost()
 	for _, n := range people {
+		was := n.Trust
 		if paid {
 			n.Trust = min(100, n.Trust+TrustDrift)
-			continue
+		} else {
+			n.Trust = max(0, n.Trust-6)
 		}
-		n.Trust = max(0, n.Trust-6)
+		// The morning somebody starts thinking about where else they could be.
+		// Said once, on the way down, because the alternative is a number on a
+		// card measured against a line the player has never been told: a man
+		// can walk out of here with one of your businesses, and the only
+		// warning was the word "politics" on the day after.
+		if was >= DefectionTrust && n.Trust < DefectionTrust {
+			w.Log(n.Name+" is thinking about it",
+				"They have stopped saying much, and whatever they are being paid has stopped being the point. Somebody who has got this far either gets a reason to stay or is gone.",
+				"danger")
+		}
 	}
 	// One of them a day, at most, decides.
 	for _, n := range people {

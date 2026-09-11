@@ -40,6 +40,10 @@ type Presence struct {
 	// does, the player paid for it, and until this the only way to know whether
 	// you had bought one was to remember. Nobody else's is anybody's business.
 	Carrying string `json:"carrying,omitempty"`
+	// Restless is one of the player's own who has got far enough down that they
+	// are thinking about where else they could be. Only for your own, and only
+	// once they are past the line, because it is a warning rather than a stat.
+	Restless bool `json:"restless,omitempty"`
 	// Walking is somebody who is between two addresses right now. Where and
 	// WhereID then name where they are *going*, because that is the only place
 	// they could be met: reaching a man in the street is not something this
@@ -230,6 +234,7 @@ func (w *World) see(n *NPC) Presence {
 		Standing: w.standingOf(n), Doing: w.doingNow(n),
 		Yours:    n.Faction == w.PlayerOrganizationID(),
 		Carrying: w.whatTheyCarry(n),
+		Restless: n.Faction == w.PlayerOrganizationID() && n.Trust < DefectionTrust,
 		Known:    known,
 		Because:  w.because(n),
 		WhereID:  n.Location,

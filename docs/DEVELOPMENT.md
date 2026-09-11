@@ -9379,3 +9379,28 @@ nothing rather than "nothing but your hands".
 `own_people` already carried a description nothing in the view reads, so what
 they drive and what they carry went in there too — where it will be right if
 anything ever draws it, rather than wrong.
+
+## The part that comes before "it had been coming"
+
+Somebody who answers to the player can stop being paid properly, come down day
+by day, and walk out — and if they are ambitious enough and there is more than
+one address, they take one of the businesses with them and every arrangement
+the player has. The log the morning after says "it had been coming".
+
+Nothing said it was coming. The only sign was a trust number on a card, measured
+against a line the player has never been told, on a screen listing eighty
+people.
+
+They are told once now, the morning somebody crosses it, and the card says so
+for as long as they are below it. Once rather than every morning, because a
+warning repeated daily is a warning nobody reads — the same rule as the counter
+nobody will stand behind.
+
+Three breaks, three failures: saying nothing, saying it every morning, and
+leaving it off the card. The middle one needed the test fixing first — the man
+walked out before the second morning, so the repeat could never be seen. Giving
+him no ambition at all holds him in place, which is a fact about this city
+worth knowing: ambition is what turns being unhappy into leaving.
+
+That is the third thing tonight with teeth and no page. The wage rules, the gun
+in somebody's coat, and now this.

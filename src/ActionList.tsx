@@ -51,6 +51,10 @@ function Person({
     // it was bought and paid for, and the only way to know they had it was to
     // remember buying it.
     who.carrying ? `carrying ${who.carrying.toLowerCase()}` : '',
+    // Somebody of yours who has got far enough down that they are thinking
+    // about where else they could be. A man can walk out of here with one of
+    // your businesses and the only warning was a number.
+    who.restless ? 'thinking about leaving' : '',
   ]
     .filter(Boolean)
     .join(' · ');
@@ -58,7 +62,9 @@ function Person({
   return (
     <article
       className={
-        'presence' + (who.yours ? ' yours' : '') + (who.overdue || who.sore ? ' sour' : '')
+        'presence' +
+        (who.yours ? ' yours' : '') +
+        (who.overdue || who.sore || who.restless ? ' sour' : '')
       }
     >
       <header>
@@ -69,7 +75,9 @@ function Person({
             {who.temperament ? ` · ${who.temperament}` : ''}
           </small>
           {notes && (
-            <small className={who.overdue || who.sore ? 'warning' : 'subtle'}>{notes}</small>
+            <small className={who.overdue || who.sore || who.restless ? 'warning' : 'subtle'}>
+              {notes}
+            </small>
           )}
         </div>
       </header>

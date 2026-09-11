@@ -1,6 +1,9 @@
 package core
 
-import "testing"
+import (
+	"strings"
+	"testing"
+)
 
 func boss(t *testing.T) (*World, *NPC) {
 	t.Helper()
@@ -217,5 +220,99 @@ func TestPuttingSomebodyOutAndPayingAShare(t *testing.T) {
 	}
 	if w.PayShareReadiness(candidate.ID) == "" || w.LetGoReadiness(candidate.ID) == "" {
 		t.Fatal("somebody who does not answer to you could still be paid or put out")
+	}
+}
+
+// Somebody of yours can walk out with one of your businesses, and the only
+// warning was a number on a card measured against a line the player has never
+// been told. The game even says "it had been coming" the morning after; this is
+// the part that comes before.
+func TestSomebodyOnTheirWayOutIsSaidSo(t *testing.T) {
+	t.Parallel()
+	w := New(61)
+	w.Event, w.District = nil, 9
+	w.Player.Health, w.Player.Respect = 100, 40
+	w.Player.Cash = 0 // nothing covered, so they come down rather than up
+	hand := w.Holder("driver")
+	if hand == nil {
+		t.Fatal("nobody to sign on")
+	}
+	hand.Faction, hand.Rank, hand.Trust = w.PlayerOrganizationID(), RankAssociate, DefectionTrust+3
+	if hand.Trust < DefectionTrust {
+		t.Fatal("they are already past it, so the crossing cannot be seen")
+	}
+
+	said, marked := false, false
+	for day := 0; day < 6 && !said; day++ {
+		before := len(w.History)
+		w.Event = nil
+		w.Advance(1440)
+		w.Event = nil
+		for _, r := range w.History[min(before, len(w.History)):] {
+			if strings.Contains(r.Title, "thinking about it") {
+				said = true
+			}
+		}
+	}
+	for _, p := range w.PeopleHere(hand.Location) {
+		if p.ID == hand.ID {
+			marked = p.Restless
+		}
+	}
+	t.Logf("%s is at %d trust: told=%v, marked on the card=%v", hand.Name, hand.Trust, said, marked)
+	if !said {
+		t.Fatal("somebody got far enough down to walk and nobody said anything")
+	}
+	if !marked {
+		t.Fatal("their card says nothing about it")
+	}
+
+	// And it is said once rather than every morning. Somebody with no ambition
+	// at all never decides to go, so they stay below the line for as long as
+	// this needs — otherwise they walk out before the second morning and the
+	// repeat can never be seen.
+	w.NPC(hand.ID).Ambition = 0
+	again := 0
+	for day := 0; day < 6; day++ {
+		before := len(w.History)
+		w.Event = nil
+		w.Advance(1440)
+		w.Event = nil
+		for _, r := range w.History[min(before, len(w.History)):] {
+			if strings.Contains(r.Title, "thinking about it") {
+				again++
+			}
+		}
+		if w.NPC(hand.ID).Faction != w.PlayerOrganizationID() {
+			t.Fatal("somebody with no ambition at all walked out anyway")
+		}
+	}
+	if again > 0 {
+		t.Fatalf("the player was told %d more times about the same man", again)
+	}
+}
+
+// Somebody who is paid and content is not marked, which is the ordinary case.
+func TestSomebodyContentIsNotMarked(t *testing.T) {
+	t.Parallel()
+	w := New(61)
+	w.Event, w.District = nil, 9
+	w.Player.Health, w.Player.Respect, w.Player.Cash = 100, 40, 100000
+	hand := w.Holder("driver")
+	hand.Faction, hand.Rank, hand.Trust = w.PlayerOrganizationID(), RankAssociate, 65
+	for day := 0; day < 5; day++ {
+		w.Event = nil
+		w.Advance(1440)
+		w.Event = nil
+	}
+	for _, p := range w.PeopleHere(hand.Location) {
+		if p.ID == hand.ID && p.Restless {
+			t.Fatalf("%s is paid and at %d trust and is marked as leaving", hand.Name, hand.Trust)
+		}
+	}
+	for _, r := range w.History {
+		if strings.Contains(r.Title, "thinking about it") {
+			t.Fatal("a contented man was reported as thinking about leaving")
+		}
 	}
 }
