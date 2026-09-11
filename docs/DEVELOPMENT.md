@@ -8950,3 +8950,37 @@ The guard reads the foot blocks out of the card itself rather than from a list
 written beside it, so the next one added is checked too. It allows a block to be
 placed by any of the classes it carries, because the work list is placed as
 `.actions.compact` rather than by its own name.
+
+## The drums turn
+
+Reported: "When playing slots, it should scroll through the items before
+displaying the final result. Right now they just shake but the result is shown
+already."
+
+Both halves of that were true. The drum showed where it was going to stop from
+the moment the handle went down, and the motion was a hundred-and-eighty
+millisecond shudder of the whole case on the spot.
+
+Showing the answer early was deliberate and stays. The fault before the shake
+was the opposite one — the drums showed one thing while turning and flipped to
+the real result when the last one landed, which from the outside is a machine
+changing its mind. So the answer is still decided before a pixel moves; what was
+missing is that nothing travelled to it.
+
+The drum is a window with a column behind it now: the three faces it lands on,
+and behind them a run of the strip to travel past. The column is moved by whole
+stops and eased into its rest with a curve that slows at the end, each drum
+running longer than the one before it, so the machine comes to rest rather than
+halting. Three drums walk the strip from different offsets so they do not turn
+through the same symbols in step. Somebody who has asked for less motion gets
+none of it.
+
+The stop height lives in two places — the stylesheet's row and the distance the
+column is moved a stop — and a drum whose two disagree comes to rest between
+symbols, so a guard holds them together. Three node tests cover the run: it
+begins with the faces the drum lands on, the three drums differ, and every face
+that goes past the window is painted by the same id as the ones it stops on.
+
+One existing guard had to be re-spelled rather than reverted: it asked the case
+to look up `painted[i][at]`, and the drum now paints the whole run it travels
+rather than only the three it stops on.

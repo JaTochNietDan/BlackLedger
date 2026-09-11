@@ -15,7 +15,8 @@ import {
   wheelPaint,
   reelWindow,
   drumFaces,
-  drumIDs,
+  drumRun,
+  drumRunIDs,
 } from './cards';
 
 // The tables, drawn as tables. Blackjack was two numbers in a sentence and
@@ -539,12 +540,22 @@ export function Machine({
   turn?: number;
 }) {
   const [rolling, setRolling] = useState([false, false, false]);
+  // Where each drum's column is sitting. The drums used to shake on the spot
+  // with the answer already on them; they travel now, and this is how far each
+  // one still has to go: TurnsADrum stops back at the moment the handle drops,
+  // nought when it has landed.
+  const [away, setAway] = useState([0, 0, 0]);
   const seen = useRef(-1);
   useEffect(() => {
     if (!machine.pulled || turn === seen.current) return;
     seen.current = turn;
     if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     setRolling([true, true, true]);
+    // Put the column back to where it starts, then let it travel on the next
+    // frame: a transform that changes in the same frame it is set does not
+    // animate, it jumps.
+    setAway([TurnsADrum, TurnsADrum, TurnsADrum]);
+    const off = requestAnimationFrame(() => setAway([0, 0, 0]));
     playTable('handle');
     const stops = [0, 1, 2].map(i =>
       setTimeout(
@@ -557,7 +568,10 @@ export function Machine({
         700 + i * 450,
       ),
     );
-    return () => stops.forEach(clearTimeout);
+    return () => {
+      cancelAnimationFrame(off);
+      stops.forEach(clearTimeout);
+    };
   }, [turn, machine.pulled]);
 
   // Which of the house's machines you are standing at. A nickel machine and a
@@ -570,9 +584,6 @@ export function Machine({
   // do not have — and showing where each drum is going to stop from the moment
   // the handle goes down, so nothing changes when it gets there.
   const windows = drumFaces(strip, line, !!machine.pulled);
-  // And which symbol each of those faces is, so the drum can be painted rather
-  // than spelled: "we should show actual images for the stuff on the rollers."
-  const painted = drumIDs(strip, line, !!machine.pulled);
   // The tray and the line under it wait for the last drum, because what a pull
   // paid is not a thing to announce while the drums are still going.
   const settled = machine.pulled && !rolling.some(Boolean);
@@ -595,30 +606,51 @@ export function Machine({
           <div className="bandit-window">
             {/* The payline, across the middle of all three drums. */}
             <span className="payline" aria-hidden="true" />
-            {[0, 1, 2].map(i => (
-              <div key={i} className={'drum' + (rolling[i] ? ' rolling' : '')}>
-                {windows[i].map((face, at) => {
-                  const art = reelArt(painted[i][at]);
-                  return (
-                    <span
-                      key={at}
-                      className={'stop' + (at === 1 ? ' on-line' : '') + (art ? ' painted' : '')}
-                      aria-label={face}
-                    >
-                      {art ? (
-                        <svg
-                          viewBox="0 0 50 50"
-                          aria-hidden="true"
-                          dangerouslySetInnerHTML={{__html: art}}
-                        />
-                      ) : (
-                        face
-                      )}
-                    </span>
-                  );
-                })}
-              </div>
-            ))}
+            {[0, 1, 2].map(i => {
+              // The three it lands on, and behind them the run it travels
+              // past. The landing faces are the core's own and are decided
+              // before anything moves, so the drum arrives at the answer
+              // rather than snapping to it.
+              const faces = drumRun(strip, windows[i], i, TurnsADrum);
+              const ids = drumRunIDs(strip, windows[i], i, TurnsADrum);
+              return (
+                <div key={i} className={'drum' + (rolling[i] ? ' rolling' : '')}>
+                  <div
+                    className="drum-strip"
+                    style={{
+                      transform: `translateY(${-away[i] * DrumStop}px)`,
+                      // Each drum runs longer than the one before it, which is
+                      // how a machine comes to rest rather than stopping dead.
+                      transitionDuration: rolling[i] ? `${700 + i * 450}ms` : '0ms',
+                    }}
+                  >
+                    {faces.map((face, at) => {
+                      const art = reelArt(ids[at]);
+                      return (
+                        <span
+                          key={at}
+                          className={
+                            'stop' + (at === 1 ? ' on-line' : '') + (art ? ' painted' : '')
+                          }
+                          aria-label={at < 3 ? face : undefined}
+                          aria-hidden={at >= 3 ? true : undefined}
+                        >
+                          {art ? (
+                            <svg
+                              viewBox="0 0 50 50"
+                              aria-hidden="true"
+                              dangerouslySetInnerHTML={{__html: art}}
+                            />
+                          ) : (
+                            face
+                          )}
+                        </span>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
           </div>
           {/* The handle is the handle. Drawing one beside a row of buttons and
               expecting somebody to press the buttons is a picture of a machine,
@@ -893,6 +925,13 @@ export function Craps({
 // edge. What matters on the screen is who is sitting there, what they bought in
 // the draw, and what they said when the money went round — because those three
 // are the whole of what the player has to read before deciding whether to pay.
+// How many stops a drum turns through on a pull, and how tall one stop is on
+// the screen. The height has to match the stylesheet: the column is moved by
+// whole stops, so a drum that travels 31 pixels a stop comes to rest between
+// two symbols.
+const TurnsADrum = 14;
+const DrumStop = 32;
+
 export interface CardsState {
   place: string;
   ante: number;

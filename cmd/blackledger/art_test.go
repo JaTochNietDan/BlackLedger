@@ -571,8 +571,15 @@ func TestEverySymbolOnTheStripIsPainted(t *testing.T) {
 	// The drums ask what to paint rather than working it out, and the fallback
 	// is the word.
 	tables := source(t, "src/Tables.tsx")
-	if !holds(tables, "const art = reelArt(painted[i][at])") {
+	// Asked of the run the drum travels rather than of the three it lands on,
+	// now that the drum turns: every face that goes past the window is painted,
+	// not only the ones it stops on. The spelling moved with the code and the
+	// thing guarded did not.
+	if !holds(tables, "const art = reelArt(ids[at])") {
 		t.Error("the case decides for itself what a symbol looks like")
+	}
+	if !holds(tables, "drumRunIDs(strip, windows[i], i, TurnsADrum)") {
+		t.Error("the drum is painted from something other than the strip it turns through")
 	}
 	// The fallback, named: `") : ("` matched every ternary in the file and
 	// could not have failed.

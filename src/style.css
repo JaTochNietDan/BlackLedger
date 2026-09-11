@@ -1116,8 +1116,7 @@ body{height:100%;overflow:hidden;margin:0;background:var(--bg);color:var(--ink);
   background:linear-gradient(#f6f1e2,#ded5bf 50%,#f6f1e2);color:#241708;
   font:15px var(--serif);letter-spacing:.04em;text-align:center;overflow:hidden;
   box-shadow:inset 0 6px 10px rgba(0,0,0,.3),inset 0 -6px 10px rgba(0,0,0,.3)}
-.drum.rolling{animation:drumroll .18s linear infinite;color:#6c6152}
-@keyframes drumroll{from{transform:translateY(-8%)}to{transform:translateY(8%)}}
+.drum.rolling{color:#6c6152}
 .bandit-handle{position:absolute;right:-14px;top:26px;width:10px;height:96px;border-radius:5px;
   background:linear-gradient(#c9a24a,#7a5730)}
 .bandit-handle i{position:absolute;top:-12px;left:-6px;width:22px;height:22px;border-radius:50%;
@@ -1126,7 +1125,7 @@ body{height:100%;overflow:hidden;margin:0;background:var(--bg);color:var(--ink);
 .paytable th{text-align:left;font-weight:400;color:#d9d3bd;padding:3px 6px;letter-spacing:.06em}
 .paytable td{text-align:right;color:var(--gold);padding:3px 6px}
 .paytable tr:nth-child(even){background:rgba(255,255,255,.03)}
-@media(prefers-reduced-motion:reduce){.drum.rolling{animation:none}}
+@media(prefers-reduced-motion:reduce){.drum-strip{transition:none}.drum.rolling .drum-strip{filter:none}}
 /* The handle is the control. */
 .bandit-handle{position:absolute;right:-16px;top:22px;width:14px;height:104px;border-radius:7px;padding:0;
   border:1px solid #7a5730;background:linear-gradient(#c9a24a,#7a5730);cursor:pointer}
@@ -1259,13 +1258,26 @@ body{height:100%;overflow:hidden;margin:0;background:var(--bg);color:var(--ink);
   background:#0d0a06;border:2px solid #7a5730;border-radius:6px;box-shadow:inset 0 0 18px #000}
 .payline{position:absolute;left:6px;right:6px;top:50%;height:2px;transform:translateY(-1px);
   background:linear-gradient(90deg,transparent,#e2554b 12%,#e2554b 88%,transparent);opacity:.85;z-index:2}
-.drum{height:96px;display:grid;grid-template-rows:repeat(3,1fr);place-items:stretch;border-radius:4px;
+/* The drum is a window with a column of symbols behind it. It used to be three
+   boxes that shook: "it should scroll through the items before displaying the
+   final result. Right now they just shake but the result is shown already."
+   The column carries the three it lands on and a run of the strip behind them,
+   and it travels the run and comes to rest on the three. */
+.drum{height:96px;border-radius:4px;position:relative;
   background:linear-gradient(#cdc4ad,#f6f1e2 18%,#fffcf2 50%,#f6f1e2 82%,#cdc4ad);color:#241708;
   overflow:hidden;box-shadow:inset 0 8px 12px rgba(0,0,0,.35),inset 0 -8px 12px rgba(0,0,0,.35)}
-.drum .stop{display:grid;place-items:center;font:11px var(--serif);letter-spacing:.04em;
+/* Slowing into the stop rather than halting at it, which is the difference
+   between a drum and a slideshow. The duration is set per drum on the element,
+   because each one runs longer than the one before it. */
+.drum-strip{display:grid;grid-auto-rows:32px;will-change:transform;
+  transition-property:transform;transition-timing-function:cubic-bezier(.13,.72,.23,1)}
+.drum .stop{height:32px;display:grid;place-items:center;font:11px var(--serif);letter-spacing:.04em;
   color:#6c6152;border-top:1px solid rgba(0,0,0,.08)}
 .drum .stop:first-child{border-top:0}
 .drum .stop.on-line{font-size:15px;color:#241708}
+/* The blur of a drum in motion, on the column rather than on the case. The
+   whole case used to shudder, which read as the machine being knocked. */
+.drum.rolling .drum-strip{filter:blur(.4px)}
 .coin-tray{margin-top:12px;padding:9px 12px;min-height:38px;display:grid;place-items:center;
   border:2px solid #7a5730;border-radius:4px 4px 8px 8px;
   background:linear-gradient(#1b130b,#2a1e12);box-shadow:inset 0 6px 14px #000}

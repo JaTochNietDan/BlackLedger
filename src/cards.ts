@@ -181,3 +181,34 @@ export function drumFaces(strip: Reel[], line: string[], pulled: boolean): strin
     pulled ? reelWindow(strip, faceOf(line[i]), i) : reelWindow(strip, faceOf(strip[0]?.id), i),
   );
 }
+
+// What a drum turns through on the way to where it stops.
+//
+// The drums did not turn. They showed where they were going to stop from the
+// moment the handle went down and shook on the spot for a second, which is a
+// machine trembling rather than a machine spinning: "it should scroll through
+// the items before displaying the final result. Right now they just shake but
+// the result is shown already."
+//
+// So the column is the three faces it lands on, and behind them a run of the
+// strip to travel past. The landing faces are the ones the core sent and they
+// are decided before a pixel moves — nothing is picked here, and nothing snaps
+// at the end, which is the fault this machine had before the shake.
+//
+// Walked from a different offset on each drum so three drums do not turn
+// through the same symbols in step.
+export function drumRun(strip: Reel[], window: string[], i: number, turns: number): string[] {
+  const stops = strip.map(s => s.face);
+  if (stops.length === 0) return window;
+  const out = [...window];
+  for (let n = 0; n < turns; n++) {
+    out.push(stops[(n * 7 + i * 5 + 1) % stops.length]);
+  }
+  return out;
+}
+
+// And the same run as symbol ids, so the drum is painted rather than spelled.
+export function drumRunIDs(strip: Reel[], window: string[], i: number, turns: number): string[] {
+  const idOf = (face: string) => strip.find(s => s.face === face)?.id ?? '';
+  return drumRun(strip, window, i, turns).map(idOf);
+}

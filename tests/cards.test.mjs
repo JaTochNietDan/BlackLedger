@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {drumFaces, pipOf, isRedSuit, knownCard, clothRows, clothColour, outsideBets, wheelOrder, wheelAngle, ballAngle, clothTable, wheelPaint, reelStops, reelWindow, REEL_WINDOW} from '../.runtime/frontend-test/cards.js';
+import {drumFaces, pipOf, isRedSuit, knownCard, clothRows, clothColour, outsideBets, wheelOrder, wheelAngle, ballAngle, clothTable, wheelPaint, reelStops, reelWindow, REEL_WINDOW, drumRun, drumRunIDs} from '../.runtime/frontend-test/cards.js';
 
 test('every suit the core deals has a pip and a colour', () => {
   for (const suit of ['spades', 'hearts', 'diamonds', 'clubs']) {
@@ -197,4 +197,53 @@ test('a drum shows where it is going to stop from the moment the handle goes dow
     ['7', '7', '7'],
     'a machine nobody has pulled is not sitting on its own first face',
   );
+});
+
+// The drum travels to where it stops. It used to show its answer from the
+// moment the handle went down and shake on the spot, and before that it showed
+// one thing and flipped to another at the end. The run has to begin with the
+// faces it lands on, so neither can happen: the answer is already there and
+// the travelling is behind it.
+test('a drum runs behind the faces it lands on', () => {
+  const strip = [
+    {id: 'seven', face: '7', stops: 1, pays: 100},
+    {id: 'bar', face: 'BAR', stops: 2, pays: 50},
+    {id: 'cherry', face: 'CHERRY', stops: 2, pays: 25},
+    {id: 'bell', face: 'BELL', stops: 3, pays: 20},
+  ];
+  const window = ['BELL', '7', 'BAR'];
+  const run = drumRun(strip, window, 0, 14);
+  assert.equal(run.length, window.length + 14, 'the run is the window plus what it travels');
+  assert.deepEqual(run.slice(0, 3), window, 'the drum lands on something other than its window');
+  for (const face of run) assert.ok(strip.some(s => s.face === face), 'a face not on the strip: ' + face);
+});
+
+test('three drums do not turn through the same symbols in step', () => {
+  const strip = [
+    {id: 'seven', face: '7', stops: 1, pays: 100},
+    {id: 'bar', face: 'BAR', stops: 2, pays: 50},
+    {id: 'cherry', face: 'CHERRY', stops: 2, pays: 25},
+    {id: 'bell', face: 'BELL', stops: 3, pays: 20},
+  ];
+  const window = ['BELL', '7', 'BAR'];
+  const runs = [0, 1, 2].map(i => drumRun(strip, window, i, 14).slice(3).join(','));
+  assert.notEqual(runs[0], runs[1], 'the first two drums turn through the same symbols');
+  assert.notEqual(runs[1], runs[2], 'the last two drums turn through the same symbols');
+});
+
+test('the run is painted by the same ids as the faces', () => {
+  const strip = [
+    {id: 'seven', face: '7', stops: 1, pays: 100},
+    {id: 'bar', face: 'BAR', stops: 2, pays: 50},
+    {id: 'cherry', face: 'CHERRY', stops: 2, pays: 25},
+    {id: 'bell', face: 'BELL', stops: 3, pays: 20},
+  ];
+  const window = ['BELL', '7', 'BAR'];
+  const faces = drumRun(strip, window, 1, 6);
+  const ids = drumRunIDs(strip, window, 1, 6);
+  assert.equal(ids.length, faces.length);
+  faces.forEach((face, i) => {
+    const want = strip.find(s => s.face === face);
+    assert.equal(ids[i], want ? want.id : '', 'the drum is painted as something it is not');
+  });
 });
