@@ -1317,10 +1317,24 @@ func (w *World) Actions(id string) []Action {
 					fmt.Sprintf("You keep what is in your pocket and lose the $%d already in the pot.", g.Ante+g.MyBet))
 			}
 		} else {
-			asks("cards", "Sit in on the game in the back room", 40, 0,
-				w.BackRoomReadiness(id, w.BackRoomAnte(0)),
-				fmt.Sprintf("Five cards each and one draw, $%d to $%d a head. There is no house in this game: the pot is what everybody put in, and it goes to the best hand at the table. The other players are whoever is in the room.",
-					MinAnte, MaxAnte))
+			// Between hands of a sitting that is still going: the table is
+			// there, the people are there, and the next hand is one decision
+			// rather than getting up and sitting down again.
+			if g := w.Game; g != nil && g.Done && !g.Over && g.Place == id {
+				add("deal", "Deal the next hand", 15, 0, w.DealReadiness(),
+					fmt.Sprintf("$%d in front of you, $%d the ante, and %s still at the table.",
+						g.Stack, g.Ante, plural(len(g.Seats), "one of them", "of them")))
+				add("cashout", "Pick your money up and leave", 10, 0, "",
+					fmt.Sprintf("You take the $%d in front of you off the table. %s played so far.",
+						g.Stack, upper1(plural(g.Hands, "hand", "hands"))))
+			} else {
+				buy := w.BackRoomBuyIn(id, 0)
+				asks("cards", "Buy into the game in the back room", 40, 0,
+					w.BackRoomReadiness(id, buy),
+					fmt.Sprintf("What you put on the table is what you can lose, and a twentieth of it is the ante — $%d buys in at $%d a hand. You play out of what is in front of you, hand after hand, until you are cleaned out or you pick it up.",
+						buy, w.TableAnteAt(id, buy)))
+				sum(MinBuyIn, min(MaxBuyIn, p.Cash), buy, "On the table")
+			}
 		}
 	}
 	if HasTables(id) && !w.Own(id) {

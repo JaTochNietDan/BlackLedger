@@ -131,7 +131,7 @@ func TestAHandEverybodyElseThrewInIsOverWhereItStands(t *testing.T) {
 		t.Fatalf("no game: %v", err)
 	}
 	g := w.Game
-	before := w.Player.Cash
+	before := g.Stack
 	for i := range g.Seats {
 		g.Seats[i].Folded = true
 	}
@@ -141,8 +141,10 @@ func TestAHandEverybodyElseThrewInIsOverWhereItStands(t *testing.T) {
 	if !g.Done {
 		t.Fatal("the player was left playing against nobody and the hand went on")
 	}
-	if w.Player.Cash != before+g.Pot {
-		t.Fatalf("everybody threw their hand in and the pot of $%d came to $%d", g.Pot, w.Player.Cash-before)
+	// Into the chips in front of them: the pot is won at the table and picked
+	// up when the player gets up.
+	if g.Stack != before+g.Pot {
+		t.Fatalf("everybody threw their hand in and the pot of $%d came to $%d", g.Pot, g.Stack-before)
 	}
 }
 

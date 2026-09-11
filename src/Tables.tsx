@@ -911,6 +911,7 @@ export interface CardsState {
     said: string;
     sore?: number;
     moved?: number;
+    stack: number;
     cards?: Card[];
     hand?: string;
   }[];
@@ -921,6 +922,15 @@ export interface CardsState {
   done: boolean;
   outcome: string;
   won: number;
+  // The sitting, as opposed to the hand: what is in front of the player, what
+  // they brought to the table, how many hands have been dealt since, and
+  // whether the night is finished.
+  stack: number;
+  buy_in: number;
+  hands: number;
+  over: boolean;
+  ended: string;
+  up: number;
 }
 
 // The back room, at hold'em. Two cards each, five in the middle, and four
@@ -946,6 +956,13 @@ export function BackRoom({
       <div className="felt-head">
         <span>{cards.street_name === 'at the showdown' ? 'The showdown' : cards.street_name}</span>
         <b>{money(cards.pot)} in the middle</b>
+        {/* What is in front of you, which is now the only money you can bet.
+            A table where the pot is the one figure on the screen is a table
+            you cannot decide anything at. */}
+        <i className="felt-stack">
+          {money(cards.stack)} in front of you
+          {cards.hands > 1 ? ` · hand ${cards.hands}` : ''}
+        </i>
       </div>
       <div className="baize">
         {cards.seats.map(s => (
@@ -957,6 +974,9 @@ export function BackRoom({
               {s.in > 0 && !s.folded ? ` · ${money(s.in)} in` : ''}
               {s.hand ? ` · ${s.hand}` : ''}
             </small>
+            {/* And what they have left. Somebody down to their last two antes
+                plays differently, and you can see it coming. */}
+            <small className="seat-stack">{money(s.stack)}</small>
             {/* What the night has cost them, and whether they are carrying
                 anything about it. The money in this game belongs to somebody,
                 so the screen says whose it was and what they think of you. */}
@@ -985,18 +1005,48 @@ export function BackRoom({
           </small>
         </div>
       </div>
-      {cards.done ? (
-        <p className={'felt-result' + (cards.won > 0 ? ' won' : '')}>{cards.outcome}</p>
+      {cards.over ? (
+        <>
+          <p className={'felt-result' + (cards.up > 0 ? ' won' : '')}>{cards.outcome}</p>
+          <p className="felt-ended">
+            {cards.ended} You brought {money(cards.buy_in)} and played{' '}
+            {cards.hands === 1 ? 'one hand' : `${cards.hands} hands`}.
+          </p>
+        </>
+      ) : cards.done ? (
+        <>
+          <p className={'felt-result' + (cards.won > 0 ? ' won' : '')}>{cards.outcome}</p>
+          {/* The night goes on. This is the whole of what a sitting is: the
+              next hand is one decision, not getting up and sitting down
+              again. */}
+          <div className="felt-actions">
+            <button className="primary" onClick={() => act({kind: 'deal'})}>
+              Deal the next hand
+            </button>
+            <button onClick={() => act({kind: 'cashout'})}>
+              Pick up {money(cards.stack)} and leave
+            </button>
+          </div>
+        </>
       ) : cards.facing ? (
         <div className="felt-actions">
-          <button onClick={() => act({kind: 'call'})} disabled={owed > cash}>
+          <button onClick={() => act({kind: 'call'})} disabled={owed > cards.stack}>
             Call the {money(owed)}
           </button>
           <button onClick={() => act({kind: 'fold'})}>Throw the hand in</button>
         </div>
       ) : (
         <div className="felt-actions">
-          <Money amount={bet} limit={500} least={0} cash={cash} onChange={setBet} label="Bet" />
+          {/* Bounded by the chips in front of you rather than by your cash:
+              nobody at a table reaches into their coat. */}
+          <Money
+            amount={bet}
+            limit={Math.min(500, cards.stack)}
+            least={0}
+            cash={cards.stack}
+            onChange={setBet}
+            label="Bet"
+          />
           <button onClick={() => act({kind: 'bet', amount: bet})}>
             {bet > 0 ? `Bet ${money(bet)}` : 'Check'}
           </button>

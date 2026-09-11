@@ -8832,3 +8832,56 @@ Worth saying plainly: a `nohup` log nobody reads is where this sat. The loop
 restarts the live game every tick and curls `/api/state` afterwards, which
 returns 200 with a panicking command path, so the check said everything was
 fine. That check now looks at the log for panics as well.
+
+## A sitting, rather than a hand
+
+From the game: "the game should continue until you stop playing, right now it
+just requires you to leave the table and rejoin. Realistically it feels like it
+should be more like actual poker, where you have a buy in and whatnot and you
+play until people go bust or you can leave."
+
+The table dealt one hand and stopped. Playing a second meant getting up and
+sitting down again, which re-seated the room, re-read everybody's pockets and
+threw away everything the last hand had meant.
+
+There is money on the table now. Everybody who sits down puts a stake in front
+of them and plays out of it: the ante, every bet and every pot move chips, not
+pockets. That buys the two things a poker night is made of and neither of which
+a one-hand table can have — you can lose what you brought without losing what
+you own, and somebody can be cleaned out and leave.
+
+The stake is the room's, not the player's. A twentieth of the buy-in, but never
+more than a quarter of what the shortest stack at the table can cover, because
+the people in these rooms carry fifty or seventy-five dollars and a table
+pitched at what the player brought would be a table nobody in the city could sit
+at. A thousand dollars at the bar plays for twelve a hand, which is a rich man
+at a poor table sitting there a long time.
+
+Between hands the table is still a table. The next hand is one decision, whoever
+cannot cover the ante takes what is left back to their pocket and goes, and
+whoever else is in the room takes the empty chair — without that, a table at the
+bar ended after nine hands because the first three were cleaned out. It ends
+when the player has nothing in front of them, when the room has nobody left, or
+when the player picks their money up. Getting up or walking out of the room both
+cash out, because chips left on the baize would be money nobody could ever pick
+up again.
+
+Measured at the bar: twenty hands on a $1,000 buy-in at $12 a hand before the
+room ran out of people to play.
+
+**Eleven guards moved, and two of them were code faults rather than test
+faults.** `remember` read what a night cost somebody out of their pocket, which
+with chips says a man with four hundred in front of him was cleaned out. The
+money-conservation guards weighed pockets before and after a hand, and had to
+learn to count the chips — including that a settled pot is already in the
+stacks, so counting both is counting the same money twice.
+
+One balance finding worth keeping: `TestFoldingIsWorthMoreThanTheCardsAre` holds
+firmly at a $50 ante — betting the good hands is $27,250 better over three
+thousand hands — and inverts at $40. That is a sharper edge than a rule this
+central should have, and it is worth a tick of its own.
+
+A save written before the table had chips is cleared on load. Those games were
+one hand settled straight out of pockets, so a sitting restored from one would
+offer to deal the next hand with nothing in front of the player. A sitting that
+does have chips on it survives, because that is somebody's money.

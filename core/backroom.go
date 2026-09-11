@@ -55,6 +55,54 @@ const (
 	Players = 3
 )
 
+// A sitting, rather than a hand.
+//
+// The table dealt one hand and stopped. To play a second you got up and sat
+// down again, which re-seated the room, re-read everybody's pockets and threw
+// away everything the last hand had meant: "the game should continue until you
+// stop playing, right now it just requires you to leave the table and rejoin.
+// Realistically it feels like it should be more like actual poker, where you
+// have a buy in and whatnot and you play until people go bust or you can
+// leave."
+//
+// So there is money on the table now. Everybody who sits down puts a stake in
+// front of them and plays out of it; the pot is chips, not pockets. What that
+// buys is the two things a poker night is made of and neither of which a
+// one-hand table can have: you can lose what you brought without losing what
+// you own, and somebody can be cleaned out and leave.
+const (
+	// MinBuyIn and MaxBuyIn are what can be put on the table.
+	MinBuyIn = 50
+	MaxBuyIn = 10000
+	// AntesInAStack is how many antes a full buy-in is worth. Twenty, because a
+	// stake that cannot lose twenty hands is not a stake, it is one hand with
+	// extra steps.
+	AntesInAStack = 20
+	// SitsOutUnder is the least anybody sits down with, in antes. Below this
+	// they are not playing, they are waiting to be blinded off.
+	SitsOutUnder = 4
+	// LeastAnte is the smallest a hand is ever played for. The people in these
+	// rooms carry fifty or seventy-five dollars, so a table pitched at what the
+	// player brought would be a table nobody in the city could sit at.
+	LeastAnte = 5
+	// SitsDownWith is the least in somebody's pocket before they will take a
+	// seat at all.
+	SitsDownWith = 20
+)
+
+// TableAnte is the stake at a table: a twentieth of what the player put up, but
+// never more than a quarter of what the shortest stack at the table can cover,
+// because the game is played against the people in the room rather than against
+// the player's bankroll. A rich man at a poor table plays for what the table
+// plays for and sits there a long time, which is what a back room is.
+func TableAnte(buyIn, shortest int) int {
+	ante := buyIn / AntesInAStack
+	if shortest > 0 {
+		ante = min(ante, shortest/SitsOutUnder)
+	}
+	return max(LeastAnte, min(MaxAnte, ante))
+}
+
 // Seat is somebody at the table who is not the player.
 type Seat struct {
 	Who   string `json:"who"`
@@ -79,6 +127,14 @@ type Seat struct {
 	// Said is what they did when the money went round, kept so the interface
 	// can show a table talking rather than a row of totals.
 	Said string `json:"said,omitempty"`
+	// Stack is what this seat has in front of them. Everything at this table is
+	// played out of it: the ante, every bet, and what a pot pays. When it will
+	// not cover the ante they are cleaned out and they leave, which is the
+	// thing a table of one hand could never do.
+	Stack int `json:"stack"`
+	// Out is set on the hand somebody is cleaned out, so the table can say so
+	// once before the seat goes.
+	Out bool `json:"out,omitempty"`
 }
 
 // CardGame is a hand in progress in the back room. It lives on the world
@@ -113,6 +169,20 @@ type CardGame struct {
 	Done    bool   `json:"done,omitempty"`
 	Outcome string `json:"outcome,omitempty"`
 	Won     int    `json:"won,omitempty"`
+	// Stack is the player's chips, BuyIn is what they put on the table when
+	// they sat down, and Hands is how many have been dealt since. Over is the
+	// sitting finished rather than the hand: everybody else cleaned out, or the
+	// player with nothing left to ante.
+	Stack int  `json:"stack"`
+	BuyIn int  `json:"buy_in,omitempty"`
+	Hands int  `json:"hands,omitempty"`
+	Over  bool `json:"over,omitempty"`
+	// Ended says why, in words, when it is over.
+	Ended string `json:"ended,omitempty"`
+	// Left is everybody who has been cleaned out at this table tonight. They do
+	// not come back to it: being cleaned out is going home, not sitting out a
+	// hand.
+	Left []string `json:"left"`
 }
 
 // pokerRank is what a card is worth in a game where an ace is not eleven and a
@@ -293,50 +363,164 @@ func BestAtTheTable(g *CardGame) HandRank {
 // SitInTheBackRoom deals a hand against whoever is actually in the room and can
 // cover the ante. Nobody is invented for this: an empty room has no game, which
 // is why the game is worth walking somewhere for.
-func (w *World) SitInTheBackRoom(place string, ante int) error {
+func (w *World) SitInTheBackRoom(place string, buyIn int) error {
 	if !HasBackRoom(place) {
 		return fmt.Errorf("there is no game here")
 	}
 	if w.Game != nil && !w.Game.Done {
 		return fmt.Errorf("there is a hand on the table already")
 	}
-	if ante < MinAnte || ante > MaxAnte {
-		return fmt.Errorf("the game runs between $%d and $%d a hand", MinAnte, MaxAnte)
+	if buyIn < MinBuyIn || buyIn > MaxBuyIn {
+		return fmt.Errorf("the table takes between $%d and $%d on it", MinBuyIn, MaxBuyIn)
 	}
-	if w.Player.Cash < ante {
-		return fmt.Errorf("you cannot cover the ante")
+	if w.Player.Cash < buyIn {
+		return fmt.Errorf("you cannot put that on the table")
 	}
+	// Everybody at the table plays out of what they put in front of them: what
+	// they can stand to, up to what the player has put up. The stake follows
+	// from the shortest of those, so the game is the room's game.
 	var seats []Seat
 	for i := range w.NPCs {
 		n := &w.NPCs[i]
 		if n.Dead || n.Location != place || w.Travelling(n) || len(seats) >= Players {
 			continue
 		}
-		if w.Pockets(n) < ante {
+		if w.Pockets(n) < SitsDownWith {
 			continue
 		}
-		seats = append(seats, Seat{Who: n.ID, Name: n.Name, Had: w.Pockets(n)})
+		seats = append(seats, Seat{Who: n.ID, Name: n.Name, Had: w.Pockets(n),
+			Stack: min(w.Pockets(n), buyIn)})
 	}
 	if len(seats) < 2 {
 		return fmt.Errorf("there is nobody in the back room with money to lose")
 	}
-	if err := w.Pay(ante); err != nil {
-		return err
+	shortest := seats[0].Stack
+	for _, s := range seats {
+		shortest = min(shortest, s.Stack)
 	}
-	g := &CardGame{Place: place, Ante: ante, Pot: ante, Seats: seats,
-		Deck: w.deck(), Street: Preflop}
-	g.Mine = g.take(2)
-	for i := range g.Seats {
-		g.Seats[i].Cards = g.take(2)
-		if n := w.NPC(g.Seats[i].Who); n != nil {
-			n.Purse -= ante
-			g.Pot += ante
+	ante := TableAnte(buyIn, shortest)
+	for i := range seats {
+		if n := w.NPC(seats[i].Who); n != nil {
+			n.Purse -= seats[i].Stack
 		}
 	}
+	if err := w.Pay(buyIn); err != nil {
+		return err
+	}
+	g := &CardGame{Place: place, Ante: ante, Seats: seats, BuyIn: buyIn, Stack: buyIn}
 	w.Game = g
-	w.Log("A game in the back room", fmt.Sprintf("$%d a head with %s. Two cards each and five to come.%s",
-		ante, listNames(g.Seats), w.tableRemembers(g)), "personal")
+	w.Log("A seat in the back room",
+		fmt.Sprintf("$%d on the table at $%d a hand, against %s. You play out of what is in front of you and take home what is left.%s",
+			buyIn, ante, listNames(g.Seats), w.tableRemembers(g)), "personal")
+	return w.DealAgain()
+}
+
+// DealAgain puts the next hand out. It is the same work whether it is the first hand
+// of a sitting or the ninth, which is the whole of what "the game should
+// continue until you stop playing" asks for: the table between hands is a table
+// with people and money still at it.
+func (w *World) DealAgain() error {
+	g := w.Game
+	if g == nil {
+		return fmt.Errorf("you are not at the table")
+	}
+	if g.Over {
+		return fmt.Errorf("the game is over")
+	}
+	if g.Hands > 0 && !g.Done {
+		return fmt.Errorf("there is a hand on the table already")
+	}
+	// Whoever cannot cover the ante is cleaned out. They take what is left in
+	// front of them back to their pocket and go.
+	kept := make([]Seat, 0, len(g.Seats))
+	var gone []string
+	for _, s := range g.Seats {
+		if s.Stack >= g.Ante {
+			kept = append(kept, s)
+			continue
+		}
+		if n := w.NPC(s.Who); n != nil {
+			n.Purse += s.Stack
+		}
+		gone = append(gone, s.Name)
+		g.Left = append(g.Left, s.Who)
+	}
+	g.Seats = kept
+	if len(gone) > 0 {
+		w.Log("Cleaned out at the table",
+			fmt.Sprintf("%s %s nothing left in front of %s and left the room.",
+				joinNames(gone), was(len(gone)), them(len(gone))), "personal")
+	}
+	if g.Stack < g.Ante {
+		return w.endSitting("You have nothing left in front of you.")
+	}
+	// And whoever else is in the room takes the empty chair. A back room does
+	// not close because one man went home; it closes when there is nobody left
+	// in it. Without this a table at the bar, where seven people spend their
+	// evening, ended after nine hands because the first three were cleaned out.
+	w.fillTheTable(g)
+	if len(g.Seats) < 2 {
+		return w.endSitting("There is nobody left in the room with money to play for.")
+	}
+	// A fresh hand: the felt is cleared and the antes go in.
+	g.Mine, g.Board, g.Deck = nil, []Card{}, w.deck()
+	g.Street, g.Bet, g.MyBet, g.Raised = Preflop, 0, 0, false
+	g.Facing, g.Folded, g.Done, g.Outcome, g.Won = false, false, false, "", 0
+	g.Pot = g.Ante
+	g.Stack -= g.Ante
+	g.Mine = g.take(2)
+	for i := range g.Seats {
+		s := &g.Seats[i]
+		s.Cards, s.In, s.Folded, s.Said, s.Out = g.take(2), 0, false, "", false
+		s.Stack -= g.Ante
+		g.Pot += g.Ante
+	}
+	g.Hands++
 	return nil
+}
+
+// endSitting closes the table and gives everybody back what is in front of
+// them. Nobody walks away from a back room leaving their chips on the baize.
+func (w *World) endSitting(why string) error {
+	g := w.Game
+	if g == nil || g.Over {
+		return nil
+	}
+	took := g.Stack
+	w.Player.Cash += took
+	g.Stack = 0
+	for i := range g.Seats {
+		if n := w.NPC(g.Seats[i].Who); n != nil {
+			n.Purse += g.Seats[i].Stack
+		}
+		g.Seats[i].Stack = 0
+	}
+	g.Over, g.Done, g.Ended = true, true, why
+	up := took - g.BuyIn
+	how := fmt.Sprintf("You put $%d on the table and picked $%d up", g.BuyIn, took)
+	switch {
+	case up > 0:
+		how = fmt.Sprintf("You put $%d on the table and picked $%d up, $%d to the good", g.BuyIn, took, up)
+	case up < 0:
+		how = fmt.Sprintf("You put $%d on the table and picked $%d up, $%d of it gone", g.BuyIn, took, -up)
+	}
+	w.Log("Up from the table",
+		fmt.Sprintf("%s. %s %s", why, how, plural(g.Hands, "hand", "hands")+" played."), "personal")
+	return nil
+}
+
+// was and them are the grammar of a line that names one person or several.
+func was(n int) string {
+	if n == 1 {
+		return "has"
+	}
+	return "have"
+}
+func them(n int) string {
+	if n == 1 {
+		return "them"
+	}
+	return "them"
 }
 
 // tableRemembers is what the player is told when they sit down against people
@@ -472,14 +656,12 @@ func (w *World) showdown() error {
 			took += rest
 		}
 		if seat < 0 {
-			w.Player.Cash += took
+			g.Stack += took
 			g.Won = took - g.Ante - g.MyBet
 			names = append(names, "you")
 			continue
 		}
-		if n := w.NPC(g.Seats[seat].Who); n != nil {
-			n.Purse += took
-		}
+		g.Seats[seat].Stack += took
 		names = append(names, g.Seats[seat].Name)
 	}
 	if g.Won == 0 && (g.Folded || winners[0] >= 0) {
@@ -522,7 +704,11 @@ func (w *World) remember() {
 		if n == nil || n.Dead {
 			continue
 		}
-		had, moved := s.Had, n.Purse-s.Had
+		// What the night did to them, not what is in their pocket. The money
+		// is in front of them while they are sitting at the table, so reading
+		// the pocket alone says a man with four hundred in chips was cleaned
+		// out and a man who won a pot went home with nothing.
+		had, moved := s.Had, n.Purse+s.Stack-s.Had
 		switch {
 		case moved > 0:
 			// Money you handed over is goodwill, and more of it is more of it.
@@ -537,7 +723,7 @@ func (w *World) remember() {
 			}
 			weight := int(float64(SoreAtCards) * share)
 			because := "the night you took them at cards"
-			if n.Purse == 0 {
+			if n.Purse+s.Stack == 0 {
 				because = "the night you cleaned them out at cards"
 			}
 			w.Aggrieve(n.ID, weight, because)
@@ -554,21 +740,53 @@ func (w *World) BackRoomAnte(amount int) int {
 	return amount
 }
 
+// BackRoomBuyIn is what the player is putting on the table: what they named, or
+// a sensible default they can afford. A twentieth of it is the ante, so this
+// one figure sets the size of the game.
+func (w *World) BackRoomBuyIn(id string, amount int) int {
+	if amount > 0 {
+		return amount
+	}
+	want := MinBuyIn * 2
+	if w.Player.Cash < want {
+		want = MinBuyIn
+	}
+	return min(want, max(MinBuyIn, w.Player.Cash))
+}
+
+// DealReadiness explains why the next hand cannot go out, or returns "".
+func (w *World) DealReadiness() string {
+	g := w.Game
+	switch {
+	case g == nil:
+		return "You are not at the table"
+	case g.Over:
+		return "The game is over"
+	case !g.Done:
+		return "There is a hand on the table already"
+	case g.Stack < g.Ante:
+		return "You have nothing left in front of you"
+	case len(g.Seats) < 2:
+		return "There is nobody left at the table"
+	}
+	return ""
+}
+
 // BackRoomReadiness explains why there is no game to sit in on, or returns "".
-func (w *World) BackRoomReadiness(id string, ante int) string {
+func (w *World) BackRoomReadiness(id string, buyIn int) string {
 	if !HasBackRoom(id) {
 		return "There is no game here"
 	}
 	if w.Game != nil && !w.Game.Done {
 		return "You are in the middle of a hand"
 	}
-	if ante < MinAnte || ante > MaxAnte {
-		return fmt.Sprintf("The game runs between $%d and $%d a hand", MinAnte, MaxAnte)
+	if buyIn < MinBuyIn || buyIn > MaxBuyIn {
+		return fmt.Sprintf("The table takes between $%d and $%d on it", MinBuyIn, MaxBuyIn)
 	}
-	if w.Player.Cash < ante {
-		return "You cannot cover the ante"
+	if w.Player.Cash < buyIn {
+		return "You cannot put that on the table"
 	}
-	if w.seatable(id, ante) < 2 {
+	if w.seatable(id, SitsDownWith) < 2 {
 		return "There is nobody in the back room with money to lose"
 	}
 	return ""
@@ -596,7 +814,7 @@ func (w *World) CardsDescription() map[string]any {
 	seats := make([]map[string]any, 0, len(g.Seats))
 	for _, s := range g.Seats {
 		seat := map[string]any{"who": s.Who, "name": s.Name, "threw": s.Threw,
-			"in": s.In, "folded": s.Folded, "said": s.Said}
+			"in": s.In, "folded": s.Folded, "said": s.Said, "stack": s.Stack}
 		// What this hand did to them, and whether they were already carrying
 		// something about the last one. A table where the player has taken
 		// money off somebody twice should look different from one where
@@ -604,7 +822,11 @@ func (w *World) CardsDescription() map[string]any {
 		if n := w.NPC(s.Who); n != nil {
 			seat["sore"] = n.Sore
 			if g.Done {
-				seat["moved"] = n.Purse - s.Had
+				// What the night has done to them, not the hand: their chips
+				// plus whatever is left in their pocket, against what they
+				// walked in with. Reading the pocket alone says a man with
+				// four hundred in front of him is broke.
+				seat["moved"] = n.Purse + s.Stack - s.Had
 			}
 		}
 		// Nobody sees a hand before it is turned over.
@@ -620,6 +842,11 @@ func (w *World) CardsDescription() map[string]any {
 		"board": cards(g.Board), "street": g.Street, "street_name": StreetName(g.Street),
 		"bet": g.Bet, "my_bet": g.MyBet, "facing": g.Facing, "folded": g.Folded,
 		"done": g.Done, "outcome": g.Outcome, "won": g.Won,
+		// The sitting, as opposed to the hand: what is in front of the player,
+		// what they brought, how many hands they have played, and whether the
+		// night is finished.
+		"stack": g.Stack, "buy_in": g.BuyIn, "hands": g.Hands,
+		"over": g.Over, "ended": g.Ended, "up": g.Stack - g.BuyIn,
 	}
 }
 
@@ -710,13 +937,14 @@ func (w *World) PlaceBet(amount int) error {
 	if amount < 0 || amount > MaxAnte {
 		return fmt.Errorf("the room takes up to $%d on one bet", MaxAnte)
 	}
-	if amount > w.Player.Cash {
-		return fmt.Errorf("you cannot cover that")
+	// Out of what is in front of you. Nobody at a table reaches into their
+	// coat: what you can bet is what you brought, which is the whole point of
+	// buying in.
+	if amount > g.Stack {
+		return fmt.Errorf("you have only $%d in front of you", g.Stack)
 	}
 	if amount > 0 {
-		if err := w.Pay(amount); err != nil {
-			return err
-		}
+		g.Stack -= amount
 		g.Bet, g.MyBet, g.Pot = amount, amount, g.Pot+amount
 	}
 	w.roundOfBetting()
@@ -773,11 +1001,11 @@ func (w *World) bettingPass() bool {
 			}
 			s.Said = "checks"
 			if strength >= 4 || bluff {
-				put := min(g.Ante*2, w.Pockets(n))
+				put := min(g.Ante*2, s.Stack)
 				if put <= 0 {
 					continue
 				}
-				n.Purse -= put
+				s.Stack -= put
 				s.In += put
 				g.Bet, g.Pot = s.In, g.Pot+put
 				s.Said = "bets $" + fmt.Sprint(put)
@@ -787,7 +1015,7 @@ func (w *World) bettingPass() bool {
 			}
 			continue
 		}
-		if w.Pockets(n) < owed {
+		if s.Stack < owed {
 			s.Folded, s.Said = true, "has not got it and throws the hand in"
 			continue
 		}
@@ -801,8 +1029,8 @@ func (w *World) bettingPass() bool {
 			up = up || strength >= 4
 		}
 		if !g.Raised && up {
-			put := min(owed+g.Ante*2, w.Pockets(n))
-			n.Purse -= put
+			put := min(owed+g.Ante*2, s.Stack)
+			s.Stack -= put
 			s.In += put
 			g.Bet, g.Pot, g.Raised = s.In, g.Pot+put, true
 			s.Said = "puts it up $" + fmt.Sprint(s.In-(g.Bet-put))
@@ -827,7 +1055,7 @@ func (w *World) bettingPass() bool {
 			s.Folded, s.Said = true, "throws the hand in"
 			continue
 		}
-		n.Purse -= owed
+		s.Stack -= owed
 		s.In += owed
 		g.Pot += owed
 		s.Said = "calls"
@@ -842,12 +1070,10 @@ func (w *World) CallBet() error {
 		return fmt.Errorf("there is nothing to call")
 	}
 	owed := g.Bet - g.MyBet
-	if owed > w.Player.Cash {
-		return fmt.Errorf("you cannot cover that")
+	if owed > g.Stack {
+		return fmt.Errorf("you have only $%d in front of you", g.Stack)
 	}
-	if err := w.Pay(owed); err != nil {
-		return err
-	}
+	g.Stack -= owed
 	g.MyBet, g.Pot, g.Facing = g.Bet, g.Pot+owed, false
 	// Whoever called the smaller figure has to match the bigger one or get out.
 	w.roundOfBetting()
@@ -884,4 +1110,62 @@ func (w *World) CallReadiness() string {
 		return fmt.Sprintf("You are $%d short of calling it", owed-w.Player.Cash)
 	}
 	return ""
+}
+
+// TableAnteAt is what a hand would cost at this room for this buy-in, read off
+// who is actually in there. The offer says it before the player commits,
+// because "a twentieth of what you put up" is not the whole truth at a table
+// where somebody is carrying fifty dollars.
+func (w *World) TableAnteAt(id string, buyIn int) int {
+	shortest := 0
+	seats := 0
+	for i := range w.NPCs {
+		n := &w.NPCs[i]
+		if n.Dead || n.Location != id || w.Travelling(n) || seats >= Players {
+			continue
+		}
+		if w.Pockets(n) < SitsDownWith {
+			continue
+		}
+		seats++
+		stake := min(w.Pockets(n), buyIn)
+		if shortest == 0 || stake < shortest {
+			shortest = stake
+		}
+	}
+	return TableAnte(buyIn, shortest)
+}
+
+// fillTheTable sits down whoever else is in the room, up to the table's size.
+// Somebody who has already been cleaned out here tonight does not come back:
+// they went home, which is what being cleaned out means.
+func (w *World) fillTheTable(g *CardGame) {
+	if len(g.Seats) >= Players {
+		return
+	}
+	seated := map[string]bool{}
+	for _, s := range g.Seats {
+		seated[s.Who] = true
+	}
+	for _, who := range g.Left {
+		seated[who] = true
+	}
+	for i := range w.NPCs {
+		n := &w.NPCs[i]
+		if len(g.Seats) >= Players {
+			return
+		}
+		if n.Dead || seated[n.ID] || n.Location != g.Place || w.Travelling(n) {
+			continue
+		}
+		stake := min(w.Pockets(n), g.BuyIn)
+		if stake < g.Ante*SitsOutUnder {
+			continue
+		}
+		n.Purse -= stake
+		g.Seats = append(g.Seats, Seat{Who: n.ID, Name: n.Name, Had: w.Pockets(n) + stake, Stack: stake})
+		place, _ := PlaceByID(g.Place)
+		w.Log("Somebody takes the empty chair",
+			fmt.Sprintf("%s sits down at %s with $%d in front of them.", n.Name, place.Name, stake), "personal")
+	}
 }

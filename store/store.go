@@ -59,6 +59,16 @@ func decode(data string) (*core.World, error) {
 		// would have no customers in it for the rest of the campaign.
 		w.SettleCars()
 		w.SettleFuel()
+		// A card game saved before the table had chips on it. Those games were
+		// one hand settled straight out of pockets: there is no buy-in, no
+		// stack and nothing to pick up, so a sitting restored from one would
+		// offer to deal the next hand with nothing in front of the player.
+		// The felt is saved state that is safe to clear — it is cleared every
+		// time anybody sits down — so the old hand goes and the room offers a
+		// seat again.
+		if w.Game != nil && w.Game.BuyIn == 0 {
+			w.Game = nil
+		}
 		// And every list is a list. A save written before a field existed has
 		// nothing under its name, and Go reads nothing as a nil slice, which
 		// goes down the wire as `null` for the view to count and blank on.

@@ -335,7 +335,20 @@ func (w *World) apply(c Command) error {
 			}
 			w.Advance(a.Minutes)
 		} else if c.Kind == "cards" {
-			if err := w.SitInTheBackRoom(p.Location, w.BackRoomAnte(c.Amount)); err != nil {
+			if err := w.SitInTheBackRoom(p.Location, w.BackRoomBuyIn(p.Location, c.Amount)); err != nil {
+				return err
+			}
+			w.Advance(a.Minutes)
+		} else if c.Kind == "deal" {
+			// The next hand of a sitting that is already going. The clock moves
+			// for it the way it moves for the first one: a hand of cards takes
+			// as long as a hand of cards takes.
+			if err := w.DealAgain(); err != nil {
+				return err
+			}
+			w.Advance(a.Minutes)
+		} else if c.Kind == "cashout" {
+			if err := w.endSitting("You pick your money up off the table."); err != nil {
 				return err
 			}
 			w.Advance(a.Minutes)

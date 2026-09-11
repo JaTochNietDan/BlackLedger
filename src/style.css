@@ -848,6 +848,11 @@ body{height:100%;overflow:hidden;margin:0;background:var(--bg);color:var(--ink);
 .felt-actions button:hover:not(:disabled){background:#2b6547;border-color:#3d8560}
 .felt-actions button:disabled{opacity:.45;cursor:default}
 .felt-note{margin:10px 0 0;font-size:11px;line-height:1.5;color:#8fae9c}
+/* A sitting has three figures the felt never had to show: what is in front of
+   the player, what is in front of everybody else, and how the night ended. */
+.felt-head i{font-style:normal;font-size:11px;color:#b6ac86;letter-spacing:.04em}
+.seat-stack{font-size:10.5px;color:#c8bd90;font-variant-numeric:tabular-nums}
+.felt-ended{margin:6px 0 0;font-size:11.5px;color:#b6ac86;text-align:center}
 .felt-result{margin:10px 0 0;font-size:13px;color:#d8cfae;text-align:center}
 .felt-result.won{color:#9fd6a8}
 

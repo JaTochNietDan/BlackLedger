@@ -117,11 +117,19 @@ export function BackRoomScene({
         ) : (
           <div className="back-room-empty">
             <p>
-              Five cards each and one draw. There is no house in this game: the pot is what
+              Two cards each and five on the table. There is no house in this game: the pot is what
               everybody put in, and it goes to the best hand at the table.
             </p>
+            <p>
+              What you put on the table is what you can lose, and a twentieth of it is the ante. You
+              play out of what is in front of you, hand after hand, until you are cleaned out or you
+              pick your money up.
+            </p>
             {seat && !seat.disabled ? (
-              <button className="action primary" onClick={() => act({kind: 'cards', amount: 0})}>
+              <button
+                className="action primary"
+                onClick={() => act({kind: 'cards', amount: seat.sum?.preset ?? 0})}
+              >
                 <span>
                   <strong>{seat.label}</strong>
                   <span className="desc">{seat.detail}</span>

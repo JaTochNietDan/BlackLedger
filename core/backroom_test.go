@@ -32,6 +32,53 @@ func backroom(t *testing.T) (*World, []string) {
 	return w, seated
 }
 
+// everything is what the table is worth in total: pockets, and the chips in
+// front of anybody. The money used to live only in pockets, so a hand could be
+// weighed by reading them before and after. It lives on the table during a
+// sitting now, and reading the pockets alone says the ante vanished.
+func everything(w *World, _ []string) int {
+	total := w.Player.Cash
+	// Every pocket in the city, not only the three this test sat down: the
+	// room fills its own seats, so a stranger's chips would otherwise look like
+	// money appearing from nowhere.
+	for i := range w.NPCs {
+		total += w.NPCs[i].Purse
+	}
+	if g := w.Game; g != nil {
+		total += g.Stack
+		for _, s := range g.Seats {
+			total += s.Stack
+		}
+		// The pot only while it is still a pot. A hand that has been settled
+		// has already paid it into the stacks, and the figure is kept so the
+		// screen can say what was played for — counting both is counting the
+		// same money twice.
+		if !g.Done {
+			total += g.Pot
+		}
+	}
+	return total
+}
+
+// theirs is what the room has, in pockets and in front of them.
+func theirs(w *World) int {
+	total := 0
+	for i := range w.NPCs {
+		total += w.NPCs[i].Purse
+	}
+	if g := w.Game; g != nil {
+		for _, s := range g.Seats {
+			total += s.Stack
+		}
+		// A pot in play was put in by both sides, so it belongs to neither
+		// until it is settled; once it is, it is already in the stacks.
+		if !g.Done {
+			total += g.Pot - g.MyBet - g.Ante
+		}
+	}
+	return total
+}
+
 // playOut checks the hand through every street: no bet from the player, and pay
 // whatever comes back at them. The cheapest way to reach a showdown from a test.
 func playOut(t *testing.T, w *World) {
@@ -55,7 +102,7 @@ func playOut(t *testing.T, w *World) {
 func TestTheBackRoomSeatsPeopleWhoLiveHere(t *testing.T) {
 	t.Parallel()
 	w, seated := backroom(t)
-	if err := w.SitInTheBackRoom(BackRoom, 50); err != nil {
+	if err := w.SitInTheBackRoom(BackRoom, 1000); err != nil {
 		t.Fatalf("nobody could get a game: %v", err)
 	}
 	g := w.Game
@@ -97,7 +144,7 @@ func TestEveryCardOnTheTableIsADifferentCard(t *testing.T) {
 	for seed := uint32(1); seed <= 200; seed++ {
 		w, _ := backroom(t)
 		w.RNG = seed * 2654435761
-		if err := w.SitInTheBackRoom(BackRoom, 50); err != nil {
+		if err := w.SitInTheBackRoom(BackRoom, 1000); err != nil {
 			t.Fatalf("nobody could get a game: %v", err)
 		}
 		playOut(t, w)
@@ -119,7 +166,7 @@ func TestEveryCardOnTheTableIsADifferentCard(t *testing.T) {
 func TestTheBestHandTakesThePot(t *testing.T) {
 	t.Parallel()
 	w, _ := backroom(t)
-	if err := w.SitInTheBackRoom(BackRoom, 50); err != nil {
+	if err := w.SitInTheBackRoom(BackRoom, 1000); err != nil {
 		t.Fatalf("nobody could get a game: %v", err)
 	}
 	before := w.Player.Cash
@@ -215,11 +262,9 @@ func TestTheBackRoomTakesNoRake(t *testing.T) {
 		w.RNG = seed * 2654435761
 		// Counted before the ante, or the antes are missing from one side of
 		// the sum and the pot looks like money out of nowhere.
-		cash, purses := w.Player.Cash, 0
-		for _, id := range seated {
-			purses += w.NPC(id).Purse
-		}
-		if err := w.SitInTheBackRoom(BackRoom, 50); err != nil {
+		cash := w.Player.Cash
+		was, theirsWas := everything(w, seated), theirs(w)
+		if err := w.SitInTheBackRoom(BackRoom, 800); err != nil {
 			t.Fatalf("no game: %v", err)
 		}
 		// Play the hand the way the room plays it, so nothing but the cards is
@@ -248,14 +293,14 @@ func TestTheBackRoomTakesNoRake(t *testing.T) {
 			}
 		}
 		playOut(t, w)
-		mine += w.Player.Cash - cash
-		after := 0
-		for _, id := range seated {
-			after += w.NPC(id).Purse
-		}
-		table += after - purses
-		if w.Player.Cash-cash+after-purses != 0 {
-			t.Fatalf("$%d appeared at the table out of nowhere", w.Player.Cash-cash+after-purses)
+		// What the hand did to the player, whether it is in their pocket or in
+		// front of them.
+		// The buy-in has already left the pocket, so the position is what is
+		// carried plus what is in front of them against what they walked in with.
+		mine += w.Player.Cash + w.Game.Stack - cash
+		table += theirs(w) - theirsWas
+		if now := everything(w, seated); now != was {
+			t.Fatalf("$%d appeared at the table out of nowhere", now-was)
 		}
 	}
 	t.Logf("over %d hands the player is $%d up and the room is $%d up", hands, mine, table)
@@ -277,7 +322,7 @@ func TestFoldingIsWorthMoreThanTheCardsAre(t *testing.T) {
 			w, _ := backroom(t)
 			w.RNG = seed * 2654435761
 			cash := w.Player.Cash
-			if err := w.SitInTheBackRoom(BackRoom, 50); err != nil {
+			if err := w.SitInTheBackRoom(BackRoom, 1000); err != nil {
 				t.Fatalf("no game: %v", err)
 			}
 			// Four streets of the same decision, which is the whole of what
@@ -312,7 +357,9 @@ func TestFoldingIsWorthMoreThanTheCardsAre(t *testing.T) {
 					t.Fatalf("betting was refused: %v", err)
 				}
 			}
-			total += w.Player.Cash - cash
+			// What the hand did, whether it ended in the pocket or in front of
+			// them. The buy-in has already left the pocket by here.
+			total += w.Player.Cash + w.Game.Stack - cash
 		}
 		return total
 	}
@@ -331,12 +378,14 @@ func TestFoldingIsWorthMoreThanTheCardsAre(t *testing.T) {
 func TestATiedPotIsSplitRatherThanGivenAway(t *testing.T) {
 	t.Parallel()
 	w, _ := backroom(t)
-	if err := w.SitInTheBackRoom(BackRoom, 50); err != nil {
+	if err := w.SitInTheBackRoom(BackRoom, 1000); err != nil {
 		t.Fatalf("no game: %v", err)
 	}
 	g := w.Game
-	before := w.Player.Cash
-	purse := w.NPC(g.Seats[0].Who).Purse
+	// Into the chips in front of them rather than into a pocket: the money is
+	// on the table until somebody picks it up.
+	before := g.Stack
+	theirs := g.Seats[0].Stack
 	// The same hand for two people, which hold'em produces far more often than
 	// draw poker did: the board is most of everybody's hand.
 	g.Board = hand("Kh", "Kd", "9s", "5h", "3s")
@@ -349,10 +398,10 @@ func TestATiedPotIsSplitRatherThanGivenAway(t *testing.T) {
 		t.Fatal(err)
 	}
 	half := g.Pot / 2
-	if got := w.Player.Cash - before; got != half {
+	if got := g.Stack - before; got != half {
 		t.Fatalf("half of a $%d pot came to $%d", g.Pot, got)
 	}
-	if got := w.NPC(g.Seats[0].Who).Purse - purse; got != half {
+	if got := g.Seats[0].Stack - theirs; got != half {
 		t.Fatalf("the other half of a $%d pot came to $%d", g.Pot, got)
 	}
 	if !strings.Contains(g.Outcome, "each way") {
@@ -386,14 +435,19 @@ func TestTheGameCanBePlayedThroughTheSamePathAsEverythingElse(t *testing.T) {
 		t.Fatalf("a card game is filed under %q", sit.Group)
 	}
 	before := w.Player.Cash
-	if err := w.apply(Command{Kind: "cards", Amount: 120, RequestID: "backroomsitdown1"}); err != nil {
+	if err := w.apply(Command{Kind: "cards", Amount: 400, RequestID: "backroomsitdown1"}); err != nil {
 		t.Fatalf("sitting down was refused: %v", err)
 	}
-	if w.Game == nil || w.Game.Ante != 120 {
-		t.Fatalf("a player who typed $120 is playing for $%d", w.Game.Ante)
+	// The figure the player types is what they put on the table, not the ante.
+	// The ante follows from it and from what the room can play for.
+	if w.Game == nil || w.Game.BuyIn != 400 {
+		t.Fatalf("a player who typed $400 put $%d on the table", w.Game.BuyIn)
 	}
-	if w.Player.Cash != before-120 {
-		t.Fatalf("the ante took $%d", before-w.Player.Cash)
+	if w.Player.Cash != before-400 {
+		t.Fatalf("buying in took $%d", before-w.Player.Cash)
+	}
+	if w.Game.Ante <= 0 || w.Game.Ante > 400/AntesInAStack {
+		t.Fatalf("a $400 buy-in is playing for $%d a hand", w.Game.Ante)
 	}
 	if offered("cards") != nil {
 		t.Fatal("a second game was offered while a hand was on the table")
@@ -429,11 +483,8 @@ func TestTheGameCanBePlayedThroughTheSamePathAsEverythingElse(t *testing.T) {
 func TestWhatIsFoldedStaysInThePot(t *testing.T) {
 	t.Parallel()
 	w, seated := backroom(t)
-	cash, purses := w.Player.Cash, 0
-	for _, id := range seated {
-		purses += w.NPC(id).Purse
-	}
-	if err := w.SitInTheBackRoom(BackRoom, 50); err != nil {
+	was := everything(w, seated)
+	if err := w.SitInTheBackRoom(BackRoom, 1000); err != nil {
 		t.Fatalf("no game: %v", err)
 	}
 	if err := w.PlaceBet(100); err != nil {
@@ -449,11 +500,9 @@ func TestWhatIsFoldedStaysInThePot(t *testing.T) {
 	if !w.Game.Done {
 		t.Fatal("the hand never finished")
 	}
-	after := 0
-	for _, id := range seated {
-		after += w.NPC(id).Purse
-	}
-	if d := w.Player.Cash - cash + after - purses; d != 0 {
+	// Weighed with the chips in it, because most of this money is on the table
+	// rather than in anybody's pocket until the sitting ends.
+	if d := everything(w, seated) - was; d != 0 {
 		t.Fatalf("$%d appeared at the table out of nowhere", d)
 	}
 	if w.Game.Folded && w.Game.Won != -(w.Game.Ante+w.Game.MyBet) {
@@ -466,7 +515,7 @@ func TestWhatIsFoldedStaysInThePot(t *testing.T) {
 func TestTheTableSaysWhatItDid(t *testing.T) {
 	t.Parallel()
 	w, _ := backroom(t)
-	if err := w.SitInTheBackRoom(BackRoom, 50); err != nil {
+	if err := w.SitInTheBackRoom(BackRoom, 1000); err != nil {
 		t.Fatalf("no game: %v", err)
 	}
 	for _, seat := range w.CardsDescription()["seats"].([]map[string]any) {
@@ -497,7 +546,7 @@ func TestTheTableSaysWhatItDid(t *testing.T) {
 func TestAHandThrownInWinsNothingHoweverGoodItWas(t *testing.T) {
 	t.Parallel()
 	w, _ := backroom(t)
-	if err := w.SitInTheBackRoom(BackRoom, 50); err != nil {
+	if err := w.SitInTheBackRoom(BackRoom, 1000); err != nil {
 		t.Fatalf("no game: %v", err)
 	}
 	g := w.Game
@@ -526,7 +575,7 @@ func TestAHandThrownInWinsNothingHoweverGoodItWas(t *testing.T) {
 func TestTheTablePublishesEverythingTheScreenReads(t *testing.T) {
 	t.Parallel()
 	w, _ := backroom(t)
-	if err := w.SitInTheBackRoom(BackRoom, 50); err != nil {
+	if err := w.SitInTheBackRoom(BackRoom, 1000); err != nil {
 		t.Fatalf("no game: %v", err)
 	}
 	table := w.CardsDescription()
@@ -596,7 +645,12 @@ func TestThereIsSomebodyInTheBackRoomToPlayAgainst(t *testing.T) {
 func TestTakingSomebodysMoneyAtCardsIsSomethingTheyRemember(t *testing.T) {
 	t.Parallel()
 	w, _ := backroom(t)
-	if err := w.SitInTheBackRoom(BackRoom, 300); err != nil {
+	// Enough on the table that everybody puts everything they have on it, so
+	// what is in front of them is what they own. The stake used to be named
+	// here as an ante of $300 against a $900 pocket, which is not a bet
+	// anybody makes: a night's money is lost by pushing chips in over a hand,
+	// not by an ante set to a third of what somebody is carrying.
+	if err := w.SitInTheBackRoom(BackRoom, 2000); err != nil {
 		t.Fatalf("no game: %v", err)
 	}
 	g := w.Game
@@ -604,6 +658,11 @@ func TestTakingSomebodysMoneyAtCardsIsSomethingTheyRemember(t *testing.T) {
 	if loser.Sore != 0 {
 		t.Fatalf("%s was already sore before a card was turned over", loser.Name)
 	}
+	// They push most of what is in front of them in, and it is beaten.
+	put := g.Seats[0].Stack * 3 / 4
+	g.Seats[0].Stack -= put
+	g.Seats[0].In += put
+	g.Pot += put
 	g.Mine = hand("Ah", "As", "Ad", "Ac", "Kh")
 	g.Seats[0].Cards = hand("2h", "7s", "9c", "Jc", "4h")
 	g.Seats[1].Cards = hand("2s", "7h", "8c", "Jh", "4s")
@@ -651,7 +710,11 @@ func TestLosingToSomebodyAtCardsIsAlsoSomethingTheyRemember(t *testing.T) {
 func TestASmallLossIsNotHeldAgainstAnybody(t *testing.T) {
 	t.Parallel()
 	w, _ := backroom(t)
-	if err := w.SitInTheBackRoom(BackRoom, 10); err != nil {
+	// The smallest table there is, against pockets of $900: what anybody loses
+	// here is small against what they are carrying, which is the whole point.
+	// This used to name a $10 ante directly; the figure is the buy-in now and
+	// the ante follows from it.
+	if err := w.SitInTheBackRoom(BackRoom, MinBuyIn); err != nil {
 		t.Fatalf("no game: %v", err)
 	}
 	g := w.Game
@@ -676,39 +739,48 @@ func TestASmallLossIsNotHeldAgainstAnybody(t *testing.T) {
 func TestARoomYouHaveCleanedOutHasNoGameLeftInIt(t *testing.T) {
 	t.Parallel()
 	w, seated := backroom(t)
+	// One sitting, hand after hand, which is what this is now: the test used to
+	// get up and sit down again between every hand, because that was the only
+	// way to play a second one.
+	if err := w.SitInTheBackRoom(BackRoom, 2000); err != nil {
+		t.Fatalf("no game: %v", err)
+	}
+	g := w.Game
 	hands, sore := 0, 0
-	for hands < 40 {
-		if reason := w.BackRoomReadiness(BackRoom, 300); reason != "" {
-			break
-		}
-		if err := w.SitInTheBackRoom(BackRoom, 300); err != nil {
-			t.Fatalf("no game: %v", err)
-		}
-		g := w.Game
+	for hands < 60 && !g.Over {
 		// The player wins every hand, which is the fastest honest way to the
 		// end of the room's money.
 		g.Mine = hand("Ah", "As", "Ad", "Ac", "Kh")
-		g.Seats[0].Cards = hand("2h", "7s", "9c", "Jc", "4h")
-		g.Seats[1].Cards = hand("2s", "7h", "8c", "Jh", "4s")
-		g.Seats[2].Cards = hand("3s", "6h", "8d", "Qh", "5s")
+		for i := range g.Seats {
+			g.Seats[i].Cards = hand("2h", "7s", "9c", "Jc", "4h")
+			// And everybody puts most of what is in front of them in, or a
+			// night of antes takes longer than anybody would sit for.
+			put := g.Seats[i].Stack / 2
+			g.Seats[i].Stack -= put
+			g.Seats[i].In += put
+			g.Pot += put
+		}
 		g.Street = River
 		if err := w.showdown(); err != nil {
 			t.Fatal(err)
 		}
 		hands++
+		if err := w.DealAgain(); err != nil {
+			break
+		}
 	}
 	for _, id := range seated {
 		if w.NPC(id).Sore > 0 {
 			sore++
 		}
 	}
-	left := w.BackRoomReadiness(BackRoom, 300)
-	t.Logf("after %d winning hands: %d of the three are sore, and the room says %q", hands, sore, left)
-	if hands >= 40 {
-		t.Fatal("forty winning hands at $300 and the room still had money in it")
+	t.Logf("after %d winning hands: %d of the three are sore, the table is over=%v (%q), and %d are still sitting",
+		hands, sore, g.Over, g.Ended, len(g.Seats))
+	if hands >= 60 {
+		t.Fatal("sixty winning hands and the room still had money in it")
 	}
-	if left == "" {
-		t.Fatal("the game stopped and the room says there is nothing wrong")
+	if !g.Over {
+		t.Fatal("the room was cleaned out and the game is still going")
 	}
 	if sore == 0 {
 		t.Fatal("a room was emptied and nobody in it minded")
@@ -729,7 +801,7 @@ func TestSomebodyYouTookMoneyOffPlaysYouHarder(t *testing.T) {
 			for _, id := range seated {
 				w.NPC(id).Sore = sore
 			}
-			if err := w.SitInTheBackRoom(BackRoom, 50); err != nil {
+			if err := w.SitInTheBackRoom(BackRoom, 1000); err != nil {
 				t.Fatalf("no game: %v", err)
 			}
 			// The player bets into them every time, so what comes back is the
@@ -788,7 +860,7 @@ func TestATableWithAGrudgeCostsYou(t *testing.T) {
 				w.NPC(id).Sore = sore
 			}
 			cash := w.Player.Cash
-			if err := w.SitInTheBackRoom(BackRoom, 50); err != nil {
+			if err := w.SitInTheBackRoom(BackRoom, 1000); err != nil {
 				t.Fatalf("no game: %v", err)
 			}
 			for i := 0; i < 12 && !w.Game.Done; i++ {
@@ -813,7 +885,9 @@ func TestATableWithAGrudgeCostsYou(t *testing.T) {
 					t.Fatal(err)
 				}
 			}
-			moved := w.Player.Cash - cash
+			// What the hand did, counting the chips: the buy-in has left the
+			// pocket and the winnings have not come back to it yet.
+			moved := w.Player.Cash + w.Game.Stack - cash
 			total += moved
 			if moved < 0 {
 				swing -= moved
@@ -841,7 +915,7 @@ func TestYouAreToldWhoAtTheTableRemembersYou(t *testing.T) {
 	t.Parallel()
 	w, seated := backroom(t)
 	w.NPC(seated[1]).Sore = SoreAtCards
-	if err := w.SitInTheBackRoom(BackRoom, 50); err != nil {
+	if err := w.SitInTheBackRoom(BackRoom, 1000); err != nil {
 		t.Fatalf("no game: %v", err)
 	}
 	last := w.History[len(w.History)-1]

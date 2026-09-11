@@ -84,6 +84,14 @@ func (w *World) Rise() error {
 	if reason := w.RiseReadiness(); reason != "" {
 		return fmt.Errorf("%s", reason)
 	}
+	// Whatever is in front of anybody comes off the table first. Getting up
+	// used to cost nothing because there was nothing on it: a hand settled
+	// straight into pockets and the felt was cleared. Now the chips are real
+	// and clearing the felt without picking them up would be the player
+	// leaving their money in the room.
+	if w.Game != nil && !w.Game.Over {
+		_ = w.endSitting("You pick your money up off the table.")
+	}
 	w.Seated, w.SeatedTo = "", ""
 	w.clearTable()
 	return nil
@@ -109,6 +117,11 @@ func (w *World) LeaveTable() {
 	if w.Seated == "" || w.Seated == w.Player.Location {
 		return
 	}
-	w.Seated = ""
+	// And the money comes with them. Walking out of a room with chips still in
+	// front of you would leave them on the baize for ever.
+	if w.Game != nil && !w.Game.Over {
+		_ = w.endSitting("You leave the room, and the table with it.")
+	}
+	w.Seated, w.SeatedTo = "", ""
 	w.clearTable()
 }

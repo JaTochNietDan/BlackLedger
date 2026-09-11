@@ -213,3 +213,35 @@ func findNil(v reflect.Value, path string, out *[]string, seen map[uintptr]bool)
 		}
 	}
 }
+
+// A card game saved before the table had chips on it. Those were one hand
+// settled straight out of pockets, so a sitting restored from one has no
+// buy-in, nothing in front of the player and no hands played — and the room
+// offers to deal the next hand of a game that cannot be played.
+func TestATableSavedBeforeItHadChipsIsCleared(t *testing.T) {
+	t.Parallel()
+	old := `{"version":1,"life":1,"seed":7,"properties":{},"npcs":[],` +
+		`"game":{"place":"poolhall","ante":50,"pot":200,"done":true}}`
+	w, err := decode(old)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if w.Game != nil {
+		t.Fatalf("a hand from before the table had chips came back: $%d in front of the player",
+			w.Game.Stack)
+	}
+	// And a sitting that does have chips on it survives, because that is
+	// somebody's money.
+	live := `{"version":1,"life":1,"seed":7,"properties":{},"npcs":[],` +
+		`"game":{"place":"poolhall","ante":50,"pot":200,"buy_in":1000,"stack":800,"hands":3}}`
+	w, err = decode(live)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if w.Game == nil {
+		t.Fatal("a sitting with $800 in front of the player was thrown away on load")
+	}
+	if w.Game.Stack != 800 {
+		t.Fatalf("the sitting came back with $%d in front of the player", w.Game.Stack)
+	}
+}

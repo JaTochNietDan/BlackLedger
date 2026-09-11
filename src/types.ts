@@ -276,6 +276,7 @@ export interface Snapshot {
       said: string;
       sore?: number;
       moved?: number;
+      stack: number;
       cards?: {rank: string; suit: string; value: number}[];
       hand?: string;
     }[];
@@ -286,6 +287,12 @@ export interface Snapshot {
     done: boolean;
     outcome: string;
     won: number;
+    stack: number;
+    buy_in: number;
+    hands: number;
+    over: boolean;
+    ended: string;
+    up: number;
   } | null;
   hand?: {
     playing: boolean;
