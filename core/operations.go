@@ -98,6 +98,19 @@ var trades = map[string]Trade{
 		Trouble: "Somebody was badly hurt on the floor on Saturday and the room has emptied since.",
 		Remedy:  "Put the room right", RemedyDetail: "A word with the family, a word with the police, and somebody new on the door.", RemedyCost: 200, Cover: 18, Watched: 3, Hides: 0,
 	},
+	// A working wharf. Everything in this city that did not come out of the
+	// ground here came over this pier, and a bonded shed is the best place in
+	// the city for a thing to sit without anybody looking at it — more than a
+	// cold room, more than a yard of trucks. It explains cash badly, because a
+	// docker is paid a docker's wages and everybody knows what they are, and it
+	// carries as much notice as anything can: attention fades by one a day, so
+	// three is the ceiling for every trade and a fourth point would climb for
+	// ever.
+	"wharf": {
+		Hands: 6, Wage: 11, Drain: 10, Restock: 280, RestockAmount: 50, Supplies: "rope, fuel and ice",
+		Trouble: "The crane has been down a week and the boats are going up the coast instead.",
+		Remedy:  "Get the crane running", RemedyDetail: "An engineer off a ship, and the backlog worked through.", RemedyCost: 260, Cover: 7, Watched: 3, Hides: 8,
+	},
 	"butcher": {
 		Hands: 3, Wage: 9, Drain: 8, Restock: 200, RestockAmount: 45, Supplies: "stock and ice",
 		Trouble: "The cold room failed overnight and a week of stock went with it.",

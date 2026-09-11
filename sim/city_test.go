@@ -8,10 +8,22 @@ import "testing"
 // meet: it follows one protagonist for a median of a few days, which is why
 // every report the harness has printed says no organization has ever fallen.
 // They fall. Nobody was watching long enough to see it.
+//
+// Forty cities rather than twelve, and the reason is that this measures a rare
+// event. An organization ending is roughly a one-in-four-cities occurrence over
+// a season, so twelve cities expect about three and a quiet sample of zero is
+// an ordinary roll rather than a broken city. It tripped that way the night the
+// wharf became a trade: a working pier employs six dockers, which moves people
+// through the errand system and settles the waterfront a little, and falls over
+// forty cities went from thirteen to eleven. That is a real effect and a small
+// one; the guard reading zero from twelve was the sample, not the city. A
+// measure of something rare has to be taken over enough of it to mean anything,
+// or it fails on noise and gets explained away — which is worse than not having
+// it.
 
 func TestACityLeftAloneKeepsMoving(t *testing.T) {
 	t.Parallel()
-	const cities, days = 12, 60
+	const cities, days = 40, 60
 	fell, formed, wars, changed := 0, 0, 0, 0
 	for seed := uint32(1); seed <= cities; seed++ {
 		r := City(seed*2654435761, days)
@@ -35,7 +47,7 @@ func TestACityLeftAloneKeepsMoving(t *testing.T) {
 
 func TestACityDoesNotCollapseIntoOneOwner(t *testing.T) {
 	t.Parallel()
-	const cities, days = 12, 60
+	const cities, days = 40, 60
 	worst, organised, empty, dead := 0, 0, 0, 0
 	for seed := uint32(1); seed <= cities; seed++ {
 		r := City(seed*2654435761, days)

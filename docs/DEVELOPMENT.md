@@ -9973,3 +9973,62 @@ ID: it fails, saying the same city stocked six things and five.
 Saint Agnes, Pier 14 and the Mercer Exchange are the same gap and are named in
 the brief. A bar, a dock and a market are three more trades, and each needs
 something of its own or the reach sweep will say so.
+
+## A boat is in at Pier 14
+
+Second of the four rooms a family holds. The wharf is a trade now — six dockers,
+rope and fuel and ice, a crane that goes down and sends the boats up the coast,
+the best place in the city for a thing to sit unlooked at, and the worst
+explanation for cash there is, because a docker is paid a docker's wages and
+everybody knows what they are.
+
+Its reach is deliberately not a discount. The waterfront is already cheap: the
+city's price less a fifth for moonshine, less a sixth for guns, and that is a
+fact about the floor, true for anybody standing on it. Holding the pier buys
+knowing when a boat is in. A quantity comes ashore at a price no floor offers,
+from somebody who has to be at sea before it is light, and it is gone in the
+morning. What is left is how much of it you dare carry, which is the decision
+the whole underground trade is built on and the one thing a discount can never
+be. Measured: a landing at $82 a crate under the dock floor.
+
+An existing guard caught a real mistake in passing. The wharf was written with a
+notice of four, and the rule is nought to three — attention fades by one a day,
+so anything adding more than one climbs without limit, and the comment beside it
+claiming the pier was "watched harder than anywhere else" was wrong as well as
+the number.
+
+### The measure that failed on noise
+
+The sim guard then said no organization in any city ever ended, which is exactly
+the layer it exists to watch. Worth chasing rather than shrugging at, and it
+turned out to be two things at once.
+
+The wharf does calm the city, and the honest number is small: over forty cities,
+falls went from thirteen to eleven and wars from a similar ratio. A working pier
+employs six dockers, which moves people through the errand system and settles
+the waterfront. That is a defensible direction and a second-order effect.
+
+But the guard read twelve cities, and an organization ending is about a
+one-in-four-cities event over a season. Twelve cities expect three. A sample of
+zero from twelve is an ordinary roll, and the guard was always one bad roll from
+failing — it just happened to fail on the night something genuinely nudged the
+number. It reads forty now, and says why. A measure of something rare taken over
+too little of it fails on noise and then gets explained away, which is worse than
+not having the measure at all.
+
+The club was checked and found innocent before any of this was changed: with the
+club a trade and the wharf not, the city behaves as it did.
+
+### Two assertions of mine that were wrong
+
+Both in the new tests, both failing against correct behaviour.
+
+The first asked that what comes off the boat leaves you exposed. It does not,
+necessarily — a bonded shed is the best hiding place in the city and the shed is
+yours, which is the wharf's other property doing its job. What the landing costs
+you is that you are carrying it, and that is what the test says now.
+
+The second compared two cities to prove that different seeds land different
+boats, and built both of them from the same seed, so it skipped itself.
+
+Six landing rules broken, six failures.

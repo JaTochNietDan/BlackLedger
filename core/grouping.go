@@ -53,7 +53,7 @@ var actionGroup = map[string]string{
 	"bankroll": "business", "post": "business", "unpost": "business",
 	// Taking money back off your own tables is running the place, not a night
 	// out at it. This was filed under work that can go wrong.
-	"draw": "business", "limit": "business", "night": "business",
+	"landing": "business", "draw": "business", "limit": "business", "night": "business",
 
 	// People.
 	"recruit": "people", "crew_bonus": "people", "contact": "people",

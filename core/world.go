@@ -507,6 +507,8 @@ type World struct {
 	// saves written before this, which reads as zero and simply means one
 	// fixed window for those campaigns.
 	Seed uint32 `json:"seed,omitempty"`
+	// What came ashore tonight at a pier of the player's, and until when.
+	Landed Landing `json:"landed,omitempty"`
 	// What the city could not redeem, on the pawnbroker's shelf. Not tied to a
 	// protagonist: the window is the shop's, and a new life walks past the same
 	// window the last one did.
@@ -1091,6 +1093,16 @@ func (w *World) Actions(id string) []Action {
 				PlateCost, PlateMinutes/60, int(PlateCover*100), int(PlateWeight*100), w.Plating(), PlateStages))
 	case "docks":
 		add("dockwork", "Work the night cargo", 90, 0, "", "Earn $75 and 1 respect. Small chance of a work injury.")
+		// A boat is in at a pier of yours. One night, and then it is gone,
+		// which is the whole of what holding the wharf buys: not a better
+		// price, but knowing when.
+		if w.BoatIsIn() && w.Landed.Where == id {
+			g := w.Good(w.Landed.Good)
+			asks("landing", fmt.Sprintf("Take what came off the boat (%d %ss)", w.Landed.Units, g.Unit),
+				LandingMinutes, w.Landed.Price*w.Landed.Units, w.LandingReadiness(0),
+				fmt.Sprintf("$%d a %s against $%d on this floor, and $%d on the exchange. Name a number or take the lot. It is gone in the morning, and what you carry is what can be found on you.",
+					w.Landed.Price, g.Unit, w.PriceAt(id, w.Landed.Good), w.PriceAt("market", w.Landed.Good)))
+		}
 		// Everything on the counter, each at its own price, in any order.
 		for _, arm := range Armaments("weapon") {
 			asks(fmt.Sprintf("arms:weapon:%d", arm.Tier), "Buy "+arm.Label, 45, arm.Cost,
@@ -2197,6 +2209,7 @@ func (w *World) Advance(minutes int) {
 			w.StillDay()
 			w.CasinoDay()
 			w.ClubNight()
+			w.LandingNight()
 			w.TableNight()
 			w.BackRoomNight()
 			w.RouteDay()

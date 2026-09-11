@@ -139,6 +139,19 @@ func TestEveryTradeReachesPastItsOwnIncome(t *testing.T) {
 				w.shelve(Shelf{Kind: "dress", Tier: 2, Wear: 30, Ask: 400, Lent: 150})
 				return w.WindowPrice(w.Window[len(w.Window)-1].ID)
 			}},
+		// Not a better price — the dock floor's spread is a fact about the
+		// floor and true for anybody standing on it. Knowing when a boat is in.
+		{"wharf", "a boat in tonight at a price no floor offers", "higher",
+			func(w *World, id string) int {
+				for day := 0; day < 40; day++ {
+					w.Advance(1440)
+					w.Event = nil
+					if w.BoatIsIn() {
+						return w.PriceAt(id, w.Landed.Good) - w.Landed.Price
+					}
+				}
+				return 0
+			}},
 		// Standing rather than money, which nothing else in this city pays.
 		{"club", "a night's standing off a room with your name over the door", "higher",
 			func(w *World, id string) int { return w.StandingFromTheDoor(id) }},

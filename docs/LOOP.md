@@ -178,7 +178,11 @@ and a local model that writes encounters and can be switched off.
   to be the only kind of address in the city that ran on nothing: you fought a
   war for the busiest room in the game and won an income figure. The club is a
   trade now, with hands, drink, its own trouble and the best front after a
-  casino. **Still open: the same is true of Saint Agnes, Pier 14 and the Mercer
+  casino. Pier 14 is one too: six dockers, rope and
+  fuel, a crane that goes down, the best hiding place in the city and the worst
+  explanation for cash. Holding it does not buy a better price on the
+  waterfront — the floor's spread is true for anybody standing on it — it buys
+  knowing when a boat is in. **Still open: Saint Agnes and the Mercer
   Exchange.** Every address that earns can be bought and run. A place with
   no price does not change hands. Twenty-six addresses, twelve kinds; the
   pawnbroker is where what is taken off the street turns into money and where

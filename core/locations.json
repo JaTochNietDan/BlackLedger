@@ -27,7 +27,8 @@
     "x": 130,
     "y": 420,
     "cost": 0,
-    "blurb": "Cargo arrives every morning. Honest work and less honest favors both pay cash."
+    "blurb": "Cargo arrives every morning. Honest work and less honest favors both pay cash.",
+    "kind": "wharf"
   },
   {
     "id": "laundry",
