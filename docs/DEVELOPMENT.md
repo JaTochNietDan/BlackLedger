@@ -11597,3 +11597,41 @@ Worth being plain about what this does not do. It reads whether a sentence is
 malformed, not whether it is true. The three faults before these were sentences
 that parsed perfectly and described something the code never did, and no reader
 of this kind will ever catch one of those.
+
+## What a card says it costs, against what pressing it takes
+
+Last night's write-up ended on what the prose sweeps cannot do: they read
+whether a sentence is well formed, never whether it is true. This is the first
+thing that reads a card for truth, and it starts with the claim that is easiest
+to check — the price.
+
+Every action runs `w.Pay(a.Cost)` in the command layer, so one that pays its own
+fee must declare `Cost: 0` and use `asks(...)`, or the money goes out twice.
+There was a guard for that and it checked one action: a still at a laundry,
+picked by hand. The last time this project trusted a hand-written list of
+actions, seventeen were missing from it.
+
+So: every action, in every room, that names a price. Press it in a copy of the
+world and see what leaves the pocket.
+
+The instrument needed care, and it said so itself before I did. The clock moves
+while the work is done — rent, wages and a day's takings all land on top of the
+fee — and the first version allowed for that with a loose band. Its own reader
+test then failed: a still is $450, a day at the laundry brings in enough that
+being charged twice read as **$859, which is under twice $450**. The sweep would
+have passed a genuine double charge. The fix is to measure the clock rather than
+allow for it: advance a copy of the world by the same minutes with nothing
+pressed, and take that off the reading.
+
+With the noise measured instead of tolerated the rule can go both ways. Not one
+of the **145 priced cards in the city** comes in under half what it says, so a
+card that names a price and does not take it is a fault rather than a tolerance.
+Neither half needs a list of which actions pay out, which is the point.
+
+Broken in both directions to check it bites: doubling the fee in the command
+layer flags 73 cards, and paying nothing flags the same 73.
+
+The city is clean. That is the useful part — one action's worth of assurance is
+now a hundred and forty-five actions' worth, and the next `asks(...)` written
+without a `Cost: 0` beside it will be caught the night it lands rather than
+whenever somebody happens to press it.
