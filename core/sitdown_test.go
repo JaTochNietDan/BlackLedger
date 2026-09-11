@@ -351,3 +351,210 @@ func TestARefusedMeetingNamesWhoWouldNotCome(t *testing.T) {
 		t.Fatalf("the refusal does not say by how much: %q", reason)
 	}
 }
+
+// A dining room of your own.
+//
+// A sitdown could only ever be held in the back of a bar, and the restaurant
+// was on the brief's list of trades that do not reach past their own income.
+// Both of those were the same gap. A corner table with the plates still down is
+// where this city has always done it, and a man with a dining room to lose has
+// as much reason as either of them for nobody to draw anything in it.
+//
+// Two things come with holding the room: you are not renting it, and the people
+// on the door are yours. The second is the one that matters, because what your
+// staff see on the way in is the difference between walking into a trap and
+// knowing about it, and information is the scarcest thing in that room.
+
+func theRestaurant() string {
+	for _, l := range Locations {
+		if l.Kind == "restaurant" {
+			return l.ID
+		}
+	}
+	return ""
+}
+
+// quarrelling is a city with a war hot enough that somebody comes to finish it.
+func quarrelling(t *testing.T) *World {
+	t.Helper()
+	w := New(53)
+	w.Event, w.District = nil, 9
+	w.Player.Health, w.Player.Cash, w.Player.Respect = 100, 200000, 90
+	for i := range w.Conflicts {
+		w.Conflicts[i].State, w.Conflicts[i].Hostility = "war", 90
+	}
+	if q, ok := w.OpenQuarrel(); !ok || !q.Trap {
+		t.Skip("this city has nobody coming to finish anything")
+	}
+	return w
+}
+
+// yourDiningRoom hands the player a restaurant with its full complement.
+func yourDiningRoom(w *World) string {
+	id := theRestaurant()
+	own(w, id)
+	trade, _ := TradeOf(id)
+	w.Properties[id].Staff = trade.Hands
+	return id
+}
+
+func TestARestaurantOfYourOwnIsARoomTheyWouldSitIn(t *testing.T) {
+	t.Parallel()
+	w := quarrelling(t)
+	id := theRestaurant()
+	w.Player.Location = id
+	if w.SitdownWhere(id) {
+		t.Fatal("two families sat down in a restaurant that belongs to somebody else")
+	}
+	if actionByID(w.Actions(id), "sitdown") != nil {
+		t.Fatal("a room that is not yours offered the meeting")
+	}
+	yourDiningRoom(w)
+	if !w.SitdownWhere(id) {
+		t.Fatal("a dining room of yours is not a room either of them would come to")
+	}
+	a := actionByID(w.Actions(id), "sitdown")
+	if a == nil {
+		t.Fatal("your own dining room does not offer the meeting")
+	}
+	if a.Disabled {
+		t.Fatalf("refused: %s", a.Reason)
+	}
+	// And the bar still works, because this adds a room rather than moving one.
+	w.Player.Location = SitdownGround
+	if !w.SitdownWhere(SitdownGround) {
+		t.Fatal("the back of the bar stopped being neutral ground")
+	}
+}
+
+func TestAnEmptyDiningRoomIsNotAGuarantee(t *testing.T) {
+	t.Parallel()
+	w := quarrelling(t)
+	id := yourDiningRoom(w)
+	w.Player.Location = id
+	w.Properties[id].Staff = 0
+	if w.SitdownWhere(id) {
+		t.Fatal("a restaurant with nobody in it was offered as neutral ground")
+	}
+	if w.OwnGround() {
+		t.Fatal("an empty room has people on the door")
+	}
+	// One short is still short: the point is the people, not the address.
+	trade, _ := TradeOf(id)
+	w.Properties[id].Staff = trade.Hands - 1
+	if w.SitdownWhere(id) {
+		t.Fatalf("short-handed at %d of %d and still offering guarantees",
+			trade.Hands-1, trade.Hands)
+	}
+}
+
+func TestYourOwnDoorTellsYouWhoCameHeavy(t *testing.T) {
+	t.Parallel()
+	w := quarrelling(t)
+	// At the bar, without the contacts to be warned, the trap is a surprise.
+	w.Player.Location = SitdownGround
+	if w.Reach() >= 2 {
+		t.Skip("this player already hears everything")
+	}
+	q, _ := w.OpenQuarrel()
+	if !q.Trap {
+		t.Fatal("nobody came to finish it")
+	}
+	if q.Suspected {
+		t.Fatal("somebody warned a player with no way of being warned")
+	}
+	// In your own room, your own staff are the warning.
+	id := yourDiningRoom(w)
+	w.Player.Location = id
+	mine, _ := w.OpenQuarrel()
+	if !mine.Suspected {
+		t.Fatal("your own people watched them come in and said nothing")
+	}
+	// And it is in the room when it opens, in somebody's words.
+	w.Event = nil
+	if err := w.CallSitdown(); err != nil {
+		t.Fatal(err)
+	}
+	if w.Event == nil {
+		t.Fatal("the meeting never opened")
+	}
+	if !strings.Contains(w.Event.Body, "your own people on the door") {
+		t.Fatalf("the room says: %s", w.Event.Body)
+	}
+}
+
+func TestTheRoomIsFreeWhenItIsYours(t *testing.T) {
+	t.Parallel()
+	w := quarrelling(t)
+	w.Player.Location = SitdownGround
+	if w.SitdownCost() != SitdownFee {
+		t.Fatalf("the bar's back room costs $%d", w.SitdownCost())
+	}
+	id := yourDiningRoom(w)
+	w.Player.Location = id
+	if w.SitdownCost() != 0 {
+		t.Fatalf("you are renting a room you own, at $%d", w.SitdownCost())
+	}
+	cash := w.Player.Cash
+	w.Event = nil
+	if err := w.CallSitdown(); err != nil {
+		t.Fatal(err)
+	}
+	if w.Player.Cash != cash {
+		t.Fatalf("$%d went somewhere for a room of your own", cash-w.Player.Cash)
+	}
+}
+
+func TestNobodyIsNamedInTheRoomWhoIsNotInIt(t *testing.T) {
+	t.Parallel()
+	// The warning said "Mara caught your eye on the way in" in every campaign
+	// ever played, including the ones in which Mara had been dead a month.
+	w := quarrelling(t)
+	w.Player.Location = SitdownGround
+	gone := w.Holder("fixer")
+	if gone == nil {
+		t.Skip("this city has no fixer")
+	}
+	dead := gone.Name
+	gone.Dead, gone.Location = true, ""
+	for day := 0; day < 3; day++ {
+		w.Event = nil
+		w.Advance(1440)
+		w.Event = nil
+	}
+	for i := range w.Conflicts {
+		w.Conflicts[i].State, w.Conflicts[i].Hostility = "war", 90
+	}
+	w.Player.Location = SitdownGround
+	w.Player.Cash, w.Player.Respect = 200000, 90
+	q, ok := w.OpenQuarrel()
+	if !ok {
+		t.Skip("the quarrel went away")
+	}
+	q.Suspected = true
+	w.Event = nil
+	if err := w.CallSitdownAs(q); err != nil {
+		t.Fatal(err)
+	}
+	// Not the dead one, and not a fragment of their name either: the first
+	// version of this guard looked for the whole name and missed "Mara" on its
+	// own, and the second looked for either word and found "Bell" inside
+	// "Bellandi Family". Whole words, against whole words.
+	said := map[string]bool{}
+	for _, word := range strings.Fields(w.Event.Body) {
+		said[strings.Trim(word, "“”.,'s")] = true
+	}
+	for _, part := range strings.Fields(dead) {
+		if said[part] {
+			t.Fatalf("%s has been dead three days and is still at the door: %s", dead, w.Event.Body)
+		}
+	}
+	// And somebody who is actually there is doing the warning.
+	now := w.Holder("fixer")
+	if now == nil {
+		t.Fatal("nobody took the fixer's place")
+	}
+	if !strings.Contains(w.Event.Body, now.Name) {
+		t.Fatalf("the room names nobody who is in it: %s", w.Event.Body)
+	}
+}

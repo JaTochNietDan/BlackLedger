@@ -9734,3 +9734,75 @@ and shelf-size rules all fail when removed. Two did not, and both were rewritten
 it. A second such method was written for the window and deleted rather than
 shipped. Whether the pawnshop panel should draw the shelf is a real question and
 a separate one; the cards carry everything a player needs to act.
+
+## The butcher already reached, and the restaurant does now
+
+Queue item seven had four trades down as not reaching past their own income.
+Checking before building, as the burlesque taught: the butcher was already
+linked and the list was wrong again.
+
+Every trade carries three numbers. Cover is how much it can launder, Watched is
+how much attention it draws, and Hides is how many units of contraband sit
+somewhere without being looked at. The butcher's cold room hides four. Measured
+rather than read: holding thirty units of moonshine, a search takes all thirty
+with nothing of your own and twenty-six with the butcher, which is a real link
+of the same shape as the garage halving the car's upkeep.
+
+That sharpens the question the queue item is really asking. Every business
+contributes Cover, so by the loosest reading every business is linked to
+laundering and the item is finished. What distinguishes the trades that actually
+reach — the garage, the haulier, the cab yard, the yard, the pawnbroker, now the
+butcher — is a link of their own rather than a number every trade contributes.
+The brief says so now, because the next tick would otherwise re-derive it.
+
+### A dining room of your own
+
+The restaurant had nothing of its own, and the reason was sitting in the sitdown
+code: `SitdownGround = "bar"`, one address, the back of a bar and nowhere else.
+Two families that will not speak to each other will speak in front of somebody
+they both owe, and it is the only thing in this game that ends a war without
+either side losing it — and it could happen in exactly one room.
+
+A corner table with the plates still down is where this city has always done it.
+The game's own prose already knew: the butcher's manner of death is a hook in
+the cold room, and the restaurant's is "shot at the corner table with the plates
+still down". So a restaurant of the player's is neutral ground — not because it
+is neutral, it plainly is not, but because a man with a dining room to lose has
+as much reason as either of them for nobody to draw anything in it.
+
+Two things come with holding the room, and only one of them is money:
+
+- You are not renting it. The $220 for the room and the guarantees is somebody
+  else's problem.
+- The people on the door are yours. What your staff see on the way in, you see —
+  so a side that came to finish it rather than settle it is suspected instead of
+  being a surprise. That previously took two points of reach, and reach is not
+  something a player has early.
+
+It takes a full complement. A dining room with nobody in it offers no
+guarantees, and short-handed by one is still short: the point is the people, not
+the address.
+
+### The third time a dead name was still talking
+
+The warning in that room read "and Mara caught your eye on the way in", in every
+campaign ever played, including the ones in which Mara had been dead a month.
+That is the same fault as the coffee bought for a fixer who no longer exists, and
+the pawnbroker's "Ackerman sold it to somebody else" found earlier tonight. Three
+instances in one night, all of them a name written into a string at the moment
+the feature was built.
+
+The guard for it took three attempts, and the two failures are the interesting
+part. Looking for the whole name "Mara Bell" missed a body that said "Mara".
+Looking for either word found "Bell" inside "Bellandi Family" and failed against
+correct output. It matches whole words against whole words now, and also asserts
+that somebody who is actually in the room is doing the warning — because a guard
+that only says who must not be named passes on a room that names nobody.
+
+### Five rules, five breaks
+
+All five fail when removed: the restaurant as ground, the full complement, the
+door that notices, the room that costs nothing, and the name. Two of the first
+attempts at breaking them did not compile or did not actually change the
+behaviour they claimed to, which is worth saying plainly — a break that builds
+and passes is not evidence, it is a second thing to check.

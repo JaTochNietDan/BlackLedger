@@ -1026,14 +1026,6 @@ func (w *World) Actions(id string) []Action {
 			fmt.Sprintf("Earn $%d and %d respect. A reliable introduction to the neighborhood.", CourierPay, CourierRespect))
 		add("contact", "Buy "+w.RoleName("fixer")+" a coffee", 30, 10, need(p.Contacts >= 5, "Your information network is fully developed"), "Build trust and an information network. Contacts may warn you of trouble.")
 		about(w.HolderID("fixer"))
-		if q, ok := w.OpenQuarrel(); ok {
-			warning := "You would be standing between them."
-			if q.Suspected {
-				warning = "Somebody has already told you that one of them is not coming to talk."
-			}
-			asks("sitdown", "Call "+q.A.Name+" and "+q.B.Name+" to a room", SitdownMinutes, SitdownFee, w.SitdownReadiness(),
-				fmt.Sprintf("$%d for the room and the guarantees, paid whether or not anybody agrees to anything. The only thing in this city that ends a war without either side losing it. %s", SitdownFee, warning))
-		}
 		reason := need(p.Respect < PremisesRespect, fmt.Sprintf("Earn %d respect first", PremisesRespect))
 		if len(p.Crew) > 0 {
 			// Name the man on the books. "Leo is already in your crew" was
@@ -1597,6 +1589,23 @@ func (w *World) Actions(id string) []Action {
 		add("sabotage", "Move against "+l.Name+" yourself", 90, 0, w.SabotageReadiness(id),
 			fmt.Sprintf("Go in with your crew against %s. Damages the property, weakens %s and costs you standing with them. They will retaliate, and a failed attempt injures you.", l.Name, f.Name))
 		_ = f
+	}
+	// A room two organizations would both sit in. The back of a bar, and a
+	// dining room of the player's with its own people on the door — which is
+	// what a restaurant reaches past its own income with.
+	if id == p.Location && w.SitdownWhere(id) {
+		if q, ok := w.OpenQuarrel(); ok {
+			warning := "You would be standing between them."
+			if q.Suspected {
+				warning = "Somebody has already told you that one of them is not coming to talk."
+			}
+			room := fmt.Sprintf("$%d for the room and the guarantees, paid whether or not anybody agrees to anything.", SitdownFee)
+			if w.SitdownCost() == 0 {
+				room = "Your dining room, your people on the door, and nothing to pay for either. What your staff see on the way in, you see."
+			}
+			asks("sitdown", "Call "+q.A.Name+" and "+q.B.Name+" to a room", SitdownMinutes, w.SitdownCost(), w.SitdownReadiness(),
+				fmt.Sprintf("%s The only thing in this city that ends a war without either side losing it. %s", room, warning))
+		}
 	}
 	// Somewhere that earns is somewhere that can be held, run and taken. This
 	// asked for three addresses by name — the laundry, the garage and the

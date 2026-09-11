@@ -21,8 +21,8 @@ const (
 	// SitdownStanding is the presence below which nobody would come because
 	// you asked.
 	SitdownStanding = 25
-	// SitdownGround is where a meeting can be held: somewhere neither side
-	// holds, which in this city means the church hall of a bar.
+	// SitdownGround is the room this city has always used: somewhere neither
+	// side holds, which meant the back of a bar and nowhere else.
 	SitdownGround = "bar"
 	// TrapHostility is the hostility above which somebody in the room is not
 	// there to talk.
@@ -70,7 +70,53 @@ func (w *World) OpenQuarrel() (Quarrel, bool) {
 	trap := worst.Hostility >= TrapHostility &&
 		(w.leaderIs(a, "hot") || w.leaderIs(b, "hot") || w.leaderIs(a, "vain") || w.leaderIs(b, "vain"))
 
-	return Quarrel{A: a, B: b, Trap: trap, Suspected: trap && w.Reach() >= 2}, true
+	return Quarrel{A: a, B: b, Trap: trap, Suspected: trap && (w.Reach() >= 2 || w.OwnGround())}, true
+}
+
+// OwnGround is whether the player is standing in a room of their own that two
+// organizations would both agree to sit in.
+//
+// A restaurant is the other kind of neutral ground this city has. Not because
+// it is neutral — it is the player's — but because a corner table with the
+// plates still down is where this has always been done, and both sides know
+// that a man with a dining room to lose has as much reason as they do for
+// nobody to draw anything in it.
+//
+// It is also the restaurant's link past its own income, which it did not have.
+// Two things come with holding the room: you are not renting it, so the fee is
+// somebody else's problem, and your own people are on the door. Your staff
+// notice who came heavy, which is the difference between walking into a trap
+// and knowing about it — and information is the scarcest thing in this room.
+func (w *World) OwnGround() bool {
+	place, ok := PlaceByID(w.Player.Location)
+	return ok && place.Kind == "restaurant" && w.Own(place.ID) && w.Staffed(place.ID)
+}
+
+// Staffed is whether a business of the player's has the hands its trade needs.
+// A dining room with nobody in it is not a room either of them would sit in:
+// the point of holding the meeting here is that the people on the door are
+// yours, and an empty restaurant has none.
+func (w *World) Staffed(id string) bool {
+	trade, running := TradeOf(id)
+	prop := w.Properties[id]
+	return running && prop != nil && prop.Staff >= trade.Hands
+}
+
+// SitdownWhere reports whether a meeting can be held in this room at all.
+func (w *World) SitdownWhere(id string) bool {
+	if id == SitdownGround {
+		return true
+	}
+	place, ok := PlaceByID(id)
+	return ok && place.Kind == "restaurant" && w.Own(id) && w.Staffed(id)
+}
+
+// SitdownCost is what the room costs. Nothing, in a room of your own.
+func (w *World) SitdownCost() int {
+	if w.OwnGround() {
+		return 0
+	}
+	return SitdownFee
 }
 
 // leaderIs reports whether whoever leads an organization is a particular kind
@@ -86,7 +132,7 @@ func (w *World) leaderIs(f *Faction, temperament string) bool {
 
 // SitdownReadiness explains why a meeting cannot be called, or returns "".
 func (w *World) SitdownReadiness() string {
-	if w.Player.Location != SitdownGround {
+	if !w.SitdownWhere(w.Player.Location) {
 		return "This is not somewhere either of them would come"
 	}
 	q, ok := w.OpenQuarrel()
@@ -105,8 +151,8 @@ func (w *World) SitdownReadiness() string {
 	if q.B.Goodwill < SitdownWelcome {
 		return fmt.Sprintf("%s would not sit in a room you arranged. They think of you at %+d and it takes %+d", q.B.Name, q.B.Goodwill, SitdownWelcome)
 	}
-	if w.Player.Cash < SitdownFee {
-		return fmt.Sprintf("The room and the guarantees cost $%d", SitdownFee)
+	if w.Player.Cash < w.SitdownCost() {
+		return fmt.Sprintf("The room and the guarantees cost $%d", w.SitdownCost())
 	}
 	return ""
 }
@@ -143,13 +189,20 @@ func (w *World) CallSitdownAs(q Quarrel) error {
 }
 
 func (w *World) openSitdown(q Quarrel) error {
-	if err := w.Pay(SitdownFee); err != nil {
+	if err := w.Pay(w.SitdownCost()); err != nil {
 		return err
 	}
 
 	body := fmt.Sprintf("“%s and %s, in the same room, because you asked. Nobody has said anything yet.”", q.A.Name, q.B.Name)
 	if q.Suspected {
-		body = fmt.Sprintf("“%s and %s, in the same room, because you asked. One of them brought more people than the room needs, and Mara caught your eye on the way in.”", q.A.Name, q.B.Name)
+		// Whoever actually told you. It said "Mara caught your eye" in every
+		// campaign, including the ones in which Mara had been dead a month —
+		// the same fault as the coffee bought for a fixer who no longer exists.
+		who := w.RoleName("fixer")
+		if w.OwnGround() {
+			who = "one of your own people on the door"
+		}
+		body = fmt.Sprintf("“%s and %s, in the same room, because you asked. One of them brought more people than the room needs, and %s caught your eye on the way in.”", q.A.Name, q.B.Name, who)
 	}
 	speaker := w.HolderID("fixer")
 	w.Event = &Scene{

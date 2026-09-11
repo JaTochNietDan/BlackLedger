@@ -106,9 +106,16 @@ which half is standing.
    a week at saturation, which is the city's side of it. The player's side is
    the window — what the city could not redeem, on a shelf at 60% of new less
    wear, and a counter you hold sells you that stock at what it lent rather
-   than what it asks. Still open: the butcher, the restaurant, the poolhall and
-   the casinos — several of which are linked to the city rather than to the
-   player, which is a different thing and worth keeping straight.
+   than what it asks. The butcher was on the open list and should not have
+   been: its cold room hides four units of contraband, measured — a search
+   takes 26 of 30 where it would take all 30. The restaurant reaches now as
+   well: a dining room of yours with its full complement on the door is a room
+   two families will sit down in, the only other one in the city besides the
+   back of the bar, and what your staff see coming in is a warning you would
+   otherwise need contacts for. Still open: the poolhall and the casinos, which
+   contribute cover to laundering like every business does but have nothing of
+   their own. Read that distinction carefully before taking one: contributing a
+   number every trade contributes is not the same as reaching.
 
 ---
 
