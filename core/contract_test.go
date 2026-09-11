@@ -438,3 +438,54 @@ func TestTheHeadsOfOrganizationsAreAlwaysNameable(t *testing.T) {
 		}
 	}
 }
+
+// Naming a mark moved the world and told nobody.
+//
+// Every command in this game advances the revision, which is how a client knows
+// the state it is holding is stale and how an optimistic command is checked
+// against the world it was decided in. Choosing who a contract is for opens the
+// terms in place of the scene the player is looking at — a real change — and it
+// used to leave the revision where it was, because the case returned early to
+// stop anything else being offered on top of the terms and that skipped the
+// increment at the end of the function.
+//
+// Found by a policy that answers a scene with whatever it has answered least,
+// on the first run in this project's history where anything ever named a mark.
+func TestNamingAMarkMovesTheRevision(t *testing.T) {
+	t.Parallel()
+	w := New(53)
+	w.Event, w.District = nil, 9
+	w.Player.Health, w.Player.Cash, w.Player.Respect = 100, 50000, 200
+	w.Player.Contacts = 5
+	w.Player.Location = "bar"
+
+	opened, err := Execute(w, Command{Kind: "contract", Target: "bar", Revision: w.Revision, RequestID: ID()})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if opened.Event == nil {
+		t.Fatal("asking about a contract opened nothing")
+	}
+	mark := ""
+	for _, c := range opened.Event.Choices {
+		if strings.HasPrefix(c.ID, "mark:") {
+			mark = c.ID
+			break
+		}
+	}
+	if mark == "" {
+		t.Fatal("nobody in this city can be named")
+	}
+	named, err := Execute(opened, Command{Kind: "choice", Event: opened.Event.ID,
+		Choice: mark, Revision: opened.Revision, RequestID: ID()})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if named.Revision != opened.Revision+1 {
+		t.Fatalf("naming %s took the revision from %d to %d", mark, opened.Revision, named.Revision)
+	}
+	// And what it opened is the terms, not something offered on top of them.
+	if named.Event == nil || named.Event.Kind != "contract_terms" {
+		t.Fatalf("naming a mark opened %v", named.Event)
+	}
+}

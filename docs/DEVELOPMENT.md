@@ -11084,3 +11084,49 @@ What changed is that there is now something at the end of not paying besides a
 slowly worsening number.
 
 Four rules, four breaks, four failures.
+
+## Naming a mark moved the world and told nobody
+
+Handing a family a business was added to this game last tick and was unreachable
+by the entire harness the moment it shipped. Every policy answers a scene from a
+fixed list of choice ids, and that list begins with "accept" and "pay" — the two
+safest things in any scene — so a branch nobody thought to list is a branch
+nothing ever takes.
+
+So the exploring policy answers a scene the way it answers a room: whatever it
+has answered least. Which needed the report to record *which* branch was taken,
+because "choice" counted 1,093 times says nothing about whether anybody ever
+refused, ran, or handed over a business.
+
+On the first run where anything in this project's history ever named a mark for
+a contract, every campaign ended on a failed invariant.
+
+**Choosing who a contract is for does not advance the revision.** Every command
+in this game does; it is how a client knows what it is holding is stale and how
+an optimistic command is checked against the world it was decided in. That case
+opened the terms in place of the scene the player is looking at — a real change —
+and then `return nil`, to stop anything else being offered on top of the terms.
+The early return also skipped the increment at the end of the function, so the
+world moved and the number that says so did not. A client holding the old
+revision would have had a stale command accepted.
+
+It sets a flag now instead of returning: nothing is offered on top of the terms,
+and the revision advances like everything else. Broken back to the early return
+to watch the guard fail.
+
+### What it cost and what it bought
+
+The policy then died in every run at 12.7 days, because it was naming a family's
+head for a contract and refusing everybody who came about it, and its coverage
+fell from 107 kinds to 94. A policy that dies in a fortnight never gets to the
+top of its own ladder. The same rule the cards already had — curious, not
+suicidal — brought it back to 31.8 days and 100 kinds.
+
+| | before | after |
+|---|---|---|
+| kinds of action | 107 | 100 |
+| branches of scene | 1 | **14** |
+
+Seven fewer kinds for thirteen more branches is the right trade, and the
+branches include the one that could not be reached at all: handing a family a
+business, taken four times in twenty campaigns.

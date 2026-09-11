@@ -27,6 +27,9 @@ func (w *World) apply(c Command) error {
 	// decision actually cost rather than leaving them to diff two screens.
 	wasCash, wasRespect, wasHeat, wasHealth := p.Cash, p.Respect, p.Heat, p.Health
 	chosen := ""
+	// Set where a command has opened a decision that nothing else may be
+	// offered on top of.
+	quiet := false
 	previousRecords := make(map[string]bool, len(w.History))
 	for _, record := range w.History {
 		previousRecords[record.ID] = true
@@ -149,8 +152,19 @@ func (w *World) apply(c Command) error {
 			if err := w.openContractTerms(strings.TrimPrefix(c.Choice, "mark:")); err != nil {
 				return err
 			}
-			// The terms are the next decision, not a committed outcome.
-			return nil
+			// The terms are the next decision, not a committed outcome, so
+			// nothing else may be offered on top of them.
+			//
+			// This used to `return nil` to achieve that, which also skipped the
+			// revision at the bottom of this function — so naming a mark
+			// replaced the scene the player is looking at and told nobody the
+			// world had moved. Every other command in this game advances the
+			// revision; this one changed the event and left it where it was,
+			// which means a client holding the old number would have had a
+			// stale command accepted. Found by a policy that answers a scene
+			// with whatever it has answered least, on the first run where
+			// anything ever named a mark.
+			quiet = true
 		case "contract_terms":
 			if c.Choice == "leave" {
 				w.Log("Nothing was agreed", "You leave the name where it was.", "personal")
@@ -952,7 +966,7 @@ func (w *World) apply(c Command) error {
 		// Completed travel is an encounter boundary too. Otherwise a prepared
 		// contact stays silent until the player performs an unrelated local action.
 		// OfferIfReady preserves any urgent incident raised during the journey.
-		if c.Kind != "provoke" && c.Kind != "audience" {
+		if !quiet && c.Kind != "provoke" && c.Kind != "audience" {
 			w.OfferIfReady()
 		}
 	}

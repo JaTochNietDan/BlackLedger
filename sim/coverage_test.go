@@ -44,7 +44,13 @@ import "testing"
 // This exists to catch a fall. Raising it is how a policy that reaches further
 // gets recognised; a drop is a policy that stopped reaching, which is how a
 // whole area of the game goes unpriced without anybody noticing.
-const kindsTheHarnessPlays = 99
+// Eighty-one after the exploring policy started answering scenes the way it
+// answers rooms — whatever it has answered least. That costs it some breadth in
+// actions, because naming a family's head for a contract shortens a campaign,
+// and buys fourteen branches of scene where the harness used to take one. A
+// branch nobody answers is code nobody runs, and handing a family a business
+// was unreachable by this entire harness the day it shipped.
+const kindsTheHarnessPlays = 81
 
 func TestTheHarnessPlaysEnoughOfTheGame(t *testing.T) {
 	t.Parallel()

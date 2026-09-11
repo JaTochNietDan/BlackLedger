@@ -357,6 +357,43 @@ func Choose(v View, strategy string) (core.Command, error) {
 		if strategy == "reckless" {
 			priorities = []string{"approach:press", "accept", "resist", "defend", "leave", "decline"}
 		}
+		// The magpie answers a scene the way it answers a room: whatever it has
+		// answered least.
+		//
+		// Every policy here picks from a fixed list of choice ids, so a branch
+		// nobody thought to list is a branch nothing ever takes — and the list
+		// starts with "accept" and "pay", which are the two safest things in
+		// any scene. Handing a family a business was added to this game and was
+		// unreachable by the entire harness the moment it shipped, because
+		// "hand" is not on anybody's list and "pay" is above it.
+		if strategy == "magpie" && len(v.Event.Choices) > 0 {
+			best, fewest := "", 0
+			for _, c := range v.Event.Choices {
+				// Affordable as well as offered. A choice carries its own
+				// price and being able to see it is not the same as being able
+				// to pay it: answering a scene with a branch it could not cover
+				// took the player's cash below nothing and every campaign ended
+				// on a failed invariant.
+				if c.Disabled || c.Cost > v.Player.Cash {
+					continue
+				}
+				// Curious, not suicidal, the same as with the cards. Naming a
+				// family's head for a contract and then refusing everybody who
+				// came about it took the policy from ninety-four game days to
+				// twelve and its coverage from 107 kinds to 94: a policy that
+				// dies in a fortnight never gets to the top of its own ladder.
+				// It still does all of it, when it is in a condition to.
+				if deadly[root(c.ID)] && v.Player.Health < 90 {
+					continue
+				}
+				if n := v.Tried["choice:"+c.ID]; best == "" || n < fewest {
+					best, fewest = c.ID, n
+				}
+			}
+			if best != "" {
+				return core.Command{Kind: "choice", Choice: best, Event: v.Event.ID, Revision: v.Revision}, nil
+			}
+		}
 		for _, id := range priorities {
 			for _, c := range v.Event.Choices {
 				if c.ID == id && !c.Disabled {
@@ -1005,6 +1042,13 @@ func RunRecorded(seed uint32, strategy, director string, limit int, trace bool, 
 			r.Events[v.Event.Kind]++
 		}
 		r.Actions[c.Kind]++
+		// And which branch of a scene, because "choice" recorded 1,093 times
+		// says nothing about whether anybody ever refused, ran, or handed over
+		// a business. A policy that means to answer a scene a different way
+		// each time cannot see what it has already answered otherwise.
+		if c.Kind == "choice" && c.Choice != "" {
+			r.Actions["choice:"+c.Choice]++
+		}
 		// What came home during this command, so a table built on the trace can
 		// put late money against the decision that sent for it rather than
 		// against whatever was happening when it arrived.
@@ -1082,3 +1126,7 @@ func root(id string) string {
 // of the ones that are kinds, and it is short on purpose: anything added to it
 // is a claim that two cards under one root are two different decisions.
 var keepWhole = []string{"sit:", "arms:", "plate:", "fit:", "retain:"}
+
+// deadly are the scene branches that get somebody killed: putting a name up for
+// a contract, agreeing terms for one, and refusing a family to its face.
+var deadly = map[string]bool{"mark": true, "hire": true, "resist": true}
