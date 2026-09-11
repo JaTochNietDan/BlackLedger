@@ -8,6 +8,7 @@ import (
 	_ "embed"
 	"encoding/json"
 	"errors"
+	"flag"
 	"fmt"
 	"io"
 	"log"
@@ -419,8 +420,24 @@ func (a *app) generateAttempt(snapshot *core.World, feedback string) error {
 	})
 }
 func main() {
-	port := env("BLACK_LEDGER_PORT", "8791")
-	s, e := store.Open(env("BLACK_LEDGER_DB", ".runtime/campaign.sqlite3"))
+	// The port and the save, from the command line or the environment.
+	//
+	// There were no flags here at all, and every command written down in this
+	// project passed them: the tick ritual in docs/LOOP.md, the API playtest's
+	// mise task, the comment at the top of cmd/apicheck. Go does not complain
+	// about arguments nobody reads, so all of it was decoration — a server told
+	// to use a scratch database on port 8862 opened the live campaign on 8791,
+	// and if something was already there it exited and left whatever else was
+	// listening to answer. That is how a stale binary from an hour earlier came
+	// to serve the API playtest, and how an id the core has not produced for
+	// weeks turned up on the wire.
+	addr := flag.String("addr", ":"+env("BLACK_LEDGER_PORT", "8791"),
+		"address to listen on, as :port")
+	db := flag.String("db", env("BLACK_LEDGER_DB", ".runtime/campaign.sqlite3"),
+		"the campaign to open")
+	flag.Parse()
+	port := strings.TrimPrefix(*addr, ":")
+	s, e := store.Open(*db)
 	if e != nil {
 		log.Fatal(e)
 	}

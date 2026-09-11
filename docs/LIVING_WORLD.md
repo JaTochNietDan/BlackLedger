@@ -153,20 +153,21 @@ Ensure efficiency of development loops by increasing efficiency of your workflow
 Asking somebody where to find somebody else publishes a shorter id over HTTP
 than the core builds, and refuses about once in a thousand commands.
 
-The core builds `about:<who>:<mark>` — checked directly, and now guarded, with
-4,262 cards across 162 rooms carrying no duplicate id. A server built fresh and
-waited at for an hour of game time publishes exactly that. But the server the
-API playtest drives publishes `about:person-14`, `about:vittorio` and the like,
-one segment, with the mark on the card's `choice` field instead. The command
-layer accepts both, which is why nothing broke; the refusal is the same card
-saying the person being asked is out on the street, on a card the same snapshot
-had just called live.
+— answered, and it was never the game. `cmd/blackledger` had no flags at all.
+  Every command written down in this project passed `-addr` and `-db` to it —
+  the tick ritual, the API playtest's task, the comment at the top of
+  `cmd/apicheck` — and Go says nothing about arguments nobody reads, so all of
+  it was decoration. A server told to open a scratch database on port 8862
+  opened the live campaign on 8791, found something already there, and exited;
+  a server somebody had started by hand an hour before went on answering every
+  run, on a build from an hour before that. The short id and the refusal were
+  both a stale binary talking.
 
-What is established: the core is clean, the shortened form comes from somewhere
-between it and the wire, and it appears only in a world that has been played
-rather than waited in. Not chased down, not claimed fixed, and the duplicate-id
-guard now in `core/pricetruth_test.go` would say in one line whether the core
-ever produces it.
+  The flags are real now, with the environment variables as their defaults, and
+  the playtest task checks that the server it started is still alive before it
+  talks to anything. Run properly: the ids are `about:mara:elena` and the like,
+  seventy-one kinds of command instead of forty-nine, and three runs of two
+  hundred and fifty commands with no invariant failures.
 
 ---
 

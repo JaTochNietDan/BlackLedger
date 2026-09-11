@@ -68,6 +68,12 @@ go build -o .runtime/blackledger-apicheck ./cmd/blackledger
 server=$!
 trap "kill $server 2>/dev/null || true" EXIT
 sleep 3
+# The server this task started, and not whatever else is listening. It used to
+# pass -addr and -db to a binary with no flags at all, so it opened the live
+# campaign on the live port, found it taken, and died — and a hand-started
+# server from an hour earlier answered every run after that, on a build nobody
+# had rebuilt since.
+kill -0 $server 2>/dev/null || { echo "the api server did not start:"; cat .runtime/apicheck-server.log; exit 1; }
 go run ./cmd/apicheck -base http://127.0.0.1:8862 -steps 250
 """
 

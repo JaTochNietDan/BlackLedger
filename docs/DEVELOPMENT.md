@@ -12217,3 +12217,39 @@ did not find it.
 An hour on that would have been an hour saved by the guard, which is the actual
 lesson: the comment describing the fault was written when it was fixed, and a
 described fault with no guard is a fault waiting for its second run.
+
+## The flags were decoration
+
+Two nights of an open inbox item — a card publishing a shorter id over HTTP than
+the core builds, and refusing once in a thousand commands — and the answer is
+that none of it was the game.
+
+**`cmd/blackledger` had no flags.** Not "ignored some": `flag` was never
+imported, `main` read two environment variables and started. And every command
+written down in this project passes flags to it. The tick ritual in the loop's
+brief. The API playtest's mise task. The comment at the top of `cmd/apicheck`
+that says how to run it. Go does not complain about arguments nobody reads, so
+all of it has been decoration for as long as those lines have existed.
+
+What that produced: a server told to open a scratch database on port 8862 opened
+the **live campaign** on 8791, found the live server already there, failed to
+bind, and exited. And a server somebody had started by hand an hour earlier —
+with the environment variables, which do work — went on answering every run
+since, from a binary nobody had rebuilt. The short id was a build from before
+the id grew its second name. The intermittent refusal was the same. Three ghost
+processes were still running from earlier ticks when I went looking.
+
+The flags are real now, with the environment variables as their defaults, so
+every command in the docs does what it reads as. The playtest task checks the
+server it started is still alive before it talks to anything, which is the part
+that would have said this in one line: a task that silently uses somebody else's
+server is a task that tests whatever happens to be listening.
+
+Run properly, the API playtest reaches **71 kinds of command** rather than 49 —
+the ids come through whole, so the cards that name two people are no longer
+colliding into one — and three runs of two hundred and fifty commands come back
+with no invariant failures.
+
+The live campaign looks untouched: it was never opened by the playtest, because
+the playtest's server could not bind while the real one held the port. That is
+luck rather than design, and the design is fixed.
