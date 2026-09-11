@@ -12498,3 +12498,33 @@ down what you are party to.
 They end with the family now, and the player is told there is nothing left to
 keep. Across forty cities of four months: 71 understandings kept, 9 ended with
 the organization they were with. Removing the clean-up puts seven of them back.
+
+## Asking the question once, of everything
+
+Two nights of finding these one at a time: the player still answering to a
+family that had ended, and an understanding with one. Both were reachable only
+because spreading the campaign numbers finally showed a city that buries
+organizations, and both showed up as a sentence rather than as a number going
+wrong — "An unidentified family" in the books, and nothing at all for the man
+who had been working for them.
+
+A city churns. Every fall, death and change of hands leaves an id somewhere that
+used to mean something, and finding those one path at a time is a losing game.
+
+`World.Dangling` asks it once, of everything that holds a name: who the player
+answers to, every understanding and ceasefire, every quarrel, plan, commission
+and debt, who holds the deeds to each address, who is on its door and behind its
+counter, and who each person in the city answers to. It hands back what is wrong
+rather than a yes or no, because a caller that finds three wants to say which
+three.
+
+**Twenty-four cities run half a year each come back clean.** Removing last
+night's clean-up puts three back, so the sweep bites. And the reader is shown
+one of each first — a fresh city with an invented employer reads one fault, with
+two invented agreements reads two — because a sweep that finds nothing is either
+a clean city or a broken reader, and there is no telling from the outside.
+
+One thing it had to be taught: the player's own organization is a valid name
+before it exists. The city keeps a quarrel with it from the first time anybody
+takes offence and files the organization later, so the first run reported
+seventy-one faults, all of them that.
