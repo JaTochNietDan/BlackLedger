@@ -234,3 +234,55 @@ func TestNobodyTakesTheLastThingAFamilyHas(t *testing.T) {
 		t.Fatal("and it went through anyway")
 	}
 }
+
+// The whole way down, in one test.
+//
+// Asking for a share and taking the room are two halves of one idea and were
+// built a tick apart, which is how this project has repeatedly ended up with a
+// thing that works in pieces and is unreachable as a path. The take needs a
+// family at −60; refusing their demands reaches about −40 in a campaign, so if
+// leaning on them did not also drive them down the whole feature would sit
+// behind a number nothing produces.
+//
+// It does. Four demands take a family past the floor and six put them at the
+// bottom of it, and then they walk out of the room.
+func TestLeaningOnAFamilyIsThePathToTakingItsRoom(t *testing.T) {
+	t.Parallel()
+	w, id, f := leaning(t, 200)
+	f.Power = 20
+	// Somewhere else for them to go, so this is not the last thing they hold.
+	for _, l := range Locations {
+		if l.ID != id && w.Properties[l.ID] != nil && w.Properties[l.ID].Income > 0 && !w.Own(l.ID) {
+			w.Properties[l.ID].Owner = f.ID
+			break
+		}
+	}
+	if len(w.FamilyHoldings(f.ID)) <= PushLeft {
+		t.Skipf("%s holds only %d places", f.Name, len(w.FamilyHoldings(f.ID)))
+	}
+	if w.PushReadiness(id) == "" {
+		t.Fatal("they would walk out before anybody had asked them for anything")
+	}
+	asked := 0
+	for i := 0; i < 12 && w.PushReadiness(id) != ""; i++ {
+		if reason := w.DemandReadiness(id); reason != "" {
+			t.Fatalf("after %d demands they will not even be asked: %s", asked, reason)
+		}
+		if err := w.DemandAShare(id); err != nil {
+			t.Fatal(err)
+		}
+		w.Event = nil
+		asked++
+	}
+	if w.PushReadiness(id) != "" {
+		t.Fatalf("twelve demands took them to %+d and they still will not go: %s",
+			f.Goodwill, w.PushReadiness(id))
+	}
+	t.Logf("%d demands took them from nothing to %+d, and then they walked out", asked, f.Goodwill)
+	if err := w.TakeItFromThem(id); err != nil {
+		t.Fatal(err)
+	}
+	if !w.Own(id) {
+		t.Fatal("they stayed after all")
+	}
+}

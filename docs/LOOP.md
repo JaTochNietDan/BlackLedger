@@ -220,6 +220,13 @@ and a local model that writes encounters and can be switched off.
   in any order. What you carry shifts an attempt on somebody — 17 in 200 with
   empty hands against 58 with a Thompson — and so does what you put in the hand
   of whoever you send. A search reaches whoever is standing with you.
+- **And the path between them.** Four demands take a family from nothing to
+  −72, which is past the floor the take needs, and six put them at the bottom of
+  it. Refusing their own demands only reaches about −40 in a campaign, so
+  leaning on them is the way down and the two halves are one thing: ask until
+  they have stopped pretending to be on terms with you, then take the room.
+  Guarded end to end, because this project keeps building things that work in
+  pieces and are unreachable as a path.
 - **Taking it off them.** The other half of the claim, and deliberately harder
   than theirs. A family that has stopped being on any terms with you — at −60 or
   below — and is worth forty less in this city than your name, and has somewhere

@@ -11270,3 +11270,30 @@ exactly the boundary and one either side.
 
 Four rules, four breaks, four failures. The baseline does not move, because no
 policy has a family at −60 to push.
+
+## Is the floor a number anything produces?
+
+The take needs a family at −60. Nothing in this project has been trusted to be
+reachable just because it was written, so: refusing every demand a family sends,
+across twelve cities and sixty days each, bottoms out at −40. Twenty-four
+refusals sounds like plenty until you notice it is two per campaign across
+twelve of them, and two refusals at twenty points each is exactly −40.
+
+So refusal alone never gets there, and if that were the only road the whole
+feature would sit behind a number the game does not produce — which is the fault
+this project has found in its own work six times tonight.
+
+It is not the only road. **Asking for a share is the way down.** Eighteen points
+each, and four of them take a family from nothing to −72. Six put them at the
+bottom. So the two halves built a tick apart are one thing after all: lean on
+them until they have stopped pretending to be on terms with you, then take the
+room. Each demand pays about $80 on the way.
+
+There is a guard for the path rather than for either end of it. It asks, counts,
+and keeps asking until they will go, and fails if twelve demands do not get
+there. Broken by making a demand cost them nothing: twelve demands, standing
+unchanged at zero, and the room never comes free.
+
+A feature whose two halves each work and which cannot be walked from one to the
+other is the shape that has cost this project the most time. This is the first
+one that was checked for it before it shipped rather than after.
