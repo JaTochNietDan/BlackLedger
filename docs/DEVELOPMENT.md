@@ -11424,3 +11424,37 @@ which is where he would be, and the day's routine moves him on from there.
 
 The guard fails at the old behaviour with the man in a cell and at the
 scrapyard.
+
+## A story worth pulling
+
+`spike` — paying the editor to keep a story out of tomorrow's paper — was
+another of the actions the harness has never played. It is worth walking rather
+than calling because it needs three separate things true at once: an arrangement
+with the editor, a story from the last day about you or about the police, and
+standing in the paper's own building.
+
+The walk starts from the tick before. Hand the police somebody of yours at your
+own door, the paper carries it, and the card at the Herald is live. That part
+works, and the guard reads the card off the room's own list rather than calling
+the function, because a card nobody is offered is a road nobody can walk.
+
+The fault is what else the card was offered for. Pulling a story takes the
+city's interest in that story out of the city's temperature, and the temperature
+scores half the kinds the paper files at nothing, on purpose — a column, an
+obituary, a notice that there was music at your club. Those were on the list of
+things to pull. The player paid, was told the city's interest went with it, and
+the temperature did not move, with a one in seven chance of losing the
+arrangement at the paper on top of it. A strictly worse deal than not clicking,
+sold on a description that was not true.
+
+A story the city never counted is not worth pulling now, which is what the
+card's own refusal has always said: "There is nothing in today's paper worth
+pulling." The words were right. They were just never reached.
+
+One note on the guard, because it caught itself. The first version filed a
+story with a headline of its own invention and passed with the filter torn out —
+the paper works out what a story is about by reading place names in the
+headline, and an invented headline names nothing, so the story was being left
+off the list for the wrong reason entirely. It asks what the paper thinks the
+story is about before it asks anything else now. That is the eighth time on this
+loop a green result has turned out to be a fact about the instrument.

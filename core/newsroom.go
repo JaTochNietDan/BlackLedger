@@ -49,14 +49,24 @@ const (
 // money, and whether he is currently in a position to be worth it.
 func (w *World) TheEditor() bool { return w.Retained("editor") && !w.Outbid("editor") }
 
-// Spikeable is what could be pulled: stories from the last day about premises
-// of the player's, or about the police, which in this city usually means them.
-// The paper is the city's memory, so a story that never runs is a thing that,
-// as far as everybody else is concerned, did not happen.
+// Spikeable is what is worth pulling: stories from the last day about premises
+// of the player's, or about the police, which in this city usually means them,
+// and only the ones the city is actually reading something into. The paper is
+// the city's memory, so a story that never runs is a thing that, as far as
+// everybody else is concerned, did not happen.
+//
+// The weight is the point of the filter rather than a detail of it. Pulling a
+// story takes the city's interest in it out of the city's temperature, and a
+// story the temperature never counted takes nothing out of it. Without this the
+// card was offered for a notice that there had been music at your club — paid
+// for, described as taking the city's interest with it, and taking nothing,
+// with a one in seven chance of costing the arrangement at the paper as well.
+// "There is nothing in today's paper worth pulling" was already the right words
+// for that; it was just never true when it needed to be.
 func (w *World) Spikeable() []Story {
 	out := []Story{}
 	for _, s := range w.News {
-		if s.Life != w.Life || w.Minute-s.Minute > 1440 {
+		if s.Life != w.Life || w.Minute-s.Minute > 1440 || scrutinyWeight[s.Kind] == 0 {
 			continue
 		}
 		subject := w.SubjectOf(s)
