@@ -375,6 +375,12 @@ func Choose(v View, strategy string) (core.Command, error) {
 		if strategy == "diplomat" && v.Event.Kind == "audience" {
 			priorities = []string{"business_truce", "leave"}
 		}
+		// Somebody coming up inside a family takes the favour, every time. It
+		// is the only answer at that table that leaves them thinking better of
+		// you, and thinking better of you is the whole of the road.
+		if strategy == "soldier" && v.Event.Kind == "audience" {
+			priorities = []string{"work", "tribute", "leave"}
+		}
 		if strategy == "reckless" {
 			priorities = []string{"approach:press", "accept", "resist", "defend", "leave", "decline"}
 		}
@@ -985,6 +991,102 @@ func Choose(v View, strategy string) (core.Command, error) {
 			}
 		}
 		strategy = "investor"
+	}
+	// Coming up inside somebody else's organization rather than building one.
+	//
+	// `serve:` is the entry to the longest road in this game — answer to a
+	// family, do enough work for them to be made a lieutenant, take the chair
+	// — and no policy has ever taken it, so the wage, the promotion, the share
+	// a lieutenant draws and the move on the chair are all unpriced. The path
+	// itself has been walked by hand and holds; what has never happened is a
+	// campaign living on it.
+	if strategy == "soldier" {
+		if v.Player.Health < 85 {
+			if c, ok := v.at(v.Player.Home, "rest"); ok {
+				return c, nil
+			}
+		}
+		// The chair, once there is one to take.
+		if c, ok := v.action(v.Player.Location, "takeover"); ok {
+			return c, nil
+		}
+		for _, p := range v.Locations {
+			for _, a := range p.Actions {
+				if a.ID == "takeover" && !a.Disabled {
+					if c, ok := v.at(p.ID, a.ID); ok {
+						return c, nil
+					}
+				}
+			}
+		}
+		// The rest of the city first. A family's own room is wherever they earn
+		// most, which is often not the district somebody starts in — and a
+		// room in a district you have not opened publishes one card, which is
+		// the card that opens it. Eight thousand audiences and not one offer of
+		// work, because the offer was in a part of town this policy had never
+		// been to.
+		if v.District == 0 {
+			if c, ok := v.at("apartment", "expand"); ok {
+				return c, nil
+			}
+		}
+		// Going to work for somebody, which happens in their own room.
+		//
+		// The card is published at the family's best-earning address and
+		// refused everywhere else — "that conversation happens at the Blue
+		// Hour" — so a policy that only looks at cards it could press right now
+		// never goes to find it. Walking to it is the first half of taking it.
+		if v.Player.Serves == "" {
+			for _, p := range v.Locations {
+				for _, a := range p.Actions {
+					if !strings.HasPrefix(a.ID, "serve:") {
+						continue
+					}
+					if a.Disabled && v.Player.Location == p.ID {
+						continue // there, and still refused: not yet
+					}
+					if c, ok := v.at(p.ID, a.ID); ok {
+						return c, nil
+					}
+				}
+			}
+		}
+
+		// Before anybody takes you on they have to think well of you, and the
+		// way that happens is favours. A seat across the table offers one, and
+		// finishing it is work done for that family: six points of standing
+		// each time, which is how somebody with no name gets to the twenty it
+		// takes before anybody will have them.
+		//
+		// Rationed, because it is a table and not a job. Asked for every time
+		// it was available, a seat came up nine thousand times in a hundred
+		// campaigns and the policy spent its whole life sitting down at one —
+		// eighty-seven of those campaigns ended with the player dead. One in
+		// six turns is enough to climb on and leaves the rest for earning.
+		if v.Player.Respect >= 6 && v.Minute%360 < 60 {
+			for _, p := range v.Locations {
+				for _, a := range p.Actions {
+					if a.ID == "audience" && !a.Disabled {
+						if c, ok := v.at(p.ID, a.ID); ok {
+							return c, nil
+						}
+					}
+				}
+			}
+		}
+		// And the work itself: harm done to whoever they are at odds with is
+		// work done for them, which is the only road anybody walks without
+		// being offered something first.
+		for _, p := range v.Locations {
+			for _, a := range p.Actions {
+				if a.ID == "sabotage" && !a.Disabled {
+					if c, ok := v.at(p.ID, a.ID); ok {
+						return c, nil
+					}
+				}
+			}
+		}
+		strategy = "worker"
 	}
 	if strategy == "publican" {
 		// Everything else the investor does: the crew, the home, the security

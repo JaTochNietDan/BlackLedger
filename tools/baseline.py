@@ -26,6 +26,7 @@ ORDER = (
     "distiller",
     "respectable",
     "diplomat",
+    "soldier",
 )
 
 # Days as well as deaths and cash.

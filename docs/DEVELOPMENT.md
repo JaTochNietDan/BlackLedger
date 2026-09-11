@@ -12581,3 +12581,31 @@ survives rather than one that thrives, and that is a reading rather than a
 complaint: nobody has tuned any of it, because nobody could see it.
 
 Coverage goes from 99 kinds of action to 100.
+
+## Living on somebody else's payroll
+
+Three kinds of action were left that the harness had never played. One of them,
+`serve:`, is the door to the longest road in this game — answer to a family, do
+enough work for them to be made a lieutenant, take the chair — and the whole
+ladder behind it was unpriced: the wage, the promotion, the share a lieutenant
+draws, the move on the room.
+
+The soldier walks it. Two things had to be learned before it could.
+
+**The offer is in a part of town it had never been to.** A family's own room is
+wherever they earn most, a room in a district nobody has opened publishes
+exactly one card, and that card is the one that opens it. Nine thousand seats at
+tables and not a single offer of work, because the offer was across the city.
+
+**And a seat at a table is not a job.** Asked for every time it was available,
+the policy spent its entire life sitting down at one. Rationed to an hour in six
+it climbs instead: **ten times going to work for a family across a hundred
+campaigns, and twice taking the chair.** Both of those are firsts.
+
+What is not good is the dying. Ninety-eight of a hundred campaigns end with the
+player dead, which is worse than the reckless policy and is the next thing to
+look at rather than something to celebrate — a policy that dies is a policy
+whose cash column means very little. It goes in as the magpie did, with what it
+is for written down: this one exists so that a road nobody could see is priced
+at all, and its numbers are what happens to somebody who spends their life
+trying to come up in somebody else's family.
