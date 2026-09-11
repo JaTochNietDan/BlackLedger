@@ -11525,3 +11525,42 @@ cannot drift apart again.
 
 Same shape as the false floor last tick, and the third time in three ticks: a
 sentence describing a consequence, and code doing something else.
+
+## Reading what the city says while it is running
+
+Three nights in a row the fault was a sentence: a card promising a consequence
+the code did not deliver, and a log line reporting nought crates as a haul. All
+three were found by walking one path at a time. This file's own rule is to
+prefer a mechanical sweep over a hand-written list, so this tick built the
+sweep instead of walking a fourth path.
+
+There was already a reader. It knew six kinds of malformed sentence and it read
+every card in every room — fifteen hundred sentences, all clean. What it never
+read was the log or the paper, which is everything the game says while something
+is *happening* rather than while somebody is deciding. "0 crates of arms out
+through the front door in daylight" lived there, and no reader had ever seen it.
+
+Two changes. The reader moved out of the test file into `core/malformed.go`, so
+anything that can collect text can use the same eye. And it learned to count: a
+haul of nothing written as a quantity, and one of a thing written as several.
+Both had been found by hand before — "for the 1 days still on them" at the
+precinct, and the empty room last night.
+
+Then a sweep over forty passive campaigns of sixty days, half of them run hot: a
+room under a floor with crates in it, a still, stock on the player, and the
+police already interested. That state is chosen rather than the sentences, which
+is the whole point — the wrong lines were written by raids, seizures and arrests,
+not by the weather.
+
+**Fifteen thousand sentences, and it found two more of exactly the same fault
+on the first run.** A family buying crates said "took 1 crates" and "there are 0
+crates left under the floor", in the very function walked last night. A forfeit
+said "0 units of stock gone" when the search found nothing to take, which is a
+number where there should be a plain statement that they went through the place
+and left with nothing. Both fixed.
+
+The sample matters twice over. At twelve campaigns the sweep was clean; the
+second fault only appeared at forty, because a forfeiture needs eighty attention
+and a search that finds nothing. A sweep too narrow reports a clean city. The
+floor on the count is ten thousand sentences now, so a sweep that quietly stops
+reaching the city fails instead of passing.

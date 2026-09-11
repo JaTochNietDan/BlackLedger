@@ -210,7 +210,15 @@ func (w *World) ArmouryDay() {
 		f.Goodwill = min(100, f.Goodwill+ArmouryGoodwill)
 		prop.Crates -= want
 		w.Earn(paid)
-		w.Log("Somebody came to "+place.Name, fmt.Sprintf("%s took %d crates and left $%d. They are %d strong now, and there are %d crates left under the floor.", f.Name, want, paid, f.Power, prop.Crates), "business")
+		left := fmt.Sprintf("there are %d crates left under the floor", prop.Crates)
+		switch prop.Crates {
+		case 0:
+			left = "the room is empty"
+		case 1:
+			left = "there is one crate left under the floor"
+		}
+		w.Log("Somebody came to "+place.Name, fmt.Sprintf("%s took %s and left $%d. They are %d strong now, and %s.",
+			f.Name, plainly(want, "one crate", fmt.Sprintf("%d crates", want)), paid, f.Power, left), "business")
 
 		// Arming one side is a thing the other side finds out about, sooner if
 		// they have anybody worth having.

@@ -122,6 +122,20 @@ func (w *World) considerRaid() {
 	w.Raid()
 }
 
+// taken is how a search's haul reads in a sentence. A search that found nothing
+// to take used to report "0 units of stock gone", which is a number where there
+// should be a plain statement that they went through the place and left with
+// nothing.
+func taken(units int) string {
+	switch units {
+	case 0:
+		return "nothing of yours worth carrying out"
+	case 1:
+		return "one unit of stock gone"
+	}
+	return fmt.Sprintf("%d units of stock gone", units)
+}
+
 // Raid is the visit: the search, and then what they do with what it turned up.
 // Confiscation and a charge are not alternatives — they take the still and then
 // somebody answers for it — so the weight of the evidence is read before the
@@ -217,7 +231,7 @@ func (w *World) search() {
 		prop.Owner = "independent"
 		prop.Mode = ""
 		w.Player.Heat = max(0, w.Player.Heat-30)
-		w.Log("They took it", fmt.Sprintf("%s is forfeit. A fine of $%d, %d units of stock gone, and the business is no longer yours.", place.Name, fine, seized), "danger")
+		w.Log("They took it", fmt.Sprintf("%s is forfeit. A fine of $%d, %s, and the business is no longer yours.", place.Name, fine, taken(seized)), "danger")
 		w.Report("police", "AUTHORITIES SEIZE "+upper(place.Name),
 			fmt.Sprintf("%s has been seized following an investigation into its accounts. The premises are closed pending proceedings.", place.Name))
 		w.Witness("seizure", target, fmt.Sprintf("%s is forfeit. They put a notice on the door and kept the keys.", place.Name),
@@ -227,7 +241,7 @@ func (w *World) search() {
 
 	prop.Condition = max(0, prop.Condition-20)
 	w.Player.Heat = max(0, w.Player.Heat-18)
-	w.Log("Turned over at "+place.Name, fmt.Sprintf("A fine of $%d, %d units of stock gone, and %s was left in a state. They will be back if nothing changes.", fine, seized, place.Name), "danger")
+	w.Log("Turned over at "+place.Name, fmt.Sprintf("A fine of $%d, %s, and %s was left in a state. They will be back if nothing changes.", fine, taken(seized), place.Name), "danger")
 	w.Report("police", "RAID AT "+upper(place.Name),
 		fmt.Sprintf("Officers searched %s this morning. No charges have yet been brought.", place.Name))
 	w.Witness("raid", target, fmt.Sprintf("They came through the front of %s in daylight. A fine of $%d and %d units gone.", place.Name, fine, seized),
