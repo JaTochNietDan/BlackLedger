@@ -2176,7 +2176,7 @@ func (w *World) Attack(plot Plot) {
 	// Two places in the world they cannot walk into: a police cell, and
 	// anywhere that is not this city. Both leave them the house.
 	if w.Held() || w.Abroad != "" {
-		w.wreckTheHouse()
+		w.outOfReach(plot)
 		return
 	}
 	// A warning is worth exactly this. Somebody told you they were coming and
@@ -2184,7 +2184,7 @@ func (w *World) Attack(plot Plot) {
 	// somewhere else is the whole value of having been warned; it costs the
 	// house, which is what makes it a decision rather than a free pass.
 	if plot.Known && w.Player.Location != w.Player.Home {
-		w.wreckTheHouse()
+		w.outOfReach(plot)
 		return
 	}
 	// And a family that has not seen you lately does not know where you are
@@ -2193,7 +2193,7 @@ func (w *World) Attack(plot Plot) {
 	// people have laid eyes on you. Being somewhere they have not looked is
 	// cover, and being seen is what costs it.
 	if !w.TheyKnowWhereYouAre(plot.Actor) {
-		w.wreckTheHouse()
+		w.outOfReach(plot)
 		return
 	}
 	if w.Warned(plot) {

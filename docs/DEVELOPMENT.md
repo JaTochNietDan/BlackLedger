@@ -12279,3 +12279,36 @@ two different questions and the difference is exactly what went wrong.
 
 Broken to check it bites: a binary built with `-buildvcs=false` reports its
 revision as "unknown", and the check names it against HEAD and exits non-zero.
+
+## Somebody who can be reached instead of you
+
+A family that comes for the player and cannot find them wrecked the house. Every
+time, and by four different roads: held in a cell, out of the city, warned and
+standing somewhere else, or simply not seen lately. Four ways of being out of
+reach and one answer to all of them, which is a family that can think of nothing
+to do about a man it cannot find except break his furniture.
+
+They can find the people who work for him. That is what having people looks like
+from the other side, and until tonight nothing the city did on its own ever
+killed one of the player's own — the only thing that had was the player walking
+them into a rival's holding. So signing somebody on carried no risk at all, and
+the funeral built for them three nights ago could not be reached by anything
+except the player's own bad move.
+
+A third of the time now, the reprisal falls on a person. Everybody else on the
+books takes ten points off the man it happened to, the quarrel gets worse, and
+there is a funeral waiting at the parlour. The rest of the time it is still the
+house, because a decision needs both branches.
+
+**The guard found its own fault twice, and the second one is worth keeping.**
+
+It first ran thirty reprisals in one city, took somebody on the first go, and
+reported that the house was never the answer — a city that has already lost
+people is a different city. One reprisal each in thirty cities instead.
+
+Then thirty cities in a row all took somebody. The world's stream is a plain
+linear congruential generator seeded with the campaign's number, and for any
+small seed the first draw is dominated by the constant: **every seed under a few
+thousand opens on about 0.236**, which is under this chance. Seeds 1 to 30 are
+not thirty samples, they are one. Spread across the range they behave: 67 of 200
+cities, 33.5% against a stated 34%.

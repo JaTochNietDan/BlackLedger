@@ -790,6 +790,21 @@ creating and I want you to be continuously autonomously creating
 
 ---
 
+Somebody who works for you can be reached instead of you (standing
+instruction; the inbox is empty).
+
+— built: a family that comes for you and cannot find you used to wreck the
+  house, every time, whichever of the four ways you were out of reach — in a
+  cell, out of the city, warned and standing elsewhere, or simply not seen
+  lately. About a third of the time now they find somebody who works for you
+  instead. Everybody else on the books takes ten points off you for it, the
+  family's quarrel with you gets worse, and there is a funeral to arrange. Until
+  this, signing somebody on carried no risk the city could deliver, and the only
+  thing that ever killed one of your own was you walking them into a rival's
+  holding yourself.
+
+---
+
 Burying your own (standing instruction; the inbox is empty).
 
 — built: a man who died working for you used to leave a line in the log and
