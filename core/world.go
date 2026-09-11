@@ -2671,4 +2671,6 @@ var PlaceIncome = map[string]int{
 	// A pawnbroker earns on the difference between what somebody will take
 	// today and what the thing is worth, which is most of it.
 	"pawn": 17,
+	// An undertaker earns on a thing this city produces without being asked.
+	"chapel": 25,
 }

@@ -11839,3 +11839,43 @@ Every gap in that row that matters is now either wide enough to believe or
 named as one that is not. What this does not do is fix the write-ups already in
 this file that ranked two policies on a gap of a few hundred dollars. They stand
 as written, with this paragraph against them.
+
+## An undertaker, and the checklist that is really the test suite
+
+A new address, because the brief asks for businesses and the inbox is empty.
+Thorne & Sons, a funeral director in the second district: the one trade in this
+city whose custom is made entirely by everybody else's work. Its counter counts
+the week's dead the way a garage counts cars with the glass out. A casket hides
+more than a cold room, and the books explain cash about as well as a laundry's,
+because a funeral is paid for in notes by people nobody wants to press.
+
+The interesting part is not the building. **The checklist in the brief for
+adding an address is seven items long, and the test suite found five of them by
+itself.** The city refused two addresses in one block. Two guards asked for a
+painted front and a painted room. One asked what this trade reaches past its own
+income that no other does. One asked what its counter sees that no other
+counter does. Only the income table and the manner of dying there went in
+without being demanded.
+
+Two things it broke that were not about the undertaker at all.
+
+**A guard that had been measuring a coincidence.** The back room's evening trade
+was checked by counting hours in which two or more people stood in it, on one
+seed, and asking that the evening beat the day. Two people is nearly always
+true, so both columns sit near the eighty-four hours a week has of each: across
+twenty seeds, twelve come out an exact tie. Three more people with somewhere
+else to be flipped the one seed it ran on. The property was never in doubt — 
+counted by heads across twenty cities the evening carries 5,939 against the
+day's 4,102, half again as many — so the guard counts heads now, and twenty
+cities rather than one.
+
+**A pin narrow enough to go off at the weather.** The coverage figure fell from
+92 kinds of action to 87, taking the distiller's own cellar with it. It had not
+been lost: run on its own the distiller presses that card three times in a
+hundred campaigns, more than before. Two seeds a policy is a sample a new
+building in another district can move by five. Four seeds, and the true figure
+is 96.
+
+And the sweeps caught two more counted-noun faults on the way through, in the
+oldest lines in the trade code: a quiet purchase of "1 crates of moonshine", and
+the same again when it sold.

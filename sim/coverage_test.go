@@ -50,9 +50,18 @@ import "testing"
 // and buys fourteen branches of scene where the harness used to take one. A
 // branch nobody answers is code nobody runs, and handing a family a business
 // was unreachable by this entire harness the day it shipped.
-// Ninety-two with the distiller, which brings a still and its own cellar —
-// the two ends of the one chain in this game the player owns both of.
-const kindsTheHarnessPlays = 92
+// Ninety-two with the distiller, which brings a still and its own cellar — the
+// two ends of the one chain in this game the player owns both of.
+//
+// Then ninety-six, on four seeds a policy rather than two. Adding one address
+// to the city — an undertaker — dropped the reading from 92 to 87 and took the
+// distiller's own cellar off the list with it. It had not been lost: run on its
+// own the distiller pressed that card three times in a hundred campaigns, more
+// than before. Two seeds of a policy is a narrow enough sample that a new
+// building in a different district can move the number by five, which makes
+// this pin an alarm that goes off at the weather. Four seeds, and the figure it
+// reports is the truer one.
+const kindsTheHarnessPlays = 96
 
 func TestTheHarnessPlaysEnoughOfTheGame(t *testing.T) {
 	t.Parallel()
@@ -61,7 +70,7 @@ func TestTheHarnessPlaysEnoughOfTheGame(t *testing.T) {
 		"worker", "investor", "defiant", "reckless", "thief",
 		"smuggler", "racketeer", "publican", "magpie", "distiller",
 	} {
-		for seed := uint32(1); seed <= 2; seed++ {
+		for seed := uint32(1); seed <= 4; seed++ {
 			r := Run(seed*2654435761, strategy, "fixture", 700, false)
 			for id := range r.Actions {
 				for i := 0; i < len(id); i++ {

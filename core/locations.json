@@ -279,5 +279,16 @@
     "y": 442,
     "cost": 300,
     "blurb": "Three brass balls over the door and a window of other people's things. Open late, and nobody in it asks where anything came from."
+  },
+  {
+    "id": "chapel",
+    "name": "Thorne & Sons",
+    "type": "work",
+    "kind": "undertaker",
+    "district": 1,
+    "x": 994,
+    "y": 613,
+    "cost": 440,
+    "blurb": "A brass plate, a long window with nothing in it, and a yard at the back wide enough for a hearse to turn. Business has never once been slow in this city."
   }
 ]

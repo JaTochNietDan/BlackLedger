@@ -24,6 +24,10 @@
     "file": "fronts/front-casino-v1.jpg"
   },
   {
+    "id": "chapel",
+    "file": "fronts/front-chapel-v1.jpg"
+  },
+  {
     "id": "dealer",
     "file": "fronts/front-dealer-v1.jpg"
   },

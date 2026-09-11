@@ -281,8 +281,8 @@ func (w *World) Buy(good string, units int) error {
 	}
 	w.Player.Stock[good] += units
 	w.Player.Heat = min(100, w.Player.Heat+1)
-	w.Log("A quiet purchase", fmt.Sprintf("%d %ss of %s for $%d, at $%d each. Holding stock draws attention until it is sold.",
-		units, g.Unit, g.InBulk(), cost, price), "business")
+	w.Log("A quiet purchase", fmt.Sprintf("%s of %s for $%d, at $%d each. Holding stock draws attention until it is sold.",
+		counted(units, g.Unit, g.Unit+"s"), g.InBulk(), cost, price), "business")
 	return nil
 }
 
@@ -307,8 +307,8 @@ func (w *World) Sell(good string, units int) error {
 	// half that shows: buying is somebody with money, selling is somebody with
 	// a trade.
 	w.RouteRun(units)
-	w.Log("The goods move on", fmt.Sprintf("%d %ss of %s sold for $%d, at $%d each.",
-		units, g.Unit, g.InBulk(), takings, price), "business")
+	w.Log("The goods move on", fmt.Sprintf("%s of %s sold for $%d, at $%d each.",
+		counted(units, g.Unit, g.Unit+"s"), g.InBulk(), takings, price), "business")
 	return nil
 }
 

@@ -139,6 +139,16 @@ var trades = map[string]Trade{
 		Trouble: "The cold room failed overnight and a week of stock went with it.",
 		Remedy:  "Get the cold room running", RemedyDetail: "An engineer, and the stock replaced.", RemedyCost: 210, Cover: 8, Watched: 0, Hides: 4,
 	},
+	// An undertaker. The one trade in this city whose custom is made by
+	// everybody else's work: a coffin is the best place in the district for a
+	// thing to sit, a hearse is the only vehicle nobody stops, and the books
+	// explain cash about as well as a laundry does because a funeral is paid
+	// for in notes by people nobody wants to press.
+	"undertaker": {
+		Hands: 3, Wage: 8, Drain: 6, Restock: 140, RestockAmount: 40, Supplies: "caskets, brass and the cars",
+		Trouble: "A family was sent the wrong coffin and the street heard about it before the funeral did.",
+		Remedy:  "Put it right with the family", RemedyDetail: "A word, a refund, and the same cars for nothing next time.", RemedyCost: 160, Cover: 13, Watched: 0, Hides: 6,
+	},
 	"haulage": {
 		Hands: 6, Wage: 12, Drain: 11, Restock: 320, RestockAmount: 50, Supplies: "fuel and parts",
 		Trouble: "A driver has been talking to somebody at Ward Street and the yard knows it.",

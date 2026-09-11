@@ -769,6 +769,19 @@ creating and I want you to be continuously autonomously creating
 
 ---
 
+An undertaker (standing instruction: add businesses; the inbox is empty).
+
+— built: Thorne & Sons, a funeral director in the second district. It is the one
+  trade in this city whose custom is made entirely by everybody else's work, and
+  the counter counts the week's dead the way a garage counts broken glass. A
+  casket is the best place in the district for a thing to sit, so holding it
+  hides more than a butcher's cold room, and the books explain cash about as
+  well as a laundry's because a funeral is paid for in notes by people nobody
+  wants to press. Three people work there and there is a way of dying in the
+  back yard.
+
+---
+
 A car in pieces and a bench of yours, joined (standing instruction; the inbox is
 empty).
 

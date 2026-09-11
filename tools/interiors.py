@@ -48,6 +48,7 @@ ROOMS = {
     "cabstand": "a taxi dispatch office, a wall of hooks and route cards, a radio set on the counter, cabs through the window",
     "dealer": "a car showroom interior, two cars on a polished floor, a salesman's desk, wide window onto the forecourt",
     "archway": "a repair shop inside a brick railway arch, an inspection pit, tools on the wall, a car up on blocks",
+    "chapel": "an undertaker's chapel of rest, two rows of chairs, a covered casket on trestles, lilies going over in a brass vase, a door to the yard",
     "scrapyard": "a scrapyard office hut, a weighbridge dial on the wall, a stove, stacked wrecks through the grimy window",
     "pawn": "a pawnbroker's shop interior, a long counter with a brass grille, shelves of watches and instruments behind it, a ledger open under a green lamp",
     "filling": "a filling station counter room, a rack of oil cans and cigarettes, a till, the pumps through the window",

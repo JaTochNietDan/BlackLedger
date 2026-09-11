@@ -175,6 +175,12 @@ func TestEveryTradeReachesPastItsOwnIncome(t *testing.T) {
 			func(w *World, id string) int { return w.StandingFromTheDoor(id) }},
 		{"butcher", "a cold room things sit in without being looked at", "higher",
 			func(w *World, id string) int { return w.Concealed() }},
+		// The only room in this city nobody opens. A casket is a better place
+		// for a crate than a cold room and the books explain the cash as well
+		// as a laundry's do, because a funeral is paid for in notes by people
+		// nobody wants to press.
+		{"undertaker", "a box nobody asks to look inside", "higher",
+			func(w *World, id string) int { return w.Concealed() }},
 		{"restaurant", "a dining room two families will sit down in", "higher",
 			func(w *World, id string) int {
 				if w.SitdownWhere(id) {

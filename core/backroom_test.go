@@ -620,38 +620,56 @@ func TestTheTablePublishesEverythingTheScreenReads(t *testing.T) {
 	}
 }
 
-// A game needs people in the room. Measured before the poolhall was put on the
-// list of places the city goes of an evening: the most anybody ever stood in it
-// in a week was one person, at nine in the morning, so the back room was a
-// feature nobody could ever have used.
-func TestThereIsSomebodyInTheBackRoomToPlayAgainst(t *testing.T) {
+// A game needs people in the room, and a back room is an evening.
+//
+// Measured before the poolhall was put on the list of places the city goes of an
+// evening: the most anybody ever stood in it in a week was one person, at nine
+// in the morning, so the back room was a feature nobody could ever have used.
+//
+// The first version of this counted HOURS in which two or more people were in
+// the room, on one seed, and asked that the evening have more of them than the
+// day. That measure saturates: two people is nearly always true, so both
+// columns sit near the eighty-four hours a week has of each, and across twenty
+// seeds twelve of them come out an exact tie. It passed on its one seed by a
+// coincidence, and adding a single address to the city — three more people with
+// somewhere else to be — flipped it. The property was never in doubt; the
+// instrument could not see it.
+//
+// Heads, not hours, and twenty cities rather than one. The evening carries
+// half again as many people as the day, which is the thing worth guarding.
+func TestTheBackRoomIsAnEveningRatherThanAnAfternoon(t *testing.T) {
 	t.Parallel()
-	w := New(404)
-	night, day, most := 0, 0, 0
-	for step := 0; step < 24*7; step++ {
-		w.Advance(60)
-		n := w.InTheRoom(BackRoom)
-		if n > most {
-			most = n
-		}
-		if n < 2 {
-			continue
-		}
-		if Evening(w.Minute) {
-			night++
-		} else {
-			day++
+	night, day, hours, most := 0, 0, 0, 0
+	for seed := uint32(400); seed < 420; seed++ {
+		w := New(seed)
+		for step := 0; step < 24*7; step++ {
+			w.Advance(60)
+			n := w.InTheRoom(BackRoom)
+			if n > most {
+				most = n
+			}
+			if Evening(w.Minute) {
+				night += n
+			} else {
+				day += n
+			}
+			hours++
 		}
 	}
-	t.Logf("in a week: at most %d in the back room, a game on %d evening hours and %d daytime hours", most, night, day)
-	if night == 0 {
-		t.Fatal("there was never an evening hour in a week when two people were in the back room")
+	t.Logf("twenty weeks: %d in the room of an evening and %d in the daytime, at most %d at once",
+		night, day, most)
+	if hours < 3000 {
+		t.Fatalf("only %d hours were watched, so this measures nothing", hours)
 	}
-	// A back room is an evening. Some daytime hours are honest — a poolhall
-	// with two people in it at noon is a poolhall — but if the day is as busy
-	// as the night then the city has stopped going to work.
-	if day >= night {
-		t.Fatalf("a game was on for %d daytime hours against %d evening ones", day, night)
+	if most < 2 {
+		t.Fatalf("the most anybody ever saw in the back room was %d, so there is no game", most)
+	}
+	// Half again as many. A poolhall with people in it at noon is a poolhall;
+	// a city whose evenings are no busier than its afternoons has stopped
+	// going to work.
+	if night*100 < day*125 {
+		t.Fatalf("%d in the room of an evening against %d in the daytime, which is not an evening trade",
+			night, day)
 	}
 }
 
