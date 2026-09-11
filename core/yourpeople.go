@@ -198,10 +198,18 @@ func (w *World) defect(n *NPC) {
 func (w *World) OwnPeopleDescription() []map[string]any {
 	out := []map[string]any{}
 	for _, n := range w.OwnPeople() {
+		// What they are carrying and what they drive, because the player paid
+		// for both and neither was anywhere on a screen. A gun in somebody's
+		// coat changes what sending them does, and until this the only way to
+		// know whether you had bought one was to remember.
 		out = append(out, map[string]any{
 			"id": n.ID, "name": n.Name, "trust": n.Trust,
 			"temperament": TemperamentOf(n).Label, "wage": MemberWage,
 			"restless": n.Trust < DefectionTrust,
+			"carrying": weapons[min(max(n.Weapon, 0), len(weapons)-1)].Label,
+			"armed":    n.Weapon > 0,
+			"car":      VehicleByTier(n.Car).Label,
+			"driving":  n.Car > 0,
 		})
 	}
 	return out

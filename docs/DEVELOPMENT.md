@@ -9359,3 +9359,23 @@ Worth saying plainly: this was a hole I made an hour earlier and did not notice
 while making it. The measurement that would have caught it — is the new thing
 strictly better than the old — is one this file keeps asking of the game and had
 not asked of the change itself.
+
+## Saying what they are carrying
+
+A gun bought for one of your own changes what sending them does, costs up to
+$1,800, and appeared on no screen anywhere. The only way to know whether you had
+bought one was to remember buying it — which is the same fault as the wage rules
+that had teeth and never reached a page, three hours earlier.
+
+It is on the card now, in both places a person is drawn: the room's own list and
+the People screen. Only for your own. What a stranger has under their jacket is
+not something the player has been told, and printing it would be the city
+knowing something nobody in it could see.
+
+Both edges guarded: showing a stranger's gun fails on the stranger, and showing
+nothing fails on the man who has one. Somebody of yours carrying nothing says
+nothing rather than "nothing but your hands".
+
+`own_people` already carried a description nothing in the view reads, so what
+they drive and what they carry went in there too — where it will be right if
+anything ever draws it, rather than wrong.

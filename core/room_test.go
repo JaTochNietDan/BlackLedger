@@ -333,3 +333,50 @@ func TestTheCityScreenTellsYouNothingAboutAStranger(t *testing.T) {
 		t.Skip("everybody in this city is known")
 	}
 }
+
+// What the player put in somebody's hand. A gun bought for one of your own
+// changes what sending them does and was bought and paid for, and the only way
+// to know they had it was to remember buying it.
+//
+// Only for your own. What a stranger has under their jacket is not something
+// the player has been told, and printing it would be the city knowing something
+// nobody in it could see.
+func TestTheCardSaysWhatYourOwnPeopleCarry(t *testing.T) {
+	t.Parallel()
+	w := New(61)
+	w.Event, w.District = nil, 9
+	w.Player.Health, w.Player.Respect, w.Player.Cash = 100, 40, 20000
+
+	mine, theirs := w.Holder("driver"), w.Holder("fixer")
+	if mine == nil || theirs == nil {
+		t.Fatal("this city has nobody to sign on")
+	}
+	mine.Faction, mine.Location = w.PlayerOrganizationID(), w.Player.Location
+	theirs.Location = w.Player.Location
+	top := Armaments("weapon")[len(Armaments("weapon"))-1]
+	mine.Weapon, theirs.Weapon = top.Tier, top.Tier
+
+	said, quiet := "", "unchecked"
+	for _, p := range w.PeopleHere(w.Player.Location) {
+		switch p.ID {
+		case mine.ID:
+			said = p.Carrying
+		case theirs.ID:
+			quiet = p.Carrying
+		}
+	}
+	if said != top.Label {
+		t.Fatalf("%s is carrying %s and the card says %q", mine.Name, top.Label, said)
+	}
+	if quiet != "" {
+		t.Fatalf("a stranger's gun is on the player's screen: %q", quiet)
+	}
+	// And somebody of yours carrying nothing says nothing rather than "nothing
+	// but your hands".
+	mine.Weapon = 0
+	for _, p := range w.PeopleHere(w.Player.Location) {
+		if p.ID == mine.ID && p.Carrying != "" {
+			t.Fatalf("somebody carrying nothing is described as carrying %q", p.Carrying)
+		}
+	}
+}

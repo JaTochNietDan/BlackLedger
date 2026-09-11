@@ -47,6 +47,10 @@ function Person({
     who.owes ? `owes $${who.owes.toLocaleString()}${who.overdue ? ' · overdue' : ''}` : '',
     who.known && who.trust !== undefined ? `thinks of you at ${who.trust}` : '',
     who.sore ? `holds ${who.sore} against you` : '',
+    // What the player put in their hand. It changes what sending them does and
+    // it was bought and paid for, and the only way to know they had it was to
+    // remember buying it.
+    who.carrying ? `carrying ${who.carrying.toLowerCase()}` : '',
   ]
     .filter(Boolean)
     .join(' · ');

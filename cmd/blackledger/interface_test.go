@@ -440,3 +440,13 @@ func TestRefusalsAreInTheListAndLast(t *testing.T) {
 		t.Fatal("the reason a card is refused is dimmed with the rest of it")
 	}
 }
+
+// And both places that draw a person put it on the card.
+func TestBothCardsSayWhatYourOwnPeopleCarry(t *testing.T) {
+	t.Parallel()
+	for _, path := range []string{"src/ActionList.tsx", "src/PeopleScreen.tsx"} {
+		if !holds(source(t, path), "who.carrying") {
+			t.Errorf("%s: a person's card says nothing about what the player put in their hand", path)
+		}
+	}
+}

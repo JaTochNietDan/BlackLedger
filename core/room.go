@@ -35,6 +35,11 @@ type Presence struct {
 	// Yours is whether they answer to the player, Known whether the player has
 	// any reason to know their name at all.
 	Yours bool `json:"yours,omitempty"`
+	// Carrying is what one of the player's own has in their coat, and only for
+	// the player's own: a gun in somebody's hand changes what sending them
+	// does, the player paid for it, and until this the only way to know whether
+	// you had bought one was to remember. Nobody else's is anybody's business.
+	Carrying string `json:"carrying,omitempty"`
 	// Walking is somebody who is between two addresses right now. Where and
 	// WhereID then name where they are *going*, because that is the only place
 	// they could be met: reaching a man in the street is not something this
@@ -223,10 +228,11 @@ func (w *World) see(n *NPC) Presence {
 	p := Presence{
 		ID: n.ID, Name: n.Name, Role: n.Role,
 		Standing: w.standingOf(n), Doing: w.doingNow(n),
-		Yours:   n.Faction == w.PlayerOrganizationID(),
-		Known:   known,
-		Because: w.because(n),
-		WhereID: n.Location,
+		Yours:    n.Faction == w.PlayerOrganizationID(),
+		Carrying: w.whatTheyCarry(n),
+		Known:    known,
+		Because:  w.because(n),
+		WhereID:  n.Location,
 		// Which painting is of this person. The interface used to work this out
 		// for itself, which is how a face and a voice came to be two unrelated
 		// hashes of two different strings.
@@ -329,4 +335,14 @@ func (w *World) PeopleHere(id string) []Presence {
 		}
 	}
 	return out
+}
+
+// whatTheyCarry is the gun in one of your own people's coat, by name, and
+// nothing for anybody else — what a stranger has under their jacket is not
+// something the player has been told.
+func (w *World) whatTheyCarry(n *NPC) string {
+	if n == nil || n.Weapon <= 0 || n.Faction != w.PlayerOrganizationID() {
+		return ""
+	}
+	return weapons[min(n.Weapon, len(weapons)-1)].Label
 }

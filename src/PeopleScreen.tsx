@@ -56,6 +56,9 @@ function Card({
         <small>
           {who.standing}
           {who.temperament ? ` · ${who.temperament}` : ''}
+          {/* And what the player put in their hand, which changes what sending
+              them does and was bought and paid for. */}
+          {who.carrying ? ` · carrying ${who.carrying.toLowerCase()}` : ''}
         </small>
         <small className="doing">
           {who.walking && (
