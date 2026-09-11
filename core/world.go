@@ -1641,6 +1641,18 @@ func (w *World) Actions(id string) []Action {
 				fmt.Sprintf("%s The only thing in this city that ends a war without either side losing it. %s", room, warning))
 		}
 	}
+	// Somebody else's room, and the thing the whole genre is about. The mirror
+	// of the demand a family sends you: the same share of the same takings,
+	// paid or refused for the same reason.
+	if Leaning(w, id) && id == p.Location {
+		outcome := "They open the till."
+		if !w.WouldPay(id) {
+			outcome = "They will not, and they will remember being asked."
+		}
+		add("demand", "Ask "+w.HolderName(id)+" for a share", DemandMinutes, 0, w.DemandReadiness(id),
+			fmt.Sprintf("A week of what this place takes, which is $%d. Asking costs %d of their opinion of you whatever comes of it, and whether they pay is what they are against what your name is worth. %s",
+				w.TheirShare(id), DemandGrudge, outcome))
+	}
 	// Somewhere that earns is somewhere that can be held, run and taken. This
 	// asked for three addresses by name — the laundry, the garage and the
 	// casino, which was every business in the city on the day it was written —

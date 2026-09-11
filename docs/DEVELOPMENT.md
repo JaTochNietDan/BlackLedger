@@ -11163,3 +11163,39 @@ actually scene branches.
 
 A sweep that is too narrow reports a clean city; a sweep that is too wide
 reports a disaster. Both look like findings and neither is.
+
+## Walking into a room that is not yours
+
+A family that holds ground on your streets sends for a share of what your places
+take, pays for an understanding, and now comes for the deed if you refuse them
+long enough. The player could do none of it back. Everything aimed at a family
+was either violence — go in with the crew, plant a charge, put a name up for a
+contract — or politics at a distance: point one at another, buy an official,
+smear a name in the paper. The thing the whole genre is about was missing.
+
+So there is a demand, and it is deliberately the mirror of theirs. The same week
+of the same takings. Whether they pay is what they are against what your name is
+worth — your presence against that family's power, decided from state rather
+than a roll, like everything else here. Asking costs eighteen points of their
+opinion of you whether they pay or refuse, because asking is the insult and
+paying is only the money. Being paid in front of the room is worth three
+standing; being refused is worth nothing, because it is the being paid that is
+worth repeating.
+
+### A guard that proved nothing, and why
+
+Four rules, four breaks — and the fourth did not bite. Removing the check that
+you cannot lean on your own room changed no outcome, because the test had not
+incorporated: the player's outfit only joins the family list once it has a name,
+and until then "is this somebody's" refuses your own places by accident rather
+than by rule.
+
+Incorporating properly turned out to have conditions the test did not meet, so
+it skipped instead — which is worse, because a skip reports a pass. What the
+test does now is put the world directly into the state a takeover leaves behind:
+the deed is the player's and the owner is a family id. With that, deleting the
+check does bite, and the rule is shown to be load-bearing rather than assumed.
+
+The balance baseline does not move, because no policy asks for anything yet.
+That is the next thing to teach the harness rather than a reason to doubt the
+feature — and it is exactly the gap that has been closing all night.

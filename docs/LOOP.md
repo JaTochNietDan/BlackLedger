@@ -220,6 +220,14 @@ and a local model that writes encounters and can be switched off.
   in any order. What you carry shifts an attempt on somebody — 17 in 200 with
   empty hands against 58 with a Thompson — and so does what you put in the hand
   of whoever you send. A search reaches whoever is standing with you.
+- **Leaning on somebody else's business.** The mirror of the demand a family
+  sends you, and the thing the genre is about that this game could not do:
+  walking into a room that is not yours and asking for a share of what it takes.
+  A week of its takings, the same figure they ask of you. Whether they pay is
+  what they are against what your name is worth — presence against the family's
+  power, decided from state rather than a roll — and asking costs eighteen of
+  their opinion of you whether they pay or refuse. Everything else aimed at a
+  family was violence or politics at a distance.
 - **A family that stops asking.** Paying a share buys an understanding and
   twelve points of standing, so a player who pays every demand is never troubled
   by anybody: measured, a publican ends the richest policy in the game with no
