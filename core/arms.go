@@ -128,11 +128,30 @@ func (w *World) BuyArms(kind string, tier int) error {
 // SeizeArms is what a search costs somebody who is armed. Handled separately
 // from stock because arms are evidence rather than merchandise.
 func (w *World) SeizeArms() bool {
-	if w.Player.Weapon == 0 && w.Player.Armour == 0 {
+	// And whoever was standing there with you. A gun bought for one of your own
+	// was the only thing in this city that carried no risk at all: the search
+	// took what was in your coat and left what was in theirs, so arming a man
+	// you send was strictly better than arming yourself in the one way that
+	// matters. They are yours, they are in the room, and the room is being
+	// turned out.
+	took := []string{}
+	for _, who := range w.OwnPeople() {
+		if who.Weapon == 0 || who.Location != w.Player.Location {
+			continue
+		}
+		who.Weapon = 0
+		took = append(took, who.Name)
+	}
+	if w.Player.Weapon == 0 && w.Player.Armour == 0 && len(took) == 0 {
 		return false
 	}
 	w.Player.Weapon, w.Player.Armour = 0, 0
-	w.Log("They took the hardware", "Everything you were carrying is evidence now. You are unarmed.", "danger")
+	note := "Everything you were carrying is evidence now. You are unarmed."
+	if len(took) > 0 {
+		note = fmt.Sprintf("Everything you were carrying is evidence now, and so is what %s had. You are unarmed and so are they.",
+			joinNames(took))
+	}
+	w.Log("They took the hardware", note, "danger")
 	return true
 }
 

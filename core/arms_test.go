@@ -198,3 +198,60 @@ func TestArmourHelpsSurviveAnAttackAtHome(t *testing.T) {
 		t.Fatal("armour made an unwarned attack survivable every time")
 	}
 }
+
+// A gun bought for one of your own was the only thing in this city that carried
+// no risk at all. The search took what was in your coat and left what was in
+// theirs, so arming the man you send was strictly better than arming yourself
+// in the one way that matters — and that was a hole opened the same night the
+// counter started selling for them.
+//
+// They are yours, they are in the room, and the room is being turned out.
+func TestASearchReachesWhoeverIsStandingWithYou(t *testing.T) {
+	t.Parallel()
+	w := New(61)
+	w.Event, w.District = nil, 9
+	w.Player.Health, w.Player.Respect, w.Player.Cash = 100, 40, 20000
+	w.Player.Weapon, w.Player.Armour = 2, 1
+
+	here := w.Holder("driver")
+	away := w.Holder("fixer")
+	if here == nil || away == nil {
+		t.Fatal("this city has nobody to sign on")
+	}
+	here.Faction, here.Location, here.Weapon = w.PlayerOrganizationID(), w.Player.Location, 3
+	away.Faction, away.Location, away.Weapon = w.PlayerOrganizationID(), "docks", 3
+	if w.Player.Location == "docks" {
+		t.Fatal("both of them are standing in the same room, so this measures nothing")
+	}
+
+	if !w.SeizeArms() {
+		t.Fatal("a search of somebody carrying a shotgun found nothing")
+	}
+	if w.Player.Weapon != 0 || w.Player.Armour != 0 {
+		t.Fatal("the search left the player armed")
+	}
+	if here.Weapon != 0 {
+		t.Fatalf("%s was standing in the room and kept their gun", here.Name)
+	}
+	// And it does not reach across the city. A man at the docks was not in the
+	// room being turned out.
+	if away.Weapon == 0 {
+		t.Fatalf("%s was at the docks and the search took their gun anyway", away.Name)
+	}
+	said := w.History[len(w.History)-1].Text
+	if !strings.Contains(said, here.Name) {
+		t.Fatalf("%s lost their gun and nobody said so: %q", here.Name, said)
+	}
+}
+
+// And a search of somebody carrying nothing, with nobody armed beside them,
+// finds nothing — which is what stops the line being printed every raid.
+func TestASearchOfNobodyArmedFindsNothing(t *testing.T) {
+	t.Parallel()
+	w := New(61)
+	w.Event, w.District = nil, 9
+	w.Player.Weapon, w.Player.Armour = 0, 0
+	if w.SeizeArms() {
+		t.Fatal("a search took hardware off somebody carrying none")
+	}
+}

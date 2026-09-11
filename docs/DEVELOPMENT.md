@@ -9338,3 +9338,24 @@ yourself fails on the other line.
 This is what the open counter was for. A player who has just decided to send
 somebody can buy the Thompson for them tonight, rather than buying a revolver
 and a shotgun first to get there.
+
+## Closing the hole the last tick opened
+
+A gun bought for one of your own was the only thing in this city that carried no
+risk at all. The search took what was in your coat and left what was in theirs,
+so arming the man you send was strictly better than arming yourself in the one
+way that matters — and nothing had been strictly better than anything else here
+until the counter started selling for them, the same night.
+
+A search reaches whoever is standing with you. They are yours, they are in the
+room, and the room is being turned out. It does not reach across the city: a man
+at the docks was not there, and the line the player is told names whoever
+actually lost something.
+
+Both edges guarded. Leaving theirs alone fails on the man who was in the room;
+reaching everywhere fails on the man who was not.
+
+Worth saying plainly: this was a hole I made an hour earlier and did not notice
+while making it. The measurement that would have caught it — is the new thing
+strictly better than the old — is one this file keeps asking of the game and had
+not asked of the change itself.
