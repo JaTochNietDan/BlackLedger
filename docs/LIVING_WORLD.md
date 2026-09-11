@@ -175,6 +175,23 @@ When buying guns/armor and whatnot I don't think you should have to progress thr
 
 When playing slots, it should scroll through the items before displaying the final result. Right now they just shake but the result is shown already. You should really try to animate it smooth and nicely.
 
+— answered, and the second half of it was still wrong until this tick. The
+  drums stopped shaking a while ago: the column travels now and the face it
+  lands on is decided before a pixel moves. What it travelled through was one
+  symbol repeated twenty times. The run behind the window was an arithmetic
+  sequence with a stride of seven, and this machine carries seven faces, so
+  every step landed on the same one. The drum moved and nothing scrolled past.
+  The guard that existed asked whether the three drums differed from each other,
+  which they did, and never asked whether one drum differed from itself.
+
+  The run is the strip now, walked backwards in the order it is painted on the
+  drum, started a face apart on each one so the three are out of step. Every
+  face on the strip goes by. Guarded at the machine's own seven and at every
+  strip length from two to twenty-four, because the fault only appears when the
+  stride and the length share a factor. What is still not checked by anything
+  but eyes is how the travel looks — speed, easing, and whether it reads as a
+  machine rather than a list going past.
+
 ---
 
 "Nobody has told you where to find them" on the people screen messes up the panel, it pushes the other text to the right.
