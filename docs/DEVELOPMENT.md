@@ -11490,3 +11490,38 @@ Nothing moved in the simulation, and that is the honest reading rather than a
 clean bill of health: the harness does not play `scrap` and rarely loses a
 loaded car, so the measure had nothing to say about this change either way. What
 it does say is that nothing else regressed.
+
+## The arms chain, and a headline about nothing
+
+`stock_arms` — putting the crates under the floor — was another action the
+harness has never played, and it is the middle of a chain rather than a thing on
+its own: own premises of the right kind, build a room under the floor, buy
+crates where crates are sold, carry them back, put them down, and wait for
+somebody at war to come to the door with money. Every link existed. Nothing had
+ever joined them. The guard now walks all six, reading each card off the room's
+own list.
+
+The chain holds. What did not was the room being searched.
+
+**A room the police found empty was reported as the year's largest arms find.**
+The room is always found — the same rule the still is under — but the crates are
+only sometimes in it, and one line of prose was written for both cases. So a
+player who had sold down to nothing got "0 crates of arms out through the front
+door in daylight" in their own log and a newspaper story saying the police
+described the find as the largest of its kind this year. An empty room now reads
+as what it is: the floor came up, there was nothing under it, and everybody
+watched them carry the boards out.
+
+**And the card that sells the room was selling the wrong risk.** It said "a
+search that finds it takes everything and the premises with it". Premises can be
+forfeit in this game, but only above 80 attention, and the search takes whatever
+business earns the player most rather than the one with the room in it. What
+finding the room actually does is take the crates, take the room, leave the
+building 35% worse, and put 20 on the player's attention — which is the step
+that can carry a campaign over the line where they do keep the building. The
+card says all of that now, with the numbers, including where the line is. Two
+of those numbers had no names and are constants now, so the card and the code
+cannot drift apart again.
+
+Same shape as the false floor last tick, and the third time in three ticks: a
+sentence describing a consequence, and code doing something else.

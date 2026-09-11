@@ -45,6 +45,20 @@ func ArmourySite(id string) bool {
 	return ok && (place.Kind == "laundry" || place.Kind == "garage")
 }
 
+// ArmouryRuin is what pulling the floor up costs the building. The card that
+// sells the room used to say a search "takes everything and the premises with
+// it", and nothing has ever taken premises off the player in this game. What it
+// does take is the crates and the room, and it leaves the building in a state,
+// which is worth saying exactly rather than overstating.
+const ArmouryRuin = 35
+
+// ArmouryCaught is what being found puts on the player's attention, which is
+// the step that can carry a campaign over the line where the police keep the
+// building. The card that sells the room said a search "takes everything and
+// the premises with it" — true only above that line, and the card never said
+// where the line was or that finding the room moves you toward it.
+const ArmouryCaught = 20
+
 // TheArmoury finds the player's armoury, if they have one.
 func (w *World) TheArmoury() (string, bool) {
 	for _, l := range Locations {
@@ -219,8 +233,8 @@ func (w *World) ArmouryFound() (string, int, bool) {
 	prop := w.Properties[id]
 	crates := prop.Crates
 	prop.Armoury, prop.Crates = false, 0
-	prop.Condition = max(0, prop.Condition-35)
-	w.Player.Heat = min(100, w.Player.Heat+20)
+	prop.Condition = max(0, prop.Condition-ArmouryRuin)
+	w.Player.Heat = min(100, w.Player.Heat+ArmouryCaught)
 	place, _ := PlaceByID(id)
 	return place.Name, crates, true
 }

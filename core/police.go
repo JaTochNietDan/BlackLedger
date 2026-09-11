@@ -167,12 +167,22 @@ func (w *World) search() {
 		w.ShiftCustom(target, "The police came through the front door in daylight", -CustomRaidLoss)
 	}
 	seized += w.CellarFound()
-	// A room full of crates is not a fine and not a warning.
+	// A room full of crates is not a fine and not a warning. An empty one is a
+	// room with nothing in it, and the paper used to carry the largest find of
+	// its kind this year over nought crates of arms: the room is always found,
+	// the crates are only sometimes there, and one line was written for both.
 	if place, crates, found := w.ArmouryFound(); found {
 		seized += crates
-		w.Log("They found the room at "+place, fmt.Sprintf("%d crates of arms out through the front door in daylight. There is no version of this that goes away.", crates), "danger")
-		w.Report("police", "ARMS CACHE SEIZED AT "+upper(place),
-			fmt.Sprintf("Officers removed a quantity of firearms from %s. The police describe the find as the largest of its kind this year.", place))
+		if crates > 0 {
+			w.Log("They found the room at "+place, fmt.Sprintf("%s of arms out through the front door in daylight. There is no version of this that goes away.",
+				plainly(crates, "One crate", fmt.Sprintf("%d crates", crates))), "danger")
+			w.Report("police", "ARMS CACHE SEIZED AT "+upper(place),
+				fmt.Sprintf("Officers removed a quantity of firearms from %s. The police describe the find as the largest of its kind this year.", place))
+		} else {
+			w.Log("They found the room at "+place, "The floor came up and there was nothing under it. They know it was built to hold something, and so does everybody who watched them carry the boards out.", "danger")
+			w.Report("police", "SEARCH AT "+upper(place),
+				fmt.Sprintf("Officers spent the morning at %s and left with nothing. A police spokesman would not be drawn on what they had expected to find.", place))
+		}
 	}
 	w.SeizeArms()
 	w.SeizeCharges()

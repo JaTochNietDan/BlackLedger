@@ -1703,7 +1703,7 @@ func (w *World) Actions(id string) []Action {
 							fmt.Sprintf("Moves what you are carrying into the room. %d of %d crates down there, and an organization at war pays $%d apiece for them.", prop.Crates, ArmouryHold, w.ArmsPrice()))
 					} else {
 						asks("armoury", "Build a room under the floor", ArmouryMinutes, ArmouryCost, w.ArmouryReadiness(id),
-							fmt.Sprintf("$%d. Holds %d crates of arms and draws %d attention a day plus one for every %d in it. Organizations at war buy at %d%% of the waterfront price and get stronger for it. A search that finds it takes everything and the premises with it.", ArmouryCost, ArmouryHold, ArmouryHeat, ArmouryCrateHeat, WarPremium))
+							fmt.Sprintf("$%d. Holds %d crates of arms and draws %d attention a day plus one for every %d in it. Organizations at war buy at %d%% of the waterfront price and get stronger for it. A search always finds it: the crates go, the room goes, the building is left %d%% worse, and finding it puts %d on your attention — above %d they keep the premises as well.", ArmouryCost, ArmouryHold, ArmouryHeat, ArmouryCrateHeat, WarPremium, ArmouryRuin, ArmouryCaught, ForfeitThreshold))
 					}
 				}
 				if StillSite(id) {
