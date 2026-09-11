@@ -12642,3 +12642,33 @@ taken twice.
 
 The lesson is not about this policy. A branch that matches on most turns hides
 everything below it, and the things below it here were a home and a guard.
+
+## A name with no ceiling
+
+The soldier ends a long campaign on fourteen hundred respect, the worker on
+three hundred and thirty-eight in a fortnight, and the highest thing respect
+explicitly gates anywhere in this game is a move on a family's chair at **forty**.
+The next highest is standing for a sit-down at twenty-five. Nothing has a
+ceiling.
+
+That reads as an obvious fault, and the first measurement agreed: a fresh city
+offers **the same 389 cards and the same 36 kinds at 40 respect as at 400**.
+Nothing above forty opens anything.
+
+So a ceiling went in at a hundred, comfortably clear of every constant, and the
+harness fell from **100 kinds of action to 67**. A third of the game, closed.
+Reproduced, because a number like that deserves a second run before anybody
+believes it.
+
+The two measurements are both right and that is the finding. Nothing above forty
+opens anything *in a city on its first morning*. In a city that has been running,
+a large name is what opens the late game — because `Presence` is read against a
+family's strength rather than against a constant, and a family's strength climbs
+all campaign. The explicit thresholds are not where the gating happens.
+
+So the cap came back out. What is left is worth writing into the inbox rather
+than the log: the panel shows the player a number that looks like a score, and
+its real meaning is a ratio against something they are never shown. Fixing that
+is not a one-line ceiling, and a one-line ceiling would have quietly shut a
+third of the game while every test stayed green except the one that counts what
+the harness can reach.

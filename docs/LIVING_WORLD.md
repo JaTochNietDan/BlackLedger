@@ -150,6 +150,27 @@ Ensure efficiency of development loops by increasing efficiency of your workflow
 
 ## Inbox — open
 
+A name has no ceiling, and the highest thing it explicitly gates is forty.
+
+Measured, and then not changed, because the two measurements disagree and the
+disagreement is the interesting part. A campaign that works the docks and does
+favours ends a fortnight on a median of 338 respect and a long one on fourteen
+hundred; the highest named threshold in the game is a move on a family's chair
+at forty, and the next is twenty-five. A fresh city offers exactly the same 389
+cards and 36 kinds at 40 as it does at 400.
+
+And capping it at a hundred takes the harness from **100 kinds of action to 67**
+— a third of the game, in a played campaign. So a large name is what opens the
+late city, and it does that through comparisons against things that grow rather
+than through any constant: `Presence` is read against a family's strength, and a
+family's strength climbs all campaign.
+
+Which means the panel is showing the player a number that looks like a score,
+whose real meaning is a ratio against something they cannot see. That is worth
+fixing and it is not a one-line cap.
+
+---
+
 Spread the campaign number across the world's stream inside `New`, and re-measure
 what moves.
 
