@@ -94,13 +94,16 @@ func (w *World) ComfortUpkeep() int {
 	return total
 }
 
-// Reach is how well the player hears things: the people they know, plus a
-// telephone if there is one in the hall.
+// Reach is how well the player hears things: the people they know, a telephone
+// if there is one in the hall, and a public house of their own, which is the
+// one room in this city where everything gets said out loud in front of
+// whoever owns it.
 func (w *World) Reach() int {
+	reach := w.Player.Contacts + w.EarsInTheRoom()
 	if w.Fitted("telephone") {
-		return w.Player.Contacts + 1
+		reach++
 	}
-	return w.Player.Contacts
+	return reach
 }
 
 // Sheltered is the cash a fine cannot reach and a thief does not find.

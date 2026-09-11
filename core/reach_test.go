@@ -139,6 +139,10 @@ func TestEveryTradeReachesPastItsOwnIncome(t *testing.T) {
 				w.shelve(Shelf{Kind: "dress", Tier: 2, Wear: 30, Ask: 400, Lent: 150})
 				return w.WindowPrice(w.Window[len(w.Window)-1].ID)
 			}},
+		// How well you hear things, which nothing else but coffee and a
+		// telephone touches.
+		{"saloon", "a line into the city, the size of a telephone in the hall", "higher",
+			func(w *World, id string) int { return w.Reach() }},
 		// Not a better price either — the exchange already pays over the odds
 		// and that is a fact about the floor. What a floor knows is what the
 		// numbers mean, and it knows it about the whole market rather than

@@ -10089,3 +10089,50 @@ All five fail when removed: a floor you do not hold saying nothing, a floor you
 do hold saying something, dear and cheap and ordinary reading differently with
 the real figure in them, a condemned or short-handed floor going quiet, and the
 war premium. The reach sweep catches two of them as well.
+
+## Saint Agnes, and the last of the four
+
+The busiest room in the city, and the last one a family holds that ran on
+nothing. Thirty people drink there of an evening, the fixer stands at one end of
+it, the envelope job starts there, there is a game behind it, and two families
+that will not speak to each other will speak in its back room. All of that was
+true whoever held the deed, and holding it did nothing whatsoever.
+
+It is a trade now: four behind the bar, the cellar and the glasses, a cellar
+that floods for a week so that what is being served is not worth drinking, cover
+about as good as a laundry's and almost no hiding, because a cellar is the first
+place anybody looks.
+
+Its reach is hearing things. What a public house is, that nothing else in this
+city is, is somewhere everything gets said out loud in front of whoever owns the
+room. `Reach` is the game's existing word for how well the player hears: it
+decides whether anybody warns you that one side came to a sitdown to finish it
+rather than settle it, and whether a word reaching Ward Street can be traced to
+a name. Until now the only ways to raise it were buying the fixer coffee, five
+times over, and putting a telephone in the hall. A bar is the third, and it is
+deliberately the same size as the telephone — a room is worth one line into the
+city, not two.
+
+A card was written for it and deleted before it shipped. "Stand at the end of
+your own bar" had no command behind it, which is worse than having no card: an
+action that does nothing is a lie the interface tells. The fact belongs where the
+room already describes itself, so it is the premises note, said above the line
+about the game in the back — that one exists mostly for rooms you do not hold,
+and this is the part only the holder gets.
+
+### All four, and where that leaves the queue
+
+The four rooms a family holds are businesses: The Monarch pays standing, Pier 14
+lands a boat, the Mercer Exchange says what a price means, Saint Agnes hears
+things. Fifteen trades in the city and every one of them reaches past its own
+income, each with something of its own rather than a share of something every
+trade has.
+
+The sweep is what makes that a fact rather than a claim. It holds each trade and
+does not hold it, measures the number, and fails both when a link stops working
+and when a sixteenth trade is added with nobody asking about it. The brief
+carries the figures and an instruction not to rewrite the list from a reading of
+the code, because that list was wrong five times in one night before it was
+measured.
+
+Five rules broken, five failures.

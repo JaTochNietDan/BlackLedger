@@ -70,6 +70,12 @@ func (w *World) PlaceNote(id string) string {
 		return fmt.Sprintf("Wants repair at %d%%", prop.Condition)
 	case prop.Still:
 		return "A still running in the back"
+	// A public house of your own, working. Said above the game behind it
+	// because the game is a thing the whole city knows about anyway — the note
+	// for it exists mostly for rooms you do not hold — and this is the part
+	// only the holder gets.
+	case w.TheBar() == id:
+		return fmt.Sprintf("The district says everything out loud in here: +%d to what you hear", BarReach)
 	case HasBackRoom(id):
 		return "There is a game in the back most evenings"
 	case w.PostedAt(id) != nil && w.Travelling(w.PostedAt(id)):

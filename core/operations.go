@@ -119,6 +119,15 @@ var trades = map[string]Trade{
 		Trouble: "The weights have been condemned and nobody will settle a price on them.",
 		Remedy:  "Get the weights passed", RemedyDetail: "New scales, and the inspector walked round them.", RemedyCost: 150, Cover: 15, Watched: 2, Hides: 1,
 	},
+	// A public house. Not a club and not a restaurant: a room people are in
+	// every evening of their lives, which is why everything gets said in it.
+	// It explains cash about as well as a laundry and hides almost nothing,
+	// because a cellar is the first place anybody looks.
+	"saloon": {
+		Hands: 4, Wage: 7, Drain: 7, Restock: 160, RestockAmount: 45, Supplies: "the cellar and the glasses",
+		Trouble: "The cellar has been flooded a week and what is being served is not worth drinking.",
+		Remedy:  "Put the cellar right", RemedyDetail: "Pumped out, and the lines cleaned.", RemedyCost: 150, Cover: 12, Watched: 2, Hides: 1,
+	},
 	"butcher": {
 		Hands: 3, Wage: 9, Drain: 8, Restock: 200, RestockAmount: 45, Supplies: "stock and ice",
 		Trouble: "The cold room failed overnight and a week of stock went with it.",

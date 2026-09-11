@@ -190,7 +190,14 @@ and a local model that writes encounters and can be switched off.
   not know whether this is a week to buy. A floor of yours says how far over or
   under a price is and which way the drift is pulling, about the whole market
   rather than the room you are in, which is the point of holding the sell side.
-  **Still open: Saint Agnes.** Every address that earns can be bought and run. A place with
+  Saint Agnes is the last of the four and is one
+  too: four behind the bar, the cellar and the glasses, a cellar that floods.
+  What a public house is that nothing else in the city is, is somewhere
+  everything gets said out loud — so holding one is a line into the city worth
+  the same as a telephone in the hall, and reach is what decides whether
+  anybody warns you that one side came to a sitdown to finish it. **All four of
+  the rooms a family holds are businesses now. Fifteen trades, every one of
+  them reaching, all measured by `TestEveryTradeReachesPastItsOwnIncome`.** Every address that earns can be bought and run. A place with
   no price does not change hands. Twenty-six addresses, twelve kinds; the
   pawnbroker is where what is taken off the street turns into money and where
   somebody short pawns the suit off their back. Its window holds what the city
