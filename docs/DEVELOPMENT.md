@@ -11702,3 +11702,38 @@ well formed, that it takes the price it names, that it spends the time it names,
 and that it works at all — and none of the four needs a list of which actions
 are special. Fifteen seconds at full width, so the fast half of the gate takes
 one seed a situation.
+
+## A still, a bar, and nothing between them
+
+Six ticks of sweeps, and the inbox is empty, so this one takes the standing
+instruction: build something, and link it to what is already there.
+
+The gap was sitting in plain sight. A still at the back of a laundry runs off
+crates of moonshine every day into the player's own hands. There was exactly one
+buyer for them in this city — the market, at whatever a crate fetched. And a bar
+of the player's was restocked by paying cash for drink to be delivered. So
+somebody who owned both a still and a saloon was carrying crates past his own
+cellar to sell them to a stranger, then paying somebody else to fill the cellar.
+
+Two halves built a long way apart, which is the shape this file has now recorded
+enough times to go looking for on purpose.
+
+A room that sells drink can be run off your own crates. Four trades take it and
+the number is a fact about the trade rather than the room: a pool hall one crate,
+a saloon and a club three, a revue bar five. A room nobody drinks in is not
+offered the card at all, and would refuse it if it were.
+
+It is cheaper than buying the round in, and the reason is not a discount. The
+crates were already yours, and a crate on your hands is a crate a search can
+find — the still's own log line says holding is what gets noticed. Moving it into
+a cellar behind a bar that sells drink is the one place in this city where stock
+stops being contraband and starts being stock. That is a second reason to do it
+that has nothing to do with the money, which is what makes it a link rather than
+a coupon.
+
+Nothing moved in the simulation, which is expected rather than reassuring: no
+policy owns both a still and a bar. The four card sweeps built over the last
+three nights all passed on the new card without being touched — its sentence
+reads, it takes no money it does not name, it spends the half hour it says, and
+it works when pressed. That is the first new thing built since they existed, and
+they covered it the moment it landed.

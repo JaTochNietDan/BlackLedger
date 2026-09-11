@@ -763,6 +763,21 @@ creating and I want you to be continuously autonomously creating
 
 ---
 
+A still and a bar, joined (taken from the standing instruction rather than the
+inbox, which is empty).
+
+— built: a room that sells drink can be restocked out of your own crates instead
+  of cash. Both halves had been in the game a long time with no road between
+  them: the still made moonshine, the only buyer in this city was the market,
+  and the bar was restocked with money. Somebody who owned both was carrying
+  crates past his own cellar to sell them to a stranger. A crate on your hands
+  is a crate the police can find, so a cellar behind a bar is the one place in
+  this city where stock stops being contraband and starts being stock. Four
+  trades take it — a pool hall one crate, a saloon and a club three, a revue bar
+  five — and a room nobody drinks in is not offered it.
+
+---
+
 Another thing is that we could have the ability for people to steal car parts
 and sell them to garages and that's how garages make money, they make more if
 there's more car theft or more car repairs to be made from broken windows from

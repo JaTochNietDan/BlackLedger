@@ -742,6 +742,10 @@ func (w *World) apply(c Command) error {
 				if err := w.Restock(target); err != nil {
 					return err
 				}
+			case "own_cellar":
+				if err := w.RunItOffYourOwn(target); err != nil {
+					return err
+				}
 			case "remedy":
 				if err := w.Remedy(target); err != nil {
 					return err

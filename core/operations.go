@@ -22,6 +22,12 @@ type Trade struct {
 	Restock, RestockAmount int
 	// Supplies is what the business runs on, in words.
 	Supplies string
+	// Drink is how many crates of moonshine a full restock takes, for a room
+	// that sells the stuff, and nothing for a room that does not. It is the
+	// other end of a still: what comes off the back of a laundry had one buyer
+	// in this city, the market, and a man who owned both a still and a bar was
+	// carrying crates past his own cellar to sell them.
+	Drink int
 	// Trouble is what goes wrong here, and what fixing it is called.
 	Trouble, Remedy, RemedyDetail string
 	// RemedyCost is what putting it right costs.
@@ -85,7 +91,7 @@ var trades = map[string]Trade{
 		Remedy:  "Put the kitchen right", RemedyDetail: "New fittings and a word with the inspector.", RemedyCost: 170, Cover: 16, Watched: 1, Hides: 1,
 	},
 	"poolhall": {
-		Hands: 2, Wage: 5, Drain: 4, Restock: 70, RestockAmount: 40, Supplies: "cloth, chalk and drink",
+		Hands: 2, Wage: 5, Drain: 4, Restock: 70, RestockAmount: 40, Supplies: "cloth, chalk and drink", Drink: 1,
 		Trouble: "Somebody is running their own book out of the back and taking the room's money with it.",
 		Remedy:  "Put the outside book out", RemedyDetail: "The room takes its own bets again.", RemedyCost: 110, Cover: 11, Watched: 2, Hides: 0,
 	},
@@ -94,7 +100,7 @@ var trades = map[string]Trade{
 	// keep anything out of sight, because a room full of strangers is a room
 	// full of witnesses.
 	"club": {
-		Hands: 5, Wage: 10, Drain: 9, Restock: 190, RestockAmount: 45, Supplies: "drink and the band",
+		Hands: 5, Wage: 10, Drain: 9, Restock: 190, RestockAmount: 45, Supplies: "drink and the band", Drink: 3,
 		Trouble: "Somebody was badly hurt on the floor on Saturday and the room has emptied since.",
 		Remedy:  "Put the room right", RemedyDetail: "A word with the family, a word with the police, and somebody new on the door.", RemedyCost: 200, Cover: 18, Watched: 3, Hides: 0,
 	},
@@ -124,7 +130,7 @@ var trades = map[string]Trade{
 	// It explains cash about as well as a laundry and hides almost nothing,
 	// because a cellar is the first place anybody looks.
 	"saloon": {
-		Hands: 4, Wage: 7, Drain: 7, Restock: 160, RestockAmount: 45, Supplies: "the cellar and the glasses",
+		Hands: 4, Wage: 7, Drain: 7, Restock: 160, RestockAmount: 45, Supplies: "the cellar and the glasses", Drink: 3,
 		Trouble: "The cellar has been flooded a week and what is being served is not worth drinking.",
 		Remedy:  "Put the cellar right", RemedyDetail: "Pumped out, and the lines cleaned.", RemedyCost: 150, Cover: 12, Watched: 2, Hides: 1,
 	},
@@ -139,7 +145,7 @@ var trades = map[string]Trade{
 		Remedy:  "Find out which driver", RemedyDetail: "One driver off the books, and the runs are quiet again.", RemedyCost: 240, Cover: 6, Watched: 1, Hides: 7,
 	},
 	"burlesque": {
-		Hands: 7, Wage: 10, Drain: 9, Restock: 260, RestockAmount: 45, Supplies: "the bar and the wardrobe",
+		Hands: 7, Wage: 10, Drain: 9, Restock: 260, RestockAmount: 45, Supplies: "the bar and the wardrobe", Drink: 5,
 		Trouble:      "Somebody from outside is leaning on the dancers for a cut of what they take.",
 		Remedy:       "Have a word with whoever is standing at the stage door",
 		RemedyDetail: "The cut stops and the room keeps its own money.", RemedyCost: 190, Cover: 14, Watched: 3, Hides: 0,

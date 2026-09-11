@@ -1693,6 +1693,15 @@ func (w *World) Actions(id string) []Action {
 				asks("restock", "Buy "+trade.Supplies, 45, stocking, w.RestockReadiness(id),
 					fmt.Sprintf("$%d. Currently %d left; a business out of %s barely trades.%s",
 						stocking, prop.Supply, trade.Supplies, carried))
+				// And the other way to fill a cellar, for a room that sells
+				// drink: your own crates, which the still has been making with
+				// nowhere but the market to send them.
+				if trade.Drink > 0 {
+					add("own_cellar", "Run it off your own cellar", 30, 0, w.OwnCellarReadiness(id),
+						fmt.Sprintf("%s off your own hands instead of $%d in cash. Holding is what gets noticed, and a cellar behind a bar is the one place in this city a crate stops being contraband. You are holding %d.",
+							plainly(trade.Drink, "One crate", fmt.Sprintf("%d crates", trade.Drink)),
+							stocking, w.Holding("moonshine")))
+				}
 				if prop.Trouble {
 					asks("remedy", trade.Remedy, 60, trade.RemedyCost, w.RemedyReadiness(id),
 						fmt.Sprintf("$%d. %s %s", trade.RemedyCost, trade.Trouble, trade.RemedyDetail))
