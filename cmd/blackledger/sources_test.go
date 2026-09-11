@@ -115,19 +115,19 @@ func TestNoGuardIsWrittenWithANeedleThatCannotFail(t *testing.T) {
 // never said otherwise, so the strip was centred instead of running; the fault
 // was invisible because the newer block read correctly on its own.
 //
-// So the count is pinned. It does not have to be zero today — unpicking these
-// is its own piece of work, done a block at a time where the result can be
-// reasoned about — but it must never go up, and cleaning one up has to lower
-// the pin, so the ground that is won stays won. The names are printed with the
-// failure so the next person to open the stylesheet knows which blocks lie.
+// So the count is pinned, and it is zero.
 //
-// Fifty when it was first counted. The slot machine accounted for twenty-nine
-// of them: its case, window, handle and the light on the handle were written
-// out twice from top to bottom and only the second copy had any effect. The
-// person card took two more. `tools/cssdead.py` lists what is left, and proves
-// a cleanup neutral by resolving every property of every selector before and
-// after and showing what moved.
-const shadowedDeclarations = 19
+// Fifty when it was first counted. The slot machine was twenty-nine of them —
+// its case, window, handle and the light on the handle written out twice from
+// top to bottom, only the second copy having any effect. The person card took
+// two more. Two of what was left were never dead at all: they sat on a rule
+// carrying three selectors of which only one was shadowed, and the count was
+// wrong about them until the rule above was tightened.
+//
+// `tools/cssdead.py` finds them, removes them and proves a removal neutral by
+// resolving every property of every selector before and after and showing what
+// moved. It printed nothing on the pass that took this to zero.
+const shadowedDeclarations = 0
 
 func TestNoRuleIsQuietlyOverriddenByALaterCopyOfItself(t *testing.T) {
 	css := rawSource(t, "src/style.css")
@@ -183,27 +183,50 @@ func TestNoRuleIsQuietlyOverriddenByALaterCopyOfItself(t *testing.T) {
 		}
 		return out
 	}
-	dead, said := 0, []string{}
-	for _, idxs := range where {
-		if len(idxs) < 2 {
-			continue
-		}
-		for pos, idx := range idxs[:len(idxs)-1] {
-			later := map[string]bool{}
-			for _, j := range idxs[pos+1:] {
-				for prop, val := range declared(rules[j].body) {
+	// Overridden means every selector on the rule is later re-set for that
+	// property, not any of them.
+	//
+	// A rule can carry several selectors — this stylesheet has
+	// `.city-view-switch button,.street-inspect button,.street-journey button`
+	// in one — and calling a declaration dead because one of the three is
+	// shadowed would take it away from the other two. The tool that does the
+	// removing shipped that version once, and the before-and-after check caught
+	// four properties resolving differently on a change meant to change
+	// nothing. Two of the nineteen this test used to count were that mistake.
+	overridden := func(idx int, prop string) bool {
+		for _, one := range strings.Split(rules[idx].selector, ",") {
+			one = strings.TrimSpace(one)
+			found := false
+			for _, j := range where[one] {
+				if j <= idx {
+					continue
+				}
+				for later, val := range declared(rules[j].body) {
 					// An earlier !important still wins, so the later copy is
 					// not an override and the earlier one is not dead.
-					if !strings.Contains(val, "!important") {
-						later[prop] = true
+					if later == prop && !strings.Contains(val, "!important") {
+						found = true
 					}
 				}
 			}
-			for prop, val := range declared(rules[idx].body) {
-				if later[prop] && !strings.Contains(val, "!important") {
-					dead++
-					said = append(said, fmt.Sprintf("    line %d  %s  %s", rules[idx].line, rules[idx].selector, prop))
-				}
+			if !found {
+				return false
+			}
+		}
+		return true
+	}
+	dead, said := 0, []string{}
+	for idx, r := range rules {
+		if strings.HasPrefix(r.selector, "@") {
+			continue
+		}
+		for prop, val := range declared(r.body) {
+			if strings.Contains(val, "!important") {
+				continue
+			}
+			if overridden(idx, prop) {
+				dead++
+				said = append(said, fmt.Sprintf("    line %d  %s  %s", r.line, r.selector, prop))
 			}
 		}
 	}

@@ -10181,3 +10181,42 @@ is not a statistic the player should have to infer from a figure moving by one.
 
 The guard runs thirty days over every held address and catches any future drift
 of the same shape, from whichever direction. Broken both ways to watch it fail.
+
+## The stylesheet stops arguing with itself
+
+Fifty dead declarations when they were first counted, then twenty-one after the
+slot machine and the person card. The last seventeen went tonight and the pin is
+zero.
+
+The interesting part is that nineteen was the wrong number, and the check that
+caught it is the one worth keeping.
+
+`tools/cssdead.py same` resolves every property of every selector to its
+last-wins value in the old file and the new one, and prints what differs. On the
+first pass it printed four lines. The tool had cut `font-size` and `padding`
+from a rule reading
+`.city-view-switch button,.street-inspect button,.street-journey button`,
+because the first of those three is re-set later. The other two are not, so the
+declaration was doing real work for them and taking it out changed how two
+selectors render.
+
+The rule is therefore: a declaration is dead only when **every** selector on its
+rule is later re-set for that property. Not any. With that in, seventeen were
+dead rather than nineteen — two of what the pin counted were never removable —
+and the strip pass printed nothing at all. Reading the diff would not have found
+this. The diff was perfectly sensible; it simply does not know whether a deleted
+declaration was reaching anything.
+
+The Go guard in `sources_test.go` had the identical flaw, so it has the same
+correction and the same worked example written into it, and the two now agree on
+every state tested: one duplicate added reads as one in both, a grouped-selector
+declaration added reads as zero in both.
+
+`strip` also used to carry its own copy of the search, which is the oldest fault
+in this project — two implementations of one rule, drifting apart the first time
+either is touched. One function finds them and all three commands use it.
+
+What is left in the file is two cosmetic residues of the cuts: a semicolon
+before a closing brace, and a brace on an indented line of its own. Both are
+valid CSS and both are provably inert. Tidying them is how this file got
+shredded on the first attempt, so they stay.
