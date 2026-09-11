@@ -12609,3 +12609,36 @@ whose cash column means very little. It goes in as the magpie did, with what it
 is for written down: this one exists so that a road nobody could see is priced
 at all, and its numbers are what happens to somebody who spends their life
 trying to come up in somebody else's family.
+
+## A man with no door and no guard
+
+Last night's soldier died in ninety-eight campaigns out of a hundred, and that
+was written down as the next thing to look at rather than dressed up.
+
+The shape of the dying says what it was. Attention nought, nothing seized,
+nobody informing, health nought at the end and a median lowest health of nought
+too. Not worn down over a fortnight — walked in on.
+
+**Every branch of the policy matched on most turns**, so the ordinary ladder at
+the bottom of the harness never ran once. It lived its entire campaign in a
+rented room with nobody on the door, while finishing a hundred and sixty
+arrangements for one family a campaign — and every arrangement finished for a
+family makes things worse with that family's rival. It was buying enemies at a
+rate of three a day and sleeping in a room anybody could walk into.
+
+Somewhere to sleep and somebody on the door, before anything else:
+
+| | before | after |
+|---|---|---|
+| survived | 2 of 100 | 31 of 100 |
+| median cash | $17,100 | $23,447 |
+| days | 20.4 | 22.9 |
+
+Sixty-nine deaths is still a hard life, and it is the right order — between the
+racketeer and the thief — for somebody who spends their days doing favours for
+one family in a city where every favour has a witness. Going to work for a
+family still happens eight times a hundred campaigns and the chair is still
+taken twice.
+
+The lesson is not about this policy. A branch that matches on most turns hides
+everything below it, and the things below it here were a home and a guard.

@@ -1006,6 +1006,26 @@ func Choose(v View, strategy string) (core.Command, error) {
 				return c, nil
 			}
 		}
+		// Somewhere to sleep and somebody on the door, before anything else.
+		//
+		// Every branch below this one matched on most turns, so the ordinary
+		// ladder at the bottom of this function never ran and the policy lived
+		// its whole life in a rented room with nobody watching it. Each
+		// arrangement it finishes for one family worsens things with that
+		// family's rival, and it did that a hundred and sixty times a campaign
+		// with no guard and no walls: ninety-eight campaigns in a hundred ended
+		// with the player killed outright — health nought, attention nought,
+		// nothing seized. Not worn down. Walked in on.
+		if v.Player.Home == "room" && v.Player.Cash >= 400 {
+			if c, ok := v.at("apartment", "move_home"); ok {
+				return c, nil
+			}
+		}
+		if v.Player.Security < 1 && v.Player.Cash >= 300 {
+			if c, ok := v.at(v.Player.Home, "security"); ok {
+				return c, nil
+			}
+		}
 		// The chair, once there is one to take.
 		if c, ok := v.action(v.Player.Location, "takeover"); ok {
 			return c, nil
