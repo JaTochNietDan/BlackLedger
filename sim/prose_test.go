@@ -33,6 +33,15 @@ func TestNothingAPlayedCitySaysIsMalformed(t *testing.T) {
 				bad++
 				t.Errorf("%s seed %d: %s", strategy, seed, line)
 			}
+			// And whether anything it ends holding points at a name that is
+			// gone. Read off the same campaigns rather than another thirty of
+			// them: the core already sweeps cities nobody touches, and what
+			// this adds is the ids a *played* city breaks — somebody killed,
+			// a family taken, premises bought out from under one.
+			for _, line := range r.Dangling {
+				bad++
+				t.Errorf("%s seed %d points at nothing: %s", strategy, seed, line)
+			}
 		}
 	}
 	if campaigns < floor {

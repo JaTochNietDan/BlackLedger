@@ -115,7 +115,10 @@ type Report struct {
 	Events     map[string]int `json:"event_counts"`
 	// Sentences this campaign wrote that do not read as English. A played city
 	// says things a city left alone never does, and nothing had ever read them.
-	Malformed    []string `json:"malformed,omitempty"`
+	Malformed []string `json:"malformed,omitempty"`
+	// References this campaign ended holding that point at a family, a person
+	// or an address which is no longer there.
+	Dangling     []string `json:"dangling,omitempty"`
 	Error        string   `json:"error,omitempty"`
 	ReplayQueued int      `json:"replay_queued,omitempty"`
 	// What the city did on its own while this run was happening.

@@ -12528,3 +12528,29 @@ One thing it had to be taught: the player's own organization is a valid name
 before it exists. The city keeps a quarrel with it from the first time anybody
 takes offence and files the organization later, so the first run reported
 seventy-one faults, all of them that.
+
+## The same question of a city that has been played
+
+Last night's sweep asks whether anything in a city points at a name that is
+gone. It runs on cities nobody touches. A played city is a different set of ids:
+somebody killed, a family taken over, premises bought out from under an
+organization, people walked off the books.
+
+So a campaign now carries what it ends holding, and the harness reads it back —
+on the same thirty-three campaigns the prose sweep already runs, rather than
+another thirty-three. Two checks, one set of runs. Nothing points at nothing.
+
+**Then the honest part, which is that this sweep can barely bite.** Across thirty
+campaigns the harness makes two understandings and goes to work for a family
+exactly never. The ids a played city breaks are mostly ids no policy creates.
+
+Trying to fix that found something better than a fix. The respectable policy was
+given a preference for reaching an understanding, since `pact:` is on the
+never-played list and is the one card that leaves a standing agreement in the
+save. It fired **zero times in a hundred campaigns**, and the reason is the
+policy itself: an understanding needs a family that thinks well of you, and that
+policy spends its days printing stories about them. It smears 263 times across a
+hundred campaigns and then cannot ally with anybody.
+
+That is the game working rather than a gap, so the preference came back out
+instead of being propped up. A branch that never runs is worse than no branch.
