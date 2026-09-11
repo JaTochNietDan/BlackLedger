@@ -138,6 +138,51 @@ which half is standing.
    points at the test that asks whether anybody comes.
 ---
 
+## What everything pays
+
+`mise run rates` prints what each action is worth for the time it takes, out of
+a traced run of the exploring policy. It is the only measure in this project
+that prices a single decision rather than a whole campaign, and it did not exist
+before. The headline figures, over sixty campaigns:
+
+| $/min over standing still | minutes | action |
+|---|---|---|
+| 5.09 | 45 | mug somebody |
+| 4.67 | 45 | rob a business |
+| 3.10 | 60 | take a parked car apart |
+| 1.26 | 45 | carry an envelope |
+| 0.92 | 90 | a shift on Pier 14 |
+| 0.04 | — | the counter (pawn and redeem) |
+| 0.02 | — | the run (buy and sell) |
+| −0.11 to −0.51 | — | the machines, the wheel, cards, the dice |
+
+**Crime pays about six times honest work by the minute.** It is the trade the
+whole game is built on and it now has a number. It is paid for over a campaign
+rather than per action: the thief dies in 93 campaigns of a hundred at four
+days with $966, while the worker lives 25 days and ends with $23,252. Mugging
+and stripping are balanced against each other rather than one dominating —
+mugging draws nine points of attention and thirty-five would-be enemies at
+twenty-eight, a stripped car five and thirty-five.
+
+**Four rules for reading it, each learned by getting it wrong first.**
+
+1. **Per minute, not per command.** The clock is what a player spends.
+2. **Net of doing nothing.** The city pays about twenty cents a minute while you
+   stand there, so everything looks profitable otherwise.
+3. **With enough samples.** The exploring policy takes each kind about once a
+   run. Twelve runs is noise; a hundred and twenty is steady.
+4. **Pair what settles in two commands.** A bet and its settlement, a run bought
+   at one end of the city and sold at the other, a loan and its redemption. Read
+   apart, one half of each is among the best rates in the game and the other
+   among the worst, and neither is what anybody decided. Pawning read as the
+   third best earner in the game until it was paired with redeeming: this table
+   prices money and the game has things.
+
+Anything that decides now and pays later reads as free until the trace carries
+it. Collections are carried; nothing else is.
+
+---
+
 ## What exists (do not rebuild)
 
 The city is a Go core that owns every fact, a React view that invents nothing,

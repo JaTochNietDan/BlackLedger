@@ -11009,3 +11009,31 @@ The tool says the general rule in its own documentation now: anything that
 decides now and pays later reads as free, and anything that turns a possession
 into money reads as profit, until each is paired with the command that settles
 it.
+
+## Two crimes that are balanced against each other, and the brief catching up
+
+The instrument is trustworthy now, so this tick used it on the game rather than
+on itself.
+
+The obvious question from the table: stripping a parked car pays $3.10 a minute
+with nobody to face, against $5.09 for a mugging done in front of the man. Sixty
+per cent of the money for none of the confrontation looked like a gap.
+
+It is not. Measured rather than assumed: a mugging costs nine points of police
+attention and leaves the man twenty-eight sore; a stripped car costs five and
+leaves him thirty-five. The two are balanced against each other along different
+axes — one draws the police, the other makes a worse enemy — which is a better
+answer than either being the right amount of bad. A car is a bigger loss than a
+wallet and the city is quieter about it, and both of those are in the numbers.
+
+So: a verification rather than a change, which is the point of having the
+instrument at all.
+
+**And the brief now carries what everything pays.** Eight hours of work produced
+one measure this project never had — the price of a single decision rather than
+the outcome of a whole campaign — and it was written only in the development log,
+which is the wrong place for a fact the next session needs before it starts. The
+brief has the table, the headline that crime pays about six times honest work by
+the minute, and the four rules for reading it, each of which was learned by
+getting it wrong first: per minute rather than per command, net of standing
+still, with enough samples, and pairing anything that settles in two commands.
