@@ -942,8 +942,14 @@ func (w *World) Actions(id string) []Action {
 	}
 	if l.ID != p.Location {
 		detail := "Travel advances the city clock. Known threats may interrupt you."
-		if walk := TravelMinutes(p.Location, l.ID); w.Driving() && w.Journey(p.Location, l.ID) < walk {
-			detail = fmt.Sprintf("%d minutes on foot, %d driving. Travel advances the city clock. Known threats may interrupt you.", walk, w.Journey(p.Location, l.ID))
+		walk, going := TravelMinutes(p.Location, l.ID), w.Journey(p.Location, l.ID)
+		if going < walk {
+			how := "driving"
+			if w.RidingWithTheCabs() {
+				how = "in one of your own cabs"
+			}
+			detail = fmt.Sprintf("%d minutes on foot, %d %s. Travel advances the city clock. Known threats may interrupt you.",
+				walk, going, how)
 		}
 		add("travel", "Visit "+l.Name, w.Journey(p.Location, l.ID), 0, "", detail)
 		// What can be done about a place without being in it. An order given to

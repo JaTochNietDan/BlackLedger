@@ -9117,3 +9117,36 @@ the roles on the street and not about the desks in the city hall. The city came
 out of it with no commissioner at all.
 
 Each of the four broken in turn, and each fails on its own line.
+
+## A yard of cabs is always a ride
+
+The user's standing words ask for businesses that link to each other. Two of
+this city's thirteen trades reached past their own income: a garage halves the
+car's upkeep and its repairs, and a haulier takes a third off stocking
+everything else. The other eleven were addresses that paid and did nothing.
+
+The cabstand is the one where the link writes itself, because moving somebody
+across town is the whole of its trade. Holding it means you always have a ride:
+when whatever you own yourself cannot take you — no car, a wreck, or a dry tank
+— one of your own drivers does.
+
+Slower than anything the player could own, because it is somebody else's car on
+somebody else's route and it stops for other fares. Measured between the room
+and the docks: twenty-five minutes on foot, twenty-one in your own cabs, fifteen
+in a Packard. So a car is still worth buying, and a yard is worth holding for a
+reason that is not the yard's own income.
+
+The city says which it is, on the travel card and on the street, because a
+journey the player did not choose the speed of is one they cannot plan around.
+
+Two things worth writing down. The first draft put the cab's warned-and-riding
+line after the bare "on foot" case in a switch, where it could never be reached
+— the fault this file already names twice, caught this time by reading the code
+back rather than by a test. And the probe that measured it had the car standing
+at nought condition because `CarWear` holds what the car is worth rather than
+what it has lost, which is worth knowing before the next measurement is written
+against it.
+
+Checked before building: the filling stations already do this properly. Your own
+pumps sell you petrol at what the petrol cost, keyed to the address you hold
+rather than to the trade, which is right — you fill up where you own the pumps.

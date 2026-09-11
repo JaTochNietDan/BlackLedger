@@ -41,12 +41,18 @@ func (w *World) Crossing(from, to string) map[string]any {
 		out["note"] = fmt.Sprintf("Somebody is looking for you. The street is the one place nothing covers you, and %s of plate is what you have out there.", counted(plate, "stage", "stages"))
 	case warned && driving:
 		out["note"] = "Somebody is looking for you, and the street is the one place nothing covers you. There is no plate on this car."
+	// Before the bare "on foot", or it can never be reached: a switch takes the
+	// first case that matches and being warned matches both.
+	case warned && w.RidingWithTheCabs():
+		out["note"] = "Somebody is looking for you, and one of your own drivers is taking you. A cab is not cover, but it is not the pavement either."
 	case warned:
 		out["note"] = "Somebody is looking for you and you are crossing the street on foot, where nothing covers anybody."
 	case driving && plate > 0:
 		out["note"] = fmt.Sprintf("%s of plate between you and the street.", capitalise(counted(plate, "stage", "stages")))
 	case driving:
 		out["note"] = "Nothing on this car but its own doors."
+	case w.RidingWithTheCabs():
+		out["note"] = "One of your own drivers has you, which is faster than the pavement and no safer."
 	default:
 		out["note"] = "On foot, and the street is the one place in the city nothing covers anybody."
 	}

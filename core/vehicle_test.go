@@ -2,6 +2,7 @@ package core
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 )
 
@@ -282,5 +283,91 @@ func TestTheForecourtOffersTheCarsAndTheGarageDoesNot(t *testing.T) {
 	}
 	if !work {
 		t.Error("the garage stopped working on cars")
+	}
+}
+
+// A yard of cabs is a business whose whole trade is moving somebody across
+// town, so what it does for the rest of what the player holds writes itself:
+// they always have a ride. It was an address that paid and did nothing else,
+// which is true of nine of this city's thirteen trades — the garage and the
+// haulier were the only two that reached past their own income.
+func TestAYardOfCabsIsAlwaysARide(t *testing.T) {
+	t.Parallel()
+	w := New(61)
+	w.Event, w.District = nil, 9
+	w.Player.Health, w.Player.Respect, w.Player.Cash = 100, 30, 200000
+	w.Player.Location = "room"
+	walk := w.Journey("room", "docks")
+	if w.RidingWithTheCabs() {
+		t.Fatal("riding in cabs nobody holds")
+	}
+
+	w.Player.Location, w.Event = "cabstand", nil
+	if err := w.apply(Command{Kind: "acquire", Target: "cabstand", RequestID: "buythecabs"}); err != nil {
+		t.Fatal(err)
+	}
+	w.Player.Location = "room"
+	if !w.RidingWithTheCabs() {
+		t.Fatal("the player holds the cab yard and is still walking")
+	}
+	riding := w.Journey("room", "docks")
+	t.Logf("on foot %d minutes, in your own cabs %d", walk, riding)
+	if riding >= walk {
+		t.Fatalf("a yard of cabs is worth nothing: %d against %d on foot", riding, walk)
+	}
+
+	// And a car of your own is still better than a cab, or there would be no
+	// reason to buy one.
+	w.Player.Car, w.Player.CarWear, w.Player.Fuelled = 3, 100, 0
+	if !w.Driving() {
+		t.Fatal("the car will not start")
+	}
+	if w.RidingWithTheCabs() {
+		t.Fatal("the cabs are taking somebody who has their own car running")
+	}
+	own := w.Journey("room", "docks")
+	if own >= riding {
+		t.Fatalf("your own car is no better than a cab: %d against %d", own, riding)
+	}
+	t.Logf("in your own car %d minutes", own)
+
+	// A dry tank puts them back in a cab rather than on the pavement, which is
+	// the whole point of holding the yard.
+	w.Player.Fuel, w.Player.Fuelled = 0, max(1, w.Minute)
+	if w.Driving() {
+		t.Fatal("a dry car is still driving")
+	}
+	if !w.RidingWithTheCabs() {
+		t.Fatal("the car ran dry and nobody sent a cab")
+	}
+	if dry := w.Journey("room", "docks"); dry != riding {
+		t.Fatalf("the cab took %d minutes with a dry car and %d without one", dry, riding)
+	}
+}
+
+// And the city says which it is, because a journey the player did not choose
+// the speed of is one they cannot plan around.
+func TestTheCitySaysWhenACabIsTakingYou(t *testing.T) {
+	t.Parallel()
+	w := New(61)
+	w.Event, w.District = nil, 9
+	w.Player.Health, w.Player.Respect, w.Player.Cash = 100, 30, 200000
+	w.Player.Location, w.Event = "cabstand", nil
+	if err := w.apply(Command{Kind: "acquire", Target: "cabstand", RequestID: "buythecabs2"}); err != nil {
+		t.Fatal(err)
+	}
+	w.Player.Location, w.Event = "room", nil
+	said := false
+	for _, a := range w.Actions("docks") {
+		if a.ID == "travel" {
+			said = strings.Contains(a.Detail, "in one of your own cabs")
+		}
+	}
+	if !said {
+		t.Fatal("a cab is taking the player across town and the card says they are driving")
+	}
+	note, _ := w.Crossing("room", "docks")["note"].(string)
+	if !strings.Contains(note, "own drivers") {
+		t.Fatalf("the street says %q while one of the player's cabs has them", note)
 	}
 }

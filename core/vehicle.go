@@ -80,8 +80,29 @@ func (w *World) Driving() bool {
 // Pace is the share of a walking journey the player's current transport takes.
 // A car in poor order is worth part of what it was, and a wreck is worth
 // nothing at all.
+// CabPace is what a cab does against walking. Slower than anything the player
+// could own, because it is somebody else's car on somebody else's route and it
+// stops for other fares — but it is a ride, and the alternative is the
+// streetcar.
+const CabPace = .85
+
+// RidingWithTheCabs reports whether the player is getting about in their own
+// cabs: a yard of cars and drivers they hold, when whatever they own themselves
+// cannot take them.
+//
+// The cabstand was an address that paid and did nothing else, which is true of
+// nine of this city's thirteen trades. A cab yard is the one whose whole
+// business is moving somebody across town, so it is the one where what it does
+// for the rest of what you hold writes itself: you always have a ride.
+func (w *World) RidingWithTheCabs() bool {
+	return !w.Driving() && w.OwnsKind("cabs")
+}
+
 func (w *World) Pace() float64 {
 	if !w.Driving() {
+		if w.RidingWithTheCabs() {
+			return CabPace
+		}
 		return 1
 	}
 	car := VehicleByTier(w.Player.Car)
