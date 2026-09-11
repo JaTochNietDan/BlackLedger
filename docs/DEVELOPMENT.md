@@ -12035,3 +12035,35 @@ name in it and a second paragraph explaining why.
 
 Three guards: the funeral lifts the people watching and cannot be held twice, a
 week is too late, and a parlour of your own is cheaper than somebody else's.
+
+## The other side of six days
+
+The funeral shipped last night as a card with one branch. Pay, and everybody on
+the books thinks better of you; do nothing, and lose nothing. A thing that is
+free to skip is not a decision, and the rule at the top of the brief is to ask
+whether the new thing is strictly better than the old. Half a decision is not.
+
+So the window closes from both sides now. A man of the player's who goes six
+days with nobody arranging anything goes into the ground on the parish's money,
+with nobody there from the firm he died working for, and everybody still on the
+books takes eight points off the man who let it happen. Once, whatever else
+happens afterwards — a man is only buried badly the once.
+
+**The guard caught two things, and the second is the real one.**
+
+The first: comparing a city where the funeral was held against one where it was
+not passes on the carrot alone. A funeral lifts the people watching whether or
+not ignoring one costs anything, so the comparison reads the same with the
+penalty torn out — checked, and it did. It watches the morning the window closes
+now, one day either side, so what it sees is the drop rather than the lift.
+
+The second: **the card was written against the wrong field.** `Remembered` on a
+dead person means the paper has carried an obituary, which it does the morning
+after anybody dies. Burying somebody was marking the same flag, so the card
+vanished after a day and the week's grace never ran out — neither half of the
+decision could ever happen, and the version shipped last night was broken in a
+way its own three guards could not see because none of them let a day pass.
+Being buried is its own field now, and the field's comment says why.
+
+A week on, two people on the books: sixty-five points of trust where it was
+arranged, forty-five where nobody did.

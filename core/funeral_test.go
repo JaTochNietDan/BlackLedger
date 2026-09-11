@@ -121,6 +121,71 @@ func TestAFuneralNobodyArrangedInTimeIsNotArrangedAtAll(t *testing.T) {
 	}
 }
 
+// And the other side of the same six days.
+//
+// Without this the card was pay-and-be-liked, with nothing at all on the other
+// branch — a decision with one option. A man of yours going into the ground on
+// the parish's money is the thing everybody on the books actually reacts to.
+func TestNobodyArrangingAnythingIsWorseThanArrangingIt(t *testing.T) {
+	t.Parallel()
+	w, parlour, dead := aDeadHandOfYours(t)
+	if len(w.OwnPeople()) == 0 {
+		t.Skip("nobody is left on the books to notice")
+	}
+
+	// Two cities from the same morning: one where it was arranged and one where
+	// nobody did anything. Measured against each other rather than against the
+	// starting number, because the day pays trust back on its own and an
+	// absolute drop would be a reading about the drift rather than the funeral.
+	held := w.Clone()
+	held.Player.Location, held.Event = parlour, nil
+	after, err := Execute(held, Command{RequestID: ID(), Revision: held.Revision, Kind: "funeral:" + dead})
+	if err != nil {
+		t.Fatal(err)
+	}
+	held = after
+
+	ignored := w.Clone()
+	ignored.Advance(FuneralWindow + 2*1440)
+	held.Advance(FuneralWindow + 2*1440 - (held.Minute - w.Minute))
+
+	sum := func(v *World) int {
+		total := 0
+		for _, n := range v.OwnPeople() {
+			total += n.Trust
+		}
+		return total
+	}
+	buried, parish := sum(held), sum(ignored)
+	t.Logf("a week on: %d trust across the books where it was arranged, %d where nobody did",
+		buried, parish)
+	if buried <= parish {
+		t.Fatalf("arranging a funeral left the books at %d and ignoring it at %d, "+
+			"so there is nothing to decide", buried, parish)
+	}
+
+	// And the gap is the parish's doing rather than the funeral's.
+	//
+	// The comparison above passes on the carrot alone: a funeral lifts the
+	// people watching whether or not ignoring one costs anything, so it would
+	// have read the same with the penalty torn out — checked, and it did. What
+	// follows watches the morning the window closes, one day either side, so
+	// what it sees is the drop and not the lift.
+	edge := w.Clone()
+	edge.Advance(FuneralWindow - 1440)
+	before := sum(edge)
+	edge.Advance(2 * 1440)
+	if after := sum(edge); after >= before {
+		t.Fatalf("the books read %d the day before the window closed and %d the day after",
+			before, after)
+	}
+	// And the city has finished with them, or every morning is the same
+	// morning.
+	if n := ignored.NPC(dead); n == nil || !n.Buried {
+		t.Fatal("the man nobody buried is still unburied, so this runs again tomorrow")
+	}
+}
+
 // A parlour of the player's own does it for what the plot and the notices cost,
 // because the cars and the box are already theirs.
 func TestYourOwnParlourBuriesYourOwnForLess(t *testing.T) {

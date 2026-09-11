@@ -32,6 +32,45 @@ const (
 	FuneralMinutes = 180
 )
 
+// PauperTrust is what everybody still on the books makes of a man of theirs
+// going into the ground on the parish's money.
+//
+// Without this the funeral was a card with no decision in it: pay and be
+// thought better of, or do nothing and lose nothing. A thing that is free to
+// skip is not a choice, and this file's own rule is to ask whether the new
+// thing is strictly better than the old. It is the same six days from the other
+// side — the morning after the last one is the morning everybody notices.
+const PauperTrust = 8
+
+// TheUnburied runs once a day and closes the window on anybody of the player's
+// nobody arranged anything for.
+func (w *World) TheUnburied() {
+	for i := range w.NPCs {
+		n := &w.NPCs[i]
+		if !n.Dead || n.Buried || n.DiedAt <= 0 {
+			continue
+		}
+		if n.Faction != w.PlayerOrganizationID() {
+			continue
+		}
+		if w.Minute-n.DiedAt <= FuneralWindow {
+			continue
+		}
+		// Marked either way. A man is only buried badly once.
+		n.Buried = true
+		left := w.OwnPeople()
+		for _, other := range left {
+			other.Trust = max(0, other.Trust-PauperTrust)
+		}
+		if len(left) == 0 {
+			continue
+		}
+		w.Log("Nobody arranged anything for "+n.Name,
+			fmt.Sprintf("They went into the ground on the parish's money, with nobody there from the firm they died working for. %s who still works for you knows it.",
+				plainly(len(left), "The one person", fmt.Sprintf("Every one of the %d people", len(left)))), "danger")
+	}
+}
+
 // FuneralFee is what burying one of yours costs here.
 func (w *World) FuneralFee(at string) int {
 	if w.Own(at) {
@@ -46,7 +85,7 @@ func (w *World) Unburied() []*NPC {
 	out := []*NPC{}
 	for i := range w.NPCs {
 		n := &w.NPCs[i]
-		if !n.Dead || n.Remembered || n.DiedAt <= 0 {
+		if !n.Dead || n.Buried || n.DiedAt <= 0 {
 			continue
 		}
 		if n.Faction != w.PlayerOrganizationID() {
@@ -70,7 +109,7 @@ func (w *World) FuneralReadiness(at, id string) string {
 		return "The arrangements are made at " + place.Name
 	}
 	n := w.NPC(id)
-	if n == nil || !n.Dead || n.Remembered {
+	if n == nil || !n.Dead || n.Buried {
 		return "There is nobody of that description to bury"
 	}
 	if n.Faction != w.PlayerOrganizationID() {
@@ -95,7 +134,7 @@ func (w *World) BuryYourOwn(at, id string) error {
 		return err
 	}
 	n := w.NPC(id)
-	n.Remembered = true
+	n.Buried = true
 	// The trade is somebody else's unless it is yours, the same as every other
 	// business in this city.
 	w.ShiftCustom(at, "", BurialTrade)

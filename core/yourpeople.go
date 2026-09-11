@@ -144,6 +144,9 @@ func (w *World) PayShare(id string) error {
 // drifts up while they are paid and down when the bill is not met, and somebody
 // far enough down goes looking for somewhere else to be.
 func (w *World) OwnPeopleDay() {
+	// Whoever nobody arranged anything for, before the day's trust is counted:
+	// the morning after the sixth day is when everybody notices.
+	w.TheUnburied()
 	people := w.OwnPeople()
 	if len(people) == 0 {
 		return

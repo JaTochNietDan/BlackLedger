@@ -154,6 +154,12 @@ type NPC struct {
 	// "who died yesterday" — which is the question a paper asks every morning.
 	DiedAt     int  `json:"died_at,omitempty"`
 	Remembered bool `json:"remembered,omitempty"`
+	// And whether anybody arranged a funeral, which is a different question
+	// from whether the paper printed a paragraph. The funeral card was written
+	// against `Remembered` first, and the obituary sets that the morning after
+	// anybody dies: the card vanished after a day and the week's grace never
+	// ran out, so neither half of the decision could happen.
+	Buried bool `json:"buried,omitempty"`
 	// When the police let this one go. Absent for anybody who is not inside,
 	// which is everybody in a save written before anybody could be taken in.
 	Held int `json:"held,omitempty"`
