@@ -1,139 +1,199 @@
 package core
 
-import "testing"
+import (
+	"strings"
+	"testing"
+)
 
-// The people behind your counters see the street all day. Somebody standing
-// across the road from your laundry for three afternoons is the sort of thing
-// they would mention, and until this the only way to learn that a family had
-// commissioned an attack on a business of yours was to go and investigate it.
+// What a counter is worth talking to for.
 //
-// It also gives the trust of somebody you employ a job. A man who thinks well of
-// you tells you what he saw. A man who does not keeps his head down.
+// Asking the person behind one used to answer with the state of the premises:
+// the wages, the trouble, whether it was short-handed, and how many came
+// through the door. All of that is on "Review the books", which costs nothing
+// and no time, so the whole of what the conversation added was a footfall
+// count the game already had.
+//
+// A person who stands in a room all day sees three things a ledger never
+// records: who is walking over, who has been asking after you, and the one
+// thing this trade is in a position to notice. Those are what make the counter
+// worth a visit.
 
-func counterWorld(t *testing.T, trust int) (*World, string) {
+func counterAt(t *testing.T, kind string) (*World, string) {
 	t.Helper()
-	w := New(61)
+	id := ""
+	for _, l := range Locations {
+		if l.Kind == kind {
+			id = l.ID
+		}
+	}
+	if id == "" {
+		t.Fatalf("the city has no %s", kind)
+	}
+	w := New(53)
 	w.Event, w.District = nil, 9
-	w.Player.Cash, w.Player.Health = 20000, 100
-	own(w, "laundry")
-	w.EmptyChairs()
-	prop := w.Properties["laundry"]
-	if len(prop.Hands) == 0 {
-		t.Fatal("nobody works at the laundry")
+	w.Player.Health, w.Player.Cash, w.Player.Respect = 100, 400000, 90
+	own(w, id)
+	for d := 0; d < 8; d++ {
+		w.Advance(1440)
+		w.Event = nil
 	}
-	for _, who := range prop.Hands {
-		w.NPC(who).Trust = trust
-	}
-	rival := w.Factions[0].ID
-	if rival == w.PlayerOrganizationID() {
-		rival = w.Factions[1].ID
-	}
-	w.Plots = append(w.Plots, Plot{ID: ID(), Kind: "sabotage", Life: w.Life,
-		Due: w.Minute + 4320, Actor: rival, Target: "laundry", Strength: 35})
-	return w, "laundry"
+	w.Player.Location = id
+	return w, id
 }
 
-func TestSomebodyBehindYourCounterNoticesWhatIsComing(t *testing.T) {
-	t.Parallel()
-	told, quiet := 0, 0
-	for seed := uint32(1); seed <= 300; seed++ {
-		w, _ := counterWorld(t, 80)
-		w.WorldRNG = seed * 2654435761
-		w.WordFromTheCounter()
-		if w.Plots[len(w.Plots)-1].Known {
-			told++
-		}
-		q, _ := counterWorld(t, 0)
-		q.WorldRNG = seed * 2654435761
-		q.WordFromTheCounter()
-		if !q.Plots[len(q.Plots)-1].Known {
-			quiet++
-		}
-	}
-	t.Logf("of 300 days: people who think well of you mentioned it %d times, people who do not kept quiet %d times", told, quiet)
-	if told == 0 {
-		t.Fatal("nobody who works for you ever noticed a family casing the place they stand in all day")
-	}
-	if told == 300 {
-		t.Fatal("every single day somebody spotted it, which is not noticing, it is being told")
-	}
-	if quiet <= 300-told {
-		t.Fatalf("somebody who thinks nothing of you is as useful as somebody who does: %d against %d", 300-quiet, told)
-	}
-}
-
-// And they only see their own street. A plot against a business across the city
-// is not something the man at your laundry counter knows about.
-func TestTheyOnlySeeTheirOwnStreet(t *testing.T) {
-	t.Parallel()
-	w, _ := counterWorld(t, 100)
-	w.Plots[len(w.Plots)-1].Target = "butcher"
-	for i := 0; i < 60; i++ {
-		w.WordFromTheCounter()
-	}
-	if w.Plots[len(w.Plots)-1].Known {
-		t.Fatal("the laundry counter reported an attack being planned on a butcher's shop across town")
-	}
-}
-
-// A room with nobody in it tells you nothing, which is what being short-handed
-// costs beyond the takings.
-func TestAnEmptyCounterSeesNothing(t *testing.T) {
-	t.Parallel()
-	w, id := counterWorld(t, 100)
+// answer is what the counter said, as one line.
+func answer(t *testing.T, w *World, id string) string {
+	t.Helper()
 	prop := w.Properties[id]
-	prop.Hands, prop.Staff = nil, 0
-	for i := 0; i < 60; i++ {
-		w.WordFromTheCounter()
+	if len(prop.Hands) == 0 {
+		t.Fatalf("nobody is behind the counter at %s", id)
 	}
-	if w.Plots[len(w.Plots)-1].Known {
-		t.Fatal("a laundry with nobody working in it noticed somebody casing it")
+	n := w.NPC(prop.Hands[0])
+	n.Location, n.Heading, n.Arrives = id, "", 0
+	before := len(w.History)
+	if err := w.AskTheCounter(n.ID); err != nil {
+		t.Fatal(err)
+	}
+	said := []string{}
+	for _, r := range w.History[before:] {
+		said = append(said, r.Text)
+	}
+	return strings.Join(said, " ")
+}
+
+func TestEachCounterSeesSomethingItsOwn(t *testing.T) {
+	t.Parallel()
+	// No two trades say the same thing, because the whole reason to hold more
+	// than one kind of place is that each shows you a different part of the
+	// same city.
+	seen := map[string]string{}
+	for _, kind := range []string{"garage", "pawn", "cabs", "filling", "butcher"} {
+		w, id := counterAt(t, kind)
+		line := w.fromBehindThisCounter(id)
+		if line == "" {
+			t.Errorf("%s: the counter has nothing of its own to say", kind)
+			continue
+		}
+		if was, twice := seen[line]; twice {
+			t.Errorf("%s and %s both say %q", was, kind, line)
+		}
+		seen[line] = kind
+		// And it reaches the player, rather than being a function nothing calls.
+		if !strings.Contains(answer(t, w, id), line) {
+			t.Errorf("%s: the counter knows it and does not say it", kind)
+		}
 	}
 }
 
-// Knowing has to be worth something or the word from the counter is flavour. A
-// business that is expecting it takes less: the shutters come down, the stock
-// goes out the back, and whoever comes finds a room that is ready for them.
-func TestAWarnedBusinessTakesLess(t *testing.T) {
+func TestTheCounterSeesWhoIsWalkingOver(t *testing.T) {
 	t.Parallel()
-	hit := func(warned bool) int {
-		w, id := counterWorld(t, 80)
-		p := w.Plots[len(w.Plots)-1]
-		p.Known = warned
-		w.Properties[id].Condition = 100
-		w.Player.Crew = nil
-		w.ResolveSabotage(p)
-		return 100 - w.Properties[id].Condition
+	w, id := counterAt(t, "butcher")
+	if w.walkingOver(id) != "" {
+		t.Fatal("somebody is walking over before anybody set off")
 	}
-	cold, ready := hit(false), hit(true)
-	t.Logf("a sabotage against a laundry: %d condition off it cold, %d off it when the counter had said something", cold, ready)
-	if cold == 0 {
-		t.Fatal("sabotage does nothing at all, so this proves nothing")
+	var coming *NPC
+	for i := range w.NPCs {
+		if n := &w.NPCs[i]; !n.Dead && n.Location != id {
+			coming = n
+			break
+		}
 	}
-	if ready >= cold {
-		t.Fatalf("a business that saw them coming took the same beating: %d against %d", ready, cold)
+	coming.Heading, coming.Sets, coming.Arrives = id, 0, w.Minute+40
+	coming.Errand, coming.Faction = "coming to buy something", ""
+	plain := w.walkingOver(id)
+	if !strings.Contains(plain, coming.Name) {
+		t.Fatalf("the counter watched somebody walk over and did not name them: %q", plain)
+	}
+	// Whose man he is, when he is anybody's, because that is the part worth a
+	// warning rather than a remark.
+	coming.Faction = "bellandi"
+	whose := w.walkingOver(id)
+	if !strings.Contains(whose, "Bellandi") {
+		t.Fatalf("a rival's man walked over as an ordinary customer: %q", whose)
+	}
+	if whose == plain {
+		t.Fatal("it made no difference whose he was")
+	}
+	// Somebody already standing in the room is not walking over.
+	coming.Heading, coming.Arrives = "", 0
+	if w.walkingOver(id) != "" {
+		t.Fatalf("nobody is on the street and the counter says: %q", w.walkingOver(id))
 	}
 }
 
-// And an empty counter cannot be ready for anything, however much warning there
-// was.
-func TestAnEmptyCounterCannotBeReady(t *testing.T) {
+func TestTheCounterHearsWhoHasBeenAsking(t *testing.T) {
 	t.Parallel()
-	w, id := counterWorld(t, 80)
-	p := w.Plots[len(w.Plots)-1]
-	p.Known = true
-	w.Properties[id].Condition, w.Player.Crew = 100, nil
-	w.Properties[id].Hands, w.Properties[id].Staff = nil, 0
-	w.ResolveSabotage(p)
-	empty := 100 - w.Properties[id].Condition
+	w, id := counterAt(t, "butcher")
+	if w.beenAsking(id) != "" {
+		t.Fatalf("somebody has been asking before anybody was wronged: %q", w.beenAsking(id))
+	}
+	var near, far *NPC
+	for i := range w.NPCs {
+		n := &w.NPCs[i]
+		if n.Dead || n.Location == "" {
+			continue
+		}
+		d := TravelMinutes(n.Location, id)
+		if near == nil && d <= AskingDistance {
+			near = n
+		}
+		if far == nil && d > AskingDistance {
+			far = n
+		}
+	}
+	if near == nil || far == nil {
+		t.Skip("this city is all one distance from the butcher")
+	}
+	// Somebody brooding across town is not somebody this room has heard about.
+	w.Aggrieve(far.ID, SoreActs+5, "a thing that happened")
+	if said := w.beenAsking(id); said != "" {
+		t.Fatalf("%s is %d minutes away and the counter has heard: %q",
+			far.Name, TravelMinutes(far.Location, id), said)
+	}
+	// A little sore is not yet worth mentioning.
+	w.Aggrieve(near.ID, SoreAsks-1, "a small thing")
+	if said := w.beenAsking(id); said != "" {
+		t.Fatalf("a grudge of %d was worth a warning: %q", near.Sore, said)
+	}
+	// Enough, and they say so; more, and they say what it sounded like.
+	w.Aggrieve(near.ID, SoreAsks, "a larger thing")
+	asking := w.beenAsking(id)
+	if !strings.Contains(asking, near.Name) {
+		t.Fatalf("somebody has been asking and the counter did not name them: %q", asking)
+	}
+	w.Aggrieve(near.ID, SoreActs, "a larger thing")
+	worse := w.beenAsking(id)
+	if worse == asking {
+		t.Fatalf("somebody past acting on it sounds the same as somebody curious: %q", worse)
+	}
+}
 
-	w2, id2 := counterWorld(t, 80)
-	p2 := w2.Plots[len(w2.Plots)-1]
-	p2.Known = true
-	w2.Properties[id2].Condition, w2.Player.Crew = 100, nil
-	w2.ResolveSabotage(p2)
-	staffed := 100 - w2.Properties[id2].Condition
-	if empty <= staffed {
-		t.Fatalf("a laundry with nobody in it defended itself as well as one with three: %d against %d", empty, staffed)
+func TestTheCounterSaysMoreThanTheBooksDo(t *testing.T) {
+	t.Parallel()
+	// The whole complaint. Everything the counter used to say was premises
+	// state, and the books give that away for nothing.
+	w, id := counterAt(t, "garage")
+	var coming *NPC
+	for i := range w.NPCs {
+		if n := &w.NPCs[i]; !n.Dead && n.Location != id {
+			coming = n
+			coming.Heading, coming.Sets, coming.Arrives = id, 0, w.Minute+40
+			coming.Faction = "bellandi"
+			break
+		}
+	}
+	said := answer(t, w, id)
+	for _, mustSay := range []string{coming.Name, "Bellandi"} {
+		if !strings.Contains(said, mustSay) {
+			t.Fatalf("the counter never mentions %q: %s", mustSay, said)
+		}
+	}
+	// None of which is anywhere in the books.
+	books := ""
+	if prop := w.Properties[id]; prop != nil {
+		books = w.PlaceNote(id)
+	}
+	if strings.Contains(books, coming.Name) {
+		t.Fatalf("the books already knew: %s", books)
 	}
 }

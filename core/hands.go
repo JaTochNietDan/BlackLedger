@@ -458,6 +458,24 @@ func (w *World) AskTheCounter(who string) error {
 	case prop.Supply == 0:
 		said = append(said, "We are out of nearly everything.")
 	}
+	// Then the things the books cannot hold.
+	//
+	// Everything above this line is the state of the premises, and the player
+	// can read all of it off "Review the books" without talking to anybody. A
+	// counter is only worth talking to for what a person standing in a room all
+	// day sees and a ledger never records: who is walking over, who has been
+	// asking, and the one thing this particular trade is in a position to
+	// notice. Without those the answer was "three people through the door
+	// today", which is a number the game already had.
+	if coming := w.walkingOver(at); coming != "" {
+		said = append(said, coming)
+	}
+	if asking := w.beenAsking(at); asking != "" {
+		said = append(said, asking)
+	}
+	if seen := w.fromBehindThisCounter(at); seen != "" {
+		said = append(said, seen)
+	}
 	if n := w.Footfall(at); n > 0 {
 		said = append(said, fmt.Sprintf("%s through the door today.", counted(n, "person", "people")))
 	} else {
@@ -671,4 +689,131 @@ func (w *World) nobodyWillWork(id string) {
 		fmt.Sprintf("It has been %d nights since anybody there was paid, and that is the sort of thing "+
 			"people in this city tell each other. Pay what is owed and somebody will take the job.",
 			prop.Unpaid), "danger")
+}
+
+// walkingOver is somebody on the street with this address at the end of it.
+// The player walks into a room and sees who is in it; the person who stands
+// there all day sees who is coming, which is a quarter of an hour's warning and
+// the only place in this game that gives any.
+func (w *World) walkingOver(at string) string {
+	for i := range w.NPCs {
+		n := &w.NPCs[i]
+		if n.Heading != at || !w.Travelling(n) {
+			continue
+		}
+		// Whose man he is, if he is anybody's, because that is the part worth
+		// a warning. A hand would not say a name and stop.
+		if f := w.faction(n.Faction); f != nil && f.ID != w.PlayerOrganizationID() {
+			return fmt.Sprintf("%s of the %s is walking over, and will be here in %s.",
+				n.Name, f.Name, counted(max(1, (n.Arrives-w.Minute)/10*10), "minute", "minutes"))
+		}
+		because := "on their way over"
+		if n.Errand != "" {
+			because = n.Errand
+		}
+		return fmt.Sprintf("%s is %s.", n.Name, because)
+	}
+	return ""
+}
+
+// beenAsking is somebody carrying something against the player, near enough to
+// this room that the people in it would have heard about it.
+//
+// What somebody holds against the protagonist is `Sore`, not a grudge record —
+// grudges are between two other people and deliberately stop short of the
+// player. It is invisible until it arrives as an ordinary robbery in the street
+// with a name attached. This is the half-hour before that.
+func (w *World) beenAsking(at string) string {
+	for _, n := range w.Aggrieved() {
+		if n.Sore < SoreAsks {
+			break
+		}
+		near := n.Location == at || n.Post == at || TravelMinutes(n.Location, at) <= AskingDistance
+		if !near {
+			continue
+		}
+		over := "something"
+		if n.SoreAt != "" {
+			over = n.SoreAt
+		}
+		if n.Sore >= SoreActs {
+			return fmt.Sprintf("%s has been in twice this week asking when you are here, over %s. They were not making conversation.", n.Name, over)
+		}
+		return fmt.Sprintf("%s has been asking after you, over %s.", n.Name, over)
+	}
+	return ""
+}
+
+// fromBehindThisCounter is the one thing this particular trade is in a position
+// to notice, drawn from that trade's own machinery rather than invented for it.
+// A garage sees what came in broken. A pawnbroker sees who was short. A yard
+// full of cabs knows where people went. It is the reason to hold more than one
+// kind of place: each counter shows you a different part of the same city.
+func (w *World) fromBehindThisCounter(at string) string {
+	place, ok := PlaceByID(at)
+	if !ok {
+		return ""
+	}
+	switch place.Kind {
+	case "garage":
+		broken := 0
+		for i := range w.NPCs {
+			if n := &w.NPCs[i]; !n.Dead && n.Hurt && n.Car > 0 {
+				broken++
+			}
+		}
+		if broken > 0 {
+			return fmt.Sprintf("%s in this city driving with the glass out, and every one of them has to come to somebody.",
+				counted(broken, "car", "cars"))
+		}
+		return "Nothing on the road is broken this week, which is the wrong kind of quiet for a garage."
+	case "pawn":
+		for i := len(w.Window) - 1; i >= 0; i-- {
+			if s := w.Window[i]; s.Whose != "" {
+				return fmt.Sprintf("%s was short enough to leave %s over the counter and has not been back.",
+					s.Whose, lowerFirst(s.What()))
+			}
+		}
+		if len(w.Window) > 0 {
+			return fmt.Sprintf("%s in the window that nobody came back for.", counted(len(w.Window), "thing", "things"))
+		}
+		return "Nothing in the window. Either the city is flush or it has stopped trusting us."
+	case "cabs":
+		for i := range w.NPCs {
+			n := &w.NPCs[i]
+			if !w.Travelling(n) || n.Heading == "" || n.Car > 0 {
+				continue
+			}
+			to, ok := PlaceByID(n.Heading)
+			if !ok {
+				continue
+			}
+			return fmt.Sprintf("One of ours took %s over to %s this morning.", n.Name, to.Name)
+		}
+		return "The cars have been standing on the rank all day."
+	case "filling":
+		driving := 0
+		for i := range w.NPCs {
+			if n := &w.NPCs[i]; !n.Dead && n.Car > 0 {
+				driving++
+			}
+		}
+		return fmt.Sprintf("%s in this city keeping a car on the road, and the tank does not fill itself.",
+			counted(driving, "person", "people"))
+	case "butcher", "restaurant":
+		// Somebody on this counter who has got far enough down to be thinking
+		// about leaving. The same figure the room panel draws a warning from,
+		// said out loud by the person standing next to them.
+		for _, who := range w.Properties[at].Hands {
+			n := w.NPC(who)
+			if n == nil || n.Dead {
+				continue
+			}
+			if n.Faction == w.PlayerOrganizationID() && n.Trust < DefectionTrust {
+				return fmt.Sprintf("%s has been talking about going somewhere else.", n.Name)
+			}
+		}
+		return "The orders are the orders. Same faces, same days."
+	}
+	return ""
 }

@@ -29,6 +29,15 @@ type Grudge struct {
 const (
 	// GrudgeActs is the weight at which somebody stops brooding and moves.
 	GrudgeActs = 55
+	// SoreAsks is what somebody has to be carrying against the player before
+	// the people behind a nearby counter have heard about it, and SoreActs
+	// before they are asking when the player will be in rather than making
+	// conversation.
+	SoreAsks = 20
+	SoreActs = 45
+	// AskingDistance is how far from a room somebody can be brooding and still
+	// be somebody that room's staff would know about.
+	AskingDistance = 40
 	// GrudgeCap is the most one person can hold against another, so a long
 	// grudge does not become a certainty.
 	GrudgeCap = 90

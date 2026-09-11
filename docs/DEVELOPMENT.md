@@ -9851,3 +9851,55 @@ each fails with the trade named and both figures printed.
 
 Queue item seven is closed. What replaced it in the brief is the table of
 figures and the instruction not to rewrite the list from a reading of the code.
+
+## What a counter is worth talking to for
+
+Queue item six had one thing left open — whether the people you employ should be
+worth talking to. Checking first, as everything tonight has taught: asking one
+was already built, wired to a card, and answering. That is five queue entries in
+one night that claimed open work which existed.
+
+This one was the most worth checking, because it was built and still wrong.
+Every line the counter had was the state of the premises: the wages, the
+trouble, whether it was short-handed, whether the shelves were empty, and how
+many came through the door. All of that is on "Review the books", which costs
+nothing and takes no time. The whole of what a conversation added was a footfall
+count the game already had, so the answer to "is it worth talking to them" was
+no, and the reason was not that the feature was missing.
+
+A person who stands in a room all day sees three things a ledger never records.
+
+**Who is walking over.** The player walks into a room and sees who is in it. The
+person behind the counter sees who is coming, which is a quarter of an hour's
+warning, and it is the only place in this game that gives any. When he is
+somebody's man the counter says whose, because that is the part worth a warning
+rather than a remark.
+
+**Who has been asking after you.** What somebody holds against the protagonist
+is `Sore`, and it is invisible until it arrives as an ordinary robbery in the
+street with a name attached. A room within forty minutes of where they are
+brooding has heard about it. Past the point where they would act on it, the
+counter stops saying they were asking and says they were not making
+conversation.
+
+**The one thing this trade can see.** Drawn from that trade's own machinery
+rather than invented for it: a garage counts the cars in this city driving with
+the glass out, and every one of them has to come to somebody. A pawnbroker names
+who was short enough to leave something and not come back. A cab yard knows
+where one of theirs took somebody this morning. A filling station knows how many
+people are keeping a car on the road. A butcher or a restaurant knows which of
+its own hands has been talking about going somewhere else. No two of them say
+the same thing, and that is guarded, because the reason to hold more than one
+kind of place should be that each shows you a different part of the same city.
+
+### Four rules, four breaks
+
+All four fail when removed: the three new lines reaching the player at all, the
+family named on a man walking over, the distance that decides whether this room
+has heard anything, and each trade having something of its own. The last of the
+four also checks that what the counter knows is not in `PlaceNote`, so the test
+fails if these ever become another way of reading the books.
+
+One break did not compile on the first attempt, which is the second time tonight
+that a deletion left a variable behind. A break that does not build is not a
+break; it has to be rewritten until the code is valid and the behaviour is gone.
