@@ -12868,3 +12868,39 @@ left is one guard, on the branch it was right for, and a straight answer about
 the other two: their walking is the cost of doing business at one address, and
 the racketeer's 55% is its trade route — docks, market, docks — which is half
 walking by construction.
+
+## A telephone, and a tick that ended with nothing shipped
+
+The diplomat spends seven hundred and ninety-one journeys buying twenty-six
+seats, and last night that was written down as the cost of diplomacy. It is also
+a gap: a seat across from a family is offered wherever one of their lieutenants
+happens to be standing, so the only way to get one is to walk the city looking.
+People had telephones in 1930 and used them for exactly this.
+
+Sending word ahead was built, and it works. A call, or a message carried by
+somebody who knows your name, and a speaker waits at their own room until the
+day is out. Guarded four ways: the card is refused to a stranger with no
+telephone and no contacts and says what it would take, the seat is there when
+the player walks in with the room otherwise emptied, and it lapses after eight
+hours.
+
+**It is not in the tree.** Coverage across the harness fell from 97 kinds of
+action to 73 the moment it went in, and I could not explain why inside the tick.
+Offering the card only where the telephone is brought it to 77, so it is not the
+number of cards in a room. Nothing in the change touches a rule — a field on the
+world, a handler in the command chain, a line in the group table, and
+`AudienceActor` asking first whether anybody said they would be there. One of
+those four costs the harness twenty kinds.
+
+So it went into the inbox with everything measured, and the tree is green.
+Shipping a feature that quietly shuts a fifth of the game to the only instrument
+that can see it would be the same mistake as the respect ceiling three nights
+ago, and that one was caught by exactly this number.
+
+Two things found on the way are worth keeping. **The price sweep needed a few
+dollars of slack**: it advances a copy of the world to measure what the clock
+moves, and a day's income lands on a boundary rather than smoothly, so a
+thirty-minute card can have the money arrive in the control and not in the run.
+It read a $25 card as $52 and called it charged twice. And a new card has to name
+a group the interface knows — "politics" is not one of the eight, and the guard
+that says so caught it in the same run.

@@ -150,6 +150,35 @@ Ensure efficiency of development loops by increasing efficiency of your workflow
 
 ## Inbox — open
 
+Send word ahead to a family, so a meeting can be arranged rather than stumbled
+into. Written, guarded, measured, and backed out at the end of the tick because
+it broke the harness in a way I could not explain in the time left.
+
+The feature: a seat across from a family is offered wherever somebody who can
+speak for them happens to be standing that minute, so the only way to get one is
+to walk the city until you find a lieutenant in a room — the diplomat spends
+seven hundred and ninety-one journeys buying twenty-six seats. People had
+telephones in 1930 and used them for exactly this. A call, or a message carried
+by somebody who knows your name, and a speaker waits at their own room for the
+rest of the day.
+
+It works: two guards pass, the seat is there when the player walks in with the
+room otherwise empty, it lapses after eight hours, and a stranger with no
+telephone and nobody who knows them is told what it would take.
+
+What it did to the harness: **coverage fell from 97 kinds of action to 73.**
+Offering the card only where the telephone is — the hall of the place the player
+lives — brought it to 77, so the card count in each room is not the cause.
+Nothing else in the change touches a rule: a new field on the world, a new
+handler in the command chain, one line in the group table, and `AudienceActor`
+asking first whether anybody said they would be there. One of those four moves
+the harness by twenty kinds and I did not find which.
+
+Two guards written for this tick are worth keeping when it comes back: the
+action's own price sweep needed a few dollars of slack, because a thirty-minute
+card can have a day's income land in the control and not in the run, and it read
+a $25 card as $52.
+
 Most of what the harness measures is walking.
 
 — answered as far as it goes. The soldier is down from **99% of its commands to
