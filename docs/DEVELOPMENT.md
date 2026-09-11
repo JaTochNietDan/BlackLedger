@@ -9548,3 +9548,66 @@ going there, so a room bought for its own sake pays for itself only on the
 nights its owner pays for a band. That may be exactly what a burlesque is, but
 it means the purchase is a treadmill rather than a holding, and it is the next
 question worth asking about that address.
+
+## The stylesheet argues with itself fifty times
+
+Three inbox entries had no answer line under them, so the tick started by asking
+which were actually done. "It still says buy Mara a coffee" is done: every line
+that names a role-holder reads the holder now.
+
+Proving it was the interesting part. The sweep kills whoever holds each of the
+five named roles, lets the city fill the desks, then reads every card in every
+room and the guide looking for a dead name. It found nothing — and it found
+nothing because it was looking at nothing. A room you are not standing in offers
+two cards, the travel card and one other; the whole body of the room's switch is
+gated on being there. Asked properly, with the player put in each room first,
+the bar offers its cards and the coffee reads the living fixer's name. A sweep
+that reports a clean city has to be shown to be capable of reporting a dirty one
+first. Every other sweep over `Locations` in the suite does move the player; the
+one that does not is the custody test, which is deliberate, because the point of
+that one is that a man in a cell can act nowhere else.
+
+Chasing the second entry — the panel that pushes text right — turned up the
+larger thing. The person card is declared twice: `display:flex` at line 373 and
+`display:grid` at 1065, and the grid is what runs, so the fix for that report
+does work. But it is the same shape as the fault that cost a whole tick on the
+drums, where a `.drum` rule set `display:grid;place-items:center` and the newer
+rule further down never said otherwise.
+
+Counted across the whole stylesheet: **fifty declarations are overridden by a
+later rule carrying the identical selector**. They are dead — same selector means
+same specificity, so the later one simply wins — and harmless until somebody
+reads the earlier block, believes it, and edits it. The whole first slot-machine
+block is in there: `.bandit-window`, `.drum`, `.bandit-handle` and its light are
+written out twice from top to bottom, and only the second copy has any effect.
+
+### What was tried and put back
+
+The obvious move was to delete all fifty. It was tried and reverted, twice,
+which is worth writing down.
+
+The first attempt blanked comments by deleting their characters and then spliced
+by byte offset into the original text, so every offset past the first comment was
+wrong and the file came out shredded mid-word. Comments have to be blanked with
+spaces, not removed, if offsets are to survive. The second attempt was correct
+about offsets and wrong about scope: a tidy-up regex meant for the bodies that
+had been cut ran over every rule in the file and stripped trailing semicolons
+from a hundred untouched lines, and running Prettier over the result rewrote
+5,700 lines, because this file is not in the gate's Prettier set.
+
+So it is reverted. Fifty dead declarations in a minified stylesheet is not work
+to do by regex at speed against a game whose rendering cannot be looked at from
+here. It is its own slice, done a block at a time.
+
+### The pin
+
+What did land is the count, as a test that reads the stylesheet and re-derives
+it. It is a ratchet rather than a guard: `shadowedDeclarations = 50` must never
+go up, and if it goes down the test fails too, telling whoever cleaned a block up
+to lower the pin so the ground stays won. Both directions were broken to watch
+them fail — one declaration added and one removed — and both do, with the fifty
+named by line and selector so the next person to open the file knows which
+blocks lie.
+
+An earlier `!important` beats a later ordinary declaration, so those are not
+counted as dead. There are none in the fifty.

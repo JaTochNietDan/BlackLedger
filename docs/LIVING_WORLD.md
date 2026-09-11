@@ -196,6 +196,16 @@ What we talked about before, making it so that hidden actions are not hidden any
 
 It still says buy Mara a coffee even though now it's Ivo Costa for me since I killed Mara.
 
+— answered, and checked rather than taken on trust. Every line that named a
+  role-holder reads the holder now. The check is a sweep: kill whoever holds
+  each of the five named roles, let the city fill the desks, then stand in every
+  room in turn and look at every card's label, reason and detail, and at the
+  guide, for any of the dead names. Nothing says them. The first version of that
+  sweep asked each room for its cards without standing in the room, and a room
+  you are not in offers two cards — so it found nothing because it looked at
+  almost nothing. Standing in the room first, the coffee card reads the living
+  fixer's name.
+
 ---
 
 When playing poker the game should continue until you stop playing, right now it just requires you to leave the table and rejoin. Realistically it feels like it should be more like actual poker, where you have a buy in and whatnot and you play until people go bust or you can leave.
