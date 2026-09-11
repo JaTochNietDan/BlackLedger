@@ -152,6 +152,20 @@ Ensure efficiency of development loops by increasing efficiency of your workflow
 
 When playing poker the game should continue until you stop playing, right now it just requires you to leave the table and rejoin. Realistically it feels like it should be more like actual poker, where you have a buy in and whatnot and you play until people go bust or you can leave.
 
+— answered. There is money on the table now: you put a stake in front of you and
+  play out of it, and so does everybody else. The ante is a twentieth of what
+  you brought but never more than a quarter of the shortest stack at the table,
+  because the people in these rooms carry fifty dollars and a game pitched at
+  your bankroll would be a game nobody could sit in. Between hands the table is
+  still there: the next hand is one decision, whoever cannot cover the ante
+  takes what is left and goes home, and whoever else is in the room takes the
+  empty chair. It ends when you have nothing left, when the room has nobody
+  left, or when you pick your money up — and getting up or walking out both
+  pick it up for you. Measured at the bar: twenty hands on a $1,000 buy-in at
+  $12 a hand before the room ran out of people. What is not built: a bigger
+  table than four, rebuying after you are cleaned out, and a stake you set
+  yourself rather than one the room sets.
+
 ---
 
 Now when gambling for some reason you changed it back to "play the nickle machine" which doesn't even show our slots page it just seems to run some background simulation and it doesn't allow you to set your own bet as we fleshed out prior.
