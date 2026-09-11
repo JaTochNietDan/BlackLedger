@@ -10495,3 +10495,55 @@ This is the second time tonight a blunt global substitution has done damage — 
 first shredded the stylesheet. The rule is the same in both: a file where the
 same expression appears in several independent places cannot be edited by
 pattern, only by position.
+
+## A finding that was not one, and a line that could never run
+
+The exploring policy was dying in every run at twenty-five days, and six of
+eleven deaths came while walking between two addresses — somebody it had robbed
+or hit, coming for it in the street. The obvious question was whether the game
+gives any warning, so the policy was given the city's own answer: keep five
+contacts, at ten dollars a coffee.
+
+Deaths went from twelve in twelve to none in twelve, and its life from
+twenty-five days to seventy-two. Fifty dollars looked like the difference
+between certain death and complete safety while doing the same amount of harm.
+
+It was not. The counts of mugging, striking and robbing were similar in absolute
+terms — eight against eleven, twelve against eleven — but the runs were three
+times longer, so **per thousand commands the harm fell from 4.96 to 1.80**. The
+policy was not protected, it was simply spending most of its life walking to the
+bar for coffee instead of hitting people. Normalising is what showed it; counting
+would never have.
+
+That is the sixth time tonight a measurement was read as a fact about the game
+and turned out to be the instrument.
+
+Confirmed the other way as well, which is the check that settles it: taking the
+player's reach out of `Warned` altogether leaves the policy dying two times in
+twelve rather than none. Contacts account for about two deaths in twelve, not
+twelve.
+
+### The line underneath it
+
+Looking for the mechanism turned up a real one. `Warned` reads:
+
+    if w.Reach() >= 2 { return true }
+    if w.InTransit() {
+        // The people who watch your door are at your door.
+        return false
+    }
+
+The second branch can never run. The flat check on reach sits above it and
+answers first, so two cups of coffee bought a warning on an empty street where
+by that function's own account there is nobody to give one. The comment
+describes a rule the code does not have.
+
+The order is the fix. In a room, contacts are enough to be told in time. On the
+street they are not, and it takes every contact the city offers plus a telephone
+or a room of your own — the word has to have reached you before you set out.
+That is a small change by the numbers, worth about two deaths in twelve for a
+policy that goes out of its way to make enemies, and it is correct regardless of
+size: a written rule that cannot run is a bug whatever it is worth.
+
+The eight policies with plans are unmoved by it, checked column by column
+against the committed baseline.

@@ -482,6 +482,18 @@ func Choose(v View, strategy string) (core.Command, error) {
 				return c, nil
 			}
 		}
+		// And knowing people is upkeep too, which is the question this was
+		// built to ask. Six of eleven deaths came while walking between two
+		// addresses — somebody the policy had robbed or hit, coming for it in
+		// the street — and the odds on an attack in the core are written as
+		// the odds of an *unwarned* one. A coffee costs ten dollars and the
+		// city has no other way of telling a stranger you have wronged from a
+		// stranger.
+		if v.Player.Contacts < 5 {
+			if c, ok := v.at("bar", "contact"); ok {
+				return c, nil
+			}
+		}
 		if v.Player.Cash < 1500 {
 			if c, ok := v.at("docks", "dockwork"); ok {
 				return c, nil

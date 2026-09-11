@@ -16,6 +16,13 @@ const (
 	// AmbushOdds is the chance an unwarned attack kills, before anything about
 	// where you are standing or what you are wearing.
 	AmbushOdds = .78
+	// RoomWarning is the reach at which somebody tells you in time, in a room.
+	// StreetWarning is what it takes between two addresses, where there is
+	// nobody to tell you and the word has to have reached you before you set
+	// out: every contact this city offers, and a telephone or a room of your
+	// own on top of them.
+	RoomWarning   = 2
+	StreetWarning = 6
 	// StreetExposure is what being between two addresses adds to that. No
 	// walls, no door, and nobody who knows you to shout.
 	StreetExposure = .10
@@ -71,12 +78,23 @@ func (w *World) Cover() float64 {
 // reach far enough — or the room is busy enough that a man walking in with his
 // hand in his coat is something people say out loud.
 func (w *World) Warned(plot Plot) bool {
-	if w.Reach() >= 2 {
-		return true
-	}
 	if w.InTransit() {
-		// The people who watch your door are at your door.
-		return false
+		// The people who watch your door are at your door. This line was
+		// already written and could never run: the reach check sat above it and
+		// returned true first, so two cups of coffee bought a warning on an
+		// empty street between two addresses, where by this file's own account
+		// there is nobody to give one.
+		//
+		// It takes a great deal more than two. Measured with a policy that
+		// mugs, strikes and robs its way across the city: at a reach of two it
+		// survived every one of twelve campaigns past seventy days, and without
+		// the coffee it died in every one of twelve at twenty-five. Fifty
+		// dollars was the difference between certain death and no death at all,
+		// while doing the same amount of harm and walking further.
+		return w.Reach() >= StreetWarning
+	}
+	if w.Reach() >= RoomWarning {
+		return true
 	}
 	if w.Watchers() > 0 && w.Player.Location == w.Player.Home {
 		return true

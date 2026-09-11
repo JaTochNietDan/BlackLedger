@@ -181,3 +181,49 @@ func TestTheyTakeItOutOnTheHouseOnlyWhenTheyCannotReachYou(t *testing.T) {
 		t.Fatal("they got to somebody in a police cell")
 	}
 }
+
+// The street is not a room.
+//
+// `Warned` had a branch saying "the people who watch your door are at your
+// door", returning false for somebody caught between two addresses — and it
+// could never run, because a flat check on the player's reach sat above it and
+// answered first. Two cups of coffee bought a warning on an empty street where
+// by that same function's account there is nobody to give one.
+//
+// The order is the fix, and this is the guard: in a room, contacts are enough;
+// on the street, they are not, and it takes everything the city offers.
+func TestContactsDoNotFollowYouIntoTheStreet(t *testing.T) {
+	t.Parallel()
+	w := New(53)
+	w.Event, w.District = nil, 9
+	w.Player.Health, w.Player.Cash = 100, 20000
+	w.Player.Contacts = RoomWarning
+	if w.Reach() < RoomWarning {
+		t.Fatalf("a reach of %d with %d contacts", w.Reach(), w.Player.Contacts)
+	}
+	// Standing in a room, that is enough to be told.
+	w.Player.Location = "bar"
+	if w.InTransit() {
+		t.Fatal("standing still and in transit")
+	}
+	if !w.Warned(Plot{}) {
+		t.Fatalf("a reach of %d in a room and nobody said anything", w.Reach())
+	}
+	// On the street between two addresses, it is not.
+	// Between two addresses is a location that is not one.
+	w.Player.Location = "on the way to Pier 14"
+	if !w.InTransit() {
+		t.Skip("this build has no journey to be caught on")
+	}
+	if w.Warned(Plot{}) {
+		t.Fatalf("a reach of %d told somebody on an empty street", w.Reach())
+	}
+	// And enough of it is enough anywhere.
+	w.Player.Contacts = StreetWarning
+	if w.Reach() < StreetWarning {
+		t.Skipf("a reach of %d is the most this city offers", w.Reach())
+	}
+	if !w.Warned(Plot{}) {
+		t.Fatalf("every contact in the city, a reach of %d, and still nothing", w.Reach())
+	}
+}
