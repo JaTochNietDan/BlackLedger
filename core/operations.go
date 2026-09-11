@@ -343,6 +343,36 @@ func (w *World) LayOff(id string) error {
 	return nil
 }
 
+// CarriedOwn is what a haulier of your own takes off the price of stocking
+// everything else you hold. A third: enough that a yard is worth holding for
+// something other than what the yard itself earns, and not so much that a
+// business runs on nothing.
+const CarriedOwn = .34
+
+// RestockCost is what topping this place up actually costs. Every business in
+// the city buys its stock from somebody and pays somebody to bring it; a player
+// who holds the haulier is paying themselves for the second half of that.
+//
+// The garage was the only address in the city that did anything for the rest of
+// what you hold — half off the car's upkeep and its repairs — and the user's
+// standing words ask for businesses that link together. This is the same shape
+// on the other side of the ledger, and it makes a yard worth having for a
+// reason that is not the yard's own income.
+func (w *World) RestockCost(id string) int {
+	trade, ok := TradeOf(id)
+	if !ok {
+		return 0
+	}
+	// The yard cannot carry its own fuel for nothing.
+	if l, ok := PlaceByID(id); ok && l.Kind == "haulage" {
+		return trade.Restock
+	}
+	if !w.OwnsKind("haulage") {
+		return trade.Restock
+	}
+	return trade.Restock - int(float64(trade.Restock)*CarriedOwn)
+}
+
 // RestockReadiness explains why it cannot be topped up, or returns "".
 func (w *World) RestockReadiness(id string) string {
 	trade, ok := TradeOf(id)
@@ -352,7 +382,7 @@ func (w *World) RestockReadiness(id string) string {
 	if w.Properties[id].Supply >= trade.RestockAmount {
 		return "It has all it needs"
 	}
-	if w.Player.Cash < trade.Restock {
+	if w.Player.Cash < w.RestockCost(id) {
 		return "Not enough cash"
 	}
 	return ""
@@ -364,13 +394,21 @@ func (w *World) Restock(id string) error {
 		return fmt.Errorf("%s", reason)
 	}
 	trade, _ := TradeOf(id)
-	if err := w.Pay(trade.Restock); err != nil {
+	paid := w.RestockCost(id)
+	if err := w.Pay(paid); err != nil {
 		return err
 	}
 	prop := w.Properties[id]
 	prop.Supply = trade.RestockAmount
 	place, _ := PlaceByID(id)
-	w.Log("Restocked at "+place.Name, fmt.Sprintf("$%d on %s. %s is trading properly again.", trade.Restock, trade.Supplies, place.Name), "business")
+	carried := ""
+	if paid < trade.Restock {
+		carried = fmt.Sprintf(" Your own yard brought it, which saved $%d of the $%d.",
+			trade.Restock-paid, trade.Restock)
+	}
+	w.Log("Restocked at "+place.Name,
+		fmt.Sprintf("$%d on %s. %s is trading properly again.%s",
+			paid, trade.Supplies, place.Name, carried), "business")
 	return nil
 }
 

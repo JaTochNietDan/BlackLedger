@@ -1,6 +1,9 @@
 package core
 
-import "testing"
+import (
+	"strings"
+	"testing"
+)
 
 func operator(t *testing.T) *World {
 	t.Helper()
@@ -187,5 +190,92 @@ func TestTroubleCanBeDealtWithAndEachTradeHasItsOwn(t *testing.T) {
 			t.Fatalf("%s shares its trouble with another trade", id)
 		}
 		seen[trade.Trouble] = true
+	}
+}
+
+// Businesses that link together. The garage was the only address in the city
+// that did anything for the rest of what you hold — half off the car's upkeep
+// and its repairs — and the user's standing words ask for businesses that link
+// to each other rather than eight separate incomes. Every business in the city
+// buys its stock from somebody and pays somebody to bring it; a player who
+// holds the haulier is paying themselves for the second half of that.
+func yardTest(t *testing.T, buyYard bool) *World {
+	t.Helper()
+	w := New(61)
+	w.Event, w.District = nil, 9
+	w.Player.Health, w.Player.Respect = 100, 30
+	w.Player.Cash = 500000
+	for _, id := range []string{"laundry", "butcher"} {
+		w.Event, w.Player.Location = nil, id
+		if err := w.apply(Command{Kind: "acquire", Target: id, RequestID: "yard" + id}); err != nil {
+			t.Fatal(id, err)
+		}
+	}
+	if buyYard {
+		w.Event, w.Player.Location = nil, "haulage"
+		if err := w.apply(Command{Kind: "acquire", Target: "haulage", RequestID: "yardyard"}); err != nil {
+			t.Fatal(err)
+		}
+	}
+	w.Event = nil
+	return w
+}
+
+func TestAYardOfYourOwnCarriesYourOwnStock(t *testing.T) {
+	t.Parallel()
+	without, with := yardTest(t, false), yardTest(t, true)
+	for _, id := range []string{"laundry", "butcher"} {
+		trade, _ := TradeOf(id)
+		full, carried := without.RestockCost(id), with.RestockCost(id)
+		t.Logf("%s: $%d the rate, $%d without a yard, $%d with one", id, trade.Restock, full, carried)
+		if full != trade.Restock {
+			t.Fatalf("%s costs $%d to stock with no yard and the trade says $%d", id, full, trade.Restock)
+		}
+		if carried >= full {
+			t.Fatalf("%s costs $%d with a yard of your own and $%d without", id, carried, full)
+		}
+	}
+	// And the yard cannot carry its own fuel for nothing.
+	trade, _ := TradeOf("haulage")
+	if with.RestockCost("haulage") != trade.Restock {
+		t.Fatalf("the yard stocks itself at $%d instead of $%d",
+			with.RestockCost("haulage"), trade.Restock)
+	}
+}
+
+// What the player pays is what the button says and what the log says, which is
+// where a discount like this usually comes apart.
+func TestTheYardsSavingIsWhatIsActuallyPaid(t *testing.T) {
+	t.Parallel()
+	w := yardTest(t, true)
+	w.Properties["butcher"].Supply = 0
+	before, want := w.Player.Cash, w.RestockCost("butcher")
+	trade, _ := TradeOf("butcher")
+	if err := w.Restock("butcher"); err != nil {
+		t.Fatal(err)
+	}
+	paid := before - w.Player.Cash
+	if paid != want {
+		t.Fatalf("the button said $%d and the till took $%d", want, paid)
+	}
+	if paid >= trade.Restock {
+		t.Fatalf("the yard saved nothing: $%d against the rate of $%d", paid, trade.Restock)
+	}
+	said := w.History[len(w.History)-1].Text
+	if !strings.Contains(said, "your own yard") && !strings.Contains(said, "Your own yard") {
+		t.Fatalf("the saving is taken and nobody is told where it came from: %q", said)
+	}
+}
+
+// A player with no yard is told nothing about one, which is the ordinary case.
+func TestAPlayerWithNoYardHearsNothingAboutOne(t *testing.T) {
+	t.Parallel()
+	w := yardTest(t, false)
+	w.Properties["butcher"].Supply = 0
+	if err := w.Restock("butcher"); err != nil {
+		t.Fatal(err)
+	}
+	if said := w.History[len(w.History)-1].Text; strings.Contains(said, "yard") {
+		t.Fatalf("a player who holds no yard is told one carried their stock: %q", said)
 	}
 }

@@ -8683,3 +8683,33 @@ what the Green Baize is.
 
 Both halves broken: the street stops saying it and the guard names the Green
 Baize; the list stops saying it and the guard says so.
+
+## A yard of your own carries your own stock
+
+The garage was the only address in the city that did anything for the rest of
+what you hold: half off the car's upkeep and half off its repairs. The user's
+standing words ask for businesses that link to each other rather than eight
+separate incomes, so here is the same shape on the other side of the ledger.
+
+Every business in the city buys its stock from somebody and pays somebody to
+bring it. A player who holds the haulier is paying themselves for the second
+half of that, and stocking everything else they hold costs a third less. The
+yard cannot carry its own fuel for nothing. The button says the reduced price,
+the till takes exactly that, and the log says where the saving came from.
+
+Measured: a laundry stocks at $90 and at $60 with a yard; a butcher at $200 and
+at $132. Three breaks, three failures — the yard carrying nothing, the yard
+stocking itself free, and the button naming one price while the till takes
+another.
+
+**And a hole in the balance harness, found on the way.** Across eight hundred
+simulated campaigns there are 1,446 acquisitions and zero restock commands, so
+nothing about stock — running out, buying more, or what carrying it costs — has
+ever been visible to the baseline. The reason is not policy but the horizon: a
+publican's campaign runs a median of 5.7 days and a business bought part-way
+through takes five to eight days to empty from full, so no simulated campaign
+has ever seen a larder run out. The publican's comment already claimed
+restocking among the twelve ticks of work it exercises; it now has the branch to
+match, and that branch does not fire today. It will the day the horizon grows.
+
+Balance unmoved, for that reason rather than because nothing happened.

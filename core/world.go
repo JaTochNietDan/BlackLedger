@@ -1514,8 +1514,14 @@ func (w *World) Actions(id string) []Action {
 					add("order", "Take on a standing order", 60, 0, w.OrderReadiness(id),
 						fmt.Sprintf("$%d a day from somebody respectable, for as long as %s keeps working at %d%%. It needs %d%% trade before anybody offers one, and losing it costs %d trade on top of the money.", OrderBonus, l.Name, int(OrderCapacity*100), OrderCustom, OrderLoss))
 				}
-				asks("restock", "Buy "+trade.Supplies, 45, trade.Restock, w.RestockReadiness(id),
-					fmt.Sprintf("$%d. Currently %d left; a business out of %s barely trades.", trade.Restock, prop.Supply, trade.Supplies))
+				stocking := w.RestockCost(id)
+				carried := ""
+				if stocking < trade.Restock {
+					carried = fmt.Sprintf(" $%d of it, because your own yard carries it.", trade.Restock-stocking)
+				}
+				asks("restock", "Buy "+trade.Supplies, 45, stocking, w.RestockReadiness(id),
+					fmt.Sprintf("$%d. Currently %d left; a business out of %s barely trades.%s",
+						stocking, prop.Supply, trade.Supplies, carried))
 				if prop.Trouble {
 					asks("remedy", trade.Remedy, 60, trade.RemedyCost, w.RemedyReadiness(id),
 						fmt.Sprintf("$%d. %s %s", trade.RemedyCost, trade.Trouble, trade.RemedyDetail))

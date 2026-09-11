@@ -23,6 +23,11 @@ type Place struct {
 	// has the keys. A policy that only ever buys a place and walks away cannot
 	// see any of it, which is why twelve ticks of work on running a business
 	// reached no simulated campaign.
+	// What it has left to trade on. A business out of stock barely trades, and
+	// no policy in this harness ever bought any: measured across eight hundred
+	// campaigns, zero restock commands, so every rule about stock, and the
+	// price of carrying it, was invisible to the balance.
+	Supply    int    `json:"supply"`
 	Staff     int    `json:"staff"`
 	Positions int    `json:"positions"`
 	Wage      int    `json:"wage"`
@@ -457,6 +462,13 @@ func Choose(v View, strategy string) (core.Command, error) {
 			}
 			if p.Staff < p.Positions {
 				if c, ok := v.at(p.ID, "hire"); ok {
+					return c, nil
+				}
+			}
+			// And something to trade with. Somebody in charge stocks the place
+			// themselves, so this is for the ones nobody is minding.
+			if p.Supply <= 0 {
+				if c, ok := v.at(p.ID, "restock"); ok {
 					return c, nil
 				}
 			}
