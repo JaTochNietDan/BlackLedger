@@ -51,6 +51,9 @@ function Person({
     // it was bought and paid for, and the only way to know they had it was to
     // remember buying it.
     who.carrying ? `carrying ${who.carrying.toLowerCase()}` : '',
+    // And what the player put them in. It shifts a job that went wrong away
+    // from the two endings nobody wants.
+    who.driving ? `driving ${who.driving.toLowerCase()}` : '',
     // Somebody of yours who has got far enough down that they are thinking
     // about where else they could be. A man can walk out of here with one of
     // your businesses and the only warning was a number.

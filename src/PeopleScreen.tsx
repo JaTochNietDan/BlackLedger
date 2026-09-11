@@ -59,6 +59,7 @@ function Card({
           {/* And what the player put in their hand, which changes what sending
               them does and was bought and paid for. */}
           {who.carrying ? ` · carrying ${who.carrying.toLowerCase()}` : ''}
+          {who.driving ? ` · driving ${who.driving.toLowerCase()}` : ''}
         </small>
         {/* Somebody of yours on their way out. The game says "it had been
             coming" the morning after; this is the part that comes before. */}

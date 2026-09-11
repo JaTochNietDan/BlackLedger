@@ -44,6 +44,11 @@ type Presence struct {
 	// are thinking about where else they could be. Only for your own, and only
 	// once they are past the line, because it is a warning rather than a stat.
 	Restless bool `json:"restless,omitempty"`
+	// Driving is the car the player bought one of their own, by name. It shifts
+	// a job that went wrong away from the two endings nobody wants, by a
+	// seventh and more with plate on it — the same argument as the gun, on the
+	// field beside it, and it was missed the same way.
+	Driving string `json:"driving,omitempty"`
 	// Walking is somebody who is between two addresses right now. Where and
 	// WhereID then name where they are *going*, because that is the only place
 	// they could be met: reaching a man in the street is not something this
@@ -234,6 +239,7 @@ func (w *World) see(n *NPC) Presence {
 		Standing: w.standingOf(n), Doing: w.doingNow(n),
 		Yours:    n.Faction == w.PlayerOrganizationID(),
 		Carrying: w.whatTheyCarry(n),
+		Driving:  w.whatTheyDrive(n),
 		Restless: n.Faction == w.PlayerOrganizationID() && n.Trust < DefectionTrust,
 		Known:    known,
 		Because:  w.because(n),
@@ -350,4 +356,14 @@ func (w *World) whatTheyCarry(n *NPC) string {
 		return ""
 	}
 	return weapons[min(n.Weapon, len(weapons)-1)].Label
+}
+
+// whatTheyDrive is the car in one of your own people's hands, by name, and
+// nothing for anybody else — the city's own drivers are not the player's
+// business and there are dozens of them.
+func (w *World) whatTheyDrive(n *NPC) string {
+	if n == nil || n.Car <= 0 || n.Faction != w.PlayerOrganizationID() {
+		return ""
+	}
+	return VehicleByTier(n.Car).Label
 }

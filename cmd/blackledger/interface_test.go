@@ -445,7 +445,7 @@ func TestRefusalsAreInTheListAndLast(t *testing.T) {
 func TestBothCardsSayWhatYourOwnPeopleCarry(t *testing.T) {
 	t.Parallel()
 	for _, path := range []string{"src/ActionList.tsx", "src/PeopleScreen.tsx"} {
-		if !holds(source(t, path), "who.carrying") {
+		if !holds(source(t, path), "who.carrying") || !holds(source(t, path), "who.driving") {
 			t.Errorf("%s: a person's card says nothing about what the player put in their hand", path)
 		}
 	}

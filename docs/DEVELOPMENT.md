@@ -9430,3 +9430,25 @@ told them.
 Worth keeping: a seizure resets the mode to nothing, which reads as "as usual".
 A player who was skimming and was raided is now running clean-ish without having
 chosen to — visible at last, which is the point.
+
+## The same sweep, on people
+
+The Property sweep found one thing worth showing out of thirteen. The same
+question asked of a person — every field on somebody against every field their
+card carries — finds twenty-four, and almost all of them are right to leave off:
+a voice, a colour, where somebody is heading and when they arrive, what is in
+their purse, who they are sore at.
+
+One was not. A car bought for one of your own shifts a job that went wrong away
+from the two endings nobody wants, by a seventh, and more with plate on it. The
+player paid for it. It is the field beside the gun and it was missed the same
+way, an hour after the gun was fixed.
+
+Both are on the card now, and only for your own: the city's own drivers are not
+the player's business and there are dozens of them.
+
+What the sweep does not answer is whether a field that *is* sent ever gets
+drawn — the whole person list goes down the wire, so nothing here is strictly
+hidden, only unsaid. The question worth asking is which facts a player needs in
+the place they are looking, and that is judgement rather than a diff. Both
+sweeps are in the log so the next one starts from what was already decided.

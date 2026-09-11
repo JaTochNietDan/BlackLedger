@@ -356,14 +356,24 @@ func TestTheCardSaysWhatYourOwnPeopleCarry(t *testing.T) {
 	top := Armaments("weapon")[len(Armaments("weapon"))-1]
 	mine.Weapon, theirs.Weapon = top.Tier, top.Tier
 
+	// And a car, which shifts a job that went wrong away from the two endings
+	// nobody wants — the same argument on the field beside it.
+	mine.Car, theirs.Car = 2, 2
+	drives, quietCar := "", "unchecked"
 	said, quiet := "", "unchecked"
 	for _, p := range w.PeopleHere(w.Player.Location) {
 		switch p.ID {
 		case mine.ID:
-			said = p.Carrying
+			said, drives = p.Carrying, p.Driving
 		case theirs.ID:
-			quiet = p.Carrying
+			quiet, quietCar = p.Carrying, p.Driving
 		}
+	}
+	if drives != VehicleByTier(2).Label {
+		t.Fatalf("%s is driving %s and the card says %q", mine.Name, VehicleByTier(2).Label, drives)
+	}
+	if quietCar != "" {
+		t.Fatalf("a stranger's car is on the player's screen: %q", quietCar)
 	}
 	if said != top.Label {
 		t.Fatalf("%s is carrying %s and the card says %q", mine.Name, top.Label, said)
@@ -373,10 +383,16 @@ func TestTheCardSaysWhatYourOwnPeopleCarry(t *testing.T) {
 	}
 	// And somebody of yours carrying nothing says nothing rather than "nothing
 	// but your hands".
-	mine.Weapon = 0
+	mine.Weapon, mine.Car = 0, 0
 	for _, p := range w.PeopleHere(w.Player.Location) {
-		if p.ID == mine.ID && p.Carrying != "" {
+		if p.ID != mine.ID {
+			continue
+		}
+		if p.Carrying != "" {
 			t.Fatalf("somebody carrying nothing is described as carrying %q", p.Carrying)
+		}
+		if p.Driving != "" {
+			t.Fatalf("somebody on foot is described as driving %q", p.Driving)
 		}
 	}
 }

@@ -56,6 +56,7 @@ export interface Presence {
   overdue?: boolean;
   yours?: boolean;
   carrying?: string;
+  driving?: string;
   restless?: boolean;
   known?: boolean;
   temperament?: string;
