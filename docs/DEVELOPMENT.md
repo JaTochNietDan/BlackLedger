@@ -9173,3 +9173,29 @@ The ones left are the pawnbroker, the butcher, the restaurant, the burlesque,
 the dealer, the laundries, the poolhall and the casinos; several of those are
 already linked to the city rather than to the player, which is a different
 thing and worth keeping straight.
+
+## Two cards under one name
+
+A playtest rather than a build. Driving a campaign through the API and reading
+what a room actually offers turned up the same shape that put somebody who asked
+for the machines into a hand of cards: two cards in one room sharing one id.
+
+Asking where somebody is was offered once per mark and all of them were called
+`about:<who>`. A command is matched to a card by its id and the match takes the
+last one that fits, so the wrong card's price, minutes and label were used
+whatever the player pressed. The right thing still happened, because the mark
+rides on the choice — but the receipt named the wrong person, and the day one of
+those asks costs more than another the wrong one is charged.
+
+The id carries both names now, the way `arms:weapon:3` and `sit:back` do. And
+rather than fix the one case, the guard rules it out everywhere: 615 cards read
+across the city, every one of them named once in its room. Putting the old id
+back fails it in two rooms on the first pass.
+
+Two existing guards had to learn that an id can carry two names — one parsed the
+subject out of everything after the first colon, and one sent the old command.
+Both were updated with the reason rather than reverted.
+
+Checked first and left alone: laundering is already tied to holding a business,
+and a forecourt you hold already sells you a car without the margin. Two of the
+links I might have built this tick were already there.

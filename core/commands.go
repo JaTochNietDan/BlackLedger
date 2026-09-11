@@ -352,8 +352,14 @@ func (w *World) apply(c Command) error {
 				return err
 			}
 			w.Advance(a.Minutes)
-		} else if who, ok := strings.CutPrefix(c.Kind, "about:"); ok {
-			if err := w.AskAbout(who, c.Choice); err != nil {
+		} else if what, ok := strings.CutPrefix(c.Kind, "about:"); ok {
+			// "about:leo:vittorio" — who is asked, and who about. The mark
+			// still rides on the choice for a client that sends the old id.
+			who, mark, _ := strings.Cut(what, ":")
+			if mark == "" {
+				mark = c.Choice
+			}
+			if err := w.AskAbout(who, mark); err != nil {
 				return err
 			}
 			w.Advance(a.Minutes)

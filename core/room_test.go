@@ -39,8 +39,17 @@ func TestWorkAimedAtSomebodyKnowsWhoItIsAimedAt(t *testing.T) {
 		}
 		for _, a := range w.Actions(l.ID) {
 			aimed := personal[a.ID]
-			if at := indexByte(a.ID, ':'); at >= 0 && w.NPC(a.ID[at+1:]) != nil {
-				aimed = true
+			// An id carries who it is about after the colon, and some of them
+			// carry two names: "about:leo:vittorio" is Leo being asked where
+			// Vittorio is. The one being acted on is the first of them.
+			if at := indexByte(a.ID, ':'); at >= 0 {
+				who := a.ID[at+1:]
+				if next := indexByte(who, ':'); next >= 0 {
+					who = who[:next]
+				}
+				if w.NPC(who) != nil {
+					aimed = true
+				}
 			}
 			if !aimed {
 				if a.Subject != "" && !here[a.Subject] {

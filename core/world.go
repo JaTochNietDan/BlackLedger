@@ -1795,7 +1795,15 @@ func (w *World) Actions(id string) []Action {
 			}
 			wanted++
 			who := asked[0]
-			add("about:"+who.ID, "Ask "+who.Name+" where "+mark.Name+" is", 15, 0,
+			// Who is being asked, and who they are being asked about. One id
+			// for every mark put two and three cards in the room under the
+			// same name, and a command is matched to a card by its id: the
+			// right thing still happened because the mark rides on the choice,
+			// but the receipt named the wrong person, and the moment one of
+			// them costs more than another the wrong one is charged. This is
+			// the shape that put somebody who asked for the machines into a
+			// hand of cards.
+			add("about:"+who.ID+":"+mark.ID, "Ask "+who.Name+" where "+mark.Name+" is", 15, 0,
 				w.AskAboutReadiness(who.ID, mark.ID),
 				"Whether they know is one thing and whether they will say is another. Asking somebody to give up one of their own family is a thing they remember.")
 			if len(out) > 0 {

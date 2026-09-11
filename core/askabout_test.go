@@ -168,7 +168,9 @@ func TestAskingAfterSomebodyIsOfferedAndCarriesBothNames(t *testing.T) {
 
 	var offered *Action
 	for _, a := range w.Actions(w.Player.Location) {
-		if a.ID == "about:"+here.ID && a.Choice == away.ID {
+		// The id carries both names now, so two cards in one room cannot
+		// share it: "about:leo:vittorio" is Leo asked where Vittorio is.
+		if a.ID == "about:"+here.ID+":"+away.ID && a.Choice == away.ID {
 			offered = &a
 		}
 	}
@@ -181,7 +183,7 @@ func TestAskingAfterSomebodyIsOfferedAndCarriesBothNames(t *testing.T) {
 	if offered.Subject != away.ID {
 		t.Fatalf("a question about %s is filed under %q", away.Name, offered.Subject)
 	}
-	if err := w.apply(Command{Kind: "about:" + here.ID, Choice: away.ID,
+	if err := w.apply(Command{Kind: "about:" + here.ID + ":" + away.ID, Choice: away.ID,
 		Target: w.Player.Location, RequestID: "askafterthem1"}); err != nil {
 		t.Fatalf("asking through the same path as everything else failed: %v", err)
 	}
