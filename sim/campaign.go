@@ -531,8 +531,48 @@ func Choose(v View, strategy string) (core.Command, error) {
 				return c, nil
 			}
 		}
-		if v.Player.Cash < 1500 {
+		// It earns to what the next thing it has never bought actually costs.
+		// A flat fifteen hundred is enough for a laundry and never enough for a
+		// car, so it hovered just under the price of one for seventy days and
+		// the whole branch that hangs off owning one went unplayed.
+		saving := 1500
+		if v.Player.Car == 0 {
+			saving = 2600
+		}
+		if v.Player.Cash < saving {
 			if c, ok := v.at("docks", "dockwork"); ok {
+				return c, nil
+			}
+		}
+		// The next district, when it can afford one.
+		//
+		// Half this city is behind a district gate and the magpie had never
+		// opened one: the forecourt, the garage and the pawnbroker are all in
+		// the second district, so seven kinds of thing that hang off owning a
+		// car were unreachable not because the policy would not buy one but
+		// because it had never been anywhere that sells them.
+		// The card sits on the locked address itself rather than anywhere you
+		// stand: looking at a forecourt in the next district is what offers to
+		// open it, so this asks the forecourt rather than walking anywhere.
+		if v.Player.Cash > 1200 {
+			if c, ok := v.action("dealer", "expand"); ok {
+				return c, nil
+			}
+		}
+		// A car, once it can afford one and before anything else it could spend
+		// the money on.
+		//
+		// Seven kinds of thing hang off owning one — buying it, plating it,
+		// having it serviced, filling the tank, scrapping it, and plating or
+		// buying one for somebody else — and no policy in this harness had ever
+		// bought a car, so none of that had ever been played.
+		//
+		// Before the acquire below rather than after, because the forecourt is
+		// itself for sale: standing on it with two thousand dollars, the rule
+		// that buys any room of its own bought the lot and left nothing for a
+		// car, every time.
+		if v.Player.Car == 0 && v.Player.Cash > 2000 {
+			if c, ok := v.at("dealer", "car"); ok {
 				return c, nil
 			}
 		}

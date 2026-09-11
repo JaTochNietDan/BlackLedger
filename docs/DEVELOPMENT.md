@@ -10884,3 +10884,51 @@ The top of the table is unchanged by any of this, which matters: mugging at $5.0
 a minute, robbing at $3.58 and stripping a car at $3.21 still lead it, so the
 headline that crime pays about six times honest work by the minute survived
 every correction made to the instrument that produced it.
+
+## Half the city was behind a gate nobody opened
+
+Twenty-nine kinds of action were still never played by any policy, and seven of
+them were the car: buying it, plating it, having it serviced, filling the tank,
+scrapping it, and plating or buying one for somebody else. No policy in this
+harness had ever bought a car.
+
+Getting there took four attempts and only the last one was about the car.
+
+**It never had the money at the same time as the opportunity.** The exploring
+policy earns to fifteen hundred and spends what it earns, so it hovered just
+under the price of a car for seventy days. It saves for what the next thing it
+has never bought actually costs now.
+
+**Standing at the forecourt, it bought the forecourt.** The rule that buys any
+room of its own fired first and spent the money the car needed, every time. The
+car goes above it.
+
+**And then none of that mattered, because the forecourt is in the second
+district.** So are the garage and the pawnbroker. Half this city is behind a
+district gate and no exploring policy had ever opened one — which is why a
+window at a pawnbroker built earlier tonight had never been simulated once.
+
+**The card to open it is not where you would look for it.** "Establish contacts
+across town" sits on the locked address itself rather than anywhere the player
+stands: looking at a forecourt in the next district is what offers to open it.
+Asking the apartment, which is where the investor's ladder goes, finds nothing.
+
+With the district open the exploring policy reaches **98 kinds of action across
+thirty campaigns**, up from 88, and survives ninety-two game days instead of
+seventy-two. What opened with it: the car and everything hanging off it, the
+pawnbroker, redeeming a ticket, and the window.
+
+Sixteen kinds are still never played, and the list is now almost entirely one
+thing: a seat at a card table (`deal`, `call`, `fold`, `bet`, `cards`,
+`cashout`), plus the boat at a pier you own, scrapping a car, and a handful of
+things aimed at an organization you have joined.
+
+### The coverage guard is a floor, not a figure
+
+Making the ladder longer made the policy slower to breadth, so the small sample
+that guard runs — two seeds of each policy, seven hundred commands — fell from
+77 kinds to 55 even as the real coverage rose from 88 to 98. The guard is pinned
+at 55 now and says plainly in its own comment that it is a floor for a small
+sample rather than the harness's coverage, and where the real number comes from.
+A guard that quotes a figure it cannot measure is the same fault as a list
+written by hand.
