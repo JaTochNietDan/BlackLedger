@@ -404,3 +404,39 @@ func TestTheDrumIsNotACentredGrid(t *testing.T) {
 			"say otherwise: %q", flat(last))
 	}
 }
+
+// What you cannot do yet is in the list, at the end of the section it belongs
+// to. It used to sit behind a "Show N you cannot do yet" toggle — and in the
+// room panel that toggle started closed, so half of what the room had was
+// hidden until you found the button: "making it so that hidden actions are not
+// hidden anymore, just showed as lower priority in the list (not changing
+// location of sub sections, just putting unavailable actions at the end of the
+// list in each subsection".
+func TestRefusalsAreInTheListAndLast(t *testing.T) {
+	t.Parallel()
+	for _, path := range []string{"src/ActionList.tsx", "src/Interior.tsx"} {
+		src := source(t, path)
+		// One list, refusals after what can be done.
+		if !holds(src, "[...actions.filter(a => !a.disabled), ...actions.filter(a => a.disabled)]") &&
+			!holds(src, "[...s.mine.filter(a => !a.disabled), ...s.mine.filter(a => a.disabled)]") {
+			t.Errorf("%s: the refusals are not ordered behind what can be done", path)
+		}
+		// And no wall in front of them.
+		if holds(src, "you cannot do yet") {
+			t.Errorf("%s: there is still a button standing in front of the refusals", path)
+		}
+		if holds(src, `className="actions blocked"`) ||
+			holds(src, `className="actions compact blocked"`) {
+			t.Errorf("%s: the refusals are still drawn as a block of their own", path)
+		}
+	}
+	// They read as lower priority rather than as broken, and the refusal itself
+	// keeps its colour because it is the point of the card.
+	style := source(t, "src/style.css")
+	if !holds(style, ".action:disabled{") {
+		t.Fatal("a refused action looks exactly like one you can take")
+	}
+	if !holds(style, ".action:disabled .desc{") {
+		t.Fatal("the reason a card is refused is dimmed with the rest of it")
+	}
+}

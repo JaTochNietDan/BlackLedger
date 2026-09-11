@@ -58,9 +58,12 @@ function Work({
   actions: Action[];
   render: (a: Action) => ReactElement;
 }) {
-  const [open, setOpen] = useState(false);
-  const ready = actions.filter(a => !a.disabled);
-  const blocked = actions.filter(a => a.disabled);
+  // What can be done first, what cannot after it, in the one list. The refusals
+  // used to sit behind a toggle that started closed, so the room hid half of
+  // what it had: "making it so that hidden actions are not hidden anymore, just
+  // showed as lower priority in the list … just putting unavailable actions at
+  // the end of the list in each subsection."
+  const ordered = [...actions.filter(a => !a.disabled), ...actions.filter(a => a.disabled)];
   if (actions.length === 0) return null;
   return (
     <section className="action-group">
@@ -68,19 +71,7 @@ function Work({
         {title}
         <span>{blurb}</span>
       </h4>
-      {ready.length > 0 ? (
-        <div className="actions compact">{ready.map(render)}</div>
-      ) : (
-        <p className="nothing-here">Nothing here you can do right now.</p>
-      )}
-      {blocked.length > 0 && (
-        <>
-          <button className="reveal-blocked" aria-expanded={open} onClick={() => setOpen(o => !o)}>
-            {open ? 'Hide' : 'Show'} {blocked.length} you cannot do yet
-          </button>
-          {open && <div className="actions compact blocked">{blocked.map(render)}</div>}
-        </>
-      )}
+      <div className="actions compact">{ordered.map(render)}</div>
     </section>
   );
 }

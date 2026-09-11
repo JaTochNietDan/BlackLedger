@@ -9027,3 +9027,27 @@ connected, so both attempts were reasoned rather than seen, and the first one
 shipped broken. A change to how something moves needs eyes on it, and without
 them the honest move is a mechanism with fewer moving parts — which is what the
 keyframe is.
+
+## The refusals are in the list
+
+"Making it so that hidden actions are not hidden anymore, just showed as lower
+priority in the list (not changing location of sub sections, just putting
+unavailable actions at the end of the list in each subsection."
+
+Each subsection stays where it was and now holds one list: what can be done,
+then what cannot. The toggle is gone from all three places that had it — the
+people standing in the room, the room's own sections, and the panel inside a
+building, where it started closed and hid half of what the room had.
+
+A refused card reads as lower priority rather than as broken: dimmer, with a
+quieter border. The reason keeps its colour, because the reason is the point of
+the card — every refusal in this game is a sentence saying what would change it,
+which is what makes a refused card worth more than an absent one.
+
+One guard was superseded rather than broken. It held that the toggle started
+open and that the toggle still existed; the second half is now wrong on purpose.
+What replaced it is a stronger statement of the same thing, because a list with
+no wall in front of it cannot be closed.
+
+Live after the restart: thirty-five actions in the room the player is standing
+in, ten of them refused, all thirty-five on the page.

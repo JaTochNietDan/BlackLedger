@@ -32,15 +32,17 @@ function Person({
   actions: Action[];
   render: (a: Action) => ReactElement;
 }) {
-  // Open. "We should probably show options like 'buy kerrigan haulage' before
-  // you can afford it instead of having it hidden. We probably should just show
-  // all hidden options tbh." An action you cannot take yet is a thing to want,
-  // and every refusal in this game is a sentence saying what would change it —
-  // so a refused card is worth more than an absent one. The toggle stays, as a
-  // way to tidy rather than a wall to get past.
-  const [open, setOpen] = useState(true);
-  const available = actions.filter(a => !a.disabled);
-  const blocked = actions.filter(a => a.disabled);
+  // "We should probably show options like 'buy kerrigan haulage' before you can
+  // afford it instead of having it hidden. We probably should just show all
+  // hidden options tbh." An action you cannot take yet is a thing to want, and
+  // every refusal in this game is a sentence saying what would change it — so a
+  // refused card is worth more than an absent one.
+  //
+  // The toggle that stood in front of them is gone: "making it so that hidden
+  // actions are not hidden anymore, just showed as lower priority in the list."
+  // What you can do comes first and what you cannot follows it, in the same
+  // list, in the same place it would have been.
+  const ordered = [...actions.filter(a => !a.disabled), ...actions.filter(a => a.disabled)];
   const notes = [
     who.owes ? `owes $${who.owes.toLocaleString()}${who.overdue ? ' · overdue' : ''}` : '',
     who.known && who.trust !== undefined ? `thinks of you at ${who.trust}` : '',
@@ -68,19 +70,8 @@ function Person({
         </div>
       </header>
       {who.says && <p className="said">{who.says}</p>}
-      {available.length > 0 && <div className="actions">{available.map(render)}</div>}
-      {blocked.length > 0 && (
-        <>
-          <button className="reveal-blocked" aria-expanded={open} onClick={() => setOpen(o => !o)}>
-            {open ? 'Hide' : 'Show'} {blocked.length} you cannot do with {who.name.split(' ')[0]}{' '}
-            yet
-          </button>
-          {open && <div className="actions blocked">{blocked.map(render)}</div>}
-        </>
-      )}
-      {available.length === 0 && blocked.length === 0 && (
-        <p className="nothing-here">Nothing to do with them here.</p>
-      )}
+      {ordered.length > 0 && <div className="actions">{ordered.map(render)}</div>}
+      {ordered.length === 0 && <p className="nothing-here">Nothing to do with them here.</p>}
     </article>
   );
 }
@@ -99,9 +90,6 @@ export function ActionList({
   here?: boolean;
 }) {
   const [query, setQuery] = useState('');
-  // Refusals are shown, and a section can be folded away rather than opened up.
-  // Keyed by section so the state is per group, and absent means shown.
-  const [hidBlocked, setHidBlocked] = useState<Record<string, boolean>>({});
   const [showRoom, setShowRoom] = useState(false);
 
   const needle = query.trim().toLowerCase();
@@ -128,13 +116,16 @@ export function ActionList({
   const shown = new Set(present.map(p => p.who.id));
   const bystanders = people.filter(p => !shown.has(p.id));
 
+  // Each section in the order it was already in, and inside it what can be done
+  // before what cannot. Nothing moves section: "not changing location of sub
+  // sections, just putting unavailable actions at the end of the list in each
+  // subsection."
   const sections = placeActions(groups?.length ? groups : [lastResort], impersonal)
     .map(s => ({
       ...s,
-      open: s.mine.filter(a => !a.disabled),
-      blocked: s.mine.filter(a => a.disabled),
+      ordered: [...s.mine.filter(a => !a.disabled), ...s.mine.filter(a => a.disabled)],
     }))
-    .filter(s => s.open.length || s.blocked.length);
+    .filter(s => s.ordered.length > 0);
 
   const available = matches.filter(a => !a.disabled).length;
 
@@ -189,36 +180,15 @@ export function ActionList({
         </section>
       )}
 
-      {sections.map(s => {
-        const showBlocked = !hidBlocked[s.id] || !!needle;
-        return (
-          <section className="action-group" key={s.id}>
-            <h4>
-              {s.title}
-              <span>{s.blurb}</span>
-            </h4>
-            {s.open.length > 0 ? (
-              <div className="actions">{s.open.map(render)}</div>
-            ) : (
-              <p className="nothing-here">Nothing available here right now.</p>
-            )}
-            {s.blocked.length > 0 && (
-              <>
-                {!needle && (
-                  <button
-                    className="reveal-blocked"
-                    aria-expanded={showBlocked}
-                    onClick={() => setHidBlocked(o => ({...o, [s.id]: !o[s.id]}))}
-                  >
-                    {showBlocked ? 'Hide' : 'Show'} {s.blocked.length} you cannot do yet
-                  </button>
-                )}
-                {showBlocked && <div className="actions blocked">{s.blocked.map(render)}</div>}
-              </>
-            )}
-          </section>
-        );
-      })}
+      {sections.map(s => (
+        <section className="action-group" key={s.id}>
+          <h4>
+            {s.title}
+            <span>{s.blurb}</span>
+          </h4>
+          <div className="actions">{s.ordered.map(render)}</div>
+        </section>
+      ))}
 
       {sections.length === 0 && present.length === 0 && (
         <p className="nothing-here">Nothing here matches “{query}”.</p>

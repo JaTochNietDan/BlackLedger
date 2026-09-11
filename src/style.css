@@ -104,7 +104,16 @@ body{height:100%;overflow:hidden;margin:0;background:var(--bg);color:var(--ink);
 .action-group h4{margin:0 0 9px;font:11px system-ui;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);font-weight:500;display:flex;align-items:baseline;gap:9px;border-bottom:1px solid var(--line);padding-bottom:7px}
 .action-group h4 span{font-size:10px;letter-spacing:0;text-transform:none;color:var(--muted);font-weight:400}
 .actions.lead{margin-top:10px}
+/* What cannot be done yet. It used to sit behind a toggle in its own block;
+   it is in the list now, after what can, and it has to read as lower priority
+   without reading as broken: "just showed as lower priority in the list … just
+   putting unavailable actions at the end of the list in each subsection". The
+   refusal is the point of the card, so the reason keeps its colour while the
+   rest of it steps back. */
 .actions.blocked{margin-top:8px;opacity:.72}
+.action:disabled{opacity:.58;background:#17211f;border-color:#2f3a33;cursor:not-allowed}
+.action:disabled strong{color:#a9b3a6}
+.action:disabled .desc{opacity:.92;color:#9a9179}
 .reveal-blocked{background:none;border:0;border-bottom:1px dotted #55635a;color:var(--muted);font-size:11px;padding:5px 0;margin-top:8px}
 .reveal-blocked:hover{color:var(--gold);background:none}
 .nothing-here{color:var(--muted);font-size:11px;margin:4px 0 0;font-style:italic}

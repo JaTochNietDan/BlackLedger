@@ -160,6 +160,15 @@ When playing slots, it should scroll through the items before displaying the fin
 
 What we talked about before, making it so that hidden actions are not hidden anymore, just showed as lower priority in the list (not changing location of sub sections, just putting unavailable actions at the end of the list in each subsection
 
+— answered. There is no toggle in front of them any more. Each subsection is in
+  the place it was, and inside it what you can do comes first and what you
+  cannot follows, in the same list. A refused card reads as lower priority
+  rather than as broken — dimmer, with a quieter border — and the reason keeps
+  its colour, because the reason is the point of the card. Three places had the
+  fold: the people standing in the room, the room's own sections, and the panel
+  inside a building, where the toggle started closed and hid half of what the
+  room had.
+
 ---
 
 It still says buy Mara a coffee even though now it's Ivo Costa for me since I killed Mara.
