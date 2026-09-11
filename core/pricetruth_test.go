@@ -234,3 +234,99 @@ func TestNoCardSpendsMoreOfTheDayThanItSays(t *testing.T) {
 		t.Fatalf("only %d cards were pressed, so this measures nothing", pressed)
 	}
 }
+
+// A card the game offers must work when it is pressed.
+//
+// Every action in this game answers `Disabled` and a `Reason` before anybody
+// touches it, and that is the whole contract of the panel: what you can do reads
+// live, what you cannot reads dim with the reason on it. A live card that
+// returns an error is the contract broken — the player gets a toast instead of a
+// reason, which the bail card did for a long time and which was found by
+// auditing one action by hand.
+//
+// A card that takes a figure the player types is pressed with a figure inside
+// the bounds the core itself published. Sending nothing to a card that wants a
+// number is a fault in the test rather than in the game: the first run of this
+// refused six cards, all of them a wage or a house limit, all of them because it
+// typed a zero.
+//
+// Seven situations rather than one rich player, because the interesting cards
+// are the ones a city only offers to somebody broke, hurt, wanted, nameless or
+// thirty days in, and one comfortable world never sees them.
+func TestEveryLiveCardWorksWhenPressed(t *testing.T) {
+	t.Parallel()
+	situations := []struct {
+		name string
+		fit  func(w *World)
+	}{
+		{"comfortable", func(w *World) {}},
+		{"broke", func(w *World) { w.Player.Cash = 3 }},
+		{"hurt", func(w *World) { w.Player.Health = 12 }},
+		{"wanted", func(w *World) { w.Player.Heat = 95 }},
+		{"nameless", func(w *World) { w.Player.Respect = 0 }},
+		{"with somebody", func(w *World) {
+			if driver := w.Holder("driver"); driver != nil {
+				w.Player.Crew = append(w.Player.Crew,
+					Crew{ID: driver.ID, Name: driver.Name, Loyalty: 70})
+			}
+		}},
+		{"a month in", func(w *World) { w.Advance(1440 * 30) }},
+	}
+
+	// Fifteen seconds of wall clock at six seeds a situation. The fast half of
+	// the gate takes one seed each, which still reaches every situation.
+	seeds, floor := uint32(6), 12000
+	if testing.Short() {
+		seeds, floor = 1, 2000
+	}
+	live, refused := 0, 0
+	for _, situation := range situations {
+		for seed := uint32(1); seed <= seeds; seed++ {
+			base := New(seed)
+			base.Event, base.District = nil, 9
+			base.Player.Cash, base.Player.Respect, base.Player.Health = 400000, 200, 100
+			base.Player.Contacts = 5
+			base.Player.Car, base.Player.CarWear = 2, 20
+			for _, id := range []string{"laundry", "garage", "casino", "poolhall"} {
+				if prop := base.Properties[id]; prop != nil {
+					prop.Owner = "player:1"
+				}
+			}
+			base.Properties["garage"].Trouble = true
+			situation.fit(base)
+
+			for _, l := range Locations {
+				if l.District > base.District {
+					continue
+				}
+				w := base.Clone()
+				w.Player.Location, w.Event = l.ID, nil
+				for _, a := range w.Actions(l.ID) {
+					if a.Disabled {
+						continue
+					}
+					live++
+					amount := 0
+					if a.Sum != nil {
+						amount = a.Sum.Preset
+						if amount < a.Sum.Least || amount > a.Sum.Most {
+							amount = a.Sum.Least
+						}
+					}
+					try := w.Clone()
+					try.Player.Location, try.Event = l.ID, nil
+					if _, err := Execute(try, Command{RequestID: ID(), Revision: try.Revision,
+						Kind: a.ID, Target: l.ID, Amount: amount}); err != nil {
+						refused++
+						t.Errorf("%s at %s reads live to a %s player and refuses when pressed: %v",
+							a.ID, l.ID, situation.name, err)
+					}
+				}
+			}
+		}
+	}
+	t.Logf("%d live cards pressed across seven situations, %d refused", live, refused)
+	if live < floor {
+		t.Fatalf("only %d live cards were pressed, so this measures nothing", live)
+	}
+}

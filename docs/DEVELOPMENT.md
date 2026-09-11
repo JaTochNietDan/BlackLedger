@@ -11668,3 +11668,37 @@ should have declared it in, so writing a trip with `add(...)` instead of
 Four hundred and eighty-one cards pressed, none spending more of the day than
 they say. Broken both ways to check it bites: dropping `Away` flags the three
 trips, and doubling the clock in the command layer flags 428 of the 481.
+
+## A card that reads live and refuses when pressed
+
+The panel's whole contract is one line: every action answers `Disabled` and a
+`Reason` before anybody touches it, so what you can do reads live and what you
+cannot reads dim with the reason on the card. A live card that returns an error
+breaks that — the player gets a toast where a reason should have been. The bail
+card did it for a long time, and it was found by auditing one action by hand.
+
+So press all of them. Third sweep in three nights over the same ground, and the
+first one to test whether the game does what it said it would rather than
+whether a number matched.
+
+Two things about the instrument, both learned by running it.
+
+**It typed a zero.** Six cards refused on the first run — a wage at three
+businesses, a house limit at two — all of them cards that take a figure the
+player enters. Sending nothing to a card that asks for a number is a fault in
+the test, not the game. The core publishes the bounds on the card itself, so the
+sweep types the preset and falls back inside the range.
+
+**One comfortable player sees the wrong half of the game.** The interesting
+cards are the ones a city only offers to somebody broke, hurt, wanted, nameless
+or thirty days in. So it runs seven situations across six seeds each, which is
+19,474 live cards rather than 487.
+
+None of them refuse. Broken to check it bites: marking every card live
+regardless of its reason flags 148.
+
+That is now four things read off every card in the game — that its sentence is
+well formed, that it takes the price it names, that it spends the time it names,
+and that it works at all — and none of the four needs a list of which actions
+are special. Fifteen seconds at full width, so the fast half of the gate takes
+one seed a situation.
