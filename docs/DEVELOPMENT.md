@@ -11635,3 +11635,36 @@ The city is clean. That is the useful part — one action's worth of assurance i
 now a hundred and forty-five actions' worth, and the next `asks(...)` written
 without a `Cost: 0` beside it will be caught the night it lands rather than
 whenever somebody happens to press it.
+
+## The other number on the card
+
+A card promises two things before it is pressed. Last night was the price. This
+is the hour, and in this game the hour is the harder currency: the clock is what
+brings rent, wages, a rival's move and the police, so a card that says thirty
+minutes and spends a day is a worse lie than one that overcharges. Nothing had
+ever read it.
+
+Same sweep, same shape, no list: every card in every room, pressed in a copy of
+the world, with the clock read before and after.
+
+It found three cards that said nothing and spent four days — and it was wrong,
+which is worth writing down as carefully as a real finding. The trips out of
+town run their own days, a day at a time, so that what happens in the city while
+the player is away happens to a city they are not standing in. They carry
+`Minutes: 0` and put the real figure in `Away`, and the panel prints "4 days
+away" out of that instead. It is exactly the trick `Asks` plays with money, for
+exactly the same reason, and the first version of the sweep read one field and
+not the other. That is the ninth time on this loop a green or red result turned
+out to be a fact about the instrument.
+
+What is worth keeping is what the corrected sweep is. **`Away` had no guard at
+all** — one write in `core/world.go`, one read in the view, and nothing between
+them. That is the same shape as the `asks(...)` convention, which went unguarded
+until seventeen actions were found to be missing from a hand-written list. A
+card that spends more of the day than it declares now fails whichever field it
+should have declared it in, so writing a trip with `add(...)` instead of
+`away(...)` is caught the night it lands.
+
+Four hundred and eighty-one cards pressed, none spending more of the day than
+they say. Broken both ways to check it bites: dropping `Away` flags the three
+trips, and doubling the clock in the command layer flags 428 of the 481.

@@ -159,3 +159,78 @@ func TestPressingACardThatChargesTwiceIsSeen(t *testing.T) {
 		t.Errorf("a card that costs money says nothing about money: %q", still.Detail)
 	}
 }
+
+// And the other number on every card: how long it takes.
+//
+// A price is one of two things a card promises before it is pressed. The other
+// is the hour, and in this game the hour is the real currency — the clock is
+// what brings rent, wages, a rival's move and the police, and a card that says
+// thirty minutes and spends a day is a worse lie than one that overcharges.
+// Nothing had ever read it.
+//
+// Same shape as the sweep above and for the same reason: every card in every
+// room, pressed in a copy of the world, with no list of which ones are special.
+func TestNoCardSpendsMoreOfTheDayThanItSays(t *testing.T) {
+	t.Parallel()
+	base := New(53)
+	base.Event, base.District = nil, 9
+	base.Player.Cash, base.Player.Respect, base.Player.Health = 400000, 200, 100
+	base.Player.Contacts = 5
+	base.Player.Car, base.Player.CarWear = 2, 20
+	for _, id := range []string{"laundry", "garage", "casino", "poolhall"} {
+		if prop := base.Properties[id]; prop != nil {
+			prop.Owner = "player:1"
+		}
+	}
+	base.Properties["garage"].Trouble = true
+
+	pressed, wrong := 0, 0
+	for _, l := range Locations {
+		if l.District > base.District {
+			continue
+		}
+		w := base.Clone()
+		w.Player.Location, w.Event = l.ID, nil
+		for _, a := range w.Actions(l.ID) {
+			if a.Disabled {
+				continue
+			}
+			try := w.Clone()
+			try.Player.Location, try.Event = l.ID, nil
+			was := try.Minute
+			next, err := Execute(try, Command{RequestID: ID(), Revision: try.Revision,
+				Kind: a.ID, Target: l.ID})
+			if err != nil {
+				continue
+			}
+			pressed++
+			// What the card declares, which is `Minutes` for work done inside
+			// the day and `Away` for work that is days out of the city. The
+			// second is the same trick `Asks` plays with money: the trips run
+			// their own days, so they carry `Minutes: 0` and the panel prints
+			// "4 days away" out of `Away` instead. Reading only `Minutes` made
+			// all three trips look like a card that says nothing and spends
+			// four days, which is the fault this looks for rather than the
+			// convention that avoids it.
+			declared := a.Minutes
+			if a.Away > declared {
+				declared = a.Away
+			}
+			spent := next.Minute - was
+			// A card may cost less than it says — being turned away at a door
+			// takes the walk and not the evening — but it must never quietly
+			// take more of the day than it named. A card that names no time at
+			// all is a card that says it takes none, and the same rule holds,
+			// which is what makes this the guard for `Away` as well.
+			if spent > declared {
+				wrong++
+				t.Errorf("%s at %s says %d minutes and took %d",
+					a.ID, l.ID, declared, spent)
+			}
+		}
+	}
+	t.Logf("%d cards pressed, %d took more of the day than they said", pressed, wrong)
+	if pressed < 120 {
+		t.Fatalf("only %d cards were pressed, so this measures nothing", pressed)
+	}
+}
