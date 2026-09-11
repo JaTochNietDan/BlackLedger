@@ -25,25 +25,25 @@ the floor here and a hundred runs is what makes it steady. The first version of
 this measurement was read off twelve runs and its top row was a gambling
 outcome.
 
-**It cannot see deferred money, and this matters more than it sounds.** The
-measure attributes a cash change to whatever command was running when it
-landed, and several things in this game pay later than they are decided. Two
-that will mislead anybody reading the table cold:
+**Money that arrives late.** A cash change lands on whatever command was running
+when it turned up, which is not the command that sent for it. Sending somebody
+on collections pays $65 two hours after the decision, so `delegate` read as
+costing six cents a minute and doing nothing, and whichever command the crew
+came back during read as generous — for a policy that rests four hours at a
+time, that is resting. A third of what a publican appeared to earn by sitting
+still was collections landing while it was asleep.
 
-A bet and its settlement are separate commands, so `play` reads as the worst
-rate in the game and `stand` as the best. They net out — across eight hundred
-and twenty commands at the tables and machines the house keeps about sixty cents
-a command net of ambient income, which is break-even within variance.
+The trace records what came home and what it paid, so this puts it back against
+the decision. The difference is not a correction, it is the opposite answer:
+`delegate` is the best rate a publican has at $3.24 a minute, because the round
+costs the crew two hours and the player fifteen minutes.
 
-Sending somebody on collections pays $65 two hours after the decision, so
-`delegate` reads as costing six cents a minute and doing nothing. A publican
-sends 140 rounds a campaign; $109,265 of collections across twelve campaigns
-landed while the player was asleep and read as up to 35% of what resting
-appeared to pay. "Resting is the publican's economy" is the wrong sentence to
-take away from this table, and it is the one the table says.
-
-So: an action that decides something now and pays for it later reads as free.
-Check what a command actually does before believing its row.
+What is still unattributed is the felt. A bet and its settlement are separate
+commands, so `play` reads as the worst rate in the game and `stand` as the best.
+They net out — across eight hundred and twenty commands at the tables the house
+keeps about sixty cents a command net of ambient income, break-even within
+variance — but the two halves are not joined up here. Anything else that decides
+now and pays later will read as free until the trace says otherwise.
 """
 
 import collections
@@ -53,11 +53,17 @@ import sys
 
 FLOOR = 40
 
+# The action that sends for money which arrives later. The trace records when a
+# collection came home and what it paid, so it can be taken off the command it
+# landed on and given to the one that sent for it.
+DEFERRED = "delegate"
+
 
 def main():
     runs = json.load(open(sys.argv[1]))["campaigns"]
     cash = collections.defaultdict(list)
     mins = collections.defaultdict(list)
+    late = collections.Counter()
     for r in runs:
         trace = r.get("trace") or []
         for a, b in zip(trace, trace[1:]):
@@ -65,11 +71,22 @@ def main():
             minutes = b["minute"] - a["minute"]
             if minutes <= 0:
                 continue
-            cash[kind].append(b["cash"] - a["cash"])
+            # Money that arrived late during this command belongs to whatever
+            # sent for it, not to whatever was running when it turned up.
+            arrived = a.get("settled", 0) * a.get("per_task", 0)
+            cash[kind].append(b["cash"] - a["cash"] - arrived)
             mins[kind].append(minutes)
-    if not mins.get("wait"):
-        sys.exit("no waiting in this run, so there is no baseline to measure against")
-    doing_nothing = sum(cash["wait"]) / sum(mins["wait"])
+            late[DEFERRED] += arrived
+    for kind, amount in late.items():
+        if amount and mins.get(kind):
+            cash[kind].append(amount)
+    # Standing still, however this policy stands still. Waiting is the purest
+    # form of it; a policy that never waits but rests is doing the same thing
+    # as far as money is concerned, and a publican never waits at all.
+    idle = "wait" if mins.get("wait") else "rest"
+    if not mins.get(idle):
+        sys.exit("this policy never stands still, so there is no baseline to measure against")
+    doing_nothing = sum(cash[idle]) / sum(mins[idle])
 
     rows = []
     for kind in cash:
@@ -79,7 +96,7 @@ def main():
         rows.append((rate, len(cash[kind]), statistics.median(mins[kind]), kind))
     rows.sort(reverse=True)
 
-    print(f"{len(runs)} campaigns. Doing nothing pays {doing_nothing:.2f} a minute.")
+    print(f"{len(runs)} campaigns. Standing still ({idle}) pays {doing_nothing:.2f} a minute.")
     print(f"{len(rows)} actions taken {FLOOR} times or more.\n")
     print(f"{'$/min over':>11} {'times':>6} {'mins':>5}  action")
     for rate, times, minutes, kind in rows:

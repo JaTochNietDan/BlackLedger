@@ -10821,3 +10821,35 @@ sentence not to take away from it. That is the eighth time this session a
 measurement has been read as a fact about the game and turned out to be the
 instrument, and the first where the instrument was one built two ticks earlier
 in this same session.
+
+## Putting the late money back where it came from
+
+Last tick the rates table was made to admit it cannot see money that arrives
+late. This tick it can.
+
+The trace now records, for each command, how many collections came home during
+it and what each paid, so the tool can take that off the command the money
+landed on and give it to the one that sent for it. It is four lines in the
+simulator and a subtraction in the tool.
+
+The difference is not a correction, it is the opposite answer:
+
+| | before | after |
+|---|---|---|
+| delegate | −$0.06 a minute | **+$3.24 a minute** |
+| rest | $0.96 a minute, $313,065 | the baseline, $0.00 over it |
+
+Sending somebody on a round is the best rate a publican has, and by a distance:
+$65 for fifteen minutes of the player's time, because the two hours are the
+crew's. Resting is exactly worth standing still, which is what resting is. The
+sentence the old table supported — a publican's economy is sitting still, and
+sending the crew out does nothing — was wrong in both halves, and both halves
+are now right.
+
+The baseline also fell back to resting where a policy never waits, because a
+publican never waits at all and the tool refused to say anything about it.
+
+What is still unjoined is the felt: a bet and its settlement remain two commands
+and the tool says so rather than guessing. Anything else in this game that
+decides now and pays later will read as free until the trace carries it, which
+is the shape of fix this tick demonstrates rather than finishes.

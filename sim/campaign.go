@@ -71,6 +71,17 @@ type Step struct {
 	Cash    int          `json:"cash"`
 	Health  int          `json:"health"`
 	Command core.Command `json:"command"`
+	// Collections that came home during this command, and what they paid.
+	//
+	// Money that arrives late lands on whatever command happens to be running
+	// when it does. Sending somebody on a round pays two hours after the
+	// decision, so `delegate` read as free and whichever command the crew came
+	// back during — resting, mostly — read as generous. A third of what a
+	// publican appeared to earn by sitting still was collections landing while
+	// it was asleep, and any table built on the trace will say so unless the
+	// trace says which money was which.
+	Settled int `json:"settled,omitempty"`
+	PerTask int `json:"per_task,omitempty"`
 }
 type Report struct {
 	Seed     uint32 `json:"seed"`
@@ -935,8 +946,10 @@ func RunRecorded(seed uint32, strategy, director string, limit int, trace bool, 
 			r.Error = err.Error()
 			break
 		}
+		outstanding := len(w.Tasks)
 		if trace {
-			r.Trace = append(r.Trace, Step{i + 1, w.Minute, w.Player.Cash, w.Player.Health, c})
+			r.Trace = append(r.Trace, Step{Number: i + 1, Minute: w.Minute,
+				Cash: w.Player.Cash, Health: w.Player.Health, Command: c})
 		}
 		stood[w.Player.Location]++
 		n, err := core.Execute(w, c)
@@ -952,6 +965,15 @@ func RunRecorded(seed uint32, strategy, director string, limit int, trace bool, 
 			r.Events[v.Event.Kind]++
 		}
 		r.Actions[c.Kind]++
+		// What came home during this command, so a table built on the trace can
+		// put late money against the decision that sent for it rather than
+		// against whatever was happening when it arrived.
+		if trace && len(r.Trace) > 0 {
+			if settled := outstanding - len(n.Tasks); settled > 0 {
+				r.Trace[len(r.Trace)-1].Settled = settled
+				r.Trace[len(r.Trace)-1].PerTask = core.CollectionPay
+			}
+		}
 		w = n
 		eyes.changed(w, &r.World)
 		r.Commands++
