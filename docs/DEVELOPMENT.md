@@ -12067,3 +12067,34 @@ Being buried is its own field now, and the field's comment says why.
 
 A week on, two people on the books: sixty-five points of trust where it was
 arranged, forty-five where nobody did.
+
+## One gate, three cards, and whichever you ask for first
+
+Five of the cards this harness had never played needed the same two things:
+somebody at the paper who takes your calls, and people of your own to lose. No
+policy had ever had either on purpose. The respectable one does — it keeps the
+editor, buys what that desk sells, signs people on, and buries them.
+
+It found something about the desk rather than about the policy.
+
+**The paper sells three things and one recency gate serialises all of them.** A
+story about a rival is refused while the paper carried something of yours too
+recently, and a paragraph about yourself is always something of yours. Asked in
+a fixed order, whichever came first took the entire campaign: the puff ahead of
+the smear ran 579 times against nought, and the smear ahead of the puff ran 512
+against nought. Neither of those is a policy. It is the gate deciding, and a
+harness that lets it decide prices one card and leaves two unmeasured.
+
+It takes whichever of the three it has taken least now, which is the rule the
+magpie already runs on. **And that needed the fix the magpie needed too** — a
+story carries the rival's name after the colon, so asking how often "smear" had
+been taken read nought for ever and the smear took four times what the other two
+did. Counted across every id sharing the verb: 293 paragraphs, 255 stories about
+somebody else, 31 pulled, across a hundred campaigns.
+
+Coverage goes from 96 kinds of action to 99. What is still not played is the
+funeral, and the reason is worth stating rather than leaving as a silence: this
+policy signs six hundred people on across a hundred campaigns and none of them
+dies. It does nothing to get anybody killed, and the city does not oblige. A
+card that needs one of your own in the ground needs a policy that loses people,
+which is the thief and the defiant, and neither of those signs anybody on.

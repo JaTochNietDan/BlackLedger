@@ -5,6 +5,7 @@ import (
 	"blackledger/core"
 	"encoding/json"
 	"fmt"
+	"strings"
 )
 
 type Place struct {
@@ -272,6 +273,11 @@ func Public(w *core.World) View {
 // StillMoney is what the distiller keeps back before putting a still in, so
 // that the room it goes behind is not left unable to feed anybody.
 const StillMoney = 900
+
+// EditorMoney is what the respectable policy keeps back before opening an
+// arrangement at the paper: nine hundred to open it, and enough left to go on
+// eating while it pays forty-five a day.
+const EditorMoney = 2200
 
 // CellarTopUp is how thin a room of the distiller's gets before it goes down
 // its own steps rather than into the till.
@@ -889,6 +895,92 @@ func Choose(v View, strategy string) (core.Command, error) {
 		// Everything else an investor does — the crew, the home, the security,
 		// the rest of the premises. The distiller is an investor who owns a
 		// still and a bar.
+		strategy = "investor"
+	}
+	// The respectable one. Five of the cards this harness has never played need
+	// the same two things — somebody at the paper who takes your calls, and
+	// people of your own to lose — and no policy here has ever had either on
+	// purpose. It keeps the editor, buys the standing the paper sells, signs
+	// people on, and buries them when the city takes one.
+	if strategy == "respectable" {
+		if v.Player.Health < 85 {
+			if c, ok := v.at(v.Player.Home, "rest"); ok {
+				return c, nil
+			}
+		}
+		// Whoever died working for them, before anything else. Six days is not
+		// long and the card is at one address.
+		for _, p := range v.Locations {
+			for _, a := range p.Actions {
+				if strings.HasPrefix(a.ID, "funeral:") && !a.Disabled {
+					if c, ok := v.at(p.ID, a.ID); ok {
+						return c, nil
+					}
+				}
+			}
+		}
+		// The arrangement at the paper, and then what it sells. Both are only
+		// ever offered in the paper's own building.
+		if v.Player.Cash >= EditorMoney {
+			if c, ok := v.at(core.HeraldPlace, "retain:editor"); ok {
+				return c, nil
+			}
+			// Whichever of the paper's three it has taken least.
+			//
+			// The desk sells three things and one recency gate serialises all
+			// of them: a story about somebody else refuses while the paper
+			// carried something of yours too recently, and a paragraph about
+			// yourself is always something of yours. Asked in a fixed order,
+			// whichever came first took the whole campaign — the puff ahead of
+			// the smear ran 579 against nought, and the smear ahead of the puff
+			// ran 512 against nought. Neither ordering is a policy; it is the
+			// gate deciding, and a harness that lets it decide prices one card
+			// and leaves two unmeasured.
+			paper, fewest := "", 0
+			for _, a := range v.place(core.HeraldPlace).Actions {
+				id := a.ID
+				if a.Disabled {
+					continue
+				}
+				if id != "puff" && id != "spike" && !strings.HasPrefix(id, "smear:") {
+					continue
+				}
+				// Counted across every id sharing the verb, because a story
+				// about somebody carries their name after the colon: asking
+				// `Tried["smear"]` reads nought for ever and the smear takes
+				// four times what the other two do.
+				root := id
+				if i := strings.IndexByte(root, ':'); i >= 0 {
+					root = root[:i]
+				}
+				taken := 0
+				for was, n := range v.Tried {
+					if was == root || strings.HasPrefix(was, root+":") {
+						taken += n
+					}
+				}
+				if paper == "" || taken < fewest {
+					paper, fewest = id, taken
+				}
+			}
+			if paper != "" {
+				if c, ok := v.at(core.HeraldPlace, paper); ok {
+					return c, nil
+				}
+			}
+		}
+		// People of their own, which is what makes a funeral possible at all.
+		if len(v.Player.Crew) > 0 {
+			for _, p := range v.Locations {
+				for _, a := range p.Actions {
+					if strings.HasPrefix(a.ID, "sign:") && !a.Disabled {
+						if c, ok := v.at(p.ID, a.ID); ok {
+							return c, nil
+						}
+					}
+				}
+			}
+		}
 		strategy = "investor"
 	}
 	if strategy == "publican" {

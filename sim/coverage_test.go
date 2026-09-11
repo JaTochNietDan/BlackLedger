@@ -61,14 +61,17 @@ import "testing"
 // building in a different district can move the number by five, which makes
 // this pin an alarm that goes off at the weather. Four seeds, and the figure it
 // reports is the truer one.
-const kindsTheHarnessPlays = 96
+// Ninety-nine with the respectable policy, which keeps the editor and brings
+// the three things that desk sells: a paragraph about itself, a story about
+// somebody else, and a story kept out of tomorrow's paper.
+const kindsTheHarnessPlays = 99
 
 func TestTheHarnessPlaysEnoughOfTheGame(t *testing.T) {
 	t.Parallel()
 	every := map[string]bool{}
 	for _, strategy := range []string{
 		"worker", "investor", "defiant", "reckless", "thief",
-		"smuggler", "racketeer", "publican", "magpie", "distiller",
+		"smuggler", "racketeer", "publican", "magpie", "distiller", "respectable",
 	} {
 		for seed := uint32(1); seed <= 4; seed++ {
 			r := Run(seed*2654435761, strategy, "fixture", 700, false)

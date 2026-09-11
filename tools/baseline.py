@@ -24,6 +24,7 @@ ORDER = (
     "publican",
     "magpie",
     "distiller",
+    "respectable",
 )
 
 # Days as well as deaths and cash.
