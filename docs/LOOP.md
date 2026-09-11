@@ -394,6 +394,11 @@ with `if false && ...`, run it again, report both numbers.
 When you change a test rather than the code it guards, say so with the reason.
 Do not claim an effect you have not measured.
 
+**Check the live server is this commit every tick: `mise run running`.** One
+curl at `/api/health`, which has reported the revision the binary was built from
+all along and which nothing ever read. A hand-started server from an hour
+earlier answered two ticks of work and cost both of them.
+
 **Play a campaign through the HTTP boundary every tick: `mise run apicheck`.**
 Two hundred and fifty commands against a scratch save on its own port, which is
 the only thing in this project that crosses the layer the browser uses — the

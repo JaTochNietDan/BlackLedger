@@ -51,6 +51,29 @@ wait $core || { cat .runtime/quick-core.log; exit 1; }
 echo "[quick] all clear"
 """
 
+# Is the server on 8791 the one this checkout would build?
+#
+# `/api/health` has reported the git revision the running binary came from for a
+# long time and nothing has ever read it. A hand-started server from an hour
+# earlier served the API playtest for two whole ticks, publishing an id the core
+# had not produced for weeks, and the answer was one curl away the entire time.
+[tasks.running]
+description = "Check the live server is built from this commit"
+run = """
+set -e
+want=$(git rev-parse HEAD)
+dirty=$(git status --porcelain | head -1)
+got=$(curl -s --max-time 5 http://127.0.0.1:8791/api/health | python3 -c "import json,sys; print(json.load(sys.stdin)['build']['revision'])")
+if [ "$want" != "$got" ]; then
+  echo "the server on 8791 is built from $got and this checkout is $want"
+  exit 1
+fi
+if [ -n "$dirty" ]; then
+  echo "the server matches HEAD ($got) but the checkout has uncommitted changes"
+fi
+echo "the server on 8791 is this commit: $got"
+"""
+
 # The command boundary itself, against a scratch save on its own port.
 #
 # `cmd/apicheck` has existed for a long time and nothing ever ran it. The Go
@@ -74,6 +97,11 @@ sleep 3
 # server from an hour earlier answered every run after that, on a build nobody
 # had rebuilt since.
 kill -0 $server 2>/dev/null || { echo "the api server did not start:"; cat .runtime/apicheck-server.log; exit 1; }
+# And that it is this checkout's build rather than something else answering on
+# the port, which is the half `kill -0` cannot see.
+want=$(git rev-parse HEAD)
+got=$(curl -s --max-time 5 http://127.0.0.1:8862/api/health | python3 -c "import json,sys; print(json.load(sys.stdin)['build']['revision'])")
+[ "$want" = "$got" ] || { echo "8862 is answering from $got and this checkout is $want"; exit 1; }
 go run ./cmd/apicheck -base http://127.0.0.1:8862 -steps 250
 """
 

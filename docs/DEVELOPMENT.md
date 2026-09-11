@@ -12253,3 +12253,29 @@ with no invariant failures.
 The live campaign looks untouched: it was never opened by the playtest, because
 the playtest's server could not bind while the real one held the port. That is
 luck rather than design, and the design is fixed.
+
+## The answer was one curl away the whole time
+
+Last night's finding was that a hand-started server from an hour earlier had
+been answering the API playtest, on a binary nobody had rebuilt, and that it
+cost two ticks of chasing a card id the core had not produced for weeks.
+
+`/api/health` has reported the git revision the running binary was built from
+for a long time. Nothing has ever read it. The check that would have ended that
+chase in one line existed before the chase started.
+
+It reads it now, in two places.
+
+`mise run running` asks the live server on 8791 what commit it is and fails if
+that is not this checkout's HEAD — and says so separately when the checkout has
+uncommitted changes, because a server that matches the last commit while the
+working tree has moved on is a different kind of stale and worth naming
+differently. The loop's brief says to run it every tick.
+
+The API playtest asks the same question of the server it just started, on its
+own port, before it sends a single command. `kill -0` says the process is alive;
+it cannot say the process on the other end of the socket is that one. Those are
+two different questions and the difference is exactly what went wrong.
+
+Broken to check it bites: a binary built with `-buildvcs=false` reports its
+revision as "unknown", and the check names it against HEAD and exits non-zero.
