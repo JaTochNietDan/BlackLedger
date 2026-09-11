@@ -115,11 +115,19 @@ func TestNoGuardIsWrittenWithANeedleThatCannotFail(t *testing.T) {
 // never said otherwise, so the strip was centred instead of running; the fault
 // was invisible because the newer block read correctly on its own.
 //
-// So the count is pinned. It does not have to be zero today — there are fifty
-// of these and unpicking them is its own piece of work, to be done where the
-// result can be looked at — but it must never go up, and the names are printed
-// so the next person to open this file knows which blocks lie.
-const shadowedDeclarations = 50
+// So the count is pinned. It does not have to be zero today — unpicking these
+// is its own piece of work, done a block at a time where the result can be
+// reasoned about — but it must never go up, and cleaning one up has to lower
+// the pin, so the ground that is won stays won. The names are printed with the
+// failure so the next person to open the stylesheet knows which blocks lie.
+//
+// Fifty when it was first counted. The slot machine accounted for twenty-nine
+// of them: its case, window, handle and the light on the handle were written
+// out twice from top to bottom and only the second copy had any effect. The
+// person card took two more. `tools/cssdead.py` lists what is left, and proves
+// a cleanup neutral by resolving every property of every selector before and
+// after and showing what moved.
+const shadowedDeclarations = 19
 
 func TestNoRuleIsQuietlyOverriddenByALaterCopyOfItself(t *testing.T) {
 	css := rawSource(t, "src/style.css")

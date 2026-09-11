@@ -9611,3 +9611,51 @@ blocks lie.
 
 An earlier `!important` beats a later ordinary declaration, so those are not
 counted as dead. There are none in the fifty.
+
+## Taking the slot machine's older self out of the stylesheet
+
+The pin came down from fifty to nineteen. Twenty-nine of the dead declarations
+were one thing: the slot machine is written out twice from top to bottom. The
+case, the window, the handle and the red light on the handle all appear at line
+1122 and again at line 1266, and only the second copy has ever had any effect.
+The first copy is what the machine looked like before it had drums that turn.
+
+Three of those four rules are strict subsets of their later selves, so they went
+whole. The drum is the interesting one, because the later rule does not say
+everything the earlier one did:
+
+- `height`, `display`, `border-radius`, `background`, `color`, `overflow` and
+  `box-shadow` are all re-set later, so they were dead.
+- `place-items:center` is not re-set later — and it is inert anyway, because the
+  later rule makes the drum `display:block` and `place-items` does nothing on a
+  block. It went too, deliberately, because leaving it is leaving the exact trap
+  that stopped the drums spinning in the first place.
+- `font`, `letter-spacing` and `text-align` are not re-set later and are
+  inherited, so they stay. They are almost certainly redundant as well, since
+  everything inside a drum is a `.stop` that sets its own font in a centred
+  grid, but "almost certainly" is not the standard for deleting something whose
+  rendering cannot be looked at from here.
+
+The person card took two more, for the same reason and from the same report: it
+says `display:flex` at line 373 and `display:grid` at 1065, the grid is what
+runs, and an afternoon went into establishing that before the panel report could
+be answered at all.
+
+### Proving a cleanup changed nothing
+
+The check that makes this safe to do at speed is in `tools/cssdead.py`. It
+resolves every property of every selector to its last-wins value in the old file
+and in the new one and prints what differs. For this change it printed exactly
+one line — the `place-items` that was meant to go — and nothing else. That is a
+much better argument than reading the diff, because the diff cannot tell you
+whether a deleted declaration was reaching anything.
+
+The same file also lists what is left, so the next block is cheap to pick up. It
+carries the two ways the bulk attempt went wrong, so nobody repeats them:
+comments must be blanked with spaces rather than cut or every byte offset past
+the first comment is wrong, and this stylesheet is not in the gate's Prettier
+set, so a formatter run rewrites thousands of unrelated lines.
+
+Nineteen left, in eight small blocks: the card, the address art, the city view
+switch, the paper's grain, the room and its chips, the felt result and the work
+heading. Each is a one-line edit with the same proof available.
