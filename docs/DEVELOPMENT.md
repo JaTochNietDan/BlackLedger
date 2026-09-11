@@ -12187,3 +12187,33 @@ same card refused once, in one run out of five, saying the person being asked
 was out on the street, on a card the same snapshot had just published as live.
 Four clean runs since. It is real and it is not chased down, and saying that is
 better than quietly not mentioning a number that came back green four times.
+
+## Two cards, one name
+
+The inbox item from last night was a card that refused once in five runs. It is
+still open, and the tick spent on it produced something better than a fix.
+
+The card is the one where you ask somebody standing here where to find somebody
+else. Its id needs two names and the comment above it in `core/world.go` says so
+plainly, and says what happens when it only carries one: "One id for every mark
+put two and three cards in the room under the same name, and a command is
+matched to a card by its id — the right thing still happened because the mark
+rides on the choice, but the receipt named the wrong person, and the moment one
+of them costs more than another the wrong one is charged."
+
+That is a fault the game cannot see from inside, because both cards do the right
+thing. **Nothing has ever checked it.** There is a guard now: no two cards in a
+room may share an id, over six cities that have been running ten days, which is
+4,262 cards across 162 rooms. The core is clean. Shortening the id back to one
+name puts 168 duplicate cards into the city, so it bites hard.
+
+What is not resolved, and is written into the inbox as precisely as I can put
+it: a server built fresh and waited at publishes the two-name id, and the server
+the API playtest drives publishes the one-name form with the mark on the choice
+field. The core produces the long one. Something between the core and the wire
+is shortening it, in a world that has been played rather than waited in, and I
+did not find it.
+
+An hour on that would have been an hour saved by the guard, which is the actual
+lesson: the comment describing the fault was written when it was fixed, and a
+described fault with no guard is a fault waiting for its second run.

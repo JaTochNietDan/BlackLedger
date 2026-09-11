@@ -451,3 +451,57 @@ func TestThePaperIsTheCheapestStandingInTheCity(t *testing.T) {
 	}
 	t.Logf("paper $%d for %d across %d cards that sell standing", paper.spent, paper.gain, len(best))
 }
+
+// No two cards in a room may share an id.
+//
+// A command is matched to a card by its id, so two cards with one id is a
+// receipt that names the wrong person — and the moment one of them costs more
+// than the other, the wrong one is charged. The comment above the asking card
+// in world.go says exactly that and says it was fixed; nothing has ever checked
+// it, and the fault it describes is invisible from inside the core because both
+// cards do the right thing.
+//
+// Written after a probe of a running server published three cards all called
+// `about:leo`, with the person being asked about riding on the choice field.
+// A freshly built server publishes `about:leo:vittorio` and the two others,
+// which is what the source says — so what was seen was a stale binary rather
+// than a fault in the game. This is the guard that would have said which, in
+// one line, instead of an hour.
+func TestNoTwoCardsInARoomShareAnID(t *testing.T) {
+	t.Parallel()
+	rooms, cards := 0, 0
+	for seed := uint32(1); seed <= 6; seed++ {
+		w := New(seed)
+		w.Event, w.District = nil, 9
+		w.Player.Cash, w.Player.Respect, w.Player.Health = 400000, 300, 100
+		for _, id := range []string{"laundry", "garage", "casino", "poolhall"} {
+			if p := w.Properties[id]; p != nil {
+				p.Owner = "player:1"
+			}
+		}
+		// A city that has been running, because the cards that name two people
+		// need somebody to owe somebody and somebody to have gone missing.
+		w.Advance(1440 * 10)
+		for _, l := range Locations {
+			if l.District > w.District {
+				continue
+			}
+			w.Player.Location, w.Event = l.ID, nil
+			seen := map[string]Action{}
+			rooms++
+			for _, a := range w.Actions(l.ID) {
+				cards++
+				if was, twice := seen[a.ID]; twice {
+					t.Errorf("%s offers %q twice: %q and %q",
+						l.ID, a.ID, was.Label, a.Label)
+					continue
+				}
+				seen[a.ID] = a
+			}
+		}
+	}
+	t.Logf("%d cards read across %d rooms", cards, rooms)
+	if cards < 2000 {
+		t.Fatalf("only %d cards were read, so this measures nothing", cards)
+	}
+}
