@@ -11297,3 +11297,38 @@ unchanged at zero, and the room never comes free.
 A feature whose two halves each work and which cannot be walked from one to the
 other is the shape that has cost this project the most time. This is the first
 one that was checked for it before it shipped rather than after.
+
+## Walking up through a family, with the game's own actions
+
+Last tick's lesson, applied to the longest road the game has: answer to a
+family, come up inside it, take it. All three pieces — `serve:`, coming up, and
+`takeover` — were on the list of things the harness has never played, and the
+one test of a takeover that exists sets `Player.Service` to the lieutenant's
+number directly. So the *earning* of a promotion had never been exercised once.
+
+Coming up has exactly three sources, and only one of them is a thing a player
+does on their own account. A settled commission credits its patron, a resolved
+arrangement credits its beneficiary, and `ServeAgainst` credits work done to
+somebody your own family is at odds with — a raid, or a move on a holding. The
+first two need to be offered to you. The third is the only road anybody can walk
+without being asked first, which is also what the comment in `core/service.go`
+says it is for.
+
+The guard walks it: go to work for the Bellandi Family in their own room, find
+somebody they are at odds with who holds something, and move on that holding
+until the promotions arrive. It takes **eight attempts to earn six credits**,
+because a raid that is turned away costs health and standing and credits
+nothing. Then, a lieutenant standing in front of a weakened leader takes the
+family. Broken by cutting the credit out of `ServeAgainst`: forty moves against
+the Russo Outfit, service still zero, never a lieutenant.
+
+So the road is walkable and nothing about it was silently broken. That the
+harness has never walked it is a question about the policies, not about the
+game, and it is a separate slice.
+
+One thing found on the way, for the loop's own check rather than the game. The
+live restart has been curling `/api/state` and reading 200 as health, which this
+file already warns is worthless. A command needs both a `request_id` of at least
+eight characters and the current `revision`; without them the server answers 409
+and the command path is never touched at all. Curling it properly this tick:
+0 panics.
