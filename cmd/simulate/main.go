@@ -8,8 +8,10 @@ import (
 	"fmt"
 	"math"
 	"os"
+	"runtime"
 	"sort"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -53,6 +55,7 @@ func main() {
 	// twenty-six hundred reaches a hundred and twenty days and costs three
 	// minutes, because the city grows as it runs and a day at the end of one of
 	// these is several times the work of a day at the start.
+	workers := flag.Int("workers", runtime.NumCPU(), "campaigns to run at once; 1 runs them one after another")
 	long := flag.Int("long", 6, "campaigns to run past the horizon where the business rules live")
 	longSteps := flag.Int("long-steps", 1200, "maximum commands in one of those")
 	longWho := flag.String("long-strategy", "publican", "the policy to run them with")
@@ -92,14 +95,18 @@ func main() {
 		}
 	}
 	start := time.Now()
-	reports := []sim.Report{}
+	// Every campaign builds its own world and draws from its own streams. There
+	// is no package-level state in the core that anything writes after `init`,
+	// no global randomness and no clock or environment read anywhere in the
+	// campaign path — so the only thing sequence was buying was the order the
+	// reports landed in, and that is bought more cheaply with an index.
+	//
+	// This ran eight hundred campaigns one after another on a machine with
+	// sixteen cores. Same seeds, same order out, same bytes.
+	reports := runCampaigns(*workers, strategies, *runs, uint32(*first), *director, *steps, *trace, corpus)
 	failed := false
-	for _, p := range strategies {
-		for i := 0; i < *runs; i++ {
-			r := sim.RunRecorded(uint32(*first)+uint32(i)*0x9e3779b9, p, *director, *steps, *trace, corpus)
-			reports = append(reports, r)
-			failed = failed || r.Error != ""
-		}
+	for _, r := range reports {
+		failed = failed || r.Error != ""
 	}
 	summaries := map[string]any{}
 	// Which strategies did not last long enough for the city block to mean
@@ -232,10 +239,12 @@ func seasonReport(cities, days int) map[string]any {
 		return map[string]any{"cities": 0}
 	}
 	total := map[string]int{}
-	worst, runs := 0, []sim.CityReport{}
-	for i := 0; i < cities; i++ {
-		r := sim.City(uint32(i+1)*2654435761, days)
-		runs = append(runs, r)
+	worst := 0
+	runs := make([]sim.CityReport, cities)
+	inParallel(runtime.NumCPU(), cities, func(i int) {
+		runs[i] = sim.City(uint32(i+1)*2654435761, days)
+	})
+	for _, r := range runs {
 		total["organizations_formed"] += r.Formed
 		total["organizations_fell"] += r.Fell
 		total["wars_started"] += r.Wars
@@ -283,8 +292,11 @@ func longReport(runs, steps int, who, director string, corpus []core.Proposal) m
 		did[name], sawIt[name] = 0, 0
 	}
 	days, cash, alive := []int{}, []int{}, 0
-	for i := 0; i < runs; i++ {
-		r := sim.RunRecorded(uint32(i+1)*0x9e3779b9, who, director, steps, false, corpus)
+	long := make([]sim.Report, runs)
+	inParallel(runtime.NumCPU(), runs, func(i int) {
+		long[i] = sim.RunRecorded(uint32(i+1)*0x9e3779b9, who, director, steps, false, corpus)
+	})
+	for _, r := range long {
 		days = append(days, r.Minutes/1440)
 		cash = append(cash, r.Cash)
 		if r.Alive {
@@ -323,5 +335,53 @@ func longReport(runs, steps int, who, director string, corpus []core.Proposal) m
 		// cannot be read past.
 		out["never_happened"] = never
 	}
+	return out
+}
+
+// inParallel runs n pieces of work across at most workers goroutines and waits
+// for all of them. Each piece writes its own slot and reads nothing another
+// piece writes, so there is nothing to lock and the output does not depend on
+// which finished first.
+func inParallel(workers, n int, do func(k int)) {
+	if workers < 1 {
+		workers = 1
+	}
+	if workers > n {
+		workers = n
+	}
+	if n == 0 {
+		return
+	}
+	next := make(chan int, n)
+	for k := 0; k < n; k++ {
+		next <- k
+	}
+	close(next)
+	var wg sync.WaitGroup
+	for i := 0; i < workers; i++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			for k := range next {
+				do(k)
+			}
+		}()
+	}
+	wg.Wait()
+}
+
+// runCampaigns is every campaign in the baseline, run across workers goroutines
+// and landing in the order the strategies and seeds were asked for rather than
+// the order they finished. Both halves matter and only one of them is visible
+// in a report, so this is one function that the harness and its guard both
+// call: a test that walks its own loop would be checking a copy of the
+// indexing rather than the indexing.
+func runCampaigns(workers int, strategies []string, runs int, first uint32,
+	director string, steps int, trace bool, corpus []core.Proposal) []sim.Report {
+	out := make([]sim.Report, len(strategies)*runs)
+	inParallel(workers, len(out), func(k int) {
+		out[k] = sim.RunRecorded(first+uint32(k%runs)*0x9e3779b9,
+			strategies[k/runs], director, steps, trace, corpus)
+	})
 	return out
 }

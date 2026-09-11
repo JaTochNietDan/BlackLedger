@@ -8750,3 +8750,28 @@ between them. Turning off the publican's restock branch fails it on nought
 loads of stock in two hundred and eighty-one days. It skips under `-short`, so
 `quick` is untouched, and it runs beside the core suite in the gate, which is
 still sixty-six seconds.
+
+## The campaigns run at once
+
+Eight hundred campaigns ran one after another on a machine with sixteen cores.
+They never needed to: every campaign builds its own world and draws from its own
+streams, nothing in the core writes package-level state after `init`, there is
+no global randomness, and there is no clock or environment read anywhere in the
+campaign path. Sequence was buying exactly one thing — the order the reports
+landed in — and an index buys that more cheaply.
+
+414 seconds to 81, and the output identical to the byte against `-workers 1`.
+The twelve cities and the six long campaigns go the same way.
+
+What could go wrong here is quiet. A piece of work skipped, a piece done twice,
+or a report landing in somebody else's slot: none of those fail a build, and all
+three move the baseline. The first two are checked directly, across five worker
+counts including none and more workers than there is work. The third was checked
+badly at first — the test walked its own copy of the loop, so scrambling the
+real one left it passing while the output came out publican-first. The loop is
+one function now that the harness and the guard both call, and scrambling it
+fails on slot nought holding a publican where a worker belongs.
+
+The brief's timing is corrected again and the advice with it: `-runs 25` was
+worth reaching for at 97 seconds against 389, and is not worth it at 45 against
+85 when the smaller sample hides small moves in noisier medians.

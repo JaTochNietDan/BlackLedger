@@ -195,15 +195,25 @@ parallel test for exactly that reason.
 core suite and the API suites start first and the format check, vet, prettier,
 the build and the 56 node tests run while they go.
 
-**`mise run simulate` (~7½ minutes) only when the tick could have moved the
-balance.** It prints the baseline itself now. This file said ninety seconds for
-a long time and that was wrong by a factor of four: measured, the eight hundred
-campaigns take 389 seconds on their own, the twelve cities with nobody in them
-cost seconds, and the long campaigns below add about a minute. A quarter-size
-baseline — `-runs 25` — takes 97 seconds and is the thing to reach for while
-iterating; the full hundred a strategy is for the number that goes in this file.
-Running it inside the gate cost more than either, because three saturating jobs
-at once made the whole gate 4m49 against 1m58.
+**`mise run simulate` (~85s) only when the tick could have moved the balance.**
+It prints the baseline itself now.
+
+The campaigns run at once. Every one builds its own world and draws from its own
+streams; nothing in the core writes package-level state after `init`, there is
+no global randomness, and no clock or environment read anywhere in the campaign
+path — so sequence was buying nothing but the order the reports landed in, and
+an index buys that more cheaply. Eight hundred campaigns went from 414 seconds
+to 81 on sixteen cores, with the output identical to the byte. `-workers 1` runs
+them one after another, which is how that was checked.
+
+This file said ninety seconds for a long time and that was wrong by a factor of
+four before the change and is about right again after it. Do not reach for
+`-runs 25` any more: a quarter-size baseline saves forty seconds now and hides
+small moves in noisier medians.
+
+Running it inside the gate still costs more than running it after, because three
+saturating jobs at once made the whole gate 4m49 against 1m58 — and the
+campaigns now saturate the machine on their own.
 
 It also runs **six long campaigns** under `a_long_campaign`, because every
 strategy in the baseline ends at the command limit after about six days and the
