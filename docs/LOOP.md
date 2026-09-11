@@ -263,7 +263,11 @@ without animation and measure the geometry.
 - Use mise, never brew.
 - Restart the live game on 8791 every tick, backing the save up first, and curl
   it afterwards: build to `.runtime/blackledger-ops.new`, `pkill -f
-  blackledger-ops`, `mv` into place, `nohup` it.
+  blackledger-ops`, `mv` into place, `nohup` it. **Then `grep -c panic
+  .runtime/ops.log`.** A 200 from `/api/state` says nothing about the command
+  path: a nil dereference in `OfferIfReady` panicked every command the browser
+  sent for an unknown number of ticks while the state endpoint answered
+  perfectly, and the loop's own check reported the game healthy each time.
 - `w.Pay(a.Cost)` runs for every action: one that pays its own fee declares
   `Cost: 0` and uses `asks(...)`; one that pays out uses `add(...)`.
 - Two RNG streams — set both `w.RNG` and `w.WorldRNG` when comparing runs.

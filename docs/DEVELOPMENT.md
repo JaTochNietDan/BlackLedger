@@ -8803,3 +8803,32 @@ The action ids changed from `sit` to `sit:floor` and `sit:back`, which broke
 three guards that named the old id and left the new ones filed under the
 fallback group. The grouping table has the prefix now, and the three guards were
 updated rather than reverted, each with the id it is actually about.
+
+## The request that panicked, and the page that could not reconnect
+
+Reported from the game: "It just says black ledger failed to fetch, reconnect,
+and then reconnect fails again. Hard reload fails."
+
+The server was up the whole time and answering `/api/state` on the command line.
+What was failing was every command the page sent. `OfferIfReady` threw away the
+error from `ValidateProposal` and read a field off the scene on the next line,
+and that scene is nil whenever the proposal does not stand up. The one thing in
+this proposal that can stop standing up is the speaker: Mara is named by role,
+the role is filled by whoever holds it, and a city that has buried them holds
+nobody. So a campaign two jobs in with a dead fixer panicked the handler, the
+connection died under the browser, and the page reported a failed fetch and
+could not reconnect — every time, because the next attempt hit the same line.
+
+A hard reload could never have fixed it. The fault was in the command path, not
+in the bundle.
+
+The offer is simply not made now, today or tomorrow, which is the honest outcome
+of a city with no fixer in it rather than a story that tells itself. Two guards:
+a city whose fixer is buried survives the offer and stays quiet for three days
+after, and a city that has one still gets it. Throwing the error away again
+panics the first of those.
+
+Worth saying plainly: a `nohup` log nobody reads is where this sat. The loop
+restarts the live game every tick and curls `/api/state` afterwards, which
+returns 200 with a panicking command path, so the check said everything was
+fine. That check now looks at the log for panics as well.

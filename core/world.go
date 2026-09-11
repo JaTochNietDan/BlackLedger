@@ -2222,7 +2222,21 @@ func (w *World) OfferIfReady() {
 		return
 	}
 	if w.Player.JobCount == 2 && !w.hasRecord("A favor with a price") {
-		e, _ := w.ValidateProposal(Proposal{"", "A favor with a price", "“A merchant wants a sealed ledger moved before their partners arrive. I would understand if you preferred the ordinary work.”", w.HolderID("fixer"), "courier", "You moved the ledger. Mara now knows you can handle sensitive work.", "", []Approach{{Method: "careful", Label: "Wait for a quiet route"}, {Method: "press", Label: "Move it before the partners arrive"}}})
+		// The error was thrown away and the scene dereferenced on the next
+		// line. It is nil whenever the proposal does not stand up, and the one
+		// thing here that can stop standing up is the speaker: Mara is named by
+		// role, the role is filled by whoever holds it, and a city that has
+		// buried them holds nobody. A campaign that got two jobs in and then
+		// lost its fixer crashed the request — "black ledger failed to fetch,
+		// reconnect, and then reconnect fails again", because every command
+		// after it panicked the same way.
+		e, err := w.ValidateProposal(Proposal{"", "A favor with a price", "“A merchant wants a sealed ledger moved before their partners arrive. I would understand if you preferred the ordinary work.”", w.HolderID("fixer"), "courier", "You moved the ledger. Mara now knows you can handle sensitive work.", "", []Approach{{Method: "careful", Label: "Wait for a quiet route"}, {Method: "press", Label: "Move it before the partners arrive"}}})
+		if err != nil || e == nil {
+			// Nobody to bring it. The offer is not made, and it is still not
+			// made tomorrow, which is the honest outcome of a city with no
+			// fixer in it rather than a story that tells itself.
+			return
+		}
 		e.Source = "authored"
 		w.Event = e
 		w.RememberArrangement(e, "offered")
