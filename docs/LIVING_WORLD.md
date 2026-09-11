@@ -150,6 +150,16 @@ Ensure efficiency of development loops by increasing efficiency of your workflow
 
 ## Inbox — open
 
+Asking somebody where to find somebody else refuses about once in a thousand
+commands, with "X is out on the street, walking to Y" on a card the same
+snapshot had just published as live. Found by `mise run apicheck` and seen once
+in five runs of two hundred and fifty commands; four clean runs after it. The
+card is `about:`, its readiness asks whether the person being asked is standing
+where the player is, and nothing between reading the room and pressing the card
+moves anybody. Not chased down and not claimed fixed.
+
+---
+
 You should be able to buy any car at any time instead of having to go through an upgrade process.
 
 Also adding armor to your car should be different than just buying a car.

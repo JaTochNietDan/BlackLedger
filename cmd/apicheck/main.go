@@ -104,6 +104,12 @@ type action struct {
 	Reason   string `json:"reason"`
 	Target   string `json:"target"`
 	Cost     int    `json:"cost"`
+	// What the card carries besides its id. Asking somebody where to find
+	// somebody else publishes the mark here as well as in the id, for a client
+	// that sends the old one-name form — and a harness that drops it is not
+	// sending what the browser sends. Without it this refused four times in a
+	// run with "There is nobody to ask about".
+	Choice string `json:"choice,omitempty"`
 }
 
 type place struct {
@@ -371,6 +377,12 @@ func destination(s *snapshot, visited map[string]int) string {
 	return best
 }
 
+// asCommand turns a card into the command a client would post for it, carrying
+// whatever the card publishes beside its id.
+func asCommand(a action, s *snapshot) command {
+	return command{Kind: a.ID, Target: targetOr(a, s), Choice: a.Choice}
+}
+
 func targetOr(a action, s *snapshot) string {
 	if a.Target != "" {
 		return a.Target
@@ -410,6 +422,29 @@ func pick(s *snapshot, visited map[string]int, tried map[string]int, turn int) (
 	if s.Player.Heat > lieLowAbove {
 		if a, ok := available["lie_low"]; ok {
 			return command{Kind: "lie_low", Target: targetOr(a, s)}, true
+		}
+	}
+	// Anything at all this run has not taken yet, before the written list.
+	//
+	// `ventures` below is a hand-written list of the risky optional systems,
+	// and a hand-written list only ever covers what somebody thought of. The
+	// line that reported "1 crates of arms" off a boat at the pier was found by
+	// accident, because taking a lot off a boat is not on that list and never
+	// was. So the first question each turn is the one the exploring policy in
+	// the simulator asks: of everything this room is actually offering, what
+	// has this run taken least? It needs no list and it cannot go stale.
+	if turn%2 == 0 {
+		want, fewest := "", 0
+		for id := range available {
+			if id == "new_life" || id == "rest" || id == "wait" || id == "lie_low" {
+				continue
+			}
+			if n := tried[id]; want == "" || n < fewest {
+				want, fewest = id, n
+			}
+		}
+		if want != "" && fewest == 0 {
+			return asCommand(available[want], s), true
 		}
 	}
 	// Prefer a system this run has not exercised yet: an untried system is an

@@ -12156,3 +12156,34 @@ happened.** An arrangement runs its minutes inside the command that accepts it.
 A still's fee is hidden by a day's takings landing on top of it. Ask when the
 effect lands before deciding when to read it, and where the clock moves, run a
 copy of the world the same minutes with nothing pressed and subtract that.
+
+## A harness that stops needing a list
+
+The API playtest went in last night and found a fault in its first run. This is
+what it was choosing from: a hand-written list of thirty-odd "ventures", the
+risky optional systems somebody thought to name. The line it found — "1 crates
+of arms" off a boat at the pier — was found by accident, because taking a lot
+off a boat was never on that list and never would have been.
+
+So the first question each turn is now the one the exploring policy in the
+simulator asks: of everything this room is actually offering, what has this run
+taken least? It needs no list and it cannot go stale. The written list stays
+underneath as a second pass.
+
+**It went from 26 kinds of command in a run to 51**, and the new ones are the
+corners: an audience with a family, sitting down at a table, pulling a handle,
+stripping a car, sending somebody after somebody else, and asking ten different
+people where to find somebody.
+
+That last one refused four times on the first run, and the reason is the other
+half of this tick. **A card publishes more than its id.** Asking where somebody
+is carries the mark in a `choice` field as well, for a client that sends the old
+one-name form, and the harness was decoding the id and dropping the rest — so it
+was not sending what the browser sends. It decodes and sends it now, and those
+four refusals are ten successful questions instead.
+
+One refusal survives and is written into the inbox rather than into a fix: the
+same card refused once, in one run out of five, saying the person being asked
+was out on the street, on a card the same snapshot had just published as live.
+Four clean runs since. It is real and it is not chased down, and saying that is
+better than quietly not mentioning a number that came back green four times.
