@@ -8594,3 +8594,32 @@ ledger fails on the page never asking.
 
 Read off 8791 after the restart: nothing behind, which is what a campaign that
 pays its way should say.
+
+## The wage slider had one right notch and ten wrong ones
+
+What somebody thought of the player moved by the same amount whether they were
+paid a dollar over the going rate or twelve, because the rule asked whether the
+wage was above the rate and not by how much. Over sixty days at a laundry: trust
+ninety either way, and the generous end cost $1,048 against $58. A player who
+worked that out would set the wage one dollar over and never touch the slider
+again, and nothing in the game told them.
+
+It scales now, from one a day at a dollar over to four at the ceiling, and the
+same in the other direction: a dollar under the rate is a small thing and the
+floor is not. Measured across three seeds, identically each time, over sixty
+days: a dollar over is worth 90, half way up 270, the ceiling 300. Putting the
+step back makes all three 90 and the two ends of the floor identical, which is
+what the guards fail on.
+
+Four rather than more. At the ceiling somebody comes round in about
+twenty-five days instead of ninety, which is worth roughly what it costs in what
+the place then handles — so the question is how fast you want them on your side
+rather than which notch is the correct one, and generosity still buys the
+counter's eyes and their staying more than it buys throughput.
+
+The cash column in that measurement is not evidence and was not used as any:
+what the city does to one laundry over sixty days swings it by a hundred
+thousand across seeds, while the wage's own contribution is the $904 of extra
+bill. The trust ladder is the deterministic part and that is what is guarded.
+
+Balance: publican $1,728 to $1,732, nothing else moved.

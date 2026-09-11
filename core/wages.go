@@ -1,6 +1,9 @@
 package core
 
-import "fmt"
+import (
+	"fmt"
+	"math"
+)
 
 // What you pay them.
 //
@@ -21,10 +24,24 @@ const (
 	// rate. Past it you are not paying a wage, you are giving money away, and
 	// the trade cannot carry it.
 	WageCeiling = 3
-	// Generous and Mean are what a day at either end is worth to somebody's
-	// opinion of you. Small: it is a wage, not a gift, and it takes weeks.
+	// Generous and Mean are what a day a dollar off the rate is worth to
+	// somebody's opinion of you. Small: it is a wage, not a gift, and it takes
+	// weeks.
 	Generous = 1
 	Mean     = 1
+	// And what a day at the far end of the slider is worth. This used to be a
+	// step: a dollar over the rate bought exactly what twelve dollars over
+	// bought, so the slider had eleven notches, one of which was right and ten
+	// of which were money thrown away with nothing to tell the player so.
+	// Measured over sixty days at a laundry: trust 90 either way, and the
+	// generous end cost $1,048 against $58.
+	//
+	// Four rather than more. At the ceiling somebody comes round in about
+	// twenty-five days instead of ninety, which is worth roughly what it costs
+	// in what the place then handles — so the question is how fast you want
+	// them on your side, not which notch is the correct one.
+	GenerousAtTheTop = 4
+	MeanAtTheFloor   = 4
 )
 
 // WageAt is what this business pays a hand a day.
@@ -101,11 +118,12 @@ func (w *World) PayDay() {
 			if n == nil || n.Dead {
 				continue
 			}
+			least, most := WageBounds(trade.Wage)
 			switch {
 			case paid > trade.Wage:
-				n.Trust = min(100, n.Trust+Generous)
+				n.Trust = min(100, n.Trust+overTheRate(paid, trade.Wage, most))
 			case paid < trade.Wage:
-				n.Trust = max(0, n.Trust-Mean)
+				n.Trust = max(0, n.Trust-underTheRate(paid, trade.Wage, least))
 			}
 		}
 	}
@@ -167,4 +185,25 @@ func (w *World) EverybodyGotPaid() {
 			prop.Unpaid, prop.Toldabout = 0, false
 		}
 	}
+}
+
+// overTheRate is what a day of being paid above the going rate is worth,
+// scaled by how far above it is rather than by the fact of it.
+func overTheRate(paid, rate, most int) int {
+	if most <= rate {
+		return Generous
+	}
+	share := float64(paid-rate) / float64(most-rate)
+	return Generous + int(math.Round(share*float64(GenerousAtTheTop-Generous)))
+}
+
+// underTheRate is the same in the other direction. Somebody paid a dollar under
+// thinks a little less of you; somebody paid the floor thinks a great deal
+// less, which is the half of this that already decided whether they stayed.
+func underTheRate(paid, rate, least int) int {
+	if least >= rate {
+		return Mean
+	}
+	share := float64(rate-paid) / float64(rate-least)
+	return Mean + int(math.Round(share*float64(MeanAtTheFloor-Mean)))
 }
