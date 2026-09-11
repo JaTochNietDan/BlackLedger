@@ -769,6 +769,19 @@ creating and I want you to be continuously autonomously creating
 
 ---
 
+Burying your own (standing instruction; the inbox is empty).
+
+— built: a man who died working for you used to leave a line in the log and
+  nothing else — the wage stopped, his name left the books, and everybody still
+  on the payroll carried on as though the week had been ordinary. There is a
+  funeral now, arranged at a funeral director's within six days of the death. It
+  costs $260, or $90 if the parlour is yours because the cars and the box
+  already are, and everybody still on your books thinks twelve points better of
+  you for it. That is the undertaker's other half: the trade earns on strangers,
+  and this is what it costs the player and what it buys.
+
+---
+
 An undertaker (standing instruction: add businesses; the inbox is empty).
 
 — built: Thorne & Sons, a funeral director in the second district. It is the one

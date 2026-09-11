@@ -12006,3 +12006,32 @@ than the text. Tested by giving the butcher a paragraph: named, and caught.
 
 Five trades explain themselves, five are pinned, and the sixth to try it fails
 the build.
+
+## What happens when it is one of yours
+
+The undertaker earns on the city's dead, which is strangers. This is its other
+half, and it is the first thing the trade does that no other trade does.
+
+A man who died working for the player left a line in the log and nothing else.
+The wage stopped, his name came off the books, and everybody else on the payroll
+carried on as though the week had been ordinary. That is the one thing about
+this business nobody actually in it would let pass, and it had been true since
+the day people could be signed on.
+
+There is a funeral now, arranged at a funeral director's within six days. It
+costs $260, or $90 when the parlour is the player's own — the cars and the box
+already are, and what is left is the plot and the notices. Everybody still on
+the books thinks twelve points better of the man who paid for it, and the street
+three. A man buried a week late was not buried by anybody who thought much of
+him, so the card goes away.
+
+**It was born disabled, for the same reason and by the same sweep as the bail
+card.** Every card aimed at a person is checked against whether that person can
+be reached, and a dead woman cannot: "Zora Ferro is dead" sat on the one card in
+this city that exists because she is. Bailing somebody out had been caught by
+exactly this once before — a conversation with a clerk about somebody, refused
+because they were in a cell — and the exemption written then now has a second
+name in it and a second paragraph explaining why.
+
+Three guards: the funeral lifts the people watching and cannot be held twice, a
+week is too late, and a parlour of your own is cheaper than somebody else's.

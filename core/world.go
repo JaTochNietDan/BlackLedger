@@ -1023,6 +1023,17 @@ func (w *World) Actions(id string) []Action {
 			fmt.Sprintf("$%d to open and $%d a day. Neither of you moves on the other, they may answer when somebody comes for you, and every quarrel of theirs becomes yours.", PactOpening, PactTribute))
 		anywhere()
 	}
+	// A funeral director's, where the one thing this trade does that no other
+	// does is arranged: burying somebody who worked for you.
+	if place, ok := PlaceByID(id); ok && place.Kind == "undertaker" {
+		for _, n := range w.Unburied() {
+			asks("funeral:"+n.ID, "Bury "+n.Name, FuneralMinutes, w.FuneralFee(id),
+				w.FuneralReadiness(id, n.ID),
+				fmt.Sprintf("$%d, and everybody still on your books watches what you do when it is one of them. Worth %d trust apiece and %d respect. There are %s left to arrange it.",
+					w.FuneralFee(id), FuneralTrust, FuneralRespect,
+					plainly((FuneralWindow-(w.Minute-n.DiedAt))/1440+1, "hours", fmt.Sprintf("%d days", (FuneralWindow-(w.Minute-n.DiedAt))/1440+1))))
+		}
+	}
 	switch id {
 	case "precinct":
 		for _, n := range w.OwnPeople() {
@@ -2548,8 +2559,10 @@ func operationOutcome(operation string) string {
 // The sweep disabled it for the reason it is offered — "Otto Reiss is being
 // held at Ward Street Station" — so the button could never be pressed, and the
 // only way to reach the mechanic was to post the command directly.
+// A funeral is the same shape and was caught by the same sweep the same way:
+// "Zora Ferro is dead" on the one card in this city that exists because she is.
 func reachesTheUnreachable(id string) bool {
-	return strings.HasPrefix(id, "bail:")
+	return strings.HasPrefix(id, "bail:") || strings.HasPrefix(id, "funeral:")
 }
 
 // AcquisitionCost is what taking a premises costs. Buying out what is left of a

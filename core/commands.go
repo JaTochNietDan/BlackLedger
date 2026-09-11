@@ -533,6 +533,10 @@ func (w *World) apply(c Command) error {
 				return err
 			}
 			w.Advance(a.Minutes)
+		} else if who, ok := strings.CutPrefix(c.Kind, "funeral:"); ok {
+			if err := w.BuryYourOwn(p.Location, who); err != nil {
+				return err
+			}
 		} else if person, ok := strings.CutPrefix(c.Kind, "bail:"); ok {
 			if err := w.Bail(person); err != nil {
 				return err

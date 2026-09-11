@@ -178,7 +178,8 @@ func paysItsOwnWay(t *testing.T) []string {
 }
 
 // asksCallSites is how many distinct actions in world.go pay their own fee.
-const asksCallSites = 41
+// Forty-two with the funeral at the undertaker's.
+const asksCallSites = 42
 
 var (
 	asksCall  = regexp.MustCompile(`(?s)asks\(\s*(.+?),`)
