@@ -111,6 +111,14 @@ var trades = map[string]Trade{
 		Trouble: "The crane has been down a week and the boats are going up the coast instead.",
 		Remedy:  "Get the crane running", RemedyDetail: "An engineer off a ship, and the backlog worked through.", RemedyCost: 260, Cover: 7, Watched: 3, Hides: 8,
 	},
+	// A public trading floor. Cash across it all day in front of everybody,
+	// which explains a great deal and hides nothing at all — a crate on the
+	// Mercer floor has been looked at by forty people before it is sold.
+	"exchange": {
+		Hands: 4, Wage: 8, Drain: 6, Restock: 120, RestockAmount: 40, Supplies: "ledgers, scales and the floor's own float",
+		Trouble: "The weights have been condemned and nobody will settle a price on them.",
+		Remedy:  "Get the weights passed", RemedyDetail: "New scales, and the inspector walked round them.", RemedyCost: 150, Cover: 15, Watched: 2, Hides: 1,
+	},
 	"butcher": {
 		Hands: 3, Wage: 9, Drain: 8, Restock: 200, RestockAmount: 45, Supplies: "stock and ice",
 		Trouble: "The cold room failed overnight and a week of stock went with it.",

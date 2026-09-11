@@ -60,7 +60,8 @@
     "x": 585,
     "y": 180,
     "cost": 0,
-    "blurb": "People sell information here. Its value depends on whom you ask, and who sees you asking."
+    "blurb": "People sell information here. Its value depends on whom you ask, and who sees you asking.",
+    "kind": "exchange"
   },
   {
     "id": "apartment",

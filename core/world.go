@@ -1520,14 +1520,21 @@ func (w *World) Actions(id string) []Action {
 			place, _ := PlaceByID(other)
 			elsewhere = fmt.Sprintf(" %s pays $%d.", place.Name, w.PriceAt(other, g.ID))
 		}
+		// What the numbers mean, to somebody who holds the floor they are set
+		// on. A price and another price tells you which way to walk; this
+		// tells you whether to walk at all.
+		word := w.MarketWord(g.ID)
+		if word != "" {
+			word = " " + word + w.TheWarPremium()
+		}
 		add("buy:"+g.ID, "Buy "+g.InBulk(), 30, 0, w.TradeReadiness(g.ID, "buy", 0),
-			fmt.Sprintf("$%d each here.%s You can carry %s more. Holding stock draws police attention every day until it is sold, and can be taken from you.",
-				price, elsewhere, counted(room, g.Unit, g.Unit+"s")))
+			fmt.Sprintf("$%d each here.%s%s You can carry %s more. Holding stock draws police attention every day until it is sold, and can be taken from you.",
+				price, elsewhere, word, counted(room, g.Unit, g.Unit+"s")))
 		sum(1, min(room, afford), min(Lot, min(room, afford)), "How many")
 		if held := w.Holding(g.ID); held > 0 {
 			add("sell:"+g.ID, "Sell "+g.InBulk(), 30, 0, w.TradeReadiness(g.ID, "sell", 0),
-				fmt.Sprintf("$%d each here.%s You are carrying %s, worth $%d on this floor.",
-					price, elsewhere, counted(held, g.Unit, g.Unit+"s"), price*held))
+				fmt.Sprintf("$%d each here.%s%s You are carrying %s, worth $%d on this floor.",
+					price, elsewhere, word, counted(held, g.Unit, g.Unit+"s"), price*held))
 			sum(1, held, held, "How many")
 		}
 	}

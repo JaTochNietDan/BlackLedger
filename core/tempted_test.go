@@ -36,9 +36,44 @@ func stayed(w *World, id string, days int) int {
 	return len(w.Properties[id].Hands)
 }
 
+// tookOne reports whether anybody who started behind the player's counter ends
+// up behind the rival's.
+//
+// This used to count heads at the end of sixty days and call an unchanged count
+// proof that nobody went. A counter that loses somebody hires again, so sixty
+// days later it is back to its full complement whatever happened in between —
+// the measure could only see a loss that had not yet been replaced, which is a
+// fact about the hiring queue rather than about poaching. It passed on where
+// the churn happened to be standing on day sixty and stopped passing the night
+// three more counters opened in the city. What the test says in words is that a
+// rival takes one of yours, so that is what it asks.
+func tookOne(w *World, from, rival string, days int) string {
+	yours := map[string]bool{}
+	for _, who := range w.Properties[from].Hands {
+		yours[who] = true
+	}
+	for day := 0; day < days; day++ {
+		w.Event = nil
+		w.Advance(1440)
+		w.Event = nil
+		for _, l := range Locations {
+			prop := w.Properties[l.ID]
+			if prop == nil || prop.Owner != rival {
+				continue
+			}
+			for _, who := range prop.Hands {
+				if yours[who] {
+					return who
+				}
+			}
+		}
+	}
+	return ""
+}
+
 func TestARivalComesForYourPeople(t *testing.T) {
 	t.Parallel()
-	w, id, _ := tempted(t)
+	w, id, rival := tempted(t)
 	trade, _ := TradeOf(id)
 	// Paid the least anybody stands there for, and nobody carrying anything
 	// against the player: the only reason to go is the money.
@@ -47,7 +82,7 @@ func TestARivalComesForYourPeople(t *testing.T) {
 		t.Fatal(err)
 	}
 	filled := len(w.Properties[id].Hands)
-	if left := stayed(w, id, 60); left == filled {
+	if took := tookOne(w, id, rival, 60); took == "" {
 		t.Fatalf("a rival with an empty counter and $40,000 never took one of the %d you pay $%d a day", filled, least)
 	}
 }

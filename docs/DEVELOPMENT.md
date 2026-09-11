@@ -10032,3 +10032,60 @@ The second compared two cities to prove that different seeds land different
 boats, and built both of them from the same seed, so it skipped itself.
 
 Six landing rules broken, six failures.
+
+## What a price means
+
+Third of the four rooms a family holds. The Mercer Exchange is a trade now —
+four on the floor, ledgers and scales and the floor's own float, weights that
+get condemned so nobody will settle a price on them, good cover because cash
+crosses it all day in front of everybody, and almost no hiding, because a crate
+on that floor has been looked at by forty people before it is sold.
+
+Its reach is not a better price. The exchange already pays over the odds, and
+like the waterfront's discount that is a fact about the floor and true for
+anybody standing on it. What a floor has is knowledge.
+
+A trader in this city can see two numbers: what a good costs here, and what the
+other floor pays. That tells you which way to walk and nothing else. Whether $52
+a crate is cheap, dear or ordinary is not on any card, because what a thing is
+normally worth lives in the core and has never been shown to anybody. Prices
+drift a quarter of the way back to it every time the market moves, and while two
+families are shooting scarcity holds everything up — none of which is a secret
+on the floor, and all of which is a secret to somebody reading a card.
+
+So a floor of your own says how far over or under a price is and which way the
+drift is pulling, and it says it about the whole market rather than about the
+room you are standing in. Holding the sell side informs the buy side across
+town, which is the only reason to hold the sell side at all. It goes quiet if
+the weights are condemned or the floor is a man short.
+
+### A test that had never measured its own sentence
+
+Adding four positions to the city broke `TestARivalComesForYourPeople`, which
+says in words that a rival with an empty counter and money will take one of your
+people. What it actually did was count heads at the end of sixty days and call
+an unchanged count proof that nobody went.
+
+A counter that loses somebody hires again. Sixty days later it is back to its
+full complement whatever happened in between, so the measure could only ever see
+a loss that had not yet been refilled — a fact about the hiring queue, not about
+poaching. Probed directly, the laundry loses somebody on day one and has always
+lost somebody on day one. The test was reading where the churn happened to be
+standing on day sixty, and three new counters in the city moved it.
+
+It asks the sentence now: did anybody who started behind your counter end up
+behind the rival's. That is unambiguous, it cannot be refilled away, and it does
+not depend on how many other counters the city has.
+
+This is the third guard this session that passed for a long time without
+measuring the thing it claimed. The pattern is the same each time — the
+assertion is a proxy that correlates with the claim until something unrelated
+moves, and the tell is that the failure message and the code disagree about what
+is being counted.
+
+### Five rules, five breaks
+
+All five fail when removed: a floor you do not hold saying nothing, a floor you
+do hold saying something, dear and cheap and ordinary reading differently with
+the real figure in them, a condemned or short-handed floor going quiet, and the
+war premium. The reach sweep catches two of them as well.
