@@ -220,6 +220,16 @@ and a local model that writes encounters and can be switched off.
   in any order. What you carry shifts an attempt on somebody — 17 in 200 with
   empty hands against 58 with a Thompson — and so does what you put in the hand
   of whoever you send. A search reaches whoever is standing with you.
+- **A family that stops asking.** Paying a share buys an understanding and
+  twelve points of standing, so a player who pays every demand is never troubled
+  by anybody: measured, a publican ends the richest policy in the game with no
+  police attention, no seizures and every milestone, and nothing in the city
+  ever costs it more than a week of one shop's takings. Refuse them instead and
+  they fall, and below −10 a family holding ground on your streets stops asking
+  for a share of a place and asks for the place. Hand it over, buy them off at
+  six times a share, or tell them no. **The escalation is the relationship, not
+  the count** — the first version keyed it to how many addresses you hold and
+  made every demand a demand for a place, 480 out of 480.
 - **Businesses. They pay, and they pay late.** Over two hundred commands a
   publican who hires, pays over the rate and restocks ends nearly the poorest
   policy in the game; over four hundred it ends the richest at $27,516, ahead of

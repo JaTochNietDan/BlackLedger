@@ -11037,3 +11037,50 @@ brief has the table, the headline that crime pays about six times honest work by
 the minute, and the four rules for reading it, each of which was learned by
 getting it wrong first: per minute rather than per command, net of standing
 still, with enough samples, and pairing anything that settles in two commands.
+
+## A family that stops asking and asks for the place
+
+The measurements said a legitimate operator has nothing to fear. A publican ends
+the richest policy in the game with no police attention, no seizures, and every
+milestone reached in ninety-eight campaigns of a hundred, and the only thing the
+city ever takes from it is a week of one shop's takings at a time. A family can
+take a holding, but only in a war, only when the place is nearly wrecked, and a
+player who pays every demand never has a war.
+
+That is a coherent arrangement and it is also the end of the story. A family
+watching somebody assemble half a district does not go on sending for an
+envelope.
+
+So there is one more beat. A family holding ground on your streets, thinking
+badly enough of you, stops asking for a share of a place and asks for the place.
+Hand it over — the deed goes, the people behind the counter stay, because who is
+being paid is not their decision — or buy them off at six times an ordinary
+understanding, or tell them no and find out what a family does about being
+refused something it came for.
+
+### Two numbers, both wrong first, and the second one is the lesson
+
+**The threshold could never fire.** A claim needs a family that thinks badly of
+you, and it was set at a standing of 40 — above the 25 at which a family sends
+any demand at all. A family had to dislike you enough to send for an envelope
+before it could decide it wanted the place instead, so the whole thing was
+unreachable.
+
+**Set at 25, it fired every time.** Measured across twelve cities of a player
+holding everything: four hundred and eighty demands, four hundred and eighty of
+them for a place. That is not an escalation, it is a different tax with a worse
+name.
+
+The fix was to stop keying it to how much you hold and key it to how they feel.
+Below nothing. Paying an ordinary share lifts a family twelve points and keeps
+them asking for envelopes; only somebody who has been refusing them falls far
+enough for them to come for the deed. Measured the same way with every demand
+refused: 466 of 480 become claims, and the first fourteen are the ordinary
+shares before the relationship sours.
+
+A player who pays is never troubled by this, which is right — that is what
+paying is for — and the balance baseline barely moves, which is the evidence.
+What changed is that there is now something at the end of not paying besides a
+slowly worsening number.
+
+Four rules, four breaks, four failures.

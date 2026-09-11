@@ -73,6 +73,23 @@ func (w *World) BusinessPressure() {
 	if rival == nil {
 		rival = f
 	}
+	// Enough of the district in one pair of hands, and the demand stops being
+	// a share and becomes the place.
+	if buyout, wanted := w.TheirClaim(f.ID, target.ID); wanted {
+		w.Event = &Scene{ID: ID(), Kind: "business_pressure", Source: "authored", Minute: w.Minute,
+			Speaker: speaker, Actor: f.ID, Target: target.ID, Title: "They want the place",
+			Body: fmt.Sprintf("“You have taken half this district under your own name and gone on sending me an envelope for it. I am not asking for a share of %s any more. I am asking for %s.”", target.Name, target.Name),
+			Choices: []Choice{
+				{ID: "hand", Label: "Hand them " + target.Name,
+					Detail: fmt.Sprintf("The deed goes to %s and the people behind the counter stay where they are. Their standing with you improves by 30, and they leave your other places alone for five days.", f.Name)},
+				{ID: "pay", Label: fmt.Sprintf("Buy them off for $%d", buyout), Cost: buyout,
+					Detail: fmt.Sprintf("Six times an ordinary understanding, because this is the price of not deciding. Improves their standing by 12 and postpones the next demand by a day.")},
+				{ID: "resist", Label: "Tell them no",
+					Detail: "Gain 2 respect; lose 20 standing. A family that came for the place and was refused does not send another envelope. They may come for the premises, and repeated defiance can put your life at risk."},
+			}}
+		w.Log("A family wants the place", f.Name+" is no longer asking for a share of "+target.Name+".", "politics")
+		return
+	}
 	w.Event = &Scene{ID: ID(), Kind: "business_pressure", Source: "authored", Minute: w.Minute, Speaker: speaker, Actor: f.ID, Target: target.ID, Title: "A claim on your earnings", Body: fmt.Sprintf("“%s is doing business under your name now. My people expect a share. Pay for an understanding, or explain why I should tolerate a competitor.”", target.Name), Choices: []Choice{
 		{ID: "pay", Label: fmt.Sprintf("Pay $%d for an understanding", w.TheirShare(target.ID)), Cost: w.TheirShare(target.ID),
 			Detail: fmt.Sprintf("A week of what %s takes. Improves this family's standing by 12. Postpones the next demand; existing personal threats remain.", target.Name)},
@@ -118,12 +135,21 @@ func (w *World) ResolvePressure(e *Scene, choice string) error {
 	}
 	f := &w.Factions[actor]
 	switch choice {
+	case "hand":
+		return w.HandOver(e.Target, f.ID)
 	case "pay":
 		share := w.TheirShare(e.Target)
+		if buyout, wanted := w.TheirClaim(f.ID, e.Target); wanted {
+			share = buyout
+		}
 		f.Cash += share
 		f.Goodwill = min(100, f.Goodwill+12)
 		w.NextPressure = w.Minute + 1440
-		w.Log("A purchased understanding", fmt.Sprintf("You pay $%d to %s, which is a week of what the place takes. The next business demand is postponed for a day; personal threats are unchanged.", share, f.Name), "politics")
+		what := "a week of what the place takes"
+		if _, wanted := w.TheirClaim(f.ID, e.Target); wanted {
+			what = "six times an understanding, because they had come for the place"
+		}
+		w.Log("A purchased understanding", fmt.Sprintf("You pay $%d to %s, which is %s. The next business demand is postponed for a day; personal threats are unchanged.", share, f.Name, what), "politics")
 	case "resist", "ally":
 		if choice == "resist" {
 			w.Player.Respect += 2
