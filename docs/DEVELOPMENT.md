@@ -9452,3 +9452,27 @@ drawn — the whole person list goes down the wire, so nothing here is strictly
 hidden, only unsaid. The question worth asking is which facts a player needs in
 the place they are looking, and that is judgement rather than a diff. Both
 sweeps are in the log so the next one starts from what was already decided.
+
+## Writing tonight into the brief
+
+`docs/LOOP.md` is what a session starting cold reads, and after a night of work
+it described a game that no longer existed. Three queue items still claimed open
+work that is built — the bandit's case and its sound, the city's game in the
+other rooms — and the two largest things added tonight, a night at cards and an
+open arms counter, were nowhere in "what exists".
+
+Six new fault shapes went in, each one something that actually cost time
+tonight: two cards in a room under one name, a switch branch that can never be
+reached, something named by a person where a role was meant, teeth with no page,
+a measurement that reads the wrong thing and concludes nothing is there, and a
+guard whose sample cannot show the fault.
+
+A seventh queue item names where the trades stand — four of thirteen reach past
+their own income, two more were already linked and were checked rather than
+rebuilt, and the six that do not are listed so the next tick does not have to
+work it out again.
+
+And one line in the rules that are not negotiable: ask of every change whether
+the new thing is strictly better than the old, in the tick that makes it. That
+is the question this file keeps asking of the game, and the one I did not ask of
+my own change an hour before it cost a tick to undo.
