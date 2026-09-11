@@ -371,3 +371,91 @@ func TestTheCitySaysWhenACabIsTakingYou(t *testing.T) {
 		t.Fatalf("the street says %q while one of the player's cabs has them", note)
 	}
 }
+
+// Buying the next car simply overwrote the last one. A player who traded a Ford
+// for a Packard watched the Ford stop existing, with nothing back and nowhere
+// it went — while the city already had the trade that wants it, and every wreck
+// arriving at a yard is worth something to whoever holds it.
+func TestACarCanBeWeighedInAtAYard(t *testing.T) {
+	t.Parallel()
+	w := New(61)
+	w.Event, w.District = nil, 9
+	w.Player.Health, w.Player.Respect, w.Player.Cash = 100, 30, 200000
+	w.Player.Car, w.Player.CarWear, w.Player.Fuelled = 3, 100, 0
+	w.Player.Location = "scrapyard"
+
+	if w.ScrapReadiness("scrapyard") != "" {
+		t.Fatal("the yard will not take it:", w.ScrapReadiness("scrapyard"))
+	}
+	// Nowhere else takes one.
+	for _, elsewhere := range []string{"garage", "dealer", "bar", "room"} {
+		w.Player.Location = elsewhere
+		if w.ScrapReadiness(elsewhere) == "" {
+			t.Fatalf("%s was buying wrecks", elsewhere)
+		}
+	}
+	w.Player.Location = "scrapyard"
+
+	// What is left of it decides what it fetches.
+	whole := w.ScrapWorth("scrapyard")
+	w.Player.CarWear = 25
+	wrecked := w.ScrapWorth("scrapyard")
+	t.Logf("a Packard fetches $%d whole and $%d as a wreck", whole, wrecked)
+	if wrecked >= whole {
+		t.Fatalf("a wreck is worth as much as a runner: $%d against $%d", wrecked, whole)
+	}
+	if whole >= VehicleByTier(3).Cost {
+		t.Fatalf("a yard pays $%d for a car that cost $%d", whole, VehicleByTier(3).Cost)
+	}
+	w.Player.CarWear = 100
+
+	cash := w.Player.Cash
+	if err := w.apply(Command{Kind: "scrap", Target: "scrapyard", RequestID: "weighitin"}); err != nil {
+		t.Fatal(err)
+	}
+	if w.Player.Car != 0 {
+		t.Fatal("the car was weighed in and is still on the road")
+	}
+	if w.Player.Cash < cash+whole {
+		t.Fatalf("weighing in paid $%d of the $%d it was worth", w.Player.Cash-cash, whole)
+	}
+	if w.Driving() {
+		t.Fatal("driving a car that is on a weighbridge")
+	}
+	// And nothing is left to sell twice.
+	if w.ScrapReadiness("scrapyard") == "" {
+		t.Fatal("the yard will take a car the player has not got")
+	}
+}
+
+// And the yard being yours is worth what the middleman was taking, which is the
+// same shape as a garage being worth more when the parts come off the street.
+func TestYourOwnYardPaysBetterForYourOwnCar(t *testing.T) {
+	t.Parallel()
+	theirs := New(61)
+	theirs.Event, theirs.District = nil, 9
+	theirs.Player.Health, theirs.Player.Respect, theirs.Player.Cash = 100, 30, 200000
+	theirs.Player.Car, theirs.Player.CarWear, theirs.Player.Fuelled = 3, 100, 0
+	theirs.Player.Location = "scrapyard"
+	outside := theirs.ScrapWorth("scrapyard")
+
+	if err := theirs.apply(Command{Kind: "acquire", Target: "scrapyard", RequestID: "buytheyard"}); err != nil {
+		t.Fatal(err)
+	}
+	mine := theirs.ScrapWorth("scrapyard")
+	t.Logf("$%d at somebody else's yard, $%d at your own", outside, mine)
+	if mine <= outside {
+		t.Fatalf("holding the yard is worth nothing: $%d against $%d", mine, outside)
+	}
+	// The card says so rather than paying more quietly.
+	theirs.Event = nil
+	said := false
+	for _, a := range theirs.Actions("scrapyard") {
+		if a.ID == "scrap" {
+			said = strings.Contains(a.Detail, "your own crane")
+		}
+	}
+	if !said {
+		t.Fatal("the yard pays the player more for holding it and nothing says why")
+	}
+}

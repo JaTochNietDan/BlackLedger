@@ -74,7 +74,8 @@ var actionGroup = map[string]string{
 	"sit_out": "standing",
 
 	// The tables. Sitting down, getting up, and every verb of every game.
-	"sit": "tables", "rise": "tables", "play": "tables", "pull": "tables",
+	"scrap": "business",
+	"sit":   "tables", "rise": "tables", "play": "tables", "pull": "tables",
 	"deal": "tables", "cashout": "tables",
 	"wheel": "tables", "dice": "tables", "roll": "tables", "hit": "tables",
 	"stand": "tables", "cards": "tables", "bet": "tables", "call": "tables", "fold": "tables",

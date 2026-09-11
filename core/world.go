@@ -1259,6 +1259,20 @@ func (w *World) Actions(id string) []Action {
 					w.PawnValue(kind), max(w.PawnValue(kind)+1, w.PawnValue(kind)*PawnBack/100), PawnDays))
 		}
 	}
+	// A yard takes what is left of a car. Buying the next one used to overwrite
+	// the last, so a Ford traded for a Packard simply stopped existing.
+	if ScrapYard(id) {
+		worth := w.ScrapWorth(id)
+		detail := fmt.Sprintf("$%d for %s at %d%% of what it was. You are walking afterwards, and anything under the floor of it goes with the car.",
+			worth, VehicleByTier(p.Car).Label, w.CarCondition())
+		if p.Car == 0 {
+			detail = "A yard takes what is left of a car. You have not got one."
+		} else if w.Own(id) {
+			detail = fmt.Sprintf("$%d for %s at %d%% of what it was — your own crane, and nobody taking a cut. You are walking afterwards.",
+				worth, VehicleByTier(p.Car).Label, w.CarCondition())
+		}
+		add("scrap", "Weigh the car in", 30, 0, w.ScrapReadiness(id), detail)
+	}
 	if Pumps(id) {
 		short := FuelFull - w.Fuel()
 		detail := fmt.Sprintf("$%d for what the tank is short. It reads %d of %d.", w.FuelFee(id), w.Fuel(), FuelFull)

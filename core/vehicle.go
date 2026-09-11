@@ -433,3 +433,86 @@ func (w *World) sellCarTo(n *NPC) {
 			n.Name, price*DealerMargin/100), "business")
 	}
 }
+
+// What a car of your own is worth once you are done with it.
+//
+// Buying the next one simply overwrote the last: a player who traded a Ford for
+// a Packard watched the Ford stop existing, with nothing back and nowhere it
+// went. The city already has the trade that wants it — a yard takes what is
+// left of a car and every wreck that arrives is worth something to whoever
+// holds it — and there was no way to walk one in.
+//
+// So it can be sold for scrap, and holding the yard is worth what the middleman
+// was taking, which is the same shape as a garage being worth more when the
+// parts come off the street.
+const (
+	// ScrapShare is what a car in perfect order fetches as scrap, against what
+	// it cost new. A fifth: this is a yard buying metal, not a forecourt buying
+	// a car, and anybody who wanted the car would have bought it.
+	ScrapShare = 20
+	// OwnYardCut is what is not taken out of it when the yard is yours.
+	OwnYardCut = 3
+)
+
+// ScrapYard reports whether a place takes what is left of a car.
+func ScrapYard(id string) bool {
+	place, ok := PlaceByID(id)
+	return ok && place.Kind == "scrapyard"
+}
+
+// ScrapWorth is what the player's car fetches at this yard, which is what it
+// was worth new, a fifth of that, and then what is left of it.
+func (w *World) ScrapWorth(id string) int {
+	if w.Player.Car == 0 {
+		return 0
+	}
+	worth := VehicleByTier(w.Player.Car).Cost * ScrapShare / 100
+	worth = worth * max(1, w.CarCondition()) / 100
+	if w.Own(id) {
+		worth = worth * OwnYardCut / 2 // your own crane, and nobody taking a cut
+	}
+	return max(1, worth)
+}
+
+// ScrapReadiness explains why the car cannot be weighed in, or returns "".
+func (w *World) ScrapReadiness(id string) string {
+	if !ScrapYard(id) {
+		return "There is nowhere here to leave it"
+	}
+	if w.Player.Location != id {
+		return "You are not in the yard"
+	}
+	if w.Player.Car == 0 {
+		return "You have nothing to leave"
+	}
+	return ""
+}
+
+// ScrapCar leaves it on the weighbridge. What was under the floor goes with it,
+// the same as losing it any other way.
+func (w *World) ScrapCar(id string) error {
+	if reason := w.ScrapReadiness(id); reason != "" {
+		return fmt.Errorf("%s", reason)
+	}
+	paid := w.ScrapWorth(id)
+	label := VehicleByTier(w.Player.Car).Label
+	w.Player.Car, w.Player.CarWear, w.Player.Plate = 0, 0, 0
+	w.Player.Fuel, w.Player.Fuelled = 0, 0
+	w.Earn(paid)
+	// The yard has one more of the city on its weighbridge.
+	w.ShiftCustom(id, "another one in off a low-loader", WreckTrade)
+	if prop := w.Properties[id]; prop != nil && !w.Own(id) {
+		if house := w.faction(prop.Owner); house != nil {
+			house.Cash = max(0, house.Cash-paid)
+		}
+	}
+	place, _ := PlaceByID(id)
+	mine := ""
+	if w.Own(id) {
+		mine = " Your own crane, and nobody taking a cut of it."
+	}
+	w.Log("Weighed in at "+place.Name,
+		fmt.Sprintf("%s for $%d. You are walking, and anything that was under the floor of it went with the car.%s",
+			label, paid, mine), "personal")
+	return nil
+}

@@ -9150,3 +9150,26 @@ against it.
 Checked before building: the filling stations already do this properly. Your own
 pumps sell you petrol at what the petrol cost, keyed to the address you hold
 rather than to the trade, which is right — you fill up where you own the pumps.
+
+## What is left of a car
+
+Buying the next car overwrote the last one. A player who traded a Ford for a
+Packard watched the Ford stop existing: nothing back, and nowhere it went. The
+city already had the trade that wants it — a yard takes what is left of a car,
+and every wreck arriving is worth something to whoever holds one — and there was
+no way to walk one in.
+
+A car can be weighed in at a scrapyard now. What it fetches is a fifth of what
+it cost new, and then what is left of it: a Packard is $880 whole and $220 as a
+wreck. Holding the yard is worth what the middleman was taking, half as much
+again, which is the same shape as a garage being worth more when the parts come
+off the street. The card says so rather than paying more quietly.
+
+Anything under the floor goes with the car, the same as losing it any other way.
+
+That is three of the thirteen trades reaching past their own income now — the
+garage, the haulier, the cab yard and this, against nine that still only pay.
+The ones left are the pawnbroker, the butcher, the restaurant, the burlesque,
+the dealer, the laundries, the poolhall and the casinos; several of those are
+already linked to the city rather than to the player, which is a different
+thing and worth keeping straight.

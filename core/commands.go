@@ -614,6 +614,10 @@ func (w *World) apply(c Command) error {
 				if err := w.Service(target); err != nil {
 					return err
 				}
+			case "scrap":
+				if err := w.ScrapCar(p.Location); err != nil {
+					return err
+				}
 			case "sit":
 				// A save or a client from before a seat had a kind. The room
 				// decides, which is right wherever there is only one thing in
