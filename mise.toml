@@ -90,6 +90,14 @@ go run ./cmd/simulate > .runtime/sim.json
 python3 tools/baseline.py .runtime/sim.json
 """
 
+[tasks.rates]
+description = "What every action pays for the time it takes, out of a traced run"
+run = """
+set -e
+go run ./cmd/simulate -strategies magpie -runs 120 -steps 2500 -trace > .runtime/trace.json
+python3 tools/rates.py .runtime/trace.json
+"""
+
 [tasks.workshop]
 description = "The playtest workshop, on its own port, against a scratch world"
 run = ["npm run build", "go run ./cmd/playtest"]

@@ -10547,3 +10547,49 @@ size: a written rule that cannot run is a bug whatever it is worth.
 
 The eight policies with plans are unmoved by it, checked column by column
 against the committed baseline.
+
+## What everything pays, for the first time
+
+This project could not say what a single action is worth. The balance baseline
+reports where a policy ends up, which is a fact about the policy. Now that one
+of them plays eighty-eight kinds of thing across seventy game days, the price of
+everything can be read out of a traced run: `mise run rates`.
+
+Three things it has to do or it says nothing true, and the first version of it
+got one of them wrong.
+
+**Per minute, not per command.** The clock is what a player actually spends.
+
+**Net of doing nothing.** The city pays about twenty cents a minute while you
+stand there, so everything looks profitable if you only take the cash
+difference.
+
+**With enough samples.** The exploring policy takes each kind about once a run,
+so twelve runs is twelve samples and the table is noise — which is exactly how
+the first attempt was read, with a gambling outcome at the top of it. A hundred
+and twenty runs gives a hundred samples of most things and sixteen thousand of
+dock work.
+
+### What it says
+
+The headline is that **crime pays about six times honest work, by the minute**.
+Mugging returns $5.04 a minute over the baseline against dock work's $0.86, and
+robbing a business $3.58. Both take forty-five minutes; a shift at the docks
+takes ninety. Nothing else in the game comes close to either, and the offset is
+the one the city already has: the people you rob hold it against you and come
+for you in the street. That is the trade the whole game is built on and it has
+never had a number until now.
+
+Running a business is negative by the minute — restocking $2.05 under, putting
+trouble right $1.98 under, buying one $27.83 under — which is correct and worth
+saying plainly: a business is a purchase that pays out afterwards, not an action
+that pays. The measure prices actions, not holdings, and reading it as though a
+laundry loses money would be the mistake it is built to prevent.
+
+And a verification rather than a finding: the tables are honest. A bet and its
+settlement are separate commands, so `play` reads as the worst rate in the game
+and `stand` as the best. Netted across eight hundred and twenty commands at the
+tables and machines and adjusted for the income accruing while you sit there,
+the house keeps about sixty cents a command — break-even within variance for
+that many hands, which is what a fair implementation of a small edge looks like
+at this sample size.
