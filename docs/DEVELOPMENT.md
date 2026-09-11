@@ -11806,3 +11806,36 @@ Coverage goes from 81 kinds of action to 92. The distiller ends at $26,908, the
 richest policy in the harness, which is a thing to watch rather than to
 celebrate: it is one campaign length and one city, and a chain that pays for
 itself should not also pay better than running four businesses properly.
+
+## The bare median was never a ranking
+
+Last night's write-up called the distiller "the richest policy in the harness"
+and flagged it as a thing to watch. It is not richer. That claim was a tenth
+instance of the fault this log keeps recording: a measurement read as a fact
+about the game when it was a fact about the instrument.
+
+The numbers. The distiller's median campaign ends on $26,872 and the publican's
+on $25,893, and the spread of a single campaign's final cash around either is
+about $6,400. With a hundred runs the error on the median is roughly $800, so
+the gap of $979 is about one error bar wide. Two policies a thousand dollars
+apart are the same policy as far as this harness can say.
+
+The baseline line has printed a bare median for as long as it has existed, and a
+row of bare numbers reads as an ordering — to a reader, and demonstrably to me.
+So it prints its own error bar now, and then names the pairs it cannot separate:
+
+    cash 23252±296/19329±515/.../26048±870/1515±55/26908±796
+    not separable by cash: defiant~racketeer publican~distiller
+
+It caught the claim it was written for, and a second one nobody had noticed:
+the defiant and the racketeer, $3,181 against $2,805, have been sitting in that
+row in an order the numbers never supported.
+
+The arithmetic is checked against the run that prompted it rather than trusted:
+a hundred distiller campaigns have a standard deviation of $6,371, which gives
+$796, and the printed bar says 796.
+
+Every gap in that row that matters is now either wide enough to believe or
+named as one that is not. What this does not do is fix the write-ups already in
+this file that ranked two policies on a gap of a few hundred dollars. They stand
+as written, with this paragraph against them.

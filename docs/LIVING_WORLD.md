@@ -150,6 +150,12 @@ Ensure efficiency of development loops by increasing efficiency of your workflow
 
 ## Inbox — open
 
+You should be able to buy any car at any time instead of having to go through an upgrade process.
+
+Also adding armor to your car should be different than just buying a car.
+
+---
+
 Nobody has taken over the Bellweather after I killed them
 
 — answered. An office is not a person. The city hall's offices were seeded once

@@ -35,10 +35,54 @@ ORDER = (
 # the poorest policy in the game and at four hundred it ends the richest, at
 # $27,516 against the worker's $23,252. Running what you hold does pay. It pays
 # later than anybody here had ever looked.
-summary = json.load(open(sys.argv[1]))["summary"]
-print("deaths", "/".join(str(summary[k]["deaths"]) for k in ORDER if k in summary))
-print("cash", "/".join(str(summary[k]["median_final_cash"]) for k in ORDER if k in summary))
-print("days", "/".join(str(summary[k]["median_game_days"]) for k in ORDER if k in summary))
-city = json.load(open(sys.argv[1])).get("city_alone", {}).get("totals")
+# And how much of the cash figure is the policy rather than the dice.
+#
+# This line was printed as a bare median for a long time and read as a ranking
+# every time. It is not one. A campaign's final cash has a spread of about six
+# thousand dollars around a median of twenty-six, so two policies a thousand
+# apart are the same policy as far as a hundred runs can say — and the night the
+# distiller was written this log called it "the richest policy in the harness"
+# on a gap of 979 against a standard error of about 800.
+#
+# So the figure carries its own error bar, and any two policies whose bars
+# overlap are named as what they are: not separable by this measure. The error
+# on a median is about 1.25 times the standard deviation over the root of the
+# count, which is close enough for deciding whether to believe a gap. Checked
+# against the run that prompted it: a hundred distiller campaigns have a
+# standard deviation of $6,371, which gives $796, and the printed bar says 796.
+def spread(values):
+    n = len(values)
+    if n < 2:
+        return 0
+    mean = sum(values) / n
+    sd = (sum((v - mean) ** 2 for v in values) / n) ** 0.5
+    return int(1.25 * sd / (n ** 0.5))
+
+
+run = json.load(open(sys.argv[1]))
+summary = run["summary"]
+cash = {}
+for campaign in run.get("campaigns", []):
+    cash.setdefault(campaign["strategy"], []).append(campaign["cash"])
+
+played = [k for k in ORDER if k in summary]
+error = {k: spread(cash.get(k, [])) for k in played}
+print("deaths", "/".join(str(summary[k]["deaths"]) for k in played))
+print("cash", "/".join(
+    "%d±%d" % (summary[k]["median_final_cash"], error[k]) for k in played))
+print("days", "/".join(str(summary[k]["median_game_days"]) for k in played))
+
+# Which of them this run cannot tell apart. Read before believing any ordering
+# in the line above.
+same = []
+for i, a in enumerate(played):
+    for b in played[i + 1:]:
+        gap = abs(summary[a]["median_final_cash"] - summary[b]["median_final_cash"])
+        if gap <= error[a] + error[b]:
+            same.append("%s~%s" % (a, b))
+if same:
+    print("not separable by cash:", " ".join(same))
+
+city = run.get("city_alone", {}).get("totals")
 if city:
     print("city_alone", city)
