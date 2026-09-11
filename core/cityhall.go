@@ -107,6 +107,19 @@ func (w *World) ensureOfficials() {
 	}
 }
 
+// OfficeName is whoever is behind that desk, by name, for every line of prose
+// that used to name the first holder and go on naming them for ever. A city
+// with nobody in the office says the office.
+func (w *World) OfficeName(id string) string {
+	if n := w.OfficeHolder(id); n != nil {
+		return n.Name
+	}
+	if o, ok := OfficialByID(id); ok {
+		return "whoever is the " + lowerFirst(o.Role)
+	}
+	return "somebody"
+}
+
 // OfficeHolder is whoever is doing that job now, which is not always the person
 // the campaign started with. Every question about an office asks this rather
 // than asking for the first holder by name.

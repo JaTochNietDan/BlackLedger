@@ -970,7 +970,7 @@ func (w *World) Actions(id string) []Action {
 	// money across a desk at the exchange, and keeping your head down is not
 	// somewhere you go.
 	asks("bribe", "An understanding with the detective", 45, w.BribeCost(), w.BribeReadiness(),
-		fmt.Sprintf("$%d to Detective Harlow to lose some paperwork. Clears attention now and buys nothing later. Above %d heat nobody will be seen taking it.", w.BribeCost(), BribeCeiling))
+		fmt.Sprintf("$%d to %s to lose some paperwork. Clears attention now and buys nothing later. Above %d heat nobody will be seen taking it.", w.BribeCost(), w.RoleName("detective"), BribeCeiling))
 	anywhere()
 	add("lie_low", "Keep a low profile", 120, 15, "", "Lose 10 heat. Time still passes for rivals and businesses.")
 	anywhere()
@@ -1097,7 +1097,7 @@ func (w *World) Actions(id string) []Action {
 				add("release:"+o.ID, "Stop paying "+o.Name, 30, 0, "",
 					fmt.Sprintf("Ends the arrangement and the $%d a day. Opening it again costs the opening payment over.", o.Retainer))
 			} else {
-				asks("retain:"+o.ID, "An arrangement with "+o.Name, OfficialMinutes, w.OfficialOpening(o), w.RetainerReadiness(o.ID),
+				asks("retain:"+o.ID, "An arrangement with "+w.OfficeName(o.ID), OfficialMinutes, w.OfficialOpening(o), w.RetainerReadiness(o.ID),
 					fmt.Sprintf("$%d to open and $%d a day after. %s They cut you loose above %d attention and keep the opening payment.", w.OfficialOpening(o), o.Retainer, o.Detail, w.OfficialCeiling(o)))
 			}
 		}
@@ -1155,7 +1155,7 @@ func (w *World) Actions(id string) []Action {
 					fmt.Sprintf("Ends the arrangement and the $%d a day. Opening it again costs the opening payment over.", o.Retainer))
 				continue
 			}
-			asks("retain:"+o.ID, "An arrangement with "+o.Name, OfficialMinutes, w.OfficialOpening(o), w.RetainerReadiness(o.ID),
+			asks("retain:"+o.ID, "An arrangement with "+w.OfficeName(o.ID), OfficialMinutes, w.OfficialOpening(o), w.RetainerReadiness(o.ID),
 				fmt.Sprintf("$%d to open and $%d a day after. %s They cut you loose above %d attention and keep the opening payment.", w.OfficialOpening(o), o.Retainer, o.Detail, w.OfficialCeiling(o)))
 		}
 		for _, d := range destinations {

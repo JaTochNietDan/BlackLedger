@@ -15,6 +15,17 @@ package core
 // written without this being asked.
 func (w *World) OutOfReach(id string) string {
 	n := w.NPC(id)
+	// An office is a desk, not a man. Work aimed at one carries the office's
+	// own id, and asking for that by name found whoever held it on the first
+	// morning — so a campaign that had buried the mayor was told "Mayor Ellis
+	// Crane is dead" for ever, while somebody else sat at his desk.
+	if IsOfficial(id) {
+		n = w.OfficeHolder(id)
+		if n == nil {
+			o, _ := OfficialByID(id)
+			return "There is nobody behind the " + lowerFirst(o.Role) + "'s desk this week"
+		}
+	}
 	if n == nil {
 		return "There is nobody by that name in this city"
 	}

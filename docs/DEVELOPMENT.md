@@ -9084,3 +9084,36 @@ the fault: the fixer crash, the coffee bought for a dead woman, and this.
 
 Checked against a copy of the live save: the mayor and the editor were both
 empty, and both were filled on the next day.
+
+## Everybody this campaign was written with, buried
+
+Three faults in one night were the same shape: something reaching for a person
+where a role was meant. The second job crashed the request when the fixer was
+dead. Ten strings went on buying coffee for a woman the player had killed. The
+editor's desk stayed empty for the rest of the campaign. So this tick went
+looking for the rest of that class instead of waiting to be told about it.
+
+Two guards. One buries every seeded role holder and every official, runs the
+city for a fortnight with the player two jobs in, and requires that nothing
+crashes and every job is being done by somebody at the end of it. The other
+buries them and then reads every action at every address the player can reach —
+574 of them — and fails on any label, detail or reason that still names one of
+the dead.
+
+Between them they found three more:
+
+- The bribe named Detective Harlow in its own sentence while the action was
+  aimed at whoever holds the job.
+- The retainer cards named the officials out of the table rather than asking who
+  is behind the desk, so they went on offering an arrangement with a dead man.
+- Being told an action was out of reach asked for the office's own id as though
+  it were a person, so a campaign that had buried the mayor read "Mayor Ellis
+  Crane is dead" for ever while somebody else sat at his desk.
+
+And one that only a whole-city test could have found. Filling the empty offices
+in one pass handed the same man the commissioner's job and then the mayor's,
+because the list of people not already doing one of the city's jobs knew about
+the roles on the street and not about the desks in the city hall. The city came
+out of it with no commissioner at all.
+
+Each of the four broken in turn, and each fails on its own line.

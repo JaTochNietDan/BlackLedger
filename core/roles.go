@@ -132,6 +132,14 @@ func (w *World) isRoleHolder(n *NPC) bool {
 			return true
 		}
 	}
+	// And the city hall's own desks. Without these, one pass of filling the
+	// empty offices handed the same man the commissioner's job and then the
+	// mayor's, and the city came out of it with no commissioner at all.
+	for _, o := range officials {
+		if n.Role == o.Role {
+			return true
+		}
+	}
 	return false
 }
 
