@@ -101,6 +101,8 @@ var prefixGroup = [][2]string{
 	// A counter is where money comes from when there is none.
 	{"pawn:", "money"}, {"redeem:", "money"},
 	{"buy:", "money"}, {"sell:", "money"}, {"play:", "tables"},
+	// Which of the two things in the room you are sitting down to.
+	{"sit:", "tables"},
 	{"retain:", "standing"}, {"release:", "standing"}, {"smear:", "standing"},
 	{"enquire:", "standing"}, {"pact:", "standing"}, {"serve:", "standing"},
 	{"operate:", "business"}, {"fit:", "business"},

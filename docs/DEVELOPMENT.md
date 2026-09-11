@@ -8775,3 +8775,31 @@ fails on slot nought holding a publican where a worker belongs.
 The brief's timing is corrected again and the advice with it: `-runs 25` was
 worth reaching for at 97 seconds against 389, and is not worth it at 45 against
 85 when the smaller sample hides small moves in noisier medians.
+
+## Two things in one room, and one button that guessed
+
+Reported from the game: "I click play the machines in Saint Agnes but I only get
+the option to play poker."
+
+Giving the bar a room behind it made two addresses in the city hold both a wall
+of machines and a card game — Saint Agnes and the Green Baize. A sitting only
+knew the address, so the screen picked which game to draw from what the room
+held rather than from what the player sat down to, and the one seat the room
+offered had to guess between them. The guess was the back room, so the machines
+at either address were unreachable.
+
+A seat has a kind now. The room offers both where both exist, the sitting
+records which was taken, and the screen follows that. A save written before a
+seat had a kind, or a client still sending the old command, takes whatever is
+the only thing in the room and the old guess where there are two.
+
+Three guards. Every room holding both offers both and offers no seat that has to
+guess — two rooms do, so it measures something. Sitting down to the machines is
+not sitting down to cards, the casino cannot be sat down to as a back room, and
+getting up forgets which it was. And the screen is chosen by what was sat down
+to: putting the room back in its place fails on the line.
+
+The action ids changed from `sit` to `sit:floor` and `sit:back`, which broke
+three guards that named the old id and left the new ones filed under the
+fallback group. The grouping table has the prefix now, and the three guards were
+updated rather than reverted, each with the id it is actually about.

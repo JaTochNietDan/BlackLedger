@@ -32,12 +32,37 @@ func (w *World) SitReadiness(id string) string {
 	return ""
 }
 
+// Backroom and Floor are the two things a seat can be. Two rooms in this city
+// have both — a bar and a poolhall each have a wall of machines and a room
+// behind the room — and a sitting that only knew the address could not tell
+// them apart: "play the machines" at the bar put the player in a hand of cards,
+// because the screen picked which game to draw from the room rather than from
+// what the player sat down to.
+const (
+	Backroom = "back"
+	Floor    = "floor"
+)
+
 // Sit takes a seat, and clears whatever the last player left on the table.
-func (w *World) Sit(id string) error {
+func (w *World) Sit(id, to string) error {
 	if reason := w.SitReadiness(id); reason != "" {
 		return fmt.Errorf("%s", reason)
 	}
-	w.Seated = id
+	// A save written before a seat had a kind, and any room with only one thing
+	// in it, take the one thing that is there.
+	if to != Backroom && to != Floor {
+		to = Floor
+		if HasBackRoom(id) && !HasTables(id) && !HasMachines(id) {
+			to = Backroom
+		}
+	}
+	if to == Backroom && !HasBackRoom(id) {
+		return fmt.Errorf("there is no room behind this one")
+	}
+	if to == Floor && !HasTables(id) && !HasMachines(id) {
+		return fmt.Errorf("there is nothing on the floor here to play")
+	}
+	w.Seated, w.SeatedTo = id, to
 	w.clearTable()
 	return nil
 }
@@ -59,7 +84,7 @@ func (w *World) Rise() error {
 	if reason := w.RiseReadiness(); reason != "" {
 		return fmt.Errorf("%s", reason)
 	}
-	w.Seated = ""
+	w.Seated, w.SeatedTo = "", ""
 	w.clearTable()
 	return nil
 }

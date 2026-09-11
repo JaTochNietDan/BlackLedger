@@ -515,6 +515,9 @@ type World struct {
 	// where the drums stopped — is saved state, and somebody walking up to it
 	// should not be shown a game that started without them.
 	Seated string `json:"seated,omitempty"`
+	// Which of the two things in the room they sat down to: the floor, or the
+	// room behind it. Absent in saves written when a seat was only an address.
+	SeatedTo string `json:"seated_to,omitempty"`
 	// Where the player is, when that is two hundred miles outside the city. A
 	// journey between two addresses and a week in Halloway both park the player
 	// in "transit", and they are not the same thing at all: one is a walk
@@ -1269,14 +1272,20 @@ func (w *World) Actions(id string) []Action {
 			add("rise", "Get up and leave the tables", 0, 0, w.RiseReadiness(),
 				"Ends the sitting. Nothing is left on the table for whoever sits down next.")
 		} else {
-			seat, what := "Sit down at the tables", "The cards, the wheel and the machines, played out in front of you until you get up."
-			if !HasTables(id) {
-				seat, what = "Play the machines", "Three drums and a handle, against the wall where they always are."
+			// Two of these rooms have both a floor and a room behind it, so
+			// both are offered. One button that guessed put a player who
+			// asked for the machines into a hand of cards.
+			if HasTables(id) || HasMachines(id) {
+				seat, what := "Sit down at the tables", "The cards, the wheel and the machines, played out in front of you until you get up."
+				if !HasTables(id) {
+					seat, what = "Play the machines", "Three drums and a handle, against the wall where they always are."
+				}
+				add("sit:"+Floor, seat, 0, 0, w.SitReadiness(id), what)
 			}
 			if HasBackRoom(id) {
-				seat, what = "Go through to the back room", "A hand of cards against whoever is in there, played out in front of you until you get up."
+				add("sit:"+Backroom, "Go through to the back room", 0, 0, w.SitReadiness(id),
+					"A hand of cards against whoever is in there, played out in front of you until you get up.")
 			}
-			add("sit", seat, 0, 0, w.SitReadiness(id), what)
 		}
 	}
 	// The machines. Not a table: no dealer, no floor, no minimum — just a wall
@@ -2185,7 +2194,7 @@ func (w *World) Public() map[string]any {
 	if len(history) > 60 {
 		history = history[len(history)-60:]
 	}
-	return map[string]any{"id": w.ID, "version": w.Version, "revision": w.Revision, "life": w.Life, "minute": w.Minute, "sky": w.Sky(), "player": w.Player, "district": w.District, "factions": w.PublicFactions(), "npcs": w.People(), "locations": locs, "event": scene, "history": history, "dead": w.Dead, "tasks": w.Tasks, "director": w.Director, "last_result": w.LastResult, "daily_cost": w.DailyCost(), "books": w.Books(), "guide": w.Guide(), "rules": GuideRules(), "groups": Groups(), "income": income, "security": w.Guard(), "opportunity": w.NextOpportunity(), "known_threats": w.KnownThreats(), "business_truces": w.ActiveBusinessTruces(), "conflicts": w.PublicConflicts(), "goods": w.Goods, "arms": w.ArmsDescription(), "appearance": w.AppearanceDescription(), "vehicle": w.VehicleDescription(), "residence": w.ResidenceDescription(), "offshore": map[string]any{"balance": w.Offshore, "reachable": w.Player.Offshore}, "newspaper": w.Edition(), "editions": w.Editions(), "arrangements": w.PendingArrangements(), "commissions": w.PublicCommissions(), "grudges": w.GrudgeSummary(), "cast": w.Cast(), "everyone": w.Everyone(), "retainers": w.RetainerDescription(), "armoury": w.ArmouryDescription(), "population": w.PopulationSummary(), "seated": w.Seated, "hand": w.HandDescription(), "cards": w.CardsDescription(), "dice": w.DiceDescription(), "wheel": w.WheelDescription(), "machine": w.MachineDescription(), "house": w.HouseDescription(), "roles": w.RoleDescription(), "organization": w.PlayerOrganizationDescription(), "own_people": w.OwnPeopleDescription(), "pacts": w.PactDescription(), "book": w.LoanDescription(), "press": w.PressDescription(), "service": w.ServiceDescription(), "city": w.ScrutinyDescription(), "dashboard": w.Dashboard(), "epitaph": w.Epitaph(), "street": w.OnTheStreet(), "street_note": w.StreetNote()}
+	return map[string]any{"id": w.ID, "version": w.Version, "revision": w.Revision, "life": w.Life, "minute": w.Minute, "sky": w.Sky(), "player": w.Player, "district": w.District, "factions": w.PublicFactions(), "npcs": w.People(), "locations": locs, "event": scene, "history": history, "dead": w.Dead, "tasks": w.Tasks, "director": w.Director, "last_result": w.LastResult, "daily_cost": w.DailyCost(), "books": w.Books(), "guide": w.Guide(), "rules": GuideRules(), "groups": Groups(), "income": income, "security": w.Guard(), "opportunity": w.NextOpportunity(), "known_threats": w.KnownThreats(), "business_truces": w.ActiveBusinessTruces(), "conflicts": w.PublicConflicts(), "goods": w.Goods, "arms": w.ArmsDescription(), "appearance": w.AppearanceDescription(), "vehicle": w.VehicleDescription(), "residence": w.ResidenceDescription(), "offshore": map[string]any{"balance": w.Offshore, "reachable": w.Player.Offshore}, "newspaper": w.Edition(), "editions": w.Editions(), "arrangements": w.PendingArrangements(), "commissions": w.PublicCommissions(), "grudges": w.GrudgeSummary(), "cast": w.Cast(), "everyone": w.Everyone(), "retainers": w.RetainerDescription(), "armoury": w.ArmouryDescription(), "population": w.PopulationSummary(), "seated": w.Seated, "seated_to": w.SeatedTo, "hand": w.HandDescription(), "cards": w.CardsDescription(), "dice": w.DiceDescription(), "wheel": w.WheelDescription(), "machine": w.MachineDescription(), "house": w.HouseDescription(), "roles": w.RoleDescription(), "organization": w.PlayerOrganizationDescription(), "own_people": w.OwnPeopleDescription(), "pacts": w.PactDescription(), "book": w.LoanDescription(), "press": w.PressDescription(), "service": w.ServiceDescription(), "city": w.ScrutinyDescription(), "dashboard": w.Dashboard(), "epitaph": w.Epitaph(), "street": w.OnTheStreet(), "street_note": w.StreetNote()}
 }
 func (w *World) hasRecord(title string) bool {
 	for _, r := range w.History {

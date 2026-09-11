@@ -150,6 +150,10 @@ Ensure efficiency of development loops by increasing efficiency of your workflow
 
 ## Inbox — open
 
+When playing poker the game should continue until you stop playing, right now it just requires you to leave the table and rejoin. Realistically it feels like it should be more like actual poker, where you have a buy in and whatnot and you play until people go bust or you can leave.
+
+---
+
 Now when gambling for some reason you changed it back to "play the nickle machine" which doesn't even show our slots page it just seems to run some background simulation and it doesn't allow you to set your own bet as we fleshed out prior.
 
 We used to have "sit down at the tables" when you were at a casino which is much nicer. No idea why you changed to this weird action button thing again that doesn't even show our fancy interface.

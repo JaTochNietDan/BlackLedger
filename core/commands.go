@@ -344,6 +344,15 @@ func (w *World) apply(c Command) error {
 				return err
 			}
 			w.Advance(a.Minutes)
+		} else if to, ok := strings.CutPrefix(c.Kind, "sit:"); ok {
+			// Which of the two things in the room. The room is where the
+			// player is standing; a bar and a poolhall each have a floor and a
+			// room behind it, and one seat that guessed put somebody who asked
+			// for the machines into a hand of cards.
+			if err := w.Sit(p.Location, to); err != nil {
+				return err
+			}
+			w.Advance(a.Minutes)
 		} else if who, ok := strings.CutPrefix(c.Kind, "incharge:"); ok {
 			if err := w.PutInCharge(c.Target, who); err != nil {
 				return err
@@ -579,7 +588,10 @@ func (w *World) apply(c Command) error {
 					return err
 				}
 			case "sit":
-				if err := w.Sit(target); err != nil {
+				// A save or a client from before a seat had a kind. The room
+				// decides, which is right wherever there is only one thing in
+				// it and is the old guess wherever there are two.
+				if err := w.Sit(p.Location, ""); err != nil {
 					return err
 				}
 			case "rise":

@@ -96,10 +96,11 @@ function App() {
   // Which kind of seat it is. The back room is a game with no house in it and
   // no other table beside it, so it gets its own screen rather than a tab in
   // the casino's.
-  // Which rooms have a room behind them. The core decides; this only has to
-  // know whether the screen the player is on is the felt or the back room, and
-  // it used to know by naming the poolhall.
-  const inTheBackRoom = atTable && !!world!.locations.find(l => l.id === world!.seated)?.back_room;
+  // Which of the two things in the room they sat down to. It has to be what
+  // the player chose rather than what the room holds: a bar and a poolhall each
+  // have a wall of machines and a room behind the room, so a screen picked from
+  // the address put somebody who asked for the machines into a hand of cards.
+  const inTheBackRoom = atTable && world!.seated_to === 'back';
   // The arrangement of the map, and whether it is being arranged. Loaded once:
   // it is a file in the repository, not part of the world, so it does not
   // change under the player the way the city does.

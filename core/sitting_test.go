@@ -29,7 +29,7 @@ func TestSittingDownLeavesNothingOnTheTable(t *testing.T) {
 	if w.Reels == nil || w.Spin == nil {
 		t.Fatal("nothing was played, so this proves nothing")
 	}
-	if err := w.Sit("club"); err != nil {
+	if err := w.Sit("club", Floor); err != nil {
 		t.Fatal(err)
 	}
 	if w.Seated != "club" {
@@ -46,7 +46,7 @@ func TestSittingDownLeavesNothingOnTheTable(t *testing.T) {
 func TestYouCannotGetUpInTheMiddleOfAHand(t *testing.T) {
 	t.Parallel()
 	w := sitter(t)
-	if err := w.Sit("club"); err != nil {
+	if err := w.Sit("club", Floor); err != nil {
 		t.Fatal(err)
 	}
 	if err := w.Deal("club", 50); err != nil {
@@ -74,7 +74,7 @@ func TestYouCannotGetUpInTheMiddleOfAHand(t *testing.T) {
 func TestTheRoomOffersASeatRatherThanAGame(t *testing.T) {
 	t.Parallel()
 	w := sitter(t)
-	sit := actionByID(w.Actions("club"), "sit")
+	sit := actionByID(w.Actions("club"), "sit:"+Floor)
 	if sit == nil || sit.Disabled {
 		t.Fatalf("a club with tables did not offer a seat: %+v", sit)
 	}
@@ -91,7 +91,7 @@ func TestTheRoomOffersASeatRatherThanAGame(t *testing.T) {
 func TestASeatIsTakenWhereTheGameIs(t *testing.T) {
 	t.Parallel()
 	w := sitter(t)
-	if err := w.Sit("club"); err != nil {
+	if err := w.Sit("club", Floor); err != nil {
 		t.Fatal(err)
 	}
 	w.Player.Location = "bar"

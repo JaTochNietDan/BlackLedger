@@ -282,3 +282,17 @@ func TestTheCityListSaysWhereTheGamesAre(t *testing.T) {
 		t.Fatal("the address list says nothing about which rooms have a game behind them")
 	}
 }
+
+// And the screen follows what the player sat down to rather than what the room
+// holds. Picking it from the address is what put somebody who asked for the
+// machines at Saint Agnes into a hand of cards.
+func TestTheScreenFollowsWhatWasSatDownTo(t *testing.T) {
+	t.Parallel()
+	src := source(t, "src/main.tsx")
+	if !holds(src, "world!.seated_to === 'back'") {
+		t.Fatal("the screen is chosen by something other than what the player sat down to")
+	}
+	if holds(src, "l.id === world!.seated)?.back_room") {
+		t.Fatal("the screen is still chosen by what the room holds")
+	}
+}

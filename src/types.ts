@@ -241,6 +241,7 @@ export interface Snapshot {
     strip: {id: string; face: string; stops: number; pays: number}[];
   };
   seated?: string;
+  seated_to?: string;
   dice?: {
     playing: boolean;
     settled: boolean;
