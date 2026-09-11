@@ -9806,3 +9806,48 @@ door that notices, the room that costs nothing, and the name. Two of the first
 attempts at breaking them did not compile or did not actually change the
 behaviour they claimed to, which is worth saying plainly — a break that builds
 and passes is not evidence, it is a second thing to check.
+
+## Asking the game instead of the list
+
+Queue item seven — which businesses reach past their own income — has been wrong
+four times in one night. The burlesque was down as unlinked and had been a valid
+host for a night since the day that was built. The butcher was down as unlinked
+and hides four units of contraband. Tonight the poolhall turned out to take the
+seat money from the city's own card game into its bankroll, and the casino to
+have a bankroll and a house edge of its own. Every one of the four was already
+built, and four ticks could have gone into rebuilding them.
+
+A list in a document cannot be trusted about this. Neither can a reading of the
+code, and that is the sharper half: the burlesque's night was wired up, offered
+on a card, and correct to read, and it moved not one person in the city for as
+long as it existed.
+
+So the question is asked of the game. `TestEveryTradeReachesPastItsOwnIncome`
+walks all thirteen trades, holds each one and does not hold it, and measures the
+number holding it is supposed to change. Ten passed first time. Three did not,
+and all three were faults in the asking rather than in the game:
+
+- The laundry measured `launderCapacity`, which is a property of the trade
+  whoever holds it. Ownership is checked by the caller. It measures what the
+  books actually absorb now: 18 points of attention, and nothing else in this
+  city takes attention off you.
+- The pawnbroker made up a shelf id, but `shelve` assigns its own, so both
+  sides priced nothing and read zero. It prices the thing that actually went on
+  the shelf: $400 asked, $150 to whoever holds the counter.
+- The filling station set the tank to empty by writing `Fuel = 0`, and a tank
+  nobody has ever touched reads as full — that is what `Fuelled` is for. Set
+  properly it is $25 against $8.
+
+Two rules came out of it and are in the brief. Contributing cover to laundering
+is not reaching, because every trade with a front does that and counting it
+would have finished the question before it was asked. And where a row can only
+ask whether something is offered, it has to say so and point at the test that
+asks whether anybody comes.
+
+The sweep also fails when a fourteenth trade is added and nobody asks about it,
+which was checked by adding one. Three links were broken one at a time — the
+garage's half-upkeep, the pumps' third, the table charge reaching the room — and
+each fails with the trade named and both figures printed.
+
+Queue item seven is closed. What replaced it in the brief is the table of
+figures and the instruction not to rewrite the list from a reading of the code.

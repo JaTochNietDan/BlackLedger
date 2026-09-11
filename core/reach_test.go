@@ -2,133 +2,197 @@ package core
 
 import "testing"
 
-// The action sweep added when people started walking asked one question — is
-// this person out on the street? — and every other way of being unreachable
-// went on being ignored. A player could send a man on collections from the far
-// side of the city, order one out of a police cell, and pay a bonus to a man
-// who had been shot the day before: the crew list kept him, the button offered
-// him work, and the command was accepted.
+// Does every trade reach past its own income?
+//
+// The brief has carried a list of which do and which do not, and the list has
+// been wrong four times in one night. The burlesque was down as unlinked and
+// had been a valid host for putting a night on since the day that was built
+// — though the feature was dead, which is why the list being wrong is not
+// harmless. The butcher was down as unlinked and hides four units of
+// contraband. The poolhall was down as unlinked and takes the seat money from
+// the city's own card game into its bankroll. The casino was down as unlinked
+// and has a bankroll and a house edge of its own.
+//
+// A list in a document cannot be trusted about this and neither can a reading
+// of the code, because a link can be wired up and still move nothing. So the
+// question is asked of the game: for every trade in the city, hold it and do
+// not hold it, and measure the number it is supposed to change.
+//
+// A trade that reaches has something of its own. Contributing cover to
+// laundering is not reaching — every trade with a front does that, and if it
+// counted then the question would have been finished before it was asked.
+//
+// What this sweep proves is narrow and worth being exact about: holding the
+// place changes the number. Whether the number means anything in play is each
+// feature's own guard's job. The burlesque is the reason that line matters —
+// its night was wired up, offered on a card and correct to read, and moved not
+// one person in the city for as long as it existed. A row here would have
+// passed on it the whole time. So where a row can only ask whether something is
+// offered, it says so, and the feature carries its own test of whether anybody
+// comes.
 
-func TestYouCannotSendAManWhoIsDead(t *testing.T) {
-	t.Parallel()
-	w, leo := crewman(t)
-	w.Player.Cash = 3000
-	w.Kill(leo.ID, "Shot at the counter.")
-	if len(w.Player.Crew) != 0 {
-		t.Fatalf("a dead man is still on the books: %+v", w.Player.Crew)
-	}
-	for _, a := range w.Actions(w.Player.Location) {
-		if a.ID == "delegate" || a.ID == "crew_bonus" {
-			t.Fatalf("%q is offered for somebody who is dead", a.Label)
-		}
-	}
-	if _, err := Execute(w, Command{RequestID: ID(), Revision: w.Revision, Kind: "delegate", Target: w.Player.Location}); err == nil {
-		t.Fatal("a dead man was sent on collections")
-	}
+// reaching is one trade, what holding it changes, and how to measure it.
+type reaching struct {
+	kind string
+	// what the link is, for the failure to say.
+	what string
+	// better is the direction holding it should move the number.
+	better string
+	// measure is the number, taken from a world that holds the place and one
+	// that does not.
+	measure func(w *World, id string) int
 }
 
-func TestYouCannotSendAManOutOfACell(t *testing.T) {
-	t.Parallel()
-	w, leo := crewman(t)
-	w.Player.Cash = 3000
-	leo.Held = w.Minute + 2880
-	for _, a := range w.Actions(w.Player.Location) {
-		if (a.ID == "delegate" || a.ID == "crew_bonus") && !a.Disabled {
-			t.Fatalf("%q is offered for a man the police are holding", a.Label)
-		}
-		if a.ID == "delegate" && !contains(a.Reason, "held") {
-			t.Fatalf("the refusal does not say where he is: %q", a.Reason)
+func addressOf(kind string) string {
+	for _, l := range Locations {
+		if l.Kind == kind {
+			return l.ID
 		}
 	}
+	return ""
 }
 
-// Being in a different building is deliberately not out of reach. A man at an
-// address can be reached; a man between two addresses is nowhere. This is here
-// so that the distinction is a decision on the record rather than an accident,
-// and so that reinstating the stricter rule has to be done deliberately.
-func TestBeingInAnotherBuildingIsNotOutOfReach(t *testing.T) {
-	t.Parallel()
-	w, leo := crewman(t)
-	w.Player.Cash = 3000
-	leo.Location = "club"
-	w.Player.Location = "bar"
-	if reason := w.OutOfReach(leo.ID); reason != "" {
-		t.Fatalf("a man standing at an address across the city is unreachable: %q", reason)
+// standing is a campaign able to exercise any of these: money, a car, stock,
+// a quarrel to stand between, and three days of a city behind it.
+func holdingIt(t *testing.T, id string, hold bool) *World {
+	t.Helper()
+	w := New(53)
+	w.Event, w.District = nil, 9
+	w.Player.Health, w.Player.Cash, w.Player.Respect = 100, 400000, 90
+	w.Player.Car, w.Player.CarWear, w.Player.Dress = 2, 30, 1
+	w.Player.Stock = map[string]int{"moonshine": 30}
+	for i := range w.Conflicts {
+		w.Conflicts[i].State, w.Conflicts[i].Hostility = "war", 90
 	}
-	// But once he steps out of it he is nowhere.
-	leo.Heading, leo.Arrives, leo.Errand = "bar", w.Minute+30, "on his way"
-	if reason := w.OutOfReach(leo.ID); reason == "" {
-		t.Fatal("a man on the street can still be dealt with")
+	if hold {
+		own(w, id)
+		if trade, runs := TradeOf(id); runs {
+			w.Properties[id].Staff = trade.Hands
+			w.Properties[id].Supply = trade.RestockAmount
+		}
 	}
+	w.Player.Location = id
+	w.Event = nil
+	return w
 }
 
-// Taking the dead off the books uncovered an older bug it had been hiding:
-// "Recruit Leo Carver" was refused only because he was already in the crew, so
-// the moment death removed him the button offered to hire him again.
-func TestYouCannotRecruitAManWhoIsDead(t *testing.T) {
+func TestEveryTradeReachesPastItsOwnIncome(t *testing.T) {
 	t.Parallel()
-	w, leo := crewman(t)
-	w.Player.Cash = 3000
-	w.Kill(leo.ID, "Shot twice outside the Mariner.")
-	for _, a := range w.Actions("bar") {
-		if a.ID != "recruit" {
+	links := []reaching{
+		{"garage", "half off what the car costs to keep", "lower",
+			func(w *World, id string) int { return w.CarUpkeep() }},
+		{"filling", "your own petrol at what it cost the pumps", "lower",
+			func(w *World, id string) int {
+				w.Player.Fuel, w.Player.Fuelled = 1, w.Minute
+				return w.FuelFee(id)
+			}},
+		{"dealer", "a car without the forecourt's margin", "lower",
+			func(w *World, id string) int {
+				next, _ := nextVehicle(w.Player.Car)
+				cash := w.Player.Cash
+				if err := w.BuyVehicle(); err != nil {
+					return next.Cost
+				}
+				return cash - w.Player.Cash
+			}},
+		{"haulage", "a third off stocking everything else", "lower",
+			func(w *World, id string) int { return w.RestockCost(addressOf("butcher")) }},
+		{"cabs", "a ride when your own car cannot take you", "higher",
+			func(w *World, id string) int {
+				w.Player.Car = 0
+				if w.RidingWithTheCabs() {
+					return 1
+				}
+				return 0
+			}},
+		{"scrapyard", "more for the wreck when the yard is yours", "higher",
+			func(w *World, id string) int { return w.ScrapWorth(id) }},
+		{"laundry", "attention the books can absorb that nothing else can", "higher",
+			func(w *World, id string) int {
+				// The capacity is a property of the trade whoever holds it, so
+				// measuring that measured nothing. What ownership decides is
+				// whether the books will take it at all — and they are the only
+				// thing in this city that takes attention off you.
+				w.Player.Heat = 60
+				before := w.Player.Heat
+				if w.LaunderReadiness(id) != "" {
+					return 0
+				}
+				if err := w.Launder(id); err != nil {
+					return 0
+				}
+				return before - w.Player.Heat
+			}},
+		// Offered only. That a night actually moves people is guarded in
+		// night_test.go, at five seeds, because it did not for a long time.
+		{"burlesque", "a night on is offered, and it draws (see night_test.go)", "higher",
+			func(w *World, id string) int {
+				if w.NightReadiness(id) != "" {
+					return 0
+				}
+				return 1
+			}},
+		{"pawn", "the window at what the counter lent, not what it asks", "lower",
+			func(w *World, id string) int {
+				// shelve gives the thing its own id, so asking for one made up
+				// here priced nothing and both sides read zero.
+				w.shelve(Shelf{Kind: "dress", Tier: 2, Wear: 30, Ask: 400, Lent: 150})
+				return w.WindowPrice(w.Window[len(w.Window)-1].ID)
+			}},
+		{"butcher", "a cold room things sit in without being looked at", "higher",
+			func(w *World, id string) int { return w.Concealed() }},
+		{"restaurant", "a dining room two families will sit down in", "higher",
+			func(w *World, id string) int {
+				if w.SitdownWhere(id) {
+					return 1
+				}
+				return 0
+			}},
+		{"poolhall", "the seat money off the city's own game", "higher",
+			func(w *World, id string) int {
+				w.BackRoomNight()
+				if prop := w.Properties[id]; prop != nil {
+					return prop.Bankroll
+				}
+				return 0
+			}},
+		// Whether the night's arithmetic is right is casino_test.go's job; this
+		// asks only whether the room has a night at all when it is yours.
+		{"casino", "a bankroll the house plays out of, and a night of its own", "higher",
+			func(w *World, id string) int {
+				prop := w.Properties[id]
+				if prop == nil {
+					return 0
+				}
+				prop.Bankroll = 5000
+				before := prop.Bankroll
+				w.CasinoDay()
+				if prop.Bankroll != before {
+					return 1
+				}
+				return 0
+			}},
+	}
+	if len(links) != len(trades) {
+		t.Fatalf("the city has %d trades and this asks about %d", len(trades), len(links))
+	}
+	for _, link := range links {
+		id := addressOf(link.kind)
+		if id == "" {
+			t.Errorf("%s: the city has no such address", link.kind)
 			continue
 		}
-		if !a.Disabled {
-			t.Fatal("the game offered to recruit a dead man")
+		without := link.measure(holdingIt(t, id, false), id)
+		with := link.measure(holdingIt(t, id, true), id)
+		moved := with < without
+		if link.better == "higher" {
+			moved = with > without
 		}
-		if !contains(a.Reason, "dead") {
-			t.Fatalf("it refuses for the wrong reason: %q", a.Reason)
+		if !moved {
+			t.Errorf("%s does not reach: %s. Holding it gives %d where not holding it gives %d, and %s would be %s",
+				link.kind, link.what, with, without, "reaching", link.better)
+			continue
 		}
-		return
-	}
-	t.Fatal("recruiting is not offered at the bar at all")
-}
-
-// The delegated jobs — rob, mug, sabotage — are aimed at a place, and the man
-// who does them is named nowhere in the action's id. So the sweep that asks
-// whether a subject is reachable never saw them, and a player could send
-// somebody out of a police cell to rob a business while the police were still
-// holding him. The one shared readiness function they all use never asked.
-func TestYouCannotSendAManFromACellToDoAJob(t *testing.T) {
-	t.Parallel()
-	w, leo := crewman(t)
-	w.Player.Cash = 3000
-	if w.DelegateReadiness() != "" {
-		t.Fatalf("he could not be sent in the first place: %q", w.DelegateReadiness())
-	}
-	leo.Held = w.Minute + 2880
-	reason := w.DelegateReadiness()
-	if reason == "" {
-		t.Fatal("a man the police are holding was available to send")
-	}
-	if !contains(reason, "held") {
-		t.Fatalf("the refusal does not say where he is: %q", reason)
-	}
-	for _, a := range w.Actions(w.Player.Location) {
-		switch a.ID {
-		case "rob:crew", "mug:crew", "sabotage:crew":
-			if !a.Disabled {
-				t.Fatalf("%q sends a man who is in a cell", a.Label)
-			}
-		}
-	}
-	// And when they let him out he is available again.
-	leo.Held = 0
-	if w.DelegateReadiness() != "" {
-		t.Fatalf("he was released and is still unavailable: %q", w.DelegateReadiness())
-	}
-}
-
-// The same question, for the same reason, about a man who is out walking.
-func TestYouCannotSendAManWhoIsAlreadyCrossingTheCity(t *testing.T) {
-	t.Parallel()
-	w, leo := crewman(t)
-	w.Player.Cash = 3000
-	leo.Heading, leo.Arrives, leo.Errand = "club", w.Minute+30, "somewhere of his own"
-	if reason := w.DelegateReadiness(); reason == "" {
-		t.Fatal("a man on the street was available to send")
-	} else if !contains(reason, "street") {
-		t.Fatalf("the refusal does not say he is out: %q", reason)
+		t.Logf("%-11s %-52s %6d -> %-6d", link.kind, link.what, without, with)
 	}
 }

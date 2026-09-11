@@ -93,30 +93,39 @@ which half is standing.
 
 ---
 
-7. **Businesses that link to each other.** Four of the thirteen trades reach
-   past their own income: a garage halves the car's upkeep and repairs, a
-   haulier takes a third off stocking everything else, a cab yard is a ride when
-   your own car cannot take you, and a scrapyard buys what is left of it, better
-   when the yard is yours. Three more were already linked and were checked rather
-   than rebuilt: laundering needs a business, a forecourt you hold sells you a
-   car without the margin, and the burlesque can put a night on — though that
-   one turned out to be linked on paper only and took a tick to make true.
-   The pawnbroker reaches now too, and reached halfway before anybody looked:
-   a mugging or a robbery already pushed the shop's custom, worth about $1,200
-   a week at saturation, which is the city's side of it. The player's side is
-   the window — what the city could not redeem, on a shelf at 60% of new less
-   wear, and a counter you hold sells you that stock at what it lent rather
-   than what it asks. The butcher was on the open list and should not have
-   been: its cold room hides four units of contraband, measured — a search
-   takes 26 of 30 where it would take all 30. The restaurant reaches now as
-   well: a dining room of yours with its full complement on the door is a room
-   two families will sit down in, the only other one in the city besides the
-   back of the bar, and what your staff see coming in is a warning you would
-   otherwise need contacts for. Still open: the poolhall and the casinos, which
-   contribute cover to laundering like every business does but have nothing of
-   their own. Read that distinction carefully before taking one: contributing a
-   number every trade contributes is not the same as reaching.
+7. **Businesses that link to each other. Done, and guarded.** All thirteen
+   trades reach past their own income, and `TestEveryTradeReachesPastItsOwnIncome`
+   in `core/reach_test.go` holds each one and does not hold it and measures the
+   number it is supposed to change. It fails if a link stops working and it
+   fails if a fourteenth trade is added with nobody asking about it. Do not
+   rewrite this list from a reading of the code — run the test, it prints the
+   figures:
 
+   | trade | what holding it changes | not held | held |
+   |---|---|---|---|
+   | garage | half off what the car costs to keep | 7 | 4 |
+   | filling | your own petrol at what it cost the pumps | 25 | 8 |
+   | dealer | a car without the forecourt's margin | 4400 | 3300 |
+   | haulage | a third off stocking everything else | 200 | 132 |
+   | cabs | a ride when your own car cannot take you | no | yes |
+   | scrapyard | more for the wreck when the yard is yours | 105 | 157 |
+   | laundry | attention the books absorb, which nothing else takes off you | 0 | 18 |
+   | burlesque | a night on, which draws (guarded in `night_test.go`) | no | yes |
+   | pawn | the window at what the counter lent, not what it asks | 400 | 150 |
+   | butcher | a cold room things sit in without being looked at | 20 | 24 |
+   | restaurant | a dining room two families will sit down in | no | yes |
+   | poolhall | the seat money off the city's own game | 0 | 32 |
+   | casino | a bankroll the house plays out of, and a night of its own | no | yes |
+
+   This list was wrong four times in one night — the burlesque, the butcher, the
+   poolhall and the casino were all down as unlinked and were not. Two rules
+   came out of that. **Contributing cover to laundering is not reaching**; every
+   trade with a front does that, and counting it would have finished the
+   question before it was asked. And **a link can be wired up, offered on a card,
+   correct to read, and move nothing** — the burlesque's night did exactly that
+   for as long as it existed. So the sweep asks the game rather than the code,
+   and where a row can only ask whether something is offered it says so and
+   points at the test that asks whether anybody comes.
 ---
 
 ## What exists (do not rebuild)
