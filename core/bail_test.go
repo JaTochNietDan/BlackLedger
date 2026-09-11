@@ -122,3 +122,112 @@ func TestOnlyBailReachesIntoACell(t *testing.T) {
 		t.Fatalf("bail is still refused: %q", a.Reason)
 	}
 }
+
+// The path nothing had ever walked: somebody of yours answers for what the
+// police found, and later you buy them back.
+//
+// Both halves were on the never-played list — `bail:` as an action, `fall:` as
+// a scene branch — and every test of bail above puts a man in a cell by writing
+// the minute he comes out straight onto him. That is the state, not the road to
+// it. The only thing in the game that puts one of the player's own people
+// inside is the arrest scene's third answer, and nothing checked that what it
+// leaves behind is what the precinct will sell back.
+func TestGivingThemSomebodyAndBuyingThemBack(t *testing.T) {
+	t.Parallel()
+	w := New(23)
+	w.Event, w.Player.Cash, w.Player.Respect = nil, 40000, 200
+	for _, id := range []string{"laundry", "garage", "casino"} {
+		w.Properties[id].Owner = "player:1"
+	}
+	w.Incorporate()
+	if w.PlayerOrganization() == nil {
+		t.Fatal("the player has no organization, so nobody answers to them")
+	}
+
+	// Somebody signed on the way the game signs people on: standing in front of
+	// you, and paid for.
+	var signed *NPC
+	for _, n := range w.NPCs {
+		who := w.NPC(n.ID)
+		w.Player.Location = who.Location
+		if w.SignOnReadiness(who.ID) != "" {
+			continue
+		}
+		if err := w.SignOn(who.ID); err != nil {
+			t.Fatal(err)
+		}
+		signed = who
+		break
+	}
+	if signed == nil {
+		t.Skip("nobody in this city would sign on")
+	}
+
+	// The door. The arrest is raised by the world, and the answer goes through
+	// the command layer like any other.
+	w.Take(2, "what was in the back room")
+	if w.Event == nil || w.Event.Kind != "arrest" {
+		t.Fatal("the police did not come to the door")
+	}
+	fall := ""
+	for _, c := range w.Event.Choices {
+		if strings.HasPrefix(c.ID, "fall:") {
+			fall = c.ID
+		}
+	}
+	if fall == "" {
+		t.Fatal("a player with somebody of their own is offered nobody to give them")
+	}
+	after, err := Execute(w, Command{Kind: "choice", Event: w.Event.ID, Choice: fall, Revision: w.Revision})
+	if err != nil {
+		t.Fatal(err)
+	}
+	w = after
+
+	inside := w.NPC(strings.TrimPrefix(fall, "fall:"))
+	if inside == nil || !w.Inside(inside) {
+		t.Fatal("the man handed over at the door is not inside")
+	}
+	if inside.Faction != w.PlayerOrganizationID() {
+		t.Fatalf("%s still answers to %q, so the precinct will not sell them back",
+			inside.Name, inside.Faction)
+	}
+
+	// And he is at the station, not standing where he was arrested. The line
+	// under his name said "In a cell at Ward Street Station" while the room he
+	// was taken from went on listing him among the people standing in it.
+	if inside.Location != "precinct" {
+		t.Fatalf("%s is in a cell and standing at %q", inside.Name, inside.Location)
+	}
+	for _, p := range w.PeopleHere(signed.Location) {
+		if p.ID == inside.ID && signed.Location != "precinct" {
+			t.Fatalf("%s is in a cell and in the room at %s", p.Name, signed.Location)
+		}
+	}
+	here := false
+	for _, p := range w.PeopleHere("precinct") {
+		here = here || p.ID == inside.ID
+	}
+	if !here {
+		t.Fatalf("%s is being held and is nowhere in the station", inside.Name)
+	}
+
+	// And the precinct sells them back. Read off the room's own card, because a
+	// card nobody is offered is a road nobody can walk.
+	w.Player.Location = "precinct"
+	card := bailAction(t, w)
+	if card.ID != "bail:"+inside.ID {
+		t.Fatalf("the precinct offers %q rather than the man who was handed over", card.ID)
+	}
+	if card.Disabled {
+		t.Fatalf("a player with $%d cannot buy them back: %s", w.Player.Cash, card.Reason)
+	}
+	bought, err := Execute(w, Command{Kind: card.ID, Revision: w.Revision})
+	if err != nil {
+		t.Fatal(err)
+	}
+	w = bought
+	if out := w.NPC(inside.ID); w.Inside(out) {
+		t.Fatalf("%s is still inside after being bailed", out.Name)
+	}
+}

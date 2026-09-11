@@ -206,9 +206,7 @@ func (w *World) itWentWrong(n *NPC, hand Hand, where string, family *Faction) {
 	case roll < HandDies+HandCaught:
 		// Taken alive. Their face is known and so is whose face it is.
 		w.Player.Heat = min(100, w.Player.Heat+25)
-		if hurt := w.NPC(who.ID); hurt != nil {
-			hurt.Held = w.Minute + 3*1440
-		}
+		w.hold(w.NPC(who.ID), 3)
 		w.Player.Crew = nil
 		w.ReportAbout("arrest", "ARREST AFTER ATTACK ON "+upper(n.Name),
 			"Somebody taken at the scene is assisting police with their enquiries. Sources suggest a name has been given.", n.ID)

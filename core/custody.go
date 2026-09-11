@@ -161,7 +161,7 @@ func (w *World) ResolveArrest(e *Scene, choice string) error {
 				prop.Posted = ""
 			}
 		}
-		n.Held = w.Minute + days*1440
+		w.hold(n, days)
 		// Everybody who works for you learns something about you tonight.
 		for _, other := range w.OwnPeople() {
 			if other.ID != n.ID {
@@ -290,6 +290,22 @@ func (w *World) CustodyDay() {
 	if w.Player.HeldUntil > 0 && w.Player.HeldUntil <= w.Minute {
 		w.Release()
 	}
+}
+
+// hold puts somebody in a cell for a number of days, which means they are at
+// Ward Street Station and not wherever they were standing when it happened.
+//
+// The minute they come out used to be the whole of it, and the line under their
+// name in every room read "In a cell at Ward Street Station" while they went on
+// standing in the garage all week, in the room's list of who is here, offered to
+// whatever the room does to people. A man handed to the police at your own door
+// is somewhere else now, which is the point of handing him over.
+func (w *World) hold(n *NPC, days int) {
+	if n == nil {
+		return
+	}
+	n.Held = w.Minute + days*1440
+	n.Location, n.Heading, n.Arrives = "precinct", "", 0
 }
 
 // Inside is everybody of the player's the police are still holding, which is the

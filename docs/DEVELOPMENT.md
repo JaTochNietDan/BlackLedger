@@ -11390,3 +11390,37 @@ Worth saying plainly, because this loop has no browser: this was read out of the
 stylesheet, not off a screen. That is enough here in a way it was not for the
 drums last tick. Whether a fixed column can be widened is a fact about the grid.
 Whether a spinning drum looks like a machine is not.
+
+## A man in a cell, standing in the garage
+
+The open inbox is empty, so this took the standing instruction instead: walk a
+path nothing has ever walked. Two entries on the never-played lists are the two
+halves of one road. `fall:` is the arrest scene's third answer — give the police
+somebody of yours instead of going yourself — and `bail:` is buying them back at
+the precinct. Neither had ever been played.
+
+Bail already had three tests. Every one of them puts a man in a cell by writing
+the minute he comes out straight onto him. That is the state and not the road to
+it, which is the difference this file keeps finding: the only thing in the game
+that puts one of the player's own people inside is that scene answer, and
+nothing checked that what it leaves behind is what the precinct will sell back.
+
+It is. The guard signs somebody on the way the game signs people on, raises the
+arrest, answers it through the command layer, reads the bail card off the
+precinct's own action list, and buys him out. That part worked first time.
+
+What did not: **`fall:` set the minute he comes out and nothing else.** He was
+standing at the scrapyard when they took him, and he went on standing at the
+scrapyard for three days — in the room's list of who is here, offered to
+whatever that room does to people, with a line under his name reading "In a cell
+at Ward Street Station". The station itself had nobody in it. The display knew
+where he was and the city did not.
+
+Being held is a place now, not just a date. One helper sets both, and the two
+places that put somebody inside — the door, and one of your own taken alive
+after a hit — both call it, so there is no third way to be in a cell and in a
+room at once. Release needs no counterpart: a man let out is at the station,
+which is where he would be, and the day's routine moves him on from there.
+
+The guard fails at the old behaviour with the man in a cell and at the
+scrapyard.
