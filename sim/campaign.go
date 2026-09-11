@@ -1080,6 +1080,51 @@ func Choose(v View, strategy string) (core.Command, error) {
 			return c, nil
 		}
 	}
+	// The diplomat's whole point, and the one subsystem in this game no
+	// campaign has ever exercised: standing with somebody rather than against
+	// them. An understanding needs an organization of your own, a family that
+	// thinks well of you, a problem you both have, enough asked about them to
+	// know what you are agreeing to, and seven hundred dollars.
+	//
+	// The asking is the part a policy has to want. Intelligence comes from a
+	// network, from somebody inside who will speak to you, and from having
+	// enquired recently — and the enquiry runs out, so it is a thing to keep
+	// doing rather than a box to tick.
+	if strategy == "diplomat" {
+		for _, p := range v.Locations {
+			for _, a := range p.Actions {
+				if strings.HasPrefix(a.ID, "pact:") && !a.Disabled {
+					if c, ok := v.at(p.ID, a.ID); ok {
+						return c, nil
+					}
+				}
+			}
+		}
+		// Nobody would agree to anything with somebody they know nothing
+		// about. Asked about whoever the player has asked about least.
+		want, fewest := "", 0
+		for _, p := range v.Locations {
+			for _, a := range p.Actions {
+				if !strings.HasPrefix(a.ID, "enquire:") || a.Disabled {
+					continue
+				}
+				if n := v.Tried[a.ID]; want == "" || n < fewest {
+					want, fewest = a.ID, n
+				}
+			}
+		}
+		if want != "" {
+			for _, p := range v.Locations {
+				for _, a := range p.Actions {
+					if a.ID == want && !a.Disabled {
+						if c, ok := v.at(p.ID, want); ok {
+							return c, nil
+						}
+					}
+				}
+			}
+		}
+	}
 	if strategy == "diplomat" && v.Player.Cash >= 200 {
 		for _, p := range v.Locations {
 			if !p.Owned || p.Income <= 0 {

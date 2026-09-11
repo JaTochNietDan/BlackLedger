@@ -12554,3 +12554,30 @@ hundred campaigns and then cannot ally with anybody.
 
 That is the game working rather than a gap, so the preference came back out
 instead of being propped up. A branch that never runs is worse than no branch.
+
+## Standing with somebody
+
+Last night the respectable policy turned out to be unable to ally with anybody,
+because it spends its days printing stories about them. That left the alliance
+subsystem where it has always been: built, balanced, and never once played.
+
+There was already a diplomat in `sim/campaign.go`. It is not in the default list
+of policies, not in the baseline, not in the coverage pin, and all it ever did
+was buy business ceasefires across a table. It never made an understanding,
+which is the thing it is named for.
+
+An understanding takes five things at once: an organization of your own, a
+family that thinks well of you, a problem you both have, enough asked about them
+to know what you are agreeing to, and seven hundred dollars. The asking is the
+part a policy has to want, and it runs out — so it is something to keep doing
+rather than a box to tick. The diplomat asks about whoever it has asked about
+least, which is the rule that has worked twice before in this harness.
+
+**Eighty-two understandings across a hundred campaigns**, where the whole project
+had seen two. The tribute, the allies who turn up when somebody comes for you,
+the drag of being known to stand with somebody — all of it is priced for the
+first time. The diplomat ends on $6,477 over eleven days, which is a policy that
+survives rather than one that thrives, and that is a reading rather than a
+complaint: nobody has tuned any of it, because nobody could see it.
+
+Coverage goes from 99 kinds of action to 100.

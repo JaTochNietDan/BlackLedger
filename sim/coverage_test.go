@@ -64,14 +64,16 @@ import "testing"
 // Ninety-nine with the respectable policy, which keeps the editor and brings
 // the three things that desk sells: a paragraph about itself, a story about
 // somebody else, and a story kept out of tomorrow's paper.
-const kindsTheHarnessPlays = 99
+// A hundred with the diplomat, which brings the one subsystem in this game no
+// campaign had ever exercised: standing with somebody rather than against them.
+const kindsTheHarnessPlays = 100
 
 func TestTheHarnessPlaysEnoughOfTheGame(t *testing.T) {
 	t.Parallel()
 	every := map[string]bool{}
 	for _, strategy := range []string{
 		"worker", "investor", "defiant", "reckless", "thief",
-		"smuggler", "racketeer", "publican", "magpie", "distiller", "respectable",
+		"smuggler", "racketeer", "publican", "magpie", "distiller", "respectable", "diplomat",
 	} {
 		for seed := uint32(1); seed <= 4; seed++ {
 			r := Run(seed*2654435761, strategy, "fixture", 700, false)

@@ -25,6 +25,7 @@ ORDER = (
     "magpie",
     "distiller",
     "respectable",
+    "diplomat",
 )
 
 # Days as well as deaths and cash.

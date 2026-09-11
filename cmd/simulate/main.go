@@ -25,7 +25,7 @@ func main() {
 	runs := flag.Int("runs", 100, "campaigns per strategy")
 	steps := flag.Int("steps", 200, "maximum commands per campaign")
 	first := flag.Uint("seed", 1, "first simulation seed; later runs use a Weyl stride")
-	profiles := flag.String("strategies", "worker,investor,defiant,reckless,thief,smuggler,racketeer,publican,magpie,distiller,respectable", "comma-separated player policies")
+	profiles := flag.String("strategies", "worker,investor,defiant,reckless,thief,smuggler,racketeer,publican,magpie,distiller,respectable,diplomat", "comma-separated player policies")
 	director := flag.String("director", "authored", "authored, fixture or replay (no model calls)")
 	corpusPath := flag.String("corpus", "", "JSON proposal array required for replay")
 	trace := flag.Bool("trace", false, "include each pre-command public state and command")
