@@ -25,9 +25,19 @@ ORDER = (
     "magpie",
 )
 
+# Days as well as deaths and cash.
+#
+# The default campaign was two hundred commands, which is about twelve game
+# days, and the simulator warns on every run that its own city measures need
+# twenty. Everything this project believed about its economy came out of
+# campaigns too short to see it: at two hundred commands a publican ends nearly
+# the poorest policy in the game and at four hundred it ends the richest, at
+# $27,516 against the worker's $23,252. Running what you hold does pay. It pays
+# later than anybody here had ever looked.
 summary = json.load(open(sys.argv[1]))["summary"]
 print("deaths", "/".join(str(summary[k]["deaths"]) for k in ORDER if k in summary))
 print("cash", "/".join(str(summary[k]["median_final_cash"]) for k in ORDER if k in summary))
+print("days", "/".join(str(summary[k]["median_game_days"]) for k in ORDER if k in summary))
 city = json.load(open(sys.argv[1])).get("city_alone", {}).get("totals")
 if city:
     print("city_alone", city)

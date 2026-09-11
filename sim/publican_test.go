@@ -41,25 +41,30 @@ func TestThePublicanActuallyRunsWhatItBuys(t *testing.T) {
 	}
 }
 
-// And what it actually costs, measured rather than assumed. Running what you
-// hold is not a free lunch and it is not even, on these numbers, a better one
-// inside two hundred commands: paying over the rate and restocking out of your
-// own pocket leaves a publican poorer and slower to expand than an investor who
-// buys and walks away.
+// And what it actually pays, measured rather than assumed.
 //
-// That is worth having in front of us rather than argued about. It says the
-// business layer currently charges for care without paying for it — a manager
-// saves the player walking to the shop, which costs a policy nothing, and the
-// wage over the rate buys loyalty against pressures a 200-command campaign
-// rarely lives long enough to feel.
-func TestRunningWhatYouHoldCostsMoreThanItPaysSoFar(t *testing.T) {
+// This was `TestRunningWhatYouHoldCostsMoreThanItPaysSoFar`, and it recorded a
+// deficiency: over two hundred commands a publican who hires, pays over the
+// rate, restocks and puts somebody in charge ends poorer and slower to expand
+// than an investor who buys and walks away. The reasoning written above it said
+// the business layer charges for care without paying for it.
+//
+// The deficiency was a horizon. Two hundred commands is about twelve game days,
+// and the simulator warns on every run that its own city measures need twenty —
+// so everything this project believed about its economy came out of campaigns
+// too short to see it. Over four hundred commands the publican is the richest
+// policy in the game: $28,121 against the investor's $21,538, and ahead of the
+// worker's $23,252 as well.
+//
+// Care pays. It pays later than anybody here had ever looked.
+func TestRunningWhatYouHoldPaysOverALongEnoughRun(t *testing.T) {
 	t.Parallel()
-	const runs = 20
+	const runs, steps = 20, 400
 	publican, investor := make([]int, 0, runs), make([]int, 0, runs)
 	pCasino, iCasino := 0, 0
 	for seed := uint32(1); seed <= runs; seed++ {
-		p := Run(seed, "publican", "authored", 200, false)
-		i := Run(seed, "investor", "authored", 200, false)
+		p := Run(seed, "publican", "authored", steps, false)
+		i := Run(seed, "investor", "authored", steps, false)
 		publican = append(publican, p.Cash)
 		investor = append(investor, i.Cash)
 		pCasino += p.Milestones["casino"]
@@ -68,28 +73,19 @@ func TestRunningWhatYouHoldCostsMoreThanItPaysSoFar(t *testing.T) {
 	sort.Ints(publican)
 	sort.Ints(investor)
 	p, i := publican[runs/2], investor[runs/2]
-	t.Logf("over %d campaigns: the publican's median is $%d with %d casinos, the investor's $%d with %d",
-		runs, p, pCasino, i, iCasino)
-	// The claim is only that the two play differently, which is what makes the
-	// measurement worth taking every time the balance moves.
+	t.Logf("over %d campaigns of %d commands: the publican's median is $%d with %d casinos, the investor's $%d with %d",
+		runs, steps, p, pCasino, i, iCasino)
 	if p == i && pCasino == iCasino {
 		t.Fatal("running a business and ignoring it come to exactly the same thing")
 	}
-	// The claim this test is named for is about money, and money still makes
-	// it: a publican ends poorer than an investor inside two hundred commands.
-	if p >= i {
-		t.Fatalf("running what you hold now pays: the publican's median is $%d against the investor's $%d.\n"+
-			"    That is the deficiency this test exists to record, so the name and the reasoning\n"+
-			"    above it are what need changing, not this line.", p, i)
+	if p <= i {
+		t.Fatalf("running what you hold stopped paying: the publican's median is $%d against the investor's $%d.\n"+
+			"    Over two hundred commands that was true and this test said so; over four hundred it was not.\n"+
+			"    If it is true again, find out whether the horizon moved or the business layer did.", p, i)
 	}
-	// It used to say the publican also expanded more slowly, and that stopped
-	// being true the day the fixer's envelopes ran out. Capping a favour at
-	// three a day takes the easy money away from a policy that spends its time
-	// carrying them and leaves the one that spends its time on its holdings
-	// where it was — so the publican now opens more rooms than the investor
-	// while still ending with less in hand. Expanding faster and being poorer
-	// for it is a different sentence from the one that was here, and it is the
-	// one the numbers now support.
-	t.Logf("the publican opens %d casinos to the investor's %d and ends $%d behind",
-		pCasino, iCasino, i-p)
+	// It also opens more rooms, which it did not when the fixer had an
+	// unlimited number of envelopes to carry.
+	if pCasino <= iCasino {
+		t.Fatalf("the publican opened %d casinos to the investor's %d", pCasino, iCasino)
+	}
 }

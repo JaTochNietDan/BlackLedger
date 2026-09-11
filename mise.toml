@@ -86,7 +86,7 @@ run = "go test -race ./core/ ./store/ ./sim/ ./cmd/blackledger/ -count=1"
 description = "Headless campaigns at scale, with the balance baseline printed"
 run = """
 set -e
-go run ./cmd/simulate > .runtime/sim.json
+go run ./cmd/simulate -steps 400 > .runtime/sim.json
 python3 tools/baseline.py .runtime/sim.json
 """
 

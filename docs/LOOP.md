@@ -175,6 +175,13 @@ and a local model that writes encounters and can be switched off.
   in any order. What you carry shifts an attempt on somebody — 17 in 200 with
   empty hands against 58 with a Thompson — and so does what you put in the hand
   of whoever you send. A search reaches whoever is standing with you.
+- **Businesses. They pay, and they pay late.** Over two hundred commands a
+  publican who hires, pays over the rate and restocks ends nearly the poorest
+  policy in the game; over four hundred it ends the richest at $27,516, ahead of
+  the worker and the investor both. The balance baseline ran at two hundred for
+  the whole life of this project and warned on every single run that its own
+  city measures need twenty game days, which two hundred does not reach. It runs
+  at four hundred now. **Read no balance figure taken at two hundred commands.**
 - **Businesses.** Every address that earns can be bought or taken and run. A
   family's seat has no price on purpose — it changes hands by force — and used
   to be the only kind of address in the city that ran on nothing: you fought a

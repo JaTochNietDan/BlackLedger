@@ -10685,3 +10685,55 @@ investor and still ends $3,344 behind. Expanding faster and being poorer for it
 is a different sentence from the one that was there, and it is the one the
 numbers support, so the assertion is about money now and the expansion count is
 logged rather than enforced.
+
+## Everything was measured on campaigns too short to see it
+
+Chasing why the defiant went from never dying to dying in fifty-nine campaigns
+of a hundred turned up something much larger than the defiant.
+
+The first thing the trace said was that it dies after a scene decision, twenty
+health at a time, and that it now rests half as often — 5.8% of its commands
+against 12.5% — because it spends the time earning instead. That is a legible
+consequence. The second thing, found by running the previous commit in a
+separate worktree rather than trusting the numbers to hand, was that at five
+hundred commands the defiant already died seven times in ten *before* the
+change. It was never robust. The baseline only ever ran it for two hundred.
+
+Which is the finding. **The default campaign is two hundred commands, about
+twelve game days, and the simulator prints a warning on every single run saying
+its own city measures need twenty.** Every balance figure this project has ever
+printed came out of campaigns too short for the tool's own standard, and the
+warning had become wallpaper.
+
+At four hundred commands the picture is not a refinement of the old one, it is a
+different picture:
+
+| | 200 commands | 400 commands |
+|---|---|---|
+| worker | $12,510 | $23,252 |
+| investor | $2,408 | $20,069 |
+| publican | $3,594 | **$27,516** |
+| smuggler | $3,431 | $5,789 |
+| defiant | $3,606, 59 deaths | $3,181, 91 deaths |
+| thief | $973, 79 deaths | $966, 94 deaths |
+
+The policies that hold and run things get rich and survive twenty-five to
+twenty-nine days. The ones that take by force die young and poor. That is the
+design, and it was invisible at the length everything was being measured at.
+
+### The guard that recorded a horizon and called it a rule
+
+`TestRunningWhatYouHoldCostsMoreThanItPaysSoFar` said the business layer charges
+for care without paying for it, and it was right about its own two hundred
+commands. Over four hundred the publican is the richest policy in the game:
+$28,121 against the investor's $21,538, and it opens more rooms as well.
+
+It is `TestRunningWhatYouHoldPaysOverALongEnoughRun` now, asserting the opposite
+of what it used to, with both numbers and the horizon in the reasoning. Its
+failure message names the question to ask if it ever flips back: whether the
+horizon moved or the business layer did.
+
+The baseline task runs at four hundred now and prints days alongside deaths and
+cash, so the length a number was taken at is never invisible again. It costs
+three minutes a run instead of forty seconds, which is the right trade for
+numbers that mean something.
