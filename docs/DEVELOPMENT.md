@@ -9199,3 +9199,27 @@ Both were updated with the reason rather than reverted.
 Checked first and left alone: laundering is already tied to holding a business,
 and a forecourt you hold already sells you a car without the margin. Two of the
 links I might have built this tick were already there.
+
+## A night at the felt, read back
+
+The second playtest drove tonight's work through the API the way a player meets
+it: open the districts, buy a car off the forecourt, weigh it in at the yard,
+try to buy the cab company, go through to the back room, buy in, and play six
+hands. Everything held. The scrap paid $350 for a Hudson at full condition,
+which is a fifth of the $1,750 it cost. The cab yard was refused for $3,132
+against $1,876 in hand, which is the right answer.
+
+What the felt read back was not English. A hand names itself with the article in
+front of it — "a pair", "a flush" — and the table's own line puts "your" in
+front of that: "Leo Carver had a pair against your a pair." A hand can give its
+name without the article now, and only where there was one to give.
+
+The guard for it was wrong on the first pass, in a way worth recording. It set
+up a hand the player loses, and the hand it chose was a high card — which has no
+article, so the sentence reads the same however it is joined. Putting the fault
+back left it passing. The player holds a pair now, and restoring the fault fails
+it on the line.
+
+Two refusals in the playtest that were correct and read as faults until they
+were chased: travel to a locked district, and no way to pick your money up in
+the middle of a hand. Both are the game saying no for a good reason.

@@ -949,3 +949,52 @@ func TestYouAreToldWhoAtTheTableRemembersYou(t *testing.T) {
 		t.Fatalf("a table nobody had played before remembered something: %q", body)
 	}
 }
+
+// The sentence a losing hand is described with. A hand names itself with the
+// article in front of it — "a pair", "a flush" — and the table's own line puts
+// "your" in front of that: "Leo Carver had a pair against your a pair", which is
+// what a playtest read back off the felt.
+func TestALosingHandIsDescribedInEnglish(t *testing.T) {
+	t.Parallel()
+	for _, category := range []int{HighCard, Pair, TwoPair, Trips, Straight, Flush, FullHouse, Quads, StraightFlush} {
+		h := HandRank{Category: category}
+		if h.Name() == "" || h.Bare() == "" {
+			t.Fatalf("a hand of category %d names itself as nothing", category)
+		}
+		line := "Leo had " + h.Name() + " against your " + h.Bare() + "."
+		if strings.Contains(line, "your a ") || strings.Contains(line, "your an ") {
+			t.Fatalf("reads wrong: %q", line)
+		}
+		// And the article is only dropped where there was one.
+		if !strings.HasPrefix(h.Name(), "a ") && h.Bare() != h.Name() {
+			t.Fatalf("%q lost something other than its article: %q", h.Name(), h.Bare())
+		}
+	}
+
+	// And the line the felt actually builds, off a hand the player loses.
+	w, _ := backroom(t)
+	if err := w.SitInTheBackRoom(BackRoom, 1000); err != nil {
+		t.Fatal(err)
+	}
+	g := w.Game
+	// The player has to hold a hand that names itself with an article, or the
+	// sentence reads the same either way and this measures nothing: "high card"
+	// against "high card" is fine however it is joined.
+	g.Board = hand("2h", "7s", "9c", "Jc", "4h")
+	g.Mine = hand("Ah", "Ac")
+	g.Seats[0].Cards = hand("2s", "2d")
+	for i := range g.Seats {
+		g.Seats[i].Folded = i != 0
+	}
+	g.Street = River
+	if err := w.showdown(); err != nil {
+		t.Fatal(err)
+	}
+	t.Logf("%s", g.Outcome)
+	if !strings.Contains(g.Outcome, "pair") {
+		t.Fatalf("the player was meant to lose with a hand that has an article: %q", g.Outcome)
+	}
+	if strings.Contains(g.Outcome, "your a ") {
+		t.Fatalf("the felt says %q", g.Outcome)
+	}
+}

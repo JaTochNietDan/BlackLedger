@@ -3,6 +3,7 @@ package core
 import (
 	"fmt"
 	"sort"
+	"strings"
 )
 
 // Every table in this city is the house. Blackjack, the wheel, the dice and the
@@ -257,6 +258,13 @@ func (h HandRank) Beats(other HandRank) bool {
 }
 
 // Name is what to call it at a showdown.
+// Bare is the hand without the article in front of it, for a sentence that has
+// already put one there: "against your a pair" is what "your " and "a pair"
+// come to when they are joined without looking.
+func (h HandRank) Bare() string {
+	return strings.TrimPrefix(h.Name(), "a ")
+}
+
 func (h HandRank) Name() string {
 	switch h.Category {
 	case StraightFlush:
@@ -679,7 +687,7 @@ func (w *World) showdown() error {
 	case len(winners) == 1 && winners[0] < 0:
 		g.Outcome = fmt.Sprintf("You had %s and took $%d off the table.", mine.Name(), g.Won)
 	case len(winners) == 1:
-		g.Outcome = fmt.Sprintf("%s had %s against your %s, and the table went to %s.", names[0], best.Name(), mine.Name(), names[0])
+		g.Outcome = fmt.Sprintf("%s had %s against your %s, and the table went to %s.", names[0], best.Name(), mine.Bare(), names[0])
 	default:
 		g.Outcome = fmt.Sprintf("%s all had %s, and $%d went each way.", joinNames(names), best.Name(), share)
 	}
