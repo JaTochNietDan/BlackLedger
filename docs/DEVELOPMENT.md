@@ -10267,3 +10267,51 @@ city will print it the first quiet week. Five of the new lines have a
 none-branch for that reason.
 
 Three rules broken, three failures.
+
+## Seventeen actions that paid their own fee and nobody was watching
+
+The hand-written list has now cost this project five separate measures, so this
+tick swept the suite for others. Most of what turned up was a false alarm: a
+test that stands in three rooms while enumerating every room is sampling its
+setup, not its subject, and the suite does that correctly nearly everywhere.
+
+Two were real.
+
+**Every trade's remedy is a string until somebody runs it.** The test that says
+each trade has its own trouble does sweep all seventeen — and then ran exactly
+one of them, the laundry's. Five trades were added to this city in one night and
+not one of their remedies had been through `Remedy()`. Every one of them runs
+now: the card carries the trade's own words, the money leaves, the trouble goes.
+A rule went in with it that a remedy costs something, because the first break —
+setting a remedy to $0 — passed. The assertion compared the charge against the
+trade, so a trade declaring a free remedy agreed with itself.
+
+**`paysItsOwnWay` was a list of twenty-five and the core had forty-two.** An
+action built with `asks(...)` pays its own fee and must declare a cost of
+nothing, or the command layer takes the money a second time. Seventeen of those
+actions were unguarded, including every one added tonight — the window at the
+pawnbroker, the boat at the pier, the night at a room you host. The list is read
+out of `world.go` now, and the extraction has to prove it is reading the file
+rather than matching nothing.
+
+Sweeping the real set immediately found four correct cards reading as faults.
+The floor games name their price as a range in words — "anything from $2 to $500
+a pull" — because the stake is set on the felt, which is the screen the player is
+looking at when they choose it. That is a third legitimate way to name a price
+alongside a figure on the card and a field to type in, and it is now expressed as
+a rule rather than an exemption list. A fifth came from giving the player a car:
+the pumps ask nothing of a full tank and say so, and a card that is refused has
+nothing to charge for.
+
+### The hole the derived list still had
+
+Reading the `asks(` sites cannot see an action that stops being one. Demonstrated
+rather than reasoned about: change the window's card from `asks` to `add` with
+the price, and the sweep loses sight of it entirely — while the command layer now
+pays that price and `BuyFromWindow` pays it again. That is the exact double
+charge the guard exists to prevent, and the guard could not see it.
+
+So the count is pinned at forty-one. A conversion drops it and the failure says
+what to check: whether the handler still calls `Pay`. Raising the pin is how a
+new self-paying action gets added, and lowering it is a question rather than a
+formality.

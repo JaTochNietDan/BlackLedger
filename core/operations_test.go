@@ -180,16 +180,85 @@ func TestTroubleCanBeDealtWithAndEachTradeHasItsOwn(t *testing.T) {
 	if w.Player.Cash >= cash {
 		t.Fatal("dealing with it was free")
 	}
-	// What goes wrong at a laundry is not what goes wrong at a casino.
-	seen := map[string]bool{}
+	// What goes wrong at a laundry is not what goes wrong at a casino. The
+	// remedy is checked as words here and run below, because a trade whose
+	// remedy has never been executed is a trade whose remedy is a string.
+	trouble, remedy, detail := map[string]bool{}, map[string]bool{}, map[string]bool{}
 	for id, trade := range trades {
 		if trade.Trouble == "" || trade.Remedy == "" || trade.Supplies == "" {
 			t.Fatalf("%s has no trouble, remedy or supplies of its own", id)
 		}
-		if seen[trade.Trouble] {
+		if trouble[trade.Trouble] {
 			t.Fatalf("%s shares its trouble with another trade", id)
 		}
-		seen[trade.Trouble] = true
+		if detail[trade.RemedyDetail] {
+			t.Fatalf("%s puts its trouble right the same way as another trade", id)
+		}
+		trouble[trade.Trouble] = true
+		remedy[trade.Remedy] = true
+		detail[trade.RemedyDetail] = true
+	}
+}
+
+// And every one of those remedies actually runs.
+//
+// The test above checks that each trade has words of its own for what goes
+// wrong and what puts it right, and then ran exactly one of them — the
+// laundry's. A remedy nobody has ever executed is a string. Five trades were
+// added to this city in one night and not one of their remedies had been
+// through `Remedy()` until this.
+func TestEveryTradesRemedyActuallyPutsItRight(t *testing.T) {
+	t.Parallel()
+	ran := 0
+	for kind, id := range everyTrade() {
+		w := New(53)
+		w.Event, w.District = nil, 9
+		w.Player.Health, w.Player.Cash, w.Player.Respect = 100, 400000, 200
+		own(w, id)
+		w.Player.Location = id
+		prop := w.Properties[id]
+		trade, _ := TradeOf(id)
+
+		if w.RemedyReadiness(id) == "" {
+			t.Errorf("%s offered a remedy with nothing wrong", kind)
+		}
+		prop.Trouble = true
+		if reason := w.RemedyReadiness(id); reason != "" {
+			t.Errorf("%s is in trouble and cannot be put right: %s", kind, reason)
+			continue
+		}
+		// The card the player actually presses, with the trade's own words on
+		// it rather than a generic label.
+		card := actionByID(w.Actions(id), "remedy")
+		if card == nil {
+			t.Errorf("%s offers no card for its own trouble", kind)
+			continue
+		}
+		if card.Label != trade.Remedy {
+			t.Errorf("%s offers %q where its trade says %q", kind, card.Label, trade.Remedy)
+		}
+		// And it costs something. Checking only that the charge matches the
+		// trade let a trade declaring a free remedy agree with itself: the
+		// break that set a remedy to $0 passed, because nothing said a remedy
+		// is a thing you pay for.
+		if trade.RemedyCost <= 0 {
+			t.Errorf("%s puts its own trouble right for nothing", kind)
+		}
+		cash := w.Player.Cash
+		if err := w.Remedy(id); err != nil {
+			t.Errorf("%s: %v", kind, err)
+			continue
+		}
+		if prop.Trouble {
+			t.Errorf("%s paid for a remedy and is still in trouble", kind)
+		}
+		if w.Player.Cash != cash-trade.RemedyCost {
+			t.Errorf("%s cost $%d where its trade says $%d", kind, cash-w.Player.Cash, trade.RemedyCost)
+		}
+		ran++
+	}
+	if ran < len(trades) {
+		t.Fatalf("%d of %d trades had their remedy run", ran, len(trades))
 	}
 }
 
