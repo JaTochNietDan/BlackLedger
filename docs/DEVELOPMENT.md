@@ -12414,3 +12414,39 @@ Seven of the thirteen are fixed. The remaining six go back in the inbox, and the
 multiply that started all this is still not in the tree — two nights of taking
 bites out of it is the right pace for a change that moves every seeded number in
 the game.
+
+## The multiply, and what the city was hiding
+
+Three nights of taking bites, and the last three came out tonight.
+
+**A takeover was assumed to have landed.** It is a roll — the leader can be
+ready, or somebody can have told him — and the helper made one attempt in one
+city and handed the result to three tests that asked what the player now owned.
+It tries cities until the move lands, and reads what the family held out of the
+city rather than naming the club and the docks.
+
+**A country run varied the wrong stream.** Three hundred journeys, each with a
+fresh world seed on `WorldRNG` — and the risk on the way home is drawn from the
+player's stream, which was the same every time. Three hundred identical
+journeys. Both streams now: 300 trips in your pockets turn $150,000 into
+$148,000 and 300 with a false floor turn $282,000 into $388,000, which is the
+decision the test was written to guard and had never measured.
+
+**And a mayor was judged on a two per cent gap.** $12,637 down against $12,396,
+in one campaign. Averaged over twenty-four: one laundry nets **-$8,904 without
+him and -$10,054 with**, three businesses net **-$76 and +$2,032**. That is a
+threshold anybody can see, where the old one reversed the moment the sample
+moved.
+
+So the multiply is in. Thirteen tests, none of them nudged: every one was a
+guard reading the wrong pocket, the wrong stream, the wrong moment, or a rate as
+a certainty.
+
+**What it says about the city is the part worth keeping.** Left alone for a long
+campaign, Bellwether now sees three organizations fall where none ever did,
+seventeen form against five, nineteen wars start against seven, and thirty-five
+people killed against twenty-eight. The policy columns barely moved — most of
+them inside their own error bars. The city was not.
+
+Every measure this project has ever taken of a city on its own was taken through
+an eighth of the range.

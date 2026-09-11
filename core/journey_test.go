@@ -2,9 +2,9 @@ package core
 
 import "testing"
 
-func traveller(t *testing.T) *World {
+func traveller(t *testing.T, seed uint32) *World {
 	t.Helper()
-	w := New(19)
+	w := New(seed)
 	w.Player.Location = TripDepart
 	w.Player.Cash = 6000
 	w.Player.Health = 100
@@ -13,7 +13,7 @@ func traveller(t *testing.T) *World {
 
 func TestJourneysAreBookedAtTheExchangeAndNowhereElse(t *testing.T) {
 	t.Parallel()
-	w := traveller(t)
+	w := traveller(t, spread(19))
 	if w.TripReadiness("halloway") != "" {
 		t.Fatal("the exchange would not sell a ticket:", w.TripReadiness("halloway"))
 	}
@@ -30,7 +30,7 @@ func TestJourneysAreBookedAtTheExchangeAndNowhereElse(t *testing.T) {
 
 func TestTheCityRunsWhileYouAreNotInIt(t *testing.T) {
 	t.Parallel()
-	w := traveller(t)
+	w := traveller(t, spread(19))
 	minute := w.Minute
 	if err := w.Trip("halloway"); err != nil {
 		t.Fatal(err)
@@ -49,7 +49,7 @@ func TestTheCityRunsWhileYouAreNotInIt(t *testing.T) {
 
 func TestBeingNowhereAnybodyIsLookingLowersAttention(t *testing.T) {
 	t.Parallel()
-	w := traveller(t)
+	w := traveller(t, spread(19))
 	w.Player.Heat = 60
 	if err := w.Trip("halloway"); err != nil {
 		t.Fatal(err)
@@ -60,7 +60,7 @@ func TestBeingNowhereAnybodyIsLookingLowersAttention(t *testing.T) {
 	}
 
 	// And it cannot fall below nothing, however long the trip.
-	quiet := traveller(t)
+	quiet := traveller(t, spread(19))
 	quiet.Player.Heat = 2
 	if err := quiet.Trip("halloway"); err != nil {
 		t.Fatal(err)
@@ -79,7 +79,9 @@ func TestCountryPricesAreWorthTheFareOnlyIfYouCanHideTheLoad(t *testing.T) {
 	run := func(car int) (int, int, int) {
 		spent, landed, jumped := 0, 0, 0
 		for seed := uint32(1); seed <= runs; seed++ {
-			w := traveller(t)
+			// Both streams. The run home is drawn from the player's, so varying
+			// only the world's ran the same journey three hundred times.
+			w := traveller(t, spread(seed))
 			w.WorldRNG = seed * 2654435761
 			if car > 0 {
 				w.Player.Car, w.Player.CarWear = car, 100
@@ -116,7 +118,7 @@ func TestCountryPricesAreWorthTheFareOnlyIfYouCanHideTheLoad(t *testing.T) {
 
 func TestSomewhereToPutItIsWhatDecidesTheLoadAndWhatSurvives(t *testing.T) {
 	t.Parallel()
-	w := traveller(t)
+	w := traveller(t, spread(19))
 	plain := w.CarryLimit()
 	w.Player.Car, w.Player.CarWear = 2, 100
 	if driving := w.CarryLimit(); driving <= plain {
@@ -132,12 +134,12 @@ func TestSomewhereToPutItIsWhatDecidesTheLoadAndWhatSurvives(t *testing.T) {
 	const runs = 300
 	openLoad, hiddenLoad := 0, 0
 	for seed := uint32(1); seed <= runs; seed++ {
-		pockets := traveller(t)
+		pockets := traveller(t, spread(19))
 		pockets.WorldRNG = seed * 2654435761
 		pockets.Trip("rockridge")
 		openLoad += pockets.Carrying()
 
-		floor := traveller(t)
+		floor := traveller(t, spread(19))
 		floor.WorldRNG = seed * 2654435761
 		floor.Player.Car, floor.Player.CarWear = 2, 100
 		floor.Trip("rockridge")
@@ -151,7 +153,7 @@ func TestSomewhereToPutItIsWhatDecidesTheLoadAndWhatSurvives(t *testing.T) {
 
 func TestTheBankIsCheaperInPerson(t *testing.T) {
 	t.Parallel()
-	w := traveller(t)
+	w := traveller(t, spread(19))
 	w.Offshore = 2000
 	if w.Player.Offshore {
 		t.Fatal("the account already answered to them")
@@ -172,7 +174,7 @@ func TestTheBankIsCheaperInPerson(t *testing.T) {
 	}
 
 	// With nothing out there and nothing to arrange, there is nothing to go for.
-	empty := traveller(t)
+	empty := traveller(t, spread(19))
 	empty.Player.Offshore, empty.Offshore = true, 0
 	if empty.TripReadiness("kingsport") == "" {
 		t.Fatal("sold a ticket to arrange nothing")
@@ -181,7 +183,7 @@ func TestTheBankIsCheaperInPerson(t *testing.T) {
 
 func TestHallowayIsWhereYouMeetSomebody(t *testing.T) {
 	t.Parallel()
-	w := traveller(t)
+	w := traveller(t, spread(19))
 	w.Player.Contacts = 1
 	if err := w.Trip("halloway"); err != nil {
 		t.Fatal(err)
@@ -190,7 +192,7 @@ func TestHallowayIsWhereYouMeetSomebody(t *testing.T) {
 		t.Fatalf("came back with %d contacts", w.Player.Contacts)
 	}
 	// And there is a ceiling, so it is not an infinite supply.
-	full := traveller(t)
+	full := traveller(t, spread(19))
 	full.Player.Contacts = 5
 	if err := full.Trip("halloway"); err != nil {
 		t.Fatal(err)
@@ -202,7 +204,7 @@ func TestHallowayIsWhereYouMeetSomebody(t *testing.T) {
 
 func TestYouCannotTravelInNoConditionToTravel(t *testing.T) {
 	t.Parallel()
-	w := traveller(t)
+	w := traveller(t, spread(19))
 	w.Player.Health = 20
 	for _, id := range []string{"rockridge", "kingsport", "halloway"} {
 		if w.TripReadiness(id) == "" {
@@ -214,7 +216,7 @@ func TestYouCannotTravelInNoConditionToTravel(t *testing.T) {
 func TestTheQuotedPriceIsThePriceCharged(t *testing.T) {
 	t.Parallel()
 	for _, id := range []string{"rockridge", "kingsport", "halloway"} {
-		w := traveller(t)
+		w := traveller(t, spread(19))
 		w.Offshore = 2000
 		quoted, cash := w.TripCost(id), w.Player.Cash
 		if err := w.Trip(id); err != nil {
@@ -237,7 +239,7 @@ func TestLeavingTownIsAWayToSurviveAWeek(t *testing.T) {
 	const runs = 300
 	stayed, left, wrecked := 0, 0, 0
 	for seed := uint32(1); seed <= runs; seed++ {
-		home := traveller(t)
+		home := traveller(t, spread(seed))
 		home.WorldRNG = seed * 2654435761
 		home.Player.Location = home.Player.Home
 		home.RetaliationFrom("bellandi")
@@ -246,7 +248,7 @@ func TestLeavingTownIsAWayToSurviveAWeek(t *testing.T) {
 			stayed++
 		}
 
-		away := traveller(t)
+		away := traveller(t, spread(seed))
 		away.WorldRNG = seed * 2654435761
 		condition := away.Properties[away.Player.Home].Condition
 		away.RetaliationFrom("bellandi")

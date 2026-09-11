@@ -760,8 +760,18 @@ func newPerson(life int) Person {
 	return Person{Name: names[(life-1)%len(names)], Cash: 90, Health: 100, Location: "room", Home: "room", Alive: true, Crew: []Crew{}}
 }
 
+func scatter(seed uint32) uint32 {
+	x := seed
+	x ^= x >> 16
+	x *= 0x7feb352d
+	x ^= x >> 15
+	x *= 0x846ca68b
+	x ^= x >> 16
+	return x
+}
+
 func New(seed uint32) *World {
-	w := &World{Version: SaveVersion, ID: ID(), Seed: seed, Life: 1, Minute: 480, RNG: seed, Player: newPerson(1), Properties: map[string]*Property{}, Tasks: []Task{}, Plots: []Plot{}, History: []Record{}, Dead: []Death{}, Offers: []Offer{}, Director: Director{"authored", "Authored opening. Local AI can prepare additional encounters.", -9999}}
+	w := &World{Version: SaveVersion, ID: ID(), Seed: seed, Life: 1, Minute: 480, RNG: scatter(seed), Player: newPerson(1), Properties: map[string]*Property{}, Tasks: []Task{}, Plots: []Plot{}, History: []Record{}, Dead: []Death{}, Offers: []Offer{}, Director: Director{"authored", "Authored opening. Local AI can prepare additional encounters.", -9999}}
 	w.Factions = []Faction{
 		{ID: "bellandi", Name: "Bellandi Family", Leader: "Vittorio Bellandi", Power: 90, Cash: 8000, Peak: 90, Reported: 90},
 		{ID: "russo", Name: "Russo Outfit", Leader: "Elena Russo", Power: 58, Cash: 4500, Peak: 58, Reported: 58},

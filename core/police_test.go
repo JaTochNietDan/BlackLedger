@@ -43,9 +43,19 @@ func TestARaidTakesStockCashAndCondition(t *testing.T) {
 	w := watched(t, 60)
 	w.Player.Stock = map[string]int{"moonshine": 15}
 	cash, condition := w.Player.Cash, w.Properties["laundry"].Condition
+	// What a search can reach is what is not hidden, and a laundry hides two.
+	// This asked that a raid leave nothing at all, which is true only of a
+	// player with nowhere to put anything — and it was, in the one city this
+	// ran in, until campaign numbers stopped opening the stream in the same
+	// eighth of its range. A search that empties a cellar it cannot find would
+	// make every hiding place in the game worthless.
+	exposed, hidden := w.Exposed(), w.Concealed()
+	if exposed <= 0 {
+		t.Fatalf("all %d units are hidden, so a raid has nothing to take", w.Carrying())
+	}
 	w.Raid()
-	if w.Carrying() != 0 {
-		t.Fatal("a raid left the stock alone")
+	if got := w.Carrying(); got != min(hidden, 15) {
+		t.Fatalf("a raid on somebody holding 15 with %d hidden left %d", hidden, got)
 	}
 	if w.Player.Cash >= cash {
 		t.Fatal("a raid cost nothing in fines")

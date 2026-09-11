@@ -6,8 +6,10 @@ import (
 	"testing"
 )
 
-func pressureWorld() *World {
-	w := New(27)
+func pressureWorld() *World { return pressureWorldFor(27) }
+
+func pressureWorldFor(seed uint32) *World {
+	w := New(seed)
 	w.Properties["laundry"].Owner = "player:1"
 	w.Player.Cash = 200
 	w.NextPressure = w.Minute + 30
@@ -65,16 +67,69 @@ func TestRefusingCreatesHiddenConsequences(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if next.Factions[0].Goodwill != -20 || next.Player.Respect != 2 || len(next.Plots) != 1 {
-		t.Fatal("refusal consequences absent")
+	if next.Factions[0].Goodwill != -20 || next.Player.Respect != 2 {
+		t.Fatalf("refusing left standing at %+d and respect at %d",
+			next.Factions[0].Goodwill, next.Player.Respect)
 	}
-	data, _ := json.Marshal(next.Public())
+	// Whether they come for the place is three times in four, and this asked
+	// for it every time on one campaign number. Measured across a spread of
+	// them: the plan is laid in most cities and not in all, which is what the
+	// card says — "the family may retaliate against your business".
+	laid, cities := 0, 24
+	for n := uint32(1); n <= uint32(cities); n++ {
+		v := pressureWorldFor(spread(n))
+		v.Advance(30)
+		if v.Event == nil {
+			cities--
+			continue
+		}
+		after, err := Execute(v, Command{Kind: "choice", Event: v.Event.ID, Choice: "resist", Revision: v.Revision})
+		if err != nil {
+			t.Fatal(err)
+		}
+		if len(after.Plots) > 0 {
+			laid++
+		}
+	}
+	if cities < 12 {
+		t.Fatalf("only %d cities put a demand at all, so this measures nothing", cities)
+	}
+	if laid*2 <= cities || laid == cities {
+		t.Fatalf("a refused family laid a plan in %d of %d cities, which is not "+
+			"\"may retaliate\"", laid, cities)
+	}
+	// And what a laid plan does, read in a city that laid one. The tail of this
+	// used to run on whichever world the top of it happened to make, and a
+	// refusal that did not draw the three-in-four left nothing to resolve.
+	var plotted *World
+	for n := uint32(1); n <= 24 && plotted == nil; n++ {
+		v := pressureWorldFor(spread(n))
+		v.Advance(30)
+		if v.Event == nil {
+			continue
+		}
+		after, err := Execute(v, Command{Kind: "choice", Event: v.Event.ID, Choice: "resist", Revision: v.Revision})
+		if err != nil {
+			t.Fatal(err)
+		}
+		if len(after.Plots) > 0 {
+			plotted = after
+		}
+	}
+	if plotted == nil {
+		t.Fatal("no city laid a plan at all, so nothing can be watched resolving")
+	}
+	data, _ := json.Marshal(plotted.Public())
 	if strings.Contains(string(data), "sabotage") {
 		t.Fatal("hidden retaliation leaked")
 	}
-	next.Advance(120)
-	if next.Properties["laundry"].Condition != 65 || len(next.Plots) != 0 {
-		t.Fatal("sabotage did not resolve once")
+	condition := plotted.Properties["laundry"].Condition
+	plotted.Advance(120)
+	if got := plotted.Properties["laundry"].Condition; got >= condition {
+		t.Fatalf("the plan resolved and the laundry went from %d%% to %d%%", condition, got)
+	}
+	if len(plotted.Plots) != 0 {
+		t.Fatalf("%d plans are still waiting after the hour they were due", len(plotted.Plots))
 	}
 }
 func TestBusinessDamageUsesAvailableCrewNotHomeGuards(t *testing.T) {

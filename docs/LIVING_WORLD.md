@@ -151,24 +151,27 @@ Ensure efficiency of development loops by increasing efficiency of your workflow
 ## Inbox — open
 
 Spread the campaign number across the world's stream inside `New`, and re-measure
-what moves. One multiply fixes every seed sweep in the suite at once — the
-stream is a plain linear congruential generator started from the campaign's own
-number, so seeds 1 to 200 open on 0.236 through 0.313 and a hundred and
-twenty-five loops in the tests start at one.
+what moves.
 
-Tried, measured, and backed out twice rather than rushed. It turned thirteen
-tests red; seven of those are now fixed and shipped without it, each of them a
-guard that was wrong rather than a number that needed nudging. Six remain, and
-they are the work:
+— done, over three nights. The stream is a plain linear congruential generator
+  and it used to start from the campaign's own number, so seeds 1 to 200 opened
+  on 0.236 through 0.313 — an eighth of the range — and a hundred and twenty-five
+  loops in the test suite start at one. One multiply scatters all of them.
 
-- `TestLeavingTownIsAWayToSurviveAWeek` — 300 of 300 survive staying, so a
-  journey buys nothing measurable; the danger has to be real before the
-  comparison means anything.
-- `TestAMayorOnlyPaysForHimselfWithAPortfolio`
-- `TestARaidTakesStockCashAndCondition`
-- `TestRefusingCreatesHiddenConsequences`
-- `TestTakingTheFamilyHandsYouFourWorkingBusinesses`
-- `TestCountryPricesAreWorthTheFareOnlyIfYouCanHideTheLoad`
+  It turned thirteen tests red and every one was a guard that was wrong rather
+  than a number that needed nudging: a poker hand measured in the wrong pocket,
+  a slot payout read as money when it is odds, security decided by one roll, a
+  raid asked to empty a cellar it cannot find, a refusal asked to draw a
+  three-in-four every time, a takeover assumed to have landed, a mayor judged on
+  a two per cent gap in one campaign, a country run that varied the world's
+  stream while the risk was drawn from the player's, and a door that was
+  guarding nothing at all.
+
+  The city itself was quieter than it really is. Left alone for a long campaign
+  it now sees three organizations fall where none ever did, seventeen form
+  against five, nineteen wars start against seven, and thirty-five people killed
+  against twenty-eight. Every measure this project has ever taken of a city on
+  its own was taken through that eighth.
 
 ---
 

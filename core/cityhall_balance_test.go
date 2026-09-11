@@ -11,8 +11,15 @@ import (
 func TestAMayorOnlyPaysForHimselfWithAPortfolio(t *testing.T) {
 	heavy(t)
 	const days = 60
-	run := func(places []string, retained bool) int {
-		w := New(37)
+	// Averaged over a spread of cities rather than measured in one.
+	//
+	// A mayor against three businesses came out $12,637 down against $12,396 —
+	// a two per cent gap, read off one campaign, which reversed the moment
+	// campaign numbers stopped opening the stream in the same eighth of its
+	// range. A difference that small in a number that big is not a difference
+	// until it has been averaged.
+	campaign := func(places []string, retained bool, seed uint32) int {
+		w := New(seed)
 		w.MigrateLivingWorld()
 		w.Player.Location, w.Player.Cash, w.Player.Respect = CityHall, 40000, 40
 		for _, id := range places {
@@ -26,6 +33,15 @@ func TestAMayorOnlyPaysForHimselfWithAPortfolio(t *testing.T) {
 		start := w.Player.Cash
 		w.Advance(days * 1440)
 		return w.Player.Cash - start
+	}
+
+	const cities = 24
+	run := func(places []string, retained bool) int {
+		total := 0
+		for n := uint32(1); n <= cities; n++ {
+			total += campaign(places, retained, spread(n))
+		}
+		return total / cities
 	}
 
 	one := []string{"laundry"}
