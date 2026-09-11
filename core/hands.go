@@ -798,6 +798,9 @@ func (w *World) fromBehindThisCounter(at string) string {
 				driving++
 			}
 		}
+		if driving == 0 {
+			return "Nobody in this city is keeping a car on the road, and pumps with nobody at them are a wall with a roof."
+		}
 		return fmt.Sprintf("%s in this city keeping a car on the road, and the tank does not fill itself.",
 			counted(driving, "person", "people"))
 	case "butcher", "restaurant":
@@ -813,7 +816,114 @@ func (w *World) fromBehindThisCounter(at string) string {
 				return fmt.Sprintf("%s has been talking about going somewhere else.", n.Name)
 			}
 		}
-		return "The orders are the orders. Same faces, same days."
+		// And two rooms that share a case have to part company here, because
+		// two counters saying the identical sentence is two cards in a room
+		// under one name wearing a different hat. A shop and a dining room do
+		// not see the same week.
+		if place.Kind == "restaurant" {
+			return "The same tables booked by the same people on the same nights, and one of them always wants the corner."
+		}
+		return "The orders are the orders. Same cuts, same days, and nothing on the hooks by four."
+
+	// The eleven below were nothing at all until they were counted. The guard
+	// over this asked five kinds whether any two said the same thing, and
+	// passed while two thirds of the city's counters said nothing — a guard
+	// over a sample, which is the same fault three other measures had tonight.
+	// It asks every trade now.
+	case "club":
+		crowd := w.TheEveningCrowd(at)
+		if crowd == 0 {
+			return "Nobody has been in but the staff, and they are drinking the profit."
+		}
+		return fmt.Sprintf("%s make an evening of it here, and that is who this room is.",
+			counted(crowd, "person", "people"))
+	case "casino":
+		if prop := w.Properties[at]; prop != nil && prop.Bankroll > 0 {
+			return fmt.Sprintf("There is $%d behind the tables, which is what decides who will sit down at them.", prop.Bankroll)
+		}
+		return "There is nothing behind the tables, so nobody serious is going to sit at one."
+	case "poolhall":
+		if w.BackRoomTake > 0 {
+			return fmt.Sprintf("The room has taken $%d in seat money off the game in the back.", w.BackRoomTake)
+		}
+		return "Nobody has sat down in the back this week. The cloth is the cleanest it has ever been."
+	case "saloon":
+		if drinkers := w.TheEveningCrowd(at); drinkers > 0 {
+			return fmt.Sprintf("%s drink here every evening of their lives, and none of them lowers their voice.",
+				counted(drinkers, "person", "people"))
+		}
+		return "Nobody has been in all week, and an empty bar hears nothing worth hearing."
+	case "haulage":
+		runs := 0
+		for _, l := range Locations {
+			if _, ok := TradeOf(l.ID); ok && w.Own(l.ID) && l.ID != at {
+				runs++
+			}
+		}
+		if runs == 0 {
+			return "The trucks are running for other people, which is a waste of a yard you hold."
+		}
+		return fmt.Sprintf("The trucks are stocking %s of yours besides this one, and every one of them cheaper for it.",
+			counted(runs, "place", "places"))
+	case "scrapyard":
+		gone := 0
+		for i := range w.NPCs {
+			if n := &w.NPCs[i]; !n.Dead && n.Drove > 0 && n.Car == 0 {
+				gone++
+			}
+		}
+		if gone == 0 {
+			return "Nobody in this city has lost a car this week, and a yard lives on the ones that stop going anywhere."
+		}
+		return fmt.Sprintf("%s in this city used to drive and do not any more, and a car goes somewhere when it stops going anywhere.",
+			counted(gone, "person", "people"))
+	case "laundry":
+		if w.Player.Heat == 0 {
+			return "Quiet books, and nobody asking you anything. That is the week to do the paperwork."
+		}
+		return fmt.Sprintf("The books will absorb %d of the %d points of attention on you, and they will hold.",
+			min(w.launderCapacity(at), w.Player.Heat), w.Player.Heat)
+	case "exchange":
+		// Not Footfall. That counts whoever is standing here, which includes
+		// the person answering the question the moment they step behind the
+		// counter — the figure moved between one call and the next and the
+		// guard over it caught the wobble. Who buys on this floor is a fact
+		// about the city, not about who is in the doorway.
+		buyers := 0
+		for i := range w.NPCs {
+			if n := &w.NPCs[i]; !n.Dead && n.Purse >= w.PriceAt(at, "moonshine") && n.Post != at {
+				buyers++
+			}
+		}
+		if buyers == 0 {
+			return "Nobody in this city could cover a crate at today's price, which is a floor with nobody on it."
+		}
+		return fmt.Sprintf("%s in this city could cover a crate at today's price, and every one of them hears what this floor says.",
+			counted(buyers, "person", "people"))
+	case "burlesque":
+		if w.NightOn(at) {
+			return "There is a night on, and the room will be full of people who drink somewhere else."
+		}
+		return "An ordinary evening, which for a room like this means the chairs outnumber the people."
+	case "dealer":
+		walking := 0
+		for i := range w.NPCs {
+			if n := &w.NPCs[i]; !n.Dead && n.Car == 0 && n.Drove == 0 {
+				walking++
+			}
+		}
+		if walking == 0 {
+			return "Everybody in this city drives something, which is a lot with nothing to sell."
+		}
+		return fmt.Sprintf("%s in this city have never owned a car, and every one of them walks past a lot like this.",
+			counted(walking, "person", "people"))
+	case "wharf":
+		if w.BoatIsIn() && w.Landed.Where == at {
+			g := w.Good(w.Landed.Good)
+			return fmt.Sprintf("There is a boat on the quay now with %d %ss of %s on it, and they are not waiting.",
+				w.Landed.Units, g.Unit, g.InBulk())
+		}
+		return "Nothing on the quay tonight. The word goes round when there is."
 	}
 	return ""
 }

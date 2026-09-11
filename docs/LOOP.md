@@ -95,9 +95,11 @@ which half is standing.
    over and whose man he is, who has been asking after you and whether they are
    past asking, and the one thing this trade can see — the glass out of cars for
    a garage, who was short for a pawnbroker, where the cabs took somebody, who
-   on this counter is thinking about leaving. No two trades say the same thing,
-   which is guarded, because holding more than one kind of place should show you
-   more than one part of the same city. Nothing here is left open.
+   on this counter is thinking about leaving. Every one of the seventeen trades has a
+   line of its own and no two say the same thing, which is guarded over the
+   whole city rather than a sample — the first version of that guard asked five
+   kinds and passed while eleven counters said nothing at all. Nothing here is
+   left open.
 
 ---
 

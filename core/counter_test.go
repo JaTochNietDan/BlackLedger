@@ -61,13 +61,31 @@ func answer(t *testing.T, w *World, id string) string {
 	return strings.Join(said, " ")
 }
 
+// everyTrade is each kind of business in the city, with an address that runs
+// it. Written out of the city rather than listed here, because a list is how
+// the first version of this asked five kinds out of seventeen and passed while
+// two thirds of the city's counters said nothing at all.
+func everyTrade() map[string]string {
+	out := map[string]string{}
+	for _, l := range Locations {
+		if l.Kind != "" && out[l.Kind] == "" {
+			out[l.Kind] = l.ID
+		}
+	}
+	return out
+}
+
 func TestEachCounterSeesSomethingItsOwn(t *testing.T) {
 	t.Parallel()
 	// No two trades say the same thing, because the whole reason to hold more
 	// than one kind of place is that each shows you a different part of the
 	// same city.
 	seen := map[string]string{}
-	for _, kind := range []string{"garage", "pawn", "cabs", "filling", "butcher"} {
+	trades := everyTrade()
+	if len(trades) < 15 {
+		t.Fatalf("only %d kinds in this city, so this proves very little", len(trades))
+	}
+	for kind := range trades {
 		w, id := counterAt(t, kind)
 		line := w.fromBehindThisCounter(id)
 		if line == "" {
@@ -78,6 +96,13 @@ func TestEachCounterSeesSomethingItsOwn(t *testing.T) {
 			t.Errorf("%s and %s both say %q", was, kind, line)
 		}
 		seen[line] = kind
+		// A count of none is a word, not a numeral. "0 people in this city
+		// used to drive" is the shape the prose guards exist to catch, and a
+		// counter that only ever reads on a busy city will print it the first
+		// quiet week.
+		if strings.HasPrefix(line, "0 ") || strings.Contains(line, " 0 ") {
+			t.Errorf("%s counts in numerals where it should use a word: %q", kind, line)
+		}
 		// And it reaches the player, rather than being a function nothing calls.
 		if !strings.Contains(answer(t, w, id), line) {
 			t.Errorf("%s: the counter knows it and does not say it", kind)

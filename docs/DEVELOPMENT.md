@@ -10220,3 +10220,50 @@ What is left in the file is two cosmetic residues of the cuts: a semicolon
 before a closing brace, and a brace on an indented line of its own. Both are
 valid CSS and both are provably inert. Tidying them is how this file got
 shredded on the first attempt, so they stay.
+
+## Eleven counters that had nothing to say
+
+Everything named in the brief was done, so this tick put every kind of business
+in the city through everything that reads one. The counters came back thin: of
+seventeen trades, six had a line of their own and eleven returned nothing at
+all. Ask the clerk at the club, the casino, the poolhall, the bar, the yard, the
+scrapyard, the laundry, the exchange, the burlesque, the forecourt or the wharf
+what they had seen, and they said the wages and the footfall — which is the
+books, which is exactly the complaint the feature was built to answer.
+
+The guard over it asked five kinds. It required no two of those five to say the
+same thing, and passed, while two thirds of the city stayed silent. That is the
+fourth measure this session that sampled instead of sweeping, and the pattern is
+identical every time: a list written by hand where the city could have been
+asked. The guard writes the list out of `Locations` now and fails if the city
+has fewer than fifteen kinds, so it cannot quietly shrink either.
+
+Each of the eleven sees something its own trade is in a position to notice. The
+casino knows what is behind the tables, because that decides who will sit down
+at one. The poolhall knows what the game in the back has paid in seat money. The
+yard knows how many of your other places its trucks are stocking, and says so
+sourly when the answer is none. The laundry knows how much of the attention on
+you the books will absorb. The scrapyard counts the people who used to drive and
+do not. The wharf says whether there is a boat on the quay right now.
+
+Asking the whole city immediately found two more things a sample had hidden.
+
+**Two trades shared a sentence.** The butcher and the restaurant were written as
+one case and both said "the orders are the orders". Two counters saying the
+identical line is two cards in a room under one name wearing a different hat. A
+shop and a dining room do not see the same week and now do not say the same
+thing about it.
+
+**One line moved while it was being read.** The exchange counted footfall, which
+counts whoever is standing in the room — including the person answering the
+question, the moment they step behind the counter. The figure differed between
+one call and the next and the guard caught the wobble. Who can afford to buy on
+this floor is a fact about the city rather than about who is in the doorway.
+
+And a prose rule went in with them: a count of none is a word, not a numeral.
+The scrapyard printed "0 people in this city used to drive", which is the shape
+the prose guards exist to catch, and a line that only ever gets read on a busy
+city will print it the first quiet week. Five of the new lines have a
+none-branch for that reason.
+
+Three rules broken, three failures.
