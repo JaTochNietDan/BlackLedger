@@ -173,7 +173,13 @@ and a local model that writes encounters and can be switched off.
   in any order. What you carry shifts an attempt on somebody — 17 in 200 with
   empty hands against 58 with a Thompson — and so does what you put in the hand
   of whoever you send. A search reaches whoever is standing with you.
-- **Businesses.** Every address that earns can be bought and run. A place with
+- **Businesses.** Every address that earns can be bought or taken and run. A
+  family's seat has no price on purpose — it changes hands by force — and used
+  to be the only kind of address in the city that ran on nothing: you fought a
+  war for the busiest room in the game and won an income figure. The club is a
+  trade now, with hands, drink, its own trouble and the best front after a
+  casino. **Still open: the same is true of Saint Agnes, Pier 14 and the Mercer
+  Exchange.** Every address that earns can be bought and run. A place with
   no price does not change hands. Twenty-six addresses, twelve kinds; the
   pawnbroker is where what is taken off the street turns into money and where
   somebody short pawns the suit off their back. Its window holds what the city

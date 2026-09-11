@@ -139,6 +139,9 @@ func TestEveryTradeReachesPastItsOwnIncome(t *testing.T) {
 				w.shelve(Shelf{Kind: "dress", Tier: 2, Wear: 30, Ask: 400, Lent: 150})
 				return w.WindowPrice(w.Window[len(w.Window)-1].ID)
 			}},
+		// Standing rather than money, which nothing else in this city pays.
+		{"club", "a night's standing off a room with your name over the door", "higher",
+			func(w *World, id string) int { return w.StandingFromTheDoor(id) }},
 		{"butcher", "a cold room things sit in without being looked at", "higher",
 			func(w *World, id string) int { return w.Concealed() }},
 		{"restaurant", "a dining room two families will sit down in", "higher",

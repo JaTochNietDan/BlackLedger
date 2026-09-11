@@ -9903,3 +9903,73 @@ fails if these ever become another way of reading the books.
 One break did not compile on the first attempt, which is the second time tonight
 that a deletion left a variable behind. A break that does not build is not a
 break; it has to be rewritten until the code is valid and the behaviour is gone.
+
+## A room you fight a war for should not be a number
+
+Every queue item was closed, so this tick went looking. Twenty-six addresses,
+twenty-one of which earn — and four of those ran on nothing: Saint Agnes,
+Pier 14, The Monarch and the Mercer Exchange. No trade, so no hands to hire, no
+supplies, no kind of trouble, no front to launder behind, and nobody behind a
+counter worth asking what they have seen.
+
+Those four are the city's busiest rooms. Thirty people drink at the bar of an
+evening and twenty-eight at the club. And they are exactly the four with no
+price, because a family's seat is not for sale — "this is not somewhere that
+changes hands". They change hands by force.
+
+So the rule was backwards. Every address you can buy is a business; every
+address you can only take is a number. You fight a war with the strongest family
+in the city, win their seat, and what you have won is an income figure with
+nothing to do about it.
+
+The Monarch is a trade now: five hands, drink and a band, a room that empties
+after somebody is badly hurt on the floor, and the best front there is after a
+casino — people and cash both move through it all night — with nothing hidden,
+because a room full of strangers is a room full of witnesses.
+
+Its own reach is standing rather than money, which nothing else in this game
+pays. A room where the city drinks with your name over the door is where a
+reputation is actually made, and standing is what gates owning anything at all.
+It takes a full complement and no trouble in the back, so it is bought with a
+wage bill rather than given.
+
+### Two guards changed, with the reason
+
+A new trade ran into three existing guards, and two of them had to change.
+
+`TestEveryTradeInTheCityCanActuallyBeRun` said every trade must be buyable. That
+is the same assumption that left the four rooms as numbers. It says held now —
+bought, or taken — and a seat proves it the other way: no price, owned by a
+family, and one of that family's own holdings.
+
+`TestTheCityFindsATradeForEverything` used the club as its example of somewhere
+that is not a trading business. It is one now, so the example is the police
+station.
+
+The third guard needed no change and was right: "a new man on the door" assumes
+a gender nothing recorded, and it is somebody new on the door.
+
+### The flaky guard, and the bug under it
+
+The full suite failed once on the pawnbroker's window and passed on its own. A
+test that passes alone and fails in company is the worst way to be wrong, so it
+was chased rather than rerun.
+
+The window is derived from the campaign and the day rather than from either
+random stream — that part was right, and it is what keeps the feature from
+moving everything else the city does. But it was keyed on `World.ID`, which is
+freshly random for every world. So two runs of seed 53 stocked different
+shelves, the reproducibility that was claimed for it in writing was not true,
+and a guard requiring three things on the shelf after three weeks was a coin
+toss.
+
+`World.Seed` now holds the number the city was made from, and the window keys on
+that. A guard runs the same seed twice and requires an identical shelf, and two
+different seeds and requires a different one. Broken by putting it back on the
+ID: it fails, saying the same city stocked six things and five.
+
+### Still open
+
+Saint Agnes, Pier 14 and the Mercer Exchange are the same gap and are named in
+the brief. A bar, a dock and a market are three more trades, and each needs
+something of its own or the reach sweep will say so.

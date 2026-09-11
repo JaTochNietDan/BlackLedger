@@ -296,10 +296,10 @@ func (w *World) WindowDay() {
 	// was not enough: the stream still shifts for everybody. A daily feature
 	// should not be spending the city's randomness at all.
 	day := w.Minute / 1440
-	chance := roll(w.ID, day, 1) % 100
-	sort := roll(w.ID, day, 2) % 100
-	pick := roll(w.ID, day, 3) % 100
-	worn := roll(w.ID, day, 4) % 100
+	chance := roll(w.Seed, day, 1) % 100
+	sort := roll(w.Seed, day, 2) % 100
+	pick := roll(w.Seed, day, 3) % 100
+	worn := roll(w.Seed, day, 4) % 100
 	if w.thePawnshop() == "" || len(w.Window) >= WindowHolds {
 		return
 	}
@@ -338,23 +338,30 @@ func (w *World) WindowDay() {
 	})
 }
 
-// roll is a number from 0 up, fixed for this campaign, this day and this
-// question. Nothing about it touches either random stream.
+// roll is a number from 0 up, fixed for this city, this day and this question.
+// Nothing about it touches either random stream.
 //
-// The mixing step is the whole of it. The first version ran the campaign id
-// through `sum*131 + c` over a starting value made of the day and the salt,
-// which is an affine map of that start — so every answer marched in step with
-// the day and the shelf filled with four of the same suit at almost the same
-// price. A hash used as a substitute for randomness has to avalanche or it is
-// a counter wearing a disguise.
-func roll(id string, day, salt int) int {
-	sum := uint64(salt)*0x9E3779B97F4A7C15 + uint64(day)*0xBF58476D1CE4E5B9
-	for i := 0; i < len(id); i++ {
-		sum = (sum ^ uint64(id[i])) * 0x100000001B3
-	}
+// Two things had to be got right and both were wrong first.
+//
+// It is derived from the seed, not from the campaign's ID. The ID is freshly
+// random for every world, so two runs of the same seed stocked different
+// windows and the guard over the window was flaky — it passed alone and failed
+// in the suite, which is the worst way for a test to be wrong.
+//
+// And the mixing step is not optional. The first version ran the id through
+// `sum*131 + c` over a starting value made of the day and the salt, which is an
+// affine map of that start — so every answer marched in step with the day and
+// the shelf filled with four of the same suit at almost the same price. A hash
+// used as a substitute for randomness has to avalanche or it is a counter
+// wearing a disguise.
+func roll(seed uint32, day, salt int) int {
+	sum := uint64(seed)*0x100000001B3 +
+		uint64(salt)*0x9E3779B97F4A7C15 + uint64(day)*0xBF58476D1CE4E5B9
 	sum ^= sum >> 33
 	sum *= 0xFF51AFD7ED558CCD
 	sum ^= sum >> 29
+	sum *= 0xC4CEB9FE1A85EC53
+	sum ^= sum >> 32
 	return int(sum >> 33)
 }
 

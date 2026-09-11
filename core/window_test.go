@@ -184,3 +184,42 @@ func TestTheWindowIsNotAWarehouse(t *testing.T) {
 		t.Fatalf("two hundred days and the shelf holds %d things", len(w.Window))
 	}
 }
+
+func TestTheSameCityStocksTheSameWindow(t *testing.T) {
+	t.Parallel()
+	// The window is meant to be the same on a replay. It was derived from the
+	// campaign's ID, which is freshly random for every world, so two runs of
+	// the same seed filled different shelves — and the guard above passed on
+	// its own and failed in the suite, which is the worst way to be wrong.
+	one, two := shop(t, 53), shop(t, 53)
+	days(one, 30)
+	days(two, 30)
+	if len(one.Window) != len(two.Window) {
+		t.Fatalf("the same city stocked %d things and %d", len(one.Window), len(two.Window))
+	}
+	if len(one.Window) == 0 {
+		t.Fatal("neither stocked anything, so this proves nothing")
+	}
+	for i := range one.Window {
+		a, b := one.Window[i], two.Window[i]
+		if a.Kind != b.Kind || a.Tier != b.Tier || a.Wear != b.Wear || a.Ask != b.Ask {
+			t.Fatalf("shelf %d holds %s at $%d in one city and %s at $%d in the same city",
+				i, a.What(), a.Ask, b.What(), b.Ask)
+		}
+	}
+	// And two different cities do not.
+	other := shop(t, 83)
+	days(other, 30)
+	same := len(other.Window) == len(one.Window)
+	if same {
+		for i := range one.Window {
+			if other.Window[i].Kind != one.Window[i].Kind || other.Window[i].Ask != one.Window[i].Ask {
+				same = false
+				break
+			}
+		}
+	}
+	if same {
+		t.Fatal("two different cities stocked the identical window")
+	}
+}

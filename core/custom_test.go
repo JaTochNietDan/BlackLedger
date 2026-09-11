@@ -23,9 +23,11 @@ func TestAPlaceTakenOnHasATradeAlready(t *testing.T) {
 	if w.TradeMultiplier("laundry") != 1 {
 		t.Fatalf("half a reputation was worth %.2f", w.TradeMultiplier("laundry"))
 	}
-	// Somewhere that is not a trading business has no trade to speak of.
-	if w.CustomDescription("club") != nil {
-		t.Fatal("a casino floor had a laundry's custom")
+	// Somewhere that is not a trading business has no trade to speak of. This
+	// used to ask about the club, which is a business now — the city's night
+	// rooms run on drink and a band like everything else runs on something.
+	if w.CustomDescription("precinct") != nil {
+		t.Fatal("a police station had a laundry's custom")
 	}
 }
 

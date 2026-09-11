@@ -89,6 +89,15 @@ var trades = map[string]Trade{
 		Trouble: "Somebody is running their own book out of the back and taking the room's money with it.",
 		Remedy:  "Put the outside book out", RemedyDetail: "The room takes its own bets again.", RemedyCost: 110, Cover: 11, Watched: 2, Hides: 0,
 	},
+	// A room the city drinks in. The best front there is after a casino —
+	// people and cash both move through it all night — and the worst place to
+	// keep anything out of sight, because a room full of strangers is a room
+	// full of witnesses.
+	"club": {
+		Hands: 5, Wage: 10, Drain: 9, Restock: 190, RestockAmount: 45, Supplies: "drink and the band",
+		Trouble: "Somebody was badly hurt on the floor on Saturday and the room has emptied since.",
+		Remedy:  "Put the room right", RemedyDetail: "A word with the family, a word with the police, and somebody new on the door.", RemedyCost: 200, Cover: 18, Watched: 3, Hides: 0,
+	},
 	"butcher": {
 		Hands: 3, Wage: 9, Drain: 8, Restock: 200, RestockAmount: 45, Supplies: "stock and ice",
 		Trouble: "The cold room failed overnight and a week of stock went with it.",

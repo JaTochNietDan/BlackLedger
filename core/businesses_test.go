@@ -41,8 +41,22 @@ func TestEveryTradeInTheCityCanActuallyBeRun(t *testing.T) {
 		if prop.Income <= 0 {
 			t.Errorf("%s (%s) is a business that earns nothing, so nobody can be starved of it", id, place.Name)
 		}
+		// Held by the player somehow: bought, or taken.
+		//
+		// This used to say bought, full stop, and that was the same assumption
+		// that left the city's four busiest rooms as numbers. A family's seat
+		// has no price — "this is not somewhere that changes hands" — because
+		// it changes hands by force, and a room you fight a war for should be
+		// the best business in the city rather than the only address in it that
+		// runs on nothing. So the rule is that every trade can end up yours,
+		// and a seat proves it the other way.
 		if place.Cost <= 0 {
-			t.Errorf("%s (%s) is a business nobody can buy", id, place.Name)
+			if w.faction(prop.Owner) == nil {
+				t.Errorf("%s (%s) has no price and belongs to no family, so nobody can ever hold it", id, place.Name)
+			}
+			if !w.SeatOf(prop.Owner, id) {
+				t.Errorf("%s (%s) has no price and is not a family's holding either", id, place.Name)
+			}
 		}
 		// A trading business is already running before anybody buys it.
 		if prop.Staff != trade.Hands || prop.Supply != trade.RestockAmount {
