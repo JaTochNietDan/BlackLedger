@@ -20,7 +20,17 @@ func (w *World) RunArrangement(job *Scene, remaining int) {
 	} else if w.Player.Alive && w.Event != nil && w.Event.Kind == "business_pressure" {
 		w.SuspendedJob = &SuspendedJob{Scene: job, Remaining: max(0, remaining-(w.Minute-start))}
 		w.RememberArrangement(job, "paused")
-		w.Log("Work put on hold", fmt.Sprintf("%s is paused with %d minutes left. Resolve the demand, then resume or abandon the job. No reward has been paid.", job.Title, w.SuspendedJob.Remaining), "story")
+		// A job interrupted on its last minute has none left, and "0 minutes
+		// left" reads as a clock rather than as a thing that has to be picked
+		// back up.
+		left := fmt.Sprintf("with %d minutes left", w.SuspendedJob.Remaining)
+		switch w.SuspendedJob.Remaining {
+		case 0:
+			left = "on its last minute"
+		case 1:
+			left = "with a minute left"
+		}
+		w.Log("Work put on hold", fmt.Sprintf("%s is paused %s. Resolve the demand, then resume or abandon the job. No reward has been paid.", job.Title, left), "story")
 	} else {
 		w.RememberArrangement(job, "interrupted")
 		w.Log("An interrupted arrangement", "Danger stopped the operation. No reward was paid.", "story")

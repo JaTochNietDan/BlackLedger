@@ -11564,3 +11564,36 @@ second fault only appeared at forty, because a forfeiture needs eighty attention
 and a search that finds nothing. A sweep too narrow reports a clean city. The
 floor on the count is ten thousand sentences now, so a sweep that quietly stops
 reaching the city fails instead of passing.
+
+## The harness reads itself back
+
+Last tick's sweep reads forty campaigns nobody touches, and found two faults the
+night it was written. What a passive city cannot reach is everything a player
+provokes: a cell, a search, a crate going out of a room, a story kept out of the
+paper. Those sentences are written by commands, and the only thing in this
+project that issues thousands of commands is the simulation harness.
+
+So the harness reads itself back. A campaign now carries the malformed sentences
+it left behind, using the same reader the cards and the passive city are read
+with — the reader moved out of a test file yesterday precisely so this could
+happen. Twenty-seven campaigns, every policy, three seeds each, because policies
+go to different places and the wrong sentence is usually in a room one of them
+never enters.
+
+**Two more, both in lines only a played city writes.** A job interrupted on its
+last minute was "paused with 0 minutes left", which reads as a clock rather than
+as work waiting to be picked up. And a search of somebody carrying a single
+crate said "You lose 1 units of stock" — the same fault the precinct had with
+"for the 1 days still on them", found by eye a long time ago and never swept
+for.
+
+That is four faults in two nights from two sweeps, all of one family, none of
+which any amount of walking single paths had turned up. The count is now: cards,
+a city left alone, and a city being played. The third is the expensive one at a
+minute of wall clock, so the fast half of the gate reads nine campaigns and the
+full gate reads all twenty-seven.
+
+Worth being plain about what this does not do. It reads whether a sentence is
+malformed, not whether it is true. The three faults before these were sentences
+that parsed perfectly and described something the code never did, and no reader
+of this kind will ever catch one of those.

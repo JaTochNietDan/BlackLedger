@@ -108,12 +108,15 @@ type Report struct {
 	// which read as a hundred runs in a hundred "hurt" and put it alongside a
 	// policy that was being shot at. How close somebody came to dying is the
 	// thing worth reporting.
-	Lowest       int            `json:"lowest_health"`
-	Milestones   map[string]int `json:"milestone_commands"`
-	Actions      map[string]int `json:"action_counts"`
-	Events       map[string]int `json:"event_counts"`
-	Error        string         `json:"error,omitempty"`
-	ReplayQueued int            `json:"replay_queued,omitempty"`
+	Lowest     int            `json:"lowest_health"`
+	Milestones map[string]int `json:"milestone_commands"`
+	Actions    map[string]int `json:"action_counts"`
+	Events     map[string]int `json:"event_counts"`
+	// Sentences this campaign wrote that do not read as English. A played city
+	// says things a city left alone never does, and nothing had ever read them.
+	Malformed    []string `json:"malformed,omitempty"`
+	Error        string   `json:"error,omitempty"`
+	ReplayQueued int      `json:"replay_queued,omitempty"`
 	// What the city did on its own while this run was happening.
 	//
 	// docs/LIVING_WORLD.md asks for exactly these and they did not exist: a
@@ -1085,7 +1088,40 @@ func RunRecorded(seed uint32, strategy, director string, limit int, trace bool, 
 		}
 	}
 	r.Alive = w.Player.Alive
+	// And what it said on the way. The reader that checks a sentence lives in
+	// the core; what the harness adds is a city that was played rather than one
+	// left alone, which is where the lines about a search, a cell, a crate and
+	// a pulled story get written.
+	r.Malformed = readBack(w)
 	return r
+}
+
+// readBack names every malformed sentence this campaign left behind, each once.
+func readBack(w *core.World) []string {
+	out, seen := []string{}, map[string]bool{}
+	note := func(text string) {
+		if found := core.Malformed(text); found != "" && !seen[text] {
+			seen[text] = true
+			out = append(out, found+": "+text)
+		}
+	}
+	for _, entry := range w.History {
+		note(entry.Title)
+		note(entry.Text)
+	}
+	for _, story := range w.News {
+		note(story.Headline)
+		note(story.Body)
+	}
+	if w.Event != nil {
+		note(w.Event.Title)
+		note(w.Event.Body)
+		for _, c := range w.Event.Choices {
+			note(c.Label)
+			note(c.Detail)
+		}
+	}
+	return out
 }
 
 // root is an action id without whoever it is about.

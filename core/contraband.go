@@ -331,7 +331,8 @@ func (w *World) Seize(reason string) int {
 		}
 	}
 	if lost > 0 {
-		w.Log("The goods are gone", fmt.Sprintf("%s You lose %d units of stock.", reason, lost), "danger")
+		w.Log("The goods are gone", fmt.Sprintf("%s You lose %s of stock.", reason,
+			plainly(lost, "one unit", fmt.Sprintf("%d units", lost))), "danger")
 	}
 	return lost
 }
