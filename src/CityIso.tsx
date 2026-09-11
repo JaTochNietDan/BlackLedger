@@ -1466,6 +1466,7 @@ export function CityIso({
           <button key={p.id} onClick={() => onSelect(p.id)}>
             {p.name}
             {p.owned ? ' · yours' : ''}
+            {p.back_room ? ' · a game in the back' : ''}
             {p.id === state.player.location
               ? ' · you are here'
               : p.district > state.district

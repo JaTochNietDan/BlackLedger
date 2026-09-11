@@ -229,3 +229,49 @@ func TestTheSeatMoneyStaysInTheRoomItWasTakenIn(t *testing.T) {
 		t.Fatal("a room the player does not hold is filling a table of its own rather than paying its holder")
 	}
 }
+
+// And the city says where the games are. While there was one of them nobody
+// needed telling which room it was; with two, a player who has always played
+// behind the poolhall has no reason to walk into a bar and find out there is a
+// table there as well.
+func TestTheCitySaysWhichRoomsHaveAGameBehindThem(t *testing.T) {
+	t.Parallel()
+	w := New(61)
+	w.Event, w.District = nil, 9
+	said := map[string]bool{}
+	for _, l := range w.Public()["locations"].([]map[string]any) {
+		id := l["id"].(string)
+		if l["back_room"].(bool) != HasBackRoom(id) {
+			t.Fatalf("%s: the payload says back room %v and the core says %v",
+				id, l["back_room"], HasBackRoom(id))
+		}
+		if strings.Contains(l["note"].(string), "game in the back") {
+			said[id] = true
+		}
+	}
+	for _, at := range BackRooms() {
+		if !said[at] {
+			place, _ := PlaceByID(at)
+			t.Fatalf("%s has a game behind it and nothing walking past says so", place.Name)
+		}
+	}
+	if len(said) != len(BackRooms()) {
+		t.Fatalf("%d rooms claim a game and %d have one", len(said), len(BackRooms()))
+	}
+}
+
+// And a room the player holds says it too, because holding the Green Baize
+// should not hide what the Green Baize is.
+func TestARoomYouHoldStillSaysItHasAGameBehindIt(t *testing.T) {
+	t.Parallel()
+	w := New(61)
+	w.Event, w.District = nil, 9
+	w.Player.Health, w.Player.Respect = 100, 30
+	w.Player.Location, w.Player.Cash = BackRoom, 200000
+	if err := w.apply(Command{Kind: "acquire", Target: BackRoom, RequestID: "holdandsay"}); err != nil {
+		t.Fatal(err)
+	}
+	if note := w.PlaceNote(BackRoom); !strings.Contains(note, "game in the back") {
+		t.Fatalf("the player holds the room with the game in it and the room says %q", note)
+	}
+}

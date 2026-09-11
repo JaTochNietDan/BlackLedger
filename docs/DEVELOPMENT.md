@@ -8657,3 +8657,29 @@ hands. The grudge guard matched the reason string, which now names the room.
 Balance moved, and in a direction that makes sense: more money circulating among
 the city's people is more for a racketeer to take. Racketeer deaths 45 to 33 and
 cash $967 to $1,658; thief cash $1,049 to $1,090. Baseline updated.
+
+## Checking last night's claim, and telling the city about the second table
+
+Last night's report said the second back room moved the balance: racketeer
+deaths 45 to 33 and cash $967 to $1,658. That was a large swing to hang on one
+change, so this tick ran the control before doing anything else — the same
+hundred campaigns a strategy with the bar taken back out of the set. It returns
+deaths 45 and cash $967 exactly, and leaves the publican at $1,732, which is the
+wage change from the tick before. The attribution holds.
+
+Then the acceptance check the last tick should have run: can a player actually
+sit down at the new room. At the twentieth hour, the poolhall has two people in
+it and the bar seven, both can seat everybody present, and both offer the game
+with no reason against it. It works end to end.
+
+What was missing was any way to find out. A player who has played behind the
+Green Baize for twenty campaigns has no reason to walk into a bar, and while
+there was one room with a game nobody needed telling which room it was. A room
+with a room behind it now says so from the street — a game with no house in it
+is the kind of thing a city knows about — and the address list behind the map
+marks it the same way it marks what is yours and what each journey costs. A room
+the player holds says it too, because holding the Green Baize should not hide
+what the Green Baize is.
+
+Both halves broken: the street stops saying it and the guard names the Green
+Baize; the list stops saying it and the guard says so.

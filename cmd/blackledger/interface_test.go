@@ -270,3 +270,15 @@ func TestTheLedgerDrawsWhatIsBehind(t *testing.T) {
 		t.Fatal("a place nobody will work at is drawn exactly like one a night behind")
 	}
 }
+
+// The address list behind the map says which rooms have a game in them, the
+// same way it says what each journey costs and which places are yours. The
+// list is the city for somebody on a keyboard, so a fact that only reaches the
+// drawing does not reach them.
+func TestTheCityListSaysWhereTheGamesAre(t *testing.T) {
+	t.Parallel()
+	src := source(t, "src/CityIso.tsx")
+	if !holds(src, "p.back_room ? ' · a game in the back' : ''") {
+		t.Fatal("the address list says nothing about which rooms have a game behind them")
+	}
+}

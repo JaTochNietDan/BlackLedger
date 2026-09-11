@@ -36,6 +36,13 @@ func (w *World) PlaceNote(id string) string {
 			return "Visibly in poor repair"
 		case l.Type == "home":
 			return ""
+		// A room with a room behind it, which is not a secret either: a game
+		// with no house in it is the kind of thing a city knows about, and
+		// until the game was at more than one address nobody needed telling
+		// which. A player who has always played behind the poolhall has no
+		// reason to walk into a bar and find out there is a table there too.
+		case HasBackRoom(id):
+			return "There is a game in the back most evenings"
 		}
 		return ""
 	}
@@ -63,6 +70,8 @@ func (w *World) PlaceNote(id string) string {
 		return fmt.Sprintf("Wants repair at %d%%", prop.Condition)
 	case prop.Still:
 		return "A still running in the back"
+	case HasBackRoom(id):
+		return "There is a game in the back most evenings"
 	case w.PostedAt(id) != nil && w.Travelling(w.PostedAt(id)):
 		n := w.PostedAt(id)
 		return n.Name + " is on the way, " + counted(max(1, n.Arrives-w.Minute), "minute", "minutes") + " out"
