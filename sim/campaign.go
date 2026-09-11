@@ -489,10 +489,17 @@ func Choose(v View, strategy string) (core.Command, error) {
 			// nobody else reached and then died before it could reach a tenth.
 			// It will still do all of them — it simply waits until it is in a
 			// condition to survive them.
-			if violent[a.ID] && v.Player.Health < 100 {
+			if violent[root(a.ID)] && v.Player.Health < 100 {
 				continue
 			}
-			if n := v.Tried[a.ID]; best == "" || n < fewest {
+			// By kind, not by person.
+			n := 0
+			for id, count := range v.Tried {
+				if root(id) == root(a.ID) {
+					n += count
+				}
+			}
+			if best == "" || n < fewest {
 				best, fewest = a.ID, n
 			}
 		}
@@ -812,4 +819,24 @@ func RunRecorded(seed uint32, strategy, director string, limit int, trace bool, 
 	}
 	r.Alive = w.Player.Alive
 	return r
+}
+
+// root is an action id without whoever it is about.
+//
+// Half the ids in this game carry a person after a colon — `strike:person-8`,
+// `about:leo:vittorio` — and both of the magpie's rules were reading the whole
+// id. It cost the policy its life and most of its purpose. The list of things
+// that get somebody killed never matched `strike:person-8`, so the one rule
+// meant to keep it alive did nothing at all; and "taken fewest times" counted
+// each person as a separate thing to try, so a room with twelve people in it
+// was twelve untried cards and it never left. Every trace ended the same way:
+// dockwork, strike, strike, strike, and health from seventy to twenty-two in
+// three commands.
+func root(id string) string {
+	for i := 0; i < len(id); i++ {
+		if id[i] == ':' {
+			return id[:i]
+		}
+	}
+	return id
 }

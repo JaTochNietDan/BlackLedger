@@ -20,18 +20,21 @@ import "testing"
 // purpose and its cash column should be read as what happens to somebody who
 // does everything once.
 //
-// It is short-lived and that is stated rather than hidden: a median of a bit
-// over two game days, and it dies in every run. Tuning bought some of that
-// back — waiting until it is unhurt before taking an attempt on anybody raised
-// the median from 1.4 days and the ids it reaches from 28 to 45 — and then
-// stopped buying much, so the tuning stopped. What it is worth is breadth in
-// the early game, which is nine kinds of action nothing else here ever took.
+// Getting it to work took three passes and the last one was worth all of the
+// others. It starved, then it died in a day and a half, and then it turned out
+// that both of its rules were reading an action id that carries a person's name
+// after a colon: the list of things that get you killed never matched
+// `strike:person-8`, and "taken fewest times" counted every person in the room
+// as a separate thing to try. Reading the id's root instead took it from dying
+// in every run at 2.2 days to surviving eight in ten past a month, and from
+// nineteen kinds of action to thirty-six — more on its own than the eight
+// policies with plans reach between them.
 //
 // This pins the breadth so it cannot quietly fall. Raising it is how a policy
 // that reaches further gets recognised; a drop is a policy that stopped
 // reaching, which is how a whole area of the game goes unpriced without
 // anybody noticing.
-const kindsTheHarnessPlays = 29
+const kindsTheHarnessPlays = 34
 
 func TestTheHarnessPlaysEnoughOfTheGame(t *testing.T) {
 	t.Parallel()

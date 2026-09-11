@@ -10359,3 +10359,51 @@ sitting through an audience.
 The breadth is pinned at twenty-nine kinds. A drop means a policy stopped
 reaching, which is how a whole area of the game goes unpriced without anybody
 noticing — which is precisely what had already happened.
+
+## Reading an id that carries a person's name
+
+The magpie was landed short-lived: a median of 2.2 game days, dead in every run,
+nineteen kinds of action. That was written down as a fact about the early game
+being lethal, and it was nothing of the sort.
+
+Tracing what actually killed it took one command and should have been the first
+thing done. Every run ended identically: dockwork, `strike:person-8`,
+`strike:person-9`, `strike:person-10`, health from seventy to twenty-two, travel
+home, rest, die. The policy had a rule specifically to stop that — do not take
+an attempt on anybody unless you are unhurt — and the rule never fired once.
+
+Half the action ids in this game carry a person after a colon. `strike:person-8`
+is an attempt on a particular man; `about:leo:vittorio` is asking Leo about
+Vittorio. Both of the magpie's rules were matching the whole id:
+
+- The list of things that get somebody killed holds `strike`, and no id is ever
+  exactly `strike`, so nothing was ever recognised as dangerous.
+- "Take whatever you have taken fewest times" counted every person in the room
+  as a separate untried thing, so a room with twelve people in it held twelve
+  cards it had never used and it never had any reason to leave.
+
+Reading the id's root instead:
+
+| | before | after |
+|---|---|---|
+| deaths | 10 of 10 | 2 of 10 |
+| median life | 2.2 days | 32.3 days |
+| kinds of action | 19 | 36 |
+| distinct ids | 45 | 79 |
+
+Thirty-six on its own is more than the eight policies with plans reach between
+them, and across all nine the harness now plays 38 of the game's 116 kinds,
+against 21 before any of this.
+
+Two things worth keeping from it. The first is that a measurement stated as a
+fact about the game — "the early game kills a curious player in two days" — was
+a bug in the thing doing the measuring, and one trace would have said so. The
+second is that the same fault had already been found and fixed twice tonight in
+other places, both times as a card label or a guard reading a whole id where it
+meant the kind. It is a fault shape in this project, not an accident.
+
+Seventy-six kinds are still never taken, and most of them need something the
+policy does not yet do: hold a business (hire, restock, remedy, launder, the
+night, the window), sit at a table (fold, call, deal, hit, stand), or take a
+boat that only lands at a pier you own. That is the next reach rather than a
+gap in this one.
