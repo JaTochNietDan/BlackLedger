@@ -1,6 +1,9 @@
 package core
 
-import "testing"
+import (
+	"strings"
+	"testing"
+)
 
 func watched(t *testing.T, heat int) *World {
 	t.Helper()
@@ -161,5 +164,66 @@ func TestWarCostsOrganizationsMoneyToo(t *testing.T) {
 	peace.PoliceDay()
 	if peace.faction("bellandi").Cash != quiet {
 		t.Fatal("the police fined an organization that was not fighting anyone")
+	}
+}
+
+// More attention means more visits. Every number this game prints about the
+// police is a count of what happened — fines paid, stock taken, premises
+// forfeit — and none of them says the thing the whole scale is for: that being
+// looked at harder is worse than being looked at less.
+//
+// Measured over four hundred days at each level, with the attention held there
+// so this reads the rule rather than the decay.
+func TestBeingLookedAtHarderIsWorse(t *testing.T) {
+	heavy(t)
+	visits := func(heat int) (raids, seizures int) {
+		for seed := uint32(1); seed <= 40; seed++ {
+			w := New(seed * 2654435761)
+			w.Event, w.District = nil, 9
+			w.Player.Health, w.Player.Respect, w.Player.Cash = 100, 40, 20000
+			w.Player.Location = "laundry"
+			w.Properties["laundry"].Owner = "player:1"
+			for day := 0; day < 10; day++ {
+				w.Player.Heat = heat
+				before := len(w.History)
+				w.Event = nil
+				w.Advance(1440)
+				w.Event = nil
+				for _, r := range w.History[min(before, len(w.History)):] {
+					switch {
+					case r.Title == "They took it":
+						seizures++
+					case strings.HasPrefix(r.Title, "They "), strings.HasPrefix(r.Title, "Turned over at "):
+						raids++
+					}
+				}
+			}
+		}
+		return raids, seizures
+	}
+	quiet, quietTaken := visits(40)
+	warm, warmTaken := visits(60)
+	hot, hotTaken := visits(95)
+	t.Logf("400 days at each: quiet %d visits %d seizures | warm %d/%d | hot %d/%d",
+		quiet, quietTaken, warm, warmTaken, hot, hotTaken)
+
+	// Somebody the city is barely interested in is left alone.
+	if quiet > 0 {
+		t.Fatalf("%d visits in four hundred days to somebody at 40 attention", quiet)
+	}
+	// And it gets worse from there rather than levelling off.
+	if warm == 0 {
+		t.Fatal("nobody came in four hundred days at 60 attention")
+	}
+	if hot <= warm {
+		t.Fatalf("being looked at hard is no worse than being looked at: %d visits against %d", hot, warm)
+	}
+	// Past the line where they stop taking money, they start taking premises —
+	// which is the one thing the scale threatens and the only place it happens.
+	if warmTaken > 0 {
+		t.Fatalf("%d premises taken below the line where that starts", warmTaken)
+	}
+	if hotTaken == 0 {
+		t.Fatal("nothing was taken from anybody in four hundred days above the forfeit line")
 	}
 }

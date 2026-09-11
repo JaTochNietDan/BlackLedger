@@ -9245,3 +9245,37 @@ Injecting a doubled article into a real card fails the sweep in every room that
 offers it. Injecting an unfilled format verb cannot be done that way at all: the
 compiler's own vet catches it before a test can run, which is a better guard
 than this one and worth knowing about.
+
+## The police, measured
+
+The half of this game nobody had pointed a measurement at. The first probe said
+the police never come: thirty days at the top of the attention scale produced
+one seizure and nothing else, and the heat drained from 95 to 21 on its own.
+
+That was wrong, and worth writing down as wrong. The probe counted log lines by
+title and the titles it looked for do not exist — the police say "They came to
+the door", "They found the still", "Turned over at", and none of those is the
+word "raid". Counting what they actually say:
+
+| attention | visits in 400 days | premises taken |
+|---|---|---|
+| 40 | 0 | 0 |
+| 60 | 58 | 0 |
+| 80 | 118 | 0 |
+| 95 | 131 | 40 |
+
+Which is the shape it should be. Somebody the city is barely interested in is
+left alone, it gets worse from there rather than levelling off, and past the
+line where they stop taking money they start taking premises. Nothing needed
+fixing.
+
+So the tick's work is the guard rather than a repair, because none of the
+numbers this game prints about the police said the thing the whole scale is for.
+Flattening the odds so attention stops mattering fails it; letting them take
+premises at any attention fails it on the other line.
+
+The heat decay is real and worth knowing: about a point a day on its own, with
+fifteen to thirty knocked off each time they actually come. A player at the top
+of the scale who simply stops slides back to safety in a fortnight — which is
+the system working, not a hole, but it is the number to reach for if the police
+ever need to feel heavier.
