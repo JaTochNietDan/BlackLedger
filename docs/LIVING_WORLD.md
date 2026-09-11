@@ -150,6 +150,28 @@ Ensure efficiency of development loops by increasing efficiency of your workflow
 
 ## Inbox — open
 
+Spread the campaign number across the world's stream inside `New`, and re-measure
+what moves. One multiply fixes every seed sweep in the suite at once — the
+stream is a plain linear congruential generator started from the campaign's own
+number, so seeds 1 to 200 open on 0.236 through 0.313 and a hundred and
+twenty-five loops in the tests start at one.
+
+Tried, measured, and backed out rather than rushed: it turns thirteen tests red.
+Four were genuine faults and are fixed and shipped. Nine remain, each needing a
+judgement rather than a nudge, and they are the work:
+
+- `TestARivalComesForYourPeople` — a rival with an empty counter never poaches.
+- `TestSomebodyOnTheDoorStopsTheQuietWord` — two of yours still put off.
+- `TestLeavingTownIsAWayToSurviveAWeek` — 300 of 300 survive staying, so a
+  journey buys nothing measurable; the danger needs to be real before the
+  comparison means anything.
+- `TestAMayorOnlyPaysForHimselfWithAPortfolio`, `TestARaidTakesStockCashAndCondition`,
+  `TestRefusingCreatesHiddenConsequences`, `TestTakingTheFamilyHandsYouFourWorkingBusinesses`,
+  `TestCountryPricesAreWorthTheFareOnlyIfYouCanHideTheLoad`, and the casino's
+  thin float, which is already re-pinned with a margin.
+
+---
+
 Asking somebody where to find somebody else publishes a shorter id over HTTP
 than the core builds, and refuses about once in a thousand commands.
 

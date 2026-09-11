@@ -242,6 +242,14 @@ func TestSomebodyOnTheirWayOutIsSaidSo(t *testing.T) {
 		t.Fatal("they are already past it, so the crossing cannot be seen")
 	}
 
+	// The card is read on the morning the line is said, not after the loop.
+	//
+	// It used to run the days out and then look, and somebody who has crossed
+	// the line can walk out on one of those mornings — at which point they are
+	// nobody's and their card says nothing about anything. The old seed never
+	// rolled that; the moment campaign numbers were spread across the stream,
+	// one did, and the test reported that the card was silent about a man who
+	// had already gone.
 	said, marked := false, false
 	for day := 0; day < 6 && !said; day++ {
 		before := len(w.History)
@@ -253,10 +261,13 @@ func TestSomebodyOnTheirWayOutIsSaidSo(t *testing.T) {
 				said = true
 			}
 		}
-	}
-	for _, p := range w.PeopleHere(hand.Location) {
-		if p.ID == hand.ID {
-			marked = p.Restless
+		if !said {
+			continue
+		}
+		for _, p := range w.PeopleHere(hand.Location) {
+			if p.ID == hand.ID {
+				marked = p.Restless
+			}
 		}
 	}
 	t.Logf("%s is at %d trust: told=%v, marked on the card=%v", hand.Name, hand.Trust, said, marked)

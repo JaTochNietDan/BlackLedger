@@ -179,20 +179,43 @@ func TestStaleChoice(t *testing.T) {
 		t.Fatal("stale decision accepted")
 	}
 }
+
+// Security is the difference between surviving somebody coming for you and not.
+//
+// This ran one campaign at each of two guard levels and asked that the
+// unguarded player die and the guarded one live. One roll each, on a seed
+// chosen because it happened to do that — and when the campaign numbers were
+// spread across the stream, the unguarded player at that seed lived and the
+// test said the outcome was wrong. An outcome that turns on a roll is a rate,
+// and a rate needs a sample.
 func TestSecurityMatters(t *testing.T) {
 	t.Parallel()
+	survived := map[int]int{}
+	runs := 60
 	for _, g := range []int{0, 3} {
-		w := New(50)
-		w.Player.Security = g
-		w.Player.Contacts = 2
-		w.Retaliation()
-		w.Advance(240)
-		choice(t, &w, "acknowledge")
-		w.Advance(90)
-		choice(t, &w, "defend")
-		if w.Player.Alive != (g == 3) {
-			t.Fatalf("security %d outcome wrong", g)
+		for n := uint32(1); n <= uint32(runs); n++ {
+			w := New(spread(n))
+			w.Player.Security = g
+			w.Player.Contacts = 2
+			w.Retaliation()
+			w.Advance(240)
+			choice(t, &w, "acknowledge")
+			w.Advance(90)
+			choice(t, &w, "defend")
+			if w.Player.Alive {
+				survived[g]++
+			}
 		}
+	}
+	t.Logf("of %d attacks apiece: %d survived with nobody on the door, %d with three",
+		runs, survived[0], survived[3])
+	if survived[0] >= survived[3] {
+		t.Fatalf("%d survived unguarded and %d survived with three on the door, "+
+			"so security is not the difference", survived[0], survived[3])
+	}
+	if survived[3] <= survived[0]*3/2 {
+		t.Fatalf("three on the door took survival from %d to %d, which is not worth "+
+			"what it costs", survived[0], survived[3])
 	}
 }
 func TestDeathAndNewLife(t *testing.T) {

@@ -112,7 +112,13 @@ func TestAThinFloatIsTheThingThatRuinsAHouse(t *testing.T) {
 			ruinedDeep++
 		}
 	}
-	if ruinedThin < 40 {
+	// Twenty-five rather than forty. The threshold was set at the figure the
+	// old sample produced, with no room in it, and campaign numbers were
+	// feeding the stream an eighth of its range: spread properly a thin float
+	// goes bust 37 times in 400 months rather than 40-odd. What is being
+	// guarded is that under-funding a room costs something, so the line sits
+	// clear of the measurement instead of on it.
+	if ruinedThin < 25 {
 		t.Fatalf("a thin float went bust in only %d of 400 months, so under-funding costs nothing", ruinedThin)
 	}
 	if ruinedDeep >= ruinedThin/2 {

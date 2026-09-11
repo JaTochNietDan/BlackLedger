@@ -155,7 +155,29 @@ func TestTheMachineCanActuallyBePlayedFromTheRoom(t *testing.T) {
 	if next.Reels == nil {
 		t.Fatal("the handle was pulled and the drums never moved")
 	}
-	if next.Player.Cash == cash {
+	// What went in against what came back, with the clock's own money measured
+	// rather than allowed for.
+	//
+	// Asking only that the cash moved reads a pull that paid exactly its stake
+	// as a pull that never happened, and the first deal the spread seeds handed
+	// this test paid $1 on a $5 line while a day's takings landed in the same
+	// command — so the pocket did not move at all and two different readings
+	// were both wrong.
+	clock := w.Clone()
+	clock.Event = nil
+	was := clock.Player.Cash
+	clock.Advance(next.Minute - w.Minute)
+	passing := was - clock.Player.Cash
+	// `Pays` is odds rather than money — the log line beside it says "it pays
+	// %d to 1" — so a line paying 1 hands the stake back and the pocket does
+	// not move. Reading it as an amount made a fair result look like a pull
+	// that never happened.
+	back := next.Reels.Down * next.Reels.Pays
+	if got := cash - next.Player.Cash - passing; got != next.Reels.Down-back {
+		t.Errorf("a $%d pull at %d to 1 returned $%d and moved $%d once the clock's own $%d is out",
+			next.Reels.Down, next.Reels.Pays, back, got, passing)
+	}
+	if next.Reels.Down <= 0 {
 		t.Error("a pull cost nothing at all")
 	}
 	if next.Minute == w.Minute {

@@ -152,6 +152,12 @@ func (w *World) OwnPeopleDay() {
 		return
 	}
 	paid := w.Player.Cash >= w.DailyCost()
+	// Whoever crossed the line this morning. They are not also deciding this
+	// morning: the warning exists so the player has a day to do something, and
+	// a man warned about and gone before lunch is a warning worth nothing. It
+	// happened — one campaign said "they have stopped saying much" and the same
+	// pass walked him out with the trust at nought and the card already blank.
+	crossing := map[string]bool{}
 	for _, n := range people {
 		was := n.Trust
 		if paid {
@@ -165,6 +171,7 @@ func (w *World) OwnPeopleDay() {
 		// can walk out of here with one of your businesses, and the only
 		// warning was the word "politics" on the day after.
 		if was >= DefectionTrust && n.Trust < DefectionTrust {
+			crossing[n.ID] = true
 			w.Log(n.Name+" is thinking about it",
 				"They have stopped saying much, and whatever they are being paid has stopped being the point. Somebody who has got this far either gets a reason to stay or is gone.",
 				"danger")
@@ -172,7 +179,7 @@ func (w *World) OwnPeopleDay() {
 	}
 	// One of them a day, at most, decides.
 	for _, n := range people {
-		if n.Trust >= DefectionTrust {
+		if n.Trust >= DefectionTrust || crossing[n.ID] {
 			continue
 		}
 		if w.WorldRandom() >= float64(n.Ambition)/300 {

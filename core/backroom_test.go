@@ -169,7 +169,6 @@ func TestTheBestHandTakesThePot(t *testing.T) {
 	if err := w.SitInTheBackRoom(BackRoom, 1000); err != nil {
 		t.Fatalf("nobody could get a game: %v", err)
 	}
-	before := w.Player.Cash
 	pot := w.Game.Pot
 	if pot <= 0 {
 		t.Fatal("nobody put anything in")
@@ -179,12 +178,21 @@ func TestTheBestHandTakesThePot(t *testing.T) {
 	if !g.Done {
 		t.Fatal("the hand never finished")
 	}
+	// What the hand paid, which is money on the table rather than money in a
+	// pocket. Sitting down puts a stake in front of you and the pot is settled
+	// against it; `Player.Cash` only moves when the money is picked up again.
+	//
+	// This asked whether the cash in hand had risen by the whole pot, which is
+	// the wrong pocket and also double-counts the player's own ante. It passed
+	// for as long as the one deal it ran on never gave the player the best
+	// hand — and the moment the seeds were spread it dealt one and reported
+	// that the best hand at the table had won nothing.
 	best, mine := BestAtTheTable(g), BestOfSeven(g.Mine, g.Board)
-	if best.Beats(mine) && w.Player.Cash > before {
-		t.Fatalf("a losing hand took %d out of the pot", w.Player.Cash-before)
-	}
-	if mine.Beats(best) && w.Player.Cash < before+pot {
-		t.Fatalf("the best hand at the table won %d of a %d pot", w.Player.Cash-before, pot)
+	switch {
+	case best.Beats(mine) && g.Won > 0:
+		t.Fatalf("a losing hand took $%d off the table", g.Won)
+	case mine.Beats(best) && g.Won <= 0:
+		t.Fatalf("the best hand at the table came away %d from a $%d pot", g.Won, pot)
 	}
 }
 

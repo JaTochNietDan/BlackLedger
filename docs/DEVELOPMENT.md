@@ -12348,3 +12348,36 @@ purchase that makes two families hate each other is not a clean one.
 
 That is twelve instrument faults, and this one is the worst kind: a guard that
 certified a sentence true on a sample that could not have shown it false.
+
+## Four faults a narrow sample had been hiding
+
+Scattering the campaign number inside `New` fixes every seed sweep in this suite
+at once. It turns thirteen tests red. Nine of those need a judgement each and
+that is more than one night can do honestly, so the change is measured, written
+into the inbox with the list, and backed out rather than rushed.
+
+The other four were real, and they are fixed and shipped without it.
+
+**The best hand at the table won nothing.** The poker guard asked whether the
+cash in hand had risen by the whole pot. Money at that table lives in a stake in
+front of you; `Player.Cash` only moves when it is picked up. It also
+double-counted the player's own ante. It passed for as long as its one deal
+never gave the player the best hand — and the first spread seed dealt one.
+
+**A pull that paid its stake back read as a pull that never happened.** The slots
+guard asked only that the cash moved. `Pays` is odds and not money, so a $5 line
+at 1 to 1 hands the stake back and leaves the pocket where it was. It now reads
+the stake against the odds, with the clock's own money measured and subtracted.
+
+**Security was one roll.** One campaign with nobody on the door and one with
+three, asking that the first die and the second live, on a seed chosen because
+it did that. An outcome that turns on a roll is a rate. Sixty attacks apiece:
+**12 survive unguarded, 42 with three on the door.**
+
+**And a warning worth nothing at all.** A man whose trust crosses the line gets
+told — "they have stopped saying much" — and the same morning's pass then rolls
+whether anybody walks out, including him. So the city could warn the player about
+somebody and have him gone before lunch, which is the opposite of the reason the
+line exists. Whoever crossed this morning does not also decide this morning. That
+is a change to the game rather than to a test, and the test that found it was
+looking for a card that had already gone blank.

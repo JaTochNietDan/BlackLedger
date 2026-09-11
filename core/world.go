@@ -759,6 +759,7 @@ func newPerson(life int) Person {
 	names := []string{"Alex Varga", "Nico Ward", "Frankie Vale", "Sam Costa", "Jamie Moretti", "Robin Hale"}
 	return Person{Name: names[(life-1)%len(names)], Cash: 90, Health: 100, Location: "room", Home: "room", Alive: true, Crew: []Crew{}}
 }
+
 func New(seed uint32) *World {
 	w := &World{Version: SaveVersion, ID: ID(), Seed: seed, Life: 1, Minute: 480, RNG: seed, Player: newPerson(1), Properties: map[string]*Property{}, Tasks: []Task{}, Plots: []Plot{}, History: []Record{}, Dead: []Death{}, Offers: []Offer{}, Director: Director{"authored", "Authored opening. Local AI can prepare additional encounters.", -9999}}
 	w.Factions = []Faction{
