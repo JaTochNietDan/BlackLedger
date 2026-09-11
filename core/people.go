@@ -216,6 +216,8 @@ func (w *World) Kill(id, cause string) bool {
 			led = w.Factions[i].ID
 		}
 	}
+	// Somebody has to bury them, and in this city that is a trade.
+	w.Bury(person)
 	w.Log(person.Name+" is dead", cause+" "+describeStanding(person, w)+".", "danger")
 	// A man with a title is not a soldier, and the city does not treat him
 	// like one.

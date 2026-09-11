@@ -11879,3 +11879,37 @@ is 96.
 And the sweeps caught two more counted-noun faults on the way through, in the
 oldest lines in the trade code: a quiet purchase of "1 crates of moonshine", and
 the same again when it sold.
+
+## The sentence I wrote last night that the code did not do
+
+The undertaker went into the city with a counter that counts the week's dead and
+a line in the working brief calling it "the one trade in this city whose custom
+is made entirely by everybody else's work". The counter said it. Nothing did it.
+The parlour earned its hourly figure whether the district buried two people that
+week or twenty.
+
+That is a description of a consequence with no code behind it, which is the
+exact fault this log has recorded four times in a fortnight — the false floor,
+the story worth pulling, the room a search finds, the crates going with the car.
+The fifth was written by me, the night before, in the paragraph announcing the
+building.
+
+It works now, and it is the same rule the garage is under. A car goes to pieces
+in the street and every bench in the city has more work; the one the player
+holds is where their own city's business ends up. A funeral is that with nobody
+to argue about the bill. Two points of custom each, so a city left alone — which
+kills about twenty-eight people in a long campaign — drifts the parlour upward
+rather than jumping it.
+
+With one exception, and it is the part worth having. **A pauper is not a
+customer.** Somebody with no name in this city, nobody to send a card to and
+nothing in their pockets is buried out of the parish's money, which is not
+money: the room does the work and is not a shilling better off. So a parlour
+does well out of a war between families and nothing at all out of the people who
+die on the street, which is the right way round for a business that dresses the
+dead for their relatives.
+
+Guarded three ways — a funeral is trade, a pauper is not, and a parlour of the
+player's is where the work goes — and all three read the city's own dead rather
+than building a corpse to order. Breaking the call out of the death path takes
+four funerals from 50% to 50%.
