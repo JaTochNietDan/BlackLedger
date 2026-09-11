@@ -11981,3 +11981,28 @@ club more than anything but a casino, a bonded shed hides more than anything
 else and specifically more than a cold room and a yard of trucks, and a trading
 floor hides next to nothing. Broken to check it bites: a saloon at nineteen
 cover flags both the club's sentence and the saloon's own.
+
+## Closing the hole the night it was named
+
+Last night's guard pinned what five trades say about themselves and its write-up
+named its own weakness in the same paragraph: a nineteenth trade could explain
+itself and nobody would notice nothing pinned the sentence. A weakness written
+down and left is a weakness.
+
+It reads the trade table's source now. It finds the comment above each trade,
+asks whether that comment talks about the two things only a comment ever
+explains — how well the books explain cash, how well the room hides a thing —
+and requires any trade that does to be named in the claims. A paragraph about
+something else is left alone: the restaurant's is about what goes wrong in a
+kitchen, which pins nothing and needs nothing pinned.
+
+**The first version passed a butcher that had started explaining itself**, and
+the reason is worth keeping. It checked whether the trade's name appeared
+anywhere in the claims file, and "butcher" is in there — inside the wharf's
+sentence, because a bonded shed hides more than a cold room. A trade can be
+named by somebody else's claim and have none of its own. So each claim now
+carries the trade whose paragraph says it, and the sweep checks that set rather
+than the text. Tested by giving the butcher a paragraph: named, and caught.
+
+Five trades explain themselves, five are pinned, and the sixth to try it fails
+the build.
