@@ -12739,3 +12739,33 @@ Moving on a holding is still never played, and the reason is worth stating
 plainly rather than counting as solved: it is gated behind going to work for a
 family, which happens five times in a hundred campaigns. The road exists, the
 harness can now walk it, and almost nobody gets far enough to.
+
+## The one number no policy could see
+
+Going to work for a family happens five times in a hundred campaigns, and
+everything on the promotion road sits behind it. So: how long is that road?
+
+Four favours. A seat at the table, offer to carry something, finish it — six
+points of standing each time, and a family at nought is at **+24 after four**,
+past the +20 it takes. The road is short.
+
+What is not short is finding out. **The view the policies decide from carries
+premises, people and prices, and does not carry what a family thinks of you.**
+That is the one number deciding whether anybody will take you on, whether
+anybody will stand with you, and whether a demand gets paid — and the comment
+above the market price in that same struct says the identical thing about
+itself, one field along: "the view carried premises and people and not the one
+number the trade is decided on."
+
+It carries the families now, and the soldier only crosses the city when they
+will actually say yes rather than walking over to be refused.
+
+**It moved nothing.** Serve is still five in a hundred, travel is still sixty-five
+thousand commands, survival is still eighty. Identical to six figures across two
+runs — deterministic, so the reading is real rather than a stale file, which is a
+thing this log has been caught by before. The futile crossings the gate prevents
+were already prevented by a cruder check, and the travel is coming from the
+audience habit instead.
+
+Said as it is. The change is right and the number it was aimed at did not move,
+and the honest next question is what those sixty-five thousand journeys are for.

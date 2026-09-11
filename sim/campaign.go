@@ -51,14 +51,24 @@ type View struct {
 	// The market. A price that moves is the whole of the underground trade, and
 	// no policy in here could see one: the view carried premises and people and
 	// not the one number the trade is decided on.
-	Goods          []core.Good    `json:"goods"`
-	BusinessTruces map[string]int `json:"business_truces"`
-	Revision       int            `json:"revision"`
-	Minute         int            `json:"minute"`
-	Player         core.Person    `json:"player"`
-	Locations      []Place        `json:"locations"`
-	Event          *Event         `json:"event"`
-	District       int            `json:"district"`
+	Goods []core.Good `json:"goods"`
+	// What the families think of the player.
+	//
+	// The view carried premises, people and prices and not this — the one
+	// number that decides whether anybody will take you on, whether anybody
+	// will stand with you, and whether a demand gets paid. Both policies built
+	// around it were flying blind: the soldier walked to a family's door, found
+	// the offer refused because they thought of it at six, walked back, and did
+	// that for a whole campaign. The same shape as the market price, one field
+	// along.
+	Factions       []core.PublicFaction `json:"factions"`
+	BusinessTruces map[string]int       `json:"business_truces"`
+	Revision       int                  `json:"revision"`
+	Minute         int                  `json:"minute"`
+	Player         core.Person          `json:"player"`
+	Locations      []Place              `json:"locations"`
+	Event          *Event               `json:"event"`
+	District       int                  `json:"district"`
 	// What this campaign has already done, so a policy can prefer what it has
 	// not. Only the magpie reads them; they are filled in the run loop rather
 	// than by Public, because they are a fact about the run and not about the
@@ -277,6 +287,11 @@ func Public(w *core.World) View {
 // that the room it goes behind is not left unable to feed anybody.
 const StillMoney = 900
 
+// ServeStanding is what a family has to think of somebody before it is worth
+// crossing the city to ask them for work. The core asks for twenty; four
+// favours carry anybody from nothing to twenty-four.
+const ServeStanding = 20
+
 // EditorMoney is what the respectable policy keeps back before opening an
 // arrangement at the paper: nine hundred to open it, and enough left to go on
 // eating while it pays forty-five a day.
@@ -285,6 +300,17 @@ const EditorMoney = 2200
 // CellarTopUp is how thin a room of the distiller's gets before it goes down
 // its own steps rather than into the till.
 const CellarTopUp = 25
+
+// family is what this organization thinks of the player, and zero for one
+// nobody has heard of.
+func (v View) family(id string) core.PublicFaction {
+	for _, f := range v.Factions {
+		if f.ID == id {
+			return f
+		}
+	}
+	return core.PublicFaction{}
+}
 
 func (v View) place(id string) Place {
 	for _, p := range v.Locations {
@@ -1071,11 +1097,18 @@ func Choose(v View, strategy string) (core.Command, error) {
 		if v.Player.Serves == "" {
 			for _, p := range v.Locations {
 				for _, a := range p.Actions {
-					if !strings.HasPrefix(a.ID, "serve:") {
+					id, ok := strings.CutPrefix(a.ID, "serve:")
+					if !ok {
 						continue
 					}
-					if a.Disabled && v.Player.Location == p.ID {
-						continue // there, and still refused: not yet
+					// Only walk over there once they think enough of you to
+					// say yes. The card is refused everywhere but their own
+					// room, so a policy that goes to look at it walks across
+					// the city to be told no and then walks back — which is
+					// what this did for a whole campaign, eight thousand
+					// audiences and five offers of work in a hundred runs.
+					if v.family(id).Goodwill < ServeStanding {
+						continue
 					}
 					if c, ok := v.at(p.ID, a.ID); ok {
 						return c, nil
