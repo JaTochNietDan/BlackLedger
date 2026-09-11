@@ -315,6 +315,46 @@ func (w *World) Service(id string) error {
 	return nil
 }
 
+// emptyTheFloor takes what the car was carrying, and reports how much that was.
+//
+// Two places said "anything that was under the floor of it went too" and
+// neither of them took anything. Stock is one pool with a hiding budget — what
+// a car adds is a false floor, not a separate boot — so a car going up in smoke
+// left every crate exactly where it was and only made it visible. That is the
+// difference between a false floor being worth having and a false floor being
+// worth having with nothing at stake.
+//
+// What was in it is read the way the limit is written: pockets first, then
+// under the floor of a car, then a cellar at home. So the car was carrying
+// whatever did not fit in a coat, up to the compartment it has. Taken off the
+// largest holdings first, because a man loading a false floor puts the bulk of
+// what he has in it.
+func (w *World) InTheFloor() int {
+	if w.Player.Car == 0 {
+		return 0
+	}
+	return min(VehicleByTier(w.Player.Car).Compartment, max(0, w.Carrying()-PocketLoad))
+}
+
+func (w *World) emptyTheFloor() int {
+	gone := w.InTheFloor()
+	for left := gone; left > 0; {
+		big := ""
+		for _, g := range w.Goods {
+			if w.Holding(g.ID) > w.Holding(big) {
+				big = g.ID
+			}
+		}
+		if big == "" || w.Holding(big) == 0 {
+			return gone - left
+		}
+		take := min(left, w.Holding(big))
+		w.Player.Stock[big] -= take
+		left -= take
+	}
+	return gone
+}
+
 // LoseCar is what happens when somebody takes it or burns it. The player is
 // walking again, and everything under the floor goes with it.
 func (w *World) LoseCar(reason string) bool {
@@ -322,8 +362,14 @@ func (w *World) LoseCar(reason string) bool {
 		return false
 	}
 	label := VehicleByTier(w.Player.Car).Label
+	gone := w.emptyTheFloor()
 	w.Player.Car, w.Player.CarWear = 0, 0
-	w.Log(label+" is gone", reason+" You are walking again, and anything that was under the floor of it went too.", "danger")
+	took := " You are walking again."
+	if gone > 0 {
+		took = fmt.Sprintf(" You are walking again, and the %s under the floor of it went too.",
+			plainly(gone, "one crate", fmt.Sprintf("%d crates", gone)))
+	}
+	w.Log(label+" is gone", reason+took, "danger")
 	return true
 }
 
@@ -496,6 +542,7 @@ func (w *World) ScrapCar(id string) error {
 	}
 	paid := w.ScrapWorth(id)
 	label := VehicleByTier(w.Player.Car).Label
+	gone := w.emptyTheFloor()
 	w.Player.Car, w.Player.CarWear, w.Player.Plate = 0, 0, 0
 	w.Player.Fuel, w.Player.Fuelled = 0, 0
 	w.Earn(paid)
@@ -511,8 +558,12 @@ func (w *World) ScrapCar(id string) error {
 	if w.Own(id) {
 		mine = " Your own crane, and nobody taking a cut of it."
 	}
+	took := "You are walking."
+	if gone > 0 {
+		took = fmt.Sprintf("You are walking, and the %s under the floor of it went with the car.",
+			plainly(gone, "one crate", fmt.Sprintf("%d crates", gone)))
+	}
 	w.Log("Weighed in at "+place.Name,
-		fmt.Sprintf("%s for $%d. You are walking, and anything that was under the floor of it went with the car.%s",
-			label, paid, mine), "personal")
+		fmt.Sprintf("%s for $%d. %s%s", label, paid, took, mine), "personal")
 	return nil
 }

@@ -11458,3 +11458,35 @@ headline, and an invented headline names nothing, so the story was being left
 off the list for the wrong reason entirely. It asks what the paper thinks the
 story is about before it asks anything else now. That is the eighth time on this
 loop a green result has turned out to be a fact about the instrument.
+
+## A false floor with nothing at stake
+
+`scrap` — weighing the car in at a yard — was another action the harness has
+never played. Walking it found the thing both the yard and the street were only
+half doing.
+
+The card said "anything under the floor of it goes with the car". The log after
+it said the same. Losing a car to a rival's match said it too. None of the three
+took anything. Stock in this game is one pool with a hiding budget: what a car
+adds is a false floor, which is a number of units a search will not find, not a
+boot with crates in it. So a car going to the crane left every crate exactly
+where it was and only made it visible.
+
+That is not a small difference. A false floor whose contents cannot be lost is a
+discount on police attention, and nothing else. It is never a thing to weigh
+before parking somewhere, or before letting a feud get to your car. The writer
+of that line meant it twice and the code did it neither time.
+
+What was riding under the floor is read the way the carrying limit is already
+written down — pockets first, then under the floor of a car, then a cellar at
+home — so the car was carrying whatever did not fit in a coat, up to the
+compartment it has. Taken off the largest holdings first. A man with four crates
+and a Packard loses nothing, because four crates fit in a coat.
+
+The card names the number before the crane picks the car up. A crate you did not
+know you were losing is not a decision.
+
+Nothing moved in the simulation, and that is the honest reading rather than a
+clean bill of health: the harness does not play `scrap` and rarely loses a
+loaded car, so the measure had nothing to say about this change either way. What
+it does say is that nothing else regressed.

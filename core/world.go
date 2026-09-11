@@ -1333,13 +1333,21 @@ func (w *World) Actions(id string) []Action {
 	// the last, so a Ford traded for a Packard simply stopped existing.
 	if ScrapYard(id) {
 		worth := w.ScrapWorth(id)
-		detail := fmt.Sprintf("$%d for %s at %d%% of what it was. You are walking afterwards, and anything under the floor of it goes with the car.",
-			worth, VehicleByTier(p.Car).Label, w.CarCondition())
+		// What is riding under the floor is a number the player should see
+		// before the crane picks the car up, not after.
+		floor := ""
+		if n := w.InTheFloor(); n > 0 {
+			floor = fmt.Sprintf(" The %s under the floor of it %s with the car.",
+				plainly(n, "one crate", fmt.Sprintf("%d crates", n)),
+				plainly(n, "goes", "go"))
+		}
+		detail := fmt.Sprintf("$%d for %s at %d%% of what it was. You are walking afterwards.%s",
+			worth, VehicleByTier(p.Car).Label, w.CarCondition(), floor)
 		if p.Car == 0 {
 			detail = "A yard takes what is left of a car. You have not got one."
 		} else if w.Own(id) {
-			detail = fmt.Sprintf("$%d for %s at %d%% of what it was — your own crane, and nobody taking a cut. You are walking afterwards.",
-				worth, VehicleByTier(p.Car).Label, w.CarCondition())
+			detail = fmt.Sprintf("$%d for %s at %d%% of what it was — your own crane, and nobody taking a cut. You are walking afterwards.%s",
+				worth, VehicleByTier(p.Car).Label, w.CarCondition(), floor)
 		}
 		add("scrap", "Weigh the car in", 30, 0, w.ScrapReadiness(id), detail)
 	}
