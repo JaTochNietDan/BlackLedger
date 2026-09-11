@@ -220,6 +220,13 @@ and a local model that writes encounters and can be switched off.
   in any order. What you carry shifts an attempt on somebody — 17 in 200 with
   empty hands against 58 with a Thompson — and so does what you put in the hand
   of whoever you send. A search reaches whoever is standing with you.
+- **Taking it off them.** The other half of the claim, and deliberately harder
+  than theirs. A family that has stopped being on any terms with you — at −60 or
+  below — and is worth forty less in this city than your name, and has somewhere
+  else to go, walks out of a room rather than fight over it. Nobody is put out
+  of this city in an afternoon: the last address a family holds cannot be taken.
+  It costs fourteen police attention, gains twelve standing, and every other
+  family thinks ten less of you for watching it happen.
 - **Leaning on somebody else's business.** The mirror of the demand a family
   sends you, and the thing the genre is about that this game could not do:
   walking into a room that is not yours and asking for a share of what it takes.

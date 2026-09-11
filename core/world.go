@@ -1649,6 +1649,11 @@ func (w *World) Actions(id string) []Action {
 		if !w.WouldPay(id) {
 			outcome = "They will not, and they will remember being asked."
 		}
+		if Pushable(w, id) {
+			add("push", "Take "+l.Name+" off "+w.HolderName(id), PushMinutes, 0, w.PushReadiness(id),
+				fmt.Sprintf("They walk out rather than fight over it, which is a thing a family only does when it has counted what you are worth against what they are. Costs %d police attention, gains %d standing, and every other family in this city thinks %d less of you for watching it happen.",
+					PushHeat, PushRespect, PushOthers))
+		}
 		add("demand", "Ask "+w.HolderName(id)+" for a share", DemandMinutes, 0, w.DemandReadiness(id),
 			fmt.Sprintf("A week of what this place takes, which is $%d. Asking costs %d of their opinion of you whatever comes of it, and whether they pay is what they are against what your name is worth. %s",
 				w.TheirShare(id), DemandGrudge, outcome))

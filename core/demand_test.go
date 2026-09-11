@@ -136,3 +136,101 @@ func TestYouCannotLeanOnYourOwnRoomOrAnEmptyOne(t *testing.T) {
 		}
 	}
 }
+
+// And when asking is no longer the point.
+//
+// A family can come for your deed once you have refused them long enough. The
+// player could not do the same: a takeover reaches only a family you serve, and
+// everything else aimed at a rival was a war. A weak family that already hated
+// you could hold a shop on your own street for ever.
+
+func TestAFamilyWalksOutWhenItHasCountedWhatYouAreWorth(t *testing.T) {
+	t.Parallel()
+	w, id, f := leaning(t, 200)
+	f.Goodwill, f.Power = DemandFloor, 20
+	// Somewhere else to go, so this is not the last thing they have.
+	for _, l := range Locations {
+		if l.ID != id && w.Properties[l.ID] != nil && w.Properties[l.ID].Income > 0 && !w.Own(l.ID) {
+			w.Properties[l.ID].Owner = f.ID
+			break
+		}
+	}
+	if len(w.FamilyHoldings(f.ID)) <= PushLeft {
+		t.Skipf("%s holds only %d places", f.Name, len(w.FamilyHoldings(f.ID)))
+	}
+	if reason := w.PushReadiness(id); reason != "" {
+		t.Fatalf("refused: %s", reason)
+	}
+	power, respect, heat := f.Power, w.Player.Respect, w.Player.Heat
+	if err := w.TakeItFromThem(id); err != nil {
+		t.Fatal(err)
+	}
+	if !w.Own(id) {
+		t.Fatal("they stayed")
+	}
+	if f.Power >= power {
+		t.Fatalf("their power went from %d to %d", power, f.Power)
+	}
+	if w.Player.Respect <= respect {
+		t.Fatal("taking a room off a family was worth no standing")
+	}
+	if w.Player.Heat <= heat {
+		t.Fatal("Ward Street did not notice")
+	}
+	// And everybody else in the city did.
+	for i := range w.Factions {
+		if w.Factions[i].ID == f.ID {
+			continue
+		}
+		if w.Factions[i].Goodwill >= 0 {
+			t.Errorf("%s watched it happen and thinks the same of you", w.Factions[i].Name)
+		}
+	}
+}
+
+func TestTheyFightForItUntilTheyHaveStoppedPretending(t *testing.T) {
+	t.Parallel()
+	w, id, f := leaning(t, 200)
+	f.Power = 20
+	// On any sort of terms with you, and they would rather fight.
+	f.Goodwill = DemandFloor + 1
+	if w.PushReadiness(id) == "" {
+		t.Fatalf("they walked out at a standing of %+d where it takes %+d", f.Goodwill, DemandFloor)
+	}
+	// And a family worth more in this city than you are does not walk out of
+	// anywhere, however it feels about you. It is the margin that decides it
+	// rather than either figure on its own: a family at the top of its power
+	// still leaves a room to somebody whose name is worth far more, which is
+	// the rule and not what the first version of this test assumed.
+	f.Goodwill = -100
+	f.Power = w.Presence() - PushMargin + 1
+	if w.PushReadiness(id) == "" {
+		t.Fatalf("a family at power %d walked out for a presence of %d, where it takes %d clear",
+			f.Power, w.Presence(), PushMargin)
+	}
+	f.Power = w.Presence() - PushMargin
+	if w.PushReadiness(id) != "" {
+		t.Fatalf("exactly %d clear and they stayed: %s", PushMargin, w.PushReadiness(id))
+	}
+}
+
+func TestNobodyTakesTheLastThingAFamilyHas(t *testing.T) {
+	t.Parallel()
+	w, id, f := leaning(t, 200)
+	f.Goodwill, f.Power = -100, 10
+	// Everything of theirs but this one.
+	for _, l := range Locations {
+		if l.ID != id && w.Properties[l.ID] != nil && w.Properties[l.ID].Owner == f.ID {
+			w.Properties[l.ID].Owner = "independent"
+		}
+	}
+	if len(w.FamilyHoldings(f.ID)) != 1 {
+		t.Skipf("%s holds %d places", f.Name, len(w.FamilyHoldings(f.ID)))
+	}
+	if w.PushReadiness(id) == "" {
+		t.Fatal("a family was put out of this city in an afternoon")
+	}
+	if err := w.TakeItFromThem(id); err == nil {
+		t.Fatal("and it went through anyway")
+	}
+}

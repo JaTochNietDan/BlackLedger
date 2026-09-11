@@ -11232,3 +11232,41 @@ is how everything else in this city works.
 
 A feature that lands in the right place in the economy without a single number
 being tuned is worth recording, because most of tonight was the opposite.
+
+## Taking it off them
+
+A family can come for your deed once you have refused them long enough. The
+player could not do the same: a takeover reaches only a family you already
+serve, and everything else aimed at a rival was a war. So a weak family that
+hated you could hold a shop on your own street for ever, paying a share every
+time you asked and losing nothing else.
+
+This is the other half, and it is deliberately harder than theirs. They need you
+to be weak on standing. You need them to be weak outright — at the bottom of
+their opinion of you, worth forty less in this city than your name, and with
+somewhere else to go. Nobody is put out of this city in an afternoon: the last
+address a family holds cannot be taken, and the refusal says why.
+
+Three guards in the suite caught things worth catching before any of mine ran.
+
+**A sentence beginning in lower case.** Some families in this city are called
+"the Duarte Brothers", so a refusal written as "%s would fight you for it" opens
+a sentence with a small "the". There is a helper for exactly that and it is used
+now.
+
+**A card refused in every room it appears in.** The take was drawn wherever a
+family held anything, and in a fresh city no family is at −60, so it could never
+be pressed anywhere. It is drawn below zero standing now, where the refusal
+tells the player how far along the path they are instead of being a wall.
+
+**A gendered line.** "A man who takes the last thing somebody has" — somebody
+does.
+
+And one of my own tests asserted something the rule does not say: that a family
+at full power never walks out. It is the margin that decides it, not either
+figure alone, so a family at the top of its power still leaves a room to
+somebody whose name is worth far more. The test measures the margin now, at
+exactly the boundary and one either side.
+
+Four rules, four breaks, four failures. The baseline does not move, because no
+policy has a family at −60 to push.

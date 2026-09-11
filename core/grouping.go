@@ -60,7 +60,7 @@ var actionGroup = map[string]string{
 
 	// Work that can go wrong.
 	"rob": "street", "mug": "street", "sabotage": "street", "move": "street", "frighten": "street",
-	"demand": "street", "incite": "street", "provoke": "street", "takeover": "street", "charge": "street",
+	"demand": "street", "push": "street", "incite": "street", "provoke": "street", "takeover": "street", "charge": "street",
 	"plant": "street", "strip": "street",
 
 	// Becoming somebody.

@@ -641,6 +641,10 @@ func (w *World) apply(c Command) error {
 				if err := w.TakeTheLanding(c.Amount); err != nil {
 					return err
 				}
+			case "push":
+				if err := w.TakeItFromThem(target); err != nil {
+					return err
+				}
 			case "demand":
 				if err := w.DemandAShare(target); err != nil {
 					return err

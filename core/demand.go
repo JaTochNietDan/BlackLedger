@@ -93,3 +93,108 @@ func (w *World) DemandAShare(id string) error {
 			paid, f.Name, f.Goodwill), "politics")
 	return nil
 }
+
+// And when asking is no longer the point.
+//
+// A family can come for your deed once you have refused them long enough. The
+// player could not do the same to them: a takeover reaches only a family you
+// serve, and everything else aimed at a rival was a war. So a weak family that
+// already hates you could go on holding a shop on your own street for ever,
+// paying you a share every time you asked and losing nothing else.
+//
+// This is the other half of the claim, and it is deliberately harder than
+// theirs. They need you to be weak on standing; you need them to be weak
+// outright — beaten down below what your name is worth by a wide margin, at the
+// bottom of their opinion of you, with somewhere else to go. Nobody is wiped out
+// of this city in an afternoon.
+
+const (
+	// PushMinutes is how long it takes to say and be believed.
+	PushMinutes = 90
+	// PushMargin is how far your name has to be above what a family is before
+	// they will walk out of a room rather than fight for it.
+	PushMargin = 40
+	// PushLeft is how many other places they have to hold. A family with one
+	// address left is a family with nothing to lose, and taking the last thing
+	// a family has is a different kind of trouble.
+	PushLeft = 1
+	// PushRespect and PushHeat are what the street and Ward Street make of it.
+	PushRespect = 12
+	PushHeat    = 14
+	// PushPower is what it takes out of them.
+	PushPower = 12
+)
+
+// Pushable reports whether this is a room worth even asking about — somebody
+// else's, and held by a family that has stopped being on terms with the player.
+//
+// The card is drawn on that rather than on the whole rule, because a card that
+// is refused in every room it ever appears in is a card nobody can press, and
+// this game has a guard for exactly that. Below nothing they are on the path to
+// walking out, and the refusal tells the player how far along it they are.
+func Pushable(w *World, id string) bool {
+	if !Leaning(w, id) {
+		return false
+	}
+	f := w.faction(w.Properties[id].Owner)
+	return f != nil && f.Goodwill < 0
+}
+
+// PushReadiness explains why a family will not walk out of this room, or "".
+func (w *World) PushReadiness(id string) string {
+	if w.Player.Location != id {
+		return "This is said in the room"
+	}
+	if !Leaning(w, id) {
+		return "There is nobody here to take it from"
+	}
+	f := w.faction(w.Properties[id].Owner)
+	if f.Goodwill > DemandFloor {
+		// upper1, because a family in this city can be called "the Duarte
+		// Brothers" and a sentence that starts with one starts in lower case.
+		return fmt.Sprintf("%s would fight you for it. They think of you at %+d and it takes %+d", upper1(f.Name), f.Goodwill, DemandFloor)
+	}
+	if w.Presence() < f.Power+PushMargin {
+		return fmt.Sprintf("%s is worth more in this city than you are. You need %d presence against their %d",
+			upper1(f.Name), f.Power+PushMargin, f.Power)
+	}
+	if len(w.FamilyHoldings(f.ID)) <= PushLeft {
+		return upper1(f.Name) + " has nowhere else to go, and somebody who takes the last thing a family has is in a different kind of trouble"
+	}
+	return ""
+}
+
+// DemandFloor is the standing at or below which a family has stopped pretending
+// to be on terms with the player, which is what it takes before they will give
+// up a room rather than fight over it.
+const DemandFloor = -60
+
+// TakeItFromThem walks in and takes the deed.
+func (w *World) TakeItFromThem(id string) error {
+	if reason := w.PushReadiness(id); reason != "" {
+		return fmt.Errorf("%s", reason)
+	}
+	prop := w.Properties[id]
+	f := w.faction(prop.Owner)
+	place, _ := PlaceByID(id)
+	prop.Owner = fmt.Sprintf("player:%d", w.Life)
+	f.Power = max(0, f.Power-PushPower)
+	f.Goodwill = -100
+	w.Player.Respect += PushRespect
+	w.Player.Heat = min(100, w.Player.Heat+PushHeat)
+	// Nobody else in the city is pleased about it either. A man who takes a
+	// room off one family is a man who might take one off another.
+	for i := range w.Factions {
+		if w.Factions[i].ID != f.ID && w.Factions[i].ID != w.PlayerOrganizationID() {
+			w.Factions[i].Goodwill = max(-100, w.Factions[i].Goodwill-PushOthers)
+		}
+	}
+	w.Log("They walked out of "+place.Name,
+		fmt.Sprintf("%s is yours. Nobody raised a hand, because %s %s what it would cost and %s %s somewhere else to be. Every family in this city heard about it by the evening.",
+			place.Name, Leads(f.Name), Agree(f.Name, "counted", "counted"), Leads(f.Name), Agree(f.Name, "has", "have")), "politics")
+	w.RetaliationFrom(f.ID)
+	return nil
+}
+
+// PushOthers is what the rest of the city makes of watching it happen.
+const PushOthers = 10
