@@ -50,14 +50,16 @@ import "testing"
 // and buys fourteen branches of scene where the harness used to take one. A
 // branch nobody answers is code nobody runs, and handing a family a business
 // was unreachable by this entire harness the day it shipped.
-const kindsTheHarnessPlays = 81
+// Ninety-two with the distiller, which brings a still and its own cellar —
+// the two ends of the one chain in this game the player owns both of.
+const kindsTheHarnessPlays = 92
 
 func TestTheHarnessPlaysEnoughOfTheGame(t *testing.T) {
 	t.Parallel()
 	every := map[string]bool{}
 	for _, strategy := range []string{
 		"worker", "investor", "defiant", "reckless", "thief",
-		"smuggler", "racketeer", "publican", "magpie",
+		"smuggler", "racketeer", "publican", "magpie", "distiller",
 	} {
 		for seed := uint32(1); seed <= 2; seed++ {
 			r := Run(seed*2654435761, strategy, "fixture", 700, false)

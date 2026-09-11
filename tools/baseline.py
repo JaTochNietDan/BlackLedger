@@ -23,6 +23,7 @@ ORDER = (
     "racketeer",
     "publican",
     "magpie",
+    "distiller",
 )
 
 # Days as well as deaths and cash.

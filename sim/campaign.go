@@ -268,6 +268,15 @@ func Public(w *core.World) View {
 	}
 	return v
 }
+
+// StillMoney is what the distiller keeps back before putting a still in, so
+// that the room it goes behind is not left unable to feed anybody.
+const StillMoney = 900
+
+// CellarTopUp is how thin a room of the distiller's gets before it goes down
+// its own steps rather than into the till.
+const CellarTopUp = 25
+
 func (v View) place(id string) Place {
 	for _, p := range v.Locations {
 		if p.ID == id {
@@ -808,6 +817,79 @@ func Choose(v View, strategy string) (core.Command, error) {
 				}
 			}
 		}
+	}
+	// The distiller runs the one chain in this game that has two ends the player
+	// owns: a still at the back of a laundry makes crates, and a room that sells
+	// drink can be filled out of them instead of out of the till. Both halves
+	// were built and neither had ever been played, which is what "no policy does
+	// this" meant in two nights of this log running.
+	//
+	// It is a separate policy rather than a habit added to the publican. Giving
+	// the publican a still cost it a sixth of its money and most of its hiring:
+	// a still draws attention and eats the laundry's supply, and a publican that
+	// pays for both without ever reaching a bar is a policy that has been made
+	// worse to measure something else. Its baseline is the thing this harness
+	// is for.
+	if strategy == "distiller" {
+		if v.Player.Health < 85 {
+			if c, ok := v.at(v.Player.Home, "rest"); ok {
+				return c, nil
+			}
+		}
+		// A still where it is standing, once there is money behind it. `at`
+		// would travel, and a scan that travels to each property in turn walks
+		// all day.
+		if v.Player.Cash >= StillMoney {
+			if c, ok := v.action(v.Player.Location, "still"); ok {
+				return c, nil
+			}
+		}
+		for _, p := range v.Locations {
+			if !p.Owned || p.Income <= 0 {
+				continue
+			}
+			if p.Runs == "" {
+				for _, h := range p.Hands {
+					if c, ok := v.at(p.ID, "incharge:"+h.ID); ok {
+						return c, nil
+					}
+				}
+			}
+			if p.Staff < p.Positions {
+				if c, ok := v.at(p.ID, "hire"); ok {
+					return c, nil
+				}
+			}
+			// Its own cellar whenever there is room for it, rather than only
+			// when the room has run dry. Somebody in charge restocks a place
+			// out of the till on their own, so waiting for empty means waiting
+			// for a thing that rarely happens — and a distiller's crates are
+			// free and are drawing attention while they sit on him. Waiting
+			// pressed this card once in a hundred campaigns.
+			if p.Supply < CellarTopUp {
+				if c, ok := v.at(p.ID, "own_cellar"); ok {
+					return c, nil
+				}
+			}
+			if p.Supply <= 0 {
+				if c, ok := v.at(p.ID, "restock"); ok {
+					return c, nil
+				}
+			}
+		}
+		// A room the city drinks in, which is the other end of the still and
+		// is not on the investor's ladder at all. Bought once the laundry is
+		// paying for itself, so the policy is not carrying two mortgages.
+		if v.place("laundry").Owned && !v.place("saloon").Owned &&
+			v.Player.Cash >= v.place("saloon").Cost {
+			if c, ok := v.at("saloon", "acquire"); ok {
+				return c, nil
+			}
+		}
+		// Everything else an investor does — the crew, the home, the security,
+		// the rest of the premises. The distiller is an investor who owns a
+		// still and a bar.
+		strategy = "investor"
 	}
 	if strategy == "publican" {
 		// Everything else the investor does: the crew, the home, the security

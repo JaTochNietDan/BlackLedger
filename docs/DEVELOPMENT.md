@@ -11766,3 +11766,43 @@ policy owns a garage and strips cars. Two links in two nights that the harness
 cannot price is a thing worth saying out loud rather than burying — the measures
 are silent on both, and what stands behind them is the guard and the reading,
 not the numbers.
+
+## A policy that owns both ends
+
+Two nights of links ended the same way: "nothing in the simulation moved, because
+no policy does this". That is a gap in the harness, not a fact about the game,
+and leaving it twice was one time too many.
+
+The distiller owns both ends of the one chain in this game the player can own
+both of. A still at the back of a laundry makes crates; a room that sells drink
+can be filled out of them instead of out of the till. It buys the laundry, puts
+a still in once there is money behind it, buys a saloon — which is on nobody
+else's ladder — and goes down its own steps rather than to the wholesaler.
+
+It is a separate policy and that was the second attempt. **The first gave the
+publican a still, and cost it a sixth of its money and most of its hiring**:
+$25,530 down to $21,691, thirty people hired across a hundred campaigns down to
+two. A still draws attention and eats the laundry's supply, and a publican that
+pays for both without ever reaching a bar is a policy made worse in order to
+measure something else. Its baseline is what the harness is for.
+
+Before that there was a worse version still, and it is the more useful lesson.
+The still was looked for across every property the player owned, using the
+helper that *travels* when the player is somewhere else. A scan that travels to
+each property in turn is a policy that walks all day: it ping-ponged between a
+laundry and a garage, because the second refuses a still — one place is enough —
+and the campaign was spent on the road. Acquisitions fell from 331 to 100 and
+wages from 317 to none. A still is opportunistic now: built where the policy is
+already standing.
+
+What it measures, plainly. At four hundred commands the chain completes **once in
+a hundred campaigns** — twenty-five days is barely enough to own two businesses,
+put a still in one and carry crates to the other. At fifteen hundred it is
+fourteen in a hundred, with a hundred and eight restocks beside them. So the
+card is now played rather than merely reachable, and the honest figure is the
+first one, not the second.
+
+Coverage goes from 81 kinds of action to 92. The distiller ends at $26,908, the
+richest policy in the harness, which is a thing to watch rather than to
+celebrate: it is one campaign length and one city, and a chain that pays for
+itself should not also pay better than running four businesses properly.

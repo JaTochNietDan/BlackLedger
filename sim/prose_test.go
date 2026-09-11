@@ -24,7 +24,7 @@ func TestNothingAPlayedCitySaysIsMalformed(t *testing.T) {
 	campaigns, bad := 0, 0
 	for _, strategy := range []string{
 		"worker", "investor", "defiant", "reckless", "thief",
-		"smuggler", "racketeer", "publican", "magpie",
+		"smuggler", "racketeer", "publican", "magpie", "distiller",
 	} {
 		for seed := uint32(1); seed <= runs; seed++ {
 			r := Run(seed*2654435761, strategy, "fixture", 700, false)
