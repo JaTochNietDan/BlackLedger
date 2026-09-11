@@ -10455,3 +10455,43 @@ are reachable and simply not yet wanted.
 The thing worth carrying out of this: five separate times tonight a measurement
 was read as a fact about the game — the early game is lethal, the city is
 closed, a policy cannot afford to explore — and five times it was the instrument.
+
+## Two rules that contradicted each other, and a sed that hit three policies
+
+Eight kinds of action — mugging, striking, robbing, charging, planting, sabotage,
+provoking, moving on a family — were unreachable by the exploring policy for a
+reason that had nothing to do with the game. It would not take an attempt on
+anybody below full health, and it only rested when it was already above
+ninety-two, so the two numbers could never both be satisfied. It was above ninety
+for ten steps out of twelve hundred.
+
+Underneath that was a second one. Taking only what it had never taken means
+every kind of thing happens exactly once, resting included: nine rests in twelve
+hundred commands, and a median health of seventy that never climbed. Resting is
+upkeep, not something to be curious about once, so it sits with the earning rule
+above the exploring rule now.
+
+With the two agreeing it reaches eighty-seven kinds and dies in every run at
+twenty-five days. That is the game answering rather than the instrument failing —
+a policy that walks up to everybody in the city gets killed — and twenty-five
+days at eighty-seven kinds is a better instrument than seventy days at
+eighty-one, so that is the setting. The death rate is the finding.
+
+### The part worth writing down
+
+While tuning those two numbers, `sed 's/Health < 85/Health < 70/'` changed
+**four** places in the file and only one of them was the magpie's. The other
+three belong to other policies, so the thief went from 75 deaths to 61 and the
+racketeer from 34 to 45, and the baseline printed those changed figures as if
+they meant something.
+
+It was caught by noticing that columns which had no business moving had moved,
+and confirmed by running the committed tree and the working tree side by side:
+thief 94 deaths and $829 both times once the three were put back. That check took
+one command and should be the reflex whenever a balance number shifts for a
+change that had no business touching it.
+
+This is the second time tonight a blunt global substitution has done damage — the
+first shredded the stylesheet. The rule is the same in both: a file where the
+same expression appears in several independent places cannot be edited by
+pattern, only by position.

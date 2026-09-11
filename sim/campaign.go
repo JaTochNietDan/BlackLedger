@@ -468,6 +468,20 @@ func Choose(v View, strategy string) (core.Command, error) {
 		// offered were the free ones and eight runs reached six kinds of thing
 		// — fewer than the eight policies with plans. A policy that means to
 		// see the whole game has to be able to afford the whole game.
+		// Upkeep before curiosity, and resting is upkeep.
+		//
+		// Taking only what it has never taken meant every kind of thing
+		// happened exactly once, resting included: nine times in twelve hundred
+		// commands, and a median health of seventy that never climbed. Which in
+		// turn meant it could never be well enough to take an attempt on
+		// anybody — it was above ninety for ten steps out of twelve hundred —
+		// so eight kinds of action stayed out of reach for a reason that had
+		// nothing to do with the game.
+		if v.Player.Health < 70 {
+			if c, ok := v.at(v.Player.Home, "rest"); ok {
+				return c, nil
+			}
+		}
 		if v.Player.Cash < 1500 {
 			if c, ok := v.at("docks", "dockwork"); ok {
 				return c, nil
@@ -547,7 +561,14 @@ func Choose(v View, strategy string) (core.Command, error) {
 			// nobody else reached and then died before it could reach a tenth.
 			// It will still do all of them — it simply waits until it is in a
 			// condition to survive them.
-			if violent[root(a.ID)] && v.Player.Health < 100 {
+			// Fit enough to survive it, which has to be a figure resting can
+			// actually reach. Requiring full health while resting stopped at
+			// ninety-two meant the two rules contradicted each other and the
+			// policy could never take an attempt on anybody at all: mugging,
+			// striking, robbing, charging, planting, sabotage, provoking and
+			// moving on a family — eight kinds of action — were locked out by
+			// arithmetic rather than by any decision.
+			if violent[root(a.ID)] && v.Player.Health < 90 {
 				continue
 			}
 			// By kind, not by person.
