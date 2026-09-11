@@ -33,11 +33,31 @@ var armour = []Armament{
 // ArmsSource is where arms change hands: off a boat, not over a counter.
 func ArmsSource(id string) bool { return id == "docks" }
 
-func nextArmament(list []Armament, tier int) (Armament, bool) {
-	if tier+1 >= len(list) {
-		return Armament{}, false
+// Armaments is everything of this kind that can be had, without the empty
+// hands at the top of the list. The dock offered exactly one of each — the next
+// one up — so getting a Thompson meant buying a revolver and a shotgun first
+// and throwing both away: "when buying guns/armor and whatnot I don't think you
+// should have to progress through them, you should be able to buy any of them
+// at any time, you don't need to go through some sort of upgrade cycle."
+//
+// Everything is on the counter now, each at its own price. What you cannot do
+// is pay for something worse than what you are already carrying, and the card
+// says so rather than going quiet: a revolver bought over a Thompson would be a
+// trap, not a choice, because nothing in this city rewards carrying less gun.
+func Armaments(kind string) []Armament {
+	list := weapons
+	if kind == "armour" {
+		list = armour
 	}
-	return list[tier+1], true
+	return append([]Armament{}, list[1:]...)
+}
+
+// carrying is what the player has of this kind.
+func (w *World) carrying(kind string) int {
+	if kind == "armour" {
+		return w.Player.Armour
+	}
+	return w.Player.Weapon
 }
 
 // WeaponEdge is how much a weapon shifts the odds of violence the player
@@ -52,36 +72,41 @@ func (w *World) Absorb(injury int) int {
 }
 
 // ArmsReadiness explains why an upgrade cannot be bought, or returns "".
-func (w *World) ArmsReadiness(kind string) string {
+func (w *World) ArmsReadiness(kind string, tier int) string {
 	if !ArmsSource(w.Player.Location) {
 		return "Nobody sells this here"
 	}
 	list := weapons
-	tier := w.Player.Weapon
 	if kind == "armour" {
-		list, tier = armour, w.Player.Armour
+		list = armour
 	}
-	next, ok := nextArmament(list, tier)
-	if !ok {
-		return "There is nothing better to be had"
+	if tier <= 0 || tier >= len(list) {
+		return "Nobody sells this here"
 	}
-	if w.Player.Cash < next.Cost {
+	have := w.carrying(kind)
+	if tier == have {
+		return "You are carrying it"
+	}
+	if tier < have {
+		return "You are already carrying something better"
+	}
+	if w.Player.Cash < list[tier].Cost {
 		return "Not enough cash"
 	}
 	return ""
 }
 
-// BuyArms takes the next step up. Holding arms is itself a reason for the
-// police to take an interest.
-func (w *World) BuyArms(kind string) error {
-	if reason := w.ArmsReadiness(kind); reason != "" {
+// BuyArms buys the one that was asked for, whichever it is. Holding arms is
+// itself a reason for the police to take an interest.
+func (w *World) BuyArms(kind string, tier int) error {
+	if reason := w.ArmsReadiness(kind, tier); reason != "" {
 		return fmt.Errorf("%s", reason)
 	}
-	list, tier := weapons, w.Player.Weapon
+	list := weapons
 	if kind == "armour" {
-		list, tier = armour, w.Player.Armour
+		list = armour
 	}
-	next, _ := nextArmament(list, tier)
+	next := list[tier]
 	if err := w.Pay(next.Cost); err != nil {
 		return err
 	}

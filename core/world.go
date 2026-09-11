@@ -1075,15 +1075,18 @@ func (w *World) Actions(id string) []Action {
 				PlateCost, PlateMinutes/60, int(PlateCover*100), int(PlateWeight*100), w.Plating(), PlateStages))
 	case "docks":
 		add("dockwork", "Work the night cargo", 90, 0, "", "Earn $75 and 1 respect. Small chance of a work injury.")
-		if next, ok := nextArmament(weapons, p.Weapon); ok {
-			asks("arms:weapon", "Buy "+next.Label, 45, next.Cost, w.ArmsReadiness("weapon"),
-				fmt.Sprintf("$%d. %s Improves your odds when violence is your idea. A search takes it.", next.Cost, next.Detail))
+		// Everything on the counter, each at its own price, in any order.
+		for _, arm := range Armaments("weapon") {
+			asks(fmt.Sprintf("arms:weapon:%d", arm.Tier), "Buy "+arm.Label, 45, arm.Cost,
+				w.ArmsReadiness("weapon", arm.Tier),
+				fmt.Sprintf("$%d. %s Improves your odds when violence is your idea. A search takes it.", arm.Cost, arm.Detail))
 		}
 		asks("charge", "Buy a charge off a boat", ChargeMinutes, ChargeCost, w.ChargeReadiness(),
 			fmt.Sprintf("$%d. Not a message: a declaration. Wrecks a business outright, kills whoever was standing in it about a third of the time, and cannot be mistaken for anything else. Draws %d police attention a day while you hold it, and a search that finds it is a prosecution rather than a fine.", ChargeCost, ChargeHeat))
-		if next, ok := nextArmament(armour, p.Armour); ok {
-			asks("arms:armour", "Buy "+next.Label, 45, next.Cost, w.ArmsReadiness("armour"),
-				fmt.Sprintf("$%d. %s Reduces what a beating costs you. A search takes it.", next.Cost, next.Detail))
+		for _, arm := range Armaments("armour") {
+			asks(fmt.Sprintf("arms:armour:%d", arm.Tier), "Buy "+arm.Label, 45, arm.Cost,
+				w.ArmsReadiness("armour", arm.Tier),
+				fmt.Sprintf("$%d. %s Reduces what a beating costs you. A search takes it.", arm.Cost, arm.Detail))
 		}
 	case "herald":
 		for _, o := range officials {
@@ -2112,6 +2115,10 @@ func (w *World) Advance(minutes int) {
 			w.ArmouryDay()
 			w.RecruitDay()
 			w.FillRoles()
+			// And the offices, which are roles the city hall fills rather than
+			// the street: an editor who is killed left the desk empty for the
+			// rest of the campaign.
+			w.ensureOfficials()
 			w.CustomDay()
 			w.OrderDay()
 			w.OrganizationDay()

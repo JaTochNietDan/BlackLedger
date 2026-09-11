@@ -9051,3 +9051,36 @@ no wall in front of it cannot be closed.
 
 Live after the restart: thirty-five actions in the room the player is standing
 in, ten of them refused, all thirty-five on the page.
+
+## Two things the city forgot to replace
+
+"When buying guns/armor and whatnot I don't think you should have to progress
+through them, you should be able to buy any of them at any time, you don't need
+to go through some sort of upgrade cycle."
+
+The dock offered exactly one weapon and one vest — the next one up — so a
+Thompson meant buying a revolver and a shotgun first and throwing both away.
+Everything is on the counter now, each at its own price, in any order. What you
+cannot do is pay for something worse than what you carry: nothing in this city
+rewards carrying less gun, and the card says why rather than going quiet.
+
+"Nobody has taken over the Bellweather after I killed them."
+
+An office is not a person. `ensureOfficials` asked whether the person existed
+rather than whether the desk was filled, and a dead man exists — so the editor's
+chair stayed empty for the rest of the campaign, and it only ran when a world
+was made rather than every day.
+
+The game already said what should happen. Asking the dead one for an arrangement
+was refused with "they are dead, whoever replaces them does not know you", and
+nobody was ever written to replace them. Somebody is behind the desk within a
+day now, found the same way a role on the street is; the newspaper reports it;
+and whatever the player had arranged lapses, because an understanding is with a
+person and not with a building.
+
+Every question about an office asks who is doing that job rather than asking for
+the first holder by name, which is the third time tonight that shape has been
+the fault: the fixer crash, the coffee bought for a dead woman, and this.
+
+Checked against a copy of the live save: the mayor and the editor were both
+empty, and both were filled on the next day.

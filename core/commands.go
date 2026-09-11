@@ -357,6 +357,17 @@ func (w *World) apply(c Command) error {
 				return err
 			}
 			w.Advance(a.Minutes)
+		} else if what, ok := strings.CutPrefix(c.Kind, "arms:"); ok && strings.Contains(what, ":") {
+			// "arms:weapon:3" — which kind, and which one of them.
+			kind, at, _ := strings.Cut(what, ":")
+			tier, err := strconv.Atoi(at)
+			if err != nil {
+				return fmt.Errorf("there is no such thing on the counter")
+			}
+			if err := w.BuyArms(kind, tier); err != nil {
+				return err
+			}
+			w.Advance(a.Minutes)
 		} else if to, ok := strings.CutPrefix(c.Kind, "sit:"); ok {
 			// Which of the two things in the room. The room is where the
 			// player is standing; a bar and a poolhall each have a floor and a
@@ -538,7 +549,10 @@ func (w *World) apply(c Command) error {
 					return err
 				}
 			case "arms:weapon", "arms:armour":
-				if err := w.BuyArms(strings.TrimPrefix(c.Kind, "arms:")); err != nil {
+				// A save or a client from before every gun was on the counter,
+				// which asked for whatever came next.
+				if err := w.BuyArms(strings.TrimPrefix(c.Kind, "arms:"),
+					w.carrying(strings.TrimPrefix(c.Kind, "arms:"))+1); err != nil {
 					return err
 				}
 			case "trip:rockridge", "trip:kingsport", "trip:halloway":

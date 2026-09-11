@@ -83,16 +83,82 @@ func Officials() []Official { return officials }
 // might first be needed.
 func (w *World) ensureOfficials() {
 	for _, o := range officials {
-		if w.NPC(o.ID) != nil {
+		if w.OfficeHolder(o.ID) != nil {
 			continue
 		}
-		w.NPCs = append(w.NPCs, NPC{
-			ID: o.ID, Name: o.Name, Role: o.Role, Voice: w.voiceFor(o.Name),
-			Color: "#7c8791", Location: o.Place(), Rank: RankLieutenant,
-			Ambition: 55, Skill: 30,
-		})
-		w.SettlePurses()
+		if w.NPC(o.ID) == nil {
+			w.NPCs = append(w.NPCs, NPC{
+				ID: o.ID, Name: o.Name, Role: o.Role, Voice: w.voiceFor(o.Name),
+				Color: "#7c8791", Location: o.Place(), Rank: RankLieutenant,
+				Ambition: 55, Skill: 30,
+			})
+			w.SettlePurses()
+			continue
+		}
+		// The office is empty because whoever held it is dead. Somebody else is
+		// doing that job by the end of the week — an office is not a person,
+		// and this one stayed empty for the rest of the campaign: "nobody has
+		// taken over the Bellweather after I killed them."
+		//
+		// The game already said what should happen. Asking the dead one for an
+		// arrangement was refused with "they are dead, whoever replaces them
+		// does not know you", and nobody was ever written to replace them.
+		w.takeTheOffice(o)
 	}
+}
+
+// OfficeHolder is whoever is doing that job now, which is not always the person
+// the campaign started with. Every question about an office asks this rather
+// than asking for the first holder by name.
+func (w *World) OfficeHolder(id string) *NPC {
+	o, ok := OfficialByID(id)
+	if !ok {
+		return nil
+	}
+	if seed := w.NPC(id); seed != nil && !seed.Dead {
+		return seed
+	}
+	for i := range w.NPCs {
+		if n := &w.NPCs[i]; !n.Dead && n.Role == o.Role {
+			return n
+		}
+	}
+	return nil
+}
+
+// takeTheOffice puts somebody else behind the desk, and lapses whatever the
+// player had arranged with the last one: an understanding is with a person, not
+// with a building.
+func (w *World) takeTheOffice(o Official) {
+	successor := w.nearestTo(o.Place())
+	if successor == nil {
+		successor = w.AddCivilian()
+	}
+	if successor == nil {
+		return
+	}
+	successor.Role, successor.Location = o.Role, o.Place()
+	successor.Faction, successor.Rank = "", RankLieutenant
+	successor.Trust = 0 // a stranger is a stranger, whatever the last one knew
+	kept := make([]string, 0, len(w.Player.Retainers))
+	lapsed := false
+	for _, held := range w.Player.Retainers {
+		if held == o.ID {
+			lapsed = true
+			continue
+		}
+		kept = append(kept, held)
+	}
+	w.Player.Retainers = kept
+	note := ""
+	if lapsed {
+		note = " Whatever you had arranged with the last one is not an arrangement any more."
+	}
+	w.Log("Somebody else is behind that desk",
+		fmt.Sprintf("%s is the %s now.%s", successor.Name, lowerFirst(o.Role), note), "politics")
+	w.Report("politics", upper(successor.Name)+" TAKES OVER AS "+upper(o.Role),
+		fmt.Sprintf("%s is doing the work of the %s now. The change was not explained and nobody has said where the last one went.",
+			successor.Name, lowerFirst(o.Role)))
 }
 
 // Retained reports whether an official is currently taking the player's money
@@ -177,8 +243,11 @@ func (w *World) RetainerReadiness(id string) string {
 	if w.Player.Location != o.Place() {
 		return "This is not arranged here"
 	}
-	if n := w.NPC(id); n != nil && n.Dead {
-		return "They are dead. Whoever replaces them does not know you"
+	// Whoever is behind that desk now, which is not always the person the
+	// campaign started with. Asking for the dead one for ever was the old
+	// answer, because nobody was ever written to replace them.
+	if w.OfficeHolder(id) == nil {
+		return "There is nobody behind that desk this week"
 	}
 	if w.Retained(id) {
 		return "That arrangement already stands"

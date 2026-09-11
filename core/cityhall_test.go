@@ -251,3 +251,98 @@ func TestALicenceIsWorthWhatItSays(t *testing.T) {
 	}
 	t.Logf("a laundry earns $%.3f a minute unlicensed and $%.3f with the mayor paid, which is %.0f%% more", without, with, (with/without-1)*100)
 }
+
+// An office is not a person. The editor of the Bellwether Herald was killed and
+// the desk stayed empty for the rest of the campaign: "nobody has taken over the
+// Bellweather after I killed them."
+//
+// The game already said what should happen — asking the dead one for an
+// arrangement was refused with "they are dead, whoever replaces them does not
+// know you" — and nobody was ever written to replace them. `ensureOfficials`
+// asked whether the person existed rather than whether the office was filled,
+// and a dead man exists.
+func TestSomebodyElseTakesAnEmptyOffice(t *testing.T) {
+	t.Parallel()
+	for _, o := range Officials() {
+		w := New(61)
+		w.Event, w.District = nil, 9
+		was := w.OfficeHolder(o.ID)
+		if was == nil {
+			t.Fatalf("%s has nobody in it to begin with", o.Role)
+		}
+		for i := range w.NPCs {
+			if w.NPCs[i].ID == was.ID {
+				w.NPCs[i].Dead = true
+			}
+		}
+		if w.OfficeHolder(o.ID) != nil {
+			t.Fatalf("%s was killed and is still behind the desk", was.Name)
+		}
+		// A day of the city, which is when it notices.
+		w.Event = nil
+		w.Advance(1440)
+		w.Event = nil
+		now := w.OfficeHolder(o.ID)
+		if now == nil {
+			t.Fatalf("%s was killed and nobody is doing the work of the %s", was.Name, o.Role)
+		}
+		if now.ID == was.ID || now.Dead {
+			t.Fatalf("the dead %s is still the %s", was.Name, o.Role)
+		}
+		if now.Role != o.Role {
+			t.Fatalf("%s took the office and is described as a %q", now.Name, now.Role)
+		}
+		if now.Location != o.Place() {
+			t.Fatalf("the new %s works somewhere other than %s", o.Role, o.Place())
+		}
+	}
+}
+
+// And whatever the player had arranged with the last one is not an arrangement
+// any more. An understanding is with a person, not with a building — the game
+// has always said the replacement does not know you.
+func TestAnUnderstandingDiesWithTheOfficialWhoMadeIt(t *testing.T) {
+	t.Parallel()
+	w := New(61)
+	w.Event, w.District = nil, 9
+	was := w.OfficeHolder("editor")
+	if was == nil {
+		t.Fatal("no editor to begin with")
+	}
+	w.Player.Retainers = append(w.Player.Retainers, "editor")
+	if !w.Retained("editor") {
+		t.Fatal("the arrangement did not stand in the first place")
+	}
+	cost := w.RetainerCost()
+	if cost == 0 {
+		t.Fatal("an arrangement that costs nothing measures nothing")
+	}
+	for i := range w.NPCs {
+		if w.NPCs[i].ID == was.ID {
+			w.NPCs[i].Dead = true
+		}
+	}
+	w.Event = nil
+	w.Advance(1440)
+	w.Event = nil
+	if w.Retained("editor") {
+		t.Fatal("the arrangement outlived the man who made it")
+	}
+	// And it is gone from the books rather than only reading as lapsed. A dead
+	// man's name left in the list is a bill that comes back the moment anybody
+	// asks the question a different way — and it is saved state, so it comes
+	// back tomorrow too.
+	for _, held := range w.Player.Retainers {
+		if held == "editor" {
+			t.Fatal("the player's book still has an arrangement with the office written in it")
+		}
+	}
+	if w.RetainerCost() >= cost {
+		t.Fatalf("the player is still paying $%d a day to a dead man", w.RetainerCost())
+	}
+	// And the desk can be dealt with again, by whoever is behind it.
+	w.Player.Location = "herald"
+	if reason := w.RetainerReadiness("editor"); reason == "They are dead. Whoever replaces them does not know you" {
+		t.Fatal("the city still thinks the office is held by the man who was killed")
+	}
+}

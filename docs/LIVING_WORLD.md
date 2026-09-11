@@ -150,6 +150,29 @@ Ensure efficiency of development loops by increasing efficiency of your workflow
 
 ## Inbox — open
 
+Nobody has taken over the Bellweather after I killed them
+
+— answered. An office is not a person. The city hall's offices were seeded once
+  and asked whether the person existed rather than whether the desk was filled,
+  and a dead man exists — so the editor's chair stayed empty for the rest of the
+  campaign. Somebody else is behind it within a day now, the newspaper reports
+  the change, and whatever you had arranged with the last one lapses, because an
+  understanding is with a person and not with a building. Checked against a copy
+  of your own save: the mayor and the editor were both empty and both filled on
+  the next day.
+
+---
+
+When buying guns/armor and whatnot I don't think you should have to progress through them, you should be able to buy any of them at any time, you don't need to go through some sort of upgrade cycle
+
+— answered. Everything is on the counter at the docks now, each at its own
+  price, and a Thompson can be the first thing you buy. The one you are carrying
+  says so, and one worse than it is refused with a reason rather than going
+  quiet: nothing in this city rewards carrying less gun, so buying down would be
+  a trap rather than a choice.
+
+---
+
 When playing slots, it should scroll through the items before displaying the final result. Right now they just shake but the result is shown already. You should really try to animate it smooth and nicely.
 
 ---

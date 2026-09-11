@@ -1,6 +1,10 @@
 package core
 
-import "testing"
+import (
+	"fmt"
+	"strings"
+	"testing"
+)
 
 func armed(t *testing.T) *World {
 	t.Helper()
@@ -13,42 +17,91 @@ func armed(t *testing.T) *World {
 func TestArmsComeOffABoatAndNowhereElse(t *testing.T) {
 	t.Parallel()
 	w := armed(t)
-	if w.ArmsReadiness("weapon") != "" {
-		t.Fatal("the waterfront refused to sell:", w.ArmsReadiness("weapon"))
+	if w.ArmsReadiness("weapon", 1) != "" {
+		t.Fatal("the waterfront refused to sell:", w.ArmsReadiness("weapon", 1))
 	}
 	for _, elsewhere := range []string{"bar", "market", "club", "room"} {
 		w.Player.Location = elsewhere
-		if w.ArmsReadiness("weapon") == "" {
+		if w.ArmsReadiness("weapon", 1) == "" {
 			t.Fatalf("%s was selling guns", elsewhere)
 		}
-		if err := w.BuyArms("weapon"); err == nil {
+		if err := w.BuyArms("weapon", 1); err == nil {
 			t.Fatalf("bought a gun at %s", elsewhere)
 		}
 	}
 }
 
-func TestBuyingArmsWorksUpwardAndRunsOut(t *testing.T) {
+// Everything is on the counter, each at its own price, and none of it has to be
+// climbed to. The dock offered exactly one of each — the next one up — so a
+// Thompson meant buying a revolver and a shotgun first and throwing both away:
+// "when buying guns/armor and whatnot I don't think you should have to progress
+// through them, you should be able to buy any of them at any time, you don't
+// need to go through some sort of upgrade cycle."
+func TestEveryGunIsOnTheCounterAtOnce(t *testing.T) {
 	t.Parallel()
 	w := armed(t)
 	w.Player.Cash = 100000
-	for tier := 1; tier < len(weapons); tier++ {
-		if err := w.BuyArms("weapon"); err != nil {
-			t.Fatal(err)
-		}
-		if w.Player.Weapon != tier {
-			t.Fatalf("expected tier %d, got %d", tier, w.Player.Weapon)
+	// Every one of them is offered, and the best of them can be had first.
+	offered := map[string]bool{}
+	for _, a := range w.Actions("docks") {
+		if strings.HasPrefix(a.ID, "arms:") {
+			offered[a.ID] = !a.Disabled
 		}
 	}
-	if w.ArmsReadiness("weapon") == "" {
-		t.Fatal("there was something better than the best")
+	for _, kind := range []string{"weapon", "armour"} {
+		for _, arm := range Armaments(kind) {
+			id := fmt.Sprintf("arms:%s:%d", kind, arm.Tier)
+			ready, ok := offered[id]
+			if !ok {
+				t.Fatalf("%s is not on the counter at all", arm.Label)
+			}
+			if !ready {
+				t.Fatalf("%s is on the counter and refused to somebody with $100,000", arm.Label)
+			}
+		}
 	}
-	if err := w.BuyArms("weapon"); err == nil {
-		t.Fatal("bought past the top of the range")
+	top := Armaments("weapon")[len(Armaments("weapon"))-1]
+	if err := w.BuyArms("weapon", top.Tier); err != nil {
+		t.Fatalf("could not buy %s without buying everything under it first: %v", top.Label, err)
+	}
+	if w.Player.Weapon != top.Tier {
+		t.Fatalf("bought %s and are carrying tier %d", top.Label, w.Player.Weapon)
+	}
+	// And paid for that one rather than for the climb.
+	if spent := 100000 - w.Player.Cash; spent != top.Cost {
+		t.Fatalf("%s cost $%d and $%d was spent", top.Label, top.Cost, spent)
+	}
+}
+
+// What you cannot do is pay for something worse than what you are carrying.
+// Nothing in this city rewards carrying less gun, so that would be a trap
+// rather than a choice — and the card says so rather than going quiet.
+func TestYouCannotPayForALesserGunThanYouCarry(t *testing.T) {
+	t.Parallel()
+	w := armed(t)
+	w.Player.Cash = 100000
+	guns := Armaments("weapon")
+	top, lesser := guns[len(guns)-1], guns[0]
+	if err := w.BuyArms("weapon", top.Tier); err != nil {
+		t.Fatal(err)
+	}
+	cash := w.Player.Cash
+	if err := w.BuyArms("weapon", lesser.Tier); err == nil {
+		t.Fatalf("bought %s while carrying %s", lesser.Label, top.Label)
+	}
+	if w.ArmsReadiness("weapon", lesser.Tier) == "" {
+		t.Fatal("the card for a lesser gun says nothing about why it is refused")
+	}
+	if w.ArmsReadiness("weapon", top.Tier) != "You are carrying it" {
+		t.Fatalf("the one being carried says %q", w.ArmsReadiness("weapon", top.Tier))
+	}
+	if w.Player.Cash != cash || w.Player.Weapon != top.Tier {
+		t.Fatal("the refusal still took the money or the gun")
 	}
 	// Being armed is itself a reason to be looked at.
 	poor := armed(t)
 	heat := poor.Player.Heat
-	if err := poor.BuyArms("armour"); err != nil {
+	if err := poor.BuyArms("armour", 1); err != nil {
 		t.Fatal(err)
 	}
 	if poor.Player.Heat <= heat {

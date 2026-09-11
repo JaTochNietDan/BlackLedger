@@ -328,7 +328,9 @@ func TestNothingIsChargedTwice(t *testing.T) {
 		prepare func(*World)
 		kind    string
 	}{
-		{"arms", "docks", func(w *World) { w.Player.Cash = 240 }, "arms:weapon"},
+		// Every gun is on the counter at its own price now, rather than one
+		// "buy the next one up": the id names which.
+		{"arms", "docks", func(w *World) { w.Player.Cash = 240 }, "arms:weapon:1"},
 		{"tables", "club", func(w *World) { w.Player.Cash = 60 }, "play"},
 		{"bribe", "market", func(w *World) { w.Player.Cash = 100000; w.Player.Heat = 20 }, "bribe"},
 		{"contraband", "market", func(w *World) { w.Player.Cash = 210 }, "buy:moonshine"},
