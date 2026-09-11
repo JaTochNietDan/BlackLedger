@@ -101,10 +101,14 @@ which half is standing.
    than rebuilt: laundering needs a business, a forecourt you hold sells you a
    car without the margin, and the burlesque can put a night on — though that
    one turned out to be linked on paper only and took a tick to make true.
-   Still open: the pawnbroker, the butcher, the restaurant, the poolhall and
-   the casinos — several of which
-   are linked to the city rather than to the player, which is a different thing
-   and worth keeping straight.
+   The pawnbroker reaches now too, and reached halfway before anybody looked:
+   a mugging or a robbery already pushed the shop's custom, worth about $1,200
+   a week at saturation, which is the city's side of it. The player's side is
+   the window — what the city could not redeem, on a shelf at 60% of new less
+   wear, and a counter you hold sells you that stock at what it lent rather
+   than what it asks. Still open: the butcher, the restaurant, the poolhall and
+   the casinos — several of which are linked to the city rather than to the
+   player, which is a different thing and worth keeping straight.
 
 ---
 
