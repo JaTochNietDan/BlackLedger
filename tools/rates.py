@@ -52,8 +52,22 @@ and is "the best price in the building". Both are true. A house edge and what an
 hour at that table costs you are different questions, and only the second one is
 about how you spend an evening.
 
+**Two-command decisions in general.** The felt is not the only thing in this
+game that is decided once and settled twice. Buying stock at one end of the city
+and selling it at the other is one run; money against a thing and getting the
+thing back is one loan. Read apart, one half of each was among the best rates in
+the table and the other among the worst.
+
+Pawning is the one to watch, because it is the one that lies in a way that looks
+like a finding. It read as the third best earner in the game at $4.64 a minute,
+ahead of anything honest, because **this table prices money and the game has
+things**: a coat turned into cash is profit until you notice the coat. Grouped
+with redeeming it is four cents a minute, which is what a loan repaid at 130%
+comes to once the forfeits are counted.
+
 Anything else in this game that decides now and pays later will still read as
-free until the trace carries it.
+free until the trace carries it, and anything that turns a possession into money
+will read as profit until it is paired with whatever buys it back.
 """
 
 import collections
@@ -91,6 +105,23 @@ FELT = {
     "pull": "the machines",
 }
 
+# The other two-command decisions. A run is buying stock at one end of the city
+# and selling it at the other; a loan is money against a thing, and getting the
+# thing back. Read apart, one half of each is among the best rates in the game
+# and the other among the worst, and neither is what anybody decided.
+#
+# Pawning in particular is not income. It reads as the third best earner here —
+# $4.64 a minute — because this table prices money and the game has things: a
+# coat turned into cash looks like profit until you notice the coat. Grouped
+# with redeeming, what it costs to borrow is visible, and what is left over is
+# the forfeits.
+PAIRS = {
+    "buy": "the run",
+    "sell": "the run",
+    "pawn": "the counter",
+    "redeem": "the counter",
+}
+
 
 def main():
     runs = json.load(open(sys.argv[1]))["campaigns"]
@@ -101,7 +132,7 @@ def main():
         trace = r.get("trace") or []
         for a, b in zip(trace, trace[1:]):
             kind = (a["command"].get("kind") or "").split(":")[0]
-            kind = FELT.get(kind, kind)
+            kind = FELT.get(kind, PAIRS.get(kind, kind))
             minutes = b["minute"] - a["minute"]
             if minutes <= 0:
                 continue

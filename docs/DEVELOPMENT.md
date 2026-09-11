@@ -10971,3 +10971,41 @@ cell, a crew to arm, a family to serve and then betray.
 
 That the harness plays 107 of 114 kinds is worth stating against where this
 started: twenty-one, eight hours ago, with everything else silently unmeasured.
+
+## What the newly-played parts say, and one that lied
+
+With the harness playing 107 of 114 kinds, the rates table can be read on parts
+of the game that have never been measured. One row stood out immediately:
+**pawning, at $4.64 a minute, the third best earner in the game**, ahead of
+everything honest and behind only mugging and robbery.
+
+It is not an earner. It is a loan. The table prices money and the game has
+things: a coat turned into cash is profit until you notice the coat. Redeeming
+sat at minus $5.03 a minute in the same table, which is the other half of the
+same decision.
+
+The felt had already taught this shape — a stake leaving on one command and
+coming back on another — and it turns out the felt is not the only place. Two
+more pairs were hiding in plain sight:
+
+| grouped | apart | together |
+|---|---|---|
+| the run (buy, sell) | −0.91 and +0.96 | **+0.02** |
+| the counter (pawn, redeem) | +4.64 and −5.03 | **+0.04** |
+
+Four cents a minute is what a loan repaid at a hundred and thirty per cent comes
+to once the forfeits are counted, which is the right answer. Two cents is what
+the smuggling trade pays somebody who buys and sells without watching the
+spread — and that is a finding rather than an artefact: the policy that does
+watch it ends a campaign with $5,207.
+
+With all three pairs joined, the top of the table is only things that actually
+pay: mugging $5.09 a minute, robbing $4.67, stripping a car $3.10, a shift at
+the docks $0.92. The headline that crime pays about six times honest work has
+now survived four separate corrections to the instrument that produced it, and
+is the only number in this project that has.
+
+The tool says the general rule in its own documentation now: anything that
+decides now and pays later reads as free, and anything that turns a possession
+into money reads as profit, until each is paired with the command that settles
+it.
