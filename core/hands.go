@@ -817,3 +817,13 @@ func (w *World) fromBehindThisCounter(at string) string {
 	}
 	return ""
 }
+
+// lastHand is whoever letGo would take off the books next, so a caller can
+// name them before they are gone.
+func (w *World) lastHand(id string) string {
+	prop := w.Properties[id]
+	if prop == nil || len(prop.Hands) == 0 {
+		return ""
+	}
+	return prop.Hands[len(prop.Hands)-1]
+}

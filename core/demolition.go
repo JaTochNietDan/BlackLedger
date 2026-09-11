@@ -175,7 +175,24 @@ func (w *World) detonate(id, cause string) {
 	prop.Condition -= damage
 	// A wrecked business does not trade. Stock, staff and the money behind the
 	// tables go with the building.
-	prop.Supply, prop.Staff = 0, max(0, prop.Staff-1)
+	//
+	// And the position that goes is a person who goes. This took the count down
+	// and left the name on the books, so a bombed club named five people behind
+	// a counter it said held four — which is the exact thing `Property.Hands`
+	// was introduced to stop, a staff that is a number rather than people. A
+	// counter that loses a position loses whoever was standing at it, and the
+	// room says so, because somebody not coming back to work is not a statistic
+	// the player should have to infer from a figure moving.
+	prop.Supply = 0
+	if prop.Staff > 0 {
+		prop.Staff--
+		if gone := w.lastHand(id); gone != "" {
+			w.letGo(id)
+			if n := w.NPC(gone); n != nil {
+				w.Log("One of them is not coming back", fmt.Sprintf("%s was at %s when it went up, and will not be standing behind that counter again.", n.Name, place.Name), "danger")
+			}
+		}
+	}
 	prop.Trouble = true
 	if prop.Bankroll > 0 {
 		prop.Bankroll = prop.Bankroll / 3

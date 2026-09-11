@@ -10136,3 +10136,48 @@ the code, because that list was wrong five times in one night before it was
 measured.
 
 Five rules broken, five failures.
+
+## Proving the four rooms the way somebody actually gets them
+
+Every guard written for the four family rooms took the room with `own()`, a test
+helper that sets the deed. That proves the trade works for an owner and proves
+nothing about how anybody becomes one — and these four are exactly the addresses
+that cannot be bought. The only way to hold one is to take the family, which is
+a different code path with its own ideas about what moves.
+
+So it is taken properly now: serve the Bellandi Family, reach lieutenant, stand
+in front of the leader with the family weak enough, and move on them. The ground
+transfers, the counters keep the people who were on them, the supplies are
+there, and both reaches work — the club earns standing off the crowd that drinks
+there and a boat comes into a pier fought for exactly as it does into one
+otherwise held.
+
+### A staff of five behind a counter that holds four
+
+Writing that turned up a real fault, by way of two false starts.
+
+The first attempt took the family on the stroke of minute one and found every
+counter counting five and naming nobody. That is a seeding seam, not a bug: each
+business opens with a count and an empty list, and the list is filled the first
+time the clock settles the city. Nothing in play sees it, because the player
+owns nothing on the first morning and every rule needing a name is reached by
+walking into a room. It is deliberately not moved into `New()` — filling
+nineteen counters before the city exists would draw on it in ways the balance
+suite is sensitive to, and tonight has already shown what a new daily draw does
+to unrelated measures.
+
+The second attempt asserted the count and the list agree everywhere, and failed
+on an independent laundry. That is also deliberate: `EmptyChairs` skips
+independents, because a shop nobody owns has nobody to poach, nobody to lean on
+and nobody to lose. They become people the day somebody takes the deed.
+
+Scoped to held addresses, from the first settled day, it found the real one. On
+day eleven the club counted four staff and named five. A bomb takes a position
+off a business — `prop.Staff--` — and left the name on the books. That is
+precisely the fault `Property.Hands` was introduced to remove: a staff that is a
+number rather than people. A counter that loses a position now loses whoever was
+standing at it, and the room says who, because somebody not coming back to work
+is not a statistic the player should have to infer from a figure moving by one.
+
+The guard runs thirty days over every held address and catches any future drift
+of the same shape, from whichever direction. Broken both ways to watch it fail.
