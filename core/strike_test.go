@@ -221,3 +221,61 @@ func TestBothWaysOfGoingAfterSomebodyAreOfferedInTheRoom(t *testing.T) {
 		t.Error("an attempt was made and the city has no account of it")
 	}
 }
+
+// What the gun is for. The arms trade has a price list, a police search that
+// takes it and a scale of four weapons, and nothing anywhere said the thing
+// that makes any of it worth buying: that what you are carrying changes how an
+// attempt on somebody goes.
+//
+// Measured over two hundred attempts at each, by somebody going themselves,
+// against the same mark from the same room.
+func TestWhatYouAreCarryingChangesHowItGoes(t *testing.T) {
+	heavy(t)
+	worked := func(weapon int) int {
+		done := 0
+		for seed := uint32(1); seed <= 200; seed++ {
+			w := New(seed * 2654435761)
+			w.Event, w.District = nil, 9
+			w.Player.Health, w.Player.Respect, w.Player.Cash = 100, 40, 20000
+			w.Player.Weapon = weapon
+			var mark *NPC
+			for i := range w.NPCs {
+				n := &w.NPCs[i]
+				if !n.Dead && n.Faction != "" && n.Rank < RankLeader {
+					mark = n
+					break
+				}
+			}
+			if mark == nil {
+				t.Fatal("this city has nobody in a family to go after")
+			}
+			w.Player.Location = mark.Location
+			if err := w.Strike(mark.ID, w.OwnHands()); err != nil {
+				t.Fatalf("going after somebody standing in front of you was refused: %v", err)
+			}
+			if mark.Dead {
+				done++
+			}
+		}
+		return done
+	}
+	bare, revolver, shotgun, thompson := worked(0), worked(1), worked(2), worked(3)
+	t.Logf("200 attempts each: empty hands %d, a revolver %d, a shotgun %d, a Thompson %d",
+		bare, revolver, shotgun, thompson)
+
+	// Every step up is worth something, and the whole ladder is worth a lot.
+	for i, pair := range [][2]int{{bare, revolver}, {revolver, shotgun}, {shotgun, thompson}} {
+		if pair[1] <= pair[0] {
+			t.Fatalf("step %d up the ladder is worth nothing: %d against %d", i+1, pair[1], pair[0])
+		}
+	}
+	if thompson < bare*2 {
+		t.Fatalf("the best gun in the city is worth %d against %d with empty hands, which is not "+
+			"worth $1,800", thompson, bare)
+	}
+	// And nothing makes it a certainty, which is the whole design of it.
+	if thompson > 120 {
+		t.Fatalf("a Thompson makes it work %d times in 200, which is a promise rather than an edge",
+			thompson)
+	}
+}

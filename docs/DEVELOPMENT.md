@@ -9279,3 +9279,31 @@ fifteen to thirty knocked off each time they actually come. A player at the top
 of the scale who simply stops slides back to safety in a fortnight — which is
 the system working, not a hole, but it is the number to reach for if the police
 ever need to feel heavier.
+
+## What the gun is for
+
+The arms trade has a price list, four weapons, a police search that takes them
+and, since tonight, every one of them on the counter at once. Nothing anywhere
+said the thing that makes any of it worth buying.
+
+Measured over two hundred attempts each, somebody going themselves at the same
+mark in the same room:
+
+| carrying | it went the way it was meant to |
+|---|---|
+| empty hands | 17 |
+| a revolver | 30 |
+| a shotgun | 43 |
+| a Thompson | 58 |
+
+Every step is worth something, the whole ladder more than doubles it, and the
+best gun in the city still fails seven times in ten. That is the design the
+arms file describes — "a better weapon shifts the odds of something the player
+chose to start" and "being armed is an advantage, not a promise" — and now a
+number says so. Taking the edge away fails it at the first step; tripling it
+fails it as a promise rather than an edge.
+
+Two other things measured and left alone. Sending one of your own succeeds less
+often than going yourself — four in sixty against eleven — and never costs you
+a scratch, which is the trade it should be. And the family is the worse for it
+every single time, whoever went.
