@@ -79,7 +79,21 @@ import "testing"
 // offering. The soldier went from ninety-nine per cent of its commands being
 // journeys to twelve, which is a different campaign — it spends its turns doing
 // things now, and one rare kind fell below the four-seed sample as a result.
-const kindsTheHarnessPlays = 97
+// Then this pin turned out to be resting on one campaign. Of the thirteen
+// policies, the exploring one plays about seventy of the kinds and the other
+// twelve add a handful each — and the explorer dies early in most seeds. On
+// four seeds that means the whole reading hangs on whether one magpie survives
+// its seven hundred commands: seed three alive plays ninety-one kinds, seed
+// three dead plays twenty-seven. Any change at all that moves the explorer's
+// turn order can kill that seed, and the pin then reports twenty kinds lost by
+// a change that took nothing away. It did exactly that to a new card the
+// explorer pressed once.
+//
+// Sixteen seeds of the explorer rather than four. It is the instrument here and
+// the others are along for what they are each good at; the union stops moving
+// by about the twelfth, no single campaign is worth more than a kind or two,
+// and it costs thirty seconds.
+const kindsTheHarnessPlays = 103
 
 func TestTheHarnessPlaysEnoughOfTheGame(t *testing.T) {
 	t.Parallel()
@@ -88,7 +102,11 @@ func TestTheHarnessPlaysEnoughOfTheGame(t *testing.T) {
 		"worker", "investor", "defiant", "reckless", "thief",
 		"smuggler", "racketeer", "publican", "magpie", "distiller", "respectable", "diplomat", "soldier",
 	} {
-		for seed := uint32(1); seed <= 4; seed++ {
+		seeds := uint32(4)
+		if strategy == "magpie" {
+			seeds = 16
+		}
+		for seed := uint32(1); seed <= seeds; seed++ {
 			r := Run(seed*2654435761, strategy, "fixture", 700, false)
 			for id := range r.Actions {
 				for i := 0; i < len(id); i++ {

@@ -317,6 +317,11 @@ func (w *World) apply(c Command) error {
 				return err
 			}
 			w.Advance(a.Minutes)
+		} else if who, ok := strings.CutPrefix(c.Kind, "word:"); ok {
+			if err := w.SendWord(who); err != nil {
+				return err
+			}
+			w.Advance(a.Minutes)
 		} else if with, ok := strings.CutPrefix(c.Kind, "pact:"); ok {
 			if err := w.MakePact(with); err != nil {
 				return err

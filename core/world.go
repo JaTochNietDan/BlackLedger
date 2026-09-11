@@ -497,6 +497,7 @@ type World struct {
 	Player         Person               `json:"player"`
 	District       int                  `json:"district"`
 	BusinessTruces map[string]int       `json:"business_truces,omitempty"`
+	Expected       map[string]int       `json:"expected,omitempty"`
 	Factions       []Faction            `json:"factions"`
 	NPCs           []NPC                `json:"npcs"`
 	Properties     map[string]*Property `json:"properties"`
@@ -1035,6 +1036,10 @@ func (w *World) Actions(id string) []Action {
 				fmt.Sprintf("Stops the $%d a day and the quarrels that come with it. They will remember that you did it first.", PactTribute))
 			anywhere()
 			continue
+		}
+		if id == p.Home {
+			asks("word:"+f.ID, "Send word to "+f.Name, WordMinutes, WordCost, w.SendWordReadiness(f.ID),
+				fmt.Sprintf("$%d, and somebody who can agree to something waits at their own room for the rest of the day.", WordCost))
 		}
 		asks("pact:"+f.ID, "Reach an understanding with "+f.Name, PactMinutes, PactOpening, w.PactReadiness(f.ID),
 			fmt.Sprintf("$%d to open and $%d a day. Neither of you moves on the other, they may answer when somebody comes for you, and every quarrel of theirs becomes yours.", PactOpening, PactTribute))

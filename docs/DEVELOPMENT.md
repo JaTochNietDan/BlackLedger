@@ -12904,3 +12904,54 @@ thirty-minute card can have the money arrive in the control and not in the run.
 It read a $25 card as $52 and called it charged twice. And a new card has to name
 a group the interface knows — "politics" is not one of the eight, and the guard
 that says so caught it in the same run.
+
+## The telephone lands, and the twenty kinds were never lost
+
+That last paragraph is wrong and it is worth saying which part. "One of those
+four costs the harness twenty kinds" — none of them does. The field, the hook,
+the handler and the group entry were each put in on their own and each read 97.
+Put the card in and it read 77. So the card was the cause, and the next question
+was which property of it mattered: the price, the readiness call, the group, the
+room it is offered in.
+
+It was none of those either. Leave the card exactly where it is and give it a
+reason that never clears, so it is offered and never pressed, and the reading
+goes back to 97. The card is not the cause. **Pressing it is.**
+
+Thirteen policies run four seeds each. Twelve of them play between four and
+seventeen kinds. The exploring one plays about seventy. It also dies in most of
+its campaigns, and when it dies it takes the coverage with it:
+
+    seed 3, card disabled:  91 kinds, 700 commands, alive
+    seed 3, card live:      27 kinds, 228 commands, dead
+
+One campaign, twenty kinds wide. The magpie pressed the new card once, which
+moved every draw after it, and that campaign ended at command 228 instead of
+running to the end. Nothing was taken away from the game. A pin resting on
+whether one campaign survives is an alarm that goes off at the weather, which is
+the same fault the four-seed change fixed two nights ago and it was still there
+one policy down.
+
+Sixteen seeds of the explorer, four of everybody else. The union stops moving by
+about the twelfth seed, no single campaign is worth more than a kind or two, and
+it costs thirty seconds. **105 kinds with the telephone in**, against a pin of
+103.
+
+So the feature ships. Thirty minutes and $25 at the place you live; a telephone
+fitted, or two people who know your name; a speaker waits at that family's own
+hall for eight hours, and outranks whoever the room happened to put in front of
+you. A family below nothing in goodwill will not take the call, one with nobody
+left to speak for it says so, and a stranger is told what it would take.
+
+Two real faults came out of the second pass. The command branch never called
+`Advance`, so a card that says thirty minutes took none — the clock sweep does
+not press cards that are refused, and this one had been refused for two nights.
+And the price sweep's slack is in: half the price capped at twenty dollars,
+because the control and the run are two campaigns and a day's income can land in
+one and not the other.
+
+Twelve times now a measurement has been a fact about the instrument. The tell
+this time was that four separate parts of one change each measured innocent and
+the whole measured guilty. That is not a bug in the change. That is arithmetic
+that does not add up, and it means the number is not measuring what its name
+says.

@@ -92,7 +92,7 @@ var actionGroup = map[string]string{
 var prefixGroup = [][2]string{
 	{"sign:", "people"}, {"share:", "people"}, {"dismiss:", "people"}, {"poach:", "business"}, {"ask:", "people"}, {"about:", "people"}, {"incharge:", "business"},
 	{"lend:", "people"}, {"lean:", "people"}, {"extend:", "people"},
-	{"forgive:", "people"}, {"bail:", "people"}, {"break:", "people"}, {"funeral:", "people"},
+	{"word:", "standing"}, {"forgive:", "people"}, {"bail:", "people"}, {"break:", "people"}, {"funeral:", "people"},
 	{"rob:", "street"}, {"mug:", "street"}, {"sabotage:", "street"},
 	{"arms:", "street"},
 	// Going after somebody, or sending one of your own to. The whole of the

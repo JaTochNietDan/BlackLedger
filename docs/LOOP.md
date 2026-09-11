@@ -380,6 +380,18 @@ and a local model that writes encounters and can be switched off.
   point, not two hundred — multiply by `2654435761` and it costs nothing. Two
   guards here were certifying claims their sample could not have disproved.
 
+- **A union taken across policies is really one policy.** Coverage is thirteen
+  policies four seeds each; twelve of them play between four and seventeen kinds
+  and the exploring one plays seventy. It also dies in most of its campaigns,
+  and the difference between one seed living and dying is twenty kinds. Any
+  change that moves its turn order at all — pressing one new card once — reads
+  as a fifth of the game going dark. Sixteen seeds of the explorer; the union
+  stops moving by the twelfth.
+
+- **When four parts of a change each measure innocent and the whole measures
+  guilty, the number is wrong, not the change.** That arithmetic does not add
+  up, and chasing a fifth part is chasing nothing.
+
 Twelve times now a result has turned out to be a fact about the instrument
 rather than about the game, and every one of them was a reading taken at the
 wrong moment or over too narrow a sample.

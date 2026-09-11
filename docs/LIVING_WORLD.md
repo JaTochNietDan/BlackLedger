@@ -151,33 +151,47 @@ Ensure efficiency of development loops by increasing efficiency of your workflow
 ## Inbox — open
 
 Send word ahead to a family, so a meeting can be arranged rather than stumbled
-into. Written, guarded, measured, and backed out at the end of the tick because
-it broke the harness in a way I could not explain in the time left.
+into.
 
-The feature: a seat across from a family is offered wherever somebody who can
-speak for them happens to be standing that minute, so the only way to get one is
-to walk the city until you find a lieutenant in a room — the diplomat spends
-seven hundred and ninety-one journeys buying twenty-six seats. People had
-telephones in 1930 and used them for exactly this. A call, or a message carried
-by somebody who knows your name, and a speaker waits at their own room for the
-rest of the day.
+— built, and the thing that stopped it last time was the instrument.
 
-It works: two guards pass, the seat is there when the player walks in with the
-room otherwise empty, it lapses after eight hours, and a stranger with no
-telephone and nobody who knows them is told what it would take.
+  The feature: a seat across from a family used to be offered wherever somebody
+  who could speak for them happened to be standing that minute, so the only way
+  to get one was to walk the city until a lieutenant turned up in a room — the
+  diplomat spends seven hundred and ninety-one journeys buying twenty-six seats.
+  People had telephones in 1930 and used them for exactly this. Thirty minutes
+  and $25 at the place you live, a telephone or two people who know your name,
+  and somebody who can agree to something waits at their own hall for eight
+  hours. A family that will not take your call says so.
 
-What it did to the harness: **coverage fell from 97 kinds of action to 73.**
-Offering the card only where the telephone is — the hall of the place the player
-lives — brought it to 77, so the card count in each room is not the cause.
-Nothing else in the change touches a rule: a new field on the world, a new
-handler in the command chain, one line in the group table, and `AudienceActor`
-asking first whether anybody said they would be there. One of those four moves
-the harness by twenty kinds and I did not find which.
+  Last time this read as coverage falling from 97 kinds of action to 77, and
+  four innocent parts of the change were bisected one at a time looking for it.
+  It was none of them. Of the thirteen policies the harness runs, the exploring
+  one plays about seventy kinds on its own and the other twelve add a handful
+  each — and the explorer dies early in most seeds. At four seeds a policy the
+  whole reading hung on whether one magpie campaign survived its seven hundred
+  commands: seed three alive plays ninety-one kinds, seed three dead plays
+  twenty-seven. Pressing one new card once moved that campaign's turn order and
+  killed it, and the pin reported twenty kinds lost by a change that took
+  nothing away. Sixteen seeds of the explorer rather than four; the union stops
+  moving by about the twelfth, no single campaign is worth more than a kind or
+  two, and it costs thirty seconds. The figure with the telephone in is 105.
 
-Two guards written for this tick are worth keeping when it comes back: the
-action's own price sweep needed a few dollars of slack, because a thirty-minute
-card can have a day's income land in the control and not in the run, and it read
-a $25 card as $52.
+  Two real faults came out of it. The command branch never advanced the clock,
+  so a card saying thirty minutes took none. And the price sweep needed a few
+  dollars of slack — the control and the run are two campaigns, a day's income
+  can land in one and not the other, and a $25 card read as $52 that way.
+
+  The twelfth time a measurement was the instrument rather than the game.
+
+---
+
+Teach the diplomat to telephone. It is the policy the feature was written for
+and it does not use it: 791 journeys for 26 seats, and a card that buys one
+outright sat unpressed through every campaign. Only the exploring policy ever
+pressed it. A feature no policy chooses is a feature nothing measures.
+
+---
 
 Most of what the harness measures is walking.
 
