@@ -12450,3 +12450,27 @@ them inside their own error bars. The city was not.
 
 Every measure this project has ever taken of a city on its own was taken through
 an eighth of the range.
+
+## The tenth man
+
+Spreading the seeds showed a city that buries three organizations in a hundred
+long campaigns where the sample this project measured through buried none. So
+the first question tonight was whether the city now runs away with itself: it
+does not. Twelve cities at thirty, sixty and a hundred and twenty days hold at
+2.2, 2.6 and 2.8 organizations, most ever five. It churns rather than grows.
+
+What it does mean is that a path nobody could reach is now reachable, and there
+was something on it.
+
+When a family ends, `dissolve` says so and counts what it cost: "nine people are
+out of work and on the street tonight". The comment above that line was written
+because the path had once buried a family and left nine men working for an id
+that resolved to nothing. **The player was the tenth man.** Somebody answering to
+that name had their `Serves` cleared the next morning by a single line with no
+word to anybody — the wage stopped, the rank went, and everything done to come
+up counted for nothing, and the only sign was a card that had quietly changed.
+
+They are told now, and told what they were: "You were a lieutenant of theirs and
+you are nothing of theirs now." Guarded by ending a family under somebody who
+had done the work, and checking both that the books are cleared and that the
+sentence names the rank they lost.

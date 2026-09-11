@@ -177,7 +177,15 @@ func (w *World) ServiceDay() {
 	f := w.faction(w.Player.Serves)
 	if f == nil {
 		// Whoever they answered to no longer exists.
+		//
+		// It was cleared here and nothing was said. The city announces an
+		// organization ending — "nine people are out of work and on the street
+		// tonight" — and the player was one of the nine and never heard. The
+		// wage stops, the rank goes, and whatever was done to come up counts
+		// for nothing, which is a thing worth being told.
+		rank := lowerFirst(w.ServiceTitle())
 		w.Player.Serves, w.Player.Service = "", 0
+		w.Log("There is nobody to answer to", fmt.Sprintf("The name you worked under is gone. You were a %s of theirs and you are nothing of theirs now; the wage stops and coming up starts again wherever you start it.", rank), "politics")
 		return
 	}
 	pay := w.ServicePay()
