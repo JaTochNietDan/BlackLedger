@@ -12098,3 +12098,30 @@ policy signs six hundred people on across a hundred campaigns and none of them
 dies. It does nothing to get anybody killed, and the city does not oblige. A
 card that needs one of your own in the ground needs a policy that loses people,
 which is the thief and the defiant, and neither of those signs anybody on.
+
+## The seat across the table, and the one answer that goes anywhere
+
+An audience with a family has four answers. Paying tribute and walking out the
+harness plays. The other two it has never touched, and one of them is the only
+one that leads anywhere: offering to do them a favour opens an arrangement, and
+an arrangement finished for a family is work done for them — the one road
+anybody in this city comes up by.
+
+So it is four steps rather than a branch. Find a room where somebody can agree
+to something, take the seat, offer the favour, take on what they hand you.
+Nothing had walked any of it. All four hold: the seat opens, the offer is there,
+what it opens is a courier arrangement with the family named as the beneficiary,
+and it can be accepted.
+
+**The card's own promise took two goes to read, and the second fault was mine.**
+"Completion improves their standing" — measured by taking the family's standing
+after accepting and then running the clock, it read +6 against +6 and looked
+like a promise nothing kept. The arrangement runs its own minutes *inside* the
+command that accepts it, so the rise had already happened before the reading was
+taken. Measured from before the accept, it is there. That is the eleventh time
+on this loop a result turned out to be a fact about the instrument rather than
+the game, and every one of them has been a measurement taken at the wrong moment
+or over the wrong sample.
+
+Broken to check it bites: cutting the beneficiary out of the arrangement's
+resolution leaves the family at +0 having thought +0.
