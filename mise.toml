@@ -51,6 +51,26 @@ wait $core || { cat .runtime/quick-core.log; exit 1; }
 echo "[quick] all clear"
 """
 
+# The command boundary itself, against a scratch save on its own port.
+#
+# `cmd/apicheck` has existed for a long time and nothing ever ran it. The Go
+# suites call the core directly and the loop's own tick check sent one command;
+# neither crosses the HTTP layer the browser uses, where the request id, the
+# revision and the idempotent replay live. Two hundred and fifty commands is
+# about a fortnight of play and takes under a minute.
+[tasks.apicheck]
+description = "Play a scratch campaign through the HTTP boundary"
+run = """
+set -e
+rm -f .runtime/api-check.sqlite3
+go build -o .runtime/blackledger-apicheck ./cmd/blackledger
+.runtime/blackledger-apicheck -addr :8862 -db .runtime/api-check.sqlite3 > .runtime/apicheck-server.log 2>&1 &
+server=$!
+trap "kill $server 2>/dev/null || true" EXIT
+sleep 3
+go run ./cmd/apicheck -base http://127.0.0.1:8862 -steps 250
+"""
+
 [tasks.gate]
 description = "Everything verify checks, with the slow and fast halves overlapped"
 run = """

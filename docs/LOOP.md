@@ -362,6 +362,18 @@ and a local model that writes encounters and can be switched off.
   guarded with a hand that has no article, so the sentence read the same either
   way and putting the fault back left it passing. Pick the sample that can
   fail.
+- **A reading taken after the thing already happened.** An arrangement runs its
+  own minutes inside the command that accepts it, so taking the family's
+  standing afterwards and then advancing the clock read +6 against +6 and looked
+  like a promise nothing kept. A still is $450 and a day at the laundry earns
+  enough that being charged twice read as $859, under twice $450. Ask when the
+  effect lands before deciding when to read it, and where the clock moves, run a
+  copy of the world the same number of minutes with nothing pressed and subtract
+  that.
+
+Eleven times now a result has turned out to be a fact about the instrument
+rather than about the game, and every one of them was a reading taken at the
+wrong moment or over too narrow a sample.
 
 ---
 
@@ -382,7 +394,17 @@ with `if false && ...`, run it again, report both numbers.
 When you change a test rather than the code it guards, say so with the reason.
 Do not claim an effect you have not measured.
 
-**Playtest in the browser at least every other tick** and say what looked wrong.
+**Play a campaign through the HTTP boundary every tick: `mise run apicheck`.**
+Two hundred and fifty commands against a scratch save on its own port, which is
+the only thing in this project that crosses the layer the browser uses — the
+request id, the revision, the idempotent replay, and the invariants that read
+what the ledger actually said. It found "1 crates of arms" off a boat at the
+pier the first time it was ever run, in a line no sweep had reached because no
+simulated policy takes the landing.
+
+A browser playtest needs a person. This loop has no browser and had been told to
+do one every other tick, which meant an instruction silently skipped every tick
+since it was written; say plainly what was checked instead.
 
 ### Gates
 

@@ -12125,3 +12125,34 @@ or over the wrong sample.
 
 Broken to check it bites: cutting the beneficiary out of the arrangement's
 resolution leaves the family at +0 having thought +0.
+
+## Playing the game through the door the browser uses
+
+The brief has said "playtest in the browser at least every other tick" since it
+was written, and this loop has no browser. So that line has been silently
+skipped every tick, which is worse than not having it: an instruction nobody can
+follow reads as one somebody is following.
+
+There is a thing this loop *can* run and never had. `cmd/apicheck` plays a
+campaign against a scratch save over HTTP, and it is the only thing in this
+project that crosses the layer the browser actually uses — the request id, the
+revision, the idempotent replay, and a set of invariants that read what the
+ledger said rather than what a function returned. It has existed for a long time
+with nothing calling it.
+
+**It found a fault on the first run.** Taking a lot off a boat at the pier
+reported "1 crates of arms for $125". The prose sweeps had never reached it,
+because they read a passive city and a played one, and no policy in the harness
+takes the landing. It is the same counted-noun fault fixed twice before in the
+trade code, in the one line neither sweep could see.
+
+It is a mise task now, it runs in a tick, and the brief says to run it every one
+— with the browser half written down as what it is: a thing that needs a person,
+and not something to claim.
+
+The brief also gained the eleventh instrument fault, which is the one this log
+keeps re-learning in a new shape: **a reading taken after the thing already
+happened.** An arrangement runs its minutes inside the command that accepts it.
+A still's fee is hidden by a day's takings landing on top of it. Ask when the
+effect lands before deciding when to read it, and where the clock moves, run a
+copy of the world the same minutes with nothing pressed and subtract that.

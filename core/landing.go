@@ -136,7 +136,8 @@ func (w *World) TakeTheLanding(units int) error {
 	// What is carried is what draws attention, which is the decision this is
 	// for. A cheap lot you cannot hide is not a cheap lot.
 	w.Log("Off the boat",
-		fmt.Sprintf("%d %ss of %s for $%d at $%d each. You are holding %d units, %d of them where anybody can find them.",
-			units, g.Unit, g.InBulk(), cost, w.Landed.Price, w.Carrying(), w.Exposed()), "business")
+		fmt.Sprintf("%s of %s for $%d at $%d each. You are holding %s, %d of them where anybody can find them.",
+			counted(units, g.Unit, g.Unit+"s"), g.InBulk(), cost, w.Landed.Price,
+			counted(w.Carrying(), "unit", "units"), w.Exposed()), "business")
 	return nil
 }
