@@ -216,6 +216,13 @@ export function Interior({
   if (place.owned && place.wage) {
     facts.push({what: 'Pays', is: '$' + place.wage + '/day'});
   }
+  // How it is being run, which the player chose and which scales what it takes
+  // by seven tenths or by half again, costs attention and wear every day when
+  // it is skimmed, and was nowhere on the screen: the only way to tell was to
+  // notice which of the three buttons was refused for being what it already is.
+  if (place.owned && place.run_as) {
+    facts.push({what: 'Run', is: place.run_as, warn: place.skimmed});
+  }
   // Who has the keys. The person a rival will come for, and the reason the
   // player does not have to be standing here.
   if (place.owned && place.runs) {

@@ -138,3 +138,60 @@ func TestOlderSavesKeepEarningWhatTheyEarned(t *testing.T) {
 		t.Fatal("the default way of running a business changed what it earns")
 	}
 }
+
+// How a business is being run is a decision the player made. It scales what the
+// place takes by seven tenths or by half again, and skimming it costs police
+// attention and condition every day and makes a family more likely to take an
+// interest in the earnings.
+//
+// The room never said which of the three was in force. The only way to tell was
+// to notice which of the buttons was refused for being what it already is.
+func TestTheRoomSaysHowItIsBeingRun(t *testing.T) {
+	t.Parallel()
+	w := New(61)
+	w.Event, w.District = nil, 9
+	w.Player.Health, w.Player.Respect, w.Player.Cash = 100, 40, 200000
+	w.Player.Location = "laundry"
+	if err := w.apply(Command{Kind: "acquire", Target: "laundry", RequestID: "buyit"}); err != nil {
+		t.Fatal(err)
+	}
+	said := map[string]string{}
+	for _, mode := range []string{"clean", "standard", "hard"} {
+		w.Event = nil
+		if err := w.SetMode("laundry", mode); err != nil && mode != "standard" {
+			t.Fatalf("could not run it %s: %v", mode, err)
+		}
+		how := w.HowItIsRun("laundry")
+		if how == "" {
+			t.Fatalf("a business being run %s says nothing about it", mode)
+		}
+		if was, seen := said[how]; seen {
+			t.Fatalf("%q and %q both read as %q", mode, was, how)
+		}
+		said[how] = mode
+		if (mode == "hard") != w.RunHard("laundry") {
+			t.Fatalf("run %s and skimmed reads %v", mode, w.RunHard("laundry"))
+		}
+		// And it is on the card the room is drawn from.
+		for _, l := range w.Public()["locations"].([]map[string]any) {
+			if l["id"] != "laundry" {
+				continue
+			}
+			if l["run_as"] != how {
+				t.Fatalf("the room is drawn from %q while the place is run %q", l["run_as"], how)
+			}
+			if l["skimmed"] != w.RunHard("laundry") {
+				t.Fatal("the room does not know the place is being skimmed")
+			}
+		}
+	}
+	if len(said) != 3 {
+		t.Fatalf("three ways to run a place and %d ways of saying so", len(said))
+	}
+
+	// Somebody else's premises say nothing: how a rival runs their laundry is
+	// not something the player has been told.
+	if w.HowItIsRun("butcher") != "" {
+		t.Fatalf("a place the player does not hold says it is run %q", w.HowItIsRun("butcher"))
+	}
+}

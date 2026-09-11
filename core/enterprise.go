@@ -24,6 +24,33 @@ type OperatingMode struct {
 	Notice int
 }
 
+// HowItIsRun is the way a business is being run, in the fewest words that say
+// it. The player chooses this, it scales what the place takes by seven tenths
+// or by half again, it adds police attention and wear every day, and a family
+// is more likely to take an interest — and the room never said which of the
+// three was in force. The only way to tell was to notice which of the buttons
+// was refused for being what it already is.
+func (w *World) HowItIsRun(id string) string {
+	prop := w.Properties[id]
+	if prop == nil || !w.Own(id) {
+		return ""
+	}
+	switch operatingMode(prop.Mode).ID {
+	case "clean":
+		return "Clean"
+	case "hard":
+		return "Skimmed"
+	}
+	return "As usual"
+}
+
+// RunHard reports whether a business is being skimmed, which is the one of the
+// three that costs something every day.
+func (w *World) RunHard(id string) bool {
+	prop := w.Properties[id]
+	return prop != nil && w.Own(id) && operatingMode(prop.Mode).ID == "hard"
+}
+
 var operatingModes = []OperatingMode{
 	{ID: "clean", Label: "Run it clean",
 		Detail: "Books that survive an audit. Earns well short of what the premises could, and nobody looks twice.",

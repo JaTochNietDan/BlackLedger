@@ -9404,3 +9404,29 @@ worth knowing: ambition is what turns being unhappy into leaving.
 
 That is the third thing tonight with teeth and no page. The wage rules, the gun
 in somebody's coat, and now this.
+
+## Thirteen fields, and the one that mattered
+
+Rather than hunt "teeth with no page" one at a time, this asked the question
+mechanically: every field on a business, against every field the room is drawn
+from. Thirteen never reach the player. Most are timers and internal counters —
+when a stripped street forgets, how much income has accrued since the last hour,
+whether somebody has already been told a thing.
+
+One is a decision the player made. How a business is being run scales what it
+takes by seven tenths or by half again, and skimming it costs police attention
+and condition every single day and makes a family likelier to decide the
+earnings are worth a share. The room showed its condition, its trade, its staff,
+its wage and who runs it — and not that.
+
+The only way to tell which of the three was in force was to notice which of the
+three buttons was refused for being what it already is.
+
+It is a fact in the room header now, and skimming is marked, because it is the
+one of the three that costs something every day. A place the player does not
+hold says nothing: how a rival runs their laundry is not something anybody has
+told them.
+
+Worth keeping: a seizure resets the mode to nothing, which reads as "as usual".
+A player who was skimming and was raided is now running clean-ish without having
+chosen to — visible at last, which is the point.

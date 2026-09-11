@@ -450,3 +450,18 @@ func TestBothCardsSayWhatYourOwnPeopleCarry(t *testing.T) {
 		}
 	}
 }
+
+// And the room draws it. How a business is being run scales what it takes by
+// seven tenths or half again, and skimming costs attention and condition every
+// day — and the only way to tell which of the three was in force was to notice
+// which of the buttons was refused for being what it already is.
+func TestTheRoomHeaderSaysHowItIsRun(t *testing.T) {
+	t.Parallel()
+	src := source(t, "src/Interior.tsx")
+	if !holds(src, "place.run_as") {
+		t.Fatal("the room header says nothing about how the business is being run")
+	}
+	if !holds(src, "warn: place.skimmed") {
+		t.Fatal("a business being skimmed reads the same as one run clean")
+	}
+}
