@@ -8885,3 +8885,31 @@ A save written before the table had chips is cleared on load. Those games were
 one hand settled straight out of pockets, so a sitting restored from one would
 offer to deal the next hand with nothing in front of the player. A sitting that
 does have chips on it survives, because that is somebody's money.
+
+## Buying in without sitting down, and an ante that was never the problem
+
+Two things, both about the table.
+
+Reported from the game: "I set the amount I want to buy in but it just ran a
+simulation instead of letting me play the game." The buy-in is offered in the
+room's own action list as well as behind the door, and taking it there bought
+in without taking a seat — so the back room screen never opened, the hand went
+on in the world, and the only sign of it was log lines and buttons. Putting
+money on a table is sitting down at it, whichever button was pressed, and it
+does that now.
+
+And the ante cliff from last night was not a cliff. `TestFoldingIsWorthMoreThan
+TheCardsAre` bet a flat $100 whatever the game was played for, which is two
+antes at one stake and five at another: the same rule read as holding at $50 and
+inverting at $40 because the bet was an overbet at the smaller pot, not because
+anything about the game changed. Measured with the bet in antes across six
+stakes from $20 to $100, the property holds at every one of them and the figures
+scale cleanly with the ante.
+
+The guard measures in antes now and runs at three stakes, because a property
+that is only true at one of them is not the property it claims to guard. Two
+breaks: a table that never bets into the player makes folding worth nothing over
+calling, and a table that folds to everything makes betting a made hand worth
+nothing over checking it. Removing the table's folding does not break it, which
+is worth knowing — betting a made hand pays because they call, not because they
+fold.

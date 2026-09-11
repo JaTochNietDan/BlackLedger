@@ -316,13 +316,19 @@ func TestTheBackRoomTakesNoRake(t *testing.T) {
 // second is the game being a game.
 func TestFoldingIsWorthMoreThanTheCardsAre(t *testing.T) {
 	t.Parallel()
-	run := func(fold, bet bool) int {
+	// Everything here is measured in antes rather than in dollars. It used to
+	// bet a flat $100 whatever the game was played for, which is two antes at
+	// one stake and five at another — so the same rule read as holding at $50
+	// and inverting at $40, and the alarm was the measurement rather than the
+	// game. Three stakes now, because a property that is only true at one of
+	// them is not the property this claims to guard.
+	run := func(buyIn int, fold, bet bool) int {
 		total := 0
-		for seed := uint32(1); seed <= 3000; seed++ {
+		for seed := uint32(1); seed <= 1000; seed++ {
 			w, _ := backroom(t)
 			w.RNG = seed * 2654435761
 			cash := w.Player.Cash
-			if err := w.SitInTheBackRoom(BackRoom, 1000); err != nil {
+			if err := w.SitInTheBackRoom(BackRoom, buyIn); err != nil {
 				t.Fatalf("no game: %v", err)
 			}
 			// Four streets of the same decision, which is the whole of what
@@ -351,7 +357,7 @@ func TestFoldingIsWorthMoreThanTheCardsAre(t *testing.T) {
 				}
 				put := 0
 				if bet && made {
-					put = 100
+					put = min(w.Game.Ante*2, w.Game.Stack)
 				}
 				if err := w.PlaceBet(put); err != nil {
 					t.Fatalf("betting was refused: %v", err)
@@ -363,13 +369,18 @@ func TestFoldingIsWorthMoreThanTheCardsAre(t *testing.T) {
 		}
 		return total
 	}
-	calls, folds, plays := run(false, false), run(true, false), run(true, true)
-	t.Logf("over 3000 hands at $50: calling everything is $%d, folding what is beaten is $%d, folding and betting the good ones is $%d", calls, folds, plays)
-	if folds <= calls {
-		t.Fatalf("throwing beaten hands in cost more than paying for them: %d against %d", folds, calls)
-	}
-	if plays <= folds {
-		t.Fatalf("putting money on a made hand earned nothing: %d against %d", plays, folds)
+	for _, buyIn := range []int{400, 1000, 2000} {
+		calls, folds, plays := run(buyIn, false, false), run(buyIn, true, false), run(buyIn, true, true)
+		t.Logf("1000 hands on a $%d buy-in: calling everything is $%d, folding what is beaten is $%d, folding and betting the good ones is $%d",
+			buyIn, calls, folds, plays)
+		if folds <= calls {
+			t.Fatalf("at $%d: throwing beaten hands in cost more than paying for them: %d against %d",
+				buyIn, folds, calls)
+		}
+		if plays <= folds {
+			t.Fatalf("at $%d: putting money on a made hand earned nothing: %d against %d",
+				buyIn, plays, folds)
+		}
 	}
 }
 

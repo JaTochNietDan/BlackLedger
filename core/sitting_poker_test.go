@@ -234,3 +234,39 @@ func TestASittingPlayedThroughTheCommands(t *testing.T) {
 		t.Fatalf("only %d hand played through the commands", w.Game.Hands)
 	}
 }
+
+// Putting money on a table is sitting down at it, whichever button was pressed.
+// The buy-in is offered in the room's own list as well as behind the door, and
+// taking it there left the player standing in the room with a hand of cards
+// going on somewhere the screen could not draw: "I set the amount I want to buy
+// in but it just ran a simulation instead of letting me play the game."
+func TestBuyingInSitsYouDown(t *testing.T) {
+	t.Parallel()
+	w := New(61)
+	w.Event, w.District = nil, 9
+	w.Player.Health, w.Player.Respect = 100, 30
+	w.Player.Cash = 5000
+	w.Player.Location = "bar"
+	for w.Minute%1440 < 1200 {
+		w.Event = nil
+		w.Advance(60)
+		w.Event = nil
+	}
+	// Straight from the room, with no seat taken first.
+	if w.Seated != "" {
+		t.Fatal("the player is already at a table")
+	}
+	if err := w.apply(Command{Kind: "cards", Target: "bar", Amount: 600,
+		RequestID: "buyinfromtheroom"}); err != nil {
+		t.Fatal(err)
+	}
+	if w.Game == nil {
+		t.Fatal("no hand was dealt")
+	}
+	if w.Seated != "bar" {
+		t.Fatalf("money is on the table at the bar and the player is seated at %q", w.Seated)
+	}
+	if w.SeatedTo != Backroom {
+		t.Fatalf("the player bought into a card game and is sitting at the %q", w.SeatedTo)
+	}
+}

@@ -409,6 +409,12 @@ func (w *World) SitInTheBackRoom(place string, buyIn int) error {
 	}
 	g := &CardGame{Place: place, Ante: ante, Seats: seats, BuyIn: buyIn, Stack: buyIn}
 	w.Game = g
+	// And the player is at the table. Buying in from the room's own list left
+	// them standing in the room with a hand of cards going on somewhere the
+	// screen could not show: "I set the amount I want to buy in but it just ran
+	// a simulation instead of letting me play the game." Putting money on a
+	// table is sitting down at it, whichever button was pressed.
+	w.Seated, w.SeatedTo = place, Backroom
 	w.Log("A seat in the back room",
 		fmt.Sprintf("$%d on the table at $%d a hand, against %s. You play out of what is in front of you and take home what is left.%s",
 			buyIn, ante, listNames(g.Seats), w.tableRemembers(g)), "personal")
