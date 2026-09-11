@@ -12838,3 +12838,33 @@ guesswork. The branch that knows what it wants is the right place to ask.
 The respectable and the diplomat are still at 65%, with the same shape around
 the paper and the seat at the table. Same fix, and it is in the inbox rather
 than rushed at the end of a long tick.
+
+## Three guards, one kept
+
+Last night fixed the soldier and left the respectable and the diplomat at 65%
+travel with "same fix" written beside them. It was not the same fix.
+
+The soldier's fault was a branch asking a room for a card it was not offering —
+its crew branch wanted a recruit at the bar, the bar was not offering one, and
+it crossed the city every forty minutes for four hundred turns. Asking whether
+the room is offering it before setting out took it from **99% to 12%**.
+
+The other two do their business at one address, and every card at that address
+is refused everywhere else. That is the point of an address.
+
+- **The paper.** Gating the editor's arrangement on the desk offering it meant
+  never walking to the desk, because "this is not arranged here" is what it says
+  until you are there. The policy stopped buying anything that desk sells — the
+  coverage count fell from 97 kinds to 94, and the three that vanished were the
+  paragraph, the story and the spike.
+- **A seat at a table.** Who can speak for a family is whoever is standing in
+  that room this minute, so going is a bet on them still being there in forty
+  minutes: seven hundred and ninety-one journeys bought twenty-six seats. Taking
+  a seat only where the player already happens to be bought **none at all** in
+  three campaigns, and the seat is the whole policy.
+
+Both guards were written, measured and taken back out inside the tick. What is
+left is one guard, on the branch it was right for, and a straight answer about
+the other two: their walking is the cost of doing business at one address, and
+the racketeer's 55% is its trade route — docks, market, docks — which is half
+walking by construction.

@@ -1004,6 +1004,11 @@ func Choose(v View, strategy string) (core.Command, error) {
 		// The arrangement at the paper, and then what it sells. Both are only
 		// ever offered in the paper's own building.
 		if v.Player.Cash >= EditorMoney {
+			// Not gated on the desk offering it. An arrangement at the paper
+			// is refused everywhere but the paper — "this is not arranged
+			// here" — so asking whether it is ready before setting out means
+			// never setting out, and the policy stopped buying anything that
+			// desk sells at all.
 			if c, ok := v.at(core.HeraldPlace, "retain:editor"); ok {
 				return c, nil
 			}
@@ -1356,6 +1361,17 @@ func Choose(v View, strategy string) (core.Command, error) {
 			if p.ID == "garage" || p.ID == "casino" {
 				actor, venue = "russo", "garage"
 			}
+			// Not gated on the card being ready there: who can speak for a
+			// family is whoever is standing in the room this minute, and that
+			// changes while somebody walks over. Gating it stopped the diplomat
+			// taking a single seat in a campaign.
+			// Walked to rather than waited for, and that is the cost of
+			// diplomacy rather than a fault in the policy. Who can speak for a
+			// family is whoever is standing in that room this minute, so going
+			// is a bet on them still being there in forty minutes: seven
+			// hundred and ninety-one journeys bought twenty-six seats. Taking
+			// one only where the player already happens to be bought none at
+			// all in three campaigns, and the seat is the whole policy.
 			if v.BusinessTruces[actor] <= v.Minute {
 				if c, ok := v.at(venue, "audience"); ok {
 					return c, nil

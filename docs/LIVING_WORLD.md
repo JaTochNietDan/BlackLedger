@@ -152,23 +152,23 @@ Ensure efficiency of development loops by increasing efficiency of your workflow
 
 Most of what the harness measures is walking.
 
-— part answered. The soldier is down from **99% of its commands to 12%**. The
-  cause was not scan order: `at(place, card)` walks to an address on the
-  strength of the address alone, so a branch naming a card that room is not
-  offering walks over, finds it refused, falls through to a branch that sends it
-  back, and does that for the whole campaign. Its crew branch was asking the bar
-  for a recruit the bar was not offering, and it crossed the city every forty
-  minutes for four hundred turns.
+— answered as far as it goes. The soldier is down from **99% of its commands to
+  12%**: `at(place, card)` walks to an address on the strength of the address
+  alone, so a branch naming a card that room is not offering walks over, finds
+  it refused, falls through to the branch that sends it back, and does that all
+  campaign. Its crew branch was asking the bar for a recruit the bar was not
+  offering.
 
-  The respectable and the diplomat are still at 65%, with the same shape in
-  their own branches — the paper, the seat at the table. Same fix, not done
-  tonight.
+  The respectable and the diplomat stay at 65%, and that is the cost of
+  diplomacy rather than a fault. Both do their business at one address — the
+  paper, a seat at a table — and both of those are refused everywhere else.
+  Asking whether the card is ready before setting out means never setting out:
+  the paper stopped selling this policy anything at all, and the diplomat took
+  nought seats in three campaigns where it had taken twenty-six. Both guards
+  were written, measured and taken back out in the same tick.
 
-  A general version of it was tried and backed out: making `at` itself refuse to
-  travel unless the card is ready there stopped every policy travelling at all,
-  because the refusals a journey *does* answer are worded a dozen ways and
-  matching them is guesswork. Asking `ready(place, card)` at the branch that
-  knows what it wants is the honest shape.
+  The racketeer's 55% is its trade route: buy at the docks, carry, sell at the
+  market, walk back. Half of that is walking by construction.
 
 ---
 
