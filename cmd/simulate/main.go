@@ -33,6 +33,29 @@ func main() {
 	// long enough. These runs have no player policy at all.
 	cities := flag.Int("cities", 12, "cities to run with nobody playing them")
 	season := flag.Int("season", 60, "days to run each of those cities for")
+	// The campaign that lasts. Every strategy here ends at the command limit
+	// after about six days, and the rules built over the last month are about
+	// weeks: a larder takes five to eight days to empty, wages go unpaid on the
+	// nights the bill does not clear, and somebody stands behind a counter for
+	// a week of that before they stop coming in. Measured across eight hundred
+	// campaigns at the standard horizon there were 1,446 acquisitions and zero
+	// restocks, so none of it was visible to any number this harness printed.
+	//
+	// A handful of long ones rather than a longer baseline: moving the baseline
+	// would change every figure it has ever printed and make this month's
+	// numbers incomparable with last month's.
+	//
+	// Twelve hundred commands, which is about ninety days — past the week a
+	// larder lasts, past the week of unpaid wages somebody will stand through,
+	// and past the stretch it takes a counter to empty. Six of them cost this
+	// harness about a minute. Nine hundred commands reaches sixty-six days for
+	// thirty-five seconds but only two of six campaigns ever buy stock;
+	// twenty-six hundred reaches a hundred and twenty days and costs three
+	// minutes, because the city grows as it runs and a day at the end of one of
+	// these is several times the work of a day at the start.
+	long := flag.Int("long", 6, "campaigns to run past the horizon where the business rules live")
+	longSteps := flag.Int("long-steps", 1200, "maximum commands in one of those")
+	longWho := flag.String("long-strategy", "publican", "the policy to run them with")
 	flag.Parse()
 	if *runs < 1 || *runs > 10000 || *steps < 1 || *steps > 10000 || *first > 4294967295 {
 		fmt.Fprintln(os.Stderr, "invalid run/step/seed bounds")
@@ -180,7 +203,8 @@ func main() {
 		}
 	}
 	// What a season does to a city that nobody is playing.
-	out := map[string]any{"city_alone": seasonReport(*cities, *season), "corpus_sha256": corpusHash, "corpus_proposals": len(corpus), "elapsed_seconds": time.Since(start).Seconds(), "director": *director, "max_commands": *steps, "summary": summaries, "campaigns": reports}
+	out := map[string]any{"city_alone": seasonReport(*cities, *season),
+		"a_long_campaign": longReport(*long, *longSteps, *longWho, *director, corpus), "corpus_sha256": corpusHash, "corpus_proposals": len(corpus), "elapsed_seconds": time.Since(start).Seconds(), "director": *director, "max_commands": *steps, "summary": summaries, "campaigns": reports}
 	if len(short) > 0 {
 		out["warning"] = fmt.Sprintf(
 			"the city measures are not meaningful for %s: a campaign has to run past about %d days "+
@@ -236,4 +260,68 @@ func median(xs []int) int {
 	}
 	sort.Ints(xs)
 	return xs[len(xs)/2]
+}
+
+// longReport runs a few campaigns past the horizon where the business rules
+// live, and reports what they did that a six-day campaign never gets to.
+//
+// It is the counterpart of the city with nobody in it: that one is the only
+// measure here that can see a family fall, and this one is the only measure
+// here that can see a larder run out, a payroll missed, or somebody decide they
+// have stood behind a counter for nothing long enough.
+func longReport(runs, steps int, who, director string, corpus []core.Proposal) map[string]any {
+	if runs <= 0 || steps <= 0 {
+		return map[string]any{"campaigns": 0}
+	}
+	// The work of running a business, as opposed to buying one. Named here
+	// rather than totalled blindly so that a count of zero says which thing
+	// never happened.
+	watched := []string{"restock", "hire", "wage", "incharge", "remedy", "bankroll", "poach"}
+	did := map[string]int{}
+	sawIt := map[string]int{}
+	for _, name := range watched {
+		did[name], sawIt[name] = 0, 0
+	}
+	days, cash, alive := []int{}, []int{}, 0
+	for i := 0; i < runs; i++ {
+		r := sim.RunRecorded(uint32(i+1)*0x9e3779b9, who, director, steps, false, corpus)
+		days = append(days, r.Minutes/1440)
+		cash = append(cash, r.Cash)
+		if r.Alive {
+			alive++
+		}
+		for _, name := range watched {
+			n := 0
+			for id, count := range r.Actions {
+				// A command carries its subject after a colon: "incharge:leo"
+				// is the same work as "incharge".
+				if id == name || strings.HasPrefix(id, name+":") {
+					n += count
+				}
+			}
+			did[name] += n
+			if n > 0 {
+				sawIt[name]++
+			}
+		}
+	}
+	sort.Ints(days)
+	sort.Ints(cash)
+	never := []string{}
+	for _, name := range watched {
+		if did[name] == 0 {
+			never = append(never, name)
+		}
+	}
+	out := map[string]any{
+		"campaigns": runs, "strategy": who, "max_commands": steps,
+		"median_days": days[len(days)/2], "median_cash": cash[len(cash)/2],
+		"survived": alive, "did": did, "campaigns_that_did": sawIt,
+	}
+	if len(never) > 0 {
+		// A count of zero is the finding, not a blank. Say it in words so it
+		// cannot be read past.
+		out["never_happened"] = never
+	}
+	return out
 }

@@ -3,6 +3,7 @@ package sim
 import (
 	"blackledger/core"
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -135,5 +136,47 @@ func TestDiplomatMaintainsPublicBusinessAgreements(t *testing.T) {
 	c, err = Choose(Public(w), "diplomat")
 	if err != nil || c.Kind == "audience" {
 		t.Fatal("repeated active agreement purchase", c, err)
+	}
+}
+
+// The campaign that lasts. Every strategy in the standard baseline ends at the
+// command limit after about six days, and the rules built over the last month
+// are about weeks: a larder takes five to eight days to empty, wages go unpaid
+// on the nights the bill does not clear, and somebody stands behind a counter
+// for a week of that before they stop coming in. Measured across eight hundred
+// campaigns at the standard horizon: 1,446 acquisitions and zero restocks.
+//
+// So the harness runs a few past that horizon, and this is the guard that they
+// still reach it. A long campaign that never buys stock is a long campaign
+// measuring nothing the short ones did not.
+func TestALongCampaignReachesTheWorkOfRunningABusiness(t *testing.T) {
+	if testing.Short() {
+		t.Skip("long campaigns: run without -short to measure them")
+	}
+	t.Parallel()
+	stocked, ran, days := 0, 0, 0
+	for i := 0; i < 3; i++ {
+		r := Run(uint32(i+1)*0x9e3779b9, "publican", "authored", 1200, false)
+		days += r.Minutes / 1440
+		for id, count := range r.Actions {
+			if id == "restock" || strings.HasPrefix(id, "restock:") {
+				stocked += count
+			}
+			if id == "wage" || strings.HasPrefix(id, "wage:") {
+				ran += count
+			}
+		}
+	}
+	t.Logf("three long publicans: %d days between them, %d loads of stock bought, %d wages set",
+		days, stocked, ran)
+	if days/3 < 20 {
+		t.Fatalf("a long campaign averages %d days, which is no longer than a short one", days/3)
+	}
+	if stocked == 0 {
+		t.Fatal("three campaigns of ninety days and nobody ever bought stock, so this measures " +
+			"nothing the six-day campaigns did not")
+	}
+	if ran == 0 {
+		t.Fatal("nobody ever set a wage, so the counter rules are still unmeasured")
 	}
 }

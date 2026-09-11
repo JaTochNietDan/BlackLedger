@@ -195,11 +195,25 @@ parallel test for exactly that reason.
 core suite and the API suites start first and the format check, vet, prettier,
 the build and the 56 node tests run while they go.
 
-**`mise run simulate` (~90s) only when the tick could have moved the balance.**
-It prints the baseline itself now. Running it every tick cost ninety seconds an
-hour for a number that had not changed; running it inside the gate cost more
-than that, because three saturating jobs at once made the whole gate 4m49
-against 1m58.
+**`mise run simulate` (~7½ minutes) only when the tick could have moved the
+balance.** It prints the baseline itself now. This file said ninety seconds for
+a long time and that was wrong by a factor of four: measured, the eight hundred
+campaigns take 389 seconds on their own, the twelve cities with nobody in them
+cost seconds, and the long campaigns below add about a minute. A quarter-size
+baseline — `-runs 25` — takes 97 seconds and is the thing to reach for while
+iterating; the full hundred a strategy is for the number that goes in this file.
+Running it inside the gate cost more than either, because three saturating jobs
+at once made the whole gate 4m49 against 1m58.
+
+It also runs **six long campaigns** under `a_long_campaign`, because every
+strategy in the baseline ends at the command limit after about six days and the
+rules about running a business are about weeks. Across eight hundred standard
+campaigns there were 1,446 acquisitions and zero restocks: nothing about stock,
+missed payroll or somebody walking out was visible to any number here. The long
+ones run a publican for twelve hundred commands, about ninety days, and report
+what they actually did — and what they still never do, by name. Today that is
+`remedy`, `bankroll` and `poach`, which no policy in this harness has ever
+tried.
 
 One tick is: `quick` while iterating, `gate` once, `simulate` only if the
 balance could have moved, then the live game and the commit.

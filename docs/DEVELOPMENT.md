@@ -8713,3 +8713,40 @@ restocking among the twelve ticks of work it exercises; it now has the branch to
 match, and that branch does not fire today. It will the day the horizon grows.
 
 Balance unmoved, for that reason rather than because nothing happened.
+
+## The campaign that lasts, and what the harness actually costs
+
+Last night's finding was that the balance harness has never seen a business run
+out of stock: eight hundred campaigns, 1,446 acquisitions, zero restocks. The
+cause was the horizon rather than the policies. Every strategy ends at the
+command limit after about six days, and the rules built over the last month are
+about weeks.
+
+So the harness now runs six long campaigns of its own under `a_long_campaign`,
+the counterpart of the twelve cities with nobody in them. That block is the only
+measure here that can see a larder run out, a payroll missed, or somebody decide
+they have stood behind a counter for nothing long enough — the way the city
+block is the only one that can see a family fall. Twelve hundred commands is
+about ninety days: nine hundred reaches sixty-six days for thirty-five seconds
+but only two of six campaigns ever buy stock, and twenty-six hundred reaches a
+hundred and twenty days for three minutes, because the city grows as it runs and
+a day at the end is several times the work of a day at the start.
+
+It reports what those campaigns did and, by name, what they still never do.
+Today that is `remedy`, `bankroll` and `poach`: three pieces of work no policy in
+this harness has ever tried. A count of zero is the finding, so it is printed in
+words rather than left as a blank to read past.
+
+**And the brief was wrong about what this costs.** It has said ninety seconds
+for a long time. Measured: the eight hundred campaigns take 389 seconds on their
+own, the twelve cities cost seconds, and the long campaigns add about a minute,
+so a full run is seven and a half minutes. A quarter-size baseline at `-runs 25`
+takes 97 seconds and is the thing to reach for while iterating. That number is
+now in the brief, along with the fact that the campaigns are all of the cost.
+
+The guard is in `sim` rather than over the JSON: three long publicans must
+average more than twenty days and must buy stock and set wages at least once
+between them. Turning off the publican's restock branch fails it on nought
+loads of stock in two hundred and eighty-one days. It skips under `-short`, so
+`quick` is untouched, and it runs beside the core suite in the gate, which is
+still sixty-six seconds.
