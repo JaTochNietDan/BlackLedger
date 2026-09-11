@@ -152,22 +152,22 @@ Ensure efficiency of development loops by increasing efficiency of your workflow
 
 A name has no ceiling, and the highest thing it explicitly gates is forty.
 
-Measured, and then not changed, because the two measurements disagree and the
-disagreement is the interesting part. A campaign that works the docks and does
-favours ends a fortnight on a median of 338 respect and a long one on fourteen
-hundred; the highest named threshold in the game is a move on a family's chair
-at forty, and the next is twenty-five. A fresh city offers exactly the same 389
-cards and 36 kinds at 40 as it does at 400.
+— answered, and it was not the ceiling that was wrong. A shift on the pier paid
+  a point of standing, every time, for ever. Four hundred shifts at seventy-five
+  dollars is a job rather than a reputation, and it is where three hundred and
+  thirty-eight came from. It carries a docker to fifteen now — past the six a
+  premises takes and the eight it takes to go to work for a family, nowhere near
+  the forty for a chair — and after that the pier pays money and nothing else.
 
-And capping it at a hundred takes the harness from **100 kinds of action to 67**
-— a third of the game, in a played campaign. So a large name is what opens the
-late city, and it does that through comparisons against things that grow rather
-than through any constant: `Presence` is read against a family's strength, and a
-family's strength climbs all campaign.
+  Every policy now ends inside the range the game's own gates use: the worker on
+  15, the magpie on 35, the diplomat on 46, the soldier on 62, the publican on
+  64. Cash did not move. What moved was a number the panel was showing the
+  player as though it were a score.
 
-Which means the panel is showing the player a number that looks like a score,
-whose real meaning is a ratio against something they cannot see. That is worth
-fixing and it is not a one-line cap.
+  A commission that asked the player to "be worth thirty more than you are
+  today" went with it — an ask that moves up every time anybody reaches it. It
+  is the family's own strength plus ten now, which is real early and gettable
+  late.
 
 ---
 

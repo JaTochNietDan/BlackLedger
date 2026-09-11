@@ -855,7 +855,17 @@ func (w *World) apply(c Command) error {
 					w.Log("Envelope delivered", fmt.Sprintf("%s pays $%d. A small favor, completed without questions.", w.RoleName("fixer"), CourierPay), "work")
 				case "dockwork":
 					w.Earn(75)
-					p.Respect++
+					// A shift gets somebody noticed while nobody has heard of
+					// them, and after that they are a docker.
+					//
+					// It was a point of standing every time, for ever, and a
+					// campaign that works the pier ends a fortnight on three
+					// hundred and thirty-eight when the highest thing standing
+					// gates anywhere in this game is forty. Four hundred shifts
+					// at seventy-five dollars is not a reputation; it is a job.
+					if p.Respect < DockName {
+						p.Respect++
+					}
 					if w.Random() < .15 {
 						p.Health = max(1, p.Health-10)
 					}

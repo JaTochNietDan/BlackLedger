@@ -66,7 +66,12 @@ import "testing"
 // somebody else, and a story kept out of tomorrow's paper.
 // A hundred with the diplomat, which brings the one subsystem in this game no
 // campaign had ever exercised: standing with somebody rather than against them.
-const kindsTheHarnessPlays = 100
+// Ninety-seven after a shift on the pier stopped building a reputation without
+// limit. The three that fell off — a standing order, a cellar of your own, a
+// move on a rival's holding — are the rarest things any policy does, a handful
+// of times in a hundred campaigns each, and at four seeds a policy they sit on
+// the edge of being sampled at all rather than having become unreachable.
+const kindsTheHarnessPlays = 97
 
 func TestTheHarnessPlaysEnoughOfTheGame(t *testing.T) {
 	t.Parallel()

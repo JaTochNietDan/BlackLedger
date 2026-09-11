@@ -127,6 +127,11 @@ const (
 	// with itself.
 	CourierPay     = 45
 	CourierRespect = 2
+	// DockName is as far as shifting cargo will carry a reputation. Past it the
+	// pier pays money and nothing else: the lowest thing a name opens is six,
+	// going to work for a family takes eight, and lending takes twelve, so a
+	// docker can still start from nothing and get somewhere.
+	DockName = 15
 	// CourierMinutes is how long it takes, which is a different 45.
 	CourierMinutes = 45
 	// CourierADay is how many envelopes there are.

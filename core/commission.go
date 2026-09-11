@@ -281,12 +281,28 @@ func (w *World) AvailableCommission(location string) (Commission, bool) {
 	}
 
 	// A quiet, solvent organization wants somebody worth being seen with.
-	target := ((w.Presence()/10)+2)*10 + 10
+	//
+	// What they want is a figure about themselves, not about you. It was
+	// `((Presence/10)+2)*10 + 10` — thirty more than whatever the player was
+	// worth that morning, rounded — which is a bar that moves up every time
+	// anybody reaches it. A city asking to be impressed a little more than last
+	// time, for ever, is the whole reason a campaign ends on three hundred and
+	// thirty-eight when the highest thing a name gates anywhere is forty.
+	//
+	// A family's own strength is the honest measure of who they will be seen
+	// with, it is capped at a hundred the way everything else in this city is,
+	// and it grows as they do — so the ask is real early and gettable late,
+	// which is the other way round from a treadmill.
+	target := f.Power + StandingAbove
 	c.Kind, c.Amount = ObjectiveStanding, target
 	c.Brief = fmt.Sprintf("Be worth %d to this city. %s will not be seen doing business with somebody nobody has heard of, and would like to do business with you.", target, Leads(f.Name))
 	c.Pay, c.Respect, c.Goodwill, c.Penalty = 300, 0, 18, 6
 	return c, true
 }
+
+// StandingAbove is how far past a family's own strength somebody has to be
+// before that family will be seen doing business with them.
+const StandingAbove = 10
 
 // CommissionReadiness explains why work cannot be taken on here, or returns "".
 func (w *World) CommissionReadiness(location string) string {

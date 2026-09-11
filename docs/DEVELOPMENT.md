@@ -12672,3 +12672,37 @@ its real meaning is a ratio against something they are never shown. Fixing that
 is not a one-line ceiling, and a one-line ceiling would have quietly shut a
 third of the game while every test stayed green except the one that counts what
 the harness can reach.
+
+## Four hundred shifts is a job, not a reputation
+
+Last night measured a name with no ceiling and decided not to cap it, because
+capping it shut a third of the game. The thing to do with a contradiction like
+that is find where the number actually comes from.
+
+**A shift on the pier paid a point of standing. Every time. For ever.** Forty
+thousand shifts across a hundred campaigns, four hundred a campaign, against a
+median of three hundred and thirty-eight — the arithmetic is the whole answer.
+Shifting cargo for seventy-five dollars is the lowest work in this city and it
+was building the biggest name in it.
+
+It carries a docker to fifteen now and stops. Fifteen is past the six a premises
+takes and the eight it takes to go to work for a family, and nowhere near the
+forty for a move on a chair, so somebody can still start from nothing on the
+pier and get somewhere — they just cannot become the most feared man in
+Bellwether by turning up.
+
+Every policy now lands inside the range the game's own gates use: **worker 15,
+magpie 35, diplomat 46, soldier 62, publican 64.** Cash did not move at all. What
+moved was a number the panel was showing as though it were a score.
+
+One other thing went with it. A commission asked the player to "be worth thirty
+more than you are today", rounded — a bar that rises every time anybody reaches
+it, which is a treadmill rather than an ask. It is the family's own strength plus
+ten now: hard early, gettable late, and bounded because strength is.
+
+The harness plays 97 kinds where it played 100. The three that fell off are the
+rarest things any policy does — a standing order, a cellar of your own, a move on
+a rival's holding — each a handful of times in a hundred campaigns, and at four
+seeds a policy they sit on the edge of being sampled rather than having become
+unreachable. Said as a caveat rather than buried, because a coverage number that
+moves by three is not the same kind of evidence as one that moves by thirty-three.
