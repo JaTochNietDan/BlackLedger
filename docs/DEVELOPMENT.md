@@ -11130,3 +11130,36 @@ suicidal — brought it back to 31.8 days and 100 kinds.
 Seven fewer kinds for thirteen more branches is the right trade, and the
 branches include the one that could not be reached at all: handing a family a
 business, taken four times in twenty campaigns.
+
+## The same sweep, applied to scenes
+
+Actions have been swept all night: what the game can offer against what the
+harness ever takes. Scenes had never had it, and now that a policy answers them
+by what it has answered least, they can.
+
+Twenty-three branches exist across every `[]Choice` in the core. Fifteen are
+answered across the whole baseline. The nine that are not each have a reason,
+and only one of them is about the game:
+
+- **`accept` and `decline`** belong to the director's proposal, and the
+  simulation always hands the director two approach methods, which replace the
+  plain accept with "prepare carefully" and "push the schedule". So `accept` is
+  reachable in a game and unreachable in this harness — an artefact of the
+  fixture rather than dead code, and worth knowing before somebody deletes it.
+- **`listen` and `side`** are the quiet answers at a sitdown, which the
+  exploring policy reaches rarely and answers with whatever it has answered
+  least — and it has not got to them yet.
+- **`abandon` and `resume`** are the two halves of a job interrupted by
+  something else, and **`work`**, **`business_truce`** and **`fall:`** need a
+  standing with a family that only the diplomat pursues.
+
+The measurement itself needed narrowing twice, which is the familiar shape. The
+first pass found six branches, because it only matched choices written as
+`Choice{ID: …}` literals. The second found ninety-one, because it matched every
+struct in the codebase with an `ID:` field — goods, comforts, districts,
+families, people, and the numbers on a roulette wheel. Only the third, which
+walks the braces of a `[]Choice{…}` block, found the twenty-three that are
+actually scene branches.
+
+A sweep that is too narrow reports a clean city; a sweep that is too wide
+reports a disaster. Both look like findings and neither is.
