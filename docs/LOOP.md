@@ -87,9 +87,17 @@ which half is standing.
    is a thing that stays done until the money does. Checked and not built:
    running the city dry of people to hire — sixty days of a city playing itself
    leaves eight held addresses, twenty-nine hands and forty-seven people still
-   free, so a rule for it would be a rule that never fires. Still open: whether
-   the people you employ should be worth talking to for what they know about
-   the room they stand in.
+   free, so a rule for it would be a rule that never fires. Asking one of them what they have seen was
+   built and wired and answering — and answering with the state of the
+   premises, which is on "Review the books" for nothing and no time, so the
+   whole of what the conversation added was a footfall count the game already
+   had. A counter now says three things a ledger never records: who is walking
+   over and whose man he is, who has been asking after you and whether they are
+   past asking, and the one thing this trade can see — the glass out of cars for
+   a garage, who was short for a pawnbroker, where the cabs took somebody, who
+   on this counter is thinking about leaving. No two trades say the same thing,
+   which is guarded, because holding more than one kind of place should show you
+   more than one part of the same city. Nothing here is left open.
 
 ---
 
