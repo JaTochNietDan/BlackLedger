@@ -13043,3 +13043,28 @@ plainly: **renaming an action id is a change to the harness, not only to the
 game.** Nothing tells you. The tests pass, the gate is green, the command works
 over HTTP, and one policy quietly spends its campaign walking to a door that no
 longer has that name on it.
+
+## Nothing you can do with a car makes money
+
+Last night's change gave the forecourt a part-exchange, and a lot the player can
+also own. That is the shape of a money pump, and nothing in the prices says it
+is not one — three per cent either way on any of four constants and it becomes
+a loop somebody can stand in all night.
+
+So the sweep. Every forecourt in the city, owned by a rival and owned by the
+player, from every car the player could be driving including none, buying every
+car on the lot twelve times over in every order. After each trade the player's
+worth is measured as the money in hand plus the best price anywhere in the city
+will turn the car back into money — the forecourt's part-exchange, a scrapyard's
+weighbridge, or the pawnbroker's counter, whichever is highest. It may never
+exceed what they were worth before the first trade.
+
+It passes, and it bites in all three directions. Part-exchange at 120 per cent
+of new fails it, the scrapyard at 200 fails it, the pawn counter at 350 fails
+it. A guard that only watches the door it was written for is how the last one of
+these was missed.
+
+What it protects is small and specific: buying down pays the difference, so the
+lot hands money back, and that is the one transaction in this game that puts
+cash in the player's pocket for walking in with something. It should stay a way
+of changing your mind cheaply, not a job.

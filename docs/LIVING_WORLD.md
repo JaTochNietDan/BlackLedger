@@ -338,6 +338,13 @@ Also adding armor to your car should be different than just buying a car.
   $4,400 because it no longer arrives with $1,800 of plate on it. A save written
   while it did keeps what it had.
 
+  Guarded the night after: no sequence of car trades, on a rival's forecourt or
+  one of the player's own, leaves them worth more than they started — measured
+  against the best price the forecourt, a scrapyard or the pawn counter will
+  turn the car back into money. Buying down pays the difference, which is the
+  one transaction in this game that puts cash in a pocket for walking in with
+  something, and it has to stay a way of changing your mind rather than a job.
+
   One thing broke on the way and it is the same shape as the last two nights:
   the action id changed from `car` to `lot:1`, the exploring policy still named
   the old one, and `at()` walked it to the forecourt to look for a card that was

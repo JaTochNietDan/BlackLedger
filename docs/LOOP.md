@@ -115,7 +115,7 @@ which half is standing.
    |---|---|---|---|
    | garage | half off what the car costs to keep | 7 | 4 |
    | filling | your own petrol at what it cost the pumps | 25 | 8 |
-   | dealer | a car without the forecourt's margin | 4400 | 3300 |
+   | dealer | a car without the forecourt's margin | 463 | 308 |
    | haulage | a third off stocking everything else | 200 | 132 |
    | cabs | a ride when your own car cannot take you | no | yes |
    | scrapyard | more for the wreck when the yard is yours | 105 | 157 |

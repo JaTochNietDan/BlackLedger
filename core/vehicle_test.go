@@ -536,3 +536,73 @@ func TestTheLotTakesWhatYouDroveIn(t *testing.T) {
 		t.Fatalf("a half-worn car was worth $%d against $%d in perfect order", worn, w.TradeIn())
 	}
 }
+
+// A lot that takes your car in part-exchange is the shape of a money pump, and
+// a lot the player owns keeps its own margin as well. So: no sequence of trades
+// on any forecourt in this city leaves the player with more money than they
+// started with, whatever they end up driving.
+//
+// Written because the trade-in went in the same night the ladder came out, and
+// the two together are what makes this possible at all. Nothing in the prices
+// says it is safe; only the sweep does.
+func TestNoRoundOfCarTradingMakesMoney(t *testing.T) {
+	t.Parallel()
+	lot := ""
+	for _, l := range Locations {
+		if l.Kind == "dealer" {
+			lot = l.ID
+			break
+		}
+	}
+	if lot == "" {
+		t.Fatal("this city sells no cars anywhere")
+	}
+	// Both sides of the counter: a rival's forecourt and one of the player's.
+	for _, owner := range []string{"bellandi", fmt.Sprintf("player:%d", 1)} {
+		for start := 0; start < len(vehicles); start++ {
+			w := New(53)
+			w.Event, w.District = nil, 9
+			w.Player.Location, w.Player.Cash = lot, 20000
+			w.Properties[lot].Owner = owner
+			w.Player.Car, w.Player.CarWear = start, 100
+			if start == 0 {
+				w.Player.CarWear = 0
+			}
+			// What they are worth to begin with: the money in hand and what
+			// the lot would give them for what they are already driving.
+			opening := w.Player.Cash + w.TradeIn()
+			for _, l := range Locations {
+				if l.Kind == "scrapyard" {
+					opening = max(opening, w.Player.Cash+w.ScrapWorth(l.ID))
+				}
+			}
+			// Every order of every car, over and over. A pump does not have to
+			// be one trade: it can be a cycle of three.
+			for round := 0; round < 12; round++ {
+				for tier := 1; tier < len(vehicles); tier++ {
+					if w.CarReadiness(tier) != "" {
+						continue
+					}
+					if err := w.BuyVehicle(tier); err != nil {
+						t.Fatalf("%s, from tier %d: %v", owner, start, err)
+					}
+					// The car is worth something; the money is not allowed to
+					// come back on its own. Worth is the best price anywhere in
+					// the city will turn it back into money: the forecourt's
+					// part-exchange, a yard's weighbridge, or the counter.
+					best := max(w.TradeIn(), w.PawnValue("car"))
+					for _, l := range Locations {
+						if l.Kind == "scrapyard" {
+							best = max(best, w.ScrapWorth(l.ID))
+						}
+					}
+					worth := w.Player.Cash + best
+					if worth > opening {
+						t.Fatalf("%s, starting on tier %d: trading to tier %d left $%d in cash and a car worth $%d against $%d to begin with",
+							owner, start, tier, w.Player.Cash, best, opening)
+					}
+				}
+			}
+		}
+	}
+}
