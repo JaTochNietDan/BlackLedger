@@ -388,6 +388,13 @@ and a local model that writes encounters and can be switched off.
   as a fifth of the game going dark. Sixteen seeds of the explorer; the union
   stops moving by the twelfth.
 
+- **A number that reads nought is not evidence of absence.** Not until you have
+  shown the instrument can see the thing at all. Organizations falling read nought
+  in every run this project ever took; the rule works and buries thirty-seven
+  families over six long cities. The season was sixty days and a family takes a
+  hundred to be ground down that far. Before believing a zero, widen the window
+  until something appears, or prove nothing can.
+
 - **Renaming an action id is a change to the harness, not only to the game.**
   Nothing tells you. The tests pass, the gate is green, the command works over
   HTTP, and a policy that still names the old id walks to the address on the
