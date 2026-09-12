@@ -88,10 +88,9 @@ func TestEveryTradeReachesPastItsOwnIncome(t *testing.T) {
 			}},
 		{"dealer", "a car without the forecourt's margin", "lower",
 			func(w *World, id string) int {
-				next, _ := nextVehicle(w.Player.Car)
 				cash := w.Player.Cash
-				if err := w.BuyVehicle(); err != nil {
-					return next.Cost
+				if err := w.BuyVehicle(1); err != nil {
+					return VehicleByTier(1).Cost
 				}
 				return cash - w.Player.Cash
 			}},

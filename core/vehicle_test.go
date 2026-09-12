@@ -22,15 +22,15 @@ func driver(t *testing.T) *World {
 func TestCarsAreSoldAtTheForecourtAndNowhereElse(t *testing.T) {
 	t.Parallel()
 	w := driver(t)
-	if w.CarReadiness() != "" {
-		t.Fatal("the forecourt refused to sell:", w.CarReadiness())
+	if w.CarReadiness(1) != "" {
+		t.Fatal("the forecourt refused to sell:", w.CarReadiness(1))
 	}
 	for _, elsewhere := range []string{"bar", "market", "docks", "room", "garage"} {
 		w.Player.Location = elsewhere
-		if w.CarReadiness() == "" {
+		if w.CarReadiness(1) == "" {
 			t.Fatalf("%s was selling cars", elsewhere)
 		}
-		if err := w.BuyVehicle(); err == nil {
+		if err := w.BuyVehicle(1); err == nil {
 			t.Fatalf("bought a car at %s", elsewhere)
 		}
 	}
@@ -45,7 +45,7 @@ func TestACarBuysTimeAndNothingElseDoes(t *testing.T) {
 	}
 	previous := walk
 	for tier := 1; tier < len(vehicles); tier++ {
-		if err := w.BuyVehicle(); err != nil {
+		if err := w.BuyVehicle(tier); err != nil {
 			t.Fatal(err)
 		}
 		got := w.Journey("garage", "docks")
@@ -54,16 +54,15 @@ func TestACarBuysTimeAndNothingElseDoes(t *testing.T) {
 		}
 		previous = got
 	}
-	if w.CarReadiness() == "" {
-		t.Fatal("there was something better than a Packard")
+	if w.CarReadiness(len(vehicles)) == "" {
+		t.Fatal("the lot was selling a car that does not exist")
 	}
 }
 
 func TestACarInPoorOrderIsWorthLessAndAWreckIsWorthNothing(t *testing.T) {
 	t.Parallel()
 	w := driver(t)
-	w.BuyVehicle()
-	w.BuyVehicle() // the Hudson, with a false floor
+	w.BuyVehicle(2) // the Hudson, with a false floor
 	fast := w.Journey("garage", "docks")
 	w.Player.CarWear = 60
 	middling := w.Journey("garage", "docks")
@@ -88,8 +87,7 @@ func TestACarInPoorOrderIsWorthLessAndAWreckIsWorthNothing(t *testing.T) {
 func TestAFalseFloorHidesStockFromAttentionAndFromASearch(t *testing.T) {
 	t.Parallel()
 	w := driver(t)
-	w.BuyVehicle()
-	w.BuyVehicle()
+	w.BuyVehicle(2)
 	compartment := VehicleByTier(w.Player.Car).Compartment
 	w.Player.Stock = map[string]int{"moonshine": compartment - 5}
 	if w.Exposed() != 0 {
@@ -124,9 +122,7 @@ func TestACarCostsSomethingEveryDayAndLessAtYourOwnGarage(t *testing.T) {
 	t.Parallel()
 	w := driver(t)
 	before := w.DailyCost()
-	w.BuyVehicle()
-	w.BuyVehicle()
-	w.BuyVehicle()
+	w.BuyVehicle(3)
 	full := w.CarUpkeep()
 	if full <= 0 || w.DailyCost() != before+full {
 		t.Fatalf("upkeep %d, bill went %d to %d", full, before, w.DailyCost())
@@ -143,7 +139,7 @@ func TestACarCostsSomethingEveryDayAndLessAtYourOwnGarage(t *testing.T) {
 func TestServicingPutsACarBackOnTheRoad(t *testing.T) {
 	t.Parallel()
 	w := driver(t)
-	w.BuyVehicle()
+	w.BuyVehicle(1)
 	w.Player.CarWear = 20
 	if w.Driving() {
 		t.Fatal("a wreck was still driveable")
@@ -211,7 +207,7 @@ func TestAWarrantThatFindsTheFloorTakesTheCar(t *testing.T) {
 func TestNobodyInheritsACar(t *testing.T) {
 	t.Parallel()
 	w := driver(t)
-	w.BuyVehicle()
+	w.BuyVehicle(1)
 	w.Player.Alive = false
 	next, err := Execute(w, Command{RequestID: ID(), Revision: w.Revision, Kind: "new_life"})
 	if err != nil {
@@ -247,7 +243,7 @@ func TestTheForecourtOffersTheCarsAndTheGarageDoesNot(t *testing.T) {
 	offered := func(place string) (Action, bool) {
 		w.Player.Location = place
 		for _, a := range w.Actions(place) {
-			if a.ID == "car" {
+			if strings.HasPrefix(a.ID, "lot:") {
 				return a, true
 			}
 		}
@@ -457,5 +453,86 @@ func TestYourOwnYardPaysBetterForYourOwnCar(t *testing.T) {
 	}
 	if !said {
 		t.Fatal("the yard pays the player more for holding it and nothing says why")
+	}
+}
+
+// "You should be able to buy any car at any time instead of having to go
+// through an upgrade process."
+//
+// The lot sold exactly one thing: the next rung. The only way to a false floor
+// was to buy a Ford first and watch it stop existing, and the only way to a
+// Packard was to buy both. Nobody buys a car that way.
+func TestEveryCarIsOnTheLotAtOnce(t *testing.T) {
+	t.Parallel()
+	w := driver(t)
+	w.Event, w.District = nil, 9
+	w.Player.Car, w.Player.CarWear = 0, 0
+	w.Player.Cash = 20000
+
+	// All of them, priced, on the first afternoon.
+	seen := map[int]bool{}
+	for _, a := range w.Actions(w.Player.Location) {
+		if !strings.HasPrefix(a.ID, "lot:") {
+			continue
+		}
+		if a.Disabled {
+			t.Errorf("%s was refused with $20,000 in hand: %q", a.Label, a.Reason)
+		}
+		if a.Asks <= 0 {
+			t.Errorf("%s is on the lot at no price", a.Label)
+		}
+		seen[a.Tier] = true
+	}
+	for tier := 1; tier < len(vehicles); tier++ {
+		if !seen[tier] {
+			t.Fatalf("%s was not on the lot", VehicleByTier(tier).Label)
+		}
+	}
+
+	// And the top of the range is the first thing this player buys.
+	if err := w.BuyVehicle(3); err != nil {
+		t.Fatalf("buying a Packard outright: %v", err)
+	}
+	if w.Player.Car != 3 || !w.Driving() {
+		t.Fatalf("driving tier %d after buying the Packard", w.Player.Car)
+	}
+}
+
+// The other half of a lot that sells anything: it takes what you arrived in.
+// Without that, buying a smaller car means throwing a bigger one away, and a
+// smaller car is a real choice here — it costs less to keep and witnesses
+// describe it less.
+func TestTheLotTakesWhatYouDroveIn(t *testing.T) {
+	t.Parallel()
+	w := driver(t)
+	w.Player.Car, w.Player.CarWear = 0, 0
+	w.Player.Cash = 20000
+	if err := w.BuyVehicle(3); err != nil {
+		t.Fatal(err)
+	}
+	allowed := w.TradeIn()
+	if allowed <= 0 {
+		t.Fatal("a Packard in perfect order was worth nothing to the lot")
+	}
+	if allowed >= VehicleByTier(3).Cost {
+		t.Fatalf("the lot allowed $%d for a car that costs $%d new", allowed, VehicleByTier(3).Cost)
+	}
+	// Buying down pays for itself: a Ford costs less than the Packard is worth.
+	cash := w.Player.Cash
+	if err := w.BuyVehicle(1); err != nil {
+		t.Fatalf("buying down: %v", err)
+	}
+	if w.Player.Car != 1 {
+		t.Fatalf("driving tier %d after buying a Ford", w.Player.Car)
+	}
+	if w.Player.Cash <= cash {
+		t.Fatalf("trading a Packard for a Ford cost $%d", cash-w.Player.Cash)
+	}
+	// A worn car is worth less than one in order.
+	w.Player.Car, w.Player.CarWear = 3, 50
+	worn := w.TradeIn()
+	w.Player.CarWear = 100
+	if worn >= w.TradeIn() {
+		t.Fatalf("a half-worn car was worth $%d against $%d in perfect order", worn, w.TradeIn())
 	}
 }

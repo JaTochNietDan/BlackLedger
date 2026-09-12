@@ -99,7 +99,7 @@ var prefixGroup = [][2]string{
 	// violence in this game sat under "jobs that pay today".
 	{"strike:", "street"}, {"send:", "street"},
 	// A car for one of your own, and plate on it: about them, not about you.
-	{"car:", "people"}, {"plate:", "people"}, {"give:", "people"},
+	{"lot:", "standing"}, {"car:", "people"}, {"plate:", "people"}, {"give:", "people"},
 	// A counter is where money comes from when there is none.
 	{"pawn:", "money"}, {"redeem:", "money"}, {"window:", "money"},
 	{"buy:", "money"}, {"sell:", "money"}, {"play:", "tables"},

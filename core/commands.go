@@ -491,6 +491,15 @@ func (w *World) apply(c Command) error {
 				return err
 			}
 			w.Advance(a.Minutes)
+		} else if which, ok := strings.CutPrefix(c.Kind, "lot:"); ok {
+			tier, err := strconv.Atoi(which)
+			if err != nil {
+				return fmt.Errorf("there is no such car on the lot")
+			}
+			if err := w.BuyVehicle(tier); err != nil {
+				return err
+			}
+			w.Advance(a.Minutes)
 		} else if person, ok := strings.CutPrefix(c.Kind, "car:"); ok {
 			if err := w.BuyCarFor(person); err != nil {
 				return err
@@ -642,10 +651,7 @@ func (w *World) apply(c Command) error {
 				if err := w.Plant(target); err != nil {
 					return err
 				}
-			case "car":
-				if err := w.BuyVehicle(); err != nil {
-					return err
-				}
+
 			case "landing":
 				if err := w.TakeTheLanding(c.Amount); err != nil {
 					return err

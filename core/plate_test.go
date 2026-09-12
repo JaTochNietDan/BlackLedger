@@ -96,14 +96,13 @@ func TestPlateSurvivesTheJourneyAndNotTheCar(t *testing.T) {
 	if plated == 0 {
 		t.Fatal("nothing was fitted")
 	}
-	// A different car is a different car. Plate is fitted to the one you have,
-	// and a Hudson off the lot is bare — unlike the Packard, which is sold
-	// armoured and says so.
+	// A different car is a different car. Plate is fitted to the one you have
+	// and stays with it; every car off the lot is bare, the Packard included.
 	w.Player.Location, w.Player.Cash = w.theForecourt(), 20000
 	if w.Player.Location == "" {
 		t.Skip("this city has no forecourt")
 	}
-	if err := w.BuyVehicle(); err != nil {
+	if err := w.BuyVehicle(3); err != nil {
 		t.Skip("nothing to buy: " + err.Error())
 	}
 	if w.Plating() != 0 {
@@ -124,11 +123,32 @@ func TestPlateCostsYouSpeed(t *testing.T) {
 	}
 }
 
-func TestTheArmouredPackardIsActuallyArmoured(t *testing.T) {
+// The inverse of the rule this used to guard. The top of the range was called
+// an armoured Packard and the rules had started reading that word, so the only
+// way to get cover was to buy the car that came with it — buying a car and
+// arming a car were one purchase and there was nothing to decide.
+func TestNoCarComesOffTheLotWithPlateOnIt(t *testing.T) {
 	t.Parallel()
 	w := plater(t)
-	w.Player.Car, w.Player.Plate = 3, 0
-	if w.Plating() == 0 {
-		t.Fatal("the car described as armoured carries no plate")
+	w.Player.Location, w.Player.Cash = w.theForecourt(), 20000
+	w.Player.Car, w.Player.CarWear, w.Player.Plate = 0, 0, 0
+	if w.Player.Location == "" {
+		t.Skip("this city has no forecourt")
+	}
+	for tier := 1; tier < len(vehicles); tier++ {
+		if err := w.BuyVehicle(tier); err != nil {
+			t.Fatalf("buying tier %d: %v", tier, err)
+		}
+		if w.Plating() != 0 {
+			t.Fatalf("%s came off the lot carrying %d of plate", VehicleByTier(tier).Label, w.Plating())
+		}
+	}
+	// And a save written while the Packard was armoured keeps what it had,
+	// rather than losing two stages overnight to a change in the counting.
+	old := plater(t)
+	old.Player.Car, old.Player.Plate = 3, 0
+	old.MigrateLivingWorld()
+	if old.Plating() != PlateStages {
+		t.Fatalf("an older save's armoured Packard came back with %d of plate", old.Plating())
 	}
 }

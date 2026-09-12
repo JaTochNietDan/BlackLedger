@@ -104,7 +104,7 @@ func (w *World) TheirPlating(id string) int {
 	if !ok || n.Car == 0 {
 		return 0
 	}
-	return min(PlateStages, plateFitted(n.Car)+n.Plate)
+	return min(PlateStages, n.Plate)
 }
 
 // TheirPlateReadiness explains why their car cannot be plated, or returns "".

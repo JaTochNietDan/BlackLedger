@@ -110,6 +110,20 @@ func (w *World) MigrateLivingWorld() {
 		w.Player.CarWear = 100
 	}
 
+	// The top of the range used to come plated, as a sentence in its
+	// description that the rules had started reading. Plate is fitted at a
+	// garage now and no car carries any off the lot, so a campaign already
+	// driving one keeps the cover it had rather than losing two stages
+	// overnight to a change in how they are counted.
+	if w.Player.Car >= 3 && w.Player.Plate == 0 {
+		w.Player.Plate = PlateStages
+	}
+	for i := range w.NPCs {
+		if n := &w.NPCs[i]; n.Car >= 3 && n.Plate == 0 {
+			n.Plate = PlateStages
+		}
+	}
+
 	// A campaign that already had a suit before clothes could wear out is
 	// wearing it in good order, not in rags.
 	if w.Player.Dress > 0 && w.Player.DressWear == 0 {

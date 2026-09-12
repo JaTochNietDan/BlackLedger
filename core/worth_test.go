@@ -45,7 +45,7 @@ func TestWhatACarIsWorthIsSaidInMinutesOnARealRoad(t *testing.T) {
 		t.Fatalf("the lot named somewhere that is not in this city: %q", worth.ToID)
 	}
 	// And the button says it.
-	a := actionByID(w.Actions(w.Player.Location), "car")
+	a := actionByID(w.Actions(w.Player.Location), "lot:1")
 	if a == nil {
 		t.Fatal("nothing for sale on the forecourt")
 	}

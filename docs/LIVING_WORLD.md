@@ -313,6 +313,37 @@ You should be able to buy any car at any time instead of having to go through an
 
 Also adding armor to your car should be different than just buying a car.
 
+— both done, and they were the same fault twice.
+
+  The lot sold exactly one thing: the next rung. The only way to a false floor
+  was to buy a Ford first and watch it stop existing, and the only way to a
+  Packard was to buy both. All three are on the forecourt now, each at its own
+  price, each with its own picture, and the top of the range can be the first
+  car a player ever owns.
+
+  The other half of a lot that sells anything is that it takes what you arrived
+  in. Thirty per cent of new, scaled by the condition it is in — less than half
+  what it cost because it is second-hand the moment it is theirs, and more than
+  the fifth a scrapyard pays because they are going to sell it again. Buying
+  down pays you the difference, which is what makes a smaller car a real choice:
+  it costs less to keep and witnesses describe it less.
+
+  And the armour. The top of the range had been called an armoured Packard since
+  the list was written, and the rules had started reading that word — so buying
+  a car and arming a car were one purchase and there was nothing to decide. A
+  garage has fitted plate in stages for some time, to whatever the player
+  actually drives, at nine hundred dollars and four hours a stage, and the weight
+  costs speed. That is the whole of it now. The Packard is a big quick car with a
+  great deal of room under the back of it, and it costs $3,200 rather than
+  $4,400 because it no longer arrives with $1,800 of plate on it. A save written
+  while it did keeps what it had.
+
+  One thing broke on the way and it is the same shape as the last two nights:
+  the action id changed from `car` to `lot:1`, the exploring policy still named
+  the old one, and `at()` walked it to the forecourt to look for a card that was
+  not there five hundred and sixteen times in one campaign. Coverage read 32
+  kinds against 105. Nothing was wrong with the feature.
+
 ---
 
 Nobody has taken over the Bellweather after I killed them

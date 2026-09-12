@@ -38,7 +38,7 @@ func (w *World) CarWorth(tier int) Worth {
 	if best.ToID == "" {
 		return best
 	}
-	best.Plate = min(PlateStages, plateFitted(tier)+w.Player.Plate)
+	best.Plate = min(PlateStages, w.Player.Plate)
 	best.Driving = max(5, int(float64(best.Walking)*paceOf(tier, best.Plate)+.5))
 	return best
 }

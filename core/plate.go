@@ -32,20 +32,19 @@ const (
 
 // plateFitted is what a car of this kind carries before anybody works on it.
 // The Packard is described as armoured, so it is.
-func plateFitted(tier int) int {
-	if tier >= 3 {
-		return PlateStages
-	}
-	return 0
-}
-
-// Plating is how much plate is on the car the player is driving: what it came
-// with, and whatever a garage has added since.
+// Plating is how much plate is on the car the player is driving.
+//
+// No car comes with any. The top of the range was called an armoured Packard
+// and carried two stages nobody fitted, which made the only real way to get
+// cover off a lot rather than off a bench — buying a car and arming a car were
+// the same purchase, and there was nothing to decide. A Packard is a big quick
+// car now and costs what one costs; plate goes on at a garage, to whatever the
+// player actually drives, and the weight is the price of it.
 func (w *World) Plating() int {
 	if w.Player.Car == 0 {
 		return 0
 	}
-	return min(PlateStages, plateFitted(w.Player.Car)+w.Player.Plate)
+	return min(PlateStages, w.Player.Plate)
 }
 
 // PlateReadiness explains why plate cannot be fitted here, or returns "".

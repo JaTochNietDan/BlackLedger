@@ -1302,7 +1302,10 @@ func (w *World) Actions(id string) []Action {
 				fmt.Sprintf("$%d off the lot. They get where they are sent faster and away from it quicker, which is worth most on the night something goes wrong.", w.TheirCarPrice()))
 			about(who.ID)
 		}
-		if next, ok := nextVehicle(p.Car); ok {
+		// Everything on the lot, each at its own price, in any order. A ladder
+		// meant the only way to a false floor was to buy a Ford first and watch
+		// it stop existing, and the only way to a Packard was to buy both.
+		for _, next := range Vehicles() {
 			hides := "Nothing to hide anything in."
 			if next.Compartment > 0 {
 				hides = fmt.Sprintf("A false floor a search will not find %d units under.", next.Compartment)
@@ -1317,10 +1320,20 @@ func (w *World) Actions(id string) []Action {
 					speed += fmt.Sprintf(" That figure carries %s of plate, which is weight.", counted(worth.Plate, "stage", "stages"))
 				}
 			}
+			// What the lot allows against what is parked outside, said on the
+			// card rather than discovered after pressing it.
+			traded := ""
+			if in := w.TradeIn(); in > 0 && next.Tier != p.Car {
+				traded = fmt.Sprintf(" They allow $%d for %s against it.", in, lowerFirst(VehicleByTier(p.Car).Label))
+				if back := w.CarChange(next.Tier); back > 0 {
+					traded = fmt.Sprintf(" They allow $%d for %s and hand you $%d back.", in, lowerFirst(VehicleByTier(p.Car).Label), back)
+				}
+			}
+			asks(fmt.Sprintf("lot:%d", next.Tier), "Buy "+lowerFirst(next.Label), 60, w.CarPrice(next.Tier), w.CarReadiness(next.Tier),
+				fmt.Sprintf("$%d, then $%d a day to keep on the road.%s %s%s %s A car outside is a thing witnesses describe.",
+					w.CarPrice(next.Tier), next.Upkeep, traded, next.Detail, speed, hides))
 			// Which car this is, so the panel can show the one being sold
 			// rather than guessing from the label.
-			asks("car", "Buy "+lowerFirst(next.Label), 60, next.Cost, w.CarReadiness(),
-				fmt.Sprintf("$%d, then $%d a day to keep on the road. %s%s %s A car outside is a thing witnesses describe.", next.Cost, next.Upkeep, next.Detail, speed, hides))
 			if len(out) > 0 {
 				out[len(out)-1].Tier = next.Tier
 			}

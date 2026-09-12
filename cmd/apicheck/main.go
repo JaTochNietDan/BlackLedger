@@ -57,7 +57,7 @@ var ventures = []string{
 	"play:small", "play:high", "buy:moonshine", "buy:cigarettes",
 	"sell:moonshine", "sell:cigarettes", "arms:weapon", "arms:armour",
 	"operate:hard", "operate:clean", "operate:standard", "inspect", "investigate", "lie_low",
-	"dress", "press", "bankroll", "draw", "car", "service",
+	"dress", "press", "bankroll", "draw", "lot:1", "lot:2", "lot:3", "service",
 	"fit:door", "fit:telephone", "fit:safe", "fit:cellar", "commission",
 	"trip:rockridge", "trip:kingsport", "trip:halloway", "charge", "plant", "sitdown", "retain:commissioner", "retain:mayor", "retain:editor", "spike", "puff", "rob:crew", "sabotage:crew", "armoury", "stock_arms", "buy:arms", "sell:arms", "mug", "mug:crew", "hit", "stand", "order", "post", "unpost", "sit_out", "lawyer", "talk",
 	// Signing somebody on and lending them money both name them, so the

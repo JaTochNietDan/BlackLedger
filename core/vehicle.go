@@ -35,7 +35,7 @@ var vehicles = []Vehicle{
 	{Tier: 0, Label: "On foot and by streetcar", Pace: 1},
 	{Tier: 1, Label: "A used Ford", Detail: "Rattles, starts most mornings, and gets you across town before the day is gone.", Cost: 620, Pace: .74, Upkeep: 4, Trail: 1},
 	{Tier: 2, Label: "A Hudson with a false floor", Detail: "Respectable from the outside, and there is room under it for things that should not be in the boot.", Cost: 1750, Pace: .6, Compartment: 20, Upkeep: 7, Trail: 2},
-	{Tier: 3, Label: "An armoured Packard", Detail: "Plated doors, glass that has stopped things before, and a driver's seat people have walked away from.", Cost: 4400, Pace: .5, Compartment: 35, Upkeep: 12, Trail: 3},
+	{Tier: 3, Label: "A Packard", Detail: "Long, heavy and quick with it, and there is room under the back of it for a great deal more than a Hudson takes.", Cost: 3200, Pace: .5, Compartment: 35, Upkeep: 12, Trail: 3},
 }
 
 const (
@@ -54,12 +54,11 @@ const (
 // VehicleByTier is what the player drives, clamped so an unknown save is safe.
 func VehicleByTier(tier int) Vehicle { return vehicles[max(0, min(tier, len(vehicles)-1))] }
 
-func nextVehicle(tier int) (Vehicle, bool) {
-	if tier+1 >= len(vehicles) {
-		return Vehicle{}, false
-	}
-	return vehicles[tier+1], true
-}
+// Vehicles is everything on the lot, in the order a forecourt would stand them
+// in. Every one of them is for sale at any time: a ladder you had to climb a
+// rung at a time meant the only way to a false floor was to buy a Ford first
+// and watch it disappear, and nobody buys a car that way.
+func Vehicles() []Vehicle { return vehicles[1:] }
 
 // CarCondition is the state of what the player drives. Saves written before
 // cars existed carry a zero and no car, which is nothing to keep running.
@@ -223,39 +222,85 @@ func CarWorkshop(id string) bool {
 // rather than going wherever cars come from. It is what a lot is worth holding.
 const DealerMargin = 25
 
-// CarReadiness explains why the next car cannot be bought, or returns "".
-func (w *World) CarReadiness() string {
+// PartExchange is what a forecourt allows against what the player is driving.
+// A lot that will not take your car in is a lot you cannot buy a smaller car
+// from without throwing the big one away, and a smaller car is a real choice
+// here: it costs less to keep and witnesses describe it less.
+//
+// Less than half of new even in perfect order, because it is second-hand the
+// moment it is theirs, and more than the fifth a scrapyard pays, because they
+// are going to sell it again rather than weigh it in.
+const PartExchange = 30
+
+// TradeIn is what the lot allows for the car the player arrived in.
+func (w *World) TradeIn() int {
+	if w.Player.Car == 0 {
+		return 0
+	}
+	worth := VehicleByTier(w.Player.Car).Cost * PartExchange / 100
+	return max(0, worth*w.CarCondition()/100)
+}
+
+// CarAsking is what the lot wants for this one before anything is taken off.
+func (w *World) CarAsking(tier int) int {
+	car := VehicleByTier(tier)
+	if w.Own(w.Player.Location) {
+		return car.Cost - car.Cost*DealerMargin/100
+	}
+	return car.Cost
+}
+
+// CarPrice is what changes hands today: the asking price with what the player
+// is driving taken off it. Never below nothing, because a card cannot ask for a
+// negative number — what is left over comes back as money instead.
+func (w *World) CarPrice(tier int) int {
+	return max(0, w.CarAsking(tier)-w.TradeIn())
+}
+
+// CarChange is what the lot hands back when the car driven in is worth more
+// than the one driven out. Buying down is a real choice here — a smaller car
+// costs less to keep and witnesses describe it less — and a lot that kept the
+// difference would make it a punishment.
+func (w *World) CarChange(tier int) int {
+	return max(0, w.TradeIn()-w.CarAsking(tier))
+}
+
+// CarReadiness explains why this car cannot be bought, or returns "".
+func (w *World) CarReadiness(tier int) string {
 	if !CarSource(w.Player.Location) {
 		return "Nobody sells cars here"
 	}
-	next, ok := nextVehicle(w.Player.Car)
-	if !ok {
-		return "There is nothing better on the lot"
+	if tier <= 0 || tier >= len(vehicles) {
+		return "Nobody sells cars here"
 	}
-	if w.Player.Cash < next.Cost {
+	if tier == w.Player.Car {
+		return "It is what you are driving"
+	}
+	if w.Player.Cash < w.CarPrice(tier) {
 		return "Not enough cash"
 	}
 	return ""
 }
 
-// BuyVehicle takes the next step up. The old one goes toward it, which is why
-// each step costs what it costs rather than the difference.
-func (w *World) BuyVehicle() error {
-	if reason := w.CarReadiness(); reason != "" {
+// BuyVehicle buys the one that was asked for, whichever it is. What the player
+// drove in goes to the lot as part of it, and anything under the floor of it
+// comes out first — a false floor is the car's, not the driver's.
+func (w *World) BuyVehicle(tier int) error {
+	if reason := w.CarReadiness(tier); reason != "" {
 		return fmt.Errorf("%s", reason)
 	}
-	next, _ := nextVehicle(w.Player.Car)
+	next := VehicleByTier(tier)
 	// A car is sold by somebody. The forecourt keeps its margin, and if the
 	// player holds the lot they are buying from themselves — the margin never
 	// leaves their pocket, so the car costs them less.
 	lot := w.Properties[w.Player.Location]
 	margin := next.Cost * DealerMargin / 100
-	price := next.Cost
-	if w.Own(w.Player.Location) {
-		price -= margin
-	}
+	price, change, traded := w.CarPrice(tier), w.CarChange(tier), w.TradeIn()
 	if err := w.Pay(price); err != nil {
 		return err
+	}
+	if change > 0 {
+		w.Earn(change)
 	}
 	if lot != nil && !w.Own(w.Player.Location) {
 		if house := w.faction(lot.Owner); house != nil {
@@ -264,11 +309,34 @@ func (w *World) BuyVehicle() error {
 	}
 	// Plate is fitted to a car, not to a person. What you had on the last one
 	// is on the last one.
+	// Plate is fitted to a car, not to a person. What you had on the last one
+	// is on the last one, and it is not on the lot's terms either.
+	dropped := w.shedTheFloor(next.Compartment)
 	w.Player.Car, w.Player.CarWear, w.Player.Plate = next.Tier, 100, 0
 	// A car off the lot comes with a tank in it.
 	w.Player.Fuel, w.Player.Fuelled = FuelFull, max(1, w.Minute)
-	w.Log("Off the lot at Russo Motor Works", fmt.Sprintf("%s, $%d. $%d a day to keep on the road. %s", next.Label, next.Cost, w.CarUpkeep(), next.Detail), "personal")
+	took := ""
+	if traded > 0 {
+		took = fmt.Sprintf(" They allowed $%d against what you drove in", traded)
+		if change > 0 {
+			took += fmt.Sprintf(" and handed you $%d back", change)
+		}
+		took += "."
+	}
+	if dropped > 0 {
+		took += fmt.Sprintf(" The %s that would not fit under the new floor is in your pockets, where it can be found on you.",
+			plainly(dropped, "one crate", fmt.Sprintf("%d crates", dropped)))
+	}
+	place, _ := PlaceByID(w.Player.Location)
+	w.Log("Off the lot at "+place.Name, fmt.Sprintf("%s, $%d.%s $%d a day to keep on the road. %s", next.Label, price, took, w.CarUpkeep(), next.Detail), "personal")
 	return nil
+}
+
+// shedTheFloor reports how much of what was hidden under the old car will not
+// fit under the new one. Nothing is taken: the crates are still the player's,
+// they are simply visible now, which is what a smaller car means.
+func (w *World) shedTheFloor(into int) int {
+	return max(0, w.InTheFloor()-into)
 }
 
 // ServiceReadiness explains why a car cannot be worked on, or returns "".

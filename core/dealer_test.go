@@ -54,7 +54,7 @@ func TestBuyingACarPaysWhoeverHoldsTheForecourt(t *testing.T) {
 		t.Fatal("no bellandi")
 	}
 	before := house.Cash
-	if err := w.BuyVehicle(); err != nil {
+	if err := w.BuyVehicle(1); err != nil {
 		t.Fatalf("buying a car: %v", err)
 	}
 	if house.Cash <= before {
@@ -80,7 +80,7 @@ func TestYourOwnForecourtSellsYouACarCheaply(t *testing.T) {
 		w.Player.Location = lot
 		w.Properties[lot].Owner = owner
 		before := w.Player.Cash
-		if err := w.BuyVehicle(); err != nil {
+		if err := w.BuyVehicle(1); err != nil {
 			t.Fatalf("buying a car from %s: %v", owner, err)
 		}
 		return before - w.Player.Cash
@@ -141,7 +141,7 @@ func TestEitherGarageWorksOnYourCar(t *testing.T) {
 		w.District = 2
 		w.Player.Cash, w.Player.Respect = 40000, 200
 		w.Player.Location = "dealer"
-		if err := w.BuyVehicle(); err != nil {
+		if err := w.BuyVehicle(1); err != nil {
 			t.Fatal(err)
 		}
 		w.Player.CarWear = 40

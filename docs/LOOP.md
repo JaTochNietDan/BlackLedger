@@ -388,6 +388,13 @@ and a local model that writes encounters and can be switched off.
   as a fifth of the game going dark. Sixteen seeds of the explorer; the union
   stops moving by the twelfth.
 
+- **Renaming an action id is a change to the harness, not only to the game.**
+  Nothing tells you. The tests pass, the gate is green, the command works over
+  HTTP, and a policy that still names the old id walks to the address on the
+  strength of the address alone, finds no such card, and is sent away again —
+  five hundred and sixteen times in one campaign when `car` became `lot:1`.
+  Grep `sim/` and `cmd/apicheck` for the old id before shipping the new one.
+
 - **When four parts of a change each measure innocent and the whole measures
   guilty, the number is wrong, not the change.** That arithmetic does not add
   up, and chasing a fifth part is chasing nothing.

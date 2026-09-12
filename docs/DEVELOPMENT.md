@@ -12997,3 +12997,49 @@ as the policies can reach. A card behind a room, a walk gated on a card the room
 is not offering, a coverage number resting on one campaign — every one of them
 was the harness being unable to get at something rather than the something being
 absent.
+
+## Every car on the lot, and armour you have to ask for
+
+Two asks from the same inbox note and the same fault under both: a thing you
+bought instead of a thing you chose.
+
+**The forecourt sold one car.** Whatever was next. The only route to a false
+floor was to buy a Ford first and watch it cease to exist, and the only route to
+a Packard was to buy both. All three stand on the lot now at their own prices,
+each painted on its own card, and a player with three thousand dollars and no
+car can drive a Packard off it on the first afternoon.
+
+A lot that sells anything has to take what you arrived in, or buying a smaller
+car means throwing a bigger one away. Thirty per cent of new, scaled by
+condition: less than half what it cost, because it is second-hand the moment it
+is theirs, and more than the fifth a scrapyard pays, because they are going to
+sell it again rather than weigh it in. When what you drove in is worth more than
+what you are driving out, the difference comes back as money. That is what makes
+a smaller car a real choice rather than a mistake — it costs less to keep, and
+witnesses describe it less.
+
+**Armour was a word in a description.** The top of the range had been called an
+armoured Packard since the list was written, and `plateFitted` had started
+reading that word and handing the car two stages of plate nobody fitted. So
+buying a car and arming a car were the same purchase and there was nothing to
+decide. A garage has fitted plate in stages for a while now, to whatever the
+player actually drives, at $900 and four hours a stage, and the weight costs
+speed. That is the whole of it. The Packard is a big quick car with a great deal
+of room under the back of it, at $3,200 rather than $4,400, because it no longer
+arrives with $1,800 of plate on it. A campaign already driving one keeps the
+cover it had: losing two stages overnight to a change in how they are counted
+would be the change taking something from a live save.
+
+**And the thing that broke.** The action id went from `car` to `lot:1`. The
+exploring policy still named the old one, and `at()` walks to an address on the
+strength of the address alone — so it went to the forecourt, found no card
+called `car`, fell through to a branch that sent it away, and did that five
+hundred and sixteen times in seven hundred commands. Coverage read 32 kinds
+against a pin of 105.
+
+That is the third night running where the thing that looked like a broken
+feature was a policy unable to reach it. It is worth writing the rule down
+plainly: **renaming an action id is a change to the harness, not only to the
+game.** Nothing tells you. The tests pass, the gate is green, the command works
+over HTTP, and one policy quietly spends its campaign walking to a door that no
+longer has that name on it.

@@ -708,8 +708,14 @@ func Choose(v View, strategy string) (core.Command, error) {
 		// itself for sale: standing on it with two thousand dollars, the rule
 		// that buys any room of its own bought the lot and left nothing for a
 		// car, every time.
+		// Named by which car it is. The lot used to sell one thing — the next
+		// rung — and the card was called "car"; every one of them is for sale
+		// now and each carries its own tier in the id. A branch naming a card
+		// the room is not offering walks there, finds nothing, and is sent
+		// back: this one did that five hundred and sixteen times in a campaign
+		// the moment the id changed under it.
 		if v.Player.Car == 0 && v.Player.Cash > 2000 {
-			if c, ok := v.at("dealer", "car"); ok {
+			if c, ok := v.at("dealer", "lot:1"); ok {
 				return c, nil
 			}
 		}
