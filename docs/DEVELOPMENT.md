@@ -13120,3 +13120,59 @@ before it:
   the third narrow-sample instrument found this week and they all read the same:
   a number that moves when an unrelated thing changes is measuring the draw
   order, not the game.
+
+## The living world was never inert; the window was shut
+
+The inbox is empty, so this came off the project's own standard: a system is
+finished when a long simulation shows it producing varied outcomes. So I read
+what the long simulation actually says about the living world, which is the city
+run for a season with nobody playing it.
+
+It said this, over twelve cities of sixty days:
+
+    organizations formed        2
+    organizations fell          0
+    wars started                3
+    wars settled                2
+    people killed              16
+
+Organizations falling has read nought in every run this project has ever taken.
+That is a whole layer of `docs/LIVING_WORLD.md` — a family reduced to nothing is
+absorbed or disappears — reporting that it does not happen.
+
+It happens. The rule is in `dissolve`, it fires, and over six cities of four
+hundred days it buries thirty-seven organizations. What it needs is time: a
+family has to lose every holding it has *and* be beaten down past the strength
+to take one back, and the city takes about a hundred days to grind anybody that
+far. Sixty days is shorter than the thing being looked at. Every zero in that
+table was the window, not the world.
+
+The same twelve cities over two hundred days:
+
+    organizations formed       33
+    organizations fell         18
+    wars started              102
+    wars settled               98
+    holdings changed hands    177
+    people killed              95
+
+Wars started went from three to a hundred and two. The season is two hundred
+days now, and it costs one second, because the cities run in parallel and were
+never the expensive part of that command.
+
+`TestASeasonOfTheCityProducesEveryKindOfUpheaval` asks one question of each of
+the six — does it ever happen at all — so the measure cannot quietly go back to
+reporting nothing. Setting the season back to sixty fails it on the organization
+that never falls, which is the exact reading it was built from.
+
+The per-campaign horizon stays at twenty days, because twenty is right for
+escalation and a split. The warning it prints says so now, and says that no
+campaign measure will ever show an organization falling, because none of them
+run for a hundred days.
+
+**Four narrow windows in four nights.** A coverage pin resting on one campaign;
+a trade guard sampling a once-in-ninety-days action over three seeds; a policy
+walking to a card whose name had changed; and now a season shorter than the
+event it was counting. They are one fault wearing four coats: *a number that
+reads nought is not evidence of absence until you have shown the instrument can
+see the thing at all.*

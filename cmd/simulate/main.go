@@ -19,6 +19,15 @@ import (
 // city measures say anything. Families escalate over weeks; at a fortnight the
 // answer is always "the city did nothing", and that is a fact about the run
 // rather than about the city.
+//
+// Twenty is the floor for the fastest of those things and not for the slowest.
+// An organization falling takes about a hundred days — it has to lose every
+// holding it has and then be beaten down past recovering any — and measured
+// over sixty it had never once happened in this project's history, which read
+// as a layer that was built and did not work. It works; the window was shut.
+// The city-alone season is two hundred days now. This number stays at twenty
+// because it guards the per-campaign measures, where twenty is right for
+// escalation and a split, and the message says which.
 const livingWorldHorizon = 20
 
 func main() {
@@ -34,7 +43,16 @@ func main() {
 	// printed showed an organization ending. They end; nobody was watching
 	// long enough. These runs have no player policy at all.
 	cities := flag.Int("cities", 12, "cities to run with nobody playing them")
-	season := flag.Int("season", 60, "days to run each of those cities for")
+	// Two hundred days, not sixty. A season of sixty reported the whole
+	// living-world layer as very nearly inert — three wars started, two
+	// settled, two organizations formed and none at all ever fell — and every
+	// one of those zeros was the window being shorter than the thing it was
+	// looking at. A family has to be ground down to nothing before it falls and
+	// that takes about a hundred days. At two hundred the same twelve cities
+	// report a hundred and two wars, ninety-eight settlements, thirty-three
+	// organizations formed and eighteen fallen, for seventeen seconds of wall
+	// clock. A measure that always says nought is not a measure.
+	season := flag.Int("season", 200, "days to run each of those cities for")
 	// The campaign that lasts. Every strategy here ends at the command limit
 	// after about six days, and the rules built over the last month are about
 	// weeks: a larder takes five to eight days to empty, wages go unpaid on the
@@ -215,7 +233,8 @@ func main() {
 	if len(short) > 0 {
 		out["warning"] = fmt.Sprintf(
 			"the city measures are not meaningful for %s: a campaign has to run past about %d days "+
-				"before families have time to escalate, split or fall, and these ended sooner. "+
+				"before families have time to escalate or split, and these ended sooner. An "+
+				"organization falling takes nearer a hundred, so no campaign measure will show one. "+
 				"Raise -steps, or read only the strategies that survived.",
 			strings.Join(short, ", "), livingWorldHorizon)
 		fmt.Fprintln(os.Stderr, out["warning"])
