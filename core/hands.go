@@ -793,6 +793,32 @@ func (w *World) fromBehindThisCounter(at string) string {
 			return fmt.Sprintf("%s in the window that nobody came back for.", counted(len(w.Window), "thing", "things"))
 		}
 		return "Nothing in the window. Either the city is flush or it has stopped trusting us."
+	case "tailor":
+		// A fitting room is where a man says what he is about to be. Who has
+		// been measured lately, and for what, is the one thing this counter
+		// knows that no ledger records.
+		// Who is carrying more than their position accounts for. A cutter
+		// knows what a man does for a living and what he can suddenly pay.
+		var rising *NPC
+		for i := range w.NPCs {
+			n := &w.NPCs[i]
+			if n.Dead || n.Rank >= RankLieutenant || n.Purse < attires[2].Cost {
+				continue
+			}
+			if rising == nil || n.Purse > rising.Purse {
+				rising = n
+			}
+		}
+		if rising != nil {
+			return fmt.Sprintf("%s was in to be measured and paid out of a roll that never got counted. A %s does not earn what a %s costs.",
+				rising.Name, lowerFirst(rising.Role), lowerFirst(attires[2].Label))
+		}
+		for i := range w.NPCs {
+			if n := &w.NPCs[i]; !n.Dead && n.Rank >= RankLieutenant && n.Purse >= attires[1].Cost {
+				return fmt.Sprintf("%s has been in twice about the same jacket and neither fitting settled it. Nobody is that particular about a shoulder unless they expect to be looked at.", n.Name)
+			}
+		}
+		return "Nobody has been measured for anything this week. When this city stops buying suits it is because nobody is going anywhere worth dressing for."
 	case "cabs":
 		for i := range w.NPCs {
 			n := &w.NPCs[i]

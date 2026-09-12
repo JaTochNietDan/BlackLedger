@@ -77,7 +77,7 @@ func TestThingsThatBelongTogetherAreTogether(t *testing.T) {
 		{"rob", "street"}, {"rob:crew", "street"}, {"mug", "street"}, {"sabotage:crew", "street"},
 		{"takeover", "street"}, {"plant", "street"},
 		{"bribe", "standing"}, {"retain:editor", "standing"}, {"smear:bellandi", "standing"},
-		{"spike", "standing"}, {"puff", "standing"}, {"dress", "standing"},
+		{"spike", "standing"}, {"puff", "standing"}, {"attire:2", "standing"},
 		{"sit_out", "standing"}, {"lawyer", "standing"}, {"talk", "standing"},
 		{"launder", "money"}, {"buy:moonshine", "money"}, {"deposit", "money"},
 		{"travel", "travel"}, {"trip:rockridge", "travel"}, {"wait", "travel"},

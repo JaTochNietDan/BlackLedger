@@ -1,90 +1,94 @@
 [
-  {
-    "id": "apartment",
-    "file": "fronts/front-apartment-v1.jpg"
-  },
-  {
-    "id": "archway",
-    "file": "fronts/front-archway-v1.jpg"
-  },
-  {
-    "id": "burlesque",
-    "file": "fronts/front-burlesque-v1.jpg"
-  },
-  {
-    "id": "butcher",
-    "file": "fronts/front-butcher-v1.jpg"
-  },
-  {
-    "id": "cabstand",
-    "file": "fronts/front-cabstand-v1.jpg"
-  },
-  {
-    "id": "casino",
-    "file": "fronts/front-casino-v1.jpg"
-  },
-  {
-    "id": "chapel",
-    "file": "fronts/front-chapel-v1.jpg"
-  },
-  {
-    "id": "dealer",
-    "file": "fronts/front-dealer-v1.jpg"
-  },
-  {
-    "id": "docks",
-    "file": "fronts/front-docks-v1.jpg"
-  },
-  {
-    "id": "estate",
-    "file": "fronts/front-estate-v1.jpg"
-  },
-  {
-    "id": "filling",
-    "file": "fronts/front-filling-v1.jpg"
-  },
-  {
-    "id": "garage",
-    "file": "fronts/front-garage-v1.jpg"
-  },
-  {
-    "id": "goldenlily",
-    "file": "fronts/front-goldenlily-v1.jpg"
-  },
-  {
-    "id": "haulage",
-    "file": "fronts/front-haulage-v1.jpg"
-  },
-  {
-    "id": "herald",
-    "file": "fronts/front-herald-v1.jpg"
-  },
-  {
-    "id": "pawn",
-    "file": "fronts/front-pawn-v1.jpg"
-  },
-  {
-    "id": "poolhall",
-    "file": "fronts/front-poolhall-v1.jpg"
-  },
-  {
-    "id": "precinct",
-    "file": "fronts/front-precinct-v1.jpg"
-  },
-  {
-    "id": "pumps",
-    "file": "fronts/front-pumps-v1.jpg"
-  },
-  {
-    "id": "restaurant",
-    "file": "fronts/front-restaurant-v1.jpg"
-  },
-  {
-    "id": "scrapyard",
-    "file": "fronts/front-scrapyard-v1.jpg"
-  },
-  {
-    "id": "steamworks",
-    "file": "fronts/front-steamworks-v1.jpg"
-  }
+ {
+  "id": "apartment",
+  "file": "fronts/front-apartment-v1.jpg"
+ },
+ {
+  "id": "archway",
+  "file": "fronts/front-archway-v1.jpg"
+ },
+ {
+  "id": "burlesque",
+  "file": "fronts/front-burlesque-v1.jpg"
+ },
+ {
+  "id": "butcher",
+  "file": "fronts/front-butcher-v1.jpg"
+ },
+ {
+  "id": "cabstand",
+  "file": "fronts/front-cabstand-v1.jpg"
+ },
+ {
+  "id": "casino",
+  "file": "fronts/front-casino-v1.jpg"
+ },
+ {
+  "id": "chapel",
+  "file": "fronts/front-chapel-v1.jpg"
+ },
+ {
+  "id": "dealer",
+  "file": "fronts/front-dealer-v1.jpg"
+ },
+ {
+  "id": "docks",
+  "file": "fronts/front-docks-v1.jpg"
+ },
+ {
+  "id": "estate",
+  "file": "fronts/front-estate-v1.jpg"
+ },
+ {
+  "id": "filling",
+  "file": "fronts/front-filling-v1.jpg"
+ },
+ {
+  "id": "garage",
+  "file": "fronts/front-garage-v1.jpg"
+ },
+ {
+  "id": "goldenlily",
+  "file": "fronts/front-goldenlily-v1.jpg"
+ },
+ {
+  "id": "haulage",
+  "file": "fronts/front-haulage-v1.jpg"
+ },
+ {
+  "id": "herald",
+  "file": "fronts/front-herald-v1.jpg"
+ },
+ {
+  "id": "pawn",
+  "file": "fronts/front-pawn-v1.jpg"
+ },
+ {
+  "id": "poolhall",
+  "file": "fronts/front-poolhall-v1.jpg"
+ },
+ {
+  "id": "precinct",
+  "file": "fronts/front-precinct-v1.jpg"
+ },
+ {
+  "id": "pumps",
+  "file": "fronts/front-pumps-v1.jpg"
+ },
+ {
+  "id": "restaurant",
+  "file": "fronts/front-restaurant-v1.jpg"
+ },
+ {
+  "id": "scrapyard",
+  "file": "fronts/front-scrapyard-v1.jpg"
+ },
+ {
+  "id": "steamworks",
+  "file": "fronts/front-steamworks-v1.jpg"
+ },
+ {
+  "id": "tailor",
+  "file": "fronts/front-tailor-v1.jpg"
+ }
 ]

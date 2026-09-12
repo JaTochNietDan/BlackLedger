@@ -52,13 +52,6 @@ const (
 // AttireByTier is the dress at a tier, clamped so an unknown save cannot panic.
 func AttireByTier(tier int) Attire { return attires[max(0, min(tier, len(attires)-1))] }
 
-func nextAttire(tier int) (Attire, bool) {
-	if tier+1 >= len(attires) {
-		return Attire{}, false
-	}
-	return attires[tier+1], true
-}
-
 // DressCondition is how well kept what the player is wearing currently is.
 // Saves written before clothes existed carry a zero here and no suit, which is
 // the same as working clothes in perfect order.
@@ -109,36 +102,83 @@ func (w *World) DressDay() {
 	}
 }
 
-// TailorReachable reports where clothes are bought. The exchange sells
-// everything else; it sells this too.
-func TailorReachable(location string) bool { return location == "market" }
+// Attires is everything on the rail, working clothes included. All of it is for
+// sale at any time: a ladder you had to climb a rung at a time meant the only
+// way to be cut for is to buy off a rack first and throw it away, and there is
+// no way down at all — which matters here, because a good suit on somebody with
+// no visible income is exactly what a detective remembers. Going back into
+// working clothes is a decision somebody in this trade makes on purpose.
+func Attires() []Attire { return attires }
 
-// DressReadiness explains why the next step up cannot be bought, or returns "".
-func (w *World) DressReadiness() string {
+// TailorReachable reports where clothes are bought. It used to be the exchange:
+// the market sold everything else, so it sold this too, and the one purchase in
+// this game that is about how you are read happened at a counter between the
+// fish and the cloth. There is a tailor's now.
+func TailorReachable(location string) bool {
+	place, ok := PlaceByID(location)
+	return ok && place.Kind == "tailor"
+}
+
+// DressMargin is the share of a suit's price that stays with the shop. Holding
+// the tailor's is a workroom of your own, and what your own cutters make you
+// costs what the cloth cost.
+const DressMargin = 30
+
+// DressPrice is what this one costs today. A shop of the player's own keeps no
+// margin from them.
+func (w *World) DressPrice(tier int) int {
+	attire := AttireByTier(tier)
+	if w.Own(w.Player.Location) {
+		return attire.Cost - attire.Cost*DressMargin/100
+	}
+	return attire.Cost
+}
+
+// DressReadiness explains why this one cannot be had, or returns "".
+func (w *World) DressReadiness(tier int) string {
 	if !TailorReachable(w.Player.Location) {
 		return "Nobody sells this here"
 	}
-	next, ok := nextAttire(w.Player.Dress)
-	if !ok {
-		return "There is nothing better to be had"
+	if tier < 0 || tier >= len(attires) {
+		return "Nobody sells this here"
 	}
-	if w.Player.Cash < next.Cost {
+	if tier == w.Player.Dress && w.DressCondition() >= 100 {
+		return "It is what you are standing in"
+	}
+	if w.Player.Cash < w.DressPrice(tier) {
 		return "Not enough cash"
 	}
 	return ""
 }
 
-// BuyAttire moves up a tier, arriving in perfect condition.
-func (w *World) BuyAttire() error {
-	if reason := w.DressReadiness(); reason != "" {
+// BuyAttire puts the player in the one they asked for, whichever it is,
+// arriving in perfect condition. Nobody takes the old one: clothes off a man's
+// back are worth nothing to a shop that makes them, which is the difference
+// between this counter and a forecourt.
+func (w *World) BuyAttire(tier int) error {
+	if reason := w.DressReadiness(tier); reason != "" {
 		return fmt.Errorf("%s", reason)
 	}
-	next, _ := nextAttire(w.Player.Dress)
-	if err := w.Pay(next.Cost); err != nil {
+	next := AttireByTier(tier)
+	price := w.DressPrice(tier)
+	if err := w.Pay(price); err != nil {
 		return err
 	}
+	// The shop keeps its margin, and if the player holds it they are buying
+	// from themselves — the money never leaves their pocket.
+	if shop := w.Properties[w.Player.Location]; shop != nil && !w.Own(w.Player.Location) {
+		if house := w.faction(shop.Owner); house != nil {
+			house.Cash += next.Cost * DressMargin / 100
+		}
+	}
 	w.Player.Dress, w.Player.DressWear = next.Tier, 100
-	w.Log("Measured at the exchange", fmt.Sprintf("%s, $%d. %s", next.Label, next.Cost, next.Detail), "personal")
+	place, _ := PlaceByID(w.Player.Location)
+	if next.Tier == 0 {
+		w.Log("Out of the suit at "+place.Name,
+			fmt.Sprintf("%s. Nobody looks at you twice now, which is the point of it.", next.Label), "personal")
+		return nil
+	}
+	w.Log("Fitted at "+place.Name, fmt.Sprintf("%s, $%d. %s", next.Label, price, next.Detail), "personal")
 	return nil
 }
 

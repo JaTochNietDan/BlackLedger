@@ -65,7 +65,7 @@ var actionGroup = map[string]string{
 
 	// Becoming somebody.
 	"expand": "standing", "audience": "standing", "sitdown": "standing", "bribe": "standing",
-	"investigate": "standing", "lie_low": "standing", "dress": "standing", "press": "standing",
+	"investigate": "standing", "lie_low": "standing", "press": "standing",
 	"security": "standing", "move_home": "standing", "car": "standing", "leave_service": "standing",
 	// Everything about the car you own, in one place. Fuelling it and plating
 	// it were nowhere, and having it worked on was filed as a job that pays.
@@ -99,7 +99,7 @@ var prefixGroup = [][2]string{
 	// violence in this game sat under "jobs that pay today".
 	{"strike:", "street"}, {"send:", "street"},
 	// A car for one of your own, and plate on it: about them, not about you.
-	{"lot:", "standing"}, {"car:", "people"}, {"plate:", "people"}, {"give:", "people"},
+	{"lot:", "standing"}, {"attire:", "standing"}, {"car:", "people"}, {"plate:", "people"}, {"give:", "people"},
 	// A counter is where money comes from when there is none.
 	{"pawn:", "money"}, {"redeem:", "money"}, {"window:", "money"},
 	{"buy:", "money"}, {"sell:", "money"}, {"play:", "tables"},

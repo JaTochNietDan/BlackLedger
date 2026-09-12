@@ -94,6 +94,14 @@ func TestEveryTradeReachesPastItsOwnIncome(t *testing.T) {
 				}
 				return cash - w.Player.Cash
 			}},
+		{"tailor", "cut for you at what the cloth cost", "lower",
+			func(w *World, id string) int {
+				cash := w.Player.Cash
+				if err := w.BuyAttire(3); err != nil {
+					return AttireByTier(3).Cost
+				}
+				return cash - w.Player.Cash
+			}},
 		{"haulage", "a third off stocking everything else", "lower",
 			func(w *World, id string) int { return w.RestockCost(addressOf("butcher")) }},
 		{"cabs", "a ride when your own car cannot take you", "higher",

@@ -1050,6 +1050,27 @@ func (w *World) Actions(id string) []Action {
 			fmt.Sprintf("$%d to open and $%d a day. Neither of you moves on the other, they may answer when somebody comes for you, and every quarrel of theirs becomes yours.", PactOpening, PactTribute))
 		anywhere()
 	}
+	// A tailor's, where how a man is read is bought. Everything on the rail at
+	// once, working clothes included: there was no way down before, and going
+	// back into working clothes is a decision somebody in this trade makes on
+	// purpose — a good suit on somebody with no visible income is exactly the
+	// thing a detective remembers.
+	if place, ok := PlaceByID(id); ok && place.Kind == "tailor" {
+		for _, next := range Attires() {
+			notice := "Nobody official looks twice at it."
+			if next.Notice > 0 {
+				notice = fmt.Sprintf("Dressing above your visible means draws %d police attention a day.", next.Notice)
+			}
+			label := "Be measured for " + lowerFirst(next.Label)
+			detail := fmt.Sprintf("$%d. %s Worth %d presence while it is kept, and it wears. %s",
+				w.DressPrice(next.Tier), next.Detail, next.Presence, notice)
+			if next.Tier == 0 {
+				label = "Go back to " + lowerFirst(next.Label)
+				detail = next.Detail + " Costs nothing and is worth nothing at a door, which is the point of it."
+			}
+			asks(fmt.Sprintf("attire:%d", next.Tier), label, 60, w.DressPrice(next.Tier), w.DressReadiness(next.Tier), detail)
+		}
+	}
 	// A funeral director's, where the one thing this trade does that no other
 	// does is arranged: burying somebody who worked for you.
 	if place, ok := PlaceByID(id); ok && place.Kind == "undertaker" {
@@ -1230,14 +1251,6 @@ func (w *World) Actions(id string) []Action {
 		}
 		add("withdraw", "Bring money home", 45, 0, w.WithdrawReadiness(0), bringing)
 		sum(min(WithdrawLeast, w.Offshore), w.Offshore, w.Offshore, "Brought home")
-		if next, ok := nextAttire(p.Dress); ok {
-			notice := "Nobody official looks twice at it."
-			if next.Notice > 0 {
-				notice = fmt.Sprintf("Dressing above your visible means draws %d police attention a day.", next.Notice)
-			}
-			asks("dress", "Be measured for "+lowerFirst(next.Label), 60, next.Cost, w.DressReadiness(),
-				fmt.Sprintf("$%d. %s Worth %d presence while it is kept, and it wears. %s", next.Cost, next.Detail, next.Presence, notice))
-		}
 		for _, o := range officials {
 			if o.Place() != id {
 				continue // a man is arranged with where he actually is
@@ -2726,4 +2739,7 @@ var PlaceIncome = map[string]int{
 	"pawn": 17,
 	// An undertaker earns on a thing this city produces without being asked.
 	"chapel": 25,
+	// A tailor earns on people who need to be taken seriously, and this city
+	// is full of them.
+	"tailor": 16,
 }

@@ -150,6 +150,9 @@ Ensure efficiency of development loops by increasing efficiency of your workflow
 
 ## Inbox — open
 
+*Nothing open. What follows is the last few answered entries in place, and the
+loop is taking its work from the standing instructions.*
+
 Send word ahead to a family, so a meeting can be arranged rather than stumbled
 into.
 

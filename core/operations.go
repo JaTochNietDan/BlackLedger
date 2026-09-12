@@ -192,6 +192,12 @@ var trades = map[string]Trade{
 		Remedy:  "Pay somebody to bring a load out of hours", RemedyDetail: "A tanker at four in the morning, and nobody writes it down.", RemedyCost: 190,
 		Cover: 9, Watched: 1, Hides: 4,
 	},
+	"tailor": {
+		Hands: 3, Wage: 10, Drain: 5, Restock: 160, RestockAmount: 40, Supplies: "cloth on the roll and the trimmings",
+		Trouble: "A bolt of cloth came in that was on a manifest for somewhere else, and the workroom has already cut into it.",
+		Remedy:  "Buy the roll twice", RemedyDetail: "Paid for again at the proper price, and the invoice put where it belongs.", RemedyCost: 150,
+		Cover: 8, Watched: 1, Hides: 3,
+	},
 	"cabs": {
 		Hands: 8, Wage: 9, Drain: 10, Restock: 280, RestockAmount: 50, Supplies: "fuel and tyres",
 		Trouble: "Two cars are off the road and the dispatcher is turning work away.",

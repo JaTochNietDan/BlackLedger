@@ -12,6 +12,7 @@ nothing at runtime depends on a model. Run through mise:
     mise run exteriors
 """
 import hashlib
+import json
 import os
 import subprocess
 import sys
@@ -49,6 +50,7 @@ FRONTS = {
     "poolhall": "a first-floor billiard hall over a shopfront, long low windows, a stair door at street level",
     "butcher": "a butcher's shop with a tiled front, wide window, delivery van at the kerb, cold store behind",
     "haulage": "a haulage yard behind a wire fence, flatbed trucks, a low office hut, fuel pump",
+    "tailor": "a bespoke tailor's shop on a corner, a deep bay window with three suits on stands in it, a half-glazed door, a lit workroom window on the floor above, plain unlettered fascia board with no writing on it",
     "pawn": "a pawnbroker's shop on a corner, three brass balls hung over the door, a barred window crowded with other people's things, a low lit doorway, plain unlettered fascia board above the window with no writing on it",
 }
 
@@ -89,6 +91,29 @@ def main(out_dir):
         generate(f"{what}, {LOOK}", seed_for(place), raw)
         Image.open(raw).convert("RGB").save(out, quality=82, optimize=True)
         print(f"  {i + 1}/{len(FRONTS)} {place} -> {out}", flush=True)
+    manifest(out_dir)
+
+
+def manifest(out_dir):
+    """Write the list the view actually reads.
+
+    The comment beside it in `src/cityAssets.ts` has said "written by the same
+    tool" since the day it was written and it was not true: the list was kept
+    by hand, so a building painted tomorrow had a picture on disk and a
+    wireframe box in the address book. It is written here now, from the files.
+    """
+    root = os.path.dirname(out_dir.rstrip("/")) or "public/art"
+    rel = os.path.basename(out_dir.rstrip("/"))
+    listed = []
+    for place in sorted(FRONTS):
+        name = f"front-{place}-v1.jpg"
+        if os.path.exists(os.path.join(out_dir, name)):
+            listed.append({"id": place, "file": f"{rel}/{name}"})
+    path = os.path.join(root, "fronts.json")
+    with open(path, "w") as f:
+        json.dump(listed, f, indent=1)
+        f.write("\n")
+    print(f"  {len(listed)} fronts listed in {path}", flush=True)
 
 
 if __name__ == "__main__":

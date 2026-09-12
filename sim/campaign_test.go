@@ -154,8 +154,13 @@ func TestALongCampaignReachesTheWorkOfRunningABusiness(t *testing.T) {
 		t.Skip("long campaigns: run without -short to measure them")
 	}
 	t.Parallel()
-	stocked, ran, days := 0, 0, 0
-	for i := 0; i < 3; i++ {
+	// Eight campaigns rather than three. Buying stock happens about once in a
+	// campaign of ninety days — nine loads across ten — so at three seeds
+	// whether this reads zero is a coin toss, and it read zero the night an
+	// address was added to the city and moved every draw after it. A guard
+	// that goes off at the weather is not guarding anything.
+	stocked, ran, days, runs := 0, 0, 0, 8
+	for i := 0; i < runs; i++ {
 		r := Run(uint32(i+1)*0x9e3779b9, "publican", "authored", 1200, false)
 		days += r.Minutes / 1440
 		for id, count := range r.Actions {
@@ -167,14 +172,14 @@ func TestALongCampaignReachesTheWorkOfRunningABusiness(t *testing.T) {
 			}
 		}
 	}
-	t.Logf("three long publicans: %d days between them, %d loads of stock bought, %d wages set",
-		days, stocked, ran)
-	if days/3 < 20 {
-		t.Fatalf("a long campaign averages %d days, which is no longer than a short one", days/3)
+	t.Logf("%d long publicans: %d days between them, %d loads of stock bought, %d wages set",
+		runs, days, stocked, ran)
+	if days/runs < 20 {
+		t.Fatalf("a long campaign averages %d days, which is no longer than a short one", days/runs)
 	}
 	if stocked == 0 {
-		t.Fatal("three campaigns of ninety days and nobody ever bought stock, so this measures " +
-			"nothing the six-day campaigns did not")
+		t.Fatalf("%d campaigns of ninety days and nobody ever bought stock, so this measures "+
+			"nothing the six-day campaigns did not", runs)
 	}
 	if ran == 0 {
 		t.Fatal("nobody ever set a wage, so the counter rules are still unmeasured")

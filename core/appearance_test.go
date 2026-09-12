@@ -8,23 +8,27 @@ import (
 func dressed(t *testing.T) *World {
 	t.Helper()
 	w := New(41)
-	w.Player.Location = "market"
+	w.Event, w.District = nil, 9
+	w.Player.Location = "tailor"
 	w.Player.Cash = 5000
 	return w
 }
 
-func TestClothesAreSoldAtTheExchangeAndNowhereElse(t *testing.T) {
+// Renamed with the rule it guards. Clothes were bought at the exchange, which
+// sold everything else and so sold this too — the one purchase in this game
+// about how a man is read, made at a counter between the fish and the cloth.
+func TestClothesAreSoldAtTheTailorsAndNowhereElse(t *testing.T) {
 	t.Parallel()
 	w := dressed(t)
-	if w.DressReadiness() != "" {
-		t.Fatal("the exchange refused to sell:", w.DressReadiness())
+	if w.DressReadiness(1) != "" {
+		t.Fatal("the tailor refused to sell:", w.DressReadiness(1))
 	}
-	for _, elsewhere := range []string{"bar", "docks", "club", "room"} {
+	for _, elsewhere := range []string{"bar", "docks", "club", "room", "market"} {
 		w.Player.Location = elsewhere
-		if w.DressReadiness() == "" {
+		if w.DressReadiness(1) == "" {
 			t.Fatalf("%s was selling suits", elsewhere)
 		}
-		if err := w.BuyAttire(); err == nil {
+		if err := w.BuyAttire(1); err == nil {
 			t.Fatalf("bought a suit at %s", elsewhere)
 		}
 	}
@@ -35,15 +39,15 @@ func TestDressWorksUpwardAndRunsOut(t *testing.T) {
 	w := dressed(t)
 	w.Player.Cash = 100000
 	for tier := 1; tier < len(attires); tier++ {
-		if err := w.BuyAttire(); err != nil {
+		if err := w.BuyAttire(tier); err != nil {
 			t.Fatal(err)
 		}
 		if w.Player.Dress != tier || w.DressCondition() != 100 {
 			t.Fatalf("tier %d at %d condition", w.Player.Dress, w.DressCondition())
 		}
 	}
-	if w.DressReadiness() == "" {
-		t.Fatal("there was something better than bespoke")
+	if w.DressReadiness(len(attires)) == "" {
+		t.Fatal("the rail was selling something that does not exist")
 	}
 }
 
@@ -54,7 +58,7 @@ func TestPresenceIsWhatYouHaveDonePlusWhatYouAreWearing(t *testing.T) {
 	if w.Presence() != 10 {
 		t.Fatalf("working clothes were worth %d", w.Presence()-10)
 	}
-	if err := w.BuyAttire(); err != nil {
+	if err := w.BuyAttire(w.Player.Dress + 1); err != nil {
 		t.Fatal(err)
 	}
 	if w.Presence() != 10+attires[1].Presence {
@@ -66,8 +70,8 @@ func TestWearTakesStandingAwayAndRuinRemovesItEntirely(t *testing.T) {
 	t.Parallel()
 	w := dressed(t)
 	w.Player.Cash = 100000
-	w.BuyAttire()
-	w.BuyAttire() // tailored
+	w.BuyAttire(w.Player.Dress + 1)
+	w.BuyAttire(w.Player.Dress + 1) // tailored
 	full := w.Standing()
 	if full == 0 {
 		t.Fatal("a tailored suit was worth nothing")
@@ -89,8 +93,8 @@ func TestABeatingCostsTheSuitAsWellAsTheHealth(t *testing.T) {
 	t.Parallel()
 	w := dressed(t)
 	w.Player.Cash = 100000
-	w.BuyAttire()
-	w.BuyAttire()
+	w.BuyAttire(w.Player.Dress + 1)
+	w.BuyAttire(w.Player.Dress + 1)
 	before := w.DressCondition()
 	w.Ruin(30)
 	if w.DressCondition() >= before {
@@ -111,9 +115,9 @@ func TestGoodClothesWearOutAndAreNoticed(t *testing.T) {
 	t.Parallel()
 	w := dressed(t)
 	w.Player.Cash = 100000
-	w.BuyAttire()
-	w.BuyAttire()
-	w.BuyAttire() // bespoke: noticed
+	w.BuyAttire(w.Player.Dress + 1)
+	w.BuyAttire(w.Player.Dress + 1)
+	w.BuyAttire(w.Player.Dress + 1) // bespoke: noticed
 	heat, condition := w.Player.Heat, w.DressCondition()
 	w.DressDay()
 	if w.DressCondition() != condition-DressUpkeep {
@@ -128,9 +132,9 @@ func TestShabbyClothesDrawNoAttention(t *testing.T) {
 	t.Parallel()
 	w := dressed(t)
 	w.Player.Cash = 100000
-	w.BuyAttire()
-	w.BuyAttire()
-	w.BuyAttire()
+	w.BuyAttire(w.Player.Dress + 1)
+	w.BuyAttire(w.Player.Dress + 1)
+	w.BuyAttire(w.Player.Dress + 1)
 	w.Player.DressWear = Shabby - 1
 	heat := w.Player.Heat
 	w.DressDay()
@@ -143,7 +147,7 @@ func TestPressingIsFreeAtALaundryOfYourOwn(t *testing.T) {
 	t.Parallel()
 	w := dressed(t)
 	w.Player.Cash = 100000
-	w.BuyAttire()
+	w.BuyAttire(w.Player.Dress + 1)
 	w.Player.DressWear = 50
 	w.Properties["laundry"].Owner = fmt.Sprintf("player:%d", w.Life)
 	w.Player.Location = "laundry"
@@ -163,7 +167,7 @@ func TestPressingCostsMoneyAtHomeAndNeverFullyRestoresARuinedSuit(t *testing.T) 
 	t.Parallel()
 	w := dressed(t)
 	w.Player.Cash = 100000
-	w.BuyAttire()
+	w.BuyAttire(w.Player.Dress + 1)
 	w.Player.DressWear = 10
 	w.Player.Location = w.Player.Home
 	cash := w.Player.Cash
@@ -197,10 +201,10 @@ func TestTheHighTablesJudgeYouAtTheDoor(t *testing.T) {
 	if w.TableReadiness("club", small) != "" {
 		t.Fatal("the small tables turned him away too:", w.TableReadiness("club", small))
 	}
-	w.Player.Location = "market"
-	w.BuyAttire()
-	w.BuyAttire()
-	w.BuyAttire()
+	w.Player.Location = "tailor"
+	w.BuyAttire(w.Player.Dress + 1)
+	w.BuyAttire(w.Player.Dress + 1)
+	w.BuyAttire(w.Player.Dress + 1)
 	w.Player.Location = "club"
 	if w.TableReadiness("club", high) != "" {
 		t.Fatal("bespoke did not open the room:", w.TableReadiness("club", high))
@@ -215,7 +219,7 @@ func TestClothesDoNotSurviveTheirOwner(t *testing.T) {
 	t.Parallel()
 	w := dressed(t)
 	w.Player.Cash = 100000
-	w.BuyAttire()
+	w.BuyAttire(w.Player.Dress + 1)
 	w.Player.Alive = false
 	next, err := Execute(w, Command{RequestID: ID(), Revision: w.Revision, Kind: "new_life"})
 	if err != nil {

@@ -278,7 +278,8 @@ func (w *World) apply(c Command) error {
 				if p.Alive {
 					from, _ := PlaceByID(oldLoc)
 					to, _ := PlaceByID(target)
-					w.Log("Journey interrupted", fmt.Sprintf("The journey to %s was interrupted after %d minutes. You remain based at %s; choose your next destination after resolving the situation.", to.Name, w.Minute-oldTime, from.Name), "travel")
+					w.Log("Journey interrupted", fmt.Sprintf("The journey to %s was interrupted after %s. You remain based at %s; choose your next destination after resolving the situation.",
+						to.Name, plainly(w.Minute-oldTime, "a minute", fmt.Sprintf("%d minutes", w.Minute-oldTime)), from.Name), "travel")
 				}
 			}
 		} else if id, ok := strings.CutPrefix(c.Kind, "serve:"); ok {
@@ -491,6 +492,15 @@ func (w *World) apply(c Command) error {
 				return err
 			}
 			w.Advance(a.Minutes)
+		} else if which, ok := strings.CutPrefix(c.Kind, "attire:"); ok {
+			tier, err := strconv.Atoi(which)
+			if err != nil {
+				return fmt.Errorf("there is nothing of that description on the rail")
+			}
+			if err := w.BuyAttire(tier); err != nil {
+				return err
+			}
+			w.Advance(a.Minutes)
 		} else if which, ok := strings.CutPrefix(c.Kind, "lot:"); ok {
 			tier, err := strconv.Atoi(which)
 			if err != nil {
@@ -697,10 +707,6 @@ func (w *World) apply(c Command) error {
 				}
 			case "draw":
 				if err := w.Draw(target, c.Amount); err != nil {
-					return err
-				}
-			case "dress":
-				if err := w.BuyAttire(); err != nil {
 					return err
 				}
 			case "press":

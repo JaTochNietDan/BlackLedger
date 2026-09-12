@@ -13068,3 +13068,55 @@ What it protects is small and specific: buying down pays the difference, so the
 lot hands money back, and that is the one transaction in this game that puts
 cash in the player's pocket for walking in with something. It should stay a way
 of changing your mind cheaply, not a job.
+
+## A tailor's, and the third ladder comes out
+
+The inbox emptied, so this came off the standing instruction: another business,
+more people in the city, and something for it to reach past its own takings.
+
+**Where a suit came from was the exchange.** The market sold everything else, so
+it sold this too, and the one purchase in this game that is about how a man is
+read happened at a counter between the fish and the cloth. Ruttledge & Vance is
+a real address now — a bay window with three suits in it, a workroom over the
+top, three people who work there, a trade of its own with its own trouble and
+its own remedy, and a counter that says the thing only a cutter knows: who has
+been measured lately and paid out of a roll that a person of that occupation
+does not earn.
+
+**And the third ladder.** Guns came off a ladder a week ago and cars came off
+one last night; clothes were still a rung at a time, and worse than either,
+because there was no way back down. That matters here more than it did for a
+car: the whole cost of a good suit is that it draws attention, and a detective
+remembers a man dressed above his visible income. Going back into working
+clothes is a decision somebody in this trade makes on purpose, and until tonight
+it was not possible at all. The rail carries all four, working clothes included,
+and the card for those says it costs nothing and is worth nothing at a door,
+which is the point of it.
+
+What holding the shop buys is the workroom: cut for you at what the cloth cost,
+$1,900 down to $1,330, which is the row it now has in the trades table.
+
+**It is in district one, beside the pawnbroker and the undertaker.** Not by
+preference — the city's grid was full. Twenty-seven addresses in a six by four
+that had exactly three blocks left, all in the southern row. Of those, the one
+under the chapel is in the column that already holds a butcher, a pawnbroker and
+a funeral director, which is the street a tailor belongs on, and it puts the two
+ends of what a suit is worth within sight of each other: the shop that makes it
+and the counter that lends against it.
+
+Three things fell out of the change and all three were faults that existed
+before it:
+
+- **The tool that paints the fronts never wrote the list the view reads.** The
+  comment beside that list has said "written by the same tool" since the day it
+  was written and it was not true, so a building painted tomorrow had a picture
+  on disk and a wireframe box in the address book. It is written from the files
+  now.
+- **A journey interrupted after one minute said "1 minutes".** The prose sweep
+  caught it the moment a new address changed what the thief walked into.
+- **The long-campaign guard was three seeds.** A publican buys stock about once
+  in ninety days — nine loads across ten campaigns — so whether the count reads
+  zero at three seeds is a coin toss, and it came up zero. Eight seeds. That is
+  the third narrow-sample instrument found this week and they all read the same:
+  a number that moves when an unrelated thing changes is measuring the draw
+  order, not the game.
