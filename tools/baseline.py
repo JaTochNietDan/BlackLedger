@@ -86,6 +86,18 @@ for i, a in enumerate(played):
 if same:
     print("not separable by cash:", " ".join(same))
 
+# What the city actually did to them. Eleven rules in this game end a life and
+# the balance report had only ever counted how many times one of them fired.
+killed = {}
+for who in summary:
+    for cause, n in (summary[who].get("killed_by") or {}).items():
+        killed[cause] = killed.get(cause, 0) + n
+if killed:
+    total = sum(killed.values())
+    print("killed_by (%d deaths, %d distinct causes)" % (total, len(killed)))
+    for cause, n in sorted(killed.items(), key=lambda kv: -kv[1]):
+        print("  %4d  %2d%%  %s" % (n, round(100 * n / total), cause))
+
 city = run.get("city_alone", {}).get("totals")
 if city:
     print("city_alone", city)

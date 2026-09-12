@@ -168,6 +168,6 @@ func (w *World) PassThrough(from, to string) {
 	}
 	w.Log(sighting.Title, body, kind)
 	if w.Player.Health <= 0 {
-		w.Die("Caught on the street by somebody else's war.")
+		w.DieOf("caught in somebody else's war", "Caught on the street by somebody else's war.")
 	}
 }

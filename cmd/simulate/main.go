@@ -133,6 +133,11 @@ func main() {
 	short := []string{}
 	for _, p := range strategies {
 		deaths, errors := 0, 0
+		// And what killed them. A death count says a policy dies; it does not
+		// say what the city did to it, and those are different faults with
+		// different answers. Eleven rules in this game can end a life and
+		// nothing had ever read back which of them fired.
+		killed := map[string]int{}
 		cash := []int{}
 		minutes := []int{}
 		milestones := map[string][]int{}
@@ -142,6 +147,7 @@ func main() {
 			}
 			if !r.Alive {
 				deaths++
+				killed[r.Died]++
 			}
 			if r.Error != "" {
 				errors++
@@ -216,7 +222,7 @@ func main() {
 				hurt++
 			}
 		}
-		summaries[p] = map[string]any{"runs": *runs, "deaths": deaths, "errors": errors,
+		summaries[p] = map[string]any{"runs": *runs, "deaths": deaths, "killed_by": killed, "errors": errors,
 			"mean_heat": heat / max(1, *runs), "seizures": seizures,
 			"informed": informed, "median_lowest_health": median(lows),
 			"median_final_cash": cash[len(cash)/2], "median_game_minutes": span,

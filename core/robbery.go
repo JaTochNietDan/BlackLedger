@@ -90,7 +90,7 @@ func (w *World) RobBy(id string, hand Hand) error {
 			w.Log("It went wrong at "+place.Name, fmt.Sprintf("Somebody was waiting. %s left with nothing, and you were not there to be seen.", hand.Name), "danger")
 		}
 		if w.Player.Health <= 0 {
-			w.Die("A robbery at " + place.Name + " went wrong.")
+			w.DieOf("robbing a business", "A robbery at "+place.Name+" went wrong.")
 		}
 		return nil
 	}

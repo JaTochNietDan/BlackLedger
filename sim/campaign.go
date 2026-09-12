@@ -101,8 +101,12 @@ type Report struct {
 	Commands int    `json:"commands"`
 	Minutes  int    `json:"game_minutes"`
 	Alive    bool   `json:"alive"`
-	Cash     int    `json:"cash"`
-	Respect  int    `json:"respect"`
+	// Died is the rule that ended it, in the game's own three or four words.
+	// Not the sentence in the ledger: that carries a name and an address, so
+	// grouping deaths by it reports eleven distinct causes where there are two.
+	Died    string `json:"died,omitempty"`
+	Cash    int    `json:"cash"`
+	Respect int    `json:"respect"`
 	// What the city took out of them. Attention is the whole risk of the
 	// underground trade and the harness could not see it: a report of deaths
 	// and cash says nothing about a policy whose money is taken rather than
@@ -1570,6 +1574,20 @@ func RunRecorded(seed uint32, strategy, director string, limit int, trace bool, 
 		}
 	}
 	r.Alive = w.Player.Alive
+	// And what killed them. A death count says a policy dies; it does not say
+	// whether the city shot it, the police took it, or it walked into a
+	// warehouse it had no business in — and those are three different faults
+	// with three different answers. The game writes a cause down when somebody
+	// dies; nothing had ever read it back.
+	if !w.Player.Alive {
+		r.Died = "the game recorded no cause"
+		for i := len(w.Dead) - 1; i >= 0; i-- {
+			if d := w.Dead[i]; d.Life == w.Life && d.Why != "" {
+				r.Died = d.Why
+				break
+			}
+		}
+	}
 	// And what it said on the way. The reader that checks a sentence lives in
 	// the core; what the harness adds is a city that was played rather than one
 	// left alone, which is where the lines about a search, a cell, a crate and

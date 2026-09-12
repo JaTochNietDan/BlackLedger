@@ -354,6 +354,11 @@ type Death struct {
 	Minute int    `json:"minute"`
 	Life   int    `json:"life"`
 	Cause  string `json:"cause"`
+	// Why is the rule that ended it, in three or four words. The cause is a
+	// sentence with a name and an address in it, which reads well in a ledger
+	// and cannot be counted: eleven rules in this game end a life and the only
+	// way to ask which of them fires was to group prose by hand.
+	Why string `json:"why,omitempty"`
 	// Estate is what the city calls whatever they left, when somebody was left
 	// to hold it. What became of what a person built is part of the record of
 	// their death; it used to be worked out and thrown away.
@@ -2190,12 +2195,15 @@ func (w *World) factionName(id string) string {
 	}
 	return "An unidentified family"
 }
-func (w *World) Die(cause string) {
+func (w *World) Die(cause string) { w.DieOf("something unrecorded", cause) }
+
+// DieOf is the same, with the rule that did it named so it can be counted.
+func (w *World) DieOf(why, cause string) {
 	w.SuspendedJob = nil
 	p := &w.Player
 	p.Alive = false
 	p.Health = 0
-	w.Dead = append(w.Dead, Death{Name: p.Name, Minute: w.Minute, Life: w.Life, Cause: cause})
+	w.Dead = append(w.Dead, Death{Name: p.Name, Minute: w.Minute, Life: w.Life, Cause: cause, Why: why})
 	// What they built outlives them if anybody was left to hold it. Whoever
 	// takes it over keeps the premises, so this runs before the estate claims
 	// anything.
@@ -2248,7 +2256,7 @@ func (w *World) Attack(plot Plot) {
 		return
 	}
 	if w.Random() < w.AmbushOddsHere() {
-		w.Die(fmt.Sprintf("An attack at %s caught you without warning or protection.", w.whereItHappens()))
+		w.DieOf("caught unwarned and unprotected", fmt.Sprintf("An attack at %s caught you without warning or protection.", w.whereItHappens()))
 		return
 	}
 	w.survived()

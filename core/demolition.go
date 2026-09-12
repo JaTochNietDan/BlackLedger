@@ -146,7 +146,7 @@ func (w *World) Plant(id string) error {
 		w.Report("attack", "EXPLOSION AT "+strings.ToUpper(place.Name),
 			fmt.Sprintf("An explosion at %s is being treated as deliberate. Witnesses described somebody leaving on foot. Police say a prosecution is likely.", place.Name))
 		if w.Player.Health <= 0 {
-			w.Die("A charge at " + place.Name + " went off with you still under it.")
+			w.DieOf("a charge of your own", "A charge at "+place.Name+" went off with you still under it.")
 		}
 		return nil
 	}

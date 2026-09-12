@@ -152,7 +152,7 @@ func (w *World) Mug(location string, hand Hand) error {
 			w.Log("It went wrong at "+place.Name, fmt.Sprintf("%s was not as easy as they looked. You came away with nothing and %d less health, and they saw all of it.", mark.Name, health-w.Player.Health), "danger")
 		}
 		if w.Player.Health <= 0 {
-			w.Die("A robbery at " + place.Name + " that should have been simple.")
+			w.DieOf("robbing somebody in the street", "A robbery at "+place.Name+" that should have been simple.")
 		}
 		return nil
 	}

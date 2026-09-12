@@ -344,6 +344,6 @@ func (w *World) bloodbath(a, b *Faction) {
 		fmt.Sprintf("Several people were shot at a bar on the waterfront. Police believe a meeting between interests associated with %s and %s was the occasion.", a.Name, b.Name))
 	w.Witness("gunfight", SitdownGround, "A meeting at Saint Agnes ended in gunfire.", "")
 	if w.Player.Health <= 0 {
-		w.Die("A meeting at Saint Agnes that was never a meeting.")
+		w.DieOf("a sit-down that was a trap", "A meeting at Saint Agnes that was never a meeting.")
 	}
 }

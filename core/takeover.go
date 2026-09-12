@@ -115,7 +115,7 @@ func (w *World) TakeOver() error {
 		w.Log("They were expecting it", fmt.Sprintf("%s knew before you were through the door. You are not one of theirs any more and %s is not a name you can use.", leader.Name, name), "danger")
 		w.RetaliationFrom(f.ID)
 		if w.Player.Health <= 0 {
-			w.Die("A move on " + leader.Name + " that they saw coming.")
+			w.DieOf("moving on a family head", "A move on "+leader.Name+" that they saw coming.")
 		}
 		return nil
 	}

@@ -112,7 +112,7 @@ func (w *World) apply(c Command) error {
 					chance = .9
 				}
 				if w.Random() > chance {
-					w.Die("You did not survive the attack at your residence.")
+					w.DieOf("somebody came to the house", "You did not survive the attack at your residence.")
 				} else {
 					lost := min(p.Security, 1+int(w.Random()*2))
 					p.Security -= lost

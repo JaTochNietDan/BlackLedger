@@ -104,7 +104,7 @@ func (w *World) MoveOn(id string) error {
 			w.Player.Health = max(0, w.Player.Health-injury)
 			w.Log("You went in with them", fmt.Sprintf("It did not go your way at %s and you came out of it with %d less health.", place.Name, injury), "danger")
 			if w.Player.Health <= 0 {
-				w.Die("A move on " + place.Name + " that should not have been made.")
+				w.DieOf("moving on a rival holding", "A move on "+place.Name+" that should not have been made.")
 			}
 		}
 	}

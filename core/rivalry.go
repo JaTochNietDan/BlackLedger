@@ -245,7 +245,7 @@ func (w *World) SabotageBy(id string, hand Hand) error {
 		}
 		w.RetaliationFrom(f.ID)
 		if w.Player.Health <= 0 {
-			w.Die("An attack on " + place.Name + " went wrong.")
+			w.DieOf("attacking a rival holding", "An attack on "+place.Name+" went wrong.")
 			return nil
 		}
 		return nil

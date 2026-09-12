@@ -138,6 +138,20 @@ which half is standing.
    points at the test that asks whether anybody comes.
 ---
 
+8. **Only one thing in this city is actually lethal. Open.** Eleven rules end a
+   life; over three hundred and ninety-one deaths, ninety-eight per cent are
+   somebody coming for you at an address you were standing at, and eight of the
+   eleven have never killed anybody in any run this project has taken. Every
+   piece of violence the player commits is survivable in practice: a robbery, a
+   mugging, a charge, a move on a holding, a move on a family head, a sit-down
+   that was a trap. `mise run simulate` prints the table now, so any change to
+   this is measurable. What it needs is a judgement about whether the game
+   should be more dangerous to the person doing the violence, and that is a
+   balance change with a wide blast radius — the death rates of thirteen
+   policies all move together.
+
+---
+
 ## What everything pays
 
 `mise run rates` prints what each action is worth for the time it takes, out of

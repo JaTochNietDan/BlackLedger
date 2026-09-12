@@ -13176,3 +13176,41 @@ walking to a card whose name had changed; and now a season shorter than the
 event it was counting. They are one fault wearing four coats: *a number that
 reads nought is not evidence of absence until you have shown the instrument can
 see the thing at all.*
+
+## Eleven ways to die and two of them ever happen
+
+Following on from the season being too short to see a family fall: the same
+question asked of the player. What does this city actually do to somebody?
+
+The balance report has always counted deaths and never once said what killed
+anybody. Eleven rules in the core end a life — a charge you planted, a robbery
+that went wrong, a mugging, a move on a holding, a move on a family head, a
+sit-down that was never a meeting, an attempt of your own that went the other
+way, being caught on the street by somebody else's war, and three different
+shapes of somebody coming for you. Nothing had ever read back which of them
+fires.
+
+Over three hundred and ninety-one deaths:
+
+    302   77%   somebody came to the house
+     81   21%   caught unwarned and unprotected
+      8    2%   an attempt of your own
+
+Two of the eleven account for ninety-eight per cent, and they are the same
+event: somebody came for you and you were there. Eight of the eleven have never
+killed anybody in any run this project has taken. **The only genuinely lethal
+thing in Black Ledger is being at an address a rival can find you at.** Every
+piece of violence the player commits is, in practice, survivable.
+
+That is written down rather than changed tonight. It is a balance judgement with
+a wide blast radius and the first thing it needed was to be visible; it is in
+the queue.
+
+**Reading it needed a change of its own.** The cause each rule writes is a
+sentence with a name and an address in it — "An attempt on Tilda Gruber at The
+Mariner that went the other way" — which reads properly in a ledger and cannot
+be counted. Grouped by that sentence, two hundred and sixty campaigns reported
+eleven distinct causes where there were three, and every name in the city looked
+like a separate way to die. A death carries the rule now as well as the
+sentence, in the game's own three or four words, and `TestEveryWayToDieNamesTheRuleThatDidIt`
+makes sure the twelfth way to die carries it too.

@@ -182,7 +182,7 @@ func (w *World) itWentWrong(n *NPC, hand Hand, where string, family *Faction) {
 		// You were there, and it can be the end of you.
 		w.Player.Heat = min(100, w.Player.Heat+StrikeHeat)
 		if w.Random() < .22 {
-			w.Die("An attempt on " + n.Name + " at " + where + " that went the other way.")
+			w.DieOf("an attempt of your own", "An attempt on "+n.Name+" at "+where+" that went the other way.")
 			return
 		}
 		w.HandHurt(hand, 55, "")
