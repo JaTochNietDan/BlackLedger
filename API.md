@@ -135,3 +135,9 @@ Thorne & Sons (`chapel`) now uses its undertaker-specific building model. The
 parked hearse in its yard is decorative premises scenery; it is not a public NPC
 journey, player vehicle or gameplay vehicle type. Existing address and command
 identifiers remain unchanged.
+
+City keyboard navigation is presentation-only: unmodified arrows pan in camera
+screen directions, Q/E rotate, +/− zoom and Home resets. Expanding focuses the
+canvas; Escape returns focus to the expansion button. Browser/OS modifier
+shortcuts and composing input are left untouched. Camera diagnostics do not
+change public simulation state or commands.

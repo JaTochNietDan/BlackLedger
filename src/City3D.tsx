@@ -22,6 +22,7 @@ import type {SceneSlot} from './city3dEvents';
 import {StreetTraffic, trafficSize} from './city3dTraffic';
 import {pedestrianModel, isPedestrian} from './city3dCast';
 import {playCityGunshot, soundOn} from './sound';
+import {cameraCommand, screenPan} from './city3dControls';
 
 type Props = {
   state: Snapshot;
@@ -96,6 +97,7 @@ const tmp = new THREE.Object3D();
 
 export function City3D(props: Props) {
   const host = useRef<HTMLDivElement>(null);
+  const expandButton = useRef<HTMLButtonElement>(null);
   const latest = useRef(props);
   latest.current = props;
   const controlsRef = useRef<OrbitControls | null>(null);
@@ -136,7 +138,7 @@ export function City3D(props: Props) {
     const canvas = renderer.domElement;
     canvas.setAttribute(
       'aria-label',
-      '3D Bellwether city. Drag to rotate, right drag to pan, scroll to zoom.',
+      '3D Bellwether city. Drag to rotate, right drag to pan, scroll to zoom. Keyboard: arrows pan, Q and E rotate, plus and minus zoom, Home resets, Escape leaves the expanded city.',
     );
     canvas.tabIndex = 0;
     element.appendChild(canvas);
@@ -406,37 +408,32 @@ export function City3D(props: Props) {
     canvas.addEventListener('pointerdown', pointerDown);
     canvas.addEventListener('pointerup', pointerUp);
     const keys = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setExpanded(false);
-      if (['+', '=', '-'].includes(e.key)) {
-        e.preventDefault();
+      const command = cameraCommand(e);
+      if (!command) return;
+      e.preventDefault();
+      if (command === 'zoom-in' || command === 'zoom-out') {
         camera.zoom = THREE.MathUtils.clamp(
-          camera.zoom * (e.key === '-' ? 0.9 : 1.1),
+          camera.zoom * (command === 'zoom-out' ? 0.9 : 1.1),
           controls.minZoom,
           controls.maxZoom,
         );
         camera.updateProjectionMatrix();
       }
-      if (['q', 'e'].includes(e.key.toLowerCase())) {
-        e.preventDefault();
+      if (command === 'rotate-left' || command === 'rotate-right') {
         const offset = camera.position.clone().sub(controls.target);
         offset.applyAxisAngle(
           new THREE.Vector3(0, 1, 0),
-          e.key.toLowerCase() === 'q' ? 0.12 : -0.12,
+          command === 'rotate-left' ? 0.12 : -0.12,
         );
         camera.position.copy(controls.target).add(offset);
         controls.update();
       }
-      if (e.key === 'Home') {
-        e.preventDefault();
+      if (command === 'reset') {
         reset();
       }
-      if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) {
-        e.preventDefault();
-        const move = new THREE.Vector3(
-          e.key === 'ArrowLeft' ? -5 : e.key === 'ArrowRight' ? 5 : 0,
-          0,
-          e.key === 'ArrowUp' ? -5 : e.key === 'ArrowDown' ? 5 : 0,
-        );
+      if (command.startsWith('pan-')) {
+        const pan = screenPan(camera.position, controls.target, command);
+        const move = new THREE.Vector3(pan.x, 0, pan.z);
         controls.target.add(move);
         camera.position.add(move);
         controls.update();
@@ -1088,6 +1085,8 @@ export function City3D(props: Props) {
           revision: w.revision,
           minute: w.minute,
           playbackRate: playback.current,
+          camera: {zoom: camera.zoom, x: camera.position.x, z: camera.position.z,
+            targetX: controls.target.x, targetZ: controls.target.z},
           actors: [...actors]
             .filter(([, a]) => a.object.visible)
             .map(([id, a]) => ({
@@ -1165,9 +1164,12 @@ export function City3D(props: Props) {
       role={expanded ? 'dialog' : 'region'}
       aria-modal={expanded || undefined}
       onKeyDown={e => {
-        if (!expanded) return;
+        if (!expanded || e.ctrlKey || e.metaKey || e.altKey || e.nativeEvent.isComposing) return;
         if (e.key === 'Escape') {
+          e.preventDefault();
+          e.stopPropagation();
           setExpanded(false);
+          expandButton.current?.focus();
           return;
         }
         if (e.key === 'Tab') {
@@ -1178,7 +1180,7 @@ export function City3D(props: Props) {
           if (e.shiftKey && at <= 0) {
             e.preventDefault();
             items.at(-1)?.focus();
-          } else if (!e.shiftKey && at === items.length - 1) {
+          } else if (!e.shiftKey && (at < 0 || at === items.length - 1)) {
             e.preventDefault();
             items[0]?.focus();
           }
@@ -1189,9 +1191,13 @@ export function City3D(props: Props) {
       <div className="city3d-heading">
         <small>BELLWETHER · 1950</small>
         <span>Drag to rotate · Right drag to pan · Scroll to zoom</span>
+        <span>Arrows: pan · Q/E: rotate · +/−: zoom · Home: reset · Esc: return</span>
       </div>
       <div className="city3d-tools">
-        <button aria-pressed={expanded} onClick={() => setExpanded(v => !v)}>
+        <button ref={expandButton} aria-pressed={expanded} onClick={() => {
+          setExpanded(!expanded);
+          if (!expanded) host.current?.querySelector('canvas')?.focus();
+        }}>
           {expanded ? 'Return to game' : 'Expand city'}
         </button>
         <button onClick={() => focus.current()}>Whole city</button>

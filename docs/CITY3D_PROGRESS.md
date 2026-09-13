@@ -64,6 +64,14 @@ These are staged fixture saves, not earned campaign progress.
 
 ## Continue next
 
+### Keyboard camera and expanded-city focus (2026-09-13)
+
+- Arrow-key pan now follows the camera's horizontal screen axes after rotation. Modified browser/OS shortcuts and composing input are ignored by camera handling. Visible keyboard instructions cover rotate, pan, zoom, reset and return.
+- Expanding focuses the canvas; Shift+Tab wraps to the address directory, Tab returns to the canvas, and Escape closes the expanded city and restores focus to its button. Camera diagnostics expose position, target and zoom for read-only browser verification.
+- Isolated port 8847 browser check: Enter opened/focused the canvas; Q then Up moved target from (96,80) to (93.5004,84.3304); + changed zoom 1.65 to 1.815; Home restored zoom 1 and target (96,80). Both focus-wrap directions and Escape/Enter reopening passed. Screenshot: `docs/qa/city3d-20260913/keyboard-navigation.png`. No gameplay command or save mutation during this check.
+- All 106 frontend tests, production build and HTTP package tests passed. Unit coverage checks modifier/IME handling and pan direction/distance through a complete camera orbit. Desktop layout inspected at 1280×720; new mobile hint spacing still needs a browser viewport check. This is a navigation pass, not production-quality visual acceptance; architectural density, character polish, curb stepping and wider device/performance checks remain.
+
+
 ### Thorne & Sons architectural follow-up
 
 The current location data describes an undertaker with a brass plate, long empty

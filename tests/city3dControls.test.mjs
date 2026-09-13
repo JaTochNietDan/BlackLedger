@@ -1,0 +1,33 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {cameraCommand, screenPan} from '../.runtime/frontend-test/city3dControls.js';
+
+test('camera shortcuts preserve browser modifiers and composing input', () => {
+  for (const key of ['+', '=', '-', 'Q', 'E', 'Home', 'ArrowLeft', 'ArrowUp']) {
+    assert.ok(cameraCommand({key}));
+    for (const modifier of ['ctrlKey', 'metaKey', 'altKey', 'isComposing'])
+      assert.equal(cameraCommand({key, [modifier]: true}), null);
+  }
+  for (const key of ['Tab', 'Escape', 'Enter', 'a', 'constructor', '__proto__']) assert.equal(cameraCommand({key}), null);
+  assert.equal(cameraCommand({key: 'Q'}), 'rotate-left');
+  assert.equal(cameraCommand({key: '+'}), 'zoom-in');
+});
+
+test('panning stays aligned with the screen through a complete camera orbit', () => {
+  const target = {x: 80, z: 64};
+  for (let angle = 0; angle < Math.PI * 2; angle += .05) {
+    const camera = {x: target.x + 100 * Math.cos(angle), z: target.z + 100 * Math.sin(angle)};
+    const up = screenPan(camera, target, 'pan-up');
+    const right = screenPan(camera, target, 'pan-right');
+    const down = screenPan(camera, target, 'pan-down');
+    const left = screenPan(camera, target, 'pan-left');
+    assert.ok(Math.abs(Math.hypot(up.x, up.z) - 5) < 1e-10);
+    assert.ok(Math.abs(Math.hypot(right.x, right.z) - 5) < 1e-10);
+    assert.ok(Math.abs(up.x * right.x + up.z * right.z) < 1e-10);
+    assert.ok(up.x * (target.x - camera.x) + up.z * (target.z - camera.z) > 0);
+    assert.ok(up.x * right.z - up.z * right.x > 0);
+    assert.equal(down.x, -up.x); assert.equal(down.z, -up.z);
+    assert.equal(left.x, -right.x); assert.equal(left.z, -right.z);
+  }
+  assert.deepEqual(screenPan(target, target, 'pan-up'), {x: 0, z: 5});
+});
