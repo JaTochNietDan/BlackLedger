@@ -70,7 +70,7 @@ export function Theatre({
   // The noise the city makes, once, at the top of the moment — not on every
   // frame, and not again when the same moment is replayed mid-flight.
   useEffect(() => {
-    if (!stagedGunfire) playMoment(cue.kind);
+    if (!stagedGunfire) return playMoment(cue.kind);
   }, [cue.id, stagedGunfire]);
 
   useEffect(() => {

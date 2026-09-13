@@ -149,3 +149,7 @@ surface-following marker do not alter authoritative travel or traffic progress.
 City scene and journey panels share one responsive overlay in normal and expanded
 views. Expanding retains the existing Theatre playback and its headline/cast;
 Skip/Go on only dismiss presentation. Public command and save semantics are unchanged.
+
+Theatre scene audio is cancellable: dismissal, cue replacement and navigation
+release its scheduled voices. Muting stops active scene sounds without replay on
+unmute. This affects presentation only and never advances or reverses a saved event.

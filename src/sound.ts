@@ -11,6 +11,47 @@
 
 let context: AudioContext | null = null;
 
+const sceneSounds = new Set<() => void>();
+class SceneSound {
+  private voices = new Set<() => void>();
+  constructor() { sceneSounds.add(this.cancel); }
+  add(stop: () => void) { this.voices.add(stop); }
+  release(stop: () => void) {
+    this.voices.delete(stop);
+    if (!this.voices.size) sceneSounds.delete(this.cancel);
+  }
+  cancel = () => {
+    for (const stop of [...this.voices]) stop();
+    sceneSounds.delete(this.cancel);
+  };
+}
+
+function startVoice(source: AudioScheduledSourceNode, nodes: AudioNode[], at: number, end: number, scene?: SceneSound) {
+  let finished = false;
+  const cleanup = () => {
+    if (finished) return;
+    finished = true;
+    source.disconnect();
+    nodes.forEach(node => node.disconnect());
+    scene?.release(stop);
+  };
+  const stop = () => {
+    if (finished) return;
+    try { source.stop(); } catch { /* already ended or not started */ }
+    cleanup();
+  };
+  source.onended = cleanup;
+  scene?.add(stop);
+  try {
+    source.start(at);
+    source.stop(end);
+  } catch (error) {
+    stop();
+    throw error;
+  }
+  return stop;
+}
+
 // A browser will not let a page make a noise before somebody has touched it,
 // so the context is built on the first sound and reused after that.
 function audio(): AudioContext | null {
@@ -32,6 +73,7 @@ export function soundOn(): boolean {
 }
 
 export function setSound(on: boolean) {
+  if (!on) for (const cancel of [...sceneSounds]) cancel();
   try {
     localStorage.setItem('black-ledger-sound', on ? 'on' : 'off');
   } catch {
@@ -52,7 +94,7 @@ function noise(ctx: AudioContext, seconds: number): AudioBufferSourceNode {
 }
 
 // One shot: a crack with almost no attack and a short tail.
-function shot(ctx: AudioContext, at: number, level = 0.5) {
+function shot(ctx: AudioContext, at: number, level = 0.5, scene?: SceneSound) {
   const source = noise(ctx, 0.3);
   const band = ctx.createBiquadFilter();
   band.type = 'bandpass';
@@ -63,22 +105,7 @@ function shot(ctx: AudioContext, at: number, level = 0.5) {
   gain.gain.linearRampToValueAtTime(level, at + 0.004);
   gain.gain.exponentialRampToValueAtTime(0.0001, at + 0.22);
   source.connect(band).connect(gain).connect(ctx.destination);
-  let finished = false;
-  const cleanup = () => {
-    if (finished) return;
-    finished = true;
-    source.disconnect();
-    band.disconnect();
-    gain.disconnect();
-  };
-  source.onended = cleanup;
-  source.start(at);
-  source.stop(at + 0.32);
-  return () => {
-    if (finished) return;
-    try { source.stop(); } catch { /* already ended */ }
-    cleanup();
-  };
+  return startVoice(source, [band, gain], at, at + 0.32, scene);
 }
 
 /** One visible city shot, cancellable on Skip, reduced motion or navigation. */
@@ -96,7 +123,7 @@ export function playCityGunshot(): (() => void) | undefined {
 }
 
 // A blast: low, long, and with a body you feel rather than hear.
-function blast(ctx: AudioContext, at: number) {
+function blast(ctx: AudioContext, at: number, scene: SceneSound) {
   const source = noise(ctx, 1.6);
   const low = ctx.createBiquadFilter();
   low.type = 'lowpass';
@@ -107,8 +134,7 @@ function blast(ctx: AudioContext, at: number) {
   gain.gain.linearRampToValueAtTime(0.7, at + 0.02);
   gain.gain.exponentialRampToValueAtTime(0.0001, at + 1.5);
   source.connect(low).connect(gain).connect(ctx.destination);
-  source.start(at);
-  source.stop(at + 1.6);
+  startVoice(source, [low, gain], at, at + 1.6, scene);
 
   // The thump under it.
   const body = ctx.createOscillator();
@@ -119,12 +145,11 @@ function blast(ctx: AudioContext, at: number) {
   thump.gain.setValueAtTime(0.6, at);
   thump.gain.exponentialRampToValueAtTime(0.0001, at + 0.9);
   body.connect(thump).connect(ctx.destination);
-  body.start(at);
-  body.stop(at + 1);
+  startVoice(body, [thump], at, at + 1, scene);
 }
 
 // Two tones, alternating: a car at the kerb with its lamp turning.
-function siren(ctx: AudioContext, at: number, times = 4) {
+function siren(ctx: AudioContext, at: number, scene: SceneSound, times = 4) {
   for (let i = 0; i < times; i++) {
     const when = at + i * 0.42;
     const tone = ctx.createOscillator();
@@ -136,13 +161,12 @@ function siren(ctx: AudioContext, at: number, times = 4) {
     gain.gain.setValueAtTime(0.09, when + 0.3);
     gain.gain.exponentialRampToValueAtTime(0.0001, when + 0.4);
     tone.connect(gain).connect(ctx.destination);
-    tone.start(when);
-    tone.stop(when + 0.42);
+    startVoice(tone, [gain], when, when + 0.42, scene);
   }
 }
 
 // Something happened, and the city noticed: a dull knock, no drama.
-function knock(ctx: AudioContext, at: number) {
+function knock(ctx: AudioContext, at: number, scene: SceneSound) {
   const tone = ctx.createOscillator();
   tone.type = 'triangle';
   tone.frequency.setValueAtTime(220, at);
@@ -151,8 +175,7 @@ function knock(ctx: AudioContext, at: number) {
   gain.gain.setValueAtTime(0.22, at);
   gain.gain.exponentialRampToValueAtTime(0.0001, at + 0.3);
   tone.connect(gain).connect(ctx.destination);
-  tone.start(at);
-  tone.stop(at + 0.32);
+  startVoice(tone, [gain], at, at + 0.32, scene);
 }
 
 // What each kind of moment sounds like. The kinds are the core's own, from
@@ -162,26 +185,28 @@ export function playMoment(kind: string) {
   if (!soundOn()) return;
   const ctx = audio();
   if (!ctx) return;
-  if (ctx.state === 'suspended') ctx.resume().catch(() => {});
-  const at = ctx.currentTime + 0.02;
-  switch (kind) {
-    case 'explosion':
-      blast(ctx, at);
-      break;
-    case 'killing':
-      shot(ctx, at, 0.55);
-      shot(ctx, at + 0.17, 0.4);
-      break;
-    case 'gunfight':
-      for (let i = 0; i < 5; i++)
-        shot(ctx, at + i * 0.13 + Math.random() * 0.04, 0.3 + Math.random() * 0.2);
-      break;
-    case 'raid':
-    case 'arrest':
-      siren(ctx, at);
-      break;
-    default:
-      knock(ctx, at);
+  const scene = new SceneSound();
+  try {
+    if (ctx.state === 'suspended') ctx.resume().catch(() => {});
+    const at = ctx.currentTime + 0.02;
+    switch (kind) {
+      case 'explosion': blast(ctx, at, scene); break;
+      case 'killing':
+        shot(ctx, at, 0.55, scene);
+        shot(ctx, at + 0.17, 0.4, scene);
+        break;
+      case 'gunfight':
+        for (let i = 0; i < 5; i++)
+          shot(ctx, at + i * 0.13 + Math.random() * 0.04, 0.3 + Math.random() * 0.2, scene);
+        break;
+      case 'raid':
+      case 'arrest': siren(ctx, at, scene); break;
+      default: knock(ctx, at, scene);
+    }
+    return scene.cancel;
+  } catch {
+    scene.cancel();
+    return undefined;
   }
 }
 

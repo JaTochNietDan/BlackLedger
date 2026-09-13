@@ -64,6 +64,12 @@ These are staged fixture saves, not earned campaign progress.
 
 ## Continue next
 
+### Cancellable explosion and siren audio (2026-09-13)
+
+- Theatre now releases its sound when the cue changes or the component unmounts. Scene sounds own their active and future scheduled voices; explosion noise/thump, siren pulses, legacy gunfire and knocks stop and disconnect on dismissal. Natural endings release their graphs, and muting cancels every active scene without replaying them on unmute. Partial construction failures cancel voices that already started.
+- All 109 frontend tests and production build passed. New tests exercise the actual audio functions with mocked Web Audio nodes: all supported scene kinds, future siren scheduling, repeated cancellation, independent overlapping scenes, natural endings, global mute and an oscillator failure after explosion noise starts. Existing visible city gunshot cancellation tests still pass. Logs: `.runtime/city3d-scene-audio-tests.log` and `city3d-scene-audio-build.log`.
+- Browser integration checks on isolated fixtures: port 8843 recorded casualty scene removed on immediate Skip; port 8853 police scene removed on navigation to People. Both had no captured console errors and neither check issued a gameplay command. Audio graph cancellation is established by the node tests and effect cleanup; no claim of an acoustic recording or listening test is made. Room ambience/table effects have separate lifecycles and were not changed. Broader visual polish and event choreography remain unfinished.
+
 ### Coopered rooftop water tanks (2026-09-13)
 
 - Replaced the simple iron cylinders on tenement and shop roofs with Blender-authored timber cisterns: 32 separate staves, steel hoops, cross-braced stands and support girders, conical caps/vents, and rung ladders. Deterministic embedded 256px cedar colour/normal textures add wood grain; a browser review prompted a lighter weathered wood tone. Casino and civic crowns remain tank-free.
