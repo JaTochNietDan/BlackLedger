@@ -1,0 +1,171 @@
+{
+  "attending": {
+    "revision": 2,
+    "minute": 780,
+    "playbackRate": 1,
+    "impact": {
+      "x": 0,
+      "y": 0
+    },
+    "buildingFire": {
+      "clock": 23.84850000000042,
+      "scenes": []
+    },
+    "headlightPools": 0,
+    "harbour": {
+      "visible": true,
+      "waterClock": 23.689200000000422
+    },
+    "followingPlayer": true,
+    "cutawayBuildings": [],
+    "weather": {
+      "kind": "clear",
+      "wet": 0,
+      "rainVisible": false,
+      "rainClock": 0
+    },
+    "camera": {
+      "zoom": 1.65,
+      "x": 292,
+      "z": -171.35,
+      "targetX": 112,
+      "targetZ": 68.65
+    },
+    "actors": [
+      {
+        "id": "player",
+        "model": "person",
+        "x": 112,
+        "z": 68.65,
+        "y": 0.2
+      },
+      {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 121.6,
+        "z": 80,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    ],
+    "waiting": [],
+    "aftermath": [
+      {
+        "id": "aftermath:c7b2f9340f0bdb4c76d11041cde78277:fire-engine",
+        "x": 122,
+        "z": 74,
+        "visible": true
+      }
+    ],
+    "doors": [
+      {
+        "id": "bar",
+        "angle": 0
+      }
+    ],
+    "effects": []
+  },
+  "cleaned": {
+    "revision": 4,
+    "minute": 840,
+    "playbackRate": 1,
+    "impact": {
+      "x": 0,
+      "y": 0
+    },
+    "buildingFire": {
+      "clock": 18.882534000000284,
+      "scenes": []
+    },
+    "headlightPools": 0,
+    "harbour": {
+      "visible": true,
+      "waterClock": 18.670200000000285
+    },
+    "followingPlayer": false,
+    "cutawayBuildings": [],
+    "weather": {
+      "kind": "clear",
+      "wet": 0,
+      "rainVisible": false,
+      "rainClock": 0
+    },
+    "camera": {
+      "zoom": 8.278643093518964,
+      "x": 228,
+      "z": -201.35,
+      "targetX": 48,
+      "targetZ": 38.65000000000001
+    },
+    "actors": [
+      {
+        "id": "elena",
+        "model": "packard",
+        "x": 41.27411543197133,
+        "z": 62.4,
+        "y": -0.115,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      },
+      {
+        "id": "player",
+        "model": "person",
+        "x": 112,
+        "z": 68.65,
+        "y": 0.2
+      },
+      {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 121.6,
+        "z": 80,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    ],
+    "waiting": [],
+    "aftermath": [],
+    "doors": [
+      {
+        "id": "bar",
+        "angle": 0
+      }
+    ],
+    "effects": []
+  }
+}

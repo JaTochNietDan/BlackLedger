@@ -566,5 +566,21 @@
       ]
     ],
     "bytes": 359452
+  },
+  "fire-engine": {
+    "file": "fire-engine.glb",
+    "bounds_blender": [
+      [
+        -1.13,
+        -2.84,
+        0.02
+      ],
+      [
+        1.13,
+        2.84,
+        2.54
+      ]
+    ],
+    "bytes": 765780
   }
 }

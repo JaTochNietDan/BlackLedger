@@ -43,10 +43,10 @@ export function sceneSlots(lot: Lot, kind: string): SceneSlot[] {
       return kind==='raid-officer' ? {root,pose:{x:root.x,z:root.z+2.6,heading:0},model:'police-approach'}
         : {root, pose: {x: root.x + 0.8, z: root.z, heading: 0}, model: 'casualty'};
     });
-  if (['raid','arrest','police-unit','raid-unit'].includes(kind))
+  if (['raid','arrest','police-unit','raid-unit','fire-engine'].includes(kind))
     return [1, -1].flatMap(side => [-6, 0, 6].map(offset => {
-      const root = {x: lot.x + side * 9.6, z: lot.z + offset};
-      return {root, pose: {...root, heading: 0}, model: 'parked-police'};
+      const root = {x: lot.x + side * (kind==='fire-engine'?10:9.6), z: lot.z + offset};
+      return {root, pose: {...root, heading: 0}, model: kind==='fire-engine'?'parked-fire-engine':'parked-police'};
     }));
   return [];
 }

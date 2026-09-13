@@ -5,7 +5,7 @@ import type {Point} from './city3dPlan.js';
 export type TrafficPose = Point & {heading: number};
 export type TrafficRequest = {id: string; model: string; points: Point[]; progress: number};
 export type TrafficPlacement = {pose: TrafficPose; progress: number; waiting: boolean};
-const lengths: Record<string, number> = {ford: 4.7, hudson: 5.1, packard: 5.8, police: 4.7};
+const lengths: Record<string, number> = {ford: 4.7, hudson: 5.1, packard: 5.8, police: 4.7, 'fire-engine':5.8};
 export function trafficSpeed(model: string) {
   return isPedestrian(model) ? 1.8 : 11;
 }
@@ -14,6 +14,7 @@ export function trafficSize(model: string) {
   if (model === 'casualty') return {length: 1.4, width: 2.6};
   const parked = model.startsWith('parked-');
   const vehicle = parked ? model.slice(7) : model;
+  if(vehicle==='fire-engine')return {length:5.8,width:parked?2.35:2.55};
   return {length: lengths[vehicle] || 1.4, width: lengths[vehicle] ? (parked ? 2.15 : 2.35) : 0.85};
 }
 export function trafficModel(model: string, stationary: boolean) {

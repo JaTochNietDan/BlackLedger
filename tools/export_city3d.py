@@ -1300,6 +1300,53 @@ def saint_agnes_interior():
             ob.parent=walls['back']
 
 
+def fire_engine():
+    paint=material('fire engine red enamel',(.39,.035,.018),.45)
+    chrome=material('fire engine bright metal',(.58,.60,.57),.82)
+    rubber=material('fire engine rubber',(.024,.026,.025))
+    glass=material('fire engine glazing',(.11,.19,.21),.3)
+    brass=material('pump brass',(.51,.34,.11),.7)
+    canvas=material('woven hose canvas',(.46,.40,.27))
+    wood=material('ladder varnished ash',(.39,.22,.085))
+    lamp=material('engine headlamps',(.94,.83,.56),0,.4)
+    box('truck frame',(0,0,.53),(1.8,5.4,.25),rubber,.05)
+    box('rounded bonnet',(0,-1.86,1.13),(1.65,1.6,.72),paint,.22)
+    box('cab lower',(0,-.54,1.0),(2.02,1.38,.78),paint,.14)
+    box('split windscreen',(0,-.72,1.73),(1.8,1.13,.76),glass,.07)
+    box('cab roof',(0,-.58,2.17),(2.05,1.42,.14),paint,.09)
+    box('windscreen divider',(0,-1.30,1.79),(.055,.045,.7),chrome)
+    for side in (-1,1):
+        box('cab rear pillar',(side*.93,.01,1.77),(.10,.10,.7),paint)
+        box('door handle',(side*1.025,-.25,1.26),(.04,.24,.035),chrome,.01)
+        box('running board',(side*.99,.05,.54),(.28,3.7,.12),chrome,.03)
+        box('rear equipment locker',(side*.70,1.40,1.0),(.62,2.32,.75),paint,.06)
+        for y in (.65,1.45,2.15):
+            box('locker inset',(side*1.02,y,1.04),(.025,.66,.50),chrome,.018)
+            box('locker latch',(side*1.044,y,1.06),(.025,.13,.035),brass)
+        for axle,y in enumerate((-1.83,1.87)):
+            cylinder('truck tyre',(side*.94,y,.52),.5,.24,rubber,(0,math.pi/2,0),48)
+            cylinder('red wheel',(side*1.067,y,.52),.34,.025,paint,(0,math.pi/2,0),40)
+            cylinder('chrome wheel hub',(side*1.086,y,.52),.16,.045,chrome,(0,math.pi/2,0),32)
+            for bolt in range(8):
+                angle=bolt*math.tau/8
+                cylinder('wheel lug',(side*1.115,y+math.sin(angle)*.245,.52+math.cos(angle)*.245),.025,.02,chrome,(0,math.pi/2,0),10)
+        for rail in (-1,1):box('ladder rail',(side*.82+rail*.14,.70,1.82),(.05,3.75,.07),wood,.008)
+        for rung in range(14):box('ladder rung',(side*.82,-1.05+rung*.26,1.82),(.32,.035,.04),wood,.008)
+        cylinder('round headlamp',(side*.70,-2.70,1.10),.17,.13,chrome,(math.pi/2,0,0),32)
+        cylinder('headlamp lens',(side*.70,-2.78,1.10),.135,.02,lamp,(math.pi/2,0,0),32)
+        # Side pump controls ahead of the hose bed.
+        cylinder('pressure gauge',(side*1.04,.27,1.17),.09,.055,chrome,(0,math.pi/2,0),24)
+        cylinder('hose outlet',(side*1.065,.27,.85),.105,.12,brass,(0,math.pi/2,0),24)
+    for y in (-2.77,2.77):box('truck bumper',(0,y,.57),(2.12,.14,.17),chrome,.045)
+    box('radiator',(0,-2.68,1.15),(1.10,.08,.69),rubber,.04)
+    for rib in range(13):box('radiator chrome rib',(-.49+rib*.082,-2.735,1.15),(.025,.025,.61),chrome)
+    box('hose bed',(0,1.4,1.11),(.76,2.2,.20),rubber)
+    for row in range(5):
+        for layer in range(3):box('folded hose',(-.28+row*.14,1.4,1.28+layer*.07),(.115,2.05,.06),canvas,.024)
+    cylinder('beacon base',(0,-.65,2.29),.19,.08,chrome,vertices=32)
+    cylinder('red rotating beacon',(0,-.65,2.43),.16,.22,material('engine beacon',(.8,.025,.01),0,1),vertices=32)
+
+
 def police_officer():
     person(False)
     # A distinct uniform and peaked cap, retaining the articulated cast rig.
@@ -1370,6 +1417,7 @@ for name in ('person','woman'):
         bpy.context.view_layer.update()
         motion_points.extend(ob.matrix_world @ Vector(c) for ob in bpy.context.scene.objects if ob.type=='MESH' for c in ob.bound_box)
     manifest[name]['motion_bounds_blender']=[[round(min(p[i] for p in motion_points),4) for i in range(3)],[round(max(p[i] for p in motion_points),4) for i in range(3)]]
+clear();fire_engine();manifest['fire-engine']=export('fire-engine')
 clear();police_officer();manifest['police-officer']=export('police-officer')
 clear();undertaker();manifest['undertaker']=export('undertaker')
 clear();revolver();manifest['revolver']=export('revolver')

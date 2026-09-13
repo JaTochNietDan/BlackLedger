@@ -287,3 +287,6 @@ A generic explosion cue, including an early charge accident, does not by itself 
 
 
 Window emitters are authored Blender `fire-window-*` nodes. The city draws up to four active windows per burning building, preferring the storey above entrance canopies, with looping flame and smoke particles. Disabled motion freezes particle motion while retaining the observable fire. At `extinguished_at` particles are removed without altering damage. Industrial and specialist models without authored window nodes still need fire emitters; no arbitrary facade positions are invented for them.
+
+
+The saved fire response now stages a locally authored `fire-engine` from `brigade_at` through `cleanup_at`, including attendance after extinguishing. It reserves a 5.8m by 2.35m parking footprint in side bays offset 10m from the parcel centre, separately from police and public vehicles. This is stationary attendance; crew, driving, hose deployment and extinguishing choreography remain pending.

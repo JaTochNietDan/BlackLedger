@@ -95,6 +95,7 @@ const modelNames = [
   'civic',
   'shop',
   'villa',
+  'fire-engine',
   'ford',
   'hudson',
   'packard',
@@ -1114,7 +1115,7 @@ export function City3D(props: Props) {
             model: trafficModel(a.model,a.start===a.end), root: {x:a.object.position.x,z:a.object.position.z},
             pose: {x:a.object.position.x,z:a.object.position.z,heading:a.object.rotation.y},
           }))], new Set(effects.filter(e=>e.cue.kind==='killing').flatMap(e=>e.cue.actors?.map(a=>a.id)||[])), w.police_presence || [],
-          new Set(effects.filter(e=>['raid','raid-officer','raid-unit'].includes(e.cue.kind)).map(e=>e.cue.target)));
+          new Set(effects.filter(e=>['raid','raid-officer','raid-unit'].includes(e.cue.kind)).map(e=>e.cue.target)),w.building_fires || []);
         const placements = traffic.update(
           [...actors]
             .filter(([, a]) => !a.arrived)

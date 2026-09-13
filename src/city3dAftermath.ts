@@ -22,27 +22,28 @@ export class CityAftermath {
     this.pool=new THREE.ShapeGeometry(shape);
   }
   update(records: NonNullable<Snapshot['aftermath']>, minute: number, lots: Map<string,Lot>, models: Map<string,THREE.Group>,
-    modelFor: (id:string)=>string, occupied: SceneSlot[], animating: Set<string>, presence: NonNullable<Snapshot['police_presence']> = [], activeRaids = new Set<string>()) {
+    modelFor: (id:string)=>string, occupied: SceneSlot[], animating: Set<string>, presence: NonNullable<Snapshot['police_presence']> = [], activeRaids = new Set<string>(), fires: NonNullable<Snapshot['building_fires']> = []) {
     const desired=new Set<string>();
     const scenes = [
-      ...records.map(record=>({...record,raid:false})),
-      ...presence.map(record=>({...record,raid:true,police_at:record.minute,victim:{id:'',name:''}})),
+      ...records.map(record=>({...record,raid:false,fire:false})),
+      ...presence.map(record=>({...record,raid:true,fire:false,police_at:record.minute,victim:{id:'',name:''}})),
+      ...fires.map(record=>({...record,raid:false,fire:true,police_at:record.brigade_at,victim:{id:'',name:''}})),
     ];
     for(const record of scenes) {
       if(minute<record.minute || minute>=record.cleanup_at)continue;
       if(record.raid && activeRaids.has(record.target))continue;
-      const cast=record.raid ? ['police','police-b','police-c','officer-a','officer-b','officer-c','officer-d']
+      const cast=record.fire ? (minute>=record.police_at?['fire-engine']:[]) : record.raid ? ['police','police-b','police-c','officer-a','officer-b','officer-c','officer-d']
         : minute>=record.police_at ? ['body','police','officer-a','officer-b'] : ['body'];
       for(const kind of cast) {
-        const vehicle=kind.startsWith('police');
+        const vehicle=kind.startsWith('police')||kind==='fire-engine';
         const key=`aftermath:${record.id}:${kind}`;
         if(kind==='body' && animating.has(record.victim.id))continue;
         desired.add(key);
         if(this.entries.has(key))continue;
         const lot=lots.get(record.target); if(!lot)continue;
         const taken=[...occupied,...[...this.entries.values()].map(e=>e.slot)];
-        const slot=availableSceneSlot(lot,vehicle?'arrest':'killing',taken);if(!slot)continue;
-        const model=kind==='body'?modelFor(record.victim.id):vehicle?'police':'police-officer';
+        const slot=availableSceneSlot(lot,kind==='fire-engine'?'fire-engine':vehicle?'arrest':'killing',taken);if(!slot)continue;
+        const model=kind==='fire-engine'?'fire-engine':kind==='body'?modelFor(record.victim.id):vehicle?'police':'police-officer';
         const source=models.get(model);if(!source)continue;
         const group=new THREE.Group(), object=source.clone(true);
         const owned=kind==='body'?dressPedestrian(object,model,wardrobe(record.victim.id)):[];
