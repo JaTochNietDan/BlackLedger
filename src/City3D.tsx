@@ -1,3 +1,4 @@
+import {CityFire} from './city3dFire';
 import {CityAftermath} from './city3dAftermath';
 import {previewScenes, previewScene, type PreviewScene} from './city3dPreview';
 import {frameScene, impactPulse, renderImpact} from './city3dFraming';
@@ -444,6 +445,7 @@ export function City3D(props: Props) {
     billowContext.putImageData(billowImage, 0, 0);
     const billowTexture = new THREE.CanvasTexture(billowCanvas);
     textures.push(billowTexture);
+    const buildingFire=new CityFire(billowTexture);scene.add(buildingFire.root);
     const contactGeometry = new THREE.PlaneGeometry(1, 1);
     const contactMaterial = new THREE.MeshBasicMaterial({
       color: 0x080b09, map: particleTexture, transparent: true,
@@ -1473,6 +1475,7 @@ export function City3D(props: Props) {
         waterClock += Math.min(dt, 100) / 1000;
         waterNormal.offset.set((waterClock * .006) % 1, (waterClock * .003) % 1);
       }
+      buildingFire.update(w.building_fires || [],w.minute,buildings,camera,dt,motion);
       renderImpact(camera,motion?impact.x:0,motion?impact.y:0,canvas.clientWidth,canvas.clientHeight,()=>renderer.render(scene,camera));
       if (ready)
         canvas.dataset.presentation = JSON.stringify({
@@ -1480,6 +1483,7 @@ export function City3D(props: Props) {
           minute: w.minute,
           playbackRate: playback.current,
           impact:motion?impact:{x:0,y:0},
+          buildingFire:buildingFire.inspect(),
           headlightPools: headlightPools.count,
           harbour: {visible: !!harbourLot, waterClock},
           followingPlayer: followPlayer.current,
@@ -1558,6 +1562,7 @@ export function City3D(props: Props) {
       canvas.removeEventListener('keydown', keys);
       canvas.removeEventListener('webglcontextlost', lost);
       effects.forEach(effect => { effect.audio?.dispose(); disposeDebris(effect); });
+      buildingFire.dispose();
       aftermath.dispose();
       disposeCityResources([scene, ...models.values()], {
         textures, geometries: [effectGeometry, contactGeometry], materials: [contactMaterial],

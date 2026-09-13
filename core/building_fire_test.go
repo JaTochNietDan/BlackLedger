@@ -10,7 +10,7 @@ func TestDetonationLeavesSavedFireWithoutRepairingDamage(t *testing.T) {
 	start := w.Minute
 	w.detonate("laundry", "Test charge.")
 	fires := w.Public()["building_fires"].([]BuildingFire)
-	if len(fires) != 1 || fires[0].Target != "laundry" || fires[0].BrigadeAt != start+10 || fires[0].ExtinguishedAt != start+45 || fires[0].CleanupAt != start+90 {
+	if len(fires) != 1 || fires[0].Target != "laundry" || fires[0].BrigadeAt != start+10 || fires[0].ExtinguishedAt != start+180 || fires[0].CleanupAt != start+240 {
 		t.Fatalf("bad fire: %+v", fires)
 	}
 	condition := w.Properties["laundry"].Condition
@@ -27,14 +27,14 @@ func TestDetonationLeavesSavedFireWithoutRepairingDamage(t *testing.T) {
 	if err = json.Unmarshal(raw, &restored); err != nil {
 		t.Fatal(err)
 	}
-	restored.Minute = start + 45
+	restored.Minute = start + 180
 	if len(restored.ActiveBuildingFires()) != 1 {
 		t.Fatal("brigade disappeared at extinguishing")
 	}
 	if restored.Properties["laundry"].Condition != condition {
 		t.Fatal("extinguishing repaired building")
 	}
-	restored.Minute = start + 90
+	restored.Minute = start + 240
 	if len(restored.ActiveBuildingFires()) != 0 {
 		t.Fatal("cleanup did not expire")
 	}
@@ -62,7 +62,31 @@ func TestRepeatedDetonationRenewsFireButNotAnArrivedBrigade(t *testing.T) {
 	w.Minute += 20
 	w.detonate("laundry", "Second charge.")
 	got := w.ActiveBuildingFires()
-	if len(got) != 1 || got[0].ID != first.ID || got[0].BrigadeAt != first.BrigadeAt || got[0].ExtinguishedAt != w.Minute+45 {
+	if len(got) != 1 || got[0].ID != first.ID || got[0].BrigadeAt != first.BrigadeAt || got[0].ExtinguishedAt != w.Minute+180 {
 		t.Fatalf("bad renewed fire: %+v", got)
 	}
+}
+
+func TestFireRemainsVisibleAfterPlantCommandDuration(t *testing.T) {
+	for seed := uint32(1); seed <= 64; seed++ {
+		w := bomber(t)
+		w.Player.Location = "club"
+		w.Player.Charges = 1
+		w.RNG = seed * 2654435761
+		start := w.Minute
+		condition := w.Properties["club"].Condition
+		act(t, &w, "plant", "club")
+		if w.Properties["club"].Condition == condition {
+			continue
+		}
+		fires := w.ActiveBuildingFires()
+		if len(fires) != 1 || fires[0].ExtinguishedAt <= w.Minute {
+			t.Fatalf("command consumed its own visible fire: minute %d, fires %+v", w.Minute, fires)
+		}
+		if w.Minute != start+PlantMinutes {
+			t.Fatal("plant duration changed")
+		}
+		return
+	}
+	t.Fatal("fixture never produced a successful building detonation")
 }

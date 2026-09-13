@@ -1,0 +1,196 @@
+{
+  "burning": {
+    "revision": 1,
+    "minute": 720,
+    "playbackRate": 1,
+    "impact": {
+      "x": 0,
+      "y": 0
+    },
+    "buildingFire": {
+      "clock": 16.211434000000057,
+      "scenes": [
+        {
+          "id": "c7b2f9340f0bdb4c76d11041cde78277",
+          "vents": [
+            {
+              "x": 106.80000019073486,
+              "y": 5.129999809265136,
+              "z": 74.28000020980835
+            },
+            {
+              "x": 109.40000009536743,
+              "y": 5.129999809265136,
+              "z": 74.28000020980835
+            },
+            {
+              "x": 112,
+              "y": 5.129999809265136,
+              "z": 74.28000020980835
+            },
+            {
+              "x": 114.59999990463257,
+              "y": 5.129999809265136,
+              "z": 74.28000020980835
+            }
+          ],
+          "particles": 48
+        }
+      ]
+    },
+    "headlightPools": 0,
+    "harbour": {
+      "visible": true,
+      "waterClock": 16.03360000000005
+    },
+    "followingPlayer": false,
+    "cutawayBuildings": [],
+    "weather": {
+      "kind": "clear",
+      "wet": 0,
+      "rainVisible": false,
+      "rainClock": 0
+    },
+    "camera": {
+      "zoom": 4.623253818997511,
+      "x": 292,
+      "z": -164.38000054359435,
+      "targetX": 111.99999999999999,
+      "targetZ": 75.61999945640564
+    },
+    "actors": [
+      {
+        "id": "player",
+        "model": "person",
+        "x": 112,
+        "z": 68.65,
+        "y": 0.2
+      },
+      {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 121.6,
+        "z": 80,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    ],
+    "waiting": [],
+    "aftermath": [
+      {
+        "id": "aftermath:48931c2141dd2436bb855ca91b9d36f3:person-13:police",
+        "x": 121.6,
+        "z": 74,
+        "visible": true
+      },
+      {
+        "id": "aftermath:48931c2141dd2436bb855ca91b9d36f3:person-13:officer-a",
+        "x": 109,
+        "z": 70.35,
+        "visible": true
+      },
+      {
+        "id": "aftermath:48931c2141dd2436bb855ca91b9d36f3:person-13:officer-b",
+        "x": 115,
+        "z": 70.35,
+        "visible": true
+      },
+      {
+        "id": "aftermath:48931c2141dd2436bb855ca91b9d36f3:person-13:body",
+        "x": 112,
+        "z": 70.35,
+        "visible": true
+      }
+    ],
+    "doors": [
+      {
+        "id": "bar",
+        "angle": 0
+      }
+    ],
+    "effects": []
+  },
+  "extinguished": {
+    "revision": 2,
+    "minute": 780,
+    "playbackRate": 1,
+    "impact": {
+      "x": 0,
+      "y": 0
+    },
+    "buildingFire": {
+      "clock": 15.845234000000032,
+      "scenes": []
+    },
+    "headlightPools": 0,
+    "harbour": {
+      "visible": true,
+      "waterClock": 15.66740000000003
+    },
+    "followingPlayer": false,
+    "cutawayBuildings": [],
+    "weather": {
+      "kind": "clear",
+      "wet": 0,
+      "rainVisible": false,
+      "rainClock": 0
+    },
+    "camera": {
+      "zoom": 1.65,
+      "x": 276,
+      "z": -160.00000000000003,
+      "targetX": 96,
+      "targetZ": 79.99999999999997
+    },
+    "actors": [
+      {
+        "id": "player",
+        "model": "person",
+        "x": 112,
+        "z": 68.65,
+        "y": 0.2
+      },
+      {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 121.6,
+        "z": 80,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    ],
+    "waiting": [],
+    "aftermath": [],
+    "doors": [
+      {
+        "id": "bar",
+        "angle": 0
+      }
+    ],
+    "effects": []
+  }
+}

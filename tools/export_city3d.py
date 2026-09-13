@@ -252,6 +252,9 @@ def building(kind, floors, width=12, depth=12, seed=0, palette=None, accent=None
                     z = floor*3.15 + 1.8
                     if kind=='tavern' and axis==0 and side==1 and floor==0 and abs(x)<2: x=2 if x>0 else -2
                     facade('window surround', x,z,(1.85 if floor==0 else 1.36,.16,1.95),stone)
+                    if axis==0 and side==1:
+                        vent=bpy.data.objects.new('fire-window-'+str(floor)+'-'+str(col),None)
+                        bpy.context.collection.objects.link(vent);vent.location=(x,d/2+.22,z)
                     facade('window pane', x,z,(1.58 if floor==0 else 1.09,.24,1.64),warm if (floor+col+side+seed)%5==0 else glass)
                     facade('window mullion', x,z,(.065,.26,1.64),iron)
                     facade('window sill',x,z-.91,(1.5,.42,.14),stone)

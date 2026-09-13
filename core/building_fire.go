@@ -18,15 +18,15 @@ func (w *World) igniteBuilding(target string) {
 			// A second detonation renews the fire, retaining an already arrived brigade.
 			if w.Minute > active[i].Minute {
 				active[i].Minute = w.Minute
-				active[i].ExtinguishedAt = w.Minute + 45
-				active[i].CleanupAt = w.Minute + 90
+				active[i].ExtinguishedAt = w.Minute + 180
+				active[i].CleanupAt = w.Minute + 240
 			}
 			w.BuildingFires = active
 			return
 		}
 	}
 	w.BuildingFires = append(active, BuildingFire{ID: ID(), Target: target, Minute: w.Minute,
-		BrigadeAt: w.Minute + 10, ExtinguishedAt: w.Minute + 45, CleanupAt: w.Minute + 90})
+		BrigadeAt: w.Minute + 10, ExtinguishedAt: w.Minute + 180, CleanupAt: w.Minute + 240})
 }
 
 // ActiveBuildingFires returns a detached projection, including brigade attendance
