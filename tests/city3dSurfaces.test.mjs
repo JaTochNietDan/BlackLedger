@@ -210,3 +210,21 @@ test('industrial zinc roofs export textured corrugations within their building f
   assert.ok(roofPoints.every(v=>Math.abs(v.x)<=7.21&&Math.abs(v.z)<=7.21),'roof geometry stays inside the plot');
  }
 });
+
+test('street trees retain authored leaf textures and a bounded canopy',async()=>{
+ const bytes=readFileSync(new URL('../public/art/models/streetside.glb',import.meta.url));
+ const length=bytes.readUInt32LE(12),json=JSON.parse(bytes.subarray(20,20+length).toString());
+ const leaves=json.materials.map((m,i)=>({m,i})).filter(({m})=>m.name.startsWith('street tree foliage'));
+ assert.equal(leaves.length,3);
+ let triangles=0;
+ for(const {m,i} of leaves){
+  assert.ok(m.pbrMetallicRoughness.baseColorTexture,'authored vein texture must survive export');
+  for(const mesh of json.meshes)for(const part of mesh.primitives)if(part.material===i){
+   assert.ok(part.attributes.TEXCOORD_0!==undefined);
+   triangles+=json.accessors[part.indices].count/3;
+  }
+ }
+ assert.equal(triangles,540*6,'individual folded leaves, not an opaque canopy ball');
+ assert.ok(manifest.streetside.bounds_blender[1][2]>4.5);
+ assert.ok(manifest.streetside.bounds_blender[1][2]<5);
+});

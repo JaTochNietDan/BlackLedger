@@ -790,13 +790,68 @@ def street_bed():
             box('drain bars',(x-.32+i*.08,12.4,-.068),(.027,.32,.012),iron,.003)
 
 
+def street_tree(x, y, iron):
+    bark=material('street tree bark',(.23,.18,.12))
+    foliage=[material('street tree foliage '+str(i),color) for i,color in enumerate([(.18,.24,.12),(.25,.31,.16),(.32,.36,.20)])]
+    for mat in foliage:
+        n=128;pixels=[];base=mat.diffuse_color[:3]
+        for row in range(n):
+            v=row/(n-1)-.5
+            for col in range(n):
+                u=col/(n-1)
+                midrib=math.exp(-abs(v)*100)
+                vein=math.exp(-abs(math.sin((u-abs(v)*.65)*math.pi*9))*35)
+                tone=.85+.1*math.sin(u*math.pi)+.12*midrib+.06*vein
+                pixels.extend((*[channel*tone for channel in base],1))
+        image=bpy.data.images.new(mat.name+' veins',width=n,height=n);image.pixels=pixels;image.pack()
+        tree=mat.node_tree;tex=tree.nodes.new('ShaderNodeTexImage');tex.image=image
+        tree.links.new(tex.outputs['Color'],tree.nodes['Principled BSDF'].inputs['Base Color'])
+    # A small maintained tree: the entire crown fits a 1.9m pavement envelope.
+    cylinder('tree soil',(x,y,.025),.39,.05,material('tree soil',(.12,.10,.065)),vertices=24)
+    bpy.ops.mesh.primitive_torus_add(major_segments=24,minor_segments=6,location=(x,y,.06),major_radius=.42,minor_radius=.035)
+    bpy.context.object.name='tree grate rim';bpy.context.object.data.materials.append(iron)
+    for i in range(12):
+        angle=i*math.tau/12
+        beam('tree grate spoke',(x+.13*math.cos(angle),y+.13*math.sin(angle),.055),(x+.4*math.cos(angle),y+.4*math.sin(angle),.055),.035,iron)
+    bpy.ops.mesh.primitive_cone_add(vertices=12,radius1=.12,radius2=.055,depth=3.0,location=(x,y,1.52))
+    bpy.context.object.name='tree tapered trunk';bpy.context.object.data.materials.append(bark)
+    for side in (-1,1):
+        box('tree iron guard',(x+side*.24,y,.62),(.04,.04,1.2),iron)
+        beam('tree guard brace',(x+side*.24,y,.9),(x+side*.08,y,1.08),.025,iron)
+    rng=random.Random(1957)
+    for i in range(10):
+        angle=i*2.4;z=2.15+i*.15
+        beam('tree branch',(x,y,z),(x+.53*math.cos(angle),y+.53*math.sin(angle),z+.65),.045,bark)
+    vertices=[];faces=[];tones=[]
+    for i in range(540):
+        angle=rng.random()*math.tau;v=rng.uniform(-1,1)
+        radius=.74*math.sqrt(1-v*v)*math.sqrt(rng.random())
+        centre=Vector((x+radius*math.cos(angle),y+radius*math.sin(angle),3.55+v*1.12))
+        azimuth=rng.random()*math.tau;tilt=rng.uniform(-.7,.7)
+        along=Vector((math.cos(azimuth)*math.cos(tilt),math.sin(azimuth)*math.cos(tilt),math.sin(tilt)))
+        across=Vector((-math.sin(azimuth),math.cos(azimuth),0))
+        length=rng.uniform(.12,.19);width=length*.42
+        # Folded six-point blades keep foliage irregular and catch soft light.
+        points=[-along*length, -along*length*.35+across*width, along*length*.45+across*width, along*length, along*length*.45-across*width, -along*length*.35-across*width, Vector((0,0,.025))]
+        start=len(vertices);vertices.extend(centre+point for point in points)
+        for j in range(6):faces.append((start+j,start+(j+1)%6,start+6));tones.append(i%3)
+    mesh=bpy.data.meshes.new('street tree leaf blades');mesh.from_pydata(vertices,[],faces);mesh.update()
+    ob=bpy.data.objects.new('street tree leaf blades',mesh);bpy.context.collection.objects.link(ob)
+    for mat in foliage:mesh.materials.append(mat)
+    uv=mesh.uv_layers.new(name='leaf veins')
+    coordinates=[(0,.5),(.325,1),(.725,1),(1,.5),(.725,0),(.325,0),(.5,.5)]
+    for polygon,tone in zip(mesh.polygons,tones):
+        polygon.material_index=tone
+        for index in polygon.loop_indices:uv.data[index].uv=coordinates[mesh.loops[index].vertex_index%7]
+
+
 def streetside():
     iron=material('street furniture iron',(.12,.16,.14),.6)
     wood=material('weathered bench timber',(.29,.19,.10))
     red=material('hydrant enamel',(.39,.075,.035),.35)
     zinc=material('galvanized bin',(.34,.36,.31),.65)
-    # Compact band behind each parcel: no object projects more than 0.4m
-    # in depth, so this authored set fits between the facade and kerb.
+    # Rear pavement furnishing; tree crown remains inside the reserved band.
+    street_tree(-6.8,-.65,iron)
     for x in (-3.8,-2.2):
         for y in (-.23,.23):box('bench leg',(x,y,.24),(.09,.09,.48),iron)
         box('bench back support',(x,.27,.68),(.08,.08,.95),iron)

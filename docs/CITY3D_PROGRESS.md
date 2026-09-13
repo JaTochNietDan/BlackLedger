@@ -64,6 +64,13 @@ These are staged fixture saves, not earned campaign progress.
 
 ## Continue next
 
+### Guarded pavement trees (2026-09-13)
+
+- The instanced street-furniture set now includes one compact, Blender-authored tree beside the rear bench band: tapered trunk, branching, iron guard, radial grate, soil opening and 540 individually folded leaf blades. Three locally authored 128px leaf-vein textures provide restrained foliage variation. This adds decorative planting without simulation entities or commands.
+- The complete exported canopy remains outside the building envelope, walking/vehicle paths, parked cars and event bays. All 125 frontend tests and production build pass; existing all-route/all-lot tests use the enlarged exported bounds, and a new GLB test verifies leaf geometry and embedded UV textures.
+- Browser orbit/zoom inspection on isolated port 8847 is recorded in `docs/qa/city3d-20260913/street-trees.png` and `street-trees-metrics.json`. Three actors/28 buildings sampled 145 FPS, 8.2ms p95, 159 draws and 531,760 triangles, with no captured warnings/errors. This is a local idle-view measurement; broader hardware and dense moving-scene acceptance remain open. Main save untouched; no gameplay command issued.
+- Trees soften a small part of the empty pavement. The repetitive parcel layout, oversized paved frontage, architectural variety and final art quality remain unresolved; this is not acceptance of the finished city.
+
 ### Corrugated industrial roofing (2026-09-13)
 
 - Garage/dealer workshops and dock/haulage sheds now have closed corrugated roof meshes with real 7cm ridges, embedded 256px weathered zinc colour/normal textures, and physical-scale UVs. Workshop vents have flashing and rain caps. Roof parts join by material during Blender export, avoiding a draw per ridge.

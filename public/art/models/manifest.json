@@ -411,17 +411,17 @@
     "file": "streetside.glb",
     "bounds_blender": [
       [
-        -4.1,
-        -0.325,
-        0.0
+        -7.6589,
+        -1.4684,
+        -0.0
       ],
       [
         3.355,
         0.325,
-        1.23
+        4.7274
       ]
     ],
-    "bytes": 115960
+    "bytes": 514752
   },
   "street-bed": {
     "file": "street-bed.glb",
