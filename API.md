@@ -130,3 +130,8 @@ Vehicle rendering roots now follow the road/pavement surface beneath them,
 including parked and staged police cars. These contact heights, soft shadows and
 street fixtures are presentation geometry and do not affect Go travel or collision
 rules.
+
+Thorne & Sons (`chapel`) now uses its undertaker-specific building model. The
+parked hearse in its yard is decorative premises scenery; it is not a public NPC
+journey, player vehicle or gameplay vehicle type. Existing address and command
+identifiers remain unchanged.

@@ -37,7 +37,7 @@ export function cityPlan(places: Pick<Place, 'id' | 'x' | 'y' | 'type'>[]) {
       archway: 'garage',
       dealer: 'dealer',
       cabstand: 'dealer',
-      chapel: 'chapel',
+      chapel: 'undertaker',
       haulage: 'haulage',
       scrapyard: 'haulage',
       estate: 'villa',

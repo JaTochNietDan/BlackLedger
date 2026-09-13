@@ -64,6 +64,44 @@ These are staged fixture saves, not earned campaign progress.
 
 ## Continue next
 
+### Thorne & Sons architectural follow-up
+
+The current location data describes an undertaker with a brass plate, long empty
+window and rear hearse yard; its older church silhouette did not fit. Thorne &
+Sons now uses a dedicated two-storey brick funeral premises with sandstone trim,
+a long framed display window, oak entry, brass plate/pulls, upstairs sashes, slate
+gables and chimneys. A gated rear coach yard includes a static period hearse,
+authored by extending the existing Packard model in Blender. This is decorative
+business scenery, not an authoritative travelling NPC or a new purchasable car.
+The old chapel model remains on disk but is no longer loaded for this address.
+There are 27 exported model files, with 26 in the active renderer catalog.
+
+The yard has locally generated periodic gravel colour and normal maps embedded
+in the GLB, with physical-scale UVs. The new asset is 798,024 bytes and its exact
+Blender bounds are (-7.7,-7.715,-0.03) to (7.7,8.01,8.87), within the reserved
+parcel. Export bounds now use actual transformed vertices rather than rotated
+local bounding-box corners, which had overstated this roof's height. Runtime
+building labels likewise use precise geometry bounds. Other existing model files
+were preserved during the focused export.
+
+Evidence: 104 frontend tests, build and HTTP package pass. The active model is
+covered by the existing parcel/route checks, actual GLB raycasts at its front door
+and across the 2.2m rear gate corridor, exact manifest/geometry agreement and
+embedded colour/normal texture checks. The final denser gateway scan also passed
+as a targeted geometry rerun. Logs: `.runtime/city3d-undertaker-tests.log`,
+`.runtime/city3d-undertaker-geometry-tests.log`, `.runtime/city3d-build.log`,
+`.runtime/city3d-undertaker-go.log`, `.runtime/city3d-undertaker-export.log`.
+
+Browser front and rear inspection used the existing isolated fixture on 8847 and
+left revision 3 / minute 773 unchanged. Screenshots:
+`qa/city3d-20260913/undertaker-front.png` and `undertaker-yard.png`. A whole-city
+sample measured 145 FPS / 7.1ms p95 / 271 draws / 440,000 triangles with 28 buildings
+and two actor objects. That remains a local sparse-traffic sample, not broad
+performance acceptance. More location-specific architecture, richer character
+surfaces, pedestrian kerb transitions and full accessibility/resource/device
+acceptance remain unfinished; the goal remains active.
+
+
 ### Street surfaces and vehicle grounding follow-up
 
 Added a locally authored Blender street-bed set: individually jointed kerbstones

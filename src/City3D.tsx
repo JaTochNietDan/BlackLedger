@@ -80,7 +80,7 @@ const modelNames = [
   'filling',
   'garage',
   'dealer',
-  'chapel',
+  'undertaker',
   'docks',
   'haulage',
   'police',
@@ -587,7 +587,7 @@ export function City3D(props: Props) {
           scene.add(model);
           buildings.set(lot.id, model);
           const label = makeLabel(latest.current.state.locations.find(p => p.id === lot.id)!.name);
-          const box = new THREE.Box3().setFromObject(model);
+          const box = new THREE.Box3().setFromObject(model, true);
           label.position.set(lot.x, box.max.y + 2, lot.z);
           scene.add(label);
           const anchor = model.getObjectByName('sign-anchor');

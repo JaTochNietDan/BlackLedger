@@ -420,7 +420,8 @@ def export(name):
         for ob in obs: ob.select_set(True)
         bpy.context.view_layer.objects.active=obs[0]
         bpy.ops.object.join()
-    points=[ob.matrix_world @ Vector(c) for ob in bpy.context.scene.objects if ob.type=='MESH' for c in ob.bound_box]
+    bpy.context.view_layer.update()
+    points=[ob.matrix_world @ vertex.co for ob in bpy.context.scene.objects if ob.type=='MESH' for vertex in ob.data.vertices]
     bounds=[[round(min(p[i] for p in points),4) for i in range(3)], [round(max(p[i] for p in points),4) for i in range(3)]]
     bpy.ops.export_scene.gltf(filepath=os.path.join(OUT,name+'.glb'),export_format='GLB',export_yup=True,export_cameras=False,export_lights=False)
     return {'file':name+'.glb','bounds_blender':bounds,'bytes':os.path.getsize(os.path.join(OUT,name+'.glb'))}
@@ -513,6 +514,128 @@ def industrial(kind):
         beam('hoist cable',(6,5,13),(6,5,2),.035,iron)
         for z in range(2,9,2):
             beam('derrick brace',(3,-3,z),(5,-1,z+1.6),.09,iron)
+
+
+def gravel_texture(mat):
+    # Periodic aggregate texture in Blender; box UVs keep its scale in metres.
+    n=256;cells=64;rand=random.Random(1953)
+    stones=[(rand.random(),rand.random(),rand.random()) for _ in range(cells*cells)]
+    pixels=[];heights=[];base=mat.diffuse_color[:3]
+    for y in range(n):
+        for x in range(n):
+            u=x*cells/n;v=y*cells/n;cx=int(u);cy=int(v);nearest=100;shade=0
+            for dy in (-1,0,1):
+                for dx in (-1,0,1):
+                    sx,sy,colour=stones[((cy+dy)%cells)*cells+(cx+dx)%cells]
+                    dist=(u-cx-dx-sx)**2+(v-cy-dy-sy)**2
+                    if dist<nearest:nearest=dist;shade=colour
+            height=max(0,1-math.sqrt(nearest)/.88);heights.append(height)
+            light=.65+shade*.5+height*.18
+            pixels.extend((*[c*light for c in base],1))
+    image=bpy.data.images.new('yard aggregate colour',width=n,height=n);image.pixels=pixels;image.pack()
+    tree=mat.node_tree;tex=tree.nodes.new('ShaderNodeTexImage');tex.image=image
+    tree.links.new(tex.outputs['Color'],tree.nodes['Principled BSDF'].inputs['Base Color'])
+    pixels=[]
+    for y in range(n):
+        for x in range(n):
+            dx=heights[y*n+(x-1)%n]-heights[y*n+(x+1)%n]
+            dy=heights[((y-1)%n)*n+x]-heights[((y+1)%n)*n+x]
+            vec=Vector((dx,dy,1.6)).normalized();pixels.extend((vec.x*.5+.5,vec.y*.5+.5,vec.z*.5+.5,1))
+    image=bpy.data.images.new('yard aggregate normal',width=n,height=n);image.colorspace_settings.name='Non-Color';image.pixels=pixels;image.pack()
+    tex=tree.nodes.new('ShaderNodeTexImage');tex.image=image
+    normal=tree.nodes.new('ShaderNodeNormalMap');normal.inputs['Strength'].default_value=.35
+    tree.links.new(tex.outputs['Color'],normal.inputs['Color'])
+    tree.links.new(normal.outputs['Normal'],tree.nodes['Principled BSDF'].inputs['Normal'])
+
+
+def undertaker():
+    wall=material('funeral red brick',(.28,.15,.115));brick(wall,47)
+    stone=material('funeral sandstone',(.53,.49,.40))
+    slate=material('funeral slate',(.105,.135,.145))
+    oak=material('funeral oak',(.085,.055,.031))
+    glass=material('funeral glazing',(.075,.115,.12),.3)
+    brass=material('funeral brass',(.57,.42,.16),.7)
+    iron=material('funeral iron',(.055,.07,.065),.6)
+    gravel=material('coach yard gravel',(.29,.285,.24));gravel_texture(gravel)
+    box('coach yard',(0,-3.25,-.01),(15.4,8.9,.04),gravel)
+    box('funeral foundation',(0,4.4,.18),(13.2,6.2,.36),stone)
+    box('funeral premises',(0,4.4,3.3),(13,6,6.6),wall)
+    for z in (.42,3.45,6.55):box('front stone course',(0,7.47,z),(13.2,.2,.18),stone)
+    for x in (-6.2,2.8,6.2):box('front pilaster',(x,7.5,1.8),(.28,.28,3.25),stone,.02)
+    box('long window surround',(-1.65,7.52,1.85),(7.4,.18,2.42),oak,.025)
+    box('empty long window',(-1.65,7.64,1.85),(7.08,.08,2.12),glass)
+    for x in (-4,-1.65,.7):box('display window mullion',(x,7.70,1.85),(.045,.06,2.15),brass)
+    box('window sill',(-1.65,7.68,.7),(7.55,.40,.15),stone,.025)
+    box('funeral entry',(4.5,7.55,1.57),(1.75,.2,2.94),oak,.025)
+    for x in (4.08,4.92):
+        for z in (.72,1.55,2.38):box('door panels',(x,7.675,z),(.65,.065,.61),oak,.02)
+    box('door pull',(4.35,7.73,1.42),(.04,.04,.26),brass,.008)
+    box('brass business plate',(3.2,7.69,1.77),(.45,.045,.63),brass,.02)
+    box('entry lintel',(4.5,7.59,3.17),(2.15,.28,.23),stone,.02)
+    box('entry threshold',(4.5,7.7,.075),(2.1,.62,.15),stone,.025)
+    anchor=bpy.data.objects.new('sign-anchor',None);bpy.context.collection.objects.link(anchor)
+    anchor.location=(-1.2,7.61,3.13);anchor.scale=(.82,1,.40)
+    def front_window(x):
+        box('upper surround',(x,7.46,4.9),(1.45,.18,1.88),stone)
+        box('upper window',(x,7.58,4.9),(1.2,.08,1.63),glass)
+        box('sash horizontal',(x,7.64,4.9),(1.23,.04,.055),oak)
+        box('upper sill',(x,7.62,3.99),(1.57,.34,.13),stone)
+    for x in (-4.75,-1.65,1.45,4.55):front_window(x)
+    for side in (-1,1):
+        for y in (2.65,5.9):
+            for z in (1.85,4.9):
+                box('side surround',(side*6.56,y,z),(.18,1.3,1.85),stone)
+                box('side sash',(side*6.67,y,z),(.07,1.06,1.60),glass)
+                box('side crossbar',(side*6.72,y,z),(.04,1.08,.055),oak)
+    box('rear coach door',(-3,1.32,1.6),(3.3,.16,3.05),oak)
+    for x in (-3.85,-2.15):box('rear door glazing',(x,1.215,2.15),(1.30,.045,.85),glass)
+    for x in (1,4.5):box('rear sash',(x,1.30,4.8),(1.35,.17,1.75),glass)
+    # Close the roof ends with brick gables and physical-scale UVs.
+    for y in (1.4,7.4):
+        vertices=[(x,y+dy,z) for dy in (-.07,.07) for x,z in [(-6.5,6.6),(6.5,6.6),(0,8.72)]]
+        mesh=bpy.data.meshes.new('funeral gable');mesh.from_pydata(vertices,[],[(0,2,1),(3,4,5),(0,1,4,3),(1,2,5,4),(2,0,3,5)])
+        mesh.materials.append(wall);uv=mesh.uv_layers.new()
+        for poly in mesh.polygons:
+            for loop in poly.loop_indices:
+                co=mesh.vertices[mesh.loops[loop].vertex_index].co;uv.data[loop].uv=(co.x/2.5,co.z/2.5)
+        ob=bpy.data.objects.new('brick gable',mesh);bpy.context.collection.objects.link(ob)
+    # A low gabled slate roof, with courses and separate chimney caps.
+    for side in (-1,1):
+        roof=box('slate roof',(side*3.4,4.4,7.65),(7.15,6.65,.17),slate)
+        roof.rotation_euler.y=side*math.radians(18)
+        for course in range(8):
+            x=side*(.42+course*.86);z=8.72-abs(x)*math.tan(math.radians(18))
+            box('slate course',(x,4.4,z+.045),(.025,6.65,.018),iron)
+    cylinder('slate ridge',(0,4.4,8.77),.1,6.7,slate,(math.pi/2,0,0))
+    for x in (-4.7,4.7):
+        box('brick chimney',(x,5.55,7.82),(.7,.9,1.7),wall)
+        box('chimney cap',(x,5.55,8.72),(.88,1.05,.18),stone)
+    # Rear yard has a wide opening; the gates swing inward within the lot.
+    for side in (-1,1):
+        for y in range(9):box('side fence picket',(side*7.65,-7.55+y,.8),(.055,.055,1.6),iron)
+        for z in (.45,1.3):box('side fence rail',(side*7.65,-3.55,z),(.07,8.1,.055),iron)
+        for x in (3,4,5,6,7):box('back fence picket',(side*x,-7.65,.8),(.055,.055,1.6),iron)
+        for z in (.45,1.3):box('back fence rail',(side*5,-7.65,z),(5.2,.07,.055),iron)
+        box('gate post',(side*2.45,-7.65,.88),(.13,.13,1.76),iron)
+        # Each gate leaf is authored as a rotated group of iron members.
+        before=set(bpy.context.scene.objects)
+        for x in range(6):box('gate upright',(side*(.15+x*.45),-7.65,.8),(.045,.06,1.6),iron)
+        for z in (.45,1.3):box('gate rail',(side*1.3,-7.65,z),(2.3,.06,.055),iron)
+        hinge=Vector((side*2.45,-7.65,0));angle=-side*math.radians(85)
+        from mathutils import Matrix
+        rot=Matrix.Rotation(angle,4,'Z')
+        for ob in set(bpy.context.scene.objects)-before:
+            ob.location=hinge+rot.to_3x3()@(ob.location-hinge);ob.rotation_euler.z=angle
+    before=set(bpy.context.scene.objects)
+    car('packard')
+    black=bpy.data.materials['enamel']
+    box('hearse coach body',(0,.72,1.36),(1.75,3.35,.75),black,.14)
+    box('hearse coach roof',(0,.72,1.78),(1.82,3.45,.16),black,.10)
+    for side in (-1,1):
+        box('hearse long glass',(side*.90,.72,1.46),(.06,2.75,.43),glass)
+        for y in (-.35,.55,1.45):box('hearse pillars',(side*.94,y,1.46),(.045,.055,.46),brass)
+    for ob in set(bpy.context.scene.objects)-before:
+        x,y,z=ob.location;ob.location=(-2-y,-3.8+x,z+.015);ob.rotation_euler.z+=math.pi/2
 
 
 def street_bed():
@@ -610,6 +733,7 @@ for name in ('person','woman'):
         bpy.context.view_layer.update()
         motion_points.extend(ob.matrix_world @ Vector(c) for ob in bpy.context.scene.objects if ob.type=='MESH' for c in ob.bound_box)
     manifest[name]['motion_bounds_blender']=[[round(min(p[i] for p in motion_points),4) for i in range(3)],[round(max(p[i] for p in motion_points),4) for i in range(3)]]
+clear();undertaker();manifest['undertaker']=export('undertaker')
 clear();revolver();manifest['revolver']=export('revolver')
 clear();street_bed();manifest['street-bed']=export('street-bed')
 clear();streetside();manifest['streetside']=export('streetside')
