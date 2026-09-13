@@ -1,0 +1,141 @@
+{
+  "revision": 1,
+  "minute": 720,
+  "playbackRate": 1,
+  "impact": {
+    "x": 0,
+    "y": 0
+  },
+  "buildingFire": {
+    "clock": 17.849034000000216,
+    "scenes": [
+      {
+        "id": "1a4f26c8d4199324c9ea730eda4a8f07",
+        "vents": [
+          {
+            "x": 106.80000019073486,
+            "y": 5.129999809265136,
+            "z": 74.28000020980835
+          },
+          {
+            "x": 109.40000009536743,
+            "y": 5.129999809265136,
+            "z": 74.28000020980835
+          },
+          {
+            "x": 112,
+            "y": 5.129999809265136,
+            "z": 74.28000020980835
+          },
+          {
+            "x": 114.59999990463257,
+            "y": 5.129999809265136,
+            "z": 74.28000020980835
+          }
+        ],
+        "particles": 48
+      }
+    ]
+  },
+  "headlightPools": 0,
+  "harbour": {
+    "visible": true,
+    "waterClock": 17.671200000000216
+  },
+  "followingPlayer": false,
+  "cutawayBuildings": [],
+  "weather": {
+    "kind": "fog",
+    "wet": 0.3,
+    "rainVisible": false,
+    "rainClock": 0
+  },
+  "camera": {
+    "zoom": 4.623253818997511,
+    "x": 292,
+    "z": -164.38000054359435,
+    "targetX": 111.99999999999999,
+    "targetZ": 75.61999945640564
+  },
+  "actors": [
+    {
+      "id": "player",
+      "model": "person",
+      "x": 112,
+      "z": 68.65,
+      "y": 0.2
+    },
+    {
+      "id": "player-car",
+      "model": "hudson",
+      "x": 121.6,
+      "z": 80,
+      "y": 0.15500000000000003,
+      "wheelPhase": 0,
+      "steering": 0,
+      "lampsOn": false,
+      "frontWheels": [
+        {
+          "x": -0.8700000047683716,
+          "angle": 0
+        },
+        {
+          "x": 0.8700000047683716,
+          "angle": 0
+        }
+      ]
+    }
+  ],
+  "waiting": [],
+  "aftermath": [
+    {
+      "id": "aftermath:eb970b6aaa483c94d36b831e1d9d8951:person-13:police",
+      "x": 121.6,
+      "z": 74,
+      "visible": true
+    },
+    {
+      "id": "aftermath:eb970b6aaa483c94d36b831e1d9d8951:person-13:officer-a",
+      "x": 109,
+      "z": 70.35,
+      "visible": true
+    },
+    {
+      "id": "aftermath:eb970b6aaa483c94d36b831e1d9d8951:person-13:officer-b",
+      "x": 115,
+      "z": 70.35,
+      "visible": true
+    },
+    {
+      "id": "aftermath:1a4f26c8d4199324c9ea730eda4a8f07:fire-engine",
+      "x": 122,
+      "z": 86,
+      "visible": true
+    },
+    {
+      "id": "aftermath:1a4f26c8d4199324c9ea730eda4a8f07:firefighter-a",
+      "x": 106,
+      "z": 70.35,
+      "visible": true
+    },
+    {
+      "id": "aftermath:1a4f26c8d4199324c9ea730eda4a8f07:firefighter-b",
+      "x": 118,
+      "z": 70.35,
+      "visible": true
+    },
+    {
+      "id": "aftermath:eb970b6aaa483c94d36b831e1d9d8951:person-13:body",
+      "x": 112,
+      "z": 70.35,
+      "visible": true
+    }
+  ],
+  "doors": [
+    {
+      "id": "bar",
+      "angle": 0
+    }
+  ],
+  "effects": []
+}

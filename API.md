@@ -290,3 +290,6 @@ Window emitters are authored Blender `fire-window-*` nodes. The city draws up to
 
 
 The saved fire response now stages a locally authored `fire-engine` from `brigade_at` through `cleanup_at`, including attendance after extinguishing. It reserves a 5.8m by 2.35m parking footprint in side bays offset 10m from the parcel centre, separately from police and public vehicles. This is stationary attendance; crew, driving, hose deployment and extinguishing choreography remain pending.
+
+
+Fire response attendance now includes two authored firefighter characters facing the affected building. They use separate forecourt reservations and share the brigade's saved cleanup deadline. Their initial standing attendance does not yet represent hose deployment. Scene staging reserves stationary public actors at their known parking/standing destinations before their first visible frame, preventing response vehicles from taking a hidden parked car's bay.

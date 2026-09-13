@@ -582,5 +582,21 @@
       ]
     ],
     "bytes": 765780
+  },
+  "firefighter": {
+    "file": "firefighter.glb",
+    "bounds_blender": [
+      [
+        -0.38,
+        -0.235,
+        0.005
+      ],
+      [
+        0.38,
+        0.305,
+        1.9925
+      ]
+    ],
+    "bytes": 343200
   }
 }

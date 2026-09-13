@@ -1347,6 +1347,38 @@ def fire_engine():
     cylinder('red rotating beacon',(0,-.65,2.43),.16,.22,material('engine beacon',(.8,.025,.01),0,1),vertices=32)
 
 
+def firefighter():
+    person(False)
+    for name in ('headwear-fedora','headwear-cap','hair-receding'):
+        group=bpy.data.objects.get(name)
+        if group:
+            for child in list(group.children_recursive):bpy.data.objects.remove(child,do_unlink=True)
+            bpy.data.objects.remove(group,do_unlink=True)
+    canvas=bpy.data.materials['wool suit'];canvas.name='fire brigade dark woven coat'
+    image=canvas.node_tree.nodes['Principled BSDF'].inputs['Base Color'].links[0].from_node.image
+    pixels=list(image.pixels)
+    for i in range(0,len(pixels),4):
+        pixels[i]*=.72;pixels[i+1]*=.67;pixels[i+2]*=.52
+    image.pixels=pixels;image.pack()
+    leather=material('fire helmet leather',(.055,.041,.025))
+    brass=material('fire coat brass',(.47,.32,.10),.65)
+    cylinder('helmet swept brim',(0,.035,1.78),.27,.04,leather,vertices=40)
+    bpy.ops.mesh.primitive_uv_sphere_add(segments=32,ring_count=16,location=(0,0,1.86))
+    dome=bpy.context.object;dome.name='leather helmet crown';dome.scale=(.195,.205,.125)
+    bpy.ops.object.transform_apply(location=False,rotation=False,scale=True);dome.data.materials.append(leather)
+    for polygon in dome.data.polygons:polygon.use_smooth=True
+    box('helmet crest',(0,0,1.975),(.045,.32,.035),leather,.014)
+    box('helmet front shield',(0,-.21,1.855),(.12,.025,.14),brass,.02)
+    box('coat storm flap',(0,-.17,1.14),(.10,.045,.40),canvas,.01)
+    for z in (1.02,1.14,1.26):box('coat brass clasp',(.035,-.201,z),(.1,.02,.025),brass,.004)
+    for side in (-1,1):box('coat pocket',(side*.16,-.173,.94),(.15,.035,.13),canvas,.01)
+    for name in ('ivory shirt','wine silk tie'):
+        mat=bpy.data.materials.get(name)
+        if mat:
+            mat.diffuse_color=(.09,.085,.065,1)
+            mat.node_tree.nodes['Principled BSDF'].inputs['Base Color'].default_value=mat.diffuse_color
+
+
 def police_officer():
     person(False)
     # A distinct uniform and peaked cap, retaining the articulated cast rig.
@@ -1417,6 +1449,7 @@ for name in ('person','woman'):
         bpy.context.view_layer.update()
         motion_points.extend(ob.matrix_world @ Vector(c) for ob in bpy.context.scene.objects if ob.type=='MESH' for c in ob.bound_box)
     manifest[name]['motion_bounds_blender']=[[round(min(p[i] for p in motion_points),4) for i in range(3)],[round(max(p[i] for p in motion_points),4) for i in range(3)]]
+clear();firefighter();manifest['firefighter']=export('firefighter')
 clear();fire_engine();manifest['fire-engine']=export('fire-engine')
 clear();police_officer();manifest['police-officer']=export('police-officer')
 clear();undertaker();manifest['undertaker']=export('undertaker')

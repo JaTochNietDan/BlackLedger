@@ -32,7 +32,7 @@ export class CityAftermath {
     for(const record of scenes) {
       if(minute<record.minute || minute>=record.cleanup_at)continue;
       if(record.raid && activeRaids.has(record.target))continue;
-      const cast=record.fire ? (minute>=record.police_at?['fire-engine']:[]) : record.raid ? ['police','police-b','police-c','officer-a','officer-b','officer-c','officer-d']
+      const cast=record.fire ? (minute>=record.police_at?['fire-engine','firefighter-a','firefighter-b']:[]) : record.raid ? ['police','police-b','police-c','officer-a','officer-b','officer-c','officer-d']
         : minute>=record.police_at ? ['body','police','officer-a','officer-b'] : ['body'];
       for(const kind of cast) {
         const vehicle=kind.startsWith('police')||kind==='fire-engine';
@@ -43,7 +43,7 @@ export class CityAftermath {
         const lot=lots.get(record.target); if(!lot)continue;
         const taken=[...occupied,...[...this.entries.values()].map(e=>e.slot)];
         const slot=availableSceneSlot(lot,kind==='fire-engine'?'fire-engine':vehicle?'arrest':'killing',taken);if(!slot)continue;
-        const model=kind==='fire-engine'?'fire-engine':kind==='body'?modelFor(record.victim.id):vehicle?'police':'police-officer';
+        const model=kind.startsWith('firefighter')?'firefighter':kind==='fire-engine'?'fire-engine':kind==='body'?modelFor(record.victim.id):vehicle?'police':'police-officer';
         const source=models.get(model);if(!source)continue;
         const group=new THREE.Group(), object=source.clone(true);
         const owned=kind==='body'?dressPedestrian(object,model,wardrobe(record.victim.id)):[];
@@ -53,6 +53,7 @@ export class CityAftermath {
           const pool=new THREE.Mesh(this.pool,this.blood);
           pool.rotation.x=-Math.PI/2;pool.position.set(1.1,.181,0);group.add(pool);
         }
+        if(kind.startsWith('firefighter'))object.rotation.y=Math.atan2(lot.x-slot.root.x,lot.z-slot.root.z);
         if(kind.startsWith('officer')) {
           const body=this.entries.get(`aftermath:${record.id}:body`);
           object.rotation.y=Math.atan2((body?.slot.root.x ?? lot.x)+.8-slot.root.x,(body?.slot.root.z ?? lot.z)-slot.root.z);

@@ -18,6 +18,7 @@ import {
   crossingPaint,
   entrance,
   route,
+  onRoute,
   PITCH,
   STREET_WIDTH,
   streetsidePosition,
@@ -95,6 +96,7 @@ const modelNames = [
   'civic',
   'shop',
   'villa',
+  'firefighter',
   'fire-engine',
   'ford',
   'hudson',
@@ -1087,6 +1089,12 @@ export function City3D(props: Props) {
           }
         }
         if (!motion) traffic.clear();
+        // Stationary actors own their known destination even before their first
+        // visible frame. Otherwise response vehicles can steal a parked bay.
+        const actorSpaces=[...actors.values()].filter(a=>a.object.visible||a.start===a.end).map(a=>{
+          const pose=a.start===a.end?onRoute(a.points,1):{x:a.object.position.x,z:a.object.position.z,heading:a.object.rotation.y};
+          return {model:trafficModel(a.model,a.start===a.end),root:{x:pose.x,z:pose.z},pose};
+        });
         // Reserve the shooter before associated casualties, so a full batch
         // cannot occupy every slot while waiting for an unstaged first shot.
         const stagingOrder = [...effects].sort((a, b) =>
@@ -1094,12 +1102,7 @@ export function City3D(props: Props) {
         for (const e of stagingOrder) {
           if (!e.extra || e.slot) continue;
           const occupied = [
-            ...[...actors.values()]
-              .filter(a => a.object.visible)
-              .map(a => ({
-                model: trafficModel(a.model,a.start === a.end),
-                pose: {x: a.object.position.x, z: a.object.position.z, heading: a.object.rotation.y},
-              })),
+            ...actorSpaces,
             ...effects.flatMap(other => other.slot ? [other.slot] : []),
             ...aftermath.slots(),
           ];
@@ -1111,10 +1114,7 @@ export function City3D(props: Props) {
           }
         }
         aftermath.update(w.aftermath || [], w.minute, lots, models, personModel,
-          [...effects.flatMap(e=>e.slot?[e.slot]:[]), ...[...actors.values()].filter(a=>a.object.visible).map(a=>({
-            model: trafficModel(a.model,a.start===a.end), root: {x:a.object.position.x,z:a.object.position.z},
-            pose: {x:a.object.position.x,z:a.object.position.z,heading:a.object.rotation.y},
-          }))], new Set(effects.filter(e=>e.cue.kind==='killing').flatMap(e=>e.cue.actors?.map(a=>a.id)||[])), w.police_presence || [],
+          [...effects.flatMap(e=>e.slot?[e.slot]:[]), ...actorSpaces], new Set(effects.filter(e=>e.cue.kind==='killing').flatMap(e=>e.cue.actors?.map(a=>a.id)||[])), w.police_presence || [],
           new Set(effects.filter(e=>['raid','raid-officer','raid-unit'].includes(e.cue.kind)).map(e=>e.cue.target)),w.building_fires || []);
         const placements = traffic.update(
           [...actors]
