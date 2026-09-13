@@ -224,3 +224,8 @@ Pedestrian material palettes are stable authored cast presentation, selected fro
 public portrait choice or the existing identity fallback. They do not encode
 attire ownership, wealth, faction or gameplay status. Walking and casualty models
 use the same palette selection; anonymous gunfight actors remain anonymous.
+
+When player following is inactive, the same local building cutaway protects the
+visible staged cast at the active event address. Its screen opening encloses the
+cast together and restores after the staged extras expire. It does not move the
+camera, reveal unstaged actors or alter saved events.

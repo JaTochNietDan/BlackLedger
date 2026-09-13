@@ -64,6 +64,14 @@ These are staged fixture saves, not earned campaign progress.
 
 ## Continue next
 
+### Staged-event visibility and cast acceptance — September 13
+
+- Fresh combined shooting/killing browser fixture confirmed the victim's cast palette and fall timing, then exposed a visibility defect: orbiting behind Saint Agnes hid both event actors completely. Player-only cutaways did not protect the staged scene.
+- Extended local building cutaways to the visible staged cast at the active event address when player following is inactive. Parallel sight lines test each staged actor; the screen opening encloses the group. Camera orientation and saved event state remain unchanged, and unstaged actors are not revealed. Cutaways restore after extras expire.
+- All 140 frontend tests and production build pass. Browser evidence includes the actual before/fixed reverse angle and restored facade: `docs/qa/city3d-20260913/event-occluded-before.png`, `event-cutaway-after.png`, `event-cutaway-restored.png`. The fixed scene shows Mara falling after gunfire begins while the anonymous shooter remains visible.
+- Three additional replays on isolated port 8859 returned to zero effects/cutaways and identical 227 geometry / 126 texture counts; final views measured 145 FPS, 7.9–8.3ms p95, 126 draws and 531,296 triangles. No captured warnings/errors. Evidence: `event-cast-cutaway.json`, `cast-event-start.png`, `cast-event-fall.png` in the same directory. Fixture: `.runtime/gunfight-killing-20260913-160027-83302.sqlite3`; revision 0/minute 480 stayed unchanged throughout presentation replay. Main save untouched.
+- This closes the prior cast palette browser-check gap for the combined casualty scene. Broader event/address combinations, police staging visibility, explosions without cast extras and street-furniture occlusion still need acceptance. Choreography, character geometry and overall art quality remain below final production acceptance.
+
 ### Stable pedestrian cast palettes — September 13
 
 - Added authored muted suit, skin, hair, hat and shirt palettes using the shipped noir portrait sheet as colour direction. Public face choice selects the generated palette; fixed painted identities retain stable choices and generated IDs use the existing cast hash. This is appearance presentation, not an assertion about equipment, wealth or faction. Geometry, animation joints and clearance remain unchanged.

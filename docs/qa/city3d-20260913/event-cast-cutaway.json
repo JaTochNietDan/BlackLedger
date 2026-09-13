@@ -1,0 +1,295 @@
+{
+  "start": {
+    "revision": 0,
+    "minute": 480,
+    "playbackRate": 1,
+    "headlightPools": 0,
+    "followingPlayer": false,
+    "cutawayBuildings": [],
+    "weather": {
+      "kind": "rain",
+      "wet": 1,
+      "rainVisible": true,
+      "rainClock": 66.09139999999891
+    },
+    "camera": {
+      "zoom": 11.100374916387254,
+      "x": 260,
+      "z": -192,
+      "targetX": 80,
+      "targetZ": 48
+    },
+    "actors": [
+      {
+        "id": "player",
+        "model": "person",
+        "x": 80,
+        "z": 36.65,
+        "y": 0.2
+      }
+    ],
+    "waiting": [],
+    "effects": [
+      {
+        "id": "6b32946d93abe35a941a289146ff9bb0",
+        "kind": "killing",
+        "target": "bar",
+        "staged": true,
+        "x": 80,
+        "z": 38.35,
+        "fall": 0
+      },
+      {
+        "id": "47618f1b07ca535d7f154c6cf4ed5c26",
+        "kind": "gunfight",
+        "target": "bar",
+        "staged": true,
+        "x": 77,
+        "z": 38.35,
+        "arm": -1.5694673245386421,
+        "audioShots": 0
+      }
+    ]
+  },
+  "fall": {
+    "revision": 0,
+    "minute": 480,
+    "playbackRate": 1,
+    "headlightPools": 0,
+    "followingPlayer": false,
+    "cutawayBuildings": [],
+    "weather": {
+      "kind": "rain",
+      "wet": 1,
+      "rainVisible": true,
+      "rainClock": 118.45139999999088
+    },
+    "camera": {
+      "zoom": 11.100374916387254,
+      "x": 260,
+      "z": -192,
+      "targetX": 80,
+      "targetZ": 48
+    },
+    "actors": [
+      {
+        "id": "player",
+        "model": "person",
+        "x": 80,
+        "z": 36.65,
+        "y": 0.2
+      }
+    ],
+    "waiting": [],
+    "effects": [
+      {
+        "id": "6b32946d93abe35a941a289146ff9bb0",
+        "kind": "killing",
+        "target": "bar",
+        "staged": true,
+        "x": 80,
+        "z": 38.35,
+        "fall": -1.089478152326164
+      },
+      {
+        "id": "47618f1b07ca535d7f154c6cf4ed5c26",
+        "kind": "gunfight",
+        "target": "bar",
+        "staged": true,
+        "x": 77,
+        "z": 38.35,
+        "arm": -1.687696326794902,
+        "audioShots": 3
+      }
+    ]
+  },
+  "after": {
+    "revision": 0,
+    "minute": 480,
+    "playbackRate": 1,
+    "headlightPools": 0,
+    "followingPlayer": false,
+    "cutawayBuildings": [
+      "bar"
+    ],
+    "weather": {
+      "kind": "rain",
+      "wet": 1,
+      "rainVisible": true,
+      "rainClock": 14.52820000000011
+    },
+    "camera": {
+      "zoom": 11.100374916387254,
+      "x": -105.13987396258986,
+      "z": 284.0576774204057,
+      "targetX": 80,
+      "targetZ": 48
+    },
+    "actors": [
+      {
+        "id": "player",
+        "model": "person",
+        "x": 80,
+        "z": 36.65,
+        "y": 0.2
+      }
+    ],
+    "waiting": [],
+    "effects": [
+      {
+        "id": "6b32946d93abe35a941a289146ff9bb0",
+        "kind": "killing",
+        "target": "bar",
+        "staged": true,
+        "x": 80,
+        "z": 38.35,
+        "fall": -0.9807005066956123
+      },
+      {
+        "id": "47618f1b07ca535d7f154c6cf4ed5c26",
+        "kind": "gunfight",
+        "target": "bar",
+        "staged": true,
+        "x": 77,
+        "z": 38.35,
+        "arm": -1.5707963267948966,
+        "audioShots": 2
+      }
+    ]
+  },
+  "cycles": [
+    {
+      "presentation": {
+        "revision": 0,
+        "minute": 480,
+        "playbackRate": 1,
+        "headlightPools": 0,
+        "followingPlayer": false,
+        "cutawayBuildings": [],
+        "weather": {
+          "kind": "rain",
+          "wet": 1,
+          "rainVisible": true,
+          "rainClock": 41.51370000000105
+        },
+        "camera": {
+          "zoom": 11.100374916387254,
+          "x": -105.13987396258986,
+          "z": 284.0576774204057,
+          "targetX": 80,
+          "targetZ": 48
+        },
+        "actors": [
+          {
+            "id": "player",
+            "model": "person",
+            "x": 80,
+            "z": 36.65,
+            "y": 0.2
+          }
+        ],
+        "waiting": [],
+        "effects": []
+      },
+      "metrics": {
+        "fps": 145,
+        "p95ms": 8.3,
+        "drawCalls": 126,
+        "triangles": 531296,
+        "actors": 1,
+        "buildings": 28,
+        "geometries": 227,
+        "textures": 126
+      }
+    },
+    {
+      "presentation": {
+        "revision": 0,
+        "minute": 480,
+        "playbackRate": 1,
+        "headlightPools": 0,
+        "followingPlayer": false,
+        "cutawayBuildings": [],
+        "weather": {
+          "kind": "rain",
+          "wet": 1,
+          "rainVisible": true,
+          "rainClock": 46.81070000000095
+        },
+        "camera": {
+          "zoom": 11.100374916387254,
+          "x": -105.13987396258986,
+          "z": 284.0576774204057,
+          "targetX": 80,
+          "targetZ": 48
+        },
+        "actors": [
+          {
+            "id": "player",
+            "model": "person",
+            "x": 80,
+            "z": 36.65,
+            "y": 0.2
+          }
+        ],
+        "waiting": [],
+        "effects": []
+      },
+      "metrics": {
+        "fps": 145,
+        "p95ms": 8.2,
+        "drawCalls": 126,
+        "triangles": 531296,
+        "actors": 1,
+        "buildings": 28,
+        "geometries": 227,
+        "textures": 126
+      }
+    },
+    {
+      "presentation": {
+        "revision": 0,
+        "minute": 480,
+        "playbackRate": 1,
+        "headlightPools": 0,
+        "followingPlayer": false,
+        "cutawayBuildings": [],
+        "weather": {
+          "kind": "rain",
+          "wet": 1,
+          "rainVisible": true,
+          "rainClock": 52.10340000000076
+        },
+        "camera": {
+          "zoom": 11.100374916387254,
+          "x": -105.13987396258986,
+          "z": 284.0576774204057,
+          "targetX": 80,
+          "targetZ": 48
+        },
+        "actors": [
+          {
+            "id": "player",
+            "model": "person",
+            "x": 80,
+            "z": 36.65,
+            "y": 0.2
+          }
+        ],
+        "waiting": [],
+        "effects": []
+      },
+      "metrics": {
+        "fps": 145,
+        "p95ms": 7.9,
+        "drawCalls": 126,
+        "triangles": 531296,
+        "actors": 1,
+        "buildings": 28,
+        "geometries": 227,
+        "textures": 126
+      }
+    }
+  ],
+  "logs": []
+}

@@ -1236,17 +1236,27 @@ export function City3D(props: Props) {
       controls.target.x = THREE.MathUtils.clamp(controls.target.x, -15, plan.width + 15);
       controls.target.z = THREE.MathUtils.clamp(controls.target.z, -15, plan.depth + 15);
       camera.position.add(controls.target.clone().sub(before));
-      // Reveal only the screen area around a followed actor, retaining the city silhouette.
+      // Keep the followed player or the active staged cast readable through buildings.
       camera.updateMatrixWorld();
-      const reveal = ready && followPlayer.current && followed?.object.visible;
-      if (reveal) {
-        const sight = followed.object.position.clone().add(new THREE.Vector3(0, .9, 0));
+      const eventTarget = p.activeCue?.target || effects.find(e => e.extra?.visible)?.cue.target;
+      const sightPoints = ready && followPlayer.current && followed?.object.visible
+        ? [followed.object.position.clone().add(new THREE.Vector3(0, .9, 0))]
+        : ready ? effects.filter(e => e.extra?.visible && e.slot && e.cue.target === eventTarget)
+          .map(e => e.extra!.position.clone().add(new THREE.Vector3(0, .9, 0))) : [];
+      if (sightPoints.length) {
         if (now - lastSightCheck >= 100) {
-          blockers = blockingBuildings(camera, sight, buildings); lastSightCheck = now;
+          blockers = new Set(sightPoints.flatMap(sight => [...blockingBuildings(camera, sight, buildings)]));
+          lastSightCheck = now;
         }
-        const screen = sight.project(camera), size = renderer.getDrawingBufferSize(new THREE.Vector2());
-        cutawayWindow.set((screen.x + 1) * size.x / 2, (screen.y + 1) * size.y / 2,
-          (65 + camera.zoom * 2) * renderer.getPixelRatio());
+        const size = renderer.getDrawingBufferSize(new THREE.Vector2());
+        const projected = sightPoints.map(sight => {
+          const screen = sight.project(camera);
+          return new THREE.Vector2((screen.x + 1) * size.x / 2, (screen.y + 1) * size.y / 2);
+        });
+        const centre = projected.reduce((sum, point) => sum.add(point), new THREE.Vector2()).divideScalar(projected.length);
+        const radius = Math.max(...projected.map(point => point.distanceTo(centre)))
+          + (65 + camera.zoom * 2) * renderer.getPixelRatio();
+        cutawayWindow.set(centre.x, centre.y, radius);
       } else { blockers.clear(); lastSightCheck = -Infinity; }
       for (const [id, building] of buildings) {
         const desired = blockers.has(id) ? 1 : 0, previous = cutawayAmounts.get(id) || 0;
