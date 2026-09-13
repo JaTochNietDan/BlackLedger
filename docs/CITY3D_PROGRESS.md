@@ -64,6 +64,23 @@ These are staged fixture saves, not earned campaign progress.
 
 ## Continue next
 
+### Street routing follow-up
+
+Cars now use directed right-hand lanes, a direct route for same-street trips,
+and sampled curved junction turns. The full frontend suite passes 71 tests,
+including opposite-direction lane separation, steering continuity at every
+current route corner, and building clearance at every curve vertex. The browser
+night fixture showed the player's Hudson travelling on the new lane at revision
+2 / minute 1292, with NPC Ford/Hudson/Packard journeys alongside it. A preceding
+travel action also verified the generic property-attack presentation. Expanded
+night rendering measured 145 FPS / 7.2ms p95 before those actions.
+
+This separates opposing lanes; same-lane following distances and intersection
+right-of-way still need a traffic presentation system. Current command handling
+also suppresses the player's journey when that result contains an event cue;
+the event and travel should be sequenced so both remain visible. The road map
+still looks too sparse and repetitive for final art acceptance.
+
 The high-quality 1950s noir art requirement remains unfinished. Prioritize
 richer architectural silhouettes/materials, streets that read as a lived-in
 neighborhood rather than repeated isolated parcels, period-specific pedestrians,
