@@ -64,6 +64,12 @@ These are staged fixture saves, not earned campaign progress.
 
 ## Continue next
 
+### Responsive city controls (2026-09-13)
+
+- Heading, camera controls and expanded scene/journey actions now share a flowing grid. Container queries use the city panel width, including when the gameplay sidebar is present. Wrapped instructions and buttons push subsequent actions down instead of depending on fixed pixel offsets. Short expanded landscape views omit the visible shortcut hints and address description; canvas accessibility instructions and the actions remain available.
+- Final production build passed. Actual browser panel rectangles at 320×568, 390×844, 800×600, 844×390 and 1280×720 show no intersections or out-of-viewport panels in idle expanded state. Evidence: `docs/qa/city3d-20260913/responsive-layout.json` and `responsive-phone.png`. Travel scene actions were additionally inspected at 320×568 and 844×390 with clear separation from the destination panel. Isolated port 8850 walk advanced only its test save to minute 690; main save untouched. Default browser viewport restored.
+- Embedded desktop layout was visually inspected and keyboard Escape/Enter still closes/reopens the city. This check does not cover every possible long event caption, browser text scale, touch gesture or extremely short window. Collapsed-city external Theatre placement still needs its own narrow-panel event audit. Broader visual quality acceptance remains open.
+
 ### Pedestrian road elevation (2026-09-13)
 
 - Moving pedestrians now follow asphalt and pavement elevations instead of staying at pavement height across every road. A 40cm smoothstep on the road side of the curb provides a continuous rise/descent; a conservative 68cm stride radius encloses both articulated models and completes the rise before their shoes reach the raised surface. Existing distance-driven gait remains intact.

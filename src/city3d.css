@@ -19,9 +19,6 @@
   touch-action: none;
 }
 .city3d-heading {
-  position: absolute;
-  top: 22px;
-  left: 24px;
   pointer-events: none;
   display: flex;
   flex-direction: column;
@@ -37,10 +34,9 @@
   color: #e0d7c1;
 }
 .city3d-tools {
-  position: absolute;
-  right: 18px;
-  top: 18px;
   display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
   gap: 6px;
 }
 .city3d button,
@@ -130,18 +126,6 @@
     height: 75vh;
     min-height: 570px;
   }
-  .city3d-heading {
-    left: 12px;
-    top: 12px;
-  }
-  .city3d-heading span {
-    font-size: 10px;
-  }
-  .city3d-tools {
-    top: 84px;
-    left: 12px;
-    right: auto;
-  }
   .city3d-address {
     left: 12px;
     bottom: 52px;
@@ -168,23 +152,6 @@
   min-height: 0;
   border: 0;
 }
-.city3d-tools {
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  max-width: 55%;
-}
-@media (max-width: 1100px) {
-  .city3d-heading {
-    max-width: 48%;
-  }
-  .city3d-heading small {
-    font-size: 13px;
-    letter-spacing: 0.12em;
-  }
-  .city3d-heading span {
-    font-size: 10px;
-  }
-}
 @media (max-width: 850px) {
   .workspace.city-workspace {
     display: block;
@@ -198,13 +165,6 @@
     overflow: visible;
     min-height: 0;
   }
-  .city3d-heading {
-    max-width: none;
-  }
-  .city3d-tools {
-    max-width: calc(100% - 24px);
-    justify-content: flex-start;
-  }
   .city3d-directory {
     max-width: calc(100% - 24px);
     flex-wrap: wrap;
@@ -215,10 +175,6 @@
   }
 }
 .city3d-event {
-  position: absolute;
-  top: 130px;
-  right: 20px;
-  max-width: min(420px, 80%);
   padding: 16px;
   background: #18201aed;
   border: 1px solid #ad9468;
@@ -229,15 +185,6 @@
     16px Georgia,
     serif;
 }
-@media (max-width: 700px) {
-  .city3d-event {
-    top: 170px;
-    left: 12px;
-    right: 12px;
-    max-width: none;
-  }
-}
-
 /* A city scene keeps the camera controls and action visible. */
 .city-stage > .theatre.theatre-city {
   left: auto;
@@ -255,4 +202,50 @@
 .theatre-city .theatre-paper b { font-size: 15px; }
 @media (max-width: 700px) {
   .city-stage > .theatre.theatre-city { top: 164px; width: 220px; }
+}
+
+/* The city can be narrower than the window when the game sidebar is open. */
+.city3d { container-type: inline-size; }
+.city3d-top {
+  position: absolute;
+  inset: 18px 18px auto 24px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 12px;
+  pointer-events: none;
+}
+.city3d-top .city3d-heading {
+  position: static;
+  min-width: 0;
+  max-width: none;
+}
+.city3d-top .city3d-tools {
+  position: static;
+  max-width: none;
+  pointer-events: auto;
+}
+.city3d-top .city3d-event {
+  position: static;
+  grid-column: 2;
+  justify-self: end;
+  width: min(420px, 100%);
+  max-width: 100%;
+  pointer-events: auto;
+}
+@container (max-width: 900px) {
+  .city3d-top {
+    inset: 12px 12px auto;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+  .city3d-top .city3d-heading small { font-size: 13px; letter-spacing: .12em; }
+  .city3d-top .city3d-heading span { font-size: 10px; }
+  .city3d-top .city3d-tools { justify-content: flex-start; }
+  .city3d-top .city3d-event { grid-column: 1; width: min(290px, 100%); padding: 12px; }
+}
+@media (max-height: 500px) {
+  .city3d-expanded .city3d-heading span { display: none; }
+  .city3d-expanded .city3d-address span { display: none; }
+  .city3d-expanded .city3d-address { padding: 12px; }
 }

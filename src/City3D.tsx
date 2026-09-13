@@ -1190,49 +1190,51 @@ export function City3D(props: Props) {
       }}
     >
       <div className="city3d-canvas" ref={host} />
-      <div className="city3d-heading">
-        <small>BELLWETHER · 1950</small>
-        <span>Drag to rotate · Right drag to pan · Scroll to zoom</span>
-        <span>Arrows: pan · Q/E: rotate · +/−: zoom · Home: reset · Esc: return</span>
-      </div>
-      <div className="city3d-tools">
-        <button ref={expandButton} aria-pressed={expanded} onClick={() => {
-          setExpanded(!expanded);
-          if (!expanded) host.current?.querySelector('canvas')?.focus();
-        }}>
-          {expanded ? 'Return to game' : 'Expand city'}
-        </button>
-        <button onClick={() => focus.current()}>Whole city</button>
-        <button onClick={() => focus.current(props.state.player.location)}>Find me</button>
-        <button onClick={() => focus.current(props.selected)}>Focus address</button>
-        <button
-          onClick={() => setPlaybackRate(rate => (rate === 1 ? 4 : 1))}
-          aria-label={`Travel playback speed: ${playbackRate} times`}
-        >
-          Travel {playbackRate}×
-        </button>
+      <div className="city3d-top">
+        <div className="city3d-heading">
+          <small>BELLWETHER · 1950</small>
+          <span>Drag to rotate · Right drag to pan · Scroll to zoom</span>
+          <span>Arrows: pan · Q/E: rotate · +/−: zoom · Home: reset · Esc: return</span>
+        </div>
+        <div className="city3d-tools">
+          <button ref={expandButton} aria-pressed={expanded} onClick={() => {
+            setExpanded(!expanded);
+            if (!expanded) host.current?.querySelector('canvas')?.focus();
+          }}>
+            {expanded ? 'Return to game' : 'Expand city'}
+          </button>
+          <button onClick={() => focus.current()}>Whole city</button>
+          <button onClick={() => focus.current(props.state.player.location)}>Find me</button>
+          <button onClick={() => focus.current(props.selected)}>Focus address</button>
+          <button
+            onClick={() => setPlaybackRate(rate => (rate === 1 ? 4 : 1))}
+            aria-label={`Travel playback speed: ${playbackRate} times`}
+          >
+            Travel {playbackRate}×
+          </button>
+        </div>
+        {expanded && props.activeCue && (
+          <div className="city3d-event" role="status">
+            <strong>{props.activeCue.caption}</strong>
+            <button onClick={props.onSkipCue}>Skip scene →</button>
+          </div>
+        )}
+        {expanded && props.journey && (
+          <div className="city3d-event" role="status">
+            <strong>Travelling to {props.journey.to.name}</strong>
+            <button onClick={props.onSkipJourney}>Skip journey →</button>
+          </div>
+        )}
       </div>
       {(status || failure) && (
         <p className="city3d-status" role="status">
           {failure || status}
         </p>
       )}
-      {expanded && props.activeCue && (
-        <div className="city3d-event" role="status">
-          <strong>{props.activeCue.caption}</strong>
-          <button onClick={props.onSkipCue}>Skip scene →</button>
-        </div>
-      )}
       {waiting > 0 && (
         <p className="city3d-status" role="status">
           {waiting} travellers waiting for space at their departures.
         </p>
-      )}
-      {expanded && props.journey && (
-        <div className="city3d-event" role="status">
-          <strong>Travelling to {props.journey.to.name}</strong>
-          <button onClick={props.onSkipJourney}>Skip journey →</button>
-        </div>
       )}
       {place && (
         <div className="city3d-address">
