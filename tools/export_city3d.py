@@ -598,7 +598,7 @@ def export(name):
     # Join by material except animated limbs: a building becomes ~6 draws.
     groups={}
     for ob in list(bpy.context.scene.objects):
-        if ob.type=='MESH' and (ob.parent is None or ob.parent.name.startswith('wheel-roll-')) and not ob.name.startswith(('leg','arm','shoe','clock-hand')):
+        if ob.type=='MESH' and (ob.parent is None or ob.parent.name.startswith(('wheel-roll-','interior-wall-'))) and not ob.name.startswith(('leg','arm','shoe','clock-hand')):
             key=(ob.parent.name if ob.parent else '',ob.data.materials[0].name)
             groups.setdefault(key,[]).append(ob)
     for obs in groups.values():
@@ -1248,6 +1248,17 @@ def saint_agnes_interior():
         box('picture frame',(-5.76,y,2.25),(.10,1.5,1.1),wood,.03)
         box('picture mount',(-5.69,y,2.25),(.03,1.3,.91),porcelain)
         box('sepia picture',(-5.66,y,2.25),(.02,1.06,.68),printmat)
+    # Retain wall assemblies independently for browser camera cutaways.
+    walls={}
+    for side in ('left','back'):
+        group=bpy.data.objects.new('interior-wall-'+side,None)
+        bpy.context.collection.objects.link(group);walls[side]=group
+    for ob in list(bpy.context.scene.objects):
+        if ob.type!='MESH':continue
+        if ob.name.startswith(('left plaster','left walnut','left dado','picture frame','picture mount','sepia picture')):
+            ob.parent=walls['left']
+        elif ob.name.startswith(('back plaster','back walnut','back dado','panel inset','silvered back','mirror carved','mirror cornice')):
+            ob.parent=walls['back']
 
 manifest={}
 for i,(name,floors,w,d) in enumerate([('tenement',4,12,11),('tavern',2,12,12),('casino',2,13,11),('warehouse',1,13,12),('civic',3,13,12),('shop',3,12,11),('villa',2,11,11)]):

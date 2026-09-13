@@ -12,16 +12,17 @@ export function Interior3D(props:{people:Presence[];picked:string;onPick:(id:str
  const host=useRef<HTMLDivElement>(null), latest=useRef(props);latest.current=props;
  const [status,setStatus]=useState('Opening Saint Agnes…');
  useEffect(()=>{
-  const el=host.current!;let dead=false,frame=0;
+  const el=host.current!;let dead=false,frame=0,dirty=true,renderedFrames=0;
   const scene=new THREE.Scene();scene.background=new THREE.Color(0x171b18);
   const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
   renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFShadowMap;
   renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.1;
-  const canvas=renderer.domElement;canvas.setAttribute('aria-label','Saint Agnes 3D interior. Drag to orbit, scroll to zoom; click a person to select their actions.');canvas.tabIndex=0;el.append(canvas);
+  const canvas=renderer.domElement;canvas.setAttribute('aria-label','Saint Agnes 3D interior. Drag or Q/E to orbit, scroll or +/- to zoom, Home resets; click a person to select their actions.');canvas.tabIndex=0;el.append(canvas);
   const camera=new THREE.OrthographicCamera(-9,9,7,-7,.1,100);camera.position.set(13,14,-17);
   const controls=new OrbitControls(camera,canvas);controls.target.set(0,1,0);controls.minZoom=.7;controls.maxZoom=3;
   controls.minPolarAngle=.35;controls.maxPolarAngle=1.15;controls.enablePan=false;controls.update();
-  const resize=()=>{const w=el.clientWidth,h=el.clientHeight;renderer.setSize(w,h);camera.left=-7*w/h;camera.right=7*w/h;camera.top=7;camera.bottom=-7;camera.updateProjectionMatrix();};
+  const changed=()=>{dirty=true;};controls.addEventListener('change',changed);
+  const resize=()=>{const w=el.clientWidth,h=el.clientHeight;renderer.setSize(w,h);camera.left=-7*w/h;camera.right=7*w/h;camera.top=7;camera.bottom=-7;camera.updateProjectionMatrix();dirty=true;};
   const observer=new ResizeObserver(resize);observer.observe(el);resize();
   const ambient=new THREE.HemisphereLight(0xffe7bc,0x443e32,2);scene.add(ambient);
   const sun=new THREE.DirectionalLight(0xffe3b0,3);sun.position.set(2,10,-8);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);
@@ -34,9 +35,9 @@ export function Interior3D(props:{people:Presence[];picked:string;onPick:(id:str
    const gltf=await loader.loadAsync(`/art/models/${name}.glb`);
    if(dead){disposeCityResources([gltf.scene]);return;}models.set(name,gltf.scene);
   })).then(()=>{if(dead)return;const room=models.get('interior-saint-agnes')!;
-   room.traverse(o=>{if(o instanceof THREE.Mesh){o.castShadow=true;o.receiveShadow=true;}});scene.add(room);setStatus('');
+   room.traverse(o=>{if(o instanceof THREE.Mesh){o.castShadow=true;o.receiveShadow=true;}});scene.add(room);dirty=true;setStatus('');
   }).catch(()=>{if(!dead)setStatus('The 3D room could not load. The people and actions below remain available.');});
-  let roster='',last=performance.now(),elapsed=0,count=0;
+  let roster='',presentation='';
   const pick=new THREE.Raycaster();const pointer=new THREE.Vector2();let down={x:0,y:0};
   const press=(event:PointerEvent)=>{down={x:event.clientX,y:event.clientY};};
   const release=(event:PointerEvent)=>{
@@ -47,10 +48,22 @@ export function Interior3D(props:{people:Presence[];picked:string;onPick:(id:str
    if(object)latest.current.onPick(object.userData.person);
   };
   canvas.addEventListener('pointerdown',press);canvas.addEventListener('pointerup',release);
+  const keys=(event:KeyboardEvent)=>{
+   if(['q','e','ArrowLeft','ArrowRight'].includes(event.key)){
+    const offset=camera.position.clone().sub(controls.target);
+    offset.applyAxisAngle(new THREE.Vector3(0,1,0),['q','ArrowLeft'].includes(event.key)?-.12:.12);
+    camera.position.copy(controls.target).add(offset);
+   }else if(['+','=','-'].includes(event.key)){
+    camera.zoom=THREE.MathUtils.clamp(camera.zoom*(event.key==='-'?1/1.12:1.12),controls.minZoom,controls.maxZoom);camera.updateProjectionMatrix();
+   }else if(event.key==='Home'){
+    camera.position.set(13,14,-17);controls.target.set(0,1,0);camera.zoom=1;camera.updateProjectionMatrix();
+   }else return;
+   event.preventDefault();controls.update();dirty=true;
+  };canvas.addEventListener('keydown',keys);
   const tick=(now:number)=>{
    if(dead)return;frame=requestAnimationFrame(tick);const p=latest.current;
    const key=JSON.stringify(p.people.slice(0,9).map(w=>[w.id,w.face]));
-   if(models.size===3&&key!==roster){roster=key;actors.forEach(a=>scene.remove(a));actors.clear();costumes.forEach(m=>m.dispose());costumes=[];
+   if(models.size===3&&key!==roster){roster=key;dirty=true;actors.forEach(a=>scene.remove(a));actors.clear();costumes.forEach(m=>m.dispose());costumes=[];
     p.people.slice(0,9).forEach((who,i)=>{
      const model=pedestrianModel(who.id,who.face),object=models.get(model)!.clone(true);
      costumes.push(...dressPedestrian(object,model,wardrobe(who.id,who.face)));
@@ -61,10 +74,20 @@ export function Interior3D(props:{people:Presence[];picked:string;onPick:(id:str
    }
    const chosen=actors.get(p.picked);selected.visible=!!chosen;if(chosen){selected.position.x=chosen.position.x;selected.position.z=chosen.position.z;}
    const hour=((p.minute/60)%24+24)%24;sun.intensity=hour>=6&&hour<20?3:.5;
-   controls.update();renderer.render(scene,camera);elapsed+=now-last;last=now;count++;
-   if(elapsed>=500){canvas.dataset.interior=JSON.stringify({people:[...actors.keys()],picked:p.picked,drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,fps:Math.round(count*1000/elapsed)});elapsed=0;count=0;}
+   const stateKey=`${p.picked}:${p.minute}`;if(stateKey!==presentation){presentation=stateKey;dirty=true;}
+   controls.update();
+   if(dirty&&!document.hidden){
+    const room=models.get('interior-saint-agnes');
+    const left=room?.getObjectByName('interior-wall-left'),back=room?.getObjectByName('interior-wall-back');
+    if(left)left.visible=camera.position.x>=-5.8;
+    if(back)back.visible=camera.position.z<=4.8;
+    renderer.render(scene,camera);renderedFrames++;dirty=false;
+    if(models.size===3)canvas.dataset.interior=JSON.stringify({people:[...actors.keys()],picked:p.picked,
+      drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,renderedFrames,
+      zoom:camera.zoom,cutawayWalls:[...(!left?.visible?['left']:[]),...(!back?.visible?['back']:[])]});
+   }
   };frame=requestAnimationFrame(tick);
-  return()=>{dead=true;cancelAnimationFrame(frame);observer.disconnect();controls.dispose();canvas.removeEventListener('pointerdown',press);canvas.removeEventListener('pointerup',release);disposeCityResources([scene,...models.values()]);renderer.dispose();renderer.forceContextLoss();canvas.remove();};
+  return()=>{dead=true;cancelAnimationFrame(frame);observer.disconnect();controls.removeEventListener('change',changed);controls.dispose();canvas.removeEventListener('keydown',keys);canvas.removeEventListener('pointerdown',press);canvas.removeEventListener('pointerup',release);disposeCityResources([scene,...models.values()]);renderer.dispose();renderer.forceContextLoss();canvas.remove();};
  },[]);
- return <div className="interior3d"><div ref={host} className="interior3d-canvas"/><span className="interior3d-caption">SAINT AGNES · Drag to orbit · Scroll to zoom · Select a person</span>{status&&<p role="status">{status}</p>}</div>;
+ return <div className="interior3d"><div ref={host} className="interior3d-canvas"/><span className="interior3d-caption">SAINT AGNES · Drag / Q/E: orbit · Scroll / +/−: zoom · Home: reset · Select a person</span>{status&&<p role="status">{status}</p>}</div>;
 }

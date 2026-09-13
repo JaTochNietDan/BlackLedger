@@ -8,6 +8,8 @@ test('Saint Agnes interior has supported clear standing bays and bounded room ge
  const b=readFileSync(new URL('../public/art/models/interior-saint-agnes.glb',import.meta.url));
  const loader=new GLTFLoader();loader.register(p=>({name:'interior-geometry',loadMaterial(i){return Promise.resolve(new THREE.MeshBasicMaterial({name:p.json.materials[i].name,side:THREE.DoubleSide}));}}));
  const room=(await loader.parseAsync(b.buffer.slice(b.byteOffset,b.byteOffset+b.byteLength),'')).scene;room.updateMatrixWorld(true);
+ assert.ok(room.getObjectByName('interior-wall-left'));
+ assert.ok(room.getObjectByName('interior-wall-back'));
  const bounds=new THREE.Box3().setFromObject(room,true);
  assert.ok(bounds.min.x>=-6.11&&bounds.max.x<=6.01&&bounds.max.y<=3.51);
  for(let i=0;i<9;i++){

@@ -1,0 +1,84 @@
+{
+  "idleBefore": {
+    "people": [
+      "leo",
+      "street-26",
+      "street-50",
+      "street-63",
+      "street-85"
+    ],
+    "picked": "",
+    "drawCalls": 264,
+    "triangles": 128272,
+    "renderedFrames": 3,
+    "zoom": 1,
+    "cutawayWalls": []
+  },
+  "idleAfter": {
+    "people": [
+      "leo",
+      "street-26",
+      "street-50",
+      "street-63",
+      "street-85"
+    ],
+    "picked": "",
+    "drawCalls": 264,
+    "triangles": 128272,
+    "renderedFrames": 3,
+    "zoom": 1,
+    "cutawayWalls": []
+  },
+  "reversedRoom": {
+    "people": [
+      "leo",
+      "street-26",
+      "street-50",
+      "street-63",
+      "street-85"
+    ],
+    "picked": "",
+    "drawCalls": 248,
+    "triangles": 115576,
+    "renderedFrames": 15,
+    "zoom": 1,
+    "cutawayWalls": [
+      "left",
+      "back"
+    ]
+  },
+  "zoomedRoom": {
+    "people": [
+      "leo",
+      "street-26",
+      "street-50",
+      "street-63",
+      "street-85"
+    ],
+    "picked": "",
+    "drawCalls": 248,
+    "triangles": 115576,
+    "renderedFrames": 22,
+    "zoom": 3,
+    "cutawayWalls": [
+      "left",
+      "back"
+    ]
+  },
+  "resetRoom": {
+    "people": [
+      "leo",
+      "street-26",
+      "street-50",
+      "street-63",
+      "street-85"
+    ],
+    "picked": "",
+    "drawCalls": 264,
+    "triangles": 128272,
+    "renderedFrames": 23,
+    "zoom": 1,
+    "cutawayWalls": []
+  },
+  "logs": []
+}

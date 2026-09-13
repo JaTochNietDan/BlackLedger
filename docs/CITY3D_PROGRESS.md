@@ -64,6 +64,13 @@ These are staged fixture saves, not earned campaign progress.
 
 ## Continue next
 
+### Interior camera cutaways and idle rendering — September 13
+
+- Split Saint Agnes's wall assemblies into authored Blender groups, retaining material batching within each wall. Camera-facing obstruction now hides the left/back wall assembly independently, including its framed decoration, while furniture remains in the room. Returning to the original angle restores the walls.
+- Added Q/E or arrow-key orbit, +/− zoom (0.7–3), and Home reset. The room draws only when controls, size, occupants, selection, game minute or loaded models change. Diagnostics report actual rendered-frame count instead of misleading idle FPS.
+- Production build and the exported interior geometry test pass, including both named wall groups, floor support and all standing-bay clearance checks. Browser verification on isolated 8860: frame count stayed at 3 across an 800ms idle observation; reverse orbit hid both walls; zoom capped at 3; Home restored zoom 1 and both walls. No captured warnings/errors. No gameplay commands or main-save changes.
+- Evidence: `interior-cutaway.png`, `interior-controls.json`. Initial view is 264 draws/128,272 triangles; reversed view 248/115,576. This improves room inspection and idle GPU use, but does not complete compact-layout, context-loss, broader hardware or overall art-quality acceptance. Other interiors and the outstanding event/response/weapon requirements remain active.
+
 ### First furnished 3D interior — Saint Agnes — September 13
 
 - Authored `interior-saint-agnes.glb` in Blender (1,923,660 bytes): walnut wall panelling/cornices, mosaic floor, mirrored bottle display, cupboard doors, marble bar, brass foot rail and stools, oxblood upholstered booths, café tables/cups, copper espresso boiler, mechanical register and pendant lamps. The deterministic source is part of the canonical model exporter.
