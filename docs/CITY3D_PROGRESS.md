@@ -70,6 +70,13 @@ These are staged fixture saves, not earned campaign progress.
 - Production build passes. Fresh isolated port 8862/killing fixture browser evidence: at 500ms a casualty effect was staged and all five spoiler-bearing panels were absent. Once effects were empty, the result strip, headline, caption, cast and scene paper appeared. Replaying the same cue hid spoilers again; Skip cleared effects and restored the headline. Browser logs were clear. Evidence: `news-timing.json`. This verifies scene timing through the actual UI, not a timer-only unit test.
 - Re-read the latest objective at `/Users/jatochnietdan/.codex/attachments/4a3692d6-f725-4a26-b1a0-9d3131b50b49/goal-objective.md`; it adds layered contextual voices and vehicle/action sound. Those audio assets/timelines, full police choreography, drive-bys, persistent building fire/brigade response, remaining interiors and final visual quality remain unfinished. No main-save access or mutation.
 
+### Continuous water jets and impact spray — September 13
+
+- Added a thin translucent water core along the droplet trajectory and 24 outward-falling splash particles per window impact. Each jet adds two draw calls; geometry is released with the hoses at extinguishing. Motion settings freeze both particle layers.
+- Production build and 168 frontend tests pass. Tests verify that the tube and droplets use the same arc, spray stays outside the facade, all particle layers freeze, and all eight private geometries are disposed when two lines stop.
+- Browser evidence on fresh isolated 8867 (`.runtime/fire-jet-20260913-1830.sqlite3`), following a real planting command: revision 1/minute 720, two visible streams, four burning upper-window emitters and no waiting actors. Expanded close view measured 145 FPS, 7ms p95 and 272 draw calls locally. Evidence: `water-jet.png` and `water-jet.json`. Main campaign untouched; sleep prevention remains active.
+- This remains an initial procedural effect. More natural working poses, deployment/reeling, arrival/departure, internal blast choreography and broader production visual acceptance remain unfinished.
+
 ### Connected suppression equipment — September 13
 
 - Authored a brass nozzle with coupling, grip, lever and water-outlet anchor in Blender; added separate side outlets to the engine. Visible firefighters hold the nozzles while two distinct hose paths run outside parked vehicles and behind the forecourt cast. Animated water arcs end at the same authored upper-window positions used by the fire renderer. Brigade and crew must both be visible before suppression can appear.

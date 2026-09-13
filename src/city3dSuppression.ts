@@ -5,12 +5,18 @@ import type {CityAftermath} from './city3dAftermath';
 export function waterArc(from:THREE.Vector3,to:THREE.Vector3,t:number){
  const u=Math.max(0,Math.min(1,t));return from.clone().lerp(to,u).add(new THREE.Vector3(0,.65*4*u*(1-u),0));
 }
-type Line={root:THREE.Group;nozzle:THREE.Group;hose:THREE.Mesh;water:THREE.Points;crew:THREE.Group;from:THREE.Vector3;to:THREE.Vector3};
+export function impactSpray(to:THREE.Vector3,index:number,clock:number){
+ const age=(clock+index*.173)% .65,angle=index*2.39996;
+ return to.clone().add(new THREE.Vector3(Math.cos(angle)*age*.9,Math.sin(angle)*age*.5-age*age*1.8,-.03-age*.8));
+}
+type Line={root:THREE.Group;nozzle:THREE.Group;hose:THREE.Mesh;water:THREE.Points;jet:THREE.Mesh;spray:THREE.Points;crew:THREE.Group;from:THREE.Vector3;to:THREE.Vector3};
 export class CitySuppression {
  readonly root=new THREE.Group();
  private lines=new Map<string,Line>();
  private hoseMaterial=new THREE.MeshStandardMaterial({color:0x9b8961,roughness:.95});
  private waterMaterial=new THREE.PointsMaterial({color:0xc9e7ee,size:2,sizeAttenuation:false,transparent:true,opacity:.8,depthWrite:false});
+ private jetMaterial=new THREE.MeshBasicMaterial({color:0xcceaf3,transparent:true,opacity:.48,depthWrite:false,toneMapped:false});
+ private sprayMaterial=new THREE.PointsMaterial({color:0xddebf0,size:3,sizeAttenuation:false,transparent:true,opacity:.45,depthWrite:false});
  private clock=0;
  update(fires:NonNullable<Snapshot['building_fires']>,minute:number,buildings:Map<string,THREE.Group>,models:Map<string,THREE.Group>,aftermath:CityAftermath,dt:number,motion:boolean){
   if(motion)this.clock+=Math.min(100,Math.max(0,dt))/1000;
@@ -46,20 +52,27 @@ export class CitySuppression {
      const hose=new THREE.Mesh(new THREE.TubeGeometry(path,100,.045,6,false),this.hoseMaterial);
      const geometry=new THREE.BufferGeometry();geometry.setAttribute('position',new THREE.BufferAttribute(new Float32Array(144),3));
      const water=new THREE.Points(geometry,this.waterMaterial);water.frustumCulled=false;
-     const root=new THREE.Group();root.add(nozzle,hose,water);this.root.add(root);
-     line={root,nozzle,hose,water,crew,from,to};this.lines.set(id,line);
+     const control=from.clone().lerp(to,.5).add(new THREE.Vector3(0,1.3,0));
+     const jet=new THREE.Mesh(new THREE.TubeGeometry(new THREE.QuadraticBezierCurve3(from,control,to),48,.023,5,false),this.jetMaterial);
+     const sprayGeometry=new THREE.BufferGeometry();sprayGeometry.setAttribute('position',new THREE.BufferAttribute(new Float32Array(72),3));
+     const spray=new THREE.Points(sprayGeometry,this.sprayMaterial);spray.frustumCulled=false;
+     const root=new THREE.Group();root.add(nozzle,hose,water,jet,spray);this.root.add(root);
+     line={root,nozzle,hose,water,jet,spray,crew,from,to};this.lines.set(id,line);
     }
     const positions=line.water.geometry.getAttribute('position') as THREE.BufferAttribute;
     for(let i=0;i<48;i++){const t=(i/48+this.clock*1.7)%1,p=waterArc(line.from,line.to,t);positions.setXYZ(i,p.x,p.y,p.z);}
     positions.needsUpdate=true;
+    const sprayPositions=line.spray.geometry.getAttribute('position') as THREE.BufferAttribute;
+    for(let i=0;i<24;i++){const p=impactSpray(line.to,i,this.clock);sprayPositions.setXYZ(i,p.x,p.y,p.z);}
+    sprayPositions.needsUpdate=true;
    }
   }
   for(const [id,line] of this.lines)if(!desired.has(id))this.remove(id,line);
  }
  private remove(id:string,line:Line){
   const actor=line.crew.children[0];for(const name of ['arm1','arm-1']){const arm=actor?.getObjectByName(name);if(arm)arm.rotation.set(0,0,0);}
-  this.root.remove(line.root);line.hose.geometry.dispose();line.water.geometry.dispose();this.lines.delete(id);
+  this.root.remove(line.root);line.hose.geometry.dispose();line.water.geometry.dispose();line.jet.geometry.dispose();line.spray.geometry.dispose();this.lines.delete(id);
  }
  inspect(){return [...this.lines].map(([id,l])=>({id,from:l.from.toArray(),to:l.to.toArray()}));}
- dispose(){for(const [id,line] of this.lines)this.remove(id,line);this.hoseMaterial.dispose();this.waterMaterial.dispose();}
+ dispose(){for(const [id,line] of this.lines)this.remove(id,line);this.hoseMaterial.dispose();this.waterMaterial.dispose();this.jetMaterial.dispose();this.sprayMaterial.dispose();}
 }
