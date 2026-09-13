@@ -110,3 +110,8 @@ Police/casualty reenactments reserve presentation space beside the cue's target
 building, including the casualty's full fall envelope. Occupied slots delay visual
 playback until clear; expiry or Skip releases them. These schematic scene positions
 are not authoritative NPC locations and never change event outcomes or time.
+
+3D pedestrian selection follows the existing portrait cast and the player's
+one-based saved `face` selection. It is appearance only, with no new gender or
+gameplay field. Portrait fallback and city selection share Go's unsigned FNV-1a
+ID calculation; named painted identities keep their established appearance.

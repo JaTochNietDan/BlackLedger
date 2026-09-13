@@ -1,4 +1,5 @@
 import {portrait} from './art';
+import {castFace} from './city3dCast';
 
 // Six of this city's people were painted by hand. The rest were a drawing made
 // out of their id — better than one repeated face, and still obviously a
@@ -30,15 +31,6 @@ const CAST_COLS = 6,
 // chosen from the same answer and only one side of the wall can be the author
 // of it. This is the fallback for anywhere the core has not said — the same
 // arithmetic it uses, kept so a portrait never comes out blank.
-function faceFor(id: string) {
-  let h = 2166136261;
-  for (const c of id) {
-    h ^= c.charCodeAt(0);
-    h = Math.imul(h, 16777619);
-  }
-  return Math.abs(h) % CAST;
-}
-
 // The size of the cast, for anywhere that offers a choice of one. The core
 // holds the same number (CastFaces) because the core is what refuses a bad one.
 export const CAST_FACES = CAST;
@@ -58,7 +50,7 @@ export function Portrait({id, size, face}: {id: string; size?: 'small' | 'tiny';
       />
     );
   }
-  const n = face ? (face - 1) % CAST : faceFor(id);
+  const n = face ? (face - 1) % CAST : castFace(id);
   // The drawn version is underneath and the generated face is laid over it.
   //
   // It used to be the other way round — the sheet on the element's own
@@ -88,6 +80,6 @@ export function pressFace(id?: string): string | null {
   if (!id) return null;
   const cell = painted[id];
   if (cell) return `${cell[0] * 50}% ${cell[1] * 100}%`;
-  const n = faceFor(id);
+  const n = castFace(id);
   return `${((n % CAST_COLS) * 100) / (CAST_COLS - 1)}% ${(Math.floor(n / CAST_COLS) * 100) / (CAST_ROWS - 1)}%`;
 }

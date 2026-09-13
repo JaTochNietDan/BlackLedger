@@ -19,6 +19,7 @@ import './city3d.css';
 import {CityCueQueue, availableSceneSlot, casualtyFall} from './city3dEvents';
 import type {SceneSlot} from './city3dEvents';
 import {StreetTraffic} from './city3dTraffic';
+import {pedestrianModel, isPedestrian} from './city3dCast';
 
 type Props = {
   state: Snapshot;
@@ -68,6 +69,7 @@ const modelNames = [
   'hudson',
   'packard',
   'person',
+  'woman',
   'filling',
   'garage',
   'dealer',
@@ -443,6 +445,12 @@ export function City3D(props: Props) {
       s.scale.set(17, 2.65, 1);
       return s;
     };
+    const personModel = (id: string) => {
+      const w = latest.current.state;
+      return id === 'player'
+        ? pedestrianModel(w.player.name, w.player.face, true)
+        : pedestrianModel(id, w.everyone?.find(person => person.id === id)?.face);
+    };
     let movementClock = performance.now();
     const addActor = (id: string, model: string): Actor => {
       const object = models.get(model)!.clone(true);
@@ -493,7 +501,7 @@ export function City3D(props: Props) {
       a.since = movementClock;
       a.realSince = now;
       a.duration = duration;
-      a.walking = model === 'person' && start !== end;
+      a.walking = isPedestrian(model) && start !== end;
     };
     const loader = new GLTFLoader();
     let ready = false,
@@ -613,7 +621,7 @@ export function City3D(props: Props) {
             to = lots.get(j.to_id);
           if (!from || !to) continue;
           seen.add(j.id);
-          const model = j.vehicle ? carModel(j.vehicle) : 'person';
+          const model = j.vehicle ? carModel(j.vehicle) : personModel(j.id);
           const before = previous?.street?.find(
             b => b.id === j.id && b.from_id === j.from_id && b.to_id === j.to_id,
           );
@@ -639,7 +647,7 @@ export function City3D(props: Props) {
               seen.add(person.id);
               assign(
                 person.id,
-                before.vehicle ? carModel(before.vehicle) : 'person',
+                before.vehicle ? carModel(before.vehicle) : personModel(person.id),
                 route(from, lot, !!before.vehicle),
                 before.progress,
                 1,
@@ -656,7 +664,7 @@ export function City3D(props: Props) {
           }
         const here = lots.get(w.player.location);
         if (here && w.player.alive) {
-          if (!actors.has('player')) assign('player', 'person', [entrance(here)], 0, 0, 0, now);
+          if (!actors.has('player')) assign('player', personModel('player'), [entrance(here)], 0, 0, 0, now);
         } else {
           const a = actors.get('player');
           if (a) scene.remove(a.object);
@@ -693,7 +701,8 @@ export function City3D(props: Props) {
           scene.add(light);
           let extra: THREE.Group | undefined;
           if (cue.kind === 'killing' || ['raid', 'arrest'].includes(cue.kind)) {
-            extra = models.get(cue.kind === 'killing' ? 'person' : 'police')!.clone(true);
+            const model = cue.kind === 'killing' ? personModel(cue.actors?.[0]?.id || '') : 'police';
+            extra = models.get(model)!.clone(true);
             extra.visible = false;
             mesh.visible = false;
             scene.add(extra);
@@ -777,17 +786,21 @@ export function City3D(props: Props) {
             if (from && motion)
               assign(
                 'player',
-                driving ? carModel(p.journey?.vehicle || w.vehicle?.car) : 'person',
+                driving ? carModel(p.journey?.vehicle || w.vehicle?.car) : personModel('player'),
                 route(from, here, driving),
                 0,
                 1,
                 2400,
                 now,
               );
-            else assign('player', 'person', [entrance(here)], 0, 0, 0, now);
+            else assign('player', personModel('player'), [entrance(here)], 0, 0, 0, now);
           }
         }
         // Non-travel commands can also change a life/location without a journey.
+        if (!p.journey && actors.has('player') && actors.get('player')!.model !== personModel('player')) {
+          const here = lots.get(w.player.location);
+          if (here) assign('player', personModel('player'), [entrance(here)], 0, 0, 0, now);
+        }
         const player = actors.get('player');
         if (player && !p.journey) {
           const here = lots.get(w.player.location);

@@ -1,3 +1,4 @@
+import {isPedestrian} from './city3dCast.js';
 import {onRoute, PITCH} from './city3dPlan.js';
 import type {Point} from './city3dPlan.js';
 
@@ -6,7 +7,7 @@ export type TrafficRequest = {id: string; model: string; points: Point[]; progre
 export type TrafficPlacement = {pose: TrafficPose; progress: number; waiting: boolean};
 const lengths: Record<string, number> = {ford: 4.7, hudson: 5.1, packard: 5.8, police: 4.7};
 export function trafficSpeed(model: string) {
-  return model === 'person' ? 1.8 : 11;
+  return isPedestrian(model) ? 1.8 : 11;
 }
 export function trafficSize(model: string) {
   if (model === 'casualty') return {length: 1.4, width: 2.6};

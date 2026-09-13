@@ -313,13 +313,14 @@ def villa():
     anchor.location=(0,7.27,3.2)
 
 
-def person():
-    coat=material('wool suit',(.16,.19,.21))
+def person(waved=False):
+    coat=material('wool suit',(.29,.13,.12) if waved else (.16,.19,.21))
     skin=material('skin',(.58,.38,.24))
     hat=material('felt hat',(.12,.1,.08))
     shoe=material('leather',(.05,.04,.035))
     shirt=material('ivory shirt',(.76,.72,.6))
     tie=material('wine silk tie',(.27,.045,.035))
+    hair=material('waved chestnut hair',(.095,.043,.023)) if waved else None
     def oval(name,at,scale,mat):
         bpy.ops.mesh.primitive_uv_sphere_add(segments=16,ring_count=8,location=at)
         ob=bpy.context.object;ob.name=name;ob.scale=scale
@@ -339,7 +340,7 @@ def person():
         return ob
     # Three jacket rings produce shoulders, a fitted waist and a wider hem.
     vertices=[]
-    for z,w,d in [(.83,.23,.15),(1.06,.20,.135),(1.4,.255,.15)]:
+    for z,w,d in ([(.88,.23,.15),(1.09,.17,.13),(1.4,.23,.15)] if waved else [(.83,.23,.15),(1.06,.20,.135),(1.4,.255,.15)]):
         vertices.extend([(-w,-d,z),(w,-d,z),(w,d,z),(-w,d,z)])
     faces=[(3,2,1,0),(8,9,10,11)]
     for ring in range(2):
@@ -350,14 +351,30 @@ def person():
     oval('head',(0,-.005,1.64),(.125,.115,.17),skin)
     oval('nose',(0,-.119,1.63),(.035,.045,.045),skin)
     for side in (-1,1):oval('ear',(side*.125,0,1.64),(.025,.035,.052),skin)
-    oval('fedora brim',(0,0,1.79),(.235,.205,.022),hat)
-    oval('fedora crown',(0,.015,1.865),(.155,.145,.095),hat)
-    cylinder('hat ribbon',(0,.015,1.827),.154,.028,shoe)
+    if waved:
+        oval('swept hair crown',(0,.025,1.76),(.145,.125,.08),hair)
+        oval('pinned hair back',(0,.087,1.64),(.145,.07,.15),hair)
+        for side in (-1,1):
+            for wave in range(4):
+                oval('sculpted hair wave',(side*(.119+wave*.003),.022,1.74-wave*.052),(.04,.105,.039),hair)
+        for wave in range(3):
+            lock=oval('front finger wave',(-.075+wave*.06,-.09,1.765-wave*.01),(.07,.035,.035),hair)
+            lock.rotation_euler.y=math.radians(-20)
+    else:
+        oval('fedora brim',(0,0,1.79),(.235,.205,.022),hat)
+        oval('fedora crown',(0,.015,1.865),(.155,.145,.095),hat)
+        cylinder('hat ribbon',(0,.015,1.827),.154,.028,shoe)
     box('shirt front',(0,-.151,1.285),(.19,.015,.23),shirt,.012)
     for side in (-1,1):
         lapel=box('notched lapel',(side*.108,-.164,1.265),(.09,.025,.27),coat,.012)
         lapel.rotation_euler.y=side*math.radians(22)
-    box('tie',(0,-.171,1.28),(.04,.018,.21),tie,.008)
+    if waved:
+        for side in (-1,1):
+            collar=box('blouse collar',(side*.052,-.174,1.39),(.065,.022,.09),shirt,.012)
+            collar.rotation_euler.y=side*math.radians(25)
+        oval('gold lapel pin',(.14,-.185,1.31),(.023,.014,.023),material('brass pin',(.62,.43,.12),.65))
+    else:
+        box('tie',(0,-.171,1.28),(.04,.018,.21),tie,.008)
     for z in (1.09,.99):oval('jacket button',(.045,-.151,z),(.013,.012,.013),shoe)
     for side in (-1,1):
         box('welt pocket',(side*.14,-.153,.995),(.115,.02,.018),shoe)
@@ -520,17 +537,18 @@ paint=bpy.data.materials['enamel'];paint.diffuse_color=(.065,.075,.08,1);paint.n
 box('police door panel',(0,0,.82),(1.83,1.5,.32),material('police cream',(.7,.69,.60)))
 cylinder('red beacon',(0,0,1.76),.18,.28,material('beacon',(.8,.02,.01),0,2))
 manifest['police']=export('police')
-clear();person();manifest['person']=export('person')
-motion_points=[]
-for sample in range(48):
-    for ob in bpy.context.scene.objects:
-        if ob.name.startswith(('leg','arm','knee')):
-            phase=sample*math.tau/48+(0 if ob.name.endswith('-1') else math.pi)
-            ob.rotation_euler.x=(max(0,math.sin(phase+.7))*.65 if ob.name.startswith('knee') else
-                math.sin(phase+(math.pi if ob.name.startswith('arm') else 0))*(.23 if ob.name.startswith('arm') else .35))
-    bpy.context.view_layer.update()
-    motion_points.extend(ob.matrix_world @ Vector(c) for ob in bpy.context.scene.objects if ob.type=='MESH' for c in ob.bound_box)
-manifest['person']['motion_bounds_blender']=[[round(min(p[i] for p in motion_points),4) for i in range(3)],[round(max(p[i] for p in motion_points),4) for i in range(3)]]
+for name in ('person','woman'):
+    clear();person(name == 'woman');manifest[name]=export(name)
+    motion_points=[]
+    for sample in range(48):
+        for ob in bpy.context.scene.objects:
+            if ob.name.startswith(('leg','arm','knee')):
+                phase=sample*math.tau/48+(0 if ob.name.endswith('-1') else math.pi)
+                ob.rotation_euler.x=(max(0,math.sin(phase+.7))*.65 if ob.name.startswith('knee') else
+                    math.sin(phase+(math.pi if ob.name.startswith('arm') else 0))*(.23 if ob.name.startswith('arm') else .35))
+        bpy.context.view_layer.update()
+        motion_points.extend(ob.matrix_world @ Vector(c) for ob in bpy.context.scene.objects if ob.type=='MESH' for c in ob.bound_box)
+    manifest[name]['motion_bounds_blender']=[[round(min(p[i] for p in motion_points),4) for i in range(3)],[round(max(p[i] for p in motion_points),4) for i in range(3)]]
 clear();streetside();manifest['streetside']=export('streetside')
 with open(os.path.join(OUT,'manifest.json'),'w') as f: json.dump(manifest,f,indent=2)
 print('Exported',len(manifest),'models')

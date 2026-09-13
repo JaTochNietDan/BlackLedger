@@ -64,6 +64,38 @@ These are staged fixture saves, not earned campaign progress.
 
 ## Continue next
 
+### Cast appearance follow-up
+
+Added a second locally authored Blender pedestrian: waved/pinned chestnut hair,
+a fitted jacket, blouse collar, lapel pin and slacks, with the same independent
+arm/hip/knee joints as the fedora model. The renderer selects these two base
+silhouettes from the existing portrait cast mapping in `core/voices.go`, including
+Mara/Elena and the player's saved face choice. Walking, observed arrivals and
+casualty reenactments use the same selection. Both models retain the pedestrian
+speed and occupancy envelope. There are now 24 exported GLBs; the new figure is
+266,848 bytes. These are two shared base appearances, not individual likenesses;
+clothing/skin/age variation and higher-quality character surfaces remain pending.
+
+The old Portrait fallback used signed JavaScript hash arithmetic and absolute
+value; Go's FaceOf uses unsigned FNV-1a bytes. Portrait and 3D selection now share
+the unsigned calculation. Explicit saved face selections are unchanged. Tests
+compare all 24 cast entries and painted identity mappings with the actual Go
+source, include FNV vectors, inspect the real GLB articulated nodes and check
+both models' exported walking/falling bounds. All 93 frontend tests, the build
+and the HTTP package pass. Evidence logs: `.runtime/city3d-cast-tests.log`,
+`.runtime/city3d-cast-export.log`, `.runtime/city3d-build.log`, and
+`.runtime/city3d-cast-go.log`.
+
+Browser evidence: the isolated killing replay on 8852 now renders Mara with the
+waved-hair figure (`qa/city3d-20260913/cast-casualty.png`). In the existing isolated
+walking fixture on 8850, selecting Face 3 saved revision 4 without changing minute
+645, and the city showed the new player model plus both NPC model types. A normal
+walk to Saint Agnes completed at revision 5 / minute 660 in 17,778ms, with visible
+articulation and clear pavement (`qa/city3d-20260913/cast-walking.png`). Its zoomed
+post-arrival view measured 145 FPS / 8ms p95 / 59 draws / 77,996 triangles. This is
+a local sparse-view sample, not broad performance acceptance.
+
+
 ### Event occupancy and framing follow-up
 
 Police and casualty extras now share presentation occupancy with ordinary actors.
