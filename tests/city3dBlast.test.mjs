@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {blastParticle,blastLight,blastOpacity,billowAlpha} from '../.runtime/frontend-test/city3dBlast.js';
+import {blastParticle,blastLight,blastOpacity,billowAlpha,windowBurst,internalDetonation} from '../.runtime/frontend-test/city3dBlast.js';
 test('blast fire ends before the rising smoke and all particles finish at three seconds',()=>{
  for(let i=0;i<32;i++){
   for(let frame=0;frame<=180;frame++){
@@ -53,4 +53,23 @@ test('debris follows separated facade lanes, settles without continuing to spin,
   assert.equal(fragmentBlocked(10+Math.sin(heading)*.8,20+Math.cos(heading)*.8,body,.85,1.4),true);
   assert.equal(fragmentBlocked(10+Math.sin(heading)*2,20+Math.cos(heading)*2,body,.85,1.4),false);
  }
+});
+
+test('window pressure starts inside glazing and escapes outward before smoke rises',()=>{
+ const window={x:106.8,y:5.13,z:74.28};
+ for(let i=0;i<32;i++){
+  const start=windowBurst(i,0,window),escaped=windowBurst(i,.2,window);
+  assert.equal(start.z,window.z+.45);assert.ok(escaped.z<window.z);
+  for(let t=0;t<=3;t+=.01){const p=windowBurst(i,t,window);assert.ok(Object.values(p).filter(v=>typeof v==='number').every(Number.isFinite));}
+  assert.equal(windowBurst(i,3,window).size,0);
+ }
+});
+
+test('early charge accidents do not claim an internal building detonation',()=>{
+ const cue={id:'actual',target:'club',minute:600};
+ assert.equal(internalDetonation(cue,[]),false);
+ assert.equal(internalDetonation(cue,[{target:'bar',minute:600}]),false);
+ assert.equal(internalDetonation(cue,[{target:'club',minute:480}]),false);
+ assert.equal(internalDetonation(cue,[{target:'club',minute:600}]),true);
+ assert.equal(internalDetonation({...cue,id:'preview:test'},[]),true);
 });

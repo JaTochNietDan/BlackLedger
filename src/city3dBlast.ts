@@ -13,7 +13,7 @@ export function blastParticle(index: number, seconds: number) {
   return {
     x: Math.cos(angle) * radius,
     y: smoke ? .8 + age * (1.8 + index % 3 * .2) : .4 + age * (1.2 + index % 3 * .4),
-    // Keep the blast on the exposed facade side, rather than inside the model.
+    // Local outward travel; windowBurst adds the internal-to-external transition.
     z: -(Math.abs(Math.sin(angle)) * radius + .1),
     size: seconds < delay ? 0 : (smoke ? 1.1 + age * .85 : .3 + smooth(0, .12, age) * 2.5) * Math.sqrt(fade),
     smoke,
@@ -59,4 +59,16 @@ export function debrisPose(index: number, seconds: number) {
 export function fragmentBlocked(x: number, z: number, body: {x: number; z: number; heading: number}, width: number, length: number) {
   const dx=x-body.x, dz=z-body.z, c=Math.cos(body.heading), s=Math.sin(body.heading);
   return Math.abs(dx*c-dz*s)<width/2+.15 && Math.abs(dx*s+dz*c)<length/2+.15;
+}
+
+/** A pressure burst begins behind glazing and escapes through the authored window. */
+export function windowBurst(index:number,seconds:number,window:{x:number;y:number;z:number}){
+ const p=blastParticle(index,seconds);
+ const escape=smooth(0,.18,seconds);
+ return {...p,x:window.x+p.x*.35,y:window.y+p.y*.65,z:window.z+.45*(1-escape)+p.z*escape,size:p.size*.72};
+}
+
+/** Only a confirmed building fire (or explicit debug scene) identifies an internal detonation. */
+export function internalDetonation(cue:{id:string;target:string;minute?:number},fires:readonly {target:string;minute:number}[]){
+ return cue.id.startsWith('preview:')||fires.some(f=>f.target===cue.target&&f.minute===cue.minute);
 }

@@ -154,8 +154,11 @@ Theatre scene audio is cancellable: dismissal, cue replacement and navigation
 release its scheduled voices. Muting stops active scene sounds without replay on
 unmute. This affects presentation only and never advances or reverses a saved event.
 
-Explosion presentation now starts at the target building's rendered front bound,
+Confirmed building detonations start behind authored front-window glazing and burst outward,
 with a brief fire/light burst followed by rising smoke and a three-second fade.
+Confirmation uses a matching target/minute in public `building_fires`; explicit debug
+explosions also use this path. Early accidents and older snapshots without confirmation
+retain the exterior burst. Models without window anchors still need authored emitters.
 This uses the committed explosion cue; it adds no damage, ignition or physics rules.
 
 Explosion debris is cosmetic: instanced masonry fragments settle on the facade

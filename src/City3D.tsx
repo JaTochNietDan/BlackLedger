@@ -38,7 +38,7 @@ import {StreetTraffic, trafficSize, trafficModel, advanceWheel, wheelSteering, a
 import {pedestrianModel, isPedestrian} from './city3dCast';
 import {playCityGunshot, playMoment, soundOn} from './sound';
 import {cameraCommand, screenPan} from './city3dControls';
-import {blastParticle, blastLight, blastOpacity, billowAlpha, debrisPose, fragmentBlocked} from './city3dBlast';
+import {blastParticle, windowBurst, internalDetonation, blastLight, blastOpacity, billowAlpha, debrisPose, fragmentBlocked} from './city3dBlast';
 
 type Props = {
   state: Snapshot;
@@ -780,7 +780,13 @@ export function City3D(props: Props) {
           const label = makeLabel(latest.current.state.locations.find(p => p.id === lot.id)!.name);
           const box = new THREE.Box3().setFromObject(model, true);
           model.userData.sightBounds = box.clone();
-          model.userData.blastOrigin = {x: lot.x, y: 0.25, z: box.min.z - 0.15};
+          model.userData.debrisOrigin = {x: lot.x, y: 0.25, z: box.min.z - 0.15};
+          const blastWindows: THREE.Vector3[]=[];
+          model.traverse(o=>{if(o.name.startsWith('fire-window-1-'))blastWindows.push(o.getWorldPosition(new THREE.Vector3()));});
+          model.userData.blastWindows=blastWindows.slice(0,4);
+          model.userData.blastOrigin = blastWindows.length
+            ? {x:lot.x,y:blastWindows[0].y,z:blastWindows[0].z+.45}
+            : {x:lot.x,y:Math.min(2,box.max.y*.5),z:lot.z};
           label.position.set(lot.x, box.max.y + 2, lot.z);
           scene.add(label);
           const anchor = model.getObjectByName('sign-anchor');
@@ -1251,8 +1257,12 @@ export function City3D(props: Props) {
           }
           const at = e.slot?.root || entrance(lot);
           const blast = e.cue.kind === 'explosion';
-          const blastOrigin = buildings.get(lot.id)?.userData.blastOrigin;
-          if (blast && blastOrigin) e.light.position.set(blastOrigin.x, 2, blastOrigin.z);
+          const blastBuilding=buildings.get(lot.id);
+          const internal=internalDetonation(e.cue,w.building_fires||[]);
+          const blastOrigin = internal?blastBuilding?.userData.blastOrigin:blastBuilding?.userData.debrisOrigin;
+          const blastWindows = (internal?blastBuilding?.userData.blastWindows || []:[]) as THREE.Vector3[];
+          const debrisOrigin=blastBuilding?.userData.debrisOrigin;
+          if (blast && blastOrigin) e.light.position.set(blastOrigin.x, blastOrigin.y, blastOrigin.z);
           const shot = e.cue.kind === 'gunfight';
           const firing = gunfightPose(t * 3);
           if(blast)addImpact(t*3,11);
@@ -1316,8 +1326,10 @@ export function City3D(props: Props) {
             tmp.scale.setScalar(casualty || shot || personnel ? 0.001 : 0.25);
             const burst = blast ? blastParticle(j, t * 3) : null;
             if (burst && blastOrigin) {
-              tmp.position.set(blastOrigin.x + burst.x, blastOrigin.y + burst.y, blastOrigin.z + burst.z);
-              tmp.scale.setScalar(Math.max(.001, burst.size));
+              const window=blastWindows[j%blastWindows.length];
+              const vent=window?windowBurst(j,t*3,window):null;
+              tmp.position.set(vent?.x ?? blastOrigin.x+burst.x,vent?.y ?? blastOrigin.y+burst.y,vent?.z ?? blastOrigin.z+burst.z);
+              tmp.scale.setScalar(Math.max(.001,vent?.size ?? burst.size));
             }
             if (shot) {
               tmp.position.copy(muzzlePosition);
@@ -1348,10 +1360,10 @@ export function City3D(props: Props) {
               ),
             );
           }
-          if (e.debris && blastOrigin) {
+          if (e.debris && debrisOrigin) {
             for (let j = 0; j < 12; j++) {
               const fragment = debrisPose(j, t * 3);
-              const x = blastOrigin.x + fragment.x, z = blastOrigin.z + fragment.z;
+              const x = debrisOrigin.x + fragment.x, z = debrisOrigin.z + fragment.z;
               let blocked = false;
               for (const actor of actors.values()) {
                 if (!actor.object.visible) continue;
@@ -1518,7 +1530,8 @@ export function City3D(props: Props) {
             staged: !e.extra || e.extra.visible, x: e.slot?.root.x, z: e.slot?.root.z,
             approach: e.cue.kind==='raid-officer'&&e.extra?{x:e.extra.position.x,z:e.extra.position.z,leg:e.extra.getObjectByName('leg1')?.rotation.x}:undefined,
             debris: e.debris?.count,
-            blastOrigin: e.cue.kind === 'explosion' ? buildings.get(e.cue.target)?.userData.blastOrigin : undefined,
+            blastOrigin: e.cue.kind === 'explosion' ? buildings.get(e.cue.target)?.userData[internalDetonation(e.cue,w.building_fires||[])?'blastOrigin':'debrisOrigin'] : undefined,
+            blastWindows: e.cue.kind === 'explosion' && internalDetonation(e.cue,w.building_fires||[]) ? buildings.get(e.cue.target)?.userData.blastWindows : undefined,
             arm: e.gunArm?.rotation.x,
             audioShots: e.cue.kind === 'gunfight' ? e.audio?.started : undefined,
             audioBreaches: e.cue.kind === 'raid-officer' ? e.audio?.started : undefined,
