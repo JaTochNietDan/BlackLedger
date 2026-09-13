@@ -64,6 +64,48 @@ These are staged fixture saves, not earned campaign progress.
 
 ## Continue next
 
+### Event occupancy and framing follow-up
+
+Police and casualty extras now share presentation occupancy with ordinary actors.
+Each address has six side bays for police and five forecourt slots for casualties;
+the casualty reservation encloses the complete standing-to-fallen motion. A full
+scene waits for a free slot instead of stacking bodies. Playback starts when the
+slot is available and releases its reservation on expiry or Skip. Falling roots
+lift enough to keep the exported person above the pavement. Police flash a red
+roof beacon instead of spraying particles around their car. Front-side bays are
+preferred because the original left-side default was hidden behind the building.
+
+The browser exposed the old full-width theatre gradient covering the city and
+camera controls. City captions now occupy a compact corner panel; expanding the
+city during playback works and shows the existing expanded caption/skip control.
+Portraits remain in the normal caption, but 3D actors are still generic. An indoor
+killing is represented schematically at the building forecourt; this is not yet
+character-specific or indoor action choreography.
+
+Evidence: 89 frontend tests pass, including every current route sampled against
+all event slots, building/lamp/furniture clearance, slot overflow with a parked
+car, the exported character bounds throughout its fall, and traffic waiting for
+an event reservation then proceeding after removal. `npm run build` and
+`go test ./cmd/blackledger ./cmd/qa-fixture` pass. Logs are in
+`.runtime/city3d-scenes-tests.log`, `.runtime/city3d-build.log` and
+`.runtime/city3d-scenes-go.log`.
+
+Isolated browser fixtures: killing on 8852 replayed the actual core-produced cue
+at Saint Agnes, root (80,38.35), with the player clear at (80,36.65). It remained
+revision 0 / minute 480 through replay. Arrest on 8853 used the actual “Go with
+them” choice, then replayed the police scene at Ward Street Station (89.6,10).
+Skip immediately removed its effect and retained revision 1 / minute 480.
+Screenshots: `qa/city3d-20260913/casualty-scene.png` and `police-scene.png`.
+The zoomed post-scene view measured 145 FPS / 7.4ms p95 / 63 calls / 72,476
+triangles; this is an idle local sample, not a busy-effect performance guarantee.
+The preview launcher accepts `killing` and `arrest`; the killing fixture now
+preserves its real core cue in LastResult for explicit replay after loading.
+
+Still pending: distinct character appearances, convincing shooters/assassins and
+vehicle arrival/departure choreography, richer city art, mobile caption recheck,
+reduced-motion/renderer-failure browser checks and prolonged resource stability.
+
+
 ### Movement pacing follow-up
 
 Normal presentation now caps walking at 1.8m/s and cars at 11m/s, replacing the

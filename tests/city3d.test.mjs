@@ -88,3 +88,62 @@ test('lamp poles stay clear of the articulated pedestrian walking envelope',asyn
   }
  }
 });
+
+test('event bays clear buildings, lamps, furniture and every ordinary route',async()=>{
+ const {sceneSlots}=await import('../.runtime/frontend-test/city3dEvents.js');
+ const {trafficSize,trafficOverlap}=await import('../.runtime/frontend-test/city3dTraffic.js');
+ const {lampPositions,streetsidePosition}=await import('../.runtime/frontend-test/city3dPlan.js');
+ const slots=plan.lots.flatMap(lot=>['killing','raid'].flatMap(kind=>sceneSlots(lot,kind)));
+ for(const slot of slots){
+  const size=trafficSize(slot.model);
+  for(const lot of plan.lots){
+   assert.ok(Math.abs(slot.pose.x-lot.x)>=MODEL_LIMIT/2+size.width/2||Math.abs(slot.pose.z-lot.z)>=MODEL_LIMIT/2+size.length/2,`building ${lot.id}`);
+   for(const lamp of lampPositions(lot))assert.ok(Math.abs(slot.pose.x-lamp.x)>size.width/2+.16||Math.abs(slot.pose.z-lamp.z)>size.length/2+.16,'lamp');
+   const furniture=streetsidePosition(lot),[min,max]=manifest.streetside.bounds_blender;
+   assert.ok(slot.pose.x+size.width/2<furniture.x+min[0]||slot.pose.x-size.width/2>furniture.x+max[0]||slot.pose.z+size.length/2<furniture.z-max[1]||slot.pose.z-size.length/2>furniture.z-min[1],'furniture');
+  }
+ }
+ for(const driving of [false,true])for(const from of plan.lots)for(const to of plan.lots){
+  const path=route(from,to,driving);
+  for(let i=0;i<=150;i++){
+   const pose=onRoute(path,i/150);
+   for(const slot of slots){
+    // Circumscribed circles reject distant bays without an expensive SAT check.
+    const a=trafficSize(driving?'packard':'person'),b=trafficSize(slot.model);
+    const radius=(Math.hypot(a.width,a.length)+Math.hypot(b.width,b.length))/2+.2;
+    if(Math.abs(pose.x-slot.pose.x)>radius||Math.abs(pose.z-slot.pose.z)>radius)continue;
+    assert.equal(trafficOverlap(pose,driving?'packard':'person',slot.pose,slot.model),false,`${from.id}/${to.id}: ${JSON.stringify(slot)}`);
+   }
+  }
+ }
+});
+test('event overflow waits for a clear slot and respects a parked player car',async()=>{
+ const {sceneSlots,availableSceneSlot}=await import('../.runtime/frontend-test/city3dEvents.js');
+ const {parkingSpot}=await import('../.runtime/frontend-test/city3dPlan.js');
+ const lot=plan.lots[0];
+ for(const kind of ['killing','arrest']){
+  const occupied=kind==='arrest'?[{model:'packard',pose:{...parkingSpot(lot),heading:0}}]:[];
+  const initial=occupied.length;
+  for(let i=0;i<sceneSlots(lot,kind).length-initial;i++){
+   const slot=availableSceneSlot(lot,kind,occupied);assert.ok(slot);occupied.push(slot);
+  }
+  assert.equal(availableSceneSlot(lot,kind,occupied),undefined);
+  const released=occupied.pop();assert.deepEqual(availableSceneSlot(lot,kind,occupied),released);
+ }
+});
+test('the complete casualty fall remains above pavement and inside its reservation',async()=>{
+ const {casualtyFall,sceneSlots}=await import('../.runtime/frontend-test/city3dEvents.js');
+ const {trafficSize}=await import('../.runtime/frontend-test/city3dTraffic.js');
+ const slot=sceneSlots(plan.lots[0],'killing')[0],size=trafficSize(slot.model);
+ const [min,max]=manifest.person.bounds_blender;
+ for(let frame=0;frame<=120;frame++){
+  const {rotation,height}=casualtyFall(frame/120);
+  for(const x of [min[0],max[0]])for(const y of [min[2],max[2]])for(const z of [-max[1],-min[1]]){
+   const wx=slot.root.x+x*Math.cos(rotation)-y*Math.sin(rotation);
+   const wy=height+x*Math.sin(rotation)+y*Math.cos(rotation);
+   assert.ok(wy>=.17,`ground at ${frame}: ${wy}`);
+   assert.ok(Math.abs(wx-slot.pose.x)<=size.width/2,`width at ${frame}`);
+   assert.ok(Math.abs(z)<=size.length/2);
+  }
+ }
+});

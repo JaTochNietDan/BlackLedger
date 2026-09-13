@@ -9,6 +9,7 @@ export function trafficSpeed(model: string) {
   return model === 'person' ? 1.8 : 11;
 }
 export function trafficSize(model: string) {
+  if (model === 'casualty') return {length: 1.4, width: 2.6};
   return {length: lengths[model] || 1.4, width: lengths[model] ? 2.15 : 0.85};
 }
 export function trafficOverlap(a: TrafficPose, am: string, b: TrafficPose, bm: string) {

@@ -90,3 +90,16 @@ test('walking and driving respect physical speed caps at normal and accelerated 
   assert.ok(Math.abs(placement.pose.x-speed*rate)<1e-6,`${model}, ${rate}x, ${fps} FPS`);
  }
 });
+test('event reservations stop later arrivals and release them after playback',()=>{
+ const traffic=new StreetTraffic();
+ const scene={id:'scene:kill',model:'casualty',points:[{x:10,z:0}],progress:0};
+ const walker={id:'npc',model:'person',points:line,progress:0};
+ traffic.update([scene,walker],1/60);walker.progress=1;
+ let poses;
+ for(let frame=0;frame<600;frame++){
+  poses=traffic.update([scene,walker],1/60);clear([scene,walker],poses);
+ }
+ assert.ok(poses.get('npc').pose.x<9,'walker yields to the complete fall envelope');
+ for(let frame=0;frame<600;frame++)poses=traffic.update([walker],1/60);
+ assert.ok(poses.get('npc').pose.x>15,'scene removal releases the waiting traveller');
+});

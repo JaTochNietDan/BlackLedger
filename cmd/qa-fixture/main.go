@@ -355,6 +355,8 @@ func main() {
 			victim.Location = "bar"
 			w.VisualCues = nil
 			w.Kill(victim.ID, "Shot twice at the counter, in front of everyone and nobody.")
+			// Preserve the actual core-produced cue for explicit browser replay.
+			w.LastResult = &core.Result{Kind: "qa-killing", From: "bar", To: "bar", Cues: w.VisualCues}
 			return nil
 		}
 		if scenario == "herald" {

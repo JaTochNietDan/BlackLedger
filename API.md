@@ -105,3 +105,8 @@ Normal travel playback caps pedestrians at 1.8 m/s and cars at 11 m/s in the
 authored scene scale. The city offers 1× and 4× travel playback; this changes
 only interpolation and gait, never saved game time. Walking cycles follow
 distance travelled and stop when occupancy makes a traveller wait.
+
+Police/casualty reenactments reserve presentation space beside the cue's target
+building, including the casualty's full fall envelope. Occupied slots delay visual
+playback until clear; expiry or Skip releases them. These schematic scene positions
+are not authoritative NPC locations and never change event outcomes or time.

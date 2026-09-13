@@ -91,7 +91,12 @@ export function Theatre({
   }, [cue.id]);
 
   return (
-    <div className="theatre" ref={band} role="status" aria-label={cue.caption}>
+    <div
+      className={plate ? 'theatre' : 'theatre theatre-city'}
+      ref={band}
+      role="status"
+      aria-label={cue.caption}
+    >
       <div className="theatre-where">
         <span className="eyebrow">
           {cue.kind === 'arrest' ? 'YOU WERE TAKEN TO' : 'IT HAPPENED AT'}

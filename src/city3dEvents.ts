@@ -1,3 +1,7 @@
+import {PITCH} from './city3dPlan.js';
+import type {Lot, Point} from './city3dPlan.js';
+import {trafficOverlap} from './city3dTraffic.js';
+import type {TrafficPose} from './city3dTraffic.js';
 import type {VisualCue} from './types';
 /** Each committed cue is staged once per mounted city. Loading an old save is
  * silent; an explicit currently playing cue survives navigation into the city. */
@@ -27,4 +31,32 @@ export class CityCueQueue {
     while (this.seen.size > 2048) this.seen.delete(this.seen.values().next().value!);
     return out;
   }
+}
+
+export type SceneSlot = {root: Point; pose: TrafficPose; model: string};
+/** Dedicated forecourt/side bays keep reenactments out of public travel lanes.
+ * The casualty reservation encloses the whole fall, including the standing pose. */
+export function sceneSlots(lot: Lot, kind: string): SceneSlot[] {
+  if (kind === 'killing')
+    return [0, -3, 3, -6, 6].map(offset => {
+      const root = {x: lot.x + offset, z: lot.row * PITCH + 6.35};
+      return {root, pose: {x: root.x + 0.8, z: root.z, heading: 0}, model: 'casualty'};
+    });
+  if (kind === 'raid' || kind === 'arrest')
+    return [1, -1].flatMap(side => [-6, 0, 6].map(offset => {
+      const root = {x: lot.x + side * 9.6, z: lot.z + offset};
+      return {root, pose: {...root, heading: 0}, model: 'police'};
+    }));
+  return [];
+}
+export function availableSceneSlot(
+  lot: Lot, kind: string, occupied: {pose: TrafficPose; model: string}[],
+): SceneSlot | undefined {
+  return sceneSlots(lot, kind).find(slot =>
+    occupied.every(other => !trafficOverlap(slot.pose, slot.model, other.pose, other.model)));
+}
+export function casualtyFall(progress: number) {
+  const angle = Math.min(1, Math.max(0, progress) * 2.5) * Math.PI / 2;
+  // Rotating around the feet would push the jacket/arms through the pavement.
+  return {rotation: -angle, height: 0.2 + 0.4 * Math.sin(angle)};
 }

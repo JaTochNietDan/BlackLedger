@@ -16,7 +16,8 @@ import {
 import type {Lot, Point} from './city3dPlan';
 import type {Journey} from './TravelPresentation';
 import './city3d.css';
-import {CityCueQueue} from './city3dEvents';
+import {CityCueQueue, availableSceneSlot, casualtyFall} from './city3dEvents';
+import type {SceneSlot} from './city3dEvents';
 import {StreetTraffic} from './city3dTraffic';
 
 type Props = {
@@ -53,6 +54,7 @@ type Effect = {
   mesh: THREE.InstancedMesh;
   light: THREE.PointLight;
   extra?: THREE.Group;
+  slot?: SceneSlot;
 };
 const modelNames = [
   'tenement',
@@ -692,8 +694,8 @@ export function City3D(props: Props) {
           let extra: THREE.Group | undefined;
           if (cue.kind === 'killing' || ['raid', 'arrest'].includes(cue.kind)) {
             extra = models.get(cue.kind === 'killing' ? 'person' : 'police')!.clone(true);
-            const pos = entrance(lot, cue.kind !== 'killing');
-            extra.position.set(pos.x, 0.2, pos.z);
+            extra.visible = false;
+            mesh.visible = false;
             scene.add(extra);
           }
           effects.push({cue, since: now, mesh, light, extra});
@@ -795,6 +797,24 @@ export function City3D(props: Props) {
           }
         }
         if (!motion) traffic.clear();
+        for (const e of effects) {
+          if (!e.extra || e.slot) continue;
+          const occupied = [
+            ...[...actors.values()]
+              .filter(a => a.object.visible)
+              .map(a => ({
+                model: a.model,
+                pose: {x: a.object.position.x, z: a.object.position.z, heading: a.object.rotation.y},
+              })),
+            ...effects.flatMap(other => other.slot ? [other.slot] : []),
+          ];
+          e.slot = availableSceneSlot(lots.get(e.cue.target)!, e.cue.kind, occupied);
+          if (e.slot) {
+            e.extra.position.set(e.slot.root.x, 0.2, e.slot.root.z);
+            e.light.position.set(e.slot.root.x, 3, e.slot.root.z);
+            e.since = now;
+          }
+        }
         const placements = traffic.update(
           [...actors]
             .filter(([, a]) => !a.arrived)
@@ -807,7 +827,13 @@ export function City3D(props: Props) {
                 points: a.points,
                 progress: a.start + (a.end - a.start) * t,
               };
-            }),
+            })
+            .concat(effects.flatMap(e => e.slot ? [{
+              id: `scene:${e.cue.id}`,
+              model: e.slot.model,
+              points: [e.slot.pose],
+              progress: 0,
+            }] : [])),
           dt / 1000,
           playback.current,
         );
@@ -868,8 +894,16 @@ export function City3D(props: Props) {
           label.scale.set(17 / labelScale, 2.65 / labelScale, 1);
         }
         for (let i = effects.length - 1; i >= 0; i--) {
-          const e = effects[i],
-            t = (now - e.since) / 3000,
+          const e = effects[i];
+          if (e.extra && motion) {
+            const staged = !!e.slot && !placements.get(`scene:${e.cue.id}`)?.waiting;
+            e.extra.visible = e.mesh.visible = staged;
+            if (!staged) {
+              e.since += dt;
+              continue;
+            }
+          }
+          const t = (now - e.since) / 3000,
             lot = lots.get(e.cue.target)!;
           if (t >= 1 || !motion) {
             scene.remove(e.mesh, e.light);
@@ -879,11 +913,15 @@ export function City3D(props: Props) {
             effects.splice(i, 1);
             continue;
           }
-          const at = entrance(lot, ['raid', 'arrest'].includes(e.cue.kind));
+          const at = e.slot?.root || entrance(lot);
           const blast = e.cue.kind === 'explosion';
           const shot = e.cue.kind === 'gunfight';
           const casualty = e.cue.kind === 'killing';
-          if (casualty && e.extra) e.extra.rotation.z = (-Math.min(1, t * 2.5) * Math.PI) / 2;
+          if (casualty && e.extra) {
+            const fall = casualtyFall(t);
+            e.extra.rotation.z = fall.rotation;
+            e.extra.position.y = fall.height;
+          }
           const police = ['raid', 'arrest'].includes(e.cue.kind);
           for (let j = 0; j < 32; j++) {
             const a = j * 2.399;
@@ -911,6 +949,11 @@ export function City3D(props: Props) {
                     ? 0.001
                     : 0.25,
             );
+            if (police) {
+              // A period rotating red roof beacon, rather than sparks around the car.
+              tmp.position.set(at.x, 1.96, at.z);
+              tmp.scale.setScalar(j === 0 ? 0.45 + 0.35 * Math.max(0, Math.sin(t * 38)) : 0.001);
+            }
             tmp.quaternion.copy(camera.quaternion);
             tmp.updateMatrix();
             e.mesh.setMatrixAt(j, tmp.matrix);
@@ -936,7 +979,13 @@ export function City3D(props: Props) {
             ? 100 * (1 - t) ** 3
             : shot && Math.floor(t * 22) % 3 === 0
               ? 30
-              : 0;
+              : police
+                ? 8 * Math.max(0, Math.sin(t * 38))
+                : 0;
+          if (police) {
+            e.light.color.setHex(0xe53220);
+            e.light.position.y = 1.96;
+          }
         }
       }
       if (ready) lastActive = p.activeCue?.id || null;
@@ -963,7 +1012,10 @@ export function City3D(props: Props) {
               z: a.object.position.z,
             })),
           waiting: [...actors].filter(([, a]) => !a.arrived && !a.object.visible).map(([id]) => id),
-          effects: effects.map(e => ({id: e.cue.id, kind: e.cue.kind, target: e.cue.target})),
+          effects: effects.map(e => ({
+            id: e.cue.id, kind: e.cue.kind, target: e.cue.target,
+            staged: !e.extra || e.extra.visible, x: e.slot?.root.x, z: e.slot?.root.z,
+          })),
         });
       if (ready && dt > 0 && dt < 250) samples.push(dt);
       if (now - sampleStart > 2500 && samples.length) {
