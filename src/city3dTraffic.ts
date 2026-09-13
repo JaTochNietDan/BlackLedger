@@ -10,6 +10,7 @@ export function trafficSpeed(model: string) {
   return isPedestrian(model) ? 1.8 : 11;
 }
 export function trafficSize(model: string) {
+  if (model === 'police-approach') return {length:4,width:1.4};
   if (model === 'casualty') return {length: 1.4, width: 2.6};
   const parked = model.startsWith('parked-');
   const vehicle = parked ? model.slice(7) : model;

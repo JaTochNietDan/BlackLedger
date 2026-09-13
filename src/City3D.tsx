@@ -29,7 +29,7 @@ import {
 import type {Lot, Point} from './city3dPlan';
 import type {Journey} from './TravelPresentation';
 import './city3d.css';
-import {CityCueQueue, policeCast, sceneSlots, availableSceneSlot, casualtyFall, gunfightPose, casualtySceneStart, GunfireAudio, BlastAudio} from './city3dEvents';
+import {CityCueQueue, officerApproach, policeCast, sceneSlots, availableSceneSlot, casualtyFall, gunfightPose, casualtySceneStart, GunfireAudio, BlastAudio} from './city3dEvents';
 import type {SceneSlot} from './city3dEvents';
 import {StreetTraffic, trafficSize, trafficModel, advanceWheel, wheelSteering, advanceSteering, frontWheelSteering} from './city3dTraffic';
 import {pedestrianModel, isPedestrian} from './city3dCast';
@@ -924,9 +924,9 @@ export function City3D(props: Props) {
           scene.add(light);
           let costume: THREE.MeshStandardMaterial[] | undefined;
           let extra: THREE.Group | undefined, gunArm: THREE.Object3D | undefined, muzzle: THREE.Object3D | undefined;
-          if (['killing', 'gunfight', 'raid', 'arrest','police-unit','officer','detainee'].includes(cue.kind)) {
+          if (['killing', 'gunfight', 'raid', 'arrest','police-unit','officer','detainee','raid-officer'].includes(cue.kind)) {
             const model = ['killing','detainee'].includes(cue.kind) ? personModel(cue.actors?.[0]?.id || '')
-              : cue.kind === 'gunfight' ? 'person' : cue.kind==='officer'?'police-officer':'police';
+              : cue.kind === 'gunfight' ? 'person' : ['officer','raid-officer'].includes(cue.kind)?'police-officer':'police';
             extra = models.get(model)!.clone(true);
             if (isPedestrian(model)) costume = dressPedestrian(extra, model, personWardrobe(['killing','detainee'].includes(cue.kind) ? cue.actors?.[0]?.id || '' : 'anonymous-shooter'));
             if (model === 'police') addVehicleShadow(extra, model);
@@ -1255,9 +1255,21 @@ export function City3D(props: Props) {
             e.extra.position.y = fall.height;
           }
           const police = ['raid', 'arrest','police-unit'].includes(e.cue.kind);
-          const personnel=['officer','detainee'].includes(e.cue.kind);
+          const personnel=['officer','detainee','raid-officer'].includes(e.cue.kind);
           if(personnel&&e.extra){
-            if(e.cue.kind==='detainee')for(const name of ['arm1','arm-1']){
+            if(e.cue.kind==='raid-officer'){
+              const front=(buildings.get(lot.id)?.userData.sightBounds as THREE.Box3|undefined)?.min.z ?? at.z;
+              const distance=THREE.MathUtils.clamp(front-at.z-.7,0,2.4);
+              const walk=officerApproach(t*3,distance,Number(e.cue.id.split(':').at(-1))||0);
+              e.extra.position.z=at.z+walk.travelled;e.extra.rotation.y=0;
+              e.extra.position.y=.2+(walk.walking?Math.abs(Math.sin(walk.phase))*.025:0);
+              for(const name of ['leg1','leg-1','knee1','knee-1','arm1','arm-1']){
+                const limb=e.extra.getObjectByName(name);if(!limb)continue;
+                const phase=walk.phase+(name.endsWith('-1')?0:Math.PI);
+                limb.rotation.x=!walk.walking?0:name.startsWith('knee')?Math.max(0,Math.sin(phase+.7))*.65
+                  :Math.sin(phase+(name.startsWith('arm')?Math.PI:0))*(name.startsWith('arm')?.23:.35);
+              }
+            }else if(e.cue.kind==='detainee')for(const name of ['arm1','arm-1']){
               const arm=e.extra.getObjectByName(name);if(arm)arm.rotation.x=.55*Math.min(1,t*4);
             }
             else e.extra.rotation.y=Math.atan2(lot.x-at.x,lot.row*PITCH+6.35-at.z);
@@ -1460,6 +1472,7 @@ export function City3D(props: Props) {
           effects: effects.map(e => ({
             id: e.cue.id, kind: e.cue.kind, target: e.cue.target,
             staged: !e.extra || e.extra.visible, x: e.slot?.root.x, z: e.slot?.root.z,
+            approach: e.cue.kind==='raid-officer'&&e.extra?{x:e.extra.position.x,z:e.extra.position.z,leg:e.extra.getObjectByName('leg1')?.rotation.x}:undefined,
             debris: e.debris?.count,
             blastOrigin: e.cue.kind === 'explosion' ? buildings.get(e.cue.target)?.userData.blastOrigin : undefined,
             arm: e.gunArm?.rotation.x,

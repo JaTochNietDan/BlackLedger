@@ -70,6 +70,12 @@ These are staged fixture saves, not earned campaign progress.
 - Production build passes. Fresh isolated port 8862/killing fixture browser evidence: at 500ms a casualty effect was staged and all five spoiler-bearing panels were absent. Once effects were empty, the result strip, headline, caption, cast and scene paper appeared. Replaying the same cue hid spoilers again; Skip cleared effects and restored the headline. Browser logs were clear. Evidence: `news-timing.json`. This verifies scene timing through the actual UI, not a timer-only unit test.
 - Re-read the latest objective at `/Users/jatochnietdan/.codex/attachments/4a3692d6-f725-4a26-b1a0-9d3131b50b49/goal-objective.md`; it adds layered contextual voices and vehicle/action sound. Those audio assets/timelines, full police choreography, drive-bys, persistent building fire/brigade response, remaining interiors and final visual quality remain unfinished. No main-save access or mutation.
 
+### Raid approach movement — September 13
+
+- Four uniformed raid officers now advance toward the measured front facade, with staggered starts and distance-driven leg/arm gait. Movement stops 0.7m before the facade and is capped at 2.4m. The entire approach corridor is reserved before staging, keeping traffic and other cast members out of the swept volume.
+- Production build and all 154 frontend tests pass. Added checks for monotonic travel, bounded walking speed, staggered starts, stopping and full-path reservation containment. Browser debug preview on isolated 8860 confirmed all four officers staged, advanced from z38.35 to z39.9473 and settled their leg rotations to zero. Stop removed every effect. Evidence: `raid-approach.png` and `raid-approach.json` under the existing QA directory. No campaign commands were issued.
+- This implements approach only. Door anchors, forcible entry, officer search, lingering raid presence, vehicle arrivals and richer action/audio timelines remain unfinished. The production goal stays active.
+
 ### Expanded police cast and WASD — September 13
 
 - Raid cues now stage three cars and four uniformed officers; arrest cues stage two cars, two officers and an explicitly identified detainee. The detainee's arms move behind their back. Supporting actors use the existing spacing/reservation, cutaway and camera-envelope paths. This is still a short staged tableau; arrivals, escort, handcuff contact, search and door-entry choreography remain unfinished.

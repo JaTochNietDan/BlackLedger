@@ -37,10 +37,11 @@ export type SceneSlot = {root: Point; pose: TrafficPose; model: string};
 /** Dedicated forecourt/side bays keep reenactments out of public travel lanes.
  * The casualty reservation encloses the whole fall, including the standing pose. */
 export function sceneSlots(lot: Lot, kind: string): SceneSlot[] {
-  if (['killing','gunfight','officer','detainee'].includes(kind))
+  if (['killing','gunfight','officer','detainee','raid-officer'].includes(kind))
     return (kind === 'gunfight' ? [-3, -6, 0, 3, 6] : [0, -3, 3, -6, 6]).map(offset => {
       const root = {x: lot.x + offset, z: lot.row * PITCH + 6.35};
-      return {root, pose: {x: root.x + 0.8, z: root.z, heading: 0}, model: 'casualty'};
+      return kind==='raid-officer' ? {root,pose:{x:root.x,z:root.z+1.2,heading:0},model:'police-approach'}
+        : {root, pose: {x: root.x + 0.8, z: root.z, heading: 0}, model: 'casualty'};
     });
   if (['raid','arrest','police-unit'].includes(kind))
     return [1, -1].flatMap(side => [-6, 0, 6].map(offset => {
@@ -148,6 +149,14 @@ export function policeCast(cue: VisualCue): VisualCue[] {
   const add=(kind:string,index:number,actors=cue.actors)=>result.push({...cue,id:`${cue.id}:${kind}:${index}`,kind,actors});
   for(let i=0;i<(cue.kind==='raid'?2:1);i++)add('police-unit',i,[]);
   if(cue.kind==='arrest'&&cue.detainee)add('detainee',0,[cue.detainee]);
-  for(let i=0;i<(cue.kind==='raid'?4:2);i++)add('officer',i,[]);
+  for(let i=0;i<(cue.kind==='raid'?4:2);i++)add(cue.kind==='raid'?'raid-officer':'officer',i,[]);
   return result;
+}
+
+/** A staggered purposeful walk; the full 2.4m sweep is reserved before moving. */
+export function officerApproach(seconds: number, distance: number, index: number) {
+ const start=.35+index*.08;
+ const travelled=Math.min(Math.max(0,distance),Math.max(0,seconds-start)*1.4);
+ const walking=seconds>start&&travelled<distance;
+ return {travelled,walking,phase:travelled/1.15*Math.PI*2};
 }

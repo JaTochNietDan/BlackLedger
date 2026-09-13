@@ -1,0 +1,272 @@
+[
+  [
+    {
+      "id": "preview:f54c59cc-81ef-433d-8544-202246c28ba4:0:raid-officer:0",
+      "kind": "raid-officer",
+      "target": "bar",
+      "staged": true,
+      "x": 80,
+      "z": 38.35,
+      "approach": {
+        "x": 80,
+        "z": 38.68614,
+        "leg": -0.33771339857451177
+      }
+    },
+    {
+      "id": "preview:f54c59cc-81ef-433d-8544-202246c28ba4:0:raid-officer:1",
+      "kind": "raid-officer",
+      "target": "bar",
+      "staged": true,
+      "x": 77,
+      "z": 38.35,
+      "approach": {
+        "x": 77,
+        "z": 38.57414,
+        "leg": -0.3292369561038746
+      }
+    },
+    {
+      "id": "preview:f54c59cc-81ef-433d-8544-202246c28ba4:0:raid-officer:2",
+      "kind": "raid-officer",
+      "target": "bar",
+      "staged": true,
+      "x": 83,
+      "z": 38.35,
+      "approach": {
+        "x": 83,
+        "z": 38.46214,
+        "leg": -0.20127530543316183
+      }
+    },
+    {
+      "id": "preview:f54c59cc-81ef-433d-8544-202246c28ba4:0:raid-officer:3",
+      "kind": "raid-officer",
+      "target": "bar",
+      "staged": true,
+      "x": 74,
+      "z": 38.35,
+      "approach": {
+        "x": 74,
+        "z": 38.350139999999996,
+        "leg": -0.00026771830436954363
+      }
+    }
+  ],
+  [
+    {
+      "id": "preview:f54c59cc-81ef-433d-8544-202246c28ba4:0:raid-officer:0",
+      "kind": "raid-officer",
+      "target": "bar",
+      "staged": true,
+      "x": 80,
+      "z": 38.35,
+      "approach": {
+        "x": 80,
+        "z": 39.18188,
+        "leg": 0.3451134841072995
+      }
+    },
+    {
+      "id": "preview:f54c59cc-81ef-433d-8544-202246c28ba4:0:raid-officer:1",
+      "kind": "raid-officer",
+      "target": "bar",
+      "staged": true,
+      "x": 77,
+      "z": 38.35,
+      "approach": {
+        "x": 77,
+        "z": 39.06988,
+        "leg": 0.24901061235407623
+      }
+    },
+    {
+      "id": "preview:f54c59cc-81ef-433d-8544-202246c28ba4:0:raid-officer:2",
+      "kind": "raid-officer",
+      "target": "bar",
+      "staged": true,
+      "x": 83,
+      "z": 38.35,
+      "approach": {
+        "x": 83,
+        "z": 38.95788,
+        "leg": 0.06253791938379588
+      }
+    },
+    {
+      "id": "preview:f54c59cc-81ef-433d-8544-202246c28ba4:0:raid-officer:3",
+      "kind": "raid-officer",
+      "target": "bar",
+      "staged": true,
+      "x": 74,
+      "z": 38.35,
+      "approach": {
+        "x": 74,
+        "z": 38.84588,
+        "leg": -0.14663075646276494
+      }
+    }
+  ],
+  [
+    {
+      "id": "preview:f54c59cc-81ef-433d-8544-202246c28ba4:0:raid-officer:0",
+      "kind": "raid-officer",
+      "target": "bar",
+      "staged": true,
+      "x": 80,
+      "z": 38.35,
+      "approach": {
+        "x": 80,
+        "z": 39.67776,
+        "leg": -0.28895048415351315
+      }
+    },
+    {
+      "id": "preview:f54c59cc-81ef-433d-8544-202246c28ba4:0:raid-officer:1",
+      "kind": "raid-officer",
+      "target": "bar",
+      "staged": true,
+      "x": 77,
+      "z": 38.35,
+      "approach": {
+        "x": 77,
+        "z": 39.56576,
+        "leg": -0.12306302858722842
+      }
+    },
+    {
+      "id": "preview:f54c59cc-81ef-433d-8544-202246c28ba4:0:raid-officer:2",
+      "kind": "raid-officer",
+      "target": "bar",
+      "staged": true,
+      "x": 83,
+      "z": 38.35,
+      "approach": {
+        "x": 83,
+        "z": 39.45376,
+        "leg": 0.08748591263511282
+      }
+    },
+    {
+      "id": "preview:f54c59cc-81ef-433d-8544-202246c28ba4:0:raid-officer:3",
+      "kind": "raid-officer",
+      "target": "bar",
+      "staged": true,
+      "x": 74,
+      "z": 38.35,
+      "approach": {
+        "x": 74,
+        "z": 39.34176,
+        "leg": 0.2662848565015
+      }
+    }
+  ],
+  [
+    {
+      "id": "preview:f54c59cc-81ef-433d-8544-202246c28ba4:0:raid-officer:0",
+      "kind": "raid-officer",
+      "target": "bar",
+      "staged": true,
+      "x": 80,
+      "z": 38.35,
+      "approach": {
+        "x": 80,
+        "z": 39.94727583115148,
+        "leg": 0
+      }
+    },
+    {
+      "id": "preview:f54c59cc-81ef-433d-8544-202246c28ba4:0:raid-officer:1",
+      "kind": "raid-officer",
+      "target": "bar",
+      "staged": true,
+      "x": 77,
+      "z": 38.35,
+      "approach": {
+        "x": 77,
+        "z": 39.94727583115148,
+        "leg": 0
+      }
+    },
+    {
+      "id": "preview:f54c59cc-81ef-433d-8544-202246c28ba4:0:raid-officer:2",
+      "kind": "raid-officer",
+      "target": "bar",
+      "staged": true,
+      "x": 83,
+      "z": 38.35,
+      "approach": {
+        "x": 83,
+        "z": 39.94727583115148,
+        "leg": 0
+      }
+    },
+    {
+      "id": "preview:f54c59cc-81ef-433d-8544-202246c28ba4:0:raid-officer:3",
+      "kind": "raid-officer",
+      "target": "bar",
+      "staged": true,
+      "x": 74,
+      "z": 38.35,
+      "approach": {
+        "x": 74,
+        "z": 39.83764,
+        "leg": -0.3369487224443914
+      }
+    }
+  ],
+  [
+    {
+      "id": "preview:f54c59cc-81ef-433d-8544-202246c28ba4:0:raid-officer:0",
+      "kind": "raid-officer",
+      "target": "bar",
+      "staged": true,
+      "x": 80,
+      "z": 38.35,
+      "approach": {
+        "x": 80,
+        "z": 39.94727583115148,
+        "leg": 0
+      }
+    },
+    {
+      "id": "preview:f54c59cc-81ef-433d-8544-202246c28ba4:0:raid-officer:1",
+      "kind": "raid-officer",
+      "target": "bar",
+      "staged": true,
+      "x": 77,
+      "z": 38.35,
+      "approach": {
+        "x": 77,
+        "z": 39.94727583115148,
+        "leg": 0
+      }
+    },
+    {
+      "id": "preview:f54c59cc-81ef-433d-8544-202246c28ba4:0:raid-officer:2",
+      "kind": "raid-officer",
+      "target": "bar",
+      "staged": true,
+      "x": 83,
+      "z": 38.35,
+      "approach": {
+        "x": 83,
+        "z": 39.94727583115148,
+        "leg": 0
+      }
+    },
+    {
+      "id": "preview:f54c59cc-81ef-433d-8544-202246c28ba4:0:raid-officer:3",
+      "kind": "raid-officer",
+      "target": "bar",
+      "staged": true,
+      "x": 74,
+      "z": 38.35,
+      "approach": {
+        "x": 74,
+        "z": 39.94727583115148,
+        "leg": 0
+      }
+    }
+  ]
+]
