@@ -64,6 +64,12 @@ These are staged fixture saves, not earned campaign progress.
 
 ## Continue next
 
+### Saved aftermath lifecycle — September 13
+
+- Added saved/public `aftermath` records for known victims of public killing cues. Each has a stable cue/victim identity, address, occurrence minute, police-arrival deadline (+5 game minutes) and cleanup deadline (+180). Reads return detached active entries, without mutating the save or advancing time. Repeated reports cannot duplicate bodies or restart old deaths. Old saves produce an empty projection rather than fabricated historical scenes.
+- Found official deaths returned before creating a killing cue. They now emit that public cue after the existing official consequences, allowing the same aftermath path. Tests cover ordinary/official deaths, immutable projection, result replacement, JSON save round-trip, exact cleanup boundary and stale reports. Full core/HTTP suites passed (118.497s/0.951s) on the initial lifecycle change; after the official/stale-report corrections, focused aftermath/official/killing checks and TypeScript check passed.
+- This is backend groundwork, not completed visual aftermath. Bodies, blood, officers, multi-car response and cleanup animation remain to integrate and browser-test. Further user amendments require interior-origin building explosions with window fire/smoke and brigade extinguishing, larger raids, visible custody actions and weapon models matching actual NPC equipment. Existing uncommitted armed-resistance work was inspected but left untouched.
+
 ### Debug action previews — September 13
 
 - `?city-debug` now exposes a scene selector, Play and Stop controls for gunfight, assassination, explosion, arrest and raid at the selected address. All use the existing renderer, staging reservations, audio, particles and event camera fitting. The preview has its own immutable world identity and never sends a campaign command. New revisions cancel previews; stop restores the original projection silently.

@@ -250,3 +250,7 @@ Active public visual cues fit the camera to the presentation envelope at their t
 ## Debug scene previews
 
 Append `?city-debug` to the browser URL to expose the scene selector. Gunfight, assassination (shooter plus casualty), explosion, arrest and raid previews run at the selected address. Each creates an immutable presentation-only snapshot with a unique preview world ID; no request is sent to the command API. Stop returns the renderer to the campaign projection without replaying saved results. A new committed revision cancels the preview. Controls are unavailable during travel, active gameplay scenes, loading or disabled motion. Reduced-motion preferences remain respected by the renderer.
+
+## Persistent killing aftermath
+
+The public `aftermath` array describes active observable death scenes independently of `last_result`. Each saved entry has `id`, `target`, a named `victim`, `minute`, `police_at` and `cleanup_at`. New public killing cues for an actually dead NPC create one entry per victim. Initial response tuning is police arrival after five game minutes and cleanup after 180; no wall-clock presentation action advances those deadlines. Entries disappear from the public projection at cleanup, while building condition remains governed by repairs. Repeated reports cannot duplicate bodies or restart an old death's lifetime. Older saves without this field load with no invented historical scenes. The browser rendering of bodies/responders is still pending.

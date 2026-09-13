@@ -223,6 +223,7 @@ func (w *World) Kill(id, cause string) bool {
 	// like one.
 	if _, official := OfficialByID(person.ID); official {
 		w.OfficialKilled(person.ID)
+		w.witnessKilling(person, cause, strings.ToUpper(person.Name)+" KILLED")
 		return true
 	}
 	// The paper reports a killing without knowing who arranged it.

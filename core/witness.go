@@ -49,10 +49,12 @@ func (w *World) Witness(kind, place, caption, headline string, actors ...string)
 			named = append(named, CueActor{ID: n.ID, Name: n.Name})
 		}
 	}
-	w.VisualCues = append(w.VisualCues, VisualCue{
+	cue := VisualCue{
 		ID: ID(), Kind: kind, Target: place, Caption: caption,
 		Headline: headline, Actors: named, Gravity: Gravity(kind), Minute: w.Minute,
-	})
+	}
+	w.VisualCues = append(w.VisualCues, cue)
+	w.recordAftermath(cue)
 }
 
 // Worth is the moment out of everything that happened worth taking the player
