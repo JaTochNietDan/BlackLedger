@@ -64,6 +64,23 @@ These are staged fixture saves, not earned campaign progress.
 
 ## Continue next
 
+### Multi-way junction follow-up
+
+A four-way test exposed a real deadlock: all four cars stopped at progress
+0.4733 and remained there. Junction occupancy now reserves space before bodies
+enter the crossing. Straight parallel/opposing lanes can share the reservation;
+turning and perpendicular traffic waits outside it. The regression confirms
+collision-free completion at 30, 60 and 144 updates per second. All 81 frontend
+tests, production build and HTTP tests pass.
+
+`city3d-junction` stages twelve cars across four approaches. Browser actions
+advanced the fixture from minute 600 through 609 to 618, with opposing traffic
+crossing and the other approach yielding. `junction.png` records the view.
+Observed telemetry was 145 FPS / 7.6ms p95, 328 draws / 155,392 triangles. This
+checks one busy junction arrangement, not universal gridlock freedom. Resume
+address-specific architecture/materials and action choreography next; large
+sections of the city still repeat the same archetypes.
+
 ### Queued player arrival follow-up
 
 Player travel now ends when rendered occupancy reaches the endpoint, replacing

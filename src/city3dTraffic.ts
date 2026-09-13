@@ -1,4 +1,4 @@
-import {onRoute} from './city3dPlan.js';
+import {onRoute, PITCH} from './city3dPlan.js';
 import type {Point} from './city3dPlan.js';
 
 export type TrafficPose = Point & {heading: number};
@@ -31,6 +31,20 @@ export function trafficOverlap(a: TrafficPose, am: string, b: TrafficPose, bm: s
 }
 const routeLength = (points: Point[]) =>
   points.slice(1).reduce((sum, p, i) => sum + Math.hypot(p.x - points[i].x, p.z - points[i].z), 0);
+function junction(p: Point) {
+  const x = Math.round(p.x / PITCH),
+    z = Math.round(p.z / PITCH);
+  return Math.abs(p.x - x * PITCH) <= 8 && Math.abs(p.z - z * PITCH) <= 8 ? `${x}:${z}` : null;
+}
+function throughAxis(request: TrafficRequest, progress: number, length: number) {
+  if (!length) return null;
+  const headings = [-10, 0, 10].map(
+    offset => onRoute(request.points, progress + offset / length).heading,
+  );
+  if (headings.every(h => Math.abs(Math.sin(h)) > 0.999)) return 'horizontal';
+  if (headings.every(h => Math.abs(Math.cos(h)) > 0.999)) return 'vertical';
+  return null;
+}
 /** Presentation occupancy only. Saved journey progress remains the upper bound.
  * Small spatial steps prevent fast snapshot interpolation tunnelling through a car.
  * A departure waits inside its source until a physical space opens on its route. */
@@ -46,6 +60,7 @@ export class StreetTraffic {
     const wanted = new Set(requests.map(r => r.id));
     for (const id of this.entries.keys()) if (!wanted.has(id)) this.entries.delete(id);
     const lengths = new Map(requests.map(r => [r.id, routeLength(r.points)]));
+    const byID = new Map(requests.map(r => [r.id, r]));
     // Preserve occupants first; new journeys yield to cars already on the road.
     const sorted = [...requests].sort(
       (a, b) =>
@@ -53,10 +68,20 @@ export class StreetTraffic {
         b.progress * lengths.get(b.id)! - a.progress * lengths.get(a.id)! ||
         a.id.localeCompare(b.id),
     );
-    const free = (pose: TrafficPose, model: string, id: string) =>
-      ![...this.entries].some(
-        ([other, e]) => other !== id && !e.waiting && trafficOverlap(pose, model, e.pose, e.model),
-      );
+    const free = (pose: TrafficPose, model: string, id: string, progress: number) => {
+      const crossing = junction(pose);
+      const axis = crossing ? throughAxis(byID.get(id)!, progress, lengths.get(id)!) : null;
+      return ![...this.entries].some(([other, e]) => {
+        if (other === id || e.waiting) return false;
+        if (trafficOverlap(pose, model, e.pose, e.model)) return true;
+        if (!crossing || crossing !== junction(e.pose)) return false;
+        // Reserve the crossing before bodies enter it. Straight parallel lanes
+        // can share it; turning or perpendicular traffic waits outside the box.
+        return (
+          axis === null || axis !== throughAxis(byID.get(other)!, e.progress, lengths.get(other)!)
+        );
+      });
+    };
     for (const r of sorted) {
       const key = JSON.stringify([r.model, r.points]);
       let e = this.entries.get(r.id);
@@ -65,15 +90,15 @@ export class StreetTraffic {
         let progress = Math.max(0, Math.min(1, r.progress));
         const length = lengths.get(r.id)!;
         let pose = onRoute(r.points, progress);
-        while (!free(pose, r.model, r.id) && progress > 0) {
+        while (!free(pose, r.model, r.id, progress) && progress > 0) {
           progress = Math.max(0, progress - 0.35 / length);
           pose = onRoute(r.points, progress);
         }
-        e = {key, model: r.model, progress, pose, waiting: !free(pose, r.model, r.id)};
+        e = {key, model: r.model, progress, pose, waiting: !free(pose, r.model, r.id, progress)};
         this.entries.set(r.id, e);
       }
       if (e.waiting) {
-        if (!free(e.pose, e.model, r.id)) continue;
+        if (!free(e.pose, e.model, r.id, e.progress)) continue;
         e.waiting = false;
       }
       const length = lengths.get(r.id)!;
@@ -86,7 +111,7 @@ export class StreetTraffic {
       while (e.progress < target) {
         const next = Math.min(target, e.progress + 0.25 / length),
           pose = onRoute(r.points, next);
-        if (!free(pose, e.model, r.id)) break;
+        if (!free(pose, e.model, r.id, next)) break;
         e.progress = next;
         e.pose = pose;
       }

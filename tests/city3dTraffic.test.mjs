@@ -58,3 +58,11 @@ test('long journeys remain in transit past the old 2.4-second cutoff',()=>{
  for(let frame=0;frame<180;frame++)pose=traffic.update([request],1/60).get('player');
  assert.equal(pose.progress,1);
 });
+test('four-way arrivals clear the junction at different frame rates without deadlocking',()=>{
+ for(const fps of [30,60,144]){
+  const requests=[{id:'east',points:[{x:-50,z:1.6},{x:50,z:1.6}]},{id:'west',points:[{x:50,z:-1.6},{x:-50,z:-1.6}]},{id:'north',points:[{x:1.6,z:50},{x:1.6,z:-50}]},{id:'south',points:[{x:-1.6,z:-50},{x:-1.6,z:50}]}].map(r=>({...r,model:'packard',progress:.3}));
+  const traffic=new StreetTraffic();traffic.update(requests,1/fps);let poses;
+  for(let frame=0;frame<fps*8;frame++){requests.forEach(r=>r.progress=.9);poses=traffic.update(requests,1/fps);clear(requests,poses);}
+  for(const [id,p]of poses)assert.ok(p.progress>=.89,`${id} deadlocked at ${fps} FPS`);
+ }
+});
