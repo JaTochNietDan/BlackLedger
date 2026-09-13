@@ -278,3 +278,9 @@ The city renders three parked police vehicles and four officers while attendance
 ## Authored raid entry
 
 The tavern GLB exposes `entrance-threshold` and `entrance-door-hinge` nodes with a real vestibule opening. At an available aligned staging bay, the lead raid officer approaches, kicks, waits for the inward-opening leaf to clear, then enters. Raid cast playback lasts seven seconds; other building types retain the approach until their openings are authored. All motion stays in a reserved corridor. This is presentation only and does not modify property damage or command outcomes. Existing active raid presence holds the door open; preview Stop restores campaign presentation. The raid target facade stays visible during entry, while other occluding buildings retain their visibility aids.
+
+## Saved building fire response
+
+Successful building detonations create saved/public `building_fires` records: `id`, `target`, `minute`, `brigade_at`, `extinguished_at`, `cleanup_at`. Initial tuning is response at +10 game minutes, extinguishing at +45 and departure/cleanup at +90. Records remain public after extinguishing until cleanup so the renderer can retain attending crews. A later detonation renews the fire and cleanup deadline while retaining an already dispatched brigade's arrival time. A repeated ignition at the same minute leaves deadlines unchanged. Reads are detached and do not advance time or mutate saves; older saves have no invented fires.
+
+A generic explosion cue, including an early charge accident, does not by itself create this building-fire record. Detonation damage remains governed by existing property condition and repairs; extinguishing cannot restore it. Rendering of persistent window fire and brigade response is still pending integration with this field.
