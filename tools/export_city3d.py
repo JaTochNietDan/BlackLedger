@@ -168,19 +168,51 @@ def building(kind, floors, width=12, depth=12, seed=0):
     if floors >= 3:
         for z in range(1,floors):
             h=z*3.15
-            box('escape platform',(0,depth/2+.8,h),(3.5,1.4,.13),iron)
+            box('escape platform',(0,-depth/2-.8,h),(3.5,1.4,.13),iron)
             for x in (-1.6,1.6):
-                box('escape rail',(x,depth/2+1.4,h+.5),(.07,.07,1),iron)
-            box('escape handrail',(0,depth/2+1.4,h+1),(3.4,.07,.07),iron)
+                box('escape rail',(x,-depth/2-1.4,h+.5),(.07,.07,1),iron)
+            box('escape handrail',(0,-depth/2-1.4,h+1),(3.4,.07,.07),iron)
             for step in range(9):
-                box('escape stair',(-1.2+step*.3,depth/2+.7,h+step*.35),(.4,.9,.08),iron)
+                box('escape stair',(-1.2+step*.3,-depth/2-.7,h+step*.35),(.4,.9,.08),iron)
         cylinder('water tank',(2,-2,height+2.5),1.25,2.5,iron)
         for x in (1.1,2.9):
             box('tank legs',(x,-2,height+.75),(.16,1.5,1.5),iron)
     if kind == 'casino':
-        box('marquee',(0,-depth/2-1,3.2),(9,2,.55),stone,.1)
+        box('marquee',(0,depth/2+1,3.2),(9,2,.55),stone,.1)
         for i in range(16):
-            box('marquee bulb',(-4+i*.53,-depth/2-2.05,3.15),(.16,.12,.16),warm)
+            box('marquee bulb',(-4+i*.53,depth/2+2.05,3.15),(.16,.12,.16),warm)
+        brass=material('aged marquee brass',(.52,.37,.15),.65)
+        neon=material('ruby neon',(.8,.025,.018),0,1.8)
+        for side in (-1,1):
+            for fin in range(3):
+                x=side*(width/2-.25-fin*.32)
+                box('deco vertical fin',(x,depth/2+.22,height*.6),(.17,.5,height+1.25-fin*.7),stone)
+            box('neon blade casing',(side*(width/2-.95),depth/2+.6,height*.78),(.65,.6,4),iron,.1)
+            for z in range(6):
+                box('neon blade tube',(side*(width/2-.95),depth/2+.93,height*.78-1.55+z*.61),(.43,.045,.08),neon)
+        for tier in range(3):
+            box('stepped deco crown',(0,0,height+.55+tier*.52),(width-1.5-tier*2,depth-1.5-tier*2,.35),stone)
+        for y in (depth/2+.16,depth/2+1.85):
+            box('marquee brass edge',(0,y,3.44),(8.8,.065,.09),brass)
+    if kind == 'civic':
+        for ob in list(bpy.context.scene.objects):
+            if ob.name.startswith(('skylight','tank','water tank')):
+                bpy.data.objects.remove(ob,do_unlink=True)
+        for tier,(w,d,h) in enumerate([(7,6,1.4),(5,4.8,1.2),(3.4,3.4,2.8)]):
+            base=height+.8+sum([1.4,1.2,2.8][:tier])
+            box('municipal tower',(0,0,base+h/2),(w,d,h),stone)
+            box('tower ledge',(0,0,base+h),(w+.3,d+.3,.18),iron)
+        clock_z=height+5.2
+        face=material('ivory clock face',(.81,.76,.60),0,.2)
+        cylinder('clock bezel',(0,1.77,clock_z),.82,.14,iron,(math.pi/2,0,0))
+        cylinder('clock face',(0,1.86,clock_z),.71,.05,face,(math.pi/2,0,0))
+        for name,length in [('minute',.56),('hour',.38)]:
+            hand=box('clock-hand-'+name,(0,1.91,clock_z+length/2),(.045,.03,length),iron)
+            bpy.context.scene.cursor.location=(0,1.91,clock_z)
+            bpy.ops.object.origin_set(type='ORIGIN_CURSOR')
+        for x in (-4,-2,2,4):
+            box('civic pilaster',(x,depth/2+.25,3.1),(.42,.48,5.7),stone)
+            box('column capital',(x,depth/2+.27,5.95),(.7,.6,.25),stone)
     if kind == 'warehouse':
         for x in (-3,3):
             box('loading door',(x,-depth/2-.1,1.6),(3.8,.22,3),iron)
@@ -218,6 +250,64 @@ def car(kind):
         box('grille',(-.48+x*.12,-length/2-.025,.69),(.04,.07,.23),chrome)
 
 
+def villa():
+    wall=material('estate pale stucco',(.64,.59,.45))
+    stone=material('estate limestone',(.72,.67,.54))
+    tile=material('terracotta roof',(.34,.12,.07))
+    dark=material('estate ironwork',(.09,.12,.1),.45)
+    glass=material('estate glazing',(.13,.22,.23),.2)
+    timber=material('shutters',(.13,.22,.17))
+    box('estate foundation',(0,0,.3),(11.5,10.5,.6),stone)
+    box('stucco residence',(0,0,3.25),(11,10,5.9),wall)
+    for side in (-1,1):
+        vertices=[(x,side*5+dy,z) for dy in (-.08,.08) for x,z in [(-5.5,6.2),(5.5,6.2),(0,8.6)]]
+        mesh=bpy.data.meshes.new('gable masonry')
+        mesh.from_pydata(vertices,[],[(0,2,1),(3,4,5),(0,1,4,3),(1,2,5,4),(2,0,3,5)])
+        mesh.materials.append(wall)
+        ob=bpy.data.objects.new('estate gable',mesh);bpy.context.collection.objects.link(ob)
+    # Two true roof planes and repeated tile rolls give the estate a distinct
+    # residential silhouette at street level and when orbiting above it.
+    for side in (-1,1):
+        roof=box('pitched tiled roof',(side*2.9,0,7.3),(6.8,11,.18),tile)
+        roof.rotation_euler.y=side*math.radians(24)
+        for y in range(23):
+            roll=cylinder('clay tile roll',(side*2.9,-5.35+y*.48,7.43),.07,6.85,tile)
+            roll.rotation_euler.y=math.pi/2+side*math.radians(24)
+    cylinder('ridge tiles',(0,0,8.64),.16,11.2,tile,(math.pi/2,0,0))
+    box('estate chimney',(-3,-2.7,7.8),(.9,1,3),wall)
+    box('chimney cap',(-3,-2.7,9.35),(1.2,1.3,.2),stone)
+    for side in (-1,1):
+        for x in (-3.4,0,3.4):
+            for z in (1.8,4.7):
+                box('window frame',(x,side*5.05,z),(1.5,.16,1.85),stone)
+                box('estate window',(x,side*5.16,z),(1.22,.12,1.58),glass)
+                box('window crossbar',(x,side*5.24,z),(1.25,.055,.07),stone)
+                for edge in (-1,1):
+                    box('louvered shutter',(x+edge*.94,side*5.1,z),(.44,.18,1.8),timber)
+                    for slat in range(8):
+                        box('shutter slat',(x+edge*.94,side*5.22,z-.72+slat*.2),(.4,.055,.045),dark)
+    box('front door',(0,5.26,1.5),(1.4,.13,2.4),timber)
+    warm=material('estate occupied windows',(.73,.43,.16),0,.4)
+    for side in (-1,1):
+        for y in (-3,0,3):
+            for z in (1.8,4.7):
+                box('side window frame',(side*5.56,y,z),(.16,1.5,1.85),stone)
+                box('side glazing',(side*5.66,y,z),(.12,1.22,1.58),warm if y==0 else glass)
+                box('side window mullion',(side*5.74,y,z),(.045,.06,1.58),stone)
+    for step in range(3):
+        box('entry steps',(0,6.7-step*.38,.1+step*.13),(4,1.2,.2+step*.26),stone)
+    box('porch canopy',(0,5.9,3.15),(5.8,2.7,.28),stone)
+    for x in (-2.5,2.5):
+        cylinder('porch column',(x,6.8,1.6),.18,3,stone)
+        box('porch capital',(x,6.8,3),(.55,.55,.2),stone)
+    for side in (-1,1):
+        for y in range(12):
+            box('estate fence picket',(side*7.25,-5.5+y, .85),(.055,.055,1.6),dark)
+        for z in (.45,1.35):box('estate fence rail',(side*7.25,0,z),(.065,11.5,.065),dark)
+    anchor=bpy.data.objects.new('sign-anchor',None);bpy.context.collection.objects.link(anchor)
+    anchor.location=(0,7.27,3.2)
+
+
 def person():
     coat=material('wool suit',(.16,.19,.21))
     skin=material('skin',(.58,.38,.24))
@@ -245,7 +335,7 @@ def export(name):
     # Join by material except animated limbs: a building becomes ~6 draws.
     groups={}
     for ob in list(bpy.context.scene.objects):
-        if ob.type=='MESH' and not ob.name.startswith(('leg','arm','shoe')):
+        if ob.type=='MESH' and not ob.name.startswith(('leg','arm','shoe','clock-hand')):
             groups.setdefault(ob.data.materials[0].name,[]).append(ob)
     for obs in groups.values():
         bpy.ops.object.select_all(action='DESELECT')
@@ -340,7 +430,10 @@ def industrial(kind):
 
 manifest={}
 for i,(name,floors,w,d) in enumerate([('tenement',4,12,11),('tavern',2,12,12),('casino',2,13,11),('warehouse',1,13,12),('civic',3,13,12),('shop',3,12,11),('villa',2,11,11)]):
-    clear(); building(name,floors,w,d,i); manifest[name]=export(name)
+    clear()
+    if name=='villa':villa()
+    else:building(name,floors,w,d,i)
+    manifest[name]=export(name)
 for name in ('filling','garage','dealer','chapel','docks','haulage'):
     clear();industrial(name);manifest[name]=export(name)
 for name in ('ford','hudson','packard'):

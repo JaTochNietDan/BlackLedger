@@ -64,6 +64,26 @@ These are staged fixture saves, not earned campaign progress.
 
 ## Continue next
 
+### Architectural follow-up
+
+The Blender source now authors a separate stucco estate with a tiled pitched roof,
+closed gables, shutters, side windows, porch and iron boundary railings. Casinos
+have an Art Deco crown, vertical fins, red neon blades and a front marquee. Civic
+buildings have stepped towers and clock hands driven by the public saved minute.
+Fire escapes moved behind the primary frontage. Browser inspection caught and
+corrected missing estate side windows and open roof gables during this pass.
+
+All 71 frontend tests and the production build pass after regeneration. Exported
+bounds and every current walking/driving route retain their clearance. Daylight
+and night browser inspections are recorded in `estate-day.png`, `civic-day.png`
+and `casino-night.png` in the evidence directory. The close civic view measured
+145 FPS, 7ms p95, 182 draw calls and 55,966 visible triangles on this Mac. This
+sample includes frustum culling and is not a worst-case full-city benchmark.
+
+These additions improve archetype recognition; multiple casinos still repeat
+the same facade, and city dressing/material richness remains below the requested
+final quality. Continue with individual address variation and denser streets.
+
 ### Street routing follow-up
 
 Cars now use directed right-hand lanes, a direct route for same-street trips,

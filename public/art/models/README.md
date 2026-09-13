@@ -19,6 +19,11 @@ metallic/roughness materials. Streets reuse the existing repository's ground
 textures. Materials are grouped before export to reduce draw calls; pedestrian
 limbs and their attached shoes remain separate for browser animation.
 
+The estate uses its own pitched tile roof, gables, porch and shuttered windows.
+Casino and civic silhouettes include Art Deco crowns and stepped clock towers.
+Clock hands remain separate nodes so the browser can show saved game time.
+Rear fire escapes leave the main entrances and signs unobstructed.
+
 This is the first realtime asset set, not final visual acceptance. More facade
 variety, convincing worn surfaces, better pedestrian anatomy/wardrobe, denser
 street dressing and richer district landmarks remain production work.

@@ -682,6 +682,8 @@ export function City3D(props: Props) {
         pools.visible = night;
         for (const b of buildings.values())
           b.traverse(o => {
+            if (o.name === 'clock-hand-minute') o.rotation.z = ((w.minute % 60) * Math.PI) / 30;
+            if (o.name === 'clock-hand-hour') o.rotation.z = ((w.minute % 720) * Math.PI) / 360;
             if (o instanceof THREE.Mesh)
               for (const m of Array.isArray(o.material) ? o.material : [o.material])
                 if (m instanceof THREE.MeshStandardMaterial && m.emissive.getHex() !== 0)
