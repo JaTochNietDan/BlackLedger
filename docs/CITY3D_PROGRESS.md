@@ -64,6 +64,14 @@ These are staged fixture saves, not earned campaign progress.
 
 ## Continue next
 
+### Slate and mineral-felt roof materials — September 13
+
+- Twelve Blender building exports now carry purpose-authored roof colour, normal and roughness maps. Thorne & Sons and The Mariner use staggered slate courses at a consistent 2.5m UV tile scale, mirrored on opposing slopes. Removed the funeral roof's oversized course bars. Ten flat-roof models use mineral-surfaced felt beneath their existing seams and rooftop equipment.
+- Browser inspection caught and corrected sRGB encoding that initially made the slate too dark. Slate maps retain 256px detail; subtle felt maps use 128px to limit repeated embedded-image download cost. The final exports add 877,212 bytes total, with every exported building bound unchanged.
+- Evidence: `docs/qa/city3d-20260913/slate-roof.png`, `mariner-slate.png`, `mineral-roof.png`, `roof-materials.json`. Close slate inspection on isolated port 8847 sampled 145 FPS / 7.7ms p95, 93 draws and 527,946 triangles, three actors/28 buildings. This is local idle-view evidence, not broad device acceptance. Main save untouched; no gameplay command issued.
+- All 138 frontend tests and the production build pass after final regeneration. The final flat-roof browser sample measured 145 FPS / 7.1ms p95, 41 draws and 514,398 triangles, with no captured warnings/errors. The existing build bundle-size warning remains.
+- Materials improve surface readability, but architecture still repeats, roofs need address-specific weathering/detail, and the overall requested production art quality remains unfinished.
+
 ### Follow-camera building cutaways — September 13
 
 - Followed players/cars now receive a local, softly dithered opening through intervening buildings. Orthographic sight lines use actual mesh intersections at 10Hz, with cached building bounds as an initial filter. Private condition materials carry cutaway uniforms; normal opacity/depth behavior and shared source materials remain intact. Fades restore on clear orbit or follow release; motion-off uses immediate transitions.

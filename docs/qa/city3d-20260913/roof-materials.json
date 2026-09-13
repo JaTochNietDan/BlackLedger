@@ -1,0 +1,23 @@
+{
+  "slate": {
+    "fps": 145,
+    "p95ms": 7.7,
+    "drawCalls": 93,
+    "triangles": 527946,
+    "actors": 3,
+    "buildings": 28,
+    "geometries": 238,
+    "textures": 123
+  },
+  "flat": {
+    "fps": 145,
+    "p95ms": 7.1,
+    "drawCalls": 41,
+    "triangles": 514398,
+    "actors": 3,
+    "buildings": 28,
+    "geometries": 238,
+    "textures": 123
+  },
+  "logs": []
+}

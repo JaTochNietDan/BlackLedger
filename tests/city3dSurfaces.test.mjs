@@ -265,3 +265,13 @@ test('pedestrian suits export woven colour normal and roughness maps on the inta
   assert.ok(json.materials.some(m=>m.name==='facial detail'));
  }
 });
+
+test('slate and mineral-felt roofs export relief and roughness with physical UVs',()=>{
+ for(const [name,roofName] of [['undertaker','funeral slate'],['mariner','mariner weathered slate'],...['tenement','tavern','casino','warehouse','civic','shop','monarch','bluehour','goldenlily','papermoon'].map(n=>[n,'tar roof'])]){
+  const bytes=readFileSync(new URL(`../public/art/models/${name}.glb`,import.meta.url));
+  const json=JSON.parse(bytes.subarray(20,20+bytes.readUInt32LE(12)).toString());
+  const index=json.materials.findIndex(m=>m.name===roofName),material=json.materials[index];
+  assert.ok(material?.normalTexture&&material.pbrMetallicRoughness.baseColorTexture&&material.pbrMetallicRoughness.metallicRoughnessTexture,`${name} needs all roof maps`);
+  for(const mesh of json.meshes)for(const p of mesh.primitives)if(p.material===index)assert.ok(json.accessors[p.attributes.TEXCOORD_0],`${name} roof needs UVs`);
+ }
+});

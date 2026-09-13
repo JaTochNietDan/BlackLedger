@@ -70,6 +70,47 @@ def brick(mat, seed):
     tree.links.new(normal_map.outputs['Normal'],tree.nodes['Principled BSDF'].inputs['Normal'])
 
 
+def roof_texture(mat, slate=False):
+    """Physical 2.5m tiles: overlapping slate courses or mineral surfaced felt."""
+    n=256 if slate else 128;rng=random.Random(1957 if slate else 1958)
+    base=mat.diffuse_color[:3];pixels=[];heights=[];rough=[]
+    tones=[rng.uniform(.76,1.18) for _ in range(64)]
+    for y in range(n):
+        for x in range(n):
+            grain=rng.uniform(-1,1)
+            if slate:
+                # X runs down the roof slope; Y runs parallel to its ridge.
+                row=x//32;offset=(y+(row%2)*16)%n;u=x%32;v=offset%32
+                seam=u<2 or v<1
+                cleft=math.sin(v*.8+u*.17)*.018+math.sin(v*2.1-u*.4)*.012
+                tone=(.38 if seam else tones[row*8+offset//32]+grain*.065+cleft)
+                height=.05 if seam else .35+u/32*.28+cleft
+                r=.83+grain*.045
+            else:
+                broad=math.sin(x*math.tau/n)*math.cos(y*math.tau/n)*.045
+                mineral=.15 if grain>.58 else (-.08 if grain<-.7 else 0)
+                tone=.90+broad+mineral+grain*.08
+                height=.3+grain*.065;r=.92+grain*.035
+            # Encode linear material colour for an sRGB image.
+            pixels.extend((*[1.055*(c*tone)**(1/2.4)-.055 for c in base],1));heights.append(height)
+            rough.extend((r,r,r,1))
+    normals=[]
+    for y in range(n):
+        for x in range(n):
+            dx=heights[y*n+(x-1)%n]-heights[y*n+(x+1)%n]
+            dy=heights[((y-1)%n)*n+x]-heights[((y+1)%n)*n+x]
+            v=Vector((dx,dy,1)).normalized();normals.extend((v.x*.5+.5,v.y*.5+.5,v.z*.5+.5,1))
+    tree=mat.node_tree;shader=tree.nodes['Principled BSDF']
+    for suffix,data,target in [('surface',pixels,'Base Color'),('relief',normals,'Normal'),('roughness',rough,'Roughness')]:
+        image=bpy.data.images.new(mat.name+' '+suffix,width=n,height=n)
+        if target!='Base Color':image.colorspace_settings.name='Non-Color'
+        image.pixels=data;image.pack();tex=tree.nodes.new('ShaderNodeTexImage');tex.image=image
+        if target=='Normal':
+            normal=tree.nodes.new('ShaderNodeNormalMap');normal.inputs['Strength'].default_value=.65 if slate else .4
+            tree.links.new(tex.outputs['Color'],normal.inputs['Color']);tree.links.new(normal.outputs['Normal'],shader.inputs['Normal'])
+        else:tree.links.new(tex.outputs['Color'],shader.inputs[target])
+
+
 def box(name, xyz, dims, mat, bevel=0):
     bpy.ops.mesh.primitive_cube_add(size=1, location=xyz)
     ob = bpy.context.object
@@ -167,7 +208,7 @@ def building(kind, floors, width=12, depth=12, seed=0, palette=None, accent=None
     palettes = [(0.43,.23,.15), (.51,.46,.35), (.31,.33,.26), (.37,.21,.18)]
     wall = material('weathered masonry', palette or palettes[seed % 4]); brick(wall, seed)
     stone = material('limestone', (.59,.55,.45))
-    dark = material('tar roof', (.13,.14,.13))
+    dark = material('tar roof', (.13,.14,.13));roof_texture(dark)
     glass = material('smoked glass', (.12,.19,.21), .25)
     warm = material('occupied windows', (.78,.46,.17), 0, .35)
     iron = material('painted iron', (.12,.15,.14), .5)
@@ -718,7 +759,7 @@ def gravel_texture(mat):
 def undertaker():
     wall=material('funeral red brick',(.28,.15,.115));brick(wall,47)
     stone=material('funeral sandstone',(.53,.49,.40))
-    slate=material('funeral slate',(.105,.135,.145))
+    slate=material('funeral slate',(.105,.135,.145));roof_texture(slate,True)
     oak=material('funeral oak',(.085,.055,.031))
     glass=material('funeral glazing',(.075,.115,.12),.3)
     brass=material('funeral brass',(.57,.42,.16),.7)
@@ -770,9 +811,7 @@ def undertaker():
     for side in (-1,1):
         roof=box('slate roof',(side*3.4,4.4,7.65),(7.15,6.65,.17),slate)
         roof.rotation_euler.y=side*math.radians(18)
-        for course in range(8):
-            x=side*(.42+course*.86);z=8.72-abs(x)*math.tan(math.radians(18))
-            box('slate course',(x,4.4,z+.045),(.025,6.65,.018),iron)
+        for uv in roof.data.uv_layers.active.data:uv.uv.x*=side
     cylinder('slate ridge',(0,4.4,8.77),.1,6.7,slate,(math.pi/2,0,0))
     for x in (-4.7,4.7):
         box('brick chimney',(x,5.55,7.82),(.7,.9,1.7),wall)
@@ -810,7 +849,7 @@ def mariner():
     stone=material('mariner limestone',(.61,.58,.48))
     timber=material('mariner painted timber',(.12,.20,.18))
     iron=material('mariner blackened iron',(.095,.115,.11),.45)
-    slate=material('mariner weathered slate',(.19,.23,.25));brick(slate,62)
+    slate=material('mariner weathered slate',(.19,.23,.25));roof_texture(slate,True)
     glass=material('mariner sash glass',(.13,.21,.23),.2)
     warm=material('mariner occupied room',(.68,.44,.20),0,.25)
     brass=material('mariner door brass',(.48,.36,.16),.6)
@@ -857,6 +896,7 @@ def mariner():
         ob=bpy.data.objects.new('mariner brick gable',mesh);bpy.context.collection.objects.link(ob)
         roof=box('mariner pitched slate',(side*3.1,0,10.60),(6.7,10.7,.15),slate)
         roof.rotation_euler.y=side*math.radians(20)
+        for uv in roof.data.uv_layers.active.data:uv.uv.x*=side
         cylinder('gable vent surround',(0,side*5.08,10.35),.43,.12,stone,(math.pi/2,0,0),24)
         cylinder('gable vent dark',(0,side*5.16,10.35),.32,.06,iron,(math.pi/2,0,0),24)
         for i in range(-2,3):box('gable vent louvre',(0,side*5.20,10.35+i*.10),(.48,.06,.035),timber)
