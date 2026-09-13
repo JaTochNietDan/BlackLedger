@@ -21,7 +21,7 @@ import type {Journey} from './TravelPresentation';
 import './city3d.css';
 import {CityCueQueue, availableSceneSlot, casualtyFall, gunfightPose, casualtySceneStart, GunfireAudio, BlastAudio} from './city3dEvents';
 import type {SceneSlot} from './city3dEvents';
-import {StreetTraffic, trafficSize, advanceWheel} from './city3dTraffic';
+import {StreetTraffic, trafficSize, trafficModel, advanceWheel, wheelSteering, advanceSteering} from './city3dTraffic';
 import {pedestrianModel, isPedestrian} from './city3dCast';
 import {playCityGunshot, playMoment, soundOn} from './sound';
 import {cameraCommand, screenPan} from './city3dControls';
@@ -54,6 +54,7 @@ type Actor = {
   limbs: THREE.Object3D[];
   wheels: THREE.Object3D[];
   wheelPhase: number;
+  steering: number;
   wheelPlaced: boolean;
   arrived?: boolean;
 };
@@ -502,7 +503,7 @@ export function City3D(props: Props) {
       const limbs: THREE.Object3D[] = [];
       const wheels: THREE.Object3D[] = [];
       object.traverse(o => {
-        if (o.name.startsWith('wheel-roll-')) wheels.push(o);
+        if (o.name.startsWith('wheel-roll-')) { o.rotation.order = 'YXZ'; wheels.push(o); }
         if (o.name.startsWith('leg') || o.name.startsWith('arm') || o.name.startsWith('knee'))
           limbs.push(o);
       });
@@ -517,7 +518,7 @@ export function City3D(props: Props) {
         walking: false,
         phase: 0,
         realSince: 0,
-        limbs, wheels, wheelPhase: 0, wheelPlaced: false,
+        limbs, wheels, wheelPhase: 0, steering: 0, wheelPlaced: false,
       };
       actors.set(id, actor);
       return actor;
@@ -549,6 +550,10 @@ export function City3D(props: Props) {
       a.realSince = now;
       a.duration = duration;
       a.walking = isPedestrian(model) && start !== end;
+      if (start === end) {
+        a.steering = 0;
+        for (const wheel of a.wheels) wheel.rotation.y = 0;
+      }
     };
     const loader = new GLTFLoader();
     let graphicsLost = false;
@@ -909,14 +914,14 @@ export function City3D(props: Props) {
             ...[...actors.values()]
               .filter(a => a.object.visible)
               .map(a => ({
-                model: a.model,
+                model: trafficModel(a.model,a.start === a.end),
                 pose: {x: a.object.position.x, z: a.object.position.z, heading: a.object.rotation.y},
               })),
             ...effects.flatMap(other => other.slot ? [other.slot] : []),
           ];
           e.slot = availableSceneSlot(lots.get(e.cue.target)!, e.cue.kind, occupied);
           if (e.slot) {
-            e.extra.position.set(e.slot.root.x, e.slot.model === 'police' ? vehicleRootHeight(e.slot.root) : 0.2, e.slot.root.z);
+            e.extra.position.set(e.slot.root.x, e.slot.model === 'parked-police' ? vehicleRootHeight(e.slot.root) : 0.2, e.slot.root.z);
             e.light.position.set(e.slot.root.x, 3, e.slot.root.z);
             e.since = now;
           }
@@ -929,7 +934,7 @@ export function City3D(props: Props) {
                 motion && a.duration ? Math.min(1, (movementClock - a.since) / a.duration) : 1;
               return {
                 id,
-                model: a.model,
+                model: trafficModel(a.model,a.start === a.end),
                 points: a.points,
                 progress: a.start + (a.end - a.start) * t,
               };
@@ -954,7 +959,11 @@ export function City3D(props: Props) {
             a.phase = (a.phase + (distance / 1.15) * Math.PI * 2) % (Math.PI * 2);
           if (a.wheels.length && a.wheelPlaced && motion && a.start !== a.end && moved) {
             a.wheelPhase = advanceWheel(a.wheelPhase, distance);
-            for (const wheel of a.wheels) wheel.rotation.x = a.wheelPhase;
+            a.steering = advanceSteering(a.steering, wheelSteering(a.points,placement.progress,a.model),distance);
+            for (const wheel of a.wheels) {
+              wheel.rotation.x = a.wheelPhase;
+              wheel.rotation.y = wheel.name.includes('-front-') ? a.steering : 0;
+            }
           }
           a.wheelPlaced = true;
           a.object.position.set(at.x, isPedestrian(a.model) ? pedestrianRootHeight(at) : vehicleRootHeight(at), at.z);
@@ -1161,6 +1170,7 @@ export function City3D(props: Props) {
               z: a.object.position.z,
               y: a.object.position.y,
               wheelPhase: a.wheels.length ? a.wheelPhase : undefined,
+              steering: a.wheels.length ? a.steering : undefined,
             })),
           waiting: [...actors].filter(([, a]) => !a.arrived && !a.object.visible).map(([id]) => id),
           effects: effects.map(e => ({

@@ -11,7 +11,12 @@ export function trafficSpeed(model: string) {
 }
 export function trafficSize(model: string) {
   if (model === 'casualty') return {length: 1.4, width: 2.6};
-  return {length: lengths[model] || 1.4, width: lengths[model] ? 2.15 : 0.85};
+  const parked = model.startsWith('parked-');
+  const vehicle = parked ? model.slice(7) : model;
+  return {length: lengths[vehicle] || 1.4, width: lengths[vehicle] ? (parked ? 2.15 : 2.35) : 0.85};
+}
+export function trafficModel(model: string, stationary: boolean) {
+  return stationary && lengths[model] ? `parked-${model}` : model;
 }
 export function trafficOverlap(a: TrafficPose, am: string, b: TrafficPose, bm: string) {
   const as = trafficSize(am),
@@ -146,4 +151,20 @@ export class StreetTraffic {
 export const WHEEL_RADIUS = .37;
 export function advanceWheel(angle: number, distance: number) {
   return (angle + Math.max(0, distance) / WHEEL_RADIUS) % (Math.PI * 2);
+}
+
+/** Average route curvature across the wheelbase avoids faceted-curve steering jitter. */
+export function wheelSteering(points: Point[], progress: number, model: string) {
+  const length = routeLength(points);
+  if (length < .001 || !lengths[model]) return 0;
+  const wheelbase = (lengths[model] - .2) * .59;
+  const radius = wheelbase / 2 / length;
+  const before = Math.max(0, progress - radius), after = Math.min(1, progress + radius);
+  if (after <= before) return 0;
+  const a = onRoute(points,before).heading, b = onRoute(points,after).heading;
+  const turn = Math.atan2(Math.sin(b-a),Math.cos(b-a));
+  return Math.max(-.5,Math.min(.5,Math.atan(wheelbase * turn / ((after-before)*length))));
+}
+export function advanceSteering(angle: number, target: number, distance: number) {
+  return angle + (target-angle) * (1-Math.exp(-Math.max(0,distance)/.45));
 }

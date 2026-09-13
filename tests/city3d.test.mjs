@@ -72,7 +72,7 @@ test('parking positions clear buildings, furniture and every travel lane',async(
   for(const b of plan.lots){const f=streetsidePosition(b);assert.ok(Math.abs(parked.z-f.z)>3.3||Math.abs(parked.x-f.x)>5.3);}
   for(const driving of [false,true])for(const from of plan.lots)for(const to of plan.lots){
    const points=route(from,to,driving);
-   for(let step=0;step<=40;step++)assert.equal(trafficOverlap(parked,'packard',onRoute(points,step/40),driving?'packard':'person'),false,`parked at ${lot.id} blocks ${from.id}/${to.id}`);
+   for(let step=0;step<=40;step++)assert.equal(trafficOverlap(parked,'parked-packard',onRoute(points,step/40),driving?'packard':'person'),false,`parked at ${lot.id} blocks ${from.id}/${to.id}`);
   }
  }
 });
@@ -122,7 +122,7 @@ test('event overflow waits for a clear slot and respects a parked player car',as
  const {parkingSpot}=await import('../.runtime/frontend-test/city3dPlan.js');
  const lot=plan.lots[0];
  for(const kind of ['killing','arrest']){
-  const occupied=kind==='arrest'?[{model:'packard',pose:{...parkingSpot(lot),heading:0}}]:[];
+  const occupied=kind==='arrest'?[{model:'parked-packard',pose:{...parkingSpot(lot),heading:0}}]:[];
   const initial=occupied.length;
   for(let i=0;i<sceneSlots(lot,kind).length-initial;i++){
    const slot=availableSceneSlot(lot,kind,occupied);assert.ok(slot);occupied.push(slot);

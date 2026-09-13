@@ -114,3 +114,32 @@ test('wheel rotation advances by actual distance and is independent of frame rat
   assert.equal(advanceWheel(angle,0),angle,'waiting traffic must not spin its wheels');
  }
 });
+
+test('front-wheel steering follows turn direction, stays bounded and eases by travelled distance',async()=>{
+ const {wheelSteering,advanceSteering}=await import('../.runtime/frontend-test/city3dTraffic.js');
+ for(const model of ['ford','hudson','packard','police']){
+  assert.equal(wheelSteering([{x:0,z:0},{x:0,z:100}],.5,model),0);
+  assert.equal(wheelSteering([{x:0,z:0}],.5,model),0);
+  for(const side of [-1,1]){
+   const curve=Array.from({length:81},(_,i)=>({x:side*10*(1-Math.cos(i*Math.PI/160)),z:10*Math.sin(i*Math.PI/160)}));
+   const angle=wheelSteering(curve,.5,model);
+   assert.ok(angle*side>.2&&Math.abs(angle)<=.5);
+  }
+ }
+ for(const fps of [30,60,144]){
+  let angle=0;for(let i=0;i<fps;i++)angle=advanceSteering(angle,.5,3/fps);
+  assert.ok(Math.abs(angle-advanceSteering(0,.5,3))<1e-10);
+  assert.equal(advanceSteering(angle,0,0),angle);
+ }
+});
+
+test('parked vehicles reserve straight-wheel width while moving vehicles reserve the steering sweep',async()=>{
+ const {trafficModel,trafficSize}=await import('../.runtime/frontend-test/city3dTraffic.js');
+ for(const model of ['ford','hudson','packard','police']){
+  assert.equal(trafficModel(model,false),model);
+  assert.equal(trafficSize(trafficModel(model,true)).width,2.15);
+  assert.equal(trafficSize(trafficModel(model,false)).width,2.35);
+  assert.equal(trafficSize(trafficModel(model,true)).length,trafficSize(model).length);
+ }
+ assert.equal(trafficModel('person',true),'person');
+});

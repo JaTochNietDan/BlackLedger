@@ -64,6 +64,13 @@ These are staged fixture saves, not earned campaign progress.
 
 ## Continue next
 
+### Front-wheel steering and tyre sweep clearance (2026-09-13)
+
+- Front wheel pivots now steer through bends using curvature averaged across the wheelbase and distance-based easing. Roll and steering use YXZ order, rear wheels remain aligned, and parked assignments reset steering to straight. The rendered steering limit is ±0.5 radians.
+- Moving traffic reserves 2.35m width for the tyre sweep; straight-wheel parked cars and staged police use their 2.15m envelope. An initial attempt to move parking outward failed pedestrian-lane clearance; the final change preserves existing parking/bay positions and explicitly distinguishes stationary occupancy. All 120 tests and production build pass, including every-route parking/event clearance and actual GLB bounds through combined roll/steering angles.
+- Isolated port 8847 drive Ackerman & Son → Thorne & Sons reached revision 5/minute 791 in 6,194ms presentation time. Browser samples peaked at 0.499897 radians through bends and eased to approximately zero on the final straight; parked steering was zero after arrival. Evidence: `docs/qa/city3d-20260913/steering-travel-samples.json`.
+- Port 8848 expanded fixture with 14 actors and 28 buildings sampled 145 FPS, 7.2ms p95, 506 draws and 537,080 triangles with no captured console errors (`steering-traffic-metrics.json`). Main save untouched. Suspension, individual inside/outside wheel angles, richer vehicle bodies and wider hardware/art-quality acceptance remain unfinished.
+
 ### Distance-driven vehicle wheels (2026-09-13)
 
 - Ford, Hudson, Packard and police models now have four separate wheel pivots, 32-sided tyres/whitewalls, valves and hub bolts. Wheel submeshes are joined by parent/material to retain animation without a draw per bolt. Static undertaker hearse generation explicitly retains its non-articulated form.

@@ -170,3 +170,8 @@ replayed. No new causal or damage field is added to public cues.
 Vehicle wheel animation follows actual presentation distance, using the authored
 0.37m tyre radius. Placement, waiting and parked states do not advance roll.
 Wheel pivots and diagnostics do not change Go travel time or vehicle state.
+
+Front-wheel steering follows presentation route curvature and actual travel
+distance. Moving occupancy includes the steered tyre sweep; parked vehicles
+and staged police retain straight-wheel occupancy at their existing positions.
+These internal presentation distinctions add no public vehicle types or commands.

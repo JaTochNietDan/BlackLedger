@@ -45,7 +45,7 @@ export function sceneSlots(lot: Lot, kind: string): SceneSlot[] {
   if (kind === 'raid' || kind === 'arrest')
     return [1, -1].flatMap(side => [-6, 0, 6].map(offset => {
       const root = {x: lot.x + side * 9.6, z: lot.z + offset};
-      return {root, pose: {...root, heading: 0}, model: 'police'};
+      return {root, pose: {...root, heading: 0}, model: 'parked-police'};
     }));
   return [];
 }
