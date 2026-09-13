@@ -206,10 +206,8 @@ function App() {
     };
   }, [stopVoice]);
   useEffect(() => {
-    if (!journey) return;
-    const timer = setTimeout(() => setJourney(null), 2400);
-    return () => clearTimeout(timer);
-  }, [journey, cityView]);
+    if (tab !== 'city' || cityView !== 'iso') setJourney(null);
+  }, [tab, cityView]);
   useEffect(() => {
     if (!notice) return;
     const id = setTimeout(() => setNotice(''), 6000);
@@ -294,7 +292,9 @@ function App() {
       ) {
         const from = world.locations.find(l => l.id === world.player.location),
           to = next.locations.find(l => l.id === next.player.location);
-        if (from && to && from.id !== to.id)
+        if (from && to && from.id !== to.id) {
+          setTab('city');
+          setCityView('iso');
           setJourney({
             from,
             to,
@@ -302,6 +302,7 @@ function App() {
             driving: !!world.vehicle?.running,
             vehicle: world.vehicle?.car,
           });
+        }
       }
       if (command.kind === 'new_life')
         setSelected(
@@ -840,6 +841,7 @@ function App() {
                   activeCue={journey ? null : playing}
                   onSkipCue={() => setPlaying(null)}
                   onSkipJourney={() => setJourney(null)}
+                  onJourneyDone={() => setJourney(null)}
                   selected={selected}
                   onSelect={setSelected}
                   onTravel={id => commit({kind: 'travel', target: id})}

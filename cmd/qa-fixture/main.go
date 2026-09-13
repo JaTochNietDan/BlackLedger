@@ -58,6 +58,7 @@ func main() {
 				n.Errand = "Crossing town in an isolated city presentation fixture"
 				n.Arrives = w.Minute + max(1, core.TravelMinutes(n.Location, n.Heading)*2/3)
 				if scenario == "city3d-traffic" {
+					w.Player.Location = "tailor"
 					n.Location, n.Heading, n.Car = "tailor", "dealer", 1+i%3
 					n.Arrives = w.Minute + max(1, core.TravelMinutes(n.Location, n.Heading)/2)
 					w.Plots = nil

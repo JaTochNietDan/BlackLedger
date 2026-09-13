@@ -64,6 +64,24 @@ These are staged fixture saves, not earned campaign progress.
 
 ## Continue next
 
+### Queued player arrival follow-up
+
+Player travel now ends when rendered occupancy reaches the endpoint, replacing
+the unconditional 2.4-second timer. Skip remains available, leaving the city
+cancels presentation, and a failed renderer completes the pending presentation.
+Travel initiated from another view opens the city so it cannot block controls
+behind an unmounted renderer. Journey completion keys include the world ID.
+
+The traffic fixture now starts the player at its shared route's departure. In
+browser, a long trip completed with all twelve NPC cars arriving. A return trip
+recorded `data-arrival` progress 1 at **3555ms**, revision 2 / minute 764; after
+completion the player changed to the pedestrian and parked Hudson, retaining
+that revision/time. The new long-route test confirms occupancy remains in transit
+at 2.4 seconds and later reaches its endpoint. All 80 frontend tests, the build,
+and HTTP tests pass. Renderer failure recovery and OS reduced-motion changes
+still need direct browser fault/setting tests; their handling is implemented but
+not claimed verified by this trip.
+
 ### Traffic occupancy follow-up
 
 The renderer now maintains oriented actor footprints and advances in small spatial

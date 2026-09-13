@@ -50,3 +50,11 @@ test('occupancy dimensions enclose the authored car meshes',async()=>{
   assert.ok(size.width>=max[0]-min[0],`${model} width`);assert.ok(size.length>=max[1]-min[1],`${model} length`);
  }
 });
+test('long journeys remain in transit past the old 2.4-second cutoff',()=>{
+ const traffic=new StreetTraffic();const request={id:'player',model:'hudson',points:[{x:0,z:0},{x:300,z:0}],progress:0};
+ traffic.update([request],1/60);let pose;
+ for(let frame=1;frame<=144;frame++){request.progress=frame/144;pose=traffic.update([request],1/60).get('player');}
+ assert.ok(pose.progress<1,'completion must use actual rendered arrival');
+ for(let frame=0;frame<180;frame++)pose=traffic.update([request],1/60).get('player');
+ assert.equal(pose.progress,1);
+});

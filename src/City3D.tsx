@@ -30,6 +30,7 @@ type Props = {
   activeCue: VisualCue | null;
   onSkipCue: () => void;
   onSkipJourney: () => void;
+  onJourneyDone: () => void;
 };
 type Actor = {
   object: THREE.Group;
@@ -86,6 +87,9 @@ export function City3D(props: Props) {
   const [failure, setFailure] = useState('');
   const [fps, setFps] = useState('');
   const [waiting, setWaiting] = useState(0);
+  useEffect(() => {
+    if (failure && props.journey) props.onJourneyDone();
+  }, [failure, props.journey, props.onJourneyDone]);
   useEffect(() => {
     const element = host.current!;
     let dead = false,
@@ -482,6 +486,7 @@ export function City3D(props: Props) {
       journeyKey = '',
       motionWas = true;
     let lastActive: string | null = null;
+    let completedJourney = '';
     Promise.all(
       modelNames.map(async name => {
         const gltf = await loader.loadAsync(`/art/models/${name}.glb`);
@@ -743,7 +748,7 @@ export function City3D(props: Props) {
           actors.delete('player-car');
         }
         const key = p.journey
-          ? `${w.life}:${p.journey.from.id}:${p.journey.to.id}:${w.revision}`
+          ? `${w.id}:${w.life}:${p.journey.from.id}:${p.journey.to.id}:${w.revision}`
           : '';
         if (key !== journeyKey || motion !== motionWas) {
           journeyKey = key;
@@ -806,6 +811,22 @@ export function City3D(props: Props) {
           }
         }
         playerRing.visible = !!actors.get('player')?.object.visible;
+        const arrival = placements.get('player');
+        if (
+          p.journey &&
+          completedJourney !== journeyKey &&
+          (!motion || (arrival && !arrival.waiting && arrival.progress >= 1))
+        ) {
+          completedJourney = journeyKey;
+          canvas.dataset.arrival = JSON.stringify({
+            revision: w.revision,
+            minute: w.minute,
+            progress: arrival?.progress,
+            elapsedMs: Math.round(now - (actors.get('player')?.since ?? now)),
+            reducedMotion: !motion,
+          });
+          p.onJourneyDone();
+        }
         const lot = lots.get(p.selected);
         selection.visible = !!lot;
         if (lot) selection.position.set(lot.x, 0.22, lot.z);
