@@ -64,6 +64,13 @@ These are staged fixture saves, not earned campaign progress.
 
 ## Continue next
 
+### Explosion audio under casualty captions (2026-09-13)
+
+- Rendered explosion effects now own one cancellable blast sound at their visible onset, independently of which cue wins the caption priority. A casualty caption suppresses its generic killing sound when the same address and minute already contain a rendered explosion or gunfight. This fixes the charge casualty replay previously producing generic shots while the city rendered an explosion.
+- Late/muted onset is consumed without a backlog or replay on unmute; Skip, graphics interruption and teardown use the existing audio disposal path. The Theatre ownership flag is now `stagedAudio`, covering both blast and gunfire.
+- All 115 frontend tests and production build pass. New tests check location/minute matching and single playback at 30/60/144 FPS, late onset, mute and idempotent disposal. Isolated port 8843 browser replay showed the Rosa Erdos casualty caption alongside one explosion audio start, then clean Skip and no console errors. Evidence: `docs/qa/city3d-20260913/blast-audio-pair.json`. No gameplay command or clock advancement occurred; this is an audio start diagnostic, not an acoustic recording.
+- The cue schema does not express a general causal graph. Same-address/minute association matches these committed batches but does not prove every possible compound incident. Broader event choreography, sound design and visual-quality acceptance remain unfinished.
+
 ### Instanced masonry debris (2026-09-13)
 
 - Added a Blender-authored chipped clay fragment with embedded masonry colour/normal textures. Each explosion uses twelve instances in short tumbling arcs; they settle with rotation-aware surface support, scatter across the facade pavement and fade with the smoke. No debris persists as an invented gameplay obstacle or additional damage.

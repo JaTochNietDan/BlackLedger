@@ -161,3 +161,8 @@ This uses the committed explosion cue; it adds no damage, ignition or physics ru
 Explosion debris is cosmetic: instanced masonry fragments settle on the facade
 pavement and disappear with playback. They avoid visible actor footprints and
 introduce no collision, inventory, obstruction or damage rule in the simulation.
+
+Rendered explosions now own their onset audio, even when a higher-gravity
+casualty supplies the caption. A same-address/minute explosion or gunfight
+suppresses that casualty's generic Theatre sound. Late or muted onsets are not
+replayed. No new causal or damage field is added to public cues.

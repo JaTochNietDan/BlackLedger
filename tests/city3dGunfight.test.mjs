@@ -90,3 +90,33 @@ test('muting stops a current tail and does not replay it on unmute',async()=>{
  audio.update(.72,true);assert.equal(fired,1);
  audio.update(1.05,true);assert.equal(fired,2);audio.dispose();assert.equal(stops,2);
 });
+
+test('a rendered blast owns its casualty audio only at the same address and minute',async()=>{
+ const {cityOwnsAudio}=await import('../.runtime/frontend-test/city3dEvents.js');
+ const death={id:'death',kind:'killing',target:'club',minute:720,caption:'A casualty'};
+ const blast={id:'blast',kind:'explosion',target:'club',minute:720,caption:'A charge'};
+ assert.equal(cityOwnsAudio(death,[death,blast]),true);
+ assert.equal(cityOwnsAudio(blast,[death,blast]),true);
+ assert.equal(cityOwnsAudio(death,[{...blast,minute:700}]),false);
+ assert.equal(cityOwnsAudio(death,[{...blast,target:'bar'}]),false);
+ assert.equal(cityOwnsAudio(death,[]),false);
+ assert.equal(cityOwnsAudio(death,[{...blast,kind:'gunfight'}]),true);
+});
+test('blast audio starts once with the visible onset, cancels on mute/dispose and skips missed starts',async()=>{
+ const {BlastAudio}=await import('../.runtime/frontend-test/city3dEvents.js');
+ for(const fps of [30,60,144]){
+  let shots=0,stops=0;
+  const audio=new BlastAudio(()=>{shots++;return()=>stops++;});
+  for(let frame=0;frame<fps*3;frame++)audio.update(frame/fps);
+  assert.equal(shots,1);assert.equal(audio.started,1);
+  audio.dispose();audio.dispose();audio.update(0);assert.equal(stops,1);
+ }
+ let started=0,stopped=0;
+ const muted=new BlastAudio(()=>{started++;return()=>stopped++;});
+ muted.update(0,false);muted.update(.1,true);assert.equal(started,0);
+ const late=new BlastAudio(()=>{started++;return()=>stopped++;});
+ late.update(1);late.update(1.1);assert.equal(started,0);
+ const active=new BlastAudio(()=>{started++;return()=>stopped++;});
+ active.update(.01);active.update(.05,false);active.update(.06,true);active.dispose();
+ assert.equal(started,1);assert.equal(stopped,1);
+});

@@ -108,3 +108,34 @@ export class GunfireAudio {
     this.stop = undefined;
   }
 }
+
+/** The rendered cause supplies audio for co-located casualties in that moment. */
+export function cityOwnsAudio(cue: VisualCue, batch: VisualCue[]) {
+  if (cue.kind === 'gunfight' || cue.kind === 'explosion') return true;
+  return cue.kind === 'killing' && batch.some(other =>
+    (other.kind === 'gunfight' || other.kind === 'explosion') &&
+    other.target === cue.target && other.minute === cue.minute);
+}
+
+/** A blast sounds once at the visible onset; a late frame never plays a backlog. */
+export class BlastAudio {
+  started = 0;
+  private consumed = false;
+  private closed = false;
+  private stop?: () => void;
+  constructor(private fire: () => (() => void) | undefined) {}
+  update(seconds: number, enabled = true) {
+    if (this.closed) return;
+    if (!enabled) { this.stop?.(); this.stop = undefined; }
+    if (this.consumed) return;
+    this.consumed = true;
+    if (seconds < 0 || seconds > .15 || !enabled) return;
+    this.stop = this.fire();
+    if (this.stop) this.started++;
+  }
+  dispose() {
+    this.closed = true;
+    this.stop?.();
+    this.stop = undefined;
+  }
+}

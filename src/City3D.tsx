@@ -19,11 +19,11 @@ import {
 import type {Lot, Point} from './city3dPlan';
 import type {Journey} from './TravelPresentation';
 import './city3d.css';
-import {CityCueQueue, availableSceneSlot, casualtyFall, gunfightPose, casualtySceneStart, GunfireAudio} from './city3dEvents';
+import {CityCueQueue, availableSceneSlot, casualtyFall, gunfightPose, casualtySceneStart, GunfireAudio, BlastAudio} from './city3dEvents';
 import type {SceneSlot} from './city3dEvents';
 import {StreetTraffic, trafficSize} from './city3dTraffic';
 import {pedestrianModel, isPedestrian} from './city3dCast';
-import {playCityGunshot, soundOn} from './sound';
+import {playCityGunshot, playMoment, soundOn} from './sound';
 import {cameraCommand, screenPan} from './city3dControls';
 import {blastParticle, blastLight, blastOpacity, billowAlpha, debrisPose, fragmentBlocked} from './city3dBlast';
 
@@ -64,7 +64,7 @@ type Effect = {
   slot?: SceneSlot;
   gunArm?: THREE.Object3D;
   muzzle?: THREE.Object3D;
-  audio?: GunfireAudio;
+  audio?: GunfireAudio | BlastAudio;
 };
 const modelNames = [
   'tenement',
@@ -789,7 +789,8 @@ export function City3D(props: Props) {
             });
           }
           effects.push({cue, since: now, mesh, light, debris, extra, gunArm, muzzle,
-            audio: cue.kind === 'gunfight' ? new GunfireAudio(playCityGunshot) : undefined});
+            audio: cue.kind === 'gunfight' ? new GunfireAudio(playCityGunshot)
+              : cue.kind === 'explosion' ? new BlastAudio(() => playMoment('explosion')) : undefined});
           if (p.activeCue?.id === cue.id) focus.current(cue.target);
         }
         // Damage is a persistent scorch state, not evidence of a continuing fire.
@@ -1156,7 +1157,8 @@ export function City3D(props: Props) {
             debris: e.debris?.count,
             blastOrigin: e.cue.kind === 'explosion' ? buildings.get(e.cue.target)?.userData.blastOrigin : undefined,
             arm: e.gunArm?.rotation.x,
-            audioShots: e.audio?.started,
+            audioShots: e.cue.kind === 'gunfight' ? e.audio?.started : undefined,
+            audioBlasts: e.cue.kind === 'explosion' ? e.audio?.started : undefined,
             fall: e.cue.kind === 'killing' ? e.extra?.rotation.z : undefined,
           })),
         });

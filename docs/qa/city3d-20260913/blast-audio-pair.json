@@ -1,0 +1,27 @@
+{
+  "caption": "Rosa Erdos at The Monarch. Rosa Erdos was inside The Monarch when a charge went off under it, in the middle of the morning.",
+  "effects": [
+    {
+      "id": "45fae53cfbbf9a7279c528740c1de9dc",
+      "kind": "killing",
+      "target": "club",
+      "staged": true,
+      "x": 112,
+      "z": 70.35,
+      "fall": -0.19268434942017396
+    },
+    {
+      "id": "e556c9955afd50fc46f677fd44a9b91b",
+      "kind": "explosion",
+      "target": "club",
+      "staged": true,
+      "debris": 12,
+      "blastOrigin": {
+        "x": 112,
+        "y": 0.25,
+        "z": 72.23999891281127
+      },
+      "audioBlasts": 1
+    }
+  ]
+}

@@ -1,3 +1,4 @@
+import {cityOwnsAudio} from './city3dEvents';
 import type {VisualCue} from './types';
 import {paintedCar} from './cityAssets';
 import {SumAction} from './SumAction';
@@ -712,9 +713,7 @@ function App() {
           place={w.locations.find(l => l.id === playing.target) || w.locations[0]}
           onProgress={setBeat}
           plate={cityView !== 'iso'}
-          stagedGunfire={cityView === 'iso' && (playing.kind === 'gunfight' ||
-            (playing.kind === 'killing' && !!w.last_result?.cues?.some(cue =>
-              cue.kind === 'gunfight' && cue.target === playing.target)))}
+          stagedAudio={cityView === 'iso' && cityOwnsAudio(playing, w.last_result?.cues || [])}
           onDone={() => setPlaying(null)}
         />
       );

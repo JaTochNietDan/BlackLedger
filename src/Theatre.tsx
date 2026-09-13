@@ -32,7 +32,7 @@ export function Theatre({
   onDone,
   onProgress,
   plate = true,
-  stagedGunfire = false,
+  stagedAudio = false,
 }: {
   cue: VisualCue;
   place: Place;
@@ -42,7 +42,8 @@ export function Theatre({
   // picture of a police station in front of the actual police station is one
   // picture too many.
   plate?: boolean;
-  stagedGunfire?: boolean;
+  // The 3D effect supplies the sound at its visible onset.
+  stagedAudio?: boolean;
   // How far through the moment is, reported outward every frame so the street
   // can light the building while it happens.
   onProgress?: (t: number) => void;
@@ -70,8 +71,8 @@ export function Theatre({
   // The noise the city makes, once, at the top of the moment — not on every
   // frame, and not again when the same moment is replayed mid-flight.
   useEffect(() => {
-    if (!stagedGunfire) return playMoment(cue.kind);
-  }, [cue.id, stagedGunfire]);
+    if (!stagedAudio) return playMoment(cue.kind);
+  }, [cue.id, stagedAudio]);
 
   useEffect(() => {
     if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
