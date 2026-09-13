@@ -120,6 +120,7 @@ function App() {
   const scene = useRef<HTMLElement | null>(null),
     latest = useRef(world),
     busyRef = useRef(false);
+  const sceneConditions=useRef<{world:string;revision:number;conditions:Record<string,number>}|null>(null);
   latest.current = world;
   const voicePlayer = useRef<VoicePlayer | null>(null);
   if (!voicePlayer.current)
@@ -272,6 +273,7 @@ function App() {
       const payload = {...command, request_id: crypto.randomUUID(), revision: world.revision};
       localStorage.setItem('black-ledger-pending', JSON.stringify(payload));
       const next = await api<Snapshot>('action', payload);
+      sceneConditions.current={world:next.id,revision:next.revision,conditions:Object.fromEntries(world.locations.map(p=>[p.id,p.condition]))};
       localStorage.removeItem('black-ledger-pending');
       setWorld(next);
       setPlaying(null);
@@ -867,6 +869,7 @@ function App() {
               ) : (
                 <City3D
                   state={w}
+                  beforeConditions={sceneConditions.current?.world===w.id&&sceneConditions.current.revision===w.revision?sceneConditions.current.conditions:undefined}
                   overlay={sceneOverlay || journeyOverlay}
                   activeCue={journey ? null : playing}
                   onSceneDone={setFinishedCue}

@@ -128,6 +128,18 @@ function doorBreach(ctx: AudioContext, at: number, scene: SceneSound) {
   }
 }
 
+// Initial glass crack followed by scattered high-frequency fragments.
+function glassBreak(ctx:AudioContext,at:number,scene:SceneSound){
+ for(let i=0;i<6;i++){
+  const duration=i===0?.13:.07+i*.018,begin=at+(i===0?0:.07+i*.046);
+  const source=noise(ctx,duration),band=ctx.createBiquadFilter(),gain=ctx.createGain();
+  band.type='bandpass';band.frequency.value=2200+i*730;band.Q.value=i===0?.7:5;
+  gain.gain.setValueAtTime(.0001,begin);gain.gain.linearRampToValueAtTime(i===0?.32:.09,begin+.002);
+  gain.gain.exponentialRampToValueAtTime(.0001,begin+duration);
+  source.connect(band).connect(gain).connect(ctx.destination);startVoice(source,[band,gain],begin,begin+duration+.01,scene);
+ }
+}
+
 // A blast: low, long, and with a body you feel rather than hear.
 function blast(ctx: AudioContext, at: number, scene: SceneSound) {
   const source = noise(ctx, 1.6);
@@ -196,6 +208,7 @@ export function playMoment(kind: string) {
     if (ctx.state === 'suspended') ctx.resume().catch(() => {});
     const at = ctx.currentTime + 0.02;
     switch (kind) {
+      case 'glass-break': glassBreak(ctx,at,scene); break;
       case 'door-breach': doorBreach(ctx, at, scene); break;
       case 'explosion': blast(ctx, at, scene); break;
       case 'killing':

@@ -8,7 +8,7 @@ import {wardrobe, dressPedestrian} from './city3dWardrobe';
 import {headlightAlpha, headlightCentre} from './city3dHeadlights';
 import {cityWeather, rainVertices} from './city3dWeather';
 import {blockingBuildings} from './city3dOcclusion';
-import {buildingCondition, buildingGlazing, buildingCutaway} from './city3dDamage';
+import {buildingCondition, buildingGlazing, glazingDuringBlast, GLASS_BREAK_AT, buildingCutaway} from './city3dDamage';
 import {disposeCityResources} from './city3dResources';
 import {useEffect, useRef, useState, type ReactNode} from 'react';
 import * as THREE from 'three';
@@ -43,6 +43,7 @@ import {blastParticle, windowBurst, internalDetonation, windowDebris, blastLight
 
 type Props = {
   state: Snapshot;
+  beforeConditions?:Record<string,number>;
   overlay?: ReactNode;
   selected: string;
   onSelect: (id: string) => void;
@@ -88,6 +89,8 @@ type Effect = {
   gunArm?: THREE.Object3D;
   muzzle?: THREE.Object3D;
   audio?: GunfireAudio | BlastAudio;
+  glassAudio?: BlastAudio;
+  glazingBefore?:number;
 };
 const modelNames = [
   'tenement',
@@ -837,7 +840,7 @@ export function City3D(props: Props) {
           scene.remove(effect.mesh, effect.light);
           if (effect.extra) scene.remove(effect.extra);
           effect.wardrobe?.forEach(material => material.dispose());
-          effect.audio?.dispose();
+          effect.audio?.dispose(); effect.glassAudio?.dispose();
           disposeDebris(effect);
           effect.mesh.dispose();
           (effect.mesh.material as THREE.Material).dispose();
@@ -974,6 +977,8 @@ export function City3D(props: Props) {
             });
           }
           effects.push({cue, since: now, mesh, light, debris, extra, wardrobe: costume, gunArm, muzzle,
+            glazingBefore:(cue.id.startsWith('preview:')?undefined:p.beforeConditions?.[cue.target]) ?? buildings.get(cue.target)?.userData.condition ?? w.locations.find(p=>p.id===cue.target)?.condition ?? 100,
+            glassAudio:cue.kind==='explosion'?new BlastAudio(()=>playMoment('glass-break')):undefined,
             audio: cue.kind === 'gunfight' ? new GunfireAudio(playCityGunshot)
               : cue.kind === 'raid-officer' ? new BlastAudio(() => playMoment('door-breach'))
               : cue.kind === 'explosion' ? new BlastAudio(() => playMoment('explosion')) : undefined});
@@ -1004,7 +1009,7 @@ export function City3D(props: Props) {
         // Condition-driven surface stains imply no ongoing fire or invented collapse.
         for (const place of w.locations) {
           const b = buildings.get(place.id);
-          if (b) buildingGlazing(b,place.condition);
+          if (b) {b.userData.condition=place.condition;buildingGlazing(b,place.condition);}
           if (b)
             b.traverse(o => {
               if (o instanceof THREE.Mesh) {
@@ -1250,7 +1255,7 @@ export function City3D(props: Props) {
             scene.remove(e.mesh, e.light);
             if (e.extra) scene.remove(e.extra);
             e.wardrobe?.forEach(material => material.dispose());
-            e.audio?.dispose();
+            e.audio?.dispose(); e.glassAudio?.dispose();
             disposeDebris(e);
             e.mesh.dispose();
             (e.mesh.material as THREE.Material).dispose();
@@ -1495,6 +1500,14 @@ export function City3D(props: Props) {
         waterClock += Math.min(dt, 100) / 1000;
         waterNormal.offset.set((waterClock * .006) % 1, (waterClock * .003) % 1);
       }
+      for(const [id,b] of buildings){
+        const condition=b.userData.condition??100;
+        const blast=effects.find(e=>e.cue.kind==='explosion'&&e.cue.target===id&&internalDetonation(e.cue,w.building_fires||[]));
+        const before=blast?.glazingBefore??condition,age=blast?(now-blast.since)/1000:0;
+        const preview=!!blast?.cue.id.startsWith('preview:');
+        buildingGlazing(b,blast?glazingDuringBlast(condition,before,age,preview):condition);
+        if(blast&&before>=60&&(preview||condition<60)&&b.getObjectByName('window-broken'))blast.glassAudio?.update(age-GLASS_BREAK_AT,soundOn());
+      }
       rubble.update(w.building_fires||[],w.minute,buildings,models.get('blast-fragment'),new Set(effects.filter(e=>e.cue.kind==='explosion').map(e=>e.cue.target)));
       suppression.update(w.building_fires || [],w.minute,buildings,models,aftermath,dt,motion);
       buildingFire.update(w.building_fires || [],w.minute,buildings,camera,dt,motion);
@@ -1542,6 +1555,7 @@ export function City3D(props: Props) {
             arm: e.gunArm?.rotation.x,
             audioShots: e.cue.kind === 'gunfight' ? e.audio?.started : undefined,
             audioBreaches: e.cue.kind === 'raid-officer' ? e.audio?.started : undefined,
+            glassBreaks:e.glassAudio?.started,
             audioBlasts: e.cue.kind === 'explosion' ? e.audio?.started : undefined,
             fall: e.cue.kind === 'killing' ? e.extra?.rotation.z : undefined,
           })),
@@ -1572,7 +1586,7 @@ export function City3D(props: Props) {
     const lost = (e: Event) => {
       e.preventDefault();
       graphicsLost = true;
-      effects.forEach(effect => effect.audio?.dispose());
+      effects.forEach(effect => {effect.audio?.dispose();effect.glassAudio?.dispose();});
       setFailure('The graphics context was interrupted. Reload the city to restore it.');
     };
     canvas.addEventListener('webglcontextlost', lost);
@@ -1587,7 +1601,7 @@ export function City3D(props: Props) {
       canvas.removeEventListener('pointerup', pointerUp);
       canvas.removeEventListener('keydown', keys);
       canvas.removeEventListener('webglcontextlost', lost);
-      effects.forEach(effect => { effect.audio?.dispose(); disposeDebris(effect); });
+      effects.forEach(effect => { effect.audio?.dispose(); effect.glassAudio?.dispose(); disposeDebris(effect); });
       rubble.dispose();
       suppression.dispose();
       buildingFire.dispose();

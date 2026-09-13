@@ -1,0 +1,1358 @@
+{
+  "before": {
+    "revision": 1,
+    "minute": 540,
+    "playbackRate": 1,
+    "impact": {
+      "x": 0,
+      "y": 0
+    },
+    "suppression": [],
+    "rubble": [],
+    "glazing": [
+      {
+        "id": "bar",
+        "broken": false
+      },
+      {
+        "id": "laundry",
+        "broken": false
+      },
+      {
+        "id": "club",
+        "broken": false
+      },
+      {
+        "id": "market",
+        "broken": false
+      },
+      {
+        "id": "apartment",
+        "broken": false
+      },
+      {
+        "id": "casino",
+        "broken": false
+      },
+      {
+        "id": "precinct",
+        "broken": false
+      },
+      {
+        "id": "herald",
+        "broken": false
+      },
+      {
+        "id": "restaurant",
+        "broken": false
+      },
+      {
+        "id": "poolhall",
+        "broken": false
+      },
+      {
+        "id": "butcher",
+        "broken": false
+      },
+      {
+        "id": "goldenlily",
+        "broken": false
+      },
+      {
+        "id": "steamworks",
+        "broken": false
+      },
+      {
+        "id": "burlesque",
+        "broken": false
+      },
+      {
+        "id": "pawn",
+        "broken": false
+      },
+      {
+        "id": "tailor",
+        "broken": false
+      }
+    ],
+    "buildingFire": {
+      "clock": 9.977300000002964,
+      "scenes": []
+    },
+    "headlightPools": 0,
+    "harbour": {
+      "visible": true,
+      "waterClock": 9.821699999999986
+    },
+    "followingPlayer": false,
+    "cutawayBuildings": [],
+    "weather": {
+      "kind": "overcast",
+      "wet": 0,
+      "rainVisible": false,
+      "rainClock": 0
+    },
+    "camera": {
+      "zoom": 1.65,
+      "x": 276,
+      "z": -160,
+      "targetX": 96,
+      "targetZ": 79.99999999999999
+    },
+    "actors": [
+      {
+        "id": "player",
+        "model": "person",
+        "x": 48,
+        "z": 68.65,
+        "y": 0.2
+      }
+    ],
+    "waiting": [],
+    "aftermath": [],
+    "doors": [
+      {
+        "id": "bar",
+        "angle": 0
+      }
+    ],
+    "effects": []
+  },
+  "early": {
+    "revision": 1,
+    "minute": 540,
+    "playbackRate": 1,
+    "impact": {
+      "x": 0.2806197029809719,
+      "y": -0.19400411538831278
+    },
+    "suppression": [],
+    "rubble": [],
+    "glazing": [
+      {
+        "id": "bar",
+        "broken": false
+      },
+      {
+        "id": "laundry",
+        "broken": true
+      },
+      {
+        "id": "club",
+        "broken": false
+      },
+      {
+        "id": "market",
+        "broken": false
+      },
+      {
+        "id": "apartment",
+        "broken": false
+      },
+      {
+        "id": "casino",
+        "broken": false
+      },
+      {
+        "id": "precinct",
+        "broken": false
+      },
+      {
+        "id": "herald",
+        "broken": false
+      },
+      {
+        "id": "restaurant",
+        "broken": false
+      },
+      {
+        "id": "poolhall",
+        "broken": false
+      },
+      {
+        "id": "butcher",
+        "broken": false
+      },
+      {
+        "id": "goldenlily",
+        "broken": false
+      },
+      {
+        "id": "steamworks",
+        "broken": false
+      },
+      {
+        "id": "burlesque",
+        "broken": false
+      },
+      {
+        "id": "pawn",
+        "broken": false
+      },
+      {
+        "id": "tailor",
+        "broken": false
+      }
+    ],
+    "buildingFire": {
+      "clock": 10.230600000002969,
+      "scenes": []
+    },
+    "headlightPools": 0,
+    "harbour": {
+      "visible": true,
+      "waterClock": 10.07499999999999
+    },
+    "followingPlayer": false,
+    "cutawayBuildings": [],
+    "weather": {
+      "kind": "overcast",
+      "wet": 0,
+      "rainVisible": false,
+      "rainClock": 0
+    },
+    "camera": {
+      "zoom": 4.986102219933408,
+      "x": 228,
+      "z": -163.13499989509586,
+      "targetX": 48,
+      "targetZ": 76.86500010490415
+    },
+    "actors": [
+      {
+        "id": "player",
+        "model": "person",
+        "x": 48,
+        "z": 68.65,
+        "y": 0.2
+      }
+    ],
+    "waiting": [],
+    "aftermath": [],
+    "doors": [
+      {
+        "id": "bar",
+        "angle": 0
+      }
+    ],
+    "effects": [
+      {
+        "id": "preview:b6c1a34a-ed98-4eae-b231-1c02a8605cac:0",
+        "kind": "explosion",
+        "target": "laundry",
+        "staged": true,
+        "debris": 12,
+        "blastOrigin": {
+          "x": 48,
+          "y": 5.129999809265136,
+          "z": 74.73000020980835
+        },
+        "blastWindows": [
+          {
+            "x": 43.5,
+            "y": 5.129999809265136,
+            "z": 74.28000020980835
+          },
+          {
+            "x": 46.5,
+            "y": 5.129999809265136,
+            "z": 74.28000020980835
+          },
+          {
+            "x": 49.5,
+            "y": 5.129999809265136,
+            "z": 74.28000020980835
+          },
+          {
+            "x": 52.5,
+            "y": 5.129999809265136,
+            "z": 74.28000020980835
+          }
+        ],
+        "glassBreaks": 1,
+        "audioBlasts": 1
+      }
+    ]
+  },
+  "during": {
+    "revision": 1,
+    "minute": 540,
+    "playbackRate": 1,
+    "impact": {
+      "x": 0,
+      "y": 0
+    },
+    "suppression": [],
+    "rubble": [],
+    "glazing": [
+      {
+        "id": "bar",
+        "broken": false
+      },
+      {
+        "id": "laundry",
+        "broken": true
+      },
+      {
+        "id": "club",
+        "broken": false
+      },
+      {
+        "id": "market",
+        "broken": false
+      },
+      {
+        "id": "apartment",
+        "broken": false
+      },
+      {
+        "id": "casino",
+        "broken": false
+      },
+      {
+        "id": "precinct",
+        "broken": false
+      },
+      {
+        "id": "herald",
+        "broken": false
+      },
+      {
+        "id": "restaurant",
+        "broken": false
+      },
+      {
+        "id": "poolhall",
+        "broken": false
+      },
+      {
+        "id": "butcher",
+        "broken": false
+      },
+      {
+        "id": "goldenlily",
+        "broken": false
+      },
+      {
+        "id": "steamworks",
+        "broken": false
+      },
+      {
+        "id": "burlesque",
+        "broken": false
+      },
+      {
+        "id": "pawn",
+        "broken": false
+      },
+      {
+        "id": "tailor",
+        "broken": false
+      }
+    ],
+    "buildingFire": {
+      "clock": 10.389300000002972,
+      "scenes": []
+    },
+    "headlightPools": 0,
+    "harbour": {
+      "visible": true,
+      "waterClock": 10.233699999999994
+    },
+    "followingPlayer": false,
+    "cutawayBuildings": [],
+    "weather": {
+      "kind": "overcast",
+      "wet": 0,
+      "rainVisible": false,
+      "rainClock": 0
+    },
+    "camera": {
+      "zoom": 4.986102219933408,
+      "x": 228,
+      "z": -163.13499989509586,
+      "targetX": 48,
+      "targetZ": 76.86500010490415
+    },
+    "actors": [
+      {
+        "id": "player",
+        "model": "person",
+        "x": 48,
+        "z": 68.65,
+        "y": 0.2
+      }
+    ],
+    "waiting": [],
+    "aftermath": [],
+    "doors": [
+      {
+        "id": "bar",
+        "angle": 0
+      }
+    ],
+    "effects": [
+      {
+        "id": "preview:b6c1a34a-ed98-4eae-b231-1c02a8605cac:0",
+        "kind": "explosion",
+        "target": "laundry",
+        "staged": true,
+        "debris": 12,
+        "blastOrigin": {
+          "x": 48,
+          "y": 5.129999809265136,
+          "z": 74.73000020980835
+        },
+        "blastWindows": [
+          {
+            "x": 43.5,
+            "y": 5.129999809265136,
+            "z": 74.28000020980835
+          },
+          {
+            "x": 46.5,
+            "y": 5.129999809265136,
+            "z": 74.28000020980835
+          },
+          {
+            "x": 49.5,
+            "y": 5.129999809265136,
+            "z": 74.28000020980835
+          },
+          {
+            "x": 52.5,
+            "y": 5.129999809265136,
+            "z": 74.28000020980835
+          }
+        ],
+        "glassBreaks": 1,
+        "audioBlasts": 1
+      }
+    ]
+  },
+  "stopped": {
+    "revision": 1,
+    "minute": 540,
+    "playbackRate": 1,
+    "impact": {
+      "x": 0,
+      "y": 0
+    },
+    "suppression": [],
+    "rubble": [],
+    "glazing": [
+      {
+        "id": "bar",
+        "broken": false
+      },
+      {
+        "id": "laundry",
+        "broken": false
+      },
+      {
+        "id": "club",
+        "broken": false
+      },
+      {
+        "id": "market",
+        "broken": false
+      },
+      {
+        "id": "apartment",
+        "broken": false
+      },
+      {
+        "id": "casino",
+        "broken": false
+      },
+      {
+        "id": "precinct",
+        "broken": false
+      },
+      {
+        "id": "herald",
+        "broken": false
+      },
+      {
+        "id": "restaurant",
+        "broken": false
+      },
+      {
+        "id": "poolhall",
+        "broken": false
+      },
+      {
+        "id": "butcher",
+        "broken": false
+      },
+      {
+        "id": "goldenlily",
+        "broken": false
+      },
+      {
+        "id": "steamworks",
+        "broken": false
+      },
+      {
+        "id": "burlesque",
+        "broken": false
+      },
+      {
+        "id": "pawn",
+        "broken": false
+      },
+      {
+        "id": "tailor",
+        "broken": false
+      }
+    ],
+    "buildingFire": {
+      "clock": 31.625600000004237,
+      "scenes": []
+    },
+    "headlightPools": 0,
+    "harbour": {
+      "visible": true,
+      "waterClock": 31.470000000001264
+    },
+    "followingPlayer": false,
+    "cutawayBuildings": [],
+    "weather": {
+      "kind": "overcast",
+      "wet": 0,
+      "rainVisible": false,
+      "rainClock": 0
+    },
+    "camera": {
+      "zoom": 4.986102219933408,
+      "x": 228,
+      "z": -163.13499989509586,
+      "targetX": 48,
+      "targetZ": 76.86500010490415
+    },
+    "actors": [
+      {
+        "id": "player",
+        "model": "person",
+        "x": 48,
+        "z": 68.65,
+        "y": 0.2
+      }
+    ],
+    "waiting": [],
+    "aftermath": [],
+    "doors": [
+      {
+        "id": "bar",
+        "angle": 0
+      }
+    ],
+    "effects": []
+  },
+  "initialCommittedFailure": {
+    "revision": 1,
+    "minute": 720,
+    "playbackRate": 1,
+    "impact": {
+      "x": -0.4177124896569835,
+      "y": 1.30988865668352
+    },
+    "suppression": [
+      {
+        "id": "8725c90738a7077bbef90a115d9efcec:a",
+        "from": [
+          106.13943833913636,
+          1.6209111827578224,
+          71.03499071426207
+        ],
+        "to": [
+          106.80000019073486,
+          5.129999809265136,
+          74.28000020980835
+        ]
+      },
+      {
+        "id": "8725c90738a7077bbef90a115d9efcec:b",
+        "from": [
+          117.52412915380718,
+          1.5900585634338138,
+          70.90005072733015
+        ],
+        "to": [
+          114.59999990463257,
+          5.129999809265136,
+          74.28000020980835
+        ]
+      }
+    ],
+    "rubble": [
+      {
+        "id": "8725c90738a7077bbef90a115d9efcec",
+        "visible": false,
+        "fragments": 12
+      }
+    ],
+    "glazing": [
+      {
+        "id": "bar",
+        "broken": false
+      },
+      {
+        "id": "laundry",
+        "broken": false
+      },
+      {
+        "id": "club",
+        "broken": true
+      },
+      {
+        "id": "market",
+        "broken": false
+      },
+      {
+        "id": "apartment",
+        "broken": false
+      },
+      {
+        "id": "casino",
+        "broken": false
+      },
+      {
+        "id": "precinct",
+        "broken": false
+      },
+      {
+        "id": "herald",
+        "broken": false
+      },
+      {
+        "id": "restaurant",
+        "broken": false
+      },
+      {
+        "id": "poolhall",
+        "broken": false
+      },
+      {
+        "id": "butcher",
+        "broken": false
+      },
+      {
+        "id": "goldenlily",
+        "broken": false
+      },
+      {
+        "id": "steamworks",
+        "broken": false
+      },
+      {
+        "id": "burlesque",
+        "broken": false
+      },
+      {
+        "id": "pawn",
+        "broken": false
+      },
+      {
+        "id": "tailor",
+        "broken": false
+      }
+    ],
+    "buildingFire": {
+      "clock": 0.24193400000000112,
+      "scenes": [
+        {
+          "id": "8725c90738a7077bbef90a115d9efcec",
+          "vents": [
+            {
+              "x": 106.80000019073486,
+              "y": 5.129999809265136,
+              "z": 74.28000020980835
+            },
+            {
+              "x": 109.40000009536743,
+              "y": 5.129999809265136,
+              "z": 74.28000020980835
+            },
+            {
+              "x": 112,
+              "y": 5.129999809265136,
+              "z": 74.28000020980835
+            },
+            {
+              "x": 114.59999990463257,
+              "y": 5.129999809265136,
+              "z": 74.28000020980835
+            }
+          ],
+          "particles": 48
+        }
+      ]
+    },
+    "headlightPools": 0,
+    "harbour": {
+      "visible": true,
+      "waterClock": 0.10580000000000292
+    },
+    "followingPlayer": false,
+    "cutawayBuildings": [],
+    "weather": {
+      "kind": "rain",
+      "wet": 1,
+      "rainVisible": true,
+      "rainClock": 0.10580000000000292
+    },
+    "camera": {
+      "zoom": 4.807018014770609,
+      "x": 292,
+      "z": -163.13499989509583,
+      "targetX": 112.00000000000003,
+      "targetZ": 76.86500010490417
+    },
+    "actors": [
+      {
+        "id": "player",
+        "model": "person",
+        "x": 112,
+        "z": 68.65,
+        "y": 0.2
+      },
+      {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 121.6,
+        "z": 80,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    ],
+    "waiting": [],
+    "aftermath": [
+      {
+        "id": "aftermath:f3927dee5ed47df4a8396acd8d6adbf8:person-13:police",
+        "x": 121.6,
+        "z": 74,
+        "visible": true
+      },
+      {
+        "id": "aftermath:f3927dee5ed47df4a8396acd8d6adbf8:person-13:officer-a",
+        "x": 109,
+        "z": 70.35,
+        "visible": true
+      },
+      {
+        "id": "aftermath:f3927dee5ed47df4a8396acd8d6adbf8:person-13:officer-b",
+        "x": 115,
+        "z": 70.35,
+        "visible": true
+      },
+      {
+        "id": "aftermath:8725c90738a7077bbef90a115d9efcec:fire-engine",
+        "x": 122,
+        "z": 86,
+        "visible": true
+      },
+      {
+        "id": "aftermath:8725c90738a7077bbef90a115d9efcec:firefighter-a",
+        "x": 106,
+        "z": 70.35,
+        "visible": true
+      },
+      {
+        "id": "aftermath:8725c90738a7077bbef90a115d9efcec:firefighter-b",
+        "x": 118,
+        "z": 70.35,
+        "visible": true
+      }
+    ],
+    "doors": [
+      {
+        "id": "bar",
+        "angle": 0
+      }
+    ],
+    "effects": [
+      {
+        "id": "f3927dee5ed47df4a8396acd8d6adbf8",
+        "kind": "killing",
+        "target": "club",
+        "staged": true,
+        "x": 112,
+        "z": 70.35,
+        "fall": -0.25512350341027307
+      },
+      {
+        "id": "0cfccf4e4b0a99e79ac54da7b48b4d1b",
+        "kind": "explosion",
+        "target": "club",
+        "staged": true,
+        "debris": 12,
+        "blastOrigin": {
+          "x": 112,
+          "y": 5.129999809265136,
+          "z": 74.73000020980835
+        },
+        "blastWindows": [
+          {
+            "x": 106.80000019073486,
+            "y": 5.129999809265136,
+            "z": 74.28000020980835
+          },
+          {
+            "x": 109.40000009536743,
+            "y": 5.129999809265136,
+            "z": 74.28000020980835
+          },
+          {
+            "x": 112,
+            "y": 5.129999809265136,
+            "z": 74.28000020980835
+          },
+          {
+            "x": 114.59999990463257,
+            "y": 5.129999809265136,
+            "z": 74.28000020980835
+          }
+        ],
+        "glassBreaks": 0,
+        "audioBlasts": 1
+      }
+    ]
+  },
+  "fixedCommitted": {
+    "revision": 1,
+    "minute": 720,
+    "playbackRate": 1,
+    "impact": {
+      "x": 0,
+      "y": 0
+    },
+    "suppression": [
+      {
+        "id": "b0a0a6b4c2a201d5a79a442527231883:a",
+        "from": [
+          106.13943833913636,
+          1.6209111827578224,
+          71.03499071426207
+        ],
+        "to": [
+          106.80000019073486,
+          5.129999809265136,
+          74.28000020980835
+        ]
+      },
+      {
+        "id": "b0a0a6b4c2a201d5a79a442527231883:b",
+        "from": [
+          117.52412915380718,
+          1.5900585634338138,
+          70.90005072733015
+        ],
+        "to": [
+          114.59999990463257,
+          5.129999809265136,
+          74.28000020980835
+        ]
+      }
+    ],
+    "rubble": [
+      {
+        "id": "b0a0a6b4c2a201d5a79a442527231883",
+        "visible": false,
+        "fragments": 12
+      }
+    ],
+    "glazing": [
+      {
+        "id": "bar",
+        "broken": false
+      },
+      {
+        "id": "laundry",
+        "broken": false
+      },
+      {
+        "id": "club",
+        "broken": true
+      },
+      {
+        "id": "market",
+        "broken": false
+      },
+      {
+        "id": "apartment",
+        "broken": false
+      },
+      {
+        "id": "casino",
+        "broken": false
+      },
+      {
+        "id": "precinct",
+        "broken": false
+      },
+      {
+        "id": "herald",
+        "broken": false
+      },
+      {
+        "id": "restaurant",
+        "broken": false
+      },
+      {
+        "id": "poolhall",
+        "broken": false
+      },
+      {
+        "id": "butcher",
+        "broken": false
+      },
+      {
+        "id": "goldenlily",
+        "broken": false
+      },
+      {
+        "id": "steamworks",
+        "broken": false
+      },
+      {
+        "id": "burlesque",
+        "broken": false
+      },
+      {
+        "id": "pawn",
+        "broken": false
+      },
+      {
+        "id": "tailor",
+        "broken": false
+      }
+    ],
+    "buildingFire": {
+      "clock": 0.46503399999999967,
+      "scenes": [
+        {
+          "id": "b0a0a6b4c2a201d5a79a442527231883",
+          "vents": [
+            {
+              "x": 106.80000019073486,
+              "y": 5.129999809265136,
+              "z": 74.28000020980835
+            },
+            {
+              "x": 109.40000009536743,
+              "y": 5.129999809265136,
+              "z": 74.28000020980835
+            },
+            {
+              "x": 112,
+              "y": 5.129999809265136,
+              "z": 74.28000020980835
+            },
+            {
+              "x": 114.59999990463257,
+              "y": 5.129999809265136,
+              "z": 74.28000020980835
+            }
+          ],
+          "particles": 48
+        }
+      ]
+    },
+    "headlightPools": 0,
+    "harbour": {
+      "visible": true,
+      "waterClock": 0.3152999999999993
+    },
+    "followingPlayer": false,
+    "cutawayBuildings": [],
+    "weather": {
+      "kind": "rain",
+      "wet": 1,
+      "rainVisible": true,
+      "rainClock": 0.3152999999999993
+    },
+    "camera": {
+      "zoom": 4.807018014770609,
+      "x": 292,
+      "z": -163.13499989509583,
+      "targetX": 112.00000000000003,
+      "targetZ": 76.86500010490417
+    },
+    "actors": [
+      {
+        "id": "player",
+        "model": "person",
+        "x": 112,
+        "z": 68.65,
+        "y": 0.2
+      },
+      {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 121.6,
+        "z": 80,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    ],
+    "waiting": [],
+    "aftermath": [
+      {
+        "id": "aftermath:53a012815d3181fd62877c10ce51a674:person-13:police",
+        "x": 121.6,
+        "z": 74,
+        "visible": true
+      },
+      {
+        "id": "aftermath:53a012815d3181fd62877c10ce51a674:person-13:officer-a",
+        "x": 109,
+        "z": 70.35,
+        "visible": true
+      },
+      {
+        "id": "aftermath:53a012815d3181fd62877c10ce51a674:person-13:officer-b",
+        "x": 115,
+        "z": 70.35,
+        "visible": true
+      },
+      {
+        "id": "aftermath:b0a0a6b4c2a201d5a79a442527231883:fire-engine",
+        "x": 122,
+        "z": 86,
+        "visible": true
+      },
+      {
+        "id": "aftermath:b0a0a6b4c2a201d5a79a442527231883:firefighter-a",
+        "x": 106,
+        "z": 70.35,
+        "visible": true
+      },
+      {
+        "id": "aftermath:b0a0a6b4c2a201d5a79a442527231883:firefighter-b",
+        "x": 118,
+        "z": 70.35,
+        "visible": true
+      }
+    ],
+    "doors": [
+      {
+        "id": "bar",
+        "angle": 0
+      }
+    ],
+    "effects": [
+      {
+        "id": "53a012815d3181fd62877c10ce51a674",
+        "kind": "killing",
+        "target": "club",
+        "staged": true,
+        "x": 112,
+        "z": 70.35,
+        "fall": -0.5636540819315693
+      },
+      {
+        "id": "04646542797471826569920523ec1a0c",
+        "kind": "explosion",
+        "target": "club",
+        "staged": true,
+        "debris": 12,
+        "blastOrigin": {
+          "x": 112,
+          "y": 5.129999809265136,
+          "z": 74.73000020980835
+        },
+        "blastWindows": [
+          {
+            "x": 106.80000019073486,
+            "y": 5.129999809265136,
+            "z": 74.28000020980835
+          },
+          {
+            "x": 109.40000009536743,
+            "y": 5.129999809265136,
+            "z": 74.28000020980835
+          },
+          {
+            "x": 112,
+            "y": 5.129999809265136,
+            "z": 74.28000020980835
+          },
+          {
+            "x": 114.59999990463257,
+            "y": 5.129999809265136,
+            "z": 74.28000020980835
+          }
+        ],
+        "glassBreaks": 1,
+        "audioBlasts": 1
+      }
+    ]
+  },
+  "afterCommitted": {
+    "revision": 1,
+    "minute": 720,
+    "playbackRate": 1,
+    "impact": {
+      "x": 0,
+      "y": 0
+    },
+    "suppression": [
+      {
+        "id": "b0a0a6b4c2a201d5a79a442527231883:a",
+        "from": [
+          106.13943833913636,
+          1.6209111827578224,
+          71.03499071426207
+        ],
+        "to": [
+          106.80000019073486,
+          5.129999809265136,
+          74.28000020980835
+        ]
+      },
+      {
+        "id": "b0a0a6b4c2a201d5a79a442527231883:b",
+        "from": [
+          117.52412915380718,
+          1.5900585634338138,
+          70.90005072733015
+        ],
+        "to": [
+          114.59999990463257,
+          5.129999809265136,
+          74.28000020980835
+        ]
+      }
+    ],
+    "rubble": [
+      {
+        "id": "b0a0a6b4c2a201d5a79a442527231883",
+        "visible": true,
+        "fragments": 12
+      }
+    ],
+    "glazing": [
+      {
+        "id": "bar",
+        "broken": false
+      },
+      {
+        "id": "laundry",
+        "broken": false
+      },
+      {
+        "id": "club",
+        "broken": true
+      },
+      {
+        "id": "market",
+        "broken": false
+      },
+      {
+        "id": "apartment",
+        "broken": false
+      },
+      {
+        "id": "casino",
+        "broken": false
+      },
+      {
+        "id": "precinct",
+        "broken": false
+      },
+      {
+        "id": "herald",
+        "broken": false
+      },
+      {
+        "id": "restaurant",
+        "broken": false
+      },
+      {
+        "id": "poolhall",
+        "broken": false
+      },
+      {
+        "id": "butcher",
+        "broken": false
+      },
+      {
+        "id": "goldenlily",
+        "broken": false
+      },
+      {
+        "id": "steamworks",
+        "broken": false
+      },
+      {
+        "id": "burlesque",
+        "broken": false
+      },
+      {
+        "id": "pawn",
+        "broken": false
+      },
+      {
+        "id": "tailor",
+        "broken": false
+      }
+    ],
+    "buildingFire": {
+      "clock": 8.800833999999986,
+      "scenes": [
+        {
+          "id": "b0a0a6b4c2a201d5a79a442527231883",
+          "vents": [
+            {
+              "x": 106.80000019073486,
+              "y": 5.129999809265136,
+              "z": 74.28000020980835
+            },
+            {
+              "x": 109.40000009536743,
+              "y": 5.129999809265136,
+              "z": 74.28000020980835
+            },
+            {
+              "x": 112,
+              "y": 5.129999809265136,
+              "z": 74.28000020980835
+            },
+            {
+              "x": 114.59999990463257,
+              "y": 5.129999809265136,
+              "z": 74.28000020980835
+            }
+          ],
+          "particles": 48
+        }
+      ]
+    },
+    "headlightPools": 0,
+    "harbour": {
+      "visible": true,
+      "waterClock": 8.651099999999985
+    },
+    "followingPlayer": false,
+    "cutawayBuildings": [],
+    "weather": {
+      "kind": "rain",
+      "wet": 1,
+      "rainVisible": true,
+      "rainClock": 8.651099999999985
+    },
+    "camera": {
+      "zoom": 4.807018014770609,
+      "x": 292,
+      "z": -163.13499989509583,
+      "targetX": 112.00000000000003,
+      "targetZ": 76.86500010490417
+    },
+    "actors": [
+      {
+        "id": "player",
+        "model": "person",
+        "x": 112,
+        "z": 68.65,
+        "y": 0.2
+      },
+      {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 121.6,
+        "z": 80,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    ],
+    "waiting": [],
+    "aftermath": [
+      {
+        "id": "aftermath:53a012815d3181fd62877c10ce51a674:person-13:police",
+        "x": 121.6,
+        "z": 74,
+        "visible": true
+      },
+      {
+        "id": "aftermath:53a012815d3181fd62877c10ce51a674:person-13:officer-a",
+        "x": 109,
+        "z": 70.35,
+        "visible": true
+      },
+      {
+        "id": "aftermath:53a012815d3181fd62877c10ce51a674:person-13:officer-b",
+        "x": 115,
+        "z": 70.35,
+        "visible": true
+      },
+      {
+        "id": "aftermath:b0a0a6b4c2a201d5a79a442527231883:fire-engine",
+        "x": 122,
+        "z": 86,
+        "visible": true
+      },
+      {
+        "id": "aftermath:b0a0a6b4c2a201d5a79a442527231883:firefighter-a",
+        "x": 106,
+        "z": 70.35,
+        "visible": true
+      },
+      {
+        "id": "aftermath:b0a0a6b4c2a201d5a79a442527231883:firefighter-b",
+        "x": 118,
+        "z": 70.35,
+        "visible": true
+      },
+      {
+        "id": "aftermath:53a012815d3181fd62877c10ce51a674:person-13:body",
+        "x": 112,
+        "z": 70.35,
+        "visible": true
+      }
+    ],
+    "doors": [
+      {
+        "id": "bar",
+        "angle": 0
+      }
+    ],
+    "effects": []
+  }
+}

@@ -309,3 +309,10 @@ panes (or front ground panes on single-storey buildings) to authored broken-glas
 remnants below 60% condition. Repairs to 60% or above restore intact glazing.
 This is visible property wear, not a new ignition or damage rule; extinguishing
 and rubble cleanup do not repair windows. Other model families need equivalent variants.
+
+The client retains pre-action property conditions for the matching world/revision
+as presentation context. Internal blast playback switches glazing at 90ms; the
+context survives an interior-to-city renderer remount. Existing broken panes remain
+broken, and snapshots without prior context use their known condition. Debug
+explosions temporarily break panes and restore saved condition on Stop/completion.
+The synchronized glass sound belongs to the cancellable scene audio lifecycle.

@@ -37,3 +37,13 @@ test('broken glazing follows condition and restores intact panes after repairs',
  for(const condition of [59,38,0]){buildingGlazing(b,condition);assert.equal(intact.visible,false);assert.equal(broken.visible,true);}
  buildingGlazing(b,80);assert.equal(intact.visible,true);assert.equal(broken.visible,false);
 });
+
+test('blast glazing changes at pressure arrival and preview does not change the base condition',async()=>{
+ const {glazingDuringBlast,GLASS_BREAK_AT}=await import('../.runtime/frontend-test/city3dDamage.js');
+ assert.equal(glazingDuringBlast(38,100,GLASS_BREAK_AT-.001,false),100);
+ assert.equal(glazingDuringBlast(38,100,GLASS_BREAK_AT,false),38);
+ assert.equal(glazingDuringBlast(38,38,0,false),38);
+ assert.equal(glazingDuringBlast(85,85,0,true),85);
+ assert.equal(glazingDuringBlast(85,85,.2,true),0);
+ assert.equal(glazingDuringBlast(85,85,.2,false),85);
+});

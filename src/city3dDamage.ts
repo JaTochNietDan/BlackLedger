@@ -66,3 +66,8 @@ export function buildingGlazing(building:THREE.Group,condition:number){
  const intact=building.getObjectByName('window-intact'),damaged=building.getObjectByName('window-broken');
  if(intact)intact.visible=!broken;if(damaged)damaged.visible=broken;
 }
+
+export const GLASS_BREAK_AT=.09;
+export function glazingDuringBlast(condition:number,before:number,seconds:number,preview:boolean){
+ return seconds<GLASS_BREAK_AT?before:preview?0:condition;
+}
