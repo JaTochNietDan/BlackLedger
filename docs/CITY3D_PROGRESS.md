@@ -64,6 +64,12 @@ These are staged fixture saves, not earned campaign progress.
 
 ## Continue next
 
+### Persistent aftermath rendered — September 13
+
+- The city now consumes saved `aftermath`: a fallen cast character and irregular dark blood pool remain after the short animation, with a police car appearing from the backend response deadline. Bodies and vehicles reserve separate bays in the existing traffic system. Active casualty playback suppresses duplicate persistent bodies; cleanup removes the scene and releases private costume materials.
+- All 148 frontend tests and production build pass. New lifecycle tests cover persistent object reuse, separate body/car reservations, playback suppression and exact deadline cleanup. Browser QA uses fresh isolated port 8860/save `.runtime/aftermath-20260913-165531-863.sqlite3`. At minute 480 the body is visible without police; after a real hour-pass command and city re-entry, revision 1/minute 540 shows body x80/z38.35 and police x89.6/z42. Two further hour-pass commands reach revision 3/minute 660, where aftermath is empty. No captured browser warnings/errors. Main campaign untouched.
+- Evidence: `aftermath-body.png`, `aftermath-police.png`, `aftermath.json`. This is an initial visual aftermath pass: the blood pool is not complete gore art; police officers, multi-unit response, arrival/cleanup animation and stable staging through replay still need work. Detailed interiors, richer assets, building fire response and weapon fidelity also remain unfinished.
+
 ### Saved aftermath lifecycle — September 13
 
 - Added saved/public `aftermath` records for known victims of public killing cues. Each has a stable cue/victim identity, address, occurrence minute, police-arrival deadline (+5 game minutes) and cleanup deadline (+180). Reads return detached active entries, without mutating the save or advancing time. Repeated reports cannot duplicate bodies or restart old deaths. Old saves produce an empty projection rather than fabricated historical scenes.

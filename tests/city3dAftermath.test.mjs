@@ -1,0 +1,23 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import * as THREE from 'three';
+import {CityAftermath} from '../.runtime/frontend-test/city3dAftermath.js';
+import {cityPlan} from '../.runtime/frontend-test/city3dPlan.js';
+import {trafficOverlap} from '../.runtime/frontend-test/city3dTraffic.js';
+
+test('aftermath persists, reserves separate body/police bays and clears on cleanup',()=>{
+ const city=new CityAftermath();
+ const lot={id:'bar',x:80,z:48,row:1,col:2};const lots=new Map([['bar',lot]]);
+ const person=new THREE.Group();person.add(new THREE.Mesh(new THREE.BoxGeometry(.7,1.8,.4),new THREE.MeshStandardMaterial()));
+ const models=new Map([['person',person],['police',new THREE.Group()]]);
+ const records=[{id:'death:mara',target:'bar',victim:{id:'mara',name:'Mara'},minute:480,police_at:485,cleanup_at:660}];
+ const update=(minute,animating=new Set())=>city.update(records,minute,lots,models,()=> 'person',[],animating);
+ update(480);assert.equal(city.reservations().length,1);
+ const root=city.root.children[0];update(484);assert.equal(city.root.children[0],root);
+ update(485);assert.equal(city.reservations().length,2);
+ const [a,b]=city.slots();assert.equal(trafficOverlap(a.pose,a.model,b.pose,b.model),false);
+ update(486,new Set(['mara']));assert.equal(city.reservations().length,1,'replay hides duplicate corpse');
+ update(487);assert.equal(city.reservations().length,2);
+ update(660);assert.equal(city.reservations().length,0);assert.equal(city.root.children.length,0);
+ city.dispose();
+});

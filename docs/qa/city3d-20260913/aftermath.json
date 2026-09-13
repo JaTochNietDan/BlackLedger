@@ -1,0 +1,90 @@
+{
+  "response": {
+    "revision": 1,
+    "minute": 540,
+    "playbackRate": 1,
+    "headlightPools": 0,
+    "harbour": {
+      "visible": true,
+      "waterClock": 0.6754000000000017
+    },
+    "followingPlayer": false,
+    "cutawayBuildings": [],
+    "weather": {
+      "kind": "clear",
+      "wet": 0,
+      "rainVisible": false,
+      "rainClock": 0
+    },
+    "camera": {
+      "zoom": 6.892459479535829,
+      "x": 260,
+      "z": -192,
+      "targetX": 80,
+      "targetZ": 48
+    },
+    "actors": [
+      {
+        "id": "player",
+        "model": "person",
+        "x": 80,
+        "z": 36.65,
+        "y": 0.2
+      }
+    ],
+    "waiting": [],
+    "aftermath": [
+      {
+        "id": "aftermath:b6e3793961dca447a9e79cdff5debcfa:mara:body",
+        "x": 80,
+        "z": 38.35,
+        "visible": true
+      },
+      {
+        "id": "aftermath:b6e3793961dca447a9e79cdff5debcfa:mara:police",
+        "x": 89.6,
+        "z": 42,
+        "visible": true
+      }
+    ],
+    "effects": []
+  },
+  "cleanup": {
+    "revision": 3,
+    "minute": 660,
+    "playbackRate": 1,
+    "headlightPools": 0,
+    "harbour": {
+      "visible": true,
+      "waterClock": 0.10850000000000001
+    },
+    "followingPlayer": false,
+    "cutawayBuildings": [],
+    "weather": {
+      "kind": "clear",
+      "wet": 0,
+      "rainVisible": false,
+      "rainClock": 0
+    },
+    "camera": {
+      "zoom": 1.65,
+      "x": 276,
+      "z": -160,
+      "targetX": 96,
+      "targetZ": 79.99999999999999
+    },
+    "actors": [
+      {
+        "id": "player",
+        "model": "person",
+        "x": 80,
+        "z": 36.65,
+        "y": 0.2
+      }
+    ],
+    "waiting": [],
+    "aftermath": [],
+    "effects": []
+  },
+  "logs": []
+}

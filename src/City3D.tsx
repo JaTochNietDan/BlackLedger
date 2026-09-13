@@ -1,3 +1,4 @@
+import {CityAftermath} from './city3dAftermath';
 import {previewScenes, previewScene, type PreviewScene} from './city3dPreview';
 import {frameScene} from './city3dFraming';
 import {wardrobe, dressPedestrian} from './city3dWardrobe';
@@ -406,6 +407,8 @@ export function City3D(props: Props) {
     const cutawayWindow = new THREE.Vector3();
     const actors = new Map<string, Actor>();
     const effects: Effect[] = [];
+    const aftermath = new CityAftermath();
+    scene.add(aftermath.root);
     const disposeDebris = (effect: Effect) => {
       if (!effect.debris) return;
       scene.remove(effect.debris);
@@ -1089,6 +1092,7 @@ export function City3D(props: Props) {
                 pose: {x: a.object.position.x, z: a.object.position.z, heading: a.object.rotation.y},
               })),
             ...effects.flatMap(other => other.slot ? [other.slot] : []),
+            ...aftermath.slots(),
           ];
           e.slot = availableSceneSlot(lots.get(e.cue.target)!, e.cue.kind, occupied);
           if (e.slot) {
@@ -1097,6 +1101,11 @@ export function City3D(props: Props) {
             e.since = now;
           }
         }
+        aftermath.update(w.aftermath || [], w.minute, lots, models, personModel,
+          [...effects.flatMap(e=>e.slot?[e.slot]:[]), ...[...actors.values()].filter(a=>a.object.visible).map(a=>({
+            model: trafficModel(a.model,a.start===a.end), root: {x:a.object.position.x,z:a.object.position.z},
+            pose: {x:a.object.position.x,z:a.object.position.z,heading:a.object.rotation.y},
+          }))], new Set(effects.filter(e=>e.cue.kind==='killing').flatMap(e=>e.cue.actors?.map(a=>a.id)||[])));
         const placements = traffic.update(
           [...actors]
             .filter(([, a]) => !a.arrived)
@@ -1115,10 +1124,11 @@ export function City3D(props: Props) {
               model: e.slot.model,
               points: [e.slot.pose],
               progress: 0,
-            }] : [])),
+            }] : [])).concat(aftermath.reservations()),
           dt / 1000,
           playback.current,
         );
+        aftermath.show(placements);
         for (const [id, a] of actors) {
           const placement = placements.get(id);
           a.object.visible = !!placement && !placement.waiting;
@@ -1432,6 +1442,7 @@ export function City3D(props: Props) {
               frontWheels: a.wheels.length ? a.wheels.filter(w => w.name.includes('-front-')).map(w => ({x: w.position.x, angle: w.rotation.y})) : undefined,
             })),
           waiting: [...actors].filter(([, a]) => !a.arrived && !a.object.visible).map(([id]) => id),
+          aftermath: aftermath.inspect(),
           effects: effects.map(e => ({
             id: e.cue.id, kind: e.cue.kind, target: e.cue.target,
             staged: !e.extra || e.extra.visible, x: e.slot?.root.x, z: e.slot?.root.z,
@@ -1485,6 +1496,7 @@ export function City3D(props: Props) {
       canvas.removeEventListener('keydown', keys);
       canvas.removeEventListener('webglcontextlost', lost);
       effects.forEach(effect => { effect.audio?.dispose(); disposeDebris(effect); });
+      aftermath.dispose();
       disposeCityResources([scene, ...models.values()], {
         textures, geometries: [effectGeometry, contactGeometry], materials: [contactMaterial],
       });
