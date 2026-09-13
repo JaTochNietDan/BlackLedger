@@ -958,6 +958,7 @@ export function City3D(props: Props) {
           }
           effects.push({cue, since: now, mesh, light, debris, extra, wardrobe: costume, gunArm, muzzle,
             audio: cue.kind === 'gunfight' ? new GunfireAudio(playCityGunshot)
+              : cue.kind === 'raid-officer' ? new BlastAudio(() => playMoment('door-breach'))
               : cue.kind === 'explosion' ? new BlastAudio(() => playMoment('explosion')) : undefined});
           if (p.activeCue?.id === cue.id) {
             setFollow(false);
@@ -1246,7 +1247,7 @@ export function City3D(props: Props) {
           if (blast && blastOrigin) e.light.position.set(blastOrigin.x, 2, blastOrigin.z);
           const shot = e.cue.kind === 'gunfight';
           const firing = gunfightPose(t * 3);
-          e.audio?.update(t * 3, soundOn());
+          if(e.cue.kind!=='raid-officer')e.audio?.update(t * 3, soundOn());
           const muzzlePosition = new THREE.Vector3(at.x, 1.4, at.z);
           if (shot && e.gunArm && e.muzzle) {
             e.gunArm.rotation.x = firing.arm;
@@ -1274,7 +1275,10 @@ export function City3D(props: Props) {
               const breaching=!!door&&!!entry&&Math.abs(entry.x-at.x)<.05&&approach>0&&approach<=3;
               const breach=breaching?raidEntryPose(t*3,approach):null;
               const walk=breach || officerApproach(t*3,distance,Number(e.cue.id.split(':').at(-1))||0);
-              if(breach&&door)door.rotation.y=-Math.PI/2*breach.door;
+              if(breach&&door){
+                door.rotation.y=-Math.PI/2*breach.door;
+                e.audio?.update(t*3-(.35+approach/1.4+.3),soundOn());
+              }
               e.extra.position.z=at.z+walk.travelled;e.extra.rotation.y=0;
               e.extra.position.y=.2+(walk.walking?Math.abs(Math.sin(walk.phase))*.025:0);
               for(const name of ['leg1','leg-1','knee1','knee-1','arm1','arm-1']){
@@ -1500,6 +1504,7 @@ export function City3D(props: Props) {
             blastOrigin: e.cue.kind === 'explosion' ? buildings.get(e.cue.target)?.userData.blastOrigin : undefined,
             arm: e.gunArm?.rotation.x,
             audioShots: e.cue.kind === 'gunfight' ? e.audio?.started : undefined,
+            audioBreaches: e.cue.kind === 'raid-officer' ? e.audio?.started : undefined,
             audioBlasts: e.cue.kind === 'explosion' ? e.audio?.started : undefined,
             fall: e.cue.kind === 'killing' ? e.extra?.rotation.z : undefined,
           })),

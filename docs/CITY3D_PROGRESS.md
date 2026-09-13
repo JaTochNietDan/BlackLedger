@@ -70,6 +70,12 @@ These are staged fixture saves, not earned campaign progress.
 - Production build passes. Fresh isolated port 8862/killing fixture browser evidence: at 500ms a casualty effect was staged and all five spoiler-bearing panels were absent. Once effects were empty, the result strip, headline, caption, cast and scene paper appeared. Replaying the same cue hid spoilers again; Skip cleared effects and restored the headline. Browser logs were clear. Evidence: `news-timing.json`. This verifies scene timing through the actual UI, not a timer-only unit test.
 - Re-read the latest objective at `/Users/jatochnietdan/.codex/attachments/4a3692d6-f725-4a26-b1a0-9d3131b50b49/goal-objective.md`; it adds layered contextual voices and vehicle/action sound. Those audio assets/timelines, full police choreography, drive-bys, persistent building fire/brigade response, remaining interiors and final visual quality remain unfinished. No main-save access or mutation.
 
+### Synchronized breach audio — September 13
+
+- Added a layered boot/wood thump, latch crack and hinge scrape using cancellable Web Audio voices. Only the officer entering an authored doorway triggers it, at the door-opening impact beat. Waiting for a staging slot delays audio with the animation. Muted or missed beats are consumed without a late backlog; Stop/navigation use effect audio disposal.
+- Production build and 159 frontend tests pass, including delayed-contact timing, missed/muted beats and cancellation of the actual three-layer graph. Browser isolated 8860 showed one trigger for the lead and zero for the other officers; replay had zero before contact and one after; Stop left zero effects. Evidence: `breach-audio.json`. No gameplay commands or main-save access.
+- This verifies scheduling and lifecycle, not final audible quality. Listening/mix review, stronger impact assets, spatial sound, contextual voices and broader action audio remain unfinished, alongside squad choreography and other production requirements.
+
 ### First authored doorway and raid entry — September 13
 
 - Rebuilt the tavern front as masonry wings, lintel and a three-metre recessed vestibule. Added a separately hinged oak-and-glass leaf, brass pull/kickplate, stone jambs, floor and threshold anchor. Export remains reproducible from the Blender source; the tavern GLB is 510,012 bytes. Other building models remain unchanged.

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {policeCast,availableSceneSlot,officerApproach,raidEntryPose,policeSceneSeconds} from '../.runtime/frontend-test/city3dEvents.js';
+import {policeCast,availableSceneSlot,officerApproach,raidEntryPose,policeSceneSeconds,BlastAudio} from '../.runtime/frontend-test/city3dEvents.js';
 import {trafficOverlap} from '../.runtime/frontend-test/city3dTraffic.js';
 
 test('raid stages three vehicles and four officers without shared bays',()=>{
@@ -50,4 +50,12 @@ test('raid entry waits for the door to clear and stays inside its reserved corri
 test('raid approach reservation leaves the public entrance clear',()=>{
  const slot=availableSceneSlot({id:'bar',x:80,z:48,row:1,col:2},'raid-officer',[]);
  assert.equal(trafficOverlap(slot.pose,slot.model,{x:80,z:36.65,heading:0},'person'),false);
+});
+
+test('delayed breach audio fires only at visible contact and consumes muted or missed beats',()=>{
+ let played=0,stopped=0;const make=()=>new BlastAudio(()=>{played++;return()=>stopped++;});
+ const audio=make();audio.update(-2);audio.update(-.01);assert.equal(played,0);
+ audio.update(.02);audio.update(.1);assert.equal(played,1);audio.dispose();assert.equal(stopped,1);
+ const muted=make();muted.update(-1);muted.update(.01,false);muted.update(.03,true);assert.equal(played,1);
+ const late=make();late.update(.4);late.update(.5);assert.equal(played,1);
 });

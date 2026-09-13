@@ -128,7 +128,7 @@ export class BlastAudio {
   update(seconds: number, enabled = true) {
     if (this.closed) return;
     if (!enabled) { this.stop?.(); this.stop = undefined; }
-    if (this.consumed) return;
+    if (this.consumed || seconds < 0) return;
     this.consumed = true;
     if (seconds < 0 || seconds > .15 || !enabled) return;
     this.stop = this.fire();

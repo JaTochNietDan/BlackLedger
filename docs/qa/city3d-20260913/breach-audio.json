@@ -1,0 +1,417 @@
+{
+  "first": {
+    "revision": 3,
+    "minute": 660,
+    "playbackRate": 1,
+    "headlightPools": 0,
+    "harbour": {
+      "visible": true,
+      "waterClock": 14.296600000000016
+    },
+    "followingPlayer": false,
+    "cutawayBuildings": [],
+    "weather": {
+      "kind": "clear",
+      "wet": 0,
+      "rainVisible": false,
+      "rainClock": 0
+    },
+    "camera": {
+      "zoom": 3.887197540705289,
+      "x": 260,
+      "z": -193.825,
+      "targetX": 80,
+      "targetZ": 46.175
+    },
+    "actors": [
+      {
+        "id": "player",
+        "model": "person",
+        "x": 80,
+        "z": 36.65,
+        "y": 0.2
+      }
+    ],
+    "waiting": [],
+    "aftermath": [],
+    "doors": [
+      {
+        "id": "bar",
+        "angle": -1.5707963267948966
+      }
+    ],
+    "effects": [
+      {
+        "id": "preview:bfc8881f-cc4f-4a26-a12b-d63eddb17f40:0",
+        "kind": "raid",
+        "target": "bar",
+        "staged": true,
+        "x": 89.6,
+        "z": 42
+      },
+      {
+        "id": "preview:bfc8881f-cc4f-4a26-a12b-d63eddb17f40:0:raid-unit:0",
+        "kind": "raid-unit",
+        "target": "bar",
+        "staged": true,
+        "x": 89.6,
+        "z": 48
+      },
+      {
+        "id": "preview:bfc8881f-cc4f-4a26-a12b-d63eddb17f40:0:raid-unit:1",
+        "kind": "raid-unit",
+        "target": "bar",
+        "staged": true,
+        "x": 89.6,
+        "z": 54
+      },
+      {
+        "id": "preview:bfc8881f-cc4f-4a26-a12b-d63eddb17f40:0:raid-officer:0",
+        "kind": "raid-officer",
+        "target": "bar",
+        "staged": true,
+        "x": 80,
+        "z": 38.35,
+        "approach": {
+          "x": 80,
+          "z": 41.554320000000004,
+          "leg": 0.34090338341512044
+        },
+        "audioBreaches": 1
+      },
+      {
+        "id": "preview:bfc8881f-cc4f-4a26-a12b-d63eddb17f40:0:raid-officer:1",
+        "kind": "raid-officer",
+        "target": "bar",
+        "staged": true,
+        "x": 77,
+        "z": 38.35,
+        "approach": {
+          "x": 77,
+          "z": 39.94727583115148,
+          "leg": 0
+        },
+        "audioBreaches": 0
+      },
+      {
+        "id": "preview:bfc8881f-cc4f-4a26-a12b-d63eddb17f40:0:raid-officer:2",
+        "kind": "raid-officer",
+        "target": "bar",
+        "staged": true,
+        "x": 83,
+        "z": 38.35,
+        "approach": {
+          "x": 83,
+          "z": 39.94727583115148,
+          "leg": 0
+        },
+        "audioBreaches": 0
+      },
+      {
+        "id": "preview:bfc8881f-cc4f-4a26-a12b-d63eddb17f40:0:raid-officer:3",
+        "kind": "raid-officer",
+        "target": "bar",
+        "staged": true,
+        "x": 74,
+        "z": 38.35,
+        "approach": {
+          "x": 74,
+          "z": 39.94727583115148,
+          "leg": 0
+        },
+        "audioBreaches": 0
+      }
+    ]
+  },
+  "before": {
+    "revision": 3,
+    "minute": 660,
+    "playbackRate": 1,
+    "headlightPools": 0,
+    "harbour": {
+      "visible": true,
+      "waterClock": 31.801400000001316
+    },
+    "followingPlayer": false,
+    "cutawayBuildings": [],
+    "weather": {
+      "kind": "clear",
+      "wet": 0,
+      "rainVisible": false,
+      "rainClock": 0
+    },
+    "camera": {
+      "zoom": 3.887197540705289,
+      "x": 260,
+      "z": -193.825,
+      "targetX": 80,
+      "targetZ": 46.175
+    },
+    "actors": [
+      {
+        "id": "player",
+        "model": "person",
+        "x": 80,
+        "z": 36.65,
+        "y": 0.2
+      }
+    ],
+    "waiting": [],
+    "aftermath": [],
+    "doors": [
+      {
+        "id": "bar",
+        "angle": 0
+      }
+    ],
+    "effects": [
+      {
+        "id": "preview:c987beba-b276-4ba7-be21-778ef06e3348:0",
+        "kind": "raid",
+        "target": "bar",
+        "staged": true,
+        "x": 89.6,
+        "z": 42
+      },
+      {
+        "id": "preview:c987beba-b276-4ba7-be21-778ef06e3348:0:raid-unit:0",
+        "kind": "raid-unit",
+        "target": "bar",
+        "staged": true,
+        "x": 89.6,
+        "z": 48
+      },
+      {
+        "id": "preview:c987beba-b276-4ba7-be21-778ef06e3348:0:raid-unit:1",
+        "kind": "raid-unit",
+        "target": "bar",
+        "staged": true,
+        "x": 89.6,
+        "z": 54
+      },
+      {
+        "id": "preview:c987beba-b276-4ba7-be21-778ef06e3348:0:raid-officer:0",
+        "kind": "raid-officer",
+        "target": "bar",
+        "staged": true,
+        "x": 80,
+        "z": 38.35,
+        "approach": {
+          "x": 80,
+          "z": 39.46258,
+          "leg": 0.07105981562387975
+        },
+        "audioBreaches": 0
+      },
+      {
+        "id": "preview:c987beba-b276-4ba7-be21-778ef06e3348:0:raid-officer:1",
+        "kind": "raid-officer",
+        "target": "bar",
+        "staged": true,
+        "x": 77,
+        "z": 38.35,
+        "approach": {
+          "x": 77,
+          "z": 39.35058,
+          "leg": 0.2550342719097936
+        },
+        "audioBreaches": 0
+      },
+      {
+        "id": "preview:c987beba-b276-4ba7-be21-778ef06e3348:0:raid-officer:2",
+        "kind": "raid-officer",
+        "target": "bar",
+        "staged": true,
+        "x": 83,
+        "z": 38.35,
+        "approach": {
+          "x": 83,
+          "z": 39.23858,
+          "leg": 0.3464528273092891
+        },
+        "audioBreaches": 0
+      },
+      {
+        "id": "preview:c987beba-b276-4ba7-be21-778ef06e3348:0:raid-officer:3",
+        "kind": "raid-officer",
+        "target": "bar",
+        "staged": true,
+        "x": 74,
+        "z": 38.35,
+        "approach": {
+          "x": 74,
+          "z": 39.126580000000004,
+          "leg": 0.3121382672881244
+        },
+        "audioBreaches": 0
+      }
+    ]
+  },
+  "replay": {
+    "revision": 3,
+    "minute": 660,
+    "playbackRate": 1,
+    "headlightPools": 0,
+    "harbour": {
+      "visible": true,
+      "waterClock": 34.107900000001145
+    },
+    "followingPlayer": false,
+    "cutawayBuildings": [],
+    "weather": {
+      "kind": "clear",
+      "wet": 0,
+      "rainVisible": false,
+      "rainClock": 0
+    },
+    "camera": {
+      "zoom": 3.887197540705289,
+      "x": 260,
+      "z": -193.825,
+      "targetX": 80,
+      "targetZ": 46.175
+    },
+    "actors": [
+      {
+        "id": "player",
+        "model": "person",
+        "x": 80,
+        "z": 36.65,
+        "y": 0.2
+      }
+    ],
+    "waiting": [],
+    "aftermath": [],
+    "doors": [
+      {
+        "id": "bar",
+        "angle": -1.5707963267948966
+      }
+    ],
+    "effects": [
+      {
+        "id": "preview:c987beba-b276-4ba7-be21-778ef06e3348:0",
+        "kind": "raid",
+        "target": "bar",
+        "staged": true,
+        "x": 89.6,
+        "z": 42
+      },
+      {
+        "id": "preview:c987beba-b276-4ba7-be21-778ef06e3348:0:raid-unit:0",
+        "kind": "raid-unit",
+        "target": "bar",
+        "staged": true,
+        "x": 89.6,
+        "z": 48
+      },
+      {
+        "id": "preview:c987beba-b276-4ba7-be21-778ef06e3348:0:raid-unit:1",
+        "kind": "raid-unit",
+        "target": "bar",
+        "staged": true,
+        "x": 89.6,
+        "z": 54
+      },
+      {
+        "id": "preview:c987beba-b276-4ba7-be21-778ef06e3348:0:raid-officer:0",
+        "kind": "raid-officer",
+        "target": "bar",
+        "staged": true,
+        "x": 80,
+        "z": 38.35,
+        "approach": {
+          "x": 80,
+          "z": 41.29168,
+          "leg": 0.12470842295000238
+        },
+        "audioBreaches": 1
+      },
+      {
+        "id": "preview:c987beba-b276-4ba7-be21-778ef06e3348:0:raid-officer:1",
+        "kind": "raid-officer",
+        "target": "bar",
+        "staged": true,
+        "x": 77,
+        "z": 38.35,
+        "approach": {
+          "x": 77,
+          "z": 39.94727583115148,
+          "leg": 0
+        },
+        "audioBreaches": 0
+      },
+      {
+        "id": "preview:c987beba-b276-4ba7-be21-778ef06e3348:0:raid-officer:2",
+        "kind": "raid-officer",
+        "target": "bar",
+        "staged": true,
+        "x": 83,
+        "z": 38.35,
+        "approach": {
+          "x": 83,
+          "z": 39.94727583115148,
+          "leg": 0
+        },
+        "audioBreaches": 0
+      },
+      {
+        "id": "preview:c987beba-b276-4ba7-be21-778ef06e3348:0:raid-officer:3",
+        "kind": "raid-officer",
+        "target": "bar",
+        "staged": true,
+        "x": 74,
+        "z": 38.35,
+        "approach": {
+          "x": 74,
+          "z": 39.94727583115148,
+          "leg": 0
+        },
+        "audioBreaches": 0
+      }
+    ]
+  },
+  "stopped": {
+    "revision": 3,
+    "minute": 660,
+    "playbackRate": 1,
+    "headlightPools": 0,
+    "harbour": {
+      "visible": true,
+      "waterClock": 34.37190000000113
+    },
+    "followingPlayer": false,
+    "cutawayBuildings": [],
+    "weather": {
+      "kind": "clear",
+      "wet": 0,
+      "rainVisible": false,
+      "rainClock": 0
+    },
+    "camera": {
+      "zoom": 3.887197540705289,
+      "x": 260,
+      "z": -193.825,
+      "targetX": 80,
+      "targetZ": 46.175
+    },
+    "actors": [
+      {
+        "id": "player",
+        "model": "person",
+        "x": 80,
+        "z": 36.65,
+        "y": 0.2
+      }
+    ],
+    "waiting": [],
+    "aftermath": [],
+    "doors": [
+      {
+        "id": "bar",
+        "angle": 0
+      }
+    ],
+    "effects": []
+  }
+}
