@@ -120,3 +120,8 @@ A `gunfight` cue stages an anonymous schematic shooter; existing cues do not
 identify the weapon or shooter, so the renderer does not attribute one to a
 named NPC. Co-located `killing` playback waits for the first visual shot. These
 poses, timing and muzzle effects never create shots, hits, casualties or time in Go.
+
+Staged city gunfire audio follows rendered muzzle beats. Queueing, skipped/muted
+playback and missed frames cannot replay a backlog of gunshots. Skip, expiry and
+scene teardown cancel the current shot tail. This audio lifecycle is independent
+of saved time and combat outcomes.

@@ -813,6 +813,9 @@ function App() {
                   place={w.locations.find(l => l.id === playing.target) || w.locations[0]}
                   onProgress={setBeat}
                   plate={cityView !== 'iso'}
+                  stagedGunfire={cityView === 'iso' && (playing.kind === 'gunfight' ||
+                    (playing.kind === 'killing' && !!w.last_result?.cues?.some(cue =>
+                      cue.kind === 'gunfight' && cue.target === playing.target)))}
                   onDone={() => setPlaying(null)}
                 />
               )}

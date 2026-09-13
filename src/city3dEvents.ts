@@ -61,14 +61,16 @@ export function casualtyFall(progress: number) {
   return {rotation: -angle, height: 0.2 + 0.4 * Math.sin(angle)};
 }
 
+export const GUNFIRE_SHOTS = [0.7, 1.05, 1.5, 1.9] as const;
+
 /** Three-second schematic gunfire sequence; no inferred target or damage. */
 export function gunfightPose(seconds: number) {
   const ease = (t: number) => { const x = Math.max(0, Math.min(1, t)); return x*x*(3-2*x); };
   const aim = ease((seconds - 0.1) / 0.45) * (1 - ease((seconds - 2.3) / 0.6));
-  const shots = [0.7, 1.05, 1.5, 1.9];
-  const age = Math.min(...shots.filter(at => at <= seconds).map(at => seconds - at));
+  const index = GUNFIRE_SHOTS.filter(at => at <= seconds).length;
+  const age = index ? seconds - GUNFIRE_SHOTS[index - 1] : Infinity;
   const recoil = Math.max(0, 1 - age / 0.16) * 0.14;
-  return {arm: -Math.PI / 2 * aim - recoil, flash: age < 0.065,
+  return {index, arm: -Math.PI / 2 * aim - recoil, flash: age < 0.065,
     smoke: age < 0.35 ? 1 - age / 0.35 : 0};
 }
 
@@ -76,4 +78,33 @@ export function gunfightPose(seconds: number) {
  * Repeated holds also cover a gun scene waiting for an available staging slot. */
 export function casualtySceneStart(since: number, now: number, gunSince?: number) {
   return gunSince !== undefined && now < gunSince + 700 ? now : since;
+}
+
+/** Sounds follow rendered muzzle pulses, with no future Web Audio schedule.
+ * A stalled/background frame consumes old beats without replaying a backlog. */
+export class GunfireAudio {
+  started = 0;
+  private consumed = 0;
+  private stop?: () => void;
+  private closed = false;
+  constructor(private fire: () => (() => void) | undefined) {}
+  update(seconds: number, enabled = true) {
+    if (this.closed) return;
+    if (!enabled) {
+      this.stop?.();
+      this.stop = undefined;
+    }
+    const pose = gunfightPose(seconds);
+    if (pose.index <= this.consumed) return;
+    this.consumed = pose.index;
+    if (!pose.flash || !enabled) return;
+    this.stop?.();
+    this.stop = this.fire();
+    if (this.stop) this.started++;
+  }
+  dispose() {
+    this.closed = true;
+    this.stop?.();
+    this.stop = undefined;
+  }
 }

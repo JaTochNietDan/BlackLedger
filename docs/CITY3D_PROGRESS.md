@@ -64,6 +64,42 @@ These are staged fixture saves, not earned campaign progress.
 
 ## Continue next
 
+### Staged gunshot audio follow-up
+
+City gunfire now drives sound from the rendered shot beat. Four muzzle pulses
+share one timing definition; each may start one cancellable Web Audio shot.
+Queued scenes make no requests, stalled/background frames consume missed beats
+without replaying a backlog, and muted frames stop any current tail and consume
+the beat silently. Skip, expiry, unmount and a world/life change dispose the
+handler. Graphics interruption stops current audio and disables further animated
+scene playback until reload. These cleanup paths do not modify Go state.
+
+The Theatre suppresses its older sound burst for a city gunfight and for a
+co-located killing whose gunfight is staged by the city. Other kinds still use
+their existing audio. Shot source/filter/gain nodes disconnect on natural end
+or cancellation. Audio allocation failure returns silently so it cannot kill the
+renderer's animation loop. Other scene sounds still need cancellation/timing
+review; this pass specifically covers staged gunfire.
+
+Evidence: 100 frontend tests, build and the HTTP package pass. Tests cover
+30/60/144 FPS beat counts, queue/skip/mute/unmute/frame stalls, idempotent disposal,
+and a mocked Web Audio graph's scheduling/disconnection and allocation failure.
+Logs: `.runtime/city3d-audio-tests.log`, `.runtime/city3d-build.log`, and
+`.runtime/city3d-audio-go.log`.
+
+Isolated browser replay on 8855 requested four shot sounds, then Skip cleared the
+scene. An early Skip after one shot left no effects after another 1.1 seconds.
+Sound Off replay retained the animated scene with zero shot-audio requests; the
+original Sound On preference was restored. All samples stayed revision 0 /
+minute 480. The diagnostics count sound handles started; audible output was not
+independently recorded, and broad browser/OS audio latency acceptance is pending.
+
+Next priorities remain the requested visual quality: richer street/block art,
+character surfaces and varied action/vehicle choreography, along with mobile,
+reduced-motion/context-recovery and prolonged resource acceptance. The production
+quality goal remains active.
+
+
 ### Gunfire choreography follow-up
 
 Gunfight cues now stage an anonymous articulated shooter with a locally authored

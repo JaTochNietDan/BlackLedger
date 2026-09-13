@@ -63,8 +63,36 @@ function shot(ctx: AudioContext, at: number, level = 0.5) {
   gain.gain.linearRampToValueAtTime(level, at + 0.004);
   gain.gain.exponentialRampToValueAtTime(0.0001, at + 0.22);
   source.connect(band).connect(gain).connect(ctx.destination);
+  let finished = false;
+  const cleanup = () => {
+    if (finished) return;
+    finished = true;
+    source.disconnect();
+    band.disconnect();
+    gain.disconnect();
+  };
+  source.onended = cleanup;
   source.start(at);
   source.stop(at + 0.32);
+  return () => {
+    if (finished) return;
+    try { source.stop(); } catch { /* already ended */ }
+    cleanup();
+  };
+}
+
+/** One visible city shot, cancellable on Skip, reduced motion or navigation. */
+export function playCityGunshot(): (() => void) | undefined {
+  if (!soundOn()) return;
+  const ctx = audio();
+  if (!ctx) return;
+  try {
+    if (ctx.state === 'suspended') ctx.resume().catch(() => {});
+    return shot(ctx, ctx.currentTime + 0.02, 0.4);
+  } catch {
+    // Sound failure must never interrupt the city animation loop.
+    return undefined;
+  }
 }
 
 // A blast: low, long, and with a body you feel rather than hear.

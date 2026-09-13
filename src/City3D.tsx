@@ -16,10 +16,11 @@ import {
 import type {Lot, Point} from './city3dPlan';
 import type {Journey} from './TravelPresentation';
 import './city3d.css';
-import {CityCueQueue, availableSceneSlot, casualtyFall, gunfightPose, casualtySceneStart} from './city3dEvents';
+import {CityCueQueue, availableSceneSlot, casualtyFall, gunfightPose, casualtySceneStart, GunfireAudio} from './city3dEvents';
 import type {SceneSlot} from './city3dEvents';
 import {StreetTraffic} from './city3dTraffic';
 import {pedestrianModel, isPedestrian} from './city3dCast';
+import {playCityGunshot, soundOn} from './sound';
 
 type Props = {
   state: Snapshot;
@@ -58,6 +59,7 @@ type Effect = {
   slot?: SceneSlot;
   gunArm?: THREE.Object3D;
   muzzle?: THREE.Object3D;
+  audio?: GunfireAudio;
 };
 const modelNames = [
   'tenement',
@@ -507,6 +509,7 @@ export function City3D(props: Props) {
       a.walking = isPedestrian(model) && start !== end;
     };
     const loader = new GLTFLoader();
+    let graphicsLost = false;
     let ready = false,
       revision = -1,
       worldID = '',
@@ -596,12 +599,13 @@ export function City3D(props: Props) {
       last = now;
       const p = latest.current,
         w = p.state,
-        motion = p.motion && !reduced.matches;
+        motion = p.motion && !reduced.matches && !graphicsLost;
       const playbackStarted = !!p.activeCue && lastActive !== p.activeCue.id;
-      if (lastActive && !p.activeCue) {
+      if ((lastActive && !p.activeCue) || worldID !== `${w.id}:${w.life}`) {
         for (const effect of effects) {
           scene.remove(effect.mesh, effect.light);
           if (effect.extra) scene.remove(effect.extra);
+          effect.audio?.dispose();
           effect.mesh.dispose();
           (effect.mesh.material as THREE.Material).dispose();
         }
@@ -720,7 +724,8 @@ export function City3D(props: Props) {
             mesh.visible = false;
             scene.add(extra);
           }
-          effects.push({cue, since: now, mesh, light, extra, gunArm, muzzle});
+          effects.push({cue, since: now, mesh, light, extra, gunArm, muzzle,
+            audio: cue.kind === 'gunfight' ? new GunfireAudio(playCityGunshot) : undefined});
           if (p.activeCue?.id === cue.id) focus.current(cue.target);
         }
         // Damage is a persistent scorch state, not evidence of a continuing fire.
@@ -942,6 +947,7 @@ export function City3D(props: Props) {
           if (t >= 1 || !motion) {
             scene.remove(e.mesh, e.light);
             if (e.extra) scene.remove(e.extra);
+            e.audio?.dispose();
             e.mesh.dispose();
             (e.mesh.material as THREE.Material).dispose();
             effects.splice(i, 1);
@@ -951,6 +957,7 @@ export function City3D(props: Props) {
           const blast = e.cue.kind === 'explosion';
           const shot = e.cue.kind === 'gunfight';
           const firing = gunfightPose(t * 3);
+          e.audio?.update(t * 3, soundOn());
           const muzzlePosition = new THREE.Vector3(at.x, 1.4, at.z);
           if (shot && e.gunArm && e.muzzle) {
             e.gunArm.rotation.x = firing.arm;
@@ -1064,6 +1071,7 @@ export function City3D(props: Props) {
             id: e.cue.id, kind: e.cue.kind, target: e.cue.target,
             staged: !e.extra || e.extra.visible, x: e.slot?.root.x, z: e.slot?.root.z,
             arm: e.gunArm?.rotation.x,
+            audioShots: e.audio?.started,
             fall: e.cue.kind === 'killing' ? e.extra?.rotation.z : undefined,
           })),
         });
@@ -1090,6 +1098,8 @@ export function City3D(props: Props) {
     frame = requestAnimationFrame(tick);
     const lost = (e: Event) => {
       e.preventDefault();
+      graphicsLost = true;
+      effects.forEach(effect => effect.audio?.dispose());
       setFailure('The graphics context was interrupted. Reload the city to restore it.');
     };
     canvas.addEventListener('webglcontextlost', lost);
@@ -1104,6 +1114,7 @@ export function City3D(props: Props) {
       canvas.removeEventListener('pointerup', pointerUp);
       canvas.removeEventListener('keydown', keys);
       canvas.removeEventListener('webglcontextlost', lost);
+      effects.forEach(effect => effect.audio?.dispose());
       disposeTree(scene);
       for (const m of models.values()) disposeTree(m);
       textures.forEach(t => t.dispose());

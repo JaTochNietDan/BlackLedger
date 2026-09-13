@@ -60,3 +60,33 @@ test('casualties wait for co-located gunfire, including a queued shooter',()=>{
  }
  assert.equal(casualtySceneStart(100,500),100);
 });
+test('audio follows visible pulses once, and disposal cancels the current tail',async()=>{
+ const {GunfireAudio}=await import('../.runtime/frontend-test/city3dEvents.js');
+ for(const fps of [30,60,144]){
+  let fired=0,stopped=0;
+  const audio=new GunfireAudio(()=>{fired++;return()=>stopped++;});
+  for(let f=0;f<=fps*3;f++)audio.update(f/fps);
+  assert.equal(fired,4);assert.equal(audio.started,4);assert.equal(stopped,3);
+  audio.dispose();audio.dispose();audio.update(4);assert.equal(stopped,4);assert.equal(fired,4);
+ }
+});
+test('queued, skipped, muted and missed gunfire does not play a backlog',async()=>{
+ const {GunfireAudio}=await import('../.runtime/frontend-test/city3dEvents.js');
+ let fired=0,muted=true;
+ const make=()=>new GunfireAudio(()=>{if(muted)return;fired++;return()=>{};});
+ const skipped=make();for(let f=0;f<100;f++)skipped.update(0);
+ skipped.dispose();skipped.update(.7);assert.equal(fired,0);
+ const audio=make();audio.update(.7);muted=false;audio.update(.73);assert.equal(fired,0);
+ audio.update(1.05);assert.equal(fired,1);
+ audio.update(2.5);audio.update(2.8);assert.equal(fired,1);
+ assert.equal(audio.started,1);audio.dispose();
+});
+
+test('muting stops a current tail and does not replay it on unmute',async()=>{
+ const {GunfireAudio}=await import('../.runtime/frontend-test/city3dEvents.js');
+ let stops=0,fired=0;
+ const audio=new GunfireAudio(()=>{fired++;return()=>stops++;});
+ audio.update(.7);audio.update(.71,false);assert.equal(stops,1);
+ audio.update(.72,true);assert.equal(fired,1);
+ audio.update(1.05,true);assert.equal(fired,2);audio.dispose();assert.equal(stops,2);
+});
