@@ -111,6 +111,7 @@ const modelNames = [
   'quay-section',
   'haulage',
   'police',
+  'police-officer',
   'streetside',
   'monarch',
   'bluehour',

@@ -64,6 +64,13 @@ These are staged fixture saves, not earned campaign progress.
 
 ## Continue next
 
+### Uniformed crime-scene officers — September 13
+
+- Added a Blender-authored `police-officer.glb` with woven navy uniform, peaked cap, brass cap/shield badges, breast pockets, epaulettes, duty belt, buckle, closed holster and utility pouch. The existing articulated cast rig is retained; uniform pigment is baked into its packed texture for reliable glTF export.
+- Persistent killing aftermath now adds two officers alongside its police car at the backend response deadline. Officers face the victim and reserve separate bays; placement waits if available space is occupied. Tests check all pairwise response reservations, replay suppression/cleanup, and actual exported officer bounds through 32 headings.
+- The 149-test frontend suite and build passed; the subsequently added actual-officer geometry test also passed. Fresh isolated 8861/save `.runtime/officers-20260913-171058-6418.sqlite3` was advanced by one hour-pass action to revision 1/minute 540. Browser inspection shows body at x80/z38.35, officers at x77 and x83/z38.35, car at x89.6/z42, all visible with no waiting. Sample: 145 FPS/8.5ms p95, 153 draws/530,981 triangles, no captured warnings/errors. Main save untouched.
+- Evidence: `uniformed-officers.png` and `.json`. This is stationary crime-scene attendance, not completion of multi-car raids, visible arrests, patrol travel, investigation/cleanup animation or final character art. Those requirements and the broader city/interior/fire/weapon work remain active.
+
 ### Interior camera cutaways and idle rendering — September 13
 
 - Split Saint Agnes's wall assemblies into authored Blender groups, retaining material batching within each wall. Camera-facing obstruction now hides the left/back wall assembly independently, including its framed decoration, while furniture remains in the room. Returning to the original angle restores the walls.

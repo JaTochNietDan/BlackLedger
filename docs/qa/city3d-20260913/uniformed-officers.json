@@ -1,0 +1,75 @@
+{
+  "presentation": {
+    "revision": 1,
+    "minute": 540,
+    "playbackRate": 1,
+    "headlightPools": 0,
+    "harbour": {
+      "visible": true,
+      "waterClock": 46.938300000000694
+    },
+    "followingPlayer": false,
+    "cutawayBuildings": [],
+    "weather": {
+      "kind": "fog",
+      "wet": 0.3,
+      "rainVisible": false,
+      "rainClock": 0
+    },
+    "camera": {
+      "zoom": 14.77459901371144,
+      "x": 260,
+      "z": -192,
+      "targetX": 80,
+      "targetZ": 48
+    },
+    "actors": [
+      {
+        "id": "player",
+        "model": "person",
+        "x": 80,
+        "z": 36.65,
+        "y": 0.2
+      }
+    ],
+    "waiting": [],
+    "aftermath": [
+      {
+        "id": "aftermath:d4309c64af0908de4af565af4e954ca1:mara:body",
+        "x": 80,
+        "z": 38.35,
+        "visible": true
+      },
+      {
+        "id": "aftermath:d4309c64af0908de4af565af4e954ca1:mara:police",
+        "x": 89.6,
+        "z": 42,
+        "visible": true
+      },
+      {
+        "id": "aftermath:d4309c64af0908de4af565af4e954ca1:mara:officer-a",
+        "x": 77,
+        "z": 38.35,
+        "visible": true
+      },
+      {
+        "id": "aftermath:d4309c64af0908de4af565af4e954ca1:mara:officer-b",
+        "x": 83,
+        "z": 38.35,
+        "visible": true
+      }
+    ],
+    "effects": []
+  },
+  "metrics": {
+    "fps": 145,
+    "p95ms": 8.5,
+    "drawCalls": 153,
+    "triangles": 530981,
+    "actors": 1,
+    "buildings": 28,
+    "geometries": 277,
+    "textures": 133
+  },
+  "logs": []
+}

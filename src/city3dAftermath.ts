@@ -26,23 +26,27 @@ export class CityAftermath {
     const desired=new Set<string>();
     for(const record of records) {
       if(minute<record.minute || minute>=record.cleanup_at)continue;
-      for(const kind of minute>=record.police_at ? ['body','police'] : ['body']) {
+      for(const kind of minute>=record.police_at ? ['body','police','officer-a','officer-b'] : ['body']) {
         const key=`aftermath:${record.id}:${kind}`;
         if(kind==='body' && animating.has(record.victim.id))continue;
         desired.add(key);
         if(this.entries.has(key))continue;
         const lot=lots.get(record.target); if(!lot)continue;
         const taken=[...occupied,...[...this.entries.values()].map(e=>e.slot)];
-        const slot=availableSceneSlot(lot,kind==='body'?'killing':'arrest',taken);if(!slot)continue;
-        const model=kind==='body'?modelFor(record.victim.id):'police';
+        const slot=availableSceneSlot(lot,kind==='police'?'arrest':'killing',taken);if(!slot)continue;
+        const model=kind==='body'?modelFor(record.victim.id):kind==='police'?'police':'police-officer';
         const source=models.get(model);if(!source)continue;
         const group=new THREE.Group(), object=source.clone(true);
         const owned=kind==='body'?dressPedestrian(object,model,wardrobe(record.victim.id)):[];
-        group.position.set(slot.root.x,kind==='body'?0:vehicleRootHeight(slot.root),slot.root.z);
+        group.position.set(slot.root.x,kind==='body'?0:kind==='police'?vehicleRootHeight(slot.root):.2,slot.root.z);
         if(kind==='body') {
           object.rotation.z=-Math.PI/2;object.position.y=.6;
           const pool=new THREE.Mesh(this.pool,this.blood);
           pool.rotation.x=-Math.PI/2;pool.position.set(1.1,.181,0);group.add(pool);
+        }
+        if(kind.startsWith('officer')) {
+          const body=this.entries.get(`aftermath:${record.id}:body`);
+          object.rotation.y=Math.atan2((body?.slot.root.x ?? lot.x)+.8-slot.root.x,(body?.slot.root.z ?? lot.z)-slot.root.z);
         }
         object.traverse(part=>{if(part instanceof THREE.Mesh){part.castShadow=true;part.receiveShadow=true;}});
         group.add(object);this.root.add(group);this.entries.set(key,{group,slot,owned});

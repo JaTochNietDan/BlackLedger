@@ -550,5 +550,21 @@
       ]
     ],
     "bytes": 1927664
+  },
+  "police-officer": {
+    "file": "police-officer.glb",
+    "bounds_blender": [
+      [
+        -0.38,
+        -0.255,
+        0.005
+      ],
+      [
+        0.38,
+        0.18,
+        1.895
+      ]
+    ],
+    "bytes": 359452
   }
 }

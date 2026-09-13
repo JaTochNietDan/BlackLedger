@@ -1260,6 +1260,42 @@ def saint_agnes_interior():
         elif ob.name.startswith(('back plaster','back walnut','back dado','panel inset','silvered back','mirror carved','mirror cornice')):
             ob.parent=walls['back']
 
+
+def police_officer():
+    person(False)
+    # A distinct uniform and peaked cap, retaining the articulated cast rig.
+    for name in ('headwear-fedora','headwear-cap','hair-receding'):
+        group=bpy.data.objects.get(name)
+        if group:
+            for child in list(group.children_recursive):bpy.data.objects.remove(child,do_unlink=True)
+            bpy.data.objects.remove(group,do_unlink=True)
+    serge=bpy.data.materials['wool suit'];serge.name='police woven navy serge'
+    # Bake the uniform pigment into the packed wool image for glTF fidelity.
+    shader=serge.node_tree.nodes['Principled BSDF']
+    image=shader.inputs['Base Color'].links[0].from_node.image
+    pixels=list(image.pixels)
+    for i in range(0,len(pixels),4):
+        pixels[i]*=.85;pixels[i+1]*=.95;pixels[i+2]*=1.25
+    image.pixels=pixels;image.pack()
+    navy=material('police cap navy',(.025,.04,.075))
+    brass=material('police badge brass',(.62,.43,.12),.8)
+    leather=material('police duty leather',(.018,.02,.018))
+    cylinder('uniform cap band',(0,0,1.8),.15,.07,navy,vertices=32)
+    cylinder('uniform cap crown',(0,0,1.86),.18,.07,navy,vertices=32)
+    peak=box('polished cap visor',(0,-.16,1.78),(.3,.19,.035),leather,.03)
+    cylinder('cap badge',(0,-.154,1.83),.034,.014,brass,(math.pi/2,0,0),16)
+    box('duty belt',(0,0,.96),(.435,.30,.075),leather,.015)
+    box('belt buckle',(0,-.159,.96),(.065,.018,.065),brass,.009)
+    box('closed leather holster',(.255,.02,.89),(.08,.14,.23),leather,.025)
+    box('utility pouch',(-.24,.03,.93),(.075,.15,.14),leather,.018)
+    for x in (-.13,.13):
+        box('uniform breast pocket',(x,-.18,1.26),(.11,.028,.13),navy,.008)
+        box('pocket flap',(x,-.197,1.31),(.12,.015,.04),navy,.006)
+    for z in (1.12,1.04):cylinder('brass tunic button',(0,-.162,z),.016,.014,brass,(math.pi/2,0,0),16)
+    cylinder('shield badge',(-.13,-.214,1.31),.038,.012,brass,(math.pi/2,0,0),6)
+    for side in (-1,1):
+        box('shoulder epaulette',(side*.23,0,1.405),(.10,.20,.026),navy,.01)
+
 manifest={}
 for i,(name,floors,w,d) in enumerate([('tenement',4,12,11),('tavern',2,12,12),('casino',2,13,11),('warehouse',1,13,12),('civic',3,13,12),('shop',3,12,11),('villa',2,11,11)]):
     clear()
@@ -1295,6 +1331,7 @@ for name in ('person','woman'):
         bpy.context.view_layer.update()
         motion_points.extend(ob.matrix_world @ Vector(c) for ob in bpy.context.scene.objects if ob.type=='MESH' for c in ob.bound_box)
     manifest[name]['motion_bounds_blender']=[[round(min(p[i] for p in motion_points),4) for i in range(3)],[round(max(p[i] for p in motion_points),4) for i in range(3)]]
+clear();police_officer();manifest['police-officer']=export('police-officer')
 clear();undertaker();manifest['undertaker']=export('undertaker')
 clear();revolver();manifest['revolver']=export('revolver')
 clear();blast_fragment();manifest['blast-fragment']=export('blast-fragment')
