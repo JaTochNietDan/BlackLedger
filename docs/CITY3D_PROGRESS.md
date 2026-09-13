@@ -64,6 +64,13 @@ These are staged fixture saves, not earned campaign progress.
 
 ## Continue next
 
+### Corrugated industrial roofing (2026-09-13)
+
+- Garage/dealer workshops and dock/haulage sheds now have closed corrugated roof meshes with real 7cm ridges, embedded 256px weathered zinc colour/normal textures, and physical-scale UVs. Workshop vents have flashing and rain caps. Roof parts join by material during Blender export, avoiding a draw per ridge.
+- Regeneration exposed a latent dealer recipe bug from articulated car pivots: translating both parents and children put display wheels outside the lot. The static display Ford now explicitly uses the non-articulated recipe. The failed footprint and blast-pavement tests prompted this correction; all 124 frontend tests and production build now pass. New checks inspect exported texture slots, ridge heights and local footprint; existing checks cover all building extents and route/event clearances.
+- Browser close inspection on isolated port 8847 shows the roof profiles and vents (`docs/qa/city3d-20260913/corrugated-workshop.png`). Local close-view sample: 145 FPS, 8ms p95, 167 draws, 426,896 triangles, three actors and 28 buildings. Four rebuilt assets add approximately 966KB combined and eight texture allocations; broader loading/device acceptance remains open. Metrics/log evidence is `corrugated-workshop-metrics.json`. No gameplay command was issued; main save untouched.
+- The city still needs stronger architectural variety, less empty paved frontage, more convincing streets and richer event choreography. These roof improvements do not establish the requested final art quality.
+
 ### Individual front-wheel steering (2026-09-13)
 
 - Inside and outside front wheels now use distinct Ackermann angles from the authored axle spacing and lateral pivots. The central steering limit is derived from the inside tyre's existing 0.5-radian limit, preserving the 2.35m moving clearance envelope. Parked wheels remain straight. This is presentation geometry; Go travel outcomes and timing are unchanged.

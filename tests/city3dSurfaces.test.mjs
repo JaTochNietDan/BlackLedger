@@ -189,3 +189,24 @@ test('rolling and steering front wheels remain inside the widened traffic envelo
   }
  }
 });
+
+test('industrial zinc roofs export textured corrugations within their building footprint',async()=>{
+ const {GLTFLoader}=await import('three/addons/loaders/GLTFLoader.js');const THREE=await import('three');
+ for(const name of ['garage','dealer','docks','haulage']){
+  const bytes=readFileSync(new URL(`../public/art/models/${name}.glb`,import.meta.url));
+  const jsonLength=bytes.readUInt32LE(12),json=JSON.parse(bytes.subarray(20,20+jsonLength).toString());
+  const zinc=json.materials.find(m=>m.name==='corrugated zinc');
+  assert.ok(zinc.pbrMetallicRoughness.baseColorTexture&&zinc.normalTexture,'embedded zinc colour and normal maps');
+  assert.ok(zinc.pbrMetallicRoughness.roughnessFactor>.6,'weathered zinc should not read as polished chrome');
+  const loader=new GLTFLoader();loader.register(parser=>({name:'roof-materials',loadMaterial(index){return Promise.resolve(new THREE.MeshBasicMaterial({name:parser.json.materials[index].name}));}}));
+  const model=(await loader.parseAsync(bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength),'')).scene;
+  model.updateMatrixWorld(true);const roofPoints=[];
+  model.traverse(o=>{if(o.isMesh&&o.material.name==='corrugated zinc'){
+   const position=o.geometry.attributes.position;
+   for(let i=0;i<position.count;i++){const v=new THREE.Vector3().fromBufferAttribute(position,i).applyMatrix4(o.matrixWorld);if(v.y>4.67&&v.y<5.43)roofPoints.push(v);}
+  }});
+  const height=name==='garage'||name==='dealer'?4.675:5.35;
+  for(const level of [0,.035,.07])assert.ok(roofPoints.some(v=>Math.abs(v.y-height-level)<1e-5),'real ridge and valley heights');
+  assert.ok(roofPoints.every(v=>Math.abs(v.x)<=7.21&&Math.abs(v.z)<=7.21),'roof geometry stays inside the plot');
+ }
+});

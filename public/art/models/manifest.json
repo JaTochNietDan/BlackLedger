@@ -138,10 +138,10 @@
       [
         7.2,
         7.2,
-        5.5
+        5.55
       ]
     ],
-    "bytes": 237896
+    "bytes": 517672
   },
   "dealer": {
     "file": "dealer.glb",
@@ -154,10 +154,10 @@
       [
         7.2,
         7.2,
-        5.5
+        5.55
       ]
     ],
-    "bytes": 359920
+    "bytes": 639692
   },
   "chapel": {
     "file": "chapel.glb",
@@ -189,7 +189,7 @@
         13.1315
       ]
     ],
-    "bytes": 199544
+    "bytes": 402980
   },
   "haulage": {
     "file": "haulage.glb",
@@ -202,10 +202,10 @@
       [
         5.82,
         6.7,
-        5.35
+        5.42
       ]
     ],
-    "bytes": 191144
+    "bytes": 394576
   },
   "monarch": {
     "file": "monarch.glb",

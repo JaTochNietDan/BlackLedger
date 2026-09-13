@@ -1,0 +1,14 @@
+{
+  "fixture": "Isolated 8847, expanded city focused on Russo Motor Works; three actors, no gameplay command",
+  "metrics": {
+    "fps": 145,
+    "p95ms": 8,
+    "drawCalls": 167,
+    "triangles": 426896,
+    "actors": 3,
+    "buildings": 28,
+    "geometries": 217,
+    "textures": 78
+  },
+  "logs": []
+}

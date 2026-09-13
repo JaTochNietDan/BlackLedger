@@ -504,10 +504,58 @@ def beam(name, a, b, width, mat):
     return ob
 
 
+def corrugated_roof(name, xyz, width, depth, mat):
+    # Closed zinc sheet profile with real ridges, physical-scale UVs and no
+    # independent mesh per rib. Joined with other zinc parts at export.
+    count=round(width/.25)*4
+    vertices=[]
+    for i in range(count+1):
+        x=-width/2+width*i/count
+        z=.035*(1-math.cos(i*math.pi/2))
+        vertices.extend([(x,-depth/2,z),(x,depth/2,z),(x,-depth/2,-.25),(x,depth/2,-.25)])
+    faces=[]
+    for i in range(count):
+        a=i*4;b=a+4
+        faces.extend([(a,b,b+1,a+1),(a+2,a+3,b+3,b+2),(a+2,b+2,b,a),(a+1,b+1,b+3,a+3)])
+    faces.extend([(0,1,3,2),(count*4+2,count*4+3,count*4+1,count*4)])
+    mesh=bpy.data.meshes.new(name);mesh.from_pydata(vertices,[],faces);mesh.update()
+    ob=bpy.data.objects.new(name,mesh);bpy.context.collection.objects.link(ob);ob.location=xyz
+    mesh.materials.append(mat);uv=mesh.uv_layers.new(name='UVMap')
+    for polygon in mesh.polygons:
+        for index in polygon.loop_indices:
+            co=mesh.vertices[mesh.loops[index].vertex_index].co
+            uv.data[index].uv=(co.x/2.5,co.y/2.5)
+    return ob
+
+
+def zinc_texture(mat):
+    # Tileable mottled galvanising and restrained oxidation; authored pixels
+    # survive glTF export without requiring procedural runtime shaders.
+    n=256;rng=random.Random(1956);pixels=[];normals=[]
+    for y in range(n):
+        for x in range(n):
+            mottling=math.sin(x*math.tau/32+math.sin(y*math.tau/64))*math.sin(y*math.tau/16+x*math.tau/64)
+            grain=rng.uniform(-.035,.035)
+            oxide=max(0,mottling-.50)*.35
+            tone=.86+.12*mottling+grain
+            pixels.extend((.34*tone+oxide*.20,.37*tone-oxide*.10,.36*tone-oxide*.19,1))
+            normals.extend((.5+grain,.5+grain*.5,1,1))
+    tree=mat.node_tree;shader=tree.nodes['Principled BSDF'];shader.inputs['Roughness'].default_value=.68
+    for suffix,data,normal in [('galvanised',pixels,False),('micro-normal',normals,True)]:
+        image=bpy.data.images.new('zinc-'+suffix,width=n,height=n)
+        if normal:image.colorspace_settings.name='Non-Color'
+        image.pixels=data;image.pack();tex=tree.nodes.new('ShaderNodeTexImage');tex.image=image
+        if normal:
+            node=tree.nodes.new('ShaderNodeNormalMap');node.inputs['Strength'].default_value=.35
+            tree.links.new(tex.outputs['Color'],node.inputs['Color']);tree.links.new(node.outputs['Normal'],shader.inputs['Normal'])
+        else:tree.links.new(tex.outputs['Color'],shader.inputs['Base Color'])
+
+
 def industrial(kind):
     stone=material('aged concrete',(.45,.43,.37))
     wall=material('industrial brick',(.41,.22,.14));brick(wall,8)
     roof=material('corrugated zinc',(.27,.30,.29),.45)
+    if kind in ('garage','dealer','docks','haulage'):zinc_texture(roof)
     iron=material('rusted steel',(.24,.18,.11),.55)
     glass=material('industrial glazing',(.18,.27,.28),.25)
     cream=material('cream enamel',(.76,.69,.52),.2)
@@ -535,10 +583,12 @@ def industrial(kind):
                 box('workshop glazing',(side*7.17,y,2.8),(.06,1.75,.95),glass)
         for x in (-4.5,0,4.5):
             box('back clerestory',(x,7.1,3.2),(3.6,.15,.85),glass)
-            cylinder('roof vent',(x,2,5),.35,1,iron)
+            cylinder('roof vent',(x,2,5),.35,1,iron,vertices=24)
+            cylinder('vent flashing',(x,2,4.72),.52,.08,roof,vertices=24)
+            cylinder('vent rain cap',(x,2,5.50),.50,.10,roof,vertices=24)
 
         box('workshop',(0,2,2.25),(14,10,4.5),wall)
-        box('workshop roof',(0,2,4.55),(14.4,10.4,.25),roof)
+        corrugated_roof('workshop corrugated roof',(0,2,4.675),14.4,10.4,roof)
         for x in (-4.5,0,4.5):
             box('garage bay',(x,-3.1,1.9),(3.6,.2,3.6),iron)
             for z in range(12):
@@ -546,7 +596,7 @@ def industrial(kind):
             box('bay windows',(x,-3.27,2.8),(3.2,.05,.6),glass)
         if kind=='dealer':
             before=set(bpy.context.scene.objects)
-            car('ford')
+            car('ford',articulated=False)
             for ob in set(bpy.context.scene.objects)-before: ob.location += Vector((-3,-6,0))
         return
     if kind=='chapel':
@@ -573,7 +623,7 @@ def industrial(kind):
     anchor.location=(-3,-3.6,4.25)
     # Dock and haulage yard: cargo shed plus a lattice derrick, fully inside lot.
     box('cargo shed',(-3,1.5,2.6),(7,10,5.2),wall)
-    box('cargo roof',(-3,1.5,5.25),(7.4,10.4,.2),roof)
+    corrugated_roof('cargo corrugated roof',(-3,1.5,5.35),7.4,10.4,roof)
     box('loading gate',(-3,-3.58,1.9),(4.5,.16,3.7),iron)
     for x,y in [(3,4),(5,4),(3,2),(5,2)]:
         box('shipping crate',(x,y,.65),(1.6,1.6,1.3),iron)
