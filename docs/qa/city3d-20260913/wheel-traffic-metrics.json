@@ -1,0 +1,11 @@
+{
+  "metrics": {
+    "fps": 145,
+    "p95ms": 7.7,
+    "drawCalls": 506,
+    "triangles": 537080,
+    "actors": 14,
+    "buildings": 28
+  },
+  "actors": 14
+}

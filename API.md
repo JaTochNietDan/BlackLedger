@@ -166,3 +166,7 @@ Rendered explosions now own their onset audio, even when a higher-gravity
 casualty supplies the caption. A same-address/minute explosion or gunfight
 suppresses that casualty's generic Theatre sound. Late or muted onsets are not
 replayed. No new causal or damage field is added to public cues.
+
+Vehicle wheel animation follows actual presentation distance, using the authored
+0.37m tyre radius. Placement, waiting and parked states do not advance roll.
+Wheel pivots and diagnostics do not change Go travel time or vehicle state.

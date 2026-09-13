@@ -64,6 +64,13 @@ These are staged fixture saves, not earned campaign progress.
 
 ## Continue next
 
+### Distance-driven vehicle wheels (2026-09-13)
+
+- Ford, Hudson, Packard and police models now have four separate wheel pivots, 32-sided tyres/whitewalls, valves and hub bolts. Wheel submeshes are joined by parent/material to retain animation without a draw per bolt. Static undertaker hearse generation explicitly retains its non-articulated form.
+- Wheel roll follows actual rendered distance at a 0.37m tyre radius. Queued/parked cars do not accumulate roll, initial placement does not imply travelled distance, and reduced-motion presentation does not animate wheels. Steering angle and suspension remain unfinished.
+- All 117 frontend tests and production build pass. Geometry tests rotate every exported wheel through a full turn, checking four pivots, material grouping, footprint and tyre contact; phase tests cover 30/60/144 FPS and waits. Browser drive on isolated port 8847 reached Ackerman & Son at revision 4/minute 782 in 5,034ms presentation time. Twenty-one straight sampled segments matched distance/radius phase to 1.8e-15 radians; parked phase remained zero on repeated reads. Evidence: `docs/qa/city3d-20260913/wheel-travel-samples.json` and `wheel-model-contact.png`.
+- Expanded port 8848 traffic fixture (14 actors, 28 buildings) sampled 145 FPS, 7.7ms p95, 506 draws, 537,080 triangles locally. Evidence: `wheel-traffic-metrics.json`. This does not establish broad hardware performance. The main save was untouched. Vehicle body polish, steering, suspension and wider city-quality acceptance remain open.
+
 ### Explosion audio under casualty captions (2026-09-13)
 
 - Rendered explosion effects now own one cancellable blast sound at their visible onset, independently of which cue wins the caption priority. A casualty caption suppresses its generic killing sound when the same address and minute already contain a rendered explosion or gunfight. This fixes the charge casualty replay previously producing generic shots while the city rendered an explosion.

@@ -21,7 +21,7 @@ import type {Journey} from './TravelPresentation';
 import './city3d.css';
 import {CityCueQueue, availableSceneSlot, casualtyFall, gunfightPose, casualtySceneStart, GunfireAudio, BlastAudio} from './city3dEvents';
 import type {SceneSlot} from './city3dEvents';
-import {StreetTraffic, trafficSize} from './city3dTraffic';
+import {StreetTraffic, trafficSize, advanceWheel} from './city3dTraffic';
 import {pedestrianModel, isPedestrian} from './city3dCast';
 import {playCityGunshot, playMoment, soundOn} from './sound';
 import {cameraCommand, screenPan} from './city3dControls';
@@ -52,6 +52,9 @@ type Actor = {
   phase: number;
   realSince: number;
   limbs: THREE.Object3D[];
+  wheels: THREE.Object3D[];
+  wheelPhase: number;
+  wheelPlaced: boolean;
   arrived?: boolean;
 };
 type Effect = {
@@ -497,7 +500,9 @@ export function City3D(props: Props) {
       if (!isPedestrian(model)) addVehicleShadow(object, model);
       scene.add(object);
       const limbs: THREE.Object3D[] = [];
+      const wheels: THREE.Object3D[] = [];
       object.traverse(o => {
+        if (o.name.startsWith('wheel-roll-')) wheels.push(o);
         if (o.name.startsWith('leg') || o.name.startsWith('arm') || o.name.startsWith('knee'))
           limbs.push(o);
       });
@@ -512,7 +517,7 @@ export function City3D(props: Props) {
         walking: false,
         phase: 0,
         realSince: 0,
-        limbs,
+        limbs, wheels, wheelPhase: 0, wheelPlaced: false,
       };
       actors.set(id, actor);
       return actor;
@@ -536,6 +541,7 @@ export function City3D(props: Props) {
       // Arrivals hide their outdoor actor; a later journey must show it again.
       a.object.visible = true;
       a.arrived = false;
+      a.wheelPlaced = false;
       a.points = points;
       a.start = start;
       a.end = end;
@@ -946,6 +952,11 @@ export function City3D(props: Props) {
           const moved = distance > 0.0001;
           if (a.walking && moved)
             a.phase = (a.phase + (distance / 1.15) * Math.PI * 2) % (Math.PI * 2);
+          if (a.wheels.length && a.wheelPlaced && motion && a.start !== a.end && moved) {
+            a.wheelPhase = advanceWheel(a.wheelPhase, distance);
+            for (const wheel of a.wheels) wheel.rotation.x = a.wheelPhase;
+          }
+          a.wheelPlaced = true;
           a.object.position.set(at.x, isPedestrian(a.model) ? pedestrianRootHeight(at) : vehicleRootHeight(at), at.z);
           a.object.rotation.y = at.heading;
           for (const limb of a.limbs) {
@@ -1149,6 +1160,7 @@ export function City3D(props: Props) {
               x: a.object.position.x,
               z: a.object.position.z,
               y: a.object.position.y,
+              wheelPhase: a.wheels.length ? a.wheelPhase : undefined,
             })),
           waiting: [...actors].filter(([, a]) => !a.arrived && !a.object.visible).map(([id]) => id),
           effects: effects.map(e => ({

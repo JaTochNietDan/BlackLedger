@@ -103,3 +103,14 @@ test('event reservations stop later arrivals and release them after playback',()
  for(let frame=0;frame<600;frame++)poses=traffic.update([walker],1/60);
  assert.ok(poses.get('npc').pose.x>15,'scene removal releases the waiting traveller');
 });
+
+test('wheel rotation advances by actual distance and is independent of frame rate',async()=>{
+ const {advanceWheel,WHEEL_RADIUS}=await import('../.runtime/frontend-test/city3dTraffic.js');
+ assert.ok(Math.abs(advanceWheel(0,2*Math.PI*WHEEL_RADIUS))<1e-12);
+ for(const fps of [30,60,144]){
+  let angle=0;
+  for(let frame=0;frame<fps*3;frame++)angle=advanceWheel(angle,11/fps);
+  assert.ok(Math.abs(angle-advanceWheel(0,33))<1e-10);
+  assert.equal(advanceWheel(angle,0),angle,'waiting traffic must not spin its wheels');
+ }
+});

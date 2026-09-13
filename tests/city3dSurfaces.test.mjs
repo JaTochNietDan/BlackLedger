@@ -146,3 +146,23 @@ test('exported blast fragments fit their rotated support envelope and remain off
   }
  }
 });
+
+test('all moving vehicle models retain four centred wheel pivots and tyre contact throughout rotation',async()=>{
+ const THREE=await import('three');const {GLTFLoader}=await import('three/addons/loaders/GLTFLoader.js');
+ for(const name of ['ford','hudson','packard','police']){
+  const bytes=readFileSync(new URL(`../public/art/models/${name}.glb`,import.meta.url));
+  const loader=new GLTFLoader();loader.register(parser=>({name:'wheel-geometry-materials',loadMaterial(index){return Promise.resolve(new THREE.MeshBasicMaterial({name:parser.json.materials[index].name}));}}));
+  const model=(await loader.parseAsync(bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength),'')).scene;
+  const wheels=[];model.traverse(o=>{if(o.name.startsWith('wheel-roll-'))wheels.push(o);});assert.equal(wheels.length,4);
+  assert.equal(new Set(wheels.map(w=>w.name)).size,4);
+  for(const wheel of wheels){assert.ok(Math.abs(wheel.position.y-.39)<1e-6);assert.ok(Math.abs(Math.abs(wheel.position.x)-.87)<1e-6);assert.equal(wheel.children.length,3,'rubber, whitewall and metal remain grouped per wheel');}
+  model.updateMatrixWorld(true);const rest=new THREE.Box3().setFromObject(model,true);
+  for(let frame=0;frame<64;frame++){
+   wheels.forEach(w=>w.rotation.x=frame*Math.PI/32);model.updateMatrixWorld(true);
+   const bounds=new THREE.Box3().setFromObject(model,true);
+   assert.ok(bounds.min.y>=.01999&&bounds.min.y<.022,'round tyres retain pavement contact at every roll angle');
+   assert.ok(bounds.min.x>=rest.min.x-1e-5&&bounds.max.x<=rest.max.x+1e-5);
+   assert.ok(bounds.min.z>=rest.min.z-1e-5&&bounds.max.z<=rest.max.z+1e-5);
+  }
+ }
+});

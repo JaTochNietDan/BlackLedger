@@ -141,3 +141,9 @@ export class StreetTraffic {
     );
   }
 }
+
+/** Wheel roll follows distance actually rendered, including traffic waits. */
+export const WHEEL_RADIUS = .37;
+export function advanceWheel(angle: number, distance: number) {
+  return (angle + Math.max(0, distance) / WHEEL_RADIUS) % (Math.PI * 2);
+}

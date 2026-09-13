@@ -93,8 +93,8 @@ def box(name, xyz, dims, mat, bevel=0):
     return ob
 
 
-def cylinder(name, xyz, radius, depth, mat, rotation=(0, 0, 0)):
-    bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=radius, depth=depth, location=xyz, rotation=rotation)
+def cylinder(name, xyz, radius, depth, mat, rotation=(0, 0, 0), vertices=12):
+    bpy.ops.mesh.primitive_cylinder_add(vertices=vertices, radius=radius, depth=depth, location=xyz, rotation=rotation)
     ob = bpy.context.object
     ob.name = name
     ob.data.materials.append(mat)
@@ -282,7 +282,7 @@ def building(kind, floors, width=12, depth=12, seed=0, palette=None, accent=None
                 box('door rib',(x,-depth/2-.25,.3+z*.35),(3.8,.08,.035),stone)
 
 
-def car(kind):
+def car(kind, articulated=True):
     length = {'ford':4.5,'hudson':4.9,'packard':5.6}[kind]
     color = {'ford':(.23,.31,.27),'hudson':(.30,.12,.09),'packard':(.08,.1,.12)}[kind]
     paint=material('enamel',color,.5)
@@ -300,10 +300,22 @@ def car(kind):
     for side in (-1,1):
         box('centre pillar',(side*.78,.15,1.22),(.065,.1,.5),chrome)
         box('chrome sill',(side*.91,0,.7),(.045,length*.85,.05),chrome)
-        for y in (-length*.29,length*.30):
-            cylinder('wheel',(side*.87,y,.39),.37,.22,rubber,(0,math.pi/2,0))
-            cylinder('whitewall',(side*1.0,y,.39),.29,.02,cream,(0,math.pi/2,0))
-            cylinder('hubcap',(side*1.015,y,.39),.18,.025,chrome,(0,math.pi/2,0))
+        for axle,y in enumerate((-length*.29,length*.30)):
+            before=set(bpy.context.scene.objects)
+            cylinder('wheel',(side*.87,y,.39),.37,.22,rubber,(0,math.pi/2,0),32 if articulated else 12)
+            cylinder('whitewall',(side*1.0,y,.39),.29,.02,cream,(0,math.pi/2,0),32 if articulated else 12)
+            cylinder('hubcap',(side*1.015,y,.39),.18,.025,chrome,(0,math.pi/2,0),32 if articulated else 12)
+            if articulated:
+                # Valve and wheel bolts provide visible rotation without exaggerated treads.
+                cylinder('tyre valve',(side*1.025,y+.22,.49),.014,.03,chrome,(0,math.pi/2,0))
+                for bolt in range(5):
+                    angle=bolt*math.tau/5
+                    cylinder('hub bolt',(side*1.031,y+.10*math.cos(angle),.39+.10*math.sin(angle)),.016,.014,chrome,(0,math.pi/2,0))
+                meshes=set(bpy.context.scene.objects)-before
+                pivot=bpy.data.objects.new('wheel-roll-'+('front' if axle==0 else 'rear')+('-left' if side<0 else '-right'),None)
+                bpy.context.collection.objects.link(pivot);pivot.location=(side*.87,y,.39)
+                for ob in meshes:
+                    ob.parent=pivot;ob.location-=pivot.location
         box('headlight',(side*.61,-length/2-.015,.77),(.32,.06,.22),lamp,.08)
         box('tail lamp',(side*.65,length/2,.75),(.18,.07,.16),red,.04)
     for y in (-length/2,length/2):
@@ -470,8 +482,9 @@ def export(name):
     # Join by material except animated limbs: a building becomes ~6 draws.
     groups={}
     for ob in list(bpy.context.scene.objects):
-        if ob.type=='MESH' and ob.parent is None and not ob.name.startswith(('leg','arm','shoe','clock-hand')):
-            groups.setdefault(ob.data.materials[0].name,[]).append(ob)
+        if ob.type=='MESH' and (ob.parent is None or ob.parent.name.startswith('wheel-roll-')) and not ob.name.startswith(('leg','arm','shoe','clock-hand')):
+            key=(ob.parent.name if ob.parent else '',ob.data.materials[0].name)
+            groups.setdefault(key,[]).append(ob)
     for obs in groups.values():
         bpy.ops.object.select_all(action='DESELECT')
         for ob in obs: ob.select_set(True)
@@ -684,7 +697,7 @@ def undertaker():
         for ob in set(bpy.context.scene.objects)-before:
             ob.location=hinge+rot.to_3x3()@(ob.location-hinge);ob.rotation_euler.z=angle
     before=set(bpy.context.scene.objects)
-    car('packard')
+    car('packard',articulated=False)
     black=bpy.data.materials['enamel']
     box('hearse coach body',(0,.72,1.36),(1.75,3.35,.75),black,.14)
     box('hearse coach roof',(0,.72,1.78),(1.82,3.45,.16),black,.10)
