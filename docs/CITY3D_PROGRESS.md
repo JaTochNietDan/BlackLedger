@@ -64,6 +64,12 @@ These are staged fixture saves, not earned campaign progress.
 
 ## Continue next
 
+### Follow the rendered player (2026-09-13)
+
+- “Find me” now toggles following of the actual rendered player/car instead of centering only the player's address. The camera keeps its offset, zoom and orbit while translating with the actor. Keyboard zoom/rotation and mouse orbit preserve following; manual pan/reset, touch interaction, building selection and explicit address/scene focus release it. The button exposes its pressed state and becomes “Stop following.”
+- All 134 frontend tests and production build pass. Browser verification on isolated 8857 drove The Mariner → Thorne & Sons, reaching revision 2/minute 1332 in 20,742ms presentation time. All 109 recorded samples retained following; camera target versus visible player position had zero measured x/z error. After reloading the final build, keyboard zoom/rotation and mouse orbit retained tracking, while keyboard pan and address focus released it.
+- Evidence: `docs/qa/city3d-20260913/player-camera-follow.json` and `player-camera-follow.png`. No captured browser warnings/errors; main save untouched. Touch release is implemented but not exercised on a physical touch device. NPC following, broader device acceptance and final city art/interaction quality remain unfinished.
+
 ### Night vehicle lamps and road pools (2026-09-13)
 
 - Night journey vehicles now illuminate their authored head/tail lamps and project two soft forward pools through one shared instanced draw. Lamp materials are private to each actor and released when it leaves the scene, so parked cars can switch off without changing other vehicles or source models. Paused public journeys retain lamps; parked cars and daylight traffic do not. Pool capacity grows with the actor count, releasing replaced instance buffers.

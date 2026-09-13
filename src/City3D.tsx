@@ -118,6 +118,9 @@ export function City3D(props: Props) {
   const controlsRef = useRef<OrbitControls | null>(null);
   const focus = useRef<(id?: string) => void>(() => {});
   const [expanded, setExpanded] = useState(false);
+  const [following, setFollowing] = useState(false);
+  const followPlayer = useRef(false);
+  const setFollow = (value: boolean) => { followPlayer.current = value; setFollowing(value); };
   const [status, setStatus] = useState('Loading Bellwether…');
   const [failure, setFailure] = useState('');
   const [fps, setFps] = useState('');
@@ -185,6 +188,7 @@ export function City3D(props: Props) {
       controls.update();
     };
     focus.current = id => {
+      setFollow(false);
       const lot = id ? lots.get(id) : undefined;
       if (!lot) {
         reset();
@@ -427,6 +431,7 @@ export function City3D(props: Props) {
     let hoveredAt = 0;
     let down = {x: 0, y: 0};
     const pointerDown = (e: PointerEvent) => {
+      if (e.button === 2 || e.pointerType === 'touch') setFollow(false);
       down = {x: e.clientX, y: e.clientY};
     };
     const pointerUp = (e: PointerEvent) => {
@@ -441,7 +446,7 @@ export function City3D(props: Props) {
       if (hits.length) {
         let ob: THREE.Object3D | null = hits[0].object;
         while (ob && !ob.userData.place) ob = ob.parent;
-        if (ob) latest.current.onSelect(ob.userData.place);
+        if (ob) { setFollow(false); latest.current.onSelect(ob.userData.place); }
       }
     };
     const pointerMove = (e: PointerEvent) => {
@@ -466,6 +471,7 @@ export function City3D(props: Props) {
       const command = cameraCommand(e);
       if (!command) return;
       e.preventDefault();
+      if (command === 'reset' || command.startsWith('pan-')) setFollow(false);
       if (command === 'zoom-in' || command === 'zoom-out') {
         camera.zoom = THREE.MathUtils.clamp(
           camera.zoom * (command === 'zoom-out' ? 0.9 : 1.1),
@@ -1199,6 +1205,13 @@ export function City3D(props: Props) {
       motionWas = motion;
       controls.enableDamping = motion;
       controls.update();
+      const followed = actors.get('player');
+      if (followPlayer.current && ready && followed?.object.visible) {
+        const dx = followed.object.position.x - controls.target.x;
+        const dz = followed.object.position.z - controls.target.z;
+        camera.position.x += dx; camera.position.z += dz;
+        controls.target.x += dx; controls.target.z += dz;
+      }
       // Keep pan within the city plus its waterfront margin.
       const before = controls.target.clone();
       controls.target.x = THREE.MathUtils.clamp(controls.target.x, -15, plan.width + 15);
@@ -1236,6 +1249,7 @@ export function City3D(props: Props) {
           minute: w.minute,
           playbackRate: playback.current,
           headlightPools: headlightPools.count,
+          followingPlayer: followPlayer.current,
           weather: {kind: w.sky?.kind || 'clear', wet: w.sky?.wet || 0, rainVisible: rainfall.visible, rainClock},
           camera: {zoom: camera.zoom, x: camera.position.x, z: camera.position.z,
             targetX: controls.target.x, targetZ: controls.target.z},
@@ -1361,7 +1375,8 @@ export function City3D(props: Props) {
             {expanded ? 'Return to game' : 'Expand city'}
           </button>
           <button onClick={() => focus.current()}>Whole city</button>
-          <button onClick={() => focus.current(props.state.player.location)}>Find me</button>
+          <button aria-pressed={following} title={following ? "Stop following your character" : "Follow your character or car"}
+            onClick={() => setFollow(!followPlayer.current)}>{following ? "Stop following" : "Find me"}</button>
           <button onClick={() => focus.current(props.selected)}>Focus address</button>
           <button
             onClick={() => setPlaybackRate(rate => (rate === 1 ? 4 : 1))}

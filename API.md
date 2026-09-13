@@ -204,3 +204,8 @@ At night, visible cars on public/presentation journeys illuminate their authored
 head/tail lamps and project soft pools ahead of the bumper. Paused journey traffic
 keeps its lights on; parked cars and daylight traffic do not. Pools are inexpensive
 ground projections, not dynamic shadow-casting lights or gameplay visibility rules.
+
+“Find me” toggles camera following of the rendered player character/car, including
+travel playback. It preserves zoom/orbit and changes no selected address or Go
+state. Manual pan/reset, touch manipulation, building selection and explicit
+address/scene focus release following. “Stop following” leaves the camera in place.
