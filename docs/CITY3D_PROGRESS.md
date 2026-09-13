@@ -64,6 +64,13 @@ These are staged fixture saves, not earned campaign progress.
 
 ## Continue next
 
+### Painted pedestrian crossings — September 13
+
+- Added paired crossing lines at junctions, centred on existing walking lanes and connecting raised pavement islands. The 6×5 grid gets 98 crossings/196 line segments; exterior sides without destination pavement are omitted. Crossing paint shares the existing instanced lane-marking draw and adds no texture or draw call.
+- All 143 frontend tests and production build pass. New geometry checks prove every painted corner is on the road surface, both crossing ends meet existing pavement within the city, there are no duplicate segments, and every interior junction has paired marks around all four walking lanes. Existing route/asset clearance tests also pass; bundle-size warning remains.
+- Isolated 8858 browser playtest walked Saint Agnes → The Mariner. Captured the player at x65.43938/z27.35 between the junction crossing lines, then arrival at revision 8/minute 645, progress 1, 28,116ms presentation time. Final three-actor view sampled 145 FPS / 7.4ms p95, 78 draws and 508,582 triangles, with no captured warnings/errors. Main save untouched.
+- Evidence: `docs/qa/city3d-20260913/pedestrian-crossing.png`, `crossing-markings.json`. Markings change no routing or right-of-way rules. Existing routes can also cross mid-block at their endpoints; broader pedestrian choreography, dense traffic acceptance and final city art quality remain unfinished.
+
 ### Quieter parcel and player markers — September 13
 
 - Replaced the large building-selection circle with muted brass parcel-corner marks, rendered in one eight-instance draw. The marks stay within the parcel pavement and no longer cut across the architectural silhouette as a broad loop.

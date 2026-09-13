@@ -238,3 +238,7 @@ an existing pedestrian even when its base model remains the same.
 City selection uses parcel-corner marks. The player's ground marker adapts to
 zoom, vehicle size and heading; it represents presentation location only and
 changes no selection, collision envelope or simulation state.
+
+Junction crossing markings align with existing pedestrian lanes and connect
+pavement islands. They are visual road paint, without new traffic signals,
+right-of-way rules or simulation effects.

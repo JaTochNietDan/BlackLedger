@@ -1,0 +1,68 @@
+{
+  "moving": {
+    "revision": 8,
+    "minute": 645,
+    "playbackRate": 1,
+    "headlightPools": 0,
+    "followingPlayer": true,
+    "cutawayBuildings": [
+      "precinct"
+    ],
+    "weather": {
+      "kind": "rain",
+      "wet": 1,
+      "rainVisible": true,
+      "rainClock": 135.00969999999222
+    },
+    "camera": {
+      "zoom": 11.100374916387254,
+      "x": 245.43937999999972,
+      "z": -212.65000000000018,
+      "targetX": 65.43937999999974,
+      "targetZ": 27.35
+    },
+    "actors": [
+      {
+        "id": "person-9",
+        "model": "person",
+        "x": 55.662237142857265,
+        "z": -4.65,
+        "y": 0.2649992087072265
+      },
+      {
+        "id": "person-12",
+        "model": "woman",
+        "x": 149.59776285714509,
+        "z": 36.65,
+        "y": 0.26499920870722843
+      },
+      {
+        "id": "player",
+        "model": "person",
+        "x": 65.43937999999974,
+        "z": 27.35,
+        "y": -0.005002022034388015
+      }
+    ],
+    "waiting": [],
+    "effects": []
+  },
+  "arrival": {
+    "revision": 8,
+    "minute": 645,
+    "progress": 1,
+    "elapsedMs": 28116,
+    "reducedMotion": false
+  },
+  "metrics": {
+    "fps": 145,
+    "p95ms": 7.4,
+    "drawCalls": 78,
+    "triangles": 508582,
+    "actors": 3,
+    "buildings": 28,
+    "geometries": 228,
+    "textures": 125
+  },
+  "logs": []
+}

@@ -11,6 +11,7 @@ import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import type {Snapshot, VisualCue} from './types';
 import {
   cityPlan,
+  crossingPaint,
   entrance,
   route,
   PITCH,
@@ -302,6 +303,7 @@ export function City3D(props: Props) {
     for (let r = 0; r <= plan.rows; r++)
       for (let x = 7; x < plan.width; x += 8)
         if (x % PITCH > 6 && x % PITCH < PITCH - 6) stripe(x, r * PITCH, 3, 0.16);
+    for (const mark of crossingPaint(plan.cols, plan.rows)) stripe(mark.x, mark.z, mark.width, mark.depth);
     const lines = new THREE.InstancedMesh(geo, stripeMat, stripes.length);
     stripes.forEach((m, i) => lines.setMatrixAt(i, m));
     scene.add(lines);

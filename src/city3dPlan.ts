@@ -8,6 +8,19 @@ export const STREET_WIDTH = 8;
 export const FOOTWAY = 4.65;
 export const LANE = 1.6;
 export const MODEL_LIMIT = 17;
+/** Paired crossing lines between existing pavement islands, aligned to walking lanes. */
+export function crossingPaint(cols: number, rows: number) {
+  const paint: {x: number; z: number; width: number; depth: number}[] = [];
+  for (let col = 0; col <= cols; col++) for (let row = 0; row <= rows; row++) {
+    for (const side of [-1, 1]) {
+      if (col > 0 && col < cols && row + (side < 0 ? -1 : 0) >= 0 && row + (side > 0 ? 1 : 0) <= rows)
+        for (const edge of [-.55, .55]) paint.push({x: col * PITCH, z: row * PITCH + side * FOOTWAY + edge, width: STREET_WIDTH - .2, depth: .11});
+      if (row > 0 && row < rows && col + (side < 0 ? -1 : 0) >= 0 && col + (side > 0 ? 1 : 0) <= cols)
+        for (const edge of [-.55, .55]) paint.push({x: col * PITCH + side * FOOTWAY + edge, z: row * PITCH, width: .11, depth: STREET_WIDTH - .2});
+    }
+  }
+  return paint;
+}
 export function surfaceHeight(at: Point) {
   const toGrid = (value: number) => Math.abs(value - Math.round(value / PITCH) * PITCH);
   return Math.min(toGrid(at.x), toGrid(at.z)) <= STREET_WIDTH / 2 ? -0.1 : 0.17;
