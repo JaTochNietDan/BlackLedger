@@ -1,6 +1,6 @@
 # Bellwether realtime models
 
-All 19 GLB files are authored locally in Blender by `tools/export_city3d.py`.
+All 23 GLB files are authored locally in Blender by `tools/export_city3d.py`.
 No purchased asset packs or assets from Afterlight are used. The generator is
 the editable source; run `.venv-blender/bin/python tools/export_city3d.py` to
 rebuild. Blender 5.2.1 LTS (`bpy`) was used for this revision.
@@ -26,6 +26,10 @@ Clock hands remain separate nodes so the browser can show saved game time.
 Rear fire escapes leave the main entrances and signs unobstructed.
 The bench, bin and hydrant set is instanced by material along a separate rear
 pavement band. Tests check its actual bounds against buildings and all routes.
+Four venue variants give The Monarch, Blue Hour, Golden Lily and Paper Moon
+separate proportions, brick palettes and neon accents. Their marquee anchors
+fit the address signs to the canopy fascia. They share the same physical scale
+and reserved parcel envelope as the other buildings.
 
 This is the first realtime asset set, not final visual acceptance. More facade
 variety, convincing worn surfaces, better pedestrian anatomy/wardrobe, denser

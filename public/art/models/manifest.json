@@ -45,7 +45,7 @@
         8.825
       ]
     ],
-    "bytes": 432772
+    "bytes": 424412
   },
   "warehouse": {
     "file": "warehouse.glb",
@@ -206,6 +206,70 @@
       ]
     ],
     "bytes": 191144
+  },
+  "monarch": {
+    "file": "monarch.glb",
+    "bounds_blender": [
+      [
+        -6.825,
+        -7.0,
+        0.0
+      ],
+      [
+        6.825,
+        7.61,
+        11.975
+      ]
+    ],
+    "bytes": 510360
+  },
+  "bluehour": {
+    "file": "bluehour.glb",
+    "bounds_blender": [
+      [
+        -6.325,
+        -6.325,
+        0.0
+      ],
+      [
+        6.325,
+        8.11,
+        8.825
+      ]
+    ],
+    "bytes": 407588
+  },
+  "goldenlily": {
+    "file": "goldenlily.glb",
+    "bounds_blender": [
+      [
+        -5.325,
+        -7.5,
+        0.0
+      ],
+      [
+        5.325,
+        8.11,
+        11.975
+      ]
+    ],
+    "bytes": 457640
+  },
+  "papermoon": {
+    "file": "papermoon.glb",
+    "bounds_blender": [
+      [
+        -7.325,
+        -5.325,
+        -0.31
+      ],
+      [
+        7.325,
+        7.11,
+        5.675
+      ]
+    ],
+    "bytes": 357032
   },
   "ford": {
     "file": "ford.glb",

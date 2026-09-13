@@ -105,9 +105,9 @@ def clear():
     bpy.ops.wm.read_factory_settings(use_empty=True)
 
 
-def building(kind, floors, width=12, depth=12, seed=0):
+def building(kind, floors, width=12, depth=12, seed=0, palette=None, accent=None):
     palettes = [(0.43,.23,.15), (.51,.46,.35), (.31,.33,.26), (.37,.21,.18)]
-    wall = material('weathered masonry', palettes[seed % 4]); brick(wall, seed)
+    wall = material('weathered masonry', palette or palettes[seed % 4]); brick(wall, seed)
     stone = material('limestone', (.59,.55,.45))
     dark = material('tar roof', (.13,.14,.13))
     glass = material('smoked glass', (.12,.19,.21), .25)
@@ -178,11 +178,16 @@ def building(kind, floors, width=12, depth=12, seed=0):
         for x in (1.1,2.9):
             box('tank legs',(x,-2,height+.75),(.16,1.5,1.5),iron)
     if kind == 'casino':
+        for ob in list(bpy.context.scene.objects):
+            if ob.name.startswith(('skylight','tank','water tank')):
+                bpy.data.objects.remove(ob,do_unlink=True)
+        anchor.location=(0,depth/2+2.14,3.3)
+        anchor.scale=(1,1,.45)
         box('marquee',(0,depth/2+1,3.2),(9,2,.55),stone,.1)
         for i in range(16):
-            box('marquee bulb',(-4+i*.53,depth/2+2.05,3.15),(.16,.12,.16),warm)
+            box('marquee bulb',(-4+i*.53,depth/2+2.05,2.88),(.16,.12,.16),warm)
         brass=material('aged marquee brass',(.52,.37,.15),.65)
-        neon=material('ruby neon',(.8,.025,.018),0,1.8)
+        neon=material('neon tubing',accent or (.8,.025,.018),0,1.8)
         for side in (-1,1):
             for fin in range(3):
                 x=side*(width/2-.25-fin*.32)
@@ -464,6 +469,14 @@ for i,(name,floors,w,d) in enumerate([('tenement',4,12,11),('tavern',2,12,12),('
     manifest[name]=export(name)
 for name in ('filling','garage','dealer','chapel','docks','haulage'):
     clear();industrial(name);manifest[name]=export(name)
+for name,floors,width,depth,seed,palette,accent in [
+    ('monarch',3,13,11,31,(.52,.44,.30),(.95,.40,.06)),
+    ('bluehour',2,12,12,32,(.24,.30,.34),(.08,.5,.8)),
+    ('goldenlily',3,10,12,33,(.26,.34,.25),(.55,.75,.14)),
+    ('papermoon',1,14,10,34,(.42,.25,.27),(.85,.18,.35)),
+]:
+    clear();building('casino',floors,width,depth,seed,palette,accent)
+    manifest[name]=export(name)
 for name in ('ford','hudson','packard'):
     clear();car(name);manifest[name]=export(name)
 clear();car('ford')

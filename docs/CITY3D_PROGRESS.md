@@ -64,6 +64,21 @@ These are staged fixture saves, not earned campaign progress.
 
 ## Continue next
 
+### Individual venue follow-up
+
+Four new Blender exports replace the shared casino model at The Monarch, Blue
+Hour, Golden Lily and Paper Moon. They vary height, width, depth, textured brick
+palette and neon colour while retaining the district's Art Deco vocabulary.
+Marquee anchors place the names on the front fascia; bulbs hang beneath it.
+Rooftop utilities that conflicted with the stepped crowns were removed.
+
+The asset set now contains 23 GLBs. All 81 frontend tests and the production
+build pass; footprint and route tests include the new exports. Browser day/night
+comparisons are `venues-day.png` and `venues-night.png`. The inspected night
+view measured 145 FPS / 7.6ms p95, 223 draws and 118,170 triangles. Repeated
+shops, tenements and industrial sheds remain visually repetitive; street layout,
+surface wear, pedestrian quality and action choreography still need improvement.
+
 ### Multi-way junction follow-up
 
 A four-way test exposed a real deadlock: all four cars stopped at progress

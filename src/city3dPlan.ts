@@ -32,8 +32,10 @@ export function cityPlan(places: Pick<Place, 'id' | 'x' | 'y' | 'type'>[]) {
       estate: 'villa',
       market: 'warehouse',
       tailor: 'shop',
-      burlesque: 'casino',
-      goldenlily: 'casino',
+      club: 'monarch',
+      casino: 'bluehour',
+      burlesque: 'papermoon',
+      goldenlily: 'goldenlily',
     };
     const model =
       specialized[p.id] ||

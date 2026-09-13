@@ -71,6 +71,10 @@ const modelNames = [
   'haulage',
   'police',
   'streetside',
+  'monarch',
+  'bluehour',
+  'goldenlily',
+  'papermoon',
 ];
 const carModel = (name = '') =>
   /packard/i.test(name) ? 'packard' : /hudson/i.test(name) ? 'hudson' : 'ford';
