@@ -1,0 +1,33 @@
+{
+  "before": {
+    "effects": [
+      {
+        "id": "be622532bd1a4986a3834e26d681e26f",
+        "kind": "killing",
+        "target": "bar",
+        "staged": true,
+        "x": 77,
+        "z": 38.35,
+        "fall": -0.9634217471008698
+      }
+    ],
+    "spoilers": [],
+    "label": "Scene at Saint Agnes"
+  },
+  "after": {
+    "effects": [],
+    "spoilers": [
+      "outcome-band empty",
+      "headline-notice",
+      "theatre-caption",
+      "theatre-cast",
+      "theatre-paper"
+    ]
+  },
+  "replayHidden": 0,
+  "skipped": {
+    "effects": [],
+    "news": 1
+  },
+  "logs": []
+}

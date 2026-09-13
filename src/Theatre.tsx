@@ -33,8 +33,10 @@ export function Theatre({
   onProgress,
   plate = true,
   stagedAudio = false,
+  finished,
 }: {
   cue: VisualCue;
+  finished?: boolean;
   place: Place;
   onDone: () => void;
   // Whether to show the painted plate for this kind of moment. In the city
@@ -49,7 +51,8 @@ export function Theatre({
   onProgress?: (t: number) => void;
 }) {
   const [t, setT] = useState(0);
-  const [paper, setPaper] = useState(false);
+  const [timedPaper, setPaper] = useState(false);
+  const paper = finished ?? timedPaper;
   // The plate is a backdrop, not a dependency: a kind nobody has painted yet
   // still plays, on the drawn building.
   const [painted, setPainted] = useState(false);
@@ -75,6 +78,8 @@ export function Theatre({
   }, [cue.id, stagedAudio]);
 
   useEffect(() => {
+    if (finished !== undefined) return;
+    setT(0);setPaper(false);
     if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
       setPaper(true);
       onProgress?.(1);
@@ -98,11 +103,11 @@ export function Theatre({
       className={plate ? 'theatre' : 'theatre theatre-city'}
       ref={band}
       role="status"
-      aria-label={cue.caption}
+      aria-label={paper ? cue.caption : `Scene at ${place.name}`}
     >
       <div className="theatre-where">
         <span className="eyebrow">
-          {cue.kind === 'arrest' ? 'YOU WERE TAKEN TO' : 'IT HAPPENED AT'}
+          {paper ? 'IT HAPPENED AT' : 'IN PROGRESS AT'}
         </span>
         <b>{place.name}</b>
       </div>
@@ -111,8 +116,8 @@ export function Theatre({
       {plate && painted && (
         <div className="theatre-plate" style={{backgroundImage: `url(${scenePlate(cue.kind)})`}} />
       )}
-      <p className="theatre-caption">{cue.caption}</p>
-      {!!cue.actors?.length && (
+      {paper && <p className="theatre-caption">{cue.caption}</p>}
+      {paper && !!cue.actors?.length && (
         <div className="theatre-cast">
           {/* The core names who was in it. A scene about somebody that cannot show
           them is a scene about nobody. */}

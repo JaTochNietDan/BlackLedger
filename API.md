@@ -264,3 +264,7 @@ Saint Agnes uses a locally authored GLB interior on entry. Public occupants popu
 Arrest cues may include `detainee: {id, name}`. This is distinct from `actors`, which can identify the arresting detective. Player confinement explicitly identifies `player` as detainee. The renderer must not infer a prisoner from an actor when the field is absent. Raid presentation expands one public cue to three police vehicles and four uniformed officers; arrest presentation uses two vehicles, two officers and the explicit detainee when present. Supporting cast IDs are local presentation identities, not new public events. Arrival, escort and door-entry choreography remain unfinished.
 
 City and 3D interior canvases accept WASD and arrow-key panning with Q/E orbit; browser-modified shortcuts and IME input retain their normal behavior.
+
+## Scene-first result reveal
+
+During active 3D playback the result strip, unread headline banner and theatre caption/cast/headline remain hidden. The theatre announces only the scene location. The renderer signals completion after its staged effect batch has finished, including any placement waits; results then become visible. Explicit Skip or navigation away ends playback and releases the reveal gate. This does not defer the backend commit or alter its outcome.

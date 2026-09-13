@@ -115,6 +115,8 @@ function App() {
   // How far through the moment the camera is holding on. Driven by the theatre,
   // read by the street, which lights the building while it happens.
   const [beat, setBeat] = useState(0);
+  const [finishedCue, setFinishedCue] = useState('');
+  const scenePending = !!playing && finishedCue !== playing.id;
   const scene = useRef<HTMLElement | null>(null),
     latest = useRef(world),
     busyRef = useRef(false);
@@ -279,6 +281,7 @@ function App() {
         : undefined;
       if (worst && !next.event && motionRef.current) {
         setBeat(0);
+        setFinishedCue('');
         setPlaying(worst);
         setCityView('iso');
         setTab('city');
@@ -710,6 +713,7 @@ function App() {
       const sceneOverlay = playing && !journey && (
         <Theatre
           cue={playing}
+          finished={cityView==='iso' ? finishedCue===playing.id : undefined}
           place={w.locations.find(l => l.id === playing.target) || w.locations[0]}
           onProgress={setBeat}
           plate={cityView !== 'iso'}
@@ -794,7 +798,7 @@ function App() {
                 )}
               </div>
             </header>
-            {unreadNews > 0 && !!w.newspaper?.length && (
+            {!scenePending && unreadNews > 0 && !!w.newspaper?.length && (
               <section className="headline-notice" role="status" aria-label="Latest news">
                 <small>THE BELLWETHER HERALD · DAY {headline.day}</small>
                 <strong>{headline.headline}</strong>
@@ -865,6 +869,7 @@ function App() {
                   state={w}
                   overlay={sceneOverlay || journeyOverlay}
                   activeCue={journey ? null : playing}
+                  onSceneDone={setFinishedCue}
                   onJourneyDone={() => setJourney(null)}
                   selected={selected}
                   onSelect={setSelected}
@@ -890,6 +895,7 @@ function App() {
                     setCityView('iso');
                     setSelected(cue.target);
                     setBeat(0);
+                    setFinishedCue('');
                     setPlaying(cue);
                   }
                 }}
@@ -1154,7 +1160,7 @@ function App() {
               aria-label={
                 id === 'news' && unreadNews > 0 ? `${label}, ${unreadNews} unread` : label
               }
-              onClick={() => setTab(id)}
+              onClick={() => {setPlaying(null);setTab(id);}}
             >
               <Icon id={id} />
               {label}
@@ -1197,7 +1203,7 @@ function App() {
               </div>
             </div>
           </header>
-          <Outcome world={world} onLedger={() => setTab('ledger')} />
+          {!scenePending && <Outcome world={world} onLedger={() => setTab('ledger')} />}
           {content()}
         </main>
       </div>

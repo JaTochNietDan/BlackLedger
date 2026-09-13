@@ -64,6 +64,12 @@ These are staged fixture saves, not earned campaign progress.
 
 ## Continue next
 
+### Reveal results after the rendered scene — September 13
+
+- Replaced the 3D theatre's independent reveal timer with a renderer completion callback. The result strip, unread headline, outcome caption, cast and scene headline now wait until the complete staged effect batch has finished. While waiting, the accessible scene label names only its location. Replay resets the reveal gate; Skip/navigation ends playback and releases it.
+- Production build passes. Fresh isolated port 8862/killing fixture browser evidence: at 500ms a casualty effect was staged and all five spoiler-bearing panels were absent. Once effects were empty, the result strip, headline, caption, cast and scene paper appeared. Replaying the same cue hid spoilers again; Skip cleared effects and restored the headline. Browser logs were clear. Evidence: `news-timing.json`. This verifies scene timing through the actual UI, not a timer-only unit test.
+- Re-read the latest objective at `/Users/jatochnietdan/.codex/attachments/4a3692d6-f725-4a26-b1a0-9d3131b50b49/goal-objective.md`; it adds layered contextual voices and vehicle/action sound. Those audio assets/timelines, full police choreography, drive-bys, persistent building fire/brigade response, remaining interiors and final visual quality remain unfinished. No main-save access or mutation.
+
 ### Expanded police cast and WASD — September 13
 
 - Raid cues now stage three cars and four uniformed officers; arrest cues stage two cars, two officers and an explicitly identified detainee. The detainee's arms move behind their back. Supporting actors use the existing spacing/reservation, cutaway and camera-envelope paths. This is still a short staged tableau; arrivals, escort, handcuff contact, search and door-entry choreography remain unfinished.

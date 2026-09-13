@@ -49,6 +49,7 @@ type Props = {
   busy: boolean;
   activeCue: VisualCue | null;
   onJourneyDone: () => void;
+  onSceneDone?: (id: string) => void;
 };
 type Actor = {
   object: THREE.Group;
@@ -408,6 +409,7 @@ export function City3D(props: Props) {
     const cutawayWindow = new THREE.Vector3();
     const actors = new Map<string, Actor>();
     const effects: Effect[] = [];
+    let completedScene = "";
     const aftermath = new CityAftermath();
     scene.add(aftermath.root);
     const disposeDebris = (effect: Effect) => {
@@ -1343,6 +1345,10 @@ export function City3D(props: Props) {
             e.light.position.y = (e.extra?.position.y ?? 0.2) + 1.76;
           }
         }
+      }
+      if (!p.activeCue) completedScene = '';
+      if (ready && p.activeCue && effects.length===0 && completedScene!==p.activeCue.id) {
+        completedScene=p.activeCue.id;p.onSceneDone?.(p.activeCue.id);
       }
       if (ready) lastActive = p.activeCue?.id || null;
       motionWas = motion;
