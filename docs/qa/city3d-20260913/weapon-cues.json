@@ -1,0 +1,40 @@
+{
+  "revision": 0,
+  "minute": 480,
+  "arms": {
+    "armour": "Just a coat",
+    "charges": 0,
+    "weapon": "A pump shotgun"
+  },
+  "cues": [
+    {
+      "id": "be28157602bec36a508ec6a9d2e0646e",
+      "kind": "killing",
+      "target": "bar",
+      "caption": "Mara Bell at Saint Agnes. At Saint Agnes, before the streets were properly awake: Mara Bell was shot with a pump shotgun.",
+      "headline": "MARA BELL FOUND DEAD",
+      "actors": [
+        {
+          "id": "mara",
+          "name": "Mara Bell"
+        }
+      ],
+      "gravity": 9,
+      "minute": 480
+    },
+    {
+      "attacker": {
+        "id": "player",
+        "name": "Alex Varga",
+        "weapon": 2
+      },
+      "id": "3a8c7da98b8c67e3a5f78f76376d244d",
+      "kind": "gunfight",
+      "target": "bar",
+      "caption": "Mara Bell was killed at Saint Agnes.",
+      "actors": [],
+      "gravity": 7,
+      "minute": 480
+    }
+  ]
+}

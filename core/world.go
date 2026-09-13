@@ -443,12 +443,20 @@ type CueActor struct {
 	Name string `json:"name"`
 }
 
+// CueAttacker captures equipment at the event, rather than at a later replay.
+type CueAttacker struct {
+	ID     string `json:"id"`
+	Name   string `json:"name"`
+	Weapon int    `json:"weapon"`
+}
+
 type VisualCue struct {
-	Detainee *CueActor `json:"detainee,omitempty"`
-	ID       string    `json:"id"`
-	Kind     string    `json:"kind"`
-	Target   string    `json:"target"`
-	Caption  string    `json:"caption"`
+	Attacker *CueAttacker `json:"attacker,omitempty"`
+	Detainee *CueActor    `json:"detainee,omitempty"`
+	ID       string       `json:"id"`
+	Kind     string       `json:"kind"`
+	Target   string       `json:"target"`
+	Caption  string       `json:"caption"`
 	// Headline is what the Herald carries about it, so the paper can arrive
 	// after the scene rather than instead of it.
 	Headline string `json:"headline,omitempty"`

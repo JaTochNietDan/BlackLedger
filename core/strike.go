@@ -136,11 +136,8 @@ func (w *World) Strike(id string, hand Hand) error {
 // finishThem is an attempt that works.
 func (w *World) finishThem(n *NPC, hand Hand, where string, crowd int, family *Faction) {
 	name := n.Name
-	var killer *NPC
-	if hand.Crew && len(w.Player.Crew) > 0 {
-		killer = w.NPC(w.Player.Crew[0].ID)
-	}
-	w.KillBy(n.ID, killer, "")
+	attacker := w.strikeAttacker(hand)
+	w.Kill(n.ID, w.strikeManner(n, attacker.Weapon))
 	heat := StrikeQuiet
 	if crowd > 0 {
 		heat = StrikeHeat
@@ -152,7 +149,14 @@ func (w *World) finishThem(n *NPC, hand Hand, where string, crowd int, family *F
 	if !hand.Crew {
 		w.Player.Respect += StrikeRespect
 	}
-	w.Witness("gunfight", n.Location, name+" was killed at "+where+".", "")
+	kind := "gunfight"
+	if attacker.Weapon == 0 {
+		kind = "attack"
+	}
+	w.Witness(kind, n.Location, name+" was killed at "+where+".", "")
+	if len(w.VisualCues) > 0 {
+		w.VisualCues[len(w.VisualCues)-1].Attacker = &attacker
+	}
 	w.ReportAbout("killing", "KILLING AT "+upper(where),
 		w.unattributed(where, fmt.Sprintf("%s was found dead at %s. Police have no arrest and describe the killing as targeted.", name, where)), n.ID)
 	if family != nil {

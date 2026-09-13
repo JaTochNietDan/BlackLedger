@@ -316,3 +316,13 @@ context survives an interior-to-city renderer remount. Existing broken panes rem
 broken, and snapshots without prior context use their known condition. Debug
 explosions temporarily break panes and restore saved condition on Stop/completion.
 The synchronized glass sound belongs to the cancellable scene audio lifecycle.
+
+Successful player-directed strikes now attach optional `attacker: {id, name, weapon}`
+to the attack cue. `weapon` snapshots the attacker’s tier at the event: 0 unarmed,
+1 revolver, 2 pump shotgun, 3 Thompson. Delegated strikes use the selected crew
+member’s equipment; later upgrades/seizures must not change this saved cue.
+Unarmed successful strikes emit `attack` alongside the victim’s `killing`, while
+armed ones emit `gunfight`. Their recorded manner of death matches the weapon.
+Other legacy gunfight cues remain anonymous unless they explicitly provide an
+attacker; renderers must not infer one from the victim’s `actors` list. Gun model
+selection and full coverage of other combat producers remain unfinished.
