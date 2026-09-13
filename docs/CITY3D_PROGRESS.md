@@ -64,6 +64,13 @@ These are staged fixture saves, not earned campaign progress.
 
 ## Continue next
 
+### Coopered rooftop water tanks (2026-09-13)
+
+- Replaced the simple iron cylinders on tenement and shop roofs with Blender-authored timber cisterns: 32 separate staves, steel hoops, cross-braced stands and support girders, conical caps/vents, and rung ladders. Deterministic embedded 256px cedar colour/normal textures add wood grain; a browser review prompted a lighter weathered wood tone. Casino and civic crowns remain tank-free.
+- Regenerated only `tenement.glb` and `shop.glb` and their manifest entries. Existing facade footprint and public building/command identifiers remain unchanged. Heights increased by 0.88m; labels use actual exported geometry bounds. These are decorative roof structures, not water-management gameplay.
+- All 108 frontend tests and production build passed. New actual-GLB checks verify timber stays inside its clear roof bay, sits above its support, faces outward and carries embedded textures; exact geometry matches updated manifest bounds. Existing all-building footprint/route checks passed. Front/reverse browser views are recorded in `docs/qa/city3d-20260913/rooftop-tanks-front.png` and `rooftop-tanks-rear.png`.
+- Whole-city local sample on isolated port 8850: 145 FPS, 7.7ms p95, 272 draws and 490,666 triangles for 28 buildings/one actor. This is one local Mac observation, not broad hardware acceptance. Street density, more differentiated architecture, characters, event choreography and final visual-quality acceptance remain unfinished.
+
 ### Shared city scene and travel panels (2026-09-13)
 
 - The normal city no longer positions Theatre or the travel banner outside its responsive controls. Both now occupy the same flowing story slot as expanded playback. Expanding preserves the mounted Theatre, its audio/progress, cast and headline instead of covering it with a duplicate caption. Interior Theatre remains in its existing stage.

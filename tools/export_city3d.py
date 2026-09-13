@@ -105,6 +105,55 @@ def clear():
     bpy.ops.wm.read_factory_settings(use_empty=True)
 
 
+def rooftop_tank(height, iron):
+    # Coopered timber cistern, strapped steel hoops and a braced rooftop stand.
+    wood=material('weathered cistern cedar',(.58,.49,.35))
+    n=256;pixels=[];normals=[]
+    for y in range(n):
+        for x in range(n):
+            grain=math.sin(x*.69+math.sin(y*.024)*1.8)*.09+math.sin(x*2.17+y*.013)*.035
+            tone=.91+grain+math.sin(x*.12)*.10
+            pixels.extend((.58*tone,.49*tone,.35*tone,1))
+            vec=Vector((math.cos(x*.69+math.sin(y*.024)*1.8)*.16,0,1)).normalized()
+            normals.extend((vec.x*.5+.5,.5,vec.z*.5+.5,1))
+    tree=wood.node_tree
+    for name,data,is_normal in [('cistern cedar grain',pixels,False),('cistern cedar normal',normals,True)]:
+        image=bpy.data.images.new(name,width=n,height=n);image.pixels=data
+        if is_normal:image.colorspace_settings.name='Non-Color'
+        image.pack();tex=tree.nodes.new('ShaderNodeTexImage');tex.image=image
+        if is_normal:
+            normal=tree.nodes.new('ShaderNodeNormalMap');normal.inputs['Strength'].default_value=.4
+            tree.links.new(tex.outputs['Color'],normal.inputs['Color'])
+            tree.links.new(normal.outputs['Normal'],tree.nodes['Principled BSDF'].inputs['Normal'])
+        else:tree.links.new(tex.outputs['Color'],tree.nodes['Principled BSDF'].inputs['Base Color'])
+    for x in (1,3):
+        for y in (-3,-1):
+            box('tank stand leg',(x,y,height+.65),(.13,.13,1.3),iron)
+        beam('tank stand cross brace',(x,-3,height+.12),(x,-1,height+1.25),.065,iron)
+        beam('tank stand cross brace',(x,-1,height+.12),(x,-3,height+1.25),.065,iron)
+    for y in (-3,-1):
+        beam('tank stand cross brace',(1,y,height+.12),(3,y,height+1.25),.065,iron)
+        beam('tank stand cross brace',(3,y,height+.12),(1,y,height+1.25),.065,iron)
+        box('tank support girder',(2,y,height+1.25),(2.8,.16,.20),iron)
+    cylinder('tank floor',(2,-2,height+1.34),1.22,.12,wood)
+    for stave in range(32):
+        angle=stave*math.tau/32
+        ob=box('tank cedar stave',(2+1.2*math.cos(angle),-2+1.2*math.sin(angle),height+2.62),(.232,.1,2.5),wood,.009)
+        ob.rotation_euler.z=angle+math.pi/2
+    for z in (1.50,2.22,2.96,3.70):
+        bpy.ops.mesh.primitive_torus_add(major_segments=32,minor_segments=6,location=(2,-2,height+z),major_radius=1.255,minor_radius=.038)
+        ob=bpy.context.object;ob.name='tank iron hoop';ob.data.materials.append(iron)
+    bpy.ops.mesh.primitive_cone_add(vertices=32,radius1=1.37,radius2=.08,depth=.62,location=(2,-2,height+4.14))
+    ob=bpy.context.object;ob.name='tank conical cap';ob.data.materials.append(iron)
+    cylinder('tank cap vent',(2,-2,height+4.53),.085,.2,iron)
+    for x in (1.72,2.28):
+        box('tank ladder upright',(x,-3.48,height+2.1),(.065,.065,4.2),iron)
+    for rung in range(14):
+        box('tank ladder rung',(2,-3.48,height+.2+rung*.28),(.56,.065,.065),iron)
+    for z in (.45,1.15):
+        beam('tank ladder bracket',(2,-3.48,height+z),(2,-3,height+z),.065,iron)
+
+
 def building(kind, floors, width=12, depth=12, seed=0, palette=None, accent=None):
     palettes = [(0.43,.23,.15), (.51,.46,.35), (.31,.33,.26), (.37,.21,.18)]
     wall = material('weathered masonry', palette or palettes[seed % 4]); brick(wall, seed)
@@ -174,9 +223,8 @@ def building(kind, floors, width=12, depth=12, seed=0, palette=None, accent=None
             box('escape handrail',(0,-depth/2-1.4,h+1),(3.4,.07,.07),iron)
             for step in range(9):
                 box('escape stair',(-1.2+step*.3,-depth/2-.7,h+step*.35),(.4,.9,.08),iron)
-        cylinder('water tank',(2,-2,height+2.5),1.25,2.5,iron)
-        for x in (1.1,2.9):
-            box('tank legs',(x,-2,height+.75),(.16,1.5,1.5),iron)
+        if kind not in ('casino','civic'):
+            rooftop_tank(height,iron)
     if kind == 'casino':
         for ob in list(bpy.context.scene.objects):
             if ob.name.startswith(('skylight','tank','water tank')):

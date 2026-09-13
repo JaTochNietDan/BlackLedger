@@ -105,3 +105,29 @@ test('pedestrians descend to asphalt with continuous, kerb-clearing stride suppo
  assert.ok(Math.abs(pedestrianRootHeight({x:16,z:0})+.07)<1e-10);
  assert.ok(Math.abs(pedestrianRootHeight({x:16,z:4.65})-.2)<1e-10);
 });
+
+test('timber roof tanks fit their clear roof bay and carry embedded grain textures',async()=>{
+ const THREE=await import('three');
+ const {GLTFLoader}=await import('three/addons/loaders/GLTFLoader.js');
+ for(const [name,floors] of [['tenement',4],['shop',3]]){
+  const bytes=readFileSync(new URL(`../public/art/models/${name}.glb`,import.meta.url));
+  const gltf=JSON.parse(bytes.subarray(20,20+bytes.readUInt32LE(12)).toString());
+  const cedar=gltf.materials.find(m=>m.name==='weathered cistern cedar');assert.ok(cedar);
+  for(const texture of [cedar.pbrMetallicRoughness.baseColorTexture,cedar.normalTexture]){
+   const image=gltf.images[gltf.textures[texture.index].source];
+   assert.ok(Number.isInteger(image.bufferView));assert.equal(image.mimeType,'image/png');
+  }
+  const loader=new GLTFLoader();
+  loader.register(parser=>({name:'tank-geometry-materials',loadMaterial(index){return Promise.resolve(new THREE.MeshBasicMaterial({name:parser.json.materials[index].name}));}}));
+  const model=(await loader.parseAsync(bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength),'')).scene;
+  model.updateMatrixWorld(true);
+  const tank=new THREE.Box3();model.traverse(o=>{if(o.isMesh&&o.material.name===cedar.name)tank.union(new THREE.Box3().setFromObject(o,true));});
+  assert.ok(!tank.isEmpty());
+  assert.ok(tank.min.x>.6&&tank.max.x<3.4&&tank.min.z>.6&&tank.max.z<3.4,'tank must stay within its clear roof bay, away from skylight and chimney');
+  assert.ok(tank.min.y>floors*3.15+1.2,'tank must sit above its steel stand');
+  const ray=new THREE.Raycaster(new THREE.Vector3(2,floors*3.15+2.62,4.5),new THREE.Vector3(0,0,-1));
+  assert.equal(ray.intersectObject(model,true)[0].object.material.name,cedar.name,'stave wall must face outward');
+  const bounds=new THREE.Box3().setFromObject(model,true),[min,max]=manifest[name].bounds_blender;
+  for(const [actual,expected]of [[bounds.min.x,min[0]],[bounds.max.x,max[0]],[bounds.max.y,max[2]],[bounds.min.z,-max[1]],[bounds.max.z,-min[1]]])assert.ok(Math.abs(actual-expected)<.001);
+ }
+});
