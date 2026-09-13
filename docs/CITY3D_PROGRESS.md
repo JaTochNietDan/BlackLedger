@@ -64,6 +64,12 @@ These are staged fixture saves, not earned campaign progress.
 
 ## Continue next
 
+### Debug action previews — September 13
+
+- `?city-debug` now exposes a scene selector, Play and Stop controls for gunfight, assassination, explosion, arrest and raid at the selected address. All use the existing renderer, staging reservations, audio, particles and event camera fitting. The preview has its own immutable world identity and never sends a campaign command. New revisions cancel previews; stop restores the original projection silently.
+- Browser testing caught inherited `pointer-events: none` swallowing clicks on the new toolbar. Fixed its pointer handling, then ran all five scenes successfully on isolated 8859. Assassination staged shooter and victim together; explosion spawned 12 fragments; arrest/raid staged police cars. Stop left no effects and the save remained revision 0/minute 480. Captured 145 FPS/8.3ms p95 with no warnings/errors; this is a single local sample.
+- Evidence: `debug-scenes.json`, `debug-explosion.png`. Production build and 147 frontend tests pass, including immutable campaign input and silent restoration after preview. Preview art is still the existing limited scene art: police currently use the car presentation, with officers/cleanup/gore still to implement. Richer models, detailed interiors and persistent aftermath remain unfinished.
+
 ### Event camera fitting — September 13
 
 - Active committed cues now fit a world-space action envelope into the orthographic camera, independently of prior zoom. The envelope includes alternative staging bays for same-address actors and, for explosions, the building plus a particle margin. Camera orientation is preserved; replay explicitly opens the city from an interior.

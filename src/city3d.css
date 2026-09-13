@@ -249,3 +249,6 @@
   background: #18201a;
   z-index: 1;
 }
+
+.city3d-preview { pointer-events: auto; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 8px; background: #17201eee; border: 1px solid #a38f62; }
+.city3d-preview small { flex-basis: 100%; color: #e0d7c1; }

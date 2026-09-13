@@ -1,0 +1,309 @@
+{
+  "runs": [
+    {
+      "scene": "Gunfight",
+      "presentation": {
+        "revision": 0,
+        "minute": 480,
+        "playbackRate": 1,
+        "headlightPools": 0,
+        "harbour": {
+          "visible": true,
+          "waterClock": 11.734100000000018
+        },
+        "followingPlayer": false,
+        "cutawayBuildings": [],
+        "weather": {
+          "kind": "rain",
+          "wet": 1,
+          "rainVisible": true,
+          "rainClock": 11.734100000000018
+        },
+        "camera": {
+          "zoom": 10.679943251678798,
+          "x": 260,
+          "z": -201.65,
+          "targetX": 80,
+          "targetZ": 38.35
+        },
+        "actors": [
+          {
+            "id": "player",
+            "model": "person",
+            "x": 80,
+            "z": 36.65,
+            "y": 0.2
+          }
+        ],
+        "waiting": [],
+        "effects": [
+          {
+            "id": "preview:1a042af4-987c-4312-b6e3-81abbc711bda:0",
+            "kind": "gunfight",
+            "target": "bar",
+            "staged": true,
+            "x": 77,
+            "z": 38.35,
+            "arm": -1.5707963267948966,
+            "audioShots": 1
+          }
+        ]
+      }
+    },
+    {
+      "scene": "Assassination",
+      "presentation": {
+        "revision": 0,
+        "minute": 480,
+        "playbackRate": 1,
+        "headlightPools": 0,
+        "harbour": {
+          "visible": true,
+          "waterClock": 12.99360000000003
+        },
+        "followingPlayer": false,
+        "cutawayBuildings": [],
+        "weather": {
+          "kind": "rain",
+          "wet": 1,
+          "rainVisible": true,
+          "rainClock": 12.99360000000003
+        },
+        "camera": {
+          "zoom": 10.679943251678798,
+          "x": 260,
+          "z": -201.65,
+          "targetX": 80,
+          "targetZ": 38.35
+        },
+        "actors": [
+          {
+            "id": "player",
+            "model": "person",
+            "x": 80,
+            "z": 36.65,
+            "y": 0.2
+          }
+        ],
+        "waiting": [],
+        "effects": [
+          {
+            "id": "preview:6a860c9b-4694-4836-bdd4-d132c3506520:0",
+            "kind": "killing",
+            "target": "bar",
+            "staged": true,
+            "x": 80,
+            "z": 38.35,
+            "fall": -0.3817035074111603
+          },
+          {
+            "id": "preview:6a860c9b-4694-4836-bdd4-d132c3506520:1",
+            "kind": "gunfight",
+            "target": "bar",
+            "staged": true,
+            "x": 77,
+            "z": 38.35,
+            "arm": -1.5707963267948966,
+            "audioShots": 1
+          }
+        ]
+      }
+    },
+    {
+      "scene": "Explosion",
+      "presentation": {
+        "revision": 0,
+        "minute": 480,
+        "playbackRate": 1,
+        "headlightPools": 0,
+        "harbour": {
+          "visible": true,
+          "waterClock": 14.204800000000038
+        },
+        "followingPlayer": false,
+        "cutawayBuildings": [],
+        "weather": {
+          "kind": "rain",
+          "wet": 1,
+          "rainVisible": true,
+          "rainClock": 14.204800000000038
+        },
+        "camera": {
+          "zoom": 4.8607328813037505,
+          "x": 260,
+          "z": -196.58886217979168,
+          "targetX": 80,
+          "targetZ": 43.41113782020832
+        },
+        "actors": [
+          {
+            "id": "player",
+            "model": "person",
+            "x": 80,
+            "z": 36.65,
+            "y": 0.2
+          }
+        ],
+        "waiting": [],
+        "effects": [
+          {
+            "id": "preview:567dcdf7-c09e-4334-9e01-22bddfc4551e:0",
+            "kind": "explosion",
+            "target": "bar",
+            "staged": true,
+            "debris": 12,
+            "blastOrigin": {
+              "x": 80,
+              "y": 0.25,
+              "z": 40.497275831151484
+            },
+            "audioBlasts": 1
+          }
+        ]
+      }
+    },
+    {
+      "scene": "Arrest",
+      "presentation": {
+        "revision": 0,
+        "minute": 480,
+        "playbackRate": 1,
+        "headlightPools": 0,
+        "harbour": {
+          "visible": true,
+          "waterClock": 15.496400000000051
+        },
+        "followingPlayer": false,
+        "cutawayBuildings": [],
+        "weather": {
+          "kind": "rain",
+          "wet": 1,
+          "rainVisible": true,
+          "rainClock": 15.496400000000051
+        },
+        "camera": {
+          "zoom": 6.402685385740697,
+          "x": 260,
+          "z": -192,
+          "targetX": 80,
+          "targetZ": 48
+        },
+        "actors": [
+          {
+            "id": "player",
+            "model": "person",
+            "x": 80,
+            "z": 36.65,
+            "y": 0.2
+          }
+        ],
+        "waiting": [],
+        "effects": [
+          {
+            "id": "preview:8f6b8712-3a75-4581-bd9c-3bfe5e338042:0",
+            "kind": "arrest",
+            "target": "bar",
+            "staged": true,
+            "x": 89.6,
+            "z": 42
+          }
+        ]
+      }
+    },
+    {
+      "scene": "Raid",
+      "presentation": {
+        "revision": 0,
+        "minute": 480,
+        "playbackRate": 1,
+        "headlightPools": 0,
+        "harbour": {
+          "visible": true,
+          "waterClock": 16.787300000000116
+        },
+        "followingPlayer": false,
+        "cutawayBuildings": [],
+        "weather": {
+          "kind": "rain",
+          "wet": 1,
+          "rainVisible": true,
+          "rainClock": 16.787300000000116
+        },
+        "camera": {
+          "zoom": 6.402685385740697,
+          "x": 260,
+          "z": -192,
+          "targetX": 80,
+          "targetZ": 48
+        },
+        "actors": [
+          {
+            "id": "player",
+            "model": "person",
+            "x": 80,
+            "z": 36.65,
+            "y": 0.2
+          }
+        ],
+        "waiting": [],
+        "effects": [
+          {
+            "id": "preview:58d2c13e-92f1-4c8d-a466-dc024ff2c161:0",
+            "kind": "raid",
+            "target": "bar",
+            "staged": true,
+            "x": 89.6,
+            "z": 42
+          }
+        ]
+      }
+    }
+  ],
+  "stopped": {
+    "revision": 0,
+    "minute": 480,
+    "playbackRate": 1,
+    "headlightPools": 0,
+    "harbour": {
+      "visible": true,
+      "waterClock": 32.34340000000113
+    },
+    "followingPlayer": false,
+    "cutawayBuildings": [],
+    "weather": {
+      "kind": "rain",
+      "wet": 1,
+      "rainVisible": true,
+      "rainClock": 32.34340000000113
+    },
+    "camera": {
+      "zoom": 4.8607328813037505,
+      "x": 260,
+      "z": -196.58886217979168,
+      "targetX": 80,
+      "targetZ": 43.41113782020832
+    },
+    "actors": [
+      {
+        "id": "player",
+        "model": "person",
+        "x": 80,
+        "z": 36.65,
+        "y": 0.2
+      }
+    ],
+    "waiting": [],
+    "effects": []
+  },
+  "metrics": {
+    "fps": 145,
+    "p95ms": 8.3,
+    "drawCalls": 127,
+    "triangles": 539170,
+    "actors": 1,
+    "buildings": 28,
+    "geometries": 238,
+    "textures": 131
+  },
+  "logs": []
+}

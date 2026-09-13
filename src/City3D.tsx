@@ -1,3 +1,4 @@
+import {previewScenes, previewScene, type PreviewScene} from './city3dPreview';
 import {frameScene} from './city3dFraming';
 import {wardrobe, dressPedestrian} from './city3dWardrobe';
 import {headlightAlpha, headlightCentre} from './city3dHeadlights';
@@ -123,7 +124,13 @@ export function City3D(props: Props) {
   const host = useRef<HTMLDivElement>(null);
   const expandButton = useRef<HTMLButtonElement>(null);
   const latest = useRef(props);
-  latest.current = props;
+  const debug = new URLSearchParams(location.search).has('city-debug');
+  const [preview, setPreview] = useState<ReturnType<typeof previewScene> | null>(null);
+  const [previewKind, setPreviewKind] = useState<PreviewScene>('Gunfight');
+  const canPreview = debug && !props.busy && !props.journey && !props.activeCue && props.motion;
+  const shownPreview = canPreview ? preview : null;
+  latest.current = shownPreview ? {...props, state: shownPreview.state, activeCue: shownPreview.cue} : props;
+  useEffect(() => { setPreview(null); }, [props.state.id, props.state.revision, props.activeCue?.id]);
   const controlsRef = useRef<OrbitControls | null>(null);
   const focus = useRef<(id?: string) => void>(() => {});
   const [expanded, setExpanded] = useState(false);
@@ -1543,6 +1550,17 @@ export function City3D(props: Props) {
             Travel {playbackRate}×
           </button>
         </div>
+        {debug && <div className="city3d-preview" aria-label="Scene preview controls">
+          <label>Debug scene <select aria-label="Debug scene" value={previewKind}
+            onChange={e => setPreviewKind(e.target.value as PreviewScene)}>
+            {previewScenes.map(kind => <option key={kind}>{kind}</option>)}
+          </select></label>
+          <button disabled={!canPreview || !!status || !!failure} onClick={() => {
+            setPreview(previewScene(props.state, props.selected, previewKind, crypto.randomUUID()));
+          }}>Play preview</button>
+          <button disabled={!preview} onClick={() => setPreview(null)}>Stop preview</button>
+          <small>{shownPreview ? 'VISUAL PREVIEW · Campaign unchanged' : 'At selected address · Scenes must be enabled'}</small>
+        </div>}
         {props.overlay && <div className="city3d-story">{props.overlay}</div>}
       </div>
       {(status || failure) && (
@@ -1567,10 +1585,10 @@ export function City3D(props: Props) {
           <strong>{place.name}</strong>
           <span>{place.blurb}</span>
           {place.id === props.state.player.location ? (
-            <button onClick={props.onEnter}>Step inside →</button>
+            <button disabled={!!shownPreview} onClick={props.onEnter}>Step inside →</button>
           ) : (
             <button
-              disabled={!travel || travel.disabled || props.busy || !!props.journey}
+              disabled={!travel || travel.disabled || props.busy || !!props.journey || !!shownPreview}
               title={travel?.reason}
               onClick={() => props.onTravel(place.id)}
             >
@@ -1581,7 +1599,7 @@ export function City3D(props: Props) {
       )}
       <span
         className="city3d-metrics"
-        hidden={!new URLSearchParams(location.search).has('city-debug')}
+        hidden={!debug}
         aria-hidden="true"
       >
         {fps}

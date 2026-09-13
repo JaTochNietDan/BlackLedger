@@ -246,3 +246,7 @@ right-of-way rules or simulation effects.
 ## Browser event framing
 
 Active public visual cues fit the camera to the presentation envelope at their target address before rendering the staged action. This is a camera-only operation: it changes no command, revision, clock or outcome. Explicit replay switches from the interior to the city. Loading a saved result without replay remains silent.
+
+## Debug scene previews
+
+Append `?city-debug` to the browser URL to expose the scene selector. Gunfight, assassination (shooter plus casualty), explosion, arrest and raid previews run at the selected address. Each creates an immutable presentation-only snapshot with a unique preview world ID; no request is sent to the command API. Stop returns the renderer to the campaign projection without replaying saved results. A new committed revision cancels the preview. Controls are unavailable during travel, active gameplay scenes, loading or disabled motion. Reduced-motion preferences remain respected by the renderer.
