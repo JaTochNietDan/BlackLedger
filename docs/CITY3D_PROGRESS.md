@@ -64,6 +64,45 @@ These are staged fixture saves, not earned campaign progress.
 
 ## Continue next
 
+### Street surfaces and vehicle grounding follow-up
+
+Added a locally authored Blender street-bed set: individually jointed kerbstones
+with occasional replacement stones, cast-iron manhole covers and recessed drain
+grilles. Four shared material groups are instanced across the 28 occupied lots;
+the new GLB is 743,712 bytes. Kerb corners are trimmed to avoid overlapping stone
+runs. Surface detail stays below pedestrian sole clearance, with manholes/drains
+outside the sampled tyre tracks. There are now 26 authored GLBs.
+
+Moving cars previously inherited the pedestrian root height, leaving tyres about
+32cm above the asphalt. Vehicle roots now follow asphalt (-0.1m) or raised pavement
+(0.17m), accounting for the exported 2cm tyre offset and a 5mm surface gap. Parked
+cars and staged police use the same helper. A shared soft contact-shadow texture
+now follows each vehicle; the selection ring and police beacon follow the adjusted
+height. Pedestrian kerb-crossing height transitions still need authored step motion.
+
+A close-up exposed a separate visible defect at Thorne & Sons: the chapel door
+was buried behind the tower wall, despite the renderer's correct façade rotation.
+The Blender doorway now sits in front of that wall, with oak panels, stone jambs,
+threshold and brass pulls. A raycast against the actual exported GLB verifies the
+visible wooden entry at three positions. The broader building still needs richer,
+location-specific architecture; fixing the missing door is not full art acceptance.
+
+Evidence: 103 frontend tests pass, including sampled current driving routes,
+parked-vehicle height, kerb/sole clearance, tyre-track/manhole/drain separation and
+the GLB entry raycasts. Build and HTTP package pass. Logs:
+`.runtime/city3d-surfaces-tests.log`, `.runtime/city3d-build.log`,
+`.runtime/city3d-surfaces-go.log` and `.runtime/city3d-street-bed-export.log`.
+Existing unchanged model binaries were preserved after the full export.
+
+Browser on the existing isolated traffic fixture 8847 showed the parked Hudson
+at y=0.155, and a drive to Thorne & Sons at y=-0.115, revision 3 / minute 773. The
+corrected doorway, contact shadow and final street surfaces are captured in
+`qa/city3d-20260913/street-surfaces.png`. Whole-city view measured 145 FPS / 8ms p95,
+263 draws and 436,064 triangles with 28 buildings and two actor objects. This is a
+local sparse-traffic sample; heavy traffic and broader device acceptance remain
+pending. The main campaign save was not opened or modified.
+
+
 ### Staged gunshot audio follow-up
 
 City gunfire now drives sound from the rendered shot beat. Four muzzle pulses

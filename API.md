@@ -125,3 +125,8 @@ Staged city gunfire audio follows rendered muzzle beats. Queueing, skipped/muted
 playback and missed frames cannot replay a backlog of gunshots. Skip, expiry and
 scene teardown cancel the current shot tail. This audio lifecycle is independent
 of saved time and combat outcomes.
+
+Vehicle rendering roots now follow the road/pavement surface beneath them,
+including parked and staged police cars. These contact heights, soft shadows and
+street fixtures are presentation geometry and do not affect Go travel or collision
+rules.

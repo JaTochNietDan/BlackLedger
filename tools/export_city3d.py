@@ -484,7 +484,16 @@ def industrial(kind):
         for x in (-2.3,2.3):
             ob=box('pitched roof',(x,1,6.5),(5.5,12.7,.24),roof)
             ob.rotation_euler.y=math.radians(25 if x>0 else -25)
-        box('chapel door',(0,-5.12,1.6),(2,.2,3.2),iron)
+        timber=material('chapel oak door',(.17,.085,.033))
+        brass=material('chapel door brass',(.52,.36,.12),.65)
+        box('chapel door',(0,-5.61,1.65),(1.95,.16,3.1),timber,.025)
+        for side in (-1,1):
+            box('entry stone jamb',(side*1.12,-5.59,1.75),(.24,.22,3.5),stone,.02)
+            for height in (.8,1.7,2.6):
+                box('oak raised panel',(side*.48,-5.704,height),(.72,.035,.64),timber,.025)
+            box('entry pull',(side*.12,-5.747,1.55),(.035,.035,.25),brass,.01)
+        box('entry lintel',(0,-5.59,3.52),(2.48,.22,.24),stone,.02)
+        box('entry threshold',(0,-5.76,.08),(2.48,.75,.16),stone,.02)
         box('tower',(0,-4,6),(3,3,12),wall)
         for z in (8,10):box('tower window',(0,-5.55,z),(.9,.12,1.4),glass)
         beam('cross', (0,-4,12),(0,-4,13.5),.15,iron)
@@ -504,6 +513,38 @@ def industrial(kind):
         beam('hoist cable',(6,5,13),(6,5,2),.035,iron)
         for z in range(2,9,2):
             beam('derrick brace',(3,-3,z),(5,-1,z+1.6),.09,iron)
+
+
+def street_bed():
+    stone=material('weathered kerbstone',(.47,.46,.40))
+    pale=material('replacement kerbstone',(.56,.53,.45))
+    iron=material('street cast iron',(.12,.135,.13),.65)
+    groove=material('recessed drain',(.035,.045,.04),.4)
+    # Four runs of individually jointed stone. Top is just above the existing
+    # pavement, while the exposed outside face bridges its raised edge.
+    for side in (-1,1):
+        for i in range(16):
+            at=-11.25+i*1.5
+            mat=pale if i%7==3 else stone
+            box('kerb frontage',(at,side*11.88,.045),(1.47,.24,.27),mat,.025)
+            flank_at=at+(.1175 if i==0 else -.1175 if i==15 else 0)
+            flank_length=1.235 if i in (0,15) else 1.47
+            box('kerb flank',(side*11.88,flank_at,.045),(.24,flank_length,.27),mat,.025)
+    # One cover in the road bordering the frontage. Model coordinates are
+    # Blender Z-up; +Y is the road north of this parcel after glTF conversion.
+    cylinder('manhole rim',(0,16,-.091),.49,.016,iron)
+    cylinder('manhole recess',(0,16,-.080),.447,.007,groove)
+    for i in range(-5,6):
+        x=i*.072
+        length=2*math.sqrt(max(0,.425**2-x*x))
+        box('cover ribs',(x,16,-.073),(.025,length,.01),iron,.003)
+    for side in (-1,1):
+        box('lifting recess',(side*.30,16,-.064),(.07,.14,.006),groove,.006)
+    for x in (-8.5,8.5):
+        box('drain surround',(x,12.4,-.09),(.82,.42,.018),iron,.018)
+        box('drain cavity',(x,12.4,-.078),(.72,.32,.006),groove)
+        for i in range(9):
+            box('drain bars',(x-.32+i*.08,12.4,-.068),(.027,.32,.012),iron,.003)
 
 
 def streetside():
@@ -570,6 +611,7 @@ for name in ('person','woman'):
         motion_points.extend(ob.matrix_world @ Vector(c) for ob in bpy.context.scene.objects if ob.type=='MESH' for c in ob.bound_box)
     manifest[name]['motion_bounds_blender']=[[round(min(p[i] for p in motion_points),4) for i in range(3)],[round(max(p[i] for p in motion_points),4) for i in range(3)]]
 clear();revolver();manifest['revolver']=export('revolver')
+clear();street_bed();manifest['street-bed']=export('street-bed')
 clear();streetside();manifest['streetside']=export('streetside')
 with open(os.path.join(OUT,'manifest.json'),'w') as f: json.dump(manifest,f,indent=2)
 print('Exported',len(manifest),'models')

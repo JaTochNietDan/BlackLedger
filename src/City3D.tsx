@@ -12,13 +12,14 @@ import {
   streetsidePosition,
   parkingSpot,
   lampPositions,
+  vehicleRootHeight,
 } from './city3dPlan';
 import type {Lot, Point} from './city3dPlan';
 import type {Journey} from './TravelPresentation';
 import './city3d.css';
 import {CityCueQueue, availableSceneSlot, casualtyFall, gunfightPose, casualtySceneStart, GunfireAudio} from './city3dEvents';
 import type {SceneSlot} from './city3dEvents';
-import {StreetTraffic} from './city3dTraffic';
+import {StreetTraffic, trafficSize} from './city3dTraffic';
 import {pedestrianModel, isPedestrian} from './city3dCast';
 import {playCityGunshot, soundOn} from './sound';
 
@@ -75,6 +76,7 @@ const modelNames = [
   'person',
   'woman',
   'revolver',
+  'street-bed',
   'filling',
   'garage',
   'dealer',
@@ -325,6 +327,20 @@ export function City3D(props: Props) {
     particleContext.fillRect(0, 0, 64, 64);
     const particleTexture = new THREE.CanvasTexture(particleCanvas);
     textures.push(particleTexture);
+    const contactGeometry = new THREE.PlaneGeometry(1, 1);
+    const contactMaterial = new THREE.MeshBasicMaterial({
+      color: 0x080b09, map: particleTexture, transparent: true,
+      opacity: 0.48, depthWrite: false,
+    });
+    const addVehicleShadow = (object: THREE.Group, model: string) => {
+      const size = trafficSize(model);
+      const shadow = new THREE.Mesh(contactGeometry, contactMaterial);
+      shadow.name = 'vehicle-contact-shadow';
+      shadow.rotation.x = -Math.PI / 2;
+      shadow.position.y = 0.017;
+      shadow.scale.set(size.width * 1.3, size.length, 1);
+      object.add(shadow);
+    };
     const pools = new THREE.InstancedMesh(
       new THREE.PlaneGeometry(1, 1),
       new THREE.MeshBasicMaterial({
@@ -459,6 +475,7 @@ export function City3D(props: Props) {
     let movementClock = performance.now();
     const addActor = (id: string, model: string): Actor => {
       const object = models.get(model)!.clone(true);
+      if (!isPedestrian(model)) addVehicleShadow(object, model);
       scene.add(object);
       const limbs: THREE.Object3D[] = [];
       object.traverse(o => {
@@ -530,6 +547,18 @@ export function City3D(props: Props) {
     )
       .then(() => {
         if (dead) return;
+        const streetBed = models.get('street-bed')!;
+        streetBed.updateMatrixWorld(true);
+        streetBed.traverse(part => {
+          if (!(part instanceof THREE.Mesh)) return;
+          const instances = new THREE.InstancedMesh(part.geometry, part.material, plan.lots.length);
+          plan.lots.forEach((lot, index) => {
+            const transform = new THREE.Matrix4().makeTranslation(lot.x, 0, lot.z);
+            instances.setMatrixAt(index, transform.multiply(part.matrixWorld));
+          });
+          instances.receiveShadow = true;
+          scene.add(instances);
+        });
         const furniture = models.get('streetside')!;
         furniture.updateMatrixWorld(true);
         furniture.traverse(part => {
@@ -711,6 +740,7 @@ export function City3D(props: Props) {
             const model = cue.kind === 'killing' ? personModel(cue.actors?.[0]?.id || '')
               : cue.kind === 'gunfight' ? 'person' : 'police';
             extra = models.get(model)!.clone(true);
+            if (model === 'police') addVehicleShadow(extra, model);
             if (cue.kind === 'gunfight') {
               extra.rotation.y = Math.PI / 2;
               gunArm = extra.getObjectByName('arm1');
@@ -845,7 +875,7 @@ export function City3D(props: Props) {
           ];
           e.slot = availableSceneSlot(lots.get(e.cue.target)!, e.cue.kind, occupied);
           if (e.slot) {
-            e.extra.position.set(e.slot.root.x, 0.2, e.slot.root.z);
+            e.extra.position.set(e.slot.root.x, e.slot.model === 'police' ? vehicleRootHeight(e.slot.root) : 0.2, e.slot.root.z);
             e.light.position.set(e.slot.root.x, 3, e.slot.root.z);
             e.since = now;
           }
@@ -881,7 +911,7 @@ export function City3D(props: Props) {
           const moved = distance > 0.0001;
           if (a.walking && moved)
             a.phase = (a.phase + (distance / 1.15) * Math.PI * 2) % (Math.PI * 2);
-          a.object.position.set(at.x, 0.2, at.z);
+          a.object.position.set(at.x, isPedestrian(a.model) ? 0.2 : vehicleRootHeight(at), at.z);
           a.object.rotation.y = at.heading;
           for (const limb of a.limbs) {
             const side = limb.name.endsWith('-1') ? 0 : Math.PI;
@@ -896,7 +926,7 @@ export function City3D(props: Props) {
           }
           if (a.walking && moved && motion)
             a.object.position.y += 0.05 + Math.abs(Math.sin(a.phase)) * 0.015;
-          if (id === 'player') playerRing.position.set(at.x, 0.23, at.z);
+          if (id === 'player') playerRing.position.set(at.x, isPedestrian(a.model) ? 0.23 : vehicleRootHeight(at) + 0.04, at.z);
           if (id !== 'player' && a.end === 1 && placement.progress >= 1) {
             a.arrived = true;
             a.object.visible = false;
@@ -1006,7 +1036,7 @@ export function City3D(props: Props) {
             }
             if (police) {
               // A period rotating red roof beacon, rather than sparks around the car.
-              tmp.position.set(at.x, 1.96, at.z);
+              tmp.position.set(at.x, (e.extra?.position.y ?? 0.2) + 1.76, at.z);
               tmp.scale.setScalar(j === 0 ? 0.45 + 0.35 * Math.max(0, Math.sin(t * 38)) : 0.001);
             }
             tmp.quaternion.copy(camera.quaternion);
@@ -1039,7 +1069,7 @@ export function City3D(props: Props) {
                 : 0;
           if (police) {
             e.light.color.setHex(0xe53220);
-            e.light.position.y = 1.96;
+            e.light.position.y = (e.extra?.position.y ?? 0.2) + 1.76;
           }
         }
       }
@@ -1065,6 +1095,7 @@ export function City3D(props: Props) {
               model: a.model,
               x: a.object.position.x,
               z: a.object.position.z,
+              y: a.object.position.y,
             })),
           waiting: [...actors].filter(([, a]) => !a.arrived && !a.object.visible).map(([id]) => id),
           effects: effects.map(e => ({
@@ -1119,6 +1150,8 @@ export function City3D(props: Props) {
       for (const m of models.values()) disposeTree(m);
       textures.forEach(t => t.dispose());
       effectGeometry.dispose();
+      contactGeometry.dispose();
+      contactMaterial.dispose();
       renderer.dispose();
       canvas.remove();
     };

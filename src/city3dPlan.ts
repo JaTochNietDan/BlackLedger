@@ -8,6 +8,14 @@ export const STREET_WIDTH = 8;
 export const FOOTWAY = 4.65;
 export const LANE = 1.6;
 export const MODEL_LIMIT = 17;
+export function surfaceHeight(at: Point) {
+  const toGrid = (value: number) => Math.abs(value - Math.round(value / PITCH) * PITCH);
+  return Math.min(toGrid(at.x), toGrid(at.z)) <= STREET_WIDTH / 2 ? -0.1 : 0.17;
+}
+/** Exported car tyres start 2cm above their root; retain a 5mm surface gap. */
+export function vehicleRootHeight(at: Point) {
+  return surfaceHeight(at) - 0.015;
+}
 export function streetsidePosition(lot: Lot): Point {
   return {x: lot.x, z: lot.z + 9};
 }
