@@ -2,7 +2,7 @@
 
 ## User amendment — detail, interiors and event direction (2026-09-13)
 
-The user requires substantially more detailed, high-quality 1950s noir gangster architecture and characters; current blocky assets do not meet visual acceptance. Model detailed building interiors for display on entry, preserving the room's actual public occupants and available gameplay actions. For committed simulation events, automatically open the city and frame the complete action before presenting its animation. Provide a debug mode with selectable action scenes for visual review without mutating the campaign. Keep the Mac awake during active work. Validate visual quality and performance in the browser as production work proceeds; local high FPS alone does not establish production readiness.
+The user requires substantially more detailed, high-quality 1950s noir gangster architecture and characters; current blocky assets do not meet visual acceptance. Model detailed building interiors for display on entry, preserving the room's actual public occupants and available gameplay actions. For committed simulation events, automatically open the city and frame the complete action before presenting its animation. Provide a debug mode with selectable action scenes for visual review without mutating the campaign. The user also requests gore and persistent aftermath: bodies, blood and police response should remain until cleanup, while damaged buildings retain their authoritative condition until repaired. Keep the Mac awake during active work. Validate visual quality and performance in the browser as production work proceeds; local high FPS alone does not establish production readiness.
 
 ## User revision — browser 3D city (2026-09-13)
 
