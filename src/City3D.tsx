@@ -1,3 +1,4 @@
+import {wardrobe, dressPedestrian} from './city3dWardrobe';
 import {headlightAlpha, headlightCentre} from './city3dHeadlights';
 import {cityWeather, rainVertices} from './city3dWeather';
 import {blockingBuildings} from './city3dOcclusion';
@@ -62,6 +63,7 @@ type Actor = {
   steering: number;
   wheelPlaced: boolean;
   lamps: THREE.MeshStandardMaterial[];
+  wardrobe: THREE.MeshStandardMaterial[];
   arrived?: boolean;
 };
 type Effect = {
@@ -71,6 +73,7 @@ type Effect = {
   light: THREE.PointLight;
   debris?: THREE.InstancedMesh;
   extra?: THREE.Group;
+  wardrobe?: THREE.MeshStandardMaterial[];
   slot?: SceneSlot;
   gunArm?: THREE.Object3D;
   muzzle?: THREE.Object3D;
@@ -534,10 +537,16 @@ export function City3D(props: Props) {
         ? pedestrianModel(w.player.name, w.player.face, true)
         : pedestrianModel(id, w.everyone?.find(person => person.id === id)?.face);
     };
+    const personWardrobe = (id: string) => {
+      const w = latest.current.state;
+      return id === 'player' ? wardrobe(w.player.name, w.player.face, true)
+        : wardrobe(id, w.everyone?.find(person => person.id === id)?.face);
+    };
     let movementClock = performance.now();
     const releaseActor = (actor: Actor) => {
       scene.remove(actor.object);
       actor.lamps.forEach(material => material.dispose());
+      actor.wardrobe.forEach(material => material.dispose());
     };
     const addActor = (id: string, model: string): Actor => {
       const object = models.get(model)!.clone(true);
@@ -569,6 +578,7 @@ export function City3D(props: Props) {
         walking: false,
         phase: 0,
         realSince: 0,
+        wardrobe: isPedestrian(model) ? dressPedestrian(object, model, personWardrobe(id)) : [],
         limbs, wheels, lamps, wheelPhase: 0, steering: 0, wheelPlaced: false,
       };
       actors.set(id, actor);
@@ -730,6 +740,7 @@ export function City3D(props: Props) {
         for (const effect of effects) {
           scene.remove(effect.mesh, effect.light);
           if (effect.extra) scene.remove(effect.extra);
+          effect.wardrobe?.forEach(material => material.dispose());
           effect.audio?.dispose();
           disposeDebris(effect);
           effect.mesh.dispose();
@@ -832,11 +843,13 @@ export function City3D(props: Props) {
           const at = entrance(lot);
           light.position.set(at.x, 3, at.z);
           scene.add(light);
+          let costume: THREE.MeshStandardMaterial[] | undefined;
           let extra: THREE.Group | undefined, gunArm: THREE.Object3D | undefined, muzzle: THREE.Object3D | undefined;
           if (['killing', 'gunfight', 'raid', 'arrest'].includes(cue.kind)) {
             const model = cue.kind === 'killing' ? personModel(cue.actors?.[0]?.id || '')
               : cue.kind === 'gunfight' ? 'person' : 'police';
             extra = models.get(model)!.clone(true);
+            if (isPedestrian(model)) costume = dressPedestrian(extra, model, personWardrobe(cue.kind === 'killing' ? cue.actors?.[0]?.id || '' : 'anonymous-shooter'));
             if (model === 'police') addVehicleShadow(extra, model);
             if (cue.kind === 'gunfight') {
               extra.rotation.y = Math.PI / 2;
@@ -864,7 +877,7 @@ export function City3D(props: Props) {
               scene.add(debris);
             });
           }
-          effects.push({cue, since: now, mesh, light, debris, extra, gunArm, muzzle,
+          effects.push({cue, since: now, mesh, light, debris, extra, wardrobe: costume, gunArm, muzzle,
             audio: cue.kind === 'gunfight' ? new GunfireAudio(playCityGunshot)
               : cue.kind === 'explosion' ? new BlastAudio(() => playMoment('explosion')) : undefined});
           if (p.activeCue?.id === cue.id) focus.current(cue.target);
@@ -1094,6 +1107,7 @@ export function City3D(props: Props) {
           if (t >= 1 || !motion) {
             scene.remove(e.mesh, e.light);
             if (e.extra) scene.remove(e.extra);
+            e.wardrobe?.forEach(material => material.dispose());
             e.audio?.dispose();
             disposeDebris(e);
             e.mesh.dispose();

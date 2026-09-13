@@ -219,3 +219,8 @@ cutaway around the character/car. Orthographic sight lines are tested at 10Hz;
 the visual opening eases in/out (immediately when motion is disabled). Orbiting
 to a clear view or releasing follow restores the facade. Building selection,
 collision, condition, static shadows and simulation state are unchanged.
+
+Pedestrian material palettes are stable authored cast presentation, selected from
+public portrait choice or the existing identity fallback. They do not encode
+attire ownership, wealth, faction or gameplay status. Walking and casualty models
+use the same palette selection; anonymous gunfight actors remain anonymous.

@@ -64,6 +64,14 @@ These are staged fixture saves, not earned campaign progress.
 
 ## Continue next
 
+### Stable pedestrian cast palettes — September 13
+
+- Added authored muted suit, skin, hair, hat and shirt palettes using the shipped noir portrait sheet as colour direction. Public face choice selects the generated palette; fixed painted identities retain stable choices and generated IDs use the existing cast hash. This is appearance presentation, not an assertion about equipment, wealth or faction. Geometry, animation joints and clearance remain unchanged.
+- Each actor clones only its tinted materials, sharing the existing weave/normal maps and geometry. Suit pieces reuse one private material per source. Casualty extras use the same identity palette; generic shooters remain anonymous. Removal and event expiry/cancellation dispose private materials without disposing shared textures.
+- All 140 frontend tests and production build pass. New checks cover portrait selection, deterministic fallback, invalid face values, material sharing within one actor, isolation between actors, and shared texture survival on material disposal. Existing bundle-size warning remains.
+- Browser QA used fresh isolated walking save `.runtime/city3d-walk-20260913-155609-81907.sqlite3` on 8858. Inspected player and Mara at close zoom, then walked Saint Agnes → The Mariner: revision 1/minute 615, 28,117ms presentation time, completion progress 1. Started with 13 visible pedestrians; moving evidence includes both models. Final 11-actor view sampled 145 FPS / 7.1ms p95, 72 draws, 511,180 triangles, with no captured warnings/errors. Main save untouched.
+- Evidence: `docs/qa/city3d-20260913/cast-mara.png`, `cast-walking.png`, `cast-wardrobe.json`. This does not establish broader hardware or full event acceptance. Body proportions and clothing/hairstyle geometry still repeat; palette variation alone does not meet final character art quality. Casualty palette integration was not separately browser-playtested in this pass.
+
 ### Slate and mineral-felt roof materials — September 13
 
 - Twelve Blender building exports now carry purpose-authored roof colour, normal and roughness maps. Thorne & Sons and The Mariner use staggered slate courses at a consistent 2.5m UV tile scale, mirrored on opposing slopes. Removed the funeral roof's oversized course bars. Ten flat-roof models use mineral-surfaced felt beneath their existing seams and rooftop equipment.
