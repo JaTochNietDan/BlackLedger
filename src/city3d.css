@@ -174,36 +174,6 @@
     max-width: 100%;
   }
 }
-.city3d-event {
-  padding: 16px;
-  background: #18201aed;
-  border: 1px solid #ad9468;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  font:
-    16px Georgia,
-    serif;
-}
-/* A city scene keeps the camera controls and action visible. */
-.city-stage > .theatre.theatre-city {
-  left: auto;
-  right: 12px;
-  top: 68px;
-  width: min(290px, calc(100% - 24px));
-  padding: 12px;
-  gap: 6px;
-  background: #18201aed;
-  border: 1px solid #ad9468;
-}
-.theatre-city .theatre-where b { font-size: 18px; }
-.theatre-city .theatre-caption { font-size: 12px; line-height: 1.4; }
-.theatre-city .theatre-paper { padding: 6px; }
-.theatre-city .theatre-paper b { font-size: 15px; }
-@media (max-width: 700px) {
-  .city-stage > .theatre.theatre-city { top: 164px; width: 220px; }
-}
-
 /* The city can be narrower than the window when the game sidebar is open. */
 .city3d { container-type: inline-size; }
 .city3d-top {
@@ -225,7 +195,7 @@
   max-width: none;
   pointer-events: auto;
 }
-.city3d-top .city3d-event {
+.city3d-top .city3d-story {
   position: static;
   grid-column: 2;
   justify-self: end;
@@ -242,10 +212,40 @@
   .city3d-top .city3d-heading small { font-size: 13px; letter-spacing: .12em; }
   .city3d-top .city3d-heading span { font-size: 10px; }
   .city3d-top .city3d-tools { justify-content: flex-start; }
-  .city3d-top .city3d-event { grid-column: 1; width: min(290px, 100%); padding: 12px; }
+  .city3d-top .city3d-story { grid-column: 1; width: min(290px, 100%); }
 }
 @media (max-height: 500px) {
   .city3d-expanded .city3d-heading span { display: none; }
   .city3d-expanded .city3d-address span { display: none; }
   .city3d-expanded .city3d-address { padding: 12px; }
+}
+
+.city3d-story {
+  max-height: min(300px, 35dvh);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.city3d-story > .theatre.theatre-city,
+.city3d-story > .street-journey {
+  position: static;
+  transform: none;
+  width: 100%;
+  max-width: none;
+  padding: 12px;
+  gap: 6px;
+  pointer-events: auto;
+  background: #18201aed;
+  border: 1px solid #ad9468;
+}
+.city3d-story .theatre-where b { font-size: 18px; }
+.city3d-story .theatre-caption { font-size: 12px; line-height: 1.4; }
+.city3d-story .theatre-paper { padding: 6px; }
+.city3d-story .theatre-paper b { font-size: 15px; }
+.city3d-story .theatre-cast { flex-wrap: wrap; }
+.city3d-story .street-journey { flex-direction: column; align-items: stretch; }
+.city3d-story .theatre-done {
+  position: sticky;
+  bottom: 0;
+  background: #18201a;
+  z-index: 1;
 }

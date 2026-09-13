@@ -1,4 +1,4 @@
-import {useEffect, useRef, useState} from 'react';
+import {useEffect, useRef, useState, type ReactNode} from 'react';
 import * as THREE from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
@@ -28,6 +28,7 @@ import {cameraCommand, screenPan} from './city3dControls';
 
 type Props = {
   state: Snapshot;
+  overlay?: ReactNode;
   selected: string;
   onSelect: (id: string) => void;
   onTravel: (id: string) => void;
@@ -36,8 +37,6 @@ type Props = {
   journey: Journey | null;
   busy: boolean;
   activeCue: VisualCue | null;
-  onSkipCue: () => void;
-  onSkipJourney: () => void;
   onJourneyDone: () => void;
 };
 type Actor = {
@@ -1213,18 +1212,7 @@ export function City3D(props: Props) {
             Travel {playbackRate}×
           </button>
         </div>
-        {expanded && props.activeCue && (
-          <div className="city3d-event" role="status">
-            <strong>{props.activeCue.caption}</strong>
-            <button onClick={props.onSkipCue}>Skip scene →</button>
-          </div>
-        )}
-        {expanded && props.journey && (
-          <div className="city3d-event" role="status">
-            <strong>Travelling to {props.journey.to.name}</strong>
-            <button onClick={props.onSkipJourney}>Skip journey →</button>
-          </div>
-        )}
+        {props.overlay && <div className="city3d-story">{props.overlay}</div>}
       </div>
       {(status || failure) && (
         <p className="city3d-status" role="status">

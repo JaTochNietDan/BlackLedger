@@ -64,6 +64,13 @@ These are staged fixture saves, not earned campaign progress.
 
 ## Continue next
 
+### Shared city scene and travel panels (2026-09-13)
+
+- The normal city no longer positions Theatre or the travel banner outside its responsive controls. Both now occupy the same flowing story slot as expanded playback. Expanding preserves the mounted Theatre, its audio/progress, cast and headline instead of covering it with a duplicate caption. Interior Theatre remains in its existing stage.
+- Story content has a bounded scroll region, wrapping cast rows and a sticky Skip/Go on control. Travel retains its saved duration, walking/driving details and crossing warning. The redundant City3D dismissal props and old fixed event offsets were removed.
+- Browser replay on isolated port 8855: normal city at 1024×768 left clear space between toolbar, scene and address; expanded scene panel had no measured intersections at 320×568, 390×844, 800×600, 844×390 and 1280×720. Keyboard navigation scrolled Go on into view; dismissal removed the scene panel. Evidence: `docs/qa/city3d-20260913/scene-panel-phone.png` and `scene-panel-layout.json`. Replay did not advance the fixture's 08:00 clock.
+- Isolated port 8850 travel test showed exactly one banner before and after expansion, retained inside the city story slot, then removed it on Skip. Only that test save advanced. All 107 frontend tests and production build passed. Default viewport restored; main save untouched. Extremely short portrait windows, unusual long captions and full touch accessibility remain unverified; this is not final visual-quality acceptance.
+
 ### Responsive city controls (2026-09-13)
 
 - Heading, camera controls and expanded scene/journey actions now share a flowing grid. Container queries use the city panel width, including when the gameplay sidebar is present. Wrapped instructions and buttons push subsequent actions down instead of depending on fixed pixel offsets. Short expanded landscape views omit the visible shortcut hints and address description; canvas accessibility instructions and the actions remain available.

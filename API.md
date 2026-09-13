@@ -145,3 +145,7 @@ change public simulation state or commands.
 Pedestrian presentation roots now ease between road and pavement elevation with
 conservative animated-stride clearance. This vertical support and the player's
 surface-following marker do not alter authoritative travel or traffic progress.
+
+City scene and journey panels share one responsive overlay in normal and expanded
+views. Expanding retains the existing Theatre playback and its headline/cast;
+Skip/Go on only dismiss presentation. Public command and save semantics are unchanged.

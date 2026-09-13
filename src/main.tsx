@@ -706,6 +706,40 @@ function App() {
     const w = world!;
     if (tab === 'city') {
       const inside = cityView === 'interior' && locationInfo.id === p.location;
+      const sceneOverlay = playing && !journey && (
+        <Theatre
+          cue={playing}
+          place={w.locations.find(l => l.id === playing.target) || w.locations[0]}
+          onProgress={setBeat}
+          plate={cityView !== 'iso'}
+          stagedGunfire={cityView === 'iso' && (playing.kind === 'gunfight' ||
+            (playing.kind === 'killing' && !!w.last_result?.cues?.some(cue =>
+              cue.kind === 'gunfight' && cue.target === playing.target)))}
+          onDone={() => setPlaying(null)}
+        />
+      );
+      const journeyOverlay = journey &&
+        (() => {
+          const cross = w.locations.find(l => l.id === journey.to.id)?.crossing;
+          return (
+            <div
+              className={'street-journey' + (cross?.warned ? ' warned' : '')}
+              role="status"
+            >
+              <div>
+                <strong>Crossing to {journey.to.name}</strong>
+                <span>
+                  {journey.minutes} minutes{' '}
+                  {cross?.driving
+                    ? `driving${cross.plate ? ` · ${cross.plate} of ${cross.plate_max} plated` : ' · no plate'}`
+                    : 'on foot'}
+                </span>
+                {cross?.note && <small>{cross.note}</small>}
+              </div>
+              <button onClick={() => setJourney(null)}>Skip journey →</button>
+            </div>
+          );
+        })();
       return (
         <div className={'workspace city-workspace' + (inside ? ' inside' : '')}>
           <section className="city-pane">
@@ -807,18 +841,7 @@ function App() {
               </section>
             )}
             <div className="city-stage">
-              {playing && !journey && (
-                <Theatre
-                  cue={playing}
-                  place={w.locations.find(l => l.id === playing.target) || w.locations[0]}
-                  onProgress={setBeat}
-                  plate={cityView !== 'iso'}
-                  stagedGunfire={cityView === 'iso' && (playing.kind === 'gunfight' ||
-                    (playing.kind === 'killing' && !!w.last_result?.cues?.some(cue =>
-                      cue.kind === 'gunfight' && cue.target === playing.target)))}
-                  onDone={() => setPlaying(null)}
-                />
-              )}
+              {inside && sceneOverlay}
               {cityView === 'interior' && locationInfo.id === p.location ? (
                 <Interior
                   place={locationInfo}
@@ -841,9 +864,8 @@ function App() {
               ) : (
                 <City3D
                   state={w}
+                  overlay={sceneOverlay || journeyOverlay}
                   activeCue={journey ? null : playing}
-                  onSkipCue={() => setPlaying(null)}
-                  onSkipJourney={() => setJourney(null)}
                   onJourneyDone={() => setJourney(null)}
                   selected={selected}
                   onSelect={setSelected}
@@ -857,28 +879,7 @@ function App() {
                   busy={busy}
                 />
               )}
-              {journey &&
-                (() => {
-                  const cross = w.locations.find(l => l.id === journey.to.id)?.crossing;
-                  return (
-                    <div
-                      className={'street-journey' + (cross?.warned ? ' warned' : '')}
-                      role="status"
-                    >
-                      <div>
-                        <strong>Crossing to {journey.to.name}</strong>
-                        <span>
-                          {journey.minutes} minutes{' '}
-                          {cross?.driving
-                            ? `driving${cross.plate ? ` · ${cross.plate} of ${cross.plate_max} plated` : ' · no plate'}`
-                            : 'on foot'}
-                        </span>
-                        {cross?.note && <small>{cross.note}</small>}
-                      </div>
-                      <button onClick={() => setJourney(null)}>Skip journey →</button>
-                    </div>
-                  );
-                })()}
+              {inside && journeyOverlay}
             </div>
             {!playing && !w.event && w.last_result?.cues?.length && (
               <button
