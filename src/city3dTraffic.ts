@@ -153,17 +153,33 @@ export function advanceWheel(angle: number, distance: number) {
   return (angle + Math.max(0, distance) / WHEEL_RADIUS) % (Math.PI * 2);
 }
 
+const HALF_TRACK = .87;
+function wheelbase(model: string) { return (lengths[model] - .2) * .59; }
+function steeringLimit(model: string) {
+  // Keep the inside tyre within the authored/tested half-radian sweep.
+  const base = wheelbase(model), tangent = Math.tan(.5);
+  return Math.atan(base * tangent / (base + HALF_TRACK * tangent));
+}
+/** Ackermann steering: both front axles intersect the same rear-axle turn centre. */
+export function frontWheelSteering(angle: number, model: string, lateral: number) {
+  if (!lengths[model]) return 0;
+  const base = wheelbase(model), limit = steeringLimit(model);
+  const tangent = Math.tan(Math.max(-limit, Math.min(limit, angle)));
+  return Math.atan(base * tangent / (base - lateral * tangent));
+}
+
 /** Average route curvature across the wheelbase avoids faceted-curve steering jitter. */
 export function wheelSteering(points: Point[], progress: number, model: string) {
   const length = routeLength(points);
   if (length < .001 || !lengths[model]) return 0;
-  const wheelbase = (lengths[model] - .2) * .59;
-  const radius = wheelbase / 2 / length;
+  const base = wheelbase(model);
+  const radius = base / 2 / length;
   const before = Math.max(0, progress - radius), after = Math.min(1, progress + radius);
   if (after <= before) return 0;
   const a = onRoute(points,before).heading, b = onRoute(points,after).heading;
   const turn = Math.atan2(Math.sin(b-a),Math.cos(b-a));
-  return Math.max(-.5,Math.min(.5,Math.atan(wheelbase * turn / ((after-before)*length))));
+  const limit = steeringLimit(model);
+  return Math.max(-limit,Math.min(limit,Math.atan(base * turn / ((after-before)*length))));
 }
 export function advanceSteering(angle: number, target: number, distance: number) {
   return angle + (target-angle) * (1-Math.exp(-Math.max(0,distance)/.45));

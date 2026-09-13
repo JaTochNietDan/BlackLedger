@@ -22,7 +22,7 @@ import type {Journey} from './TravelPresentation';
 import './city3d.css';
 import {CityCueQueue, availableSceneSlot, casualtyFall, gunfightPose, casualtySceneStart, GunfireAudio, BlastAudio} from './city3dEvents';
 import type {SceneSlot} from './city3dEvents';
-import {StreetTraffic, trafficSize, trafficModel, advanceWheel, wheelSteering, advanceSteering} from './city3dTraffic';
+import {StreetTraffic, trafficSize, trafficModel, advanceWheel, wheelSteering, advanceSteering, frontWheelSteering} from './city3dTraffic';
 import {pedestrianModel, isPedestrian} from './city3dCast';
 import {playCityGunshot, playMoment, soundOn} from './sound';
 import {cameraCommand, screenPan} from './city3dControls';
@@ -963,7 +963,7 @@ export function City3D(props: Props) {
             a.steering = advanceSteering(a.steering, wheelSteering(a.points,placement.progress,a.model),distance);
             for (const wheel of a.wheels) {
               wheel.rotation.x = a.wheelPhase;
-              wheel.rotation.y = wheel.name.includes('-front-') ? a.steering : 0;
+              wheel.rotation.y = wheel.name.includes('-front-') ? frontWheelSteering(a.steering, a.model, wheel.position.x) : 0;
             }
           }
           a.wheelPlaced = true;
@@ -1172,6 +1172,7 @@ export function City3D(props: Props) {
               y: a.object.position.y,
               wheelPhase: a.wheels.length ? a.wheelPhase : undefined,
               steering: a.wheels.length ? a.steering : undefined,
+              frontWheels: a.wheels.length ? a.wheels.filter(w => w.name.includes('-front-')).map(w => ({x: w.position.x, angle: w.rotation.y})) : undefined,
             })),
           waiting: [...actors].filter(([, a]) => !a.arrived && !a.object.visible).map(([id]) => id),
           effects: effects.map(e => ({

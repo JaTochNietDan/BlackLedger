@@ -64,6 +64,12 @@ These are staged fixture saves, not earned campaign progress.
 
 ## Continue next
 
+### Individual front-wheel steering (2026-09-13)
+
+- Inside and outside front wheels now use distinct Ackermann angles from the authored axle spacing and lateral pivots. The central steering limit is derived from the inside tyre's existing 0.5-radian limit, preserving the 2.35m moving clearance envelope. Parked wheels remain straight. This is presentation geometry; Go travel outcomes and timing are unchanged.
+- All 123 frontend tests and production build pass. Tests check a shared turn centre for both directions and every vehicle, mirror symmetry, and actual GLB track/wheelbase, combined roll/steering bounds and tyre contact.
+- Isolated port 8848 browser journey Saint Agnes → Thorne & Sons reached revision 3/minute 668 in 17,831ms presentation time. Among 196 moving-wheel samples, peak wheel angle was 0.499989 radians and maximum discrepancy between the two calculated turn centres was 7.11e-15m. Parked angles returned to zero; no browser warnings/errors were captured. Evidence: `docs/qa/city3d-20260913/ackermann-steering.json`. Final idle sample was 145 FPS/8.1ms p95 with two actors; this is not a moving-load or broad-device performance claim. Suspension, differential wheel roll, richer vehicle bodies and broader art acceptance remain unfinished. Main save untouched.
+
 ### Renderer resource teardown (2026-09-13)
 
 - City unmount now disposes instanced buffers, shadow targets and decoded image bitmaps alongside shared geometry, materials and textures. One collection covers the scene and loaded prototypes to avoid repeated disposal of shared assets; late model loads use the same cleanup. The old renderer explicitly releases its WebGL context after cancelling animation and listeners.

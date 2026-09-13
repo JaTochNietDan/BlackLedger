@@ -1,0 +1,978 @@
+{
+  "fixture": "Isolated port 8848, Saint Agnes to Thorne & Sons",
+  "movingWheelSamples": 196,
+  "maxTurnCentreError": 7.105427357601002e-15,
+  "peakWheelAngle": 0.4999885764952178,
+  "samples": [
+    {
+      "revision": 3,
+      "minute": 668,
+      "playbackRate": 1,
+      "camera": {
+        "zoom": 1.65,
+        "x": 356,
+        "z": -128,
+        "targetX": 176,
+        "targetZ": 111.99999999999999
+      },
+      "actors": [
+        {
+          "id": "player",
+          "model": "hudson",
+          "x": 77.47879999999999,
+          "z": 30.4,
+          "y": -0.115,
+          "wheelPhase": 0.5308687468744868,
+          "steering": 0,
+          "frontWheels": [
+            {
+              "x": -0.8700000047683716,
+              "angle": 0
+            },
+            {
+              "x": 0.8700000047683716,
+              "angle": 0
+            }
+          ]
+        }
+      ],
+      "waiting": [],
+      "effects": []
+    },
+    {
+      "revision": 3,
+      "minute": 668,
+      "playbackRate": 1,
+      "camera": {
+        "zoom": 1.65,
+        "x": 356,
+        "z": -128,
+        "targetX": 176,
+        "targetZ": 111.99999999999999
+      },
+      "actors": [
+        {
+          "id": "player",
+          "model": "hudson",
+          "x": 69.8503,
+          "z": 30.4,
+          "y": -0.115,
+          "wheelPhase": 2.2988803929032597,
+          "steering": 0,
+          "frontWheels": [
+            {
+              "x": -0.8700000047683716,
+              "angle": 0
+            },
+            {
+              "x": 0.8700000047683716,
+              "angle": 0
+            }
+          ]
+        }
+      ],
+      "waiting": [],
+      "effects": []
+    },
+    {
+      "revision": 3,
+      "minute": 668,
+      "playbackRate": 1,
+      "camera": {
+        "zoom": 1.65,
+        "x": 356,
+        "z": -128,
+        "targetX": 176,
+        "targetZ": 111.99999999999999
+      },
+      "actors": [
+        {
+          "id": "player",
+          "model": "hudson",
+          "x": 62.719289023130884,
+          "z": 31.767440943825004,
+          "y": -0.115,
+          "wheelPhase": 4.093215716930697,
+          "steering": 0.4384854738956367,
+          "frontWheels": [
+            {
+              "x": -0.8700000047683716,
+              "angle": 0.3899023238497701
+            },
+            {
+              "x": 0.8700000047683716,
+              "angle": 0.49975065862490625
+            }
+          ]
+        }
+      ],
+      "waiting": [],
+      "effects": []
+    },
+    {
+      "revision": 3,
+      "minute": 668,
+      "playbackRate": 1,
+      "camera": {
+        "zoom": 1.65,
+        "x": 356,
+        "z": -128,
+        "targetX": 176,
+        "targetZ": 111.99999999999999
+      },
+      "actors": [
+        {
+          "id": "player",
+          "model": "hudson",
+          "x": 62.4,
+          "z": 39.354798609677516,
+          "y": -0.115,
+          "wheelPhase": 5.869396057512851,
+          "steering": 0.000003911564649461005,
+          "frontWheels": [
+            {
+              "x": -0.8700000047683716,
+              "angle": 0.0000039115600450755085
+            },
+            {
+              "x": 0.8700000047683716,
+              "angle": 0.0000039115692538573415
+            }
+          ]
+        }
+      ],
+      "waiting": [],
+      "effects": []
+    },
+    {
+      "revision": 3,
+      "minute": 668,
+      "playbackRate": 1,
+      "camera": {
+        "zoom": 1.65,
+        "x": 356,
+        "z": -128,
+        "targetX": 176,
+        "targetZ": 111.99999999999999
+      },
+      "actors": [
+        {
+          "id": "player",
+          "model": "hudson",
+          "x": 62.4,
+          "z": 47.00859860967753,
+          "y": -0.115,
+          "wheelPhase": 1.4226007747404814,
+          "steering": 1.6057463540087745e-13,
+          "frontWheels": [
+            {
+              "x": -0.8700000047683716,
+              "angle": 1.605746354008697e-13
+            },
+            {
+              "x": 0.8700000047683716,
+              "angle": 1.6057463540088522e-13
+            }
+          ]
+        }
+      ],
+      "waiting": [],
+      "effects": []
+    },
+    {
+      "revision": 3,
+      "minute": 668,
+      "playbackRate": 1,
+      "camera": {
+        "zoom": 1.65,
+        "x": 356,
+        "z": -128,
+        "targetX": 176,
+        "targetZ": 111.99999999999999
+      },
+      "actors": [
+        {
+          "id": "player",
+          "model": "hudson",
+          "x": 62.4,
+          "z": 54.64259860967752,
+          "y": -0.115,
+          "wheelPhase": 3.2054772856341365,
+          "steering": 6.88830444910323e-21,
+          "frontWheels": [
+            {
+              "x": -0.8700000047683716,
+              "angle": 6.88830444910323e-21
+            },
+            {
+              "x": 0.8700000047683716,
+              "angle": 6.88830444910323e-21
+            }
+          ]
+        }
+      ],
+      "waiting": [],
+      "effects": []
+    },
+    {
+      "revision": 3,
+      "minute": 668,
+      "playbackRate": 1,
+      "camera": {
+        "zoom": 1.65,
+        "x": 356,
+        "z": -128,
+        "targetX": 176,
+        "targetZ": 111.99999999999999
+      },
+      "actors": [
+        {
+          "id": "player",
+          "model": "hudson",
+          "x": 62.4,
+          "z": 62.28319860967751,
+          "y": -0.115,
+          "wheelPhase": 5.006191634365626,
+          "steering": 2.9119108230815656e-28,
+          "frontWheels": [
+            {
+              "x": -0.8700000047683716,
+              "angle": 2.9119108230815656e-28
+            },
+            {
+              "x": 0.8700000047683716,
+              "angle": 2.9119108230815656e-28
+            }
+          ]
+        }
+      ],
+      "waiting": [],
+      "effects": []
+    },
+    {
+      "revision": 3,
+      "minute": 668,
+      "playbackRate": 1,
+      "camera": {
+        "zoom": 1.65,
+        "x": 356,
+        "z": -128,
+        "targetX": 176,
+        "targetZ": 111.99999999999999
+      },
+      "actors": [
+        {
+          "id": "player",
+          "model": "hudson",
+          "x": 62.4,
+          "z": 69.92049860967752,
+          "y": -0.115,
+          "wheelPhase": 0.5148017569986555,
+          "steering": 1.2400198395229874e-35,
+          "frontWheels": [
+            {
+              "x": -0.8700000047683716,
+              "angle": 1.2400198395229874e-35
+            },
+            {
+              "x": 0.8700000047683716,
+              "angle": 1.2400198395229874e-35
+            }
+          ]
+        }
+      ],
+      "waiting": [],
+      "effects": []
+    },
+    {
+      "revision": 3,
+      "minute": 668,
+      "playbackRate": 1,
+      "camera": {
+        "zoom": 1.65,
+        "x": 356,
+        "z": -128,
+        "targetX": 176,
+        "targetZ": 111.99999999999999
+      },
+      "actors": [
+        {
+          "id": "player",
+          "model": "hudson",
+          "x": 62.4,
+          "z": 77.55559860967746,
+          "y": -0.115,
+          "wheelPhase": 2.300651240865131,
+          "steering": 5.306429689065624e-43,
+          "frontWheels": [
+            {
+              "x": -0.8700000047683716,
+              "angle": 5.306429689065624e-43
+            },
+            {
+              "x": 0.8700000047683716,
+              "angle": 5.306429689065624e-43
+            }
+          ]
+        }
+      ],
+      "waiting": [],
+      "effects": []
+    },
+    {
+      "revision": 3,
+      "minute": 668,
+      "playbackRate": 1,
+      "camera": {
+        "zoom": 1.65,
+        "x": 356,
+        "z": -128,
+        "targetX": 176,
+        "targetZ": 111.99999999999999
+      },
+      "actors": [
+        {
+          "id": "player",
+          "model": "hudson",
+          "x": 62.4,
+          "z": 85.19949860967748,
+          "y": -0.115,
+          "wheelPhase": 4.110284508515603,
+          "steering": 2.2268108297441475e-50,
+          "frontWheels": [
+            {
+              "x": -0.8700000047683716,
+              "angle": 2.2268108297441475e-50
+            },
+            {
+              "x": 0.8700000047683716,
+              "angle": 2.2268108297441475e-50
+            }
+          ]
+        }
+      ],
+      "waiting": [],
+      "effects": []
+    },
+    {
+      "revision": 3,
+      "minute": 668,
+      "playbackRate": 1,
+      "camera": {
+        "zoom": 1.65,
+        "x": 356,
+        "z": -128,
+        "targetX": 176,
+        "targetZ": 111.99999999999999
+      },
+      "actors": [
+        {
+          "id": "player",
+          "model": "hudson",
+          "x": 62.4,
+          "z": 92.82909860967743,
+          "y": -0.115,
+          "wheelPhase": 5.881269127517256,
+          "steering": 9.646397387895283e-58,
+          "frontWheels": [
+            {
+              "x": -0.8700000047683716,
+              "angle": 9.646397387895282e-58
+            },
+            {
+              "x": 0.8700000047683716,
+              "angle": 9.646397387895282e-58
+            }
+          ]
+        }
+      ],
+      "waiting": [],
+      "effects": []
+    },
+    {
+      "revision": 3,
+      "minute": 668,
+      "playbackRate": 1,
+      "camera": {
+        "zoom": 1.65,
+        "x": 356,
+        "z": -128,
+        "targetX": 176,
+        "targetZ": 111.99999999999999
+      },
+      "actors": [
+        {
+          "id": "player",
+          "model": "hudson",
+          "x": 66.40459721935483,
+          "z": 97.6,
+          "y": -0.115,
+          "wheelPhase": 1.3978445099321,
+          "steering": 0.17841199748281503,
+          "frontWheels": [
+            {
+              "x": -0.8700000047683716,
+              "angle": 0.16940772629833833
+            },
+            {
+              "x": 0.8700000047683716,
+              "angle": 0.18841520606374246
+            }
+          ]
+        }
+      ],
+      "waiting": [],
+      "effects": []
+    },
+    {
+      "revision": 3,
+      "minute": 668,
+      "playbackRate": 1,
+      "camera": {
+        "zoom": 1.65,
+        "x": 356,
+        "z": -128,
+        "targetX": 176,
+        "targetZ": 111.99999999999999
+      },
+      "actors": [
+        {
+          "id": "player",
+          "model": "hudson",
+          "x": 74.03529721935482,
+          "z": 97.6,
+          "y": -0.115,
+          "wheelPhase": 3.1718021019068274,
+          "steering": 1.022658004321347e-8,
+          "frontWheels": [
+            {
+              "x": -0.8700000047683716,
+              "angle": 1.0226580011740914e-8
+            },
+            {
+              "x": 0.8700000047683716,
+              "angle": 1.0226580074686026e-8
+            }
+          ]
+        }
+      ],
+      "waiting": [],
+      "effects": []
+    },
+    {
+      "revision": 3,
+      "minute": 668,
+      "playbackRate": 1,
+      "camera": {
+        "zoom": 1.65,
+        "x": 356,
+        "z": -128,
+        "targetX": 176,
+        "targetZ": 111.99999999999999
+      },
+      "actors": [
+        {
+          "id": "player",
+          "model": "hudson",
+          "x": 81.69239721935467,
+          "z": 97.6,
+          "y": -0.115,
+          "wheelPhase": 5.017111045232547,
+          "steering": 4.1674656390308605e-16,
+          "frontWheels": [
+            {
+              "x": -0.8700000047683716,
+              "angle": 4.16746563903086e-16
+            },
+            {
+              "x": 0.8700000047683716,
+              "angle": 4.167465639030861e-16
+            }
+          ]
+        }
+      ],
+      "waiting": [],
+      "effects": []
+    },
+    {
+      "revision": 3,
+      "minute": 668,
+      "playbackRate": 1,
+      "camera": {
+        "zoom": 1.65,
+        "x": 356,
+        "z": -128,
+        "targetX": 176,
+        "targetZ": 111.99999999999999
+      },
+      "actors": [
+        {
+          "id": "player",
+          "model": "hudson",
+          "x": 89.31319721935482,
+          "z": 97.6,
+          "y": -0.115,
+          "wheelPhase": 0.48112657327135183,
+          "steering": 1.8409700438988954e-23,
+          "frontWheels": [
+            {
+              "x": -0.8700000047683716,
+              "angle": 1.8409700438988954e-23
+            },
+            {
+              "x": 0.8700000047683716,
+              "angle": 1.8409700438988954e-23
+            }
+          ]
+        }
+      ],
+      "waiting": [],
+      "effects": []
+    },
+    {
+      "revision": 3,
+      "minute": 668,
+      "playbackRate": 1,
+      "camera": {
+        "zoom": 1.65,
+        "x": 356,
+        "z": -128,
+        "targetX": 176,
+        "targetZ": 111.99999999999999
+      },
+      "actors": [
+        {
+          "id": "player",
+          "model": "hudson",
+          "x": 96.96699721935474,
+          "z": 97.6,
+          "y": -0.115,
+          "wheelPhase": 2.3175165976783165,
+          "steering": 7.557412955549551e-31,
+          "frontWheels": [
+            {
+              "x": -0.8700000047683716,
+              "angle": 7.557412955549551e-31
+            },
+            {
+              "x": 0.8700000047683716,
+              "angle": 7.557412955549551e-31
+            }
+          ]
+        }
+      ],
+      "waiting": [],
+      "effects": []
+    },
+    {
+      "revision": 3,
+      "minute": 668,
+      "playbackRate": 1,
+      "camera": {
+        "zoom": 1.65,
+        "x": 356,
+        "z": -128,
+        "targetX": 176,
+        "targetZ": 111.99999999999999
+      },
+      "actors": [
+        {
+          "id": "player",
+          "model": "hudson",
+          "x": 104.6031972193548,
+          "z": 97.6,
+          "y": -0.115,
+          "wheelPhase": 4.106339054518093,
+          "steering": 3.2261557160100257e-38,
+          "frontWheels": [
+            {
+              "x": -0.8700000047683716,
+              "angle": 3.2261557160100257e-38
+            },
+            {
+              "x": 0.8700000047683716,
+              "angle": 3.2261557160100257e-38
+            }
+          ]
+        }
+      ],
+      "waiting": [],
+      "effects": []
+    },
+    {
+      "revision": 3,
+      "minute": 668,
+      "playbackRate": 1,
+      "camera": {
+        "zoom": 1.65,
+        "x": 356,
+        "z": -128,
+        "targetX": 176,
+        "targetZ": 111.99999999999999
+      },
+      "actors": [
+        {
+          "id": "player",
+          "model": "hudson",
+          "x": 112.24489721935481,
+          "z": 97.6,
+          "y": -0.115,
+          "wheelPhase": 5.910026376222618,
+          "steering": 1.360471516552676e-45,
+          "frontWheels": [
+            {
+              "x": -0.8700000047683716,
+              "angle": 1.360471516552676e-45
+            },
+            {
+              "x": 0.8700000047683716,
+              "angle": 1.360471516552676e-45
+            }
+          ]
+        }
+      ],
+      "waiting": [],
+      "effects": []
+    },
+    {
+      "revision": 3,
+      "minute": 668,
+      "playbackRate": 1,
+      "camera": {
+        "zoom": 1.65,
+        "x": 356,
+        "z": -128,
+        "targetX": 176,
+        "targetZ": 111.99999999999999
+      },
+      "actors": [
+        {
+          "id": "player",
+          "model": "hudson",
+          "x": 119.87229721935489,
+          "z": 97.6,
+          "y": -0.115,
+          "wheelPhase": 1.3918797420990836,
+          "steering": 5.922355801503719e-53,
+          "frontWheels": [
+            {
+              "x": -0.8700000047683716,
+              "angle": 5.92235580150372e-53
+            },
+            {
+              "x": 0.8700000047683716,
+              "angle": 5.92235580150372e-53
+            }
+          ]
+        }
+      ],
+      "waiting": [],
+      "effects": []
+    },
+    {
+      "revision": 3,
+      "minute": 668,
+      "playbackRate": 1,
+      "camera": {
+        "zoom": 1.65,
+        "x": 356,
+        "z": -128,
+        "targetX": 176,
+        "targetZ": 111.99999999999999
+      },
+      "actors": [
+        {
+          "id": "player",
+          "model": "hudson",
+          "x": 127.50629721935475,
+          "z": 97.6,
+          "y": -0.115,
+          "wheelPhase": 3.1747562529923723,
+          "steering": 2.5405625063284274e-60,
+          "frontWheels": [
+            {
+              "x": -0.8700000047683716,
+              "angle": 2.5405625063284274e-60
+            },
+            {
+              "x": 0.8700000047683716,
+              "angle": 2.5405625063284274e-60
+            }
+          ]
+        }
+      ],
+      "waiting": [],
+      "effects": []
+    },
+    {
+      "revision": 3,
+      "minute": 668,
+      "playbackRate": 1,
+      "camera": {
+        "zoom": 1.65,
+        "x": 356,
+        "z": -128,
+        "targetX": 176,
+        "targetZ": 111.99999999999999
+      },
+      "actors": [
+        {
+          "id": "player",
+          "model": "hudson",
+          "x": 135.14359721935466,
+          "z": 97.6,
+          "y": -0.115,
+          "wheelPhase": 4.966551682804722,
+          "steering": 1.0818833758316462e-67,
+          "frontWheels": [
+            {
+              "x": -0.8700000047683716,
+              "angle": 1.0818833758316462e-67
+            },
+            {
+              "x": 0.8700000047683716,
+              "angle": 1.0818833758316462e-67
+            }
+          ]
+        }
+      ],
+      "waiting": [],
+      "effects": []
+    },
+    {
+      "revision": 3,
+      "minute": 668,
+      "playbackRate": 1,
+      "camera": {
+        "zoom": 1.65,
+        "x": 356,
+        "z": -128,
+        "targetX": 176,
+        "targetZ": 111.99999999999999
+      },
+      "actors": [
+        {
+          "id": "player",
+          "model": "hudson",
+          "x": 142.79739721935476,
+          "z": 97.6,
+          "y": -0.115,
+          "wheelPhase": 0.5197564000326006,
+          "steering": 4.441266965748328e-75,
+          "frontWheels": [
+            {
+              "x": -0.8700000047683716,
+              "angle": 4.441266965748328e-75
+            },
+            {
+              "x": 0.8700000047683716,
+              "angle": 4.441266965748328e-75
+            }
+          ]
+        }
+      ],
+      "waiting": [],
+      "effects": []
+    },
+    {
+      "revision": 3,
+      "minute": 668,
+      "playbackRate": 1,
+      "camera": {
+        "zoom": 1.65,
+        "x": 356,
+        "z": -128,
+        "targetX": 176,
+        "targetZ": 111.99999999999999
+      },
+      "actors": [
+        {
+          "id": "player",
+          "model": "hudson",
+          "x": 150.42369721935484,
+          "z": 97.6,
+          "y": -0.115,
+          "wheelPhase": 2.2818221001156602,
+          "steering": 1.938088166550065e-82,
+          "frontWheels": [
+            {
+              "x": -0.8700000047683716,
+              "angle": 1.9380881665500647e-82
+            },
+            {
+              "x": 0.8700000047683716,
+              "angle": 1.9380881665500647e-82
+            }
+          ]
+        }
+      ],
+      "waiting": [],
+      "effects": []
+    },
+    {
+      "revision": 3,
+      "minute": 668,
+      "playbackRate": 1,
+      "camera": {
+        "zoom": 1.65,
+        "x": 356,
+        "z": -128,
+        "targetX": 176,
+        "targetZ": 111.99999999999999
+      },
+      "actors": [
+        {
+          "id": "player",
+          "model": "hudson",
+          "x": 158.07199721935484,
+          "z": 97.6,
+          "y": -0.115,
+          "wheelPhase": 4.103347259657999,
+          "steering": 8.053932872690715e-90,
+          "frontWheels": [
+            {
+              "x": -0.8700000047683716,
+              "angle": 8.053932872690715e-90
+            },
+            {
+              "x": 0.8700000047683716,
+              "angle": 8.053932872690715e-90
+            }
+          ]
+        }
+      ],
+      "waiting": [],
+      "effects": []
+    },
+    {
+      "revision": 3,
+      "minute": 668,
+      "playbackRate": 1,
+      "camera": {
+        "zoom": 1.65,
+        "x": 356,
+        "z": -128,
+        "targetX": 176,
+        "targetZ": 111.99999999999999
+      },
+      "actors": [
+        {
+          "id": "player",
+          "model": "hudson",
+          "x": 165.70159721935482,
+          "z": 97.6,
+          "y": -0.115,
+          "wheelPhase": 5.874331878659734,
+          "steering": 3.4889105076936094e-97,
+          "frontWheels": [
+            {
+              "x": -0.8700000047683716,
+              "angle": 3.4889105076936094e-97
+            },
+            {
+              "x": 0.8700000047683716,
+              "angle": 3.4889105076936094e-97
+            }
+          ]
+        }
+      ],
+      "waiting": [],
+      "effects": []
+    },
+    {
+      "revision": 3,
+      "minute": 668,
+      "playbackRate": 1,
+      "camera": {
+        "zoom": 1.65,
+        "x": 356,
+        "z": -128,
+        "targetX": 176,
+        "targetZ": 111.99999999999999
+      },
+      "actors": [
+        {
+          "id": "player",
+          "model": "hudson",
+          "x": 173.33449721935477,
+          "z": 97.6,
+          "y": -0.115,
+          "wheelPhase": 1.3710501094007066,
+          "steering": 1.5003301186434003e-104,
+          "frontWheels": [
+            {
+              "x": -0.8700000047683716,
+              "angle": 1.5003301186434003e-104
+            },
+            {
+              "x": 0.8700000047683716,
+              "angle": 1.5003301186434003e-104
+            }
+          ]
+        }
+      ],
+      "waiting": [],
+      "effects": []
+    }
+  ],
+  "arrival": {
+    "revision": 3,
+    "minute": 668,
+    "progress": 1,
+    "elapsedMs": 17831,
+    "reducedMotion": false
+  },
+  "final": {
+    "revision": 3,
+    "minute": 668,
+    "playbackRate": 1,
+    "camera": {
+      "zoom": 1.65,
+      "x": 356,
+      "z": -128,
+      "targetX": 176,
+      "targetZ": 111.99999999999999
+    },
+    "actors": [
+      {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 185.6,
+        "z": 112,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      },
+      {
+        "id": "player",
+        "model": "person",
+        "x": 176,
+        "z": 100.65,
+        "y": 0.2
+      }
+    ],
+    "waiting": [],
+    "effects": []
+  },
+  "metrics": {
+    "fps": 145,
+    "p95ms": 8.1,
+    "drawCalls": 215,
+    "triangles": 443480,
+    "actors": 2,
+    "buildings": 28,
+    "geometries": 234,
+    "textures": 70
+  },
+  "logs": []
+}

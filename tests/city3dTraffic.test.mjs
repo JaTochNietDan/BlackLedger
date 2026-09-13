@@ -143,3 +143,20 @@ test('parked vehicles reserve straight-wheel width while moving vehicles reserve
  }
  assert.equal(trafficModel('person',true),'person');
 });
+
+test('front tyres share a turn centre with a tighter inside angle in either direction',async()=>{
+ const {frontWheelSteering}=await import('../.runtime/frontend-test/city3dTraffic.js');
+ for(const [model,length] of Object.entries({ford:4.7,hudson:5.1,packard:5.8,police:4.7})){
+  const base=(length-.2)*.59;
+  for(const angle of [-.5,-.3,-.01,.01,.3,.5]){
+   const left=frontWheelSteering(angle,model,-.87),right=frontWheelSteering(angle,model,.87);
+   assert.ok(Math.abs(left)<=.50000001&&Math.abs(right)<=.50000001);
+   assert.ok(Math.sign(left)===Math.sign(angle)&&Math.sign(right)===Math.sign(angle));
+   assert.ok(angle>0?right>left:Math.abs(left)>Math.abs(right),'inside wheel must turn more sharply');
+   assert.ok(Math.abs((-.87+base/Math.tan(left))-(.87+base/Math.tan(right)))<1e-9,'front wheel axes must meet at one rear-axle turn centre');
+   assert.ok(Math.abs(left+frontWheelSteering(-angle,model,.87))<1e-12,'opposite turns must mirror');
+  }
+  assert.equal(frontWheelSteering(0,model,-.87),0);
+  assert.equal(frontWheelSteering(0,model,.87),0);
+ }
+});

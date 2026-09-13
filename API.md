@@ -176,6 +176,10 @@ distance. Moving occupancy includes the steered tyre sweep; parked vehicles
 and staged police retain straight-wheel occupancy at their existing positions.
 These internal presentation distinctions add no public vehicle types or commands.
 
+Front tyres use separate inside/outside steering angles derived from the authored
+axle spacing. The inside angle remains within the existing clearance limit;
+the optional `frontWheels` canvas diagnostic records lateral pivots and angles.
+
 City renderer teardown releases shared model resources, instance buffers,
 shadow targets, decoded image bitmaps and its WebGL context. Canvas metrics
 include geometry and texture counts for repeated-mount diagnostics; these are

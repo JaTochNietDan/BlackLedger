@@ -169,15 +169,19 @@ test('all moving vehicle models retain four centred wheel pivots and tyre contac
 
 test('rolling and steering front wheels remain inside the widened traffic envelope',async()=>{
  const THREE=await import('three');const {GLTFLoader}=await import('three/addons/loaders/GLTFLoader.js');
- const {trafficSize}=await import('../.runtime/frontend-test/city3dTraffic.js');
+ const {trafficSize,frontWheelSteering}=await import('../.runtime/frontend-test/city3dTraffic.js');
  for(const name of ['ford','hudson','packard','police']){
   const bytes=readFileSync(new URL(`../public/art/models/${name}.glb`,import.meta.url));
   const loader=new GLTFLoader();loader.register(parser=>({name:'steering-test-materials',loadMaterial(index){return Promise.resolve(new THREE.MeshBasicMaterial({name:parser.json.materials[index].name}));}}));
   const model=(await loader.parseAsync(bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength),'')).scene;
   const wheels=[];model.traverse(o=>{if(o.name.startsWith('wheel-roll-'))wheels.push(o);});
   const size=trafficSize(name);
+  const front=wheels.filter(w=>w.name.includes('-front-')),rear=wheels.filter(w=>w.name.includes('-rear-'));
+  assert.equal(front.length,2);assert.equal(rear.length,2);
+  assert.ok(Math.abs(front[0].position.z-rear[0].position.z-(size.length-.2)*.59)<1e-6,'steering wheelbase must match the authored axles');
+  for(const wheel of wheels)assert.ok(Math.abs(Math.abs(wheel.position.x)-.87)<1e-6,'steering track must match the authored pivots');
   for(let steer=-.5;steer<=.5001;steer+=.1)for(let roll=0;roll<Math.PI*2;roll+=.2){
-   for(const wheel of wheels){wheel.rotation.order='YXZ';wheel.rotation.x=roll;wheel.rotation.y=wheel.name.includes('-front-')?steer:0;}
+   for(const wheel of wheels){wheel.rotation.order='YXZ';wheel.rotation.x=roll;wheel.rotation.y=wheel.name.includes('-front-')?frontWheelSteering(steer,name,wheel.position.x):0;}
    model.updateMatrixWorld(true);const bounds=new THREE.Box3().setFromObject(model,true);
    assert.ok(bounds.min.x>=-size.width/2&&bounds.max.x<=size.width/2);
    assert.ok(bounds.min.z>=-size.length/2&&bounds.max.z<=size.length/2);
