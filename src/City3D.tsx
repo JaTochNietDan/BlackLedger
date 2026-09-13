@@ -1,3 +1,4 @@
+import {headlightAlpha, headlightCentre} from './city3dHeadlights';
 import {cityWeather, rainVertices} from './city3dWeather';
 import {buildingCondition} from './city3dDamage';
 import {disposeCityResources} from './city3dResources';
@@ -59,6 +60,7 @@ type Actor = {
   wheelPhase: number;
   steering: number;
   wheelPlaced: boolean;
+  lamps: THREE.MeshStandardMaterial[];
   arrived?: boolean;
 };
 type Effect = {
@@ -373,6 +375,20 @@ export function City3D(props: Props) {
       color: 0x080b09, map: particleTexture, transparent: true,
       opacity: 0.48, depthWrite: false,
     });
+    const headlightCanvas = document.createElement('canvas');
+    headlightCanvas.width = headlightCanvas.height = 128;
+    const headlightContext = headlightCanvas.getContext('2d')!;
+    const headlightImage = headlightContext.createImageData(128, 128);
+    for (let y = 0; y < 128; y++) for (let x = 0; x < 128; x++)
+      headlightImage.data.set([255, 255, 255, Math.round(255 * headlightAlpha(x / 63.5 - 1, y / 127))], (y * 128 + x) * 4);
+    headlightContext.putImageData(headlightImage, 0, 0);
+    const headlightTexture = new THREE.CanvasTexture(headlightCanvas); textures.push(headlightTexture);
+    const headlightGeometry = new THREE.PlaneGeometry(3, 7);
+    const headlightMaterial = new THREE.MeshBasicMaterial({map: headlightTexture, color: 0xffdf9b,
+      transparent: true, opacity: .28, depthWrite: false, blending: THREE.AdditiveBlending});
+    const headlightTransform = new THREE.Object3D();
+    let headlightPools = new THREE.InstancedMesh(headlightGeometry, headlightMaterial, 64);
+    headlightPools.frustumCulled = false; headlightPools.count = 0; scene.add(headlightPools);
     const addVehicleShadow = (object: THREE.Group, model: string) => {
       const size = trafficSize(model);
       const shadow = new THREE.Mesh(contactGeometry, contactMaterial);
@@ -509,13 +525,25 @@ export function City3D(props: Props) {
         : pedestrianModel(id, w.everyone?.find(person => person.id === id)?.face);
     };
     let movementClock = performance.now();
+    const releaseActor = (actor: Actor) => {
+      scene.remove(actor.object);
+      actor.lamps.forEach(material => material.dispose());
+    };
     const addActor = (id: string, model: string): Actor => {
       const object = models.get(model)!.clone(true);
       if (!isPedestrian(model)) addVehicleShadow(object, model);
       scene.add(object);
       const limbs: THREE.Object3D[] = [];
       const wheels: THREE.Object3D[] = [];
+      const lamps: THREE.MeshStandardMaterial[] = [];
       object.traverse(o => {
+        if (o instanceof THREE.Mesh) {
+          const cloneLamp = (m: THREE.Material) => {
+            if (!(m instanceof THREE.MeshStandardMaterial) || !['headlamps', 'tail lamps'].includes(m.name)) return m;
+            const own = m.clone(); own.emissiveIntensity = 0; lamps.push(own); return own;
+          };
+          o.material = Array.isArray(o.material) ? o.material.map(cloneLamp) : cloneLamp(o.material);
+        }
         if (o.name.startsWith('wheel-roll-')) { o.rotation.order = 'YXZ'; wheels.push(o); }
         if (o.name.startsWith('leg') || o.name.startsWith('arm') || o.name.startsWith('knee'))
           limbs.push(o);
@@ -531,7 +559,7 @@ export function City3D(props: Props) {
         walking: false,
         phase: 0,
         realSince: 0,
-        limbs, wheels, wheelPhase: 0, steering: 0, wheelPlaced: false,
+        limbs, wheels, lamps, wheelPhase: 0, steering: 0, wheelPlaced: false,
       };
       actors.set(id, actor);
       return actor;
@@ -547,7 +575,7 @@ export function City3D(props: Props) {
     ) => {
       let a = actors.get(id);
       if (a && a.model !== model) {
-        scene.remove(a.object);
+        releaseActor(a);
         actors.delete(id);
         a = undefined;
       }
@@ -704,7 +732,7 @@ export function City3D(props: Props) {
       ) {
         const first = worldID !== `${w.id}:${w.life}` || revision < 0;
         if (first) {
-          for (const a of actors.values()) scene.remove(a.object);
+          for (const a of actors.values()) releaseActor(a);
           actors.clear();
           traffic.clear();
           previous = null;
@@ -753,7 +781,7 @@ export function City3D(props: Props) {
         }
         for (const [id, a] of actors)
           if (!id.startsWith('player') && !seen.has(id)) {
-            scene.remove(a.object);
+            releaseActor(a);
             actors.delete(id);
           }
         const here = lots.get(w.player.location);
@@ -761,7 +789,7 @@ export function City3D(props: Props) {
           if (!actors.has('player')) assign('player', personModel('player'), [entrance(here)], 0, 0, 0, now);
         } else {
           const a = actors.get('player');
-          if (a) scene.remove(a.object);
+          if (a) releaseActor(a);
           actors.delete('player');
         }
         for (const cue of p.journey
@@ -888,7 +916,7 @@ export function City3D(props: Props) {
           const car = actors.get('player-car')!;
           car.points = [parkingSpot(hereForCar)];
         } else if (parked) {
-          scene.remove(parked.object);
+          releaseActor(parked);
           actors.delete('player-car');
         }
         const key = p.journey
@@ -1176,6 +1204,25 @@ export function City3D(props: Props) {
       controls.target.x = THREE.MathUtils.clamp(controls.target.x, -15, plan.width + 15);
       controls.target.z = THREE.MathUtils.clamp(controls.target.z, -15, plan.depth + 15);
       camera.position.add(controls.target.clone().sub(before));
+      if (actors.size * 2 > headlightPools.instanceMatrix.count) {
+        scene.remove(headlightPools); headlightPools.dispose();
+        headlightPools = new THREE.InstancedMesh(headlightGeometry, headlightMaterial, actors.size * 4);
+        headlightPools.frustumCulled = false; scene.add(headlightPools);
+      }
+      headlightPools.count = 0;
+      const lampHour = (w.minute % 1440) / 60, lampsOn = lampHour < 6 || lampHour >= 20;
+      for (const actor of actors.values()) {
+        const lit = ready && lampsOn && actor.object.visible && actor.points.length > 1;
+        for (const material of actor.lamps) material.emissiveIntensity = lit ? (material.name === 'headlamps' ? 1.6 : .8) : 0;
+        if (!lit || !actor.lamps.length) continue;
+        for (const side of [-1, 1]) {
+          const at = headlightCentre(actor.object.position.x, actor.object.position.z, actor.object.rotation.y, trafficSize(actor.model).length, side);
+          headlightTransform.position.set(at.x, actor.object.position.y + .02, at.z);
+          headlightTransform.rotation.set(-Math.PI / 2, actor.object.rotation.y, 0, 'YXZ'); headlightTransform.updateMatrix();
+          headlightPools.setMatrixAt(headlightPools.count++, headlightTransform.matrix);
+        }
+      }
+      if (headlightPools.count) headlightPools.instanceMatrix.needsUpdate = true;
       rainfall.visible = ready && motion && w.sky?.kind === 'rain';
       if (rainfall.visible) {
         rainClock += Math.min(dt, 100) / 1000;
@@ -1188,6 +1235,7 @@ export function City3D(props: Props) {
           revision: w.revision,
           minute: w.minute,
           playbackRate: playback.current,
+          headlightPools: headlightPools.count,
           weather: {kind: w.sky?.kind || 'clear', wet: w.sky?.wet || 0, rainVisible: rainfall.visible, rainClock},
           camera: {zoom: camera.zoom, x: camera.position.x, z: camera.position.z,
             targetX: controls.target.x, targetZ: controls.target.z},
@@ -1201,6 +1249,7 @@ export function City3D(props: Props) {
               y: a.object.position.y,
               wheelPhase: a.wheels.length ? a.wheelPhase : undefined,
               steering: a.wheels.length ? a.steering : undefined,
+              lampsOn: a.lamps.length ? a.lamps.some(m => m.emissiveIntensity > 0) : undefined,
               frontWheels: a.wheels.length ? a.wheels.filter(w => w.name.includes('-front-')).map(w => ({x: w.position.x, angle: w.rotation.y})) : undefined,
             })),
           waiting: [...actors].filter(([, a]) => !a.arrived && !a.object.visible).map(([id]) => id),

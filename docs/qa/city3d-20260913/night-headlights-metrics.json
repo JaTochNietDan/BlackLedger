@@ -1,0 +1,2123 @@
+{
+  "before": {
+    "revision": 0,
+    "minute": 1260,
+    "playbackRate": 1,
+    "headlightPools": 18,
+    "weather": {
+      "kind": "clear",
+      "wet": 0,
+      "rainVisible": false,
+      "rainClock": 0
+    },
+    "camera": {
+      "zoom": 3.5369215365000013,
+      "x": 260,
+      "z": -192,
+      "targetX": 80,
+      "targetZ": 48
+    },
+    "actors": [
+      {
+        "id": "mara",
+        "model": "woman",
+        "x": 27.35,
+        "z": 30.48400000000001,
+        "y": -0.07
+      },
+      {
+        "id": "leo",
+        "model": "ford",
+        "x": 62.4,
+        "z": 49.981463610709696,
+        "y": -0.115,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": true,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      },
+      {
+        "id": "vittorio",
+        "model": "hudson",
+        "x": 1.6,
+        "z": 14.555400463440833,
+        "y": -0.115,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": true,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      },
+      {
+        "id": "elena",
+        "model": "packard",
+        "x": 41.08873147957003,
+        "z": 33.6,
+        "y": -0.115,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": true,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      },
+      {
+        "id": "commissioner",
+        "model": "person",
+        "x": 123.2,
+        "z": 68.65,
+        "y": 0.2
+      },
+      {
+        "id": "mayor",
+        "model": "ford",
+        "x": 94.4,
+        "z": 25.977932869892506,
+        "y": -0.115,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": true,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      },
+      {
+        "id": "editor",
+        "model": "hudson",
+        "x": 129.6,
+        "z": 13.099860417096757,
+        "y": -0.115,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": true,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      },
+      {
+        "id": "person-8",
+        "model": "packard",
+        "x": 129.6,
+        "z": 32.23137133882696,
+        "y": -0.115,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": true,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      },
+      {
+        "id": "person-9",
+        "model": "person",
+        "x": 100.65,
+        "z": 50.765714285714274,
+        "y": 0.2
+      },
+      {
+        "id": "person-10",
+        "model": "ford",
+        "x": 158.4,
+        "z": 35.32015032004966,
+        "y": -0.115,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": true,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      },
+      {
+        "id": "person-11",
+        "model": "hudson",
+        "x": 62.4,
+        "z": 34.51126620322582,
+        "y": -0.115,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": true,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      },
+      {
+        "id": "person-12",
+        "model": "packard",
+        "x": 47.112992458433276,
+        "z": 33.6,
+        "y": -0.115,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": true,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      },
+      {
+        "id": "player",
+        "model": "person",
+        "x": 80,
+        "z": 36.65,
+        "y": 0.2
+      },
+      {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 89.6,
+        "z": 48,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    ],
+    "waiting": [],
+    "effects": []
+  },
+  "metrics": {
+    "fps": 145,
+    "p95ms": 7.9,
+    "drawCalls": 391,
+    "triangles": 604466,
+    "actors": 14,
+    "buildings": 28,
+    "geometries": 271,
+    "textures": 89
+  },
+  "travel": [
+    {
+      "pools": 20,
+      "player": {
+        "id": "player",
+        "model": "hudson",
+        "x": 77.4755,
+        "z": 30.4,
+        "y": -0.115,
+        "wheelPhase": 0.5397876657933955,
+        "steering": 0,
+        "lampsOn": true,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    },
+    {
+      "pools": 20,
+      "player": {
+        "id": "player",
+        "model": "hudson",
+        "x": 75.5032,
+        "z": 30.4,
+        "y": -0.115,
+        "wheelPhase": 5.870328206333909,
+        "steering": 0,
+        "lampsOn": true,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    },
+    {
+      "pools": 20,
+      "player": {
+        "id": "player",
+        "model": "hudson",
+        "x": 73.44180000000001,
+        "z": 30.4,
+        "y": -0.115,
+        "wheelPhase": 5.158494250505652,
+        "steering": 0,
+        "lampsOn": true,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    },
+    {
+      "pools": 20,
+      "player": {
+        "id": "player",
+        "model": "hudson",
+        "x": 71.45740000000002,
+        "z": 30.4,
+        "y": -0.115,
+        "wheelPhase": 4.238552186569293,
+        "steering": 0,
+        "lampsOn": true,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    },
+    {
+      "pools": 20,
+      "player": {
+        "id": "player",
+        "model": "hudson",
+        "x": 69.45980000000002,
+        "z": 30.4,
+        "y": -0.115,
+        "wheelPhase": 3.35428579830864,
+        "steering": 0,
+        "lampsOn": true,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    },
+    {
+      "pools": 20,
+      "player": {
+        "id": "player",
+        "model": "hudson",
+        "x": 67.4666,
+        "z": 30.4,
+        "y": -0.115,
+        "wheelPhase": 2.4581275181561244,
+        "steering": 0,
+        "lampsOn": true,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    },
+    {
+      "pools": 20,
+      "player": {
+        "id": "player",
+        "model": "hudson",
+        "x": 65.48110000000001,
+        "z": 30.4,
+        "y": -0.115,
+        "wheelPhase": 1.5411584271927223,
+        "steering": 0,
+        "lampsOn": true,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    },
+    {
+      "pools": 20,
+      "player": {
+        "id": "player",
+        "model": "hudson",
+        "x": 63.5077,
+        "z": 30.4,
+        "y": -0.115,
+        "wheelPhase": 0.5914866335266844,
+        "steering": 0,
+        "lampsOn": true,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    },
+    {
+      "pools": 20,
+      "player": {
+        "id": "player",
+        "model": "hudson",
+        "x": 61.508999999999986,
+        "z": 30.4,
+        "y": -0.115,
+        "wheelPhase": 5.993378525418614,
+        "steering": 0,
+        "lampsOn": true,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    },
+    {
+      "pools": 20,
+      "player": {
+        "id": "player",
+        "model": "hudson",
+        "x": 59.53559999999999,
+        "z": 30.4,
+        "y": -0.115,
+        "wheelPhase": 5.043706731752536,
+        "steering": 0,
+        "lampsOn": true,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    },
+    {
+      "pools": 20,
+      "player": {
+        "id": "player",
+        "model": "hudson",
+        "x": 57.54679999999999,
+        "z": 30.4,
+        "y": -0.115,
+        "wheelPhase": 4.135656559708079,
+        "steering": 0,
+        "lampsOn": true,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    },
+    {
+      "pools": 20,
+      "player": {
+        "id": "player",
+        "model": "hudson",
+        "x": 55.550299999999986,
+        "z": 30.4,
+        "y": -0.115,
+        "wheelPhase": 3.2484171984744505,
+        "steering": 0,
+        "lampsOn": true,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    },
+    {
+      "pools": 20,
+      "player": {
+        "id": "player",
+        "model": "hudson",
+        "x": 53.57909999999998,
+        "z": 30.4,
+        "y": -0.115,
+        "wheelPhase": 2.2927994588624414,
+        "steering": 0,
+        "lampsOn": true,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    },
+    {
+      "pools": 20,
+      "player": {
+        "id": "player",
+        "model": "hudson",
+        "x": 51.52099999999997,
+        "z": 30.4,
+        "y": -0.115,
+        "wheelPhase": 1.5720465841153164,
+        "steering": 0,
+        "lampsOn": true,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    },
+    {
+      "pools": 20,
+      "player": {
+        "id": "player",
+        "model": "hudson",
+        "x": 49.52889999999998,
+        "z": 30.4,
+        "y": -0.115,
+        "wheelPhase": 0.6729153309897679,
+        "steering": 0,
+        "lampsOn": true,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    },
+    {
+      "pools": 18,
+      "player": {
+        "id": "player",
+        "model": "person",
+        "x": 48,
+        "z": 36.65,
+        "y": 0.2
+      },
+      "parked": {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 57.6,
+        "z": 48,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    },
+    {
+      "pools": 18,
+      "player": {
+        "id": "player",
+        "model": "person",
+        "x": 48,
+        "z": 36.65,
+        "y": 0.2
+      },
+      "parked": {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 57.6,
+        "z": 48,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    },
+    {
+      "pools": 18,
+      "player": {
+        "id": "player",
+        "model": "person",
+        "x": 48,
+        "z": 36.65,
+        "y": 0.2
+      },
+      "parked": {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 57.6,
+        "z": 48,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    },
+    {
+      "pools": 18,
+      "player": {
+        "id": "player",
+        "model": "person",
+        "x": 48,
+        "z": 36.65,
+        "y": 0.2
+      },
+      "parked": {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 57.6,
+        "z": 48,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    },
+    {
+      "pools": 18,
+      "player": {
+        "id": "player",
+        "model": "person",
+        "x": 48,
+        "z": 36.65,
+        "y": 0.2
+      },
+      "parked": {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 57.6,
+        "z": 48,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    },
+    {
+      "pools": 18,
+      "player": {
+        "id": "player",
+        "model": "person",
+        "x": 48,
+        "z": 36.65,
+        "y": 0.2
+      },
+      "parked": {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 57.6,
+        "z": 48,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    },
+    {
+      "pools": 18,
+      "player": {
+        "id": "player",
+        "model": "person",
+        "x": 48,
+        "z": 36.65,
+        "y": 0.2
+      },
+      "parked": {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 57.6,
+        "z": 48,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    },
+    {
+      "pools": 18,
+      "player": {
+        "id": "player",
+        "model": "person",
+        "x": 48,
+        "z": 36.65,
+        "y": 0.2
+      },
+      "parked": {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 57.6,
+        "z": 48,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    },
+    {
+      "pools": 18,
+      "player": {
+        "id": "player",
+        "model": "person",
+        "x": 48,
+        "z": 36.65,
+        "y": 0.2
+      },
+      "parked": {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 57.6,
+        "z": 48,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    },
+    {
+      "pools": 18,
+      "player": {
+        "id": "player",
+        "model": "person",
+        "x": 48,
+        "z": 36.65,
+        "y": 0.2
+      },
+      "parked": {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 57.6,
+        "z": 48,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    },
+    {
+      "pools": 18,
+      "player": {
+        "id": "player",
+        "model": "person",
+        "x": 48,
+        "z": 36.65,
+        "y": 0.2
+      },
+      "parked": {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 57.6,
+        "z": 48,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    },
+    {
+      "pools": 18,
+      "player": {
+        "id": "player",
+        "model": "person",
+        "x": 48,
+        "z": 36.65,
+        "y": 0.2
+      },
+      "parked": {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 57.6,
+        "z": 48,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    },
+    {
+      "pools": 18,
+      "player": {
+        "id": "player",
+        "model": "person",
+        "x": 48,
+        "z": 36.65,
+        "y": 0.2
+      },
+      "parked": {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 57.6,
+        "z": 48,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    },
+    {
+      "pools": 18,
+      "player": {
+        "id": "player",
+        "model": "person",
+        "x": 48,
+        "z": 36.65,
+        "y": 0.2
+      },
+      "parked": {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 57.6,
+        "z": 48,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    },
+    {
+      "pools": 18,
+      "player": {
+        "id": "player",
+        "model": "person",
+        "x": 48,
+        "z": 36.65,
+        "y": 0.2
+      },
+      "parked": {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 57.6,
+        "z": 48,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    },
+    {
+      "pools": 18,
+      "player": {
+        "id": "player",
+        "model": "person",
+        "x": 48,
+        "z": 36.65,
+        "y": 0.2
+      },
+      "parked": {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 57.6,
+        "z": 48,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    },
+    {
+      "pools": 18,
+      "player": {
+        "id": "player",
+        "model": "person",
+        "x": 48,
+        "z": 36.65,
+        "y": 0.2
+      },
+      "parked": {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 57.6,
+        "z": 48,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    },
+    {
+      "pools": 18,
+      "player": {
+        "id": "player",
+        "model": "person",
+        "x": 48,
+        "z": 36.65,
+        "y": 0.2
+      },
+      "parked": {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 57.6,
+        "z": 48,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    },
+    {
+      "pools": 18,
+      "player": {
+        "id": "player",
+        "model": "person",
+        "x": 48,
+        "z": 36.65,
+        "y": 0.2
+      },
+      "parked": {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 57.6,
+        "z": 48,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    },
+    {
+      "pools": 18,
+      "player": {
+        "id": "player",
+        "model": "person",
+        "x": 48,
+        "z": 36.65,
+        "y": 0.2
+      },
+      "parked": {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 57.6,
+        "z": 48,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    },
+    {
+      "pools": 18,
+      "player": {
+        "id": "player",
+        "model": "person",
+        "x": 48,
+        "z": 36.65,
+        "y": 0.2
+      },
+      "parked": {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 57.6,
+        "z": 48,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    },
+    {
+      "pools": 18,
+      "player": {
+        "id": "player",
+        "model": "person",
+        "x": 48,
+        "z": 36.65,
+        "y": 0.2
+      },
+      "parked": {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 57.6,
+        "z": 48,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    },
+    {
+      "pools": 18,
+      "player": {
+        "id": "player",
+        "model": "person",
+        "x": 48,
+        "z": 36.65,
+        "y": 0.2
+      },
+      "parked": {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 57.6,
+        "z": 48,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    },
+    {
+      "pools": 18,
+      "player": {
+        "id": "player",
+        "model": "person",
+        "x": 48,
+        "z": 36.65,
+        "y": 0.2
+      },
+      "parked": {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 57.6,
+        "z": 48,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    },
+    {
+      "pools": 18,
+      "player": {
+        "id": "player",
+        "model": "person",
+        "x": 48,
+        "z": 36.65,
+        "y": 0.2
+      },
+      "parked": {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 57.6,
+        "z": 48,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    },
+    {
+      "pools": 18,
+      "player": {
+        "id": "player",
+        "model": "person",
+        "x": 48,
+        "z": 36.65,
+        "y": 0.2
+      },
+      "parked": {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 57.6,
+        "z": 48,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    },
+    {
+      "pools": 18,
+      "player": {
+        "id": "player",
+        "model": "person",
+        "x": 48,
+        "z": 36.65,
+        "y": 0.2
+      },
+      "parked": {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 57.6,
+        "z": 48,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    },
+    {
+      "pools": 18,
+      "player": {
+        "id": "player",
+        "model": "person",
+        "x": 48,
+        "z": 36.65,
+        "y": 0.2
+      },
+      "parked": {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 57.6,
+        "z": 48,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    },
+    {
+      "pools": 18,
+      "player": {
+        "id": "player",
+        "model": "person",
+        "x": 48,
+        "z": 36.65,
+        "y": 0.2
+      },
+      "parked": {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 57.6,
+        "z": 48,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    },
+    {
+      "pools": 18,
+      "player": {
+        "id": "player",
+        "model": "person",
+        "x": 48,
+        "z": 36.65,
+        "y": 0.2
+      },
+      "parked": {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 57.6,
+        "z": 48,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    },
+    {
+      "pools": 18,
+      "player": {
+        "id": "player",
+        "model": "person",
+        "x": 48,
+        "z": 36.65,
+        "y": 0.2
+      },
+      "parked": {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 57.6,
+        "z": 48,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    },
+    {
+      "pools": 18,
+      "player": {
+        "id": "player",
+        "model": "person",
+        "x": 48,
+        "z": 36.65,
+        "y": 0.2
+      },
+      "parked": {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 57.6,
+        "z": 48,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    },
+    {
+      "pools": 18,
+      "player": {
+        "id": "player",
+        "model": "person",
+        "x": 48,
+        "z": 36.65,
+        "y": 0.2
+      },
+      "parked": {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 57.6,
+        "z": 48,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    },
+    {
+      "pools": 18,
+      "player": {
+        "id": "player",
+        "model": "person",
+        "x": 48,
+        "z": 36.65,
+        "y": 0.2
+      },
+      "parked": {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 57.6,
+        "z": 48,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    },
+    {
+      "pools": 18,
+      "player": {
+        "id": "player",
+        "model": "person",
+        "x": 48,
+        "z": 36.65,
+        "y": 0.2
+      },
+      "parked": {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 57.6,
+        "z": 48,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    },
+    {
+      "pools": 18,
+      "player": {
+        "id": "player",
+        "model": "person",
+        "x": 48,
+        "z": 36.65,
+        "y": 0.2
+      },
+      "parked": {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 57.6,
+        "z": 48,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    },
+    {
+      "pools": 18,
+      "player": {
+        "id": "player",
+        "model": "person",
+        "x": 48,
+        "z": 36.65,
+        "y": 0.2
+      },
+      "parked": {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 57.6,
+        "z": 48,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    },
+    {
+      "pools": 18,
+      "player": {
+        "id": "player",
+        "model": "person",
+        "x": 48,
+        "z": 36.65,
+        "y": 0.2
+      },
+      "parked": {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 57.6,
+        "z": 48,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    },
+    {
+      "pools": 18,
+      "player": {
+        "id": "player",
+        "model": "person",
+        "x": 48,
+        "z": 36.65,
+        "y": 0.2
+      },
+      "parked": {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 57.6,
+        "z": 48,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    },
+    {
+      "pools": 18,
+      "player": {
+        "id": "player",
+        "model": "person",
+        "x": 48,
+        "z": 36.65,
+        "y": 0.2
+      },
+      "parked": {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 57.6,
+        "z": 48,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    },
+    {
+      "pools": 18,
+      "player": {
+        "id": "player",
+        "model": "person",
+        "x": 48,
+        "z": 36.65,
+        "y": 0.2
+      },
+      "parked": {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 57.6,
+        "z": 48,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    },
+    {
+      "pools": 18,
+      "player": {
+        "id": "player",
+        "model": "person",
+        "x": 48,
+        "z": 36.65,
+        "y": 0.2
+      },
+      "parked": {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 57.6,
+        "z": 48,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    },
+    {
+      "pools": 18,
+      "player": {
+        "id": "player",
+        "model": "person",
+        "x": 48,
+        "z": 36.65,
+        "y": 0.2
+      },
+      "parked": {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 57.6,
+        "z": 48,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    },
+    {
+      "pools": 18,
+      "player": {
+        "id": "player",
+        "model": "person",
+        "x": 48,
+        "z": 36.65,
+        "y": 0.2
+      },
+      "parked": {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 57.6,
+        "z": 48,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    },
+    {
+      "pools": 18,
+      "player": {
+        "id": "player",
+        "model": "person",
+        "x": 48,
+        "z": 36.65,
+        "y": 0.2
+      },
+      "parked": {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 57.6,
+        "z": 48,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    },
+    {
+      "pools": 18,
+      "player": {
+        "id": "player",
+        "model": "person",
+        "x": 48,
+        "z": 36.65,
+        "y": 0.2
+      },
+      "parked": {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 57.6,
+        "z": 48,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    },
+    {
+      "pools": 18,
+      "player": {
+        "id": "player",
+        "model": "person",
+        "x": 48,
+        "z": 36.65,
+        "y": 0.2
+      },
+      "parked": {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 57.6,
+        "z": 48,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    },
+    {
+      "pools": 18,
+      "player": {
+        "id": "player",
+        "model": "person",
+        "x": 48,
+        "z": 36.65,
+        "y": 0.2
+      },
+      "parked": {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 57.6,
+        "z": 48,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    },
+    {
+      "pools": 18,
+      "player": {
+        "id": "player",
+        "model": "person",
+        "x": 48,
+        "z": 36.65,
+        "y": 0.2
+      },
+      "parked": {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 57.6,
+        "z": 48,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    },
+    {
+      "pools": 18,
+      "player": {
+        "id": "player",
+        "model": "person",
+        "x": 48,
+        "z": 36.65,
+        "y": 0.2
+      },
+      "parked": {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 57.6,
+        "z": 48,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    }
+  ],
+  "arrival": {
+    "revision": 1,
+    "minute": 1269,
+    "progress": 1,
+    "elapsedMs": 2917,
+    "reducedMotion": false
+  },
+  "logs": [],
+  "daylight": {
+    "minute": 600,
+    "pools": 0,
+    "litActors": 0
+  }
+}

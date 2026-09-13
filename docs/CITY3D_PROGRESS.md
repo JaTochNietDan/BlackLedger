@@ -64,6 +64,13 @@ These are staged fixture saves, not earned campaign progress.
 
 ## Continue next
 
+### Night vehicle lamps and road pools (2026-09-13)
+
+- Night journey vehicles now illuminate their authored head/tail lamps and project two soft forward pools through one shared instanced draw. Lamp materials are private to each actor and released when it leaves the scene, so parked cars can switch off without changing other vehicles or source models. Paused public journeys retain lamps; parked cars and daylight traffic do not. Pool capacity grows with the actor count, releasing replaced instance buffers.
+- All 134 frontend tests and production build pass. Tests cover bumper-relative pool positions through all headings and current vehicle lengths, and transparent tapered mask boundaries. Browser testing caught an initial mistake that treated a paused journey as parked; the final rule uses the journey path rather than frame-to-frame movement.
+- New isolated night server 8857 uses `.runtime/city3d-night-20260913-152215-71362.sqlite3`. Initial 14-actor/28-building view showed 18 pools at 145 FPS, 7.9ms p95, 391 draws, 604,466 triangles. Saint Agnes → The Mariner drive reached revision 1/minute 1269 in 2,917ms presentation time; 15 sampled travel frames had player lamps on, then the parked Hudson had lamps off. Daylight rainy fixture 8856 showed zero pools/illuminated actors. No captured console warnings/errors; main save untouched.
+- Evidence: `docs/qa/city3d-20260913/night-headlights.png` and `night-headlights-metrics.json`. These are ground light approximations; they do not cast vehicle headlight shadows onto buildings. Staged-police projections, richer wet reflections, broad-device performance and final city art acceptance remain unfinished.
+
 ### Backend weather in the 3D city (2026-09-13)
 
 - Public `sky.kind` now drives overcast/rain lighting and fog range; `sky.wet` darkens and reduces roughness on road/pavement materials, including the backend's drying-day wetness. Rain uses one LineSegments draw with a reusable 1,800-streak vertex buffer. It follows elapsed presentation seconds independently of Go time and travel speed. Motion-off and OS reduced-motion paths hide precipitation while retaining wet surfaces. Teardown now collects line/point geometry and materials as well as meshes.

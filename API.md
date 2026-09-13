@@ -199,3 +199,8 @@ fog, falling rain and wet road/pavement materials. Rain uses elapsed presentatio
 seconds, independently of gameplay time and travel playback speed. Disabling
 motion (or OS reduced motion) hides precipitation while retaining wetness.
 Drying streets follow `sky.wet` even after rain stops; the view invents no weather.
+
+At night, visible cars on public/presentation journeys illuminate their authored
+head/tail lamps and project soft pools ahead of the bumper. Paused journey traffic
+keeps its lights on; parked cars and daylight traffic do not. Pools are inexpensive
+ground projections, not dynamic shadow-casting lights or gameplay visibility rules.
