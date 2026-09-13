@@ -105,6 +105,15 @@ def clear():
     bpy.ops.wm.read_factory_settings(use_empty=True)
 
 
+def blast_fragment():
+    clay=material('broken fired clay',(.46,.25,.14));brick(clay,1954)
+    ob=box('chipped masonry fragment',(0,0,0),(.18,.09,.08),clay,.012)
+    # A broken end, rather than a perfect miniature brick.
+    for vertex in ob.data.vertices:
+        if vertex.co.x>.065:
+            vertex.co.x-=.009*(1+math.sin(vertex.co.y*91+vertex.co.z*73))
+
+
 def rooftop_tank(height, iron):
     # Coopered timber cistern, strapped steel hoops and a braced rooftop stand.
     wood=material('weathered cistern cedar',(.58,.49,.35))
@@ -783,6 +792,7 @@ for name in ('person','woman'):
     manifest[name]['motion_bounds_blender']=[[round(min(p[i] for p in motion_points),4) for i in range(3)],[round(max(p[i] for p in motion_points),4) for i in range(3)]]
 clear();undertaker();manifest['undertaker']=export('undertaker')
 clear();revolver();manifest['revolver']=export('revolver')
+clear();blast_fragment();manifest['blast-fragment']=export('blast-fragment')
 clear();street_bed();manifest['street-bed']=export('street-bed')
 clear();streetside();manifest['streetside']=export('streetside')
 with open(os.path.join(OUT,'manifest.json'),'w') as f: json.dump(manifest,f,indent=2)

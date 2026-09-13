@@ -34,3 +34,29 @@ export function billowAlpha(x: number, y: number) {
   const grain = .86 + .09 * Math.sin(x * 31 + y * 17) * Math.cos(y * 29 - x * 13);
   return Math.max(0, Math.min(1, edge * grain));
 }
+
+const fragmentVariation = (index: number) => {
+  let h = Math.imul(index + 1, 0x45d9f3b);
+  h = Math.imul(h ^ (h >>> 16), 0x45d9f3b);
+  return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
+};
+/** Small facade fragments settle independently; paths never enter the road. */
+export function debrisPose(index: number, seconds: number) {
+  const delay = (index % 3) * .025;
+  const duration = .62 + (index % 4) * .09;
+  const u = Math.max(0, Math.min(1, (seconds - delay) / duration));
+  const lane = (index - 5.5) * .5;
+  const spin = (1 - smooth(.65, 1, u));
+  return {
+    x: lane * (.75 + .25 * u) + (fragmentVariation(index + 12) - .5) * .1,
+    z: -.25 - u * (.18 + fragmentVariation(index) * 1.7),
+    height: u === 1 ? 0 : .4 * (1 - u) + Math.sin(Math.PI * u) * (.6 + index % 4 * .15),
+    rx: u * (5 + index % 3) * spin, ry: index * 1.7 + u * 3,
+    rz: spin ? u * (index % 2 ? -4 : 4) * spin : 0,
+    scale: seconds < delay || seconds >= 3 ? 0 : .85 + index % 3 * .1,
+  };
+}
+export function fragmentBlocked(x: number, z: number, body: {x: number; z: number; heading: number}, width: number, length: number) {
+  const dx=x-body.x, dz=z-body.z, c=Math.cos(body.heading), s=Math.sin(body.heading);
+  return Math.abs(dx*c-dz*s)<width/2+.15 && Math.abs(dx*s+dz*c)<length/2+.15;
+}

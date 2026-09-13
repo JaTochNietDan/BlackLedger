@@ -454,5 +454,21 @@
       ]
     ],
     "bytes": 798024
+  },
+  "blast-fragment": {
+    "file": "blast-fragment.glb",
+    "bounds_blender": [
+      [
+        -0.09,
+        -0.045,
+        -0.04
+      ],
+      [
+        0.0895,
+        0.045,
+        0.04
+      ]
+    ],
+    "bytes": 184796
   }
 }

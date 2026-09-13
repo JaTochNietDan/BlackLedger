@@ -157,3 +157,7 @@ unmute. This affects presentation only and never advances or reverses a saved ev
 Explosion presentation now starts at the target building's rendered front bound,
 with a brief fire/light burst followed by rising smoke and a three-second fade.
 This uses the committed explosion cue; it adds no damage, ignition or physics rules.
+
+Explosion debris is cosmetic: instanced masonry fragments settle on the facade
+pavement and disappear with playback. They avoid visible actor footprints and
+introduce no collision, inventory, obstruction or damage rule in the simulation.

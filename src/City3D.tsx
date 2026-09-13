@@ -25,7 +25,7 @@ import {StreetTraffic, trafficSize} from './city3dTraffic';
 import {pedestrianModel, isPedestrian} from './city3dCast';
 import {playCityGunshot, soundOn} from './sound';
 import {cameraCommand, screenPan} from './city3dControls';
-import {blastParticle, blastLight, blastOpacity, billowAlpha} from './city3dBlast';
+import {blastParticle, blastLight, blastOpacity, billowAlpha, debrisPose, fragmentBlocked} from './city3dBlast';
 
 type Props = {
   state: Snapshot;
@@ -59,6 +59,7 @@ type Effect = {
   since: number;
   mesh: THREE.InstancedMesh;
   light: THREE.PointLight;
+  debris?: THREE.InstancedMesh;
   extra?: THREE.Group;
   slot?: SceneSlot;
   gunArm?: THREE.Object3D;
@@ -79,6 +80,7 @@ const modelNames = [
   'person',
   'woman',
   'revolver',
+  'blast-fragment',
   'street-bed',
   'filling',
   'garage',
@@ -317,6 +319,13 @@ export function City3D(props: Props) {
     const labels = new Map<string, THREE.Sprite>();
     const actors = new Map<string, Actor>();
     const effects: Effect[] = [];
+    const disposeDebris = (effect: Effect) => {
+      if (!effect.debris) return;
+      scene.remove(effect.debris);
+      effect.debris.geometry.dispose();
+      (effect.debris.material as THREE.Material).dispose();
+      effect.debris.dispose();
+    };
     const cueQueue = new CityCueQueue();
     const traffic = new StreetTraffic();
     const effectGeometry = new THREE.PlaneGeometry(1, 1);
@@ -646,6 +655,7 @@ export function City3D(props: Props) {
           scene.remove(effect.mesh, effect.light);
           if (effect.extra) scene.remove(effect.extra);
           effect.audio?.dispose();
+          disposeDebris(effect);
           effect.mesh.dispose();
           (effect.mesh.material as THREE.Material).dispose();
         }
@@ -765,7 +775,20 @@ export function City3D(props: Props) {
             mesh.visible = false;
             scene.add(extra);
           }
-          effects.push({cue, since: now, mesh, light, extra, gunArm, muzzle,
+          let debris: THREE.InstancedMesh | undefined;
+          if (cue.kind === 'explosion') {
+            const model = models.get('blast-fragment')!;
+            model.updateMatrixWorld(true);
+            model.traverse(part => {
+              if (!(part instanceof THREE.Mesh) || debris) return;
+              const material = (part.material as THREE.MeshStandardMaterial).clone();
+              material.transparent = true;
+              debris = new THREE.InstancedMesh(part.geometry.clone().applyMatrix4(part.matrixWorld), material, 12);
+              debris.frustumCulled = false;
+              scene.add(debris);
+            });
+          }
+          effects.push({cue, since: now, mesh, light, debris, extra, gunArm, muzzle,
             audio: cue.kind === 'gunfight' ? new GunfireAudio(playCityGunshot) : undefined});
           if (p.activeCue?.id === cue.id) focus.current(cue.target);
         }
@@ -989,6 +1012,7 @@ export function City3D(props: Props) {
             scene.remove(e.mesh, e.light);
             if (e.extra) scene.remove(e.extra);
             e.audio?.dispose();
+            disposeDebris(e);
             e.mesh.dispose();
             (e.mesh.material as THREE.Material).dispose();
             effects.splice(i, 1);
@@ -1054,6 +1078,35 @@ export function City3D(props: Props) {
               ),
             );
           }
+          if (e.debris && blastOrigin) {
+            for (let j = 0; j < 12; j++) {
+              const fragment = debrisPose(j, t * 3);
+              const x = blastOrigin.x + fragment.x, z = blastOrigin.z + fragment.z;
+              let blocked = false;
+              for (const actor of actors.values()) {
+                if (!actor.object.visible) continue;
+                const size = trafficSize(actor.model);
+                if (fragmentBlocked(x,z,{x:actor.object.position.x,z:actor.object.position.z,heading:actor.object.rotation.y},size.width,size.length)) blocked = true;
+              }
+              for (const other of effects) {
+                if (!other.slot || !other.extra?.visible) continue;
+                const size = trafficSize(other.slot.model);
+                if (fragmentBlocked(x,z,other.slot.pose,size.width,size.length)) blocked = true;
+              }
+              tmp.position.set(x, 0, z);
+              tmp.rotation.set(fragment.rx, fragment.ry, fragment.rz);
+              tmp.scale.setScalar(blocked ? .001 : Math.max(.001, fragment.scale));
+              tmp.updateMatrix();
+              // Support the rotated fragment's exported half extents on the surface.
+              const basis = tmp.matrix.elements;
+              const support = .09*Math.abs(basis[1]) + .04*Math.abs(basis[5]) + .045*Math.abs(basis[9]);
+              tmp.position.y = surfaceHeight({x,z}) + support + .006 + fragment.height;
+              tmp.updateMatrix();
+              e.debris.setMatrixAt(j,tmp.matrix);
+            }
+            e.debris.instanceMatrix.needsUpdate = true;
+            (e.debris.material as THREE.MeshStandardMaterial).opacity = blastOpacity(t*3)/.8;
+          }
           e.mesh.instanceMatrix.needsUpdate = true;
           if (e.mesh.instanceColor) e.mesh.instanceColor.needsUpdate = true;
           (e.mesh.material as THREE.MeshBasicMaterial).opacity = blast ? blastOpacity(t * 3) : 1 - t;
@@ -1100,6 +1153,7 @@ export function City3D(props: Props) {
           effects: effects.map(e => ({
             id: e.cue.id, kind: e.cue.kind, target: e.cue.target,
             staged: !e.extra || e.extra.visible, x: e.slot?.root.x, z: e.slot?.root.z,
+            debris: e.debris?.count,
             blastOrigin: e.cue.kind === 'explosion' ? buildings.get(e.cue.target)?.userData.blastOrigin : undefined,
             arm: e.gunArm?.rotation.x,
             audioShots: e.audio?.started,
@@ -1145,7 +1199,7 @@ export function City3D(props: Props) {
       canvas.removeEventListener('pointerup', pointerUp);
       canvas.removeEventListener('keydown', keys);
       canvas.removeEventListener('webglcontextlost', lost);
-      effects.forEach(effect => effect.audio?.dispose());
+      effects.forEach(effect => { effect.audio?.dispose(); disposeDebris(effect); });
       disposeTree(scene);
       for (const m of models.values()) disposeTree(m);
       textures.forEach(t => t.dispose());

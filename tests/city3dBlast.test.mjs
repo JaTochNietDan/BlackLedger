@@ -30,3 +30,27 @@ test('billow texture has a soft transparent boundary and varied interior opacity
  assert.ok(billowAlpha(0,0)>.8);
  assert.notEqual(billowAlpha(.3,.2),billowAlpha(.2,.3));
 });
+
+test('debris follows separated facade lanes, settles without continuing to spin, and avoids actors',async()=>{
+ const {debrisPose,fragmentBlocked}=await import('../.runtime/frontend-test/city3dBlast.js');
+ for(let frame=0;frame<180;frame++){
+  const parts=Array.from({length:12},(_,i)=>debrisPose(i,frame/60));
+  for(const p of parts){
+   assert.ok(Object.values(p).every(Number.isFinite));
+   assert.ok(Math.abs(p.x)<=2.81&&p.z>=-2.14&&p.z<=-.25&&p.height>=0);
+  }
+  for(let i=0;i<parts.length;i++)for(let j=i+1;j<parts.length;j++)
+   assert.ok(Math.hypot(parts[i].x-parts[j].x,parts[i].z-parts[j].z)>.26,'fragment envelopes must remain separated');
+ }
+ for(let i=0;i<12;i++){
+  const p=debrisPose(i,1.5),q=debrisPose(i,2.5);
+  assert.equal(p.height,0);assert.equal(p.rx,0);assert.equal(p.rz,0);assert.deepEqual(p,q);
+  assert.equal(debrisPose(i,3).scale,0);
+ }
+ for(let heading=0;heading<Math.PI*2;heading+=.1){
+  const body={x:10,z:20,heading};
+  assert.equal(fragmentBlocked(10,20,body,.85,1.4),true);
+  assert.equal(fragmentBlocked(10+Math.sin(heading)*.8,20+Math.cos(heading)*.8,body,.85,1.4),true);
+  assert.equal(fragmentBlocked(10+Math.sin(heading)*2,20+Math.cos(heading)*2,body,.85,1.4),false);
+ }
+});

@@ -131,3 +131,18 @@ test('timber roof tanks fit their clear roof bay and carry embedded grain textur
   for(const [actual,expected]of [[bounds.min.x,min[0]],[bounds.max.x,max[0]],[bounds.max.y,max[2]],[bounds.min.z,-max[1]],[bounds.max.z,-min[1]]])assert.ok(Math.abs(actual-expected)<.001);
  }
 });
+
+test('exported blast fragments fit their rotated support envelope and remain off every road',async()=>{
+ const {debrisPose}=await import('../.runtime/frontend-test/city3dBlast.js');
+ const [min,max]=manifest['blast-fragment'].bounds_blender;
+ for(const [axis,half] of [[0,.09],[1,.045],[2,.04]]){assert.ok(min[axis]>=-half-.0001);assert.ok(max[axis]<=half+.0001);}
+ for(const lot of plan.lots){
+  const [lo,hi]=manifest[lot.model].bounds_blender;
+  const reversed=['filling','garage','dealer','chapel','docks','haulage'].includes(lot.model);
+  const front=lot.z+(reversed?lo[1]:-hi[1])-.15;
+  for(let i=0;i<12;i++)for(let time=0;time<3;time+=.025){
+   const p=debrisPose(i,time);
+   for(const dx of [-.13,.13])for(const dz of [-.13,.13])assert.equal(surfaceHeight({x:lot.x+p.x+dx,z:front+p.z+dz}),.17,'debris must stay on its facade pavement');
+  }
+ }
+});

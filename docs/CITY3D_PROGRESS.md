@@ -64,6 +64,13 @@ These are staged fixture saves, not earned campaign progress.
 
 ## Continue next
 
+### Instanced masonry debris (2026-09-13)
+
+- Added a Blender-authored chipped clay fragment with embedded masonry colour/normal textures. Each explosion uses twelve instances in short tumbling arcs; they settle with rotation-aware surface support, scatter across the facade pavement and fade with the smoke. No debris persists as an invented gameplay obstacle or additional damage.
+- Fragment envelopes remain separated and off roads across every current building. Fragments overlapping visible traffic or staged character footprints are suppressed, preserving the committed outcome. Per-effect geometry/material/instance allocations are released on timeout, Skip, world reset and scene teardown.
+- All 113 frontend tests and production build pass. Added tests cover deterministic paths, separated envelopes, settled transforms, actor exclusion at all headings, exported fragment bounds and every facade's pavement clearance. Browser replay on isolated port 8843 inspected flight/settling, verified natural cleanup and immediate Skip cleanup, and reported no console errors. Evidence: `docs/qa/city3d-20260913/blast-debris-airborne.png` and `blast-debris-settled.png`. The saved noon clock was unchanged.
+- A local close-view sample during the earlier narrower scatter pass measured 145 FPS/8.3ms p95; this does not establish broad hardware or multi-blast performance. Richer structural damage, varied fragments and final explosion/art-quality acceptance remain unfinished.
+
 ### Facade-anchored blast and rising smoke (2026-09-13)
 
 - Explosions now originate at the target model's actual exposed front bound instead of its pedestrian arrival point. The Monarch browser replay reports origin (112,0.25,72.24), 3.59m nearer the building than the former curb arrival point. A short light pulse/fire burst gives way to slower rising smoke; billows use a locally generated irregular alpha texture and fade while expanding. No new gameplay consequences or persistent fire are inferred.
