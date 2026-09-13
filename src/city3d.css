@@ -229,3 +229,11 @@
     16px Georgia,
     serif;
 }
+@media (max-width: 700px) {
+  .city3d-event {
+    top: 170px;
+    left: 12px;
+    right: 12px;
+    max-width: none;
+  }
+}

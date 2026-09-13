@@ -5,6 +5,9 @@ export type TrafficPose = Point & {heading: number};
 export type TrafficRequest = {id: string; model: string; points: Point[]; progress: number};
 export type TrafficPlacement = {pose: TrafficPose; progress: number; waiting: boolean};
 const lengths: Record<string, number> = {ford: 4.7, hudson: 5.1, packard: 5.8, police: 4.7};
+export function trafficSpeed(model: string) {
+  return model === 'person' ? 1.8 : 11;
+}
 export function trafficSize(model: string) {
   return {length: lengths[model] || 1.4, width: lengths[model] ? 2.15 : 0.85};
 }
@@ -60,7 +63,11 @@ export class StreetTraffic {
   clear() {
     this.entries.clear();
   }
-  update(requests: TrafficRequest[], seconds: number): Map<string, TrafficPlacement> {
+  update(
+    requests: TrafficRequest[],
+    seconds: number,
+    playbackRate = 1,
+  ): Map<string, TrafficPlacement> {
     const wanted = new Set(requests.map(r => r.id));
     for (const id of this.entries.keys()) if (!wanted.has(id)) this.entries.delete(id);
     const lengths = new Map(requests.map(r => [r.id, routeLength(r.points)]));
@@ -110,7 +117,11 @@ export class StreetTraffic {
       // A snapshot may jump minutes. Compress travel, but retain safe occupancy.
       const target = Math.max(
         e.progress,
-        Math.min(r.progress, e.progress + (Math.min(0.1, seconds) * 80) / length),
+        Math.min(
+          r.progress,
+          e.progress +
+            (Math.min(0.1, Math.max(0, seconds)) * playbackRate * trafficSpeed(r.model)) / length,
+        ),
       );
       while (e.progress < target) {
         const next = Math.min(target, e.progress + 0.25 / length),

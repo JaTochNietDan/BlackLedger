@@ -42,6 +42,8 @@ type Actor = {
   since: number;
   duration: number;
   walking: boolean;
+  phase: number;
+  realSince: number;
   limbs: THREE.Object3D[];
   arrived?: boolean;
 };
@@ -92,6 +94,9 @@ export function City3D(props: Props) {
   const [failure, setFailure] = useState('');
   const [fps, setFps] = useState('');
   const [waiting, setWaiting] = useState(0);
+  const [playbackRate, setPlaybackRate] = useState(1);
+  const playback = useRef(playbackRate);
+  playback.current = playbackRate;
   useEffect(() => {
     if (failure && props.journey) props.onJourneyDone();
   }, [failure, props.journey, props.onJourneyDone]);
@@ -436,6 +441,7 @@ export function City3D(props: Props) {
       s.scale.set(17, 2.65, 1);
       return s;
     };
+    let movementClock = performance.now();
     const addActor = (id: string, model: string): Actor => {
       const object = models.get(model)!.clone(true);
       scene.add(object);
@@ -453,6 +459,8 @@ export function City3D(props: Props) {
         since: 0,
         duration: 0,
         walking: false,
+        phase: 0,
+        realSince: 0,
         limbs,
       };
       actors.set(id, actor);
@@ -480,7 +488,8 @@ export function City3D(props: Props) {
       a.points = points;
       a.start = start;
       a.end = end;
-      a.since = now;
+      a.since = movementClock;
+      a.realSince = now;
       a.duration = duration;
       a.walking = model === 'person' && start !== end;
     };
@@ -570,6 +579,7 @@ export function City3D(props: Props) {
         return;
       }
       const dt = now - last;
+      movementClock += Math.min(100, dt) * playback.current;
       last = now;
       const p = latest.current,
         w = p.state,
@@ -789,7 +799,8 @@ export function City3D(props: Props) {
           [...actors]
             .filter(([, a]) => !a.arrived)
             .map(([id, a]) => {
-              const t = motion && a.duration ? Math.min(1, (now - a.since) / a.duration) : 1;
+              const t =
+                motion && a.duration ? Math.min(1, (movementClock - a.since) / a.duration) : 1;
               return {
                 id,
                 model: a.model,
@@ -798,18 +809,22 @@ export function City3D(props: Props) {
               };
             }),
           dt / 1000,
+          playback.current,
         );
         for (const [id, a] of actors) {
           const placement = placements.get(id);
           a.object.visible = !!placement && !placement.waiting;
           if (!placement || placement.waiting) continue;
           const at = placement.pose;
-          const moved = Math.hypot(a.object.position.x - at.x, a.object.position.z - at.z) > 0.0001;
+          const distance = Math.hypot(a.object.position.x - at.x, a.object.position.z - at.z);
+          const moved = distance > 0.0001;
+          if (a.walking && moved)
+            a.phase = (a.phase + (distance / 1.15) * Math.PI * 2) % (Math.PI * 2);
           a.object.position.set(at.x, 0.2, at.z);
           a.object.rotation.y = at.heading;
           for (const limb of a.limbs) {
             const side = limb.name.endsWith('-1') ? 0 : Math.PI;
-            const phase = now * 0.012 + side;
+            const phase = a.phase + side;
             limb.rotation.x =
               !a.walking || !moved || !motion
                 ? 0
@@ -819,7 +834,7 @@ export function City3D(props: Props) {
                     (limb.name.startsWith('arm') ? 0.23 : 0.35);
           }
           if (a.walking && moved && motion)
-            a.object.position.y += 0.05 + Math.abs(Math.sin(now * 0.012)) * 0.015;
+            a.object.position.y += 0.05 + Math.abs(Math.sin(a.phase)) * 0.015;
           if (id === 'player') playerRing.position.set(at.x, 0.23, at.z);
           if (id !== 'player' && a.end === 1 && placement.progress >= 1) {
             a.arrived = true;
@@ -838,7 +853,7 @@ export function City3D(props: Props) {
             revision: w.revision,
             minute: w.minute,
             progress: arrival?.progress,
-            elapsedMs: Math.round(now - (actors.get('player')?.since ?? now)),
+            elapsedMs: Math.round(now - (actors.get('player')?.realSince ?? now)),
             reducedMotion: !motion,
           });
           p.onJourneyDone();
@@ -938,6 +953,7 @@ export function City3D(props: Props) {
         canvas.dataset.presentation = JSON.stringify({
           revision: w.revision,
           minute: w.minute,
+          playbackRate: playback.current,
           actors: [...actors]
             .filter(([, a]) => a.object.visible)
             .map(([id, a]) => ({
@@ -1035,6 +1051,12 @@ export function City3D(props: Props) {
         <button onClick={() => focus.current()}>Whole city</button>
         <button onClick={() => focus.current(props.state.player.location)}>Find me</button>
         <button onClick={() => focus.current(props.selected)}>Focus address</button>
+        <button
+          onClick={() => setPlaybackRate(rate => (rate === 1 ? 4 : 1))}
+          aria-label={`Travel playback speed: ${playbackRate} times`}
+        >
+          Travel {playbackRate}×
+        </button>
       </div>
       {(status || failure) && (
         <p className="city3d-status" role="status">

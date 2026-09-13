@@ -33,7 +33,7 @@ test('opposing lanes do not block each other',()=>{
 test('crossing traffic cannot tunnel through occupied vehicles between frames',()=>{
  const traffic=new StreetTraffic();const requests=[{id:'east',model:'ford',points:[{x:0,z:0},{x:100,z:0}],progress:.4},{id:'north',model:'packard',points:[{x:50,z:-50},{x:50,z:50}],progress:.3}];
  traffic.update(requests,1/60);
- for(let frame=0;frame<180;frame++){requests.forEach(r=>r.progress=.9);clear(requests,traffic.update(requests,1/30));}
+ for(let frame=0;frame<450;frame++){requests.forEach(r=>r.progress=.9);clear(requests,traffic.update(requests,1/30));}
  for(const p of traffic.update(requests,1/30).values())assert.ok(p.progress>.89,'crossing traffic must finish');
 });
 test('a newly restarted journey on the same route never inherits old progress',()=>{
@@ -55,14 +55,14 @@ test('long journeys remain in transit past the old 2.4-second cutoff',()=>{
  traffic.update([request],1/60);let pose;
  for(let frame=1;frame<=144;frame++){request.progress=frame/144;pose=traffic.update([request],1/60).get('player');}
  assert.ok(pose.progress<1,'completion must use actual rendered arrival');
- for(let frame=0;frame<180;frame++)pose=traffic.update([request],1/60).get('player');
+ for(let frame=0;frame<2400;frame++)pose=traffic.update([request],1/60).get('player');
  assert.equal(pose.progress,1);
 });
 test('four-way arrivals clear the junction at different frame rates without deadlocking',()=>{
  for(const fps of [30,60,144]){
   const requests=[{id:'east',points:[{x:-50,z:1.6},{x:50,z:1.6}]},{id:'west',points:[{x:50,z:-1.6},{x:-50,z:-1.6}]},{id:'north',points:[{x:1.6,z:50},{x:1.6,z:-50}]},{id:'south',points:[{x:-1.6,z:-50},{x:-1.6,z:50}]}].map(r=>({...r,model:'packard',progress:.3}));
   const traffic=new StreetTraffic();traffic.update(requests,1/fps);let poses;
-  for(let frame=0;frame<fps*8;frame++){requests.forEach(r=>r.progress=.9);poses=traffic.update(requests,1/fps);clear(requests,poses);}
+  for(let frame=0;frame<fps*20;frame++){requests.forEach(r=>r.progress=.9);poses=traffic.update(requests,1/fps);clear(requests,poses);}
   for(const [id,p]of poses)assert.ok(p.progress>=.89,`${id} deadlocked at ${fps} FPS`);
  }
 });
@@ -79,6 +79,14 @@ test('a walking player can pass a snapshot-held opposing pedestrian',async()=>{
  const at=id=>lots.find(l=>l.id===id);
  const requests=[{id:'npc',model:'person',points:route(at('room'),at('apartment')),progress:.25},{id:'player',model:'person',points:route(at('bar'),at('room')),progress:0}];
  const traffic=new StreetTraffic();traffic.update(requests,1/60);let poses;
- for(let frame=0;frame<480;frame++){requests[1].progress=Math.min(1,frame/144);poses=traffic.update(requests,1/60);clear(requests,poses);}
+ for(let frame=0;frame<3600;frame++){requests[1].progress=Math.min(1,frame/144);poses=traffic.update(requests,1/60);clear(requests,poses);}
  assert.equal(poses.get('player').progress,1);assert.equal(poses.get('npc').progress,.25);
+});
+test('walking and driving respect physical speed caps at normal and accelerated playback',()=>{
+ for(const [model,speed]of [['person',1.8],['hudson',11]])for(const rate of [1,4])for(const fps of [30,144]){
+  const traffic=new StreetTraffic(),request={id:'traveller',model,points:line,progress:0};
+  traffic.update([request],1/fps,rate);request.progress=1;let placement;
+  for(let frame=0;frame<fps;frame++)placement=traffic.update([request],1/fps,rate).get(request.id);
+  assert.ok(Math.abs(placement.pose.x-speed*rate)<1e-6,`${model}, ${rate}x, ${fps} FPS`);
+ }
 });

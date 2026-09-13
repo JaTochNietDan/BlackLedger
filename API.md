@@ -100,3 +100,8 @@ committed progress, never advance beyond it. Small spatial steps and oriented
 vehicle footprints prevent rendered bodies passing through one another. When a
 source is physically full, the city reports travellers waiting for departure space.
 This does not change Go journey timing, decisions, fuel or saved progress.
+
+Normal travel playback caps pedestrians at 1.8 m/s and cars at 11 m/s in the
+authored scene scale. The city offers 1× and 4× travel playback; this changes
+only interpolation and gait, never saved game time. Walking cycles follow
+distance travelled and stop when occupancy makes a traveller wait.

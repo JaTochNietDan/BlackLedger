@@ -64,6 +64,28 @@ These are staged fixture saves, not earned campaign progress.
 
 ## Continue next
 
+### Movement pacing follow-up
+
+Normal presentation now caps walking at 1.8m/s and cars at 11m/s, replacing the
+shared 80m/s ceiling. Walking phase follows actual distance (1.15m per cycle)
+instead of wall-clock time, so queued people stop stepping. A 1×/4× travel
+control advances the movement clock and occupancy together; saved time and
+event results remain unchanged. Arrival completion still follows the endpoint.
+
+Browser evidence: a 32m walking leg completed at 17784ms. Toggling 4× retained
+revision 2 / minute 630; the return route, including road crossings, completed
+at 7034ms at revision 3 / minute 645. Tests verify physical distance at both
+rates and 30/144 FPS. Existing completion tests now allow time appropriate to
+their path lengths at the slower speeds. All 85 tests, build and HTTP checks
+pass. The browser sample remained 145 FPS / 7.1ms p95. Narrow-screen scene
+captions have extra clearance beneath the expanded control row; that CSS change
+has not yet had a fresh mobile viewport test.
+
+Continue event choreography and integration of event actors with traffic, plus
+same-direction pedestrian passing, varied character appearance and richer city
+surfaces. The more readable walking pace is still a basic articulated cycle,
+not final foot planting or animation acceptance.
+
 ### Pedestrian model and walking-route follow-up
 
 The Blender pedestrian now has a fitted jacket, lapels, pockets, shirt/tie,
