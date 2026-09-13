@@ -70,6 +70,14 @@ These are staged fixture saves, not earned campaign progress.
 - Production build passes. Fresh isolated port 8862/killing fixture browser evidence: at 500ms a casualty effect was staged and all five spoiler-bearing panels were absent. Once effects were empty, the result strip, headline, caption, cast and scene paper appeared. Replaying the same cue hid spoilers again; Skip cleared effects and restored the headline. Browser logs were clear. Evidence: `news-timing.json`. This verifies scene timing through the actual UI, not a timer-only unit test.
 - Re-read the latest objective at `/Users/jatochnietdan/.codex/attachments/4a3692d6-f725-4a26-b1a0-9d3131b50b49/goal-objective.md`; it adds layered contextual voices and vehicle/action sound. Those audio assets/timelines, full police choreography, drive-bys, persistent building fire/brigade response, remaining interiors and final visual quality remain unfinished. No main-save access or mutation.
 
+### Rubble retained through saved cleanup — September 13
+
+- Added one instanced rubble draw per active building fire, using the authored fragment model and the exact settled window-debris transforms. It persists through extinguishing until the saved `cleanup_at` minute. Replay hides settled instances and restores them when transient debris ends; confirmed rubble-bound fragments no longer fade away immediately before that handoff.
+- Geometry is cloned once per city renderer and shared across rubble entries; cleanup disposes instance allocations, renderer teardown releases owned geometry and leaves source model resources for their existing owner. No new backend state or main-save changes.
+- Production build and 172 frontend tests pass. New tests verify settled positions/surface support, paused-game stability, replay visibility, retained object identity after extinguishing, exact cleanup and resource ownership.
+- Browser isolated 8867: revision 1/minute 720 had 12 visible rubble fragments; real replay hid them during the blast and restored them afterward. Actual wait reached revision 2/minute 780 with no flames and retained rubble. The next wait reached minute 840 and opened a rival encounter; paying its $180 demand in this test save allowed inspection at revision 4/minute 840 with no rubble. Evidence: `persistent-rubble.png/json`.
+- The rubble is still sparse small masonry. Shattered glass, richer rubble art, cleanup-worker choreography, response travel and full production acceptance remain unfinished. Mac sleep prevention remains active.
+
 ### Window-ejected debris and clear exit corridors — September 13
 
 - Internal explosions now eject the existing Blender masonry fragments from window height with a fast outward impulse, gravity-driven fall and settled orientation. Exterior accidents retain their previous pavement debris. Rendering retains actor-avoidance checks and surface support.

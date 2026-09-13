@@ -1,0 +1,760 @@
+{
+  "before": {
+    "revision": 1,
+    "minute": 720,
+    "playbackRate": 1,
+    "impact": {
+      "x": 0,
+      "y": 0
+    },
+    "suppression": [
+      {
+        "id": "a4d197fa516de14739b5d7dafd858840:a",
+        "from": [
+          106.13943833913636,
+          1.6209111827578224,
+          71.03499071426207
+        ],
+        "to": [
+          106.80000019073486,
+          5.129999809265136,
+          74.28000020980835
+        ]
+      },
+      {
+        "id": "a4d197fa516de14739b5d7dafd858840:b",
+        "from": [
+          117.52412915380718,
+          1.5900585634338138,
+          70.90005072733015
+        ],
+        "to": [
+          114.59999990463257,
+          5.129999809265136,
+          74.28000020980835
+        ]
+      }
+    ],
+    "rubble": [
+      {
+        "id": "a4d197fa516de14739b5d7dafd858840",
+        "visible": true,
+        "fragments": 12
+      }
+    ],
+    "buildingFire": {
+      "clock": 7.393199999994027,
+      "scenes": [
+        {
+          "id": "a4d197fa516de14739b5d7dafd858840",
+          "vents": [
+            {
+              "x": 106.80000019073486,
+              "y": 5.129999809265136,
+              "z": 74.28000020980835
+            },
+            {
+              "x": 109.40000009536743,
+              "y": 5.129999809265136,
+              "z": 74.28000020980835
+            },
+            {
+              "x": 112,
+              "y": 5.129999809265136,
+              "z": 74.28000020980835
+            },
+            {
+              "x": 114.59999990463257,
+              "y": 5.129999809265136,
+              "z": 74.28000020980835
+            }
+          ],
+          "particles": 48
+        }
+      ]
+    },
+    "headlightPools": 0,
+    "harbour": {
+      "visible": true,
+      "waterClock": 7.245799999999986
+    },
+    "followingPlayer": false,
+    "cutawayBuildings": [],
+    "weather": {
+      "kind": "fog",
+      "wet": 0.3,
+      "rainVisible": false,
+      "rainClock": 0
+    },
+    "camera": {
+      "zoom": 1.65,
+      "x": 276,
+      "z": -160,
+      "targetX": 96,
+      "targetZ": 79.99999999999999
+    },
+    "actors": [
+      {
+        "id": "player",
+        "model": "person",
+        "x": 112,
+        "z": 68.65,
+        "y": 0.2
+      },
+      {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 121.6,
+        "z": 80,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    ],
+    "waiting": [],
+    "aftermath": [
+      {
+        "id": "aftermath:367116fb8f28adfc7ff3f7d965212cde:person-13:body",
+        "x": 112,
+        "z": 70.35,
+        "visible": true
+      },
+      {
+        "id": "aftermath:367116fb8f28adfc7ff3f7d965212cde:person-13:police",
+        "x": 121.6,
+        "z": 74,
+        "visible": true
+      },
+      {
+        "id": "aftermath:367116fb8f28adfc7ff3f7d965212cde:person-13:officer-a",
+        "x": 109,
+        "z": 70.35,
+        "visible": true
+      },
+      {
+        "id": "aftermath:367116fb8f28adfc7ff3f7d965212cde:person-13:officer-b",
+        "x": 115,
+        "z": 70.35,
+        "visible": true
+      },
+      {
+        "id": "aftermath:a4d197fa516de14739b5d7dafd858840:fire-engine",
+        "x": 122,
+        "z": 86,
+        "visible": true
+      },
+      {
+        "id": "aftermath:a4d197fa516de14739b5d7dafd858840:firefighter-a",
+        "x": 106,
+        "z": 70.35,
+        "visible": true
+      },
+      {
+        "id": "aftermath:a4d197fa516de14739b5d7dafd858840:firefighter-b",
+        "x": 118,
+        "z": 70.35,
+        "visible": true
+      }
+    ],
+    "doors": [
+      {
+        "id": "bar",
+        "angle": 0
+      }
+    ],
+    "effects": []
+  },
+  "during": {
+    "revision": 1,
+    "minute": 720,
+    "playbackRate": 1,
+    "impact": {
+      "x": 0,
+      "y": 0
+    },
+    "suppression": [
+      {
+        "id": "a4d197fa516de14739b5d7dafd858840:a",
+        "from": [
+          106.13943833913636,
+          1.6209111827578224,
+          71.03499071426207
+        ],
+        "to": [
+          106.80000019073486,
+          5.129999809265136,
+          74.28000020980835
+        ]
+      },
+      {
+        "id": "a4d197fa516de14739b5d7dafd858840:b",
+        "from": [
+          117.52412915380718,
+          1.5900585634338138,
+          70.90005072733015
+        ],
+        "to": [
+          114.59999990463257,
+          5.129999809265136,
+          74.28000020980835
+        ]
+      }
+    ],
+    "rubble": [
+      {
+        "id": "a4d197fa516de14739b5d7dafd858840",
+        "visible": false,
+        "fragments": 12
+      }
+    ],
+    "buildingFire": {
+      "clock": 7.839199999994026,
+      "scenes": [
+        {
+          "id": "a4d197fa516de14739b5d7dafd858840",
+          "vents": [
+            {
+              "x": 106.80000019073486,
+              "y": 5.129999809265136,
+              "z": 74.28000020980835
+            },
+            {
+              "x": 109.40000009536743,
+              "y": 5.129999809265136,
+              "z": 74.28000020980835
+            },
+            {
+              "x": 112,
+              "y": 5.129999809265136,
+              "z": 74.28000020980835
+            },
+            {
+              "x": 114.59999990463257,
+              "y": 5.129999809265136,
+              "z": 74.28000020980835
+            }
+          ],
+          "particles": 48
+        }
+      ]
+    },
+    "headlightPools": 0,
+    "harbour": {
+      "visible": true,
+      "waterClock": 7.691799999999985
+    },
+    "followingPlayer": false,
+    "cutawayBuildings": [],
+    "weather": {
+      "kind": "fog",
+      "wet": 0.3,
+      "rainVisible": false,
+      "rainClock": 0
+    },
+    "camera": {
+      "zoom": 4.807018014770609,
+      "x": 292,
+      "z": -163.13499989509583,
+      "targetX": 112.00000000000003,
+      "targetZ": 76.86500010490417
+    },
+    "actors": [
+      {
+        "id": "player",
+        "model": "person",
+        "x": 112,
+        "z": 68.65,
+        "y": 0.2
+      },
+      {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 121.6,
+        "z": 80,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    ],
+    "waiting": [],
+    "aftermath": [
+      {
+        "id": "aftermath:367116fb8f28adfc7ff3f7d965212cde:person-13:police",
+        "x": 121.6,
+        "z": 74,
+        "visible": true
+      },
+      {
+        "id": "aftermath:367116fb8f28adfc7ff3f7d965212cde:person-13:officer-a",
+        "x": 109,
+        "z": 70.35,
+        "visible": true
+      },
+      {
+        "id": "aftermath:367116fb8f28adfc7ff3f7d965212cde:person-13:officer-b",
+        "x": 115,
+        "z": 70.35,
+        "visible": true
+      },
+      {
+        "id": "aftermath:a4d197fa516de14739b5d7dafd858840:fire-engine",
+        "x": 122,
+        "z": 86,
+        "visible": true
+      },
+      {
+        "id": "aftermath:a4d197fa516de14739b5d7dafd858840:firefighter-a",
+        "x": 106,
+        "z": 70.35,
+        "visible": true
+      },
+      {
+        "id": "aftermath:a4d197fa516de14739b5d7dafd858840:firefighter-b",
+        "x": 118,
+        "z": 70.35,
+        "visible": true
+      }
+    ],
+    "doors": [
+      {
+        "id": "bar",
+        "angle": 0
+      }
+    ],
+    "effects": [
+      {
+        "id": "367116fb8f28adfc7ff3f7d965212cde",
+        "kind": "killing",
+        "target": "club",
+        "staged": true,
+        "x": 112,
+        "z": 70.35,
+        "fall": -0.4169155250701455
+      },
+      {
+        "id": "8c6ec60c11e0ef440b607c7d5075d117",
+        "kind": "explosion",
+        "target": "club",
+        "staged": true,
+        "debris": 12,
+        "blastOrigin": {
+          "x": 112,
+          "y": 5.129999809265136,
+          "z": 74.73000020980835
+        },
+        "blastWindows": [
+          {
+            "x": 106.80000019073486,
+            "y": 5.129999809265136,
+            "z": 74.28000020980835
+          },
+          {
+            "x": 109.40000009536743,
+            "y": 5.129999809265136,
+            "z": 74.28000020980835
+          },
+          {
+            "x": 112,
+            "y": 5.129999809265136,
+            "z": 74.28000020980835
+          },
+          {
+            "x": 114.59999990463257,
+            "y": 5.129999809265136,
+            "z": 74.28000020980835
+          }
+        ],
+        "audioBlasts": 1
+      }
+    ]
+  },
+  "after": {
+    "revision": 1,
+    "minute": 720,
+    "playbackRate": 1,
+    "impact": {
+      "x": 0,
+      "y": 0
+    },
+    "suppression": [
+      {
+        "id": "a4d197fa516de14739b5d7dafd858840:a",
+        "from": [
+          106.13943833913636,
+          1.6209111827578224,
+          71.03499071426207
+        ],
+        "to": [
+          106.80000019073486,
+          5.129999809265136,
+          74.28000020980835
+        ]
+      },
+      {
+        "id": "a4d197fa516de14739b5d7dafd858840:b",
+        "from": [
+          117.52412915380718,
+          1.5900585634338138,
+          70.90005072733015
+        ],
+        "to": [
+          114.59999990463257,
+          5.129999809265136,
+          74.28000020980835
+        ]
+      }
+    ],
+    "rubble": [
+      {
+        "id": "a4d197fa516de14739b5d7dafd858840",
+        "visible": true,
+        "fragments": 12
+      }
+    ],
+    "buildingFire": {
+      "clock": 21.581199999994553,
+      "scenes": [
+        {
+          "id": "a4d197fa516de14739b5d7dafd858840",
+          "vents": [
+            {
+              "x": 106.80000019073486,
+              "y": 5.129999809265136,
+              "z": 74.28000020980835
+            },
+            {
+              "x": 109.40000009536743,
+              "y": 5.129999809265136,
+              "z": 74.28000020980835
+            },
+            {
+              "x": 112,
+              "y": 5.129999809265136,
+              "z": 74.28000020980835
+            },
+            {
+              "x": 114.59999990463257,
+              "y": 5.129999809265136,
+              "z": 74.28000020980835
+            }
+          ],
+          "particles": 48
+        }
+      ]
+    },
+    "headlightPools": 0,
+    "harbour": {
+      "visible": true,
+      "waterClock": 21.433800000000524
+    },
+    "followingPlayer": false,
+    "cutawayBuildings": [],
+    "weather": {
+      "kind": "fog",
+      "wet": 0.3,
+      "rainVisible": false,
+      "rainClock": 0
+    },
+    "camera": {
+      "zoom": 4.807018014770609,
+      "x": 292,
+      "z": -163.13499989509583,
+      "targetX": 112.00000000000003,
+      "targetZ": 76.86500010490417
+    },
+    "actors": [
+      {
+        "id": "player",
+        "model": "person",
+        "x": 112,
+        "z": 68.65,
+        "y": 0.2
+      },
+      {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 121.6,
+        "z": 80,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    ],
+    "waiting": [],
+    "aftermath": [
+      {
+        "id": "aftermath:367116fb8f28adfc7ff3f7d965212cde:person-13:police",
+        "x": 121.6,
+        "z": 74,
+        "visible": true
+      },
+      {
+        "id": "aftermath:367116fb8f28adfc7ff3f7d965212cde:person-13:officer-a",
+        "x": 109,
+        "z": 70.35,
+        "visible": true
+      },
+      {
+        "id": "aftermath:367116fb8f28adfc7ff3f7d965212cde:person-13:officer-b",
+        "x": 115,
+        "z": 70.35,
+        "visible": true
+      },
+      {
+        "id": "aftermath:a4d197fa516de14739b5d7dafd858840:fire-engine",
+        "x": 122,
+        "z": 86,
+        "visible": true
+      },
+      {
+        "id": "aftermath:a4d197fa516de14739b5d7dafd858840:firefighter-a",
+        "x": 106,
+        "z": 70.35,
+        "visible": true
+      },
+      {
+        "id": "aftermath:a4d197fa516de14739b5d7dafd858840:firefighter-b",
+        "x": 118,
+        "z": 70.35,
+        "visible": true
+      },
+      {
+        "id": "aftermath:367116fb8f28adfc7ff3f7d965212cde:person-13:body",
+        "x": 112,
+        "z": 70.35,
+        "visible": true
+      }
+    ],
+    "doors": [
+      {
+        "id": "bar",
+        "angle": 0
+      }
+    ],
+    "effects": []
+  },
+  "extinguished": {
+    "revision": 2,
+    "minute": 780,
+    "playbackRate": 1,
+    "impact": {
+      "x": 0,
+      "y": 0
+    },
+    "suppression": [],
+    "rubble": [
+      {
+        "id": "a4d197fa516de14739b5d7dafd858840",
+        "visible": true,
+        "fragments": 12
+      }
+    ],
+    "buildingFire": {
+      "clock": 11.682634000000045,
+      "scenes": []
+    },
+    "headlightPools": 0,
+    "harbour": {
+      "visible": true,
+      "waterClock": 11.505200000000045
+    },
+    "followingPlayer": false,
+    "cutawayBuildings": [],
+    "weather": {
+      "kind": "fog",
+      "wet": 0.3,
+      "rainVisible": false,
+      "rainClock": 0
+    },
+    "camera": {
+      "zoom": 10.679943251678807,
+      "x": 292,
+      "z": -169.65,
+      "targetX": 112,
+      "targetZ": 70.35
+    },
+    "actors": [
+      {
+        "id": "player",
+        "model": "person",
+        "x": 112,
+        "z": 68.65,
+        "y": 0.2
+      },
+      {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 121.6,
+        "z": 80,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    ],
+    "waiting": [],
+    "aftermath": [
+      {
+        "id": "aftermath:a4d197fa516de14739b5d7dafd858840:fire-engine",
+        "x": 122,
+        "z": 74,
+        "visible": true
+      },
+      {
+        "id": "aftermath:a4d197fa516de14739b5d7dafd858840:firefighter-a",
+        "x": 112,
+        "z": 70.35,
+        "visible": true
+      },
+      {
+        "id": "aftermath:a4d197fa516de14739b5d7dafd858840:firefighter-b",
+        "x": 109,
+        "z": 70.35,
+        "visible": true
+      }
+    ],
+    "doors": [
+      {
+        "id": "bar",
+        "angle": 0
+      }
+    ],
+    "effects": []
+  },
+  "cleaned": {
+    "revision": 4,
+    "minute": 840,
+    "playbackRate": 1,
+    "impact": {
+      "x": 0,
+      "y": 0
+    },
+    "suppression": [],
+    "rubble": [],
+    "buildingFire": {
+      "clock": 12.901600000000043,
+      "scenes": []
+    },
+    "headlightPools": 0,
+    "harbour": {
+      "visible": true,
+      "waterClock": 12.69940000000004
+    },
+    "followingPlayer": false,
+    "cutawayBuildings": [],
+    "weather": {
+      "kind": "fog",
+      "wet": 0.3,
+      "rainVisible": false,
+      "rainClock": 0
+    },
+    "camera": {
+      "zoom": 8.278643093518964,
+      "x": 228,
+      "z": -201.35,
+      "targetX": 48,
+      "targetZ": 38.65000000000001
+    },
+    "actors": [
+      {
+        "id": "elena",
+        "model": "packard",
+        "x": 41.27411543197133,
+        "z": 62.4,
+        "y": -0.115,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      },
+      {
+        "id": "player",
+        "model": "person",
+        "x": 112,
+        "z": 68.65,
+        "y": 0.2
+      },
+      {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 121.6,
+        "z": 80,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    ],
+    "waiting": [],
+    "aftermath": [],
+    "doors": [
+      {
+        "id": "bar",
+        "angle": 0
+      }
+    ],
+    "effects": []
+  }
+}

@@ -1,3 +1,4 @@
+import {CityRubble} from './city3dRubble';
 import {CitySuppression} from './city3dSuppression';
 import {CityFire, clearBlastWindows} from './city3dFire';
 import {CityAftermath} from './city3dAftermath';
@@ -417,6 +418,7 @@ export function City3D(props: Props) {
     const effects: Effect[] = [];
     let completedScene = "";
     const suppression=new CitySuppression();scene.add(suppression.root);
+    const rubble=new CityRubble();scene.add(rubble.root);
     const aftermath = new CityAftermath();
     scene.add(aftermath.root);
     const disposeDebris = (effect: Effect) => {
@@ -1388,7 +1390,7 @@ export function City3D(props: Props) {
               e.debris.setMatrixAt(j,tmp.matrix);
             }
             e.debris.instanceMatrix.needsUpdate = true;
-            (e.debris.material as THREE.MeshStandardMaterial).opacity = blastOpacity(t*3)/.8;
+            (e.debris.material as THREE.MeshStandardMaterial).opacity = blastWindows.length&&w.building_fires?.some(f=>f.target===lot.id&&w.minute<f.cleanup_at)?1:blastOpacity(t*3)/.8;
           }
           e.mesh.instanceMatrix.needsUpdate = true;
           if (e.mesh.instanceColor) e.mesh.instanceColor.needsUpdate = true;
@@ -1492,6 +1494,7 @@ export function City3D(props: Props) {
         waterClock += Math.min(dt, 100) / 1000;
         waterNormal.offset.set((waterClock * .006) % 1, (waterClock * .003) % 1);
       }
+      rubble.update(w.building_fires||[],w.minute,buildings,models.get('blast-fragment'),new Set(effects.filter(e=>e.cue.kind==='explosion').map(e=>e.cue.target)));
       suppression.update(w.building_fires || [],w.minute,buildings,models,aftermath,dt,motion);
       buildingFire.update(w.building_fires || [],w.minute,buildings,camera,dt,motion);
       renderImpact(camera,motion?impact.x:0,motion?impact.y:0,canvas.clientWidth,canvas.clientHeight,()=>renderer.render(scene,camera));
@@ -1502,6 +1505,7 @@ export function City3D(props: Props) {
           playbackRate: playback.current,
           impact:motion?impact:{x:0,y:0},
           suppression:suppression.inspect(),
+          rubble:rubble.inspect(),
           buildingFire:buildingFire.inspect(),
           headlightPools: headlightPools.count,
           harbour: {visible: !!harbourLot, waterClock},
@@ -1582,6 +1586,7 @@ export function City3D(props: Props) {
       canvas.removeEventListener('keydown', keys);
       canvas.removeEventListener('webglcontextlost', lost);
       effects.forEach(effect => { effect.audio?.dispose(); disposeDebris(effect); });
+      rubble.dispose();
       suppression.dispose();
       buildingFire.dispose();
       aftermath.dispose();

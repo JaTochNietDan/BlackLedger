@@ -163,7 +163,10 @@ This uses the committed explosion cue; it adds no damage, ignition or physics ru
 
 Explosion debris is cosmetic: confirmed internal blasts eject instanced masonry
 from unobstructed authored windows, clear projecting canopies and settle on the
-facade pavement. Other explosions retain exterior debris. Fragments disappear with playback. They avoid visible actor footprints and
+facade pavement. Saved `building_fires` retains settled rubble until `cleanup_at`,
+including the period after extinguishing. Replay temporarily hides the settled
+instances while animated fragments play. Other explosions retain exterior debris
+that disappears with playback. Animated fragments avoid visible actor footprints and
 introduce no collision, inventory, obstruction or damage rule in the simulation.
 
 Rendered explosions now own their onset audio, even when a higher-gravity
