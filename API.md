@@ -94,3 +94,9 @@ The active city renderer is now Three.js with locally authored Blender glTF mode
 A failed `plant` attempt also emits an `explosion` cue: the charge went off prematurely even when it did not destroy the building. Blast casualties are now chosen from living NPCs physically at the affected premises, excluding travellers. Previously the family-wide casualty selection could kill somebody across town and produce a contradictory death cue. The casualty chance is unchanged; an empty building cannot produce an NPC casualty.
 
 Explicit scene replay can restage all cues in the selected committed result. Ordinary revision refreshes and reloads remain silent. Skip immediately clears the transient effects without posting an action or changing saved time.
+
+Street occupancy is presentation-only: rendered travellers may queue behind their
+committed progress, never advance beyond it. Small spatial steps and oriented
+vehicle footprints prevent rendered bodies passing through one another. When a
+source is physically full, the city reports travellers waiting for departure space.
+This does not change Go journey timing, decisions, fuel or saved progress.

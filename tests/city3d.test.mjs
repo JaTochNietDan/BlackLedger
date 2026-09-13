@@ -64,3 +64,15 @@ test('authored street furniture stays on pavements and outside all buildings and
   }
  }
 });
+test('parking positions clear buildings, furniture and every travel lane',async()=>{
+ const {parkingSpot,streetsidePosition}=await import('../.runtime/frontend-test/city3dPlan.js');
+ const {trafficOverlap}=await import('../.runtime/frontend-test/city3dTraffic.js');
+ for(const lot of plan.lots){const parked={...parkingSpot(lot),heading:0};
+  for(const b of plan.lots)assert.ok(Math.abs(parked.x-b.x)>=8.5+1.075||Math.abs(parked.z-b.z)>=8.5+2.9);
+  for(const b of plan.lots){const f=streetsidePosition(b);assert.ok(Math.abs(parked.z-f.z)>3.3||Math.abs(parked.x-f.x)>5.3);}
+  for(const driving of [false,true])for(const from of plan.lots)for(const to of plan.lots){
+   const points=route(from,to,driving);
+   for(let step=0;step<=40;step++)assert.equal(trafficOverlap(parked,'packard',onRoute(points,step/40),driving?'packard':'person'),false,`parked at ${lot.id} blocks ${from.id}/${to.id}`);
+  }
+ }
+});

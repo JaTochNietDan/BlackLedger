@@ -7,15 +7,16 @@ import {
   cityPlan,
   entrance,
   route,
-  onRoute,
   PITCH,
   STREET_WIDTH,
   streetsidePosition,
+  parkingSpot,
 } from './city3dPlan';
 import type {Lot, Point} from './city3dPlan';
 import type {Journey} from './TravelPresentation';
 import './city3d.css';
 import {CityCueQueue} from './city3dEvents';
+import {StreetTraffic} from './city3dTraffic';
 
 type Props = {
   state: Snapshot;
@@ -40,6 +41,7 @@ type Actor = {
   duration: number;
   walking: boolean;
   limbs: THREE.Object3D[];
+  arrived?: boolean;
 };
 type Effect = {
   cue: VisualCue;
@@ -83,6 +85,7 @@ export function City3D(props: Props) {
   const [status, setStatus] = useState('Loading Bellwether…');
   const [failure, setFailure] = useState('');
   const [fps, setFps] = useState('');
+  const [waiting, setWaiting] = useState(0);
   useEffect(() => {
     const element = host.current!;
     let dead = false,
@@ -286,6 +289,7 @@ export function City3D(props: Props) {
     const actors = new Map<string, Actor>();
     const effects: Effect[] = [];
     const cueQueue = new CityCueQueue();
+    const traffic = new StreetTraffic();
     const effectGeometry = new THREE.PlaneGeometry(1, 1);
     const particleCanvas = document.createElement('canvas');
     particleCanvas.width = particleCanvas.height = 64;
@@ -462,6 +466,7 @@ export function City3D(props: Props) {
       if (!a) a = addActor(id, model);
       // Arrivals hide their outdoor actor; a later journey must show it again.
       a.object.visible = true;
+      a.arrived = false;
       a.points = points;
       a.start = start;
       a.end = end;
@@ -576,6 +581,7 @@ export function City3D(props: Props) {
         if (first) {
           for (const a of actors.values()) scene.remove(a.object);
           actors.clear();
+          traffic.clear();
           previous = null;
         }
         const seen = new Set<string>();
@@ -729,17 +735,9 @@ export function City3D(props: Props) {
           /Ford|Hudson|Packard/i.test(w.vehicle?.car || '')
         ) {
           if (!parked || parked.model !== carModel(w.vehicle?.car))
-            assign(
-              'player-car',
-              carModel(w.vehicle?.car),
-              [entrance(hereForCar, true)],
-              0,
-              0,
-              0,
-              now,
-            );
+            assign('player-car', carModel(w.vehicle?.car), [parkingSpot(hereForCar)], 0, 0, 0, now);
           const car = actors.get('player-car')!;
-          car.points = [entrance(hereForCar, true)];
+          car.points = [parkingSpot(hereForCar)];
         } else if (parked) {
           scene.remove(parked.object);
           actors.delete('player-car');
@@ -775,25 +773,39 @@ export function City3D(props: Props) {
             player.start = player.end = 0;
           }
         }
+        if (!motion) traffic.clear();
+        const placements = traffic.update(
+          [...actors]
+            .filter(([, a]) => !a.arrived)
+            .map(([id, a]) => {
+              const t = motion && a.duration ? Math.min(1, (now - a.since) / a.duration) : 1;
+              return {
+                id,
+                model: a.model,
+                points: a.points,
+                progress: a.start + (a.end - a.start) * t,
+              };
+            }),
+          dt / 1000,
+        );
         for (const [id, a] of actors) {
-          const t = motion && a.duration ? Math.min(1, (now - a.since) / a.duration) : 1;
-          const at = onRoute(a.points, a.start + (a.end - a.start) * t);
+          const placement = placements.get(id);
+          a.object.visible = !!placement && !placement.waiting;
+          if (!placement || placement.waiting) continue;
+          const at = placement.pose;
+          const moved = Math.hypot(a.object.position.x - at.x, a.object.position.z - at.z) > 0.0001;
           a.object.position.set(at.x, 0.2, at.z);
-          const turn = Math.atan2(
-            Math.sin(at.heading - a.object.rotation.y),
-            Math.cos(at.heading - a.object.rotation.y),
-          );
-          a.object.rotation.y += motion ? turn * Math.min(1, dt * 0.014) : turn;
+          a.object.rotation.y = at.heading;
           for (let i = 0; i < a.limbs.length; i++)
             a.limbs[i].rotation.x =
-              a.walking && t < 1 && motion ? Math.sin(now * 0.012 + (i % 2) * Math.PI) * 0.45 : 0;
-          if (id === 'player') {
-            playerRing.position.set(at.x, 0.23, at.z);
-            playerRing.visible = w.player.alive;
+              a.walking && moved && motion ? Math.sin(now * 0.012 + (i % 2) * Math.PI) * 0.45 : 0;
+          if (id === 'player') playerRing.position.set(at.x, 0.23, at.z);
+          if (id !== 'player' && a.end === 1 && placement.progress >= 1) {
+            a.arrived = true;
+            a.object.visible = false;
           }
-          if (id !== 'player' && a.end === 1 && t === 1) a.object.visible = false;
         }
-        playerRing.visible = !!actors.get('player');
+        playerRing.visible = !!actors.get('player')?.object.visible;
         const lot = lots.get(p.selected);
         selection.visible = !!lot;
         if (lot) selection.position.set(lot.x, 0.22, lot.z);
@@ -894,6 +906,7 @@ export function City3D(props: Props) {
               x: a.object.position.x,
               z: a.object.position.z,
             })),
+          waiting: [...actors].filter(([, a]) => !a.arrived && !a.object.visible).map(([id]) => id),
           effects: effects.map(e => ({id: e.cue.id, kind: e.cue.kind, target: e.cue.target})),
         });
       if (ready && dt > 0 && dt < 250) samples.push(dt);
@@ -911,6 +924,7 @@ export function City3D(props: Props) {
         };
         canvas.dataset.metrics = JSON.stringify(metrics);
         setFps(`${metrics.fps} FPS · ${metrics.drawCalls} draws`);
+        setWaiting([...actors.values()].filter(a => !a.arrived && !a.object.visible).length);
         samples = [];
         sampleStart = now;
       }
@@ -992,6 +1006,11 @@ export function City3D(props: Props) {
           <strong>{props.activeCue.caption}</strong>
           <button onClick={props.onSkipCue}>Skip scene →</button>
         </div>
+      )}
+      {waiting > 0 && (
+        <p className="city3d-status" role="status">
+          {waiting} travellers waiting for space at their departures.
+        </p>
       )}
       {expanded && props.journey && (
         <div className="city3d-event" role="status">

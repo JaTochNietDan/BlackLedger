@@ -64,6 +64,31 @@ These are staged fixture saves, not earned campaign progress.
 
 ## Continue next
 
+### Traffic occupancy follow-up
+
+The renderer now maintains oriented actor footprints and advances in small spatial
+steps. Same-lane cars queue, crossing bodies yield, and a full departure reports
+its waiting population. Positions remain at or behind public committed progress.
+New journeys can reset progress without inheriting an old trip. The player's
+parked car moved out of the travel lane to a separate side position; tests cover
+its clearance from every building, furniture band and route.
+
+`city3d-traffic` stages twelve operational cars on one route. Browser evidence
+shows all twelve in a separated queue at revision 0 / minute 600, then advancing
+through a turn after a real travel command at revision 1 / minute 609. The player
+Hudson travelled concurrently. `traffic-queue.png` records the resulting view.
+Observed telemetry was 145 FPS / 7.1ms p95, 317 draws / 151,686 triangles before
+the close view settled. All 79 frontend tests and the production build pass;
+HTTP tests pass. Tests include twelve-car monotonic following, capacity overflow
+and recovery, opposing lanes, crossing safety and completion, journey reset,
+exported vehicle dimensions and parking clearance.
+
+This is not full traffic acceptance: test more crowded multi-way intersections,
+extend player playback to wait for an actual queued arrival, and give waiting
+departures a stronger visual indication than the current status count. The
+parking position also needs an authored recessed kerb/bay. Event-specific actors
+still need integration with ordinary street occupancy.
+
 ### Street furniture follow-up
 
 A nineteenth Blender asset adds slatted timber benches, galvanized litter bins

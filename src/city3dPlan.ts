@@ -11,6 +11,9 @@ export const MODEL_LIMIT = 17;
 export function streetsidePosition(lot: Lot): Point {
   return {x: lot.x, z: lot.z + 9};
 }
+export function parkingSpot(lot: Lot): Point {
+  return {x: lot.x + 9.65, z: lot.z};
+}
 export function cityPlan(places: Pick<Place, 'id' | 'x' | 'y' | 'type'>[]) {
   const cells = grid(places);
   const lots: Lot[] = places.map(p => {
