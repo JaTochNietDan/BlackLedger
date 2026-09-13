@@ -64,6 +64,13 @@ These are staged fixture saves, not earned campaign progress.
 
 ## Continue next
 
+### Pedestrian road elevation (2026-09-13)
+
+- Moving pedestrians now follow asphalt and pavement elevations instead of staying at pavement height across every road. A 40cm smoothstep on the road side of the curb provides a continuous rise/descent; a conservative 68cm stride radius encloses both articulated models and completes the rise before their shoes reach the raised surface. Existing distance-driven gait remains intact.
+- The player location ring follows the actual surface independently of the character's stride support. Go journey duration, routing and traffic progress are unchanged.
+- Isolated port 8850 browser walk Saint Agnes → The Mariner completed at revision 6/minute 675, progress 1 after 28,116ms of presentation. Sampled walking root ranged from −0.01976m on asphalt to 0.265m on pavement, and settled at 0.2m at (48,36.65). Evidence: `docs/qa/city3d-20260913/walking-ground-samples.json` and `walking-road-contact.png`. The screenshot is a distant scene view; the numeric samples provide the stronger height evidence.
+- All 107 frontend tests and production build pass. New geometry checks sweep both exported animated bounds across positive/negative X/Z road edges and camera-independent character headings, asserting surface clearance and continuous bounded height. This is conservative body support, not individual foot planting or authored curb-step animation; those and broader architectural/character polish remain unfinished.
+
 ### Keyboard camera and expanded-city focus (2026-09-13)
 
 - Arrow-key pan now follows the camera's horizontal screen axes after rotation. Modified browser/OS shortcuts and composing input are ignored by camera handling. Visible keyboard instructions cover rotate, pan, zoom, reset and return.

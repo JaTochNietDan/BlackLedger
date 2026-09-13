@@ -141,3 +141,7 @@ screen directions, Q/E rotate, +/− zoom and Home resets. Expanding focuses the
 canvas; Escape returns focus to the expansion button. Browser/OS modifier
 shortcuts and composing input are left untouched. Camera diagnostics do not
 change public simulation state or commands.
+
+Pedestrian presentation roots now ease between road and pavement elevation with
+conservative animated-stride clearance. This vertical support and the player's
+surface-following marker do not alter authoritative travel or traffic progress.

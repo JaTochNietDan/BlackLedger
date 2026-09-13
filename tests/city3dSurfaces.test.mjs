@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {cityPlan,route,onRoute,surfaceHeight,vehicleRootHeight,parkingSpot,PITCH} from '../.runtime/frontend-test/city3dPlan.js';
+import {cityPlan,route,onRoute,surfaceHeight,pedestrianRootHeight,vehicleRootHeight,parkingSpot,PITCH} from '../.runtime/frontend-test/city3dPlan.js';
 const places=JSON.parse(readFileSync(new URL('../core/locations.json',import.meta.url)));
 const manifest=JSON.parse(readFileSync(new URL('../public/art/models/manifest.json',import.meta.url)));
 const plan=cityPlan(places);
@@ -79,4 +79,29 @@ test('the coach yard uses embedded colour and normal textures',()=>{
   assert.ok(texture);const image=gltf.images[gltf.textures[texture.index].source];
   assert.ok(Number.isInteger(image.bufferView));assert.equal(image.mimeType,'image/png');
  }
+});
+
+test('pedestrians descend to asphalt with continuous, kerb-clearing stride support',()=>{
+ for(const axis of ['x','z'])for(const sign of [-1,1]){
+  let previous;
+  for(let d=0;d<=6;d+=.005){
+   const point={x:16,z:16};point[axis]=sign*d;
+   const height=pedestrianRootHeight(point);
+   assert.ok(height>=-.07-1e-10&&height<=.2+1e-10);
+   if(previous!==undefined)assert.ok(Math.abs(height-previous)<.006);
+   previous=height;
+   for(const model of ['person','woman']){
+    const bounds=manifest[model].motion_bounds_blender;
+    // Swept GLB envelope at every azimuth, including hip/knee gait clearance.
+    for(let angle=0;angle<Math.PI*2;angle+=.15){
+     for(const x of [bounds[0][0],bounds[1][0]])for(const z of [-bounds[1][1],-bounds[0][1]]){
+      const foot={x:point.x+x*Math.cos(angle)+z*Math.sin(angle),z:point.z-x*Math.sin(angle)+z*Math.cos(angle)};
+      assert.ok(height+.05+bounds[0][2]>surfaceHeight(foot),'animated foot envelope clips surface');
+     }
+    }
+   }
+  }
+ }
+ assert.ok(Math.abs(pedestrianRootHeight({x:16,z:0})+.07)<1e-10);
+ assert.ok(Math.abs(pedestrianRootHeight({x:16,z:4.65})-.2)<1e-10);
 });

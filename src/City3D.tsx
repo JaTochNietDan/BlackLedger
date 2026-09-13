@@ -13,6 +13,8 @@ import {
   parkingSpot,
   lampPositions,
   vehicleRootHeight,
+  pedestrianRootHeight,
+  surfaceHeight,
 } from './city3dPlan';
 import type {Lot, Point} from './city3dPlan';
 import type {Journey} from './TravelPresentation';
@@ -908,7 +910,7 @@ export function City3D(props: Props) {
           const moved = distance > 0.0001;
           if (a.walking && moved)
             a.phase = (a.phase + (distance / 1.15) * Math.PI * 2) % (Math.PI * 2);
-          a.object.position.set(at.x, isPedestrian(a.model) ? 0.2 : vehicleRootHeight(at), at.z);
+          a.object.position.set(at.x, isPedestrian(a.model) ? pedestrianRootHeight(at) : vehicleRootHeight(at), at.z);
           a.object.rotation.y = at.heading;
           for (const limb of a.limbs) {
             const side = limb.name.endsWith('-1') ? 0 : Math.PI;
@@ -923,7 +925,7 @@ export function City3D(props: Props) {
           }
           if (a.walking && moved && motion)
             a.object.position.y += 0.05 + Math.abs(Math.sin(a.phase)) * 0.015;
-          if (id === 'player') playerRing.position.set(at.x, isPedestrian(a.model) ? 0.23 : vehicleRootHeight(at) + 0.04, at.z);
+          if (id === 'player') playerRing.position.set(at.x, isPedestrian(a.model) ? surfaceHeight(at) + 0.06 : vehicleRootHeight(at) + 0.04, at.z);
           if (id !== 'player' && a.end === 1 && placement.progress >= 1) {
             a.arrived = true;
             a.object.visible = false;

@@ -12,6 +12,16 @@ export function surfaceHeight(at: Point) {
   const toGrid = (value: number) => Math.abs(value - Math.round(value / PITCH) * PITCH);
   return Math.min(toGrid(at.x), toGrid(at.z)) <= STREET_WIDTH / 2 ? -0.1 : 0.17;
 }
+/** Conservative stride support: finish rising before either shoe reaches a kerb.
+ * The 68cm radius encloses both authored animated pedestrian footprints.
+ * Ease across the road side of the edge, retaining the existing gait clearance.
+ */
+export function pedestrianRootHeight(at: Point) {
+  const toGrid = (value: number) => Math.abs(value - Math.round(value / PITCH) * PITCH);
+  const edgeDistance = Math.min(toGrid(at.x), toGrid(at.z));
+  const t = Math.max(0, Math.min(1, (edgeDistance + 0.68 - (STREET_WIDTH / 2 - 0.4)) / 0.4));
+  return -0.07 + 0.27 * t * t * (3 - 2 * t);
+}
 /** Exported car tyres start 2cm above their root; retain a 5mm surface gap. */
 export function vehicleRootHeight(at: Point) {
   return surfaceHeight(at) - 0.015;
