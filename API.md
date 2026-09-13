@@ -213,3 +213,9 @@ address/scene focus release following. “Stop following” leaves the camera in
 City camera close inspection supports orthographic zoom up to 32. Keyboard pan
 uses 8.25 / zoom world metres per press, preserving the initial 5m step while
 allowing fine movement at close zoom. These controls change no simulation state.
+
+While following the player, intervening building geometry receives a local screen
+cutaway around the character/car. Orthographic sight lines are tested at 10Hz;
+the visual opening eases in/out (immediately when motion is disabled). Orbiting
+to a clear view or releasing follow restores the facade. Building selection,
+collision, condition, static shadows and simulation state are unchanged.

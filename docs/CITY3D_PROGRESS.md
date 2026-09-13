@@ -64,6 +64,13 @@ These are staged fixture saves, not earned campaign progress.
 
 ## Continue next
 
+### Follow-camera building cutaways — September 13
+
+- Followed players/cars now receive a local, softly dithered opening through intervening buildings. Orthographic sight lines use actual mesh intersections at 10Hz, with cached building bounds as an initial filter. Private condition materials carry cutaway uniforms; normal opacity/depth behavior and shared source materials remain intact. Fades restore on clear orbit or follow release; motion-off uses immediate transitions.
+- All 137 frontend tests and the production build pass. New checks exercise off-centre orthographic sight lines, intervening versus behind/beside geometry, private material isolation and full restoration without shader recompilation. The existing bundle-size warning remains.
+- Browser verification reproduced the obscured Thorne & Sons view on isolated port 8847 at zoom 32. Its `chapel` location ID was the sole blocker. The screenshot shows the player through a local roof/facade opening; stopping follow restored the solid facade, and orbiting to a clear side removed the blocker while retaining follow. Evidence: `docs/qa/city3d-20260913/player-cutaway.json`, `player-cutaway.png`, `player-cutaway-restored.png`.
+- This three-actor close view sampled 145 FPS / 7.7ms p95, 54 draws, 498,680 triangles, with no captured warnings/errors. Main save untouched; no gameplay command issued. This does not establish dense moving-scene or broader hardware acceptance. The cutaway currently handles buildings while following the player; street furniture, event targets and NPC focus need broader visibility design. Character anatomy/variety and production art quality remain unfinished.
+
 
 ### Pedestrian fabric and close inspection — September 13
 

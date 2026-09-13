@@ -1,6 +1,7 @@
 import {headlightAlpha, headlightCentre} from './city3dHeadlights';
 import {cityWeather, rainVertices} from './city3dWeather';
-import {buildingCondition} from './city3dDamage';
+import {blockingBuildings} from './city3dOcclusion';
+import {buildingCondition, buildingCutaway} from './city3dDamage';
 import {disposeCityResources} from './city3dResources';
 import {useEffect, useRef, useState, type ReactNode} from 'react';
 import * as THREE from 'three';
@@ -340,6 +341,9 @@ export function City3D(props: Props) {
     const models = new Map<string, THREE.Group>();
     const buildings = new Map<string, THREE.Group>();
     const labels = new Map<string, THREE.Sprite>();
+    let blockers = new Set<string>(), lastSightCheck = -Infinity;
+    const cutawayAmounts = new Map<string, number>();
+    const cutawayWindow = new THREE.Vector3();
     const actors = new Map<string, Actor>();
     const effects: Effect[] = [];
     const disposeDebris = (effect: Effect) => {
@@ -678,6 +682,7 @@ export function City3D(props: Props) {
           buildings.set(lot.id, model);
           const label = makeLabel(latest.current.state.locations.find(p => p.id === lot.id)!.name);
           const box = new THREE.Box3().setFromObject(model, true);
+          model.userData.sightBounds = box.clone();
           model.userData.blastOrigin = {x: lot.x, y: 0.25, z: box.min.z - 0.15};
           label.position.set(lot.x, box.max.y + 2, lot.z);
           scene.add(label);
@@ -1217,6 +1222,30 @@ export function City3D(props: Props) {
       controls.target.x = THREE.MathUtils.clamp(controls.target.x, -15, plan.width + 15);
       controls.target.z = THREE.MathUtils.clamp(controls.target.z, -15, plan.depth + 15);
       camera.position.add(controls.target.clone().sub(before));
+      // Reveal only the screen area around a followed actor, retaining the city silhouette.
+      camera.updateMatrixWorld();
+      const reveal = ready && followPlayer.current && followed?.object.visible;
+      if (reveal) {
+        const sight = followed.object.position.clone().add(new THREE.Vector3(0, .9, 0));
+        if (now - lastSightCheck >= 100) {
+          blockers = blockingBuildings(camera, sight, buildings); lastSightCheck = now;
+        }
+        const screen = sight.project(camera), size = renderer.getDrawingBufferSize(new THREE.Vector2());
+        cutawayWindow.set((screen.x + 1) * size.x / 2, (screen.y + 1) * size.y / 2,
+          (65 + camera.zoom * 2) * renderer.getPixelRatio());
+      } else { blockers.clear(); lastSightCheck = -Infinity; }
+      for (const [id, building] of buildings) {
+        const desired = blockers.has(id) ? 1 : 0, previous = cutawayAmounts.get(id) || 0;
+        const amount = motion ? THREE.MathUtils.lerp(previous, desired, 1 - Math.exp(-Math.min(dt, 100) / 90)) : desired;
+        const settled = Math.abs(amount - desired) < .001 ? desired : amount;
+        cutawayAmounts.set(id, settled);
+        if (!settled && !previous) continue;
+        building.traverse(part => {
+          if (!(part instanceof THREE.Mesh)) return;
+          for (const material of Array.isArray(part.material) ? part.material : [part.material])
+            if (material instanceof THREE.MeshStandardMaterial) buildingCutaway(material, settled, cutawayWindow);
+        });
+      }
       if (actors.size * 2 > headlightPools.instanceMatrix.count) {
         scene.remove(headlightPools); headlightPools.dispose();
         headlightPools = new THREE.InstancedMesh(headlightGeometry, headlightMaterial, actors.size * 4);
@@ -1250,6 +1279,7 @@ export function City3D(props: Props) {
           playbackRate: playback.current,
           headlightPools: headlightPools.count,
           followingPlayer: followPlayer.current,
+          cutawayBuildings: [...blockers],
           weather: {kind: w.sky?.kind || 'clear', wet: w.sky?.wet || 0, rainVisible: rainfall.visible, rainClock},
           camera: {zoom: camera.zoom, x: camera.position.x, z: camera.position.z,
             targetX: controls.target.x, targetZ: controls.target.z},

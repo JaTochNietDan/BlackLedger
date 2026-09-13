@@ -1,0 +1,231 @@
+{
+  "on": {
+    "revision": 5,
+    "minute": 791,
+    "playbackRate": 1,
+    "headlightPools": 0,
+    "followingPlayer": true,
+    "cutawayBuildings": [
+      "chapel"
+    ],
+    "weather": {
+      "kind": "rain",
+      "wet": 1,
+      "rainVisible": true,
+      "rainClock": 30.389200000001285
+    },
+    "camera": {
+      "zoom": 32,
+      "x": -9.139873962590144,
+      "z": 336.7076774204056,
+      "targetX": 176,
+      "targetZ": 100.65
+    },
+    "actors": [
+      {
+        "id": "mara",
+        "model": "ford",
+        "x": 4.674365475944713,
+        "z": -1.6,
+        "y": -0.115,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      },
+      {
+        "id": "player",
+        "model": "person",
+        "x": 176,
+        "z": 100.65,
+        "y": 0.2
+      },
+      {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 185.6,
+        "z": 112,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    ],
+    "waiting": [],
+    "effects": []
+  },
+  "off": {
+    "revision": 5,
+    "minute": 791,
+    "playbackRate": 1,
+    "headlightPools": 0,
+    "followingPlayer": false,
+    "cutawayBuildings": [],
+    "weather": {
+      "kind": "rain",
+      "wet": 1,
+      "rainVisible": true,
+      "rainClock": 40.62480000000075
+    },
+    "camera": {
+      "zoom": 32,
+      "x": -9.139873962590116,
+      "z": 336.7076774204056,
+      "targetX": 176.00000000000003,
+      "targetZ": 100.65
+    },
+    "actors": [
+      {
+        "id": "mara",
+        "model": "ford",
+        "x": 4.674365475944713,
+        "z": -1.6,
+        "y": -0.115,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      },
+      {
+        "id": "player",
+        "model": "person",
+        "x": 176,
+        "z": 100.65,
+        "y": 0.2
+      },
+      {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 185.6,
+        "z": 112,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    ],
+    "waiting": [],
+    "effects": []
+  },
+  "clearAngle": {
+    "revision": 5,
+    "minute": 791,
+    "playbackRate": 1,
+    "headlightPools": 0,
+    "followingPlayer": true,
+    "cutawayBuildings": [],
+    "weather": {
+      "kind": "rain",
+      "wet": 1,
+      "rainVisible": true,
+      "rainClock": 51.46450000000008
+    },
+    "camera": {
+      "zoom": 32,
+      "x": -118.8420321297005,
+      "z": 156.04111923069183,
+      "targetX": 176,
+      "targetZ": 100.65
+    },
+    "actors": [
+      {
+        "id": "mara",
+        "model": "ford",
+        "x": 4.674365475944713,
+        "z": -1.6,
+        "y": -0.115,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      },
+      {
+        "id": "player",
+        "model": "person",
+        "x": 176,
+        "z": 100.65,
+        "y": 0.2
+      },
+      {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 185.6,
+        "z": 112,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    ],
+    "waiting": [],
+    "effects": []
+  },
+  "metrics": {
+    "fps": 145,
+    "p95ms": 7.7,
+    "drawCalls": 54,
+    "triangles": 498680,
+    "actors": 3,
+    "buildings": 28,
+    "geometries": 238,
+    "textures": 92
+  },
+  "logs": []
+}
