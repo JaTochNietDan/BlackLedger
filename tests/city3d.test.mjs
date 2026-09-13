@@ -4,7 +4,7 @@ import {readFileSync} from 'node:fs';
 // Node's ES module loader needs the explicit extension on the emitted import.
 const places=JSON.parse(readFileSync(new URL('../core/locations.json',import.meta.url)));
 const manifest=JSON.parse(readFileSync(new URL('../public/art/models/manifest.json',import.meta.url)));
-const {cityPlan,route,onRoute,intersectsLot,MODEL_LIMIT}=await import('../.runtime/frontend-test/city3dPlan.js');
+const {cityPlan,route,onRoute,intersectsLot,MODEL_LIMIT,PITCH}=await import('../.runtime/frontend-test/city3dPlan.js');
 const plan=cityPlan(places);
 test('all exported building geometry, including escapes and cornices, stays inside the reserved footprint',()=>{
  for(const lot of plan.lots){const m=manifest[lot.model];assert.ok(m,lot.model);const [a,b]=m.bounds_blender;for(const axis of [0,1]){assert.ok(a[axis]>=-MODEL_LIMIT/2,`${lot.model} min ${axis}`);assert.ok(b[axis]<=MODEL_LIMIT/2,`${lot.model} max ${axis}`);}}
@@ -13,7 +13,7 @@ test('each current building has a separate reserved footprint',()=>{
  for(const a of plan.lots)for(const b of plan.lots)if(a.id!==b.id)assert.ok(Math.abs(a.x-b.x)>=MODEL_LIMIT||Math.abs(a.z-b.z)>=MODEL_LIMIT,`${a.id}/${b.id}`);
 });
 test('every pedestrian and vehicle route avoids every building with actor clearance',()=>{
- for(const driving of [false,true])for(const from of plan.lots)for(const to of plan.lots){const points=route(from,to,driving);for(let step=0;step<=200;step++){const p=onRoute(points,step/200);for(const building of plan.lots)assert.equal(intersectsLot(p,building,driving?2.9:.4),false,`${from.id} to ${to.id} intersects ${building.id} at ${JSON.stringify(p)}`);}}
+ for(const driving of [false,true])for(const from of plan.lots)for(const to of plan.lots){const points=route(from,to,driving);for(let step=0;step<=200;step++){const p=onRoute(points,step/200);for(const building of plan.lots)assert.equal(intersectsLot(p,building,driving?2.9:.7),false,`${from.id} to ${to.id} intersects ${building.id} at ${JSON.stringify(p)}`);}}
 });
 test('route progress clamps and travels by path distance',()=>{const path=[{x:0,z:0},{x:10,z:0},{x:10,z:30}];assert.deepEqual(onRoute(path,.5),{x:10,z:10,heading:0});assert.equal(onRoute(path,-1).x,0);assert.equal(onRoute(path,2).z,30);});
 const {CityCueQueue}=await import('../.runtime/frontend-test/city3dEvents.js');
@@ -31,7 +31,7 @@ test('opposing cars use separate right-hand lanes without a same-street detour',
    const a=onRoute(forward,step/100),b=onRoute(reverse,1-step/100);
    assert.ok(Math.abs(a.x-b.x)<1e-8);
    assert.ok(Math.abs(a.z-b.z)>3.1);
-   assert.equal(Math.sign(a.z-from.row*28),Math.sign(to.x-from.x));
+   assert.equal(Math.sign(a.z-from.row*PITCH),Math.sign(to.x-from.x));
   }
  }
 });
@@ -57,7 +57,7 @@ test('authored street furniture stays on pavements and outside all buildings and
   return box;
  });
  for(const driving of [false,true])for(const from of plan.lots)for(const to of plan.lots){
-  const points=route(from,to,driving),padding=driving?2.9:.4;
+  const points=route(from,to,driving),padding=driving?2.9:.7;
   for(let step=0;step<=200;step++){
    const p=onRoute(points,step/200);
    for(const box of boxes)assert.ok(p.x<=box.x0-padding||p.x>=box.x1+padding||p.z<=box.z0-padding||p.z>=box.z1+padding,`${from.id}/${to.id}: street furniture obstructs route`);
@@ -73,6 +73,18 @@ test('parking positions clear buildings, furniture and every travel lane',async(
   for(const driving of [false,true])for(const from of plan.lots)for(const to of plan.lots){
    const points=route(from,to,driving);
    for(let step=0;step<=40;step++)assert.equal(trafficOverlap(parked,'packard',onRoute(points,step/40),driving?'packard':'person'),false,`parked at ${lot.id} blocks ${from.id}/${to.id}`);
+  }
+ }
+});
+test('lamp poles stay clear of the articulated pedestrian walking envelope',async()=>{
+ const {lampPositions}=await import('../.runtime/frontend-test/city3dPlan.js');
+ const lamps=plan.lots.flatMap(lampPositions);
+ for(const from of plan.lots)for(const to of plan.lots){const points=route(from,to);
+  for(let step=0;step<=100;step++){const p=onRoute(points,step/100);
+   for(const lamp of lamps){const dx=lamp.x-p.x,dz=lamp.z-p.z;
+    const side=dx*Math.cos(p.heading)-dz*Math.sin(p.heading),forward=dx*Math.sin(p.heading)+dz*Math.cos(p.heading);
+    assert.ok(Math.abs(side)>=.85/2+.16||Math.abs(forward)>=1.4/2+.16,`${from.id}/${to.id} walks through a lamp`);
+   }
   }
  }
 });

@@ -64,6 +64,35 @@ These are staged fixture saves, not earned campaign progress.
 
 ## Continue next
 
+### Pedestrian model and walking-route follow-up
+
+The Blender pedestrian now has a fitted jacket, lapels, pockets, shirt/tie,
+cuffs, hands and a shaped fedora. Hip, knee and arm joints produce opposing
+left/right steps; the previous mesh-order phase assignment could swing both
+legs together. Animated bounds sampled at 48 phases are recorded in the model
+manifest and checked against traffic occupancy and pavement height. Close zoom
+now reaches 12x, with labels scaling down to retain readable screen size.
+
+Browser play exposed an indefinite walking queue: opposing pedestrians shared
+one path. Walkers now use directional pavements with explicit source/destination
+crossings. Parcel pitch increased from 28m to 32m to leave room for the stride,
+street furniture and parking; building scale and Go travel timing are unchanged.
+Lamps moved clear of the walking envelope. A new regression then exposed overly
+broad junction reservation: a turn outside the junction blocked parallel traffic.
+The check now inspects only the path ahead inside that crossing.
+
+The original blocked trip was repeated in a fresh `city3d-walk` fixture and
+completed at progress 1 / 2403ms, revision 1 / minute 615. Controls became
+available without Skip. `pedestrian-walk.png` records the playtest. All 84
+frontend tests, the production build and HTTP tests pass. The inspected close
+view measured 145 FPS / 7ms p95, 155 draws / 98,514 triangles.
+
+The figures still share one outfit and appearance. Gait articulation is better,
+but snapshot playback compresses walking distances too aggressively; improve
+movement pacing next. Also check same-direction pedestrians behind snapshot-held
+travellers, plus event actors against ordinary occupancy. These are still open
+acceptance items, alongside the broader art and scene-choreography work.
+
 ### Individual venue follow-up
 
 Four new Blender exports replace the shared casino model at The Monarch, Blue

@@ -3,16 +3,19 @@ import type {Place} from './types';
 
 export type Point = {x: number; z: number};
 export type Lot = Point & {id: string; col: number; row: number; model: string};
-export const PITCH = 28;
+export const PITCH = 32;
 export const STREET_WIDTH = 8;
-export const FOOTWAY = 4.8;
+export const FOOTWAY = 4.65;
 export const LANE = 1.6;
 export const MODEL_LIMIT = 17;
 export function streetsidePosition(lot: Lot): Point {
   return {x: lot.x, z: lot.z + 9};
 }
+export function lampPositions(lot: Lot): Point[] {
+  return [-1, 1].map(side => ({x: lot.x + side * 8.7, z: lot.row * PITCH + 5.6}));
+}
 export function parkingSpot(lot: Lot): Point {
-  return {x: lot.x + 9.65, z: lot.z};
+  return {x: lot.x + 9.6, z: lot.z};
 }
 export function cityPlan(places: Pick<Place, 'id' | 'x' | 'y' | 'type'>[]) {
   const cells = grid(places);
@@ -61,18 +64,20 @@ export function entrance(lot: Lot, driving = false): Point {
 // Orthogonal street routes share the same pitch as the building footprints.
 // Paths stay in the carriageway/footway, including at intermediate blocks.
 export function route(from: Lot, to: Lot, driving = false): Point[] {
-  if (driving) return drivingRoute(from, to);
-  const a = entrance(from, driving),
-    b = entrance(to, driving);
-  const offset = driving ? LANE : FOOTWAY;
-  const turn = from.col * PITCH + offset;
-  const points = [a, {x: turn, z: a.z}, {x: turn, z: b.z}, b];
-  return points.filter((p, i) => i === 0 || p.x !== points[i - 1].x || p.z !== points[i - 1].z);
+  const points = streetRoute(from, to, driving ? LANE : FOOTWAY, driving);
+  if (!driving) {
+    const start = entrance(from);
+    if (points[0].x !== start.x || points[0].z !== start.z) points.unshift(start);
+    const end = entrance(to);
+    const last = points.at(-1)!;
+    if (last.x !== end.x || last.z !== end.z) points.push(end);
+  }
+  return points;
 }
 // Offset each directed road segment onto its right-hand lane. Mitered
 // intersections then receive a short curve so cars steer through the junction.
-function drivingRoute(from: Lot, to: Lot): Point[] {
-  if (from.id === to.id) return [entrance(from, true)];
+function streetRoute(from: Lot, to: Lot, offset: number, driving: boolean): Point[] {
+  if (from.id === to.id) return [entrance(from, driving)];
   const a = {x: from.x, z: from.row * PITCH};
   const b = {x: to.x, z: to.row * PITCH};
   const spine =
@@ -85,8 +90,8 @@ function drivingRoute(from: Lot, to: Lot): Point[] {
     const dx = (p.x - q.x) / length,
       dz = (p.z - q.z) / length;
     return {
-      a: {x: q.x - dz * LANE, z: q.z + dx * LANE},
-      b: {x: p.x - dz * LANE, z: p.z + dx * LANE},
+      a: {x: q.x - dz * offset, z: q.z + dx * offset},
+      b: {x: p.x - dz * offset, z: p.z + dx * offset},
       dx,
       dz,
     };
@@ -98,6 +103,7 @@ function drivingRoute(from: Lot, to: Lot): Point[] {
     lane.push(before.dx ? {x: after.a.x, z: before.b.z} : {x: before.b.x, z: after.a.z});
   }
   lane.push(segments.at(-1)!.b);
+  if (!driving) return lane;
   const rounded = [lane[0]];
   for (let i = 1; i < lane.length - 1; i++) {
     const a = lane[i - 1],

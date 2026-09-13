@@ -11,6 +11,7 @@ import {
   STREET_WIDTH,
   streetsidePosition,
   parkingSpot,
+  lampPositions,
 } from './city3dPlan';
 import type {Lot, Point} from './city3dPlan';
 import type {Journey} from './TravelPresentation';
@@ -133,7 +134,7 @@ export function City3D(props: Props) {
     controls.minPolarAngle = 0.28;
     controls.maxPolarAngle = Math.PI * 0.44;
     controls.minZoom = 0.6;
-    controls.maxZoom = 5;
+    controls.maxZoom = 12;
     controls.screenSpacePanning = false;
     controls.mouseButtons = {
       LEFT: THREE.MOUSE.ROTATE,
@@ -268,9 +269,9 @@ export function City3D(props: Props) {
     );
     n = 0;
     for (const l of plan.lots)
-      for (const side of [-1, 1]) {
+      for (const at of lampPositions(l)) {
         tmp.scale.set(1, 1, 1);
-        tmp.position.set(l.x + side * 8.8, 2.6, l.row * PITCH + 4.3);
+        tmp.position.set(at.x, 2.6, at.z);
         tmp.updateMatrix();
         poles.setMatrixAt(n, tmp.matrix);
         tmp.position.y = 5.2;
@@ -324,8 +325,8 @@ export function City3D(props: Props) {
     );
     n = 0;
     for (const lot of plan.lots)
-      for (const side of [-1, 1]) {
-        tmp.position.set(lot.x + side * 8.8, 0.185, lot.row * PITCH + 4.3);
+      for (const at of lampPositions(lot)) {
+        tmp.position.set(at.x, 0.185, at.z);
         tmp.rotation.set(-Math.PI / 2, 0, 0);
         tmp.scale.set(8, 8, 1);
         tmp.updateMatrix();
@@ -440,7 +441,8 @@ export function City3D(props: Props) {
       scene.add(object);
       const limbs: THREE.Object3D[] = [];
       object.traverse(o => {
-        if (o.name.startsWith('leg') || o.name.startsWith('arm')) limbs.push(o);
+        if (o.name.startsWith('leg') || o.name.startsWith('arm') || o.name.startsWith('knee'))
+          limbs.push(o);
       });
       const actor = {
         object,
@@ -805,9 +807,19 @@ export function City3D(props: Props) {
           const moved = Math.hypot(a.object.position.x - at.x, a.object.position.z - at.z) > 0.0001;
           a.object.position.set(at.x, 0.2, at.z);
           a.object.rotation.y = at.heading;
-          for (let i = 0; i < a.limbs.length; i++)
-            a.limbs[i].rotation.x =
-              a.walking && moved && motion ? Math.sin(now * 0.012 + (i % 2) * Math.PI) * 0.45 : 0;
+          for (const limb of a.limbs) {
+            const side = limb.name.endsWith('-1') ? 0 : Math.PI;
+            const phase = now * 0.012 + side;
+            limb.rotation.x =
+              !a.walking || !moved || !motion
+                ? 0
+                : limb.name.startsWith('knee')
+                  ? Math.max(0, Math.sin(phase + 0.7)) * 0.65
+                  : Math.sin(phase + (limb.name.startsWith('arm') ? Math.PI : 0)) *
+                    (limb.name.startsWith('arm') ? 0.23 : 0.35);
+          }
+          if (a.walking && moved && motion)
+            a.object.position.y += 0.05 + Math.abs(Math.sin(now * 0.012)) * 0.015;
           if (id === 'player') playerRing.position.set(at.x, 0.23, at.z);
           if (id !== 'player' && a.end === 1 && placement.progress >= 1) {
             a.arrived = true;
@@ -834,9 +846,12 @@ export function City3D(props: Props) {
         const lot = lots.get(p.selected);
         selection.visible = !!lot;
         if (lot) selection.position.set(lot.x, 0.22, lot.z);
-        for (const [id, label] of labels)
+        for (const [id, label] of labels) {
           label.visible =
             camera.zoom > 2.7 || id === p.selected || id === w.player.location || id === hovered;
+          const labelScale = Math.max(1, camera.zoom / 2.7);
+          label.scale.set(17 / labelScale, 2.65 / labelScale, 1);
+        }
         for (let i = effects.length - 1; i >= 0; i--) {
           const e = effects[i],
             t = (now - e.since) / 3000,

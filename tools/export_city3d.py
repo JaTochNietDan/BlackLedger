@@ -318,29 +318,65 @@ def person():
     skin=material('skin',(.58,.38,.24))
     hat=material('felt hat',(.12,.1,.08))
     shoe=material('leather',(.05,.04,.035))
-    box('torso',(0,0,1.13),(.48,.27,.64),coat,.09)
-    cylinder('head',(0,0,1.62),.14,.28,skin)
-    cylinder('hat crown',(0,0,1.83),.16,.13,hat)
-    cylinder('hat brim',(0,0,1.77),.23,.035,hat)
+    shirt=material('ivory shirt',(.76,.72,.6))
+    tie=material('wine silk tie',(.27,.045,.035))
+    def oval(name,at,scale,mat):
+        bpy.ops.mesh.primitive_uv_sphere_add(segments=16,ring_count=8,location=at)
+        ob=bpy.context.object;ob.name=name;ob.scale=scale
+        bpy.ops.object.transform_apply(location=False,rotation=False,scale=True)
+        ob.data.materials.append(mat)
+        for polygon in ob.data.polygons:polygon.use_smooth=True
+        return ob
+    def joint(name,at,parent=None):
+        ob=bpy.data.objects.new(name,None);bpy.context.collection.objects.link(ob)
+        ob.location=at
+        bpy.context.view_layer.update()
+        if parent:
+            matrix=ob.matrix_world.copy();ob.parent=parent;ob.matrix_world=matrix
+        return ob
+    def attach(ob,parent):
+        matrix=ob.matrix_world.copy();ob.parent=parent;ob.matrix_world=matrix
+        return ob
+    # Three jacket rings produce shoulders, a fitted waist and a wider hem.
+    vertices=[]
+    for z,w,d in [(.83,.23,.15),(1.06,.20,.135),(1.4,.255,.15)]:
+        vertices.extend([(-w,-d,z),(w,-d,z),(w,d,z),(-w,d,z)])
+    faces=[(3,2,1,0),(8,9,10,11)]
+    for ring in range(2):
+        for i in range(4):faces.append((ring*4+i,ring*4+(i+1)%4,(ring+1)*4+(i+1)%4,(ring+1)*4+i))
+    mesh=bpy.data.meshes.new('tailored jacket');mesh.from_pydata(vertices,[],faces);mesh.materials.append(coat)
+    torso=bpy.data.objects.new('jacket',mesh);bpy.context.collection.objects.link(torso)
+    oval('neck',(0,0,1.46),(.075,.08,.13),skin)
+    oval('head',(0,-.005,1.64),(.125,.115,.17),skin)
+    oval('nose',(0,-.119,1.63),(.035,.045,.045),skin)
+    for side in (-1,1):oval('ear',(side*.125,0,1.64),(.025,.035,.052),skin)
+    oval('fedora brim',(0,0,1.79),(.235,.205,.022),hat)
+    oval('fedora crown',(0,.015,1.865),(.155,.145,.095),hat)
+    cylinder('hat ribbon',(0,.015,1.827),.154,.028,shoe)
+    box('shirt front',(0,-.151,1.285),(.19,.015,.23),shirt,.012)
     for side in (-1,1):
-        # Limb origins at hips/shoulders enable inexpensive browser gait.
-        for name,xyz,dims,mat,pivot in [
-            ('leg',(side*.13,0,.46),(.18,.2,.75),coat,(side*.13,0,.84)),
-            ('arm',(side*.32,0,1.07),(.16,.2,.61),coat,(side*.32,0,1.37)),
-        ]:
-            ob=box(name+str(side),xyz,dims,mat,.035)
-            bpy.context.scene.cursor.location=pivot
-            bpy.ops.object.origin_set(type='ORIGIN_CURSOR')
-            if name=='leg': leg=ob
-        boot=box('shoe',(side*.13,-.07,.08),(.2,.34,.16),shoe,.035)
-        matrix=boot.matrix_world.copy();boot.parent=leg;boot.matrix_world=matrix
+        lapel=box('notched lapel',(side*.108,-.164,1.265),(.09,.025,.27),coat,.012)
+        lapel.rotation_euler.y=side*math.radians(22)
+    box('tie',(0,-.171,1.28),(.04,.018,.21),tie,.008)
+    for z in (1.09,.99):oval('jacket button',(.045,-.151,z),(.013,.012,.013),shoe)
+    for side in (-1,1):
+        box('welt pocket',(side*.14,-.153,.995),(.115,.02,.018),shoe)
+        hip=joint('leg'+str(side),(side*.12,0,.86))
+        attach(box('trouser upper',(side*.12,0,.67),(.19,.22,.4),coat,.045),hip)
+        knee=joint('knee'+str(side),(side*.12,0,.47),hip)
+        attach(box('trouser lower',(side*.12,0,.29),(.16,.185,.39),coat,.035),knee)
+        attach(box('shoe',(side*.12,-.07,.075),(.18,.32,.14),shoe,.05),knee)
+        arm=joint('arm'+str(side),(side*.3,0,1.35))
+        attach(box('jacket sleeve',(side*.31,0,1.095),(.14,.19,.53),coat,.045),arm)
+        attach(box('shirt cuff',(side*.31,0,.842),(.125,.175,.045),shirt,.015),arm)
+        attach(oval('hand',(side*.31,-.005,.77),(.066,.065,.095),skin),arm)
 
 
 def export(name):
     # Join by material except animated limbs: a building becomes ~6 draws.
     groups={}
     for ob in list(bpy.context.scene.objects):
-        if ob.type=='MESH' and not ob.name.startswith(('leg','arm','shoe','clock-hand')):
+        if ob.type=='MESH' and ob.parent is None and not ob.name.startswith(('leg','arm','shoe','clock-hand')):
             groups.setdefault(ob.data.materials[0].name,[]).append(ob)
     for obs in groups.values():
         bpy.ops.object.select_all(action='DESELECT')
@@ -485,6 +521,16 @@ box('police door panel',(0,0,.82),(1.83,1.5,.32),material('police cream',(.7,.69
 cylinder('red beacon',(0,0,1.76),.18,.28,material('beacon',(.8,.02,.01),0,2))
 manifest['police']=export('police')
 clear();person();manifest['person']=export('person')
+motion_points=[]
+for sample in range(48):
+    for ob in bpy.context.scene.objects:
+        if ob.name.startswith(('leg','arm','knee')):
+            phase=sample*math.tau/48+(0 if ob.name.endswith('-1') else math.pi)
+            ob.rotation_euler.x=(max(0,math.sin(phase+.7))*.65 if ob.name.startswith('knee') else
+                math.sin(phase+(math.pi if ob.name.startswith('arm') else 0))*(.23 if ob.name.startswith('arm') else .35))
+    bpy.context.view_layer.update()
+    motion_points.extend(ob.matrix_world @ Vector(c) for ob in bpy.context.scene.objects if ob.type=='MESH' for c in ob.bound_box)
+manifest['person']['motion_bounds_blender']=[[round(min(p[i] for p in motion_points),4) for i in range(3)],[round(max(p[i] for p in motion_points),4) for i in range(3)]]
 clear();streetside();manifest['streetside']=export('streetside')
 with open(os.path.join(OUT,'manifest.json'),'w') as f: json.dump(manifest,f,indent=2)
 print('Exported',len(manifest),'models')

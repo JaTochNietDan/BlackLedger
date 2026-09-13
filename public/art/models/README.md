@@ -10,7 +10,7 @@ articulated pedestrian, plus a streetside furniture set. Geometry uses metres,
 Z-up in Blender and Y-up in glTF.
 `manifest.json` records actual exported bounds including cornices, fire escapes,
 awnings and cargo. Models must stay within the 17m reserved footprint. The
-browser places these on 28m blocks with separate pavements and carriageways.
+browser places these on 32m blocks with separate pavements and carriageways.
 `sign-anchor` empties place readable address signs onto the authored facades.
 
 Brick base-color and tangent normal maps are deterministic local textures
@@ -34,3 +34,7 @@ and reserved parcel envelope as the other buildings.
 This is the first realtime asset set, not final visual acceptance. More facade
 variety, convincing worn surfaces, better pedestrian anatomy/wardrobe, denser
 street dressing and richer district landmarks remain production work.
+
+The pedestrian has a tailored jacket, shirt/cuffs, hands and shaped fedora, with
+separate hip, knee and arm joints. The manifest includes bounds sampled across
+48 gait phases; traffic occupancy and pavement-clearance tests cover that stride.

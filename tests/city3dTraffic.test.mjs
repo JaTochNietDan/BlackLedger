@@ -66,3 +66,19 @@ test('four-way arrivals clear the junction at different frame rates without dead
   for(const [id,p]of poses)assert.ok(p.progress>=.89,`${id} deadlocked at ${fps} FPS`);
  }
 });
+test('pedestrian occupancy encloses the exported animated stride',async()=>{
+ const {readFileSync}=await import('node:fs');const {trafficSize}=await import('../.runtime/frontend-test/city3dTraffic.js');
+ const manifest=JSON.parse(readFileSync(new URL('../public/art/models/manifest.json',import.meta.url)));
+ const [min,max]=manifest.person.motion_bounds_blender,size=trafficSize('person');
+ assert.ok(size.width/2>=Math.max(-min[0],max[0]));assert.ok(size.length/2>=Math.max(-min[1],max[1]));
+ assert.ok(min[2]+.2+.05>=.17,'walking toes clear the pavement top');
+});
+test('a walking player can pass a snapshot-held opposing pedestrian',async()=>{
+ const {readFileSync}=await import('node:fs');const {cityPlan,route}=await import('../.runtime/frontend-test/city3dPlan.js');
+ const lots=cityPlan(JSON.parse(readFileSync(new URL('../core/locations.json',import.meta.url)))).lots;
+ const at=id=>lots.find(l=>l.id===id);
+ const requests=[{id:'npc',model:'person',points:route(at('room'),at('apartment')),progress:.25},{id:'player',model:'person',points:route(at('bar'),at('room')),progress:0}];
+ const traffic=new StreetTraffic();traffic.update(requests,1/60);let poses;
+ for(let frame=0;frame<480;frame++){requests[1].progress=Math.min(1,frame/144);poses=traffic.update(requests,1/60);clear(requests,poses);}
+ assert.equal(poses.get('player').progress,1);assert.equal(poses.get('npc').progress,.25);
+});

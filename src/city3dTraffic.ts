@@ -6,7 +6,7 @@ export type TrafficRequest = {id: string; model: string; points: Point[]; progre
 export type TrafficPlacement = {pose: TrafficPose; progress: number; waiting: boolean};
 const lengths: Record<string, number> = {ford: 4.7, hudson: 5.1, packard: 5.8, police: 4.7};
 export function trafficSize(model: string) {
-  return {length: lengths[model] || 0.7, width: lengths[model] ? 2.15 : 0.7};
+  return {length: lengths[model] || 1.4, width: lengths[model] ? 2.15 : 0.85};
 }
 export function trafficOverlap(a: TrafficPose, am: string, b: TrafficPose, bm: string) {
   const as = trafficSize(am),
@@ -38,9 +38,13 @@ function junction(p: Point) {
 }
 function throughAxis(request: TrafficRequest, progress: number, length: number) {
   if (!length) return null;
-  const headings = [-10, 0, 10].map(
-    offset => onRoute(request.points, progress + offset / length).heading,
-  );
+  const crossing = junction(onRoute(request.points, progress));
+  const headings: number[] = [];
+  for (let offset = 0; offset <= 32; offset++) {
+    const pose = onRoute(request.points, progress + offset / length);
+    if (junction(pose) !== crossing) break;
+    headings.push(pose.heading);
+  }
   if (headings.every(h => Math.abs(Math.sin(h)) > 0.999)) return 'horizontal';
   if (headings.every(h => Math.abs(Math.cos(h)) > 0.999)) return 'vertical';
   return null;
