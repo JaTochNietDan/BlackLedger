@@ -87,6 +87,7 @@ const modelNames = [
   'revolver',
   'blast-fragment',
   'street-bed',
+  'vacant-lot',
   'filling',
   'garage',
   'dealer',
@@ -578,12 +579,25 @@ export function City3D(props: Props) {
     )
       .then(() => {
         if (dead) return;
+        const vacantLot = models.get('vacant-lot')!;
+        vacantLot.updateMatrixWorld(true);
+        if (plan.vacant.length) vacantLot.traverse(part => {
+          if (!(part instanceof THREE.Mesh)) return;
+          const instances = new THREE.InstancedMesh(part.geometry, part.material, plan.vacant.length);
+          plan.vacant.forEach((lot, index) => {
+            const transform = new THREE.Matrix4().makeTranslation(lot.x, .18, lot.z);
+            instances.setMatrixAt(index, transform.multiply(part.matrixWorld));
+          });
+          instances.castShadow = instances.receiveShadow = true;
+          scene.add(instances);
+        });
         const streetBed = models.get('street-bed')!;
+        const parcels = [...plan.lots, ...plan.vacant];
         streetBed.updateMatrixWorld(true);
         streetBed.traverse(part => {
           if (!(part instanceof THREE.Mesh)) return;
-          const instances = new THREE.InstancedMesh(part.geometry, part.material, plan.lots.length);
-          plan.lots.forEach((lot, index) => {
+          const instances = new THREE.InstancedMesh(part.geometry, part.material, parcels.length);
+          parcels.forEach((lot, index) => {
             const transform = new THREE.Matrix4().makeTranslation(lot.x, 0, lot.z);
             instances.setMatrixAt(index, transform.multiply(part.matrixWorld));
           });

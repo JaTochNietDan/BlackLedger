@@ -1,0 +1,14 @@
+{
+  "fixture": "Isolated 8847; two non-playable unused parcels, expanded city near Thorne & Sons; no gameplay command",
+  "metrics": {
+    "fps": 145,
+    "p95ms": 8.2,
+    "drawCalls": 169,
+    "triangles": 573968,
+    "actors": 3,
+    "buildings": 28,
+    "geometries": 226,
+    "textures": 84
+  },
+  "logs": []
+}

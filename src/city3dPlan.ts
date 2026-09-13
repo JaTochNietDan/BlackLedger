@@ -74,7 +74,11 @@ export function cityPlan(places: Pick<Place, 'id' | 'x' | 'y' | 'type'>[]) {
     return {id: p.id, ...c, x: (c.col + 0.5) * PITCH, z: (c.row + 0.5) * PITCH, model};
   });
   const extent = bounds(cells);
-  return {lots, width: extent.cols * PITCH, depth: extent.rows * PITCH, ...extent};
+  const occupied = new Set(lots.map(lot => `${lot.col}:${lot.row}`));
+  const vacant: (Point & {col: number; row: number})[] = [];
+  for (let col = 0; col < extent.cols; col++) for (let row = 0; row < extent.rows; row++)
+    if (!occupied.has(`${col}:${row}`)) vacant.push({col, row, x: (col + .5) * PITCH, z: (row + .5) * PITCH});
+  return {lots, vacant, width: extent.cols * PITCH, depth: extent.rows * PITCH, ...extent};
 }
 export function entrance(lot: Lot, driving = false): Point {
   return {x: lot.x, z: lot.row * PITCH + (driving ? LANE : FOOTWAY)};

@@ -147,3 +147,21 @@ test('the complete casualty fall remains above pavement and inside its reservati
   }
  }
 });
+
+test('unused grid cells receive scenery exactly once without claiming playable addresses',()=>{
+ const occupied=new Set(plan.lots.map(l=>`${l.col}:${l.row}`));
+ const vacant=new Set(plan.vacant.map(l=>`${l.col}:${l.row}`));
+ assert.equal(vacant.size,plan.vacant.length);
+ assert.equal(vacant.size+occupied.size,plan.cols*plan.rows);
+ for(const key of vacant)assert.equal(occupied.has(key),false);
+ assert.ok(vacant.size>0,'current map contains unused parcels');
+ const [min,max]=manifest['vacant-lot'].bounds_blender;
+ for(const axis of [0,1])assert.ok(min[axis]>=-8.5&&max[axis]<=8.5);
+ for(const driving of [false,true])for(const from of plan.lots)for(const to of plan.lots){
+  const points=route(from,to,driving),padding=driving?2.9:.7;
+  for(let i=0;i<=200;i++){
+   const at=onRoute(points,i/200);
+   for(const lot of plan.vacant)assert.ok(at.x<=lot.x+min[0]-padding||at.x>=lot.x+max[0]+padding||at.z<=lot.z-max[1]-padding||at.z>=lot.z-min[1]+padding,'vacant fencing must not obstruct a route');
+  }
+ }
+});

@@ -184,3 +184,8 @@ City renderer teardown releases shared model resources, instance buffers,
 shadow targets, decoded image bitmaps and its WebGL context. Canvas metrics
 include geometry and texture counts for repeated-mount diagnostics; these are
 presentation-only counters, not simulation state or total GPU memory usage.
+
+Unused cells within the browser city grid render as fenced vacant yards. They
+are decorative parcels without location IDs, actions, ownership or simulation
+state. Their geometry preserves the same building reserve and street clearances;
+adding a real location to a cell removes its vacant-yard presentation.

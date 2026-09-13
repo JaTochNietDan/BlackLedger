@@ -470,5 +470,21 @@
       ]
     ],
     "bytes": 184796
+  },
+  "vacant-lot": {
+    "file": "vacant-lot.glb",
+    "bounds_blender": [
+      [
+        -8.2,
+        -8.2,
+        0.0
+      ],
+      [
+        8.2,
+        8.2,
+        1.76
+      ]
+    ],
+    "bytes": 858164
   }
 }

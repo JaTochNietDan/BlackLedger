@@ -37,7 +37,7 @@ test('street-bed kerbs stay below pedestrian soles and road furniture clears tyr
     const x=at.x+side*.87*cos+fore*1.74*sin;
     const z=at.z-side*.87*sin+fore*1.74*cos;
     assert.equal(surfaceHeight({x,z}),-.1,`tyre crosses pavement ${from.id}/${to.id}`);
-    for(const lot of plan.lots){
+    for(const lot of [...plan.lots,...plan.vacant]){
      assert.ok(Math.hypot(x-lot.x,z-lot.row*PITCH)>.60,'manhole under a tyre');
      for(const drain of [-8.5,8.5])assert.ok(Math.abs(x-lot.x-drain)>.52||Math.abs(z-(lot.z-12.4))>.32,'drain under a tyre');
     }

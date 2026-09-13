@@ -758,6 +758,51 @@ def undertaker():
         x,y,z=ob.location;ob.location=(-2-y,-3.8+x,z+.015);ob.rotation_euler.z+=math.pi/2
 
 
+def vacant_lot():
+    gravel=material('vacant yard earth and gravel',(.30,.28,.22));gravel_texture(gravel)
+    timber=material('vacant yard silvered timber',(.39,.37,.30))
+    iron=material('vacant yard rusted fixings',(.22,.16,.10),.4)
+    grass=material('vacant yard dry weeds',(.30,.32,.17))
+    # The footprint is strictly within the same 17m reserve as occupied lots.
+    box('vacant yard ground',(0,0,.015),(16.4,16.4,.03),gravel)
+    n=128;pixels=[]
+    for y in range(n):
+        for x in range(n):
+            grain=math.sin(x*.72+math.sin(y*.05)*1.7)*.09+math.sin(x*2.2+y*.02)*.04
+            tone=.89+grain
+            pixels.extend((.39*tone,.37*tone,.30*tone,1))
+    image=bpy.data.images.new('silvered fence grain',width=n,height=n);image.pixels=pixels;image.pack()
+    tex=timber.node_tree.nodes.new('ShaderNodeTexImage');tex.image=image
+    timber.node_tree.links.new(tex.outputs['Color'],timber.node_tree.nodes['Principled BSDF'].inputs['Base Color'])
+    rng=random.Random(1958)
+    for axis in (0,1):
+        for side in (-1,1):
+            def fence(name,along,z,dims,mat):
+                xyz=(along,side*8,z) if axis==0 else (side*8,along,z)
+                shape=dims if axis==0 else (dims[1],dims[0],dims[2])
+                return box(name,xyz,shape,mat)
+            for along in (-7.8,-4,0,4,7.8):fence('fence post',along,.88,(.16,.16,1.76),timber)
+            for z in (.42,1.20):fence('fence rail',0,z,(15.7,.09,.12),timber)
+            for i in range(52):
+                along=-7.65+i*.3
+                if (i+axis*7+(side+1)*3)%19==0:continue
+                height=1.48+rng.uniform(-.12,.12)
+                fence('weathered fence board',along,height/2,(.27,.07,height),timber)
+                for z in (.42,1.20):fence('fence nail',along,z,(.025,.09,.025),iron)
+    # Sparse clusters of folded grass blades, not a solid green carpet.
+    vertices=[];faces=[]
+    for i in range(240):
+        x=rng.uniform(-7.5,7.5);y=rng.uniform(-7.5,7.5)
+        if abs(x)<3 and abs(y)<3:continue
+        for j in range(5):
+            angle=rng.random()*math.tau;h=rng.uniform(.16,.48);w=.025
+            start=len(vertices);dx=math.cos(angle);dy=math.sin(angle)
+            vertices.extend([(x-w*dy,y+w*dx,.035),(x+w*dy,y-w*dx,.035),(x+.12*dx,y+.12*dy,h)])
+            faces.append((start,start+1,start+2))
+    mesh=bpy.data.meshes.new('vacant yard weed blades');mesh.from_pydata(vertices,[],faces);mesh.update()
+    ob=bpy.data.objects.new('vacant yard weed blades',mesh);bpy.context.collection.objects.link(ob);mesh.materials.append(grass)
+
+
 def street_bed():
     stone=material('weathered kerbstone',(.47,.46,.40))
     pale=material('replacement kerbstone',(.56,.53,.45))
@@ -911,6 +956,7 @@ for name in ('person','woman'):
 clear();undertaker();manifest['undertaker']=export('undertaker')
 clear();revolver();manifest['revolver']=export('revolver')
 clear();blast_fragment();manifest['blast-fragment']=export('blast-fragment')
+clear();vacant_lot();manifest['vacant-lot']=export('vacant-lot')
 clear();street_bed();manifest['street-bed']=export('street-bed')
 clear();streetside();manifest['streetside']=export('streetside')
 with open(os.path.join(OUT,'manifest.json'),'w') as f: json.dump(manifest,f,indent=2)

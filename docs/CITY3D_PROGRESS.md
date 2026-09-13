@@ -64,6 +64,13 @@ These are staged fixture saves, not earned campaign progress.
 
 ## Continue next
 
+### Unused parcels as fenced yards (2026-09-13)
+
+- The two unused cells in the current 6×5 grid now render locally authored Blender vacant yards: textured earth/gravel, silvered timber boards with irregular tops and gaps, posts/rails/fixings, and sparse folded weeds. The material groups are instanced across unused cells. Kerb stones, drains and manhole treatment now cover these parcels as well as occupied blocks.
+- Vacancies are derived from unoccupied grid coordinates, with no location IDs or gameplay actions. Real addresses retain their positions and commands; a newly occupied cell no longer receives yard scenery. Yard geometry remains inside the existing 17m building reserve.
+- All 126 frontend tests and production build pass. Tests cover exact vacant/occupied partitioning and every current pedestrian/vehicle route against yard bounds, with tyre/drain checks extended to unused cells. Browser orbit/zoom inspection on isolated port 8847 is recorded in `docs/qa/city3d-20260913/vacant-yards.png` and `vacant-yards-metrics.json`: 145 FPS, 8.2ms p95, 169 draws, 573,968 triangles, three actors/28 buildings, no captured console warnings/errors. Main save untouched and no gameplay command issued.
+- The empty-cell placeholder appearance is resolved, but repeated architecture and excessive paved frontage around occupied buildings remain. This does not establish final art quality or broad hardware performance.
+
 ### Guarded pavement trees (2026-09-13)
 
 - The instanced street-furniture set now includes one compact, Blender-authored tree beside the rear bench band: tapered trunk, branching, iron guard, radial grate, soil opening and 540 individually folded leaf blades. Three locally authored 128px leaf-vein textures provide restrained foliage variation. This adds decorative planting without simulation entities or commands.
