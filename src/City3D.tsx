@@ -16,7 +16,7 @@ import {
 import type {Lot, Point} from './city3dPlan';
 import type {Journey} from './TravelPresentation';
 import './city3d.css';
-import {CityCueQueue, availableSceneSlot, casualtyFall} from './city3dEvents';
+import {CityCueQueue, availableSceneSlot, casualtyFall, gunfightPose, casualtySceneStart} from './city3dEvents';
 import type {SceneSlot} from './city3dEvents';
 import {StreetTraffic} from './city3dTraffic';
 import {pedestrianModel, isPedestrian} from './city3dCast';
@@ -56,6 +56,8 @@ type Effect = {
   light: THREE.PointLight;
   extra?: THREE.Group;
   slot?: SceneSlot;
+  gunArm?: THREE.Object3D;
+  muzzle?: THREE.Object3D;
 };
 const modelNames = [
   'tenement',
@@ -70,6 +72,7 @@ const modelNames = [
   'packard',
   'person',
   'woman',
+  'revolver',
   'filling',
   'garage',
   'dealer',
@@ -699,15 +702,25 @@ export function City3D(props: Props) {
           const at = entrance(lot);
           light.position.set(at.x, 3, at.z);
           scene.add(light);
-          let extra: THREE.Group | undefined;
-          if (cue.kind === 'killing' || ['raid', 'arrest'].includes(cue.kind)) {
-            const model = cue.kind === 'killing' ? personModel(cue.actors?.[0]?.id || '') : 'police';
+          let extra: THREE.Group | undefined, gunArm: THREE.Object3D | undefined, muzzle: THREE.Object3D | undefined;
+          if (['killing', 'gunfight', 'raid', 'arrest'].includes(cue.kind)) {
+            const model = cue.kind === 'killing' ? personModel(cue.actors?.[0]?.id || '')
+              : cue.kind === 'gunfight' ? 'person' : 'police';
             extra = models.get(model)!.clone(true);
+            if (cue.kind === 'gunfight') {
+              extra.rotation.y = Math.PI / 2;
+              gunArm = extra.getObjectByName('arm1');
+              const weapon = models.get('revolver')!.clone(true);
+              weapon.position.set(0, -0.58, 0);
+              weapon.rotation.x = Math.PI / 2;
+              gunArm?.add(weapon);
+              muzzle = weapon.getObjectByName('muzzle');
+            }
             extra.visible = false;
             mesh.visible = false;
             scene.add(extra);
           }
-          effects.push({cue, since: now, mesh, light, extra});
+          effects.push({cue, since: now, mesh, light, extra, gunArm, muzzle});
           if (p.activeCue?.id === cue.id) focus.current(cue.target);
         }
         // Damage is a persistent scorch state, not evidence of a continuing fire.
@@ -810,7 +823,11 @@ export function City3D(props: Props) {
           }
         }
         if (!motion) traffic.clear();
-        for (const e of effects) {
+        // Reserve the shooter before associated casualties, so a full batch
+        // cannot occupy every slot while waiting for an unstaged first shot.
+        const stagingOrder = [...effects].sort((a, b) =>
+          Number(b.cue.kind === 'gunfight') - Number(a.cue.kind === 'gunfight'));
+        for (const e of stagingOrder) {
           if (!e.extra || e.slot) continue;
           const occupied = [
             ...[...actors.values()]
@@ -916,6 +933,10 @@ export function City3D(props: Props) {
               continue;
             }
           }
+          if (e.cue.kind === 'killing') {
+            const gunScene = effects.find(other => other.cue.kind === 'gunfight' && other.cue.target === e.cue.target);
+            e.since = casualtySceneStart(e.since, now, gunScene?.since);
+          }
           const t = (now - e.since) / 3000,
             lot = lots.get(e.cue.target)!;
           if (t >= 1 || !motion) {
@@ -929,6 +950,14 @@ export function City3D(props: Props) {
           const at = e.slot?.root || entrance(lot);
           const blast = e.cue.kind === 'explosion';
           const shot = e.cue.kind === 'gunfight';
+          const firing = gunfightPose(t * 3);
+          const muzzlePosition = new THREE.Vector3(at.x, 1.4, at.z);
+          if (shot && e.gunArm && e.muzzle) {
+            e.gunArm.rotation.x = firing.arm;
+            e.extra!.updateMatrixWorld(true);
+            e.muzzle.getWorldPosition(muzzlePosition);
+            e.light.position.copy(muzzlePosition);
+          }
           const casualty = e.cue.kind === 'killing';
           if (casualty && e.extra) {
             const fall = casualtyFall(t);
@@ -962,6 +991,12 @@ export function City3D(props: Props) {
                     ? 0.001
                     : 0.25,
             );
+            if (shot) {
+              tmp.position.copy(muzzlePosition);
+              const smoke = j === 1 && firing.smoke > 0;
+              if (smoke) tmp.position.y += (1 - firing.smoke) * 0.3;
+              tmp.scale.setScalar(j === 0 && firing.flash ? 0.28 : smoke ? 0.15 + (1 - firing.smoke) * 0.3 : 0.001);
+            }
             if (police) {
               // A period rotating red roof beacon, rather than sparks around the car.
               tmp.position.set(at.x, 1.96, at.z);
@@ -973,7 +1008,7 @@ export function City3D(props: Props) {
             e.mesh.setColorAt(
               j,
               new THREE.Color(
-                smoke
+                smoke || (shot && j === 1)
                   ? 0x55534e
                   : police
                     ? 0xde3426
@@ -990,7 +1025,7 @@ export function City3D(props: Props) {
           (e.mesh.material as THREE.MeshBasicMaterial).opacity = 1 - t;
           e.light.intensity = blast
             ? 100 * (1 - t) ** 3
-            : shot && Math.floor(t * 22) % 3 === 0
+            : shot && firing.flash
               ? 30
               : police
                 ? 8 * Math.max(0, Math.sin(t * 38))
@@ -1028,6 +1063,8 @@ export function City3D(props: Props) {
           effects: effects.map(e => ({
             id: e.cue.id, kind: e.cue.kind, target: e.cue.target,
             staged: !e.extra || e.extra.visible, x: e.slot?.root.x, z: e.slot?.root.z,
+            arm: e.gunArm?.rotation.x,
+            fall: e.cue.kind === 'killing' ? e.extra?.rotation.z : undefined,
           })),
         });
       if (ready && dt > 0 && dt < 250) samples.push(dt);

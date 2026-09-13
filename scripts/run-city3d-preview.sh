@@ -4,7 +4,7 @@ set -euo pipefail
 city_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$city_root"
 city_scenario="${1:-city3d}"
-case "$city_scenario" in city3d|city3d-night|city3d-blast|city3d-traffic|city3d-junction|city3d-walk|killing|arrest) ;; *) echo 'Choose city3d, city3d-night, city3d-blast, city3d-traffic, city3d-junction, city3d-walk, killing, or arrest.' >&2; exit 2;; esac
+case "$city_scenario" in city3d|city3d-night|city3d-blast|city3d-traffic|city3d-junction|city3d-walk|killing|arrest|gunfight|gunfight-killing) ;; *) echo 'Choose city3d, city3d-night, city3d-blast, city3d-traffic, city3d-junction, city3d-walk, killing, arrest, gunfight, or gunfight-killing.' >&2; exit 2;; esac
 mkdir -p .runtime
 city_save="$city_root/.runtime/$city_scenario-$(date +%Y%m%d-%H%M%S)-$$.sqlite3"
 if [[ ! -d node_modules ]]; then npm ci; fi

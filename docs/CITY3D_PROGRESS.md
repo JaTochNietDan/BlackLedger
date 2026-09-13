@@ -64,6 +64,49 @@ These are staged fixture saves, not earned campaign progress.
 
 ## Continue next
 
+### Gunfire choreography follow-up
+
+Gunfight cues now stage an anonymous articulated shooter with a locally authored
+Blender revolver (blued frame, cylinder/barrel, walnut grip, open trigger guard,
+sights and a muzzle anchor). The three-second sequence raises the arm, fires four
+brief muzzle flashes with recoil and smoke, then lowers the weapon. Light and
+particles follow the exported muzzle through the animation. The shooter uses the
+same forecourt reservations as casualties and prefers a slot behind the first
+casualty along the firing direction. This is a schematic reenactment: existing
+Go gunfight cues do not identify a shooter or weapon, so the renderer does not
+assign the figure to a named NPC or invent hit outcomes.
+
+Co-located killing cues hold their fall until the first gunfire moment. Shooter
+slots are allocated first so a full casualty batch cannot consume every slot
+while waiting for a shooter to stage. Other killing cues retain their existing
+fall timing. The detailed position/shot count is presentation, not saved combat.
+
+Evidence: 96 frontend tests pass, including four firing pulses at 30/60/144 FPS,
+casualty delay, and actual parsed GLB geometry through every aim/recoil frame
+checked against the reserved footprint and pavement. `npm run build` and
+`go test ./cmd/blackledger ./cmd/qa-fixture` pass. Logs:
+`.runtime/city3d-gun-tests.log`, `.runtime/city3d-gun-go.log`,
+`.runtime/city3d-gun-export.log` and `.runtime/city3d-build.log`.
+There are 25 exported models. Existing person/woman binaries were preserved when
+the full exporter rewrote those unchanged models.
+
+Browser fixtures on 8854 (`gunfight`) and 8855 (`gunfight-killing`) use core Witness
+and, for the paired case, core Kill to produce replayable records. These are
+explicit isolated presentation fixtures, not a campaign combat acceptance test.
+The paired replay showed the shooter at (77,38.35), Mara at (80,38.35), and the
+player clear at (80,36.65). Before the shot, the arm was raised and fall was zero;
+a later sample showed the fall at -1.327 radians. Skip cleared both effects at
+revision 0 / minute 480. Screenshots: `qa/city3d-20260913/gunfight.png` and
+`gunfight-casualty.png`. The post-scene local view measured 145 FPS / 7.1ms p95,
+65 draws and 78,460 triangles; this is not a busy combat performance guarantee.
+
+Still pending: sound currently follows the older Theatre audio timing; align it
+with staged muzzle pulses and cancellation. Add varied, convincing multi-actor
+combat and vehicle choreography, richer character materials, and broader browser
+acceptance for accessibility, resource stability and dense scenes. Final art and
+production acceptance remain incomplete.
+
+
 ### Cast appearance follow-up
 
 Added a second locally authored Blender pedestrian: waved/pinned chestnut hair,

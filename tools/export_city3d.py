@@ -389,6 +389,26 @@ def person(waved=False):
         attach(oval('hand',(side*.31,-.005,.77),(.066,.065,.095),skin),arm)
 
 
+def revolver():
+    steel=material('blued revolver steel',(.055,.065,.075),.8)
+    wood=material('walnut grip',(.17,.07,.025))
+    dark=material('revolver bore',(.012,.014,.016))
+    grip=box('walnut grip',(0,.025,-.018),(.055,.075,.13),wood,.014)
+    grip.rotation_euler.x=math.radians(-12)
+    box('steel frame',(0,-.025,.062),(.055,.14,.065),steel,.009)
+    cylinder('six shot cylinder',(0,-.055,.083),.041,.073,steel,(math.pi/2,0,0))
+    cylinder('barrel',(0,-.191,.086),.021,.22,steel,(math.pi/2,0,0))
+    cylinder('muzzle bore',(0,-.302,.086),.010,.003,dark,(math.pi/2,0,0))
+    box('front sight',(0,-.265,.11),(.012,.018,.014),steel,.003)
+    box('hammer',(0,.027,.113),(.014,.036,.029),steel,.004)
+    # A small open trigger guard, rather than a solid block beneath the frame.
+    for side in (-1,1):box('guard side',(0,-.061+side*.023,.006),(.012,.011,.048),steel,.003)
+    box('guard bottom',(0,-.061,-.018),(.012,.055,.01),steel,.003)
+    box('trigger',(0,-.055,.012),(.01,.01,.029),steel,.003)
+    anchor=bpy.data.objects.new('muzzle',None);bpy.context.collection.objects.link(anchor)
+    anchor.location=(0,-.307,.086)
+
+
 def export(name):
     # Join by material except animated limbs: a building becomes ~6 draws.
     groups={}
@@ -549,6 +569,7 @@ for name in ('person','woman'):
         bpy.context.view_layer.update()
         motion_points.extend(ob.matrix_world @ Vector(c) for ob in bpy.context.scene.objects if ob.type=='MESH' for c in ob.bound_box)
     manifest[name]['motion_bounds_blender']=[[round(min(p[i] for p in motion_points),4) for i in range(3)],[round(max(p[i] for p in motion_points),4) for i in range(3)]]
+clear();revolver();manifest['revolver']=export('revolver')
 clear();streetside();manifest['streetside']=export('streetside')
 with open(os.path.join(OUT,'manifest.json'),'w') as f: json.dump(manifest,f,indent=2)
 print('Exported',len(manifest),'models')

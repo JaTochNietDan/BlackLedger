@@ -115,3 +115,8 @@ are not authoritative NPC locations and never change event outcomes or time.
 one-based saved `face` selection. It is appearance only, with no new gender or
 gameplay field. Portrait fallback and city selection share Go's unsigned FNV-1a
 ID calculation; named painted identities keep their established appearance.
+
+A `gunfight` cue stages an anonymous schematic shooter; existing cues do not
+identify the weapon or shooter, so the renderer does not attribute one to a
+named NPC. Co-located `killing` playback waits for the first visual shot. These
+poses, timing and muzzle effects never create shots, hits, casualties or time in Go.
