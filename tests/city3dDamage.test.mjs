@@ -29,3 +29,11 @@ test('damaged clones do not stain healthy buildings sharing the same source text
  assert.equal(damaged.map,healthy.map);assert.equal(source.userData.cityWear,undefined);
  assert.equal(damaged.customProgramCacheKey(),healthy.customProgramCacheKey(),'material instances can share a program');
 });
+
+test('broken glazing follows condition and restores intact panes after repairs',async()=>{
+ const {buildingGlazing}=await import('../.runtime/frontend-test/city3dDamage.js');
+ const b=new THREE.Group(),intact=new THREE.Group(),broken=new THREE.Group();intact.name='window-intact';broken.name='window-broken';b.add(intact,broken);
+ for(const condition of [100,60,NaN]){buildingGlazing(b,condition);assert.equal(intact.visible,true);assert.equal(broken.visible,false);}
+ for(const condition of [59,38,0]){buildingGlazing(b,condition);assert.equal(intact.visible,false);assert.equal(broken.visible,true);}
+ buildingGlazing(b,80);assert.equal(intact.visible,true);assert.equal(broken.visible,false);
+});

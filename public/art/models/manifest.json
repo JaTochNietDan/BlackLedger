@@ -13,7 +13,7 @@
         17.23
       ]
     ],
-    "bytes": 977692
+    "bytes": 998876
   },
   "tavern": {
     "file": "tavern.glb",
@@ -29,7 +29,7 @@
         8.825
       ]
     ],
-    "bytes": 510704
+    "bytes": 520364
   },
   "casino": {
     "file": "casino.glb",
@@ -45,7 +45,7 @@
         8.825
       ]
     ],
-    "bytes": 498528
+    "bytes": 509752
   },
   "warehouse": {
     "file": "warehouse.glb",
@@ -61,7 +61,7 @@
         5.675
       ]
     ],
-    "bytes": 391736
+    "bytes": 402956
   },
   "civic": {
     "file": "civic.glb",
@@ -77,7 +77,7 @@
         15.74
       ]
     ],
-    "bytes": 532944
+    "bytes": 551936
   },
   "shop": {
     "file": "shop.glb",
@@ -93,7 +93,7 @@
         14.08
       ]
     ],
-    "bytes": 925776
+    "bytes": 940568
   },
   "villa": {
     "file": "villa.glb",
@@ -221,7 +221,7 @@
         11.975
       ]
     ],
-    "bytes": 584964
+    "bytes": 603664
   },
   "bluehour": {
     "file": "bluehour.glb",
@@ -237,7 +237,7 @@
         8.825
       ]
     ],
-    "bytes": 481420
+    "bytes": 491080
   },
   "goldenlily": {
     "file": "goldenlily.glb",
@@ -253,7 +253,7 @@
         11.975
       ]
     ],
-    "bytes": 531636
+    "bytes": 543796
   },
   "papermoon": {
     "file": "papermoon.glb",
@@ -269,7 +269,7 @@
         5.675
       ]
     ],
-    "bytes": 430656
+    "bytes": 440888
   },
   "ford": {
     "file": "ford.glb",

@@ -55,3 +55,18 @@ test('window debris clears exported facades and canopies before settling',async(
   }
  }
 });
+
+test('authored broken glazing has a missing centre and retains separate intact panes',async()=>{
+ for(const name of ['tavern','monarch','tenement','shop','civic','casino','warehouse','bluehour','goldenlily','papermoon']){
+  const b=readFileSync(new URL(`../public/art/models/${name}.glb`,import.meta.url)),loader=new GLTFLoader();
+  loader.register(p=>({name:'glazing-geometry',loadMaterial(i){return Promise.resolve(new THREE.MeshBasicMaterial({side:THREE.DoubleSide,name:p.json.materials[i].name}));}}));
+  const model=(await loader.parseAsync(b.buffer.slice(b.byteOffset,b.byteOffset+b.byteLength),'')).scene;model.updateMatrixWorld(true);
+  const intact=model.getObjectByName('window-intact'),broken=model.getObjectByName('window-broken');assert.ok(intact&&broken,name);
+  const window=model.getObjectByName('fire-window-1-1')||model.getObjectByName('fire-window-0-1');
+  const p=window.getWorldPosition(new THREE.Vector3());p.x+=.12;
+  const ray=new THREE.Raycaster(p,new THREE.Vector3(0,0,1),0,.2);
+  assert.ok(ray.intersectObject(intact,true).length,`${name} intact pane missing`);
+  const hits=ray.intersectObject(broken,true);assert.ok(hits.length,`${name} recess missing`);
+  assert.equal(hits[0].object.material.name,'unlit window recess');
+ }
+});

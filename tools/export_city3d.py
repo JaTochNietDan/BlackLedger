@@ -213,6 +213,11 @@ def building(kind, floors, width=12, depth=12, seed=0, palette=None, accent=None
     warm = material('occupied windows', (.78,.46,.17), 0, .35)
     iron = material('painted iron', (.12,.15,.14), .5)
     height = floors * 3.15
+    glazing={}
+    for state in ('intact','broken'):
+        group=bpy.data.objects.new('window-'+state,None);bpy.context.collection.objects.link(group);glazing[state]=group
+    recess=material('unlit window recess',(.018,.023,.024))
+    shards=material('broken glass edges',(.19,.31,.32),.45)
     anchor=bpy.data.objects.new('sign-anchor',None);bpy.context.collection.objects.link(anchor);anchor.location=(0,depth/2+.26,2.85)
     if kind=='tavern':
         # A real front vestibule, not a painted doorway on a solid block.
@@ -255,7 +260,21 @@ def building(kind, floors, width=12, depth=12, seed=0, palette=None, accent=None
                     if axis==0 and side==1:
                         vent=bpy.data.objects.new('fire-window-'+str(floor)+'-'+str(col),None)
                         bpy.context.collection.objects.link(vent);vent.location=(x,d/2+.22,z)
-                    facade('window pane', x,z,(1.58 if floor==0 else 1.09,.24,1.64),warm if (floor+col+side+seed)%5==0 else glass)
+                    pane_width=1.58 if floor==0 else 1.09
+                    pane=facade('window pane', x,z,(pane_width,.24,1.64),warm if (floor+col+side+seed)%5==0 else glass)
+                    if axis==0 and side==1 and (floor>0 or floors==1):
+                        pane.parent=glazing['intact']
+                        backing=box('broken window recess',(x,d/2+.155,z),(pane_width,.025,1.64),recess,0)
+                        backing.parent=glazing['broken']
+                        # Four separated jagged remnants cling to the edges; the centre is missing.
+                        outline=[(-1,-1),(-.18,-1),(-.35,-.62),(-.56,-.74),(-.70,-.30),(-1,-.18)]
+                        for sx,sz in ((1,1),(-1,1),(1,-1),(-1,-1)):
+                            verts=[(x+px*sx*pane_width/2,d/2+.195,z+pz*sz*.82) for px,pz in outline]
+                            mesh=bpy.data.meshes.new('jagged glass');mesh.from_pydata(verts,[],[tuple(range(len(verts)))]);mesh.update()
+                            ob=bpy.data.objects.new('window glass remnant',mesh);bpy.context.collection.objects.link(ob);ob.data.materials.append(shards);ob.parent=glazing['broken']
+                            # Two-sided thin glazing exports visible edges from either orbit direction.
+                            solid=ob.modifiers.new('glass thickness','SOLIDIFY');solid.thickness=.008
+
                     facade('window mullion', x,z,(.065,.26,1.64),iron)
                     facade('window sill',x,z-.91,(1.5,.42,.14),stone)
             facade('shop fascia',0,2.85,(w+.2,.35,.36),iron)
@@ -637,7 +656,7 @@ def export(name):
     # Join by material except animated limbs: a building becomes ~6 draws.
     groups={}
     for ob in list(bpy.context.scene.objects):
-        if ob.type=='MESH' and (ob.parent is None or ob.parent.name.startswith(('wheel-roll-','interior-wall-','entrance-door-'))) and not ob.name.startswith(('leg','arm','shoe','clock-hand')):
+        if ob.type=='MESH' and (ob.parent is None or ob.parent.name.startswith(('wheel-roll-','interior-wall-','entrance-door-','window-'))) and not ob.name.startswith(('leg','arm','shoe','clock-hand')):
             key=(ob.parent.name if ob.parent else '',ob.data.materials[0].name)
             groups.setdefault(key,[]).append(ob)
     for obs in groups.values():

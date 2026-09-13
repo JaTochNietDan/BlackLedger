@@ -303,3 +303,9 @@ Fire response attendance now includes two authored firefighter characters facing
 
 
 Between brigade arrival and extinguishing, visible firefighters on supported facades hold authored nozzles, with separate hoses connected to the engine's side outlets and animated water arcs ending at authored fire-window positions. Hidden/unavailable crews cannot emit water. Disabled motion freezes stream particles; extinguishing removes hoses/nozzles/streams and resets the working arm pose while brigade attendance continues. This remains initial suppression choreography; deployment, reeling-in, impact spray and adaptive hose routing still need production work.
+
+Condition-driven glazing on the ten standard building exports switches front upper
+panes (or front ground panes on single-storey buildings) to authored broken-glass
+remnants below 60% condition. Repairs to 60% or above restore intact glazing.
+This is visible property wear, not a new ignition or damage rule; extinguishing
+and rubble cleanup do not repair windows. Other model families need equivalent variants.

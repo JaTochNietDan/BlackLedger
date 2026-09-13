@@ -59,3 +59,10 @@ export function buildingCutaway(material: THREE.MeshStandardMaterial, amount: nu
   wear.cutaway.value = Math.max(0, Math.min(1, amount));
   wear.window.value.copy(window);
 }
+
+/** Broken glazing remains a condition state until repairs restore the facade. */
+export function buildingGlazing(building:THREE.Group,condition:number){
+ const broken=Number.isFinite(condition)&&condition<60;
+ const intact=building.getObjectByName('window-intact'),damaged=building.getObjectByName('window-broken');
+ if(intact)intact.visible=!broken;if(damaged)damaged.visible=broken;
+}

@@ -8,7 +8,7 @@ import {wardrobe, dressPedestrian} from './city3dWardrobe';
 import {headlightAlpha, headlightCentre} from './city3dHeadlights';
 import {cityWeather, rainVertices} from './city3dWeather';
 import {blockingBuildings} from './city3dOcclusion';
-import {buildingCondition, buildingCutaway} from './city3dDamage';
+import {buildingCondition, buildingGlazing, buildingCutaway} from './city3dDamage';
 import {disposeCityResources} from './city3dResources';
 import {useEffect, useRef, useState, type ReactNode} from 'react';
 import * as THREE from 'three';
@@ -1004,6 +1004,7 @@ export function City3D(props: Props) {
         // Condition-driven surface stains imply no ongoing fire or invented collapse.
         for (const place of w.locations) {
           const b = buildings.get(place.id);
+          if (b) buildingGlazing(b,place.condition);
           if (b)
             b.traverse(o => {
               if (o instanceof THREE.Mesh) {
@@ -1506,6 +1507,7 @@ export function City3D(props: Props) {
           impact:motion?impact:{x:0,y:0},
           suppression:suppression.inspect(),
           rubble:rubble.inspect(),
+          glazing:[...buildings].flatMap(([id,b])=>{const broken=b.getObjectByName('window-broken');return broken?[{id,broken:broken.visible}]:[];}),
           buildingFire:buildingFire.inspect(),
           headlightPools: headlightPools.count,
           harbour: {visible: !!harbourLot, waterClock},
