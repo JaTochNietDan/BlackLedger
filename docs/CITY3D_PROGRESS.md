@@ -64,6 +64,12 @@ These are staged fixture saves, not earned campaign progress.
 
 ## Continue next
 
+### Localized condition staining (2026-09-13)
+
+- Replaced uniform whole-building darkening with stable surface-coordinate staining driven by the public condition value. Spatial variation preserves readable facade detail; it implies neither ongoing fire nor structural collapse. Full repairs remove staining without altering source textures. Healthy buildings bypass noise calculations, and condition changes update existing uniforms instead of recompiling materials.
+- All 129 frontend tests and production build pass. New tests cover clamping, repair restoration, uniform reuse and isolation between damaged/healthy clones sharing source textures. Browser shader compilation and close inspection passed on isolated port 8843 (Monarch condition 38) and port 8847 (condition 100), with no captured warnings/errors. Evidence: `docs/qa/city3d-20260913/condition-stains-38.png`, `condition-stains-100.png`, `condition-stains-metrics.json`.
+- Damaged-view local sample: 145 FPS, 7.4ms p95, 186 draws, 582,816 triangles, two actors/28 buildings. Repair restoration is unit-tested; the browser comparison uses separate healthy/damaged fixtures, not a repair command. Main save untouched. Broken-window/rubble variants, richer structural damage and broader device/art acceptance remain unfinished.
+
 ### Distinct Mariner lodging house (2026-09-13)
 
 - The player's starting home now uses a dedicated Blender model instead of the generic tenement: three storeys of weathered brick, limestone courses, sash windows, a single sheltered front entrance and lodging sign, closed brick gables, pitched slate roof/ridge, chimney pots and rear iron escape. Its existing `room` location, travel endpoints and gameplay remain unchanged.

@@ -1,3 +1,4 @@
+import {buildingCondition} from './city3dDamage';
 import {disposeCityResources} from './city3dResources';
 import {useEffect, useRef, useState, type ReactNode} from 'react';
 import * as THREE from 'three';
@@ -820,7 +821,7 @@ export function City3D(props: Props) {
               : cue.kind === 'explosion' ? new BlastAudio(() => playMoment('explosion')) : undefined});
           if (p.activeCue?.id === cue.id) focus.current(cue.target);
         }
-        // Damage is a persistent scorch state, not evidence of a continuing fire.
+        // Condition-driven surface stains imply no ongoing fire or invented collapse.
         for (const place of w.locations) {
           const b = buildings.get(place.id);
           if (b)
@@ -831,18 +832,10 @@ export function City3D(props: Props) {
                     ? o.material.map(m => m.clone())
                     : o.material.clone();
                   o.userData.ownMaterial = true;
-                  for (const m of Array.isArray(o.material) ? o.material : [o.material]) {
-                    if (m instanceof THREE.MeshStandardMaterial)
-                      m.userData.baseColor = m.color.clone();
-                  }
                 }
                 for (const m of Array.isArray(o.material) ? o.material : [o.material])
                   if (m instanceof THREE.MeshStandardMaterial)
-                    m.color
-                      .copy(m.userData.baseColor as THREE.Color)
-                      .multiplyScalar(
-                        0.42 + (0.58 * Math.max(0, Math.min(100, place.condition))) / 100,
-                      );
+                    buildingCondition(m, place.condition, b.position);
               }
             });
         }

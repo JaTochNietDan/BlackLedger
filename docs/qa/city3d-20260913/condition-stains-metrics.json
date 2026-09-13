@@ -1,0 +1,14 @@
+{
+  "fixture": "Isolated 8843, Monarch condition 38, no gameplay command",
+  "metrics": {
+    "fps": 145,
+    "p95ms": 7.4,
+    "drawCalls": 186,
+    "triangles": 582816,
+    "actors": 2,
+    "buildings": 28,
+    "geometries": 217,
+    "textures": 88
+  },
+  "logs": []
+}

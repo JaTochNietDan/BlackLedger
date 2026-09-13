@@ -189,3 +189,7 @@ Unused cells within the browser city grid render as fenced vacant yards. They
 are decorative parcels without location IDs, actions, ownership or simulation
 state. Their geometry preserves the same building reserve and street clearances;
 adding a real location to a cell removes its vacant-yard presentation.
+
+Building condition drives stable localized surface staining. It does not identify
+the damage cause or imply an active fire/collapse. Full condition removes the
+staining; updates reuse material uniforms and leave shared source textures intact.
