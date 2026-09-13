@@ -66,6 +66,7 @@ export class CityAftermath {
       this.root.remove(entry.group);entry.owned.forEach(m=>m.dispose());this.entries.delete(key);
     }
   }
+  object(id:string){return this.entries.get(id)?.group;}
   reservations() {return [...this.entries].map(([id,e])=>({id,model:e.slot.model,points:[e.slot.pose],progress:0}));}
   slots() {return [...this.entries.values()].map(e=>e.slot);}
   show(placements: Map<string,{waiting:boolean}>) {

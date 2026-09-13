@@ -1336,7 +1336,7 @@ def fire_engine():
         cylinder('headlamp lens',(side*.70,-2.78,1.10),.135,.02,lamp,(math.pi/2,0,0),32)
         # Side pump controls ahead of the hose bed.
         cylinder('pressure gauge',(side*1.04,.27,1.17),.09,.055,chrome,(0,math.pi/2,0),24)
-        cylinder('hose outlet',(side*1.065,.27,.85),.105,.12,brass,(0,math.pi/2,0),24)
+        for y in (.27,.52):cylinder('hose outlet',(side*1.065,y,.85),.105,.12,brass,(0,math.pi/2,0),24)
     for y in (-2.77,2.77):box('truck bumper',(0,y,.57),(2.12,.14,.17),chrome,.045)
     box('radiator',(0,-2.68,1.15),(1.10,.08,.69),rubber,.04)
     for rib in range(13):box('radiator chrome rib',(-.49+rib*.082,-2.735,1.15),(.025,.025,.61),chrome)
@@ -1345,6 +1345,17 @@ def fire_engine():
         for layer in range(3):box('folded hose',(-.28+row*.14,1.4,1.28+layer*.07),(.115,2.05,.06),canvas,.024)
     cylinder('beacon base',(0,-.65,2.29),.19,.08,chrome,vertices=32)
     cylinder('red rotating beacon',(0,-.65,2.43),.16,.22,material('engine beacon',(.8,.025,.01),0,1),vertices=32)
+
+
+def fire_nozzle():
+    brass=material('nozzle brass',(.48,.31,.10),.72)
+    rubber=material('nozzle grip',(.035,.038,.031))
+    cylinder('hose coupling',(0,.12,0),.065,.10,brass,(math.pi/2,0,0),32)
+    cylinder('nozzle barrel',(0,-.08,0),.043,.32,brass,(math.pi/2,0,0),32)
+    cylinder('nozzle hand grip',(0,.015,0),.049,.14,rubber,(math.pi/2,0,0),32)
+    cylinder('nozzle tip',(0,-.255,0),.031,.065,brass,(math.pi/2,0,0),24)
+    box('shutoff lever',(0,-.035,.065),(.12,.025,.025),brass,.008)
+    tip=bpy.data.objects.new('water-outlet',None);bpy.context.collection.objects.link(tip);tip.location=(0,-.29,0)
 
 
 def firefighter():
@@ -1449,6 +1460,7 @@ for name in ('person','woman'):
         bpy.context.view_layer.update()
         motion_points.extend(ob.matrix_world @ Vector(c) for ob in bpy.context.scene.objects if ob.type=='MESH' for c in ob.bound_box)
     manifest[name]['motion_bounds_blender']=[[round(min(p[i] for p in motion_points),4) for i in range(3)],[round(max(p[i] for p in motion_points),4) for i in range(3)]]
+clear();fire_nozzle();manifest['fire-nozzle']=export('fire-nozzle')
 clear();firefighter();manifest['firefighter']=export('firefighter')
 clear();fire_engine();manifest['fire-engine']=export('fire-engine')
 clear();police_officer();manifest['police-officer']=export('police-officer')

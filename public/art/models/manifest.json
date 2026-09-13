@@ -581,7 +581,7 @@
         2.54
       ]
     ],
-    "bytes": 765780
+    "bytes": 776104
   },
   "firefighter": {
     "file": "firefighter.glb",
@@ -598,5 +598,21 @@
       ]
     ],
     "bytes": 343200
+  },
+  "fire-nozzle": {
+    "file": "fire-nozzle.glb",
+    "bounds_blender": [
+      [
+        -0.065,
+        -0.2875,
+        -0.065
+      ],
+      [
+        0.065,
+        0.17,
+        0.0775
+      ]
+    ],
+    "bytes": 35940
   }
 }

@@ -1,3 +1,4 @@
+import {CitySuppression} from './city3dSuppression';
 import {CityFire} from './city3dFire';
 import {CityAftermath} from './city3dAftermath';
 import {previewScenes, previewScene, type PreviewScene} from './city3dPreview';
@@ -96,6 +97,7 @@ const modelNames = [
   'civic',
   'shop',
   'villa',
+  'fire-nozzle',
   'firefighter',
   'fire-engine',
   'ford',
@@ -414,6 +416,7 @@ export function City3D(props: Props) {
     const actors = new Map<string, Actor>();
     const effects: Effect[] = [];
     let completedScene = "";
+    const suppression=new CitySuppression();scene.add(suppression.root);
     const aftermath = new CityAftermath();
     scene.add(aftermath.root);
     const disposeDebris = (effect: Effect) => {
@@ -1476,6 +1479,7 @@ export function City3D(props: Props) {
         waterClock += Math.min(dt, 100) / 1000;
         waterNormal.offset.set((waterClock * .006) % 1, (waterClock * .003) % 1);
       }
+      suppression.update(w.building_fires || [],w.minute,buildings,models,aftermath,dt,motion);
       buildingFire.update(w.building_fires || [],w.minute,buildings,camera,dt,motion);
       renderImpact(camera,motion?impact.x:0,motion?impact.y:0,canvas.clientWidth,canvas.clientHeight,()=>renderer.render(scene,camera));
       if (ready)
@@ -1484,6 +1488,7 @@ export function City3D(props: Props) {
           minute: w.minute,
           playbackRate: playback.current,
           impact:motion?impact:{x:0,y:0},
+          suppression:suppression.inspect(),
           buildingFire:buildingFire.inspect(),
           headlightPools: headlightPools.count,
           harbour: {visible: !!harbourLot, waterClock},
@@ -1563,6 +1568,7 @@ export function City3D(props: Props) {
       canvas.removeEventListener('keydown', keys);
       canvas.removeEventListener('webglcontextlost', lost);
       effects.forEach(effect => { effect.audio?.dispose(); disposeDebris(effect); });
+      suppression.dispose();
       buildingFire.dispose();
       aftermath.dispose();
       disposeCityResources([scene, ...models.values()], {

@@ -293,3 +293,6 @@ The saved fire response now stages a locally authored `fire-engine` from `brigad
 
 
 Fire response attendance now includes two authored firefighter characters facing the affected building. They use separate forecourt reservations and share the brigade's saved cleanup deadline. Their initial standing attendance does not yet represent hose deployment. Scene staging reserves stationary public actors at their known parking/standing destinations before their first visible frame, preventing response vehicles from taking a hidden parked car's bay.
+
+
+Between brigade arrival and extinguishing, visible firefighters on supported facades hold authored nozzles, with separate hoses connected to the engine's side outlets and animated water arcs ending at authored fire-window positions. Hidden/unavailable crews cannot emit water. Disabled motion freezes stream particles; extinguishing removes hoses/nozzles/streams and resets the working arm pose while brigade attendance continues. This remains initial suppression choreography; deployment, reeling-in, impact spray and adaptive hose routing still need production work.
