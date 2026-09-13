@@ -1147,6 +1147,108 @@ def streetside():
         cylinder('outlet nut',(3+side*.33,0,.63),.075,.05,iron,(0,math.pi/2,0))
 
 
+def saint_agnes_interior():
+    wood=material('cafe polished walnut',(.105,.047,.024))
+    plaster=material('cafe aged ivory plaster',(.53,.48,.35))
+    cream=material('cafe ivory mosaic',(.58,.55,.43))
+    charcoal=material('cafe charcoal mosaic',(.036,.048,.045))
+    brass=material('cafe aged brass',(.46,.29,.085),.75)
+    leather=material('cafe oxblood upholstery',(.16,.026,.025))
+    marble=material('cafe cream marble',(.66,.62,.48))
+    porcelain=material('cafe porcelain',(.79,.76,.62))
+    iron=material('cafe black enamel',(.025,.032,.031),.35)
+    mirror=material('cafe silvered mirror',(.24,.32,.29),.8)
+    glow=material('cafe opal lamps',(.94,.68,.30),0,1.6)
+    # Packed walnut colour and normal grain, shared across panelling/furniture.
+    n=128;image=bpy.data.images.new('cafe walnut grain',width=n,height=n);pixels=[]
+    for y in range(n):
+        for x in range(n):
+            grain=.88+.12*math.sin(x*.7+math.sin(y*.045)*2)+.04*math.sin(x*2.8)
+            pixels.extend((*[1.055*(c*grain)**(1/2.4)-.055 for c in wood.diffuse_color[:3]],1))
+    image.pixels=pixels;image.pack();tex=wood.node_tree.nodes.new('ShaderNodeTexImage');tex.image=image
+    wood.node_tree.links.new(tex.outputs['Color'],wood.node_tree.nodes['Principled BSDF'].inputs['Base Color'])
+    wood.node_tree.nodes['Principled BSDF'].inputs['Roughness'].default_value=.34
+    leather.node_tree.nodes['Principled BSDF'].inputs['Roughness'].default_value=.43
+    box('cafe floor slab',(0,0,-.13),(12,10,.26),charcoal)
+    for ix in range(24):
+        for iy in range(20):
+            box('mosaic tile',(-5.75+ix*.5,-4.75+iy*.5,.014),(.485,.485,.028),cream if (ix+iy)%2 else charcoal)
+    box('back plaster wall',(0,-5,1.75),(12,.2,3.5),plaster)
+    box('left plaster wall',(-6,0,1.75),(.2,10,3.5),plaster)
+    for x in [-5.5+i for i in range(12)]:
+        box('back walnut panel',(x,-4.85,.65),(.91,.12,1.18),wood,.022)
+        for z in (.18,1.12):box('panel inset moulding',(x,-4.77,z),(.77,.035,.035),brass,.01)
+    for y in [-4.5+i for i in range(10)]:
+        box('left walnut panel',(-5.85,y,.65),(.12,.91,1.18),wood,.022)
+    for z in (.12,1.3,3.36):
+        box('back dado and cornice',(0,-4.75,z),(12,.18,.12),wood,.018)
+        box('left dado and cornice',(-5.75,0,z),(.18,10,.12),wood,.018)
+    # Back bar and mirrored display, with layered frames and bottle shelves.
+    box('back bar cupboard',(1,-4.25,.55),(7,1.1,1.1),wood,.045)
+    for x in (-2,-.5,1,2.5,4):
+        box('cupboard raised door',(x,-3.67,.55),(1.35,.05,.87),wood,.018)
+        cylinder('cupboard brass pull',(x+.44,-3.61,.6),.035,.055,brass,(math.pi/2,0,0),16)
+    box('silvered back bar mirror',(1,-4.82,2.25),(6.8,.05,1.65),mirror)
+    for x in (-2.5,4.5):box('mirror carved stile',(x,-4.7,2.25),(.13,.16,1.9),wood,.025)
+    for z in (1.33,3.18):box('mirror cornice',(1,-4.7,z),(7.15,.2,.16),wood,.025)
+    bottles=[material('bottle green',(.022,.12,.052),.15),material('bottle amber',(.25,.105,.021),.12)]
+    label=material('bottle paper labels',(.59,.52,.34))
+    for z in (1.4,2.18):
+        box('bottle shelf',(1,-4.3,z),(6.8,.7,.065),wood,.012)
+        for i in range(22):
+            x=-2.15+i*.30;m=bottles[i%2];h=.32+(i%3)*.04
+            cylinder('bottle body',(x,-4.22,z+h/2+.05),.075,h,m,vertices=16)
+            cylinder('bottle neck',(x,-4.22,z+h+.11),.033,.14,m,vertices=16)
+            cylinder('bottle label',(x,-4.22,z+.18),.076,.12,label,vertices=16)
+    box('front bar panel',(1,-2.65,.53),(7, .7,1.06),wood,.055)
+    box('rounded marble counter',(1,-2.65,1.12),(7.25,1.15,.13),marble,.055)
+    for x in (-2,-.5,1,2.5,4):
+        box('bar inset field',(x,-2.27,.57),(1.3,.05,.67),wood,.018)
+    cylinder('brass foot rail',(1,-1.95,.23),.037,6.8,brass,(0,math.pi/2,0),24)
+    for x in (-2,0,2,4):
+        cylinder('foot rail post',(x,-2.05,.14),.025,.28,brass,vertices=16)
+        cylinder('stool pedestal',(x,-1.4,.35),.065,.65,brass,vertices=24)
+        cylinder('stool foot',(x,-1.4,.055),.24,.08,iron,vertices=32)
+        cylinder('round padded stool',(x,-1.4,.72),.26,.16,leather,vertices=32)
+    # Two deeply upholstered booths beside the wall, with clear central aisle.
+    for y in (.5,3.2):
+        for side in (-1,1):
+            yy=y+side*.72
+            box('booth walnut plinth',(-4.65,yy,.24),(1.8,.6,.48),wood,.04)
+            box('booth seat cushion',(-4.65,yy,.53),(1.8,.65,.19),leather,.07)
+            box('booth padded back',(-4.65,yy+side*.25,.96),(1.8,.19,.85),leather,.065)
+            for x in (-5.3,-4.85,-4.4,-3.95):
+                cylinder('upholstery button',(x,yy+side*.14,1.08),.025,.018,brass,(math.pi/2,0,0),12)
+        box('booth marble table',(-4.65,y,.83),(1.6,.8,.09),marble,.04)
+        cylinder('table cast pedestal',(-4.65,y,.4),.07,.78,iron,vertices=24)
+        cylinder('table base',(-4.65,y,.07),.3,.10,iron,vertices=24)
+        cylinder('sugar bowl',(-4.65,y,.93),.09,.12,porcelain,vertices=24)
+        for x in (-5.15,-4.15):
+            cylinder('coffee saucer',(x,y,.893),.115,.025,porcelain,vertices=32)
+            cylinder('coffee cup',(x,y,.97),.065,.13,porcelain,vertices=32)
+    # Period espresso boiler, register and service ware.
+    copper=material('cafe copper boiler',(.43,.19,.073),.8)
+    cylinder('espresso boiler',(3,-4,1.54),.25,.76,copper,vertices=32)
+    cylinder('boiler lid',(3,-4,1.94),.28,.06,brass,vertices=32)
+    for x in (2.82,3.18):cylinder('espresso tap',(x,-3.72,1.5),.035,.2,brass,(math.pi/2,0,0),16)
+    box('cash register base',(-1.7,-2.6,1.29),(.65,.55,.23),brass,.04)
+    box('cash register head',(-1.7,-2.75,1.57),(.58,.25,.36),brass,.04)
+    for row in range(3):
+        for col in range(7):cylinder('register ivory key',(-1.94+col*.08,-2.43-row*.08,1.44),.025,.045,porcelain,vertices=12)
+    for x in (-.5,1,2):
+        cylinder('counter saucer',(x,-2.35,1.2),.12,.024,porcelain,vertices=24)
+        cylinder('counter cup',(x,-2.35,1.28),.067,.13,porcelain,vertices=24)
+    for x in (-3,1,4):
+        cylinder('pendant suspension',(x,-2.7,3.2),.016,.55,brass,vertices=12)
+        cylinder('opal pendant',(x,-2.7,2.85),.24,.27,glow,vertices=32)
+        cylinder('pendant brass shade',(x,-2.7,3),.30,.06,brass,vertices=32)
+    # Framed local prints on the booth wall.
+    printmat=material('cafe sepia print',(.26,.22,.14))
+    for y in (.5,3.2):
+        box('picture frame',(-5.76,y,2.25),(.10,1.5,1.1),wood,.03)
+        box('picture mount',(-5.69,y,2.25),(.03,1.3,.91),porcelain)
+        box('sepia picture',(-5.66,y,2.25),(.02,1.06,.68),printmat)
+
 manifest={}
 for i,(name,floors,w,d) in enumerate([('tenement',4,12,11),('tavern',2,12,12),('casino',2,13,11),('warehouse',1,13,12),('civic',3,13,12),('shop',3,12,11),('villa',2,11,11)]):
     clear()
@@ -1186,6 +1288,7 @@ clear();undertaker();manifest['undertaker']=export('undertaker')
 clear();revolver();manifest['revolver']=export('revolver')
 clear();blast_fragment();manifest['blast-fragment']=export('blast-fragment')
 clear();mariner();manifest['mariner']=export('mariner')
+clear();saint_agnes_interior();manifest['interior-saint-agnes']=export('interior-saint-agnes')
 clear();harbour_pier();manifest['harbour-pier']=export('harbour-pier')
 clear();quay_section();manifest['quay-section']=export('quay-section')
 clear();vacant_lot();manifest['vacant-lot']=export('vacant-lot')

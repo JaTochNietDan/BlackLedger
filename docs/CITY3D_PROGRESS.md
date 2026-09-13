@@ -64,6 +64,13 @@ These are staged fixture saves, not earned campaign progress.
 
 ## Continue next
 
+### First furnished 3D interior — Saint Agnes — September 13
+
+- Authored `interior-saint-agnes.glb` in Blender (1,923,660 bytes): walnut wall panelling/cornices, mosaic floor, mirrored bottle display, cupboard doors, marble bar, brass foot rail and stools, oxblood upholstered booths, café tables/cups, copper espresso boiler, mechanical register and pendant lamps. The deterministic source is part of the canonical model exporter.
+- Entering Saint Agnes now opens an orbitable/zoomable Three.js room. Up to nine public occupants stand in clear aisle bays with the existing cast models/palettes; selecting a model selects the same existing room action panel. The full accessible roster and premises actions remain below. Other locations still use their existing backdrops.
+- All 149 frontend tests and production build pass. Actual exported geometry tests check room bounds, floor support under shoe footprints and radial furniture clearance at five heights around every bay. Browser testing on isolated 8860 selected Leo by native canvas click, confirmed his room panel, and measured steady 144 FPS, 255 draws/128,352 triangles for five occupants. Fixed a deprecated shadow-map warning; final browser logs are clear. Initial asset/shader warmup sampled 22 FPS, so loading performance remains to improve. No gameplay command in this interior test; save stayed revision 3/minute 660.
+- Evidence: `saint-agnes-interior.png` and `.json`. This is the first room, not final interior acceptance. Other building interiors, player presence, seating/idle behavior, richer characters, more convincing surface detail, robust graphics failure handling, compact view and repeated-entry resource QA remain unfinished. Event/aftermath/weapon production requirements remain active as well.
+
 ### Persistent aftermath rendered — September 13
 
 - The city now consumes saved `aftermath`: a fallen cast character and irregular dark blood pool remain after the short animation, with a police car appearing from the backend response deadline. Bodies and vehicles reserve separate bays in the existing traffic system. Active casualty playback suppresses duplicate persistent bodies; cleanup removes the scene and releases private costume materials.

@@ -1,0 +1,16 @@
+{
+  "metrics": {
+    "people": [
+      "leo",
+      "street-26",
+      "street-50",
+      "street-63",
+      "street-85"
+    ],
+    "picked": "leo",
+    "drawCalls": 255,
+    "triangles": 128352,
+    "fps": 144
+  },
+  "logs": []
+}

@@ -1,3 +1,4 @@
+import {Interior3D} from './Interior3D';
 import {useEffect, useState} from 'react';
 import type {ReactElement} from 'react';
 import type {Action, Coming, Group, Place, Presence} from './types';
@@ -254,7 +255,7 @@ export function Interior({
           ))}
         </div>
       )}
-      <div
+      {place.id === 'bar' ? <Interior3D people={onFloor} picked={picked} onPick={id=>setPicked(id===picked?'':id)} minute={minute}/> : <div
         className={'room' + (painted ? ' painted' : '')}
         style={painted ? {backgroundImage: `url(${paintedRoom(place.id)})`} : undefined}
       >
@@ -311,7 +312,7 @@ export function Interior({
             and {onFloor.length - standingSpots.length} more in here
           </span>
         )}
-      </div>
+      </div>}
 
       <div className="room-people" role="list">
         {people.map(p => (

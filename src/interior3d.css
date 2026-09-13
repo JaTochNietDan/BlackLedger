@@ -1,0 +1,4 @@
+.interior3d{position:relative;width:100%;height:clamp(340px,55vh,620px);background:#171b18;grid-column:1;grid-row:2;overflow:hidden}
+.interior3d-canvas{position:absolute;inset:0}.interior3d canvas{display:block;width:100%;height:100%;touch-action:none}
+.interior3d-caption{position:absolute;left:14px;top:12px;color:#ebdcbb;background:#171b18d9;padding:8px 12px;font-size:11px;letter-spacing:.08em;pointer-events:none}
+.interior3d>p{position:absolute;left:20px;bottom:20px;padding:12px;background:#171b18ed;color:#ebdcbb}

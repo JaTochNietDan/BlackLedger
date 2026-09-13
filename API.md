@@ -254,3 +254,7 @@ Append `?city-debug` to the browser URL to expose the scene selector. Gunfight, 
 ## Persistent killing aftermath
 
 The public `aftermath` array describes active observable death scenes independently of `last_result`. Each saved entry has `id`, `target`, a named `victim`, `minute`, `police_at` and `cleanup_at`. New public killing cues for an actually dead NPC create one entry per victim. Initial response tuning is police arrival after five game minutes and cleanup after 180; no wall-clock presentation action advances those deadlines. Entries disappear from the public projection at cleanup, while building condition remains governed by repairs. Repeated reports cannot duplicate bodies or restart an old death's lifetime. Older saves without this field load with no invented historical scenes. The city renders a persistent fallen character and blood pool, then a police car from `police_at`, using separate traffic reservations. Active casualty playback suppresses the duplicate persistent body. Officers, response travel and animated cleanup remain pending.
+
+## First 3D room presentation
+
+Saint Agnes uses a locally authored GLB interior on entry. Public occupants populate up to nine clear standing bays, and clicking an occupant selects their existing room actions. The full roster remains available below the canvas. This changes presentation only; occupant presence, action availability and premises ownership remain public Go projections. Other interiors remain on the existing renderer pending their authored rooms.
