@@ -29,7 +29,7 @@ import {
 import type {Lot, Point} from './city3dPlan';
 import type {Journey} from './TravelPresentation';
 import './city3d.css';
-import {CityCueQueue, officerApproach, policeCast, sceneSlots, availableSceneSlot, casualtyFall, gunfightPose, casualtySceneStart, GunfireAudio, BlastAudio} from './city3dEvents';
+import {CityCueQueue, raidEntryPose, policeSceneSeconds, officerApproach, policeCast, sceneSlots, availableSceneSlot, casualtyFall, gunfightPose, casualtySceneStart, GunfireAudio, BlastAudio} from './city3dEvents';
 import type {SceneSlot} from './city3dEvents';
 import {StreetTraffic, trafficSize, trafficModel, advanceWheel, wheelSteering, advanceSteering, frontWheelSteering} from './city3dTraffic';
 import {pedestrianModel, isPedestrian} from './city3dCast';
@@ -924,7 +924,7 @@ export function City3D(props: Props) {
           scene.add(light);
           let costume: THREE.MeshStandardMaterial[] | undefined;
           let extra: THREE.Group | undefined, gunArm: THREE.Object3D | undefined, muzzle: THREE.Object3D | undefined;
-          if (['killing', 'gunfight', 'raid', 'arrest','police-unit','officer','detainee','raid-officer'].includes(cue.kind)) {
+          if (['killing', 'gunfight', 'raid', 'arrest','raid-unit','police-unit','officer','detainee','raid-officer'].includes(cue.kind)) {
             const model = ['killing','detainee'].includes(cue.kind) ? personModel(cue.actors?.[0]?.id || '')
               : cue.kind === 'gunfight' ? 'person' : ['officer','raid-officer'].includes(cue.kind)?'police-officer':'police';
             extra = models.get(model)!.clone(true);
@@ -1109,7 +1109,7 @@ export function City3D(props: Props) {
             model: trafficModel(a.model,a.start===a.end), root: {x:a.object.position.x,z:a.object.position.z},
             pose: {x:a.object.position.x,z:a.object.position.z,heading:a.object.rotation.y},
           }))], new Set(effects.filter(e=>e.cue.kind==='killing').flatMap(e=>e.cue.actors?.map(a=>a.id)||[])), w.police_presence || [],
-          new Set(effects.filter(e=>['raid','raid-officer','police-unit'].includes(e.cue.kind)).map(e=>e.cue.target)));
+          new Set(effects.filter(e=>['raid','raid-officer','raid-unit'].includes(e.cue.kind)).map(e=>e.cue.target)));
         const placements = traffic.update(
           [...actors]
             .filter(([, a]) => !a.arrived)
@@ -1208,6 +1208,11 @@ export function City3D(props: Props) {
           const labelScale = Math.max(1, camera.zoom / 2.7);
           label.scale.set(17 / labelScale, 2.65 / labelScale, 1);
         }
+        for(const [id,building] of buildings){
+          const door=building.getObjectByName('entrance-door-hinge');if(!door)continue;
+          const playing=effects.some(e=>e.cue.target===id&&e.cue.kind==='raid-officer');
+          door.rotation.y=!playing&&w.police_presence?.some(p=>p.target===id&&w.minute<p.cleanup_at)?-Math.PI/2:0;
+        }
         for (let i = effects.length - 1; i >= 0; i--) {
           const e = effects[i];
           if (e.extra && motion) {
@@ -1224,7 +1229,7 @@ export function City3D(props: Props) {
           }
           const t = (now - e.since) / 3000,
             lot = lots.get(e.cue.target)!;
-          if (t >= 1 || !motion) {
+          if (t * 3 >= policeSceneSeconds(e.cue.kind) || !motion) {
             scene.remove(e.mesh, e.light);
             if (e.extra) scene.remove(e.extra);
             e.wardrobe?.forEach(material => material.dispose());
@@ -1255,13 +1260,21 @@ export function City3D(props: Props) {
             e.extra.rotation.z = fall.rotation;
             e.extra.position.y = fall.height;
           }
-          const police = ['raid', 'arrest','police-unit'].includes(e.cue.kind);
+          const police = ['raid', 'arrest','raid-unit','police-unit'].includes(e.cue.kind);
           const personnel=['officer','detainee','raid-officer'].includes(e.cue.kind);
           if(personnel&&e.extra){
             if(e.cue.kind==='raid-officer'){
               const front=(buildings.get(lot.id)?.userData.sightBounds as THREE.Box3|undefined)?.min.z ?? at.z;
               const distance=THREE.MathUtils.clamp(front-at.z-.7,0,2.4);
-              const walk=officerApproach(t*3,distance,Number(e.cue.id.split(':').at(-1))||0);
+              const building=buildings.get(lot.id);
+              const threshold=building?.getObjectByName('entrance-threshold');
+              const door=building?.getObjectByName('entrance-door-hinge');
+              const entry=threshold?.getWorldPosition(new THREE.Vector3());
+              const approach=entry?entry.z-at.z-.65:0;
+              const breaching=!!door&&!!entry&&Math.abs(entry.x-at.x)<.05&&approach>0&&approach<=3;
+              const breach=breaching?raidEntryPose(t*3,approach):null;
+              const walk=breach || officerApproach(t*3,distance,Number(e.cue.id.split(':').at(-1))||0);
+              if(breach&&door)door.rotation.y=-Math.PI/2*breach.door;
               e.extra.position.z=at.z+walk.travelled;e.extra.rotation.y=0;
               e.extra.position.y=.2+(walk.walking?Math.abs(Math.sin(walk.phase))*.025:0);
               for(const name of ['leg1','leg-1','knee1','knee-1','arm1','arm-1']){
@@ -1269,6 +1282,11 @@ export function City3D(props: Props) {
                 const phase=walk.phase+(name.endsWith('-1')?0:Math.PI);
                 limb.rotation.x=!walk.walking?0:name.startsWith('knee')?Math.max(0,Math.sin(phase+.7))*.65
                   :Math.sin(phase+(name.startsWith('arm')?Math.PI:0))*(name.startsWith('arm')?.23:.35);
+              }
+              if(breach){
+                const leg=e.extra.getObjectByName('leg1'), knee=e.extra.getObjectByName('knee1');
+                if(leg)leg.rotation.x-=breach.kick*.9;
+                if(knee)knee.rotation.x+=breach.kick*.5;
               }
             }else if(e.cue.kind==='detainee')for(const name of ['arm1','arm-1']){
               const arm=e.extra.getObjectByName(name);if(arm)arm.rotation.x=.55*Math.min(1,t*4);
@@ -1389,6 +1407,9 @@ export function City3D(props: Props) {
       if (sightPoints.length) {
         if (now - lastSightCheck >= 100) {
           blockers = new Set(sightPoints.flatMap(sight => [...blockingBuildings(camera, sight, buildings)]));
+          // An authored doorway should occlude an entering officer naturally;
+          // dissolving the target would erase the door being breached.
+          for(const e of effects)if(e.cue.kind==='raid-officer'&&buildings.get(e.cue.target)?.getObjectByName('entrance-door-hinge'))blockers.delete(e.cue.target);
           lastSightCheck = now;
         }
         const size = renderer.getDrawingBufferSize(new THREE.Vector2());
@@ -1470,6 +1491,7 @@ export function City3D(props: Props) {
             })),
           waiting: [...actors].filter(([, a]) => !a.arrived && !a.object.visible).map(([id]) => id),
           aftermath: aftermath.inspect(),
+          doors:[...buildings].flatMap(([id,b])=>{const door=b.getObjectByName('entrance-door-hinge');return door?[{id,angle:door.rotation.y}]:[];}),
           effects: effects.map(e => ({
             id: e.cue.id, kind: e.cue.kind, target: e.cue.target,
             staged: !e.extra || e.extra.visible, x: e.slot?.root.x, z: e.slot?.root.z,

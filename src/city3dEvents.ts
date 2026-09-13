@@ -40,10 +40,10 @@ export function sceneSlots(lot: Lot, kind: string): SceneSlot[] {
   if (['killing','gunfight','officer','detainee','raid-officer'].includes(kind))
     return (kind === 'gunfight' ? [-3, -6, 0, 3, 6] : [0, -3, 3, -6, 6]).map(offset => {
       const root = {x: lot.x + offset, z: lot.row * PITCH + 6.35};
-      return kind==='raid-officer' ? {root,pose:{x:root.x,z:root.z+1.2,heading:0},model:'police-approach'}
+      return kind==='raid-officer' ? {root,pose:{x:root.x,z:root.z+2.6,heading:0},model:'police-approach'}
         : {root, pose: {x: root.x + 0.8, z: root.z, heading: 0}, model: 'casualty'};
     });
-  if (['raid','arrest','police-unit'].includes(kind))
+  if (['raid','arrest','police-unit','raid-unit'].includes(kind))
     return [1, -1].flatMap(side => [-6, 0, 6].map(offset => {
       const root = {x: lot.x + side * 9.6, z: lot.z + offset};
       return {root, pose: {...root, heading: 0}, model: 'parked-police'};
@@ -147,16 +147,32 @@ export function policeCast(cue: VisualCue): VisualCue[] {
   if(!['raid','arrest'].includes(cue.kind))return [cue];
   const result=[cue];
   const add=(kind:string,index:number,actors=cue.actors)=>result.push({...cue,id:`${cue.id}:${kind}:${index}`,kind,actors});
-  for(let i=0;i<(cue.kind==='raid'?2:1);i++)add('police-unit',i,[]);
+  for(let i=0;i<(cue.kind==='raid'?2:1);i++)add(cue.kind==='raid'?'raid-unit':'police-unit',i,[]);
   if(cue.kind==='arrest'&&cue.detainee)add('detainee',0,[cue.detainee]);
   for(let i=0;i<(cue.kind==='raid'?4:2);i++)add(cue.kind==='raid'?'raid-officer':'officer',i,[]);
   return result;
 }
 
-/** A staggered purposeful walk; the full 2.4m sweep is reserved before moving. */
+/** A staggered purposeful walk; callers reserve its complete swept path. */
 export function officerApproach(seconds: number, distance: number, index: number) {
  const start=.35+index*.08;
  const travelled=Math.min(Math.max(0,distance),Math.max(0,seconds-start)*1.4);
  const walking=seconds>start&&travelled<distance;
  return {travelled,walking,phase:travelled/1.15*Math.PI*2};
+}
+
+/** Door contact precedes its opening; entry starts only after the leaf clears. */
+export function raidEntryPose(seconds: number, distance: number) {
+  const approach=officerApproach(seconds,distance,0);
+  const arrived=.35+distance/1.4;
+  const contact=seconds-arrived;
+  const kick=contact>=0 && contact<.65 ? Math.sin(contact/.65*Math.PI) : 0;
+  const door=Math.max(0,Math.min(1,(contact-.3)/.35));
+  const inside=Math.max(0,Math.min(1.9,(contact-1)*1.4));
+  const travelled=approach.travelled+inside;
+  const walking=approach.walking || (contact>1 && inside<1.9);
+  return {travelled,walking,phase:travelled/1.15*Math.PI*2,kick,door};
+}
+export function policeSceneSeconds(kind: string) {
+  return ['raid','raid-unit','raid-officer'].includes(kind)?7:3;
 }

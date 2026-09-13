@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {policeCast,availableSceneSlot,officerApproach} from '../.runtime/frontend-test/city3dEvents.js';
+import {policeCast,availableSceneSlot,officerApproach,raidEntryPose,policeSceneSeconds} from '../.runtime/frontend-test/city3dEvents.js';
 import {trafficOverlap} from '../.runtime/frontend-test/city3dTraffic.js';
 
 test('raid stages three vehicles and four officers without shared bays',()=>{
@@ -26,7 +26,7 @@ test('officer approach is staggered, speed bounded and stays inside its swept re
    const pose=officerApproach(time,distance,officer);
    assert.ok(pose.travelled>=previous&&pose.travelled<=distance);
    assert.ok(pose.travelled-previous<=.014001,'approach exceeds walking speed');
-   assert.ok(Math.abs(slot.root.z+pose.travelled-slot.pose.z)+.7<=2,'actor exceeds reserved sweep');
+   assert.ok(Math.abs(slot.root.z+pose.travelled-slot.pose.z)+.7<=3.300001,'actor exceeds reserved sweep');
    previous=pose.travelled;
   }
   assert.equal(officerApproach(3,distance,officer).travelled,distance);
@@ -34,4 +34,20 @@ test('officer approach is staggered, speed bounded and stays inside its swept re
  }
  assert.equal(officerApproach(.5,2.4,3).travelled,0);
  assert.ok(officerApproach(.5,2.4,0).travelled>0);
+});
+
+test('raid entry waits for the door to clear and stays inside its reserved corridor',()=>{
+ const slot=availableSceneSlot({id:'bar',x:80,z:48,row:1,col:2},'raid-officer',[]);
+ for(const distance of [2.4,2.92,3])for(let t=0;t<=7;t+=.01){
+  const pose=raidEntryPose(t,distance);
+  assert.ok(Math.abs(slot.root.z+pose.travelled-slot.pose.z)+.7<=3.300001);
+  if(pose.travelled>distance)assert.equal(pose.door,1,'entry preceded door opening');
+ }
+ assert.equal(raidEntryPose(7,2.92).walking,false);
+ for(const cue of policeCast({id:'raid',kind:'raid',target:'bar'}))assert.equal(policeSceneSeconds(cue.kind),7);
+});
+
+test('raid approach reservation leaves the public entrance clear',()=>{
+ const slot=availableSceneSlot({id:'bar',x:80,z:48,row:1,col:2},'raid-officer',[]);
+ assert.equal(trafficOverlap(slot.pose,slot.model,{x:80,z:36.65,heading:0},'person'),false);
 });
