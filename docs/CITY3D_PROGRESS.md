@@ -64,6 +64,12 @@ These are staged fixture saves, not earned campaign progress.
 
 ## Continue next
 
+### Event camera fitting — September 13
+
+- Active committed cues now fit a world-space action envelope into the orthographic camera, independently of prior zoom. The envelope includes alternative staging bays for same-address actors and, for explosions, the building plus a particle margin. Camera orientation is preserved; replay explicitly opens the city from an interior.
+- All 146 frontend tests and production build pass. New projection tests check every envelope corner across narrow/square/wide viewports, four rotations and both previous zoom extremes. Browser replay on isolated 8859 verified the gunfight and casualty together, then entered Saint Agnes and replayed again: city reopened at zoom 6.9055, target x80/z38.35, both effects staged, revision 0/minute 480 unchanged. Captured sample 145 FPS/7.7ms p95, no browser warnings/errors.
+- Evidence: `event-framing.png` and `event-framing.json`. Explosion/police framing still needs browser inspection; simultaneous events at separate addresses, caption occlusion at compact sizes and scene timing during slow asset loading remain to address. The new user-requested debug scene selector and detailed 3D interiors remain pending. Existing architecture/characters still do not meet the requested quality standard.
+
 ### Harbour frontage and revised visual acceptance — September 13
 
 - Added locally authored Blender timber landing and masonry quay assets at Pier 14. Individual deck boards, grain/normal textures, submerged piles, iron collars, bollards and rubber fenders give the harbour a distinct construction. Instanced retaining-wall sections leave the landing opening clear. Animated normal-mapped water extends beyond the western city edge; motion settings stop the water clock.

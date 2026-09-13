@@ -1,0 +1,69 @@
+{
+  "presentation": {
+    "revision": 0,
+    "minute": 480,
+    "playbackRate": 1,
+    "headlightPools": 0,
+    "harbour": {
+      "visible": true,
+      "waterClock": 0.961
+    },
+    "followingPlayer": false,
+    "cutawayBuildings": [],
+    "weather": {
+      "kind": "rain",
+      "wet": 1,
+      "rainVisible": true,
+      "rainClock": 0.961
+    },
+    "camera": {
+      "zoom": 6.9055328616331835,
+      "x": 260,
+      "z": -201.65,
+      "targetX": 80,
+      "targetZ": 38.35
+    },
+    "actors": [
+      {
+        "id": "player",
+        "model": "person",
+        "x": 80,
+        "z": 36.65,
+        "y": 0.2
+      }
+    ],
+    "waiting": [],
+    "effects": [
+      {
+        "id": "6b32946d93abe35a941a289146ff9bb0",
+        "kind": "killing",
+        "target": "bar",
+        "staged": true,
+        "x": 80,
+        "z": 38.35,
+        "fall": -0.3726714285320854
+      },
+      {
+        "id": "47618f1b07ca535d7f154c6cf4ed5c26",
+        "kind": "gunfight",
+        "target": "bar",
+        "staged": true,
+        "x": 77,
+        "z": 38.35,
+        "arm": -1.5707963267948966,
+        "audioShots": 1
+      }
+    ]
+  },
+  "metrics": {
+    "fps": 145,
+    "p95ms": 7.7,
+    "drawCalls": 136,
+    "triangles": 531390,
+    "actors": 1,
+    "buildings": 28,
+    "geometries": 212,
+    "textures": 45
+  },
+  "logs": []
+}

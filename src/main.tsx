@@ -887,7 +887,7 @@ function App() {
                   const cues = w.last_result?.cues || [];
                   const cue = [...cues].sort((a, b) => (b.gravity || 0) - (a.gravity || 0))[0];
                   if (cue) {
-                    setCityView(v => (v === 'interior' ? remembered() : v));
+                    setCityView('iso');
                     setSelected(cue.target);
                     setBeat(0);
                     setPlaying(cue);

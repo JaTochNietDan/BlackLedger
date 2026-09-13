@@ -242,3 +242,7 @@ changes no selection, collision envelope or simulation state.
 Junction crossing markings align with existing pedestrian lanes and connect
 pavement islands. They are visual road paint, without new traffic signals,
 right-of-way rules or simulation effects.
+
+## Browser event framing
+
+Active public visual cues fit the camera to the presentation envelope at their target address before rendering the staged action. This is a camera-only operation: it changes no command, revision, clock or outcome. Explicit replay switches from the interior to the city. Loading a saved result without replay remains silent.

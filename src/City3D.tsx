@@ -1,3 +1,4 @@
+import {frameScene} from './city3dFraming';
 import {wardrobe, dressPedestrian} from './city3dWardrobe';
 import {headlightAlpha, headlightCentre} from './city3dHeadlights';
 import {cityWeather, rainVertices} from './city3dWeather';
@@ -26,7 +27,7 @@ import {
 import type {Lot, Point} from './city3dPlan';
 import type {Journey} from './TravelPresentation';
 import './city3d.css';
-import {CityCueQueue, availableSceneSlot, casualtyFall, gunfightPose, casualtySceneStart, GunfireAudio, BlastAudio} from './city3dEvents';
+import {CityCueQueue, sceneSlots, availableSceneSlot, casualtyFall, gunfightPose, casualtySceneStart, GunfireAudio, BlastAudio} from './city3dEvents';
 import type {SceneSlot} from './city3dEvents';
 import {StreetTraffic, trafficSize, trafficModel, advanceWheel, wheelSteering, advanceSteering, frontWheelSteering} from './city3dTraffic';
 import {pedestrianModel, isPedestrian} from './city3dCast';
@@ -945,7 +946,29 @@ export function City3D(props: Props) {
           effects.push({cue, since: now, mesh, light, debris, extra, wardrobe: costume, gunArm, muzzle,
             audio: cue.kind === 'gunfight' ? new GunfireAudio(playCityGunshot)
               : cue.kind === 'explosion' ? new BlastAudio(() => playMoment('explosion')) : undefined});
-          if (p.activeCue?.id === cue.id) focus.current(cue.target);
+          if (p.activeCue?.id === cue.id) {
+            setFollow(false);
+            const envelope = new THREE.Box3();
+            const siblings = (w.last_result?.cues || []).filter(other => other.target === cue.target);
+            for (const other of [...siblings, cue]) {
+              for (const slot of sceneSlots(lot, other.kind)) {
+                envelope.expandByPoint(new THREE.Vector3(slot.root.x - 3.5, 0, slot.root.z - 3.5));
+                envelope.expandByPoint(new THREE.Vector3(slot.root.x + 3.5, 3, slot.root.z + 3.5));
+              }
+              if (other.kind === 'explosion') {
+                const building = buildings.get(lot.id);
+                if (building) envelope.union(new THREE.Box3().setFromObject(building));
+                const origin = building?.userData.blastOrigin || {x: lot.x, y: 0, z: at.z};
+                envelope.expandByPoint(new THREE.Vector3(origin.x - 8, 0, origin.z - 8));
+                envelope.expandByPoint(new THREE.Vector3(origin.x + 8, 15, origin.z + 8));
+              }
+            }
+            if (envelope.isEmpty()) envelope.set(
+              new THREE.Vector3(lot.x - 10, 0, at.z - 4),
+              new THREE.Vector3(lot.x + 10, 5, at.z + 8));
+            frameScene(camera, controls.target, envelope);
+            controls.update();
+          }
         }
         // Condition-driven surface stains imply no ongoing fire or invented collapse.
         for (const place of w.locations) {
