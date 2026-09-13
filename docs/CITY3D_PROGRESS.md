@@ -64,6 +64,15 @@ These are staged fixture saves, not earned campaign progress.
 
 ## Continue next
 
+### Authored hair and headwear silhouettes — September 13
+
+- The Blender male model now contains separately selectable side-parted hair, receding hair, fedora and cloth-cap groups. Bald portraits hide both hair groups. Crown surfaces have subtle authored combing relief; headwear selection is mutually exclusive. Fixed named cast retain their previous fedora presentation; generated portrait choices use their corresponding hair/headwear direction.
+- Runtime appearance-key tracking refreshes a pedestrian when its portrait palette/silhouette changes even if the base model remains the same. Geometry and texture resources remain shared; private tinted materials are released with replaced actors.
+- All 141 frontend tests and production build pass. Actual GLB tests cover each selected silhouette, mutually exclusive visibility and existing walking clearance. Rest and 48-pose motion bounds are exactly unchanged; the male GLB adds 39,916 bytes. Existing bundle-size warning remains.
+- Browser inspection on isolated 8858 used the actual Settings portrait controls for faces 4, 1, 10 and 19, showing full hair, receding hair, bald scalp and cloth cap at zoom 32. Evidence: `docs/qa/city3d-20260913/hair-full.png`, `hair-face-1.png`, `hair-face-10.png`, `hair-face-19.png`, `cap-walking.png`. Main save untouched.
+- The cap-wearing player completed The Mariner → Saint Agnes at revision 6/minute 630 in 17,784ms presentation time. The final eight-actor view sampled 145 FPS / 7.8ms p95, 55 draws and 496,676 triangles, with no captured warnings/errors. Restored the fixture’s original portrait using Settings afterward; `hair-variants.json` records the checks. This is local browser evidence, not broad hardware acceptance.
+- These silhouettes improve cast variety, but faces, body proportions and hair/clothing detail remain simplified. Female hairstyle geometry, additional period clothing and full production character art acceptance remain unfinished.
+
 ### Staged-event visibility and cast acceptance — September 13
 
 - Fresh combined shooting/killing browser fixture confirmed the victim's cast palette and fall timing, then exposed a visibility defect: orbiting behind Saint Agnes hid both event actors completely. Player-only cutaways did not protect the staged scene.

@@ -229,3 +229,8 @@ When player following is inactive, the same local building cutaway protects the
 visible staged cast at the active event address. Its screen opening encloses the
 cast together and restores after the staged extras expire. It does not move the
 camera, reveal unstaged actors or alter saved events.
+
+Male pedestrian cast silhouettes now select authored full/receding hair, bald
+scalp, fedora or cloth-cap groups. The choice follows portrait presentation;
+headwear is not a newly owned inventory item. A changed appearance key refreshes
+an existing pedestrian even when its base model remains the same.

@@ -64,6 +64,7 @@ type Actor = {
   wheelPlaced: boolean;
   lamps: THREE.MeshStandardMaterial[];
   wardrobe: THREE.MeshStandardMaterial[];
+  wardrobeKey: string;
   arrived?: boolean;
 };
 type Effect = {
@@ -579,6 +580,7 @@ export function City3D(props: Props) {
         phase: 0,
         realSince: 0,
         wardrobe: isPedestrian(model) ? dressPedestrian(object, model, personWardrobe(id)) : [],
+        wardrobeKey: isPedestrian(model) ? JSON.stringify(personWardrobe(id)) : '',
         limbs, wheels, lamps, wheelPhase: 0, steering: 0, wheelPlaced: false,
       };
       actors.set(id, actor);
@@ -594,7 +596,7 @@ export function City3D(props: Props) {
       now: number,
     ) => {
       let a = actors.get(id);
-      if (a && a.model !== model) {
+      if (a && (a.model !== model || (isPedestrian(model) && a.wardrobeKey !== JSON.stringify(personWardrobe(id))))) {
         releaseActor(a);
         actors.delete(id);
         a = undefined;
@@ -966,7 +968,8 @@ export function City3D(props: Props) {
           }
         }
         // Non-travel commands can also change a life/location without a journey.
-        if (!p.journey && actors.has('player') && actors.get('player')!.model !== personModel('player')) {
+        if (!p.journey && actors.has('player') && (actors.get('player')!.model !== personModel('player')
+          || actors.get('player')!.wardrobeKey !== JSON.stringify(personWardrobe('player')))) {
           const here = lots.get(w.player.location);
           if (here) assign('player', personModel('player'), [entrance(here)], 0, 0, 0, now);
         }

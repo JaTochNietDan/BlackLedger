@@ -21,17 +21,27 @@ export function wardrobe(id: string, face = 0, player = false) {
   // Named painted cast retain a restrained palette independent of the generated sheet.
   const named: Record<string, number> = {mara: 2, elena: 8, leo: 7, vittorio: 14, harlow: 5, 'Alex Varga': 3};
   const chosen = (!player || !selected) && Object.hasOwn(named, id) ? named[id] : index;
-  return {coat: coats[chosen], hair: hair[chosen], skin: skin[chosen], hat: coats[chosen], shirt: '#c8c3ad'};
+  const hairStyle = [0,1,12,15].includes(chosen) ? 'receding' : chosen === 9 ? 'bald' : 'full';
+  const headwear = chosen === 18 ? 'cap' : ((!player || !selected) && ['leo','vittorio','harlow','Alex Varga'].includes(id)) ? 'fedora' : 'none';
+  return {coat: coats[chosen], hair: hair[chosen], skin: skin[chosen], hat: coats[chosen], shirt: '#c8c3ad', hairStyle, headwear};
 }
 
 /** Clone once per source material, sharing geometry and embedded texture maps. */
 export function dressPedestrian(object: THREE.Group, model: string, look: ReturnType<typeof wardrobe>) {
+  for (const style of ['full','receding']) {
+    const group = object.getObjectByName('hair-' + style);
+    if (group) group.visible = look.hairStyle === style;
+  }
+  for (const style of ['fedora','cap']) {
+    const group = object.getObjectByName('headwear-' + style);
+    if (group) group.visible = look.headwear === style;
+  }
   const copies = new Map<THREE.Material, THREE.MeshStandardMaterial>();
   const woolBase = new THREE.Color().setRGB(...(model === 'woman' ? [.29,.13,.12] : [.16,.19,.21]) as [number,number,number], THREE.SRGBColorSpace);
   const tint = (source: THREE.Material) => {
     if (!(source instanceof THREE.MeshStandardMaterial)) return source;
     const colour = source.name === 'wool suit' ? look.coat : source.name === 'skin' ? look.skin
-      : source.name === 'felt hat' ? look.hat : source.name === 'waved chestnut hair' ? look.hair
+      : source.name === 'felt hat' ? look.hat : ['waved chestnut hair','barbered hair'].includes(source.name) ? look.hair
       : source.name === 'ivory shirt' ? look.shirt : undefined;
     if (!colour) return source;
     let own = copies.get(source);

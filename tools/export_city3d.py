@@ -458,7 +458,7 @@ def person(waved=False):
     shoe=material('leather',(.05,.04,.035))
     shirt=material('ivory shirt',(.76,.72,.6))
     tie=material('wine silk tie',(.27,.045,.035))
-    hair=material('waved chestnut hair',(.095,.043,.023)) if waved else None
+    hair=material('waved chestnut hair' if waved else 'barbered hair',(.095,.043,.023))
     def oval(name,at,scale,mat):
         bpy.ops.mesh.primitive_uv_sphere_add(segments=16,ring_count=8,location=at)
         ob=bpy.context.object;ob.name=name;ob.scale=scale
@@ -506,9 +506,37 @@ def person(waved=False):
             lock=oval('front finger wave',(-.075+wave*.06,-.09,1.765-wave*.01),(.07,.035,.035),hair)
             lock.rotation_euler.y=math.radians(-20)
     else:
-        oval('fedora brim',(0,0,1.79),(.235,.205,.022),hat)
-        oval('fedora crown',(0,.015,1.865),(.155,.145,.095),hat)
-        cylinder('hat ribbon',(0,.015,1.827),.154,.028,shoe)
+        # Separate root groups let the renderer choose one portrait silhouette.
+        for style in ('full','receding'):
+            root=joint('hair-'+style,(0,0,0));vertices=[];faces=[]
+            segments=32;rows=10
+            for row in range(rows+1):
+                for segment in range(segments+1):
+                    phi=segment*math.tau/segments
+                    start=.72 if style=='receding' else .02
+                    edge=(1.23+.58*math.cos(phi)) if style=='receding' else (1.35+.45*math.cos(phi))
+                    theta=start+(max(start+.015,edge)-start)*row/rows
+                    radius=1+.014*math.sin(phi*15+theta*4)
+                    vertices.append((.132*math.sin(theta)*math.sin(phi)*radius,
+                                     -.005+.122*math.sin(theta)*math.cos(phi)*radius,
+                                     1.64+.181*math.cos(theta)))
+            for row in range(rows):
+                for segment in range(segments):
+                    i=row*(segments+1)+segment;faces.append((i,i+1,i+segments+2,i+segments+1))
+            mesh=bpy.data.meshes.new('barbered '+style);mesh.from_pydata(vertices,[],faces);mesh.materials.append(hair)
+            ob=bpy.data.objects.new('barbered '+style,mesh);bpy.context.collection.objects.link(ob)
+            for polygon in mesh.polygons:polygon.use_smooth=True
+            attach(ob,root)
+            if style=='full':
+                lock=oval('side parted forelock',(-.038,-.065,1.785),(.087,.07,.043),hair)
+                lock.rotation_euler.y=math.radians(-12);attach(lock,root)
+        fedora=joint('headwear-fedora',(0,0,0))
+        attach(oval('fedora brim',(0,0,1.79),(.235,.205,.022),hat),fedora)
+        attach(oval('fedora crown',(0,.015,1.865),(.155,.145,.095),hat),fedora)
+        attach(cylinder('hat ribbon',(0,.015,1.827),.154,.028,shoe),fedora)
+        cap=joint('headwear-cap',(0,0,0))
+        attach(oval('cloth cap crown',(0,-.01,1.835),(.20,.17,.07),hat),cap)
+        attach(oval('cap peak',(0,-.095,1.795),(.15,.11,.015),hat),cap)
     box('shirt front',(0,-.151,1.285),(.19,.015,.23),shirt,.012)
     for side in (-1,1):
         lapel=box('notched lapel',(side*.108,-.164,1.265),(.09,.025,.27),coat,.012)

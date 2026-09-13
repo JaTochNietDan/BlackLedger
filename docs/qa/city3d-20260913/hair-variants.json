@@ -1,0 +1,529 @@
+{
+  "variants": [
+    {
+      "face": 1,
+      "presentation": {
+        "revision": 3,
+        "minute": 615,
+        "playbackRate": 1,
+        "headlightPools": 0,
+        "followingPlayer": true,
+        "cutawayBuildings": [],
+        "weather": {
+          "kind": "rain",
+          "wet": 1,
+          "rainVisible": true,
+          "rainClock": 1.009700000000004
+        },
+        "camera": {
+          "zoom": 32,
+          "x": -246.84203212970033,
+          "z": 92.04111923069212,
+          "targetX": 48,
+          "targetZ": 36.65
+        },
+        "actors": [
+          {
+            "id": "mara",
+            "model": "woman",
+            "x": 44.324000000000005,
+            "z": 68.65,
+            "y": 0.2
+          },
+          {
+            "id": "leo",
+            "model": "person",
+            "x": 107.044,
+            "z": 68.65,
+            "y": 0.2
+          },
+          {
+            "id": "vittorio",
+            "model": "person",
+            "x": 35.87500000000001,
+            "z": 4.65,
+            "y": 0.2
+          },
+          {
+            "id": "elena",
+            "model": "woman",
+            "x": 81.20833333333331,
+            "z": 36.65,
+            "y": 0.2
+          },
+          {
+            "id": "mayor",
+            "model": "person",
+            "x": 91.35,
+            "z": 69.33333333333334,
+            "y": 0.2
+          },
+          {
+            "id": "person-8",
+            "model": "person",
+            "x": 126.67454545454544,
+            "z": -4.65,
+            "y": -0.07
+          },
+          {
+            "id": "person-9",
+            "model": "person",
+            "x": 100.65,
+            "z": 12.494285714285695,
+            "y": 0.2
+          },
+          {
+            "id": "person-10",
+            "model": "person",
+            "x": 147.63538461538462,
+            "z": 59.35,
+            "y": 0.2
+          },
+          {
+            "id": "person-11",
+            "model": "person",
+            "x": 59.35,
+            "z": 69.58333333333334,
+            "y": 0.2
+          },
+          {
+            "id": "person-12",
+            "model": "woman",
+            "x": 78.61571428571432,
+            "z": 36.65,
+            "y": 0.2
+          },
+          {
+            "id": "player",
+            "model": "person",
+            "x": 48,
+            "z": 36.65,
+            "y": 0.2
+          }
+        ],
+        "waiting": [],
+        "effects": []
+      },
+      "metrics": {
+        "fps": 145,
+        "p95ms": 7.5,
+        "drawCalls": 53,
+        "triangles": 500740,
+        "actors": 11,
+        "buildings": 28,
+        "geometries": 228,
+        "textures": 125
+      }
+    },
+    {
+      "face": 10,
+      "presentation": {
+        "revision": 4,
+        "minute": 615,
+        "playbackRate": 1,
+        "headlightPools": 0,
+        "followingPlayer": true,
+        "cutawayBuildings": [],
+        "weather": {
+          "kind": "rain",
+          "wet": 1,
+          "rainVisible": true,
+          "rainClock": 0.9958000000000026
+        },
+        "camera": {
+          "zoom": 32,
+          "x": -246.84203212970033,
+          "z": 92.04111923069212,
+          "targetX": 48,
+          "targetZ": 36.65
+        },
+        "actors": [
+          {
+            "id": "mara",
+            "model": "woman",
+            "x": 44.324000000000005,
+            "z": 68.65,
+            "y": 0.2
+          },
+          {
+            "id": "leo",
+            "model": "person",
+            "x": 107.044,
+            "z": 68.65,
+            "y": 0.2
+          },
+          {
+            "id": "vittorio",
+            "model": "person",
+            "x": 35.87500000000001,
+            "z": 4.65,
+            "y": 0.2
+          },
+          {
+            "id": "elena",
+            "model": "woman",
+            "x": 81.20833333333331,
+            "z": 36.65,
+            "y": 0.2
+          },
+          {
+            "id": "mayor",
+            "model": "person",
+            "x": 91.35,
+            "z": 69.33333333333334,
+            "y": 0.2
+          },
+          {
+            "id": "person-8",
+            "model": "person",
+            "x": 126.67454545454544,
+            "z": -4.65,
+            "y": -0.07
+          },
+          {
+            "id": "person-9",
+            "model": "person",
+            "x": 100.65,
+            "z": 12.494285714285695,
+            "y": 0.2
+          },
+          {
+            "id": "person-10",
+            "model": "person",
+            "x": 147.63538461538462,
+            "z": 59.35,
+            "y": 0.2
+          },
+          {
+            "id": "person-11",
+            "model": "person",
+            "x": 59.35,
+            "z": 69.58333333333334,
+            "y": 0.2
+          },
+          {
+            "id": "person-12",
+            "model": "woman",
+            "x": 78.61571428571432,
+            "z": 36.65,
+            "y": 0.2
+          },
+          {
+            "id": "player",
+            "model": "person",
+            "x": 48,
+            "z": 36.65,
+            "y": 0.2
+          }
+        ],
+        "waiting": [],
+        "effects": []
+      },
+      "metrics": {
+        "fps": 145,
+        "p95ms": 7.8,
+        "drawCalls": 52,
+        "triangles": 500100,
+        "actors": 11,
+        "buildings": 28,
+        "geometries": 228,
+        "textures": 125
+      }
+    },
+    {
+      "face": 19,
+      "presentation": {
+        "revision": 5,
+        "minute": 615,
+        "playbackRate": 1,
+        "headlightPools": 0,
+        "followingPlayer": true,
+        "cutawayBuildings": [],
+        "weather": {
+          "kind": "rain",
+          "wet": 1,
+          "rainVisible": true,
+          "rainClock": 0.9888000000000026
+        },
+        "camera": {
+          "zoom": 32,
+          "x": -246.84203212970033,
+          "z": 92.04111923069212,
+          "targetX": 48,
+          "targetZ": 36.65
+        },
+        "actors": [
+          {
+            "id": "mara",
+            "model": "woman",
+            "x": 44.324000000000005,
+            "z": 68.65,
+            "y": 0.2
+          },
+          {
+            "id": "leo",
+            "model": "person",
+            "x": 107.044,
+            "z": 68.65,
+            "y": 0.2
+          },
+          {
+            "id": "vittorio",
+            "model": "person",
+            "x": 35.87500000000001,
+            "z": 4.65,
+            "y": 0.2
+          },
+          {
+            "id": "elena",
+            "model": "woman",
+            "x": 81.20833333333331,
+            "z": 36.65,
+            "y": 0.2
+          },
+          {
+            "id": "mayor",
+            "model": "person",
+            "x": 91.35,
+            "z": 69.33333333333334,
+            "y": 0.2
+          },
+          {
+            "id": "person-8",
+            "model": "person",
+            "x": 126.67454545454544,
+            "z": -4.65,
+            "y": -0.07
+          },
+          {
+            "id": "person-9",
+            "model": "person",
+            "x": 100.65,
+            "z": 12.494285714285695,
+            "y": 0.2
+          },
+          {
+            "id": "person-10",
+            "model": "person",
+            "x": 147.63538461538462,
+            "z": 59.35,
+            "y": 0.2
+          },
+          {
+            "id": "person-11",
+            "model": "person",
+            "x": 59.35,
+            "z": 69.58333333333334,
+            "y": 0.2
+          },
+          {
+            "id": "person-12",
+            "model": "woman",
+            "x": 78.61571428571432,
+            "z": 36.65,
+            "y": 0.2
+          },
+          {
+            "id": "player",
+            "model": "person",
+            "x": 48,
+            "z": 36.65,
+            "y": 0.2
+          }
+        ],
+        "waiting": [],
+        "effects": []
+      },
+      "metrics": {
+        "fps": 145,
+        "p95ms": 8.1,
+        "drawCalls": 56,
+        "triangles": 501412,
+        "actors": 11,
+        "buildings": 28,
+        "geometries": 230,
+        "textures": 125
+      }
+    }
+  ],
+  "moving": {
+    "revision": 6,
+    "minute": 630,
+    "playbackRate": 1,
+    "headlightPools": 0,
+    "followingPlayer": true,
+    "cutawayBuildings": [],
+    "weather": {
+      "kind": "rain",
+      "wet": 1,
+      "rainVisible": true,
+      "rainClock": 30.522000000001313
+    },
+    "camera": {
+      "zoom": 32,
+      "x": -243.67997212970033,
+      "z": 92.04111923069212,
+      "targetX": 51.16205999999998,
+      "targetZ": 36.65
+    },
+    "actors": [
+      {
+        "id": "vittorio",
+        "model": "person",
+        "x": 39.03705999999875,
+        "z": 4.65,
+        "y": 0.2649999566558525
+      },
+      {
+        "id": "elena",
+        "model": "woman",
+        "x": 84.3703933333336,
+        "z": 36.65,
+        "y": 0.2649999566558528
+      },
+      {
+        "id": "person-8",
+        "model": "person",
+        "x": 123.51248545454484,
+        "z": -4.65,
+        "y": 0.26499995665585285
+      },
+      {
+        "id": "person-9",
+        "model": "person",
+        "x": 100.65,
+        "z": 9.332225714285713,
+        "y": 0.26499995665585274
+      },
+      {
+        "id": "person-10",
+        "model": "person",
+        "x": 144.47332461538463,
+        "z": 59.35,
+        "y": 0.26499995665585274
+      },
+      {
+        "id": "person-11",
+        "model": "person",
+        "x": 59.35,
+        "z": 72.74539333333334,
+        "y": 0.26499995665585274
+      },
+      {
+        "id": "person-12",
+        "model": "woman",
+        "x": 81.7777742857146,
+        "z": 36.65,
+        "y": 0.2649999566558528
+      },
+      {
+        "id": "player",
+        "model": "person",
+        "x": 51.16205999999998,
+        "z": 36.65,
+        "y": 0.26499995665585274
+      }
+    ],
+    "waiting": [],
+    "effects": []
+  },
+  "arrival": {
+    "revision": 6,
+    "minute": 630,
+    "progress": 1,
+    "elapsedMs": 17784,
+    "reducedMotion": false
+  },
+  "metrics": {
+    "fps": 145,
+    "p95ms": 7.8,
+    "drawCalls": 55,
+    "triangles": 496676,
+    "actors": 8,
+    "buildings": 28,
+    "geometries": 230,
+    "textures": 125
+  },
+  "logs": [],
+  "restored": {
+    "revision": 7,
+    "minute": 630,
+    "playbackRate": 1,
+    "headlightPools": 0,
+    "followingPlayer": false,
+    "cutawayBuildings": [],
+    "weather": {
+      "kind": "rain",
+      "wet": 1,
+      "rainVisible": true,
+      "rainClock": 0.10700000000000001
+    },
+    "camera": {
+      "zoom": 1.65,
+      "x": 276,
+      "z": -160.00000000000003,
+      "targetX": 96,
+      "targetZ": 79.99999999999997
+    },
+    "actors": [
+      {
+        "id": "vittorio",
+        "model": "person",
+        "x": 81.55,
+        "z": 4.65,
+        "y": 0.2
+      },
+      {
+        "id": "elena",
+        "model": "woman",
+        "x": 118.88333333333333,
+        "z": 36.65,
+        "y": 0.2
+      },
+      {
+        "id": "person-8",
+        "model": "person",
+        "x": 86.69272727272727,
+        "z": -4.65,
+        "y": 0.2
+      },
+      {
+        "id": "person-9",
+        "model": "person",
+        "x": 79.52285714285713,
+        "z": -4.65,
+        "y": 0.2
+      },
+      {
+        "id": "person-10",
+        "model": "person",
+        "x": 106.41999999999999,
+        "z": 59.35,
+        "y": 0.2
+      },
+      {
+        "id": "person-11",
+        "model": "person",
+        "x": 36.46666666666665,
+        "z": 91.35,
+        "y": 0.2
+      },
+      {
+        "id": "person-12",
+        "model": "woman",
+        "x": 125.73714285714286,
+        "z": 36.65,
+        "y": -0.07
+      },
+      {
+        "id": "player",
+        "model": "person",
+        "x": 80,
+        "z": 36.65,
+        "y": 0.2
+      }
+    ],
+    "waiting": [],
+    "effects": []
+  }
+}

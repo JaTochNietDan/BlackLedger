@@ -30,3 +30,18 @@ test('cast material copies preserve weave maps, geometry and source materials ac
  let textureDisposals=0;coat.map.addEventListener('dispose',()=>textureDisposals++);
  ownedA.forEach(m=>m.dispose());assert.equal(textureDisposals,0);
 });
+
+test('authored hair and hat groups select one silhouette and stay inside existing walking clearance',async()=>{
+ const {readFileSync}=await import('node:fs');const {GLTFLoader}=await import('three/addons/loaders/GLTFLoader.js');
+ const bytes=readFileSync(new URL('../public/art/models/person.glb',import.meta.url));
+ const loader=new GLTFLoader();loader.register(parser=>({name:'wardrobe-geometry',loadMaterial(i){return Promise.resolve(new THREE.MeshStandardMaterial({name:parser.json.materials[i].name}));}}));
+ const source=(await loader.parseAsync(bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength),'')).scene;
+ for(const [id,face,hair,hat] of [['cast',1,'receding','none'],['cast',10,'bald','none'],['cast',19,'full','cap'],['cast',4,'full','none'],['Alex Varga',0,'full','fedora']]){
+  const model=source.clone(true);dressPedestrian(model,'person',wardrobe(id,face,true));model.updateMatrixWorld(true);
+  for(const name of ['full','receding'])assert.equal(model.getObjectByName('hair-'+name)?.visible,hair===name);
+  for(const name of ['fedora','cap'])assert.equal(model.getObjectByName('headwear-'+name)?.visible,hat===name);
+  const bounds=new THREE.Box3();model.traverseVisible(part=>{if(part instanceof THREE.Mesh)bounds.union(new THREE.Box3().setFromObject(part));});
+  assert.ok(bounds.min.x>=-.38-1e-5&&bounds.max.x<=.38+1e-5);
+  assert.ok(bounds.max.y<=1.96+1e-5&&bounds.min.z>=-.21&&bounds.max.z<=.231);
+ }
+});
