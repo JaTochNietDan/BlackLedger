@@ -3,7 +3,15 @@ import * as THREE from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import type {Snapshot, VisualCue} from './types';
-import {cityPlan, entrance, route, onRoute, PITCH, STREET_WIDTH} from './city3dPlan';
+import {
+  cityPlan,
+  entrance,
+  route,
+  onRoute,
+  PITCH,
+  STREET_WIDTH,
+  streetsidePosition,
+} from './city3dPlan';
 import type {Lot, Point} from './city3dPlan';
 import type {Journey} from './TravelPresentation';
 import './city3d.css';
@@ -59,6 +67,7 @@ const modelNames = [
   'docks',
   'haulage',
   'police',
+  'streetside',
 ];
 const carModel = (name = '') =>
   /packard/i.test(name) ? 'packard' : /hudson/i.test(name) ? 'hudson' : 'ford';
@@ -480,6 +489,19 @@ export function City3D(props: Props) {
     )
       .then(() => {
         if (dead) return;
+        const furniture = models.get('streetside')!;
+        furniture.updateMatrixWorld(true);
+        furniture.traverse(part => {
+          if (!(part instanceof THREE.Mesh)) return;
+          const instances = new THREE.InstancedMesh(part.geometry, part.material, plan.lots.length);
+          plan.lots.forEach((lot, index) => {
+            const at = streetsidePosition(lot);
+            const transform = new THREE.Matrix4().makeTranslation(at.x, 0.18, at.z);
+            instances.setMatrixAt(index, transform.multiply(part.matrixWorld));
+          });
+          instances.castShadow = instances.receiveShadow = true;
+          scene.add(instances);
+        });
         for (const lot of plan.lots) {
           const model = models.get(lot.model)!.clone(true);
           model.position.set(lot.x, 0.18, lot.z);

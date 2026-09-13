@@ -8,6 +8,9 @@ export const STREET_WIDTH = 8;
 export const FOOTWAY = 4.8;
 export const LANE = 1.6;
 export const MODEL_LIMIT = 17;
+export function streetsidePosition(lot: Lot): Point {
+  return {x: lot.x, z: lot.z + 9};
+}
 export function cityPlan(places: Pick<Place, 'id' | 'x' | 'y' | 'type'>[]) {
   const cells = grid(places);
   const lots: Lot[] = places.map(p => {

@@ -46,3 +46,21 @@ test('vehicle junction curves have continuous heading and retain building cleara
   }
  }
 });
+test('authored street furniture stays on pavements and outside all buildings and travel clearances',async()=>{
+ const {streetsidePosition,PITCH}=await import('../.runtime/frontend-test/city3dPlan.js');
+ const [min,max]=manifest.streetside.bounds_blender;
+ const boxes=plan.lots.map(lot=>{
+  const p=streetsidePosition(lot),box={x0:p.x+min[0],x1:p.x+max[0],z0:p.z-max[1],z1:p.z-min[1]};
+  assert.ok(box.x0>=lot.col*PITCH+4&&box.x1<=(lot.col+1)*PITCH-4);
+  assert.ok(box.z0>=lot.row*PITCH+4&&box.z1<=(lot.row+1)*PITCH-4);
+  for(const b of plan.lots)assert.ok(box.x1<=b.x-8.5||box.x0>=b.x+8.5||box.z1<=b.z-8.5||box.z0>=b.z+8.5,`furniture overlaps ${b.id}`);
+  return box;
+ });
+ for(const driving of [false,true])for(const from of plan.lots)for(const to of plan.lots){
+  const points=route(from,to,driving),padding=driving?2.9:.4;
+  for(let step=0;step<=200;step++){
+   const p=onRoute(points,step/200);
+   for(const box of boxes)assert.ok(p.x<=box.x0-padding||p.x>=box.x1+padding||p.z<=box.z0-padding||p.z>=box.z1+padding,`${from.id}/${to.id}: street furniture obstructs route`);
+  }
+ }
+});

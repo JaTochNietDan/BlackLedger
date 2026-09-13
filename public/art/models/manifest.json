@@ -286,5 +286,21 @@
       ]
     ],
     "bytes": 64720
+  },
+  "streetside": {
+    "file": "streetside.glb",
+    "bounds_blender": [
+      [
+        -4.1,
+        -0.325,
+        0.0
+      ],
+      [
+        3.355,
+        0.325,
+        1.23
+      ]
+    ],
+    "bytes": 115960
   }
 }

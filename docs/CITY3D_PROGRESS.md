@@ -64,6 +64,19 @@ These are staged fixture saves, not earned campaign progress.
 
 ## Continue next
 
+### Street furniture follow-up
+
+A nineteenth Blender asset adds slatted timber benches, galvanized litter bins
+and cast-iron hydrants. The renderer instances its four material meshes across
+the city. A separate pavement band keeps it out of the reserved building bounds
+and public journey paths. New tests use the exported asset bounds to check every
+placement against all buildings and 201 samples on every walking/driving route.
+All 72 frontend tests and the production build pass. Browser orbit inspection
+is recorded in `street-furniture.png`; the inspected view measured 145 FPS,
+7.1ms p95, 198 draws and 105,790 triangles. Placement is still repetitive and
+will benefit from address-specific dressing. Traffic separation beyond opposing
+lanes remains an outstanding requirement.
+
 ### Architectural follow-up
 
 The Blender source now authors a separate stucco estate with a tiled pitched roof,

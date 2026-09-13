@@ -428,6 +428,34 @@ def industrial(kind):
             beam('derrick brace',(3,-3,z),(5,-1,z+1.6),.09,iron)
 
 
+def streetside():
+    iron=material('street furniture iron',(.12,.16,.14),.6)
+    wood=material('weathered bench timber',(.29,.19,.10))
+    red=material('hydrant enamel',(.39,.075,.035),.35)
+    zinc=material('galvanized bin',(.34,.36,.31),.65)
+    # Compact band behind each parcel: no object projects more than 0.4m
+    # in depth, so this authored set fits between the facade and kerb.
+    for x in (-3.8,-2.2):
+        for y in (-.23,.23):box('bench leg',(x,y,.24),(.09,.09,.48),iron)
+        box('bench back support',(x,.27,.68),(.08,.08,.95),iron)
+    for y in (-.24,-.08,.08,.24):box('seat slat',(-3,y,.5),(2.2,.12,.065),wood,.015)
+    for z in (.76,.96,1.16):box('back slat',(-3,.28,z),(2.2,.075,.14),wood,.015)
+    for x in (-4,-2):box('bench armrest',(x,0,.76),(.075,.65,.08),iron,.025)
+    cylinder('litter bin',(0,0,.43),.28,.86,zinc)
+    cylinder('bin rolled rim',(0,0,.88),.3,.065,iron)
+    cylinder('bin lid',(0,0,.93),.3,.06,zinc)
+    for i in range(12):
+        angle=i*math.tau/12
+        box('bin vertical rib',(.285*math.cos(angle),.285*math.sin(angle),.43),(.028,.028,.75),iron)
+    cylinder('hydrant pedestal',(3,0,.1),.23,.2,iron)
+    cylinder('hydrant body',(3,0,.51),.17,.8,red)
+    cylinder('hydrant cap',(3,0,.94),.22,.14,red)
+    cylinder('hydrant crown',(3,0,1.05),.1,.1,iron)
+    for side in (-1,1):
+        cylinder('hydrant outlet',(3+side*.22,0,.63),.105,.2,red,(0,math.pi/2,0))
+        cylinder('outlet nut',(3+side*.33,0,.63),.075,.05,iron,(0,math.pi/2,0))
+
+
 manifest={}
 for i,(name,floors,w,d) in enumerate([('tenement',4,12,11),('tavern',2,12,12),('casino',2,13,11),('warehouse',1,13,12),('civic',3,13,12),('shop',3,12,11),('villa',2,11,11)]):
     clear()
@@ -444,5 +472,6 @@ box('police door panel',(0,0,.82),(1.83,1.5,.32),material('police cream',(.7,.69
 cylinder('red beacon',(0,0,1.76),.18,.28,material('beacon',(.8,.02,.01),0,2))
 manifest['police']=export('police')
 clear();person();manifest['person']=export('person')
+clear();streetside();manifest['streetside']=export('streetside')
 with open(os.path.join(OUT,'manifest.json'),'w') as f: json.dump(manifest,f,indent=2)
 print('Exported',len(manifest),'models')
