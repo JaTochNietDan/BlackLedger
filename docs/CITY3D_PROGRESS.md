@@ -76,10 +76,15 @@ travel action also verified the generic property-attack presentation. Expanded
 night rendering measured 145 FPS / 7.2ms p95 before those actions.
 
 This separates opposing lanes; same-lane following distances and intersection
-right-of-way still need a traffic presentation system. Current command handling
-also suppresses the player's journey when that result contains an event cue;
-the event and travel should be sequenced so both remain visible. The road map
-still looks too sparse and repetitive for final art acceptance.
+right-of-way still need a traffic presentation system. The road map still looks
+too sparse and repetitive for final art acceptance.
+
+The follow-up also fixes travel results with event cues: show the completed trip
+first, then stage its saved event batch. A fresh `city3d-night` fixture on 8840
+verified the Hudson in motion with no effects, followed by the attack at Bluebird
+Laundry, both at revision 1 / minute 1276. Expanded view now includes Skip journey.
+New commands clear the previous playing cue so an old event cannot follow a new
+trip. The preview launcher itself was exercised successfully for this fixture.
 
 The high-quality 1950s noir art requirement remains unfinished. Prioritize
 richer architectural silhouettes/materials, streets that read as a lived-in

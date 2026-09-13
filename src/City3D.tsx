@@ -20,6 +20,7 @@ type Props = {
   busy: boolean;
   activeCue: VisualCue | null;
   onSkipCue: () => void;
+  onSkipJourney: () => void;
 };
 type Actor = {
   object: THREE.Group;
@@ -610,13 +611,15 @@ export function City3D(props: Props) {
           if (a) scene.remove(a.object);
           actors.delete('player');
         }
-        for (const cue of cueQueue.take(
-          `${w.id}:${w.life}`,
-          w.last_result?.cues || [],
-          p.activeCue,
-          first,
-          !first && revision === w.revision && playbackStarted,
-        )) {
+        for (const cue of p.journey
+          ? []
+          : cueQueue.take(
+              `${w.id}:${w.life}`,
+              w.last_result?.cues || [],
+              p.activeCue,
+              first,
+              !first && revision === w.revision && playbackStarted,
+            )) {
           if (!motion) continue;
           const lot = lots.get(cue.target);
           if (!lot) continue;
@@ -964,6 +967,12 @@ export function City3D(props: Props) {
         <div className="city3d-event" role="status">
           <strong>{props.activeCue.caption}</strong>
           <button onClick={props.onSkipCue}>Skip scene →</button>
+        </div>
+      )}
+      {expanded && props.journey && (
+        <div className="city3d-event" role="status">
+          <strong>Travelling to {props.journey.to.name}</strong>
+          <button onClick={props.onSkipJourney}>Skip journey →</button>
         </div>
       )}
       {place && (

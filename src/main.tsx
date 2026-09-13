@@ -273,6 +273,7 @@ function App() {
       const next = await api<Snapshot>('action', payload);
       localStorage.removeItem('black-ledger-pending');
       setWorld(next);
+      setPlaying(null);
       const cues = next.last_result?.cues || [];
       const worst = cues.length
         ? [...cues].sort((a, b) => (b.gravity || 0) - (a.gravity || 0))[0]
@@ -286,7 +287,6 @@ function App() {
       }
       if (
         command.kind === 'travel' &&
-        !worst &&
         !next.event &&
         next.player.alive &&
         motionRef.current &&
@@ -806,7 +806,7 @@ function App() {
               </section>
             )}
             <div className="city-stage">
-              {playing && (
+              {playing && !journey && (
                 <Theatre
                   cue={playing}
                   place={w.locations.find(l => l.id === playing.target) || w.locations[0]}
@@ -837,8 +837,9 @@ function App() {
               ) : (
                 <City3D
                   state={w}
-                  activeCue={playing}
+                  activeCue={journey ? null : playing}
                   onSkipCue={() => setPlaying(null)}
+                  onSkipJourney={() => setJourney(null)}
                   selected={selected}
                   onSelect={setSelected}
                   onTravel={id => commit({kind: 'travel', target: id})}
