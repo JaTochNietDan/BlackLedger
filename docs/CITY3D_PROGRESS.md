@@ -70,6 +70,12 @@ These are staged fixture saves, not earned campaign progress.
 - Production build passes. Fresh isolated port 8862/killing fixture browser evidence: at 500ms a casualty effect was staged and all five spoiler-bearing panels were absent. Once effects were empty, the result strip, headline, caption, cast and scene paper appeared. Replaying the same cue hid spoilers again; Skip cleared effects and restored the headline. Browser logs were clear. Evidence: `news-timing.json`. This verifies scene timing through the actual UI, not a timer-only unit test.
 - Re-read the latest objective at `/Users/jatochnietdan/.codex/attachments/4a3692d6-f725-4a26-b1a0-9d3131b50b49/goal-objective.md`; it adds layered contextual voices and vehicle/action sound. Those audio assets/timelines, full police choreography, drive-bys, persistent building fire/brigade response, remaining interiors and final visual quality remain unfinished. No main-save access or mutation.
 
+### Transient camera impacts — September 13
+
+- Gunfire, blast onset and the authored door-breach contact now drive short damped screen-space camera pulses. Gunfire shares the muzzle timing constants. Combined offsets are capped at 9 horizontal/12 vertical CSS pixels and expire after 0.32 seconds. The render projection is restored in a finally block; camera position, orbit target and zoom remain untouched. Disabled/reduced motion bypasses the offsets.
+- Production build and 160 frontend tests pass. New tests verify pulse bounds/expiry and exact projection/inverse restoration after a render exception. Browser isolated 8860 gunfight sampling captured 12 nonzero impact frames across 23 samples, one unchanged camera state, and zero impact after Stop. Evidence: `camera-impact.json`. Main campaign untouched; sleep prevention remains running.
+- This adds initial impact feedback, not final cinematic acceptance. Visual tuning across more devices, stronger character animation, contextual audio, fire response and other outstanding production work remain active.
+
 ### Synchronized breach audio — September 13
 
 - Added a layered boot/wood thump, latch crack and hinge scrape using cancellable Web Audio voices. Only the officer entering an authored doorway triggers it, at the door-opening impact beat. Waiting for a staging slot delays audio with the animation. Muted or missed beats are consumed without a late backlog; Stop/navigation use effect audio disposal.

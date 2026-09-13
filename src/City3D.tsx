@@ -1,6 +1,6 @@
 import {CityAftermath} from './city3dAftermath';
 import {previewScenes, previewScene, type PreviewScene} from './city3dPreview';
-import {frameScene} from './city3dFraming';
+import {frameScene, impactPulse, renderImpact} from './city3dFraming';
 import {wardrobe, dressPedestrian} from './city3dWardrobe';
 import {headlightAlpha, headlightCentre} from './city3dHeadlights';
 import {cityWeather, rainVertices} from './city3dWeather';
@@ -29,7 +29,7 @@ import {
 import type {Lot, Point} from './city3dPlan';
 import type {Journey} from './TravelPresentation';
 import './city3d.css';
-import {CityCueQueue, raidEntryPose, policeSceneSeconds, officerApproach, policeCast, sceneSlots, availableSceneSlot, casualtyFall, gunfightPose, casualtySceneStart, GunfireAudio, BlastAudio} from './city3dEvents';
+import {CityCueQueue, GUNFIRE_SHOTS, raidEntryPose, policeSceneSeconds, officerApproach, policeCast, sceneSlots, availableSceneSlot, casualtyFall, gunfightPose, casualtySceneStart, GunfireAudio, BlastAudio} from './city3dEvents';
 import type {SceneSlot} from './city3dEvents';
 import {StreetTraffic, trafficSize, trafficModel, advanceWheel, wheelSteering, advanceSteering, frontWheelSteering} from './city3dTraffic';
 import {pedestrianModel, isPedestrian} from './city3dCast';
@@ -814,6 +814,8 @@ export function City3D(props: Props) {
       const p = latest.current,
         w = p.state,
         motion = p.motion && !reduced.matches && !graphicsLost;
+      const impact={x:0,y:0};
+      const addImpact=(age:number,strength:number)=>{const pulse=impactPulse(age,strength);impact.x+=pulse.x;impact.y+=pulse.y;};
       const playbackStarted = !!p.activeCue && lastActive !== p.activeCue.id;
       if ((lastActive && !p.activeCue) || worldID !== `${w.id}:${w.life}`) {
         for (const effect of effects) {
@@ -1247,6 +1249,8 @@ export function City3D(props: Props) {
           if (blast && blastOrigin) e.light.position.set(blastOrigin.x, 2, blastOrigin.z);
           const shot = e.cue.kind === 'gunfight';
           const firing = gunfightPose(t * 3);
+          if(blast)addImpact(t*3,11);
+          if(shot)for(const beat of GUNFIRE_SHOTS)addImpact(t*3-beat,3);
           if(e.cue.kind!=='raid-officer')e.audio?.update(t * 3, soundOn());
           const muzzlePosition = new THREE.Vector3(at.x, 1.4, at.z);
           if (shot && e.gunArm && e.muzzle) {
@@ -1277,7 +1281,9 @@ export function City3D(props: Props) {
               const walk=breach || officerApproach(t*3,distance,Number(e.cue.id.split(':').at(-1))||0);
               if(breach&&door){
                 door.rotation.y=-Math.PI/2*breach.door;
-                e.audio?.update(t*3-(.35+approach/1.4+.3),soundOn());
+                const impactAge=t*3-(.35+approach/1.4+.3);
+                e.audio?.update(impactAge,soundOn());
+                addImpact(impactAge,5);
               }
               e.extra.position.z=at.z+walk.travelled;e.extra.rotation.y=0;
               e.extra.position.y=.2+(walk.walking?Math.abs(Math.sin(walk.phase))*.025:0);
@@ -1467,12 +1473,13 @@ export function City3D(props: Props) {
         waterClock += Math.min(dt, 100) / 1000;
         waterNormal.offset.set((waterClock * .006) % 1, (waterClock * .003) % 1);
       }
-      renderer.render(scene, camera);
+      renderImpact(camera,motion?impact.x:0,motion?impact.y:0,canvas.clientWidth,canvas.clientHeight,()=>renderer.render(scene,camera));
       if (ready)
         canvas.dataset.presentation = JSON.stringify({
           revision: w.revision,
           minute: w.minute,
           playbackRate: playback.current,
+          impact:motion?impact:{x:0,y:0},
           headlightPools: headlightPools.count,
           harbour: {visible: !!harbourLot, waterClock},
           followingPlayer: followPlayer.current,

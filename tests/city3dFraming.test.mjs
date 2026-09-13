@@ -18,3 +18,19 @@ test('event envelope fits at extreme previous zooms, rotations and narrow viewpo
   assert.ok(camera.zoom>0 && camera.zoom<=32);
  }
 });
+
+test('impact projection is bounded and restored even if rendering fails',async()=>{
+ const {impactPulse,renderImpact}=await import('../.runtime/frontend-test/city3dFraming.js');
+ const camera=new THREE.OrthographicCamera(-10,10,8,-8,.1,1000);camera.updateProjectionMatrix();
+ const original=camera.projectionMatrix.clone(),inverse=camera.projectionMatrixInverse.clone();
+ assert.deepEqual(impactPulse(-.01,10),{x:0,y:0});assert.deepEqual(impactPulse(.32,10),{x:0,y:0});
+ for(let t=0;t<.32;t+=.001){const p=impactPulse(t,11);assert.ok(Math.abs(p.x)<=6.05&&Math.abs(p.y)<=11);}
+ assert.throws(()=>renderImpact(camera,100,100,1000,800,()=>{
+  assert.ok(Math.abs(camera.projectionMatrix.elements[12]-original.elements[12]-.018)<1e-9);
+  assert.ok(Math.abs(camera.projectionMatrix.elements[13]-original.elements[13]-.03)<1e-9);
+  throw new Error('render failure');
+ }));
+ assert.deepEqual(camera.projectionMatrix.elements,original.elements);
+ assert.deepEqual(camera.projectionMatrixInverse.elements,inverse.elements);
+ renderImpact(camera,0,0,1000,800,()=>assert.deepEqual(camera.projectionMatrix.elements,original.elements));
+});

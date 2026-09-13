@@ -21,3 +21,21 @@ export function frameScene(camera: THREE.OrthographicCamera, target: THREE.Vecto
     (camera.top-camera.bottom)*.58/Math.max(1,size.y));
   camera.updateProjectionMatrix();
 }
+
+/** Short screen-space impact, with no persistent camera or control displacement. */
+export function impactPulse(age: number, strength: number) {
+  if(age<0 || age>=.32)return {x:0,y:0};
+  const decay=(1-age/.32)**2;
+  return {x:Math.sin(age*83)*strength*.55*decay,y:Math.cos(age*61)*strength*decay};
+}
+export function renderImpact(camera: THREE.OrthographicCamera, x: number, y: number, width: number, height: number, render: ()=>void) {
+  const matrix=camera.projectionMatrix, oldX=matrix.elements[12], oldY=matrix.elements[13];
+  if(width<=0 || height<=0 || (!x&&!y)){render();return;}
+  matrix.elements[12]+=2*Math.max(-9,Math.min(9,x))/width;
+  matrix.elements[13]+=2*Math.max(-12,Math.min(12,y))/height;
+  camera.projectionMatrixInverse.copy(matrix).invert();
+  try{render();}finally{
+    matrix.elements[12]=oldX;matrix.elements[13]=oldY;
+    camera.projectionMatrixInverse.copy(matrix).invert();
+  }
+}
