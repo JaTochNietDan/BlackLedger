@@ -104,6 +104,8 @@ const modelNames = [
   'dealer',
   'undertaker',
   'docks',
+  'harbour-pier',
+  'quay-section',
   'haulage',
   'police',
   'streetside',
@@ -258,6 +260,37 @@ export function City3D(props: Props) {
     rainfall.frustumCulled = false; rainfall.visible = false; scene.add(rainfall);
     let rainClock = 0;
     const textures: THREE.Texture[] = [];
+    const harbourLot = plan.lots.find(lot => lot.id === 'docks' && lot.col === 0);
+    let waterNormal: THREE.CanvasTexture | undefined, waterClock = 0;
+    if (harbourLot) {
+      const waterCanvas = document.createElement('canvas'); waterCanvas.width = waterCanvas.height = 128;
+      const context = waterCanvas.getContext('2d')!, pixels = context.createImageData(128, 128);
+      for (let y = 0; y < 128; y++) for (let x = 0; x < 128; x++) {
+        const u = x * Math.PI * 2 / 128, v = y * Math.PI * 2 / 128;
+        const normal = new THREE.Vector3(.35 * Math.cos(u * 3 + v * 2) + .12 * Math.cos(u * 7 - v * 5),
+          .23 * Math.cos(u * 3 + v * 2) - .09 * Math.cos(u * 7 - v * 5), 1).normalize();
+        pixels.data.set([Math.round((normal.x * .5 + .5) * 255), Math.round((normal.y * .5 + .5) * 255), Math.round((normal.z * .5 + .5) * 255), 255], (y * 128 + x) * 4);
+      }
+      context.putImageData(pixels, 0, 0); waterNormal = new THREE.CanvasTexture(waterCanvas);
+      waterNormal.wrapS = waterNormal.wrapT = THREE.RepeatWrapping;
+      waterNormal.repeat.set(100, (plan.depth + 1600) / 10); textures.push(waterNormal);
+      const water = new THREE.Mesh(new THREE.PlaneGeometry(1000, plan.depth + 1600),
+        new THREE.MeshStandardMaterial({color: 0x344e50, metalness: .28, roughness: .34,
+          normalMap: waterNormal, normalScale: new THREE.Vector2(.65, .65)}));
+      water.rotation.x = -Math.PI / 2; water.position.set(-517, -.9, plan.depth / 2); water.receiveShadow = true;
+      scene.add(water);
+      const promenadeGeometry = new THREE.BoxGeometry(13, .28, plan.depth + 40);
+      const positions = promenadeGeometry.attributes.position, normals = promenadeGeometry.attributes.normal;
+      const uv = promenadeGeometry.attributes.uv;
+      for (let i = 0; i < positions.count; i++) {
+        const x = positions.getX(i), y = positions.getY(i), z = positions.getZ(i);
+        uv.setXY(i, (Math.abs(normals.getX(i)) > .5 ? z : x) / 24,
+          (Math.abs(normals.getY(i)) > .5 ? z : y) / 24);
+      }
+      const promenade = new THREE.Mesh(promenadeGeometry, pavementMat);
+      promenade.position.set(-10.5, .03, plan.depth / 2);
+      promenade.receiveShadow = true; scene.add(promenade);
+    }
     const textureLoader = new THREE.TextureLoader();
     for (const [path, mat, repeat] of [
       ['asphalt', groundMat, 40],
@@ -358,6 +391,7 @@ export function City3D(props: Props) {
     scene.add(playerRing);
     const models = new Map<string, THREE.Group>();
     const buildings = new Map<string, THREE.Group>();
+    const landings: THREE.Group[] = [];
     const labels = new Map<string, THREE.Sprite>();
     let blockers = new Set<string>(), lastSightCheck = -Infinity;
     const cutawayAmounts = new Map<string, number>();
@@ -464,7 +498,7 @@ export function City3D(props: Props) {
         (-(e.clientY - rect.top) / rect.height) * 2 + 1,
       );
       raycaster.setFromCamera(pointer, camera);
-      const hits = raycaster.intersectObjects([...buildings.values()], true);
+      const hits = raycaster.intersectObjects([...buildings.values(), ...landings], true);
       if (hits.length) {
         let ob: THREE.Object3D | null = hits[0].object;
         while (ob && !ob.userData.place) ob = ob.parent;
@@ -480,7 +514,7 @@ export function City3D(props: Props) {
         (-(e.clientY - rect.top) / rect.height) * 2 + 1,
       );
       raycaster.setFromCamera(pointer, camera);
-      const hits = raycaster.intersectObjects([...buildings.values()], true);
+      const hits = raycaster.intersectObjects([...buildings.values(), ...landings], true);
       let ob: THREE.Object3D | null = hits[0]?.object || null;
       while (ob && !ob.userData.place) ob = ob.parent;
       hovered = ob?.userData.place || '';
@@ -692,6 +726,21 @@ export function City3D(props: Props) {
           instances.castShadow = instances.receiveShadow = true;
           scene.add(instances);
         });
+        if (harbourLot) {
+          const pier = models.get('harbour-pier')!.clone(true);
+          pier.position.set(-24, 0, harbourLot.z); pier.userData.place = harbourLot.id;
+          pier.traverse(part => {if (part instanceof THREE.Mesh) part.castShadow = part.receiveShadow = true;});
+          scene.add(pier); landings.push(pier);
+          const quay = models.get('quay-section')!; quay.updateMatrixWorld(true);
+          const sections: number[] = [];
+          for (let z = -16; z <= plan.depth + 16; z += 8) if (Math.abs(z - harbourLot.z) >= 4) sections.push(z);
+          quay.traverse(part => {
+            if (!(part instanceof THREE.Mesh)) return;
+            const instances = new THREE.InstancedMesh(part.geometry, part.material, sections.length);
+            sections.forEach((z, i) => instances.setMatrixAt(i, new THREE.Matrix4().makeTranslation(-17.15, 0, z).multiply(part.matrixWorld)));
+            instances.castShadow = instances.receiveShadow = true; scene.add(instances);
+          });
+        }
         for (const lot of plan.lots) {
           const model = models.get(lot.model)!.clone(true);
           model.position.set(lot.x, 0.18, lot.z);
@@ -1260,7 +1309,7 @@ export function City3D(props: Props) {
       }
       // Keep pan within the city plus its waterfront margin.
       const before = controls.target.clone();
-      controls.target.x = THREE.MathUtils.clamp(controls.target.x, -15, plan.width + 15);
+      controls.target.x = THREE.MathUtils.clamp(controls.target.x, harbourLot ? -45 : -15, plan.width + 15);
       controls.target.z = THREE.MathUtils.clamp(controls.target.z, -15, plan.depth + 15);
       camera.position.add(controls.target.clone().sub(before));
       // Keep the followed player or the active staged cast readable through buildings.
@@ -1322,6 +1371,10 @@ export function City3D(props: Props) {
         rainVertices(rainPositions, rainClock, plan.width, plan.depth);
         rainAttribute.needsUpdate = true;
       }
+      if (ready && motion && waterNormal) {
+        waterClock += Math.min(dt, 100) / 1000;
+        waterNormal.offset.set((waterClock * .006) % 1, (waterClock * .003) % 1);
+      }
       renderer.render(scene, camera);
       if (ready)
         canvas.dataset.presentation = JSON.stringify({
@@ -1329,6 +1382,7 @@ export function City3D(props: Props) {
           minute: w.minute,
           playbackRate: playback.current,
           headlightPools: headlightPools.count,
+          harbour: {visible: !!harbourLot, waterClock},
           followingPlayer: followPlayer.current,
           cutawayBuildings: [...blockers],
           weather: {kind: w.sky?.kind || 'clear', wet: w.sky?.wet || 0, rainVisible: rainfall.visible, rainClock},

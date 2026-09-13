@@ -752,6 +752,53 @@ def industrial(kind):
             beam('derrick brace',(3,-3,z),(5,-1,z+1.6),.09,iron)
 
 
+def harbour_pier():
+    timber=material('salt worn dock timber',(.32,.27,.19))
+    # Long grain follows each board; packed colour and normal detail survive glTF.
+    n=128;colour=[];normal=[]
+    for y in range(n):
+        for x in range(n):
+            g=math.sin(x*.83+math.sin(y*.06))*.08+math.sin(x*2.4+y*.03)*.025
+            colour.extend((.55+g,.49+g,.38+g,1))
+            v=Vector((math.cos(x*.83+math.sin(y*.06))*.18,0,1)).normalized()
+            normal.extend((v.x*.5+.5,.5,v.z*.5+.5,1))
+    tree=timber.node_tree;shader=tree.nodes['Principled BSDF']
+    for suffix,data in [('grain',colour),('normal',normal)]:
+        image=bpy.data.images.new('dock timber '+suffix,width=n,height=n)
+        if suffix=='normal':image.colorspace_settings.name='Non-Color'
+        image.pixels=data;image.pack();tex=tree.nodes.new('ShaderNodeTexImage');tex.image=image
+        if suffix=='normal':
+            bump=tree.nodes.new('ShaderNodeNormalMap');bump.inputs['Strength'].default_value=.5
+            tree.links.new(tex.outputs['Color'],bump.inputs['Color']);tree.links.new(bump.outputs['Normal'],shader.inputs['Normal'])
+        else:tree.links.new(tex.outputs['Color'],shader.inputs['Base Color'])
+    iron=material('dock black iron',(.065,.075,.07),.55)
+    for i in range(32):box('landing deck board',(-7.75+i*.5,0,.08),(.48,7.6,.24),timber,.018)
+    for y in (-3.35,0,3.35):box('landing bearer',(0,y,-.20),(16,.24,.32),timber)
+    for x in (-7,0,7):
+        for y in (-3.35,3.35):
+            cylinder('timber pile',(x,y,-1.15),.23,2.7,timber,vertices=16)
+            cylinder('pile iron collar',(x,y,-.2),.25,.14,iron,vertices=16)
+    for x in (-6.5,5.5):
+        for y in (-3.25,3.25):
+            cylinder('mooring bollard base',(x,y,.24),.3,.08,iron,vertices=16)
+            cylinder('mooring bitt',(x,y,.53),.12,.54,iron,vertices=16)
+            cylinder('bollard head',(x,y,.80),.22,.10,iron,vertices=16)
+    # An open working quay: low edge timbers rather than a fence through the loading space.
+    for y in (-3.7,3.7):box('edge rubbing timber',(0,y,.29),(16,.18,.18),timber,.025)
+    rubber=material('fender rubber',(.035,.035,.03))
+    for x in (-7,0,7):
+        for y in (-3.72,3.72):
+            bpy.ops.mesh.primitive_torus_add(major_segments=16,minor_segments=8,major_radius=.3,minor_radius=.10,location=(x,y,-.25),rotation=(math.pi/2,0,0))
+            ob=bpy.context.object;ob.name='rubber dock fender';ob.data.materials.append(rubber)
+
+
+def quay_section():
+    stone=material('harbour retaining masonry',(.36,.35,.30));brick(stone,1959)
+    cap=material('worn quay coping',(.44,.43,.37))
+    box('quay retaining wall',(0,0,-1.35),(.5,8,3),stone)
+    box('quay coping',(0,0,.19),(.75,8,.12),cap,.025)
+
+
 def gravel_texture(mat):
     # Periodic aggregate texture in Blender; box UVs keep its scale in metres.
     n=256;cells=64;rand=random.Random(1953)
@@ -1139,6 +1186,8 @@ clear();undertaker();manifest['undertaker']=export('undertaker')
 clear();revolver();manifest['revolver']=export('revolver')
 clear();blast_fragment();manifest['blast-fragment']=export('blast-fragment')
 clear();mariner();manifest['mariner']=export('mariner')
+clear();harbour_pier();manifest['harbour-pier']=export('harbour-pier')
+clear();quay_section();manifest['quay-section']=export('quay-section')
 clear();vacant_lot();manifest['vacant-lot']=export('vacant-lot')
 clear();street_bed();manifest['street-bed']=export('street-bed')
 clear();streetside();manifest['streetside']=export('streetside')

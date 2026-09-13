@@ -502,5 +502,37 @@
       ]
     ],
     "bytes": 699412
+  },
+  "harbour-pier": {
+    "file": "harbour-pier.glb",
+    "bounds_blender": [
+      [
+        -8.0,
+        -3.82,
+        -2.5
+      ],
+      [
+        8.0,
+        3.82,
+        0.85
+      ]
+    ],
+    "bytes": 474112
+  },
+  "quay-section": {
+    "file": "quay-section.glb",
+    "bounds_blender": [
+      [
+        -0.375,
+        -4.0,
+        -2.85
+      ],
+      [
+        0.375,
+        4.0,
+        0.25
+      ]
+    ],
+    "bytes": 188584
   }
 }

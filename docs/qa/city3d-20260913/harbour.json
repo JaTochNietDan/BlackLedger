@@ -1,0 +1,49 @@
+{
+  "metrics": {
+    "fps": 145,
+    "p95ms": 7.4,
+    "drawCalls": 167,
+    "triangles": 574736,
+    "actors": 1,
+    "buildings": 28,
+    "geometries": 234,
+    "textures": 130
+  },
+  "presentation": {
+    "revision": 9,
+    "minute": 705,
+    "playbackRate": 1,
+    "headlightPools": 0,
+    "harbour": {
+      "visible": true,
+      "waterClock": 151.62320000000912
+    },
+    "followingPlayer": false,
+    "cutawayBuildings": [],
+    "weather": {
+      "kind": "rain",
+      "wet": 1,
+      "rainVisible": true,
+      "rainClock": 151.62320000000912
+    },
+    "camera": {
+      "zoom": 3.38240002720573,
+      "x": 128.44261914840473,
+      "z": -203.63246959808663,
+      "targetX": 16,
+      "targetZ": 80
+    },
+    "actors": [
+      {
+        "id": "player",
+        "model": "person",
+        "x": 144,
+        "z": 4.65,
+        "y": 0.2
+      }
+    ],
+    "waiting": [],
+    "effects": []
+  },
+  "logs": []
+}

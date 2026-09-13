@@ -64,6 +64,13 @@ These are staged fixture saves, not earned campaign progress.
 
 ## Continue next
 
+### Harbour frontage and revised visual acceptance — September 13
+
+- Added locally authored Blender timber landing and masonry quay assets at Pier 14. Individual deck boards, grain/normal textures, submerged piles, iron collars, bollards and rubber fenders give the harbour a distinct construction. Instanced retaining-wall sections leave the landing opening clear. Animated normal-mapped water extends beyond the western city edge; motion settings stop the water clock.
+- Added a paved waterfront promenade. Browser inspection caught stretched paving UVs; corrected them to physical scale before the production build. The landing is selectable as the existing Pier 14 destination. Travel remains tied to the public entrance and existing routes.
+- All 145 frontend tests and production build pass. New tests inspect actual GLB bounds, deck elevation, quay depth and route clearance. Existing bundle-size warning remains. Browser evidence in `harbour-landing.png`, `harbour-quay.png` and `harbour.json` uses isolated port 8858. Final sampled view: 145 FPS, 7.4ms p95, 167 draws, 574,736 triangles, one actor/28 buildings, 234 geometries/130 textures; no captured browser warnings/errors. This is a local sample, not broad hardware acceptance.
+- The amended objective explicitly rejects current blockiness and adds detailed 3D interiors plus automatic event framing. Existing interiors are painted backdrops with functional public occupants/actions. Current event focus selects a parcel but preserves zoom; complete scene fitting remains to implement. Interior production, richer architecture/characters, harbour activity and final quality acceptance remain unfinished.
+
 ### Painted pedestrian crossings — September 13
 
 - Added paired crossing lines at junctions, centred on existing walking lanes and connecting raised pavement islands. The 6×5 grid gets 98 crossings/196 line segments; exterior sides without destination pavement are omitted. Crossing paint shares the existing instanced lane-marking draw and adds no texture or draw call.

@@ -1,5 +1,9 @@
 # Current goal and workstream ownership
 
+## User amendment — detail, interiors and event direction (2026-09-13)
+
+The user requires substantially more detailed, high-quality 1950s noir gangster architecture and characters; current blocky assets do not meet visual acceptance. Model detailed building interiors for display on entry, preserving the room's actual public occupants and available gameplay actions. For committed simulation events, automatically open the city and frame the complete action before presenting its animation. Keep the Mac awake during active work. Validate visual quality and performance in the browser as production work proceeds; local high FPS alone does not establish production readiness.
+
 ## User revision — browser 3D city (2026-09-13)
 
 The current user request supersedes the earlier 2D visual-production restriction below. Codex is to build one browser-rendered, rotatable, pannable, zoomable 3D 1950s mafia city, using locally authored Blender models and textures. Buildings must be selectable destinations; public simulation journeys must show pedestrians or their appropriate vehicles; committed violence must drive animated effects. Preserve Go authority and existing command handling. Use isolated saves for QA, verify footprints and browser behavior, measure performance toward 60 FPS, and record unfinished acceptance honestly. Historical handoff instructions remain below for context; no separate visual agent is currently running on this request.
