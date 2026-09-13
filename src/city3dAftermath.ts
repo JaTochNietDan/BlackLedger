@@ -22,23 +22,31 @@ export class CityAftermath {
     this.pool=new THREE.ShapeGeometry(shape);
   }
   update(records: NonNullable<Snapshot['aftermath']>, minute: number, lots: Map<string,Lot>, models: Map<string,THREE.Group>,
-    modelFor: (id:string)=>string, occupied: SceneSlot[], animating: Set<string>) {
+    modelFor: (id:string)=>string, occupied: SceneSlot[], animating: Set<string>, presence: NonNullable<Snapshot['police_presence']> = [], activeRaids = new Set<string>()) {
     const desired=new Set<string>();
-    for(const record of records) {
+    const scenes = [
+      ...records.map(record=>({...record,raid:false})),
+      ...presence.map(record=>({...record,raid:true,police_at:record.minute,victim:{id:'',name:''}})),
+    ];
+    for(const record of scenes) {
       if(minute<record.minute || minute>=record.cleanup_at)continue;
-      for(const kind of minute>=record.police_at ? ['body','police','officer-a','officer-b'] : ['body']) {
+      if(record.raid && activeRaids.has(record.target))continue;
+      const cast=record.raid ? ['police','police-b','police-c','officer-a','officer-b','officer-c','officer-d']
+        : minute>=record.police_at ? ['body','police','officer-a','officer-b'] : ['body'];
+      for(const kind of cast) {
+        const vehicle=kind.startsWith('police');
         const key=`aftermath:${record.id}:${kind}`;
         if(kind==='body' && animating.has(record.victim.id))continue;
         desired.add(key);
         if(this.entries.has(key))continue;
         const lot=lots.get(record.target); if(!lot)continue;
         const taken=[...occupied,...[...this.entries.values()].map(e=>e.slot)];
-        const slot=availableSceneSlot(lot,kind==='police'?'arrest':'killing',taken);if(!slot)continue;
-        const model=kind==='body'?modelFor(record.victim.id):kind==='police'?'police':'police-officer';
+        const slot=availableSceneSlot(lot,vehicle?'arrest':'killing',taken);if(!slot)continue;
+        const model=kind==='body'?modelFor(record.victim.id):vehicle?'police':'police-officer';
         const source=models.get(model);if(!source)continue;
         const group=new THREE.Group(), object=source.clone(true);
         const owned=kind==='body'?dressPedestrian(object,model,wardrobe(record.victim.id)):[];
-        group.position.set(slot.root.x,kind==='body'?0:kind==='police'?vehicleRootHeight(slot.root):.2,slot.root.z);
+        group.position.set(slot.root.x,kind==='body'?0:vehicle?vehicleRootHeight(slot.root):.2,slot.root.z);
         if(kind==='body') {
           object.rotation.z=-Math.PI/2;object.position.y=.6;
           const pool=new THREE.Mesh(this.pool,this.blood);

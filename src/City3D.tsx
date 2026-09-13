@@ -1108,7 +1108,8 @@ export function City3D(props: Props) {
           [...effects.flatMap(e=>e.slot?[e.slot]:[]), ...[...actors.values()].filter(a=>a.object.visible).map(a=>({
             model: trafficModel(a.model,a.start===a.end), root: {x:a.object.position.x,z:a.object.position.z},
             pose: {x:a.object.position.x,z:a.object.position.z,heading:a.object.rotation.y},
-          }))], new Set(effects.filter(e=>e.cue.kind==='killing').flatMap(e=>e.cue.actors?.map(a=>a.id)||[])));
+          }))], new Set(effects.filter(e=>e.cue.kind==='killing').flatMap(e=>e.cue.actors?.map(a=>a.id)||[])), w.police_presence || [],
+          new Set(effects.filter(e=>['raid','raid-officer','police-unit'].includes(e.cue.kind)).map(e=>e.cue.target)));
         const placements = traffic.update(
           [...actors]
             .filter(([, a]) => !a.arrived)

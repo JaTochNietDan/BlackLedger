@@ -268,3 +268,9 @@ City and 3D interior canvases accept WASD and arrow-key panning with Q/E orbit; 
 ## Scene-first result reveal
 
 During active 3D playback the result strip, unread headline banner and theatre caption/cast/headline remain hidden. The theatre announces only the scene location. The renderer signals completion after its staged effect batch has finished, including any placement waits; results then become visible. Explicit Skip or navigation away ends playback and releases the reveal gate. This does not defer the backend commit or alter its outcome.
+
+## Persistent raid presence
+
+The saved/public `police_presence` array contains observable raid cordons with `id`, `target`, `minute` and `cleanup_at`. A witnessed raid creates one cordon per address, initially lasting 120 game minutes. A later raid at that address extends attendance; duplicate delivery does not restart the clock. Reads return detached active records without changing the save. Older saves have no invented cordons. Playback and debug previews never write these deadlines.
+
+The city renders three parked police vehicles and four officers while attendance is active. Raid playback temporarily owns the cast to avoid duplicate officers; persistent attendance returns after playback. Cleanup releases all scene reservations. This is standing attendance: seamless transitions from the approach, forced entry, search and animated departure remain unfinished.

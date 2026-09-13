@@ -461,6 +461,7 @@ export interface Snapshot {
   dead: {name: string; minute: number; life: number; cause: string; estate?: string}[];
   tasks: {id: string; name: string; due: number}[];
   director: {status: string; detail: string; last_request: number};
+  police_presence?: {id: string; target: string; minute: number; cleanup_at: number}[];
   aftermath?: {id: string; target: string; victim: {id: string; name: string}; minute: number; police_at: number; cleanup_at: number}[];
   last_result: {
     comings?: Coming[];

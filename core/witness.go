@@ -55,6 +55,7 @@ func (w *World) Witness(kind, place, caption, headline string, actors ...string)
 	}
 	w.VisualCues = append(w.VisualCues, cue)
 	w.recordAftermath(cue)
+	w.recordPolicePresence(cue)
 }
 
 // Worth is the moment out of everything that happened worth taking the player
