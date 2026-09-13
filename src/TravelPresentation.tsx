@@ -1,6 +1,8 @@
 import {useEffect, useRef, useState} from 'react';
 import type {Place} from './types';
 export interface Journey {
+  driving?: boolean;
+  vehicle?: string;
   from: Place;
   to: Place;
   minutes: number;

@@ -84,3 +84,13 @@ A scene title must exist and must not merely repeat one of the offer's approach 
 A family may be named freely, but a job's own people and premises may not be attributed to a family that is neither the offer's beneficiary nor the recorded owner of the job's location. Faction words come from the family name and both parts of the leader's name. Ownership is read from saved state, so a property changing hands changes what may be said about it. This prevents neutral work, which moves no goodwill, from implying family standing.
 
 These are lexical and relational checks against saved state. They are not semantic verification of motive, plot or history. Public DTOs, saved memories, hidden plans and outcome authority are unchanged.
+
+## Browser 3D city presentation (2026-09-13)
+
+The active city renderer is now Three.js with locally authored Blender glTF models. City selection, camera motion, pedestrian gait, journey interpolation and event effects are presentation only. The old isometric sprite and address-card renderers remain as source references but are no longer city-view choices.
+
+`street[].vehicle` is an optional public vehicle label for an NPC visibly travelling with an operational car (not dry or damaged). Omitted means on foot. It does not disclose private intentions or change travel timing. Existing journey `progress`, endpoints and remaining minutes retain their meanings. The city interpolates between committed progress observations, then holds; it never advances an NPC to an uncommitted destination. Public property condition produces a persistent darkened building; only committed explosion cues produce transient fire/smoke.
+
+A failed `plant` attempt also emits an `explosion` cue: the charge went off prematurely even when it did not destroy the building. Blast casualties are now chosen from living NPCs physically at the affected premises, excluding travellers. Previously the family-wide casualty selection could kill somebody across town and produce a contradictory death cue. The casualty chance is unchanged; an empty building cannot produce an NPC casualty.
+
+Explicit scene replay can restage all cues in the selected committed result. Ordinary revision refreshes and reloads remain silent. Skip immediately clears the transient effects without posting an action or changing saved time.

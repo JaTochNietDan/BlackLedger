@@ -12,13 +12,13 @@ import (
 
 func main() {
 	if len(os.Args) < 2 || len(os.Args) > 3 {
-		log.Fatal("usage: go run ./cmd/qa-fixture <new-qa.sqlite3> [police|damage|warning|russo-warning|attack|voice|contact|paused-job|leader|doorman|arrest|debt|herald|killing|dead|offer|audience|street|room|gone|post|round|bereaved|inside|writeoff|writeoff-dead|worn|tables|bench|petrol]")
+		log.Fatal("usage: go run ./cmd/qa-fixture <new-qa.sqlite3> [city3d|city3d-night|city3d-blast|police|damage|warning|russo-warning|attack|voice|contact|paused-job|leader|doorman|arrest|debt|herald|killing|dead|offer|audience|street|room|gone|post|round|bereaved|inside|writeoff|writeoff-dead|worn|tables|bench|petrol]")
 	}
 	scenario := "police"
 	if len(os.Args) == 3 {
 		scenario = os.Args[2]
 	}
-	if scenario != "police" && scenario != "damage" && scenario != "warning" && scenario != "russo-warning" && scenario != "attack" && scenario != "voice" && scenario != "contact" && scenario != "paused-job" && scenario != "leader" && scenario != "doorman" && scenario != "arrest" && scenario != "debt" && scenario != "herald" && scenario != "killing" && scenario != "dead" && scenario != "offer" && scenario != "audience" && scenario != "street" && scenario != "room" && scenario != "gone" && scenario != "post" && scenario != "round" && scenario != "bereaved" && scenario != "inside" && scenario != "writeoff" && scenario != "writeoff-dead" && scenario != "worn" && scenario != "tables" && scenario != "bench" && scenario != "petrol" {
+	if scenario != "city3d-blast" && scenario != "city3d" && scenario != "city3d-night" && scenario != "police" && scenario != "damage" && scenario != "warning" && scenario != "russo-warning" && scenario != "attack" && scenario != "voice" && scenario != "contact" && scenario != "paused-job" && scenario != "leader" && scenario != "doorman" && scenario != "arrest" && scenario != "debt" && scenario != "herald" && scenario != "killing" && scenario != "dead" && scenario != "offer" && scenario != "audience" && scenario != "street" && scenario != "room" && scenario != "gone" && scenario != "post" && scenario != "round" && scenario != "bereaved" && scenario != "inside" && scenario != "writeoff" && scenario != "writeoff-dead" && scenario != "worn" && scenario != "tables" && scenario != "bench" && scenario != "petrol" {
 		log.Fatal("unsupported QA scenario")
 	}
 	path := os.Args[1]
@@ -36,6 +36,30 @@ func main() {
 	}
 	defer s.DB.Close()
 	err = s.Change(func(w *core.World) error {
+		if scenario == "city3d" || scenario == "city3d-night" || scenario == "city3d-blast" {
+			w.Player.Cash, w.Player.Respect, w.District = 12000, 60, 2
+			w.Player.Location, w.Player.Car, w.Player.CarWear = "bar", 2, 95
+			w.SettleFuel()
+			w.Minute = 600
+			if scenario == "city3d-night" {
+				w.Minute = 1260
+			}
+			w.Properties["laundry"].Owner = "player:1"
+			w.Plots = []core.Plot{{ID: "city3d-visible-test", Kind: "sabotage", Life: w.Life, Due: w.Minute + 5, Actor: "bellandi", Target: "laundry", Strength: 35}}
+			if scenario == "city3d-blast" {
+				w.Player.Location, w.Player.Charges, w.RNG = "club", 2, 1
+				w.Plots = nil
+			}
+			for i := 0; i < 12 && i < len(w.NPCs); i++ {
+				n := &w.NPCs[i]
+				n.Location = core.Locations[i%len(core.Locations)].ID
+				n.Heading = core.Locations[(i+3)%len(core.Locations)].ID
+				n.Sets, n.Car, n.Dry, n.Hurt = 0, i%4, false, false
+				n.Errand = "Crossing town in an isolated city presentation fixture"
+				n.Arrives = w.Minute + max(1, core.TravelMinutes(n.Location, n.Heading)*2/3)
+			}
+			return nil
+		}
 		if scenario == "worn" {
 			// A business of the player's knocked about but still standing, so the
 			// screen has to say what it is really earning rather than what a sound

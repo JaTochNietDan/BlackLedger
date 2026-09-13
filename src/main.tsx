@@ -3,8 +3,7 @@ import {paintedCar} from './cityAssets';
 import {SumAction} from './SumAction';
 import {useCallback, useEffect, useRef, useState} from 'react';
 import {createRoot} from 'react-dom/client';
-import {CityStreet} from './CityStreet';
-import {CityIso} from './CityIso';
+import {City3D} from './City3D';
 import {VoicePlayer, speaking, speakerOf} from './voice';
 import {unreadInLatest} from './paper';
 import {paintedAsset, paintedFront, paintedMask} from './cityAssets';
@@ -13,9 +12,6 @@ import {icon, pressPlate} from './art';
 import {ActionList} from './ActionList';
 import {Interior} from './Interior';
 import {MarketScreen} from './MarketScreen';
-import {MapEditor} from './MapEditor';
-import {EMPTY, loadLayout} from './layout';
-import type {Layout} from './layout';
 import {Portrait, CAST_FACES} from './Portrait';
 import {Casino, isTableAction} from './Casino';
 import {BackRoomScene} from './BackRoomScene';
@@ -66,12 +62,8 @@ async function api<T>(path: string, payload?: unknown): Promise<T> {
 // Which city the player last chose to look at. Boot used to force the card
 // view on every load, so the isometric city could be picked and then quietly
 // taken away again by the next refresh.
-function remembered(): 'street' | 'iso' {
-  try {
-    return localStorage.getItem('black-ledger-view') === 'street' ? 'street' : 'iso';
-  } catch {
-    return 'iso';
-  }
+function remembered(): 'iso' {
+  return 'iso';
 }
 function App() {
   const [world, setWorld] = useState<Snapshot | null>(null),
@@ -82,7 +74,7 @@ function App() {
     [voice, setVoice] = useState(localStorage.getItem('black-ledger-voice') === 'yes'),
     [speech, setSpeech] = useState('Read aloud'),
     [error, setError] = useState('');
-  const [cityView, setCityView] = useState<'street' | 'interior' | 'iso'>(remembered);
+  const [cityView, setCityView] = useState<'interior' | 'iso'>(remembered);
   // Whether the player is sitting at a table. A game takes the whole screen and
   // holds it until they get up: playing one out of the corner of a sidebar, with
   // the building's staff and supplies beside it, is being shown a game rather
@@ -101,15 +93,6 @@ function App() {
   // have a wall of machines and a room behind the room, so a screen picked from
   // the address put somebody who asked for the machines into a hand of cards.
   const inTheBackRoom = atTable && world!.seated_to === 'back';
-  // The arrangement of the map, and whether it is being arranged. Loaded once:
-  // it is a file in the repository, not part of the world, so it does not
-  // change under the player the way the city does.
-  const [layout, setLayout] = useState<Layout>(EMPTY);
-  const [arranging, setArranging] = useState(false);
-  const [slot, setSlot] = useState('');
-  useEffect(() => {
-    loadLayout().then(setLayout);
-  }, []);
   const [sound, setSoundOn] = useState(soundOn);
   const [motion, setMotion] = useState(() => {
     try {
@@ -297,6 +280,7 @@ function App() {
       if (worst && !next.event && motionRef.current) {
         setBeat(0);
         setPlaying(worst);
+        setCityView('iso');
         setTab('city');
         setSelected(worst.target);
       }
@@ -311,7 +295,13 @@ function App() {
         const from = world.locations.find(l => l.id === world.player.location),
           to = next.locations.find(l => l.id === next.player.location);
         if (from && to && from.id !== to.id)
-          setJourney({from, to, minutes: next.last_result?.elapsed || 0});
+          setJourney({
+            from,
+            to,
+            minutes: next.last_result?.elapsed || 0,
+            driving: !!world.vehicle?.running,
+            vehicle: world.vehicle?.car,
+          });
       }
       if (command.kind === 'new_life')
         setSelected(
@@ -716,7 +706,7 @@ function App() {
     if (tab === 'city') {
       const inside = cityView === 'interior' && locationInfo.id === p.location;
       return (
-        <div className={'workspace' + (inside ? ' inside' : '')}>
+        <div className={'workspace city-workspace' + (inside ? ' inside' : '')}>
           <section className="city-pane">
             <header className="city-header">
               <div className="map-heading">
@@ -744,28 +734,6 @@ function App() {
                   The city
                 </button>
                 <button
-                  aria-pressed={cityView === 'street'}
-                  onClick={() => {
-                    setCityView('street');
-                    try {
-                      localStorage.setItem('black-ledger-view', 'street');
-                    } catch {}
-                  }}
-                >
-                  The addresses
-                </button>
-                {layout.editable && cityView === 'iso' && (
-                  <button
-                    aria-pressed={arranging}
-                    onClick={() => {
-                      setArranging(v => !v);
-                      setSlot('');
-                    }}
-                  >
-                    {arranging ? 'Stop arranging' : 'Arrange the map'}
-                  </button>
-                )}
-                <button
                   className="enter"
                   aria-pressed={cityView === 'interior'}
                   onClick={() => {
@@ -783,7 +751,7 @@ function App() {
                     title={w.opportunity.detail}
                     onClick={() => {
                       setSelected(w.opportunity!.target);
-                      setCityView('street');
+                      setCityView('iso');
                     }}
                   >
                     <small>AN OPPORTUNITY</small>
@@ -864,44 +832,23 @@ function App() {
                   comings={w.last_result?.comings}
                   minute={w.minute}
                   render={actionButton}
-                  onLeave={() => setCityView('street')}
-                />
-              ) : cityView === 'iso' ? (
-                <CityIso
-                  state={w}
-                  selected={selected}
-                  onSelect={setSelected}
-                  spotlight={playing ? {id: playing.target, kind: playing.kind, t: beat} : null}
-                  onEnter={() => {
-                    setSelected(p.location);
-                    setCityView('interior');
-                  }}
-                  layout={layout}
-                  editing={arranging}
-                  slot={slot}
-                  onSlot={setSlot}
+                  onLeave={() => setCityView('iso')}
                 />
               ) : (
-                <CityStreet
+                <City3D
                   state={w}
+                  activeCue={playing}
+                  onSkipCue={() => setPlaying(null)}
                   selected={selected}
                   onSelect={setSelected}
-                  spotlight={playing ? {id: playing.target, kind: playing.kind, t: beat} : null}
+                  onTravel={id => commit({kind: 'travel', target: id})}
                   onEnter={() => {
                     setSelected(p.location);
                     setCityView('interior');
                   }}
-                />
-              )}
-              {arranging && cityView === 'iso' && (
-                <MapEditor
-                  layout={layout}
-                  slot={slot}
-                  onChange={setLayout}
-                  onClose={() => {
-                    setArranging(false);
-                    setSlot('');
-                  }}
+                  motion={motion}
+                  journey={journey}
+                  busy={busy}
                 />
               )}
               {journey &&
@@ -973,7 +920,7 @@ function App() {
           onFind={id => {
             setSelected(id);
             setTab('city');
-            setCityView('street');
+            setCityView('iso');
           }}
         />
       );
@@ -987,7 +934,7 @@ function App() {
             const seat = id === 'bellandi' ? 'club' : 'garage';
             setSelected(seat);
             setTab('city');
-            setCityView('street');
+            setCityView('iso');
           }}
         />
       );

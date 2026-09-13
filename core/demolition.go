@@ -145,6 +145,7 @@ func (w *World) Plant(id string) error {
 		w.Log("It went off early at "+place.Name, fmt.Sprintf("Something was wrong with it, or with the hour you chose. You are burned and cut (-%d health) and half the street saw somebody running.", injury), "danger")
 		w.Report("attack", "EXPLOSION AT "+strings.ToUpper(place.Name),
 			fmt.Sprintf("An explosion at %s is being treated as deliberate. Witnesses described somebody leaving on foot. Police say a prosecution is likely.", place.Name))
+		w.Witness("explosion", id, "A charge went off early at "+place.Name+".", "EXPLOSION AT "+upper(place.Name))
 		if w.Player.Health <= 0 {
 			w.DieOf("a charge of your own", "A charge at "+place.Name+" went off with you still under it.")
 		}
@@ -208,19 +209,20 @@ func (w *World) detonate(id, cause string) {
 
 	killed := ""
 	if w.WorldRandom() < BlastCasualty {
-		if owner != nil {
-			if victim := w.casualty(owner.ID); victim != nil {
-				killed = victim.Name
-				w.Kill(victim.ID, fmt.Sprintf("%s was inside %s when a charge went off under it, %s.", victim.Name, place.Name, hourOf(w.Minute)))
+		// A blast can only kill somebody physically inside these premises.
+		// Choosing from the entire owning family killed people across town and
+		// sent the city camera to an unrelated address while describing this one.
+		present := []*NPC{}
+		for i := range w.NPCs {
+			n := &w.NPCs[i]
+			if !n.Dead && n.Location == id && !w.Travelling(n) {
+				present = append(present, n)
 			}
-		} else {
-			for i := range w.NPCs {
-				if n := &w.NPCs[i]; !n.Dead && n.Location == id {
-					killed = n.Name
-					w.Kill(n.ID, fmt.Sprintf("%s was inside %s when a charge went off under it, %s.", n.Name, place.Name, hourOf(w.Minute)))
-					break
-				}
-			}
+		}
+		if len(present) > 0 {
+			victim := present[int(w.WorldRandom()*float64(len(present)))]
+			killed = victim.Name
+			w.Kill(victim.ID, fmt.Sprintf("%s was inside %s when a charge went off under it, %s.", victim.Name, place.Name, hourOf(w.Minute)))
 		}
 	}
 

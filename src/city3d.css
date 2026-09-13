@@ -1,0 +1,231 @@
+.city3d {
+  position: relative;
+  isolation: isolate;
+  height: min(76vh, 850px);
+  min-height: 520px;
+  border: 1px solid #82765d;
+  background: #26302f;
+  overflow: hidden;
+  color: #efdfbb;
+}
+.city3d-canvas {
+  position: absolute;
+  inset: 0;
+}
+.city3d-canvas canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+}
+.city3d-heading {
+  position: absolute;
+  top: 22px;
+  left: 24px;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-shadow: 0 2px 5px #000;
+}
+.city3d-heading small {
+  font-size: 17px;
+  letter-spacing: 0.24em;
+}
+.city3d-heading span {
+  font-size: 12px;
+  color: #e0d7c1;
+}
+.city3d-tools {
+  position: absolute;
+  right: 18px;
+  top: 18px;
+  display: flex;
+  gap: 6px;
+}
+.city3d button,
+.city3d select {
+  background: #242c28ec;
+  color: #eadbb9;
+  border: 1px solid #a38f62;
+  padding: 9px 12px;
+  font-size: 12px;
+  cursor: pointer;
+}
+.city3d button:hover {
+  background: #485043;
+}
+.city3d button:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+.city3d-address {
+  position: absolute;
+  bottom: 48px;
+  left: 24px;
+  width: 260px;
+  background: #1d2421ed;
+  border: 1px solid #8d7b54;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: 0 4px 20px #0005;
+}
+.city3d-address small {
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  color: #c5ac79;
+}
+.city3d-address strong {
+  font:
+    24px Georgia,
+    serif;
+}
+.city3d-address span {
+  font-size: 12px;
+  color: #c6c1ae;
+  line-height: 1.5;
+}
+.city3d-address button {
+  background: #b89a60;
+  color: #172018;
+  font-weight: 700;
+}
+.city3d-metrics {
+  position: absolute;
+  right: 16px;
+  bottom: 15px;
+  font: 10px monospace;
+  color: #cdc8b6;
+}
+.city3d-directory {
+  position: absolute;
+  bottom: 10px;
+  left: 24px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+}
+.city3d-directory select {
+  max-width: 210px;
+  padding: 4px;
+}
+.city3d-status {
+  position: absolute;
+  top: 40%;
+  left: 20%;
+  right: 20%;
+  text-align: center;
+  background: #18231feb;
+  padding: 20px;
+}
+.city3d-canvas canvas:focus-visible {
+  outline: 2px solid #f2ce81;
+  outline-offset: -4px;
+}
+@media (max-width: 700px) {
+  .city3d {
+    height: 75vh;
+    min-height: 570px;
+  }
+  .city3d-heading {
+    left: 12px;
+    top: 12px;
+  }
+  .city3d-heading span {
+    font-size: 10px;
+  }
+  .city3d-tools {
+    top: 70px;
+    left: 12px;
+    right: auto;
+  }
+  .city3d-address {
+    left: 12px;
+    bottom: 52px;
+    width: 225px;
+    padding: 12px;
+  }
+  .city3d-address span {
+    display: none;
+  }
+  .city3d-directory {
+    left: 12px;
+  }
+  .city3d-metrics {
+    bottom: 42px;
+    font-size: 9px;
+  }
+}
+.city3d.city3d-expanded {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  width: 100vw;
+  height: 100dvh;
+  min-height: 0;
+  border: 0;
+}
+.city3d-tools {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  max-width: 55%;
+}
+@media (max-width: 1100px) {
+  .city3d-heading {
+    max-width: 48%;
+  }
+  .city3d-heading small {
+    font-size: 13px;
+    letter-spacing: 0.12em;
+  }
+  .city3d-heading span {
+    font-size: 10px;
+  }
+}
+@media (max-width: 850px) {
+  .workspace.city-workspace {
+    display: block;
+    overflow-y: auto;
+  }
+  .workspace.city-workspace > .city-pane {
+    overflow: visible;
+    min-height: 0;
+  }
+  .workspace.city-workspace > .sidebar {
+    overflow: visible;
+    min-height: 0;
+  }
+  .city3d-heading {
+    max-width: none;
+  }
+  .city3d-tools {
+    max-width: calc(100% - 24px);
+    justify-content: flex-start;
+  }
+  .city3d-directory {
+    max-width: calc(100% - 24px);
+    flex-wrap: wrap;
+    gap: 3px;
+  }
+  .city3d-directory select {
+    max-width: 100%;
+  }
+}
+.city3d-event {
+  position: absolute;
+  top: 130px;
+  right: 20px;
+  max-width: min(420px, 80%);
+  padding: 16px;
+  background: #18201aed;
+  border: 1px solid #ad9468;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font:
+    16px Georgia,
+    serif;
+}

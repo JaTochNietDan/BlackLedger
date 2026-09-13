@@ -78,44 +78,29 @@ func TestEveryAddressGetsItsOwnBlock(t *testing.T) {
 	}
 }
 
-// And the switch has to keep offering the card view while the city is built,
-// so a broken renderer never leaves the game unplayable.
-func TestTheCardViewIsStillReachable(t *testing.T) {
+// The September 13 scope requests one 3D city, with an HTML address selector
+// retained for keyboard navigation and renderer failure recovery.
+func TestOneBrowserCityWithAccessibleAddresses(t *testing.T) {
 	t.Parallel()
-	// Both mounted, not merely imported: a component name on its own appears in
-	// the import line of a file that no longer draws it.
 	body := source(t, "src/main.tsx")
-	if !holds(body, "<CityStreet state={w}") || !holds(body, "<CityIso state={w}") {
-		t.Fatal("the city view and the card view are not both reachable")
+	if !holds(body, "<City3D state={w}") || holds(body, "<CityStreet") || holds(body, "<CityIso") {
+		t.Fatal("the active city must be the single 3D scene")
+	}
+	city := source(t, "src/City3D.tsx")
+	if !holds(city, "aria-label=\"Find an address\"") || !holds(city, "props.onTravel(place.id)") {
+		t.Fatal("HTML destinations and travel must remain available")
 	}
 }
 
-// The city is drawn on a GPU now, and a renderer that fails to start would
-// leave a blank pane where the city was. Two things have to stay true: the
-// card view remains reachable (checked above), and the addresses remain
-// reachable without a mouse or WebGL at all.
+// The HTML selector is independent of WebGL initialization and retains every address.
 func TestTheCityCanBeReadWithoutWebGL(t *testing.T) {
 	t.Parallel()
-	body := source(t, "src/CityIso.tsx")
-	source := body
-	if !holds(source, "iso-reader") {
-		t.Error("the city has no text alternative, so a browser without WebGL shows an empty pane")
+	body := source(t, "src/City3D.tsx")
+	if !holds(body, "props.state.locations.map") || !holds(body, "aria-label=\"Find an address\"") || !holds(body, "props.onSelect") {
+		t.Fatal("the city needs an HTML selector for every public destination")
 	}
-	// Every address, not a selection of them. It reads a sorted copy rather
-	// than the city's own order now — nearest first, so the list is a way of
-	// choosing where to go rather than twenty-six names — so what this guards
-	// is that the copy is of all of them and nothing is filtered out on the
-	// way.
-	if !holds(source, "[...state.locations].sort") || !holds(source, "reachable.map") {
-		t.Error("the text alternative does not list the city's own addresses")
-	}
-	if holds(source, "state.locations.filter") {
-		t.Error("the text alternative shows a selection of the city's addresses rather than all of them")
-	}
-	// The camera must not be reset by an ordinary update: a player who has
-	// zoomed in on the docks should stay there when an hour passes.
-	if holds(source, "useEffect(frame") {
-		t.Error("the camera is re-framed on every update, which throws away where the player was looking")
+	if !holds(body, "setFailure") {
+		t.Fatal("renderer errors must be explained")
 	}
 }
 

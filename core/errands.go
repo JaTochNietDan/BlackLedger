@@ -62,6 +62,8 @@ func (w *World) noticed(n *NPC, leaving bool) {
 // Journeying is one person between two addresses, for anybody who needs to
 // draw the street or say what is happening on it.
 type Journeying struct {
+	// Vehicle is the publicly visible car on this journey; empty means on foot.
+	Vehicle string `json:"vehicle,omitempty"`
 	ID      string `json:"id"`
 	Name    string `json:"name"`
 	FromID  string `json:"from_id"`
@@ -298,10 +300,14 @@ func (w *World) OnTheStreet() []Journeying {
 		if !okFrom || !okTo {
 			continue
 		}
+		vehicle := ""
+		if n.Car > 0 && !n.Dry && !n.Hurt {
+			vehicle = VehicleByTier(n.Car).Label
+		}
 		total := max(1, TravelMinutes(n.Location, n.Heading))
 		left := max(0, n.Arrives-w.Minute)
 		out = append(out, Journeying{
-			ID: n.ID, Name: n.Name,
+			ID: n.ID, Name: n.Name, Vehicle: vehicle,
 			FromID: n.Location, From: from.Name,
 			ToID: n.Heading, To: to.Name,
 			Because:  n.Errand,

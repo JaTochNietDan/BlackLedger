@@ -179,6 +179,7 @@ export interface Coming {
   note: string;
 }
 export interface Journeying {
+  vehicle?: string;
   id: string;
   name: string;
   from_id: string;

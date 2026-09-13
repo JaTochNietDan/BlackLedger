@@ -1,5 +1,9 @@
 # Current goal and workstream ownership
 
+## User revision — browser 3D city (2026-09-13)
+
+The current user request supersedes the earlier 2D visual-production restriction below. Codex is to build one browser-rendered, rotatable, pannable, zoomable 3D 1950s mafia city, using locally authored Blender models and textures. Buildings must be selectable destinations; public simulation journeys must show pedestrians or their appropriate vehicles; committed violence must drive animated effects. Preserve Go authority and existing command handling. Use isolated saves for QA, verify footprints and browser behavior, measure performance toward 60 FPS, and record unfinished acceptance honestly. Historical handoff instructions remain below for context; no separate visual agent is currently running on this request.
+
 ## User revision — visual production handoff (2026-09-07)
 
 The user has reassigned visual production to Claude or another separate agent. **Codex's ongoing goal is gameplay and player experience:** build and playtest the single-player mafia vertical slice, deepen action-driven progression and consequences, improve AI stories/NPC/faction behavior, maintain reliable saves and optional voices, run headless simulations, and complete a playable 20–30-minute rise-and-consequence campaign. Keep the Mac awake while active work is running.

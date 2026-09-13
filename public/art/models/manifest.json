@@ -1,0 +1,290 @@
+{
+  "tenement": {
+    "file": "tenement.glb",
+    "bounds_blender": [
+      [
+        -6.325,
+        -5.825,
+        0.0
+      ],
+      [
+        6.325,
+        7.0,
+        16.35
+      ]
+    ],
+    "bytes": 492236
+  },
+  "tavern": {
+    "file": "tavern.glb",
+    "bounds_blender": [
+      [
+        -6.325,
+        -6.325,
+        0.0
+      ],
+      [
+        6.325,
+        7.3527,
+        8.825
+      ]
+    ],
+    "bytes": 360768
+  },
+  "casino": {
+    "file": "casino.glb",
+    "bounds_blender": [
+      [
+        -6.825,
+        -7.61,
+        0.0
+      ],
+      [
+        6.825,
+        6.8527,
+        8.825
+      ]
+    ],
+    "bytes": 395952
+  },
+  "warehouse": {
+    "file": "warehouse.glb",
+    "bounds_blender": [
+      [
+        -6.825,
+        -6.325,
+        0.0
+      ],
+      [
+        6.825,
+        6.325,
+        5.675
+      ]
+    ],
+    "bytes": 318112
+  },
+  "civic": {
+    "file": "civic.glb",
+    "bounds_blender": [
+      [
+        -6.825,
+        -6.325,
+        0.0
+      ],
+      [
+        6.825,
+        7.5,
+        13.2
+      ]
+    ],
+    "bytes": 449892
+  },
+  "shop": {
+    "file": "shop.glb",
+    "bounds_blender": [
+      [
+        -6.325,
+        -5.825,
+        0.0
+      ],
+      [
+        6.325,
+        7.0,
+        13.2
+      ]
+    ],
+    "bytes": 440616
+  },
+  "villa": {
+    "file": "villa.glb",
+    "bounds_blender": [
+      [
+        -5.825,
+        -5.825,
+        0.0
+      ],
+      [
+        5.825,
+        5.825,
+        8.825
+      ]
+    ],
+    "bytes": 348424
+  },
+  "filling": {
+    "file": "filling.glb",
+    "bounds_blender": [
+      [
+        -6.55,
+        -5.05,
+        0.0
+      ],
+      [
+        6.55,
+        6.7,
+        3.58
+      ]
+    ],
+    "bytes": 245972
+  },
+  "garage": {
+    "file": "garage.glb",
+    "bounds_blender": [
+      [
+        -7.2,
+        -3.295,
+        0.0
+      ],
+      [
+        7.2,
+        7.2,
+        5.5
+      ]
+    ],
+    "bytes": 237896
+  },
+  "dealer": {
+    "file": "dealer.glb",
+    "bounds_blender": [
+      [
+        -7.2,
+        -8.32,
+        0.0
+      ],
+      [
+        7.2,
+        7.2,
+        5.5
+      ]
+    ],
+    "bytes": 359920
+  },
+  "chapel": {
+    "file": "chapel.glb",
+    "bounds_blender": [
+      [
+        -4.8937,
+        -5.61,
+        0.0
+      ],
+      [
+        4.9083,
+        7.35,
+        13.5
+      ]
+    ],
+    "bytes": 186904
+  },
+  "docks": {
+    "file": "docks.glb",
+    "bounds_blender": [
+      [
+        -6.7,
+        -3.7,
+        -0.0091
+      ],
+      [
+        6.1641,
+        6.7,
+        13.1315
+      ]
+    ],
+    "bytes": 199544
+  },
+  "haulage": {
+    "file": "haulage.glb",
+    "bounds_blender": [
+      [
+        -6.7,
+        -3.7,
+        0.0
+      ],
+      [
+        5.82,
+        6.7,
+        5.35
+      ]
+    ],
+    "bytes": 191144
+  },
+  "ford": {
+    "file": "ford.glb",
+    "bounds_blender": [
+      [
+        -1.0275,
+        -2.32,
+        0.02
+      ],
+      [
+        1.0275,
+        2.32,
+        1.59
+      ]
+    ],
+    "bytes": 122232
+  },
+  "hudson": {
+    "file": "hudson.glb",
+    "bounds_blender": [
+      [
+        -1.0275,
+        -2.52,
+        0.02
+      ],
+      [
+        1.0275,
+        2.52,
+        1.59
+      ]
+    ],
+    "bytes": 122272
+  },
+  "packard": {
+    "file": "packard.glb",
+    "bounds_blender": [
+      [
+        -1.0275,
+        -2.87,
+        0.02
+      ],
+      [
+        1.0275,
+        2.87,
+        1.59
+      ]
+    ],
+    "bytes": 122464
+  },
+  "police": {
+    "file": "police.glb",
+    "bounds_blender": [
+      [
+        -1.0275,
+        -2.32,
+        0.02
+      ],
+      [
+        1.0275,
+        2.32,
+        1.9
+      ]
+    ],
+    "bytes": 127912
+  },
+  "person": {
+    "file": "person.glb",
+    "bounds_blender": [
+      [
+        -0.4,
+        -0.24,
+        -0.0
+      ],
+      [
+        0.4,
+        0.23,
+        1.895
+      ]
+    ],
+    "bytes": 64720
+  }
+}
