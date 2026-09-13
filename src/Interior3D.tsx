@@ -1,3 +1,4 @@
+import {cameraCommand, screenPan} from './city3dControls';
 import {useEffect, useRef, useState} from 'react';
 import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
@@ -17,7 +18,7 @@ export function Interior3D(props:{people:Presence[];picked:string;onPick:(id:str
   const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
   renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFShadowMap;
   renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.1;
-  const canvas=renderer.domElement;canvas.setAttribute('aria-label','Saint Agnes 3D interior. Drag or Q/E to orbit, scroll or +/- to zoom, Home resets; click a person to select their actions.');canvas.tabIndex=0;el.append(canvas);
+  const canvas=renderer.domElement;canvas.setAttribute('aria-label','Saint Agnes 3D interior. Drag or Q/E to orbit, scroll or +/- to zoom, Home resets, WASD or arrows pan; click a person to select their actions.');canvas.tabIndex=0;el.append(canvas);
   const camera=new THREE.OrthographicCamera(-9,9,7,-7,.1,100);camera.position.set(13,14,-17);
   const controls=new OrbitControls(camera,canvas);controls.target.set(0,1,0);controls.minZoom=.7;controls.maxZoom=3;
   controls.minPolarAngle=.35;controls.maxPolarAngle=1.15;controls.enablePan=false;controls.update();
@@ -49,9 +50,14 @@ export function Interior3D(props:{people:Presence[];picked:string;onPick:(id:str
   };
   canvas.addEventListener('pointerdown',press);canvas.addEventListener('pointerup',release);
   const keys=(event:KeyboardEvent)=>{
-   if(['q','e','ArrowLeft','ArrowRight'].includes(event.key)){
+   const command=cameraCommand(event);if(!command)return;
+   if(command.startsWith('pan-')){
+    const delta=screenPan({x:camera.position.x,z:camera.position.z},{x:controls.target.x,z:controls.target.z},command,.6/camera.zoom);
+    const before=controls.target.clone();controls.target.x=THREE.MathUtils.clamp(controls.target.x+delta.x,-6,6);controls.target.z=THREE.MathUtils.clamp(controls.target.z+delta.z,-5,5);
+    camera.position.add(controls.target.clone().sub(before));
+   }else if(['rotate-left','rotate-right'].includes(command)){
     const offset=camera.position.clone().sub(controls.target);
-    offset.applyAxisAngle(new THREE.Vector3(0,1,0),['q','ArrowLeft'].includes(event.key)?-.12:.12);
+    offset.applyAxisAngle(new THREE.Vector3(0,1,0),command==='rotate-left'?-.12:.12);
     camera.position.copy(controls.target).add(offset);
    }else if(['+','=','-'].includes(event.key)){
     camera.zoom=THREE.MathUtils.clamp(camera.zoom*(event.key==='-'?1/1.12:1.12),controls.minZoom,controls.maxZoom);camera.updateProjectionMatrix();
@@ -89,5 +95,5 @@ export function Interior3D(props:{people:Presence[];picked:string;onPick:(id:str
   };frame=requestAnimationFrame(tick);
   return()=>{dead=true;cancelAnimationFrame(frame);observer.disconnect();controls.removeEventListener('change',changed);controls.dispose();canvas.removeEventListener('keydown',keys);canvas.removeEventListener('pointerdown',press);canvas.removeEventListener('pointerup',release);disposeCityResources([scene,...models.values()]);renderer.dispose();renderer.forceContextLoss();canvas.remove();};
  },[]);
- return <div className="interior3d"><div ref={host} className="interior3d-canvas"/><span className="interior3d-caption">SAINT AGNES · Drag / Q/E: orbit · Scroll / +/−: zoom · Home: reset · Select a person</span>{status&&<p role="status">{status}</p>}</div>;
+ return <div className="interior3d"><div ref={host} className="interior3d-canvas"/><span className="interior3d-caption">SAINT AGNES · Drag / Q/E: orbit · Scroll / +/−: zoom · WASD / arrows: pan · Home: reset · Select a person</span>{status&&<p role="status">{status}</p>}</div>;
 }

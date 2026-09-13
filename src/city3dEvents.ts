@@ -37,12 +37,12 @@ export type SceneSlot = {root: Point; pose: TrafficPose; model: string};
 /** Dedicated forecourt/side bays keep reenactments out of public travel lanes.
  * The casualty reservation encloses the whole fall, including the standing pose. */
 export function sceneSlots(lot: Lot, kind: string): SceneSlot[] {
-  if (kind === 'killing' || kind === 'gunfight')
+  if (['killing','gunfight','officer','detainee'].includes(kind))
     return (kind === 'gunfight' ? [-3, -6, 0, 3, 6] : [0, -3, 3, -6, 6]).map(offset => {
       const root = {x: lot.x + offset, z: lot.row * PITCH + 6.35};
       return {root, pose: {x: root.x + 0.8, z: root.z, heading: 0}, model: 'casualty'};
     });
-  if (kind === 'raid' || kind === 'arrest')
+  if (['raid','arrest','police-unit'].includes(kind))
     return [1, -1].flatMap(side => [-6, 0, 6].map(offset => {
       const root = {x: lot.x + side * 9.6, z: lot.z + offset};
       return {root, pose: {...root, heading: 0}, model: 'parked-police'};
@@ -138,4 +138,16 @@ export class BlastAudio {
     this.stop?.();
     this.stop = undefined;
   }
+}
+
+/** Supporting presentation cast; these are not new backend events. Never infer
+ * the prisoner from cue actors, which can name an arresting detective. */
+export function policeCast(cue: VisualCue): VisualCue[] {
+  if(!['raid','arrest'].includes(cue.kind))return [cue];
+  const result=[cue];
+  const add=(kind:string,index:number,actors=cue.actors)=>result.push({...cue,id:`${cue.id}:${kind}:${index}`,kind,actors});
+  for(let i=0;i<(cue.kind==='raid'?2:1);i++)add('police-unit',i,[]);
+  if(cue.kind==='arrest'&&cue.detainee)add('detainee',0,[cue.detainee]);
+  for(let i=0;i<(cue.kind==='raid'?4:2);i++)add('officer',i,[]);
+  return result;
 }

@@ -444,10 +444,11 @@ type CueActor struct {
 }
 
 type VisualCue struct {
-	ID      string `json:"id"`
-	Kind    string `json:"kind"`
-	Target  string `json:"target"`
-	Caption string `json:"caption"`
+	Detainee *CueActor `json:"detainee,omitempty"`
+	ID       string    `json:"id"`
+	Kind     string    `json:"kind"`
+	Target   string    `json:"target"`
+	Caption  string    `json:"caption"`
 	// Headline is what the Herald carries about it, so the paper can arrive
 	// after the scene rather than instead of it.
 	Headline string `json:"headline,omitempty"`

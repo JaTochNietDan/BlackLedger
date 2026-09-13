@@ -3,12 +3,12 @@ import assert from 'node:assert/strict';
 import {cameraCommand, screenPan} from '../.runtime/frontend-test/city3dControls.js';
 
 test('camera shortcuts preserve browser modifiers and composing input', () => {
-  for (const key of ['+', '=', '-', 'Q', 'E', 'Home', 'ArrowLeft', 'ArrowUp']) {
+  for (const key of ['+', '=', '-', 'Q', 'E', 'Home', 'ArrowLeft', 'ArrowUp', 'w', 'a', 's', 'd']) {
     assert.ok(cameraCommand({key}));
     for (const modifier of ['ctrlKey', 'metaKey', 'altKey', 'isComposing'])
       assert.equal(cameraCommand({key, [modifier]: true}), null);
   }
-  for (const key of ['Tab', 'Escape', 'Enter', 'a', 'constructor', '__proto__']) assert.equal(cameraCommand({key}), null);
+  for (const key of ['Tab', 'Escape', 'Enter', 'h', 'constructor', '__proto__']) assert.equal(cameraCommand({key}), null);
   assert.equal(cameraCommand({key: 'Q'}), 'rotate-left');
   assert.equal(cameraCommand({key: '+'}), 'zoom-in');
 });
@@ -30,4 +30,12 @@ test('panning stays aligned with the screen through a complete camera orbit', ()
     assert.equal(left.x, -right.x); assert.equal(left.z, -right.z);
   }
   assert.deepEqual(screenPan(target, target, 'pan-up'), {x: 0, z: 5});
+});
+
+test('WASD matches arrow panning with case-insensitive keys and preserves shortcuts',()=>{
+ for(const [letter,arrow] of [['w','ArrowUp'],['a','ArrowLeft'],['s','ArrowDown'],['d','ArrowRight']]){
+  assert.equal(cameraCommand({key:letter}),cameraCommand({key:arrow}));
+  assert.equal(cameraCommand({key:letter.toUpperCase()}),cameraCommand({key:arrow}));
+  assert.equal(cameraCommand({key:letter,metaKey:true}),null);
+ }
 });

@@ -193,6 +193,7 @@ func (w *World) Confine(days int, because string) {
 		fmt.Sprintf("%s has been remanded following searches across the district. Police said the investigation was continuing.", p.Name))
 	w.Witness("arrest", "precinct", fmt.Sprintf("%d days for %s. They took the laces out of your shoes at the desk.", days, because),
 		"ONE CHARGED AFTER DISTRICT SEARCHES", w.HolderID("detective"))
+	w.VisualCues[len(w.VisualCues)-1].Detainee = &CueActor{ID: "player", Name: p.Name}
 }
 
 // Release is the morning it ends.

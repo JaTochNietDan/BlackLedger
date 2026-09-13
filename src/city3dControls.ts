@@ -8,6 +8,7 @@ export function cameraCommand(event: {
   if (event.ctrlKey || event.metaKey || event.altKey || event.isComposing) return null;
   const commands: Record<string, CameraCommand> = {
     '+': 'zoom-in', '=': 'zoom-in', '-': 'zoom-out',
+    w: 'pan-up', a: 'pan-left', s: 'pan-down', d: 'pan-right',
     q: 'rotate-left', e: 'rotate-right', home: 'reset',
     arrowleft: 'pan-left', arrowright: 'pan-right', arrowup: 'pan-up', arrowdown: 'pan-down',
   };

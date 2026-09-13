@@ -258,3 +258,9 @@ The public `aftermath` array describes active observable death scenes independen
 ## First 3D room presentation
 
 Saint Agnes uses a locally authored GLB interior on entry. Public occupants populate up to nine clear standing bays, and clicking an occupant selects their existing room actions. The full roster remains available below the canvas. This changes presentation only; occupant presence, action availability and premises ownership remain public Go projections. Other interiors remain on the existing renderer pending their authored rooms.
+
+## Police presentation cast and detainee identity
+
+Arrest cues may include `detainee: {id, name}`. This is distinct from `actors`, which can identify the arresting detective. Player confinement explicitly identifies `player` as detainee. The renderer must not infer a prisoner from an actor when the field is absent. Raid presentation expands one public cue to three police vehicles and four uniformed officers; arrest presentation uses two vehicles, two officers and the explicit detainee when present. Supporting cast IDs are local presentation identities, not new public events. Arrival, escort and door-entry choreography remain unfinished.
+
+City and 3D interior canvases accept WASD and arrow-key panning with Q/E orbit; browser-modified shortcuts and IME input retain their normal behavior.

@@ -29,7 +29,7 @@ import {
 import type {Lot, Point} from './city3dPlan';
 import type {Journey} from './TravelPresentation';
 import './city3d.css';
-import {CityCueQueue, sceneSlots, availableSceneSlot, casualtyFall, gunfightPose, casualtySceneStart, GunfireAudio, BlastAudio} from './city3dEvents';
+import {CityCueQueue, policeCast, sceneSlots, availableSceneSlot, casualtyFall, gunfightPose, casualtySceneStart, GunfireAudio, BlastAudio} from './city3dEvents';
 import type {SceneSlot} from './city3dEvents';
 import {StreetTraffic, trafficSize, trafficModel, advanceWheel, wheelSteering, advanceSteering, frontWheelSteering} from './city3dTraffic';
 import {pedestrianModel, isPedestrian} from './city3dCast';
@@ -174,7 +174,7 @@ export function City3D(props: Props) {
     const canvas = renderer.domElement;
     canvas.setAttribute(
       'aria-label',
-      '3D Bellwether city. Drag to rotate, right drag to pan, scroll to zoom. Keyboard: arrows pan, Q and E rotate, plus and minus zoom, Home resets, Escape leaves the expanded city.',
+      '3D Bellwether city. Drag to rotate, right drag to pan, scroll to zoom. Keyboard: WASD or arrows pan, Q and E rotate, plus and minus zoom, Home resets, Escape leaves the expanded city.',
     );
     canvas.tabIndex = 0;
     element.appendChild(canvas);
@@ -899,7 +899,7 @@ export function City3D(props: Props) {
               p.activeCue,
               first,
               !first && revision === w.revision && playbackStarted,
-            )) {
+            ).flatMap(policeCast)) {
           if (!motion) continue;
           const lot = lots.get(cue.target);
           if (!lot) continue;
@@ -922,11 +922,11 @@ export function City3D(props: Props) {
           scene.add(light);
           let costume: THREE.MeshStandardMaterial[] | undefined;
           let extra: THREE.Group | undefined, gunArm: THREE.Object3D | undefined, muzzle: THREE.Object3D | undefined;
-          if (['killing', 'gunfight', 'raid', 'arrest'].includes(cue.kind)) {
-            const model = cue.kind === 'killing' ? personModel(cue.actors?.[0]?.id || '')
-              : cue.kind === 'gunfight' ? 'person' : 'police';
+          if (['killing', 'gunfight', 'raid', 'arrest','police-unit','officer','detainee'].includes(cue.kind)) {
+            const model = ['killing','detainee'].includes(cue.kind) ? personModel(cue.actors?.[0]?.id || '')
+              : cue.kind === 'gunfight' ? 'person' : cue.kind==='officer'?'police-officer':'police';
             extra = models.get(model)!.clone(true);
-            if (isPedestrian(model)) costume = dressPedestrian(extra, model, personWardrobe(cue.kind === 'killing' ? cue.actors?.[0]?.id || '' : 'anonymous-shooter'));
+            if (isPedestrian(model)) costume = dressPedestrian(extra, model, personWardrobe(['killing','detainee'].includes(cue.kind) ? cue.actors?.[0]?.id || '' : 'anonymous-shooter'));
             if (model === 'police') addVehicleShadow(extra, model);
             if (cue.kind === 'gunfight') {
               extra.rotation.y = Math.PI / 2;
@@ -961,7 +961,7 @@ export function City3D(props: Props) {
             setFollow(false);
             const envelope = new THREE.Box3();
             const siblings = (w.last_result?.cues || []).filter(other => other.target === cue.target);
-            for (const other of [...siblings, cue]) {
+            for (const other of [...siblings, cue].flatMap(policeCast)) {
               for (const slot of sceneSlots(lot, other.kind)) {
                 envelope.expandByPoint(new THREE.Vector3(slot.root.x - 3.5, 0, slot.root.z - 3.5));
                 envelope.expandByPoint(new THREE.Vector3(slot.root.x + 3.5, 3, slot.root.z + 3.5));
@@ -1132,7 +1132,7 @@ export function City3D(props: Props) {
         aftermath.show(placements);
         for (const [id, a] of actors) {
           const placement = placements.get(id);
-          a.object.visible = !!placement && !placement.waiting;
+          a.object.visible = !!placement && !placement.waiting && !(id==='player'&&effects.some(e=>e.cue.kind==='detainee'&&e.cue.actors?.[0]?.id==='player'&&e.slot));
           if (!placement || placement.waiting) continue;
           const at = placement.pose;
           const distance = Math.hypot(a.object.position.x - at.x, a.object.position.z - at.z);
@@ -1252,12 +1252,19 @@ export function City3D(props: Props) {
             e.extra.rotation.z = fall.rotation;
             e.extra.position.y = fall.height;
           }
-          const police = ['raid', 'arrest'].includes(e.cue.kind);
+          const police = ['raid', 'arrest','police-unit'].includes(e.cue.kind);
+          const personnel=['officer','detainee'].includes(e.cue.kind);
+          if(personnel&&e.extra){
+            if(e.cue.kind==='detainee')for(const name of ['arm1','arm-1']){
+              const arm=e.extra.getObjectByName(name);if(arm)arm.rotation.x=.55*Math.min(1,t*4);
+            }
+            else e.extra.rotation.y=Math.atan2(lot.x-at.x,lot.row*PITCH+6.35-at.z);
+          }
           for (let j = 0; j < 32; j++) {
             const a = j * 2.399;
             const r = shot ? 0.35 : 1.8;
             tmp.position.set(at.x + Math.cos(a) * r, 1 + Math.sin(a) * r * 0.4, at.z + Math.sin(a) * r);
-            tmp.scale.setScalar(casualty || shot ? 0.001 : 0.25);
+            tmp.scale.setScalar(casualty || shot || personnel ? 0.001 : 0.25);
             const burst = blast ? blastParticle(j, t * 3) : null;
             if (burst && blastOrigin) {
               tmp.position.set(blastOrigin.x + burst.x, blastOrigin.y + burst.y, blastOrigin.z + burst.z);
@@ -1543,7 +1550,7 @@ export function City3D(props: Props) {
         <div className="city3d-heading">
           <small>BELLWETHER · 1950</small>
           <span>Drag to rotate · Right drag to pan · Scroll to zoom</span>
-          <span>Arrows: pan · Q/E: rotate · +/−: zoom · Home: reset · Esc: return</span>
+          <span>WASD / Arrows: pan · Q/E: rotate · +/−: zoom · Home: reset · Esc: return</span>
         </div>
         <div className="city3d-tools">
           <button ref={expandButton} aria-pressed={expanded} onClick={() => {

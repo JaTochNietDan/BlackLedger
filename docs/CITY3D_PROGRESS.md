@@ -64,6 +64,13 @@ These are staged fixture saves, not earned campaign progress.
 
 ## Continue next
 
+### Expanded police cast and WASD — September 13
+
+- Raid cues now stage three cars and four uniformed officers; arrest cues stage two cars, two officers and an explicitly identified detainee. The detainee's arms move behind their back. Supporting actors use the existing spacing/reservation, cutaway and camera-envelope paths. This is still a short staged tableau; arrivals, escort, handcuff contact, search and door-entry choreography remain unfinished.
+- Found that existing player-arrest cue actors identify the detective, not the prisoner. Added an optional explicit `detainee` field to player confinement; absent identity never substitutes the detective. Debug arrest uses a clearly synthetic detainee. Targeted Go custody/arrest tests pass. Renderer tests cover cast counts, pairwise spacing and detainee identity.
+- Added requested WASD panning alongside arrows to the city and first 3D interior. Q/E retains orbit; shortcut modifiers/IME remain excluded. Browser 8860 W–D–S–A returned the camera to x96/z80 within floating-point tolerance. No gameplay commands in this preview run; save stayed revision 3/minute 660.
+- Evidence: `raid-group.png`, `arrest-group.png`, `police-cast.json`, `wasd.json`. Both full casts staged without waiting; stopping removed all effects; captured logs were clear. Production build passes. All 153 frontend tests pass (`.runtime/police-cast-tests.log`). The latest user amendment explicitly calls for high-fidelity action timelines, forced-entry raids with lingering presence, crisp impact sound/camera feedback and simulation-grounded drive-by variants. Current tableaux do not satisfy that requirement. Broader art, interiors, fire brigade, weapon fidelity and production acceptance remain active.
+
 ### Uniformed crime-scene officers — September 13
 
 - Added a Blender-authored `police-officer.glb` with woven navy uniform, peaked cap, brass cap/shield badges, breast pockets, epaulettes, duty belt, buckle, closed holster and utility pouch. The existing articulated cast rig is retained; uniform pigment is baked into its packed texture for reliable glTF export.

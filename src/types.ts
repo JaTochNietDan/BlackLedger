@@ -9,6 +9,7 @@ export interface VisualCue {
   target: string;
   caption: string;
   headline?: string;
+  detainee?: {id: string; name: string};
   actors?: {id: string; name: string}[];
   gravity?: number;
   minute?: number;
