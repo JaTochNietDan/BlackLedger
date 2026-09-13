@@ -40,6 +40,7 @@ export function cityPlan(places: Pick<Place, 'id' | 'x' | 'y' | 'type'>[]) {
   const lots: Lot[] = places.map(p => {
     const c = cells.get(p.id)!;
     const specialized: Record<string, string> = {
+      room: 'mariner',
       docks: 'docks',
       filling: 'filling',
       pumps: 'filling',

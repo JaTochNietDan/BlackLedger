@@ -228,3 +228,23 @@ test('street trees retain authored leaf textures and a bounded canopy',async()=>
  assert.ok(manifest.streetside.bounds_blender[1][2]>4.5);
  assert.ok(manifest.streetside.bounds_blender[1][2]<5);
 });
+
+test('The Mariner has a distinct lodging model with a front door and closed gabled roof',async()=>{
+ const THREE=await import('three');const {GLTFLoader}=await import('three/addons/loaders/GLTFLoader.js');
+ assert.equal(plan.lots.find(l=>l.id==='room').model,'mariner');
+ const bytes=readFileSync(new URL('../public/art/models/mariner.glb',import.meta.url));
+ const loader=new GLTFLoader();loader.register(parser=>({name:'mariner-materials',loadMaterial(index){return Promise.resolve(new THREE.MeshBasicMaterial({name:parser.json.materials[index].name}));}}));
+ const model=(await loader.parseAsync(bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength),'')).scene;
+ model.updateMatrixWorld(true);
+ const bounds=new THREE.Box3().setFromObject(model,true);
+ assert.ok(bounds.min.x>=-8.5&&bounds.max.x<=8.5&&bounds.min.z>=-8.5&&bounds.max.z<=8.5);
+ const doorRay=new THREE.Raycaster(new THREE.Vector3(0,1.2,-8),new THREE.Vector3(0,0,1));
+ assert.match(doorRay.intersectObject(model,true)[0].object.material.name,/mariner painted timber/,'frontage must expose the entrance');
+ for(const x of [-5,-2,0,2,5]){
+  const roofRay=new THREE.Raycaster(new THREE.Vector3(x,15,0),new THREE.Vector3(0,-1,0));
+  const hit=roofRay.intersectObject(model,true)[0];assert.ok(hit);
+  assert.match(hit.object.material.name,/mariner weathered slate/);
+  assert.ok(hit.point.y>9.45,'roof must cover the lodging block without an open ridge');
+ }
+ const sign=model.getObjectByName('sign-anchor');assert.ok(sign);assert.ok(sign.position.z< -5.2);
+});

@@ -73,6 +73,7 @@ type Effect = {
 };
 const modelNames = [
   'tenement',
+  'mariner',
   'tavern',
   'casino',
   'warehouse',

@@ -64,6 +64,13 @@ These are staged fixture saves, not earned campaign progress.
 
 ## Continue next
 
+### Distinct Mariner lodging house (2026-09-13)
+
+- The player's starting home now uses a dedicated Blender model instead of the generic tenement: three storeys of weathered brick, limestone courses, sash windows, a single sheltered front entrance and lodging sign, closed brick gables, pitched slate roof/ridge, chimney pots and rear iron escape. Its existing `room` location, travel endpoints and gameplay remain unchanged.
+- All 127 frontend tests and production build pass. Actual GLB raycasts verify the exposed front door and slate roof coverage including the ridge; existing tests cover every building footprint and route, parking/event bays and blast-fragment pavement clearance with the new model.
+- Isolated port 8847 browser inspection covered front/rear orbit and close zoom, then native coordinate clicks selected Saint Agnes and The Mariner (`bar` → `room`) without a gameplay command. Evidence: `docs/qa/city3d-20260913/mariner-lodging.png`, `mariner-rear.png`, `mariner-metrics.json`. Local idle view: 145 FPS, 7.1ms p95, 141 draws, 545,216 triangles, three actors/28 buildings, no captured warnings/errors. Main save untouched.
+- This removes one repeated silhouette. Other repeated commercial buildings, oversize pavement, stronger district character, richer event choreography and broader performance/art acceptance remain unfinished.
+
 ### Unused parcels as fenced yards (2026-09-13)
 
 - The two unused cells in the current 6×5 grid now render locally authored Blender vacant yards: textured earth/gravel, silvered timber boards with irregular tops and gaps, posts/rails/fixings, and sparse folded weeds. The material groups are instanced across unused cells. Kerb stones, drains and manhole treatment now cover these parcels as well as occupied blocks.

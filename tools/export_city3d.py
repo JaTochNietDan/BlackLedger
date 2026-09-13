@@ -758,6 +758,73 @@ def undertaker():
         x,y,z=ob.location;ob.location=(-2-y,-3.8+x,z+.015);ob.rotation_euler.z+=math.pi/2
 
 
+def mariner():
+    wall=material('mariner salt worn brick',(.39,.24,.18));brick(wall,61)
+    stone=material('mariner limestone',(.61,.58,.48))
+    timber=material('mariner painted timber',(.12,.20,.18))
+    iron=material('mariner blackened iron',(.095,.115,.11),.45)
+    slate=material('mariner weathered slate',(.19,.23,.25));brick(slate,62)
+    glass=material('mariner sash glass',(.13,.21,.23),.2)
+    warm=material('mariner occupied room',(.68,.44,.20),0,.25)
+    brass=material('mariner door brass',(.48,.36,.16),.6)
+    box('lodging house brick',(0,0,4.725),(12,10,9.45),wall)
+    box('lodging house foundation',(0,0,.22),(12.25,10.25,.44),stone)
+    for z in (3.12,6.27,9.42):box('lodging house string course',(0,0,z),(12.3,10.3,.15),stone)
+    for axis in (0,1):
+        for side in (-1,1):
+            depth=5 if axis==0 else 6
+            positions=(-4.3,-2.0,2.0,4.3) if axis==0 else (-3.4,0,3.4)
+            def facade(name,along,z,dims,mat):
+                xyz=(along,side*(depth+.06),z) if axis==0 else (side*(depth+.06),along,z)
+                ds=dims if axis==0 else (dims[1],dims[0],dims[2])
+                return box(name,xyz,ds,mat)
+            for floor in range(3):
+                for i,x in enumerate(positions):
+                    z=1.75+floor*3.15
+                    facade('sash stone lintel',x,z+1,(1.60,.3,.2),stone)
+                    facade('sash painted frame',x,z,(1.35,.22,1.85),timber)
+                    facade('sash pane',x,z,(1.10,.27,1.59),warm if (i+floor+axis+side)%6==0 else glass)
+                    facade('sash central rail',x,z,(1.12,.31,.065),stone)
+                    facade('sash upright',x,z,(.055,.32,1.6),stone)
+                    facade('sash sill',x,z-.96,(1.62,.42,.14),stone)
+    # One public entrance and a shallow shelter facing the frontage.
+    box('mariner oak door',(0,5.2,1.25),(1.6,.18,2.5),timber,.02)
+    for side in (-1,1):
+        box('door jamb',(side*.94,5.15,1.42),(.22,.32,2.84),stone)
+        box('door raised panel',(side*.38,5.305,.7),(.57,.035,.88),timber,.025)
+        box('door glazing',(side*.38,5.31,1.72),(.56,.04,.84),glass)
+        box('shelter post',(side*1.38,6.4,1.40),(.13,.13,2.8),timber)
+        beam('shelter bracket',(side*1.38,6.4,2.2),(side*.90,6.4,2.75),.09,timber)
+    box('door pull',(.20,5.355,1.24),(.045,.055,.28),brass,.012)
+    box('entry transom',(0,5.17,2.73),(1.65,.26,.22),stone)
+    box('entry shelter',(0,5.78,2.88),(3.2,1.65,.19),slate)
+    box('lodging sign board',(0,5.21,3.50),(5.5,.22,.67),timber)
+    anchor=bpy.data.objects.new('sign-anchor',None);bpy.context.collection.objects.link(anchor);anchor.location=(0,5.34,3.5);anchor.scale=(.71,1,.52)
+    # Closed brick gables and two sloping slate planes, with a proper ridge.
+    for side in (-1,1):
+        mesh=bpy.data.meshes.new('mariner gable')
+        mesh.from_pydata([(-6,side*5.02,9.45),(6,side*5.02,9.45),(0,side*5.02,11.63)],[],[(0,1,2) if side<0 else (2,1,0)])
+        mesh.materials.append(wall);uv=mesh.uv_layers.new(name='masonry scale')
+        for i,loop in enumerate(mesh.loops):
+            co=mesh.vertices[loop.vertex_index].co;uv.data[i].uv=(co.x/2.5,co.z/2.5)
+        ob=bpy.data.objects.new('mariner brick gable',mesh);bpy.context.collection.objects.link(ob)
+        roof=box('mariner pitched slate',(side*3.1,0,10.60),(6.7,10.7,.15),slate)
+        roof.rotation_euler.y=side*math.radians(20)
+        cylinder('gable vent surround',(0,side*5.08,10.35),.43,.12,stone,(math.pi/2,0,0),24)
+        cylinder('gable vent dark',(0,side*5.16,10.35),.32,.06,iron,(math.pi/2,0,0),24)
+        for i in range(-2,3):box('gable vent louvre',(0,side*5.20,10.35+i*.10),(.48,.06,.035),timber)
+    box('slate ridge cap',(0,0,11.78),(.25,10.8,.18),slate,.06)
+    box('lodging chimney',(2,-2,11.13),(1.1,1.05,2.6),wall)
+    box('chimney cap',(2,-2,12.47),(1.35,1.3,.16),stone)
+    for x in (1.75,2.25):cylinder('chimney clay pot',(x,-2,12.70),.16,.34,wall,vertices=16)
+    for level in (3.15,6.3):
+        box('rear escape landing',(0,-5.75,level),(3.4,1.4,.12),iron)
+        for x in (-1.6,1.6):box('rear escape upright',(x,-6.4,level+.5),(.055,.055,1),iron)
+        box('rear escape handrail',(0,-6.4,level+1),(3.3,.055,.055),iron)
+        for x in range(12):box('rear escape baluster',(-1.5+x*.27,-6.4,level+.5),(.025,.025,1),iron)
+        for step in range(9):box('rear escape stair',(-1.2+step*.3,-5.75,level+step*.35),(.37,.9,.08),iron)
+
+
 def vacant_lot():
     gravel=material('vacant yard earth and gravel',(.30,.28,.22));gravel_texture(gravel)
     timber=material('vacant yard silvered timber',(.39,.37,.30))
@@ -956,6 +1023,7 @@ for name in ('person','woman'):
 clear();undertaker();manifest['undertaker']=export('undertaker')
 clear();revolver();manifest['revolver']=export('revolver')
 clear();blast_fragment();manifest['blast-fragment']=export('blast-fragment')
+clear();mariner();manifest['mariner']=export('mariner')
 clear();vacant_lot();manifest['vacant-lot']=export('vacant-lot')
 clear();street_bed();manifest['street-bed']=export('street-bed')
 clear();streetside();manifest['streetside']=export('streetside')

@@ -1,0 +1,17 @@
+{
+  "fixture": "Isolated 8847, camera orbit/zoom only; canvas clicks selected bar then room without a gameplay command",
+  "selected": [
+    "room"
+  ],
+  "metrics": {
+    "fps": 145,
+    "p95ms": 7.1,
+    "drawCalls": 141,
+    "triangles": 545216,
+    "actors": 3,
+    "buildings": 28,
+    "geometries": 234,
+    "textures": 88
+  },
+  "logs": []
+}
