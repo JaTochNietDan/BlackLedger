@@ -1,0 +1,131 @@
+{
+  "buildingClick": {
+    "label": "The Mariner",
+    "value": "room"
+  },
+  "pedestrianMetrics": {
+    "fps": 145,
+    "p95ms": 8,
+    "drawCalls": 73,
+    "triangles": 507850,
+    "actors": 8,
+    "buildings": 28,
+    "geometries": 228,
+    "textures": 125
+  },
+  "drive": {
+    "revision": 4,
+    "minute": 1350,
+    "playbackRate": 1,
+    "headlightPools": 2,
+    "followingPlayer": true,
+    "cutawayBuildings": [],
+    "weather": {
+      "kind": "clear",
+      "wet": 0,
+      "rainVisible": false,
+      "rainClock": 0
+    },
+    "camera": {
+      "zoom": 14.77459901371144,
+      "x": 341.60327088337976,
+      "z": -116.52476968226574,
+      "targetX": 161.60327088337974,
+      "targetZ": 123.47523031773443
+    },
+    "actors": [
+      {
+        "id": "player",
+        "model": "hudson",
+        "x": 161.60327088337974,
+        "z": 123.47523031773443,
+        "y": -0.115,
+        "wheelPhase": 6.056003862736453,
+        "steering": -0.41215383766767716,
+        "lampsOn": true,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": -0.46638682363148504
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": -0.36869446193933947
+          }
+        ]
+      }
+    ],
+    "waiting": [],
+    "effects": []
+  },
+  "arrival": {
+    "revision": 4,
+    "minute": 1350,
+    "progress": 1,
+    "elapsedMs": 5034,
+    "reducedMotion": false
+  },
+  "final": {
+    "revision": 4,
+    "minute": 1350,
+    "playbackRate": 1,
+    "headlightPools": 0,
+    "followingPlayer": true,
+    "cutawayBuildings": [],
+    "weather": {
+      "kind": "clear",
+      "wet": 0,
+      "rainVisible": false,
+      "rainClock": 0
+    },
+    "camera": {
+      "zoom": 14.77459901371144,
+      "x": 356,
+      "z": -139.35000000000022,
+      "targetX": 176,
+      "targetZ": 100.65
+    },
+    "actors": [
+      {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 185.6,
+        "z": 112,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      },
+      {
+        "id": "player",
+        "model": "person",
+        "x": 176,
+        "z": 100.65,
+        "y": 0.2
+      }
+    ],
+    "waiting": [],
+    "effects": []
+  },
+  "metrics": {
+    "fps": 145,
+    "p95ms": 7.1,
+    "drawCalls": 83,
+    "triangles": 509024,
+    "actors": 2,
+    "buildings": 28,
+    "geometries": 225,
+    "textures": 123
+  },
+  "logs": []
+}

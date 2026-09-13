@@ -234,3 +234,7 @@ Male pedestrian cast silhouettes now select authored full/receding hair, bald
 scalp, fedora or cloth-cap groups. The choice follows portrait presentation;
 headwear is not a newly owned inventory item. A changed appearance key refreshes
 an existing pedestrian even when its base model remains the same.
+
+City selection uses parcel-corner marks. The player's ground marker adapts to
+zoom, vehicle size and heading; it represents presentation location only and
+changes no selection, collision envelope or simulation state.

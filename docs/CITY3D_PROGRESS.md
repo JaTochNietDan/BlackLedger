@@ -64,6 +64,14 @@ These are staged fixture saves, not earned campaign progress.
 
 ## Continue next
 
+### Quieter parcel and player markers — September 13
+
+- Replaced the large building-selection circle with muted brass parcel-corner marks, rendered in one eight-instance draw. The marks stay within the parcel pavement and no longer cut across the architectural silhouette as a broad loop.
+- The pedestrian marker shrinks at close zoom and retains a bounded minimum screen presence at wider views. While driving it scales to the vehicle envelope and rotates with its heading; on arrival it returns to the pedestrian size. Both marker materials avoid tone-mapping washout and depth writes.
+- All 141 frontend tests and production build pass. Browser QA on isolated 8858 verified whole-city/close/building-scale readability and a native canvas click selecting The Mariner (`room`). On isolated 8857, drove Thorne & Sons → Ruttledge & Vance → Thorne & Sons and captured the Hudson marker through a junction turn. Final arrival was revision 4/minute 1350, 5,034ms presentation time, progress 1. Main save untouched.
+- Evidence: `docs/qa/city3d-20260913/player-marker-close.png`, `parcel-selection.png`, `vehicle-marker.png`, `city-markers.json`. Final night view sampled 145 FPS / 7.1ms p95, 83 draws and 509,024 triangles, two actors/28 buildings, with no captured warnings/errors. This is local browser evidence, not broad hardware or accessibility acceptance. Existing bundle-size warning remains.
+- The city still needs denser, less repetitive architecture and higher-quality character/event art. These marker changes improve readability; they do not establish final visual acceptance.
+
 ### Authored hair and headwear silhouettes — September 13
 
 - The Blender male model now contains separately selectable side-parted hair, receding hair, fedora and cloth-cap groups. Bald portraits hide both hair groups. Crown surfaces have subtle authored combing relief; headwear selection is mutually exclusive. Fixed named cast retain their previous fedora presentation; generated portrait choices use their corresponding hair/headwear direction.

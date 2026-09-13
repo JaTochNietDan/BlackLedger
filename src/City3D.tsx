@@ -329,17 +329,29 @@ export function City3D(props: Props) {
         bulbs.setMatrixAt(n++, tmp.matrix);
       }
     scene.add(poles, bulbs);
-    const selection = new THREE.Mesh(
-      new THREE.RingGeometry(9.5, 9.8, 64),
-      new THREE.MeshBasicMaterial({color: 0xf3ce83, side: THREE.DoubleSide, depthWrite: false}),
-    );
-    selection.rotation.x = -Math.PI / 2;
-    selection.position.y = 0.22;
-    scene.add(selection);
+    // Mark parcel corners without drawing a broad circle through the architecture.
+    const selectionMaterial = new THREE.MeshBasicMaterial({color: 0xb99452,
+      transparent: true, opacity: .88, depthWrite: false, toneMapped: false});
+    const cornerGeometry = new THREE.BoxGeometry(2.25, .008, .09);
+    const selection = new THREE.InstancedMesh(cornerGeometry, selectionMaterial, 8);
+    const markerTransform = new THREE.Object3D();
+    let markerIndex = 0;
+    for (const x of [-1, 1]) for (const z of [-1, 1]) {
+      markerTransform.rotation.y = 0;
+      markerTransform.position.set(x * (9.7 - 1.125), 0, z * 9.7);
+      markerTransform.updateMatrix(); selection.setMatrixAt(markerIndex++, markerTransform.matrix);
+      markerTransform.rotation.y = Math.PI / 2;
+      markerTransform.position.set(x * 9.7, 0, z * (9.7 - 1.125));
+      markerTransform.updateMatrix(); selection.setMatrixAt(markerIndex++, markerTransform.matrix);
+    }
+    selection.instanceMatrix.needsUpdate = true;
+    selection.position.y = .22; scene.add(selection);
     const playerRing = new THREE.Mesh(
-      new THREE.RingGeometry(1, 1.25, 32),
-      new THREE.MeshBasicMaterial({color: 0xffd885, side: THREE.DoubleSide}),
+      new THREE.RingGeometry(.92, 1, 48),
+      new THREE.MeshBasicMaterial({color: 0xd0bb87, side: THREE.DoubleSide,
+        transparent: true, opacity: .9, depthWrite: false, toneMapped: false}),
     );
+    playerRing.rotation.order = 'YXZ';
     playerRing.rotation.x = -Math.PI / 2;
     scene.add(playerRing);
     const models = new Map<string, THREE.Group>();
@@ -1059,7 +1071,17 @@ export function City3D(props: Props) {
           }
           if (a.walking && moved && motion)
             a.object.position.y += 0.05 + Math.abs(Math.sin(a.phase)) * 0.015;
-          if (id === 'player') playerRing.position.set(at.x, isPedestrian(a.model) ? surfaceHeight(at) + 0.06 : vehicleRootHeight(at) + 0.04, at.z);
+          if (id === 'player') {
+            playerRing.position.set(at.x, isPedestrian(a.model) ? surfaceHeight(at) + .045 : vehicleRootHeight(at) + .04, at.z);
+            const pixel = (camera.top - camera.bottom) / (Math.max(1, element.clientHeight) * camera.zoom);
+            const radius = Math.max(.58, Math.min(2.2, pixel * 7));
+            if (isPedestrian(a.model)) playerRing.scale.set(radius, radius, 1);
+            else {
+              const size = trafficSize(a.model);
+              playerRing.scale.set(Math.max(radius, size.width / 2 + .2), Math.max(radius, size.length / 2 + .25), 1);
+            }
+            playerRing.rotation.y = at.heading;
+          }
           if (id !== 'player' && a.end === 1 && placement.progress >= 1) {
             a.arrived = true;
             a.object.visible = false;
