@@ -64,6 +64,13 @@ These are staged fixture saves, not earned campaign progress.
 
 ## Continue next
 
+### Facade-anchored blast and rising smoke (2026-09-13)
+
+- Explosions now originate at the target model's actual exposed front bound instead of its pedestrian arrival point. The Monarch browser replay reports origin (112,0.25,72.24), 3.59m nearer the building than the former curb arrival point. A short light pulse/fire burst gives way to slower rising smoke; billows use a locally generated irregular alpha texture and fade while expanding. No new gameplay consequences or persistent fire are inferred.
+- All 111 frontend tests and production build passed. New tests cover bounded visible particles, finite trajectories, fire ending before smoke, three-second completion, soft texture edges and late opacity fade. Existing event/traffic/asset tests remain passing.
+- Isolated port 8843 browser replay inspected close-range fire, rising smoke and final fade, then verified an empty effect list and no captured console errors. Evidence: `docs/qa/city3d-20260913/blast-fire-origin.png`, `blast-rising-smoke.png`, `blast-smoke-fade.png`. Replay left the saved clock at noon. Smoke uses the existing 32-instance effect budget and one additional shared texture.
+- Debris, richer facade damage, volumetric smoke and broader multi-event performance acceptance remain unfinished. This is an improvement to origin and timing, not final explosion-quality acceptance or a claim that every visual effect is complete.
+
 ### Cancellable explosion and siren audio (2026-09-13)
 
 - Theatre now releases its sound when the cue changes or the component unmounts. Scene sounds own their active and future scheduled voices; explosion noise/thump, siren pulses, legacy gunfire and knocks stop and disconnect on dismissal. Natural endings release their graphs, and muting cancels every active scene without replaying them on unmute. Partial construction failures cancel voices that already started.

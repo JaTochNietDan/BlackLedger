@@ -25,6 +25,7 @@ import {StreetTraffic, trafficSize} from './city3dTraffic';
 import {pedestrianModel, isPedestrian} from './city3dCast';
 import {playCityGunshot, soundOn} from './sound';
 import {cameraCommand, screenPan} from './city3dControls';
+import {blastParticle, blastLight, blastOpacity, billowAlpha} from './city3dBlast';
 
 type Props = {
   state: Snapshot;
@@ -330,6 +331,17 @@ export function City3D(props: Props) {
     particleContext.fillRect(0, 0, 64, 64);
     const particleTexture = new THREE.CanvasTexture(particleCanvas);
     textures.push(particleTexture);
+    const billowCanvas = document.createElement('canvas');
+    billowCanvas.width = billowCanvas.height = 128;
+    const billowContext = billowCanvas.getContext('2d')!;
+    const billowImage = billowContext.createImageData(128, 128);
+    for (let y = 0; y < 128; y++) for (let x = 0; x < 128; x++) {
+      const index = (y * 128 + x) * 4;
+      billowImage.data.set([255, 255, 255, Math.round(255 * billowAlpha(x / 63.5 - 1, y / 63.5 - 1))], index);
+    }
+    billowContext.putImageData(billowImage, 0, 0);
+    const billowTexture = new THREE.CanvasTexture(billowCanvas);
+    textures.push(billowTexture);
     const contactGeometry = new THREE.PlaneGeometry(1, 1);
     const contactMaterial = new THREE.MeshBasicMaterial({
       color: 0x080b09, map: particleTexture, transparent: true,
@@ -586,6 +598,7 @@ export function City3D(props: Props) {
           buildings.set(lot.id, model);
           const label = makeLabel(latest.current.state.locations.find(p => p.id === lot.id)!.name);
           const box = new THREE.Box3().setFromObject(model, true);
+          model.userData.blastOrigin = {x: lot.x, y: 0.25, z: box.min.z - 0.15};
           label.position.set(lot.x, box.max.y + 2, lot.z);
           scene.add(label);
           const anchor = model.getObjectByName('sign-anchor');
@@ -720,7 +733,7 @@ export function City3D(props: Props) {
             effectGeometry,
             new THREE.MeshBasicMaterial({
               color: 0xffffff,
-              map: particleTexture,
+              map: cue.kind === 'explosion' ? billowTexture : particleTexture,
               transparent: true,
               opacity: 0.85,
               depthWrite: false,
@@ -983,6 +996,8 @@ export function City3D(props: Props) {
           }
           const at = e.slot?.root || entrance(lot);
           const blast = e.cue.kind === 'explosion';
+          const blastOrigin = buildings.get(lot.id)?.userData.blastOrigin;
+          if (blast && blastOrigin) e.light.position.set(blastOrigin.x, 2, blastOrigin.z);
           const shot = e.cue.kind === 'gunfight';
           const firing = gunfightPose(t * 3);
           e.audio?.update(t * 3, soundOn());
@@ -1002,30 +1017,14 @@ export function City3D(props: Props) {
           const police = ['raid', 'arrest'].includes(e.cue.kind);
           for (let j = 0; j < 32; j++) {
             const a = j * 2.399;
-            const smoke = blast && t > 0.12 + (j % 8) * 0.055;
-            const r = blast
-              ? Math.sin((Math.min(1, t * 2) * Math.PI) / 2) * (2 + (j % 5))
-              : shot
-                ? 0.35
-                : 1.8;
-            tmp.position.set(
-              at.x + Math.cos(a) * r,
-              1 + (smoke ? t * 9 : Math.sin(a) * r * 0.4),
-              at.z + Math.sin(a) * r,
-            );
-            tmp.scale.setScalar(
-              blast
-                ? smoke
-                  ? 3.5 * t + 1.3
-                  : (1 - t) * 4.1
-                : shot
-                  ? j < 3 && Math.floor(t * 22) % 3 === 0
-                    ? 0.45
-                    : 0.001
-                  : casualty
-                    ? 0.001
-                    : 0.25,
-            );
+            const r = shot ? 0.35 : 1.8;
+            tmp.position.set(at.x + Math.cos(a) * r, 1 + Math.sin(a) * r * 0.4, at.z + Math.sin(a) * r);
+            tmp.scale.setScalar(casualty || shot ? 0.001 : 0.25);
+            const burst = blast ? blastParticle(j, t * 3) : null;
+            if (burst && blastOrigin) {
+              tmp.position.set(blastOrigin.x + burst.x, blastOrigin.y + burst.y, blastOrigin.z + burst.z);
+              tmp.scale.setScalar(Math.max(.001, burst.size));
+            }
             if (shot) {
               tmp.position.copy(muzzlePosition);
               const smoke = j === 1 && firing.smoke > 0;
@@ -1043,7 +1042,7 @@ export function City3D(props: Props) {
             e.mesh.setColorAt(
               j,
               new THREE.Color(
-                smoke || (shot && j === 1)
+                burst ? burst.color : (shot && j === 1)
                   ? 0x55534e
                   : police
                     ? 0xde3426
@@ -1057,9 +1056,9 @@ export function City3D(props: Props) {
           }
           e.mesh.instanceMatrix.needsUpdate = true;
           if (e.mesh.instanceColor) e.mesh.instanceColor.needsUpdate = true;
-          (e.mesh.material as THREE.MeshBasicMaterial).opacity = 1 - t;
+          (e.mesh.material as THREE.MeshBasicMaterial).opacity = blast ? blastOpacity(t * 3) : 1 - t;
           e.light.intensity = blast
-            ? 100 * (1 - t) ** 3
+            ? blastLight(t * 3)
             : shot && firing.flash
               ? 30
               : police
@@ -1101,6 +1100,7 @@ export function City3D(props: Props) {
           effects: effects.map(e => ({
             id: e.cue.id, kind: e.cue.kind, target: e.cue.target,
             staged: !e.extra || e.extra.visible, x: e.slot?.root.x, z: e.slot?.root.z,
+            blastOrigin: e.cue.kind === 'explosion' ? buildings.get(e.cue.target)?.userData.blastOrigin : undefined,
             arm: e.gunArm?.rotation.x,
             audioShots: e.audio?.started,
             fall: e.cue.kind === 'killing' ? e.extra?.rotation.z : undefined,
