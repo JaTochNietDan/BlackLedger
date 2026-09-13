@@ -161,8 +161,9 @@ explosions also use this path. Early accidents and older snapshots without confi
 retain the exterior burst. Models without window anchors still need authored emitters.
 This uses the committed explosion cue; it adds no damage, ignition or physics rules.
 
-Explosion debris is cosmetic: instanced masonry fragments settle on the facade
-pavement and disappear with playback. They avoid visible actor footprints and
+Explosion debris is cosmetic: confirmed internal blasts eject instanced masonry
+from unobstructed authored windows, clear projecting canopies and settle on the
+facade pavement. Other explosions retain exterior debris. Fragments disappear with playback. They avoid visible actor footprints and
 introduce no collision, inventory, obstruction or damage rule in the simulation.
 
 Rendered explosions now own their onset audio, even when a higher-gravity

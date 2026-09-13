@@ -70,6 +70,13 @@ These are staged fixture saves, not earned campaign progress.
 - Production build passes. Fresh isolated port 8862/killing fixture browser evidence: at 500ms a casualty effect was staged and all five spoiler-bearing panels were absent. Once effects were empty, the result strip, headline, caption, cast and scene paper appeared. Replaying the same cue hid spoilers again; Skip cleared effects and restored the headline. Browser logs were clear. Evidence: `news-timing.json`. This verifies scene timing through the actual UI, not a timer-only unit test.
 - Re-read the latest objective at `/Users/jatochnietdan/.codex/attachments/4a3692d6-f725-4a26-b1a0-9d3131b50b49/goal-objective.md`; it adds layered contextual voices and vehicle/action sound. Those audio assets/timelines, full police choreography, drive-bys, persistent building fire/brigade response, remaining interiors and final visual quality remain unfinished. No main-save access or mutation.
 
+### Window-ejected debris and clear exit corridors — September 13
+
+- Internal explosions now eject the existing Blender masonry fragments from window height with a fast outward impulse, gravity-driven fall and settled orientation. Exterior accidents retain their previous pavement debris. Rendering retains actor-avoidance checks and surface support.
+- Actual exported-geometry tests found an outer casino window blocked by a neon blade. Window selection now checks three outward rays across a 1.1m exit corridor and excludes blocked emitters. It falls back to ground-floor anchors for single-storey models. No per-frame architectural raycasts were added.
+- Production build and 171 frontend tests pass. New tests sample all 12 fragment trajectories against all ten exported building models, checking center-path facade/canopy clearance and settling. These are center-path checks, not a full swept rigid-body proof. Browser isolated 8867 expanded preview was reviewed and captured in `window-debris.png/json`; local HUD 145 FPS/327 draws. Main campaign untouched; Mac sleep prevention remains running.
+- Fragments are still small cosmetic masonry and fade with playback. Shattered glazing, persistent rubble/cleanup, richer impact audio, response travel and broader production acceptance remain unfinished.
+
 ### Internally originated window bursts — September 13
 
 - Confirmed building detonations now place their light source behind the front glazing. The transient fire/smoke particles begin 45cm inside four authored upper windows, escape outward over 180ms, then billow upward. They share those window positions with persistent fire. Existing cosmetic pavement debris remains separate and still needs replacement with window-ejected glass/masonry choreography.

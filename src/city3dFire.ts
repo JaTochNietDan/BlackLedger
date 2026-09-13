@@ -52,3 +52,16 @@ export class CityFire {
  inspect(){return {clock:this.clock,scenes:[...this.entries].map(([id,e])=>({id,vents:e.vents.map(v=>({x:v.x,y:v.y,z:v.z})),particles:e.mesh.count}))};}
  dispose(){for(const e of this.entries.values())e.mesh.dispose();this.entries.clear();this.root.clear();this.geometry.dispose();this.material.dispose();}
 }
+
+/** Keep the exit corridor clear of projecting signs and facade ornament. */
+export function clearBlastWindows(building:THREE.Group){
+ building.updateMatrixWorld(true);
+ const vents:THREE.Object3D[]=[];building.traverse(o=>{if(o.name.startsWith('fire-window-'))vents.push(o);});
+ const upper=vents.filter(o=>o.name.startsWith('fire-window-1-'));
+ return (upper.length?upper:vents).map(o=>o.getWorldPosition(new THREE.Vector3())).filter(p=>{
+  for(const x of [-.55,0,.55]){
+   const ray=new THREE.Raycaster(p.clone().add(new THREE.Vector3(x,0,-.06)),new THREE.Vector3(0,0,-1),0,3.4);
+   if(ray.intersectObject(building,true).length)return false;
+  }return true;
+ }).slice(0,4);
+}

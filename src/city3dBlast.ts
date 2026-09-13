@@ -72,3 +72,18 @@ export function windowBurst(index:number,seconds:number,window:{x:number;y:numbe
 export function internalDetonation(cue:{id:string;target:string;minute?:number},fires:readonly {target:string;minute:number}[]){
  return cue.id.startsWith('preview:')||fires.some(f=>f.target===cue.target&&f.minute===cue.minute);
 }
+
+/** Window-ejected masonry: fast outward impulse clears the canopy before falling. */
+export function windowDebris(index:number,seconds:number,window:{x:number;y:number;z:number},ground:number,count=4){
+ const delay=.06+(index%3)*.025,age=Math.max(0,seconds-delay);
+ const height=Math.max(0,window.y-ground),up=.4,gravity=9.8;
+ const duration=(up+Math.sqrt(up*up+2*gravity*height))/gravity;
+ const u=Math.min(1,age/duration),lane=Math.floor(index/count)-(Math.ceil(12/count)-1)/2;
+ const settle=1-smooth(.8,1,u);
+ return {
+  x:window.x+lane*(.22+.08*u),z:window.z-.08-(2.8+(index%3)*.15)*(2*u-u*u),
+  height:Math.max(0,height+up*Math.min(age,duration)-gravity*Math.min(age,duration)**2/2),
+  rx:age*(5+index%3)*settle,ry:index*1.7+u*3,rz:settle?age*(index%2?-4:4)*settle:0,
+  scale:seconds<delay||seconds>=3?0:.85+(index%3)*.1,
+ };
+}

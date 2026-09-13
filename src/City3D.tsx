@@ -1,5 +1,5 @@
 import {CitySuppression} from './city3dSuppression';
-import {CityFire} from './city3dFire';
+import {CityFire, clearBlastWindows} from './city3dFire';
 import {CityAftermath} from './city3dAftermath';
 import {previewScenes, previewScene, type PreviewScene} from './city3dPreview';
 import {frameScene, impactPulse, renderImpact} from './city3dFraming';
@@ -38,7 +38,7 @@ import {StreetTraffic, trafficSize, trafficModel, advanceWheel, wheelSteering, a
 import {pedestrianModel, isPedestrian} from './city3dCast';
 import {playCityGunshot, playMoment, soundOn} from './sound';
 import {cameraCommand, screenPan} from './city3dControls';
-import {blastParticle, windowBurst, internalDetonation, blastLight, blastOpacity, billowAlpha, debrisPose, fragmentBlocked} from './city3dBlast';
+import {blastParticle, windowBurst, internalDetonation, windowDebris, blastLight, blastOpacity, billowAlpha, debrisPose, fragmentBlocked} from './city3dBlast';
 
 type Props = {
   state: Snapshot;
@@ -781,8 +781,7 @@ export function City3D(props: Props) {
           const box = new THREE.Box3().setFromObject(model, true);
           model.userData.sightBounds = box.clone();
           model.userData.debrisOrigin = {x: lot.x, y: 0.25, z: box.min.z - 0.15};
-          const blastWindows: THREE.Vector3[]=[];
-          model.traverse(o=>{if(o.name.startsWith('fire-window-1-'))blastWindows.push(o.getWorldPosition(new THREE.Vector3()));});
+          const blastWindows=clearBlastWindows(model);
           model.userData.blastWindows=blastWindows.slice(0,4);
           model.userData.blastOrigin = blastWindows.length
             ? {x:lot.x,y:blastWindows[0].y,z:blastWindows[0].z+.45}
@@ -1362,8 +1361,10 @@ export function City3D(props: Props) {
           }
           if (e.debris && debrisOrigin) {
             for (let j = 0; j < 12; j++) {
-              const fragment = debrisPose(j, t * 3);
-              const x = debrisOrigin.x + fragment.x, z = debrisOrigin.z + fragment.z;
+              const window=blastWindows[j%blastWindows.length];
+              const airborne=window?windowDebris(j,t*3,window,surfaceHeight({x:window.x,z:window.z-3}),blastWindows.length) : null;
+              const fragment = airborne || debrisPose(j, t * 3);
+              const x = airborne?fragment.x:debrisOrigin.x+fragment.x, z = airborne?fragment.z:debrisOrigin.z+fragment.z;
               let blocked = false;
               for (const actor of actors.values()) {
                 if (!actor.object.visible) continue;

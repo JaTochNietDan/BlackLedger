@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as THREE from 'three';
-import {CityFire} from '../.runtime/frontend-test/city3dFire.js';
+import {CityFire,clearBlastWindows} from '../.runtime/frontend-test/city3dFire.js';
 import {readFileSync} from 'node:fs';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 
@@ -29,6 +29,29 @@ test('exported fire anchors are on the authored front windows',async()=>{
    assert.ok(v.y>1&&v.z<0);
    const ray=new THREE.Raycaster(v,new THREE.Vector3(0,0,1),0,.1);
    assert.ok(ray.intersectObject(model,true).some(h=>/glass|windows/.test(h.object.material.name)),`${name} anchor lacks window immediately behind it`);
+  }
+ }
+});
+
+test('window debris clears exported facades and canopies before settling',async()=>{
+ const {windowDebris}=await import('../.runtime/frontend-test/city3dBlast.js');
+ for(const name of ['tavern','monarch','tenement','shop','civic','casino','warehouse','bluehour','goldenlily','papermoon']){
+  const b=readFileSync(new URL(`../public/art/models/${name}.glb`,import.meta.url)),loader=new GLTFLoader();
+  loader.register(p=>({name:'debris-geometry',loadMaterial(){return Promise.resolve(new THREE.MeshBasicMaterial({side:THREE.DoubleSide}));}}));
+  const model=(await loader.parseAsync(b.buffer.slice(b.byteOffset,b.byteOffset+b.byteLength),'')).scene;model.updateMatrixWorld(true);
+  const windows=clearBlastWindows(model);
+  for(let i=0;i<12;i++){
+   const window=windows[i%windows.length];assert.ok(window,name);
+   let prev;
+   for(let t=0;t<1.8;t+=.01){
+    const p=windowDebris(i,t,window,0,windows.length),point=new THREE.Vector3(p.x,p.height+.05,p.z);
+    if(prev){const step=point.clone().sub(prev);if(step.length()>1e-6){
+     const ray=new THREE.Raycaster(prev,step.clone().normalize(),0,step.length());
+     const hits=ray.intersectObject(model,true);assert.equal(hits.length,0,`${name} fragment ${i} collides at ${t}: ${hits[0]?.object.name} ${JSON.stringify(hits[0]?.point)}`);
+    }}prev=point;
+    assert.ok(p.z<window.z&&p.height>=0);
+   }
+   const settled=windowDebris(i,2,window,0,windows.length);assert.ok(settled.height<1e-10);assert.equal(settled.rx,0);assert.equal(settled.rz,0);
   }
  }
 });
