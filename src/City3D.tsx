@@ -450,6 +450,8 @@ export function City3D(props: Props) {
         a = undefined;
       }
       if (!a) a = addActor(id, model);
+      // Arrivals hide their outdoor actor; a later journey must show it again.
+      a.object.visible = true;
       a.points = points;
       a.start = start;
       a.end = end;
