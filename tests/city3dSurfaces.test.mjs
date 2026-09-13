@@ -248,3 +248,20 @@ test('The Mariner has a distinct lodging model with a front door and closed gabl
  }
  const sign=model.getObjectByName('sign-anchor');assert.ok(sign);assert.ok(sign.position.z< -5.2);
 });
+
+test('pedestrian suits export woven colour normal and roughness maps on the intact rigs',()=>{
+ for(const name of ['person','woman']){
+  const bytes=readFileSync(new URL(`../public/art/models/${name}.glb`,import.meta.url));
+  const length=bytes.readUInt32LE(12),json=JSON.parse(bytes.subarray(20,20+length).toString());
+  const index=json.materials.findIndex(m=>m.name==='wool suit'),suit=json.materials[index];
+  assert.ok(suit.pbrMetallicRoughness.baseColorTexture&&suit.normalTexture&&suit.pbrMetallicRoughness.metallicRoughnessTexture);
+  let pieces=0;
+  for(const mesh of json.meshes)for(const part of mesh.primitives)if(part.material===index){
+   const uv=json.accessors[part.attributes.TEXCOORD_0];assert.ok(uv,'coat pieces need weave UVs');pieces++;
+  }
+  assert.ok(pieces>=5,'torso, sleeves and trousers retain woven surfaces');
+  for(const joint of ['leg-1','leg1','knee-1','knee1','arm-1','arm1'])assert.ok(json.nodes.some(n=>n.name===joint));
+  assert.ok(json.materials.some(m=>m.name==='muted eye whites'));
+  assert.ok(json.materials.some(m=>m.name==='facial detail'));
+ }
+});

@@ -170,7 +170,7 @@ export function City3D(props: Props) {
     controls.minPolarAngle = 0.28;
     controls.maxPolarAngle = Math.PI * 0.44;
     controls.minZoom = 0.6;
-    controls.maxZoom = 12;
+    controls.maxZoom = 32;
     controls.screenSpacePanning = false;
     controls.mouseButtons = {
       LEFT: THREE.MOUSE.ROTATE,
@@ -493,7 +493,7 @@ export function City3D(props: Props) {
         reset();
       }
       if (command.startsWith('pan-')) {
-        const pan = screenPan(camera.position, controls.target, command);
+        const pan = screenPan(camera.position, controls.target, command, 8.25 / camera.zoom);
         const move = new THREE.Vector3(pan.x, 0, pan.z);
         controls.target.add(move);
         camera.position.add(move);

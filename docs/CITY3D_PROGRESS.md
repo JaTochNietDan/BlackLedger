@@ -64,6 +64,15 @@ These are staged fixture saves, not earned campaign progress.
 
 ## Continue next
 
+
+### Pedestrian fabric and close inspection — September 13
+
+- Both Blender pedestrian models now embed woven wool colour, normal and roughness maps, with a consistent 20cm UV tile across the articulated clothing. Restrained eyes, brows and a mouth seam add facial definition. Exported rest and walking bounds remain exactly unchanged; the pair adds about 112KB.
+- Maximum orthographic zoom increases from 12 to 32. Keyboard pan scales inversely with zoom, retaining the original 5m step at initial zoom and allowing a measured 0.2578125m step at maximum zoom. Manual pan releases player following as before.
+- All 135 frontend tests and production build pass. The shooter geometry test now uses the same texture-free material loading approach as other Node geometry tests; actual embedded textures were inspected in the browser. The existing bundle-size warning remains.
+- Browser evidence on isolated port 8847: `docs/qa/city3d-20260913/pedestrian-wool.png` and `pedestrian-wool.json`. Close view sampled 145 FPS, 8.2ms p95, 53 draws and 509,074 triangles with three actors/28 buildings; no captured warnings/errors. No gameplay command or main save access. This is a local idle-view sample, not a dense animation or hardware acceptance benchmark.
+- Character silhouettes remain visibly simplified, with only two clothing/appearance archetypes. Facial anatomy, identity variety and broader final art quality remain unfinished. Buildings can occlude a followed actor at some camera angles; automatic occlusion handling remains open.
+
 ### Follow the rendered player (2026-09-13)
 
 - “Find me” now toggles following of the actual rendered player/car instead of centering only the player's address. The camera keeps its offset, zoom and orbit while translating with the actor. Keyboard zoom/rotation and mouse orbit preserve following; manual pan/reset, touch interaction, building selection and explicit address/scene focus release it. The button exposes its pressed state and becomes “Stop following.”

@@ -382,8 +382,36 @@ def villa():
     anchor.location=(0,7.27,3.2)
 
 
+def wool_texture(mat):
+    n=256;pixels=[];heights=[];rough=[];base=mat.diffuse_color[:3]
+    for y in range(n):
+        for x in range(n):
+            warp=math.sin(x*math.pi/2);weft=math.sin(y*math.pi/2)
+            twill=1 if ((x//2+y//2)%4)<2 else -1
+            stripe=.13 if x%16<1 else 0
+            tone=.91+.035*warp+.035*weft+.025*twill+stripe
+            pixels.extend((*[c*tone for c in base],1))
+            heights.append(.06*warp+.06*weft+.035*twill)
+            value=.78+.045*warp*weft;rough.extend((value,value,value,1))
+    normals=[]
+    for y in range(n):
+        for x in range(n):
+            dx=heights[y*n+(x-1)%n]-heights[y*n+(x+1)%n]
+            dy=heights[((y-1)%n)*n+x]-heights[((y+1)%n)*n+x]
+            v=Vector((dx,dy,1)).normalized();normals.extend((v.x*.5+.5,v.y*.5+.5,v.z*.5+.5,1))
+    tree=mat.node_tree;shader=tree.nodes['Principled BSDF']
+    for name,data,target in [('wool weave colour',pixels,'Base Color'),('wool weave normal',normals,'Normal'),('wool fibre roughness',rough,'Roughness')]:
+        image=bpy.data.images.new(name,width=n,height=n)
+        if target!='Base Color':image.colorspace_settings.name='Non-Color'
+        image.pixels=data;image.pack();tex=tree.nodes.new('ShaderNodeTexImage');tex.image=image
+        if target=='Normal':
+            normal=tree.nodes.new('ShaderNodeNormalMap');normal.inputs['Strength'].default_value=.35
+            tree.links.new(tex.outputs['Color'],normal.inputs['Color']);tree.links.new(normal.outputs['Normal'],shader.inputs['Normal'])
+        else:tree.links.new(tex.outputs['Color'],shader.inputs[target])
+
+
 def person(waved=False):
-    coat=material('wool suit',(.29,.13,.12) if waved else (.16,.19,.21))
+    coat=material('wool suit',(.29,.13,.12) if waved else (.16,.19,.21));wool_texture(coat)
     skin=material('skin',(.58,.38,.24))
     hat=material('felt hat',(.12,.1,.08))
     shoe=material('leather',(.05,.04,.035))
@@ -420,6 +448,13 @@ def person(waved=False):
     oval('head',(0,-.005,1.64),(.125,.115,.17),skin)
     oval('nose',(0,-.119,1.63),(.035,.045,.045),skin)
     for side in (-1,1):oval('ear',(side*.125,0,1.64),(.025,.035,.052),skin)
+    eye=material('muted eye whites',(.42,.39,.33));eye.node_tree.nodes['Principled BSDF'].inputs['Roughness'].default_value=.3
+    detail=material('facial detail',(.10,.06,.04))
+    for side in (-1,1):
+        oval('eye white',(side*.052,-.110,1.675),(.027,.014,.012),eye)
+        oval('iris',(side*.052,-.125,1.675),(.010,.005,.010),detail)
+        oval('eyebrow',(side*.052,-.103,1.704),(.032,.013,.007),detail)
+    oval('mouth seam',(0,-.114,1.57),(.034,.008,.006),detail)
     if waved:
         oval('swept hair crown',(0,.025,1.76),(.145,.125,.08),hair)
         oval('pinned hair back',(0,.087,1.64),(.145,.07,.15),hair)
@@ -456,6 +491,18 @@ def person(waved=False):
         attach(box('jacket sleeve',(side*.31,0,1.095),(.14,.19,.53),coat,.045),arm)
         attach(box('shirt cuff',(side*.31,0,.842),(.125,.175,.045),shirt,.015),arm)
         attach(oval('hand',(side*.31,-.005,.77),(.066,.065,.095),skin),arm)
+    # Bake the weave at one physical scale before joints animate; torso meshes
+    # and manufactured limb meshes share the same 20cm texture tile.
+    bpy.context.view_layer.update()
+    for ob in bpy.context.scene.objects:
+        if ob.type!='MESH' or coat not in list(ob.data.materials):continue
+        uv=ob.data.uv_layers.active or ob.data.uv_layers.new(name='wool physical scale')
+        for polygon in ob.data.polygons:
+            normal=ob.matrix_world.to_3x3() @ polygon.normal
+            axis=max(range(3),key=lambda i:abs(normal[i]));axes=[i for i in range(3) if i!=axis]
+            for index in polygon.loop_indices:
+                co=ob.matrix_world @ ob.data.vertices[ob.data.loops[index].vertex_index].co
+                uv.data[index].uv=(co[axes[0]]/.2,co[axes[1]]/.2)
 
 
 def revolver():

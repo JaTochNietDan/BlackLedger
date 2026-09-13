@@ -25,7 +25,10 @@ test('gunfire raises, recoils four times and lowers at common frame rates',()=>{
 test('actual shooter and revolver geometry stay within the reserved scene space',async()=>{
  const load=async name=>{
   const bytes=readFileSync(new URL(`../public/art/models/${name}.glb`,import.meta.url));
-  return (await new GLTFLoader().parseAsync(bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength),'')).scene;
+  const loader=new GLTFLoader();
+  // This test measures geometry; browser QA verifies embedded texture decoding.
+  loader.register(parser=>({name:'gunfight-geometry-materials',loadMaterial(index){return Promise.resolve(new THREE.MeshBasicMaterial({name:parser.json.materials[index].name}));}}));
+  return (await loader.parseAsync(bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength),'')).scene;
  };
  const person=await load('person'),gun=await load('revolver');
  const arm=person.getObjectByName('arm1'),muzzle=gun.getObjectByName('muzzle');

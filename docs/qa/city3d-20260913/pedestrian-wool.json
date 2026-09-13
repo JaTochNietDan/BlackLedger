@@ -1,0 +1,101 @@
+{
+  "presentation": {
+    "revision": 5,
+    "minute": 791,
+    "playbackRate": 1,
+    "headlightPools": 0,
+    "followingPlayer": true,
+    "weather": {
+      "kind": "rain",
+      "wet": 1,
+      "rainVisible": true,
+      "rainClock": 292.9933000001052
+    },
+    "camera": {
+      "zoom": 32,
+      "x": -118.84203212970039,
+      "z": 156.04111923069235,
+      "targetX": 176,
+      "targetZ": 100.65
+    },
+    "actors": [
+      {
+        "id": "mara",
+        "model": "ford",
+        "x": 4.674365475944713,
+        "z": -1.6,
+        "y": -0.115,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      },
+      {
+        "id": "player",
+        "model": "person",
+        "x": 176,
+        "z": 100.65,
+        "y": 0.2
+      },
+      {
+        "id": "player-car",
+        "model": "hudson",
+        "x": 185.6,
+        "z": 112,
+        "y": 0.15500000000000003,
+        "wheelPhase": 0,
+        "steering": 0,
+        "lampsOn": false,
+        "frontWheels": [
+          {
+            "x": -0.8700000047683716,
+            "angle": 0
+          },
+          {
+            "x": 0.8700000047683716,
+            "angle": 0
+          }
+        ]
+      }
+    ],
+    "waiting": [],
+    "effects": []
+  },
+  "metrics": {
+    "fps": 145,
+    "p95ms": 8.2,
+    "drawCalls": 53,
+    "triangles": 509074,
+    "actors": 3,
+    "buildings": 28,
+    "geometries": 238,
+    "textures": 92
+  },
+  "pan": {
+    "before": {
+      "zoom": 32,
+      "x": -118.79443038661151,
+      "z": 156.2944991020538,
+      "targetX": 176.04760174308888,
+      "targetZ": 100.90337987136147
+    },
+    "after": {
+      "zoom": 32,
+      "x": -118.74682864352263,
+      "z": 156.54787897341524,
+      "targetX": 176.09520348617775,
+      "targetZ": 101.1567597427229
+    },
+    "distance": 0.25781249999997097
+  },
+  "logs": []
+}

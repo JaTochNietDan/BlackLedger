@@ -209,3 +209,7 @@ ground projections, not dynamic shadow-casting lights or gameplay visibility rul
 travel playback. It preserves zoom/orbit and changes no selected address or Go
 state. Manual pan/reset, touch manipulation, building selection and explicit
 address/scene focus release following. “Stop following” leaves the camera in place.
+
+City camera close inspection supports orthographic zoom up to 32. Keyboard pan
+uses 8.25 / zoom world metres per press, preserving the initial 5m step while
+allowing fine movement at close zoom. These controls change no simulation state.
