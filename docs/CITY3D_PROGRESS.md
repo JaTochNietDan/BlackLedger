@@ -64,6 +64,12 @@ These are staged fixture saves, not earned campaign progress.
 
 ## Continue next
 
+### Renderer resource teardown (2026-09-13)
+
+- City unmount now disposes instanced buffers, shadow targets and decoded image bitmaps alongside shared geometry, materials and textures. One collection covers the scene and loaded prototypes to avoid repeated disposal of shared assets; late model loads use the same cleanup. The old renderer explicitly releases its WebGL context after cancelling animation and listeners.
+- All 122 frontend tests and production build pass. Disposal-event tests cover shared resources, shadow maps, instances, bitmap deduplication and late-loading models. The existing build chunk-size warning remains.
+- Eighteen street/interior cycles on isolated port 8847 retained 200 geometries and 70 textures per mounted city, with zero city canvases inside and no captured browser errors or warnings. Evidence: `docs/qa/city3d-20260913/renderer-resource-cycles.json`. These are renderer counters, not a measurement of OS GPU memory. This three-actor fixture does not establish long-session or broad-device performance; larger scenes, richer art and wider production acceptance remain open. No gameplay commands were issued and the main save was untouched.
+
 ### Front-wheel steering and tyre sweep clearance (2026-09-13)
 
 - Front wheel pivots now steer through bends using curvature averaged across the wheelbase and distance-based easing. Roll and steering use YXZ order, rear wheels remain aligned, and parked assignments reset steering to straight. The rendered steering limit is ±0.5 radians.

@@ -175,3 +175,8 @@ Front-wheel steering follows presentation route curvature and actual travel
 distance. Moving occupancy includes the steered tyre sweep; parked vehicles
 and staged police retain straight-wheel occupancy at their existing positions.
 These internal presentation distinctions add no public vehicle types or commands.
+
+City renderer teardown releases shared model resources, instance buffers,
+shadow targets, decoded image bitmaps and its WebGL context. Canvas metrics
+include geometry and texture counts for repeated-mount diagnostics; these are
+presentation-only counters, not simulation state or total GPU memory usage.

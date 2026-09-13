@@ -1,3 +1,4 @@
+import {disposeCityResources} from './city3dResources';
 import {useEffect, useRef, useState, type ReactNode} from 'react';
 import * as THREE from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
@@ -569,7 +570,7 @@ export function City3D(props: Props) {
       modelNames.map(async name => {
         const gltf = await loader.loadAsync(`/art/models/${name}.glb`);
         if (dead) {
-          disposeTree(gltf.scene);
+          disposeCityResources([gltf.scene]);
           return;
         }
         models.set(name, gltf.scene);
@@ -1196,6 +1197,8 @@ export function City3D(props: Props) {
           triangles: renderer.info.render.triangles,
           actors: actors.size,
           buildings: buildings.size,
+          geometries: renderer.info.memory.geometries,
+          textures: renderer.info.memory.textures,
         };
         canvas.dataset.metrics = JSON.stringify(metrics);
         setFps(`${metrics.fps} FPS · ${metrics.drawCalls} draws`);
@@ -1224,13 +1227,11 @@ export function City3D(props: Props) {
       canvas.removeEventListener('keydown', keys);
       canvas.removeEventListener('webglcontextlost', lost);
       effects.forEach(effect => { effect.audio?.dispose(); disposeDebris(effect); });
-      disposeTree(scene);
-      for (const m of models.values()) disposeTree(m);
-      textures.forEach(t => t.dispose());
-      effectGeometry.dispose();
-      contactGeometry.dispose();
-      contactMaterial.dispose();
+      disposeCityResources([scene, ...models.values()], {
+        textures, geometries: [effectGeometry, contactGeometry], materials: [contactMaterial],
+      });
       renderer.dispose();
+      renderer.forceContextLoss();
       canvas.remove();
     };
   }, []);
@@ -1352,19 +1353,4 @@ export function City3D(props: Props) {
       </label>
     </section>
   );
-}
-function disposeTree(root: THREE.Object3D) {
-  const geometry = new Set<THREE.BufferGeometry>(),
-    materials = new Set<THREE.Material>();
-  root.traverse(o => {
-    if (o instanceof THREE.Mesh) {
-      geometry.add(o.geometry);
-      for (const m of Array.isArray(o.material) ? o.material : [o.material]) materials.add(m);
-    } else if (o instanceof THREE.Sprite) materials.add(o.material);
-  });
-  geometry.forEach(g => g.dispose());
-  materials.forEach(m => {
-    for (const v of Object.values(m)) if (v instanceof THREE.Texture) v.dispose();
-    m.dispose();
-  });
 }
