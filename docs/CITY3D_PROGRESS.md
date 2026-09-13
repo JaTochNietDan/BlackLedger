@@ -64,6 +64,13 @@ These are staged fixture saves, not earned campaign progress.
 
 ## Continue next
 
+### Backend weather in the 3D city (2026-09-13)
+
+- Public `sky.kind` now drives overcast/rain lighting and fog range; `sky.wet` darkens and reduces roughness on road/pavement materials, including the backend's drying-day wetness. Rain uses one LineSegments draw with a reusable 1,800-streak vertex buffer. It follows elapsed presentation seconds independently of Go time and travel speed. Motion-off and OS reduced-motion paths hide precipitation while retaining wet surfaces. Teardown now collects line/point geometry and materials as well as meshes.
+- Added `city3d-rain` to the isolated QA launcher. It chooses a campaign ID whose real `World.Sky()` returns rain, preserving the public weather contract rather than overriding the response. Port 8856 uses `.runtime/city3d-rain-20260913-151635-69573.sqlite3`; main save untouched.
+- All 132 frontend tests and production build pass; QA fixture/server builds and startup pass. Tests cover rain versus residual wetness, bounded/finite buffers, elapsed-time equivalence at 30/60/144 FPS and precipitation resource disposal. Browser motion-off/on returned `rainVisible=false/true` with `wet=1` unchanged; original motion preference restored. No gameplay commands issued.
+- Evidence: `docs/qa/city3d-20260913/rain-city.png` and `rain-city-metrics.json`. Expanded 14-actor/28-building local view sampled 145 FPS, 7.2ms p95, 422 draws, 625,730 triangles with no captured warnings/errors. Rain visibility and muted daylight are verified; night rain, splashes, reflections, broad-device performance and final city art acceptance remain unfinished.
+
 ### Localized condition staining (2026-09-13)
 
 - Replaced uniform whole-building darkening with stable surface-coordinate staining driven by the public condition value. Spatial variation preserves readable facade detail; it implies neither ongoing fire nor structural collapse. Full repairs remove staining without altering source textures. Healthy buildings bypass noise calculations, and condition changes update existing uniforms instead of recompiling materials.

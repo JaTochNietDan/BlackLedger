@@ -1,3 +1,4 @@
+import {cityWeather, rainVertices} from './city3dWeather';
 import {buildingCondition} from './city3dDamage';
 import {disposeCityResources} from './city3dResources';
 import {useEffect, useRef, useState, type ReactNode} from 'react';
@@ -236,6 +237,14 @@ export function City3D(props: Props) {
     ground.position.set(plan.width / 2, -0.4, plan.depth / 2);
     ground.receiveShadow = true;
     scene.add(ground);
+    const rainGeometry = new THREE.BufferGeometry();
+    const rainPositions = new Float32Array(1800 * 6);
+    const rainAttribute = new THREE.BufferAttribute(rainPositions, 3).setUsage(THREE.DynamicDrawUsage);
+    rainGeometry.setAttribute('position', rainAttribute);
+    const rainMaterial = new THREE.LineBasicMaterial({color: 0xb9c8cf, transparent: true, opacity: .22, depthWrite: false});
+    const rainfall = new THREE.LineSegments(rainGeometry, rainMaterial);
+    rainfall.frustumCulled = false; rainfall.visible = false; scene.add(rainfall);
+    let rainClock = 0;
     const textures: THREE.Texture[] = [];
     const textureLoader = new THREE.TextureLoader();
     for (const [path, mat, repeat] of [
@@ -841,7 +850,12 @@ export function City3D(props: Props) {
         }
         const hour = (w.minute % 1440) / 60;
         const night = hour < 6 || hour >= 20;
-        sky.intensity = night ? 0.9 : 2.1;
+        const weather = cityWeather(w.sky, night);
+        sky.intensity = weather.ambient;
+        groundMat.color.setHex(0x646460).multiplyScalar(weather.roadTone);
+        pavementMat.color.setHex(0xaaa18b).multiplyScalar(weather.pavementTone);
+        groundMat.roughness = weather.roadRoughness;
+        pavementMat.roughness = weather.pavementRoughness;
         pools.visible = night;
         for (const b of buildings.values())
           b.traverse(o => {
@@ -852,9 +866,9 @@ export function City3D(props: Props) {
                 if (m instanceof THREE.MeshStandardMaterial && m.emissive.getHex() !== 0)
                   m.emissiveIntensity = night ? 1.2 : 0.2;
           });
-        sun.intensity = night ? 0.35 : 3.2;
-        scene.background = new THREE.Color(night ? 0x17232c : 0x657477);
-        scene.fog = new THREE.Fog(scene.background, 260, w.sky?.kind === 'fog' ? 440 : 850);
+        sun.intensity = weather.sun;
+        scene.background = new THREE.Color(weather.background);
+        scene.fog = new THREE.Fog(scene.background, 260, weather.fogFar);
         renderer.shadowMap.needsUpdate = true;
         revision = w.revision;
         worldID = `${w.id}:${w.life}`;
@@ -1162,12 +1176,19 @@ export function City3D(props: Props) {
       controls.target.x = THREE.MathUtils.clamp(controls.target.x, -15, plan.width + 15);
       controls.target.z = THREE.MathUtils.clamp(controls.target.z, -15, plan.depth + 15);
       camera.position.add(controls.target.clone().sub(before));
+      rainfall.visible = ready && motion && w.sky?.kind === 'rain';
+      if (rainfall.visible) {
+        rainClock += Math.min(dt, 100) / 1000;
+        rainVertices(rainPositions, rainClock, plan.width, plan.depth);
+        rainAttribute.needsUpdate = true;
+      }
       renderer.render(scene, camera);
       if (ready)
         canvas.dataset.presentation = JSON.stringify({
           revision: w.revision,
           minute: w.minute,
           playbackRate: playback.current,
+          weather: {kind: w.sky?.kind || 'clear', wet: w.sky?.wet || 0, rainVisible: rainfall.visible, rainClock},
           camera: {zoom: camera.zoom, x: camera.position.x, z: camera.position.z,
             targetX: controls.target.x, targetZ: controls.target.z},
           actors: [...actors]

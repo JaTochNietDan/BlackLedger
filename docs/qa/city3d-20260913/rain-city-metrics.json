@@ -1,0 +1,26 @@
+{
+  "fixture": "Isolated 8856 city3d-rain; backend rain and wet=1; no gameplay commands",
+  "expandedMetrics": {
+    "fps": 145,
+    "p95ms": 7.2,
+    "drawCalls": 422,
+    "triangles": 625730,
+    "actors": 14,
+    "buildings": 28,
+    "geometries": 270,
+    "textures": 88
+  },
+  "motionOff": {
+    "kind": "rain",
+    "wet": 1,
+    "rainVisible": false,
+    "rainClock": 0
+  },
+  "motionRestored": {
+    "kind": "rain",
+    "wet": 1,
+    "rainVisible": true,
+    "rainClock": 0.10700000000000001
+  },
+  "logs": []
+}

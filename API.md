@@ -193,3 +193,9 @@ adding a real location to a cell removes its vacant-yard presentation.
 Building condition drives stable localized surface staining. It does not identify
 the damage cause or imply an active fire/collapse. Full condition removes the
 staining; updates reuse material uniforms and leave shared source textures intact.
+
+The 3D city consumes public `sky.kind` and `sky.wet` for overcast lighting,
+fog, falling rain and wet road/pavement materials. Rain uses elapsed presentation
+seconds, independently of gameplay time and travel playback speed. Disabling
+motion (or OS reduced motion) hides precipitation while retaining wetness.
+Drying streets follow `sky.wet` even after rain stops; the view invents no weather.

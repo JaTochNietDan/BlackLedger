@@ -13,7 +13,7 @@ export function disposeCityResources(roots: THREE.Object3D[], extras: {
   const shadows = new Set<THREE.LightShadow>();
   const bitmaps = new Set<ImageBitmap>();
   for (const root of roots) root.traverse(object => {
-    if (object instanceof THREE.Mesh) {
+    if (object instanceof THREE.Mesh || object instanceof THREE.Line || object instanceof THREE.Points) {
       geometries.add(object.geometry);
       for (const material of Array.isArray(object.material) ? object.material : [object.material]) materials.add(material);
       if (object instanceof THREE.InstancedMesh) instances.add(object);

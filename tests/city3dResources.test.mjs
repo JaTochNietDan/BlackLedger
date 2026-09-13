@@ -30,3 +30,10 @@ test('a late-loading model can release resources without a renderer or browser b
  disposeCityResources([new THREE.Mesh(geometry,material)]);
  assert.equal(disposed,3);
 });
+
+test('precipitation line and point buffers are released alongside ordinary meshes',()=>{
+ const line=new THREE.LineSegments(new THREE.BufferGeometry(),new THREE.LineBasicMaterial());
+ const points=new THREE.Points(new THREE.BufferGeometry(),new THREE.PointsMaterial());
+ let count=0;for(const resource of [line.geometry,line.material,points.geometry,points.material])resource.addEventListener('dispose',()=>count++);
+ const root=new THREE.Group();root.add(line,points);disposeCityResources([root]);assert.equal(count,4);
+});
