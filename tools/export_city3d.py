@@ -398,8 +398,8 @@ def car(kind, articulated=True, police=False):
         leather=material('oxblood seat leather',(.12,.065,.043))
         lining=material('door lining',(.22,.17,.105))
         door_paint=material('police cream',(.7,.69,.60)) if police else paint
-        box('floor pan',(0,0,.48),(1.70,length-.25,.17),rubber,.07)
-        box('front body',(0,-length*.335,.64),(1.8,length*.33,.44),paint,.17)
+        box('floor pan',(0,0,.09),(1.70,length-.25,.12),rubber,.07)
+        box('front body',(0,-length*.37,.64),(1.8,length*.26,.44),paint,.17)
         box('rear body',(0,length*.365,.67),(1.8,length*.27,.48),paint,.17)
         # Separate front/rear glazing, pillars and door leaves expose real seats.
         front=-length*.17;rear=length*.22
@@ -408,16 +408,19 @@ def car(kind, articulated=True, police=False):
         box('windscreen divider',(0,front-.035,1.20),(.025,.028,.55),chrome,.005)
         for x in (-.72,.72):
             for y in (front,rear):box('window pillar',(x,y,1.19),(.07,.09,.59),paint,.025)
-        for y in (-length*.05,length*.15):
-            box('bench cushion',(0,y,.72),(1.34,.43,.16),leather,.07)
-            box('bench backrest',(0,y+.18,1.0),(1.34,.13,.48),leather,.065)
-            for x in range(9):box('upholstery piping',(-.56+x*.14,y-.015,.806),(.014,.31,.008),lining,.004)
+        for y in (.04,length*.175):
+            box('bench cushion',(0,y,.32),(1.34,.43,.16),leather,.07)
+            box('bench backrest',(0,y+.18,.63),(1.34,.13,.48),leather,.065)
+            for x in range(9):box('upholstery piping',(-.56+x*.14,y-.015,.406),(.014,.31,.008),lining,.004)
         box('dashboard',(0,front+.1,1.02),(1.4,.22,.19),paint,.05)
         for x in (-.43,-.25,-.07):
             cylinder('dashboard dial',(x,front+.22,1.035),.055,.015,chrome,(math.pi/2,0,0),24)
             cylinder('dial face',(x,front+.232,1.035),.044,.017,rubber,(math.pi/2,0,0),24)
         bpy.ops.mesh.primitive_torus_add(major_radius=.16,minor_radius=.017,major_segments=32,minor_segments=8,location=(-.42,front+.40,1.08),rotation=(math.radians(60),0,0))
         bpy.context.object.name='steering wheel';bpy.context.object.data.materials.append(rubber)
+        for side in (-1,1):
+            grip=bpy.data.objects.new('seat-driver-grip-'+('left' if side<0 else 'right'),None)
+            bpy.context.collection.objects.link(grip);grip.location=((- .42+side*.16)*.984,(front+.40)+(.15-(front+.40))*.035,1.08)
         for side in (-1,1):
             box('cabin sill',(side*.79,.08,.62),(.12,length*.41,.13),paint,.035)
             for index,(a,b) in enumerate(((front+.05,.09),(.19,rear-.04))):
@@ -434,7 +437,7 @@ def car(kind, articulated=True, police=False):
                 bpy.context.collection.objects.link(hinge);hinge.location=(side*.8,a,.68)
                 for ob in meshes:ob.parent=hinge;ob.location-=hinge.location
                 seat=bpy.data.objects.new('seat-'+('front' if index==0 else 'rear')+('-left' if side<0 else '-right'),None)
-                bpy.context.collection.objects.link(seat);seat.location=(side*.40,middle,.79)
+                bpy.context.collection.objects.link(seat);seat.location=(side*.36,.04 if index==0 else length*.175,.495)
             box('mirror stem',(side*.86,front+.08,1.07),(.16,.025,.025),chrome,.008)
             box('wing mirror',(side*.94,front+.08,1.11),(.065,.16,.10),chrome,.025)
     box('bonnet',(0,-length*.3,.87),(1.7,length*.34,.32),paint,.14)

@@ -7,6 +7,7 @@ import {CityFire, clearBlastWindows} from './city3dFire';
 import {CityAftermath} from './city3dAftermath';
 import {previewScenes, previewScene, type PreviewScene} from './city3dPreview';
 import {frameScene, stagedSceneBounds, impactPulse, renderImpact} from './city3dFraming';
+import {seatDriver} from './city3dSeating';
 import {wardrobe, dressPedestrian} from './city3dWardrobe';
 import {headlightAlpha, headlightCentre} from './city3dHeadlights';
 import {cityWeather, rainVertices} from './city3dWeather';
@@ -81,6 +82,7 @@ type Actor = {
   lamps: THREE.MeshStandardMaterial[];
   wardrobe: THREE.MeshStandardMaterial[];
   wardrobeKey: string;
+  driver?: THREE.Group;
   arrived?: boolean;
 };
 type Effect = {
@@ -656,8 +658,25 @@ export function City3D(props: Props) {
         if (o.name.startsWith('leg') || o.name.startsWith('arm') || o.name.startsWith('knee'))
           limbs.push(o);
       });
+      const costume=isPedestrian(model)?dressPedestrian(object,model,personWardrobe(id)):[];
+      let driver:THREE.Group|undefined;
+      if(['ford','hudson','packard'].includes(model)){
+        const seat=object.getObjectByName('seat-front-left');
+        if(seat){
+          const driverModel=personModel(id);driver=models.get(driverModel)!.clone(true);
+          costume.push(...dressPedestrian(driver,driverModel,personWardrobe(id)));
+          seatDriver(driver,seat.position,['left','right'].map(side=>object.getObjectByName('seat-driver-grip-'+side)!.position));driver.name='vehicle-driver';driver.visible=false;
+          const windows=new Map<THREE.Material,THREE.MeshStandardMaterial>();
+          object.traverse(part=>{if(part instanceof THREE.Mesh){
+            const glaze=(m:THREE.Material)=>{if(!(m instanceof THREE.MeshStandardMaterial)||m.name!=='car glass')return m;
+              let own=windows.get(m);if(!own){own=m.clone();own.transparent=true;own.opacity=.38;own.depthWrite=false;windows.set(m,own);costume.push(own);}return own;};
+            part.material=Array.isArray(part.material)?part.material.map(glaze):glaze(part.material);
+          }});
+          object.add(driver);
+        }
+      }
       const actor = {
-        object,
+        object, driver,
         model,
         points: [{x: 0, z: 0}],
         start: 0,
@@ -667,8 +686,8 @@ export function City3D(props: Props) {
         walking: false,
         phase: 0,
         realSince: 0,
-        wardrobe: isPedestrian(model) ? dressPedestrian(object, model, personWardrobe(id)) : [],
-        wardrobeKey: isPedestrian(model) ? JSON.stringify(personWardrobe(id)) : '',
+        wardrobe: costume,
+        wardrobeKey: JSON.stringify(personWardrobe(id)),
         limbs, wheels, lamps, wheelPhase: 0, steering: 0, wheelPlaced: false,
       };
       actors.set(id, actor);
@@ -684,7 +703,7 @@ export function City3D(props: Props) {
       now: number,
     ) => {
       let a = actors.get(id);
-      if (a && (a.model !== model || (isPedestrian(model) && a.wardrobeKey !== JSON.stringify(personWardrobe(id))))) {
+      if (a && (a.model !== model || ((isPedestrian(model)||a.driver) && a.wardrobeKey !== JSON.stringify(personWardrobe(id))))) {
         releaseActor(a);
         actors.delete(id);
         a = undefined;
@@ -1250,6 +1269,7 @@ export function City3D(props: Props) {
           a.wheelPlaced = true;
           a.object.position.set(at.x, isPedestrian(a.model) ? pedestrianRootHeight(at) : vehicleRootHeight(at), at.z);
           a.object.rotation.y = at.heading;
+          if(a.driver)a.driver.visible=a.start!==a.end&&!a.arrived&&camera.zoom>=6;
           for (const limb of a.limbs) {
             const side = limb.name.endsWith('-1') ? 0 : Math.PI;
             const phase = a.phase + side;
@@ -1648,6 +1668,7 @@ export function City3D(props: Props) {
               x: a.object.position.x,
               z: a.object.position.z,
               y: a.object.position.y,
+              driverVisible:a.driver?.visible,
               wheelPhase: a.wheels.length ? a.wheelPhase : undefined,
               steering: a.wheels.length ? a.steering : undefined,
               lampsOn: a.lamps.length ? a.lamps.some(m => m.emissiveIntensity > 0) : undefined,

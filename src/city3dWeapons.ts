@@ -6,13 +6,13 @@ export function sceneWeapon(tier?:number):'revolver'|'shotgun'|'thompson'|null {
 }
 
 /** Two rigid sleeve segments reach the grip; arm lengths remain unchanged. */
-export function aimArm(actor:THREE.Group,side:number,target:THREE.Vector3){
+export function aimArm(actor:THREE.Group,side:number,target:THREE.Vector3,bendHint?:THREE.Vector3){
  const arm=actor.getObjectByName(`arm${side}`),elbow=actor.getObjectByName(`elbow${side}`);if(!arm||!elbow)return;
  const origin=arm.position,delta=target.clone().sub(origin),distance=delta.length();
  const upper=.285,lower=.295,d=Math.max(.011,Math.min(upper+lower-.001,distance));
  const direction=delta.normalize();
  const along=(upper*upper-lower*lower+d*d)/(2*d);
- const bend=new THREE.Vector3(side*.5,-1,-.4);bend.addScaledVector(direction,-bend.dot(direction)).normalize();
+ const bend=bendHint?.clone()||new THREE.Vector3(side*.5,-1,-.4);bend.addScaledVector(direction,-bend.dot(direction)).normalize();
  const joint=origin.clone().addScaledVector(direction,along).addScaledVector(bend,Math.sqrt(Math.max(0,upper*upper-along*along)));
  arm.quaternion.setFromUnitVectors(new THREE.Vector3(0,-1,0),joint.clone().sub(origin).normalize());
  const forearm=origin.clone().addScaledVector(direction,d).sub(joint).applyQuaternion(arm.quaternion.clone().invert()).normalize();
