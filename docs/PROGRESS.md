@@ -76,3 +76,21 @@ now lasts6s. Browser8873 private close-up verified the paired pose beside existi
 aftermath; screenshot145FPS/167draws. All202 tests and build pass. Evidence:
 paired-custody PNG/JSON. Escort/car-door/departure remain unfinished. No campaign
 command issued. User then reprioritized map-first UI; continuing that migration.
+
+### September 13 — map-first shell migration
+
+Responded to the amended highest-priority objective by keeping one city component
+mounted under menu overlays. Navigation and dashboard are now in-game HUD layers;
+People/Families/Market/Ledger/Herald/Guide/Settings use a contained dialog with
+focus handling, Close and Escape. City briefing preserves opportunities, public
+threats, commissions and headline notices in an expandable HUD panel. Entering
+Saint Agnes replaces the city canvas with its interior; Back to city restores
+the city. Menus no longer cancel active scene playback merely by navigation.
+Browser1280x720 verified People and Families overlays, unchanged camera coordinates
+across open/close, a single background canvas, and interior replacement with the
+status bar remaining onscreen. Fixed menu focus scrolling the shell and navigation
+overflow found during QA. All202 existing frontend tests pass; layout correctness
+is supported by browser evidence, not those simulation/geometry tests. Narrow
+viewport and full action flows still need acceptance. Automatic post-scene
+newspaper reveal, entrance sound and pre-generated narrator audio remain the next
+priority; no completion claim for that requirement.

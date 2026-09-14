@@ -1,0 +1,42 @@
+{
+  "cameraBefore": {
+    "zoom": 1.65,
+    "x": 260,
+    "z": -192,
+    "targetX": 80,
+    "targetZ": 48
+  },
+  "cameraDuring": {
+    "zoom": 1.65,
+    "x": 260,
+    "z": -192,
+    "targetX": 80,
+    "targetZ": 48
+  },
+  "cameraAfter": {
+    "zoom": 1.65,
+    "x": 260,
+    "z": -192,
+    "targetX": 80,
+    "targetZ": 48
+  },
+  "menuChecks": [
+    {
+      "menu": "Market",
+      "canvasCount": 1
+    },
+    {
+      "menu": "Ledger",
+      "canvasCount": 1
+    },
+    {
+      "menu": "Guide",
+      "canvasCount": 1
+    },
+    {
+      "menu": "Settings",
+      "canvasCount": 1
+    }
+  ],
+  "settingsRetest": "opened and closed after explicit rail height correction"
+}

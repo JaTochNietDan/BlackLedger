@@ -1,0 +1,66 @@
+/* The scene persists beneath every menu. HUD and modal layers own their input. */
+.shell.map-first {display:block;position:fixed;inset:0;overflow:hidden;background:#111b1b}
+.map-first .page {display:block;height:100%;overflow:hidden}
+.map-first .rail {position:absolute;z-index:5;left:12px;top:96px;bottom:18px;width:64px;border:1px solid #89754c;background:#14201dee;border-radius:4px;padding:10px 2px;box-shadow:0 8px 28px #0005}
+.map-first .rail .monogram {display:none}
+.map-first .topbar {position:absolute;z-index:4;top:12px;left:12px;right:12px;height:72px;padding:10px 20px;background:#14201dee;border:1px solid #89754c;border-radius:4px;box-shadow:0 8px 28px #0005}
+.map-first .topbar .stats {gap:18px}
+.map-main-scene,.map-first .city-workspace,.map-first .city-pane,.map-first .city-stage {position:absolute;inset:0;display:block;overflow:hidden;min-height:0;height:100%;width:100%;background:transparent}
+.map-first .city-workspace>.sidebar {display:none}
+.map-first .city3d.city3d-immersive {position:absolute;inset:0;width:100%;height:100%;min-height:0;border:0}
+.map-first .city3d-top {top:100px;left:94px;right:24px}
+.map-first .city3d-heading {display:none}
+.map-first .city3d-address,.map-first .city3d-directory {left:94px}
+.map-first .city3d-preview {top:148px;left:94px}
+.map-first .replay-scene {position:absolute;z-index:3;bottom:20px;right:24px;background:#17231fed;border:1px solid #89754c;padding:9px 12px}
+.map-briefing {position:absolute;z-index:3;top:100px;left:94px;width:min(410px,calc(100vw - 120px));color:#e8dabc;background:#14201dee;border:1px solid #89754c;max-height:calc(100% - 210px);overflow:auto}
+.map-briefing summary {padding:9px 14px;cursor:pointer;font-size:12px}
+.map-briefing[open] {z-index:6}
+.map-first .map-briefing .city-header {display:block;min-height:0;padding:12px}
+.map-first .map-briefing .map-heading {display:none}
+.map-first .map-briefing .map-key,.map-first .map-briefing .city-view-switch {position:static;margin:4px 0;display:flex;flex-wrap:wrap}
+.map-first .map-briefing .headline-notice,.map-first .map-briefing .known-threats {margin:10px;padding:12px}
+.map-menu-shade {position:absolute;inset:0;z-index:8;display:grid;place-items:center;background:#07100d66;padding:100px 24px 24px 92px}
+.map-menu {width:min(1050px,100%);max-height:100%;height:min(790px,100%);display:flex;flex-direction:column;background:#17231ff5;border:1px solid #ab9264;box-shadow:0 24px 100px #000a;outline:none}
+.map-menu-title {display:flex;justify-content:space-between;align-items:center;padding:12px 20px;border-bottom:1px solid #736548;font:20px var(--serif)}
+.map-menu-title button {padding:7px 12px;background:#25332a;border:1px solid #89754c;color:#efdfbb;font:12px system-ui}
+.map-menu-body {overflow:auto;min-height:0;flex:1}
+.map-menu-body>.section-content {min-height:100%;overflow:visible}
+.map-outcome {position:absolute;z-index:4;bottom:18px;left:50%;transform:translateX(-50%);max-width:min(580px,65vw)}
+.map-first .inside .city-stage {padding:94px 12px 12px 86px}
+@media(max-width:800px){
+ .map-first .topbar {height:112px;padding:8px 12px;gap:6px}
+ .map-first .topbar>.brand,.map-first .topbar .eyebrow {display:none}
+ .map-first .topbar .brand {font-size:17px}
+ .map-first .topbar .stats {gap:10px;flex-wrap:wrap}
+ .map-first .topbar .stat b {font-size:13px}
+ .map-first .rail {top:136px;left:6px;width:54px}
+ .map-first .city3d-top {top:136px;left:72px;right:12px}
+ .map-briefing {top:184px;left:72px;width:210px}
+ .map-first .city3d-preview {top:226px;left:72px;right:12px}
+ .map-first .city3d-address,.map-first .city3d-directory {left:72px}
+ .map-menu-shade {padding:136px 10px 10px 70px}
+ .map-menu-title {padding:10px}
+ .map-first .inside .city-stage {padding:132px 8px 8px 68px}
+}
+.map-first .page {position:relative}
+.map-menu-shade {position:fixed}
+.map-menu {height:calc(100dvh - 132px);max-height:790px;min-height:0;overflow:hidden}
+.map-first .rail {overflow:auto}
+.map-first .rail button {min-height:48px;flex-shrink:0}
+.map-first .city3d-top {display:flex;flex-direction:column;align-items:flex-end;pointer-events:none}
+.map-first .city3d-tools,.map-first .city3d-preview,.map-first .city3d-story {pointer-events:auto}
+.map-first .city3d-preview {max-width:600px}
+.map-briefing {width:180px}
+.map-briefing[open] {width:min(410px,calc(100vw - 120px))}
+@media(max-width:800px){.map-menu{height:calc(100dvh - 146px)}.map-first .rail button{min-height:44px}}
+.shell.map-first,.map-first .page,.map-main-scene {overflow:clip}
+.map-first .inside .city-stage {overflow:auto;overscroll-behavior:contain}
+.map-first .inside .map-briefing {display:none}
+.map-leave-building {position:fixed;z-index:4;right:24px;top:100px;background:#17231fee;border:1px solid #ab9264;padding:9px 12px;color:#eadbb9}
+@media(max-width:800px){.map-leave-building{top:136px;right:12px}}
+.map-first .rail {gap:4px}
+.map-first .rail button {height:auto;min-height:40px;max-height:60px;flex:1 1 0;margin:0;padding:4px 2px}
+.map-first .rail .bottom {margin-top:auto}
+.map-first .rail {height:calc(100dvh - 114px);min-height:0}
+@media(max-width:800px){.map-first .rail{height:calc(100dvh - 154px)}}

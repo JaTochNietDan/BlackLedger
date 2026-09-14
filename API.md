@@ -397,3 +397,12 @@ public fires and rendered actor movement. Muting/view disposal cancels owned
 voices; no audio completion issues a command. The imported escape sample awaits
 moving getaway choreography. Debug `effectAudio` reports loaded/played/active
 clips for verification, without changing the public server schema.
+
+### Map-first presentation shell
+
+The city renderer stays mounted while informational/action menus open above it;
+menu selection does not issue a command or discard the camera. Entering a building
+switches the main scene to its interior; leaving switches back. HUD/menu state is
+local presentation state. Existing action requests, revision/idempotency and
+server outcomes retain their meaning. Newspaper narration/reveal migration is
+not yet implemented by this shell change.

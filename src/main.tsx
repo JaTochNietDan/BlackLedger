@@ -1,3 +1,5 @@
+import {MapMenu} from './MapMenu';
+import './mapFirst.css';
 import {cityOwnsAudio} from './city3dEvents';
 import type {VisualCue} from './types';
 import {paintedCar} from './cityAssets';
@@ -709,9 +711,9 @@ function App() {
     const fresh = paper.slice(0, Math.max(unreadNews, 1));
     return fresh.reduce((best, s) => ((s.weight || 0) > (best.weight || 0) ? s : best), fresh[0]);
   })();
-  function content() {
+  function content(view=tab) {
     const w = world!;
-    if (tab === 'city') {
+    if (view === 'city') {
       const inside = cityView === 'interior' && locationInfo.id === p.location;
       const sceneOverlay = playing && !journey && (
         <Theatre
@@ -749,7 +751,7 @@ function App() {
       return (
         <div className={'workspace city-workspace' + (inside ? ' inside' : '')}>
           <section className="city-pane">
-            <header className="city-header">
+            <details className="map-briefing"><summary>City briefing</summary><header className="city-header">
               <div className="map-heading">
                 <div className="eyebrow">THE CITY OF</div>
                 <h1>Bellwether</h1>
@@ -846,7 +848,8 @@ function App() {
                 </button>
               </section>
             )}
-            <div className="city-stage">
+            </details><div className="city-stage">
+              {inside&&<button className="map-leave-building" onClick={()=>setCityView('iso')}>Back to city ↗</button>}
               {inside && sceneOverlay}
               {cityView === 'interior' && locationInfo.id === p.location ? (
                 <Interior
@@ -869,6 +872,7 @@ function App() {
                 />
               ) : (
                 <City3D
+                  immersive
                   state={w}
                   replaySerial={sceneReplay.current}
                   beforeConditions={sceneConditions.current?.world===w.id&&sceneConditions.current.revision===w.revision?sceneConditions.current.conditions:undefined}
@@ -916,8 +920,8 @@ function App() {
         </div>
       );
     }
-    if (tab === 'market') return <MarketScreen world={w} />;
-    if (tab === 'ledger')
+    if (view === 'market') return <MarketScreen world={w} />;
+    if (view === 'ledger')
       return (
         <LedgerScreen
           world={w}
@@ -925,7 +929,7 @@ function App() {
           actions={anywhere.filter(a => a.id === 'bribe' || a.id === 'lie_low')}
         />
       );
-    if (tab === 'crew')
+    if (view === 'crew')
       return (
         <PeopleScreen
           world={w}
@@ -942,7 +946,7 @@ function App() {
           }}
         />
       );
-    if (tab === 'families')
+    if (view === 'families')
       return (
         <FamiliesScreen
           world={w}
@@ -956,7 +960,7 @@ function App() {
           }}
         />
       );
-    if (tab === 'news')
+    if (view === 'news')
       return (
         <section className="section-content">
           {!!w.arrangements?.length && (
@@ -982,7 +986,7 @@ function App() {
           <Herald world={w} />
         </section>
       );
-    if (tab === 'settings')
+    if (view === 'settings')
       return (
         <section className="section-content">
           <div className="eyebrow">HOW THIS PLAYS</div>
@@ -1011,8 +1015,7 @@ function App() {
               <div>
                 <h3>Sound</h3>
                 <p>
-                  An explosion, a shot, a police lamp turning over at the kerb. Short noises made by
-                  the browser rather than recordings, played once when a moment starts.
+                  An explosion, a shot, a police lamp turning over at the kerb. Recorded and synthesized effects, played when their matching actions occur.
                 </p>
               </div>
               <button
@@ -1144,8 +1147,8 @@ function App() {
   }
   return (
     <>
-      <div className={'shell ' + (busy ? 'busy' : '')} inert={!!event || !p.alive || atTable}>
-        <nav className="rail" aria-label="Main navigation">
+      <div className={'shell map-first ' + (busy ? 'busy' : '')} inert={!!event || !p.alive || atTable}>
+        <nav className="rail" aria-label="Main navigation" inert={tab!=='city'}>
           <div className="monogram">
             <span>B</span>
           </div>
@@ -1166,7 +1169,7 @@ function App() {
               aria-label={
                 id === 'news' && unreadNews > 0 ? `${label}, ${unreadNews} unread` : label
               }
-              onClick={() => {setPlaying(null);setTab(id);}}
+              onClick={() => {setTab(id);if(id==='city')setCityView('iso');}}
             >
               <Icon id={id} />
               {label}
@@ -1187,7 +1190,7 @@ function App() {
           </button>
         </nav>
         <main className="page">
-          <header className="topbar">
+          <header className="topbar" inert={tab!=='city'}>
             <div>
               <div className="eyebrow">A CITY REMEMBERS</div>
               <div className="brand">BLACK LEDGER</div>
@@ -1209,8 +1212,9 @@ function App() {
               </div>
             </div>
           </header>
-          {!scenePending && <Outcome world={world} onLedger={() => setTab('ledger')} />}
-          {content()}
+          <div className="map-main-scene" inert={tab!=='city'}>{content('city')}</div>
+          {!scenePending && <div className="map-outcome"><Outcome world={world} onLedger={() => setTab('ledger')} /></div>}
+          {tab!=='city'&&<MapMenu title={({crew:'People',families:'Families',market:'Market',ledger:'Ledger',news:'The Bellwether Herald',settings:'Settings',help:'Guide'} as Record<string,string>)[tab]||tab} onClose={()=>setTab('city')}>{content()}</MapMenu>}
         </main>
       </div>
       {atTable && inTheBackRoom && !event && p.alive && (

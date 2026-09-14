@@ -45,6 +45,7 @@ import {cameraCommand, KeyboardPan, bindKeyboardPan} from './city3dControls';
 import {blastParticle, windowBurst, internalDetonation, windowDebris, blastLight, blastOpacity, billowAlpha, debrisPose, fragmentBlocked} from './city3dBlast';
 
 type Props = {
+  immersive?:boolean;
   state: Snapshot;
   beforeConditions?:Record<string,number>;
   replaySerial?:number;
@@ -1711,12 +1712,12 @@ export function City3D(props: Props) {
   const travel = place?.actions.find(a => a.id === 'travel');
   return (
     <section
-      className={'city3d' + (expanded ? ' city3d-expanded' : '')}
+      className={'city3d' + (props.immersive?' city3d-immersive':expanded ? ' city3d-expanded' : '')}
       aria-label="Bellwether city"
-      role={expanded ? 'dialog' : 'region'}
-      aria-modal={expanded || undefined}
+      role={expanded&&!props.immersive ? 'dialog' : 'region'}
+      aria-modal={expanded&&!props.immersive || undefined}
       onKeyDown={e => {
-        if (!expanded || e.ctrlKey || e.metaKey || e.altKey || e.nativeEvent.isComposing) return;
+        if (props.immersive || !expanded || e.ctrlKey || e.metaKey || e.altKey || e.nativeEvent.isComposing) return;
         if (e.key === 'Escape') {
           e.preventDefault();
           e.stopPropagation();
@@ -1747,12 +1748,12 @@ export function City3D(props: Props) {
           <span>WASD / Arrows: pan · Q/E: rotate · +/−: zoom · Home: reset · Esc: return</span>
         </div>
         <div className="city3d-tools">
-          <button ref={expandButton} aria-pressed={expanded} onClick={() => {
+          {!props.immersive&&<button ref={expandButton} aria-pressed={expanded} onClick={() => {
             setExpanded(!expanded);
             if (!expanded) host.current?.querySelector('canvas')?.focus();
           }}>
             {expanded ? 'Return to game' : 'Expand city'}
-          </button>
+          </button>}
           <button onClick={() => focus.current()}>Whole city</button>
           <button aria-pressed={following} title={following ? "Stop following your character" : "Follow your character or car"}
             onClick={() => setFollow(!followPlayer.current)}>{following ? "Stop following" : "Find me"}</button>
