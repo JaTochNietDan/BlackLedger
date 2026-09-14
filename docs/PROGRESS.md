@@ -13,3 +13,15 @@ fixture; the cause and contact path still need an
 unobstructed browser test. Vehicle/pain playback also needs targeted browser QA.
 Audio unit checks pass, including tail duration, stereo seam and mute/restart.
 Frontend build passes. No subjective listening or production-ready claim.
+
+### September 13 — occupied raid doorway
+
+Resolved the missing door contact above: the first officer used a lateral bay
+when a pre-existing casualty occupied the central forecourt. Added an optional
+shorter doorway-aligned corridor derived from the authored threshold, retaining
+conservative traffic reservations. Browser8873 now shows three police cars/four
+officers, one recorded door kick, an open door before entry and the original body
+in place. Screenshot reports145FPS/321draws; this is local evidence only. Stop
+restores the private preview and clears audio. Evidence: raid-door-corridor.json
+and PNG. All190 frontend tests pass; build passes. Other building models still
+need authored working entrances; hero character detail remains insufficient.

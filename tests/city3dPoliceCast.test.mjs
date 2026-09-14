@@ -59,3 +59,18 @@ test('delayed breach audio fires only at visible contact and consumes muted or m
  const muted=make();muted.update(-1);muted.update(.01,false);muted.update(.03,true);assert.equal(played,1);
  const late=make();late.update(.4);late.update(.5);assert.equal(played,1);
 });
+
+test('a casualty in the central forecourt leaves a shorter door-aligned breach corridor',()=>{
+ const lot={id:'bar',x:80,z:48,row:1,col:2},entry={x:80,z:41.92};
+ const occupied=[{pose:{x:80.8,z:38.35,heading:0},model:'casualty'},
+  {pose:{x:80,z:36.65,heading:0},model:'person'}];
+ const slot=availableSceneSlot(lot,'raid-officer',occupied,entry);
+ assert.ok(slot);assert.equal(slot.root.x,entry.x);
+ assert.ok(slot.root.z>38.35);
+ for(const other of occupied)assert.equal(trafficOverlap(slot.pose,slot.model,other.pose,other.model),false);
+ const distance=entry.z-slot.root.z-.65;
+ for(let t=0;t<=10;t+=.01){
+  const pose=raidEntryPose(t,distance);
+  assert.ok(Math.abs(slot.root.z+pose.travelled-slot.pose.z)+.7<=3.300001);
+ }
+});

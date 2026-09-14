@@ -1158,7 +1158,8 @@ export function City3D(props: Props) {
             ...effects.flatMap(other => other.slot ? [other.slot] : []),
             ...aftermath.slots(),
           ];
-          e.slot = availableSceneSlot(lots.get(e.cue.target)!, e.assassination?'assassination':e.cue.kind, occupied);
+          const entry=buildings.get(e.cue.target)?.getObjectByName('entrance-threshold')?.getWorldPosition(new THREE.Vector3());
+          e.slot = availableSceneSlot(lots.get(e.cue.target)!, e.assassination?'assassination':e.cue.kind, occupied,entry);
           if (e.slot) {
             e.extra.position.set(e.slot.root.x, e.slot.model === 'parked-police' ? vehicleRootHeight(e.slot.root) : 0.2, e.slot.root.z);
             e.light.position.set(e.slot.root.x, 3, e.slot.root.z);
