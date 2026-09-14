@@ -2189,6 +2189,16 @@ def mariner_lobby():
         elif ob.name.startswith('rear '):ob.parent=walls['back']
 
 
+def riverside_courts():
+    from riverside import exterior
+    exterior(box,cylinder,material)
+
+
+def riverside_lobby():
+    from riverside import lobby
+    lobby(box,cylinder,material)
+
+
 def mercer_lobby():
     plaster=material('aged cream plaster',(.56,.51,.40))
     wood=material('varnished walnut',(.18,.09,.045))
@@ -2262,7 +2272,7 @@ def mercer_lobby():
 
 
 
-def mercer_plate(path, camera_at, target, scale):
+def mercer_plate(path, camera_at, target, scale, lighting=None):
     scene=bpy.context.scene
     broken=bpy.data.objects.get('window-broken')
     if broken:
@@ -2270,7 +2280,7 @@ def mercer_plate(path, camera_at, target, scale):
     scene.render.engine='CYCLES';scene.cycles.samples=32;scene.cycles.use_denoising=True
     scene.render.resolution_x=1280;scene.render.resolution_y=900;scene.render.resolution_percentage=100
     scene.world=bpy.data.worlds.new('Mercer ambient sky');scene.world.color=(.22,.22,.20)
-    for name,position,power,size in [('soft daylight',(-8,-9,22),2600,12),('warm reflected light',(6,2,15),1600,10)]:
+    for name,position,power,size in (lighting or [('soft daylight',(-8,-9,22),2600,12),('warm reflected light',(6,2,15),1600,10)]):
         data=bpy.data.lights.new(name,'AREA');data.energy=power;data.shape='DISK';data.size=size
         obj=bpy.data.objects.new(name,data);scene.collection.objects.link(obj);obj.location=position;obj.rotation_euler=(Vector(target)-obj.location).to_track_quat('-Z','Y').to_euler()
     data=bpy.data.cameras.new('plate camera');obj=bpy.data.objects.new('plate camera',data);scene.collection.objects.link(obj);scene.camera=obj
@@ -2568,6 +2578,23 @@ if __name__ == '__main__' and '--only=bar-cloth' in __import__('sys').argv:
     raise SystemExit(0)
 
 # Export just this new address without rewriting reviewed assets.
+if __name__ == '__main__' and '--only=riverside-plates' in __import__('sys').argv:
+    clear();bpy.ops.import_scene.gltf(filepath=os.path.join(OUT,'riverside-courts.glb'))
+    mercer_plate(os.path.abspath('public/art/fronts/front-riverside-v1.jpg'),(28,35,36),(0,0,14),52,[('soft daylight',(-30,30,48),12000,24),('warm reflected light',(30,15,40),7000,22)])
+    raise SystemExit(0)
+
+
+if __name__ == '__main__' and '--only=riverside' in __import__('sys').argv:
+    manifest_path=os.path.join(OUT,'manifest.json')
+    with open(manifest_path) as f: selected_manifest=json.load(f)
+    clear();riverside_courts();selected_manifest['riverside-courts']=export('riverside-courts')
+    mercer_plate(os.path.abspath('public/art/fronts/front-riverside-v1.jpg'),(28,35,36),(0,0,14),52,[('soft daylight',(-30,30,48),12000,24),('warm reflected light',(30,15,40),7000,22)])
+    clear();riverside_lobby();selected_manifest['interior-riverside']=export('interior-riverside')
+    mercer_plate(os.path.abspath('public/art/rooms/room-riverside-v1.jpg'),(11,-15,10),(0,0,1.5),15)
+    with open(manifest_path,'w') as f:json.dump(selected_manifest,f,indent=2)
+    raise SystemExit(0)
+
+
 if __name__ == '__main__' and '--only=mercer-court' in __import__('sys').argv:
     clear();mercer_court()
     manifest_path=os.path.join(OUT,'manifest.json')
@@ -2645,6 +2672,8 @@ clear();ashbury_interior();manifest['interior-ashbury']=export('interior-ashbury
 clear();cypress_interior();manifest['interior-cypress']=export('interior-cypress')
 clear();laundry_interior();manifest['interior-laundry']=export('interior-laundry')
 clear();mariner_lobby();manifest['interior-mariner']=export('interior-mariner')
+clear();riverside_courts();manifest['riverside-courts']=export('riverside-courts')
+clear();riverside_lobby();manifest['interior-riverside']=export('interior-riverside')
 clear();mercer_court();manifest['mercer-court']=export('mercer-court')
 clear();mercer_lobby();manifest['interior-mercer-court']=export('interior-mercer-court')
 clear();saint_agnes_interior();manifest['interior-saint-agnes']=export('interior-saint-agnes')

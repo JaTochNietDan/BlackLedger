@@ -1904,3 +1904,42 @@ Main8791 remains8ada776; no QA gameplay command touched main. Logs
 .runtime/precinct-{export,tests,build}.log. Remaining holding cells/custody staging,
 physical desk interactions, other missing interiors and full visual/campaign
 acceptance remain open. Unrelated dirty files excluded from this commit.
+
+### Riverside housing capacity and residential map expansion — September 14
+
+A one-year isolated economy probe exposed the finite stock failure: seeds 7, 41
+and 97 ended with 98, 164 and 149 unhoused living NPCs respectively. The previous
+137-place city also left 264 people unhoused at the 400-person roster ceiling.
+Added Riverside Courts on the eastern map: four 68-unit, nine-storey wings with full-height entrances, a communal garden,
+a furnished 3D entrance hall, and 272 stable apartment deeds. Total accommodation
+is now 409. Existing homes, journeys and numbered deeds survive settlement.
+
+Riverside supports $100 leases, $20 private/$10 shared daily rent, $1,000 base
+unit prices with existing local crime pressure and resale spreads, actual funded
+NPC trades, investment rent, private flat views, repair bookings, and existing
+home-crime scenes. Current-version save loading now settles added housing and
+deeds immediately; a crowded-save regression checks no cash, clock, revision or
+player changes, preservation of established homes, and repeated-load idempotence.
+The resident register gained a name/accommodation search for large buildings.
+
+Evidence: three 365-day simulations now have zero shortage at every residential
+command boundary and 25, 10 and 9 living NPC-owned deeds respectively after adding Riverside caretaker/porter jobs. The standalone Advance-only diagnostic can briefly show
+unassigned arrivals between residential settlements; committed actions perform
+settlement before publishing their result. A separate full-400-person fixture
+has no shortage or capacity violations and preserves old residents and deeds.
+Targeted transaction tests exercise leasing, ownership ending rent, selling
+without displacement, cash-funded rent and NPC resale, and neighborhood-local
+price changes. These are economy simulations, not a newly played campaign.
+
+Browser QA on isolated port 8958: all four wings render inside their street lot;
+Focus address frames the complex. The lobby shows six real NPCs and the player,
+with 139 draw calls / 159,440 triangles before the final noticeboard leg detail.
+The expanded lobby fits at 820×740. Both exported actor rigs pass seat support,
+furniture/actor separation and entrance-path geometry checks. Full frontend suite
+passed 372 tests; production TypeScript/Vite build passed. The first full rules
+run identified two obsolete capacity fixtures, updated to deliberately fill the
+expanded stock; their focused rerun passed. Additional address checks caught missing caretaker/porter trades, local death descriptions and fallback-front registration; these were added and their focused tests passed. A repair-booking subject is validated by residence, since bookings remain on the building board during the resident’s absence. Server and store suites passed. A final broad simulation rerun is still in progress; live promotion is recorded separately. The main campaign was not used for these tests.
+
+Outstanding: other venue interiors, richer occupied/failed burglary choreography,
+further visual detail and progression/campaign acceptance remain in the active
+goal. This housing expansion does not close the overall request.

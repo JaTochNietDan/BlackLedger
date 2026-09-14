@@ -122,8 +122,11 @@ export function Interior({
   comings?: Coming[];
 }) {
   const [picked, setPicked] = useState('');
+  const [residentQuery,setResidentQuery]=useState('');
+  useEffect(()=>setResidentQuery(''),[place.id]);
+  const registeredTenants=(place.rent_register?.tenants||[]).filter(t=>`${t.name} ${t.accommodation}`.toLocaleLowerCase().includes(residentQuery.trim().toLocaleLowerCase()));
   const [privateRoom,setPrivateRoom]=useState(false);
-  const hasFlat=player.home===place.id&&(place.id==='apartment'||place.id==='mercercourt'||place.id==='room');
+  const hasFlat=player.home===place.id&&(place.id==='apartment'||place.id==='mercercourt'||place.id==='riverside'||place.id==='room');
   const inFlat=privateRoom&&hasFlat;
   useEffect(()=>{setPrivateRoom(false);},[place.id,player.home]);
   // The sidebar's action search came in here with the work. A room with
@@ -277,7 +280,9 @@ export function Interior({
       {place.rent_register && <details className="lodging-register">
         <summary>Residents’ register <span>{place.rent_register.occupied} tenants · {place.rent_register.capacity} places</span></summary>
         <p>${place.rent_register.daily} current rent per day. {place.id === 'room' && 'Service and condition affect the rate. '}Payments settle daily; unpaid rent remains owing.</p>
-        <ul>{place.rent_register.tenants.map(tenant=><li key={tenant.id}>
+        <input type="search" aria-label="Find a resident" placeholder="Find a resident…" value={residentQuery} onChange={e=>setResidentQuery(e.target.value)}/>
+        {residentQuery&&<p role="status">{registeredTenants.length} matching residents</p>}
+        <ul>{registeredTenants.map(tenant=><li key={tenant.id}>
           <strong>{tenant.name}</strong><span>{tenant.accommodation} · ${tenant.daily} a day</span>
           {tenant.account && <small>Last payment ${tenant.account.paid} · {tenant.account.arrears ? `$${tenant.account.arrears} owing` : 'Account settled'}</small>}
         </li>)}</ul>

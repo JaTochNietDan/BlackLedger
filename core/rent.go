@@ -29,6 +29,11 @@ func (w *World) NPCRent(n *NPC) int {
 	case "room":
 		p := w.Properties[n.Home]
 		return max(0, int(15*float64(p.Condition)/100*math.Min(1, w.Capacity(n.Home))*operatingMode(p.Mode).Take))
+	case "riverside":
+		if n.Accommodation == "Shared flat" {
+			return 10
+		}
+		return 20
 	case "mercercourt":
 		if n.Accommodation == "Shared flat" {
 			return 12

@@ -77,12 +77,18 @@ func TestHousingMigrationIsIdempotentAndDoesNotTakePlayerEstate(t *testing.T) {
 func TestHousingCapacityShortageIsExplicitAndExistingResidentsStay(t *testing.T) {
 	w := New(1)
 	w.NPCs = nil
-	for i := 0; i < 150; i++ {
+	capacity := -1 // Reserve the player’s room; low-standing NPCs cannot use Cypress.
+	for id, n := range ResidentialCapacity {
+		if IsRentalHome(id) {
+			capacity += n
+		}
+	}
+	for i := 0; i < capacity+15; i++ {
 		w.NPCs = append(w.NPCs, NPC{ID: fmt.Sprintf("resident-%03d", i), Purse: 30})
 	}
 	w.SettleHousing()
 	if got := w.HousingShortage(); got != 15 {
-		t.Fatalf("expected 15 without homes after 135 affordable places, got %d", got)
+		t.Fatalf("expected 15 without homes after %d affordable places, got %d", capacity, got)
 	}
 	before := map[string]string{}
 	for _, n := range w.NPCs {

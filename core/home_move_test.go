@@ -51,15 +51,12 @@ func TestNoRehousingWithoutAVacancy(t *testing.T) {
 	w.Player.Location = "room"
 	w.Properties["estate"].Owner = "player:1"
 	w.NPCs = nil
-	for i := 0; i < 136; i++ {
-		home := "room"
-		if i >= 24 {
-			home = "apartment"
+	// Deliberately exceed the ordinary roster ceiling to exercise exhaustion.
+	for _, home := range []string{"room", "apartment", "mercercourt", "riverside"} {
+		for i := 0; i < ResidentialCapacity[home]; i++ {
+			id := fmt.Sprintf("%s-%d", home, i)
+			w.NPCs = append(w.NPCs, NPC{ID: id, Name: id, Home: home, Location: "bar", Post: "bar"})
 		}
-		if i >= 88 {
-			home = "mercercourt"
-		}
-		w.NPCs = append(w.NPCs, NPC{ID: fmt.Sprint(i), Name: fmt.Sprint(i), Home: home, Location: "bar", Post: "bar"})
 	}
 	changes, why := w.PlanHomeMove("room")
 	if why == "" || len(changes) > 0 {

@@ -41,7 +41,7 @@ func (w *World) SettleApartments() {
 	for _, u := range w.Apartments {
 		existing[u.ID] = true
 	}
-	for _, building := range []string{"apartment", "mercercourt"} {
+	for _, building := range []string{"apartment", "mercercourt", "riverside"} {
 		for number := 1; number <= ResidentialCapacity[building]; number++ {
 			id := fmt.Sprintf("%s-%02d", building, number)
 			if !existing[id] {
@@ -105,6 +105,8 @@ func (w *World) ApartmentPrice(u *ApartmentDeed) int {
 	base := 1800
 	if u.Building == "mercercourt" {
 		base = 1200
+	} else if u.Building == "riverside" {
+		base = 1000
 	}
 	return base * w.NeighborhoodPropertyIndex(u.Building) / 100
 }
@@ -199,6 +201,7 @@ func (w *World) ApartmentDay() {
 	// their tenancy. Stable identity order makes this independent of roster order.
 	buyers := w.Residents("apartment")
 	buyers = append(buyers, w.Residents("mercercourt")...)
+	buyers = append(buyers, w.Residents("riverside")...)
 	sort.Slice(buyers, func(i, j int) bool { return buyers[i].ID < buyers[j].ID })
 	for i := range w.Apartments {
 		u := &w.Apartments[i]

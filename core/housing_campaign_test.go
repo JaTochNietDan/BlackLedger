@@ -9,17 +9,23 @@ import (
 // to avoid personal rent bankruptcy and dismisses player-only event prompts.
 // NPC wages, trade, housing, recruitment and conflict use the real clock.
 func TestHousingEconomyFundsNPCDeedsAndHomesForLaterResidents(t *testing.T) {
-	for _, seed := range []uint32{7, 27, 61} {
+	for _, seed := range []uint32{7, 41, 97} {
 		t.Run(fmt.Sprint(seed), func(t *testing.T) {
 			w := New(seed)
 			w.Player.Cash = 100000
 			w.Plots, w.Tasks, w.Contracts = nil, nil, nil
 			start := w.Minute
-			for turn := 0; w.Player.Alive && w.Minute < start+90*1440 && turn < 1000; turn++ {
+			for turn := 0; w.Player.Alive && w.Minute < start+365*1440 && turn < 5000; turn++ {
 				w.Event = nil
 				w.Advance(240)
+				// Same residential settlement performed at a committed command boundary.
+				w.SettleHousing()
+				w.SettleApartments()
+				if w.HousingShortage() != 0 {
+					t.Fatalf("day %d: %d unhoused", (w.Minute-start)/1440, w.HousingShortage())
+				}
 			}
-			if w.Minute < start+90*1440 {
+			if w.Minute < start+365*1440 {
 				t.Fatal("economy simulation ended early")
 			}
 			if w.HousingShortage() != 0 {
@@ -43,7 +49,7 @@ func TestHousingEconomyFundsNPCDeedsAndHomesForLaterResidents(t *testing.T) {
 					t.Fatalf("%s: %d occupants in %d places", id, occupied, capacity)
 				}
 			}
-			t.Logf("90 days: %d living NPC-owned deeds, zero shortage", deeds)
+			t.Logf("365 days: %d living NPC-owned deeds, zero shortage", deeds)
 		})
 	}
 }

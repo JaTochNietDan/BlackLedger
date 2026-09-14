@@ -2,7 +2,7 @@ import {isStagedStrike} from './city3dAssassination.js';
 import type {VisualCue} from './types';
 /** Only an explicit committed home setting selects private-room playback. */
 export function isHomeStrike(cue:VisualCue|null|undefined):boolean {
- return !!cue&&cue.strike?.setting==='home'&&['apartment','mercercourt','estate','room'].includes(cue.target)&&isStagedStrike(cue)&&!!cue.attacker;
+ return !!cue&&cue.strike?.setting==='home'&&['apartment','mercercourt','riverside','estate','room'].includes(cue.target)&&isStagedStrike(cue)&&!!cue.attacker;
 }
 export function homeStrikeRoom(target:string){
  return target==='room'

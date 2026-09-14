@@ -67,6 +67,7 @@ var streetTrades = []struct{ role, place string }{
 	{"Pump attendant", "pumps"}, {"Night attendant", "pumps"}, {"Stock clerk", "pumps"},
 	{"Undertaker", "chapel"}, {"Embalmer", "chapel"}, {"Hearse driver", "chapel"},
 	{"Cutter", "tailor"}, {"Finisher", "tailor"}, {"Fitting clerk", "tailor"},
+	{"Caretaker", "riverside"}, {"Porter", "riverside"},
 }
 
 // AddCivilian puts somebody in the city who answers to nobody.

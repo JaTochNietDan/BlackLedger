@@ -3,6 +3,7 @@ type RoomSettings={lampIntensity?:number;name:string;model:string;span:number;le
 // Coordinates are glTF metres. Cutaway thresholds follow each authored wall;
 // fixtures are positioned in the room that owns them, never borrowed by fallback.
 export const interiorSettings:Record<InteriorPlace,RoomSettings>={
+ riverside:{lampIntensity:2,name:'Riverside Courts',model:'interior-riverside',span:7,leftWall:-5,backWall:-5.5,lamps:[[-2,2.94,-1.9],[2.6,2.94,-1.4],[0,2.94,2.1]]},
  precinct:{lampIntensity:2,name:'Ward Street Station',model:'interior-precinct',span:7,leftWall:-5,backWall:-5.5,lamps:[[-2,2.94,-1.9],[2.6,2.94,-1.4],[0,2.94,2.1]]},
  market:{lampIntensity:2,name:'Mercer Exchange',model:'interior-exchange',span:7,leftWall:-5,backWall:-5,lamps:[[-2.5,2.97,.5],[1.4,2.97,.5],[1.4,2.97,-2.6]]},
  restaurant:{lampIntensity:3,name:"Vittoria’s",model:"interior-restaurant",span:6.5,leftWall:-5,backWall:-5.5,lamps:[[-2.7,2.68,-1.5],[-2.7,2.68,1.5],[2.7,2.68,-1.5],[2.7,2.68,1.5]]},

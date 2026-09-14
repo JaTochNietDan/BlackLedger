@@ -94,5 +94,9 @@
  {
   "id": "mercercourt",
   "file": "fronts/front-mercercourt-v1.jpg"
+ },
+ {
+  "id": "riverside",
+  "file": "fronts/front-riverside-v1.jpg"
  }
 ]

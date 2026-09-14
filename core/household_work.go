@@ -13,7 +13,7 @@ const (
 // The building's notice board carries one small repair booking each day.
 // Selection is stable on reads and rotates through residents, including tenants.
 func (w *World) HouseholdWorkOffer(id string) (*NPC, string) {
-	if id != "room" && id != "apartment" && id != "mercercourt" {
+	if !IsRentalHome(id) {
 		return nil, "Household repair work is posted at residential buildings"
 	}
 	prop := w.Properties[id]

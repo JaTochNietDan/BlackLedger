@@ -54,6 +54,10 @@ func decode(data string) (*core.World, error) {
 		// be gated like one: adding four addresses crashed every save already
 		// at the current version, because nothing had bumped the number.
 		w.SettleNewPlaces()
+		// Added residential stock must serve existing crowded saves immediately.
+		// Settlement preserves valid homes and numbered deeds without advancing time.
+		w.SettleHousing()
+		w.SettleApartments()
 		// And the people who would drive. A save written before the city had
 		// cars in it reads as a city where nobody ever did, and the forecourt
 		// would have no customers in it for the rest of the campaign.

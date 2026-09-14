@@ -128,6 +128,7 @@ type Effect = {
 const modelNames = [
   'tenement',
   'mercer-court',
+  'riverside-courts',
   'mariner',
   'tavern',
   'casino',

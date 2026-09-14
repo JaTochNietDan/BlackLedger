@@ -4,10 +4,10 @@ import "sort"
 
 // Residential capacity is distinct from public footfall and workplace staffing.
 // The apartment building includes shared flats as well as private tenancies.
-var ResidentialCapacity = map[string]int{"room": 24, "apartment": 64, "estate": 1, "mercercourt": 48}
+var ResidentialCapacity = map[string]int{"room": 24, "apartment": 64, "estate": 1, "mercercourt": 48, "riverside": 272}
 
 func IsRentalHome(id string) bool {
-	return id == "room" || id == "apartment" || id == "mercercourt"
+	return id == "room" || id == "apartment" || id == "mercercourt" || id == "riverside"
 }
 
 func (w *World) HousingStanding(n *NPC) int {
@@ -56,12 +56,12 @@ func (w *World) SettleHousing() {
 			continue
 		}
 		wealth := w.HousingStanding(n)
-		choices := []string{"room", "mercercourt", "apartment"}
+		choices := []string{"room", "mercercourt", "apartment", "riverside"}
 		if wealth >= 80 {
-			choices = []string{"apartment", "mercercourt", "room"}
+			choices = []string{"apartment", "mercercourt", "room", "riverside"}
 		}
 		if wealth >= 500 {
-			choices = []string{"estate", "apartment", "mercercourt", "room"}
+			choices = []string{"estate", "apartment", "mercercourt", "room", "riverside"}
 		}
 		for _, home := range choices {
 			// Cypress is a private residence, never a stranger's rented bed in an

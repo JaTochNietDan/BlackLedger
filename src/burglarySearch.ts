@@ -3,7 +3,7 @@ import {aimArm} from './city3dWeapons.js';
 import {groundCharacter} from './city3dGround.js';
 import type {VisualCue} from './types';
 export function isIndoorSearch(cue:VisualCue|null|undefined){
- return !!cue&&cue.kind==='robbery'&&!!cue.burglary&&cue.burglary.success&&!cue.burglary.resident_present&&!cue.burglary.fatal&&['room','apartment','mercercourt','estate'].includes(cue.target);
+ return !!cue&&cue.kind==='robbery'&&!!cue.burglary&&cue.burglary.success&&!cue.burglary.resident_present&&!cue.burglary.fatal&&['room','apartment','mercercourt','riverside','estate'].includes(cue.target);
 }
 export function burglaryRoute(target:string):[number,number][]{
  return target==='estate'?[[1.8,3.5],[1.8,1.6],[2.65,.4],[2.65,-.78]]:target==='room'?[[-2.45,2.45],[-.2,.8],[-.1,-.65],[-.67,-1.63]]:[[0,3.15],[0,1.1],[-.4,-.3],[-1.25,-1.81]];

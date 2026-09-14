@@ -917,6 +917,8 @@ func (w *World) NPC(id string) *NPC {
 }
 func HomeRent(id string) int {
 	switch id {
+	case "riverside":
+		return 20
 	case "mercercourt":
 		return 25
 	case "apartment":
@@ -930,7 +932,7 @@ func HomeRank(id string) int {
 	switch id {
 	case "estate":
 		return 2
-	case "apartment", "mercercourt":
+	case "apartment", "mercercourt", "riverside":
 		return 1
 	}
 	return 0
@@ -942,7 +944,7 @@ func HomeRank(id string) int {
 func (w *World) Watchers() int {
 	n := w.Player.Security
 	switch w.Player.Home {
-	case "apartment", "mercercourt":
+	case "apartment", "mercercourt", "riverside":
 		n++
 	case "estate":
 		n += 2
@@ -958,7 +960,7 @@ func (w *World) Guard() int {
 		n++
 	}
 	switch w.Player.Home {
-	case "apartment", "mercercourt":
+	case "apartment", "mercercourt", "riverside":
 		n++
 	case "estate":
 		n += 2
@@ -1158,7 +1160,7 @@ func (w *World) Actions(id string) []Action {
 					plainly((FuneralWindow-(w.Minute-n.DiedAt))/1440+1, "hours", fmt.Sprintf("%d days", (FuneralWindow-(w.Minute-n.DiedAt))/1440+1))))
 		}
 	}
-	if id == "room" || id == "apartment" || id == "mercercourt" {
+	if IsRentalHome(id) {
 		resident, reason := w.HouseholdWorkOffer(id)
 		label := "Take a household repair booking"
 		if resident != nil {

@@ -52,6 +52,15 @@ func TestWorkAimedAtSomebodyKnowsWhoItIsAimedAt(t *testing.T) {
 				}
 			}
 			if !aimed {
+				if a.ID == "householdwork" && a.Subject != "" {
+					// A resident leaves a booking on their building's board;
+					// they need not remain physically beside it all day.
+					resident := w.NPC(a.Subject)
+					if resident == nil || resident.Dead || resident.Home != l.ID {
+						missing = append(missing, "repair booking has no living resident at "+l.ID)
+					}
+					continue
+				}
 				if a.Subject != "" && !here[a.Subject] {
 					missing = append(missing, a.ID+" is about "+a.Subject+", who is not at "+l.ID)
 				}

@@ -1015,3 +1015,24 @@ funds; changed circumstances cancel payment without substituting another payer.
 These are small domestic repairs, with no change to the building's structural
 condition, deed, tenant assignment or inventory. Presentation uses ordinary local
 work results; a dedicated repair animation is not yet implemented.
+
+## Riverside residential expansion
+
+`riverside` (Riverside Courts, district 1) adds 272 numbered apartments in four
+68-unit wings at the eastern map address (1167, 613). Total city accommodation is
+409 places, enough for the 400-person roster ceiling plus the player even when
+Cypress House cannot receive an NPC. Established valid homes and deed IDs remain
+unchanged. Newly arriving residents use Riverside after existing vacancies.
+
+The lease costs $100, with $20/day private or $10/day shared NPC rent. Individual
+`riverside-01` through `riverside-272` deeds start at $1,000 before the existing
+neighborhood crime index; the normal broker sale spread applies. Funded NPC sales,
+owner rent receipts, player purchases/sales, household repair bookings, burglary
+and attacks at an occupied home use their existing rules. Apartment ownership
+ends the owner-occupant's rent; buying an investment retains its tenant.
+
+Current-version saves gain the new property, housing assignments and numbered
+deeds on decode without advancing the clock, altering cash or moving established
+tenants. This is additive content, not a new save schema or command. The Riverside
+lobby and four-wing courtyard have authored 3D models; rented private apartments
+and recorded home scenes use the existing private-flat interior.

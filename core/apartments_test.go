@@ -27,7 +27,7 @@ func TestApartmentRegistryPreservesHomesAndIsReadOnlyDuringMovePlanning(t *testi
 		t.Fatal("read mutated apartment registry")
 	}
 	w.SettleApartments()
-	if *w.apartmentForResident("tenant") != u || len(w.Apartments) != 112 {
+	if *w.apartmentForResident("tenant") != u || len(w.Apartments) != 384 {
 		t.Fatal("stable apartment assignment changed")
 	}
 	for _, n := range w.NPCs {
