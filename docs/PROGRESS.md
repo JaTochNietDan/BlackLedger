@@ -38,3 +38,16 @@ assassination review shows the updated silhouettes at145FPS/143draws. Screenshot
 and diagnostic evidence: tailored-characters.png/json. This is an incremental
 silhouette pass; toy-like anatomy, hands, faces and clothing variety still fall
 short of final visual acceptance. No campaign command was issued.
+
+### September 13 — working entrances across standard venues
+
+Extended the authored hinged doorway/vestibule to ten standard building exports,
+covering sixteen mapped addresses. Cleared front windows and piers away from the
+opening. Added doorway-distance-aware staging for shallower buildings so the
+breaching officer reaches the actual leaf. All200 frontend tests pass, including
+closed/open passage rays, floor support and parcel bounds for every changed GLB;
+build passes. Browser8873 Blue Hour and Paper Moon private raids each opened their
+door and triggered one recorded kick. Blue Hour screenshot145FPS/277draws. Evidence:
+bluehour-entry.png and venue-entries.json. No campaign commands issued. Specialist
+buildings remain without working entrances; full interior and entry art variety
+are still unfinished.

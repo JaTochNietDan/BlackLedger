@@ -219,18 +219,14 @@ def building(kind, floors, width=12, depth=12, seed=0, palette=None, accent=None
     recess=material('unlit window recess',(.018,.023,.024))
     shards=material('broken glass edges',(.19,.31,.32),.45)
     anchor=bpy.data.objects.new('sign-anchor',None);bpy.context.collection.objects.link(anchor);anchor.location=(0,depth/2+.26,2.85)
-    if kind=='tavern':
-        # A real front vestibule, not a painted doorway on a solid block.
-        # The 2m clear opening and 3m recess admit an articulated person.
-        for side in (-1,1):
-            box('masonry wing',(side*(width/4+.5),0,height/2),((width-2)/2,depth,height),wall)
-            box('foundation wing',(side*(width/4+.5625),0,.25),((width-2)/2+.125,depth+.25,.5),stone)
-        box('vestibule lintel',(0,0,(height+2.6)/2),(2,depth,height-2.6),wall)
-        box('vestibule rear',(0,-1.5,1.3),(2,depth-3,2.6),wall)
-        box('vestibule paving',(0,depth/2-1.5,-.04),(2,3,.08),stone)
-    else:
-        box('masonry', (0,0,height/2), (width,depth,height), wall)
-        box('foundation', (0,0,.25), (width+.25,depth+.25,.5), stone)
+    # A real front vestibule, not a painted doorway on a solid block.
+    # The 2m clear opening and 3m recess admit an articulated person.
+    for side in (-1,1):
+        box('masonry wing',(side*(width/4+.5),0,height/2),((width-2)/2,depth,height),wall)
+        box('foundation wing',(side*(width/4+.5625),0,.25),((width-2)/2+.125,depth+.25,.5),stone)
+    box('vestibule lintel',(0,0,(height+2.6)/2),(2,depth,height-2.6),wall)
+    box('vestibule rear',(0,-1.5,1.3),(2,depth-3,2.6),wall)
+    box('vestibule paving',(0,depth/2-1.5,-.04),(2,3,.08),stone)
     box('cornice lower', (0,0,height-.18), (width+.45,depth+.45,.18), stone)
     box('cornice cap', (0,0,height), (width+.65,depth+.65,.22), stone)
     box('roof', (0,0,height+.13), (width,depth,.08), dark)
@@ -255,7 +251,9 @@ def building(kind, floors, width=12, depth=12, seed=0, palette=None, accent=None
                 for col in range(count):
                     x = (col-(count-1)/2)*w/count
                     z = floor*3.15 + 1.8
-                    if kind=='tavern' and axis==0 and side==1 and floor==0 and abs(x)<2: x=2 if x>0 else -2
+                    if axis==0 and side==1 and floor==0 and abs(x)<2.2:
+                        if abs(x)<.01: continue
+                        x=2.2 if x>0 else -2.2
                     facade('window surround', x,z,(1.85 if floor==0 else 1.36,.16,1.95),stone)
                     if axis==0 and side==1:
                         vent=bpy.data.objects.new('fire-window-'+str(floor)+'-'+str(col),None)
@@ -278,12 +276,12 @@ def building(kind, floors, width=12, depth=12, seed=0, palette=None, accent=None
                     facade('window mullion', x,z,(.065,.26,1.64),iron)
                     facade('window sill',x,z-.91,(1.5,.42,.14),stone)
             facade('shop fascia',0,2.85,(w+.2,.35,.36),iron)
-            if not(kind=='tavern' and axis==0 and side==1):
+            if not(axis==0 and side==1):
                 facade('entrance',0,1.15,(1.35,.32,2.25),iron)
                 facade('door glass',0,1.45,(1.02,.36,1.4),glass)
             for col in range(count+1):
                 x=(col-count/2)*w/count
-                if not(kind=='tavern' and axis==0 and side==1 and abs(x)<1):
+                if not(axis==0 and side==1 and abs(x)<1):
                     facade('ground pier',x,1.4,(.21,.27,2.65),stone)
             if kind in ('tavern','shop','casino') and axis==0 and side==1:
                 cloth=material('burgundy canvas',(.24,.055,.045))
@@ -294,28 +292,27 @@ def building(kind, floors, width=12, depth=12, seed=0, palette=None, accent=None
                     awning.rotation_euler.x=math.radians(-12)
                     facade('awning valance',x,2.4,(w/count-.18,1.5,.26),cloth)
 
-    if kind=='tavern':
-        oak=material('entrance polished oak',(.16,.075,.029))
-        brass=material('entrance aged brass',(.48,.34,.12),.65)
-        pivot=bpy.data.objects.new('entrance-door-hinge',None)
-        bpy.context.collection.objects.link(pivot);pivot.location=(-.92,depth/2+.08,.02)
-        def doorpart(name,xyz,dims,mat,bevel=.01):
-            ob=box(name,xyz,dims,mat,bevel)
-            ob.parent=pivot;ob.location-=pivot.location
-            return ob
-        # Thin independent leaf with framed glazing and recessed lower panels.
-        doorpart('door bottom rail',(0,depth/2+.08,.14),(1.84,.12,.24),oak)
-        doorpart('door middle rail',(0,depth/2+.08,1.0),(1.84,.12,.16),oak)
-        doorpart('door top rail',(0,depth/2+.08,2.28),(1.84,.12,.16),oak)
-        for x in (-.84,.84):doorpart('door stile',(x,depth/2+.08,1.19),(.16,.12,2.34),oak)
-        doorpart('door lower panel',(0,depth/2+.07,.58),(1.52,.07,.7),oak)
-        doorpart('door glazing',(0,depth/2+.08,1.65),(1.52,.045,1.14),glass)
-        doorpart('door brass kickplate',(0,depth/2+.15,.22),(1.5,.025,.22),brass)
-        doorpart('door brass pull',(.63,depth/2+.20,1.14),(.045,.075,.3),brass)
-        for x in (-1.08,1.08):box('entry stone jamb',(x,depth/2+.04,1.28),(.16,.32,2.56),stone)
-        box('entry stone head',(0,depth/2+.04,2.49),(2.32,.32,.14),stone)
-        entry=bpy.data.objects.new('entrance-threshold',None)
-        bpy.context.collection.objects.link(entry);entry.location=(0,depth/2+.08,0)
+    oak=material('entrance polished oak',(.16,.075,.029))
+    brass=material('entrance aged brass',(.48,.34,.12),.65)
+    pivot=bpy.data.objects.new('entrance-door-hinge',None)
+    bpy.context.collection.objects.link(pivot);pivot.location=(-.92,depth/2+.08,.02)
+    def doorpart(name,xyz,dims,mat,bevel=.01):
+        ob=box(name,xyz,dims,mat,bevel)
+        ob.parent=pivot;ob.location-=pivot.location
+        return ob
+    # Thin independent leaf with framed glazing and recessed lower panels.
+    doorpart('door bottom rail',(0,depth/2+.08,.14),(1.84,.12,.24),oak)
+    doorpart('door middle rail',(0,depth/2+.08,1.0),(1.84,.12,.16),oak)
+    doorpart('door top rail',(0,depth/2+.08,2.28),(1.84,.12,.16),oak)
+    for x in (-.84,.84):doorpart('door stile',(x,depth/2+.08,1.19),(.16,.12,2.34),oak)
+    doorpart('door lower panel',(0,depth/2+.07,.58),(1.52,.07,.7),oak)
+    doorpart('door glazing',(0,depth/2+.08,1.65),(1.52,.045,1.14),glass)
+    doorpart('door brass kickplate',(0,depth/2+.15,.22),(1.5,.025,.22),brass)
+    doorpart('door brass pull',(.63,depth/2+.20,1.14),(.045,.075,.3),brass)
+    for x in (-1.08,1.08):box('entry stone jamb',(x,depth/2+.04,1.28),(.16,.32,2.56),stone)
+    box('entry stone head',(0,depth/2+.04,2.49),(2.32,.32,.14),stone)
+    entry=bpy.data.objects.new('entrance-threshold',None)
+    bpy.context.collection.objects.link(entry);entry.location=(0,depth/2+.08,0)
 
     # Rooftop skylight, chimney, water tank, fire escape: silhouette at any angle.
     box('skylight',(-2,1,height+.45),(2.2,2.8,.6),iron,.08)

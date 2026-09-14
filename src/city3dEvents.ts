@@ -63,7 +63,7 @@ export function availableSceneSlot(
     // Its conservative swept reservation also protects the entry after contact.
     const root={x:entry.x,z:Math.max(lot.row*PITCH+6.35,entry.z-1.55)};
     if(entry.z-root.z>.65&&entry.z-root.z<=3.65)
-      candidates.splice(1,0,{root,pose:{x:root.x,z:root.z+2.6,heading:0},model:'police-approach'});
+      candidates.splice(entry.z-candidates[0].root.z>3.65?0:1,0,{root,pose:{x:root.x,z:root.z+2.6,heading:0},model:'police-approach'});
   }
   return candidates.find(slot =>
     occupied.every(other => !trafficOverlap(slot.pose, slot.model, other.pose, other.model)));

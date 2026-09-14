@@ -46,3 +46,10 @@ Joint locations, weapon grips and traffic envelopes are unchanged. The Blender
 source remains `tools/export_city3d.py`; GLBs and measured manifest were regenerated.
 This reduces box-shaped clothing; detailed anatomical/facial and wardrobe work
 remains necessary for hero close-ups.
+
+September 13 entry pass: the ten standard masonry/venue exports (tenement,
+tavern, casino, warehouse, civic, shop, Monarch, Blue Hour, Golden Lily, Paper Moon)
+share a real two-metre vestibule, independent oak/glass/brass door leaf and named
+hinge/threshold. Front windows and piers clear the entrance. Geometry tests sweep
+open passages and floors across all ten GLBs. Specialist industrial, villa,
+Mariner and other unique exports still require their own working entrances.

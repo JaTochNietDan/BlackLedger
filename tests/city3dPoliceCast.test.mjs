@@ -74,3 +74,9 @@ test('a casualty in the central forecourt leaves a shorter door-aligned breach c
   assert.ok(Math.abs(slot.root.z+pose.travelled-slot.pose.z)+.7<=3.300001);
  }
 });
+
+test('shallower buildings stage close enough to reach their doorway',()=>{
+ const lot={id:'burlesque',x:80,z:48,row:1,col:2},entry={x:80,z:42.92};
+ const slot=availableSceneSlot(lot,'raid-officer',[],entry);
+ assert.equal(slot.root.x,entry.x);assert.ok(entry.z-slot.root.z-.65<=3);
+});
