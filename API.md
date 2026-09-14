@@ -605,9 +605,9 @@ The attack removes15–30 condition points, bounded by remaining condition, remo
 
 The existing saved building-fire lifecycle supplies brigade arrival, extinguishing and cleanup; extinguishing does not repair condition. A new `incendiary` visual cue has gravity8, the target address and an attacker identifying the player with weapon0. Its news is an attack-category arson report. No save schema or endpoint shape changes. The browser stages an authored held-bottle approach, throw, flight and escape before revealing the newspaper. A reserved forecourt footprint protects the actor path. Presentation hides window fire until impact and defers the saved brigade response until the cast exits; authoritative fire timestamps and damage remain unchanged. An Incendiary debug scene uses a private snapshot. Facade/path clearance across all addresses, impact detail and animation quality remain under development.
 
-## Building drive-by foundation — not yet exposed as a command
+## Building drive-by property attack
 
-`World.BuildingDriveBy` resolves an attack against a nonowned operating business
+The `driveby-building` action calls `World.BuildingDriveBy` against a nonowned operating business
 at the player's current address. The player must be alive, free, carrying an
 equipped firearm (tier1–3), and have an operational personal car with petrol.
 The first crew member must satisfy existing delegation availability and loyalty
@@ -620,8 +620,10 @@ Thompson26–31, capped by remaining condition. Supply loss is floor(actual dama
 bounded at zero; operating trouble is set. A faction owner loses25 goodwill and
 receives the existing retaliation scheduling call. The attack itself does not
 start a fire, create casualties, remove staff/bankroll, consume charges or grant
-respect. The method does not advance the clock; future command integration must
-advance the quoted10 minutes once through the normal transactional action path.
+respect. The method does not advance the clock; command dispatch advances the
+quoted10 minutes once through the normal transactional action path. The action
+appears in The Street with its35-dollar/fuel cost, crew/car requirements and
+attention disclosed; its generic action cost is zero because the method pays.
 
 The resulting `driveby-building` cue has gravity7 and captures the player in
 `attacker`, the driver in `actors`, and optional `drive_by` data:
@@ -630,8 +632,7 @@ Names, equipment and actual damage refer to the event time, including after
 serialization in `last_result.cues`. The attack-category newspaper headline is
 shared with the cue. Legacy and unrelated cues omit `drive_by`.
 
-This is a staged core contract. No action listing or command dispatch is enabled
-yet. City3D now plays the captured car and distinct driver/shooter through a
+City3D plays the captured car and distinct driver/shooter through a
 reserved road sweep, with timed gunfire, facade dust and vehicle audio; the
 Building drive-by debug preview uses a private Packard/Thompson cast without
 changing campaign condition. Material wear and glazing reveal the captured
@@ -640,8 +641,9 @@ starting condition. Scene completion or cancellation restores the current
 snapshot's condition (including undoing private preview damage). Aim points and
 impacts use the first visible authored building surface along a ray, rather
 than its bounding box; shot impacts sample the muzzle at the firing beat.
-Recorded-result news sequencing and actual command acceptance remain required
-before exposing the gameplay action.
+The recorded newspaper is revealed after scene completion, through the existing
+result/newspaper flow. Normal completion has been exercised on an isolated
+campaign; replay, Skip/motion-off and broader visual acceptance remain to verify.
 
 
 Pending planter exits now hold their future footprint against newly arriving moving

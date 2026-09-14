@@ -1729,6 +1729,8 @@ func (w *World) Actions(id string) []Action {
 		}
 	}
 	if prop := w.Properties[id]; prop != nil && prop.Income > 0 && !w.Own(id) {
+		add("driveby-building", "Drive past and shoot up "+l.Name, BuildingDriveByMinutes, 0, w.BuildingDriveByReadiness(id),
+			fmt.Sprintf("Costs $%d and petrol. You fire your equipped gun while your first crew member drives your car; they must be here and available. Damages the premises and supplies, draws %d attention and provokes the owner.", BuildingDriveByCost, BuildingDriveByHeat))
 		add("incendiary", "Throw an incendiary bottle at "+l.Name, IncendiaryMinutes, 0, w.IncendiaryReadiness(id),
 			fmt.Sprintf("Costs $%d. Damages the premises and destroys supplies, starts a fire and draws %d attention. The owner will retaliate. Cannot target premises already burning.", IncendiaryCost, IncendiaryHeat))
 	}

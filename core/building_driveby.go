@@ -61,8 +61,8 @@ func (w *World) BuildingDriveByReadiness(id string) string {
 	return ""
 }
 
-// BuildingDriveBy resolves a property attack. Command dispatch and its browser
-// scene are deliberately not enabled yet; this method does not advance time.
+// BuildingDriveBy resolves a property attack before command dispatch advances
+// the quoted time through the ordinary simulation path.
 func (w *World) BuildingDriveBy(id string) error {
 	if reason := w.BuildingDriveByReadiness(id); reason != "" {
 		return fmt.Errorf("%s", reason)
@@ -91,7 +91,6 @@ func (w *World) BuildingDriveBy(id string) error {
 	w.Report("attack", headline, fmt.Sprintf("Shots fired from a passing car damaged %s. The car left the scene.", place.Name))
 	w.Witness("driveby-building", id, body, headline, driver.ID)
 	cue := &w.VisualCues[len(w.VisualCues)-1]
-	cue.Gravity = 7
 	cue.Attacker = &CueAttacker{ID: "player", Name: w.Player.Name, Weapon: w.Player.Weapon}
 	cue.DriveBy = &CueDriveBy{
 		Driver:  CueActor{ID: driver.ID, Name: driver.Name},

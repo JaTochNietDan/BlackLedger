@@ -189,3 +189,32 @@ func TestBuildingDriveByProvokesActualOwner(t *testing.T) {
 		t.Fatal("missing owner retaliation", w.Plots)
 	}
 }
+
+func TestBuildingDriveByCommandPersistsOutcomeAndChargesOnce(t *testing.T) {
+	w := buildingDriveByFixture(t, 61)
+	w.Plots = nil
+	before := w.Clone()
+	act(t, &w, "driveby-building", "club")
+	if w.Minute != before.Minute+BuildingDriveByMinutes || w.Player.Cash != before.Player.Cash-BuildingDriveByCost || w.Fuel() != before.Fuel()-1 {
+		t.Fatal("wrong command duration, payment or fuel")
+	}
+	if w.LastResult == nil || w.LastResult.Elapsed != BuildingDriveByMinutes || len(w.LastResult.Cues) == 0 {
+		t.Fatal("command lost result")
+	}
+	var captured *VisualCue
+	for i := range w.LastResult.Cues {
+		if w.LastResult.Cues[i].Kind == "driveby-building" {
+			captured = &w.LastResult.Cues[i]
+		}
+	}
+	if captured == nil || captured.DriveBy == nil || captured.Minute != before.Minute || captured.DriveBy.ConditionAfter != w.Properties["club"].Condition {
+		t.Fatal("lost recorded scene", captured)
+	}
+	saved := w.Clone()
+	if saved.LastResult.Cues[0].DriveBy == nil || saved.Properties["club"].Condition != w.Properties["club"].Condition {
+		t.Fatal("saved result lost damage/cast")
+	}
+	if _, err := Execute(w, Command{Revision: before.Revision, Kind: "driveby-building", Target: "club"}); err == nil {
+		t.Fatal("stale duplicate command accepted")
+	}
+}
