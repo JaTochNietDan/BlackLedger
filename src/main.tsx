@@ -1,3 +1,4 @@
+import {isIndoorSearch} from './burglarySearch';
 import {HomeStrikeScene} from './HomeStrikeScene';
 import {homeStrikeFor} from './homeStrike';
 import {KeyboardShortcuts} from './KeyboardShortcuts';
@@ -734,7 +735,7 @@ function App() {
   function content(view=tab) {
     const w = world!;
     if (view === 'city') {
-      const homeCue=homeStrikeFor(playing,w.last_result?.cues||[]);
+      const homeCue=homeStrikeFor(playing,w.last_result?.cues||[])||(isIndoorSearch(playing)?playing:undefined);
       const inside = cityView === 'interior' && locationInfo.id === p.location;
       const theatre = playing && !journey && (
         <Theatre
@@ -744,7 +745,7 @@ function App() {
           place={w.locations.find(l => l.id === playing.target) || w.locations[0]}
           onProgress={setBeat}
           plate={cityView !== 'iso'}
-          stagedAudio={cityView === 'iso' && cityOwnsAudio(playing, w.last_result?.cues || [])}
+          stagedAudio={cityView === 'iso' && (isIndoorSearch(playing)||cityOwnsAudio(playing, w.last_result?.cues || []))}
           onDone={() => {if(sceneArticle&&playing)setFinishedCue(playing.id);else setPlaying(null);}}
         />
       );

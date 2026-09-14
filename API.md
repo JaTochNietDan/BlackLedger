@@ -987,3 +987,12 @@ the authored tray only; it is not a cash inventory, search command or loot claim
 It sends no action and resets with the room view. Motion off/reduced motion
 settles the drawer immediately. The articulated `burglary-drawer` model group is
 available for the pending recorded burglary search animation.
+
+Successful burglaries with the resident absent now play a recorded indoor search
+at Ashbury/Mercer flats and Mariner lodging. The existing burglary cue supplies
+the intruder and amount; a cash prop appears only when taken>0. Entry, physical
+drawer opening/search, closing and exit complete before the existing newspaper
+reveal. Empty successful searches use the same route without cash. Occupied,
+failed, fatal, estate and legacy robbery cases retain existing presentation
+pending distinct choreography; they are not substituted with a successful search.
+Replay does not perform a command or change the recorded amounts.

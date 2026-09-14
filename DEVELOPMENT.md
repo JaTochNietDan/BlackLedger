@@ -1591,3 +1591,31 @@ storage-lodging-export.log. Main campaign untouched for QA and main8791 remains
 on the prior release. Recorded burglary approach/search/outcome animation is
 still unfinished; these assets remove the solid-furniture obstacle to staging
 that interaction. Remaining interiors/aftermath/campaign work remain active.
+
+## September 14 — recorded unattended burglary search
+
+Connected successful absent-resident burglary cues to the existing home renderer
+for private flats and Mariner lodging. BurglarySearch walks an authored furniture-
+clear route, opens the actual bedside drawer, leans/reaches over the tray, shows
+a small cash bundle only for actual taken>0, closes the drawer and exits. The
+bundle follows the actual hand during the short pocketing gesture. Empty searches
+never show it. No resident is invented. Occupied/failed/fatal/estate and generic
+robbery cues are deliberately still pending their distinct scenes.
+
+Added burglary-search isolated fixture using the real committed burgle action;
+new QA server8946 includes CueBurglary (older release binaries would discard the
+new optional saved cue). Browser observed entry, approach, exit and report flow.
+Geometry tests found the initial hand stopped short of the tray; moved the stance
+closer and corrected Euler rotation order to YXZ so the lean is toward the
+cabinet. Actual exported hand centers now project inside the open tray for both
+rigs and both rooms. Sampled full routes verify floor support and furniture
+clearance; checks also prove empty searches have no money and unsupported
+outcomes do not select this scene. Final corrected hand contact has geometry
+evidence; the timed browser capture caught retreat rather than the brief search.
+
+All366 frontend tests pass (`.runtime/burglary-search-final-tests.log`), final
+build passes (`burglary-search-final-build.log`), and dedicated contact tests pass
+(`burglary-search-contact.log`). No gameplay commands from browser replay and no
+main-save QA. Main8791 remains the prior verified release. Search/confrontation
+sound design, occupied/failure/fatal and Cypress burglary choreography, indoor
+persistent aftermath and remaining interiors/campaign acceptance remain open.
