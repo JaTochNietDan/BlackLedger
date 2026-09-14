@@ -2805,3 +2805,30 @@ Added an early household-funds eligibility check before scanning holdings and
 listings: every purchase already requires more than the $500 minimum reserve.
 Targeted proprietor/Mariner/tournament-owner checks pass0.257s. Preparing a clean
 release and copied-save compatibility evidence while broader tests finish.
+
+### September 14 — clean release gate found failures; no promotion
+
+The exact cc4a6ea full run (session71514) terminated with failure. It exposed
+plural-family SendWord prose ("people has") and ownership-reference scan failures
+for living NPC proprietors. Both core and sim also hit the default10-minute
+package timeout; this was confirmed terminal, not inferred from quiet output.
+Expanded owner integration session27100 passed313.238s.
+
+Corrected SendWord agreement for has/have and is/are. The reference audit now
+recognizes living individual owners while retaining errors for missing and dead
+owners; a regression test checks all three. The apartment listing path appeared
+in the timeout stacks. Cached the life-specific owner ID per listing/market/rent
+read and avoided NPC lookups for vacant units or already-filled broker groups.
+No listing eligibility or ordering policy was intentionally changed.
+
+Clean07e41c4 candidate8984 uses only a copied campaign.403 frontend tests passed
+56.886s under test contention; build8.78s. Backup revision2182/minute163810/life11
+and all2184 receipts are preserved byte-for-byte after loading and public reads:
+SHA256a12b3718954540bb3cec26d7ad952c9c1ebacf876194939c46350b184e5ed0d4.
+Release-local compatibility.json records assertions. The first binary reported
+modified:true because node_modules was a symlink rather than an ignored directory;
+added that symlink to local git exclude, rebuilt and restarted only candidate8984.
+Current candidate session37894 reports modified:false. It predates these gate
+fixes and is NOT approved for promotion. Main8791 remains untouched.
+Targeted apartment/reference/one-family prose checks pass2.707s after the fixes.
+A new clean full suite with a longer package timeout is required before release.

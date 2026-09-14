@@ -233,6 +233,7 @@ func (w *World) ApartmentDay() {
 // never allocate units, evict tenants or change the order of the saved registry.
 func (w *World) ApartmentListings() map[string]bool {
 	listed := map[string]bool{}
+	owner := w.playerDeedID()
 	units := make([]*ApartmentDeed, 0, len(w.Apartments))
 	for i := range w.Apartments {
 		units = append(units, &w.Apartments[i])
@@ -240,7 +241,7 @@ func (w *World) ApartmentListings() map[string]bool {
 	sort.Slice(units, func(i, j int) bool { return units[i].ID < units[j].ID })
 	occupied, vacant := map[string]int{}, map[string]int{}
 	for _, u := range units {
-		if u.Owner == w.playerDeedID() || u.Resident == w.playerDeedID() {
+		if u.Owner == owner || u.Resident == owner {
 			listed[u.ID] = true
 			continue
 		}
@@ -250,9 +251,11 @@ func (w *World) ApartmentListings() map[string]bool {
 		if u.Resident == "" && vacant[u.Building] < 1 {
 			listed[u.ID] = true
 			vacant[u.Building]++
-		} else if n := w.NPC(u.Resident); n != nil && !n.Dead && occupied[u.Building] < 3 {
-			listed[u.ID] = true
-			occupied[u.Building]++
+		} else if u.Resident != "" && occupied[u.Building] < 3 {
+			if n := w.NPC(u.Resident); n != nil && !n.Dead {
+				listed[u.ID] = true
+				occupied[u.Building]++
+			}
 		}
 	}
 	return listed
@@ -260,11 +263,12 @@ func (w *World) ApartmentListings() map[string]bool {
 
 func (w *World) ApartmentMarket() []map[string]any {
 	listed := w.ApartmentListings()
+	owner := w.playerDeedID()
 	out := []map[string]any{}
 	for i := range w.Apartments {
 		u := &w.Apartments[i]
-		owned := u.Owner == w.playerDeedID()
-		home := u.Resident == w.playerDeedID()
+		owned := u.Owner == owner
+		home := u.Resident == owner
 		if !listed[u.ID] {
 			continue
 		}
@@ -297,9 +301,10 @@ func (w *World) ApartmentMarket() []map[string]any {
 }
 
 func (w *World) ApartmentRentIncome() int {
+	owner := w.playerDeedID()
 	total := 0
 	for _, n := range w.NPCs {
-		if u := w.apartmentForResident(n.ID); u != nil && u.Building == n.Home && u.Owner == w.playerDeedID() {
+		if u := w.apartmentForResident(n.ID); u != nil && u.Building == n.Home && u.Owner == owner {
 			total += w.NPCRent(&n)
 		}
 	}

@@ -25,8 +25,10 @@ func (w *World) Dangling() []string {
 		family[f.ID] = true
 	}
 	person := map[string]bool{}
+	living := map[string]bool{}
 	for i := range w.NPCs {
 		person[w.NPCs[i].ID] = true
+		living[w.NPCs[i].ID] = !w.NPCs[i].Dead
 	}
 	place := map[string]bool{}
 	for _, l := range Locations {
@@ -90,9 +92,9 @@ func (w *World) Dangling() []string {
 		if prop == nil {
 			continue
 		}
-		// An owner is a family, the player, or nobody in particular.
+		// An owner can also be a living individual proprietor.
 		if prop.Owner != "" && prop.Owner != "independent" &&
-			prop.Owner != mine && !family[prop.Owner] {
+			prop.Owner != mine && !family[prop.Owner] && !living[prop.Owner] {
 			note("the deeds to "+l.ID, prop.Owner)
 		}
 		if prop.Posted != "" && !person[prop.Posted] {

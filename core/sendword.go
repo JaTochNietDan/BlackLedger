@@ -19,13 +19,13 @@ func (w *World) SendWordReadiness(id string) string {
 		return "There is nobody of that description"
 	}
 	if w.Expecting(id) {
-		return f.Name + " is already expecting you"
+		return f.Name + " " + Agree(f.Name, "is", "are") + " already expecting you"
 	}
 	if w.Leader(id) == nil {
 		return "Nobody is left to speak for " + f.Name
 	}
 	if len(w.FamilyHoldings(id)) == 0 {
-		return f.Name + " has nowhere left to receive anybody"
+		return f.Name + " " + Agree(f.Name, "has", "have") + " nowhere left to receive anybody"
 	}
 	if !w.Fitted("telephone") && w.Player.Contacts < WordContacts {
 		return fmt.Sprintf("Nobody would carry a message for you. It takes a telephone or %d people who know your name", WordContacts)

@@ -114,3 +114,24 @@ func TestFamilyLeaderDeathKeepsFamilyBusinessesThroughSuccession(t *testing.T) {
 		t.Fatal("family deed did not survive succession")
 	}
 }
+
+func TestOwnershipReferenceAuditAcceptsOnlyLivingProprietors(t *testing.T) {
+	w := New(7)
+	n := w.NPC("mara")
+	w.Properties["laundry"].Owner = n.ID
+	if bad := w.Dangling(); len(bad) > 0 {
+		t.Fatalf("valid owner rejected: %v", bad)
+	}
+	n.Dead = true
+	if len(w.Dangling()) != 1 {
+		t.Fatal("dead proprietor was not detected")
+	}
+	w.Properties["laundry"].Owner = "missing-proprietor"
+	if len(w.Dangling()) != 1 {
+		t.Fatal("missing proprietor was not detected")
+	}
+	w.Properties["laundry"].Owner = "independent"
+	if len(w.Dangling()) != 0 {
+		t.Fatal("released business still dangles")
+	}
+}
