@@ -2286,3 +2286,28 @@ visually inspected. This is hand/arm motion, not individually articulated
 fingers, mechanical key depression or moving carriage animation.
 No main campaign commands or release promotion; 8791 stays at 89cc61b.
 Broader interiors and billiards fidelity remain unfinished.
+
+### 2026-09-14 — Thorne & Sons public chapel
+
+Previous d693d60 was committed newsroom animation progress. Added an original
+Blender chapel interior for Thorne & Sons: walnut panelling, cornices, eight
+upholstered visitor chairs, reception desk/ledger, brass fittings, flowers,
+sconces and a closed display casket on a bier. This is scenery and does not
+assert a dead NPC or create funeral simulation. Added selective/full model
+export, chapel registration, occupied-seat staging and isolated chapel fixture.
+
+392 frontend tests pass; production build passes. Tests load real exported
+geometry and both character rigs, checking seat support, actor separation,
+reception clearance and the sampled entrance path. The first check caught
+a carpet-top mismatch with the shared walking floor; corrected the authored
+carpet height and reran successfully. Logs `.runtime/chapel-tests.log`,
+`.runtime/chapel-tests-final.log`, `.runtime/chapel-build.log`,
+`.runtime/chapel-export.log`.
+Browser tab 71 at isolated8973 reviewed the room, seated occupants and direct
+receptionist selection into the correct existing action list. Fixture remains
+revision0/minute600/no receipts; no gameplay commands or main-save writes.
+Main8791 is still89cc61b; this room awaits release promotion.
+
+The public chapel does not include the rear preparation room/hearse yard.
+Other interiors, broader visual acceptance and full billiards physics/character
+animation remain unfinished; the goal remains active.

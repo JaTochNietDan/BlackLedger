@@ -1126,5 +1126,21 @@
       ]
     ],
     "bytes": 2004728
+  },
+  "interior-chapel": {
+    "file": "interior-chapel.glb",
+    "bounds_blender": [
+      [
+        -5.08,
+        -5.5,
+        -0.19
+      ],
+      [
+        5.0,
+        5.58,
+        3.8
+      ]
+    ],
+    "bytes": 1717960
   }
 }
