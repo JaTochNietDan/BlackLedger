@@ -682,3 +682,14 @@ fee-dependent field selection, rounding, owner entry funds and invalid input.
 Core pool tests, full adapters, frontend suite, build and vet pass; logs
 `.runtime/pool-host-preview-{core,adapters,tests,build,vet}.log`. This checkpoint
 was verified by tests/build, with no new browser or live-save mutation.
+
+## Metre-based cue offsets — September 14 correction
+
+The public controls, command payload, saved intent and solver now consistently
+use metres for Top/Side. The original solver mistakenly treated metre inputs
+as fractions of the radius, weakening spin by a factor of about 35. Initial
+angular velocity uses 2.5 × speed × offset / radius², from solid-sphere inertia.
+The combined contact limit is 0.6 × radius =17.145mm; both UI sliders at12mm
+remain legal together. Historical recorded replays remain as played and are
+not resimulated. Centre-ball shots and current centre-ball NPC intent are
+unchanged; newly played off-centre shots use the corrected spin.

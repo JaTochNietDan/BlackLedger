@@ -40,6 +40,8 @@ type Ball struct {
 	Pocketed                 bool
 	Pocket                   int
 }
+
+// Shot uses radians, metres/second and metre-based tip offsets, respectively.
 type Shot struct{ Angle, Speed, Top, Side float64 }
 type Event struct {
 	Time        float64
@@ -189,7 +191,7 @@ func (e *Engine) Shoot(initial []Ball, shot Shot) (Result, error) {
 			return Result{}, errors.New("non-finite shot")
 		}
 	}
-	if shot.Speed < .05 || shot.Speed > 8 || math.Hypot(shot.Top, shot.Side) > .6 {
+	if shot.Speed < .05 || shot.Speed > 8 || math.Hypot(shot.Top, shot.Side) > .6*Radius {
 		return Result{}, errors.New("shot outside cue limits")
 	}
 	balls := append([]Ball(nil), initial...)
@@ -207,7 +209,7 @@ func (e *Engine) Shoot(initial []Ball, shot Shot) (Result, error) {
 	}
 	d := Vec{math.Cos(shot.Angle), math.Sin(shot.Angle), 0}
 	balls[cue].Velocity = d.mul(shot.Speed)
-	balls[cue].Spin = Vec{-d.Y * shot.Top, d.X * shot.Top, -shot.Side}.mul(2.5 * shot.Speed / Radius)
+	balls[cue].Spin = Vec{-d.Y * shot.Top, d.X * shot.Top, -shot.Side}.mul(2.5 * shot.Speed / (Radius * Radius))
 	return e.Roll(balls)
 }
 

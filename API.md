@@ -1080,7 +1080,8 @@ All actions use the existing `/api/action` request ID and revision transaction:
 | `pool_close` | No cue payload | Dismisses a settled rack; cannot abandon a live wager. |
 
 Except `pool_start`, `target` may be absent or `poolhall`. Cue direction is radians
-in cloth XY coordinates; speed is m/s, top/side are tip offsets in metres. A
+in cloth XY coordinates; speed is m/s, top/side are tip offsets in metres.
+Their combined magnitude must not exceed 0.6 ball radii (0.017145 m). A
 called object ball is 1–15 and pocket is 0–5; breaks and safeties follow the posted
 eight-ball rules in `docs/BILLIARDS.md`. The server accepts intent only, never
 client ball outcomes, winners, replay data or NPC inputs. Missing/invalid inputs,

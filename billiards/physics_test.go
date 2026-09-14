@@ -115,7 +115,7 @@ func TestDrawAndFollowComeFromAngularMomentum(t *testing.T) {
 	e := New()
 	var travel []float64
 	for _, top := range []float64{-.5, 0, .5} {
-		got, err := e.Shoot([]Ball{ball(0, .40, 1), ball(1, .40+2*Radius+.015, 1)}, Shot{Angle: 0, Speed: 1.2, Top: top})
+		got, err := e.Shoot([]Ball{ball(0, .40, 1), ball(1, .40+2*Radius+.015, 1)}, Shot{Angle: 0, Speed: 1.2, Top: top * Radius})
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -185,7 +185,7 @@ func TestRestingSpinDecaysAndReplayHasRotation(t *testing.T) {
 func TestInvalidShotsAndPlacementsAreRejected(t *testing.T) {
 	e := New()
 	rack := Rack()
-	for _, shot := range []Shot{{Speed: math.NaN()}, {Speed: 9}, {Speed: 1, Top: .61}, {Speed: 1, Angle: math.Inf(1)}} {
+	for _, shot := range []Shot{{Speed: math.NaN()}, {Speed: 9}, {Speed: 1, Top: .61 * Radius}, {Speed: 1, Angle: math.Inf(1)}} {
 		if _, err := e.Shoot(rack, shot); err == nil {
 			t.Fatal("accepted invalid shot", shot)
 		}
@@ -223,7 +223,7 @@ func TestBreaksWithPowerAimAndSpinStayPhysical(t *testing.T) {
 			for _, side := range []float64{-.4, 0, .4} {
 				initial := Rack()
 				initial[0].Position.X += aim
-				result, err := e.Shoot(initial, Shot{Angle: math.Pi/2 + aim/5, Speed: speed, Top: .3, Side: side})
+				result, err := e.Shoot(initial, Shot{Angle: math.Pi/2 + aim/5, Speed: speed, Top: .3 * Radius, Side: side * Radius})
 				if err != nil {
 					t.Fatalf("speed=%f aim=%f side=%f: %v", speed, aim, side, err)
 				}
@@ -269,7 +269,7 @@ func TestBreaksWithPowerAimAndSpinStayPhysical(t *testing.T) {
 func TestClothIntegrationConvergesWithHalfStep(t *testing.T) {
 	e := New()
 	initial := []Ball{ball(0, .30, .5), ball(1, .70, .7)}
-	shot := Shot{Angle: .40, Speed: 1.6, Top: .25, Side: .1}
+	shot := Shot{Angle: .40, Speed: 1.6, Top: .25 * Radius, Side: .1 * Radius}
 	coarse, err := e.Shoot(initial, shot)
 	if err != nil {
 		t.Fatal(err)
@@ -331,5 +331,28 @@ func TestPathologicalConfigurationsAreBounded(t *testing.T) {
 		if _, err := e.Shoot(Rack(), Shot{Speed: 1}); err == nil {
 			t.Fatal("accepted unbounded physics configuration")
 		}
+	}
+}
+
+func TestCueOffsetsUseMetresAndSolidSphereInertia(t *testing.T) {
+	e := New()
+	for _, angle := range []float64{0, math.Pi / 2, math.Pi} {
+		shot := Shot{Angle: angle, Speed: 1.2, Top: .012, Side: -.010}
+		result, err := e.Shoot([]Ball{ball(0, .6, 1)}, shot)
+		if err != nil {
+			t.Fatal(err)
+		}
+		initial := result.Frames[0].Balls[0]
+		// Angular impulse / I: (m*v*offset)/(2/5*m*R²).
+		factor := 2.5 * shot.Speed / (Radius * Radius)
+		near(t, initial.Spin.X, -math.Sin(angle)*shot.Top*factor, 1e-10)
+		near(t, initial.Spin.Y, math.Cos(angle)*shot.Top*factor, 1e-10)
+		near(t, initial.Spin.Z, -shot.Side*factor, 1e-10)
+	}
+	if _, err := e.Shoot([]Ball{ball(0, .6, 1)}, Shot{Speed: 1, Top: .012, Side: .012}); err != nil {
+		t.Fatal("UI corner offsets must be legal", err)
+	}
+	if _, err := e.Shoot([]Ball{ball(0, .6, 1)}, Shot{Speed: 1, Top: .013, Side: .012}); err == nil {
+		t.Fatal("combined offset outside 0.6 radii accepted")
 	}
 }

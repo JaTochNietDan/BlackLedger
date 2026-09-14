@@ -136,3 +136,30 @@ func TestPoolProjectionIsReadOnlyAndLocal(t *testing.T) {
 		t.Fatal("old-life table exposed")
 	}
 }
+
+func TestPoolCommandMillimetreDrawAndOffsetRejection(t *testing.T) {
+	w := beginPool(t)
+	winningPoolPosition(w)
+	for i := range w.Pool.Match.Balls {
+		b := &w.Pool.Match.Balls[i]
+		if b.ID == 0 {
+			b.Position = billiards.Vec{X: .4, Y: 1, Z: billiards.Radius}
+		}
+		if b.ID == 8 {
+			b.Position = billiards.Vec{X: .4 + 2*billiards.Radius + .015, Y: 1, Z: billiards.Radius}
+		}
+	}
+	poolReject(t, w, Command{Kind: "pool_shot", Pool: &PoolInput{Speed: 1.2, Top: .02, Safety: true}})
+	w = poolExecute(t, w, Command{Kind: "pool_shot", Pool: &PoolInput{Speed: 1.2, Top: -.012, Safety: true}})
+	if w.Pool.LastStroke.Intent.Shot.Top != -.012 {
+		t.Fatal("saved offset changed units")
+	}
+	for _, b := range w.Pool.Match.Balls {
+		if b.ID == 0 && b.Position.X >= .4 {
+			t.Fatal("12mm draw did not reverse the cue ball", b.Position)
+		}
+	}
+	if _, err := billiards.DecodeReplay(w.Pool.Replay); err != nil {
+		t.Fatal(err)
+	}
+}

@@ -2311,3 +2311,26 @@ Main8791 is still89cc61b; this room awaits release promotion.
 The public chapel does not include the rear preparation room/hearse yard.
 Other interiors, broader visual acceptance and full billiards physics/character
 animation remain unfinished; the goal remains active.
+
+### 2026-09-14 — correct cue spin units
+
+Previous3c6cf3f was interior-production progress. Physics review found a real
+public/solver mismatch: API and UI supplied metres, but Shoot multiplied as
+though Top/Side were normalized radii and allowed offsets up to0.6m. Corrected
+the angular impulse to2.5*v*offset/R² and the limit to0.6R (17.145mm). Updated
+older solver fixtures to express their intended radius fractions in metres,
+preserving the physical scenarios instead of weakening assertions.
+
+Full billiards suite passed11.875s, core Pool command/tournament selection
+passed8.662s, store/server suites passed0.283s/1.890s and vet passed. Logs
+`.runtime/pool-spin-units-{tests,core,adapters}.log`. New checks verify initial
+angular momentum along three cue directions, combined UI maximum offsets,
+out-of-range rejection, and a command-level12mm draw that reverses cue-ball
+travel after object contact. Rejection preserves state; saved intent retains
+metres and the resulting replay decodes. No frontend changes or browser claims
+for this solver correction. No live save mutations or promotion.
+
+Existing replay tapes remain historical outcomes, with no retroactive
+resimulation/payout changes. Centre hits are unchanged. This fixes spin
+strength, not missing airborne/jump/massé/slate physics or shooting characters.
+The broader goal remains active.
