@@ -13246,3 +13246,38 @@ Remaining: the upstairs cutting room is represented by its stair and door, not
 a separately staged room. Fitting/cutting work animations and other unbuilt
 venue interiors remain in scope. This salon is committed source progress; live
 port 8791 still serves release 16c1c95 pending the next verified promotion.
+
+
+## The Green Baize six-table hall — 2026-09-14
+
+Added a dedicated 16×18 metre 3D hall with six billiard tables, cut-out cloth
+pockets above recessed mouths, ball layouts, individual green table shades, cue
+racks, spectator chairs, marker counter and ledger, scoreboard, payphone and
+private card-room door. Two idle cabinets reuse the playable slot cabinet model
+with empty payout trays. Marker and Table hand roles have reserved positions;
+nine visitors and the player have separate furniture-free positions. Overflow
+remains available in the people list.
+
+Verification: all 375 frontend tests passed (14.755 seconds). After adding the
+cabinets, the final hall geometry test passed (2.628 seconds), additionally
+probing all six cloth surfaces and all 36 recessed pockets. Both pedestrian rigs
+and entrance clearance are checked. Production builds passed; the final poker
+renderer build is recorded in `.runtime/poolhall-poker-build.log`.
+
+Isolated `poolhall-interior` fixture at port 8963 rendered six NPCs plus the
+player, with one extra Marker retained in the list. Final expanded room: 249
+draw calls and 243744 triangles. Inspected expanded framing, compact 820×740
+framing and Home reset. Entered the separate 3D poker view, bought in for $100,
+visually read Q-heart / 5-heart, folded and collected $95, then returned to the
+hall. This was disposable fixture money; main campaign was not used for QA.
+The transition exposed poker's obsolete PCFSoftShadowMap setting; switched to
+the supported PCFShadowMap. Reloaded bundle main-Bw-x3YEq.js and entered poker
+again: no new console warnings/errors (only historical warnings from the old
+main-PXygcjSe.js bundle remained in the log).
+
+The new user amendment requires playable billiards, individual stakes and
+entry-fee tournaments with the whole prize pool paid to the winner. This room
+is a setting for that work; its ball layouts are currently static scenery and
+are not a billiards simulation. Physics, eight-ball rules, aiming/shot UX,
+opponent play and tournament accounting are the next required work. Live port
+8791 still serves release 16c1c95 pending a verified promotion.

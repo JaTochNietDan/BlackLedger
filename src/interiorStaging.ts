@@ -187,6 +187,19 @@ export function pawnPlacements(people:Presence[]) {
  return result;
 }
 
+export function poolhallPlacements(people:Presence[]) {
+ const result=new Map<string,InteriorSpot>();
+ const staff:InteriorSpot[]=[{id:'pool-marker',x:3.3,z:-7.85,yaw:0},{id:'pool-table-hand',x:-1.4,z:-6.4,yaw:0}];
+ const available:InteriorSpot[]=[...[-4.25,0,4.25].map(z=>({id:`pool-spectator-${z}`,x:-7.2,z,yaw:Math.PI/2,seat:.69})),...[-4.25,0,4.25].flatMap(z=>[-1.7,1.7].map(x=>({id:`pool-table-side-${x}-${z}`,x,z,yaw:x<0?-Math.PI/2:Math.PI/2})))];
+ for(const who of [...people].sort((a,b)=>a.id.localeCompare(b.id))){
+  if(result.has(who.id))continue;
+  const station=/^marker$/i.test(who.role||'')?0:/^table hand$/i.test(who.role||'')?1:-1;
+  const spot=station<0?available.shift():[...result.values()].some(s=>s.id===staff[station].id)?undefined:staff[station];
+  if(spot)result.set(who.id,spot);
+ }
+ return result;
+}
+
 export function tailorPlacements(people:Presence[]) {
  const result=new Map<string,InteriorSpot>();
  const staff:InteriorSpot[]=[-1.5,0,1.5].map((x,i)=>({id:`tailor-staff-${i}`,x,z:-3.8,yaw:0}));
@@ -201,14 +214,14 @@ export function tailorPlacements(people:Presence[]) {
  return result;
 }
 
-export type InteriorPlace='tailor'|'pawn'|'riverside'|'bar'|'mercercourt'|'room'|'laundry'|'estate'|'apartment'|'flat'|'butcher'|'garage'|'lodging'|'restaurant'|'market'|'precinct';
+export type InteriorPlace='poolhall'|'tailor'|'pawn'|'riverside'|'bar'|'mercercourt'|'room'|'laundry'|'estate'|'apartment'|'flat'|'butcher'|'garage'|'lodging'|'restaurant'|'market'|'precinct';
 export function placementsForInterior(place:InteriorPlace,people:Presence[]){
  if(place==='riverside'){
   const spots:InteriorSpot[]=[...[-.6,.8,2.2].map(z=>({id:'bench',x:-4.2,z,yaw:Math.PI/2,seat:.69})),...[0,1.6].flatMap(z=>[-2.5,-.8,1,2.8].map(x=>({id:'lobby',x,z,yaw:Math.PI})))];
   return new Map([...people].sort((a,b)=>a.id.localeCompare(b.id)).slice(0,spots.length).map((p,i)=>[p.id,spots[i]]));
  }
  if(place==='flat'||place==='lodging')return new Map<string,InteriorSpot>();
- return (place==='tailor'?tailorPlacements:place==='pawn'?pawnPlacements:place==='precinct'?precinctPlacements:place==='market'?exchangePlacements:place==='restaurant'?restaurantPlacements:place==='garage'?garagePlacements:place==='butcher'?butcherPlacements:place==='apartment'?ashburyPlacements:place==='estate'?cypressPlacements:place==='laundry'?laundryPlacements:place==='bar'?interiorPlacements:place==='room'?marinerLobbyPlacements:mercerLobbyPlacements)(people);
+ return (place==='poolhall'?poolhallPlacements:place==='tailor'?tailorPlacements:place==='pawn'?pawnPlacements:place==='precinct'?precinctPlacements:place==='market'?exchangePlacements:place==='restaurant'?restaurantPlacements:place==='garage'?garagePlacements:place==='butcher'?butcherPlacements:place==='apartment'?ashburyPlacements:place==='estate'?cypressPlacements:place==='laundry'?laundryPlacements:place==='bar'?interiorPlacements:place==='room'?marinerLobbyPlacements:mercerLobbyPlacements)(people);
 }
 
 export function poseInteriorOccupant(actor:THREE.Group,spot:InteriorSpot) {
@@ -229,6 +242,7 @@ export function poseInteriorOccupant(actor:THREE.Group,spot:InteriorSpot) {
 
 // Reserved clear floor positions; these never displace a public occupant.
 export function interiorPlayerSpot(place:InteriorPlace):InteriorSpot {
+ if(place==='poolhall')return {id:'player-entry',x:0,z:6.9,yaw:Math.PI};
  if(place==='tailor')return {id:'player-entry',x:0,z:4.1,yaw:Math.PI};
  if(place==='pawn')return {id:'player-entry',x:1.4,z:3.6,yaw:Math.PI};
  if(place==='precinct'||place==='riverside')return {id:'player-entry',x:1.4,z:4.1,yaw:Math.PI};

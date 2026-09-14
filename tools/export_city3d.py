@@ -2456,6 +2456,34 @@ if __name__ == '__main__' and '--only=interior-precinct' in __import__('sys').ar
     raise SystemExit(0)
 
 
+def poolhall_interior():
+    from poolhall_interior import build
+    build(box,cylinder,material)
+    # Reuse the playable machine's cabinet at its public hall address.
+    # Its idle scenery has no payout and never represents a committed spin.
+    ink=material('Baize idle reel ink',(.035,.04,.03))
+    for x in [-4.4,-2.9]:
+        before=set(bpy.data.objects)
+        slot_cabinet()
+        coins=[ob for ob in bpy.data.objects if ob not in before and ob.name.startswith('slot-coins')]
+        for root in coins:
+            for child in list(root.children):bpy.data.objects.remove(child,do_unlink=True)
+            bpy.data.objects.remove(root,do_unlink=True)
+        for i,rx in enumerate([-.28,0,.28]):
+            for j in range(i+1):box('idle reel bar',(rx,-.435,1.055+(j-i/2)*.05),(.15,.006,.025),ink)
+        for ob in set(bpy.data.objects)-before:
+            if ob.parent is None:ob.location+=Vector((x,8.25,.02))
+
+
+if __name__ == '__main__' and '--only=interior-poolhall' in __import__('sys').argv:
+    clear();poolhall_interior()
+    manifest_path=os.path.join(OUT,'manifest.json')
+    with open(manifest_path) as f: selected_manifest=json.load(f)
+    selected_manifest['interior-poolhall']=export('interior-poolhall')
+    with open(manifest_path,'w') as f:json.dump(selected_manifest,f,indent=2)
+    raise SystemExit(0)
+
+
 def tailor_interior():
     from tailor_interior import build
     build(box,cylinder,material)
@@ -2691,6 +2719,7 @@ clear();dice_tray();manifest['dice-tray']=export('dice-tray')
 clear();slot_cabinet();manifest['slot-cabinet']=export('slot-cabinet')
 clear();lodging_room();manifest['interior-lodging-room']=export('interior-lodging-room')
 clear();precinct_interior();manifest['interior-precinct']=export('interior-precinct')
+clear();poolhall_interior();manifest['interior-poolhall']=export('interior-poolhall')
 clear();tailor_interior();manifest['interior-tailor']=export('interior-tailor')
 clear();pawn_interior();manifest['interior-pawn']=export('interior-pawn')
 clear();exchange_interior();manifest['interior-exchange']=export('interior-exchange')

@@ -1,5 +1,15 @@
 # Current goal and workstream ownership
 
+## User amendment — playable billiards (2026-09-14)
+
+The pool hall must support playing billiards across its tables, individual games
+with wagers, and occasional entry-fee tournaments whose winner receives the
+whole prize pool. The user explicitly requires a full-fidelity billiards
+minigame with proper physics simulation. An authored room with static balls does
+not satisfy this requirement. Eight-ball is the initial implementation choice;
+physics, match rules, opponent play, stakes and tournament settlement remain to
+be implemented and verified. This extends all earlier requirements.
+
 ## Highest priority amendment — map-first UI
 
 The persistent HUD (left navigation and top bar) must now receive the same

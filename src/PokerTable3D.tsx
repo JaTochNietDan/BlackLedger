@@ -21,7 +21,7 @@ export function PokerTable3D({cards,player,people=[],motion=true,animateOnMount=
  useEffect(()=>{
   const el=host.current!;let dead=false;let renderer:THREE.WebGLRenderer;
   try{renderer=new THREE.WebGLRenderer({antialias:true});}catch{setFailed(true);return;}
-  renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+  renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFShadowMap;
   renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;
   const canvas=renderer.domElement;canvas.setAttribute('aria-label','Poker table. Your cards are nearest you; shared cards are in the center.');el.append(canvas);
   const scene=new THREE.Scene();scene.background=new THREE.Color('#10251e');

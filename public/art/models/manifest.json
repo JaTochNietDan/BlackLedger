@@ -1094,5 +1094,21 @@
       ]
     ],
     "bytes": 1435108
+  },
+  "interior-poolhall": {
+    "file": "interior-poolhall.glb",
+    "bounds_blender": [
+      [
+        -8.08,
+        -9.0,
+        -0.19
+      ],
+      [
+        8.0,
+        9.08,
+        4.0
+      ]
+    ],
+    "bytes": 3425888
   }
 }
