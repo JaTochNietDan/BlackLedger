@@ -82,3 +82,5 @@ export interface PoolTournamentState {
  names:Record<string,string>;
  games:{index:number;round:number;table_number:number;players:[string,string];player_seat:number;resolved:boolean;winner:string;table:PoolState|null}[];
 }
+
+export interface PoolTournamentNoticeState {opens:number;closes:number;fee:number;entrants:{id:string;name:string}[];pot:number;can_enter:boolean;unavailable:string}

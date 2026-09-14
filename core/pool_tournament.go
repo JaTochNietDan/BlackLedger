@@ -19,7 +19,7 @@ type PoolTournament struct {
 	Voided   bool               `json:"voided"`
 }
 
-// Internal entry point until scheduled entry and command/public views are joined.
+// Shared funding entry point; scheduled admission calls this after checking its window.
 // All participants and all money are validated before any wallet is touched.
 func (w *World) StartPoolTournament(npcs []string, fee int) error {
 	if len(npcs) != 3 && len(npcs) != 7 {

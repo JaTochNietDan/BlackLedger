@@ -78,3 +78,44 @@ func TestHTTPTournamentCommandsAndBracket(t *testing.T) {
 		t.Fatal("incomplete public bracket")
 	}
 }
+
+func TestHTTPTournamentScheduledEntryReceipt(t *testing.T) {
+	a := testApp(t)
+	if err := a.s.Change(func(w *core.World) error {
+		w.Minute = 1080
+		w.Player.Location = core.PoolPlace
+		w.Player.Cash = 1000
+		w.Event = nil
+		for i := range w.NPCs {
+			w.NPCs[i].Location = "bar"
+		}
+		for _, id := range []string{"leo", "mara", "elena"} {
+			n := w.NPC(id)
+			n.Location = core.PoolPlace
+			n.Purse = 300
+			n.Dead = false
+			n.Heading = ""
+			n.Sets, n.Arrives, n.Held = 0, 0, 0
+		}
+		return nil
+	}); err != nil {
+		t.Fatal(err)
+	}
+	body := `{"request_id":"scheduled-tour-entry","revision":0,"kind":"pool_tournament_enter"}`
+	first := request(a, "POST", "/api/action", body)
+	if first.Code != 200 {
+		t.Fatal(first.Code, first.Body.String())
+	}
+	retry := request(a, "POST", "/api/action", body)
+	if retry.Code != 200 || retry.Body.String() != first.Body.String() {
+		t.Fatal("entry receipt changed")
+	}
+	w, err := a.s.Read()
+	if err != nil || w.Player.Cash != 975 || w.PoolTournament.Escrow != 100 || w.LastPoolTournamentSlot != 1080 {
+		t.Fatal("entry duplicated", err)
+	}
+	r := request(a, "POST", "/api/action", `{"request_id":"second-entry","revision":1,"kind":"pool_tournament_enter"}`)
+	if r.Code != 409 {
+		t.Fatal("second entry accepted", r.Code)
+	}
+}

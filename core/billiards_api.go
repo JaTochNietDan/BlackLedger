@@ -26,6 +26,9 @@ func (w *World) poolCommand(c Command) (string, int, error) {
 	if c.Pool != nil && c.Kind != "pool_place" && c.Kind != "pool_shot" && c.Kind != "pool_tournament_place" && c.Kind != "pool_tournament_shot" {
 		return "", 0, fmt.Errorf("this command does not accept cue input")
 	}
+	if c.Kind == "pool_tournament_enter" {
+		return "Enter the Green Baize tournament", 0, w.EnterPoolTournament()
+	}
 	if strings.HasPrefix(c.Kind, "pool_tournament_") {
 		return w.poolTournamentCommand(c)
 	}

@@ -11,21 +11,22 @@ export function PoolChallenges({opponents,cash,busy,act}:{opponents:PoolOpponent
  {opponents.length===0&&<p>No opponent is on the floor at the moment.</p>}
  {opponents.map(n=><button key={n.id} title={n.unavailable||`Offers up to $${n.max_stake}`} disabled={busy||!!n.unavailable||stake<10||!Number.isInteger(stake)||stake>Math.min(500,cash,n.max_stake)} onClick={()=>act({kind:'pool_start',target:n.id,amount:stake})}>Play {n.name} · ${stake} each</button>)}<small>Eight-ball · both stakes held until the rack ends</small></section>;
 }
-export function BilliardsRoom({pool,busy,motion,act}:{pool:PoolState;busy:boolean;motion:boolean;act:(c:Command)=>void}){
+export function BilliardsRoom({pool,busy,motion,act,tournament}:{pool:PoolState;busy:boolean;motion:boolean;act:(c:Command)=>void;tournament?:{names:[string,string];observer:boolean;onBack:()=>void}}){
  const [angle,setAngle]=useState(90),[speed,setSpeed]=useState(pool.breaking?7.5:4),[top,setTop]=useState(0),[side,setSide]=useState(0),[ball,setBall]=useState(1),[pocket,setPocket]=useState(0),[safety,setSafety]=useState(false),[x,setX]=useState(pool.width/2),[y,setY]=useState(.4),[playing,setPlaying]=useState(false);
- const locked=busy||playing,playerTurn=pool.turn===0,canPlay=!locked&&!pool.unavailable&&!pool.settled;
+ const locked=busy||playing,playerTurn=pool.turn===0&&!tournament?.observer,canPlay=!locked&&!pool.unavailable&&!pool.settled;
  const target=pool.legal_balls.includes(ball)?ball:(pool.legal_balls[0]??8);
  const placementHint=poolPlacementHint(pool,x,y);
+ const names=tournament?.names??['You',pool.opponent_name];
  const groups=['Open table','Solids','Stripes'];
  return <section className="billiards-room" role="dialog" aria-modal="true" aria-label="Green Baize billiards">
-  <header><div><small>GREEN BAIZE · EIGHT-BALL</small><h2>You &amp; {pool.opponent_name}</h2><p>{pool.settled?(pool.voided?'Stakes returned':pool.winner===0?'You won the rack':`${pool.opponent_name} won the rack`):`$${pool.pot} in the middle · ${playerTurn?'Your turn':pool.opponent_name+' to shoot'}`} · You: {groups[pool.groups[0]]}</p></div>
-   <button disabled={locked} onClick={()=>act({kind:pool.settled?'pool_close':'pool_concede'})}>{pool.settled?'Return to the hall':`Concede · lose $${pool.stake}`}</button></header>
-  <BilliardsTable3D pool={pool} angle={angle*Math.PI/180} top={top/1000} side={side/1000} motion={motion} locked={busy} calledBall={target} calledPocket={pocket} placement={[x,y]} onPlaying={setPlaying} onAim={r=>setAngle(Number((r*180/Math.PI).toFixed(2)))} onBall={setBall} onPocket={setPocket} onPlace={(x,y)=>{setX(Number(x.toFixed(3)));setY(Number(y.toFixed(3)));}}/>
+  <header><div><small>GREEN BAIZE · {tournament?'TOURNAMENT':'EIGHT-BALL'}</small><h2>{names[0]} &amp; {names[1]}</h2><p>{pool.settled?(pool.voided?'Event cancelled':pool.winner>=0?`${names[pool.winner]} won the rack`:'Game ended'):`$${pool.pot} ${tournament?'tournament prize':'in the middle'} · ${names[pool.turn]} to shoot`} · {names[0]}: {groups[pool.groups[0]]}</p></div>
+   <button disabled={locked} onClick={()=>tournament?tournament.onBack():act({kind:pool.settled?'pool_close':'pool_concede'})}>{tournament?'Back to the draw':pool.settled?'Return to the hall':`Concede · lose $${pool.stake}`}</button></header>
+  <BilliardsTable3D pool={pool} angle={angle*Math.PI/180} top={top/1000} side={side/1000} motion={motion} locked={busy||!!tournament?.observer} calledBall={target} calledPocket={pocket} placement={[x,y]} onPlaying={setPlaying} onAim={r=>setAngle(Number((r*180/Math.PI).toFixed(2)))} onBall={setBall} onPocket={setPocket} onPlace={(x,y)=>{setX(Number(x.toFixed(3)));setY(Number(y.toFixed(3)));}}/>
   <div className="pool-controls">
-   <p aria-live="polite">{playing?'Playing the shot…':pool.unavailable||pool.outcome||(pool.ball_in_hand?'Click the cloth to position your cue ball, then confirm.':'Click to aim; click a ball and a numbered pocket to call your shot.')} </p>
+   <p aria-live="polite">{playing?'Playing the shot…':pool.unavailable||pool.outcome||(tournament?.observer?'Watch the next stroke, or move the camera to inspect the table.':pool.ball_in_hand?'Click the cloth to position your cue ball, then confirm.':'Click to aim; click a ball and a numbered pocket to call your shot.')} </p>
    {canPlay&&playerTurn&&!pool.ball_in_hand&&!pool.break_choices.length&&<p className="pool-pointer-help">Click cloth to aim. Click a ball and a numbered pocket to call them. Drag to move the camera.</p>}
    {!pool.settled&&<fieldset disabled={!canPlay}>
-    {!playerTurn?<button onClick={()=>act({kind:'pool_opponent'})}>Watch {pool.opponent_name} play</button>:pool.break_choices.length?<div>{pool.break_choices.map(c=><button key={c.id} onClick={()=>act({kind:'pool_decide',choice:c.id})}>{c.label}</button>)}</div>:pool.ball_in_hand?<div className="pool-inputs">
+    {!playerTurn?<button onClick={()=>act({kind:'pool_opponent'})}>Watch {names[pool.turn]} play</button>:pool.break_choices.length?<div>{pool.break_choices.map(c=><button key={c.id} onClick={()=>act({kind:'pool_decide',choice:c.id})}>{c.label}</button>)}</div>:pool.ball_in_hand?<div className="pool-inputs">
      <details className="pool-precise-placement"><summary>Precise placement</summary><div className="pool-inputs">
      <label>Across cloth (m)<input type="number" min={pool.radius} max={pool.width-pool.radius} step={.01} value={x} onChange={e=>setX(Number(e.target.value))}/></label>
      <label>From near end (m)<input type="number" min={pool.radius} max={pool.behind_head_string?pool.length/4-.001:pool.length-pool.radius} step={.01} value={y} onChange={e=>setY(Number(e.target.value))}/></label>

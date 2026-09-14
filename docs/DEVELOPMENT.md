@@ -13354,3 +13354,13 @@ SQLite tests cover invalid inputs, local read-only projection, concurrent winnin
 retries, reopen and stale rejection. Focused core, full store/server, Go vet and
 frontend build pass; see `docs/BILLIARDS.md` for evidence and remaining work.
 Scheduled entry and UI are still pending. No live save or release promotion.
+
+### 2026-09-14 — Scheduled tournament admission and 3D draw
+
+Added a posted every-third-evening entry window, funded local field selection,
+one draw per window, hall entry terms and a playable/spectatable tournament draw.
+Isolated browser entry and strokes on two tables reached revision4 with cash975
+and escrow100. Core/adapters/vet, all384 frontend tests and build pass. The room
+GLB was truncated on a proxied request but served fully without the proxy; its
+preview verification remains open. See BILLIARDS.md for exact evidence and next
+work. Main campaign remains unchanged.

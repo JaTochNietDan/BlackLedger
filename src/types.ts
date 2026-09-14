@@ -1,4 +1,4 @@
-import type {PoolInput,PoolState,PoolOpponent,PoolTournamentState} from './billiards';
+import type {PoolInput,PoolState,PoolOpponent,PoolTournamentState,PoolTournamentNoticeState} from './billiards';
 export interface Group {
   id: string;
   title: string;
@@ -207,6 +207,7 @@ export interface StreetSegment extends Journeying {from_minute:number;to_minute:
 export interface Snapshot {
   pool?:PoolState|null;
   pool_tournament?:PoolTournamentState|null;
+  pool_tournament_notice?:PoolTournamentNoticeState|null;
   pool_opponents?:PoolOpponent[];
 	apartment_market?: {id:string;building:string;number:number;address:string;owned:boolean;home:boolean;available:boolean;locked?:boolean;owner:string;resident:string;asking:number;offer:number;daily_rent:number}[];
 	property_market?: {id:string;name:string;owned:boolean;available:boolean;holder:string;asking:number;offer:number;condition:number;neighborhood_index?:number;residents:number;home:boolean;locked:boolean}[];

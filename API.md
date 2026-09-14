@@ -1121,9 +1121,8 @@ validator. Pointer aiming toward a ball centre is not an automatic pocket soluti
 
 Saves may now contain optional `pool_tournament`: life-bound player identity,
 entry fee, original participant deposits, remaining escrow, the physical bracket,
-per-match replays/cue intent, and settled/voided status. No tournament entry or
-play command/public projection is exposed yet. Scheduled entry and UI integration
-remain required before enabling this feature.
+per-match replays/cue intent, and settled/voided status. Commands and public views
+are described below.
 
 Internal entry supports four/eight actual participants and validates every wallet
 before reserving any fee. A champion takes the entire held pool; player earnings
@@ -1158,5 +1157,24 @@ spectator tables. Unstarted later rounds have no table. A resolved rack's table
 is settled even while the overall tournament remains open. The tournament pot
 is the total held event escrow, not a separate wager for every rack.
 
-This exposes play for saved funded tournaments. Scheduled entry and the user
-interface remain pending; no public tournament-start command exists yet.
+This exposes play for saved funded tournaments. Scheduled admission is described
+below.
+
+### Scheduled tournament admission
+
+`pool_tournament_enter` requires no payload and takes no game time. Entry is open
+18:00–20:00 on days 1, 4, 7 and so on. The server chooses three or seven eligible
+local NPCs in stable ID order, preferring an eight-person draw when possible.
+Every entrant pays $25 from their actual wallet before play begins. Fewer than
+three funded local opponents prevents admission; nobody is spawned or teleported.
+The saved `last_pool_tournament_slot` prevents a second draw in the same window,
+even after cancellation. Later windows can host another completed event.
+
+Local nullable `pool_tournament_notice` exposes absolute-minute `opens`/`closes`,
+`fee`, available `entrants` (ID/name), prospective `pot`, `can_enter` and an
+`unavailable` reason. The prospective pot is not escrow until entry succeeds.
+The hall notice presents entry terms and opens the draw. Each started rack opens
+the same 3D view, mapping commands to its match index. Spectators can request NPC
+strokes and move the camera, but cannot supply player cue inputs. Returning to
+the draw or hall is a view change; withdrawal is an explicit command. Other
+tables currently progress when watched; autonomous table progression is pending.

@@ -460,3 +460,39 @@ tests, Go vet and the production frontend build pass. Logs are
 This is a command/projection checkpoint, not a playable tournament UI release.
 Scheduled admission, screen controls and background table progression remain.
 Main port 8791 and its campaign database have not been modified.
+
+## Scheduled entry and playable tournament draw (2026-09-14)
+
+The hall now posts $25 entry on every third evening, 18:00–20:00. Admission uses
+three/seven actual funded local NPCs, pays all wallets atomically and remembers
+the window so a cancelled/completed event cannot be entered again that evening.
+No NPCs are spawned or teleported to fill a draw. An insufficient local field
+leaves admission unavailable. A subsequent window can host another event.
+
+The notice opens a draw with active tables and waiting rounds. Both player and
+NPC-only racks use the close 3D billiards view; spectator controls execute actual
+NPC strokes without exposing cue input. Returning to the draw/hall preserves the
+entry, while withdrawal explicitly forfeits it. The posted terms cover the full
+prize, departure and cancellation refunds.
+
+Isolated browser evidence on port 8966 / `.runtime/tournament-entry-qa.sqlite3`:
+paid $25, opened player table, placed cue, played a legal break, returned to draw,
+opened Leo/Mara's table and requested a physical NPC break. Saved revision4,
+minute1084, cash975, prize escrow100, rack shots [1,1,unstarted]. The rendered
+player table was visually inspected at 1235×1051. The general hall renderer
+reported a load failure: a proxied asset download truncated at 4,194,816 bytes,
+whereas a direct no-proxy localhost request returned the full 4,961,068-byte GLB.
+That room-preview limitation is unresolved; it is not evidence of a verified
+hall render. No production promotion or live campaign changes occurred.
+
+Core pool tests pass (0.458s); full store/server tests pass (0.307s/1.245s);
+384 frontend tests pass (14.387s); production build and Go vet pass. HTTP coverage
+includes scheduled-entry receipt retries and duplicate-draw rejection. Core
+coverage includes the deadline, insufficient funds/field, read-only notice,
+cancellation window reuse rejection and subsequent-window admission. Evidence
+logs `.runtime/pool-tournament-entry-{core,adapters,tests,build,vet}.log` and browser
+state `.runtime/tournament-entry-browser-state.json`.
+
+Remaining: tournament attendance through ordinary NPC travel, autonomous progress
+at other tables, complete multi-round browser playthrough and final payout UX,
+compact/touch layouts, human cue/bridge animation and fuller billiards physics.
