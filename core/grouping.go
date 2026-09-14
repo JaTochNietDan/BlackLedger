@@ -43,7 +43,7 @@ func Groups() []Group { return groups }
 // decision spread across the file that offers it.
 var actionGroup = map[string]string{
 	// Work that pays on the day.
-	"courier": "work", "dockwork": "work", "delegate": "work", "commission": "work",
+	"courier": "work", "dockwork": "work", "rushorder": "work", "delegate": "work", "commission": "work",
 	"contract": "work", "order": "work",
 
 	// Premises.

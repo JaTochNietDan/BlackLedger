@@ -8,7 +8,7 @@ package core
 // to somebody.
 
 // SaveVersion is the shape the current build writes.
-const SaveVersion = 18
+const SaveVersion = 19
 
 // seedHoldings is the property each established family holds in a new city.
 var seedHoldings = map[string][]string{

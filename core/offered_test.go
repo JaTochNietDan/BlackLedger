@@ -84,12 +84,12 @@ func TestEveryActionOfferedCanActuallyBeTaken(t *testing.T) {
 // campaign and reported fourteen faults, every one of them false — the tank was
 // full, the premises fully staffed, nobody was looking at the player. Those are
 // refusals that clear the moment the state changes, which is a button doing its
-// job. So it asks two campaigns: one that has everything and one that needs
-// everything, and an action is honest if it is usable in either.
+// job. So it asks established campaigns that have or need everything, plus a new
+// arrival with no premises. An action must be usable in at least one.
 func TestNoActionIsOfferedOnlyWhereItIsRefused(t *testing.T) {
 	t.Parallel()
 	seen, usable := map[string]string{}, map[string]bool{}
-	for _, shape := range []string{"comfortable", "needy"} {
+	for _, shape := range []string{"comfortable", "needy", "starting"} {
 		w := proprietor(t)
 		own(w, "laundry", "garage", "casino")
 		w.District = 2
@@ -144,6 +144,12 @@ func TestNoActionIsOfferedOnlyWhereItIsRefused(t *testing.T) {
 			w.Player.Offshore, w.Offshore = false, 2000
 			w.Player.Stock = map[string]int{"moonshine": 4}
 		}
+		// A newcomer can take helper work that an owner cannot. Include a
+		// real starting state instead of exempting those actions from coverage.
+		if shape == "starting" {
+			w = New(27)
+			w.Event = nil
+		}
 		for _, l := range Locations {
 			if l.District > w.District {
 				continue
@@ -172,7 +178,7 @@ func TestNoActionIsOfferedOnlyWhereItIsRefused(t *testing.T) {
 		t.Fatalf("%d actions are drawn in every room they appear in and refused in every one of them: %v",
 			len(stuck), stuck)
 	}
-	t.Logf("%d distinct actions across two campaigns, every one of them usable somewhere", len(seen))
+	t.Logf("%d distinct actions across three campaigns, every one of them usable somewhere", len(seen))
 }
 
 // situational names the work that is deliberately drawn before it can be done,

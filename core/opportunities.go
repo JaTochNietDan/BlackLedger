@@ -36,7 +36,7 @@ func (w *World) actionOpportunity(title, place, id string) *Opportunity {
 }
 
 func (w *World) earningOpportunity(title, why string) *Opportunity {
-	for _, job := range [][2]string{{"bar", "courier"}, {"docks", "dockwork"}} {
+	for _, job := range [][2]string{{"bar", "courier"}, {"laundry", "rushorder"}, {"docks", "dockwork"}} {
 		if next := w.actionOpportunity(title, job[0], job[1]); next != nil {
 			if why != "" {
 				next.Detail = why + " " + next.Detail

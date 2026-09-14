@@ -14,6 +14,11 @@ func TestOpeningGuidanceFindsPaidWorkWhenEnvelopesRunOut(t *testing.T) {
 	w.Player.CarriedDay = w.Minute / 1440
 	w.Player.Carried = CourierADay
 	next := w.NextOpportunity()
+	if next == nil || next.Target != "laundry" || !strings.Contains(next.Detail, "$80") {
+		t.Fatalf("no limited daytime alternative: %+v", next)
+	}
+	w.Properties["laundry"].RushOrderDay = w.Minute/1440 + 1
+	next = w.NextOpportunity()
 	if next == nil || next.Target != "docks" || !strings.Contains(next.Detail, "$75") || !strings.Contains(next.Detail, "90 minutes") {
 		t.Fatalf("no actionable cargo fallback: %+v", next)
 	}

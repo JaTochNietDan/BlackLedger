@@ -593,6 +593,10 @@ func (w *World) apply(c Command) error {
 		} else {
 			// Hiring/delegating commits arrangements immediately; work rewards require reaching completion.
 			switch c.Kind {
+			case "rushorder":
+				if err := w.StartRushOrder(target); err != nil {
+					return err
+				}
 			case "security":
 				p.Security++
 				w.Log("Someone at the door", "Another security detail is assigned to your residence. It adds $10 a day to your expenses.", "personal")
@@ -883,6 +887,8 @@ func (w *World) apply(c Command) error {
 			w.Advance(a.Minutes)
 			if p.Alive && w.Event == nil {
 				switch c.Kind {
+				case "rushorder":
+					w.CompleteRushOrder()
 				case "courier":
 					w.Earn(CourierPay)
 					p.Respect += CourierRespect
@@ -1042,6 +1048,8 @@ func (w *World) apply(c Command) error {
 					w.District = min(2, w.District+1)
 					w.Log("The city opens up", "Your contacts introduce you to another district. More properties are accessible.", "city")
 				}
+			} else if c.Kind == "rushorder" {
+				w.Log("Linen order interrupted", "The order could not be completed. No fee was paid; today’s order and the supplies committed to it remain used.", "work")
 			} else if a.Cost > 0 && c.Kind != "security" {
 				w.Player.Cash += a.Cost
 				w.Log("A commitment interrupted", "Unspent funds were returned. The arrangement was not completed.", "personal")

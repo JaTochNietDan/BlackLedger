@@ -552,3 +552,14 @@ Early guidance routes to available envelope work, then cargo work when envelopes
 
 
 The existing guide crew milestone now includes the initial driver recruitment as well as later organization sign-ons. It inspects actual available hiring actions at unlocked addresses, and either kind of hired crew completes it. The cargo action is labeled Work a cargo shift because it is available by day as well as at night; command ID, pay, duration and risk are unchanged.
+
+
+## Save schema v19 — daily hotel linen order
+
+Property `rush_order_day` is an optional one-based calendar-day reservation; zero/missing means no order has been taken. Existing saves upgrade without historical reservations or resetting supplies/condition. The reservation belongs to the property and survives a new life or ownership transfer.
+
+`rushorder` at Bluebird Laundry is a60-minute helper job paying80 dollars on uninterrupted completion, with up to one respect below the existing DockName cap. It requires being at the address, not owning it, starting between08:00 and17:00 inclusive, condition at least40, no operating trouble, at least one staff member and two supply units. The normal command boundary checks life, custody, pending events, revision and idempotency.
+
+Acceptance reserves today's order and consumes two of the premises' supplies before time advances. Interruption pays nothing and leaves the order/supplies used; it is not a resumable arrangement. A successful job does not add attention or count toward the fixer's envelope-job milestones. Another order is available the next day subject to the same operating requirements. Owners receive their business's ordinary income rather than this helper payment.
+
+The action appears under Work with its actual terms/refusal. Opening earning guidance tries it after unavailable envelopes and before repeatable cargo work. No new frontend command shape is required. This is an external customer order, not a new fully modeled hotel business or NPC-paid contract market.

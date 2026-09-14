@@ -246,12 +246,13 @@ type Faction struct {
 	Short int `json:"short,omitempty"`
 }
 type Property struct {
-	BoughtLife int                     `json:"bought_life,omitempty"`
-	Rents      map[string]*RentAccount `json:"rents,omitempty"`
-	Owner      string                  `json:"owner"`
-	Condition  int                     `json:"condition"`
-	Income     int                     `json:"income"`
-	Carry      float64                 `json:"carry"`
+	RushOrderDay int                     `json:"rush_order_day,omitempty"`
+	BoughtLife   int                     `json:"bought_life,omitempty"`
+	Rents        map[string]*RentAccount `json:"rents,omitempty"`
+	Owner        string                  `json:"owner"`
+	Condition    int                     `json:"condition"`
+	Income       int                     `json:"income"`
+	Carry        float64                 `json:"carry"`
 	// How the business is run. Empty means the ordinary way, so saves written
 	// before this was a decision keep earning exactly what they earned.
 	Mode string `json:"mode,omitempty"`
@@ -1119,6 +1120,8 @@ func (w *World) Actions(id string) []Action {
 		}
 	}
 	switch id {
+	case "laundry":
+		add("rushorder", "Finish a hotel linen order", RushOrderMinutes, 0, w.RushOrderReadiness(id), fmt.Sprintf("Earn $%d and up to 1 respect. One order per day, accepted 08:00–17:00. Uses %d of the laundry’s supplies, with no added attention. The order is reserved when you start; an interruption pays nothing and keeps today’s order taken.", RushOrderPay, RushOrderSupply))
 	case "precinct":
 		for _, n := range w.OwnPeople() {
 			if !w.Inside(n) {
