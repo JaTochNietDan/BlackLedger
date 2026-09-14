@@ -110,6 +110,7 @@ func TestFuneralUsesSavingsAndNeverOverdrawsAFamily(t *testing.T) {
 	w, at := theParlour(t)
 	n := w.AddCivilian()
 	n.Faction, n.Purse = w.Factions[0].ID, 10
+	w.HouseholdSavings = map[string]HouseholdAccount{}
 	account := w.HouseholdSavings[n.ID]
 	account.Cash = 20
 	w.HouseholdSavings[n.ID] = account

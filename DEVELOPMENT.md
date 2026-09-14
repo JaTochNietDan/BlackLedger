@@ -2945,3 +2945,10 @@ Added explicit estate/family split, all three owner types, poor means, repeat
 settlement, crew choice/payment, savings use and no family overdraft coverage.
 No live release or live-save QA commands;4daa6c8 remains on8791.
 New morgue/cemetery/crematorium venues and their authored interiors remain open.
+
+Final funeral validation: the added savings test initially failed because its
+fixture wrote to a nil savings map. Initialized that fixture explicitly and
+reran the full focused death/funeral/ownership selection successfully (see
+.runtime/funeral-death-integration-final.log). The earlier integration selection
+passed9.085s before that additional test was added. This is targeted simulation
+coverage, not a new complete-suite or campaign acceptance claim.
