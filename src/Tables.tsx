@@ -1,3 +1,4 @@
+import type {Presence} from './types';
 import {planCards} from './blackjackPresentation';
 import {BlackjackTable3D} from './BlackjackTable3D';
 import {DiceTable3D} from './DiceTable3D';
@@ -146,12 +147,14 @@ function Chip({amount, money}: {amount: number; money: (n: number) => string}) {
 // stands, so it is drawn face down: that is what is true, not a decoration.
 export function CardTable({
   hand,
+  dealer,
   motion = true,
   onPresent,
   money,
   act,
 }: {
   hand: HandState;
+  dealer?: Presence;
   motion?: boolean;
   onPresent?: (active:boolean)=>void;
   money: (n: number) => string;
@@ -183,17 +186,17 @@ export function CardTable({
   return (
     <div className="felt card-felt">
       <div className="felt-head">
-        <span>{hand.place}</span>
+        <span>{hand.place}{dealer ? ` · ${dealer.name}, dealer` : ""}</span>
         <b>{money(hand.stake ?? 0)} down</b>
       </div>
       {/* The cloth itself, with the two seats on it and the money in the middle
           of the table where a stake actually sits. */}
-      <BlackjackTable3D mine={mine} theirs={theirs} hidden={!over && theirs.length < 2 ? 1 : 0} presentation={presentation}/>
+      <BlackjackTable3D dealer={dealer} mine={mine} theirs={theirs} hidden={!over && theirs.length < 2 ? 1 : 0} presentation={presentation}/>
       <div className="blackjack-hand-summary">
       {presentation.active && <p className="blackjack-dealing" role="status">The cards are being dealt…</p>}
       <div className="baize" style={{visibility:presentation.active?"hidden":"visible"}} aria-hidden={presentation.active}>
         <div className="seat dealer">
-          <span className="seat-name">Dealer</span>
+          <span className="seat-name" title={dealer?.name}>Dealer</span>
           <span className="hand-description">{theirs.map(c=>knownCard(c)?`${c.rank}${pipOf(c.suit)}`:"Face down").join(" · ")}{!over && theirs.length < 2 ? " · Face down" : ""}</span>
           <b className="seat-total">{hand.dealer ?? 0}</b>
         </div>

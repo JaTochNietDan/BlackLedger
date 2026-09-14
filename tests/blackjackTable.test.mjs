@@ -40,3 +40,22 @@ test('revealed hole card turns from its existing seat with its full stock above 
  }
  assert.equal(planCards(before,after,false).cards.some(c=>c.flip),false);
 });
+
+test('only public dealers are staged and both rigs clear the table',async()=>{
+ const {blackjackDealer,poseBlackjackDealer}=await import('../.runtime/frontend-test/blackjackDealer.js');
+ const patron={id:'patron',name:'Patron',standing:'',role:'Bellandi Family'};
+ assert.equal(blackjackDealer([patron]),undefined);
+ const dealer={...patron,id:'dealer',name:'Dante',role:'Croupier'};
+ assert.equal(blackjackDealer([patron,dealer]),dealer);
+ for(const name of ['person','woman']){
+  const actor=await model(name);poseBlackjackDealer(actor);
+  actor.traverse(o=>{
+   if(!(o instanceof THREE.Mesh))return;
+   const pos=o.geometry.getAttribute('position');
+   for(let i=0;i<pos.count;i++){
+    const v=new THREE.Vector3().fromBufferAttribute(pos,i).applyMatrix4(o.matrixWorld);
+    assert.ok(!(v.y>.60&&v.y<.875&&v.x*v.x/(1.67*1.67)+v.z*v.z/(1.18*1.18)<1),'dealer enters table apron or rail');
+   }
+  });
+ }
+});
