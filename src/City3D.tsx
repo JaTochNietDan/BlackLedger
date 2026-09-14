@@ -1244,7 +1244,7 @@ export function City3D(props: Props) {
           const pose=a.start===a.end?(traffic.placement(id)?.pose||onRoute(a.points,1)):{x:a.object.position.x,z:a.object.position.z,heading:a.object.rotation.y};
           return {model:trafficModel(a.model,a.start===a.end),root:{x:pose.x,z:pose.z},pose};
         });
-        const animatingVictims=new Set(effects.flatMap(e=>e.assassination?[e.cue.strike!.victim.id]:e.cue.kind==='killing'?e.cue.actors?.map(a=>a.id)||[]:[]));
+        const animatingVictims=new Set(effects.flatMap(e=>e.accident?.fatal&&!e.cue.id.startsWith('preview:')?[`player:${w.life}`]:e.assassination?[e.cue.strike!.victim.id]:e.cue.kind==='killing'?e.cue.actors?.map(a=>a.id)||[]:[]));
         aftermath.suppressVictims(animatingVictims);
         // Reserve the planter/shooter before associated casualties, so the
         // casualties cannot occupy the path their triggering scene needs.
@@ -1273,6 +1273,7 @@ export function City3D(props: Props) {
             e.since = now;
             if(e.accident){
               e.extra.rotation.y=e.slot.pose.heading;
+              if(e.accident.fatal&&!e.cue.id.startsWith('preview:'))aftermath.rememberBody(`player:${w.life}`,e.slot,0);
               frameScene(camera,controls.target,new THREE.Box3(new THREE.Vector3(e.slot.root.x-3,0,e.slot.root.z-2),new THREE.Vector3(e.slot.root.x+3,3,e.slot.root.z+2)));
               controls.update();
             }

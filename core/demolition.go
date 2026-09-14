@@ -159,6 +159,12 @@ func (w *World) Plant(id string) error {
 		cue.Attacker = &CueAttacker{ID: "player", Name: w.Player.Name, Weapon: 0}
 		cue.Accident = &CueAccident{HealthLost: healthBefore - w.Player.Health, Fatal: w.Player.Health <= 0}
 		if w.Player.Health <= 0 {
+			w.Aftermath = append(w.ActiveAftermath(), Aftermath{
+				ID: cue.ID + ":player", Target: id,
+				Victim: CueActor{ID: fmt.Sprintf("player:%d", w.Life), Name: w.Player.Name},
+				Minute: cue.Minute, PoliceAt: cue.Minute + 5, CleanupAt: cue.Minute + 180,
+				Cause: "charge-accident", Face: w.Player.Face,
+			})
 			w.DieOf("a charge of your own", "A charge at "+place.Name+" went off with you still under it.")
 		}
 		return nil

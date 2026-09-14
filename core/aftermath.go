@@ -9,6 +9,8 @@ type Aftermath struct {
 	Minute    int      `json:"minute"`
 	PoliceAt  int      `json:"police_at"`
 	CleanupAt int      `json:"cleanup_at"`
+	Cause     string   `json:"cause,omitempty"`
+	Face      int      `json:"face,omitempty"`
 }
 
 func (w *World) recordAftermath(cue VisualCue) {

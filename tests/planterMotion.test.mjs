@@ -244,3 +244,32 @@ test('accident reservations enclose the whole posed cast and yield occupied fron
   assert.ok(slot.pose.z+size.width/2<39.5);
  }
 });
+
+test('fatal accident aftermath retains the final rig pose and occupied slot until cleanup',async()=>{
+ const {CityAccident}=await import('../.runtime/frontend-test/city3dAccident.js');
+ const {CityAftermath}=await import('../.runtime/frontend-test/city3dAftermath.js');
+ const {sceneSlots}=await import('../.runtime/frontend-test/city3dEvents.js');
+ const lot={id:'bar',x:80,z:48,row:1,col:2},lots=new Map([['bar',lot]]);
+ for(const [name,face] of [['person',1],['woman',3]]){
+  const source=await model(name),cast=new CityAccident(source.clone(true),true),city=new CityAftermath();
+  const slot=sceneSlots(lot,'accident')[1],id='player:1';
+  cast.root.position.set(slot.root.x,.2,slot.root.z);cast.root.rotation.y=slot.pose.heading;cast.update(4);
+  const records=[{id:'fatal',target:'bar',victim:{id,name:'Recorded victim'},cause:'charge-accident',face,minute:600,police_at:605,cleanup_at:780}];
+  const models=new Map([[name,source],['police',new THREE.Group()],['police-officer',source]]);
+  city.rememberBody(id,slot,0);
+  city.update(records,600,lots,models,()=>{throw Error('looked up current player instead of recorded appearance');},[],new Set([id]));
+  assert.equal(city.slots().length,0);
+  city.update(records,600,lots,models,()=>'',[],new Set());
+  const body=city.object('aftermath:fatal:body'),actor=body.children.at(-1);
+  body.updateMatrixWorld(true);
+  cast.actor.traverse(part=>{
+   if(!(part instanceof THREE.Mesh))return;
+   const held=actor.getObjectByName(part.name);assert.ok(held,part.name);
+   assert.ok(part.matrixWorld.elements.every((n,i)=>Math.abs(n-held.matrixWorld.elements[i])<1e-7),`${name} ${part.name} jumped at handoff`);
+  });
+  assert.deepEqual(city.slots()[0],slot);
+  city.update(records,605,lots,models,()=>'',[],new Set());
+  assert.equal(city.inspect().filter(e=>e.id.includes('police')).length,1);
+  city.update(records,780,lots,models,()=>'',[],new Set());assert.equal(city.slots().length,0);city.dispose();
+ }
+});

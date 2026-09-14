@@ -189,6 +189,33 @@ func TestPrematureBlastCapturesTheInjuryIndependentlyOfLaterPlayerState(t *testi
 			t.Fatalf("wrong accident outcome: %+v health=%d alive=%v", cue.Accident, w.Player.Health, w.Player.Alive)
 		}
 		seen[cue.Accident.Fatal] = true
+		after := w.ActiveAftermath()
+		if !cue.Accident.Fatal && len(after) != 0 {
+			t.Fatal("surviving accident left a body")
+		}
+		if cue.Accident.Fatal {
+			if len(after) != 1 || after[0].Cause != "charge-accident" || after[0].Victim.ID != "player:1" || after[0].Victim.Name != w.Player.Name || after[0].Face != w.Player.Face || after[0].PoliceAt != cue.Minute+5 || after[0].CleanupAt != cue.Minute+180 {
+				t.Fatalf("missing fatal accident aftermath: %+v", after)
+			}
+			raw, err := json.Marshal(w)
+			if err != nil {
+				t.Fatal(err)
+			}
+			var restored World
+			if err := json.Unmarshal(raw, &restored); err != nil {
+				t.Fatal(err)
+			}
+			restored.VisualCues, restored.LastResult = nil, nil
+			restored.Player.Name, restored.Player.Face = "A different life", 24
+			restored.Minute = cue.Minute + 179
+			if got := restored.ActiveAftermath(); len(got) != 1 || got[0] != after[0] {
+				t.Fatal("reload or changed player lost the recorded victim")
+			}
+			restored.Minute++
+			if len(restored.ActiveAftermath()) != 0 {
+				t.Fatal("accident body outlived cleanup")
+			}
+		}
 		linked := false
 		for _, story := range w.News {
 			if story.Headline != cue.Headline || story.Minute != cue.Minute {

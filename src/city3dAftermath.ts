@@ -1,4 +1,6 @@
 import * as THREE from 'three';
+import {CityAccident} from './city3dAccident.js';
+import {pedestrianModel} from './city3dCast.js';
 import {availableSceneSlot} from './city3dEvents.js';
 import type {SceneSlot} from './city3dEvents.js';
 import type {Lot} from './city3dPlan.js';
@@ -59,18 +61,25 @@ export class CityAftermath {
         const lot=lots.get(record.target); if(!lot)continue;
         const taken=[...occupied,...[...this.entries.values()].map(e=>e.slot)];
         const remembered=kind==='body'?this.bodyPoses.get(record.victim.id):undefined;
-        const slot=remembered?.slot || availableSceneSlot(lot,kind==='fire-engine'?'fire-engine':vehicle?'arrest':'killing',taken);if(!slot)continue;
-        const model=kind.startsWith('firefighter')?'firefighter':kind==='fire-engine'?'fire-engine':kind==='body'?modelFor(record.victim.id):vehicle?'police':'police-officer';
+        const accident='cause' in record && record.cause==='charge-accident';
+        const face='face' in record&&typeof record.face==='number'?record.face:undefined;
+        const slot=remembered?.slot || availableSceneSlot(lot,kind==='fire-engine'?'fire-engine':vehicle?'arrest':kind==='body'&&accident?'accident':'killing',taken);if(!slot)continue;
+        const model=kind.startsWith('firefighter')?'firefighter':kind==='fire-engine'?'fire-engine':kind==='body'?(accident?pedestrianModel(record.victim.name,face,true):modelFor(record.victim.id)):vehicle?'police':'police-officer';
         const source=models.get(model);if(!source)continue;
         const group=new THREE.Group(), object=source.clone(true);
-        const owned=kind==='body'?dressPedestrian(object,model,wardrobe(record.victim.id)):[];
+        const owned=kind==='body'?dressPedestrian(object,model,accident?wardrobe(record.victim.name,face,true):wardrobe(record.victim.id)):[];
         group.position.set(slot.root.x,kind==='body'?0:vehicle?vehicleRootHeight(slot.root):.2,slot.root.z);
         if(kind==='body') {
+          if(accident){
+            const fall=new CityAccident(object,true);fall.update(fall.duration);
+            group.position.y=.2;group.rotation.y=slot.pose.heading;
+          }else{
           for(const [name,rotation] of Object.entries(remembered?.joints||{}))object.getObjectByName(name)?.quaternion.fromArray(rotation);
           object.quaternion.setFromAxisAngle(new THREE.Vector3(0,1,0),remembered?.yaw||0)
             .premultiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,0,1),-Math.PI/2));object.position.y=.6;
+          }
           const pool=new THREE.Mesh(this.pool,this.blood);
-          pool.rotation.x=-Math.PI/2;pool.position.set(1.1,.181,0);group.add(pool);
+          pool.rotation.x=-Math.PI/2;pool.position.set(accident?0:1.1,accident?.006:.181,0);group.add(pool);
         }
         if(kind.startsWith('firefighter'))object.rotation.y=Math.atan2(lot.x-slot.root.x,lot.z-slot.root.z);
         if(kind.startsWith('officer')) {

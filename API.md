@@ -644,3 +644,19 @@ at the staged actor, with no invented building fire or broken windows. The
 normal attacker is suppressed during the cast. Debug offers separate surviving
 and fatal accident previews. Persistent aftermath, seamless handoffs and actual
 player-death overlay timing still require further integration.
+
+## Fatal charge accident aftermath
+
+A fatal player charge accident now creates a saved aftermath entry alongside its
+explosion cue. Optional `cause: "charge-accident"` identifies the fall pose and
+`face` preserves the victim's portrait selection; `victim.name` is captured at
+death and `victim.id` is life-specific (`player:<life>`). Existing NPC records and
+legacy saves are unchanged. Police and cleanup retain the existing five- and
+180-game-minute deadlines. Surviving accidents create no body.
+
+The city suppresses the persistent body during fatal accident playback and
+retains its staged reservation for the handoff. The persistent cast reconstructs
+the same final fall pose from the saved appearance. Reloads choose an available
+accident frontage slot; exact presentation coordinates are not saved. Blood and
+response reservations remain presentation-only. Animated police arrival and
+cleanup remain unfinished; a paused dead campaign does not advance their clock.
