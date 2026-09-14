@@ -5,11 +5,14 @@ import "fmt"
 // Bracket holds actual eight-ball matches. Campaign code owns entry fees and
 // eligibility; a client must never submit bracket winners or replacement racks.
 type Bracket struct {
-	Entrants []string       `json:"entrants"`
-	Matches  []BracketMatch `json:"matches"`
-	Winner   string         `json:"winner"`
+	Withdrawn map[string]bool `json:"withdrawn"`
+	Finished  bool            `json:"finished"`
+	Entrants  []string        `json:"entrants"`
+	Matches   []BracketMatch  `json:"matches"`
+	Winner    string          `json:"winner"`
 }
 type BracketMatch struct {
+	Resolved bool      `json:"resolved"`
 	Round    int       `json:"round"`
 	Table    int       `json:"table"`
 	Players  [2]string `json:"players"`
@@ -53,44 +56,110 @@ func NewBracket(entrants []string) (*Bracket, error) {
 	return b, nil
 }
 
-// Advance records only winners adjudicated by the embedded physical match (or
-// its explicit concession rule). It is idempotent and never plays unseen shots.
+// Advance records physical match winners, explicit concessions and withdrawal
+// walkovers. It is idempotent and never plays unseen shots.
 func (b *Bracket) Advance() {
-	if b.Winner != "" {
+	if b.Finished || b.Winner != "" {
+		b.Finished = true
 		return
 	}
 	for i := range b.Matches {
 		cell := &b.Matches[i]
-		if cell.Winner != "" || cell.Rack == nil || cell.Rack.Winner < 0 || cell.Rack.Winner > 1 {
+		if cell.Resolved {
 			continue
 		}
-		winner := cell.Players[cell.Rack.Winner]
-		if winner == "" {
+		if cell.Winner != "" {
+			cell.Resolved = true
 			continue
+		}
+		if cell.Round > 0 {
+			ready := 0
+			for j := 0; j < i; j++ {
+				source := &b.Matches[j]
+				if source.Next == i && source.Resolved {
+					cell.Players[source.NextSeat] = source.Winner
+					ready++
+				}
+			}
+			if ready != 2 {
+				continue
+			}
+		}
+		present := [2]bool{}
+		for seat, id := range cell.Players {
+			present[seat] = id != "" && !b.Withdrawn[id]
+		}
+		winner := ""
+		switch {
+		case !present[0] && !present[1]:
+			// A resolved empty branch supplies a bye, not a fabricated champion.
+		case !present[0] || !present[1]:
+			seat := 0
+			if present[1] {
+				seat = 1
+			}
+			winner = cell.Players[seat]
+			if cell.Rack != nil && cell.Rack.Winner < 0 {
+				_ = cell.Rack.Concede(1 - seat)
+			}
+		default:
+			if cell.Rack == nil {
+				cell.Table = b.freeTable()
+				cell.Rack, _ = NewMatch(0)
+			}
+			if cell.Rack.Winner < 0 {
+				continue
+			}
+			winner = cell.Players[cell.Rack.Winner]
 		}
 		cell.Winner = winner
+		cell.Resolved = true
 		if cell.Next < 0 {
 			b.Winner = winner
+			b.Finished = true
 			return
 		}
-		next := &b.Matches[cell.Next]
-		next.Players[cell.NextSeat] = winner
-		if next.Players[0] != "" && next.Players[1] != "" && next.Rack == nil {
-			next.Table = b.freeTable()
-			next.Rack, _ = NewMatch(0)
+	}
+}
+
+// Withdraw removes eligibility, including while waiting for another table. It
+// cannot rewrite a finished event. Campaign code supplies the actual cause.
+func (b *Bracket) Withdraw(id string) error { return b.WithdrawMany([]string{id}) }
+
+// Simultaneous departures must be marked together before advancing, otherwise
+// the first withdrawal could prematurely award the event to another casualty.
+func (b *Bracket) WithdrawMany(ids []string) error {
+	if b.Finished || b.Winner != "" {
+		return fmt.Errorf("the tournament is already finished")
+	}
+	entrants := map[string]bool{}
+	for _, id := range b.Entrants {
+		entrants[id] = true
+	}
+	for _, id := range ids {
+		if !entrants[id] {
+			return fmt.Errorf("that person did not enter this tournament")
 		}
 	}
+	if b.Withdrawn == nil {
+		b.Withdrawn = map[string]bool{}
+	}
+	for _, id := range ids {
+		b.Withdrawn[id] = true
+	}
+	b.Advance()
+	return nil
 }
 
 // ActiveFor returns a playable match, never a speculative future pairing or an
 // already resolved rack. Advance should be called after each committed shot.
 func (b *Bracket) ActiveFor(id string) (index, seat int, ok bool) {
-	if id == "" || b.Winner != "" {
+	if id == "" || b.Finished || b.Winner != "" || b.Withdrawn[id] {
 		return 0, 0, false
 	}
 	for i := range b.Matches {
 		cell := &b.Matches[i]
-		if cell.Rack == nil || cell.Winner != "" || cell.Rack.Winner >= 0 {
+		if cell.Rack == nil || cell.Resolved || cell.Winner != "" || cell.Rack.Winner >= 0 {
 			continue
 		}
 		for seat, player := range cell.Players {
@@ -107,7 +176,7 @@ func (b *Bracket) ActiveFor(id string) (index, seat int, ok bool) {
 func (b *Bracket) freeTable() int {
 	occupied := map[int]bool{}
 	for _, cell := range b.Matches {
-		if cell.Rack != nil && cell.Rack.Winner < 0 && cell.Winner == "" {
+		if cell.Rack != nil && cell.Rack.Winner < 0 && !cell.Resolved && cell.Winner == "" {
 			occupied[cell.Table] = true
 		}
 	}

@@ -378,3 +378,27 @@ funded participant deposits, retention/forfeit rules on death/departure/closure,
 whole-prize-pool settlement exactly once, command receipts, public bracket and
 browser progression. Individual casual matches must also respect tournament table
 occupancy when those two systems are joined. No campaign save was used.
+
+## Tournament withdrawal and empty-branch handling — 2026-09-14
+
+Before attaching entry-fee escrow, the bracket now supports explicit withdrawal
+and simultaneous withdrawal batches. Active opponents receive a concession;
+entrants waiting between rounds cannot return after withdrawing. If both sides
+of a branch withdraw, it resolves without a winner and supplies a bye downstream.
+An all-withdrawn event has `finished:true` and an empty champion, distinct from an
+unfinished bracket. Finished events cannot be rewritten by later departures.
+
+Batches validate every identity before changing eligibility, then advance once.
+This is necessary for a shared incident: withdrawing casualties one at a time
+could incorrectly crown the last casualty before processing their withdrawal.
+Resolved empty branches release their tables even if their historical rack had
+not physically finished. Consumers must use the bracket's resolved/finished
+status, not infer event progress from rack winner alone.
+
+The full billiards suite passes (11.623s), including saved waiting entrants,
+simultaneous empty branches, all-entrant withdrawal, atomic invalid batches,
+physical concessions and immutable finished champions. Vet passes. Logs:
+`.runtime/pool-withdrawal-{tests,vet}.log`. Campaign entry fees and payouts were
+not connected in this increment; this closes a lifecycle gap needed before money
+can safely be attached. Core/HTTP/UI integration and scheduling remain open.
+No campaign save was used.

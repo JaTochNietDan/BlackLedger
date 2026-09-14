@@ -147,3 +147,88 @@ func TestBracketLaterRoundNeverTakesAnOccupiedOpeningTable(t *testing.T) {
 		t.Fatal("semifinal displaced active opening game")
 	}
 }
+
+func TestBracketWithdrawalWhileWaitingDoesNotReviveEntrant(t *testing.T) {
+	b, _ := NewBracket([]string{"a", "b", "c", "d"})
+	if err := b.Matches[0].Rack.Concede(1); err != nil {
+		t.Fatal(err)
+	}
+	b.Advance()
+	if err := b.Withdraw("a"); err != nil {
+		t.Fatal(err)
+	}
+	if b.Finished {
+		t.Fatal("other opening match is still undecided")
+	}
+	raw, _ := json.Marshal(b)
+	var restored Bracket
+	if err := json.Unmarshal(raw, &restored); err != nil {
+		t.Fatal(err)
+	}
+	b = &restored
+	if err := b.Matches[1].Rack.Concede(1); err != nil {
+		t.Fatal(err)
+	}
+	b.Advance()
+	if !b.Finished || b.Winner != "c" {
+		t.Fatal("withdrawn semifinalist returned", b.Winner)
+	}
+	if b.Matches[2].Rack != nil {
+		t.Fatal("walkover invented a played final")
+	}
+	if _, _, ok := b.ActiveFor("a"); ok {
+		t.Fatal("withdrawn entrant still active")
+	}
+}
+func TestBracketSimultaneousWithdrawalsResolveEmptyBranchAndWholeEvent(t *testing.T) {
+	b, _ := NewBracket([]string{"a", "b", "c", "d"})
+	if err := b.WithdrawMany([]string{"a", "b"}); err != nil {
+		t.Fatal(err)
+	}
+	if !b.Matches[0].Resolved || b.Matches[0].Winner != "" || b.Finished {
+		t.Fatal("empty branch awarded a false winner")
+	}
+	if err := b.Matches[1].Rack.Concede(1); err != nil {
+		t.Fatal(err)
+	}
+	b.Advance()
+	if b.Winner != "c" || !b.Finished {
+		t.Fatal("empty branch did not supply bye")
+	}
+	all, _ := NewBracket([]string{"a", "b", "c", "d"})
+	if err := all.WithdrawMany(all.Entrants); err != nil {
+		t.Fatal(err)
+	}
+	if !all.Finished || all.Winner != "" {
+		t.Fatal("all-withdrawn event invented a champion")
+	}
+	before, _ := json.Marshal(all)
+	all.Advance()
+	after, _ := json.Marshal(all)
+	if string(before) != string(after) {
+		t.Fatal("void event changed on reconcile")
+	}
+}
+func TestBracketWithdrawalValidationIsAtomicAndFinishedChampionStays(t *testing.T) {
+	b, _ := NewBracket([]string{"a", "b"})
+	before, _ := json.Marshal(b)
+	if err := b.WithdrawMany([]string{"a", "stranger"}); err == nil {
+		t.Fatal("unknown entrant accepted")
+	}
+	after, _ := json.Marshal(b)
+	if string(before) != string(after) {
+		t.Fatal("partially withdrew before validation")
+	}
+	if err := b.Withdraw("a"); err != nil {
+		t.Fatal(err)
+	}
+	if b.Winner != "b" || !b.Finished {
+		t.Fatal("live opponent did not win by concession")
+	}
+	if b.Matches[0].Rack.Winner != 1 {
+		t.Fatal("active rack not conceded")
+	}
+	if err := b.Withdraw("b"); err == nil {
+		t.Fatal("rewrote completed event")
+	}
+}

@@ -2146,3 +2146,17 @@ fixture produces a legal called-eight champion after13 strokes. No campaign or
 HTTP interface changed. Entry fees, occasional scheduling, participant lifecycle,
 full-pool payout and playable bracket integration remain next; this foundation
 alone is not a completed tournament feature. Main campaign untouched.
+
+### 2026-09-14 — tournament withdrawals before fee integration
+
+Added withdrawal-aware bracket progression, including saved waiting entrants,
+empty branches/byes and an explicit finished-without-champion state. Simultaneous
+withdrawals validate and apply as a batch to avoid awarding a tournament to a
+second casualty while processing the first. Resolved branches release tables;
+finished champions remain immutable.
+
+Full billiards tests pass (11.623s), vet passes. Tests exercise partial-round
+save/reopen, active concessions, all-entrant withdrawal, malformed batch atomicity
+and finished-event protection. No campaign money or live save changed. Entry-fee,
+payout, scheduling and UI integration remain outstanding; withdrawal lifecycle
+was completed first so those integrations can distinguish winners from void events.
