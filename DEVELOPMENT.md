@@ -1650,3 +1650,31 @@ room controls, working residential drawers, indoor home strikes and successful
 unattended burglary searches into the main game. Occupied/failed/fatal/Cypress
 burglary scenes, persistent indoor aftermath, remaining interiors, richer income
 progression and broader visual/played-campaign acceptance are still unfinished.
+
+### Resident-funded household repair jobs — September 14
+
+Added householdwork at The Mariner, Ashbury Court and Mercer Court. A named living
+resident commissions 90 minutes of small domestic repairs for $45, funded by their
+purse/savings, retaining $100. One booking per building/day; 08:00–16:30 acceptance,
+sound building required. Start reserves the building's saved day; completion pays
+only if the original customer remains alive, resident and funded. Interruptions
+pay nothing and keep the booking taken. No structural repairs or deed/tenant
+changes are implied. Mariner makes this accessible from the starting district.
+
+Isolated household-work fixture on8949: browser visited Mariner and completed the
+actual work command; cash90→135, respect0→1, clock08:00→09:30; repeat action became
+disabled with the used-booking explanation. Main8791 remains on releasee4270de;
+no main-save QA commands were made. Work currently resolves through the ordinary
+local result, with no bespoke handyman animation. The offer remains below the
+premises section in the current interior layout; improving paid-work prominence
+for newcomers remains useful UX work.
+
+Verification repeated in `.runtime/household-work-clean`, an archive of committed
+HEAD with only this change copied in, excluding pre-existing armed/robbery/mugging/
+aftermath/simulation edits. Targeted household/rush/group/price core tests pass
+1.134s; full store0.160s and HTTP server0.900s suites pass; qa-fixture builds.
+Tests cover read purity, starting-district access, exact conserved pocket/savings
+payments, customer death/move/poverty, remote/closed/damaged rejection, completion
+and interruption, repeat prevention, reload/new-life persistence and next-day use.
+The broader goal remains active; this is an income addition, not final visual or
+campaign acceptance.

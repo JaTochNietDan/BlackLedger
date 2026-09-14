@@ -246,13 +246,14 @@ type Faction struct {
 	Short int `json:"short,omitempty"`
 }
 type Property struct {
-	RushOrderDay int                     `json:"rush_order_day,omitempty"`
-	BoughtLife   int                     `json:"bought_life,omitempty"`
-	Rents        map[string]*RentAccount `json:"rents,omitempty"`
-	Owner        string                  `json:"owner"`
-	Condition    int                     `json:"condition"`
-	Income       int                     `json:"income"`
-	Carry        float64                 `json:"carry"`
+	HouseholdWorkDay int                     `json:"household_work_day,omitempty"`
+	RushOrderDay     int                     `json:"rush_order_day,omitempty"`
+	BoughtLife       int                     `json:"bought_life,omitempty"`
+	Rents            map[string]*RentAccount `json:"rents,omitempty"`
+	Owner            string                  `json:"owner"`
+	Condition        int                     `json:"condition"`
+	Income           int                     `json:"income"`
+	Carry            float64                 `json:"carry"`
 	// How the business is run. Empty means the ordinary way, so saves written
 	// before this was a decision keep earning exactly what they earned.
 	Mode string `json:"mode,omitempty"`
@@ -1155,6 +1156,17 @@ func (w *World) Actions(id string) []Action {
 				fmt.Sprintf("$%d, and everybody still on your books watches what you do when it is one of them. Worth %d trust apiece and %d respect. There are %s left to arrange it.",
 					w.FuneralFee(id), FuneralTrust, FuneralRespect,
 					plainly((FuneralWindow-(w.Minute-n.DiedAt))/1440+1, "hours", fmt.Sprintf("%d days", (FuneralWindow-(w.Minute-n.DiedAt))/1440+1))))
+		}
+	}
+	if id == "room" || id == "apartment" || id == "mercercourt" {
+		resident, reason := w.HouseholdWorkOffer(id)
+		label := "Take a household repair booking"
+		if resident != nil {
+			label = "Do small repairs for " + resident.Name
+		}
+		add("householdwork", label, HouseholdWorkMinutes, 0, reason, fmt.Sprintf("Earn $%d and up to 1 respect for small repairs inside a resident’s home. One booking per building per day, accepted 08:00–16:30. Paid from the resident’s household funds if they still live here and can afford the fee when work finishes. Interrupted work pays nothing; today’s booking remains taken.", HouseholdWorkPay))
+		if resident != nil {
+			about(resident.ID)
 		}
 	}
 	switch id {

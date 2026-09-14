@@ -257,6 +257,7 @@ func (w *World) apply(c Command) error {
 		chosen = a.Label
 		// Whose evening this is, decided before the clock moves. See
 		// CallSitdownAs.
+		var householdCustomer string
 		var homeChanges []HomeChange
 		if c.Kind == "move_home" {
 			homeChanges, _ = w.PlanHomeMove(target)
@@ -613,6 +614,12 @@ func (w *World) apply(c Command) error {
 		} else {
 			// Hiring/delegating commits arrangements immediately; work rewards require reaching completion.
 			switch c.Kind {
+			case "householdwork":
+				var err error
+				householdCustomer, err = w.StartHouseholdWork(target)
+				if err != nil {
+					return err
+				}
 			case "rushorder":
 				if err := w.StartRushOrder(target); err != nil {
 					return err
@@ -915,6 +922,8 @@ func (w *World) apply(c Command) error {
 			w.Advance(a.Minutes)
 			if p.Alive && w.Event == nil {
 				switch c.Kind {
+				case "householdwork":
+					w.CompleteHouseholdWork(target, householdCustomer)
 				case "rushorder":
 					w.CompleteRushOrder()
 				case "courier":
@@ -1077,6 +1086,8 @@ func (w *World) apply(c Command) error {
 					w.District = min(2, w.District+1)
 					w.Log("The city opens up", "Your contacts introduce you to another district. More properties are accessible.", "city")
 				}
+			} else if c.Kind == "householdwork" {
+				w.Log("Household work interrupted", "The repairs could not be completed. No fee was paid; today’s booking remains taken.", "work")
 			} else if c.Kind == "rushorder" {
 				w.Log("Linen order interrupted", "The order could not be completed. No fee was paid; today’s order and the supplies committed to it remain used.", "work")
 			} else if a.Cost > 0 && c.Kind != "security" {

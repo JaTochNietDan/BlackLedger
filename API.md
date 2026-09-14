@@ -996,3 +996,22 @@ reveal. Empty successful searches use the same route without cash. Occupied,
 failed, fatal, estate and legacy robbery cases retain existing presentation
 pending distinct choreography; they are not substituted with a successful search.
 Replay does not perform a command or change the recorded amounts.
+
+## Household repair income
+
+`householdwork` is a local, zero-cost work action at `room`, `apartment` and
+`mercercourt`. Its action subject names the resident commissioning small household
+repairs. It takes 90 minutes and pays $45 from that resident's actual purse/savings,
+plus one respect below the existing dock-work reputation cap. Bookings open from
+08:00 through 16:30 and require a sound building and a resident able to retain a
+$100 household reserve after payment. Reads choose a stable daily resident without
+mutating housing or exposing their balance.
+
+Each building saves an optional `household_work_day` reservation (day + 1), taken
+when work starts. Old saves default to no booking; reload, new life and property
+sale do not reset a taken booking. Interrupted work pays nothing and keeps the
+booking used. Completion rechecks the original resident's life, home and available
+funds; changed circumstances cancel payment without substituting another payer.
+These are small domestic repairs, with no change to the building's structural
+condition, deed, tenant assignment or inventory. Presentation uses ordinary local
+work results; a dedicated repair animation is not yet implemented.
