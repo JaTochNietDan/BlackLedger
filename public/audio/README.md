@@ -16,3 +16,16 @@ burst peaks. Full sample tails overlap; Skip/mute/navigation cancel active voice
 The revolver and shotgun originals contain a few full-scale samples; headroom in
 the mix prevents simply adding them at unity, but does not restore clipped source
 data. Final subjective sound/mix review remains part of production acceptance.
+
+## Additional effects — September 13
+
+Ten additional WAVs supplied by the user were copied unchanged from Downloads.
+`effects/sources.json` records original filenames, formats, durations and SHA-256.
+Explosion and raid use their full recordings in 14s/10s scene windows. Arrest uses
+siren; authored door contact uses door-kick; matched shooting casualties use pain;
+explosions layer panic after one second. Nearby active building fires use crackle.
+Visible nearby vehicles use an approach sample once per observed journey and idle
+when stationary. Fire/idle have a 50ms decoded-buffer seam crossfade; source files
+remain unchanged. Loops stop on mute, hidden tab, context loss or view disposal.
+The drive-away recording is imported for the still-unfinished moving getaway
+choreography; it is not played over stationary cars. Subjective mix review remains.

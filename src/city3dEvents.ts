@@ -124,7 +124,7 @@ export class GunfireAudio {
 
 /** The rendered cause supplies audio for co-located casualties in that moment. */
 export function cityOwnsAudio(cue: VisualCue, batch: VisualCue[]) {
-  if (cue.kind === 'gunfight' || cue.kind === 'explosion') return true;
+  if (['gunfight','explosion','raid','arrest'].includes(cue.kind)) return true;
   return cue.kind === 'killing' && batch.some(other =>
     (other.kind === 'gunfight' || other.kind === 'explosion') &&
     other.target === cue.target && other.minute === cue.minute);
@@ -186,5 +186,5 @@ export function raidEntryPose(seconds: number, distance: number) {
   return {travelled,walking,phase:travelled/1.15*Math.PI*2,kick,door};
 }
 export function policeSceneSeconds(kind: string) {
-  return ['raid','raid-unit','raid-officer'].includes(kind)?7:3;
+  return kind==='explosion'?14:['raid','raid-unit','raid-officer'].includes(kind)?10:3;
 }

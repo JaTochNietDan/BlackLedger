@@ -1,0 +1,82 @@
+{
+  "door-kick": {
+    "source": "door kick.wav",
+    "seconds": 0.94325,
+    "rate": 48000,
+    "channels": 2,
+    "bits": 16,
+    "sha256": "cc09152afb223736fdc0c1f718eea7c772b47f7b240acb13b217120f1abcf98b"
+  },
+  "drive-away": {
+    "source": "driving away fast tire screeching.wav",
+    "seconds": 2.56,
+    "rate": 48000,
+    "channels": 2,
+    "bits": 16,
+    "sha256": "e3705691ecb395cf1b9713b499b0da47caf02a16e4d98b9fadd7b174db75d602"
+  },
+  "engine-idle": {
+    "source": "engine idle.wav",
+    "seconds": 1.56,
+    "rate": 48000,
+    "channels": 2,
+    "bits": 16,
+    "sha256": "b273c9a853ad2691d3707bd8230d26bd872485d2cd10328725bcb93d654db3f1"
+  },
+  "explosion": {
+    "source": "explosion.wav",
+    "seconds": 14.0,
+    "rate": 48000,
+    "channels": 2,
+    "bits": 16,
+    "sha256": "b511683672956ec58d5fbef3c4e3e9100b7de8e1102bea39c5030e85d8fb2f43"
+  },
+  "fire": {
+    "source": "fire crackling.wav",
+    "seconds": 1.139125,
+    "rate": 48000,
+    "channels": 2,
+    "bits": 16,
+    "sha256": "6d0a5117f849eb24c5f3bc4a0f4e573c96f7ab30c479037c8cfe340d9f9420b8"
+  },
+  "pain": {
+    "source": "painful cries.wav",
+    "seconds": 2.56,
+    "rate": 48000,
+    "channels": 2,
+    "bits": 16,
+    "sha256": "ed26ef1e799ecc33a0afde7d138328593efaca30c3fbf941a985ddd893de3eae"
+  },
+  "panic": {
+    "source": "panicked shouting.wav",
+    "seconds": 12.0,
+    "rate": 48000,
+    "channels": 2,
+    "bits": 16,
+    "sha256": "084c56bfeb807e39c9d91472dcdd350f39debb14f61bcb0b7daeb7eeef0023f8"
+  },
+  "raid": {
+    "source": "raid.wav",
+    "seconds": 9.8,
+    "rate": 48000,
+    "channels": 2,
+    "bits": 16,
+    "sha256": "e8dac86267d853268f06f19e97564b01862bd402c0748815c7311b2d6ae9d7a5"
+  },
+  "siren": {
+    "source": "siren.wav",
+    "seconds": 2.56,
+    "rate": 48000,
+    "channels": 2,
+    "bits": 16,
+    "sha256": "182f3f91aeba1486b54f89a77e0778f230b5071fffa9a71316fa75efca69e675"
+  },
+  "vehicle-approach": {
+    "source": "vehicle approach.wav",
+    "seconds": 2.56,
+    "rate": 48000,
+    "channels": 2,
+    "bits": 16,
+    "sha256": "8f7716e50708f85868b0eecec55d46bd6ba9a08ce35cc47b5865b41b05ef8681"
+  }
+}

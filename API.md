@@ -386,3 +386,14 @@ its original deadlines. Generic gunfight playback waits for all co-located,
 same-minute casualty cues to have visible reservations; explicit strike identity
 narrows this match to its recorded victim. This prevents firing at an unstaged
 casualty and does not add police, deaths or gameplay time.
+
+### Supplied city effect audio
+
+The browser preloads the ten user-provided effect WAVs once. Explosion/raid
+presentation windows are 14/10 seconds to retain recorded tails; no simulation
+clock change is involved. Explosion debug snapshots include a private temporary
+building fire, removed on Stop. Nearby fire and vehicle audio reads existing
+public fires and rendered actor movement. Muting/view disposal cancels owned
+voices; no audio completion issues a command. The imported escape sample awaits
+moving getaway choreography. Debug `effectAudio` reports loaded/played/active
+clips for verification, without changing the public server schema.

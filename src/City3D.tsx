@@ -39,7 +39,7 @@ import {CityCueQueue, gunVictim, gunCastReady, raidEntryPose, policeSceneSeconds
 import type {SceneSlot} from './city3dEvents';
 import {StreetTraffic, trafficSize, trafficModel, advanceWheel, wheelSteering, advanceSteering, frontWheelSteering} from './city3dTraffic';
 import {pedestrianModel, isPedestrian} from './city3dCast';
-import {playCityGunshot, preloadCityGunshots, cityGunshotStatus, playMoment, soundOn} from './sound';
+import {playCityGunshot, preloadCityGunshots, cityGunshotStatus, preloadCityEffects, CityAmbientAudio, cityEffectStatus, playRecordedEffect, playMoment, soundOn} from './sound';
 import {cameraCommand, KeyboardPan, bindKeyboardPan} from './city3dControls';
 import {blastParticle, windowBurst, internalDetonation, windowDebris, blastLight, blastOpacity, billowAlpha, debrisPose, fragmentBlocked} from './city3dBlast';
 
@@ -95,6 +95,7 @@ type Effect = {
   muzzle?: THREE.Object3D;
   audio?: GunfireAudio | BlastAudio;
   glassAudio?: BlastAudio;
+  reactionAudio?:BlastAudio;
   glazingBefore?:number;
   assassination?:CityAssassination;
 };
@@ -590,6 +591,7 @@ export function City3D(props: Props) {
     };
     canvas.addEventListener('keydown', keys);
     void preloadCityGunshots();
+    void preloadCityEffects();
     const makeLabel = (name: string) => {
       const c = document.createElement('canvas');
       c.width = 512;
@@ -821,6 +823,11 @@ export function City3D(props: Props) {
       .catch(err => {
         if (!dead) setFailure(`City assets could not load: ${String(err.message || err)}`);
       });
+    const ambientAudio=new CityAmbientAudio();
+    const vehicleSounds=new Map<string,{key:string;stop?:()=>void}>();
+    const silenceAmbient=()=>{ambientAudio.dispose();for(const voice of vehicleSounds.values())voice.stop?.();};
+    const hiddenAudio=()=>{if(document.hidden)silenceAmbient();};
+    document.addEventListener('visibilitychange',hiddenAudio);
     const reduced = matchMedia('(prefers-reduced-motion: reduce)');
     let sampleStart = performance.now(),
       samples: number[] = [],
@@ -845,6 +852,7 @@ export function City3D(props: Props) {
       const p = latest.current,
         w = p.state,
         motion = p.motion && !reduced.matches && !graphicsLost;
+      const nearbyIdle:string[]=[];
       const impact={x:0,y:0};
       const addImpact=(age:number,strength:number)=>{const pulse=impactPulse(age,strength);impact.x+=pulse.x;impact.y+=pulse.y;};
       const activePlayback=p.activeCue?`${p.activeCue.id}:${p.replaySerial??0}`:null;
@@ -854,7 +862,7 @@ export function City3D(props: Props) {
           scene.remove(effect.mesh, effect.light);
           if (effect.extra) scene.remove(effect.extra);
           effect.wardrobe?.forEach(material => material.dispose());
-          effect.audio?.dispose(); effect.glassAudio?.dispose();
+          effect.audio?.dispose(); effect.glassAudio?.dispose(); effect.reactionAudio?.dispose();
           disposeDebris(effect);
           effect.mesh.dispose();
           (effect.mesh.material as THREE.Material).dispose();
@@ -1002,10 +1010,12 @@ export function City3D(props: Props) {
           }
           effects.push({cue, assassination, since: now, mesh, light, debris, extra, wardrobe: costume, gunArm, muzzle, weapon, weaponModel:weaponModel||undefined,
             glazingBefore:(cue.id.startsWith('preview:')?undefined:p.beforeConditions?.[cue.target]) ?? buildings.get(cue.target)?.userData.condition ?? w.locations.find(p=>p.id===cue.target)?.condition ?? 100,
+            reactionAudio:cue.kind==='explosion'?new BlastAudio(()=>playRecordedEffect('panic'))
+              :cue.kind==='killing'&&(w.last_result?.cues||[]).some(gun=>gunVictim(gun,cue))?new BlastAudio(()=>playRecordedEffect('pain')):undefined,
             glassAudio:cue.kind==='explosion'?new BlastAudio(()=>playMoment('glass-break')):undefined,
             audio: cue.kind === 'gunfight' && weaponModel ? new GunfireAudio(()=>playCityGunshot(weaponModel),weaponShots(weaponModel||undefined,cue.strike?.variant),true)
               : cue.kind === 'raid-officer' ? new BlastAudio(() => playMoment('door-breach'))
-              : cue.kind === 'explosion' ? new BlastAudio(() => playMoment('explosion')) : undefined});
+              : ['explosion','raid','arrest'].includes(cue.kind) ? new BlastAudio(() => playMoment(cue.kind)) : undefined});
           if (p.activeCue?.id === cue.id || (assassination && p.activeCue?.strike?.victim.id===cue.strike?.victim.id)) {
             setFollow(false);
             const envelope = new THREE.Box3();
@@ -1198,6 +1208,12 @@ export function City3D(props: Props) {
           const at = placement.pose;
           const distance = Math.hypot(a.object.position.x - at.x, a.object.position.z - at.z);
           const moved = distance > 0.0001;
+          if(!isPedestrian(a.model)&&a.object.visible&&Math.hypot(at.x-controls.target.x,at.z-controls.target.z)<22){
+            const key=`${a.since}:${a.start}:${a.end}`,previous=vehicleSounds.get(id);
+            if(motion&&moved&&a.start!==a.end&&previous?.key!==key){
+              previous?.stop?.();vehicleSounds.set(id,{key,stop:playRecordedEffect('vehicle-approach')});
+            }else if(!moved)nearbyIdle.push('engine-idle');
+          }
           if (a.walking && moved)
             a.phase = (a.phase + (distance / 1.15) * Math.PI * 2) % (Math.PI * 2);
           if (a.wheels.length && a.wheelPlaced && motion && a.start !== a.end && moved) {
@@ -1296,7 +1312,7 @@ export function City3D(props: Props) {
             scene.remove(e.mesh, e.light);
             if (e.extra) scene.remove(e.extra);
             e.wardrobe?.forEach(material => material.dispose());
-            e.audio?.dispose(); e.glassAudio?.dispose();
+            e.audio?.dispose(); e.glassAudio?.dispose(); e.reactionAudio?.dispose();
             disposeDebris(e);
             e.mesh.dispose();
             (e.mesh.material as THREE.Material).dispose();
@@ -1317,6 +1333,7 @@ export function City3D(props: Props) {
           if(blast)addImpact(t*3,11);
           if(shot)for(const beat of weaponShots(e.weaponModel,e.cue.strike?.variant))addImpact(t*3-beat,3);
           if(e.cue.kind!=='raid-officer')e.audio?.update(t * 3, soundOn());
+          e.reactionAudio?.update(t*3-(blast?1:.06),soundOn());
           const muzzlePosition = new THREE.Vector3(at.x, 1.4, at.z);
           if (shot && e.gunArm && e.muzzle) {
             if(e.assassination){ /* the shared cast owns its arm and weapon rig */ }
@@ -1447,7 +1464,7 @@ export function City3D(props: Props) {
           }
           e.mesh.instanceMatrix.needsUpdate = true;
           if (e.mesh.instanceColor) e.mesh.instanceColor.needsUpdate = true;
-          (e.mesh.material as THREE.MeshBasicMaterial).opacity = blast ? blastOpacity(t * 3) : e.assassination?1:Math.max(0,1 - t);
+          (e.mesh.material as THREE.MeshBasicMaterial).opacity = blast ? blastOpacity(t * 3) : e.assassination?1:Math.max(0,1 - t*3/policeSceneSeconds(e.cue.kind));
           e.light.intensity = blast
             ? blastLight(t * 3)
             : shot && firing.flash
@@ -1560,9 +1577,15 @@ export function City3D(props: Props) {
         buildingGlazing(b,blast?glazingDuringBlast(condition,before,age,preview):condition);
         if(blast&&before>=60&&(preview||condition<60)&&b.getObjectByName('window-broken'))blast.glassAudio?.update(age-GLASS_BREAK_AT,soundOn());
       }
-      rubble.update(w.building_fires||[],w.minute,buildings,models.get('blast-fragment'),new Set(effects.filter(e=>e.cue.kind==='explosion').map(e=>e.cue.target)));
+      rubble.update(w.building_fires||[],w.minute,buildings,models.get('blast-fragment'),new Set(effects.filter(e=>e.cue.kind==='explosion'&&now-e.since<3000).map(e=>e.cue.target)));
       suppression.update(w.building_fires || [],w.minute,buildings,models,aftermath,dt,motion);
       buildingFire.update(w.building_fires || [],w.minute,buildings,camera,dt,motion);
+      const nearFire=(w.building_fires||[]).some(f=>{
+        const b=buildings.get(f.target);
+        return b&&w.minute<f.extinguished_at&&Math.hypot(b.position.x-controls.target.x,b.position.z-controls.target.z)<28;
+      });
+      ambientAudio.update(graphicsLost?[]:[...(nearFire?['fire']:[]),...nearbyIdle]);
+      for(const [id,voice] of vehicleSounds)if(!actors.has(id)){voice.stop?.();vehicleSounds.delete(id);}
       renderImpact(camera,motion?impact.x:0,motion?impact.y:0,canvas.clientWidth,canvas.clientHeight,()=>renderer.render(scene,camera));
       if (ready)
         canvas.dataset.presentation = JSON.stringify({
@@ -1570,6 +1593,7 @@ export function City3D(props: Props) {
           minute: w.minute,
           playbackRate: playback.current,
           gunAudio:cityGunshotStatus(),
+          effectAudio:cityEffectStatus(),
           impact:motion?impact:{x:0,y:0},
           suppression:suppression.inspect(),
           rubble:rubble.inspect(),
@@ -1641,12 +1665,15 @@ export function City3D(props: Props) {
     const lost = (e: Event) => {
       e.preventDefault();
       graphicsLost = true;
-      effects.forEach(effect => {effect.audio?.dispose();effect.glassAudio?.dispose();});
+      silenceAmbient();
+      effects.forEach(effect => {effect.audio?.dispose();effect.glassAudio?.dispose(); effect.reactionAudio?.dispose();});
       setFailure('The graphics context was interrupted. Reload the city to restore it.');
     };
     canvas.addEventListener('webglcontextlost', lost);
     return () => {
       dead = true;
+      silenceAmbient();
+      document.removeEventListener('visibilitychange',hiddenAudio);
       cancelAnimationFrame(frame);
       observer.disconnect();
       controls.dispose();
@@ -1657,7 +1684,7 @@ export function City3D(props: Props) {
       unbindPan();
       canvas.removeEventListener('keydown', keys);
       canvas.removeEventListener('webglcontextlost', lost);
-      effects.forEach(effect => { effect.audio?.dispose(); effect.glassAudio?.dispose(); disposeDebris(effect); });
+      effects.forEach(effect => { effect.audio?.dispose(); effect.glassAudio?.dispose(); effect.reactionAudio?.dispose(); disposeDebris(effect); });
       rubble.dispose();
       suppression.dispose();
       buildingFire.dispose();

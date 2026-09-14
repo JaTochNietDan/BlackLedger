@@ -12,6 +12,9 @@ export function previewScene(state: Snapshot, target: string, scene: PreviewScen
     attacker:scene==='Assassination'&&kind==='gunfight'?{id:'preview-assassin',name:'Preview assassin',weapon:1}:undefined, detainee: kind==='arrest'?{id:'preview-detainee',name:'Preview detainee'}:undefined, actors: kind === 'killing'
       ? [{id: 'preview-victim', name: 'Preview character'}] : [],
   }));
-  return {state: {...state, id: `${state.id}:preview:${token}`,
+  return {state: {...state,
+    building_fires:scene==='Explosion'?[...(state.building_fires||[]).filter(f=>f.target!==target),
+      {id:`preview-fire:${token}`,target,minute:state.minute,brigade_at:state.minute+10,extinguished_at:state.minute+180,cleanup_at:state.minute+240}]:state.building_fires,
+    id: `${state.id}:preview:${token}`,
     last_result: {from_location: target, to_location: target, elapsed: 0, records: [], cash: 0, respect: 0, heat: 0, health: 0, ...state.last_result, cues}}, cue: cues[0]};
 }

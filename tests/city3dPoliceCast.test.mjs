@@ -44,7 +44,7 @@ test('raid entry waits for the door to clear and stays inside its reserved corri
   if(pose.travelled>distance)assert.equal(pose.door,1,'entry preceded door opening');
  }
  assert.equal(raidEntryPose(7,2.92).walking,false);
- for(const cue of policeCast({id:'raid',kind:'raid',target:'bar'}))assert.equal(policeSceneSeconds(cue.kind),7);
+ for(const cue of policeCast({id:'raid',kind:'raid',target:'bar'}))assert.equal(policeSceneSeconds(cue.kind),10);
 });
 
 test('raid approach reservation leaves the public entrance clear',()=>{

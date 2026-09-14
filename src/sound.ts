@@ -36,7 +36,7 @@ function startVoice(source: AudioScheduledSourceNode, nodes: AudioNode[], at: nu
   scene?.add(stop);
   try {
     source.start(at);
-    source.stop(end);
+    if(Number.isFinite(end))source.stop(end);
   } catch (error) {
     stop();
     throw error;
@@ -153,6 +153,64 @@ export function playCityGunshot(weapon='revolver'): (() => void) | undefined {
   }
 }
 
+const effectSamples:Record<string,{gain:number;loop?:boolean}>={
+  explosion:{gain:.65},raid:{gain:.65},siren:{gain:.35},'door-kick':{gain:.7},
+  pain:{gain:.4},panic:{gain:.22},fire:{gain:.16,loop:true},
+  'engine-idle':{gain:.12,loop:true},'vehicle-approach':{gain:.3},'drive-away':{gain:.4},
+};
+const effectBuffers=new Map<string,AudioBuffer>(),activeEffects=new Map<AudioBufferSourceNode,string>();
+const playedEffects:Record<string,number>={};let loadingEffects:Promise<void>|undefined;
+/** Crossfade a short end/start overlap instead of clicking at every loop seam. */
+export function seamlessLoop(ctx:AudioContext,source:AudioBuffer){
+  const fade=Math.min(Math.floor(source.sampleRate*.05),Math.floor(source.length/4));
+  if(fade<2)return source;
+  const result=ctx.createBuffer(source.numberOfChannels,source.length-fade,source.sampleRate);
+  for(let ch=0;ch<source.numberOfChannels;ch++){
+    const input=source.getChannelData(ch),out=result.getChannelData(ch);out.set(input.subarray(fade));
+    for(let i=0;i<fade;i++){
+      const t=i/(fade-1),at=out.length-fade+i;
+      out[at]=input[source.length-fade+i]*(1-t)+input[i]*t;
+    }
+  }
+  return result;
+}
+export function preloadCityEffects():Promise<void>{
+  if(loadingEffects)return loadingEffects;const ctx=audio();if(!ctx)return Promise.resolve();
+  loadingEffects=Promise.all(Object.entries(effectSamples).map(async([name,sample])=>{
+    try{const response=await fetch(`/audio/effects/${name}.wav`);if(!response.ok)return;
+      const decoded=await ctx.decodeAudioData(await response.arrayBuffer());
+      effectBuffers.set(name,sample.loop?seamlessLoop(ctx,decoded):decoded);
+    }catch{ /* Missing effects remain silent or use the existing procedural fallback. */ }
+  })).then(()=>{});return loadingEffects;
+}
+export function cityEffectStatus(){return {loaded:[...effectBuffers.keys()],played:{...playedEffects},active:[...activeEffects.values()]};}
+export function playRecordedEffect(name:string):(()=>void)|undefined{
+  if(!soundOn())return;const ctx=audio(),buffer=effectBuffers.get(name),sample=effectSamples[name];
+  if(!ctx||!buffer||!sample)return;
+  const scene=new SceneSound();
+  try{
+    if(ctx.state==='suspended')ctx.resume().catch(()=>{});
+    const source=ctx.createBufferSource(),gain=ctx.createGain();source.buffer=buffer;source.loop=!!sample.loop;
+    gain.gain.value=sample.gain;source.connect(gain).connect(ctx.destination);
+    activeEffects.set(source,name);const at=ctx.currentTime+.005;
+    startVoice(source,[gain],at,sample.loop?Infinity:at+buffer.duration,scene,()=>activeEffects.delete(source));
+    playedEffects[name]=(playedEffects[name]||0)+1;return scene.cancel;
+  }catch{scene.cancel();return;}
+}
+
+/** One owned loop per sound; global mute cancellation can safely restart on a later frame. */
+export class CityAmbientAudio {
+  private loops=new Map<string,()=>void>();
+  update(names:string[]){
+    const wanted=new Set(soundOn()?names:[]);
+    for(const [name,stop] of this.loops)if(!wanted.has(name)||!cityEffectStatus().active.includes(name)){stop();this.loops.delete(name);}
+    for(const name of wanted)if(!this.loops.has(name)){
+      const stop=playRecordedEffect(name);if(stop)this.loops.set(name,stop);
+    }
+  }
+  dispose(){for(const stop of this.loops.values())stop();this.loops.clear();}
+}
+
 // Layered boot/wood impact, latch crack and short hinge scrape.
 function doorBreach(ctx: AudioContext, at: number, scene: SceneSound) {
   for(const [delay,seconds,frequency,level] of [[0,.22,230,.55],[.015,.12,2600,.28],[.09,.38,750,.12]]) {
@@ -240,6 +298,8 @@ function knock(ctx: AudioContext, at: number, scene: SceneSound) {
 // than nothing — silence reads as a bug.
 export function playMoment(kind: string) {
   if (!soundOn()) return;
+  const sample=({explosion:'explosion',raid:'raid',arrest:'siren','door-breach':'door-kick'} as Record<string,string>)[kind];
+  if(sample){const cancel=playRecordedEffect(sample);if(cancel)return cancel;}
   const ctx = audio();
   if (!ctx) return;
   const scene = new SceneSound();

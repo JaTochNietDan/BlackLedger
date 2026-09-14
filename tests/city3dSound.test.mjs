@@ -104,3 +104,32 @@ test('provided gun samples preload once, retain full tails, select the recorded 
   assert.equal(sources.at(-1).stops.length,1,'completed sample was stopped twice');
  }finally{globalThis.window=previousWindow;globalThis.localStorage=previousStorage;globalThis.fetch=previousFetch;}
 });
+
+test('recorded effects preserve tails, crossfade stereo loops, and release ambient voices on mute',async()=>{
+ const old={window:globalThis.window,localStorage:globalThis.localStorage,fetch:globalThis.fetch};
+ let muted=false,fetches=0;const sources=[];
+ const buffer=(channels,length,rate)=>{const data=Array.from({length:channels},(_,ch)=>Float32Array.from({length},(_,i)=>(i/length-.5)*(ch+1)));return{numberOfChannels:channels,length,sampleRate:rate,duration:length/rate,getChannelData:ch=>data[ch]};};
+ const node=()=>({connect(next){return next;},disconnect(){this.disconnected=true;}});
+ class Context {
+  state='running';currentTime=3;destination={};
+  createBuffer=buffer;
+  decodeAudioData(){return Promise.resolve(buffer(2,1400,100));}
+  createGain(){return Object.assign(node(),{gain:{value:0}});}
+  createBufferSource(){const s=Object.assign(node(),{stops:[],start(at){this.at=at;},stop(at){this.stops.push(at);}});sources.push(s);return s;}
+ }
+ globalThis.window={AudioContext:Context};globalThis.localStorage={getItem:()=>muted?'off':'on',setItem:(_,v)=>muted=v==='off'};
+ globalThis.fetch=async()=>{fetches++;return{ok:true,arrayBuffer:async()=>new ArrayBuffer(1)};};
+ try{
+  const sound=await import('../.runtime/frontend-test/sound.js?recorded-effects');
+  await Promise.all([sound.preloadCityEffects(),sound.preloadCityEffects()]);assert.equal(fetches,10);assert.equal(sources.length,0);
+  sound.playMoment('explosion');assert.equal(sources.length,1);assert.equal(sources[0].stops[0]-sources[0].at,14);
+  const ambient=new sound.CityAmbientAudio();ambient.update(['fire','fire','engine-idle']);ambient.update(['fire','engine-idle']);assert.equal(sources.length,3);
+  assert.ok(sources.slice(1).every(s=>s.loop&&s.stops.length===0));
+  const original=buffer(2,100,100),copy=original.getChannelData(0).slice();const loop=sound.seamlessLoop(new Context(),original);
+  assert.equal(loop.length,95);assert.deepEqual(original.getChannelData(0),copy);
+  for(let ch=0;ch<2;ch++){const data=loop.getChannelData(ch);assert.ok(Math.abs(data.at(-1)-data[0])<.021);assert.ok(data.every(Number.isFinite));}
+  sound.setSound(false);assert.deepEqual(sound.cityEffectStatus().active,[]);
+  ambient.update(['fire']);sound.setSound(true);ambient.update(['fire']);assert.equal(sources.length,4);
+  ambient.dispose();ambient.dispose();assert.deepEqual(sound.cityEffectStatus().active,[]);assert.ok(sources.every(s=>s.disconnected));
+ }finally{Object.assign(globalThis,old);}
+});
