@@ -1968,3 +1968,29 @@ untracked 260-campaign sweep among its running tests. That is not a pass. Clean
 release simulation validation has been restarted with a 20-minute limit; the
 working-tree full core rerun is also still running. Main remains on release
 8ada776 pending this verification. Do not describe 3105991 as live yet.
+
+### Ackerman & Son pawnshop interior — September 14
+
+Added an original 8×9-metre 3D shop: oak valuation counter, watch trays, balance
+scales, register and pledge book, cameras, shelf radios, wall clocks, framed
+pictures and pledged trunks. These are scenery; no invented stock or prices
+replace actual pawn actions. Three distinct staff stations place the pawnbroker
+at the watch tray, valuer at the scales and counter clerk at the register. Six
+customer positions and a separate entrance preserve the public aisle; excess
+staff or visitors remain accessible in the existing people list.
+
+`interior-pawn.glb` is 1.1 MB with separately cutaway side/rear walls. The regular
+room camera, map-sized expansion, picking, motion controls and pawn/business
+commands remain in use. Isolated browser QA at port 8960 showed eight actual NPCs
+and the player (one extra pawnbroker in the list), 141 calls and 189,088 triangles.
+The expanded room fits 820×740. Both rigs pass furniture clearance, actor spacing
+and all sampled entrance positions; role checks bind clerk and valuer to their
+correct workstations. All 373 frontend tests passed in 24.631s; the final staff
+placement's geometry test and production build passed after that refinement.
+
+The broad core run for Riverside finished in 549.708s with one false-positive
+prose test: “Greta Berger of Alex Varga’s people is…” was parsed as though “people”
+were the subject. Commit 6dd6e29 preserves the full clause for the already-existing
+agreement checker; the exact failing campaign now passes (0.711s). All other
+core tests in that run passed. This changes only the test, not game prose or rules.
+The clean release simulation suite remains in progress; no live promotion yet.

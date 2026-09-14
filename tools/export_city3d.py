@@ -2456,6 +2456,20 @@ if __name__ == '__main__' and '--only=interior-precinct' in __import__('sys').ar
     raise SystemExit(0)
 
 
+def pawn_interior():
+    from pawn_interior import build
+    build(box,cylinder,material)
+
+
+if __name__ == '__main__' and '--only=interior-pawn' in __import__('sys').argv:
+    clear();pawn_interior()
+    manifest_path=os.path.join(OUT,'manifest.json')
+    with open(manifest_path) as f: selected_manifest=json.load(f)
+    selected_manifest['interior-pawn']=export('interior-pawn')
+    with open(manifest_path,'w') as f:json.dump(selected_manifest,f,indent=2)
+    raise SystemExit(0)
+
+
 def exchange_interior():
     from exchange_interior import build
     build(box,cylinder,material)
@@ -2663,6 +2677,7 @@ clear();dice_tray();manifest['dice-tray']=export('dice-tray')
 clear();slot_cabinet();manifest['slot-cabinet']=export('slot-cabinet')
 clear();lodging_room();manifest['interior-lodging-room']=export('interior-lodging-room')
 clear();precinct_interior();manifest['interior-precinct']=export('interior-precinct')
+clear();pawn_interior();manifest['interior-pawn']=export('interior-pawn')
 clear();exchange_interior();manifest['interior-exchange']=export('interior-exchange')
 clear();restaurant_interior();manifest['interior-restaurant']=export('interior-restaurant')
 clear();garage_interior();manifest['interior-garage']=export('interior-garage')

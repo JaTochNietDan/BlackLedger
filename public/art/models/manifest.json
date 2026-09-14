@@ -1062,5 +1062,21 @@
       ]
     ],
     "bytes": 1027880
+  },
+  "interior-pawn": {
+    "file": "interior-pawn.glb",
+    "bounds_blender": [
+      [
+        -4.08,
+        -4.5,
+        -0.19
+      ],
+      [
+        4.0,
+        4.58,
+        3.8
+      ]
+    ],
+    "bytes": 1150840
   }
 }
