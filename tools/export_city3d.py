@@ -436,8 +436,10 @@ def car(kind, articulated=True, police=False):
             box('cabin sill',(side*.79,.08,.62),(.12,length*.41,.13),paint,.035)
             for index,(a,b) in enumerate(((front+.05,.09),(.19,rear-.04))):
                 before=set(bpy.context.scene.objects);middle=(a+b)/2;span=b-a
-                box('door skin',(side*.80,middle,.855),(.095,span,.38),door_paint,.035)
-                box('door upholstery',(side*.744,middle,.865),(.025,span-.05,.30),lining,.015)
+                # Full-height leaves enclose the footwell; the previous upper
+                # panel left a visible gap from the sill to the floor pan.
+                box('door skin',(side*.80,middle,.625),(.095,span,.84),door_paint,.035)
+                box('door upholstery',(side*.744,middle,.65),(.025,span-.05,.75),lining,.015)
                 box('door window',(side*.755,middle,1.225),(.032,span-.07,.36),glass,.025)
                 for y in (a+.025,b-.025):box('door window surround',(side*.78,y,1.23),(.04,.04,.45),chrome,.01)
                 for z in (1.04,1.445):box('window belt trim',(side*.785,middle,z),(.045,span,.03),chrome,.01)
@@ -2322,6 +2324,17 @@ def mercer_court():
                 x=side*(1.4+col*.22)
                 box('tenant letter box',(x,6.28,.98+row*.19),(.20,.08,.16),brass,.009)
                 box('letter slot',(x,6.325,1.02+row*.19),(.13,.01,.014),iron)
+
+if __name__ == '__main__' and '--only=cars' in __import__('sys').argv:
+    manifest_path=os.path.join(OUT,'manifest.json')
+    with open(manifest_path) as f: selected_manifest=json.load(f)
+    for name in ('ford','hudson','packard','police'):
+        clear();car('ford' if name=='police' else name,police=name=='police')
+        if name=='police':
+            cylinder('red beacon',(0,0,1.76),.18,.28,material('beacon',(.8,.02,.01),0,2))
+        selected_manifest[name]=export(name)
+    with open(manifest_path,'w') as f: json.dump(selected_manifest,f,indent=2)
+    raise SystemExit
 
 if __name__ == '__main__' and '--only=bottle-shard' in __import__('sys').argv:
     manifest_path=os.path.join(OUT,'manifest.json')
