@@ -4,3 +4,9 @@
 .interior3d>p{position:absolute;left:20px;bottom:20px;padding:12px;background:#171b18ed;color:#ebdcbb}
 
 .room-holder .private-room-toggle{margin-right:124px;flex-shrink:0}
+
+.interior3d.enlarged{height:clamp(420px,calc(100dvh - 150px),1100px)}
+.interior3d-expand{position:absolute;z-index:2;right:14px;top:14px;border:1px solid #ac9469;background:#e5d4ad;color:#342b20;padding:8px 12px;font:13px Georgia,serif;cursor:pointer}
+.interior3d-expand:focus-visible{outline:2px solid #ebdcbb;outline-offset:3px}
+
+.interior3d .interior3d-expand[aria-pressed="true"]{background:#e5d4ad;color:#342b20;border-color:#ac9469}

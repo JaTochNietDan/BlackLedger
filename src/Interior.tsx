@@ -1,3 +1,4 @@
+import {hasInterior} from './interiorSettings';
 import {Interior3D} from './Interior3D';
 import {useEffect, useState} from 'react';
 import type {ReactElement} from 'react';
@@ -272,7 +273,7 @@ export function Interior({
           ))}
         </div>
       )}
-      {inFlat?<Interior3D key={`${place.id}-private`} place="flat" player={player} motion={motion} people={[]} picked="" onPick={()=>{}} minute={minute}/>:place.id === 'butcher' || place.id === 'bar' || place.id === 'mercercourt' || place.id === 'room' || place.id === 'laundry' || place.id === 'estate' || place.id === 'apartment' ? <Interior3D key={place.id} place={place.id} operation={place} player={player} motion={motion} people={onFloor} picked={picked} onPick={id=>setPicked(id===picked?'':id)} minute={minute}/> : <div
+      {inFlat?<Interior3D key={`${place.id}-private`} place="flat" player={player} motion={motion} people={[]} picked="" onPick={()=>{}} minute={minute}/>:hasInterior(place.id) ? <Interior3D key={place.id} place={place.id} operation={place} player={player} motion={motion} people={onFloor} picked={picked} onPick={id=>setPicked(id===picked?'':id)} minute={minute}/> : <div
         className={'room' + (painted ? ' painted' : '')}
         style={painted ? {backgroundImage: `url(${paintedRoom(place.id)})`} : undefined}
       >

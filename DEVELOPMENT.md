@@ -1405,3 +1405,25 @@ serves releasedb4b7aee; this shop is currently in the development preview.
 Remaining: cold-room interior/work animations, richer surface wear and prop
 variation, and the other commercial/civic/industrial rooms. This is one further
 interactive destination, not completion of the full interiors/visual goal.
+
+## September 14 — enlarged interiors and explicit room lighting
+
+Added an enlarged room toggle to every authored 3D interior, retaining the same
+renderer, camera and cast while increasing available screen height. Standard
+view and canvas Escape restore the prior layout; actions remain below the scene.
+Browser checked1280x720 and820x740 on isolated8941: expansion, Escape staying
+inside, complete compact framing and readable toggle. Corrected the initial
+pressed-state contrast after visual inspection. No main-save actions.
+
+Replaced increasingly nested room fallbacks with typed interiorSettings, covering
+all eight current room types, model/name/framing, fixture positions and wall
+thresholds. This fixes Fassano Meats inheriting Mercer Court lights outside its
+walls and incorrect cutaway distances. Its lamps now align with the two authored
+pendants, and cutaways use its actual9m room boundaries. Existing rooms retain
+their reviewed settings. Registration checks reject unknown/prototype keys and
+verify exported models; frontend tests and build evidence are in
+`.runtime/interior-settings-tests.log` and `interior-settings-final-build.log`.
+
+This improves available interior viewing space; it does not create the remaining
+rooms or finish their planned activities/choreography. Main8791 remains on the
+previous verified release; these changes are on the development preview.

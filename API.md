@@ -935,3 +935,9 @@ position behind the counter; excess occupants remain in the complete roster.
 The player has a separate clear entrance aisle. Shop dressing, display trays,
 scale and cold-room door are cosmetic, not public inventory or new actions.
 Existing selection, camera controls and authoritative building commands apply.
+
+All registered 3D interiors offer an enlarged room view. This resizes the render
+in the existing page; people and commands remain below it. The control or Escape
+while the canvas is focused restores standard height. Camera and selection are
+retained; no simulation command or time advancement occurs. Interior model,
+lighting and cutaway metadata are centralized in `src/interiorSettings.ts`.
