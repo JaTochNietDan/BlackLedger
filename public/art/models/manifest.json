@@ -950,5 +950,21 @@
       ]
     ],
     "bytes": 1224432
+  },
+  "interior-garage": {
+    "file": "interior-garage.glb",
+    "bounds_blender": [
+      [
+        -6.09,
+        -5.5,
+        -0.205
+      ],
+      [
+        6.0,
+        5.59,
+        4.23
+      ]
+    ],
+    "bytes": 3417152
   }
 }

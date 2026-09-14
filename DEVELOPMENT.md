@@ -1427,3 +1427,36 @@ verify exported models; frontend tests and build evidence are in
 This improves available interior viewing space; it does not create the remaining
 rooms or finish their planned activities/choreography. Main8791 remains on the
 previous verified release; these changes are on the development preview.
+
+## September 14 — Russo Motor Works 3D workshop
+
+Replaced Russo's flat interior with an original Blender workshop: masonry,
+concrete slabs, inspection lift, tool drawers/bench/vice and hanging spanners,
+engine/stand/manifold/pulley, two-tier tyre rack, oil drums/pumps, compressor,
+service desk/ledger and suspended fluorescent fixtures. Source is
+`tools/garage_interior.py`; targeted export:
+`.venv-blender/bin/python tools/export_city3d.py --only=interior-garage`.
+Full exporter includes it. Scene dressing does not impersonate a player's car
+or stock; actual vehicle positioning and service animations remain unfinished.
+
+Public staging reserves a mechanic position beside the engine, nine customer
+positions and a separate player entrance. Actual GLB/both-rig checks prove floor
+support, furniture clearance, non-overlap and full-roster entrance clearance.
+All359 frontend tests pass (`.runtime/garage-final-tests.log`); final geometry
+and registration checks pass after suspension-cable export, and build passes
+(`garage-final-geometry.log`, `garage-reviewed-build.log`). The initial test
+attempt preceded GLB export completion; its missing-asset failures were rerun
+after completion. The registration rejection example was changed from garage
+(now supported) to missing-room-id.
+
+Isolated garage-interior QA fixture on8942: browser1280x720 and820x740, standard
+and enlarged views, orbit and rendered-mechanic selection checked. Observed140
+draw calls/260840 triangles with eight public occupants plus player, prior to
+four suspension cables. This is rendering-load evidence, not a60FPS guarantee.
+Added cables after visual inspection. Moved the room-size button above the
+camera caption to prevent overlap with fixed Back to City when scrolled.
+Final browser inspection confirms separate controls and suspended fixtures.
+
+Main8791 remains the verifiedb4b7aee release; these changes are in development.
+Remaining: player vehicle/service staging, more surface wear, other business and
+civic interiors, indoor crimes and the broader campaign/visual acceptance.

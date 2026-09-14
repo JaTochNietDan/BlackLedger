@@ -107,10 +107,22 @@ export function butcherPlacements(people:Presence[]) {
  return result;
 }
 
-export type InteriorPlace='bar'|'mercercourt'|'room'|'laundry'|'estate'|'apartment'|'flat'|'butcher';
+export function garagePlacements(people:Presence[]) {
+ const result=new Map<string,InteriorSpot>();
+ const available:InteriorSpot[]=[1.3,2.8,4.3].flatMap((z,row)=>[-1.1,.5,2.1].map((x,col)=>({id:`garage-customer-${row}-${col}`,x,z,yaw:Math.PI})));
+ for(const who of [...people].sort((a,b)=>a.id.localeCompare(b.id))){
+  if(result.has(who.id))continue;
+  if(/\b(mechanic|garage hand)\b/i.test(who.role||'')&&![...result.values()].some(s=>s.id==='garage-mechanic'))
+   result.set(who.id,{id:'garage-mechanic',x:.7,z:-2.5,yaw:Math.PI/2});
+  else {const spot=available.shift();if(spot)result.set(who.id,spot);}
+ }
+ return result;
+}
+
+export type InteriorPlace='bar'|'mercercourt'|'room'|'laundry'|'estate'|'apartment'|'flat'|'butcher'|'garage';
 export function placementsForInterior(place:InteriorPlace,people:Presence[]){
  if(place==='flat')return new Map<string,InteriorSpot>();
- return (place==='butcher'?butcherPlacements:place==='apartment'?ashburyPlacements:place==='estate'?cypressPlacements:place==='laundry'?laundryPlacements:place==='bar'?interiorPlacements:place==='room'?marinerLobbyPlacements:mercerLobbyPlacements)(people);
+ return (place==='garage'?garagePlacements:place==='butcher'?butcherPlacements:place==='apartment'?ashburyPlacements:place==='estate'?cypressPlacements:place==='laundry'?laundryPlacements:place==='bar'?interiorPlacements:place==='room'?marinerLobbyPlacements:mercerLobbyPlacements)(people);
 }
 
 export function poseInteriorOccupant(actor:THREE.Group,spot:InteriorSpot) {
@@ -131,6 +143,7 @@ export function poseInteriorOccupant(actor:THREE.Group,spot:InteriorSpot) {
 
 // Reserved clear floor positions; these never displace a public occupant.
 export function interiorPlayerSpot(place:InteriorPlace):InteriorSpot {
+ if(place==='garage')return {id:'player-entry',x:-3,z:4.25,yaw:Math.PI};
  if(place==='butcher')return {id:'player-entry',x:2.7,z:3.5,yaw:Math.PI};
  if(place==='flat')return {id:'player-entry',x:1,z:2.7,yaw:Math.PI};
  if(place==='apartment')return {id:'player-entry',x:1.6,z:4.15,yaw:Math.PI};

@@ -3,6 +3,7 @@ type RoomSettings={name:string;model:string;span:number;leftWall:number;backWall
 // Coordinates are glTF metres. Cutaway thresholds follow each authored wall;
 // fixtures are positioned in the room that owns them, never borrowed by fallback.
 export const interiorSettings:Record<InteriorPlace,RoomSettings>={
+ garage:{name:'Russo Motor Works',model:'interior-garage',span:8,leftWall:-6,backWall:-5.5,lamps:[[-3,3.47,-.5],[2.5,3.47,-.5]]},
  bar:{name:'Saint Agnes',model:'interior-saint-agnes',span:7,leftWall:-5.8,backWall:4.8,lamps:[[-3,2.65,2.7],[1,2.65,2.7],[4,2.65,2.7]]},
  mercercourt:{name:'Mercer Court',model:'interior-mercer-court',span:8.5,leftWall:-5.8,backWall:-6.8,lamps:[[-4.7,3.78,-6.2],[.1,3.78,-6.2]]},
  room:{name:'The Mariner',model:'interior-mariner',span:7.5,leftWall:-4.8,backWall:-5.8,lamps:[[-4.1,3.27,-5.46],[.5,3.27,-5.46]]},

@@ -941,3 +941,9 @@ in the existing page; people and commands remain below it. The control or Escape
 while the canvas is focused restores standard height. Camera and selection are
 retained; no simulation command or time advancement occurs. Interior model,
 lighting and cutaway metadata are centralized in `src/interiorSettings.ts`.
+
+Russo Motor Works (`garage`) now uses an authored 3D workshop with nine customer
+positions, one reserved public mechanic position and a separate player entrance.
+The lift, engine stand, tools, tyres and service desk are cosmetic room dressing;
+they do not assign or service any vehicle or alter inventory. Existing garage
+commands remain authoritative, and the full public roster remains available.

@@ -8,5 +8,5 @@ test('registered rooms reference exported assets and reject unknown destinations
  for(const [place,room] of Object.entries(interiorSettings)){
   assert.ok(hasInterior(place));assert.ok(manifest[room.model],`${place} has no exported room`);
  }
- for(const name of ['garage','constructor','toString','__proto__',''])assert.equal(hasInterior(name),false);
+ for(const name of ['missing-room-id','constructor','toString','__proto__',''])assert.equal(hasInterior(name),false);
 });
