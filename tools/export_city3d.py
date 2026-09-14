@@ -895,7 +895,24 @@ def industrial(kind):
         bpy.context.collection.objects.link(vent);vent.location=(x,y,z)
     if kind=='filling':
         anchor.location=(0,-5.06,3.52)
-        box('station office',(0,4,1.65),(12,5,3.3),wall)
+        box('station office wing',(-1,4,1.65),(10,5,3.3),wall)
+        box('station entry lintel',(5,4,2.95),(2,5,.7),wall)
+        box('station vestibule rear',(5,5.5,1.3),(2,2,2.6),wall)
+        box('station entry side wall',(5.97,4,1.3),(.06,5,2.6),wall)
+        box('station vestibule paving',(5,3,-.04),(2,3,.08),stone)
+        hinge=bpy.data.objects.new('entrance-door-hinge',None)
+        bpy.context.collection.objects.link(hinge);hinge.location=(5.875,1.4,0)
+        def doorpart(name,xyz,dims,mat):
+            ob=box(name,xyz,dims,mat,.01);ob.parent=hinge;ob.location-=hinge.location
+        for z,h in [(.12,.24),(1.0,.14),(2.43,.14)]:
+            doorpart('office door rail',(5,1.4,z),(1.75,.12,h),cream)
+        for x in (4.2,5.8):doorpart('office door stile',(x,1.4,1.25),(.15,.12,2.5),cream)
+        doorpart('office door lower panel',(5,1.4,.58),(1.45,.08,.7),cream)
+        doorpart('office door glazing',(5,1.4,1.72),(1.45,.055,1.28),glass)
+        doorpart('office door pull',(4.4,1.30,1.15),(.035,.08,.3),iron)
+        for x in (4.03,5.97):box('office entry jamb',(x,1.45,1.3),(.06,.23,2.6),cream)
+        entry=bpy.data.objects.new('entrance-threshold',None)
+        bpy.context.collection.objects.link(entry);entry.location=(5,1.4,0)
         box('station roof',(0,4,3.4),(12.4,5.4,.25),cream)
         box('office glazing',(0,1.44,1.85),(8,.1,1.6),glass)
         for i,x in enumerate((-3,0,3)):fire_target(i,x,1.30,1.85)
