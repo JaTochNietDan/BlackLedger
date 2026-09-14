@@ -1091,6 +1091,7 @@ func (w *World) apply(c Command) error {
 			w.OfferIfReady()
 		}
 	}
+	w.SettleHousing()
 	w.SettleApartments()
 	w.Revision++
 	// History is capped. Its old length is not a stable cursor once new entries

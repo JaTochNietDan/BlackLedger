@@ -908,3 +908,15 @@ Mailboxes represent the existing 64 numbered units; they do not create units or
 assign residents. The lift and upper stair opening are scenic access cues, not
 new commands. The complete public roster and residents' register remain below
 the render; no private-flat interior or indoor assault playback is implied.
+
+Household savings now reserve enough for local home ownership: residents with a
+numbered apartment may save up to `max(1000, current apartment price + 500)`;
+other households retain the $1000 ceiling. Deposits still come from actual purse
+cash, at most $60 per day, and a valuation decline never confiscates existing
+savings. All saved household cash remains private and available to the existing
+purchase, bills and burglary rules.
+
+The daily population update and committed-command boundary now settle missing
+housing assignments before refreshing numbered flats. Later replacements and
+recruits therefore receive homes when capacity exists. Reads remain mutation-free;
+established residents keep their homes and assignment does not teleport them.

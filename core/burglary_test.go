@@ -69,12 +69,13 @@ func TestHouseholdSavingsAreFundedBoundedAndAvailableForBills(t *testing.T) {
 		t.Fatal("household bills created money or ignored savings")
 	}
 	a = w.HouseholdSavings[n.ID]
-	a.Cash = 999
+	limit := max(1000, w.ApartmentPrice(w.apartmentForResident(n.ID))+500)
+	a.Cash = limit - 1
 	a.Day = 0
 	w.HouseholdSavings[n.ID] = a
 	n.Purse = 10000
 	w.HouseholdSavingsDay()
-	if w.HouseholdSavings[n.ID].Cash != 1000 {
+	if w.HouseholdSavings[n.ID].Cash != limit {
 		t.Fatal("savings cap exceeded")
 	}
 }

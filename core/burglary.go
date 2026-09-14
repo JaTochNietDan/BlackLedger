@@ -27,7 +27,14 @@ func (w *World) HouseholdSavingsDay() {
 		}
 		a.Day = day
 		reserve := max(50, 3*w.NPCLivingCost(n))
-		deposit := min(60, min(max(0, (n.Purse-reserve)/5), max(0, 1000-a.Cash)))
+		// Keep enough household savings to reach the local deed price and a
+		// modest reserve. A fixed $1000 ceiling made $1800 flats impossible
+		// to buy through ordinary earnings, even over an entire campaign.
+		limit := 1000
+		if unit := w.apartmentForResident(n.ID); unit != nil {
+			limit = max(limit, w.ApartmentPrice(unit)+500)
+		}
+		deposit := min(60, min(max(0, (n.Purse-reserve)/5), max(0, limit-a.Cash)))
 		n.Purse -= deposit
 		a.Cash += deposit
 		w.HouseholdSavings[n.ID] = a

@@ -1269,3 +1269,35 @@ measurement, not a performance acceptance claim. Main campaign save untouched.
 Remaining: private flat rooms, other commercial/civic/industrial interiors,
 interior residential crime choreography, higher character/material fidelity,
 additional income activities and integrated campaign/balance acceptance.
+
+## September 14 — long-run housing progression defects
+
+An unattended economy audit found zero NPC deeds across three 30-day runs.
+Ordinary households hit the fixed $1000 savings ceiling below the normal $1800
+Ashbury asking price. Replaced that ceiling for numbered-flat residents with
+max($1000, local flat price + $500). Deposits remain actual purse transfers, capped
+at $60/day; savings above a subsequently falling limit are not destroyed. This
+allows earned savings to fund deeds and also makes older affluent households
+worth more to a burglar, through actual accumulated cash rather than a loot roll.
+
+Extending the simulation to 90 days exposed another real defect: later NPC
+replacements had no homes despite vacancies (19/20/20 unhoused in seeds 7/27/61).
+New-game population settlement worked, but later daily creation paths skipped it.
+Added housing/flat settlement after daily officials/roles are filled and before
+committed commands increment revision. Existing residences and current journeys
+remain stable; no new stock was needed for these populations.
+
+Final three 90-day runs: seed7 108 living, zero shortage, 8 living NPC-owned deeds;
+seed27 103 living, zero shortage, 4 deeds; seed61 99 living, zero shortage, 4 deeds.
+Recorded `.runtime/housing-audit-final.log`. These are unattended economy runs:
+player observer starts with $100000 to avoid rent bankruptcy, initial tasks/plots/
+contracts are cleared, and player event prompts are dismissed between real-clock
+240-minute advances. NPC purses, wages, conflicts and purchases are not seeded
+with extra money. This does not replace played campaign acceptance.
+
+Added permanent three-seed 90-day regression checking actual NPC ownership,
+zero shortage and building capacity, plus committed-command newcomer housing.
+Focused housing/household/apartment/broker/property/save checks pass (core2.805s,
+store.170s, `.runtime/housing-progression-tests.log`). No main-save QA mutation.
+Broader visual fidelity, remaining interiors/indoor scenes, extra income activity
+and full campaign/balance acceptance remain outstanding.

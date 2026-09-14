@@ -2508,6 +2508,8 @@ func (w *World) Advance(minutes int) {
 			// the street: an editor who is killed left the desk empty for the
 			// rest of the campaign.
 			w.ensureOfficials()
+			w.SettleHousing()
+			w.SettleApartments()
 			w.CustomDay()
 			w.OrderDay()
 			w.OrganizationDay()
