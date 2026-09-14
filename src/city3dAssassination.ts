@@ -5,7 +5,7 @@ import {casualtyFall} from './city3dEvents.js';
 import type {VisualCue} from './types';
 
 export const ASSASSINATION_SHOT = 3.65;
-export const ASSASSINATION_SECONDS = 6.5;
+export const ASSASSINATION_SECONDS = 8.5;
 export const ASSASSINATION_VICTIM_X = 5;
 export function isExecution(cue: VisualCue) {
   return cue.kind==='gunfight' && cue.strike?.variant==='back-of-head' && cue.attacker?.weapon===1;
@@ -21,12 +21,15 @@ export function assassinationBatch(cues: VisualCue[]) {
 }
 const ease=(v:number)=>{const t=Math.max(0,Math.min(1,v));return t*t*(3-2*t);};
 export function assassinationPose(seconds:number) {
-  const distance=Math.min(4.07,Math.max(0,seconds-.35)*1.35);
-  const walking=seconds>.35&&distance<4.07;
+  const approach=Math.min(4.07,Math.max(0,seconds-.35)*1.35);
+  const retreat=Math.min(4.07,Math.max(0,seconds-5.3)*1.35);
+  const distance=approach-retreat;
+  const walking=(seconds>.35&&approach<4.07)||(seconds>5.3&&retreat<4.07);
   const age=seconds-ASSASSINATION_SHOT;
   const aim=ease((seconds-2.85)/.6)*(1-ease((seconds-4.5)/.65));
   const recoil=age>=0?Math.max(0,1-age/.16):0;
-  return {distance,walking,phase:distance/1.15*Math.PI*2,aim,recoil,yaw:Math.PI/2,
+  return {distance,walking,phase:(approach+retreat)/1.15*Math.PI*2,aim,recoil,
+    yaw:Math.PI/2+Math.PI*ease((seconds-4.85)/.45),
     fall:casualtyFall(Math.max(0,age-.06)/3),age};
 }
 export const MELEE_IMPACTS = [3.7, 4.15, 4.6] as const;
@@ -59,7 +62,7 @@ export class CityAssassination {
     attacker.rotation.set(0,Math.PI/2,0);
     this.update(0);
   }
-  get duration(){return this.variant==='close-shot'||this.variant==='burst'?8:ASSASSINATION_SECONDS;}
+  get duration(){return this.variant==='close-quarters'?6.5:this.variant==='close-shot'||this.variant==='burst'?8:ASSASSINATION_SECONDS;}
   get victimYaw(){return this.variant==='back-of-head'?Math.PI/2:-Math.PI/2;}
   update(seconds:number) {
     const execution=this.variant==='back-of-head';

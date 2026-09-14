@@ -19,6 +19,24 @@ test('execution links only its recorded victim and preserves unrelated or legacy
  assert.deepEqual(assassinationBatch([death,{...gun,minute:500}]).length,2);
  assert.deepEqual(assassinationBatch([death,{...gun,attacker:undefined}]).length,2);
 });
+test('execution lowers the weapon, turns and walks back before scene completion',()=>{
+ const impact=assassinationPose(ASSASSINATION_SHOT);
+ assert.equal(impact.aim,1);
+ assert.equal(impact.yaw,Math.PI/2);
+ const departing=assassinationPose(5.31);
+ assert.equal(departing.aim,0,'gun remains raised during escape');
+ assert.equal(departing.yaw,Math.PI*1.5,'walk begins before facing the exit');
+ assert.ok(departing.walking);
+ let previous=departing.distance;
+ for(let t=5.32;t<ASSASSINATION_SECONDS;t+=1/60){
+  const p=assassinationPose(t);
+  assert.ok(p.distance<=previous,'escape reverses toward the victim');
+  assert.ok(previous-p.distance<=1.35/60+.000001,'escape teleports');
+  previous=p.distance;
+ }
+ assert.equal(assassinationPose(ASSASSINATION_SECONDS).distance,0);
+ assert.equal(assassinationPose(ASSASSINATION_SECONDS).walking,false);
+});
 test('both cast rigs, muzzle and droplet trajectories stay inside the full scene reserve',async()=>{
  for(const attackerModel of ['person','woman'])for(const victimModel of ['person','woman']){
   const actor=await model(attackerModel),victim=await model(victimModel),gun=await model('revolver');
