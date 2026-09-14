@@ -796,7 +796,7 @@ def export(name):
     # Join by material except animated limbs: a building becomes ~6 draws.
     groups={}
     for ob in list(bpy.context.scene.objects):
-        if ob.type=='MESH' and (ob.parent is None or ob.parent.name.startswith(('wheel-roll-','interior-wall-','entrance-door-','window-','pump-','car-door-'))) and not ob.name.startswith(('leg','arm','shoe','clock-hand')):
+        if ob.type=='MESH' and (ob.parent is None or ob.parent.name.startswith(('wheel-roll-','interior-wall-','entrance-door-','window-','pump-','car-door-','laundry-drum-'))) and not ob.name.startswith(('leg','arm','shoe','clock-hand')):
             key=(ob.parent.name if ob.parent else '',ob.data.materials[0].name)
             groups.setdefault(key,[]).append(ob)
     for obs in groups.values():
@@ -1643,11 +1643,16 @@ def laundry_interior():
         cylinder('washer dark drum',(x,3.86,.94),.49,.04,iron,(math.pi/2,0,0),48)
         ring('washer polished door rim',(x,3.81,.94),.49,.047,steel)
         ring('washer rubber seal',(x,3.805,.94),.421,.017,iron)
+        drum=bpy.data.objects.new(f'laundry-drum-{i}',None);bpy.context.collection.objects.link(drum);drum.location=(x,3.815,.94)
+        moving=[]
         for j in range(16):
             a=j*math.tau/16
-            cylinder('drum perforation',(x+math.sin(a)*.33,3.827,.94+math.cos(a)*.33),.026,.015,steel,(math.pi/2,0,0),8)
+            moving.append(cylinder('drum perforation',(x+math.sin(a)*.33,3.827,.94+math.cos(a)*.33),.026,.015,steel,(math.pi/2,0,0),8))
         for j in range(3):
-            ob=box('linen inside drum',(x-.16+j*.14,3.815,.80+j*.10),(.20,.028,.15),linen,.04);ob.rotation_euler.y=j*.45
+            ob=box('linen inside drum',(x-.16+j*.14,3.815,.80+j*.10),(.20,.028,.15),linen,.04);ob.rotation_euler.y=j*.45;moving.append(ob)
+        bpy.context.view_layer.update()
+        for ob in moving:
+            world=ob.matrix_world.copy();ob.parent=drum;ob.matrix_world=world
         box('washer door hinge',(x-.54,3.79,.94),(.10,.13,.28),steel,.025)
         beam('washer locking handle',(x+.52,3.74,.82),(x+.52,3.74,1.07),.045,brass)
         cylinder('washer selector dial',(x-.44,3.83,1.53),.075,.05,iron,(math.pi/2,0,0),24)

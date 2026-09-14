@@ -1,3 +1,4 @@
+import {LaundryMotion,laundryRunningMachines,type LaundryOperation} from './laundryMotion';
 import {InteriorArrival} from './interiorArrival';
 import {CounterWipe} from './interiorService';
 import {InteriorCastBatch} from './interiorCastBatch';
@@ -13,7 +14,7 @@ import {pedestrianModel} from './city3dCast';
 import {disposeCityResources} from './city3dResources';
 import './interior3d.css';
 
-export function Interior3D(props:{place:InteriorPlace;motion:boolean;player:Pick<Person,'name'|'face'|'alive'>;people:Presence[];picked:string;onPick:(id:string)=>void;minute:number}) {
+export function Interior3D(props:{place:InteriorPlace;operation?:LaundryOperation;motion:boolean;player:Pick<Person,'name'|'face'|'alive'>;people:Presence[];picked:string;onPick:(id:string)=>void;minute:number}) {
  const host=useRef<HTMLDivElement>(null), latest=useRef(props);latest.current=props;
  const roomName=props.place==='laundry'?'Bluebird Laundry':props.place==='mercercourt'?'Mercer Court':props.place==='room'?'The Mariner':'Saint Agnes';
  const extraPeople=props.people.length-placementsForInterior(props.place,props.people).size;
@@ -44,13 +45,14 @@ export function Interior3D(props:{place:InteriorPlace;motion:boolean;player:Pick
   const selected=new THREE.Mesh(new THREE.RingGeometry(.45,.5,40),new THREE.MeshBasicMaterial({color:0xcba85c,side:THREE.DoubleSide}));selected.rotation.x=-Math.PI/2;selected.position.y=.04;scene.add(selected);
   const playerMarker=new THREE.Mesh(new THREE.RingGeometry(.36,.41,40),new THREE.MeshBasicMaterial({color:0xede2bd,side:THREE.DoubleSide}));
   playerMarker.rotation.x=-Math.PI/2;playerMarker.position.y=.065;playerMarker.visible=false;scene.add(playerMarker);
+  let machines:LaundryMotion|undefined;
   const loader=new GLTFLoader();
   const modelNames=[roomModel,'person','woman',...(!lobby?['bar-cloth']:[])];
   Promise.all(modelNames.map(async name=>{
    const gltf=await loader.loadAsync(`/art/models/${name}.glb`);
    if(dead){disposeCityResources([gltf.scene]);return;}models.set(name,gltf.scene);
   })).then(()=>{if(dead)return;const room=models.get(roomModel)!;
-   room.traverse(o=>{if(o instanceof THREE.Mesh){o.castShadow=true;o.receiveShadow=true;}});scene.add(room);dirty=true;setStatus('');
+   room.traverse(o=>{if(o instanceof THREE.Mesh){o.castShadow=true;o.receiveShadow=true;}});scene.add(room);if(laundry)machines=new LaundryMotion(room);dirty=true;setStatus('');
   }).catch(()=>{if(!dead)setStatus('The 3D room could not load. The people and actions below remain available.');});
   let service:CounterWipe|undefined,cloth:THREE.Group|undefined,serviceSeconds=0;
   let castBatch:InteriorCastBatch|undefined;
@@ -116,6 +118,8 @@ export function Interior3D(props:{place:InteriorPlace;motion:boolean;player:Pick
     }}
     castBatch=new InteriorCastBatch(actors);scene.add(castBatch.root);
    }
+   const running=laundryRunningMachines(p.operation);
+   if(machines?.step(seconds,running,p.motion&&!reduced,document.hidden))dirty=true;
    let poseChanged=false;
    if(arrival&&arriving&&!document.hidden){
     arrivalSeconds=!p.motion||reduced?arrival.duration:Math.min(arrival.duration,arrivalSeconds+Math.min(.05,Math.max(0,seconds)));
@@ -139,7 +143,7 @@ export function Interior3D(props:{place:InteriorPlace;motion:boolean;player:Pick
     renderer.render(scene,camera);renderedFrames++;dirty=false;
     if(models.size===modelNames.length)canvas.dataset.interior=JSON.stringify({place:p.place,people:[...actors.keys()],occupants:[...actors].map(([id,a])=>({id,spot:a.userData.spot,x:a.position.x,y:a.position.y,z:a.position.z})),picked:p.picked,
       drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,renderedFrames,
-      zoom:camera.zoom,arrival:arrival?{seconds:arrivalSeconds,duration:arrival.duration,moving:arriving}:undefined,service:service?.available?{seconds:serviceSeconds,cloth:service.clothPosition.toArray()}:undefined,omitted:Math.max(0,p.people.length-actors.size+(playerActor?1:0)),cutawayWalls:[...(!left?.visible?['left']:[]),...(!back?.visible?['back']:[])]});
+      zoom:camera.zoom,machines:machines?{count:machines.count,running,seconds:machines.seconds}:undefined,arrival:arrival?{seconds:arrivalSeconds,duration:arrival.duration,moving:arriving}:undefined,service:service?.available?{seconds:serviceSeconds,cloth:service.clothPosition.toArray()}:undefined,omitted:Math.max(0,p.people.length-actors.size+(playerActor?1:0)),cutawayWalls:[...(!left?.visible?['left']:[]),...(!back?.visible?['back']:[])]});
    }
   };frame=requestAnimationFrame(tick);
   return()=>{reduce.removeEventListener('change',reduction);unbindPan();dead=true;cancelAnimationFrame(frame);observer.disconnect();controls.removeEventListener('change',changed);controls.dispose();canvas.removeEventListener('keydown',keys);canvas.removeEventListener('pointerdown',press);canvas.removeEventListener('pointerup',release);castBatch?.dispose();disposeCityResources([scene,...models.values()]);renderer.dispose();renderer.forceContextLoss();canvas.remove();};
