@@ -599,3 +599,10 @@ The action appears under Work with its actual terms/refusal. Opening earning gui
 The attack removes15–30 condition points, bounded by remaining condition, removes up to10 supply units and marks operating trouble. It adds18 player attention (capped100); a faction owner loses25 goodwill and receives the existing retaliation scheduling call. It does not directly kill occupants, remove staff, destroy bankroll, consume an explosive charge or grant respect. This is the initial balance, not a completed broader arson economy.
 
 The existing saved building-fire lifecycle supplies brigade arrival, extinguishing and cleanup; extinguishing does not repair condition. A new `incendiary` visual cue has gravity8, the target address and an attacker identifying the player with weapon0. Its news is an attack-category arson report. No save schema or endpoint shape changes. The browser stages an authored held-bottle approach, throw, flight and escape before revealing the newspaper. A reserved forecourt footprint protects the actor path. Presentation hides window fire until impact and defers the saved brigade response until the cast exits; authoritative fire timestamps and damage remain unchanged. An Incendiary debug scene uses a private snapshot. Facade/path clearance across all addresses, impact detail and animation quality remain under development.
+
+
+Pending planter exits now hold their future footprint against newly arriving moving
+traffic. Existing occupants can continue along their committed routes out of that
+space; the scene still waits for actual clearance before starting. Releasing or
+cancelling the scene releases the hold. This advances no simulation time and does
+not move stationary blockers, which still require separate staging recovery.

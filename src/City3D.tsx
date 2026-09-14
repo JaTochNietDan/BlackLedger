@@ -41,7 +41,7 @@ import {
 import type {Lot, Point} from './city3dPlan';
 import type {Journey} from './TravelPresentation';
 import './city3d.css';
-import {CityCueQueue, gunVictim, gunCastReady, raidEntryPose, policeSceneSeconds, officerApproach, policeCast, sceneSlots, availableSceneSlot, casualtyFall, gunfightPose, casualtySceneStart, GunfireAudio, BlastAudio} from './city3dEvents';
+import {CityCueQueue, gunVictim, gunCastReady, raidEntryPose, policeSceneSeconds, officerApproach, policeCast, sceneSlots, availableSceneSlot, planterReservation, casualtyFall, gunfightPose, casualtySceneStart, GunfireAudio, BlastAudio} from './city3dEvents';
 import type {SceneSlot} from './city3dEvents';
 import {StreetTraffic, trafficSpeed, trafficSize, trafficModel, advanceWheel, wheelSteering, advanceSteering, frontWheelSteering} from './city3dTraffic';
 import {pedestrianModel, isPedestrian} from './city3dCast';
@@ -1334,6 +1334,12 @@ export function City3D(props: Props) {
             }] : [])).concat(aftermath.reservations()),
           dt / 1000,
           playback.current,
+          effects.flatMap(e=>{
+            if(!e.planter||e.slot)return [];
+            const building=buildings.get(e.cue.target);
+            const entry=(building?.getObjectByName('entrance-threshold')||building?.getObjectByName('entrance-landing'))?.getWorldPosition(new THREE.Vector3());
+            return entry?[planterReservation(entry)]:[];
+          }),
         );
         aftermath.show(placements);
         for (const [id, a] of actors) {

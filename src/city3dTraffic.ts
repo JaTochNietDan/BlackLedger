@@ -80,6 +80,7 @@ export class StreetTraffic {
     requests: TrafficRequest[],
     seconds: number,
     playbackRate = 1,
+    pending: readonly {pose:TrafficPose;model:string}[] = [],
   ): Map<string, TrafficPlacement> {
     const wanted = new Set(requests.map(r => r.id));
     for (const id of this.entries.keys()) if (!wanted.has(id)) this.entries.delete(id);
@@ -93,6 +94,11 @@ export class StreetTraffic {
         a.id.localeCompare(b.id),
     );
     const free = (pose: TrafficPose, model: string, id: string, progress: number) => {
+      // A waiting scene closes its approach to new moving traffic. Existing
+      // occupants may finish leaving; the scene itself still waits for clearance.
+      const current=this.entries.get(id);
+      if(lengths.get(id)!>0&&pending.some(space=>trafficOverlap(pose,model,space.pose,space.model)&&
+        !(current&&!current.waiting&&trafficOverlap(current.pose,current.model,space.pose,space.model))))return false;
       const crossing = junction(pose);
       const axis = crossing ? throughAxis(byID.get(id)!, progress, lengths.get(id)!) : null;
       return ![...this.entries].some(([other, e]) => {

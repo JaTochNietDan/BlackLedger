@@ -160,3 +160,24 @@ test('front tyres share a turn centre with a tighter inside angle in either dire
   assert.equal(frontWheelSteering(0,model,.87),0);
  }
 });
+
+test('pending scenes let existing traffic leave but stop new arrivals entering',()=>{
+ const traffic=new StreetTraffic(),points=[{x:40,z:16},{x:70,z:16}];
+ const occupied={pose:{x:50,z:16,heading:0},model:'planter'};
+ const inside={id:'inside',model:'person',points,progress:.3};
+ traffic.update([inside],1/60);
+ const behind={id:'behind',model:'person',points,progress:0};
+ traffic.update([inside,behind],1/60,1,[occupied]);
+ inside.progress=1;behind.progress=1;
+ let poses;
+ for(let i=0;i<900;i++){
+  poses=traffic.update([inside,behind],1/60,1,[occupied]);
+  clear([inside,behind],poses);
+  const arrival=poses.get('behind');
+  if(!arrival.waiting)assert.equal(trafficOverlap(arrival.pose,'person',occupied.pose,occupied.model),false);
+ }
+ assert.ok(poses.get('inside').progress>.8,'occupant could not leave');
+ assert.ok(poses.get('behind').progress<.3,'new arrival crossed pending scene');
+ for(let i=0;i<1200;i++)poses=traffic.update([inside,behind],1/60);
+ assert.ok(poses.get('behind').progress>.9,'traffic failed to resume after scene release');
+});

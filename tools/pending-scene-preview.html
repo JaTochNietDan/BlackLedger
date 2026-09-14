@@ -1,0 +1,15 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Pending exit traffic review</title><style>body{margin:0;background:#1c211d;color:#e6d7b6;font:18px Georgia}canvas{display:block}p{position:absolute;top:10px;left:20px}</style></head><body><p>Pending exit · traffic review <button id="release">Release scene</button><output></output></p><canvas></canvas><script type="module">
+import * as THREE from '/node_modules/three/build/three.module.js';
+import {GLTFLoader} from '/node_modules/three/examples/jsm/loaders/GLTFLoader.js';
+import {StreetTraffic,trafficOverlap} from '/src/city3dTraffic.ts';
+const renderer=new THREE.WebGLRenderer({canvas:document.querySelector('canvas'),antialias:true});renderer.setSize(innerWidth,innerHeight);renderer.setClearColor(0x1c211d);
+const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(40,innerWidth/innerHeight,.1,100);camera.position.set(50,12,35);camera.lookAt(50,0,16);
+scene.add(new THREE.HemisphereLight(0xffeac5,0x34463d,3));const sun=new THREE.DirectionalLight(0xffedce,2);sun.position.set(45,10,10);scene.add(sun);
+const floor=new THREE.Mesh(new THREE.BoxGeometry(36,.1,12),new THREE.MeshStandardMaterial({color:0x777568}));floor.position.set(54,-.05,16);scene.add(floor);
+const box=new THREE.Box3(new THREE.Vector3(48.3,0,12.8),new THREE.Vector3(51.7,2.5,19.2));const helper=new THREE.Box3Helper(box,0xd1a35d);scene.add(helper);
+const model=(await new GLTFLoader().loadAsync('/art/models/person.glb')).scene,actors=[model,model.clone(true)];actors.forEach(a=>scene.add(a));
+const traffic=new StreetTraffic(),points=[{x:40,z:16},{x:70,z:16}],inside={id:'inside',model:'person',points,progress:.3},behind={id:'behind',model:'person',points,progress:0};
+const space={pose:{x:50,z:16,heading:0},model:'planter'};let pending=[space];traffic.update([inside],1/60);traffic.update([inside,behind],1/60,1,pending);inside.progress=behind.progress=1;
+document.getElementById('release').onclick=()=>{pending=[];helper.visible=false;};
+let last=performance.now();function frame(now){const placements=traffic.update([inside,behind],(now-last)/1000,1,pending);last=now;const data={held:!!pending.length};[inside,behind].forEach((r,i)=>{const p=placements.get(r.id);actors[i].visible=!p.waiting;actors[i].position.set(p.pose.x,0,p.pose.z);actors[i].rotation.y=p.pose.heading;data[r.id]={x:p.pose.x,waiting:p.waiting,inside:trafficOverlap(p.pose,'person',space.pose,'planter')};});document.body.dataset.traffic=JSON.stringify(data);document.querySelector('output').value=pending.length?' New traffic yields':' Traffic released';renderer.render(scene,camera);requestAnimationFrame(frame);}requestAnimationFrame(frame);
+</script></body></html>
