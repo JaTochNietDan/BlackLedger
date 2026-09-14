@@ -1,0 +1,23 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Camera resize review</title><style>body{margin:0;background:#202722;color:#eee2c7;font:16px Georgia}nav{padding:12px}canvas{display:block}output{margin-left:12px}</style></head><body><nav>Camera resize review <button id="close">Doorway</button> <button id="half">Halfway</button> <button id="blast">Blast view</button> <button id="narrow">Narrow</button> <button id="wide">Wide</button><output></output></nav><canvas></canvas><script type="module">
+import * as THREE from 'three';
+import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
+import {frameScene,ScenePullback} from '/src/city3dFraming.ts';
+import {buildingGlazing} from '/src/city3dDamage.ts';
+const renderer=new THREE.WebGLRenderer({canvas:document.querySelector('canvas'),antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
+const scene=new THREE.Scene();scene.background=new THREE.Color(0x202722);
+scene.add(new THREE.HemisphereLight(0xffebc7,0x40534a,2));const light=new THREE.DirectionalLight(0xfff2d9,3);light.position.set(5,15,-10);scene.add(light);
+const camera=new THREE.OrthographicCamera(-150,150,100,-100,.1,3000),target=new THREE.Vector3();camera.position.set(180,200,-240);
+const model=(await new GLTFLoader().loadAsync('/art/models/monarch.glb')).scene;buildingGlazing(model,100);scene.add(model);model.updateMatrixWorld(true);
+const entry=model.getObjectByName('entrance-threshold').getWorldPosition(new THREE.Vector3());
+const close=new THREE.Box3(new THREE.Vector3(entry.x-3,0,entry.z-3.2),new THREE.Vector3(entry.x+1,3,entry.z+2.8));
+const wide=new THREE.Box3(new THREE.Vector3(entry.x-8,0,entry.z-8),new THREE.Vector3(entry.x+8,15,entry.z+5));wide.union(new THREE.Box3().setFromObject(model));
+scene.add(new THREE.Box3Helper(wide,0xdbc382));
+let fraction=1,progress=-.1,move;
+const draw=()=>{const points=[];for(const x of [wide.min.x,wide.max.x])for(const y of [wide.min.y,wide.max.y])for(const z of [wide.min.z,wide.max.z])points.push(new THREE.Vector3(x,y,z).project(camera));const fits=points.every(p=>Math.abs(p.x)<=.58001&&Math.abs(p.y)<=.58001);document.body.dataset.review=JSON.stringify({width:renderer.domElement.clientWidth,progress,zoom:camera.zoom,blastFits:fits});document.querySelector('output').value=`${renderer.domElement.clientWidth}px · zoom ${camera.zoom.toFixed(2)} · blast fits: ${fits}`;renderer.render(scene,camera);};
+const resize=()=>{const w=Math.max(240,Math.floor(innerWidth*fraction)),h=Math.max(240,innerHeight-60);renderer.setSize(w,h);camera.left=-100*w/h;camera.right=100*w/h;camera.updateProjectionMatrix();if(move)move.update(camera,target,progress);draw();};
+const reset=()=>{frameScene(camera,target,close);move=new ScenePullback(camera,target,wide);progress=-.1;draw();};
+document.querySelector('#close').onclick=reset;
+for(const [id,value] of [['half',.5],['blast',1]])document.getElementById(id).onclick=()=>{if(progress>value)reset();progress=value;move.update(camera,target,progress);draw();};
+document.querySelector('#narrow').onclick=()=>{fraction=.35;resize();};document.querySelector('#wide').onclick=()=>{fraction=1;resize();};addEventListener('resize',resize);
+resize();reset();
+</script></body></html>

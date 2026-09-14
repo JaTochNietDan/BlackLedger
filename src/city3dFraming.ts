@@ -58,25 +58,43 @@ export class ScenePullback {
  private readonly startPosition:THREE.Vector3;
  private readonly startTarget:THREE.Vector3;
  private readonly startZoom:number;
+ private readonly initialWidth:number;
+ private readonly initialHeight:number;
+ private readonly bounds:THREE.Box3;
+ private viewport:string;
  private readonly endPosition:THREE.Vector3;
  private readonly endTarget:THREE.Vector3;
- private readonly endZoom:number;
- private stopped=false;
+ private endZoom:number;
+ private cancelled=false;
+ private completed=false;
  constructor(camera:THREE.OrthographicCamera,target:THREE.Vector3,bounds:THREE.Box3){
   this.startPosition=camera.position.clone();this.startTarget=target.clone();this.startZoom=camera.zoom;
+  this.initialWidth=camera.right-camera.left;this.initialHeight=camera.top-camera.bottom;
+  this.bounds=bounds.clone();this.viewport=`${this.initialWidth}:${this.initialHeight}`;
   const endCamera=camera.clone(),endTarget=target.clone();frameScene(endCamera,endTarget,bounds);
   this.endPosition=endCamera.position.clone();this.endTarget=endTarget;this.endZoom=endCamera.zoom;
  }
- cancel(){this.stopped=true;}
+ cancel(){this.cancelled=true;}
  update(camera:THREE.OrthographicCamera,target:THREE.Vector3,progress:number){
-  if(this.stopped||progress<0)return false;
+  if(this.cancelled)return false;
+  const width=camera.right-camera.left,height=camera.top-camera.bottom,viewport=`${width}:${height}`;
+  const resized=viewport!==this.viewport;
+  if(resized){
+   const fit=camera.clone(),centre=target.clone();frameScene(fit,centre,this.bounds);this.endZoom=fit.zoom;this.viewport=viewport;
+  }
+  const startZoom=this.startZoom*Math.min(width/this.initialWidth,height/this.initialHeight);
+  if(progress<0){
+   if(resized){camera.zoom=startZoom;camera.updateProjectionMatrix();}
+   return resized;
+  }
+  if(this.completed&&!resized)return false;
   const t=Math.min(1,progress),ease=t*t*(3-2*t);
   camera.position.lerpVectors(this.startPosition,this.endPosition,ease);
   target.lerpVectors(this.startTarget,this.endTarget,ease);
   // Interpolate visible world span, avoiding an abrupt perceived zoom near the end.
-  camera.zoom=1/THREE.MathUtils.lerp(1/this.startZoom,1/this.endZoom,ease);
+  camera.zoom=1/THREE.MathUtils.lerp(1/startZoom,1/this.endZoom,ease);
   camera.lookAt(target);camera.updateProjectionMatrix();camera.updateMatrixWorld(true);
-  if(t===1)this.stopped=true;
+  if(t===1)this.completed=true;
   return true;
  }
 }

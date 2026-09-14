@@ -81,3 +81,21 @@ test('planter pullback fits the blast envelope and yields permanently to manual 
   assert.equal(move.update(camera,target,2),false,'completed pullback reclaimed manual view');
  }
 });
+
+test('pullback refits a narrower viewport before, during and after its move',()=>{
+ for(const resizeAt of [-.1,.5,2]){
+  const camera=new THREE.OrthographicCamera(-150,150,100,-100,.1,3000),target=new THREE.Vector3();camera.position.set(180,200,-240);
+  const close=new THREE.Box3(new THREE.Vector3(-3,0,-3),new THREE.Vector3(1,3,3));
+  const wide=new THREE.Box3(new THREE.Vector3(-8,0,-8),new THREE.Vector3(8,15,5));
+  frameScene(camera,target,close);const move=new ScenePullback(camera,target,wide);
+  if(resizeAt>=0)move.update(camera,target,Math.min(1,resizeAt));
+  camera.left=-20;camera.right=20;camera.updateProjectionMatrix();
+  assert.equal(move.update(camera,target,resizeAt),true);
+  move.update(camera,target,1);
+  for(const x of [-8,8])for(const y of [0,15])for(const z of [-8,5]){
+   const p=new THREE.Vector3(x,y,z).project(camera);assert.ok(Math.abs(p.x)<=.580001&&Math.abs(p.y)<=.580001,'resized blast cropped');
+  }
+  move.cancel();camera.left=-200;camera.right=200;camera.zoom=2;camera.updateProjectionMatrix();
+  assert.equal(move.update(camera,target,2),false);assert.equal(camera.zoom,2,'resize resurrected cancelled cinematic');
+ }
+});
