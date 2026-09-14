@@ -8,7 +8,7 @@ package core
 // to somebody.
 
 // SaveVersion is the shape the current build writes.
-const SaveVersion = 17
+const SaveVersion = 18
 
 // seedHoldings is the property each established family holds in a new city.
 var seedHoldings = map[string][]string{
@@ -22,6 +22,11 @@ var holdingIncome = map[string]int{"club": 30, "market": 18, "docks": 22, "bar":
 // MigrateLivingWorld is idempotent: running it on an already-migrated save
 // changes nothing.
 func (w *World) MigrateLivingWorld() {
+	for id, p := range w.Properties {
+		if p != nil && w.Own(id) && p.BoughtLife == 0 {
+			p.BoughtLife = w.Life
+		}
+	}
 	for i := range w.Factions {
 		f := &w.Factions[i]
 		if f.Peak == 0 {

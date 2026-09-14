@@ -22,7 +22,7 @@ const counter: Record<string, string> = {
   arms: 'Nobody sells these across a counter. Ask at the garage.',
 };
 
-export function MarketScreen({world}: {world: Snapshot}) {
+export function MarketScreen({world,onFind}: {world: Snapshot;onFind?:(id:string)=>void}) {
   const goods = world.goods || [];
   const held = world.player.stock || {};
   const carrying = goods.filter(g => (held[g.id] || 0) > 0);
@@ -32,7 +32,20 @@ export function MarketScreen({world}: {world: Snapshot}) {
   return (
     <section className="section-content">
       <div className="eyebrow">PRICES &amp; WHAT YOU ARE HOLDING</div>
-      <h1 className="screen-title">The underground market</h1>
+      <h1 className="screen-title">Market notices</h1>
+      {!!world.property_market?.length && <section className="property-exchange" aria-label="Property exchange">
+        <h2>Property exchange</h2>
+        <p>Deeds and standing broker offers. Visit an address to inspect the terms and complete a purchase or sale.</p>
+        <div className="market-board">{world.property_market.map(property=><article className="market-good" key={property.id}>
+          <header><b>{property.name}</b><span>{money(property.owned?property.offer:property.asking)}<small>{property.owned?' broker offer':property.available?' asking price':' reference price'}</small></span></header>
+          <p>{property.owned?'Your deed':property.available?'Offered for sale':'Not currently offered'} · {property.condition}% condition</p>
+          <p>{property.residents} {property.residents===1?'resident':'residents'}{property.home?' · Your current home':''}</p>
+          <p>{property.owned?'A sale transfers the building and tenant accounts.':`Held by ${property.holder}.`}</p>
+          {property.owned && property.home && <p>You can stay as a renter after selling; the terms are shown at the property.</p>}
+          {onFind && <button className="plain" disabled={property.locked} onClick={()=>onFind(property.id)}>{property.locked?'District not yet accessible':'Inspect the address ↗'}</button>}
+        </article>)}</div>
+      </section>}
+      <h2>The underground market</h2>
       <p className="subtle market-note">
         Prices move whether or not anybody is watching them. Stock is only worth what somebody will
         pay for it today, and every day it sits in your hands it is drawing attention.

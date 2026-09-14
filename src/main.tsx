@@ -836,7 +836,7 @@ function App() {
         </div>
       );
     }
-    if (view === 'market') return <MarketScreen world={w} />;
+    if (view === 'market') return <MarketScreen world={w} onFind={id=>{setSelected(id);setTab('city');setCityView('iso');}} />;
     if (view === 'ledger')
       return (
         <LedgerScreen

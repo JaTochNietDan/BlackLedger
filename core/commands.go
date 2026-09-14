@@ -571,6 +571,16 @@ func (w *World) apply(c Command) error {
 				return err
 			}
 			w.Advance(a.Minutes)
+		} else if c.Kind == "sell_property" {
+			if err := w.SellProperty(target); err != nil {
+				return err
+			}
+			w.Advance(a.Minutes)
+		} else if c.Kind == "buy_residence" {
+			w.Properties[target].Owner = fmt.Sprintf("player:%d", w.Life)
+			w.Properties[target].BoughtLife = w.Life
+			w.Log("A deed in your name", placeName(target)+" belongs to you. Your home and the existing residents are unchanged.", "business")
+			w.Advance(a.Minutes)
 		} else if person, ok := strings.CutPrefix(c.Kind, "dismiss:"); ok {
 			if err := w.LetGo(person); err != nil {
 				return err
@@ -946,7 +956,10 @@ func (w *World) apply(c Command) error {
 						// in charge, and a wage bill for nobody.
 						w.EmptyChairs()
 					}
-					p.Respect += 4
+					if w.Properties[target].BoughtLife != w.Life {
+						p.Respect += 4
+					}
+					w.Properties[target].BoughtLife = w.Life
 					l, _ := PlaceByID(target)
 					detail := l.Name + " now produces income for you. Earnings accrue as game time passes."
 					if target == "room" {

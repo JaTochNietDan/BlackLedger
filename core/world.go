@@ -246,11 +246,12 @@ type Faction struct {
 	Short int `json:"short,omitempty"`
 }
 type Property struct {
-	Rents     map[string]*RentAccount `json:"rents,omitempty"`
-	Owner     string                  `json:"owner"`
-	Condition int                     `json:"condition"`
-	Income    int                     `json:"income"`
-	Carry     float64                 `json:"carry"`
+	BoughtLife int                     `json:"bought_life,omitempty"`
+	Rents      map[string]*RentAccount `json:"rents,omitempty"`
+	Owner      string                  `json:"owner"`
+	Condition  int                     `json:"condition"`
+	Income     int                     `json:"income"`
+	Carry      float64                 `json:"carry"`
 	// How the business is run. Empty means the ordinary way, so saves written
 	// before this was a decision keep earning exactly what they earned.
 	Mode string `json:"mode,omitempty"`
@@ -1957,6 +1958,21 @@ func (w *World) Actions(id string) []Action {
 				fmt.Sprintf("Everything %s has becomes yours: the premises, the people who stay, and every quarrel the name was in. They are not an easy person to be in a room with, and if they are expecting it you are not one of theirs any more, if you are anything.", f.Name))
 		}
 	}
+	if saleableResidence(id) && w.Own(id) {
+		detail := "Transfer the deed, fixtures, staff, repairs and tenant accounts to the buyer."
+		if p.Home == id {
+			detail += fmt.Sprintf(" You stay here as a renter at $%d a day.", HomeRent(id))
+		}
+		label := "Sell " + l.Name
+		if offer := w.PropertyOffer(id); offer > 0 {
+			label = fmt.Sprintf("Sell %s for $%d", l.Name, offer)
+		}
+		add("sell_property", label, 30, 0, w.SellPropertyReadiness(id), detail)
+	}
+	if id == "estate" && !w.Own(id) {
+		add("buy_residence", "Buy the deed to "+l.Name, 60, l.Cost, w.BuyResidenceReadiness(id), "Own the residence without moving home. Existing residents keep their accommodation. Moving in is a separate decision.")
+	}
+
 	if l.Type == "home" {
 		if p.Home != id {
 			label := "Rent this apartment"
@@ -2526,7 +2542,7 @@ func (w *World) Public() map[string]any {
 	if len(history) > 60 {
 		history = history[len(history)-60:]
 	}
-	return map[string]any{"id": w.ID, "version": w.Version, "revision": w.Revision, "life": w.Life, "minute": w.Minute, "sky": w.Sky(), "player": w.Player, "district": w.District, "factions": w.PublicFactions(), "npcs": w.People(), "locations": locs, "event": scene, "history": history, "dead": w.Dead, "tasks": w.Tasks, "director": w.Director, "last_result": w.LastResult, "aftermath": w.ActiveAftermath(), "police_presence": w.ActivePolicePresence(), "building_fires": w.ActiveBuildingFires(), "daily_cost": w.DailyCost(), "books": w.Books(), "guide": w.Guide(), "rules": GuideRules(), "groups": Groups(), "income": income, "security": w.Guard(), "opportunity": w.NextOpportunity(), "known_threats": w.KnownThreats(), "business_truces": w.ActiveBusinessTruces(), "conflicts": w.PublicConflicts(), "goods": w.Goods, "arms": w.ArmsDescription(), "appearance": w.AppearanceDescription(), "vehicle": w.VehicleDescription(), "residence": w.ResidenceDescription(), "offshore": map[string]any{"balance": w.Offshore, "reachable": w.Player.Offshore}, "newspaper": w.Edition(), "editions": w.Editions(), "arrangements": w.PendingArrangements(), "commissions": w.PublicCommissions(), "grudges": w.GrudgeSummary(), "cast": w.Cast(), "everyone": w.Everyone(), "retainers": w.RetainerDescription(), "armoury": w.ArmouryDescription(), "population": w.PopulationSummary(), "housing_shortage": w.HousingShortage(), "seated": w.Seated, "seated_to": w.SeatedTo, "hand": w.HandDescription(), "cards": w.CardsDescription(), "dice": w.DiceDescription(), "wheel": w.WheelDescription(), "machine": w.MachineDescription(), "house": w.HouseDescription(), "roles": w.RoleDescription(), "organization": w.PlayerOrganizationDescription(), "own_people": w.OwnPeopleDescription(), "pacts": w.PactDescription(), "book": w.LoanDescription(), "press": w.PressDescription(), "service": w.ServiceDescription(), "city": w.ScrutinyDescription(), "dashboard": w.Dashboard(), "epitaph": w.Epitaph(), "street": w.OnTheStreet(), "street_note": w.StreetNote()}
+	return map[string]any{"id": w.ID, "version": w.Version, "revision": w.Revision, "life": w.Life, "minute": w.Minute, "sky": w.Sky(), "player": w.Player, "district": w.District, "factions": w.PublicFactions(), "npcs": w.People(), "locations": locs, "event": scene, "history": history, "dead": w.Dead, "tasks": w.Tasks, "director": w.Director, "last_result": w.LastResult, "aftermath": w.ActiveAftermath(), "police_presence": w.ActivePolicePresence(), "building_fires": w.ActiveBuildingFires(), "daily_cost": w.DailyCost(), "books": w.Books(), "property_market": w.PropertyMarket(), "guide": w.Guide(), "rules": GuideRules(), "groups": Groups(), "income": income, "security": w.Guard(), "opportunity": w.NextOpportunity(), "known_threats": w.KnownThreats(), "business_truces": w.ActiveBusinessTruces(), "conflicts": w.PublicConflicts(), "goods": w.Goods, "arms": w.ArmsDescription(), "appearance": w.AppearanceDescription(), "vehicle": w.VehicleDescription(), "residence": w.ResidenceDescription(), "offshore": map[string]any{"balance": w.Offshore, "reachable": w.Player.Offshore}, "newspaper": w.Edition(), "editions": w.Editions(), "arrangements": w.PendingArrangements(), "commissions": w.PublicCommissions(), "grudges": w.GrudgeSummary(), "cast": w.Cast(), "everyone": w.Everyone(), "retainers": w.RetainerDescription(), "armoury": w.ArmouryDescription(), "population": w.PopulationSummary(), "housing_shortage": w.HousingShortage(), "seated": w.Seated, "seated_to": w.SeatedTo, "hand": w.HandDescription(), "cards": w.CardsDescription(), "dice": w.DiceDescription(), "wheel": w.WheelDescription(), "machine": w.MachineDescription(), "house": w.HouseDescription(), "roles": w.RoleDescription(), "organization": w.PlayerOrganizationDescription(), "own_people": w.OwnPeopleDescription(), "pacts": w.PactDescription(), "book": w.LoanDescription(), "press": w.PressDescription(), "service": w.ServiceDescription(), "city": w.ScrutinyDescription(), "dashboard": w.Dashboard(), "epitaph": w.Epitaph(), "street": w.OnTheStreet(), "street_note": w.StreetNote()}
 }
 func (w *World) hasRecord(title string) bool {
 	for _, r := range w.History {
