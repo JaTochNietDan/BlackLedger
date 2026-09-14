@@ -3127,3 +3127,12 @@ without losing the other associate or hurting the player. Broader selected
 combat/delegation/scene checks passed 2.870s. First regression used adjacent raw
 LCG states and exercised only death; corrected its seed distribution rather
 than weakening the death-and-capture assertion. No live release.
+
+### September 14 — death-service integration coverage corrections
+
+Registered mortuary, cemetery and crematorium fronts in the existing fallback
+manifest so the already-authored plates are actually reachable. Removed the
+optional tag from the saved service receipt list to comply with the core list
+contract; no public receipt disclosure was added. The three formerly failing
+front/list/wire-shape checks pass 0.186s. Routine predictability remains under
+investigation; no full-suite pass or release is claimed.

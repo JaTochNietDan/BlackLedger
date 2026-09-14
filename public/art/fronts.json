@@ -98,5 +98,17 @@
  {
   "id": "riverside",
   "file": "fronts/front-riverside-v1.jpg"
+ },
+ {
+  "id": "mortuary",
+  "file": "fronts/front-mortuary-v1.jpg"
+ },
+ {
+  "id": "cemetery",
+  "file": "fronts/front-cemetery-v1.jpg"
+ },
+ {
+  "id": "crematorium",
+  "file": "fronts/front-crematorium-v1.jpg"
  }
 ]
