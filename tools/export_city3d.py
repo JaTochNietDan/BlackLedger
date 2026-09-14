@@ -2432,6 +2432,20 @@ if __name__ == '__main__' and '--only=interior-lodging-room' in __import__('sys'
     raise SystemExit(0)
 
 
+def exchange_interior():
+    from exchange_interior import build
+    build(box,cylinder,material)
+
+
+if __name__ == '__main__' and '--only=interior-exchange' in __import__('sys').argv:
+    clear();exchange_interior()
+    manifest_path=os.path.join(OUT,'manifest.json')
+    with open(manifest_path) as f: selected_manifest=json.load(f)
+    selected_manifest['interior-exchange']=export('interior-exchange')
+    with open(manifest_path,'w') as f:json.dump(selected_manifest,f,indent=2)
+    raise SystemExit(0)
+
+
 def restaurant_interior():
     from restaurant_interior import build
     build(box,cylinder,material)
@@ -2607,6 +2621,7 @@ clear();playing_card();manifest['playing-card']=export('playing-card')
 clear();dice_tray();manifest['dice-tray']=export('dice-tray')
 clear();slot_cabinet();manifest['slot-cabinet']=export('slot-cabinet')
 clear();lodging_room();manifest['interior-lodging-room']=export('interior-lodging-room')
+clear();exchange_interior();manifest['interior-exchange']=export('interior-exchange')
 clear();restaurant_interior();manifest['interior-restaurant']=export('interior-restaurant')
 clear();garage_interior();manifest['interior-garage']=export('interior-garage')
 clear();butcher_interior();manifest['interior-butcher']=export('interior-butcher')

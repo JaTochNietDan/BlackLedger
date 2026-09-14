@@ -1825,3 +1825,31 @@ preceding movement commit. Main8791 remains8ba57c1 and unchanged; this renderer
 fix joins126357b/0678fd8 for later clean release integration. Log:
 .runtime/home-shadow-build.log. Material/character fidelity still needs further
 work; correcting this rendering defect is not final visual acceptance.
+
+### Mercer Exchange 3D hall — September 14
+
+Added an original10×10m Blender interior for market: stone floor/cornices/pilasters,
+three brass message windows with writing pads/envelopes, pigeonhole archives,
+a four-seat reading table and benches with newspapers, pinned noticeboards, a
+forms desk, opal pendants and a readable Mercer Exchange plaque. Source
+`tools/exchange_interior.py`; targeted/full export wired in export_city3d.py;
+interior-exchange.glb (~1.4MB) and manifest registered. Decorative notices carry
+no invented live quotes, offers or financial amounts. Existing game actions remain
+authoritative; the location is an information/trading venue, not a new stock game.
+
+Independent placements offer four seated readers, six standing visitors and three
+role-based clerk/broker/teller stations; player has a reserved foreground entry.
+Overflow remains in the actual roster and the caption reports it. Isolated8955
+exchange-interior fixture shows11NPCs plus player, with7more in the list;149draw
+calls/257348triangles (not a measured FPS or cross-device guarantee). Reviewed
+standard and enlarged room. First pass found lettering crossing a pilaster;
+replaced it with a foreground plaque and verified the full name is readable.
+
+Geometry checks cover both rigs, full13NPC staging plus player, disjoint occupant
+bounds, actual cushion support, standing clearance and the supported entrance.
+All370 frontend tests pass13.189s; final plaque export's targeted room test passes
+0.845s; final build passes2.62s. Logs .runtime/exchange-{export,tests,build,
+final-geometry}.log. QA used isolated save and UI-only entry/enlargement; main8791
+remains8ba57c1. Public cast and command meaning unchanged. More interiors, richer
+materials/characters, physical document interactions and whole-campaign acceptance
+remain open. This is a furnished room integration, not final visual acceptance.

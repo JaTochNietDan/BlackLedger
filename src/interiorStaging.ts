@@ -142,10 +142,25 @@ export function restaurantPlacements(people:Presence[]) {
  return result;
 }
 
-export type InteriorPlace='bar'|'mercercourt'|'room'|'laundry'|'estate'|'apartment'|'flat'|'butcher'|'garage'|'lodging'|'restaurant';
+export function exchangePlacements(people:Presence[]) {
+ const result=new Map<string,InteriorSpot>();
+ const staff:InteriorSpot[]=[-1.8,.6,3].map((x,i)=>({id:`exchange-clerk-${i}`,x,z:-3.7,yaw:0}));
+ const available:InteriorSpot[]=[
+  ...[-3.6,-1.4].flatMap((x,col)=>[-.3,1.3].map((z,row)=>({id:`exchange-reader-${col}-${row}`,x,z,yaw:col===0?Math.PI/2:-Math.PI/2,seat:.69}))),
+  ...[-.8,.8].flatMap((z,row)=>[.3,1.9,3.5].map((x,col)=>({id:`exchange-floor-${row}-${col}`,x,z,yaw:Math.PI}))),
+ ];
+ for(const who of [...people].sort((a,b)=>a.id.localeCompare(b.id))){
+  if(result.has(who.id))continue;
+  const spot=/\b(clerk|broker|teller|exchange attendant)\b/i.test(who.role||'')?staff.shift():available.shift();
+  if(spot)result.set(who.id,spot);
+ }
+ return result;
+}
+
+export type InteriorPlace='bar'|'mercercourt'|'room'|'laundry'|'estate'|'apartment'|'flat'|'butcher'|'garage'|'lodging'|'restaurant'|'market';
 export function placementsForInterior(place:InteriorPlace,people:Presence[]){
  if(place==='flat'||place==='lodging')return new Map<string,InteriorSpot>();
- return (place==='restaurant'?restaurantPlacements:place==='garage'?garagePlacements:place==='butcher'?butcherPlacements:place==='apartment'?ashburyPlacements:place==='estate'?cypressPlacements:place==='laundry'?laundryPlacements:place==='bar'?interiorPlacements:place==='room'?marinerLobbyPlacements:mercerLobbyPlacements)(people);
+ return (place==='market'?exchangePlacements:place==='restaurant'?restaurantPlacements:place==='garage'?garagePlacements:place==='butcher'?butcherPlacements:place==='apartment'?ashburyPlacements:place==='estate'?cypressPlacements:place==='laundry'?laundryPlacements:place==='bar'?interiorPlacements:place==='room'?marinerLobbyPlacements:mercerLobbyPlacements)(people);
 }
 
 export function poseInteriorOccupant(actor:THREE.Group,spot:InteriorSpot) {
@@ -166,6 +181,7 @@ export function poseInteriorOccupant(actor:THREE.Group,spot:InteriorSpot) {
 
 // Reserved clear floor positions; these never displace a public occupant.
 export function interiorPlayerSpot(place:InteriorPlace):InteriorSpot {
+ if(place==='market')return {id:'player-entry',x:.2,z:3.8,yaw:Math.PI};
  if(place==='restaurant')return {id:'player-entry',x:0,z:4.1,yaw:Math.PI};
  if(place==='lodging')return {id:'player-entry',x:-1.8,z:1.8,yaw:Math.PI/4};
  if(place==='garage')return {id:'player-entry',x:-3,z:4.25,yaw:Math.PI};
