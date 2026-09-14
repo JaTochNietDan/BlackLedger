@@ -213,3 +213,27 @@ viewport and one city canvas; no new-life command issued. Screenshots saved as
 conversation-folio.png and memorial-sheet.png. Both temporary tabs closed.
 Compact viewport and varied long encounters still need acceptance; broader city
 assets, interiors, choreography and performance requirements remain unfinished.
+
+### Escort after cuffing — September 13
+
+Read the current409771b4 objective; prior turn was progress (conversation folio
+and memorial delivery). Arrest choreography now continues after wrist contact:
+the officer releases the cuffs, walks around to the detainee's side, both turn,
+and walk2.3m across the reserved forecourt. The escorting hand follows the
+prisoner's actual upper-arm transform. Restraints remain attached throughout.
+Arrest/support cast lifetime is9s, and the expanded2m-deep swept reservation and
+camera bounds cover the side-by-side movement. No backend outcome changes.
+
+All203 frontend tests pass and production build passes. Geometry QA samples both
+male/female Blender rigs across540 frames: original cuff contact, subsequent
+upper-arm contact, pavement clearance, full path bounds and completed travel.
+CUA arrest preview on isolated8875 verified cuffed x76, moving x75.40468 and
+arrived x73.7; officer follows at the same x with0.75m lateral separation.
+Saved diagnostics in custody-escort.json; revision0/minute480 unchanged. First
+visual inspection showed both actors walking together, clear of the frontage,
+at145FPS/173draws locally. A later screenshot capture showed the user-opened
+Herald instead and was discarded, not presented as arrest evidence. The user
+adopted the remaining browser tab, so it was left open.
+
+Car entry/departure, more detailed actor production, other action variants,
+interiors and wider performance/visual acceptance remain unfinished.

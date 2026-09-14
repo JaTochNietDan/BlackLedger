@@ -39,7 +39,7 @@ export type SceneSlot = {root: Point; pose: TrafficPose; model: string};
 export function sceneSlots(lot: Lot, kind: string): SceneSlot[] {
   if(kind==='custody')return [-3,-7,1].map(offset=>{
     const root={x:lot.x+offset,z:lot.row*PITCH+6.35};
-    return {root,pose:{x:root.x+1.5,z:root.z,heading:0},model:'custody'};
+    return {root,pose:{x:root.x+1.5,z:root.z+.3,heading:0},model:'custody'};
   });
   if(kind==='assassination')return [-4,-8.6,-1].map(offset=>{
     const root={x:lot.x+offset,z:lot.row*PITCH+6.35};
@@ -198,5 +198,5 @@ export function raidEntryPose(seconds: number, distance: number) {
   return {travelled,walking,phase:travelled/1.15*Math.PI*2,kick,door};
 }
 export function policeSceneSeconds(kind: string) {
-  return ['arrest','police-unit','officer','detainee'].includes(kind)?6:kind==='explosion'?14:['raid','raid-unit','raid-officer'].includes(kind)?10:3;
+  return ['arrest','police-unit','officer','detainee'].includes(kind)?9:kind==='explosion'?14:['raid','raid-unit','raid-officer'].includes(kind)?10:3;
 }

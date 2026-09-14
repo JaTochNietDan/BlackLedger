@@ -1173,7 +1173,7 @@ export function City3D(props: Props) {
             e.extra.position.set(e.slot.root.x, e.slot.model === 'parked-police' ? vehicleRootHeight(e.slot.root) : 0.2, e.slot.root.z);
             e.light.position.set(e.slot.root.x, 3, e.slot.root.z);
             e.since = now;
-            if(e.custody){frameScene(camera,controls.target,new THREE.Box3(new THREE.Vector3(e.slot.root.x-.7,0,e.slot.root.z-1),new THREE.Vector3(e.slot.root.x+3.7,2.4,e.slot.root.z+1)));controls.update();}
+            if(e.custody){frameScene(camera,controls.target,new THREE.Box3(new THREE.Vector3(e.slot.root.x-.7,0,e.slot.root.z-1),new THREE.Vector3(e.slot.root.x+3.7,2.4,e.slot.root.z+1.4)));controls.update();}
             if(e.assassination){
               frameScene(camera,controls.target,new THREE.Box3(
                 new THREE.Vector3(e.slot.root.x-.8,0,e.slot.root.z-1.2),
