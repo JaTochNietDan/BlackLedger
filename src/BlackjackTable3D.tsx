@@ -34,7 +34,8 @@ export function BlackjackTable3D({mine,theirs,hidden,presentation,dealer,player}
  const host=useRef<HTMLDivElement>(null),latest=useRef({mine,theirs,hidden,presentation});latest.current={mine,theirs,hidden,presentation};
  const [status,setStatus]=useState('Opening the card table…');
  useEffect(()=>{
-  const el=host.current!;let dead=false,frame=0,dirty=true,key='',rendered=0;
+  const el=host.current!;let dead=false,frame=0,dirty=true,key='',stateKey='',rendered=0,cardBuilds=0,previousFrame=0,wasPresenting=false;
+  let intervals:number[]=[],playback:{frames:number;fps:number;p95FrameMs:number;worstFrameMs:number}|undefined;
   const scene=new THREE.Scene();scene.background=new THREE.Color('#173128');
   const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;
   renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFShadowMap;
@@ -62,10 +63,17 @@ export function BlackjackTable3D({mine,theirs,hidden,presentation,dealer,player}
    }).catch(()=>{});
   }
   Promise.all(['blackjack-table','playing-card'].map(async name=>{const g=await loader.loadAsync(`/art/models/${name}.glb`);if(dead){disposeCityResources([g.scene]);return;}models.push(g.scene);return g.scene;})).then(([table,card])=>{if(dead||!table||!card)return;shadow(table);scene.add(table);prototype=card;key='';dirty=true;setStatus('');}).catch(()=>{if(!dead)setStatus('The table could not load. Your cards are listed below.');});
-  const tick=()=>{
-   if(dead)return;frame=requestAnimationFrame(tick);const p=latest.current,k=JSON.stringify(p);
+  const tick=(now:number)=>{
+   if(dead)return;frame=requestAnimationFrame(tick);const p=latest.current;
+   const state=JSON.stringify([p.presentation.start,p.presentation.active]);if(state!==stateKey){stateKey=state;dirty=true;}
+   if(p.presentation.active&&!wasPresenting){intervals=[];previousFrame=0;playback=undefined;}
+   if(p.presentation.active&&!document.hidden){if(previousFrame)intervals.push(now-previousFrame);previousFrame=now;}else previousFrame=0;
+   if(wasPresenting&&!p.presentation.active&&intervals.length){const sorted=[...intervals].sort((a,b)=>a-b);playback={frames:intervals.length+1,fps:1000*intervals.length/intervals.reduce((sum,n)=>sum+n,0),p95FrameMs:sorted[Math.ceil(sorted.length*.95)-1],worstFrameMs:sorted[sorted.length-1]};}
+   wasPresenting=p.presentation.active;
+   // Geometry and textures depend on card identity, not animation timing or its completion.
+   const k=JSON.stringify(p.presentation.plan.cards.map(c=>c.card??null));
    if(prototype&&k!==key){
-    key=k;cards.clear();textures.splice(0).forEach(t=>t.dispose());materials.splice(0).forEach(m=>m.dispose());
+    key=k;cardBuilds++;cards.clear();textures.splice(0).forEach(t=>t.dispose());materials.splice(0).forEach(m=>m.dispose());
     p.presentation.plan.cards.forEach(move=>{
       const object=prototype!.clone(true),texture=cardTexture(move.card);textures.push(texture);
       object.traverse(o=>{if(o instanceof THREE.Mesh&&o.material.name==='card printed face'){const m=o.material.clone();m.map=texture;m.color.set('#ffffff');m.needsUpdate=true;o.material=m;materials.push(m);}});
@@ -76,10 +84,11 @@ export function BlackjackTable3D({mine,theirs,hidden,presentation,dealer,player}
       object.scale.set(1.4,1,1.4);shadow(object);cards.add(object);
     });dirty=true;
    }
+   if(p.presentation.active)dirty=true;
+   if(!dirty||document.hidden)return;
    const elapsed=p.presentation.active?performance.now()-p.presentation.start:Infinity;
    cards.children.forEach((object,i)=>{const move=p.presentation.plan.cards[i];if(!move)return;const pose=cardPose(move,elapsed);object.visible=pose.visible;object.position.fromArray(pose.position);object.rotation.z=pose.rotation;});
-   if(p.presentation.active)dirty=true;
-   if(!dirty||document.hidden)return;renderer.render(scene,camera);rendered++;canvas.dataset.blackjack=JSON.stringify({mine:p.mine,theirs:p.theirs,hidden:p.hidden,dealing:p.presentation.active,flips:p.presentation.plan.cards.filter(c=>c.flip).length,dealer:dealer?.id,player:player?.alive?player.name:undefined,rendered,drawCalls:renderer.info.render.calls});dirty=false;
+   renderer.render(scene,camera);rendered++;canvas.dataset.blackjack=JSON.stringify({mine:p.mine,theirs:p.theirs,hidden:p.hidden,dealing:p.presentation.active,flips:p.presentation.plan.cards.filter(c=>c.flip).length,dealer:dealer?.id,player:player?.alive?player.name:undefined,rendered,cardBuilds,playback,drawCalls:renderer.info.render.calls});dirty=false;
   };frame=requestAnimationFrame(tick);
   return()=>{dead=true;cancelAnimationFrame(frame);observer.disconnect();disposeCityResources([scene,...models],{textures,materials:[...materials,...costumes]});renderer.dispose();renderer.forceContextLoss();canvas.remove();};
  },[dealer?.id,dealer?.face,player?.name,player?.face,player?.alive]);
