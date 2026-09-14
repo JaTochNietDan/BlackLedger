@@ -96,8 +96,13 @@ A failed `plant` attempt also emits an `explosion` cue: the charge went off prem
 Explosion cues now optionally carry `detonation: "planted" | "premature"`.
 Successful `detonate` calls record `planted`; an early player charge accident
 records `premature`. Player planting outcomes also capture the existing `attacker`
-identity with weapon0. Faction detonations leave individual identity absent because
-the simulation does not select a named planter. Legacy cues omit this field.
+identity with weapon0. Faction detonations select the most skilled available
+faction member already inside the target (ID breaks ties), provided that person
+has a valid different home and no custody, death or existing departure schedule.
+They immediately begin a saved journey home before the blast, excluding them
+from indoor casualties; the cue captures their identity with weapon0. No eligible
+member leaves the individual identity absent. This does not yet dispatch a
+planter from another address. Legacy cues omit this field.
 This records the resolved cause for presentation without changing damage, charge
 consumption, command duration, odds or fire rules. It survives result/save replay.
 The renderer prioritizes explicit detonation outcome over matching fire records;
@@ -616,3 +621,8 @@ original start first walks back along that frontage under traffic collision
 checks. Presentation journey progress remains zero until the start is reached.
 This preserves continuity without changing the saved route, elapsed minutes or
 outcome. Different models/starts retain their existing transition behavior.
+
+Planted explosion cues now use the exact headline filed by their damage/casualty
+report, retaining the same minute. This lets automatic newspaper presentation
+match both fatal and nonfatal blasts without guessing among unrelated articles.
+Previously those cues used a shorter headline which prevented automatic reveal.

@@ -242,7 +242,7 @@ func (w *World) detonate(id, cause string) {
 	w.Report("attack", headline,
 		fmt.Sprintf("An explosion at %s is being treated as deliberate. %s Police have appealed for witnesses and say they expect none.", place.Name, body))
 	w.igniteBuilding(id)
-	w.Witness("explosion", id, fmt.Sprintf("An explosion wrecked %s. Condition is now %d%%.", place.Name, prop.Condition), "EXPLOSION AT "+upper(place.Name))
+	w.Witness("explosion", id, fmt.Sprintf("An explosion wrecked %s. Condition is now %d%%.", place.Name, prop.Condition), headline)
 	w.VisualCues[len(w.VisualCues)-1].Detonation = "planted"
 }
 
@@ -273,7 +273,40 @@ func (w *World) DemolitionDay() {
 			continue
 		}
 		f.Cash -= FactionChargeCost
-		w.detonate(target, reason)
+		w.factionDetonation(f.ID, target, reason)
+	}
+}
+
+// A named planter must actually be inside the target and able to leave. Do not
+// borrow somebody across town or interrupt custody/an existing journey merely
+// to supply a face for the presentation. Dispatch from elsewhere is separate.
+func (w *World) factionDetonation(faction, target, reason string) {
+	var planter *NPC
+	for i := range w.NPCs {
+		n := &w.NPCs[i]
+		if n.Dead || n.Faction != faction || n.Location != target || n.Held > w.Minute || w.Travelling(n) || n.Heading != "" || n.Home == target {
+			continue
+		}
+		if _, valid := PlaceByID(n.Home); !valid {
+			continue
+		}
+		if planter == nil || n.Skill > planter.Skill || (n.Skill == planter.Skill && n.ID < planter.ID) {
+			planter = n
+		}
+	}
+	var attacker *CueAttacker
+	if planter != nil {
+		attacker = &CueAttacker{ID: planter.ID, Name: planter.Name, Weapon: 0}
+		// Leaving before the blast also removes the planter from the set of
+		// occupants eligible to become its casualty. Location remains the source
+		// until the normal arrival pass completes this saved journey.
+		planter.Heading, planter.Errand = planter.Home, "leaving after planting a charge"
+		planter.Sets, planter.Arrives = 0, w.Minute+max(1, TravelMinutes(target, planter.Home))
+		w.noticed(planter, true)
+	}
+	w.detonate(target, reason)
+	if attacker != nil {
+		w.VisualCues[len(w.VisualCues)-1].Attacker = attacker
 	}
 }
 
