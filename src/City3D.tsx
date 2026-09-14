@@ -938,12 +938,15 @@ export function City3D(props: Props) {
       const activePlayback=p.activeCue?`${p.activeCue.id}:${p.replaySerial??0}`:null;
       const playbackStarted = !!activePlayback && lastActive !== activePlayback;
       const handOffSurvivor=(effect:Effect)=>{
-        if(!effect.accident||effect.accident.fatal||!effect.slot||effect.cue.id.startsWith('preview:')||
+        if((!effect.accident&&!effect.assassination)||effect.accident?.fatal||!effect.slot||effect.cue.id.startsWith('preview:')||
           effect.cue.attacker?.id!=='player'||!w.player.alive||w.player.location!==effect.cue.target)return;
         const actor=actors.get('player');if(!actor||actor.start!==actor.end||!isPedestrian(actor.model))return;
-        effect.accident.update(effect.accident.duration);
-        const at=effect.accident.actor.getWorldPosition(new THREE.Vector3());
-        const pose={x:at.x,z:at.z,heading:effect.slot.pose.heading};
+        const cast=effect.assassination||effect.accident!;
+        cast.update(cast.duration);
+        const person=effect.assassination?.attacker||effect.accident!.actor;
+        const at=person.getWorldPosition(new THREE.Vector3());
+        const forward=new THREE.Vector3(0,0,1).applyQuaternion(person.getWorldQuaternion(new THREE.Quaternion()));
+        const pose={x:at.x,z:at.z,heading:effect.assassination?Math.atan2(forward.x,forward.z):effect.slot.pose.heading};
         if(traffic.adoptFrontage({id:'player',model:actor.model,points:actor.points,progress:actor.end},pose)){
           actor.object.position.set(at.x,at.y,at.z);actor.object.rotation.set(0,pose.heading,0);
           actor.limbs.forEach(limb=>limb.rotation.x=0);actor.object.visible=true;
@@ -1293,7 +1296,9 @@ export function City3D(props: Props) {
         if (!motion) traffic.clear();
         // Stationary actors own their known destination even before their first
         // visible frame. Otherwise response vehicles can steal a parked bay.
-        const replacedActors=new Set(effects.flatMap(e=>e.driveBy?[e.cue.attacker?.id,...(isPedestrian(actors.get(e.cue.drive_by?.driver.id||'')?.model||'')?[e.cue.drive_by?.driver.id]:[]),...(e.cue.attacker?.id==='player'?['player-car']:[])]:e.incendiary||e.planter||e.accident?[e.cue.attacker?.id]:[]));
+        const replacedActors=new Set(effects.flatMap(e=>e.assassination?
+          [e.cue.attacker?.id,e.cue.strike?.victim.id].filter(id=>!!id&&isPedestrian(actors.get(id)?.model||'')):
+          e.driveBy?[e.cue.attacker?.id,...(isPedestrian(actors.get(e.cue.drive_by?.driver.id||'')?.model||'')?[e.cue.drive_by?.driver.id]:[]),...(e.cue.attacker?.id==='player'?['player-car']:[])]:e.incendiary||e.planter||e.accident?[e.cue.attacker?.id]:[]));
         const actorSpaces=[...actors].filter(([id])=>!replacedActors.has(id)).filter(([,a])=>a.object.visible||a.start===a.end).map(([id,a])=>{
           const pose=a.start===a.end?(traffic.placement(id)?.pose||onRoute(a.points,1)):{x:a.object.position.x,z:a.object.position.z,heading:a.object.rotation.y};
           return {model:trafficModel(a.model,a.start===a.end),root:{x:pose.x,z:pose.z},pose};
