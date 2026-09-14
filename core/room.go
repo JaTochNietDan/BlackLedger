@@ -15,6 +15,9 @@ import "fmt"
 // Presence is one person where the player is standing, and everything the
 // player has earned the right to know about them.
 type Presence struct {
+	HomeID        string `json:"home_id,omitempty"`
+	HomeName      string `json:"home_name,omitempty"`
+	Accommodation string `json:"accommodation,omitempty"`
 	// Says is what this person says to the player's face, when they have
 	// something to say. Built by the core out of what they are carrying; the
 	// interface prints it and invents nothing.
@@ -236,6 +239,7 @@ func (w *World) see(n *NPC) Presence {
 	known := w.Known(n)
 	p := Presence{
 		ID: n.ID, Name: n.Name, Role: n.Role,
+		HomeID: n.Home, Accommodation: n.Accommodation,
 		Standing: w.standingOf(n), Doing: w.doingNow(n),
 		Yours:    n.Faction == w.PlayerOrganizationID(),
 		Carrying: w.whatTheyCarry(n),
@@ -269,6 +273,9 @@ func (w *World) see(n *NPC) Presence {
 		// Not an address, so nothing to walk to. The note says what is known,
 		// which is usually where they were and how long ago.
 		p.WhereID, p.Where, p.Lost = "", "", w.WhereNote(n.ID)
+	}
+	if n.Home != "" {
+		p.HomeName = placeName(n.Home)
 	}
 	if known {
 		p.Faction = w.factionName(n.Faction)

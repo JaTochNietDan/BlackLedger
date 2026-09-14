@@ -485,3 +485,20 @@ Daily accounts now use the same current HourlyIncome calculation as clock payout
 including actual room footfall and custody collection share. This corrects the
 reported daily rate; it does not change the existing operating factors or add
 Mariner rental income.
+
+## Save schema v15 — NPC residences
+
+NPCs persist optional `home` (location ID) and `accommodation` (display category),
+independent of Location, Post and Heading. New-city population and migration assign
+missing homes in deterministic wealth/standing order, preserving existing valid
+residents. `Presence` adds `home_id`, `home_name`, and `accommodation`; these identify
+a residence, not the NPC's current whereabouts. Dead NPCs never count as residents.
+
+Initial capacity is24 residents at The Mariner,64 at Ashbury Court and one private
+resident at Cypress House, with a place reserved for the player at their home.
+Ashbury supports shared flats for lower standing and private apartments for higher
+standing; the private estate requires high wealth and cannot admit a stranger into
+a player/family-owned house. Capacity shortages leave homes unassigned and appear
+in the public `housing_shortage` count and People screen. Additional housing remains
+planned. Existing income, rent payments, ownership and movement rules are unchanged:
+this residence assignment is not yet a paid lease or NPC return-home schedule.

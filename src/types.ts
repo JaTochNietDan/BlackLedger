@@ -41,6 +41,9 @@ export interface Action {
   target: string;
 }
 export interface Presence {
+  home_id?: string;
+  home_name?: string;
+  accommodation?: string;
   says?: string;
   face?: number;
   id: string;
@@ -196,6 +199,7 @@ export interface Journeying {
 }
 export interface StreetSegment extends Journeying {from_minute:number;to_minute:number;end_progress:number;}
 export interface Snapshot {
+  housing_shortage?: number;
   house?: {
     games: boolean;
     place?: string;

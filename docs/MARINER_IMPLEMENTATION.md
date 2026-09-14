@@ -22,6 +22,8 @@ Current requirement: objective903a4109-a113-4a4f-b726-f6ef277f7e41. The Mariner 
 5. Display named tenants, capacity, rate, collected income and problems in a styled lodging register. Keep all information server-authoritative.
 6. Exercise acquisition and management through the HTTP command API on a fresh isolated fixture; verify saved/reloaded leases, clock partition invariance, obligations and browser display. Never QA against the main campaign.
 
-No Mariner feature is enabled yet. Broad visual, interior, assassination and production requirements remain active alongside this work.
+NPC residence assignment and its public home display are now implemented in schema v15. Mariner rental billing and takeover are not yet enabled. Broad visual, interior, assassination and production requirements remain active alongside this work.
 
 The latest amendment broadens this to city-wide homes appropriate to wealth and standing. Establish housing capacity and price tiers first, then lease the Mariner through the same assignment system. Employment/Post must remain independent of residence. Existing core/mugging.go contains unrelated working-tree edits; preserve them while coordinating any PayTheCity integration.
+
+Progress: SettleHousing now assigns persistent homes independently of Post/Location, preserves existing residents, excludes the dead and reports shortages. People cards display the accommodation and home. The next integration must replace the bundled NPC room allowance with paid tenancy accounting and add Mariner acquisition/management; do not also credit generic hourly income for collected rent. Latest objective84acfc45 adds a real-estate market, more housing, broader progression income and a beginner questline.

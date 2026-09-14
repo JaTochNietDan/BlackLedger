@@ -17,7 +17,7 @@ so it starts promptly. Preserve all earlier simulation/visual requirements.
 
 ## User amendment — detail, interiors and event direction (2026-09-13)
 
-Current objective source: `/Users/jatochnietdan/.codex/attachments/903a4109-a113-4a4f-b726-f6ef277f7e41/goal-objective.md` (read September 13; supersedes the earlier 35be00d7 objective).
+Current objective source: `/Users/jatochnietdan/.codex/attachments/84acfc45-069d-4a1a-ace4-a4a5eee74946/goal-objective.md` (read September 13; supersedes the earlier 35be00d7 objective).
 
 The expanded scope also requires much richer gambling tables and slot-machine presentation, occupants and animations; consistent styling across every menu; debug access to every assassination variant; explosion preambles showing the planter leaving; new authoritative molotov and building drive-by actions with visible damage and escape; and attacks against the player during street travel. Also stage interior occupants at chairs and counters, render cause-specific player deaths, track and display personal/family backstories and interactions, and illustrate moonshine, untaxed cigarettes and crated arms. The latest amendment additionally requires assassinations inside buildings and plausible wire attacks from behind, with animation fidelity sufficient to support them. These additions remain outstanding and do not replace earlier requirements.
 
@@ -72,3 +72,5 @@ The user requests removal of redundant City navigation/briefing, a period-styled
 The latest amendment requires takeover and management of The Mariner as a lodging business. Living NPC tenants must actually rent rooms, rental income must derive from those occupants, and ownership must bring business obligations comparable to other premises. This gameplay expansion remains outstanding.
 
 The subsequent amendment requires all living NPCs to have homes appropriate to their wealth and standing, with additional housing where capacity requires it. Mariner leases must therefore be part of city-wide residential assignment, not an isolated occupancy counter.
+
+Latest amendments additionally require a real-estate market with houses changing hands, player purchases and sales, more residential housing, broader income opportunities across progression, and a guiding beginner questline. These remain outstanding.

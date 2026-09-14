@@ -64,6 +64,7 @@ function Card({
         {/* Somebody of yours on their way out. The game says "it had been
             coming" the morning after; this is the part that comes before. */}
         {who.restless && <small className="warning">thinking about leaving</small>}
+        {who.home_name&&<small className="person-home">{who.accommodation} · {who.home_name}</small>}
         <small className="doing">
           {who.walking && (
             <i className="on-street" aria-hidden="true">
@@ -170,6 +171,7 @@ export function PeopleScreen({
           : 'Everybody in Bellwether, and what they are doing about it.'}
       </p>
 
+      {!!world.housing_shortage&&<p className="warning">{world.housing_shortage} residents need accommodation. More housing is needed.</p>}
       {!!render && actions.length > 0 && (
         <section className="anywhere-strip" aria-label="What you can do about people">
           <h4>
