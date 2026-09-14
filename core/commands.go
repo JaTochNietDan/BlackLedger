@@ -19,13 +19,13 @@ func Execute(original *World, c Command) (*World, error) {
 }
 func (w *World) apply(c Command) error {
 	p := &w.Player
-	w.VisualCues = nil
-	w.Comings = nil
-	w.recordStreet = c.Kind == "travel"
-	w.streetTravel = nil
-	if w.recordStreet {
-		w.streetTravel = []StreetSegment{}
+	if w.Pool != nil && !w.Pool.Settled && p.Alive && w.Pool.Life == w.Life && !strings.HasPrefix(c.Kind, "pool_") && c.Kind != "face" && c.Kind != "choice" && c.Kind != "new_life" {
+		return fmt.Errorf("finish or concede the billiards rack before switching activities")
 	}
+	w.VisualCues = []VisualCue{}
+	w.Comings = []Coming{}
+	w.recordStreet = c.Kind == "travel"
+	w.streetTravel = []StreetSegment{}
 	oldTime := w.Minute
 	oldLoc := p.Location
 	// What the player had before they decided, so the result can say what the
@@ -80,6 +80,14 @@ func (w *World) apply(c Command) error {
 		p.Face = n
 	} else if !p.Alive {
 		return fmt.Errorf("this life has ended")
+	} else if strings.HasPrefix(c.Kind, "pool_") {
+		label, minutes, err := w.poolCommand(c)
+		if err != nil {
+			return err
+		}
+		chosen = label
+		quiet = true
+		w.Advance(minutes)
 	} else if c.Kind == "choice" {
 		e := w.Event
 		if e == nil || e.ID != c.Event {
@@ -1103,6 +1111,7 @@ func (w *World) apply(c Command) error {
 			w.OfferIfReady()
 		}
 	}
+	w.ReconcilePool()
 	w.SettleHousing()
 	w.SettleApartments()
 	w.Revision++

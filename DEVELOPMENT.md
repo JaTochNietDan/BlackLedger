@@ -2016,3 +2016,30 @@ health 100, home Ashbury Court, location Fassano Meats) are preserved. There are
 384 apartment deeds. The release's `.runtime/compatibility.json` and
 `.runtime/live-verification.json` hold the assertions and clean health response.
 The broader interior/scenes/progression goal remains active.
+
+### 2026-09-14 — billiards command and receipt boundary
+
+Connected funded physical billiards to `pool_start/place/shot/opponent/decide/
+concede/close` commands and a read-only local table/opponent projection. The
+client submits cue intent; Go owns physics, rules, opponent inputs and settlement.
+Active wagers require explicit concession before another activity. Event decisions
+and appearance changes remain available; interrupted racks can be conceded.
+API.md documents coordinates, pocket indexing, replay encoding and all command
+inputs. The playable view and tournaments remain unfinished.
+
+Core tests cover real player/NPC strokes, wrong-turn and missing/forged inputs,
+interruption, explicit close/concession and immutable/local public views. Temporary
+SQLite checks concurrent duplicate stake requests, a real winning shot, restart,
+byte-identical winning receipt retry, stale new-ID rejection and one payout. HTTP
+checks start/place/break, duplicates, replay, malformed input and response shapes.
+The extended shape check exposed null travel/effect lists in action receipts;
+command initialization now makes those empty lists, consistent with the existing
+contract. Nullable rack/previous stroke are explicitly documented in that guard.
+
+Final core pool/card/travel/lifecycle selection passes (0.333s), full store tests
+pass (0.271s), full server tests pass (1.286s), and vet passes for billiards/core/
+store/server. Evidence: `.runtime/pool-api-core-verified.log`,
+`.runtime/pool-api-adapters-verified.log`, `.runtime/pool-api-vet-final.log`.
+No frontend changes or live campaign QA/promotion in this increment. Next is the
+close playable 3D table and controls, with physical replay and corrected table
+proportions; full fidelity, multiple active tables and tournaments remain open.

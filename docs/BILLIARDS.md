@@ -167,9 +167,9 @@ backend benchmarks, not browser frame-time measurements. Logs are under
 1. Connect match rules to campaign commands and post the rules in the playable
    view, including break decisions and any deliberate house variation. Extend
    adjudication as unsupported physical events become available.
-2. Connect saved funded matches to exactly-once Go commands and test HTTP
-   receipt retries, stale revisions, interrupted requests and public projections.
-   Core/stake and SQLite persistence already exist; routes are still pending.
+2. Keep the implemented command/receipt path as the single authority while
+   connecting the browser. Test browser request interruption and restored playback;
+   store/HTTP retries and stale revisions now have coverage below.
 3. A close 3D table with aiming, power, tip position, ball placement, numbered
    rotating balls, cue motion and impact/pocket sound. The hall's initial table
    props have stylized proportions; align the playable model and the six hall
@@ -185,3 +185,28 @@ backend benchmarks, not browser frame-time measurements. Logs are under
 
 No live campaign was used for physics QA. Main port 8791 still serves release
 16c1c95; tailor/hall source commits await a verified promotion.
+
+## Command and public-state integration — 2026-09-14
+
+Added the intent-only `pool_*` commands and an explicit local table DTO, documented
+in API.md. Commands reserve stakes, place/shoot, play the NPC, resolve breaks,
+concede and dismiss finished racks. A live wager requires finish/concession before
+switching activities; appearance changes and urgent event decisions remain usable.
+The public view copies positions/quaternions, legal targets, decisions, exact cue
+intent and the compressed replay without consuming RNG or altering the match.
+No UI challenge button is exposed until playable controls are integrated.
+
+Temporary-SQLite tests exercise concurrent same-ID start retries, a physical
+winning shot, database close/reopen, byte-identical saved shot receipts, stale
+new-ID rejection, exactly one shot/payout and unchanged persisted state. HTTP
+checks start/place/break, identical retries, complete public replay, malformed
+numeric cue input, missing payload and forged NPC intent. The existing null-shape
+guard initially rejected the new nullable `pool`; its contract now explicitly
+permits absent rack/previous stroke while the HTTP rack checks verify lists stay
+lists. No live campaign was used or promoted.
+
+Final evidence: selected core pool/card/travel/lifecycle tests pass (0.333 s),
+full store tests pass (0.271 s), full HTTP/server tests pass (1.286 s), and vet
+passes. The expanded HTTP shape check also found null travel/effect lists in
+command receipts; command initialization now publishes empty lists. Logs are
+`.runtime/pool-api-{core-verified,adapters-verified,vet-final}.log`.

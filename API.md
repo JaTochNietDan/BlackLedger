@@ -1061,3 +1061,54 @@ and call, optional ball-in-hand placement and break decision). The opponent
 core entry point chooses and executes its own physical stroke with a stable
 local seed. Clients will request an opponent turn, not submit its cue input or
 result. HTTP routing/public projection and request-retry tests remain pending.
+
+## Funded physical billiards
+
+The optional `pool` object describes the player's current-life rack at Green
+Baize (`poolhall`); it is `null` elsewhere or without a rack. `pool_opponents`
+is always a list, empty outside the hall. Present opponents expose `id`, `name`,
+`max_stake` (their available offer capped at $500), and `unavailable` (empty when
+eligible). This does not expose remote people or their private planning/skill.
+
+All actions use the existing `/api/action` request ID and revision transaction:
+
+| `kind` | Additional input | Effect |
+| --- | --- | --- |
+| `pool_start` | `target`: present NPC ID; `amount`: stake $10–$500, default $20 | Reserves both players' money; player breaks; two game minutes. |
+| `pool_place` | `pool: {x,y}` in cloth metres | Places cue ball when authorized; no time. |
+| `pool_shot` | `pool: {angle,speed,top,side,ball,pocket,safety}` | Executes player cue input through physics and rules; two minutes. |
+| `pool_opponent` | No cue payload | Server plans and physically executes one NPC stroke; two minutes. |
+| `pool_decide` | `choice`: one of the offered break-choice IDs | Resolves player break decision; no time. |
+| `pool_concede` | No cue payload | Surrenders the active rack and settles escrow; no time. |
+| `pool_close` | No cue payload | Dismisses a settled rack; cannot abandon a live wager. |
+
+Except `pool_start`, `target` may be absent or `poolhall`. Cue direction is radians
+in cloth XY coordinates; speed is m/s, top/side are tip offsets in metres. A
+called object ball is 1–15 and pocket is 0–5; breaks and safeties follow the posted
+eight-ball rules in `docs/BILLIARDS.md`. The server accepts intent only, never
+client ball outcomes, winners, replay data or NPC inputs. Missing/invalid inputs,
+wrong turns, active interruptions and stale new request IDs are rejected without
+state changes. Successful same-ID retries return the original saved response,
+including replay, even after restart. A pending rack must be finished or conceded
+before another activity; face changes and active event choices remain available.
+Death, forced departure and hall closure retain the existing reconciliation rules.
+
+`pool` contains venue/opponent identity, `stake`, remaining `pot` escrow,
+`settled`, `voided`, `turn` (0 player, 1 NPC), `groups` (0 open, 1 solids, 2 stripes),
+`breaking`, `ball_in_hand`, `behind_head_string`, `winner` (-1 unfinished), `shots`,
+`balls`, `legal_balls`, `break_choices` (`id`, `label`), latest `outcome` and `foul`,
+`unavailable`, and solver `width`, `length`, `radius` in metres. Each ball has `id`,
+`position` [x,y,z], `rotation` quaternion [x,y,z,w], and `pocket` (-1 on table,
+otherwise 0–5). Positions use cloth-plane XY and Z up. Pocket order is left near,
+left far, right near, right far, left middle, right middle.
+
+`stroke` is null before the first shot; thereafter it holds `shooter`, exact
+`intent`, optional cue-ball `placement`, and any preceding break `decision`.
+`replay` is empty before the first shot, otherwise base64-encoded zlib JSON v1:
+`{v,duration,frames:[{t,balls}],events}`. Each frame ball is
+`[id,x,y,z,qx,qy,qz,qw,pocket]`, where the compact replay uses 0 for live and 1–6
+for pocketed (subtract one to match the public ball pocket index). Events use
+`Time`, `Kind`, `Ball`, `Other`, `Speed`. Frames include impacts as well as regular
+samples; clients must retain impact boundaries when interpolating. Playback is
+presentation only and cannot advance time or settle money. This API is ready for
+the playable 3D client; table controls and tournaments are not yet connected.
