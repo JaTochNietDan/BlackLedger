@@ -96,3 +96,15 @@ export function poolHostPreview(offers:PoolHostOffer[],fee:number,percent:number
  const entrants=eligible.slice(0,needed),count=needed+(enter?1:0),gross=count*fee,cut=Math.floor(gross*percent/100);
  return {entrants,count,gross,cut,prize:gross-cut,reason};
 }
+
+/** Presentation clock only: slowing or pausing never changes saved physics. */
+export class PoolReplayClock {
+ private seconds=0;
+ private last=0;
+ private rate=1;
+ private paused=false;
+ reset(now:number){this.seconds=0;this.last=now;this.paused=false;return this.seconds;}
+ time(now:number){this.seconds+=Math.max(0,now-this.last)/1000*(this.paused?0:this.rate);this.last=now;return this.seconds;}
+ setRate(rate:number,now:number){this.time(now);this.rate=rate;}
+ setPaused(paused:boolean,now:number){this.time(now);this.paused=paused;}
+}

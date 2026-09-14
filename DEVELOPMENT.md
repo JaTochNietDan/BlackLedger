@@ -2209,3 +2209,31 @@ were retained. Release-local `.runtime/compatibility.json` and
 This is release progress, not completion of the broad goal. Full human
 shooting/bridge animation, airborne billiards physics, remaining planned
 interiors and broader visual/campaign acceptance remain open.
+
+### 2026-09-14 — inspectable billiards replays
+
+Previous e89b18b was verified release progress. Added explicit last-shot replay,
+pause/resume, quarter/half/normal speed and return-to-saved-table controls to
+the close billiards view. These consume the existing encoded physics tape and
+cue intent without submitting commands. Spectators and finished tournament
+racks can replay too. Automatic playback still respects motion preferences;
+explicit replay is user initiated, and changing motion preference interrupts it.
+The presentation clock preserves elapsed position across speed/pause changes.
+Paused replay stops repeated GPU rendering while camera movement still redraws.
+
+389 frontend tests passed, including continuity across pause, speed changes,
+restart and cue contact. TypeScript/production build passed; logs:
+`.runtime/pool-replay-controls-{tests,build}.log`. Browser tab 66 on isolated
+8968 reviewed the saved championship shot at quarter speed, paused it, verified
+unchanged ball positions across screenshots, orbited while paused and returned
+to the authoritative resting layout. The fixture retained revision 1/minute
+1082/one receipt and state SHA256
+`ec1c28526c72844fee90d05ba316ecd194ba796ee4a2bb084ad68372cd21ba48`.
+No gameplay commands were issued. Main 8791 remains clean release 89cc61b;
+these new controls are currently in the working preview only.
+
+Close-table character shooting/bridge animation remains absent: the cue still
+moves without a person. A complete pose must keep feet outside the cabinet,
+solve both hands to the shaft and handle shots needing a rest. This turn adds
+replay inspection, not that character animation or airborne/slate physics.
+The broad interiors, art and campaign goal remains active.

@@ -5,18 +5,19 @@ import {useEffect,useRef,useState} from 'react';
 import * as THREE from 'three';
 import {TableCamera} from './tableCamera';
 import {disposeCityResources} from './city3dResources';
-import {decodePoolReplay,poolFramePair,poolPocketCenters,poolAimAngle,poolPlacementHint,PoolTap,poolCueStroke,POOL_CUE_END} from './billiards';
+import {decodePoolReplay,poolFramePair,poolPocketCenters,poolAimAngle,poolPlacementHint,PoolTap,PoolReplayClock,poolCueStroke,POOL_CUE_END} from './billiards';
 import type {PoolState,PoolReplay} from './billiards';
 import {playTable} from './sound';
 
 interface TableProps {
- pool:PoolState;angle:number;top:number;side:number;motion:boolean;locked:boolean;calledBall:number;calledPocket:number;placement:[number,number];
+ pool:PoolState;angle:number;top:number;side:number;motion:boolean;locked:boolean;replayLocked:boolean;calledBall:number;calledPocket:number;placement:[number,number];
  onPlaying:(playing:boolean)=>void;onAim:(angle:number)=>void;onBall:(ball:number)=>void;onPocket:(pocket:number)=>void;onPlace:(x:number,y:number)=>void;
 }
 export function BilliardsTable3D(props:TableProps){
  const {pool}=props;
  const host=useRef<HTMLDivElement>(null),live=useRef(props);live.current=props;
- const [error,setError]=useState(''),[playback,setPlayback]=useState(false);
+ const [error,setError]=useState(''),[playback,setPlayback]=useState(false),[paused,setPaused]=useState(false),[rate,setRate]=useState(1);
+ const playbackOptions=useRef({paused,rate});playbackOptions.current={paused,rate};
  useEffect(()=>{
   const el=host.current!;let dead=false,renderer:THREE.WebGLRenderer;
   try{renderer=new THREE.WebGLRenderer({antialias:true});}catch{setError('The 3D table could not start.');return;}
@@ -66,9 +67,15 @@ export function BilliardsTable3D(props:TableProps){
   const guide=new THREE.Line(new THREE.BufferGeometry(),new THREE.LineDashedMaterial({color:'#e7d6a5',dashSize:.04,gapSize:.025,transparent:true,opacity:.65}));scene.add(guide);
   const {cue,materials:cueMaterials}=createBilliardsCue();scene.add(cue);
   const cuePose=(origin:THREE.Vector3,angle:number,front:number,top:number,side:number,opacity:number)=>{const direction=new THREE.Vector3(Math.cos(angle),0,-Math.sin(angle)),across=new THREE.Vector3(-Math.sin(angle),0,-Math.cos(angle));cue.position.copy(origin).addScaledVector(direction,front-.714).addScaledVector(across,side);cue.position.y+=top;cue.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),direction);for(const m of cueMaterials){m.opacity=opacity;m.depthWrite=opacity>.99;}};
-  let tape:PoolReplay|null=null,started=0,loading=false,key='',generation=0,playing=false,eventCursor=0,cueSound=false;
+  const clock=new PoolReplayClock();let clockRate=1,clockPaused=false;
+  let tape:PoolReplay|null=null,loading=false,key='',generation=0,playing=false,eventCursor=0,cueSound=false;
   const preference=matchMedia('(prefers-reduced-motion: reduce)');
-  const notify=(v:boolean)=>{if(v!==playing){playing=v;setPlayback(v);live.current.onPlaying(v);}};
+  const notify=(v:boolean)=>{if(v!==playing){playing=v;setPlayback(v);if(!v)setPaused(false);live.current.onPlaying(v);}};
+  const startReplay=(encoded:string)=>{
+   if(!encoded||dead)return;const token=++generation;tape=null;eventCursor=0;cueSound=false;loading=true;setPaused(false);clockPaused=false;setError('');notify(true);dirty=true;
+   decodePoolReplay(encoded).then(r=>{if(dead||token!==generation)return;tape=r;const now=performance.now();clock.reset(now);clockPaused=playbackOptions.current.paused;clock.setPaused(clockPaused,now);loading=false;dirty=true;}).catch(()=>{if(dead||token!==generation)return;loading=false;notify(false);setError('Replay unavailable. The saved table below is the authoritative result.');});
+  };
+  const replay=()=>{if(!live.current.replayLocked&&!playing)startReplay(live.current.pool.replay);};canvas.addEventListener('pool-replay',replay);
   const skip=()=>{generation++;tape=null;loading=false;notify(false);dirty=true;};canvas.addEventListener('pool-skip',skip);
   const ray=new THREE.Raycaster(),pointer=new THREE.Vector2(),hit=new THREE.Vector3(),plane=new THREE.Plane(new THREE.Vector3(0,1,0),-H),tap=new PoolTap();
   const down=(e:PointerEvent)=>tap.begin(e.pointerId,e.clientX,e.clientY,e.isPrimary,e.button);
@@ -93,18 +100,22 @@ export function BilliardsTable3D(props:TableProps){
   const worldRotation=new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1,0,0),-Math.PI/2),qa=new THREE.Quaternion(),qb=new THREE.Quaternion();
   function pose(id:number,x:number,y:number,z:number,q:number[],pocket:number){const mesh=balls.get(id)!;mesh.visible=pocket<0;mesh.position.set(x-W/2,H+z,L/2-y);qa.fromArray(q);mesh.quaternion.copy(worldRotation).multiply(qa);}
   const resize=()=>{renderer.setSize(el.clientWidth,Math.max(1,el.clientHeight));camera.aspect=el.clientWidth/Math.max(1,el.clientHeight);camera.updateProjectionMatrix();view.resize();dirty=true;};const observer=new ResizeObserver(resize);observer.observe(el);resize();
+  let lastMotion=live.current.motion,lastReduced=preference.matches;
+  let lastReplaySeconds=NaN;
   let frame=0,lastAngle=NaN,lastPool:PoolState|null=null,lastSelection='';
   const tick=(now:number)=>{
    frame=requestAnimationFrame(tick);const p=live.current.pool;if(lastPool!==p){lastPool=p;dirty=true;}
    const selectionKey=JSON.stringify([live.current.placement,live.current.calledBall,live.current.calledPocket,live.current.locked,live.current.top,live.current.side]);if(lastSelection!==selectionKey){lastSelection=selectionKey;dirty=true;}
    const next=`${p.shots}:${p.replay}`;
-   if(next!==key){const first=key==='';key=next;const token=++generation;tape=null;eventCursor=0;cueSound=false;dirty=true;
-    if(!first&&p.replay&&live.current.motion&&!preference.matches){loading=true;notify(true);decodePoolReplay(p.replay).then(r=>{if(dead||token!==generation)return;tape=r;started=performance.now();loading=false;dirty=true;}).catch(()=>{if(dead||token!==generation)return;loading=false;notify(false);setError('Replay unavailable. The saved table below is the authoritative result.');});}
+   if(next!==key){const first=key==='';key=next;++generation;tape=null;eventCursor=0;cueSound=false;dirty=true;
+    if(!first&&p.replay&&live.current.motion&&!preference.matches)startReplay(p.replay);
     else {loading=false;notify(false);}
    }
-   if((!live.current.motion||preference.matches)&&(tape||loading)){tape=null;loading=false;notify(false);generation++;dirty=true;}
+   if((live.current.motion!==lastMotion||preference.matches!==lastReduced)&&(tape||loading)){tape=null;loading=false;notify(false);generation++;dirty=true;}
+   lastMotion=live.current.motion;lastReduced=preference.matches;
+   const options=playbackOptions.current;if(options.rate!==clockRate){clock.setRate(options.rate,now);clockRate=options.rate;}if(options.paused!==clockPaused){clock.setPaused(options.paused,now);clockPaused=options.paused;}
    let stroking=false;
-   if(tape){const seconds=(now-started)/1000,intent=p.stroke?.intent,animated=!!intent;
+   if(tape){const seconds=clock.time(now),intent=p.stroke?.intent,animated=!!intent;
     const stroke=poolCueStroke(seconds,intent?.speed??0,R,intent?.top??0,intent?.side??0),elapsed=animated?stroke.ballTime:seconds;
     const initial=tape.frames[0].balls.find(b=>b[0]===0)!;
     if(animated&&stroke.visible){stroking=true;cuePose(new THREE.Vector3(initial[1]-W/2,H+initial[3],L/2-initial[2]),intent.angle??0,stroke.front,intent.top??0,intent.side??0,stroke.opacity);}
@@ -113,7 +124,7 @@ export function BilliardsTable3D(props:TableProps){
     const nextBalls=new Map(b.balls.map(ball=>[ball[0],ball]));
     for(const ba of a.balls){const bb=nextBalls.get(ba[0])!;qa.fromArray(ba.slice(4,8));qb.fromArray(bb.slice(4,8));qa.slerp(qb,mix);pose(ba[0],ba[1]+(bb[1]-ba[1])*mix,ba[2]+(bb[2]-ba[2])*mix,ba[3]+(bb[3]-ba[3])*mix,qa.toArray(),ba[8]-1);}
     while((!animated||stroke.contact)&&eventCursor<tape.events.length&&tape.events[eventCursor].Time<=elapsed){const e=tape.events[eventCursor++];if(elapsed-e.Time<.15)playTable(e.Kind==='pocket'?'pool-pocket':'pool-impact',Math.min(1,e.Speed/4));}
-    dirty=true;if(elapsed>=tape.duration&&(!animated||seconds>=POOL_CUE_END)){tape=null;notify(false);stroking=false;}
+    dirty=dirty||seconds!==lastReplaySeconds;lastReplaySeconds=seconds;if(elapsed>=tape.duration&&(!animated||seconds>=POOL_CUE_END)){tape=null;notify(false);stroking=false;}
    }
    if(!tape&&!loading)for(const b of p.balls)pose(b.id,...b.position,b.rotation,b.pocket);
    const interactive=!playing&&!live.current.locked&&!p.unavailable&&!p.settled&&p.turn===0&&!p.break_choices.length;
@@ -126,7 +137,12 @@ export function BilliardsTable3D(props:TableProps){
    if(aiming&&(dirty||lastAngle!==live.current.angle)){lastAngle=live.current.angle;const ball=p.balls.find(b=>b.id===0)!;const start=new THREE.Vector3(ball.position[0]-W/2,H+R,L/2-ball.position[1]);const direction=new THREE.Vector3(Math.cos(lastAngle),0,-Math.sin(lastAngle));guide.geometry.dispose();guide.geometry=new THREE.BufferGeometry().setFromPoints([start,start.clone().addScaledVector(direction,.7)]);guide.computeLineDistances();cuePose(start,lastAngle,-R-.06,live.current.top,live.current.side,1);dirty=true;}
    if(dirty){renderer.render(scene,camera);dirty=false;}
   };frame=requestAnimationFrame(tick);
-  return ()=>{dead=true;generation++;cancelAnimationFrame(frame);observer.disconnect();canvas.removeEventListener('pool-skip',skip);canvas.removeEventListener('pointerdown',down);canvas.removeEventListener('pointermove',move);canvas.removeEventListener('pointerup',up);canvas.removeEventListener('pointercancel',cancel);canvas.removeEventListener('lostpointercapture',cancel);view.dispose();disposeCityResources([scene]);renderer.dispose();canvas.remove();};
+  return ()=>{dead=true;generation++;cancelAnimationFrame(frame);observer.disconnect();canvas.removeEventListener('pool-skip',skip);canvas.removeEventListener('pool-replay',replay);canvas.removeEventListener('pointerdown',down);canvas.removeEventListener('pointermove',move);canvas.removeEventListener('pointerup',up);canvas.removeEventListener('pointercancel',cancel);canvas.removeEventListener('lostpointercapture',cancel);view.dispose();disposeCityResources([scene]);renderer.dispose();canvas.remove();};
  },[]);
- return <div className="pool-render" ref={host}>{error&&<p role="alert">{error}</p>}{playback&&<button className="pool-skip" onClick={()=>host.current?.querySelector('canvas')?.dispatchEvent(new Event('pool-skip'))}>Skip ball motion</button>}<button className="table-camera-reset" onClick={()=>host.current?.querySelector('canvas')?.dispatchEvent(new Event('table-reset'))}>Reset camera</button></div>;
+ return <div className="pool-render" ref={host}>{error&&<p role="alert">{error}</p>}
+  <div className="pool-replay-controls" aria-label="Shot replay controls">
+   {playback?<><button onClick={()=>setPaused(v=>!v)}>{paused?'Resume replay':'Pause replay'}</button><button onClick={()=>host.current?.querySelector('canvas')?.dispatchEvent(new Event('pool-skip'))}>Return to saved table</button></>:pool.replay&&<button disabled={props.replayLocked} onClick={()=>host.current?.querySelector('canvas')?.dispatchEvent(new Event('pool-replay'))}>Replay last shot</button>}
+   {pool.replay&&<label>Replay speed <select aria-label="Replay speed" value={rate} onChange={e=>setRate(Number(e.target.value))}><option value={1}>1×</option><option value={.5}>½×</option><option value={.25}>¼×</option></select></label>}
+  </div>
+  <button className="table-camera-reset" onClick={()=>host.current?.querySelector('canvas')?.dispatchEvent(new Event('table-reset'))}>Reset camera</button></div>;
 }

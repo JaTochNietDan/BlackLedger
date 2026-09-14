@@ -59,3 +59,16 @@ test('cue contacts the sphere before physical replay advances, including off-cen
 test('cue motion is continuous at phase boundaries',()=>{
  for(const t of [.42,POOL_CUE_CONTACT,.88,POOL_CUE_END])assert.ok(Math.abs(poolCueStroke(t-1e-8,7,.028575).front-poolCueStroke(t+1e-8,7,.028575).front)<1e-6);
 });
+
+test('replay pause and speed changes preserve continuous cue and ball time',async()=>{
+ const {PoolReplayClock}=await import('../.runtime/frontend-test/billiards.js');
+ const clock=new PoolReplayClock();clock.reset(1000);
+ assert.equal(clock.time(1500),.5);
+ clock.setRate(.25,1500);assert.equal(clock.time(1900),.6);
+ clock.setPaused(true,1900);assert.equal(clock.time(11900),.6);
+ clock.setRate(.5,11900);assert.equal(clock.time(12900),.6);
+ clock.setPaused(false,12900);assert.equal(clock.time(13100),.7);
+ assert.equal(poolCueStroke(clock.time(13100),4,.028575).ballTime,0);
+ assert.ok(poolCueStroke(clock.time(13500),4,.028575).ballTime>0);
+ clock.reset(20000);assert.equal(clock.time(20200),.1);
+});
