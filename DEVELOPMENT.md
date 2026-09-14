@@ -1853,3 +1853,28 @@ final-geometry}.log. QA used isolated save and UI-only entry/enlargement; main87
 remains8ba57c1. Public cast and command meaning unchanged. More interiors, richer
 materials/characters, physical document interactions and whole-campaign acceptance
 remain open. This is a furnished room integration, not final visual acceptance.
+
+### Clean release8ada776 integrated on main8791 — September 14
+
+Released126357b Cypress search,0678fd8 movement smoothing,6fcda54 shadow correction
+and8ada776 Mercer Exchange from clean clone `.runtime/release-8ada776`. Pre-existing
+uncommitted armed/robbery/mugging/aftermath/simulation edits remain excluded. All370
+frontend checks pass13.219s; build2.70s, store0.220s, server1.186s pass; qa-fixture
+builds. Core/store/API sources are unchanged relative to8ba57c1. Final Go stamp:
+8ada77631378fd11dbc2c5a07a0cbcc03baa0eb0, modified:false; clone source is clean.
+
+Backed up main through SQLite's backup API to campaign-pre-8ada776.sqlite3 and
+verified integrity. Loaded a separate copy on8956; full saved state and receipts
+remain byte-identical. Rechecked main against that snapshot, verified oldPID69534's
+executable, then replaced it with the release on8791/session19129. Live verification
+again preserves complete state/player, revision2115, minute160095, all2117receipts.
+StateSHA63a214cca7228db606d159e88e4dd2df2eae332f37ec4083ffc9235eb1b5c25d;
+receiptSHA5f9dc235c96c51baa248fb740553ffe5030ce9a683d3fadd2c94eede2979d30b.
+Health confirms the clean revision; index, exchangeGLB and CypressGLB return200.
+
+Evidence under release-8ada776/.runtime: before,compatibility,live-verification JSON;
+sibling release-8ada776-{frontend,build,server,identity}.log. Main inspection for QA
+was read-only; actual release startup followed copied verification. No gameplay
+command was sent to main. Remaining civic/commercial interiors, occupied/failure
+burglary scenes, sound/aftermath, richer character/material fidelity and complete
+played-campaign acceptance remain open; the full goal is still active.
