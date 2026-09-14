@@ -1,0 +1,10 @@
+.crew-orders{padding:18px;border:1px solid #a88b5d;background:var(--newsprint),#e5d4b0;color:#372b1c;margin:0 0 18px}
+.crew-orders h2{font:24px Georgia,serif;margin:6px 0 12px}
+.crew-orders p{font-size:13px;line-height:1.5}
+.crew-orders label{display:grid;gap:5px;margin:12px 0;font-size:12px;font-weight:700}
+.crew-orders select{width:100%;min-width:0;box-sizing:border-box;padding:10px;background:#f3e6ca;color:#302416;border:1px solid #a88b5d}
+.crew-orders small{display:block;font-size:11px;line-height:1.5;margin-top:12px}
+.crew-order-register{max-height:300px;overflow:auto;margin-top:18px}
+.crew-order-register article{padding:12px 0;border-top:1px solid #b49a70}
+.crew-order-register span{display:block;font-size:12px;margin:5px 0}
+.crew-orders button:disabled{opacity:1;color:#67563c;background:#cfbc94;border-color:#b29a70;cursor:default}

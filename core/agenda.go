@@ -55,7 +55,7 @@ func (w *World) PeopleDay() {
 		// holding one of the city's standing jobs. The paper carried
 		// "DETECTIVE HARLOW TAKES OVER THE BLUE HOUR": the city detective had
 		// walked off his beat and seized a casino.
-		if n.Dead || w.keepsPost(n) {
+		if n.Dead || w.keepsPost(n) || w.CrewOrderFor(n.ID) != nil {
 			continue
 		}
 		if w.WorldRandom() >= dailyAmbition(n)*w.cityPace() {

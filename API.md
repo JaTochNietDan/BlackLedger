@@ -1389,3 +1389,26 @@ families relocate when its deed is lost; the player explicitly selects a
 replacement. Housing is separate from headquarters. A damaged base can retain
 its deed while its operations are unavailable. Full HQ crew dispatch is still
 under development; these fields/actions do not imply it has been implemented.
+
+## Saved headquarters assignments (first operation adapters)
+
+`crew_order:restock` and `crew_order:assassinate` use `choice` for the hired actor
+ID and `target` for the business/person ID. Dispatch requires the player at a
+usable headquarters and takes five minutes to issue. `crew_recall` uses `choice`
+for an active order ID and is issued at headquarters without advancing time.
+Normal command revision and request-ID idempotency apply.
+
+Public `crew_order_offers` contains named actors, targets, quoted costs, total
+travel/work duration and authoritative disabled reasons. Public `crew_orders`
+contains only this life's orders, including stage, due minute, reserved budget,
+recall flag and result. Saved orders retain their original base and destination.
+An assassination uses the recent last-seen address; it does not disclose or
+follow hidden target movement. Arrival and work completion recheck availability.
+Restocking shares the player effect and reserves cash once; unused cash returns
+on settlement. On issuer death/new life, surviving operatives retain unused
+mission funds rather than crediting the next protagonist.
+
+The lifecycle supports simultaneous named assignments, natural travel, routine
+exclusion and recall after the current street leg. The present adapters are
+restocking and assassination only. Bombing, robbery and other practical work,
+rich equipment allocation and comprehensive succession continuation remain open.

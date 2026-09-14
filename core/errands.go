@@ -216,7 +216,7 @@ func (w *World) SetOut() {
 }
 
 func (w *World) setOutNPC(n *NPC) {
-	if n.Dead || n.Location == "" || w.Travelling(n) || n.Held > w.Minute || w.PoolOpponentPlaying(n.ID) {
+	if w.CrewOrderFor(n.ID) != nil || n.Dead || n.Location == "" || w.Travelling(n) || n.Held > w.Minute || w.PoolOpponentPlaying(n.ID) {
 		return
 	}
 	n.Heading, n.Arrives, n.Errand, n.Sets = "", 0, "", 0
@@ -268,6 +268,7 @@ func (w *World) Arrivals() {
 		if n.Arrives > w.Minute {
 			continue
 		}
+		crewJourney := n.Errand == "on a headquarters assignment"
 		homeJourney := strings.HasPrefix(n.Errand, "heading home to ")
 		n.Location = n.Heading
 		n.Heading, n.Arrives, n.Errand, n.Sets = "", 0, "", 0
@@ -275,7 +276,7 @@ func (w *World) Arrivals() {
 		// reason brought them, this is now where their day is, and the evening
 		// has somewhere to send them back from. An evening arrival is a drink
 		// and changes nothing.
-		if !homeJourney && !Evening(w.Minute) && n.Location != n.Home {
+		if !crewJourney && !homeJourney && !Evening(w.Minute) && n.Location != n.Home {
 			w.keepPost(n, n.Location)
 		}
 		// What they came for. A garage's trade and a forecourt's are somebody

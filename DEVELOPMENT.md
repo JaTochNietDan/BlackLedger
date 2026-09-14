@@ -3154,3 +3154,46 @@ logs show housing moves, changes in work and actual takeovers disrupting the old
 whole-fortnight metric. No threshold was lowered and no passing result claimed.
 Temporary diagnostic tests removed; evidence remains in .runtime/routine-context.log.
 Comprehensive queued dispatch and operations UI are still outstanding.
+
+### September 14 — saved crew orders, first adapters and interior controls
+
+Previous goal turn was progress: headquarters, named combat and ownership fixes
+committed. Added saved named assignments for restock/assassinate with outbound,
+work, return, result, recall and cash escrow. Actors use normal NPC journeys;
+routines, ambition, guard selection and other person actions respect their
+assignment. Player identity/location is never swapped. Last-seen addresses
+prevent target tracking through hidden movement. Restock shares its existing
+effect; assassination shares odds, consequences and actual attacker cues.
+
+Interior Business menu and Families page expose authoritative named offers and
+assignment register. Browser103, isolated .runtime/crew-orders-qa.sqlite3 on8991
+(session62165): enter laundry, choose Russo Motor Works, dispatch Leo; cash
+reserved130 (one dollar ordinary income during five-minute issuance), actor left
+the room, outbound35min/Recall visible, player remained inside. Screenshot
+review at1235x1053 exposed low disabled-button contrast, corrected in CSS.
+Build2.88s after correction. Compact-width visual acceptance still outstanding.
+
+Core/order/cue checks passed0.401s and HTTP retry/list projection checks0.198s
+before the additional hidden-address regression. Final privacy and frontend
+suite results recorded separately below when terminal. No main8791 actions.
+Remaining scope: robbery/bombing/all practical adapters, equipment/cargo budgets,
+full family-succession continuation, broader unavailable-actor integration and
+complete UI/scene acceptance. Do not treat two adapters as full dispatch.
+
+Prior clean25b8530 full run session9082 is terminal FAILED: core501.113s, sim
+528.113s. Failures: routine86%; room staff count3 vs named0 onday10; taking a
+family no longer implicitly incorporates; HTTP progression's fixed laundry
+acquisition encounters an existing owner; long publicans buy no stock. These
+predate this order implementation and remain release blockers. No restart or
+promotion based on that run.
+
+Final order/hidden-address/core checks passed0.414s; HTTP idempotency and wire
+list checks0.217s (.runtime/crew-orders-privacy-tests.log). All405 frontend tests
+passed19.982s (.runtime/crew-orders-frontend-tests.log). Cancellation leaves a
+living operative's current journey intact, preventing a dismissed/new-life
+actor from teleporting back to their street-leg origin. This final small
+adjustment requires the focused cancellation checks again before release.
+
+Final cancellation regression explicitly retains the living actor's destination
+after new-life cancellation; focused core0.192s and HTTP0.152s pass. Diff
+whitespace check passes. Goal remains active; no release promotion.

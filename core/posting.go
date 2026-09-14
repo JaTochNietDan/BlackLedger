@@ -47,7 +47,7 @@ func (w *World) Unposted() []*NPC {
 	out := []*NPC{}
 	for _, n := range w.OwnPeople() {
 		// Somebody the police are holding is not standing anywhere.
-		if !posted[n.ID] && !w.Inside(n) {
+		if !posted[n.ID] && !w.Inside(n) && w.CrewOrderFor(n.ID) == nil {
 			out = append(out, n)
 		}
 	}

@@ -1,3 +1,4 @@
+import {CrewOrdersPanel} from './CrewOrdersPanel';
 import {PoolTournamentRoom,PoolTournamentNotice} from './PoolTournamentRoom';
 import {BilliardsRoom,PoolChallenges} from './BilliardsRoom';
 import {isIndoorSearch} from './burglarySearch';
@@ -793,7 +794,7 @@ function App() {
                 <Interior
                   tournament={w.pool_tournament}
                   onPoolTable={index=>{setTournamentGame(index);setTournamentOpen(true);}}
-                  activities={locationInfo.id==='poolhall'?<><PoolTournamentNotice cash={p.cash} notice={w.pool_tournament_notice} tournament={w.pool_tournament} busy={busy} act={commit} onOpen={()=>{setTournamentGame(null);setTournamentOpen(true);}}/><PoolChallenges opponents={w.pool_opponents||[]} cash={p.cash} busy={busy} act={commit}/></>:undefined}
+                  activities={w.organization?.headquarters===locationInfo.id?<CrewOrdersPanel world={w} busy={busy||!!journey} act={commit}/>:locationInfo.id==='poolhall'?<><PoolTournamentNotice cash={p.cash} notice={w.pool_tournament_notice} tournament={w.pool_tournament} busy={busy} act={commit} onOpen={()=>{setTournamentGame(null);setTournamentOpen(true);}}/><PoolChallenges opponents={w.pool_opponents||[]} cash={p.cash} busy={busy} act={commit}/></>:undefined}
                   motion={motion}
                   player={p}
                   place={locationInfo}
@@ -895,6 +896,8 @@ function App() {
       return (
         <FamiliesScreen
           world={w}
+          act={commit}
+          busy={busy||!!journey}
           actions={anywhere}
           render={actionButton}
           onMeet={id => {

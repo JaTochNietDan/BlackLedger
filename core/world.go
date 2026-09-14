@@ -546,6 +546,7 @@ type Result struct {
 	Health  int `json:"health"`
 }
 type World struct {
+	CrewOrders             []CrewOrder                      `json:"crew_orders"`
 	LastPoolTournamentSlot int                              `json:"last_pool_tournament_slot"`
 	PoolTournament         *PoolTournament                  `json:"pool_tournament,omitempty"`
 	Pool                   *PoolGame                        `json:"pool,omitempty"`
@@ -2468,6 +2469,11 @@ func (w *World) Advance(minutes int) {
 		if w.NextPressure > 0 {
 			next = min(next, max(w.Minute+1, w.NextPressure))
 		}
+		for _, order := range w.CrewOrders {
+			if order.active() {
+				next = min(next, max(w.Minute+1, order.Due))
+			}
+		}
 		for _, task := range w.Tasks {
 			next = min(next, max(w.Minute+1, task.Due))
 		}
@@ -2528,6 +2534,7 @@ func (w *World) Advance(minutes int) {
 			w.SetOut()
 		}
 		w.Arrivals()
+		w.SettleCrewOrders()
 		w.ResolveContracts()
 		w.SettleCommissions()
 		if w.Minute%1440 == 0 {
@@ -2680,7 +2687,7 @@ func (w *World) Public() map[string]any {
 	if len(history) > 60 {
 		history = history[len(history)-60:]
 	}
-	return map[string]any{"id": w.ID, "version": w.Version, "revision": w.Revision, "life": w.Life, "minute": w.Minute, "sky": w.Sky(), "player": w.Player, "district": w.District, "factions": w.PublicFactions(), "npcs": w.People(), "locations": locs, "event": scene, "history": history, "dead": w.Dead, "tasks": w.Tasks, "director": w.Director, "last_result": w.LastResult, "aftermath": w.ActiveAftermath(), "police_presence": w.ActivePolicePresence(), "building_fires": w.ActiveBuildingFires(), "daily_cost": w.DailyCost(), "books": w.Books(), "property_market": w.PropertyMarket(), "apartment_market": w.ApartmentMarket(), "guide": w.Guide(), "rules": GuideRules(), "groups": Groups(), "income": income, "security": w.Guard(), "opportunity": w.NextOpportunity(), "known_threats": w.KnownThreats(), "business_truces": w.ActiveBusinessTruces(), "conflicts": w.PublicConflicts(), "goods": w.Goods, "arms": w.ArmsDescription(), "appearance": w.AppearanceDescription(), "vehicle": w.VehicleDescription(), "residence": w.ResidenceDescription(), "offshore": map[string]any{"balance": w.Offshore, "reachable": w.Player.Offshore}, "newspaper": w.Edition(), "editions": w.Editions(), "arrangements": w.PendingArrangements(), "commissions": w.PublicCommissions(), "grudges": w.GrudgeSummary(), "cast": w.Cast(), "everyone": w.Everyone(), "retainers": w.RetainerDescription(), "armoury": w.ArmouryDescription(), "population": w.PopulationSummary(), "housing_shortage": w.HousingShortage(), "pool": w.PoolDescription(), "pool_tournament": w.PoolTournamentDescription(), "pool_tournament_notice": w.PoolTournamentNotice(), "pool_opponents": w.PoolOpponents(), "seated": w.Seated, "seated_to": w.SeatedTo, "hand": w.HandDescription(), "cards": w.CardsDescription(), "dice": w.DiceDescription(), "wheel": w.WheelDescription(), "machine": w.MachineDescription(), "house": w.HouseDescription(), "roles": w.RoleDescription(), "organization": w.PlayerOrganizationDescription(), "own_people": w.OwnPeopleDescription(), "pacts": w.PactDescription(), "book": w.LoanDescription(), "press": w.PressDescription(), "service": w.ServiceDescription(), "city": w.ScrutinyDescription(), "dashboard": w.Dashboard(), "epitaph": w.Epitaph(), "street": w.OnTheStreet(), "street_note": w.StreetNote()}
+	return map[string]any{"id": w.ID, "version": w.Version, "revision": w.Revision, "life": w.Life, "minute": w.Minute, "sky": w.Sky(), "player": w.Player, "district": w.District, "factions": w.PublicFactions(), "npcs": w.People(), "locations": locs, "event": scene, "history": history, "dead": w.Dead, "tasks": w.Tasks, "crew_orders": w.PublicCrewOrders(), "crew_order_offers": w.CrewOrderOffers(), "director": w.Director, "last_result": w.LastResult, "aftermath": w.ActiveAftermath(), "police_presence": w.ActivePolicePresence(), "building_fires": w.ActiveBuildingFires(), "daily_cost": w.DailyCost(), "books": w.Books(), "property_market": w.PropertyMarket(), "apartment_market": w.ApartmentMarket(), "guide": w.Guide(), "rules": GuideRules(), "groups": Groups(), "income": income, "security": w.Guard(), "opportunity": w.NextOpportunity(), "known_threats": w.KnownThreats(), "business_truces": w.ActiveBusinessTruces(), "conflicts": w.PublicConflicts(), "goods": w.Goods, "arms": w.ArmsDescription(), "appearance": w.AppearanceDescription(), "vehicle": w.VehicleDescription(), "residence": w.ResidenceDescription(), "offshore": map[string]any{"balance": w.Offshore, "reachable": w.Player.Offshore}, "newspaper": w.Edition(), "editions": w.Editions(), "arrangements": w.PendingArrangements(), "commissions": w.PublicCommissions(), "grudges": w.GrudgeSummary(), "cast": w.Cast(), "everyone": w.Everyone(), "retainers": w.RetainerDescription(), "armoury": w.ArmouryDescription(), "population": w.PopulationSummary(), "housing_shortage": w.HousingShortage(), "pool": w.PoolDescription(), "pool_tournament": w.PoolTournamentDescription(), "pool_tournament_notice": w.PoolTournamentNotice(), "pool_opponents": w.PoolOpponents(), "seated": w.Seated, "seated_to": w.SeatedTo, "hand": w.HandDescription(), "cards": w.CardsDescription(), "dice": w.DiceDescription(), "wheel": w.WheelDescription(), "machine": w.MachineDescription(), "house": w.HouseDescription(), "roles": w.RoleDescription(), "organization": w.PlayerOrganizationDescription(), "own_people": w.OwnPeopleDescription(), "pacts": w.PactDescription(), "book": w.LoanDescription(), "press": w.PressDescription(), "service": w.ServiceDescription(), "city": w.ScrutinyDescription(), "dashboard": w.Dashboard(), "epitaph": w.Epitaph(), "street": w.OnTheStreet(), "street_note": w.StreetNote()}
 }
 func (w *World) hasRecord(title string) bool {
 	for _, r := range w.History {

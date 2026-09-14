@@ -1,5 +1,6 @@
+import {CrewOrdersPanel} from './CrewOrdersPanel';
 import type {ReactElement} from 'react';
-import type {Action, Snapshot} from './types';
+import type {Action, Snapshot, Command} from './types';
 import {Portrait} from './Portrait';
 
 // Three thin cards: a strength, a money word and a bare number for standing —
@@ -10,10 +11,14 @@ import {Portrait} from './Portrait';
 export function FamiliesScreen({
   world,
   onMeet,
+  act,
+  busy=false,
   actions = [],
   render,
 }: {
   world: Snapshot;
+  act?: (c:Command)=>unknown;
+  busy?:boolean;
   onMeet: (id: string) => void;
   // Understandings and what is being said about a family are reached through
   // other people. Neither of them happens at a counter, and both used to be
@@ -141,6 +146,7 @@ export function FamiliesScreen({
         <>
           <h2>Yours</h2>
           <div className="family-grid">{mine.map(card)}</div>
+          {act&&<CrewOrdersPanel world={world} busy={busy} act={act}/>}
         </>
       )}
 

@@ -48,6 +48,7 @@ func (w *World) apply(c Command) error {
 		w.Dissolve(w.PlayerOrganizationID())
 		w.Life++
 		w.Player = newPerson(w.Life)
+		w.SettleCrewOrders()
 		w.Event = nil
 		w.Offers = []Offer{}
 		w.Plots = []Plot{}
@@ -88,6 +89,17 @@ func (w *World) apply(c Command) error {
 		chosen = label
 		quiet = true
 		w.Advance(minutes)
+	} else if strings.HasPrefix(c.Kind, "crew_order:") {
+		if err := w.StartCrewOrder(strings.TrimPrefix(c.Kind, "crew_order:"), c.Choice, c.Target); err != nil {
+			return err
+		}
+		chosen = "Issued a headquarters order"
+		w.Advance(5)
+	} else if c.Kind == "crew_recall" {
+		if err := w.RecallCrewOrder(c.Choice); err != nil {
+			return err
+		}
+		chosen = "Recalled an operative"
 	} else if c.Kind == "choice" {
 		e := w.Event
 		if e == nil || e.ID != c.Event {

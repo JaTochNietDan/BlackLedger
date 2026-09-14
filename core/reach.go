@@ -42,6 +42,9 @@ func (w *World) OutOfReach(id string) string {
 		}
 		return out
 	}
+	if w.CrewOrderFor(n.ID) != nil {
+		return n.Name + " is on a headquarters assignment"
+	}
 	// Being in another building is deliberately not a reason. It was tried
 	// here and taken out again: requiring the player to stand in the same room
 	// is a change to how the game plays rather than a correction of something

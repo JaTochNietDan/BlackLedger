@@ -466,11 +466,16 @@ func (w *World) Restock(id string) error {
 	if reason := w.RestockReadiness(id); reason != "" {
 		return fmt.Errorf("%s", reason)
 	}
-	trade, _ := TradeOf(id)
 	paid := w.RestockCost(id)
 	if err := w.Pay(paid); err != nil {
 		return err
 	}
+	w.applyRestock(id, paid)
+	return nil
+}
+
+func (w *World) applyRestock(id string, paid int) {
+	trade, _ := TradeOf(id)
 	prop := w.Properties[id]
 	prop.Supply = trade.RestockAmount
 	place, _ := PlaceByID(id)
@@ -482,7 +487,6 @@ func (w *World) Restock(id string) error {
 	w.Log("Restocked at "+place.Name,
 		fmt.Sprintf("$%d on %s. %s is trading properly again.%s",
 			paid, trade.Supplies, place.Name, carried), "business")
-	return nil
 }
 
 // RemedyReadiness explains why the trouble cannot be dealt with, or returns "".

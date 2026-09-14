@@ -39,8 +39,12 @@ const (
 // StrikeTarget is somebody the player could go after where they are standing:
 // alive, here, and not one of their own.
 func (w *World) StrikeTarget(id string) (*NPC, bool) {
+	return w.StrikeTargetAt(id, w.Player.Location)
+}
+
+func (w *World) StrikeTargetAt(id, at string) (*NPC, bool) {
 	n := w.NPC(id)
-	if n == nil || n.Dead || n.Location != w.Player.Location {
+	if n == nil || n.Dead || n.Location != at {
 		return nil, false
 	}
 	if n.Faction != "" && n.Faction == w.PlayerOrganizationID() {

@@ -54,6 +54,9 @@ func (w *World) DelegateReadiness() string {
 	if len(w.Player.Crew) == 0 {
 		return "You have nobody to send"
 	}
+	if w.CrewOrderFor(w.Player.Crew[0].ID) != nil {
+		return "They are on a headquarters assignment"
+	}
 	if len(w.Tasks) > 0 {
 		return w.Player.Crew[0].Name + " is already on assignment"
 	}
@@ -107,6 +110,9 @@ func (w *World) handMember(hand Hand) (Crew, bool) {
 }
 
 func (w *World) HandReadiness(hand Hand) string {
+	if w.CrewOrderFor(hand.ID) != nil {
+		return "They are on a headquarters assignment"
+	}
 	c, ok := w.handMember(hand)
 	if !ok {
 		return "They do not work for you"

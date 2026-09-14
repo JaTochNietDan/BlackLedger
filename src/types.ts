@@ -479,6 +479,8 @@ export interface Snapshot {
   event: Event | null;
   history: Record[];
   dead: {name: string; minute: number; life: number; cause: string; estate?: string}[];
+  crew_orders?: {id:string;life:number;actor:string;name:string;kind:string;target:string;place:string;base:string;stage:string;due:number;reserved:number;recall:boolean;result:string}[];
+  crew_order_offers?: {actor:string;name:string;kind:string;target:string;label:string;cost:number;minutes:number;reason:string}[];
   tasks: {id: string; name: string; due: number}[];
   director: {status: string; detail: string; last_request: number};
   building_fires?: {id: string; target: string; minute: number; brigade_at: number; extinguished_at: number; cleanup_at: number}[];

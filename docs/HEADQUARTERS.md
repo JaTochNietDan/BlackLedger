@@ -24,6 +24,18 @@ The base is an actual address used by the existing family home/rally function,
 not the leader's residence. Housing remains separate. Public family information
 shows a known family's base; personal homes are not exposed by this field.
 
+## Current operations implementation
+
+Saved named orders now cover restocking and assassination, with outbound/work/
+return stages, parallel operatives, cash reservations, recall, arrival/commit
+validation and HTTP retry coverage. The Business panel at headquarters and the
+Families page contain an order selector and register. Assassination follows a
+recent sighting rather than hidden movement and shares combat/scene effects.
+Restocking shares the player supply effect. Losing the issuing life cancels
+orders; surviving operatives retain unused budget. This is not yet the full
+succession-continuation design below. Other operation adapters, comprehensive
+resource custody and all remaining practical-command coverage are outstanding.
+
 ## Operations expansion to implement
 
 The current code still contains old direct/first-associate delegation and a
