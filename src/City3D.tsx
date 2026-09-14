@@ -1172,10 +1172,11 @@ export function City3D(props: Props) {
       if (ready) {
         const hereForCar = lots.get(w.player.location);
         const parked = actors.get('player-car');
+        // Death does not delete the saved car; retain its empty parked model
+        // until the authoritative vehicle/location changes (including new life).
         if (
           !p.journey &&
           hereForCar &&
-          w.player.alive &&
           /Ford|Hudson|Packard/i.test(w.vehicle?.car || '')
         ) {
           if (!parked || parked.model !== carModel(w.vehicle?.car))
