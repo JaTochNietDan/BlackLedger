@@ -286,3 +286,27 @@ and car-cabin-open.png. Temporary inspection tab closed; no campaign mutations.
 This is asset preparation: car entry/departure choreography is not yet integrated,
 and fuller vehicle silhouette/texture fidelity remains below final acceptance.
 The wider city/interior/action goal remains active.
+
+### Frame the complete police cast — September 13
+
+Read current35be00d7 objective; previous turn was progress (articulated car assets).
+Car-entry inspection exposed a prerequisite camera defect: the custody staging
+path replaced the event-wide framing with a detainee-only close-up, excluding
+both police cars. Replaced that override with the union of the actual reserved
+paths of the active arrest/raid and its supporting cast. This includes rotated
+vehicle footprints and the full escort/entry movement envelopes. Framing changes
+only when another member stages, preserving subsequent user camera control.
+
+Browser preview on isolated8875 shows both arrest cars, supporting officer and
+cuffed escort together; raid shows three cars and four officers including the
+breacher. Saved arrest-full-cast.png/json and raid-full-cast.png. Recorded arrest
+zoom9.379 versus the earlier custody-only29.523. Both previews show145FPS locally
+(286/367 draws respectively), not a cross-device performance guarantee. QA only
+used previews; revision0/minute480 unchanged. Temporary tab closed.
+
+Projection tests cover rotated car bounds, all escort corners, narrow/wide aspect
+ratios and camera angles. Initial strict decimal-corner comparison was corrected
+for floating-point tolerance; implementation bounds were unchanged. Build passes.
+Vehicle boarding/departure remains unimplemented, and this change does not claim
+full cinematic, asset or interior acceptance.
+Final full frontend run:208 tests passed, zero failures.

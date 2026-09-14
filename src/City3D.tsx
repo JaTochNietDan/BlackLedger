@@ -6,7 +6,7 @@ import {CitySuppression} from './city3dSuppression';
 import {CityFire, clearBlastWindows} from './city3dFire';
 import {CityAftermath} from './city3dAftermath';
 import {previewScenes, previewScene, type PreviewScene} from './city3dPreview';
-import {frameScene, impactPulse, renderImpact} from './city3dFraming';
+import {frameScene, stagedSceneBounds, impactPulse, renderImpact} from './city3dFraming';
 import {wardrobe, dressPedestrian} from './city3dWardrobe';
 import {headlightAlpha, headlightCentre} from './city3dHeadlights';
 import {cityWeather, rainVertices} from './city3dWeather';
@@ -1160,6 +1160,7 @@ export function City3D(props: Props) {
         // cannot occupy every slot while waiting for an unstaged first shot.
         const stagingOrder = [...effects].sort((a, b) =>
           Number(b.cue.kind === 'gunfight') - Number(a.cue.kind === 'gunfight'));
+        let policeStaged=false;
         for (const e of stagingOrder) {
           if (!e.extra || e.slot) continue;
           const occupied = [
@@ -1173,7 +1174,7 @@ export function City3D(props: Props) {
             e.extra.position.set(e.slot.root.x, e.slot.model === 'parked-police' ? vehicleRootHeight(e.slot.root) : 0.2, e.slot.root.z);
             e.light.position.set(e.slot.root.x, 3, e.slot.root.z);
             e.since = now;
-            if(e.custody){frameScene(camera,controls.target,new THREE.Box3(new THREE.Vector3(e.slot.root.x-.7,0,e.slot.root.z-1),new THREE.Vector3(e.slot.root.x+3.7,2.4,e.slot.root.z+1.4)));controls.update();}
+            if(p.activeCue && ['arrest','raid'].includes(p.activeCue.kind) && (e.cue.id===p.activeCue.id||e.cue.id.startsWith(p.activeCue.id+':')))policeStaged=true;
             if(e.assassination){
               frameScene(camera,controls.target,new THREE.Box3(
                 new THREE.Vector3(e.slot.root.x-.8,0,e.slot.root.z-1.2),
@@ -1185,6 +1186,11 @@ export function City3D(props: Props) {
               aftermath.rememberBody(e.cue.strike!.victim.id,{root,pose:{x:root.x+.8,z:root.z,heading:0},model:'casualty'},Math.PI/2);
             }
           }
+        }
+        if(policeStaged&&p.activeCue){
+          const group=effects.filter(e=>e.cue.id===p.activeCue!.id||e.cue.id.startsWith(p.activeCue!.id+':'));
+          const bounds=stagedSceneBounds(group.flatMap(e=>e.slot?[e.slot]:[]));
+          frameScene(camera,controls.target,bounds);controls.update();
         }
         aftermath.update(w.aftermath || [], w.minute, lots, models, personModel,
           [...effects.flatMap(e=>e.slot?[e.slot]:[]), ...actorSpaces], animatingVictims, w.police_presence || [],

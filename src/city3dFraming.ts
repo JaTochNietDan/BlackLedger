@@ -1,4 +1,17 @@
 import * as THREE from 'three';
+import {trafficSize,type TrafficPose} from './city3dTraffic.js';
+
+/** Union actual staged paths, including support cars and the full escort sweep. */
+export function stagedSceneBounds(slots:readonly {pose:TrafficPose;model:string}[]){
+ const bounds=new THREE.Box3();
+ for(const {pose,model} of slots){
+  const size=trafficSize(model),c=Math.cos(pose.heading),s=Math.sin(pose.heading);
+  for(const x of [-size.width/2,size.width/2])for(const z of [-size.length/2,size.length/2])
+   for(const y of [0,3])bounds.expandByPoint(new THREE.Vector3(pose.x+x*c+z*s,y,pose.z-x*s+z*c));
+ }
+ return bounds;
+}
+
 
 /** Fit an entire world envelope, including its height, within the clear centre
  * of an orthographic viewport. Independent of the user's previous zoom. */

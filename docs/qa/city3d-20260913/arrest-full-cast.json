@@ -1,0 +1,58 @@
+{
+  "camera": {
+    "zoom": 9.379346467642664,
+    "x": 261.4875,
+    "z": -196,
+    "targetX": 81.4875,
+    "targetZ": 44
+  },
+  "effects": [
+    {
+      "id": "preview:f0a791dd-dec4-4d73-b9c9-1e05ab41bd50:0",
+      "kind": "arrest",
+      "target": "bar",
+      "staged": true,
+      "x": 89.6,
+      "z": 42
+    },
+    {
+      "id": "preview:f0a791dd-dec4-4d73-b9c9-1e05ab41bd50:0:police-unit:0",
+      "kind": "police-unit",
+      "target": "bar",
+      "staged": true,
+      "x": 89.6,
+      "z": 48
+    },
+    {
+      "id": "preview:f0a791dd-dec4-4d73-b9c9-1e05ab41bd50:0:detainee:0",
+      "kind": "detainee",
+      "target": "bar",
+      "staged": true,
+      "x": 73,
+      "z": 38.35,
+      "custody": {
+        "officer": {
+          "x": 75.38158,
+          "y": 0.20611301026978504,
+          "z": 39.1
+        },
+        "detainee": {
+          "x": 75.38158,
+          "y": 0.2042302214025621,
+          "z": 38.35
+        },
+        "restrained": true
+      }
+    },
+    {
+      "id": "preview:f0a791dd-dec4-4d73-b9c9-1e05ab41bd50:0:officer:0",
+      "kind": "officer",
+      "target": "bar",
+      "staged": true,
+      "x": 83,
+      "z": 38.35
+    }
+  ],
+  "revision": 0,
+  "minute": 480
+}
