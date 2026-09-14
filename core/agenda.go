@@ -155,6 +155,7 @@ func (w *World) claimPremises(n *NPC) bool {
 		n.Rank = max(n.Rank, RankSoldier)
 		n.Location = l.ID
 		n.Role = "Runs " + l.Name
+		w.EmptyChairs()
 		w.Log(n.Name+" takes over "+l.Name, fmt.Sprintf("%s has put themselves in charge of %s. Nobody stopped them.", n.Name, l.Name), "politics")
 		w.Report("business", upper(n.Name)+" TAKES OVER "+upper(l.Name),
 			fmt.Sprintf("%s is now running %s, which had been standing without anyone to answer for it.", n.Name, l.Name))

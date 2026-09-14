@@ -9,6 +9,7 @@ import (
 )
 
 type Place struct {
+	Owner     string `json:"owner"`
 	ID        string `json:"id"`
 	Owned     bool   `json:"owned"`
 	Locked    bool   `json:"locked"`
@@ -753,7 +754,7 @@ func Choose(v View, strategy string) (core.Command, error) {
 			}
 			cheapest, price := "", 0
 			for _, p := range v.Locations {
-				if p.Owned || p.Locked || p.Cost <= 0 || p.Income <= 0 {
+				if p.Owned || p.Locked || p.Cost <= 0 || p.Income <= 0 || (p.Owner != "independent" && !strings.HasPrefix(p.Owner, "former:")) {
 					continue
 				}
 				if cheapest == "" || p.Cost < price {

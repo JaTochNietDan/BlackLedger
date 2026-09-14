@@ -3223,3 +3223,28 @@ end-to-end bombing scene and compact-layout acceptance remain outstanding.
 Unrelated dirty robbery/mugging/aftermath files preserved. Main8791 untouched.
 Robbery, other practical adapters and known broad campaign failures remain open;
 this is the third adapter, not completion of the requested operations system.
+
+### September 14 — campaign integration after ownership and headquarters
+
+Previous turn made progress on named bombing. Rechecked worktree and retained
+unrelated changes. Repaired three failures from the earlier full run:
+NPC criminal takeovers now immediately assign named workers, like player deed
+acquisition, because they occur after BusinessDay. EmptyChairs no longer invents
+a full staff count before checking a hiring cooldown/unpaid wages; reopening
+hires real people. Taking over an existing family explicitly incorporates the
+transferred deeds and retains its headquarters, rather than relying on the
+removed daily auto-formation. The existing takeover test now checks that base.
+
+Core staffing/takeover/counter selection passes2.959s. Added targeted closed-hiring
+regression. HTTP full rise/fall/new-life route now shops for an available deed
+and rechecks after travel rather than assuming laundry stays unowned; its final
+inheritance assertion follows the actual acquired deed. Passed0.878s. Initial
+rerun caught that remaining hardcoded laundry assertion and was corrected.
+Publican first-business search now reads the already-public owner and excludes
+held deeds. TestThePublicanActuallyRunsWhatItBuys passes1.712s; an earlier
+TestPublican regex selected no tests and is not counted as validation.
+
+Routine predictability and long-publican manual-restocking coverage still have
+no passing rerun. Other jobs, full scene/layout checks and broad original goal
+remain incomplete. Live8791 was not changed or used for QA. A fresh clean full
+run will check the accumulated headquarters/job changes and these fixes.

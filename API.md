@@ -1422,3 +1422,7 @@ credits the next protagonist. Planting takes PlantMinutes; the target must remai
 another owner's non-destroyed business. Demolition consequences share player
 resolution with explicit actor attribution. A successful planter is excluded
 from collateral victims; premature failure can kill the named operative.
+
+Taking leadership of an existing family remains an explicit formation path:
+its transferred business deeds support incorporation and its existing headquarters
+is retained. This does not restore automatic formation from ordinary purchases.

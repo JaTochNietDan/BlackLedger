@@ -76,6 +76,7 @@ func TestTakingItMeansTakingAllOfIt(t *testing.T) {
 		w, f, leader := lieutenant(t)
 		w.RNG, w.WorldRNG = seed*2654435761, seed*2654435761
 		name, id := f.Name, f.ID
+		base := w.Headquarters(id)
 		held := len(w.FamilyHoldings(id))
 		people := len(w.Members(id))
 		rival := w.Factions[1].ID
@@ -94,6 +95,9 @@ func TestTakingItMeansTakingAllOfIt(t *testing.T) {
 		}
 		if !w.Incorporated() {
 			t.Fatal("taking an organization did not make them one")
+		}
+		if base == "" || w.Headquarters(me) != base {
+			t.Fatal("takeover lost the existing headquarters")
 		}
 		if w.Serving() != "" {
 			t.Fatal("they still answer to somebody")

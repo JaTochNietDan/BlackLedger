@@ -87,12 +87,35 @@ func TestHTTPRiseFallAndNewLife(t *testing.T) {
 	// longer: a freehold is meant to be a thing a player builds up to rather
 	// than an afternoon's courier work.
 	earn(14)
-	travel("laundry")
-	command("acquire", "laundry", "")
-	settle()
-	if !state().Own("laundry") || len(state().Player.Crew) != 1 {
-		t.Fatal("first organization not established")
+	bought := ""
+	for attempt := 0; attempt < 16 && bought == ""; attempt++ {
+		w := state()
+		target := ""
+		for _, place := range core.Locations {
+			if place.District > w.District || w.AcquireReadiness(place.ID) != "" {
+				continue
+			}
+			if target == "" || core.AcquisitionCost(w, place.ID) < core.AcquisitionCost(w, target) {
+				target = place.ID
+			}
+		}
+		if target == "" {
+			earn(1)
+			continue
+		}
+		travel(target)
+		// An NPC can acquire the deed during our journey.
+		if state().AcquireReadiness(target) != "" {
+			continue
+		}
+		command("acquire", target, "")
+		settle()
+		bought = target
 	}
+	if bought == "" || !state().Own(bought) || len(state().Player.Crew) != 1 {
+		t.Fatal("first business and crew not established")
+	}
+
 	earn(10)
 	command("expand", "apartment", "")
 	settle()
@@ -136,7 +159,7 @@ func TestHTTPRiseFallAndNewLife(t *testing.T) {
 	oldMinute := state().Minute
 	command("new_life", "", "")
 	w := state()
-	if w.ID != worldID || w.Life != 2 || w.Player.Name == oldName || w.Player.Cash != 90 || w.Player.Respect != 0 || len(w.Player.Crew) != 0 || w.Own("laundry") || w.Properties["laundry"].Owner != "former:"+oldName || w.Minute <= oldMinute {
+	if w.ID != worldID || w.Life != 2 || w.Player.Name == oldName || w.Player.Cash != 90 || w.Player.Respect != 0 || len(w.Player.Crew) != 0 || w.Own(bought) || w.Properties[bought].Owner != "former:"+oldName || w.Minute <= oldMinute {
 		t.Fatal("new life did not preserve city and reset personal authority")
 	}
 	t.Logf("Completed %d committed HTTP commands; death at minute %d, city %s persisted", count, oldMinute, worldID)

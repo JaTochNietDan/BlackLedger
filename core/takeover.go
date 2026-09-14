@@ -104,6 +104,7 @@ func (w *World) TakeOver() error {
 	f := w.faction(w.Player.Serves)
 	leader := w.Leader(f.ID)
 	name := f.Name
+	base := w.Headquarters(f.ID)
 
 	if w.Random() >= w.takeoverOdds(leader, f) {
 		// He was ready, or somebody told him.
@@ -152,6 +153,12 @@ func (w *World) TakeOver() error {
 		}
 	}
 	w.Dissolve(f.ID)
+	// Seizing an existing family is an explicit leadership decision, unlike
+	// merely buying ground. Keep its chosen seat after the deeds transfer.
+	w.Incorporate()
+	if family := w.PlayerOrganization(); family != nil && w.headquartersSite(me, base) {
+		family.Headquarters = base
+	}
 	w.OrganizationDay()
 
 	// "8 of its people stayed and 0 would not" — a zero written as a figure

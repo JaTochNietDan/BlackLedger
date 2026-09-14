@@ -163,13 +163,11 @@ func (w *World) EmptyChairs() {
 		if prop.Owner == "" || prop.Owner == "independent" {
 			continue
 		}
-		if trade, ok := TradeOf(l.ID); ok && prop.Staff == 0 && prop.Income > 0 && !w.wordIsOut(l.ID) {
-			prop.Staff = trade.Hands
-		}
 		// A counter that somebody has just walked out of stays short. Without
 		// this the city handed the position straight back to the person who
 		// had had enough of it, on the same morning they left.
 		if w.Minute < prop.Shorthanded {
+			prop.Staff = min(prop.Staff, len(prop.Hands))
 			continue
 		}
 		// And nobody comes to work at a place that is not paying. Without
@@ -178,8 +176,12 @@ func (w *World) EmptyChairs() {
 		// later, for nothing, over and over — nineteen unpaid nights and
 		// strangers still turning up.
 		if w.wordIsOut(l.ID) {
+			prop.Staff = min(prop.Staff, len(prop.Hands))
 			w.nobodyWillWork(l.ID)
 			continue
+		}
+		if trade, ok := TradeOf(l.ID); ok && prop.Staff == 0 && prop.Income > 0 && !w.wordIsOut(l.ID) {
+			prop.Staff = trade.Hands
 		}
 		for len(prop.Hands) < prop.Staff {
 			who := w.takeOn(l.ID)
