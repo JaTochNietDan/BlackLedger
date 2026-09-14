@@ -530,7 +530,7 @@ export function City3D(props: Props) {
     let hoveredAt = 0;
     let down = {x: 0, y: 0};
     const pointerDown = (e: PointerEvent) => {
-      if (e.button === 2 || e.pointerType === 'touch') setFollow(false);
+      setFollow(false);
       down = {x: e.clientX, y: e.clientY};
     };
     const pointerUp = (e: PointerEvent) => {
@@ -566,6 +566,8 @@ export function City3D(props: Props) {
     canvas.addEventListener('pointermove', pointerMove);
     canvas.addEventListener('pointerdown', pointerDown);
     canvas.addEventListener('pointerup', pointerUp);
+    const manualZoom=()=>setFollow(false);
+    canvas.addEventListener('wheel',manualZoom,{passive:true});
     const keyboardPan = new KeyboardPan();
     const unbindPan = bindKeyboardPan(canvas, keyboardPan);
     let panTime = performance.now();
@@ -573,7 +575,7 @@ export function City3D(props: Props) {
       const command = cameraCommand(e);
       if (!command) return;
       e.preventDefault();
-      if (command === 'reset' || command.startsWith('pan-')) setFollow(false);
+      if (command === 'reset' || command.startsWith('pan-') || command.startsWith('zoom-')) setFollow(false);
       if (command === 'zoom-in' || command === 'zoom-out') {
         camera.zoom = THREE.MathUtils.clamp(
           camera.zoom * (command === 'zoom-out' ? 0.9 : 1.1),
@@ -581,15 +583,6 @@ export function City3D(props: Props) {
           controls.maxZoom,
         );
         camera.updateProjectionMatrix();
-      }
-      if (command === 'rotate-left' || command === 'rotate-right') {
-        const offset = camera.position.clone().sub(controls.target);
-        offset.applyAxisAngle(
-          new THREE.Vector3(0, 1, 0),
-          command === 'rotate-left' ? 0.12 : -0.12,
-        );
-        camera.position.copy(controls.target).add(offset);
-        controls.update();
       }
       if (command === 'reset') {
         reset();
@@ -862,7 +855,14 @@ export function City3D(props: Props) {
     const tick = (now: number) => {
       if (dead) return;
       frame = requestAnimationFrame(tick);
-      const pan = keyboardPan.step(camera.position, controls.target, (now - panTime) / 1000, 110 / camera.zoom);
+      const inputSeconds = (now - panTime) / 1000;
+      const turn = keyboardPan.rotation(inputSeconds);
+      if (turn) {
+        const offset = camera.position.clone().sub(controls.target);
+        offset.applyAxisAngle(new THREE.Vector3(0, 1, 0), turn);
+        camera.position.copy(controls.target).add(offset);
+      }
+      const pan = keyboardPan.step(camera.position, controls.target, inputSeconds, 110 / camera.zoom);
       panTime = now;
       if (pan.x || pan.z) {
         setFollow(false);
@@ -1737,6 +1737,7 @@ export function City3D(props: Props) {
       canvas.removeEventListener('pointerdown', pointerDown);
       canvas.removeEventListener('pointermove', pointerMove);
       canvas.removeEventListener('pointerup', pointerUp);
+      canvas.removeEventListener('wheel',manualZoom);
       unbindPan();
       canvas.removeEventListener('keydown', keys);
       canvas.removeEventListener('webglcontextlost', lost);
@@ -1799,11 +1800,12 @@ export function City3D(props: Props) {
           }}>
             {expanded ? 'Return to game' : 'Expand city'}
           </button>}
-          <button onClick={() => focus.current()}>Whole city</button>
-          <button aria-pressed={following} title={following ? "Stop following your character" : "Follow your character or car"}
+          <button data-shortcut="o" aria-keyshortcuts="O" title="Whole city (O)" onClick={() => focus.current()}>Whole city · O</button>
+          <button data-shortcut="f" aria-keyshortcuts="F" aria-pressed={following} title={following ? "Stop following your character" : "Follow your character or car"}
             onClick={() => setFollow(!followPlayer.current)}>{following ? "Stop following" : "Find me"}</button>
-          <button onClick={() => focus.current(props.selected)}>Focus address</button>
+          <button data-shortcut="z" aria-keyshortcuts="Z" title="Focus address (Z)" onClick={() => focus.current(props.selected)}>Focus address · Z</button>
           <button
+            data-shortcut="t" aria-keyshortcuts="T"
             onClick={() => setPlaybackRate(rate => (rate === 1 ? 4 : 1))}
             aria-label={`Travel playback speed: ${playbackRate} times`}
           >
@@ -1845,9 +1847,10 @@ export function City3D(props: Props) {
           <strong>{place.name}</strong>
           <span>{place.blurb}</span>
           {place.id === props.state.player.location ? (
-            <button disabled={!!shownPreview} onClick={props.onEnter}>Step inside →</button>
+            <button data-shortcut="g" aria-keyshortcuts="G" title="Step inside (G)" disabled={!!shownPreview} onClick={props.onEnter}>Step inside · G →</button>
           ) : (
             <button
+              data-shortcut="g" aria-keyshortcuts="G"
               disabled={!travel || travel.disabled || props.busy || !!props.journey || !!shownPreview}
               title={travel?.reason}
               onClick={() => props.onTravel(place.id)}
@@ -1867,7 +1870,7 @@ export function City3D(props: Props) {
       <label className="city3d-directory">
         Find an address
         <select
-          aria-label="Find an address"
+          data-shortcut="j" aria-keyshortcuts="J" aria-label="Find an address"
           value={props.selected}
           onChange={e => {
             props.onSelect(e.target.value);

@@ -31,9 +31,14 @@ export class KeyboardPan {
   private held = new Map<string, CameraCommand>();
   press(event: Parameters<typeof cameraCommand>[0]) {
     const command = cameraCommand(event);
-    if (!command?.startsWith('pan-')) return false;
+    if (!command || (!command.startsWith('pan-') && !command.startsWith('rotate-'))) return false;
     this.held.set(event.key.toLowerCase(), command);
     return true;
+  }
+  rotation(seconds: number, speed = 1.2): number {
+    const commands = new Set(this.held.values());
+    const direction = Number(commands.has('rotate-left')) - Number(commands.has('rotate-right'));
+    return direction * Math.max(0, Math.min(seconds, .05)) * speed;
   }
   release(key: string) { this.held.delete(key.toLowerCase()); }
   clear() { this.held.clear(); }

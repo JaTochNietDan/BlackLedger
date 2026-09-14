@@ -1,3 +1,4 @@
+import {KeyboardShortcuts} from './KeyboardShortcuts';
 import {CityAccounts} from './CityAccounts';
 import {SceneNewspaper} from './SceneNewspaper';
 import {MapMenu} from './MapMenu';
@@ -760,7 +761,7 @@ function App() {
         <div className={'workspace city-workspace' + (inside ? ' inside' : '')}>
           <section className="city-pane">
             <div className="city-stage">
-              {inside&&<button className="map-leave-building" onClick={()=>setCityView('iso')}>Back to city ↗</button>}
+              {inside&&<button data-shortcut="b" aria-keyshortcuts="B" className="map-leave-building" onClick={()=>setCityView('iso')}>Back to city ↗</button>}
               {inside && sceneOverlay}
               {cityView === 'interior' && locationInfo.id === p.location ? (
                 <Interior
@@ -1108,9 +1109,10 @@ function App() {
             ['ledger', 'Ledger'],
             ['news', 'Herald'],
             ['help', 'Guide'],
-          ].map(([id, label]) => (
+          ].map(([id, label], shortcutIndex) => (
             <button
               key={id}
+              data-shortcut={String(shortcutIndex+1)} aria-keyshortcuts={String(shortcutIndex+1)}
               className={
                 (tab === id ? 'active' : '') + (id === 'news' && unreadNews > 0 ? ' has-news' : '')
               }
@@ -1121,19 +1123,19 @@ function App() {
               onClick={() => {setTab(id);if(id==='city')setCityView('iso');}}
             >
               <Icon id={id} />
-              {label}
+              {label}<kbd aria-hidden="true">{shortcutIndex+1}</kbd>
               {id === 'news' && unreadNews > 0 ? <i className="news-count">{unreadNews}</i> : null}
             </button>
           ))}
           <button
-            className="bottom"
+            className="bottom" data-shortcut="v" aria-keyshortcuts="V"
             onClick={toggleVoice}
             aria-label={(voice ? 'Disable' : 'Enable') + ' voice acting'}
           >
             <Icon id={voice ? 'voice' : 'mute'} />
             Voice {voice ? 'on' : 'off'}
           </button>
-          <button onClick={() => setTab('settings')} aria-label="Settings">
+          <button data-shortcut="7" aria-keyshortcuts="7" onClick={() => setTab('settings')} aria-label="Settings">
             <Icon id="settings" />
             Settings
           </button>
@@ -1387,6 +1389,7 @@ function App() {
           </section>
         </div>
       )}
+      <KeyboardShortcuts/>
       {notice && (
         <div id="toast" role="status" aria-live="polite" style={{display: 'block'}}>
           {notice}

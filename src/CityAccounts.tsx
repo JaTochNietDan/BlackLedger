@@ -3,7 +3,7 @@ const money = (n: number) => (n < 0 ? '−$' : '$') + Math.abs(Math.floor(n)).to
 export function CityAccounts({world}: {world: Snapshot}) {
  const b=world.books;
  if(!b) return null;
- return <details className="city-accounts"><summary><span>Daily accounts</span><span>In <b>{money(b.income)}</b></span><span>Out <b>{money(b.costs)}</b></span><span>Net <b>{money(b.net)}</b></span></summary>
+ return <details className="city-accounts"><summary data-shortcut="8" aria-keyshortcuts="8"><span>Daily accounts</span><span>In <b>{money(b.income)}</b></span><span>Out <b>{money(b.costs)}</b></span><span>Net <b className={b.net < 0 ? 'bad' : 'good'}>{money(b.net)}</b></span></summary>
       {b && (
         <div className="books">
           <div className="books-figures">

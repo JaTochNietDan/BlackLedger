@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {cameraCommand, screenPan} from '../.runtime/frontend-test/city3dControls.js';
+import {cameraCommand, screenPan, KeyboardPan} from '../.runtime/frontend-test/city3dControls.js';
 
 test('camera shortcuts preserve browser modifiers and composing input', () => {
   for (const key of ['+', '=', '-', 'Q', 'E', 'Home', 'ArrowLeft', 'ArrowUp', 'w', 'a', 's', 'd']) {
@@ -56,5 +56,18 @@ test('held panning is frame-rate independent, normalized and stops on release', 
   pan.press({key:'W'});pan.release('w');assert.deepEqual(pan.step(camera,target,.02,10),{x:0,z:0});
   assert.equal(pan.press({key:'w',metaKey:true}),false);
   pan.press({key:'w'});assert.equal(pan.step(camera,target,100,10).z,.5);
+ }
+});
+
+test('held Q/E orbit is frame-rate independent and stops on release',()=>{
+ for(const fps of [30,60,144]){
+  const input=new KeyboardPan();input.press({key:'q'});
+  let angle=0;for(let frame=0;frame<fps;frame++)angle+=input.rotation(1/fps);
+  assert.ok(Math.abs(angle-1.2)<1e-9);
+  input.press({key:'e'});assert.equal(input.rotation(1/60),0);
+  input.release('q');assert.ok(input.rotation(1/60)<0);
+  input.release('e');assert.equal(input.rotation(1/60),0);
+  input.press({key:'q'});assert.equal(input.rotation(30),.06);
+  input.clear();assert.equal(input.rotation(1/60),0);
  }
 });
