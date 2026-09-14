@@ -3007,3 +3007,33 @@ generic silhouettes for new service addresses. The silhouette failure is a
 real pending exterior task and was not suppressed. Rechecked targeted staging
 and indoor-strike tests after the import correction; results in
 .runtime/mortuary-targeted-ui.log. No claim that all frontend tests passed.
+
+### September 14 — distinct death-service exteriors and fallback plates
+
+Previous turn made progress with the mortuary interior. Authored original
+Blender mortuary receiving-house facade, cemetery grounds/lodge/gate piers/iron
+rails/headstones, and crematorium with furnace chimney and memorial planters.
+Registered all three models in city planning AND the explicit city load list;
+Browser97 caught the omitted load entries (undefined clone) before acceptance.
+The initial cemetery crossing had coplanar faces; separated the cross-path
+surface and re-exported/rerendered after visually observing the dark rectangle.
+
+All models and fallback JPEG plates come from the repository's authored geometry
+and generated brick/roof materials. tools/death_service_exteriors.py and
+--only=death-service-exteriors reproduce the GLBs;
+tools/render_death_service_plates.py reproduces three fronts and mortuary room
+plate at960x720. Visually inspected all three final fronts. Updated legacy
+isometric silhouettes to represent the receiving house, headstones/lodge and
+chimney. The initial direct node grid check had used stale compiled files;
+the final npm test recompiled sources and passed all404 tests24.811s.
+Final production build2.77s. Front-art coverage Go test passed0.193s.
+Browser98 at1280x720 successfully loaded and Z-framed the mortuary, showing its
+facade, lot/footpaths, entrance and city label; adjacent cemetery visible.
+
+Full clean86dd0d0 Go run session55129 is now TERMINAL FAILED. sim passed415.830s;
+core416.695s failed on missing new-address worker roles, manner descriptions,
+counter material and missing three reach-test cases. cmd/blackledger failed on
+new front/interior plates. Fronts and mortuary interior plate now supplied;
+cemetery/crematorium interior plates and their 3D rooms remain, along with those
+simulation/content integration tasks. Do not restart this terminal handle or
+call this a passing full suite. No release promoted; live8791 remains4daa6c8.

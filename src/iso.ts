@@ -109,6 +109,9 @@ export function blockFor(type: string, id = ''): Block {
   // stack. A map you cannot read your own city off is a map that is not
   // working, so the ones with a shape of their own get it.
   switch (id) {
+    case 'mortuary': return {w:size('work')[0],d:size('work')[1],parts:[box(2.6,2.1,.9,pale),box(1.0,.5,.08,dark,{dx:.8,dy:2.0,base:.72})]};
+    case 'cemetery': return {w:size('work')[0],d:size('work')[1],parts:[box(.9,.8,.7,brick),...Array.from({length:6},(_,i)=>box(.20,.13,.32,pale,{dx:1.25+(i%2)*.6,dy:.35+Math.floor(i/2)*.6}))]};
+    case 'crematorium': return {w:size('work')[0],d:size('work')[1],parts:[box(2.3,1.8,.9,brick),box(.28,.35,2.0,brick,{dx:1.7,dy:.2})]};
     case 'filling':
     case 'pumps':
       return {

@@ -157,6 +157,7 @@ const modelNames = [
   'garage',
   'dealer',
   'undertaker',
+  'mortuary', 'cemetery', 'crematorium',
   'docks',
   'harbour-pier',
   'quay-section',

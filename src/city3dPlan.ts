@@ -62,6 +62,7 @@ export function cityPlan(places: Pick<Place, 'id' | 'x' | 'y' | 'type'>[]) {
       dealer: 'dealer',
       cabstand: 'dealer',
       chapel: 'undertaker',
+      mortuary:'mortuary', cemetery:'cemetery', crematorium:'crematorium',
       haulage: 'haulage',
       scrapyard: 'haulage',
       estate: 'villa',

@@ -2526,6 +2526,20 @@ if __name__ == '__main__' and '--only=interior-docks' in __import__('sys').argv:
     raise SystemExit(0)
 
 
+def death_service_exterior(kind):
+    from death_service_exteriors import build
+    build(kind,box,cylinder,material,brick,roof_texture)
+
+
+if __name__ == '__main__' and '--only=death-service-exteriors' in __import__('sys').argv:
+    manifest_path=os.path.join(OUT,'manifest.json')
+    with open(manifest_path) as f: selected_manifest=json.load(f)
+    for kind in ('mortuary','cemetery','crematorium'):
+        clear();death_service_exterior(kind);selected_manifest[kind]=export(kind)
+    with open(manifest_path,'w') as f:json.dump(selected_manifest,f,indent=2)
+    raise SystemExit(0)
+
+
 def mortuary_interior():
     from mortuary_interior import build
     build(box,cylinder,material)
@@ -2795,6 +2809,8 @@ clear();cabstand_interior();manifest['interior-cabstand']=export('interior-cabst
 clear();docks_interior();manifest['interior-docks']=export('interior-docks')
 clear();chapel_interior();manifest['interior-chapel']=export('interior-chapel')
 clear();mortuary_interior();manifest['interior-mortuary']=export('interior-mortuary')
+for kind in ('mortuary','cemetery','crematorium'):
+    clear();death_service_exterior(kind);manifest[kind]=export(kind)
 clear();herald_interior();manifest['interior-herald']=export('interior-herald')
 clear();pawn_interior();manifest['interior-pawn']=export('interior-pawn')
 clear();exchange_interior();manifest['interior-exchange']=export('interior-exchange')

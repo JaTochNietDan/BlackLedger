@@ -1190,5 +1190,53 @@
       ]
     ],
     "bytes": 1241656
+  },
+  "mortuary": {
+    "file": "mortuary.glb",
+    "bounds_blender": [
+      [
+        -7.8,
+        -7.8,
+        -0.105
+      ],
+      [
+        7.8,
+        7.8,
+        5.4
+      ]
+    ],
+    "bytes": 471764
+  },
+  "cemetery": {
+    "file": "cemetery.glb",
+    "bounds_blender": [
+      [
+        -7.8,
+        -7.8,
+        -0.105
+      ],
+      [
+        7.8,
+        7.8,
+        3.49
+      ]
+    ],
+    "bytes": 824392
+  },
+  "crematorium": {
+    "file": "crematorium.glb",
+    "bounds_blender": [
+      [
+        -7.8,
+        -7.8,
+        -0.105
+      ],
+      [
+        7.8,
+        7.8,
+        9.645
+      ]
+    ],
+    "bytes": 450712
   }
 }
