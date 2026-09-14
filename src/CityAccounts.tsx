@@ -6,6 +6,27 @@ export function CityAccounts({world}: {world: Snapshot}) {
  return <details className="city-accounts"><summary data-shortcut="8" aria-keyshortcuts="8"><span>Daily accounts</span><span>In <b>{money(b.income)}</b></span><span>Out <b>{money(b.costs)}</b></span><span>Net <b className={b.net < 0 ? 'bad' : 'good'}>{money(b.net)}</b></span></summary>
       {b && (
         <div className="books">
+          {/* What is already unpaid, above the breakdown, because the day's
+              costs are what is owed and this is where it has already gone
+              wrong. Wages are the last thing the night gives up and the only
+              one with people on the other side of it: a week of this and
+              somebody stops coming in, and nobody new takes the job until it
+              is paid. */}
+          {!!b.behind?.length && (
+            <ul className="books-behind" aria-label="Premises behind on wages">
+              {b.behind.map(w => (
+                <li key={w.id} className={w.shut ? 'warning shut' : 'warning'}>
+                  <b>{w.place}</b>
+                  <small>
+                    {w.nights === 1 ? 'one night unpaid' : w.nights + ' nights unpaid'}
+                    {w.shut
+                      ? ' · nobody will take the job until it is paid'
+                      : ' · ' + w.hands + ' of ' + w.positions + ' still coming in'}
+                  </small>
+                </li>
+              ))}
+            </ul>
+          )}
           <section className="books-lines" aria-label="Daily cost breakdown">
             <h2>What the {money(b.costs)} a day is</h2>
             <ul>
@@ -64,27 +85,7 @@ export function CityAccounts({world}: {world: Snapshot}) {
               </div>
             )}
           </div>
-          {/* What is already unpaid, above the breakdown, because the day's
-              costs are what is owed and this is where it has already gone
-              wrong. Wages are the last thing the night gives up and the only
-              one with people on the other side of it: a week of this and
-              somebody stops coming in, and nobody new takes the job until it
-              is paid. */}
-          {!!b.behind?.length && (
-            <ul className="books-behind" aria-label="Premises behind on wages">
-              {b.behind.map(w => (
-                <li key={w.id} className={w.shut ? 'warning shut' : 'warning'}>
-                  <b>{w.place}</b>
-                  <small>
-                    {w.nights === 1 ? 'one night unpaid' : w.nights + ' nights unpaid'}
-                    {w.shut
-                      ? ' · nobody will take the job until it is paid'
-                      : ' · ' + w.hands + ' of ' + w.positions + ' still coming in'}
-                  </small>
-                </li>
-              ))}
-            </ul>
-          )}
+
 
         </div>
       )}

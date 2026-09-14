@@ -662,5 +662,37 @@
       ]
     ],
     "bytes": 61092
+  },
+  "mercer-court": {
+    "file": "mercer-court.glb",
+    "bounds_blender": [
+      [
+        -7.325,
+        -7.5,
+        -0.08
+      ],
+      [
+        7.325,
+        6.58,
+        20.38
+      ]
+    ],
+    "bytes": 1767976
+  },
+  "interior-mercer-court": {
+    "file": "interior-mercer-court.glb",
+    "bounds_blender": [
+      [
+        -6.125,
+        -5.0,
+        -0.275
+      ],
+      [
+        6.0,
+        7.125,
+        4.7
+      ]
+    ],
+    "bytes": 2629780
   }
 }

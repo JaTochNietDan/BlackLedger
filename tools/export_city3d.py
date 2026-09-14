@@ -1584,6 +1584,146 @@ def police_officer():
     for side in (-1,1):
         box('shoulder epaulette',(side*.23,0,1.405),(.10,.20,.026),navy,.01)
 
+
+def mercer_lobby():
+    plaster=material('aged cream plaster',(.56,.51,.40))
+    wood=material('varnished walnut',(.18,.09,.045))
+    stone=material('worn stone steps',(.38,.38,.33))
+    brass=material('tenant brass',(.46,.32,.12),.6)
+    iron=material('black stair rail',(.035,.045,.04),.5)
+    black=material('black terrazzo',(.09,.10,.09))
+    cream=material('cream terrazzo',(.55,.51,.40))
+    glass=material('frosted glass',(.33,.42,.39),.2)
+    box('foundation',(0,1,-.15),(12,12,.25),stone)
+    for x in range(-12,12):
+        for y in range(-10,14):
+            box('terrazzo tile',(x*.5+.25,y*.5+.25,0),(.492,.492,.035),black if (x+y)%2 else cream)
+    box('rear plaster wall',(0,7,2.35),(12,.25,4.7),plaster)
+    box('west plaster wall',(-6,1,2.35),(.25,12,4.7),plaster)
+    for x in range(-23,24):
+        box('rear tongue groove board',(x*.25,6.83,.67),(.242,.08,1.34),wood)
+    for y in range(-19,28):
+        box('west tongue groove board',(-5.83,y*.25,.67),(.08,.242,1.34),wood)
+    box('rear dado rail',(0,6.76,1.37),(12,.12,.12),wood,.025)
+    box('west dado rail',(-5.76,1,1.37),(.12,12,.12),wood,.025)
+    for z in (.12,4.45):
+        box('rear moulding',(0,6.78,z),(12,.19,.18),cream,.025)
+        box('west moulding',(-5.78,1,z),(.19,12,.18),cream,.025)
+    # Forty-eight numbered compartments, matching the accommodation register.
+    box('letterbox backboard',(-2,6.68,2.55),(4.75,.16,2.15),wood,.04)
+    for row in range(6):
+        for col in range(8):
+            x=-4.0+col*.57;z=1.7+row*.34
+            box('individual letterbox',(x,6.55,z),(.53,.15,.30),brass,.012)
+            box('mail slot',(x,6.465,z+.06),(.33,.025,.025),iron)
+            cylinder('letterbox keyhole',(x+.16,6.46,z-.07),.022,.025,iron,(math.pi/2,0,0),12)
+            # Small engraved number plaques, actual type geometry.
+            curve=bpy.data.curves.new('mailbox number','FONT');curve.body=str(row*8+col+1);curve.size=.095;curve.align_x='CENTER';curve.extrude=.001
+            obj=bpy.data.objects.new('mailbox number',curve);bpy.context.collection.objects.link(obj);obj.location=(x-.08,6.457,z-.085);obj.rotation_euler=(math.pi/2,0,0);obj.data.materials.append(iron)
+            bpy.context.view_layer.objects.active=obj;obj.select_set(True);bpy.ops.object.convert(target='MESH');obj.select_set(False)
+    # Apartment corridor door with transom glazing and a worn brass push plate.
+    box('corridor door',(1.15,6.76,1.35),(1.8,.16,2.7),wood,.04)
+    for x in (.16,2.14):box('door casing',(x,6.61,1.5),(.17,.23,3),cream,.02)
+    box('door casing head',(1.15,6.61,2.96),(2.15,.23,.17),cream,.02)
+    box('door frosted pane',(1.15,6.655,1.93),(1.38,.03,.85),glass)
+    for x in (.75,1.55):box('recessed door panel',(x,6.66,.75),(.58,.035,.8),wood,.035)
+    box('door push plate',(1.85,6.64,1.35),(.14,.025,.43),brass,.01)
+    # A stone stair with a continuous handrail, open toward the lobby.
+    for step in range(15):
+        y=.2+step*.42;h=(step+1)*.20
+        box('stair tread',(4.25,y,h/2),(2.7,.42,h),stone,.018)
+        box('stair nosing',(4.25,y-.205,h),(2.76,.06,.06),cream,.012)
+        if step%2==0:
+            for x in (2.9,5.6):cylinder('stair baluster',(x,y,h+.47),.032,.94,iron)
+    for x in (2.9,5.6):beam('stair handrail',(x,.2,1.1),(x,6.1,3.9),.09,wood)
+    # Waiting bench: slatted seat, back, curved-looking arm supports and legs.
+    for y in (-2.5,.5):
+        for x in (-5.15,-4.48):box('bench leg',(x,y,.35),(.12,.12,.7),wood,.02)
+    for x in (-5.18,-4.96,-4.74,-4.52):box('seat slat',(x,-1,.72),(.19,3.3,.10),wood,.025)
+    for z in (1.0,1.22,1.44):box('bench back slat',(-5.3,-1,z),(.12,3.4,.16),wood,.025)
+    for y in (-2.7,.7):box('bench arm',(-4.88,y,1.06),(.97,.12,.10),wood,.035)
+    for x in (-4.7,.1):
+        box('sconce back',(x,6.65,3.72),(.22,.15,.46),brass,.03)
+        cylinder('sconce opal globe',(x,6.37,3.78),.17,.35,material('opal lamp '+str(x),(.9,.72,.42),0,1.5),vertices=24)
+    box('entrance mat',(0,-3.4,.04),(2.8,1.5,.035),material('coir doormat',(.22,.16,.08)))
+
+
+def mercer_plate(path, camera_at, target, scale):
+    scene=bpy.context.scene
+    broken=bpy.data.objects.get('window-broken')
+    if broken:
+        for child in broken.children_recursive:child.hide_render=True
+    scene.render.engine='CYCLES';scene.cycles.samples=32;scene.cycles.use_denoising=True
+    scene.render.resolution_x=1280;scene.render.resolution_y=900;scene.render.resolution_percentage=100
+    scene.world=bpy.data.worlds.new('Mercer ambient sky');scene.world.color=(.22,.22,.20)
+    for name,position,power,size in [('soft daylight',(-8,-9,22),2600,12),('warm reflected light',(6,2,15),1600,10)]:
+        data=bpy.data.lights.new(name,'AREA');data.energy=power;data.shape='DISK';data.size=size
+        obj=bpy.data.objects.new(name,data);scene.collection.objects.link(obj);obj.location=position;obj.rotation_euler=(Vector(target)-obj.location).to_track_quat('-Z','Y').to_euler()
+    data=bpy.data.cameras.new('plate camera');obj=bpy.data.objects.new('plate camera',data);scene.collection.objects.link(obj);scene.camera=obj
+    obj.location=camera_at;obj.rotation_euler=(Vector(target)-obj.location).to_track_quat('-Z','Y').to_euler();data.type='ORTHO';data.ortho_scale=scale
+    scene.render.image_settings.file_format='JPEG';scene.render.image_settings.quality=92;scene.render.filepath=path
+    bpy.ops.render.render(write_still=True)
+
+
+def mercer_court():
+    """Five-storey workers' flats: limestone lintels, iron escapes and roof laundry."""
+    building('tenement',5,14,12,57,palette=(.40,.22,.15))
+    stone=bpy.data.materials['limestone']
+    iron=bpy.data.materials['painted iron']
+    brass=material('Mercer oxidised brass',(.38,.29,.13),.5)
+    linen=material('Mercer washed linen',(.69,.65,.52))
+    slate=material('Mercer blue laundry',(.23,.29,.33))
+    # A raised central name tablet and paired entrance sconces identify the
+    # address without turning the residential facade into a shop frontage.
+    box('Mercer entry tablet',(0,6.28,3.05),(3.35,.20,.65),stone,.045)
+    anchor=bpy.data.objects['sign-anchor'];anchor.location=(0,6.40,3.05);anchor.scale=(.42,1,.5)
+    for x in (-1.6,1.6):
+        box('entry lamp bracket',(x,6.36,2.28),(.16,.22,.33),iron,.025)
+        box('entry lamp glass',(x,6.49,2.34),(.20,.18,.26),bpy.data.materials['occupied windows'],.02)
+    for floor in range(1,5):
+        for x in (-5.6,-2.8,0,2.8,5.6):
+            box('window lintel cap',(x,6.19,floor*3.15+2.83),(1.63,.29,.15),stone,.018)
+    # Cast dentils below the projecting roof cornice.
+    for x in range(-13,14):
+        box('cornice dentil',(x*.49,6.20,15.42),(.22,.27,.24),stone,.01)
+    # Clotheslines live entirely within the roof parapet; no walking route
+    # crosses this roof. Deterministic hanging cloth panels include folds.
+    for x in (-5.4,-.4):
+        for y in (-3,0):
+            cylinder('laundry upright',(x,y,17.0),.045,2.15,iron)
+    for y in (-3,0):
+        beam('laundry line',(-5.4,y,17.7),(-.4,y,17.7),.025,iron)
+        for i in range(4):
+            x=-4.8+i*1.05
+            for fold in range(7):
+                box('linen folded panel',(x+fold*.10,y+(.04 if fold%2 else -.04),17.20),(.105,.035,.95),linen if i%2 else slate)
+            for pin in (0,.6):
+                box('wood clothes peg',(x+pin,y,17.72),(.035,.06,.12),brass)
+    for x in (-6.2,6.2):
+        cylinder('rainwater downpipe',(x,6.28,7.65),.075,15.2,iron)
+        for z in (1,4,7,10,13):
+            box('pipe wall collar',(x,6.22,z),(.21,.20,.08),iron)
+    # Individual brass letter boxes flank the working entrance door.
+    for side in (-1,1):
+        for row in range(3):
+            for col in range(2):
+                x=side*(1.4+col*.22)
+                box('tenant letter box',(x,6.28,.98+row*.19),(.20,.08,.16),brass,.009)
+                box('letter slot',(x,6.325,1.02+row*.19),(.13,.01,.014),iron)
+
+# Export just this new address without rewriting reviewed assets.
+if __name__ == '__main__' and '--only=mercer-court' in __import__('sys').argv:
+    clear();mercer_court()
+    manifest_path=os.path.join(OUT,'manifest.json')
+    with open(manifest_path) as f: selected_manifest=json.load(f)
+    selected_manifest['mercer-court']=export('mercer-court')
+    mercer_plate(os.path.abspath('public/art/fronts/front-mercercourt-v1.jpg'),(28,35,27),(0,0,9),36)
+    clear();mercer_lobby();selected_manifest['interior-mercer-court']=export('interior-mercer-court')
+    mercer_plate(os.path.abspath('public/art/rooms/room-mercercourt-v1.jpg'),(11,-15,10),(0,2,1.6),15)
+    with open(manifest_path,'w') as f:json.dump(selected_manifest,f,indent=2)
+    raise SystemExit(0)
+
+
 manifest={}
 for i,(name,floors,w,d) in enumerate([('tenement',4,12,11),('tavern',2,12,12),('casino',2,13,11),('warehouse',1,13,12),('civic',3,13,12),('shop',3,12,11),('villa',2,11,11)]):
     clear()
@@ -1628,6 +1768,8 @@ for name in ('shotgun','thompson'):
     clear();long_gun(name);manifest[name]=export(name)
 clear();blast_fragment();manifest['blast-fragment']=export('blast-fragment')
 clear();mariner();manifest['mariner']=export('mariner')
+clear();mercer_court();manifest['mercer-court']=export('mercer-court')
+clear();mercer_lobby();manifest['interior-mercer-court']=export('interior-mercer-court')
 clear();saint_agnes_interior();manifest['interior-saint-agnes']=export('interior-saint-agnes')
 clear();harbour_pier();manifest['harbour-pier']=export('harbour-pier')
 clear();quay_section();manifest['quay-section']=export('quay-section')

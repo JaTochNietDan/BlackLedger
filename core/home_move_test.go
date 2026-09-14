@@ -51,10 +51,13 @@ func TestNoRehousingWithoutAVacancy(t *testing.T) {
 	w.Player.Location = "room"
 	w.Properties["estate"].Owner = "player:1"
 	w.NPCs = nil
-	for i := 0; i < 88; i++ {
+	for i := 0; i < 136; i++ {
 		home := "room"
 		if i >= 24 {
 			home = "apartment"
+		}
+		if i >= 88 {
+			home = "mercercourt"
 		}
 		w.NPCs = append(w.NPCs, NPC{ID: fmt.Sprint(i), Name: fmt.Sprint(i), Home: home, Location: "bar", Post: "bar"})
 	}

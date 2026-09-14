@@ -61,7 +61,7 @@ func (w *World) FamilyDay() {
 			prop := w.Properties[id]
 			count++
 			condition += prop.Condition
-			if id != "room" && id != "apartment" {
+			if !IsRentalHome(id) {
 				income += prop.Income * prop.Condition / 100
 			}
 			if prop.Condition < 100 {
@@ -356,7 +356,7 @@ func (w *World) FamilyIncome(f *Faction) int {
 	income, rent := 0, 0
 	for _, id := range w.FamilyHoldings(f.ID) {
 		prop := w.Properties[id]
-		if id == "room" || id == "apartment" {
+		if IsRentalHome(id) {
 			rent += w.RentalDaily(id)
 		} else {
 			income += prop.Income * prop.Condition / 100

@@ -877,6 +877,8 @@ func (w *World) NPC(id string) *NPC {
 }
 func HomeRent(id string) int {
 	switch id {
+	case "mercercourt":
+		return 25
 	case "apartment":
 		return 35
 	case "estate":
@@ -888,7 +890,7 @@ func HomeRank(id string) int {
 	switch id {
 	case "estate":
 		return 2
-	case "apartment":
+	case "apartment", "mercercourt":
 		return 1
 	}
 	return 0
@@ -900,7 +902,7 @@ func HomeRank(id string) int {
 func (w *World) Watchers() int {
 	n := w.Player.Security
 	switch w.Player.Home {
-	case "apartment":
+	case "apartment", "mercercourt":
 		n++
 	case "estate":
 		n += 2
@@ -916,7 +918,7 @@ func (w *World) Guard() int {
 		n++
 	}
 	switch w.Player.Home {
-	case "apartment":
+	case "apartment", "mercercourt":
 		n++
 	case "estate":
 		n += 2
@@ -2522,7 +2524,7 @@ func (w *World) Public() map[string]any {
 	for _, l := range Locations {
 		prop := w.Properties[l.ID]
 		if w.Own(l.ID) {
-			if l.ID == "room" || l.ID == "apartment" {
+			if IsRentalHome(l.ID) {
 				income += float64(w.RentalDaily(l.ID)) / 24
 			} else {
 				income += float64(prop.Income*prop.Condition) / 100

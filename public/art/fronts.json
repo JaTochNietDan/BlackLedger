@@ -90,5 +90,9 @@
  {
   "id": "tailor",
   "file": "fronts/front-tailor-v1.jpg"
+ },
+ {
+  "id": "mercercourt",
+  "file": "fronts/front-mercercourt-v1.jpg"
  }
 ]

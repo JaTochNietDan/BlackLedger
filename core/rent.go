@@ -26,6 +26,11 @@ func (w *World) NPCRent(n *NPC) int {
 	case "room":
 		p := w.Properties[n.Home]
 		return max(0, int(15*float64(p.Condition)/100*math.Min(1, w.Capacity(n.Home))*operatingMode(p.Mode).Take))
+	case "mercercourt":
+		if n.Accommodation == "Shared flat" {
+			return 12
+		}
+		return 25
 	case "apartment":
 		if n.Accommodation == "Shared flat" {
 			return 15
@@ -84,7 +89,7 @@ func (w *World) RentalDaily(id string) int {
 }
 
 func (w *World) RentRegister(id string) map[string]any {
-	if id != "room" && id != "apartment" {
+	if !IsRentalHome(id) {
 		return nil
 	}
 	tenants := []map[string]any{}
@@ -103,7 +108,7 @@ func (w *World) RentRegister(id string) map[string]any {
 // HomeCost keeps the player's room rental separate from the deed. Cypress's
 // existing upkeep remains a household cost even when its resident owns it.
 func (w *World) HomeCost(id string) int {
-	if (id == "room" || id == "apartment") && w.Own(id) {
+	if IsRentalHome(id) && w.Own(id) {
 		return 0
 	}
 	return HomeRent(id)

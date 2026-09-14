@@ -45,6 +45,7 @@ var streetTrades = []struct{ role, place string }{
 	{"Dealer", "casino"}, {"Floor manager", "casino"},
 	{"Landlady", "room"}, {"Boarder", "room"},
 	{"Caretaker", "apartment"}, {"Nurse", "apartment"},
+	{"Superintendent", "mercercourt"}, {"Seamstress", "mercercourt"},
 	{"Groundsman", "estate"}, {"Housekeeper", "estate"},
 	{"Newspaperman", "market"}, {"Photographer", "bar"},
 	// The addresses added since this list was written. Half the city had

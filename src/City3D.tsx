@@ -111,6 +111,7 @@ type Effect = {
 };
 const modelNames = [
   'tenement',
+  'mercer-court',
   'mariner',
   'tavern',
   'casino',
@@ -243,9 +244,10 @@ export function City3D(props: Props) {
         reset();
         return;
       }
-      const offset = camera.position.clone().sub(controls.target);
-      controls.target.set(lot.x, 0, lot.z);
-      camera.position.copy(controls.target).add(offset);
+      const building = buildings.get(lot.id);
+      const envelope = building?.userData.sightBounds as THREE.Box3 | undefined;
+      frameScene(camera, controls.target, envelope?.clone().expandByScalar(1) ??
+        new THREE.Box3(new THREE.Vector3(lot.x - 9, 0, lot.z - 9), new THREE.Vector3(lot.x + 9, 22, lot.z + 9)));
       controls.update();
     };
     reset();

@@ -165,3 +165,12 @@ test('unused grid cells receive scenery exactly once without claiming playable a
   }
  }
 });
+
+test('Mercer Court occupies a vacant block without shifting existing addresses',()=>{
+ const previous=cityPlan(places.filter(p=>p.id!=='mercercourt'));
+ for(const old of previous.lots){const current=plan.lots.find(p=>p.id===old.id);assert.equal(current.x,old.x,old.id);assert.equal(current.z,old.z,old.id);}
+ const court=plan.lots.find(p=>p.id==='mercercourt');
+ assert.equal(court.model,'mercer-court');
+ assert.ok(previous.vacant.some(v=>v.col===court.col&&v.row===court.row));
+ assert.equal(plan.cols,previous.cols);assert.equal(plan.rows,previous.rows);
+});

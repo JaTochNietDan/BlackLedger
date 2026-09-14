@@ -302,5 +302,15 @@
   "y": 786,
   "cost": 280,
   "blurb": "A bay window with three suits in it and a workroom upstairs where the cutting is done. They remember what you were measured at and they remember who paid."
+ },
+ {
+  "id": "mercercourt",
+  "name": "Mercer Court",
+  "type": "home",
+  "district": 0,
+  "x": 650,
+  "y": 790,
+  "cost": 120,
+  "blurb": "A brick walk-up beside the southern yards. Shared flats for dock workers, private apartments above, and washing lines on the roof."
  }
 ]
