@@ -1,3 +1,4 @@
+import {BlackjackTable3D} from './BlackjackTable3D';
 import {DiceTable3D} from './DiceTable3D';
 import {DICE_ROLL_MS} from './dicePresentation';
 import {SlotCabinet} from './SlotCabinet';
@@ -166,10 +167,11 @@ export function CardTable({
       </div>
       {/* The cloth itself, with the two seats on it and the money in the middle
           of the table where a stake actually sits. */}
+      <BlackjackTable3D mine={mine} theirs={theirs} hidden={!over && theirs.length < 2 ? 1 : 0}/>
       <div className="baize">
         <div className="seat dealer">
           <span className="seat-name">Dealer</span>
-          <Row cards={theirs} hidden={!over && theirs.length < 2 ? 1 : 0} />
+          <span className="hand-description">{theirs.map(c=>knownCard(c)?`${c.rank}${pipOf(c.suit)}`:"Face down").join(" · ")}{!over && theirs.length < 2 ? " · Face down" : ""}</span>
           <b className="seat-total">{hand.dealer ?? 0}</b>
         </div>
         <div className="baize-line" aria-hidden="true">
@@ -178,7 +180,7 @@ export function CardTable({
         </div>
         <div className="seat mine">
           <span className="seat-name">You</span>
-          <Row cards={mine} hidden={0} />
+          <span className="hand-description">{mine.map(c=>knownCard(c)?`${c.rank}${pipOf(c.suit)}`:"Face down").join(" · ")}</span>
           <b className={'seat-total' + (total > 21 ? ' warning' : '')}>{total}</b>
         </div>
       </div>

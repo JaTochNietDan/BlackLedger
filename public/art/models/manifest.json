@@ -790,5 +790,37 @@
       ]
     ],
     "bytes": 113824
+  },
+  "blackjack-table": {
+    "file": "blackjack-table.glb",
+    "bounds_blender": [
+      [
+        -1.67,
+        -1.18,
+        -0.0
+      ],
+      [
+        1.67,
+        1.18,
+        0.9885
+      ]
+    ],
+    "bytes": 320820
+  },
+  "playing-card": {
+    "file": "playing-card.glb",
+    "bounds_blender": [
+      [
+        -0.105,
+        -0.15,
+        -0.001
+      ],
+      [
+        0.105,
+        0.15,
+        0.0012
+      ]
+    ],
+    "bytes": 9876
   }
 }

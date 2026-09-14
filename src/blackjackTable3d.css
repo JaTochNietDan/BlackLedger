@@ -1,0 +1,8 @@
+.blackjack3d{position:relative;height:clamp(300px,48vh,490px);background:#173128;border-block:3px double #ad8c50}
+.blackjack3d>div{height:100%;width:100%}.blackjack3d canvas{display:block;width:100%;height:100%}
+.blackjack3d>p{position:absolute;bottom:12px;left:12px;right:12px;color:#efdfb9;text-align:center;font:15px Georgia,serif}
+.card-felt .baize{min-height:0;padding:14px;display:flex;justify-content:space-around;gap:12px;border-radius:0}
+.card-felt .baize .card-row,.card-felt .baize-line{display:none}
+.card-felt .baize .seat{position:static;display:flex;gap:10px;align-items:center}
+.card-felt .baize .seat-total{position:static}
+.card-felt .baize .seat{flex-wrap:wrap;justify-content:center;min-width:0;flex:1}.hand-description{font:14px Georgia,serif;color:#f0dfb7}

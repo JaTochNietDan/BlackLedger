@@ -1609,6 +1609,60 @@ def gaming_die():
             bpy.context.view_layer.update();world=ob.matrix_world.copy();ob.parent=group;ob.matrix_world=world
 
 
+def blackjack_table():
+    wood=material('blackjack polished walnut',(.12,.055,.028))
+    leather=material('blackjack oxblood leather',(.14,.025,.018))
+    felt=material('blackjack green baize',(.028,.12,.065))
+    brass=material('blackjack brass trim',(.55,.35,.12),.7)
+    ink=material('blackjack printed gold',(.68,.54,.26))
+    def oval(name,rx,ry,z,depth,mat):
+        ob=cylinder(name,(0,0,z),1,depth,mat,vertices=128)
+        ob.scale.x=rx;ob.scale.y=ry
+        bevel=ob.modifiers.new("soft upholstered edge","BEVEL");bevel.width=.02;bevel.segments=3
+        return ob
+    oval('table walnut apron',1.65,1.16,.69,.18,wood)
+    oval('upholstered rail',1.67,1.18,.80,.12,leather)
+    oval('brass inner reveal',1.51,1.025,.857,.014,brass)
+    oval('playing cloth',1.49,1.005,.866,.008,felt)
+    for x in (-1,1):
+        for y in (-.55,.55):
+            box('tapered pedestal leg',(x,y,.32),(.14,.14,.64),wood,.015)
+            box('brass foot',(x,y,.045),(.15,.15,.09),brass,.008)
+    box('pedestal stretcher',(0,0,.20),(2.1,.12,.12),wood,.02)
+    # House chip rack, each denomination in its own recessed channel.
+    box('dealer rack',(0,.78,.90),(.88,.24,.055),wood,.02)
+    for col,color in enumerate(((.65,.55,.35),(.45,.05,.035),(.025,.07,.10),(.075,.28,.12))):
+        chip=material('rack denomination '+str(col),color)
+        for row in range(5):
+            cylinder('house chip',(-.30+col*.20,.78,.935+row*.012),.06,.011,chip)
+    def label(text,y,size):
+        bpy.ops.object.text_add(location=(0,y,.874));ob=bpy.context.object
+        ob.name='cloth '+text;ob.data.body=text;ob.data.align_x='CENTER';ob.data.size=size
+        ob.data.materials.append(ink);bpy.ops.object.convert(target='MESH');ob.select_set(False)
+    label('BLACKJACK PAYS 3 TO 2',-.04,.082)
+    label('DEALER STANDS ON 17',-.17,.043)
+    # Actual packed textile texture, sampled in the browser with the rest of the model.
+    rng=random.Random(1955);pixels=[]
+    for y in range(128):
+        for x in range(128):
+            tone=rng.uniform(.90,1.10)
+            pixels.extend((*[1.055*(c*tone)**(1/2.4)-.055 for c in felt.diffuse_color[:3]],1))
+    img=bpy.data.images.new('blackjack cloth weave',width=128,height=128);img.pixels=pixels;img.pack()
+    tex=felt.node_tree.nodes.new('ShaderNodeTexImage');tex.image=img
+    felt.node_tree.links.new(tex.outputs['Color'],felt.node_tree.nodes['Principled BSDF'].inputs['Base Color'])
+
+
+def playing_card():
+    paper=material('card paper edge',(.88,.84,.72))
+    face=material('card printed face',(1,1,1))
+    box('rounded card stock',(0,0,0),(.21,.30,.002),paper,.007)
+    mesh=bpy.data.meshes.new('card face UV')
+    mesh.from_pydata([(-.102,-.147,.0012),(.102,-.147,.0012),(.102,.147,.0012),(-.102,.147,.0012)],[],[(0,1,2,3)])
+    uv=mesh.uv_layers.new(name='UVMap')
+    for loop,coord in zip(uv.data,((0,0),(1,0),(1,1),(0,1))):loop.uv=coord
+    ob=bpy.data.objects.new('printed card',mesh);bpy.context.collection.objects.link(ob);ob.data.materials.append(face)
+
+
 def dice_tray():
     felt=material('dice forest baize',(.035,.17,.095))
     wood=material('dice tray walnut',(.16,.07,.035))
@@ -2040,6 +2094,14 @@ def mercer_court():
                 box('tenant letter box',(x,6.28,.98+row*.19),(.20,.08,.16),brass,.009)
                 box('letter slot',(x,6.325,1.02+row*.19),(.13,.01,.014),iron)
 
+if __name__ == '__main__' and '--only=blackjack-table' in __import__('sys').argv:
+    manifest_path=os.path.join(OUT,'manifest.json')
+    with open(manifest_path) as f: selected_manifest=json.load(f)
+    clear();blackjack_table();selected_manifest['blackjack-table']=export('blackjack-table')
+    clear();playing_card();selected_manifest['playing-card']=export('playing-card')
+    with open(manifest_path,'w') as f:json.dump(selected_manifest,f,indent=2)
+    raise SystemExit(0)
+
 if __name__ == '__main__' and '--only=dice-table' in __import__('sys').argv:
     manifest_path=os.path.join(OUT,'manifest.json')
     with open(manifest_path) as f: selected_manifest=json.load(f)
@@ -2139,6 +2201,8 @@ clear();blast_fragment();manifest['blast-fragment']=export('blast-fragment')
 clear();bar_cloth();manifest['bar-cloth']=export('bar-cloth')
 clear();mariner();manifest['mariner']=export('mariner')
 clear();gaming_die();manifest['gaming-die']=export('gaming-die')
+clear();blackjack_table();manifest['blackjack-table']=export('blackjack-table')
+clear();playing_card();manifest['playing-card']=export('playing-card')
 clear();dice_tray();manifest['dice-tray']=export('dice-tray')
 clear();slot_cabinet();manifest['slot-cabinet']=export('slot-cabinet')
 clear();laundry_interior();manifest['interior-laundry']=export('interior-laundry')
