@@ -231,10 +231,8 @@ export function Casino({
           <div className="casino-game">
             {game === 'cards' ? (
               <div className="cards-panel">
-                {(dealt || hand.settled) && (
-                  <CardTable hand={hand} money={money} act={k => act({kind: k})} />
-                )}
-                {!dealt && (
+                <CardTable hand={hand} motion={motion} onPresent={setPresenting} money={money} act={k => act({kind: k})} />
+                {!dealt && !presenting && (
                   <div className="felt sit-down">
                     <p className="felt-note">
                       {hand.settled

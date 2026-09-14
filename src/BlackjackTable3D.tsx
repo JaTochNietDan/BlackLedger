@@ -1,3 +1,4 @@
+import {cardPose,type planCards} from './blackjackPresentation';
 import {useEffect,useRef,useState} from 'react';
 import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
@@ -25,8 +26,8 @@ function cardTexture(card?:Card){
  const texture=new THREE.CanvasTexture(canvas);texture.colorSpace=THREE.SRGBColorSpace;texture.flipY=false;texture.anisotropy=4;return texture;
 }
 
-export function BlackjackTable3D({mine,theirs,hidden}:{mine:Card[];theirs:Card[];hidden:number}){
- const host=useRef<HTMLDivElement>(null),latest=useRef({mine,theirs,hidden});latest.current={mine,theirs,hidden};
+export function BlackjackTable3D({mine,theirs,hidden,presentation}:{mine:Card[];theirs:Card[];hidden:number;presentation:{plan:ReturnType<typeof planCards>;start:number;active:boolean}}){
+ const host=useRef<HTMLDivElement>(null),latest=useRef({mine,theirs,hidden,presentation});latest.current={mine,theirs,hidden,presentation};
  const [status,setStatus]=useState('Opening the card table…');
  useEffect(()=>{
   const el=host.current!;let dead=false,frame=0,dirty=true,key='',rendered=0;
@@ -47,15 +48,16 @@ export function BlackjackTable3D({mine,theirs,hidden}:{mine:Card[];theirs:Card[]
    if(dead)return;frame=requestAnimationFrame(tick);const p=latest.current,k=JSON.stringify(p);
    if(prototype&&k!==key){
     key=k;cards.clear();textures.splice(0).forEach(t=>t.dispose());materials.splice(0).forEach(m=>m.dispose());
-    [[...p.theirs,...Array.from({length:p.hidden},():Card|undefined=>undefined)],p.mine].forEach((hand,row)=>{
-     const spacing=Math.min(.35,1.7/Math.max(1,hand.length-1));
-     hand.forEach((card,i)=>{const object=prototype!.clone(true),texture=cardTexture(card);textures.push(texture);
+    p.presentation.plan.cards.forEach(move=>{
+      const object=prototype!.clone(true),texture=cardTexture(move.card);textures.push(texture);
       object.traverse(o=>{if(o instanceof THREE.Mesh&&o.material.name==='card printed face'){const m=o.material.clone();m.map=texture;m.color.set('#ffffff');m.needsUpdate=true;o.material=m;materials.push(m);}});
-      object.scale.set(1.4,1,1.4);object.position.set((i-(hand.length-1)/2)*spacing,.875+i*.0001,row===0?-.38:.48);cards.add(object);
-     });
+      object.scale.set(1.4,1,1.4);cards.add(object);
     });dirty=true;
    }
-   if(!dirty||document.hidden)return;renderer.render(scene,camera);rendered++;canvas.dataset.blackjack=JSON.stringify({mine:p.mine,theirs:p.theirs,hidden:p.hidden,rendered,drawCalls:renderer.info.render.calls});dirty=false;
+   const elapsed=p.presentation.active?performance.now()-p.presentation.start:Infinity;
+   cards.children.forEach((object,i)=>{const move=p.presentation.plan.cards[i];if(!move)return;const pose=cardPose(move,elapsed);object.visible=pose.visible;object.position.fromArray(pose.position);});
+   if(p.presentation.active)dirty=true;
+   if(!dirty||document.hidden)return;renderer.render(scene,camera);rendered++;canvas.dataset.blackjack=JSON.stringify({mine:p.mine,theirs:p.theirs,hidden:p.hidden,dealing:p.presentation.active,rendered,drawCalls:renderer.info.render.calls});dirty=false;
   };frame=requestAnimationFrame(tick);
   return()=>{dead=true;cancelAnimationFrame(frame);observer.disconnect();disposeCityResources([scene,...models],{textures,materials});renderer.dispose();renderer.forceContextLoss();canvas.remove();};
  },[]);

@@ -1,3 +1,4 @@
+import {planCards} from './blackjackPresentation';
 import {BlackjackTable3D} from './BlackjackTable3D';
 import {DiceTable3D} from './DiceTable3D';
 import {DICE_ROLL_MS} from './dicePresentation';
@@ -145,13 +146,33 @@ function Chip({amount, money}: {amount: number; money: (n: number) => string}) {
 // stands, so it is drawn face down: that is what is true, not a decoration.
 export function CardTable({
   hand,
+  motion = true,
+  onPresent,
   money,
   act,
 }: {
   hand: HandState;
+  motion?: boolean;
+  onPresent?: (active:boolean)=>void;
   money: (n: number) => string;
   act: (kind: string) => void;
 }) {
+  const previous=useRef(hand);
+  const [presentation,setPresentation]=useState(()=>({plan:planCards(hand,hand,false),start:0,active:false}));
+  const [reduced,setReduced]=useState(()=>matchMedia('(prefers-reduced-motion: reduce)').matches);
+  useEffect(()=>{const media=matchMedia('(prefers-reduced-motion: reduce)');const change=()=>setReduced(media.matches);media.addEventListener('change',change);change();return()=>media.removeEventListener('change',change);},[]);
+  const animate=motion&&!reduced;
+  const handKey=JSON.stringify([hand.playing,hand.settled,hand.mine,hand.theirs]);
+  useLayoutEffect(()=>{
+    const changed=JSON.stringify(previous.current)!==JSON.stringify(hand);
+    const plan=planCards(previous.current,hand,animate&&changed);
+    previous.current=hand;
+    const active=plan.duration>0;
+    setPresentation({plan,start:performance.now(),active});onPresent?.(active);
+    if(!active)return;
+    const done=setTimeout(()=>{setPresentation(p=>({...p,active:false}));onPresent?.(false);},plan.duration);
+    return()=>{clearTimeout(done);onPresent?.(false);};
+  },[handKey,animate,onPresent]);
   if (!hand.playing && !hand.settled) return null;
   const mine = hand.mine ?? [],
     theirs = hand.theirs ?? [];
@@ -167,8 +188,8 @@ export function CardTable({
       </div>
       {/* The cloth itself, with the two seats on it and the money in the middle
           of the table where a stake actually sits. */}
-      <BlackjackTable3D mine={mine} theirs={theirs} hidden={!over && theirs.length < 2 ? 1 : 0}/>
-      <div className="baize">
+      <BlackjackTable3D mine={mine} theirs={theirs} hidden={!over && theirs.length < 2 ? 1 : 0} presentation={presentation}/>
+      {presentation.active ? <p role="status">The cards are being dealt…</p> : <div className="baize">
         <div className="seat dealer">
           <span className="seat-name">Dealer</span>
           <span className="hand-description">{theirs.map(c=>knownCard(c)?`${c.rank}${pipOf(c.suit)}`:"Face down").join(" · ")}{!over && theirs.length < 2 ? " · Face down" : ""}</span>
@@ -184,7 +205,8 @@ export function CardTable({
           <b className={'seat-total' + (total > 21 ? ' warning' : '')}>{total}</b>
         </div>
       </div>
-      {over ? (
+      }
+      {presentation.active ? null : over ? (
         <p className={'felt-result' + (hand.won ? ' won' : '')}>{hand.outcome}</p>
       ) : (
         <div className="felt-actions">
