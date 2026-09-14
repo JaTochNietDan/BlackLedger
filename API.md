@@ -900,3 +900,11 @@ neighborhood pressure, sale spread and NPC private-owner protections apply.
 per building, plus all player holdings and their current unit. Listings replenish
 as units leave the broker board. The projection includes optional `locked` for
 district access. Listing reads are deterministic and never mutate residences.
+
+Ashbury Court (`apartment`) now displays its own 3D entrance hall, with three
+bench seats, nine clear standing positions and a reserved concierge position
+when a public occupant has that role. The player uses a separate entrance aisle.
+Mailboxes represent the existing 64 numbered units; they do not create units or
+assign residents. The lift and upper stair opening are scenic access cues, not
+new commands. The complete public roster and residents' register remain below
+the render; no private-flat interior or indoor assault playback is implied.

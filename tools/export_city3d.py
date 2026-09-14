@@ -2418,6 +2418,20 @@ if __name__ == '__main__' and '--only=slot-cabinet' in __import__('sys').argv:
     with open(manifest_path,'w') as f:json.dump(selected_manifest,f,indent=2)
     raise SystemExit(0)
 
+def ashbury_interior():
+    from ashbury_interior import build
+    build(box,cylinder,material)
+
+
+if __name__ == '__main__' and '--only=interior-ashbury' in __import__('sys').argv:
+    clear();ashbury_interior()
+    manifest_path=os.path.join(OUT,'manifest.json')
+    with open(manifest_path) as f: selected_manifest=json.load(f)
+    selected_manifest['interior-ashbury']=export('interior-ashbury')
+    with open(manifest_path,'w') as f:json.dump(selected_manifest,f,indent=2)
+    raise SystemExit(0)
+
+
 def cypress_interior():
     from cypress_interior import build
     build(box,cylinder,material)
@@ -2522,6 +2536,7 @@ clear();blackjack_table();manifest['blackjack-table']=export('blackjack-table')
 clear();playing_card();manifest['playing-card']=export('playing-card')
 clear();dice_tray();manifest['dice-tray']=export('dice-tray')
 clear();slot_cabinet();manifest['slot-cabinet']=export('slot-cabinet')
+clear();ashbury_interior();manifest['interior-ashbury']=export('interior-ashbury')
 clear();cypress_interior();manifest['interior-cypress']=export('interior-cypress')
 clear();laundry_interior();manifest['interior-laundry']=export('interior-laundry')
 clear();mariner_lobby();manifest['interior-mariner']=export('interior-mariner')

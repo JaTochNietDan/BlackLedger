@@ -64,3 +64,9 @@ geometry from `tools/cypress_interior.py`, exported through
 sash windows and pleated curtains, limestone fireplace/clock/mirror, bookcase,
 oxblood sofa, ochre armchairs, patterned rug, study desk/radio and drinks sideboard.
 No external models or images. Independent wall groups support camera cutaways.
+
+September 14 Ashbury Court: `interior-ashbury.glb` is authored in
+`tools/ashbury_interior.py`, exported with
+`tools/export_city3d.py --only=interior-ashbury`. Locally built stone-floor hall,
+64 numbered brass mailboxes, reception/register, lift gate, staircase/landing,
+bench, sconces, tenant notices and plants. No external assets or textures.

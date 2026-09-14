@@ -80,9 +80,24 @@ export function cypressPlacements(people:Presence[]) {
  return result;
 }
 
-export type InteriorPlace='bar'|'mercercourt'|'room'|'laundry'|'estate';
+export function ashburyPlacements(people:Presence[]) {
+ const available:InteriorSpot[]=[
+  ...[2.8,1.4,0].map((z,i)=>({id:`ashbury-bench-${i}`,x:-4.13,z,yaw:Math.PI/2,seat:.77})),
+  ...[-.4,1.2,2.8].flatMap((z,row)=>[-2.2,-.6,1].map((x,col)=>({id:`ashbury-hall-${row}-${col}`,x,z,yaw:Math.PI}))),
+ ];
+ const result=new Map<string,InteriorSpot>();
+ for(const who of [...people].sort((a,b)=>a.id.localeCompare(b.id))){
+  if(result.has(who.id))continue;
+  if(/\b(concierge|superintendent|caretaker)\b/i.test(who.role||'')&&![...result.values()].some(s=>s.id==='ashbury-register'))
+   result.set(who.id,{id:'ashbury-register',x:-2.65,z:-3.35,yaw:0});
+  else {const spot=available.shift();if(spot)result.set(who.id,spot);}
+ }
+ return result;
+}
+
+export type InteriorPlace='bar'|'mercercourt'|'room'|'laundry'|'estate'|'apartment';
 export function placementsForInterior(place:InteriorPlace,people:Presence[]){
- return (place==='estate'?cypressPlacements:place==='laundry'?laundryPlacements:place==='bar'?interiorPlacements:place==='room'?marinerLobbyPlacements:mercerLobbyPlacements)(people);
+ return (place==='apartment'?ashburyPlacements:place==='estate'?cypressPlacements:place==='laundry'?laundryPlacements:place==='bar'?interiorPlacements:place==='room'?marinerLobbyPlacements:mercerLobbyPlacements)(people);
 }
 
 export function poseInteriorOccupant(actor:THREE.Group,spot:InteriorSpot) {
@@ -103,6 +118,7 @@ export function poseInteriorOccupant(actor:THREE.Group,spot:InteriorSpot) {
 
 // Reserved clear floor positions; these never displace a public occupant.
 export function interiorPlayerSpot(place:InteriorPlace):InteriorSpot {
+ if(place==='apartment')return {id:'player-entry',x:1.6,z:4.15,yaw:Math.PI};
  if(place==='estate')return {id:'player-entry',x:1.6,z:3.3,yaw:Math.PI};
  if(place==='room'||place==='laundry')return {id:'player-entry',x:1.6,z:3.15,yaw:Math.PI};
  return place==='mercercourt'

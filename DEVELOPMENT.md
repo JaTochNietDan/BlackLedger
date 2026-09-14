@@ -1240,3 +1240,32 @@ Validation:
 - Main campaign save untouched. Full simulation campaign/balance acceptance,
   additional earning activities, additional residential districts as population
   requires, and remaining 3D interiors/action choreography are still open.
+
+## September 14 — Ashbury Court entrance hall
+
+Added a distinct Blender-authored residential hall: stone floor and pilasters,
+64 numbered mailboxes, walnut reception counter/register/bell, brass lift gate,
+upholstered bench, notices, plants and stone staircase. Browser review caught a
+stair terminating against the rear wall; the final model has a supported landing
+and open exit beyond the cutaway. Walls and attached fixtures cut away with orbit.
+Public occupants use the authored bench and clear floor; a concierge role, when
+present, gets the reception aisle. No invented decorative NPC or new capacity.
+
+Validation: production build passes (`.runtime/ashbury-build.log`), complete
+frontend suite passes 352 tests (`.runtime/ashbury-tests.log`). An additional
+focused final check passes both Ashbury tests (`.runtime/ashbury-geometry-tests.log`):
+both rigs remain separated, seats have actual cushion support, standing bays have
+floor/clearance; all 12 stair treads, landing and upper opening checked by rays
+against the exported GLB. The added stair test ran after the 352-test suite.
+
+Fresh isolated `ashbury` fixture at `.runtime/ashbury-interior-20260914.sqlite3`,
+port 8939. Browser reviewed 1280×720 and 820×740, completed entry with six public
+occupants plus player, no omissions, and selected Mara directly in the canvas.
+The registry still shows 16 tenants / 64 places; property/burglary actions remain
+available. Cash6000/time08:00 unchanged through presentation checks. Observed
+143 draw calls / 253,928 triangles for the seven-character hall. This is a scene
+measurement, not a performance acceptance claim. Main campaign save untouched.
+
+Remaining: private flat rooms, other commercial/civic/industrial interiors,
+interior residential crime choreography, higher character/material fidelity,
+additional income activities and integrated campaign/balance acceptance.

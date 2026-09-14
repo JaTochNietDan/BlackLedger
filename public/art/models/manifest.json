@@ -902,5 +902,21 @@
       ]
     ],
     "bytes": 1649568
+  },
+  "interior-ashbury": {
+    "file": "interior-ashbury.glb",
+    "bounds_blender": [
+      [
+        -5.08,
+        -5.0,
+        -0.19
+      ],
+      [
+        5.0,
+        5.08,
+        4.2
+      ]
+    ],
+    "bytes": 3156748
   }
 }
