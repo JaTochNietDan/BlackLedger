@@ -3,8 +3,7 @@ package core
 import "fmt"
 
 func (w *World) strikeAttacker(hand Hand) CueAttacker {
-	if hand.Crew && len(w.Player.Crew) > 0 {
-		member := w.Player.Crew[0]
+	if member, ok := w.handMember(hand); ok {
 		tier := 0
 		if n := w.NPC(member.ID); n != nil {
 			tier = n.Weapon

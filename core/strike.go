@@ -115,10 +115,17 @@ func (w *World) strikeChance(n *NPC, hand Hand) float64 {
 func (w *World) Strike(id string, hand Hand) error {
 	reason := w.StrikeReadiness(id)
 	if hand.Crew {
-		reason = w.SendReadiness(id)
+		reason = w.HandReadiness(hand)
+		if _, ok := w.StrikeTarget(id); !ok {
+			reason = "They are not here"
+		}
 	}
 	if reason != "" {
 		return fmt.Errorf("%s", reason)
+	}
+	if hand.Crew {
+		member, _ := w.handMember(hand)
+		hand.ID, hand.Name = member.ID, member.Name
 	}
 	n, _ := w.StrikeTarget(id)
 	place, _ := PlaceByID(n.Location)
@@ -178,7 +185,7 @@ func (w *World) finishThem(n *NPC, hand Hand, where string, crowd int, family *F
 		w.RetaliationFrom(family.ID)
 	}
 	if hand.Crew {
-		w.Log(w.Player.Crew[0].Name+" finished it", fmt.Sprintf("%s is dead at %s. It was not your face anybody saw.", name, where), "danger")
+		w.Log(hand.Name+" finished it", fmt.Sprintf("%s is dead at %s. It was not your face anybody saw.", name, where), "danger")
 		return
 	}
 	w.Log("You finished it", fmt.Sprintf("%s is dead at %s. %s", name, where,
@@ -210,7 +217,10 @@ func (w *World) itWentWrong(n *NPC, hand Hand, where string, family *Faction) {
 
 	// Somebody of yours. Three ways it ends for them, and the worst one for you
 	// is the one where they are still breathing.
-	who := w.Player.Crew[0]
+	who, ok := w.handMember(hand)
+	if !ok {
+		return
+	}
 	w.Player.Heat = min(100, w.Player.Heat+SentHeat)
 	// What was waiting at the kerb. A man with something running gets off the
 	// street; a man on foot is still on it when the doors open. This is the
@@ -219,13 +229,13 @@ func (w *World) itWentWrong(n *NPC, hand Hand, where string, family *Faction) {
 	switch {
 	case roll < HandDies:
 		w.Kill(who.ID, fmt.Sprintf("Shot at %s, going for %s on somebody else's word.", where, n.Name))
-		w.Player.Crew = nil
+		w.removeAssociate(who.ID)
 		w.Log("They did not come back", fmt.Sprintf("%s went for %s at %s and did not walk out of it.", who.Name, n.Name, where), "danger")
 	case roll < HandDies+HandCaught:
 		// Taken alive. Their face is known and so is whose face it is.
 		w.Player.Heat = min(100, w.Player.Heat+25)
 		w.hold(w.NPC(who.ID), 3)
-		w.Player.Crew = nil
+		w.removeAssociate(who.ID)
 		w.ReportAbout("arrest", "ARREST AFTER ATTACK ON "+upper(n.Name),
 			"Somebody taken at the scene is assisting police with their enquiries. Sources suggest a name has been given.", n.ID)
 		if family != nil {
@@ -240,7 +250,7 @@ func (w *World) itWentWrong(n *NPC, hand Hand, where string, family *Faction) {
 		w.HandHurt(hand, 40, "go after "+n.Name+" at "+where)
 		// A severe injury can still kill the person sent. HandHurt already
 		// records that death; do not follow it with a claim that they escaped.
-		if len(w.Player.Crew) == 0 {
+		if actor := w.NPC(who.ID); actor == nil || actor.Dead {
 			return
 		}
 		w.Log("They got away with nothing", fmt.Sprintf("%s went for %s at %s, did not finish it, and got out. %s is alive and looking.",

@@ -29,6 +29,8 @@ const (
 
 // Hand is who does a piece of work.
 type Hand struct {
+	// ID binds the work to a particular hired person, even if the roster changes.
+	ID string
 	// Crew is true when somebody else's hands were on it.
 	Crew bool
 	// Name is who did it, for the record.
@@ -44,7 +46,7 @@ func (w *World) CrewHands() (Hand, bool) {
 	if len(w.Player.Crew) == 0 {
 		return Hand{}, false
 	}
-	return Hand{Crew: true, Name: w.Player.Crew[0].Name}, true
+	return Hand{ID: w.Player.Crew[0].ID, Crew: true, Name: w.Player.Crew[0].Name}, true
 }
 
 // DelegateReadiness explains why nobody can be sent, or returns "".
@@ -67,25 +69,91 @@ func (w *World) DelegateReadiness() string {
 	return ""
 }
 
-// HandEdge is what the person doing the work brings to it. The player brings
-// what they are and what they are carrying; somebody sent brings how they feel
-// about being sent, and no more than that.
+// NamedHands resolves either an original associate or a signed family member.
+func (w *World) NamedHands(id string) (Hand, bool) {
+	for _, c := range w.Player.Crew {
+		if c.ID == id {
+			return Hand{ID: id, Crew: true, Name: c.Name}, true
+		}
+	}
+	for _, n := range w.OwnPeople() {
+		if n.ID == id {
+			return Hand{ID: id, Crew: true, Name: n.Name}, true
+		}
+	}
+	return Hand{}, false
+}
+
+func (w *World) handMember(hand Hand) (Crew, bool) {
+	if !hand.Crew {
+		return Crew{}, false
+	}
+	id := hand.ID
+	// Older synchronous callers have no ID; keep their original default.
+	if id == "" && len(w.Player.Crew) > 0 {
+		id = w.Player.Crew[0].ID
+	}
+	for _, c := range w.Player.Crew {
+		if c.ID == id {
+			return c, true
+		}
+	}
+	for _, n := range w.OwnPeople() {
+		if n.ID == id {
+			return Crew{ID: n.ID, Name: n.Name, Loyalty: n.Trust}, true
+		}
+	}
+	return Crew{}, false
+}
+
+func (w *World) HandReadiness(hand Hand) string {
+	c, ok := w.handMember(hand)
+	if !ok {
+		return "They do not work for you"
+	}
+	if why := w.OutOfReach(c.ID); why != "" {
+		return why
+	}
+	for _, task := range w.Homes {
+		if task.Person == c.ID {
+			return c.Name + " is already on assignment"
+		}
+	}
+	// Saves predating named task homes assigned every task to the first associate.
+	if len(w.Tasks) > 0 && len(w.Homes) == 0 && len(w.Player.Crew) > 0 && w.Player.Crew[0].ID == c.ID {
+		return c.Name + " is already on assignment"
+	}
+	if c.Loyalty < HandLoyalty {
+		return fmt.Sprintf("%s will not do this below %d loyalty", c.Name, HandLoyalty)
+	}
+	return ""
+}
+
 func (w *World) HandEdge(hand Hand) float64 {
 	if !hand.Crew {
 		return float64(min(w.Presence(), 100))/400 + w.WeaponEdge()
 	}
-	// What they think of you, and what you put in their hand. A gun is worth
-	// the same to somebody you sent as it is to you: the odds it shifts are the
-	// odds of the same piece of work.
-	edge := float64(w.Player.Crew[0].Loyalty)/500 - .08
-	if n := w.NPC(w.Player.Crew[0].ID); n != nil {
+	c, ok := w.handMember(hand)
+	if !ok {
+		return 0
+	}
+	edge := float64(c.Loyalty)/500 - .08
+	if n := w.NPC(c.ID); n != nil {
 		edge += float64(n.Weapon) * WeaponWorth
 	}
 	return edge
 }
 
-// HandHurt is what a job going wrong costs, and to whom. The player takes it in
-// health; somebody sent takes it in loyalty, and sometimes in everything.
+func (w *World) removeAssociate(id string) {
+	for i, c := range w.Player.Crew {
+		if c.ID == id {
+			w.Player.Crew = append(w.Player.Crew[:i], w.Player.Crew[i+1:]...)
+			return
+		}
+	}
+}
+
+// HandHurt charges the selected person's trust, never another associate's life.
 func (w *World) HandHurt(hand Hand, injury int, what string) {
 	if !hand.Crew {
 		w.Ruin(30)
@@ -93,24 +161,34 @@ func (w *World) HandHurt(hand Hand, injury int, what string) {
 		w.Player.Health = max(0, w.Player.Health-w.Absorb(injury))
 		return
 	}
-	if len(w.Player.Crew) == 0 {
+	c, ok := w.handMember(hand)
+	if !ok {
 		return
 	}
-	member := &w.Player.Crew[0]
-	// A bad enough night and he does not come back from it.
 	if injury >= 25 && w.Random() < .22 {
-		name := member.Name
-		w.Player.Crew = w.Player.Crew[:0]
-		if n := w.NPC(member.ID); n != nil {
+		if n := w.NPC(c.ID); n != nil {
 			w.KillBy(n.ID, nil, fmt.Sprintf("They had gone to %s for somebody else.", what))
 		} else {
-			w.Log(name+" did not come back", fmt.Sprintf("You sent them to %s and somebody was waiting. There is nobody to send now.", what), "danger")
+			w.Log(c.Name+" did not come back", fmt.Sprintf("You sent them to %s and somebody was waiting.", what), "danger")
 		}
+		w.removeAssociate(c.ID)
 		return
 	}
-	before := member.Loyalty
-	member.Loyalty = max(0, member.Loyalty-HandLoyaltyCost)
-	w.Log(member.Name+" took it instead of you", fmt.Sprintf("They went out to %s and came back hurt. Loyalty falls from %d to %d, and they know whose idea it was.", what, before, member.Loyalty), "danger")
+	after := max(0, c.Loyalty-HandLoyaltyCost)
+	associate := false
+	for i := range w.Player.Crew {
+		if w.Player.Crew[i].ID == c.ID {
+			w.Player.Crew[i].Loyalty = after
+			associate = true
+			break
+		}
+	}
+	if !associate {
+		if n := w.NPC(c.ID); n != nil {
+			n.Trust = after
+		}
+	}
+	w.Log(c.Name+" took it instead of you", fmt.Sprintf("They went out to %s and came back hurt. Loyalty falls from %d to %d, and they know whose idea it was.", what, c.Loyalty, after), "danger")
 }
 
 // HandRespectFor is the standing a piece of work is worth, which is less when

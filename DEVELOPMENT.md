@@ -3110,3 +3110,20 @@ Earlier clean c123527 full suite terminated: sim passed 484.227s, core failed
 routine predictability (87% vs 90%), cmd failed missing three front manifest
 entries and an omitted receipt-list tag. These remain tracked failures, not a
 passing release. Live 8791 remains the earlier 4daa6c8 build.
+
+### September 14 — named combat actors before queued operations
+
+Added stable Hand.ID resolution for original associates and signed family
+members. Strike readiness, weapons, scene attacker, trust penalties and death/
+capture now follow that actor. Fixed the existing fatal/captured strike branches
+that cleared the entire associate roster. Legacy no-ID synchronous callers keep
+their default; other crime adapters and the operations queue remain pending.
+No new dispatch buttons have been exposed prematurely. Existing unrelated
+robbery/mugging edits remain untouched.
+
+Named regression tests reorder two associates, charge the selected member's
+trust, reject held/departed members and exercise death/capture across 100 seeds
+without losing the other associate or hurting the player. Broader selected
+combat/delegation/scene checks passed 2.870s. First regression used adjacent raw
+LCG states and exercised only death; corrected its seed distribution rather
+than weakening the death-and-capture assertion. No live release.
