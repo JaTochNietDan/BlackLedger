@@ -102,7 +102,14 @@ export function incendiaryFlight(start:THREE.Vector3,windows:THREE.Vector3[],bui
 /** Test a conservative sampled bottle envelope once when selecting a facade target. */
 function findIncendiaryFlight(start:THREE.Vector3,windows:THREE.Vector3[],building:THREE.Object3D):Flight|null{
  const offsets=[new THREE.Vector3(),...[-1,1].flatMap(side=>[new THREE.Vector3(side*.27,0,0),new THREE.Vector3(0,side*.27,0),new THREE.Vector3(0,0,side*.27)])];
- const ray=new THREE.Raycaster();
+ const ray=new THREE.Raycaster(),entry=new THREE.Vector3();
+ // Mesh.raycast tests an infinite ray against its box before testing triangles.
+ // Our rays are short segments: reject boxes reached only beyond their end.
+ const colliders:{mesh:THREE.Mesh;bounds:THREE.Box3}[]=[];
+ building.traverse(o=>{if(o instanceof THREE.Mesh){
+  o.geometry.computeBoundingBox();
+  colliders.push({mesh:o,bounds:o.geometry.boundingBox!.clone().applyMatrix4(o.matrixWorld)});
+ }});
  for(const window of windows)for(const loft of [.8,.4,.15,1.4,2,2.8]){
   // The bottle body contacts the facade before its grip reaches the glass.
   const target=window.clone().add(new THREE.Vector3(0,0,-.30));
@@ -111,7 +118,14 @@ function findIncendiaryFlight(start:THREE.Vector3,windows:THREE.Vector3[],buildi
    const t=frame/48,point=start.clone().lerp(target,t);point.y+=loft*4*t*(1-t);
    const direction=point.clone().sub(previous),length=direction.length();direction.normalize();
    for(const offset of offsets){ray.set(previous.clone().add(offset),direction);ray.near=0;ray.far=length;
-    if(ray.intersectObject(building,true).length){clear=false;break;}
+    for(const {mesh,bounds} of colliders){
+     if(!bounds.containsPoint(ray.ray.origin)){
+      const contact=ray.ray.intersectBox(bounds,entry);
+      if(!contact||contact.distanceToSquared(ray.ray.origin)>length*length+1e-12)continue;
+     }
+     if(ray.intersectObject(mesh,false).length){clear=false;break;}
+    }
+    if(!clear)break;
    }
    previous=point;
   }

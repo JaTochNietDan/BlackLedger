@@ -59,7 +59,8 @@ test('special facade fire markers sit in front of upper-window glazing',async()=
 test('flight cache avoids repeated raycasts and invalidates changed obstacles',()=>{
  const building=new THREE.Group(),wall=new THREE.Mesh(new THREE.BoxGeometry(30,30,.2),new THREE.MeshBasicMaterial({side:THREE.DoubleSide}));
  wall.position.set(40,3,2);building.add(wall);
- let rays=0;const original=wall.raycast;wall.raycast=function(ray,hits){rays++;original.call(this,ray,hits);};
+ const ring=new THREE.Mesh(new THREE.TorusGeometry(10,.1,8,24),wall.material);ring.position.set(0,2,2);building.add(ring);
+ let rays=0;for(const mesh of [wall,ring]){const original=mesh.raycast;mesh.raycast=function(ray,hits){rays++;original.call(this,ray,hits);};}
  const start=new THREE.Vector3(0,1.7,0),windows=[new THREE.Vector3(0,2,5)];
  const first=incendiaryFlight(start,windows,building);assert.ok(first);const initial=rays;assert.ok(initial>0);
  const expected=first.target.clone();first.target.set(999,999,999);
@@ -72,5 +73,15 @@ test('flight cache avoids repeated raycasts and invalidates changed obstacles',(
  const replacement=fresh.slice();for(let i=0;i<replacement.length;i+=3)replacement[i]-=40;
  wall.geometry.setAttribute('position',new THREE.BufferAttribute(replacement,3));wall.geometry.computeBoundingBox();wall.geometry.computeBoundingSphere();
  assert.equal(incendiaryFlight(start,windows,building),null,'replacement attribute reused old geometry at the same version');
+ wall.geometry.dispose();ring.geometry.dispose();wall.material.dispose();
+});
+
+test('short flight segments reject distant geometry but retain nearer blockers',()=>{
+ const building=new THREE.Group(),wall=new THREE.Mesh(new THREE.BoxGeometry(30,30,.1),new THREE.MeshBasicMaterial({side:THREE.DoubleSide}));
+ building.position.set(12,.3,-6);building.rotation.y=.6;wall.position.set(0,2,20);building.add(wall);building.updateMatrixWorld(true);
+ let rays=0;const original=wall.raycast;wall.raycast=function(ray,hits){rays++;original.call(this,ray,hits);};
+ const start=building.localToWorld(new THREE.Vector3(0,1.7,0)),windows=[building.localToWorld(new THREE.Vector3(0,2,5))];
+ assert.ok(incendiaryFlight(start,windows,building));assert.equal(rays,0,'triangles beyond every segment were still tested');
+ wall.position.z=2;assert.equal(incendiaryFlight(start,windows,building),null,'near blocker was rejected with distant geometry');assert.ok(rays>0);
  wall.geometry.dispose();wall.material.dispose();
 });
