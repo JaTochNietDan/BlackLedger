@@ -21,3 +21,22 @@ test('blackjack cards rest above the felt and expose upright printed faces',asyn
   assert.equal(hit.object.material.name,'card printed face');assert.ok(hit.uv.y<.5,'card face is upside down');
  }
 });
+
+test('revealed hole card turns from its existing seat with its full stock above the felt',async()=>{
+ const {planCards,cardPose}=await import('../.runtime/frontend-test/blackjackPresentation.js');
+ const first={rank:'8',suit:'diamonds',value:8},hole={rank:'9',suit:'hearts',value:9};
+ const before={playing:true,mine:[first],theirs:[first]},after={playing:false,settled:true,mine:[first],theirs:[first,hole]};
+ const plan=planCards(before,after,true),move=plan.cards.find(c=>c.flip);
+ assert.ok(move);assert.equal(move.row,0);assert.equal(move.index,1);assert.deepEqual(move.from,move.to);
+ const card=await model('playing-card');card.scale.set(1.4,1,1.4);
+ let face;card.traverse(o=>{if(o instanceof THREE.Mesh&&o.material.name==='card printed face')face=o;});
+ const reverse=face.clone();reverse.rotation.z=Math.PI;card.add(reverse);
+ for(let frame=0;frame<=120;frame++){
+  const pose=cardPose(move,frame/120*move.duration);card.position.fromArray(pose.position);card.rotation.z=pose.rotation;card.updateMatrixWorld(true);
+  assert.ok(new THREE.Box3().setFromObject(card,true).min.y>.87,'turning card intersects cloth');
+  const normal=new THREE.Vector3(0,1,0).transformDirection(card.matrixWorld);
+  if(frame===0)assert.ok(normal.y<-.9999,'face is exposed before turnover');
+  if(frame===120)assert.ok(normal.y>.9999,'card does not finish face up');
+ }
+ assert.equal(planCards(before,after,false).cards.some(c=>c.flip),false);
+});

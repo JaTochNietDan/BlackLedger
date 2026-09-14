@@ -51,13 +51,17 @@ export function BlackjackTable3D({mine,theirs,hidden,presentation}:{mine:Card[];
     p.presentation.plan.cards.forEach(move=>{
       const object=prototype!.clone(true),texture=cardTexture(move.card);textures.push(texture);
       object.traverse(o=>{if(o instanceof THREE.Mesh&&o.material.name==='card printed face'){const m=o.material.clone();m.map=texture;m.color.set('#ffffff');m.needsUpdate=true;o.material=m;materials.push(m);}});
+      // A physical reverse lets the card turn over without exposing its face through the stock.
+      let face:THREE.Mesh|undefined;
+      object.traverse(o=>{if(o instanceof THREE.Mesh&&o.material.name==='card printed face')face=o;});
+      if(face){const reverse=face.clone();const back=cardTexture();textures.push(back);const material=(face.material as THREE.MeshStandardMaterial).clone();material.map=back;materials.push(material);reverse.material=material;reverse.rotation.z=Math.PI;object.add(reverse);}
       object.scale.set(1.4,1,1.4);cards.add(object);
     });dirty=true;
    }
    const elapsed=p.presentation.active?performance.now()-p.presentation.start:Infinity;
-   cards.children.forEach((object,i)=>{const move=p.presentation.plan.cards[i];if(!move)return;const pose=cardPose(move,elapsed);object.visible=pose.visible;object.position.fromArray(pose.position);});
+   cards.children.forEach((object,i)=>{const move=p.presentation.plan.cards[i];if(!move)return;const pose=cardPose(move,elapsed);object.visible=pose.visible;object.position.fromArray(pose.position);object.rotation.z=pose.rotation;});
    if(p.presentation.active)dirty=true;
-   if(!dirty||document.hidden)return;renderer.render(scene,camera);rendered++;canvas.dataset.blackjack=JSON.stringify({mine:p.mine,theirs:p.theirs,hidden:p.hidden,dealing:p.presentation.active,rendered,drawCalls:renderer.info.render.calls});dirty=false;
+   if(!dirty||document.hidden)return;renderer.render(scene,camera);rendered++;canvas.dataset.blackjack=JSON.stringify({mine:p.mine,theirs:p.theirs,hidden:p.hidden,dealing:p.presentation.active,flips:p.presentation.plan.cards.filter(c=>c.flip).length,rendered,drawCalls:renderer.info.render.calls});dirty=false;
   };frame=requestAnimationFrame(tick);
   return()=>{dead=true;cancelAnimationFrame(frame);observer.disconnect();disposeCityResources([scene,...models],{textures,materials});renderer.dispose();renderer.forceContextLoss();canvas.remove();};
  },[]);
