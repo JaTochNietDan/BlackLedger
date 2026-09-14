@@ -1585,6 +1585,14 @@ def police_officer():
         box('shoulder epaulette',(side*.23,0,1.405),(.10,.20,.026),navy,.01)
 
 
+def bar_cloth():
+    linen=material('washed bar linen',(.65,.61,.49))
+    stripe=material('woven blue border',(.20,.29,.32))
+    box('folded wiping cloth',(0,0,.005),(.19,.16,.01),linen,.004)
+    for x in (-.073,.073):box('cloth border',(x,0,.0105),(.009,.145,.002),stripe,.001)
+    for i in range(4):box('soft linen fold',(-.05+i*.035,0,.011),(.017,.14,.002),linen,.001)
+
+
 def mercer_lobby():
     plaster=material('aged cream plaster',(.56,.51,.40))
     wood=material('varnished walnut',(.18,.09,.045))
@@ -1721,6 +1729,14 @@ def mercer_court():
                 box('tenant letter box',(x,6.28,.98+row*.19),(.20,.08,.16),brass,.009)
                 box('letter slot',(x,6.325,1.02+row*.19),(.13,.01,.014),iron)
 
+if __name__ == '__main__' and '--only=bar-cloth' in __import__('sys').argv:
+    clear();bar_cloth()
+    manifest_path=os.path.join(OUT,'manifest.json')
+    with open(manifest_path) as f: selected_manifest=json.load(f)
+    selected_manifest['bar-cloth']=export('bar-cloth')
+    with open(manifest_path,'w') as f:json.dump(selected_manifest,f,indent=2)
+    raise SystemExit(0)
+
 # Export just this new address without rewriting reviewed assets.
 if __name__ == '__main__' and '--only=mercer-court' in __import__('sys').argv:
     clear();mercer_court()
@@ -1777,6 +1793,7 @@ clear();revolver();manifest['revolver']=export('revolver')
 for name in ('shotgun','thompson'):
     clear();long_gun(name);manifest[name]=export(name)
 clear();blast_fragment();manifest['blast-fragment']=export('blast-fragment')
+clear();bar_cloth();manifest['bar-cloth']=export('bar-cloth')
 clear();mariner();manifest['mariner']=export('mariner')
 clear();mercer_court();manifest['mercer-court']=export('mercer-court')
 clear();mercer_lobby();manifest['interior-mercer-court']=export('interior-mercer-court')

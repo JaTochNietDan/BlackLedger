@@ -1,3 +1,4 @@
+import {CounterWipe} from './interiorService';
 import {InteriorCastBatch} from './interiorCastBatch';
 import {interiorPlacements,mercerLobbyPlacements,interiorPlayerSpot,poseInteriorOccupant} from './interiorStaging';
 import {cameraCommand, KeyboardPan, bindKeyboardPan} from './city3dControls';
@@ -11,7 +12,7 @@ import {pedestrianModel} from './city3dCast';
 import {disposeCityResources} from './city3dResources';
 import './interior3d.css';
 
-export function Interior3D(props:{place:'bar'|'mercercourt';player:Pick<Person,'name'|'face'|'alive'>;people:Presence[];picked:string;onPick:(id:string)=>void;minute:number}) {
+export function Interior3D(props:{place:'bar'|'mercercourt';motion:boolean;player:Pick<Person,'name'|'face'|'alive'>;people:Presence[];picked:string;onPick:(id:string)=>void;minute:number}) {
  const host=useRef<HTMLDivElement>(null), latest=useRef(props);latest.current=props;
  const roomName=props.place==='mercercourt'?'Mercer Court':'Saint Agnes';
  const extraPeople=props.people.length-(props.place==='mercercourt'?mercerLobbyPlacements:interiorPlacements)(props.people).size;
@@ -36,17 +37,21 @@ export function Interior3D(props:{place:'bar'|'mercercourt';player:Pick<Person,'
   const sun=new THREE.DirectionalLight(0xffe3b0,3);sun.position.set(2,10,lobby?8:-8);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);
   Object.assign(sun.shadow.camera,{left:-9,right:9,top:9,bottom:-9,near:.1,far:35});sun.shadow.bias=-.0003;scene.add(sun);
   for(const x of (lobby?[-4.7,.1]:[-3,1,4])){const lamp=new THREE.PointLight(0xffba68,12,7,2);lamp.position.set(x,lobby?3.78:2.65,lobby?-6.2:2.7);scene.add(lamp);}
+  const reduce=matchMedia('(prefers-reduced-motion: reduce)');let reduced=reduce.matches;
+  const reduction=()=>{reduced=reduce.matches;dirty=true;};reduce.addEventListener('change',reduction);
   const models=new Map<string,THREE.Group>();const actors=new Map<string,THREE.Group>();let costumes:THREE.Material[]=[];
   const selected=new THREE.Mesh(new THREE.RingGeometry(.45,.5,40),new THREE.MeshBasicMaterial({color:0xcba85c,side:THREE.DoubleSide}));selected.rotation.x=-Math.PI/2;selected.position.y=.04;scene.add(selected);
   const playerMarker=new THREE.Mesh(new THREE.RingGeometry(.36,.41,40),new THREE.MeshBasicMaterial({color:0xede2bd,side:THREE.DoubleSide}));
   playerMarker.rotation.x=-Math.PI/2;playerMarker.position.y=.065;playerMarker.visible=false;scene.add(playerMarker);
   const loader=new GLTFLoader();
-  Promise.all([roomModel,'person','woman'].map(async name=>{
+  const modelNames=[roomModel,'person','woman',...(!lobby?['bar-cloth']:[])];
+  Promise.all(modelNames.map(async name=>{
    const gltf=await loader.loadAsync(`/art/models/${name}.glb`);
    if(dead){disposeCityResources([gltf.scene]);return;}models.set(name,gltf.scene);
   })).then(()=>{if(dead)return;const room=models.get(roomModel)!;
    room.traverse(o=>{if(o instanceof THREE.Mesh){o.castShadow=true;o.receiveShadow=true;}});scene.add(room);dirty=true;setStatus('');
   }).catch(()=>{if(!dead)setStatus('The 3D room could not load. The people and actions below remain available.');});
+  let service:CounterWipe|undefined,cloth:THREE.Group|undefined,serviceSeconds=0;
   let castBatch:InteriorCastBatch|undefined;
   let roster='',presentation='';
   const pick=new THREE.Raycaster();const pointer=new THREE.Vector2();let down={x:0,y:0};
@@ -84,7 +89,7 @@ export function Interior3D(props:{place:'bar'|'mercercourt';player:Pick<Person,'
     camera.position.add(controls.target.clone().sub(before));dirty=true;
    }
    const key=JSON.stringify([p.people.map(w=>[w.id,w.face,w.role]),[p.player.name,p.player.face,p.player.alive]]);
-   if(models.size===3&&key!==roster){roster=key;dirty=true;castBatch?.dispose();actors.forEach(a=>scene.remove(a));actors.clear();costumes.forEach(m=>m.dispose());costumes=[];
+   if(models.size===modelNames.length&&key!==roster){roster=key;dirty=true;service=undefined;cloth?.removeFromParent();cloth=undefined;castBatch?.dispose();actors.forEach(a=>scene.remove(a));actors.clear();costumes.forEach(m=>m.dispose());costumes=[];
     const placements=(lobby?mercerLobbyPlacements:interiorPlacements)(p.people);
     p.people.forEach(who=>{
      const spot=placements.get(who.id);if(!spot)return;
@@ -102,8 +107,12 @@ export function Interior3D(props:{place:'bar'|'mercercourt';player:Pick<Person,'
      object.traverse(o=>{if(o instanceof THREE.Mesh){o.castShadow=true;o.receiveShadow=true;}});
      actors.set('player',object);scene.add(object);
     }
+    if(!lobby){const bartender=[...actors.values()].find(a=>a.userData.spot==='service');if(bartender){
+     service=new CounterWipe(bartender);if(service.available){cloth=models.get('bar-cloth')!.clone(true);cloth.traverse(o=>{if(o instanceof THREE.Mesh){o.castShadow=true;o.receiveShadow=true;}});scene.add(cloth);service.pose(serviceSeconds);cloth.position.copy(service.clothPosition);}
+    }}
     castBatch=new InteriorCastBatch(actors);scene.add(castBatch.root);
    }
+   if(service?.available&&cloth&&p.motion&&!reduced&&!document.hidden){serviceSeconds+=Math.min(.05,Math.max(0,seconds));service.pose(serviceSeconds);cloth.position.copy(service.clothPosition);castBatch?.update();dirty=true;}
    const playerActor=actors.get('player');playerMarker.visible=!!playerActor;
    if(playerActor){playerMarker.position.x=playerActor.position.x;playerMarker.position.z=playerActor.position.z;}
    const chosen=actors.get(p.picked);selected.visible=!!chosen;if(chosen){selected.position.x=chosen.position.x;selected.position.z=chosen.position.z;}
@@ -115,15 +124,15 @@ export function Interior3D(props:{place:'bar'|'mercercourt';player:Pick<Person,'
     const left=room?.getObjectByName('interior-wall-left'),back=room?.getObjectByName('interior-wall-back');
     if(left)left.visible=camera.position.x>=-5.8;
     if(back)back.visible=lobby?camera.position.z>=-6.8:camera.position.z<=4.8;
-    // Cast matrices change only when the roster/pose is rebuilt; orbiting does
-    // not need to upload the same instance buffers again.
+    // Moving service poses refresh the cast above; orbiting a static room
+    // does not re-upload its unchanged instance buffers.
     renderer.render(scene,camera);renderedFrames++;dirty=false;
-    if(models.size===3)canvas.dataset.interior=JSON.stringify({place:p.place,people:[...actors.keys()],occupants:[...actors].map(([id,a])=>({id,spot:a.userData.spot,x:a.position.x,y:a.position.y,z:a.position.z})),picked:p.picked,
+    if(models.size===modelNames.length)canvas.dataset.interior=JSON.stringify({place:p.place,people:[...actors.keys()],occupants:[...actors].map(([id,a])=>({id,spot:a.userData.spot,x:a.position.x,y:a.position.y,z:a.position.z})),picked:p.picked,
       drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,renderedFrames,
-      zoom:camera.zoom,omitted:Math.max(0,p.people.length-actors.size+(playerActor?1:0)),cutawayWalls:[...(!left?.visible?['left']:[]),...(!back?.visible?['back']:[])]});
+      zoom:camera.zoom,service:service?.available?{seconds:serviceSeconds,cloth:service.clothPosition.toArray()}:undefined,omitted:Math.max(0,p.people.length-actors.size+(playerActor?1:0)),cutawayWalls:[...(!left?.visible?['left']:[]),...(!back?.visible?['back']:[])]});
    }
   };frame=requestAnimationFrame(tick);
-  return()=>{unbindPan();dead=true;cancelAnimationFrame(frame);observer.disconnect();controls.removeEventListener('change',changed);controls.dispose();canvas.removeEventListener('keydown',keys);canvas.removeEventListener('pointerdown',press);canvas.removeEventListener('pointerup',release);castBatch?.dispose();disposeCityResources([scene,...models.values()]);renderer.dispose();renderer.forceContextLoss();canvas.remove();};
+  return()=>{reduce.removeEventListener('change',reduction);unbindPan();dead=true;cancelAnimationFrame(frame);observer.disconnect();controls.removeEventListener('change',changed);controls.dispose();canvas.removeEventListener('keydown',keys);canvas.removeEventListener('pointerdown',press);canvas.removeEventListener('pointerup',release);castBatch?.dispose();disposeCityResources([scene,...models.values()]);renderer.dispose();renderer.forceContextLoss();canvas.remove();};
  },[props.place]);
  return <div className="interior3d"><div ref={host} className="interior3d-canvas"/><span className="interior3d-caption">{roomName} · {props.player.name}: pale ring · Drag / Q/E: orbit · Scroll / +/−: zoom · WASD / arrows: pan · Home: reset · Select a person{extraPeople>0&&` · ${extraPeople} more in the people list`}</span>{status&&<p role="status">{status}</p>}</div>;
 }

@@ -80,6 +80,7 @@ function Work({
 export function Interior({
   place,
   player,
+  motion,
   people,
   actions,
   render,
@@ -91,6 +92,7 @@ export function Interior({
   minute,
 }: {
   place: Place;
+  motion: boolean;
   player: Pick<Person,'name'|'face'|'alive'>;
   people: Presence[];
   actions: Action[];
@@ -265,7 +267,7 @@ export function Interior({
           ))}
         </div>
       )}
-      {place.id === 'bar' || place.id === 'mercercourt' ? <Interior3D key={place.id} place={place.id} player={player} people={onFloor} picked={picked} onPick={id=>setPicked(id===picked?'':id)} minute={minute}/> : <div
+      {place.id === 'bar' || place.id === 'mercercourt' ? <Interior3D key={place.id} place={place.id} player={player} motion={motion} people={onFloor} picked={picked} onPick={id=>setPicked(id===picked?'':id)} minute={minute}/> : <div
         className={'room' + (painted ? ' painted' : '')}
         style={painted ? {backgroundImage: `url(${paintedRoom(place.id)})`} : undefined}
       >

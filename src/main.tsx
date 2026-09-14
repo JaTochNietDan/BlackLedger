@@ -768,6 +768,7 @@ function App() {
               {inside && sceneOverlay}
               {cityView === 'interior' && locationInfo.id === p.location ? (
                 <Interior
+                  motion={motion}
                   player={p}
                   place={locationInfo}
                   people={locationInfo.people || []}

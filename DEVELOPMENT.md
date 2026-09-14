@@ -202,3 +202,14 @@ Evidence:228/228 frontend tests passed (.runtime/interior-batch-final-tests.log)
 CUA isolated8891, unchanged six-character bar fixture:331→143 draws (56.8% reduction), unchanged166136 rendered triangles. Clicked the batched barman and received Aldo Olsen's own actions. Leave/re-enter restored the same cast and143 draws; no browser errors. Isolated8890 lobby:177→131 draws with unchanged152112 triangles and the same three actors. Screenshots visually reviewed for appearance and seating. No main campaign writes or simulation commands. Draw-call reduction is measured; general60FPS/crowded-scene GPU acceptance remains unproven.
 
 This optimizes the two current interactive interiors. City traffic/effect batching, full interior animation, other buildings and the wider visual/gameplay production scope remain active.
+
+
+### 2026-09-14 — bartender counter service animation
+
+Saint Agnes's public bartender now wipes a clear strip of the marble counter with a locally authored Blender cloth. The articulated hand drives the cloth position; iterative contact fitting uses the actual hand geometry without changing arm lengths or moving the feet. The cloth includes folded linen geometry and blue woven borders. Targeted reproducible export: `.venv-blender/bin/python tools/export_city3d.py --only=bar-cloth`. Only an existing public service-role occupant receives this cosmetic activity; no new simulation action or clock advancement is invented.
+
+Passed the existing scenes preference into interactive rooms. Motion pauses when scenes are disabled, the document is hidden, or the system requests reduced motion. Animated poses refresh the character instance batch; static rooms keep render-on-demand behavior.
+
+Validation:230/230 frontend tests passed (.runtime/interior-service-tests.log), including360 sampled poses for each actual male/female GLB, hand/cloth contact, countertop clearance, cloth movement and unchanged feet/root. TypeScript/Vite passed2.53s (.runtime/interior-service-build.log). HTTP command/public-state/campaign tests passed.513s (.runtime/interior-service-http.log). Browser CUA isolated8891 showed all six actors,147 draw calls and167648 triangles. Successive live observations confirmed cloth movement; disabling scenes held both pose time17.5202 and rendered-frame count2519 unchanged across observations, and reenabling resumed motion. No browser errors; the screenshot was reviewed for staging/contact. System reduced-motion behavior is implemented but was not separately toggled in browser QA. Main campaign untouched.
+
+This adds one service animation, not full arrival/exit, crowd idle behavior or interior combat. Other interiors, higher visual fidelity, full event variants, gameplay progression and comprehensive campaign/performance acceptance remain outstanding.
