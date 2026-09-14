@@ -1174,5 +1174,21 @@
       ]
     ],
     "bytes": 697364
+  },
+  "interior-mortuary": {
+    "file": "interior-mortuary.glb",
+    "bounds_blender": [
+      [
+        -5.08,
+        -5.0,
+        -0.2
+      ],
+      [
+        5.0,
+        5.08,
+        3.7
+      ]
+    ],
+    "bytes": 1241656
   }
 }

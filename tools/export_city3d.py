@@ -2526,6 +2526,20 @@ if __name__ == '__main__' and '--only=interior-docks' in __import__('sys').argv:
     raise SystemExit(0)
 
 
+def mortuary_interior():
+    from mortuary_interior import build
+    build(box,cylinder,material)
+
+
+if __name__ == '__main__' and '--only=interior-mortuary' in __import__('sys').argv:
+    clear();mortuary_interior()
+    manifest_path=os.path.join(OUT,'manifest.json')
+    with open(manifest_path) as f: selected_manifest=json.load(f)
+    selected_manifest['interior-mortuary']=export('interior-mortuary')
+    with open(manifest_path,'w') as f:json.dump(selected_manifest,f,indent=2)
+    raise SystemExit(0)
+
+
 def chapel_interior():
     from chapel_interior import build
     build(box,cylinder,material)
@@ -2780,6 +2794,7 @@ clear();tailor_interior();manifest['interior-tailor']=export('interior-tailor')
 clear();cabstand_interior();manifest['interior-cabstand']=export('interior-cabstand')
 clear();docks_interior();manifest['interior-docks']=export('interior-docks')
 clear();chapel_interior();manifest['interior-chapel']=export('interior-chapel')
+clear();mortuary_interior();manifest['interior-mortuary']=export('interior-mortuary')
 clear();herald_interior();manifest['interior-herald']=export('interior-herald')
 clear();pawn_interior();manifest['interior-pawn']=export('interior-pawn')
 clear();exchange_interior();manifest['interior-exchange']=export('interior-exchange')

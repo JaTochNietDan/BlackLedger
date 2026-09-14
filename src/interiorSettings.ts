@@ -3,6 +3,7 @@ type RoomSettings={lampIntensity?:number;name:string;model:string;span:number;le
 // Coordinates are glTF metres. Cutaway thresholds follow each authored wall;
 // fixtures are positioned in the room that owns them, never borrowed by fallback.
 export const interiorSettings:Record<InteriorPlace,RoomSettings>={
+ mortuary:{lampIntensity:2,name:"Bellwether Mortuary",model:"interior-mortuary",span:7,leftWall:-5,backWall:-5,lamps:[[-2,2.94,0],[2,2.94,0]]},
  cabstand:{lampIntensity:2,name:'Vance Cab Company',model:'interior-cabstand',span:7,leftWall:-5,backWall:-5,lamps:[[-2,2.9,0],[2,2.9,0]]},
  docks:{lampIntensity:2,name:'Pier 14',model:'interior-docks',span:8,leftWall:-6,backWall:-6,lamps:[[-2.4,3.40,0],[2.4,3.40,0]]},
  chapel:{lampIntensity:1.8,name:'Thorne & Sons',model:'interior-chapel',span:7,leftWall:-5,backWall:-5.5,lamps:[[-2.1,2.9,.4],[2.1,2.9,.4]]},

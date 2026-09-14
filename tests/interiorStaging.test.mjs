@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import * as THREE from 'three';
 import {readFileSync} from 'node:fs';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
-import {interiorPlacements,poseInteriorOccupant} from '../.runtime/frontend-test/interiorStaging.js';
+import {interiorPlacements,poseInteriorOccupant,placementsForInterior} from '../.runtime/frontend-test/interiorStaging.js';
 async function model(name){
  const b=readFileSync(new URL(`../public/art/models/${name}.glb`,import.meta.url)),loader=new GLTFLoader();
  loader.register(()=>({name:'geometry-only',loadMaterial(){return Promise.resolve(new THREE.MeshStandardMaterial());}}));
@@ -100,4 +100,13 @@ test('Mariner stages its public landlady at reception and keeps every rig clear 
  }
  const room=await model('interior-mariner');assert.ok(room.getObjectByName('interior-wall-left'));assert.ok(room.getObjectByName('interior-wall-back'));
  const bounds=new THREE.Box3().setFromObject(room,true);assert.ok(bounds.min.x>=-5.12&&bounds.max.x<=5.01&&bounds.min.z>=-6.12&&bounds.max.z<=4.01);
+});
+
+test('mortuary registry is reserved for a public attendant and receiving spots stay distinct',()=>{
+ const people=[{id:'visitor'}, {id:'worker',role:'Receiving attendant'},...Array.from({length:5},(_,i)=>({id:`guest-${i}`}))];
+ const a=placementsForInterior('mortuary',people);
+ assert.deepEqual([...a],[...placementsForInterior('mortuary',[...people].reverse())]);
+ assert.equal(a.get('worker').id,'registry-clerk');
+ assert.equal(new Set([...a.values()].map(s=>s.id)).size,a.size);
+ assert.equal([...placementsForInterior('mortuary',[{id:'visitor'}]).values()].some(s=>s.id==='registry-clerk'),false);
 });

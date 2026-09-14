@@ -2972,3 +2972,38 @@ separate burial/cremation custom, family and individual owner margins, closed
 providers, duplicate prevention and old-save initialization. Distinct 3D assets
 and interior staging for these addresses are still pending; currently they use
 the generic work-building map representation. Nothing promoted to8791.
+
+### September 14 — authored mortuary receiving room
+
+Previous turn was progress: added funded death-service premises. Revalidated
+full clean86dd0d0 suite session55129; still running. cmd/blackledger has already
+reported missing painted fronts and fallback interiors for the three new
+addresses. These are actual remaining release defects, not a passed full run.
+Do not restart the still-live suite or promote this incomplete asset set.
+
+Authored original Blender mortuary receiving room: six cold cabinet doors with
+gaskets/hinges/latches, jade wall tiles, terrazzo floor, stainless empty trolley
+and basin, oak registry desk/telephone/register, filing drawers, visitor chairs,
+lettering and milk-glass task lights. Exported interior-mortuary.glb1241656bytes;
+reproducible via .venv-blender/bin/python tools/export_city3d.py
+--only=interior-mortuary. Registered room camera/cutaway settings and reserved
+occupant positions. Only an actual public attendant/clerk gets the registry.
+Recorded indoor strikes can now use this room through existing room routing.
+
+Isolated fixture .runtime/mortuary-interior-qa.sqlite3 on8987 (session60850),
+new mortuary-interior scenario. Browser96 G-entered and visually inspected at
+1235x1053: six public occupants plus player clear of furnishings, registry
+attendant behind desk, receiving cabinets/trolley and header readable. Current
+room geometry and controls are in the main stage; no live8791 commands.
+Production build passed4.59s before the attendant-only correction; final build
+and frontend tests are recorded in.runtime/mortuary-final-build.log and
+.runtime/mortuary-ui-tests.log. Expanded the existing indoor-strike placement
+check to the actual mortuary GLB and added public registry assignment coverage.
+Distinct exterior, fallback art, cemetery and crematorium interiors remain.
+
+Final build passed5.64s. Full frontend run finished402passed/2failed: the
+new registry test lacked its import (corrected), and city-grid reports shared
+generic silhouettes for new service addresses. The silhouette failure is a
+real pending exterior task and was not suppressed. Rechecked targeted staging
+and indoor-strike tests after the import correction; results in
+.runtime/mortuary-targeted-ui.log. No claim that all frontend tests passed.
