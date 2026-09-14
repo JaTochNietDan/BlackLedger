@@ -203,7 +203,7 @@ func (w *World) itWentWrong(n *NPC, hand Hand, where string, family *Faction) {
 			w.DieOf("an attempt of your own", "An attempt on "+n.Name+" at "+where+" that went the other way.")
 			return
 		}
-		w.HandHurt(hand, 55, "")
+		w.HandHurt(hand, 55, "go after "+n.Name+" at "+where)
 		w.Log("It went wrong", fmt.Sprintf("%s is alive, knows your face, and you came out of %s worse than you went in.", n.Name, where), "danger")
 		return
 	}
@@ -237,7 +237,7 @@ func (w *World) itWentWrong(n *NPC, hand Hand, where string, family *Faction) {
 		}
 		w.Log("They gave up a name", fmt.Sprintf("%s was taken alive at %s and questioned. Your name came out of it.", who.Name, where), "danger")
 	default:
-		w.HandHurt(hand, 40, "")
+		w.HandHurt(hand, 40, "go after "+n.Name+" at "+where)
 		w.Log("They got away with nothing", fmt.Sprintf("%s went for %s at %s, did not finish it, and got out. %s is alive and looking.",
 			who.Name, n.Name, where, n.Name), "danger")
 	}

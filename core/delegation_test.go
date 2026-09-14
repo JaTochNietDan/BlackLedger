@@ -290,3 +290,27 @@ func TestTheCounterWillArmYourOwnPeople(t *testing.T) {
 		t.Fatal("bought them a revolver while they are carrying a Thompson")
 	}
 }
+
+func TestFailedDelegatedStrikeNamesTheTargetAndPlace(t *testing.T) {
+	seen := 0
+	for seed := uint32(1); seed <= 64; seed++ {
+		w := withCrew(t, 80)
+		w.RNG = seed * 2654435761
+		mark := &NPC{ID: "target", Name: "Morgan Dale", Location: "bar"}
+		w.NPCs = append(w.NPCs, *mark)
+		hand, _ := w.CrewHands()
+		w.itWentWrong(w.NPC(mark.ID), hand, "Saint Agnes", nil)
+		for _, record := range w.History {
+			if !strings.HasSuffix(record.Title, " took it instead of you") {
+				continue
+			}
+			seen++
+			if !strings.Contains(record.Text, "go after Morgan Dale at Saint Agnes") {
+				t.Fatalf("lost the delegated task: %s", record.Text)
+			}
+		}
+	}
+	if seen == 0 {
+		t.Fatal("did not exercise an injured returning crew member")
+	}
+}
