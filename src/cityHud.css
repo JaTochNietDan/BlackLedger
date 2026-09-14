@@ -122,3 +122,6 @@
 .map-first .map-outcome-folded[open]{width:min(540px,calc(100vw - 100px))}
 .map-first .map-outcome-folded .outcome-band{box-shadow:none;border-bottom:0}
 .map-outcome-folded>summary:focus-visible{outline:2px solid #873f2d;outline-offset:-4px}
+
+.lodging-register{margin:12px 0;background:var(--newsprint),#e5d4b2;color:#3d301f;border-block:3px double #91734d;padding:12px 18px;font:14px/1.5 Georgia,serif}
+.lodging-register summary{cursor:pointer;font-weight:bold}.lodging-register summary span{float:right;font-size:12px;font-weight:normal}.lodging-register p{font-size:12px}.lodging-register ul{list-style:none;margin:0;padding:0;max-height:280px;overflow:auto}.lodging-register li{padding:8px 0;border-top:1px solid #b3a07b;display:flex;flex-wrap:wrap;gap:4px 16px}.lodging-register li strong{flex:1 1 180px}.lodging-register li small{width:100%;color:#715332}

@@ -38,6 +38,11 @@ func (w *World) Books() map[string]any {
 		income += w.HourlyIncome(l.ID)
 	}
 	daily := int(income * 24)
+	for _, id := range []string{"room", "apartment"} {
+		if w.Own(id) {
+			daily += w.RentalDaily(id)
+		}
+	}
 
 	out := []Line{}
 	add := func(label string, amount int, detail string) {
@@ -45,7 +50,7 @@ func (w *World) Books() map[string]any {
 			out = append(out, Line{label, amount, detail})
 		}
 	}
-	add("Rent", HomeRent(p.Home), placeName(p.Home))
+	add("Rent", w.HomeCost(p.Home), placeName(p.Home))
 	add("Security", 10*p.Security, plural(p.Security, "detail", "details"))
 	add("Crew", 12*len(p.Crew), plural(len(p.Crew), "on the payroll", "on the payroll"))
 	add("Staff", w.Wages(), plural(w.staffed(), "hand", "hands")+" across your premises")

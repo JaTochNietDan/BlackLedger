@@ -70,6 +70,7 @@ export interface Presence {
   minutes?: number;
 }
 export interface Place {
+	 rent_register?: {capacity:number; occupied:number; daily:number; tenants:{id:string;name:string;daily:number;accommodation:string;account?:{day:number;due:number;paid:number;arrears:number;collected:number}}[]} | null;
   crossing?: {
     to: string;
     to_id: string;

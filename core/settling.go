@@ -44,7 +44,7 @@ func (w *World) Settle() {
 	// The roof over their head, down to a rented room.
 	if p.Cash < bill && p.Home != "room" {
 		lost = append(lost, "your residence is now a rented room")
-		bill -= HomeRent(p.Home) - HomeRent("room")
+		bill -= w.HomeCost(p.Home) - w.HomeCost("room")
 		p.Home = "room"
 	}
 

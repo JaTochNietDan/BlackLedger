@@ -245,6 +245,14 @@ export function Interior({
         </div>
         {place.note && <small className={place.note_warn ? 'warning' : ''}>{place.note}</small>}
       </div>
+      {place.rent_register && <details className="lodging-register">
+        <summary>Residents’ register <span>{place.rent_register.occupied} tenants · {place.rent_register.capacity} places</span></summary>
+        <p>${place.rent_register.daily} contracted per day · Payments settle daily; unpaid rent remains owing.</p>
+        <ul>{place.rent_register.tenants.map(tenant=><li key={tenant.id}>
+          <strong>{tenant.name}</strong><span>{tenant.accommodation} · ${tenant.daily} a day</span>
+          {tenant.account && <small>Last payment ${tenant.account.paid} · {tenant.account.arrears ? `$${tenant.account.arrears} owing` : 'Account settled'}</small>}
+        </li>)}</ul>
+      </details>}
       {!!traffic.length && (
         <div className="room-traffic" role="status">
           {traffic.map(c => (

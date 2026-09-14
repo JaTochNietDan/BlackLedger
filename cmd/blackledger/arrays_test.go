@@ -66,6 +66,7 @@ func TestNoListInTheCoreLeavesItselfOut(t *testing.T) {
 // a result from a hand nobody has played, a page nobody has printed. Each is
 // one thing or no thing, never a list, and the view asks whether it is there.
 var mayBeNothing = map[string]bool{
+	"rent_register": true, // Non-residential premises have no lodging register.
 	"event": true, "last_result": true, "press": true, "cards": true, "epitaph": true,
 	"trade": true, "posted": true, "note": true, "room": true, "travel_note": true,
 	"crossing": true, "away": true, "runs": true, "handle": true, "curtains": true,

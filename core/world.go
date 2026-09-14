@@ -134,6 +134,7 @@ type Crew struct {
 	Loyalty int    `json:"loyalty"`
 }
 type NPC struct {
+	BudgetDay     int    `json:"budget_day,omitempty"`
 	Home          string `json:"home,omitempty"`
 	Accommodation string `json:"accommodation,omitempty"`
 	ID            string `json:"id"`
@@ -245,10 +246,11 @@ type Faction struct {
 	Short int `json:"short,omitempty"`
 }
 type Property struct {
-	Owner     string  `json:"owner"`
-	Condition int     `json:"condition"`
-	Income    int     `json:"income"`
-	Carry     float64 `json:"carry"`
+	Rents     map[string]*RentAccount `json:"rents,omitempty"`
+	Owner     string                  `json:"owner"`
+	Condition int                     `json:"condition"`
+	Income    int                     `json:"income"`
+	Carry     float64                 `json:"carry"`
 	// How the business is run. Empty means the ordinary way, so saves written
 	// before this was a decision keep earning exactly what they earned.
 	Mode string `json:"mode,omitempty"`
@@ -921,7 +923,7 @@ func (w *World) Guard() int {
 	return n
 }
 func (w *World) DailyCost() int {
-	return HomeRent(w.Player.Home) + 10*w.Player.Security + 12*len(w.Player.Crew) + w.Wages() + w.CarUpkeep() + w.ComfortUpkeep() + w.RetainerCost() + w.MemberWages() + w.PactCost()
+	return w.HomeCost(w.Player.Home) + 10*w.Player.Security + 12*len(w.Player.Crew) + w.Wages() + w.CarUpkeep() + w.ComfortUpkeep() + w.RetainerCost() + w.MemberWages() + w.PactCost()
 }
 func TravelMinutes(a, b string) int {
 	x, _ := PlaceByID(a)
@@ -1969,7 +1971,7 @@ func (w *World) Actions(id string) []Action {
 				}
 				leaving = " You would be leaving " + joinNames(labels) + " behind."
 			}
-			add("move_home", label, 60, cost, reason, fmt.Sprintf("$%d/day upkeep. Moving resets hired security. Respect is earned only for a new housing tier.%s", HomeRent(id), leaving))
+			add("move_home", label, 60, cost, reason, fmt.Sprintf("$%d/day upkeep. Moving resets hired security. Respect is earned only for a new housing tier.%s", w.HomeCost(id), leaving))
 		} else {
 			add("rest", "Rest for four hours", 240, 0, "", "Recover up to 25 health as you rest. Rivals can act while you sleep.")
 			add("security", "Hire another security detail", 30, 100, need(p.Security >= 3, "Maximum security hired"), "Improves detection and survival at home. Adds $10/day upkeep.")
@@ -2490,9 +2492,13 @@ func (w *World) Public() map[string]any {
 	for _, l := range Locations {
 		prop := w.Properties[l.ID]
 		if w.Own(l.ID) {
-			income += float64(prop.Income*prop.Condition) / 100
+			if l.ID == "room" || l.ID == "apartment" {
+				income += float64(w.RentalDaily(l.ID)) / 24
+			} else {
+				income += float64(prop.Income*prop.Condition) / 100
+			}
 		}
-		locs = append(locs, map[string]any{"id": l.ID, "name": l.Name, "type": l.Type, "district": l.District, "x": l.X, "y": l.Y, "cost": AcquisitionCost(w, l.ID), "blurb": l.Blurb, "owner": prop.Owner, "holder": w.HolderName(l.ID), "staff": prop.Staff, "hands": w.HandsDescription(l.ID), "wage": w.WageAt(l.ID), "runs": w.RunsItName(l.ID), "rate": tradeWage(l.ID), "positions": tradeHands(l.ID), "supply": prop.Supply, "unpaid": prop.Unpaid, "run_as": w.HowItIsRun(l.ID), "skimmed": w.RunHard(l.ID), "back_room": HasBackRoom(l.ID), "trouble": prop.Trouble, "shy": w.Shy(l.ID), "curtains": w.Curtains(l.ID), "trade": w.CustomDescription(l.ID), "posted": w.PostingDescription(l.ID), "people": w.PeopleHere(l.ID), "note": w.PlaceNote(l.ID), "room": w.RoomNote(l.ID), "note_warn": w.PlaceWarn(l.ID), "away": w.Away(l.ID), "travel_note": w.TravelNote(l.ID), "crossing": w.Crossing(w.Player.Location, l.ID), "still": prop.Still, "bankroll": prop.Bankroll, "handle": w.NightHandleAt(l.ID), "capacity": w.Capacity(l.ID), "trading": w.Trading(l.ID), "condition": prop.Condition, "income": prop.Income, "owned": w.Own(l.ID), "locked": l.District > w.District, "actions": w.Actions(l.ID)})
+		locs = append(locs, map[string]any{"id": l.ID, "name": l.Name, "type": l.Type, "district": l.District, "x": l.X, "y": l.Y, "cost": AcquisitionCost(w, l.ID), "blurb": l.Blurb, "owner": prop.Owner, "holder": w.HolderName(l.ID), "rent_register": w.RentRegister(l.ID), "staff": prop.Staff, "hands": w.HandsDescription(l.ID), "wage": w.WageAt(l.ID), "runs": w.RunsItName(l.ID), "rate": tradeWage(l.ID), "positions": tradeHands(l.ID), "supply": prop.Supply, "unpaid": prop.Unpaid, "run_as": w.HowItIsRun(l.ID), "skimmed": w.RunHard(l.ID), "back_room": HasBackRoom(l.ID), "trouble": prop.Trouble, "shy": w.Shy(l.ID), "curtains": w.Curtains(l.ID), "trade": w.CustomDescription(l.ID), "posted": w.PostingDescription(l.ID), "people": w.PeopleHere(l.ID), "note": w.PlaceNote(l.ID), "room": w.RoomNote(l.ID), "note_warn": w.PlaceWarn(l.ID), "away": w.Away(l.ID), "travel_note": w.TravelNote(l.ID), "crossing": w.Crossing(w.Player.Location, l.ID), "still": prop.Still, "bankroll": prop.Bankroll, "handle": w.NightHandleAt(l.ID), "capacity": w.Capacity(l.ID), "trading": w.Trading(l.ID), "condition": prop.Condition, "income": prop.Income, "owned": w.Own(l.ID), "locked": l.District > w.District, "actions": w.Actions(l.ID)})
 	}
 	var scene any = nil
 	if e := w.Event; e != nil {

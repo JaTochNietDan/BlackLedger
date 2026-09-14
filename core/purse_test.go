@@ -72,6 +72,7 @@ func TestStarvingAFamilyEmptiesItsPeoplesPockets(t *testing.T) {
 
 	// A fortnight of the family paying its way.
 	for day := 0; day < 14; day++ {
+		w.Minute += 1440
 		w.FamilyDay()
 		w.PayTheCity()
 	}
@@ -88,6 +89,7 @@ func TestStarvingAFamilyEmptiesItsPeoplesPockets(t *testing.T) {
 		w.Properties[id].Owner = "player:1"
 	}
 	for day := 0; day < 45; day++ {
+		w.Minute += 1440
 		w.FamilyDay()
 		w.PayTheCity()
 	}

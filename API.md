@@ -506,3 +506,11 @@ this residence assignment is not yet a paid lease or NPC return-home schedule.
 ## Residential routines
 
 Ordinary NPCs with a home and workplace now schedule homeward journeys at midnight, with deterministic departure staggering, and reconsider work at 06:00. Existing noon evening routines remain. Duties, custody and urgent errands retain priority; this is not a complete shift system for officials or business managers. Home arrivals preserve the separate workplace. These trips use the existing public street and recorded travel segments; no frontend clock or endpoint changes. Taking office clears a successor's previous journey and sets their new workplace.
+
+## Save schema v16 — residential rent accounts
+
+NPC `budget_day` guards salary and living-expense settlement once per calendar day. Property `rents` maps tenant IDs to accounts (`day`, current `due`, most recent `paid`, outstanding `arrears`, lifetime `collected`). Day keys are minute/1440+1. Missing old-save accounts start on the next settlement without historical bills. Rent replaces the former bundled lodging expense: Mariner/shared flats cost15 daily, private Ashbury apartments35, plus4 other necessities. Existing salary recovery covers the selected accommodation; missed family payroll can leave arrears.
+
+Only living residents pay; work/travel does not remove tenancy. Cash transfers once to the current owner, and property receivables remain with the premises on transfer. Independent-owner payments leave the modeled cash pool. Old debts remain on the previous premises if somebody moves; debt enforcement/eviction is not implemented. Mariner/Ashbury earn no duplicate hourly cash. Books and public income show the contracted living-tenant rate, which is a forecast rather than guaranteed collection. A player owning their Mariner/Ashbury residence pays no room rent to themselves; Cypress household upkeep remains unchanged.
+
+Locations have `rent_register` (null outside Mariner/Ashbury): capacity, occupied NPC count, daily contracted rate and a non-null tenants list with ID/name/accommodation/daily rate. The player's reserved place is not an NPC tenant. Owner views additionally include each existing account by value; nonowners do not receive account balances. The interior exposes the register. Mariner purchase and operating controls are still outstanding.

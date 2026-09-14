@@ -254,9 +254,10 @@ const LivingCost = 12
 func (w *World) PayTheCity() {
 	for i := range w.NPCs {
 		n := &w.NPCs[i]
-		if n.Dead {
+		if n.Dead || n.BudgetDay == w.Minute/1440+1 {
 			continue
 		}
+		n.BudgetDay = w.Minute/1440 + 1
 		// A day's earnings cover the day and make up a seventh of whatever the
 		// week has taken off them, so somebody robbed on Monday is themselves
 		// again by the weekend and nobody accumulates without end. A flat
@@ -265,7 +266,8 @@ func (w *World) PayTheCity() {
 		// four, and a day costs twelve — so three quarters of the city was
 		// broke inside four months.
 		standing := w.StandingPurse(n)
-		earned := LivingCost + max(0, standing-n.Purse)/7
+		cost := w.NPCLivingCost(n)
+		earned := cost + max(0, standing-n.Purse)/7
 		if f := w.faction(n.Faction); f != nil && f.Short > 0 {
 			// Their family missed payday. Officials are on the city's books
 			// rather than a family's and are paid regardless.
@@ -276,7 +278,8 @@ func (w *World) PayTheCity() {
 		if earned > 0 {
 			n.Paid = max(1, w.Minute)
 		}
-		n.Purse = max(0, n.Purse+earned-LivingCost)
+		n.Purse = max(0, n.Purse+earned-(cost-w.NPCRent(n)))
+		w.collectRent(n)
 	}
 }
 
