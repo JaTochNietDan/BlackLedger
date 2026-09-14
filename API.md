@@ -634,9 +634,12 @@ This is a staged core contract. No action listing or command dispatch is enabled
 yet. City3D now plays the captured car and distinct driver/shooter through a
 reserved road sweep, with timed gunfire, facade dust and vehicle audio; the
 Building drive-by debug preview uses a private Packard/Thompson cast without
-changing campaign condition. Captured condition reveal, verified facade targets
-across buildings, recorded-result news sequencing and actual command acceptance
-remain required before exposing the gameplay action.
+changing campaign condition. Material wear and glazing reveal the captured
+condition loss across the firing beats; before firing they show the recorded
+starting condition. Scene completion or cancellation restores the current
+snapshot's condition (including undoing private preview damage). Verified facade
+targets across buildings, recorded-result news sequencing and actual command
+acceptance remain required before exposing the gameplay action.
 
 
 Pending planter exits now hold their future footprint against newly arriving moving

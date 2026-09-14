@@ -6,6 +6,12 @@ export const BUILDING_DRIVEBY_SECONDS=6.2;
 export const buildingDriveByShots=(weapon:string):readonly number[]=>weapon==='thompson'
  ? [2.4,2.49,2.58,2.67,3.2,3.29,3.38,3.47]
  : weapon==='shotgun'?[2.4,3.6]:[2.4,2.8,3.2,3.6];
+/** Reveal only the recorded total damage, distributed across the firing beats.
+ * This is a visual interpolation, never an additional gameplay damage roll. */
+export function buildingDriveByCondition(before:number,after:number,seconds:number,weapon:string){
+ const shots=buildingDriveByShots(weapon),landed=shots.filter(at=>seconds>=at).length;
+ return before+Math.round((after-before)*landed/shots.length);
+}
 const ease=(v:number)=>{const t=Math.max(0,Math.min(1,v));return t*t*(3-2*t);};
 
 /** Integrated continuous velocity: approach, slow firing pass, accelerating exit.

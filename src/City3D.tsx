@@ -1,4 +1,4 @@
-import {CityBuildingDriveBy} from './city3dBuildingDriveBy';
+import {CityBuildingDriveBy,buildingDriveByCondition} from './city3dBuildingDriveBy';
 import {CityVillaExit} from './city3dVillaExit';
 import {CityAccident} from './city3dAccident';
 import {CityPlanter} from './city3dPlanter';
@@ -1171,7 +1171,7 @@ export function City3D(props: Props) {
         // Condition-driven surface stains imply no ongoing fire or invented collapse.
         for (const place of w.locations) {
           const b = buildings.get(place.id);
-          if (b) {b.userData.condition=place.condition;buildingGlazing(b,place.condition);}
+          if (b) {b.userData.condition=place.condition;b.userData.renderedCondition=place.condition;buildingGlazing(b,place.condition);}
           if (b)
             b.traverse(o => {
               if (o instanceof THREE.Mesh) {
@@ -1891,10 +1891,19 @@ export function City3D(props: Props) {
       }
       for(const [id,b] of buildings){
         const condition=b.userData.condition??100;
+        const drive=effects.find(e=>e.driveBy&&e.cue.target===id);
+        const record=drive?.cue.drive_by;
+        const shown=record?buildingDriveByCondition(record.condition_before,record.condition_after,
+          drive?.extra?.visible?(now-drive.since)/1000:-1,drive!.weaponModel!):condition;
+        if(b.userData.renderedCondition!==shown){
+          b.traverse(o=>{if(o instanceof THREE.Mesh)for(const material of Array.isArray(o.material)?o.material:[o.material])
+            if(material instanceof THREE.MeshStandardMaterial)buildingCondition(material,shown,b.position);});
+          b.userData.renderedCondition=shown;
+        }
         const blast=effects.find(e=>e.cue.kind==='explosion'&&e.cue.target===id&&internalDetonation(e.cue,w.building_fires||[]));
         const before=blast?.glazingBefore??condition,age=blast?(now-blast.since)/1000:0;
         const preview=!!blast?.cue.id.startsWith('preview:');
-        buildingGlazing(b,blast?glazingDuringBlast(condition,before,age,preview):condition);
+        buildingGlazing(b,drive?shown:blast?glazingDuringBlast(condition,before,age,preview):condition);
         if(blast&&before>=60&&(preview||condition<60)&&b.getObjectByName('window-broken'))blast.glassAudio?.update(age-GLASS_BREAK_AT,soundOn());
       }
       const revealedFires=fireRecords.filter(f=>!effects.some(e=>e.cue.target===f.target&&((e.incendiary&&(!e.slot||now-e.since<INCENDIARY_IMPACT*1000))||(e.planter&&(!e.slot||now<e.since)))));
@@ -1912,6 +1921,7 @@ export function City3D(props: Props) {
       if (ready)
         canvas.dataset.presentation = JSON.stringify({
           revision: w.revision,
+          buildingConditions:[...buildings].map(([id,b])=>({id,committed:b.userData.condition,rendered:b.userData.renderedCondition})),
           minute: w.minute,
           playbackRate: playback.current,
           gunAudio:cityGunshotStatus(),

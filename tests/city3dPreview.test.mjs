@@ -12,6 +12,11 @@ test('building drive-by preview captures distinct cast and equipment without dam
  assert.equal(preview.cue.drive_by.vehicle_tier,3);
  assert.equal(preview.state.locations[0].condition,100);
  assert.equal(preview.state.last_result.elapsed,0);
+ const damaged={...state,locations:[{id:'bar',condition:43}]};
+ const replay=previewScene(damaged,'bar','Building drive-by','damaged');
+ assert.equal(replay.cue.drive_by.condition_before,43);
+ assert.equal(replay.cue.drive_by.condition_after,15);
+ assert.equal(damaged.locations[0].condition,43);
 });
 import {CityCueQueue} from '../.runtime/frontend-test/city3dEvents.js';
 

@@ -1,6 +1,6 @@
 import test from 'node:test';import assert from 'node:assert/strict';import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';import {readFileSync} from 'node:fs';
-import {CityBuildingDriveBy,buildingDriveByPose,BUILDING_DRIVEBY_SECONDS} from '../.runtime/frontend-test/city3dBuildingDriveBy.js';
+import {CityBuildingDriveBy,buildingDriveByCondition,buildingDriveByShots,buildingDriveByPose,BUILDING_DRIVEBY_SECONDS} from '../.runtime/frontend-test/city3dBuildingDriveBy.js';
 import {sceneSlots,availableSceneSlot} from '../.runtime/frontend-test/city3dEvents.js';
 import {StreetTraffic,trafficOverlap,trafficSize} from '../.runtime/frontend-test/city3dTraffic.js';
 const models=new Map();
@@ -96,4 +96,15 @@ test('admitted drive-by keeps its swept orientation in traffic',()=>{
   if(!car.waiting)assert.equal(trafficOverlap(car.pose,moving.model,slot.pose,slot.model),false,'traffic entered the actual swept footprint');
  }
  assert.ok(poses.get(moving.id).progress<.4);
+});
+
+for(const gun of ['revolver','shotgun','thompson'])test(`${gun}: damage reveals on shots and respects captured endpoints`,()=>{
+ for(const [before,after]of[[100,72],[65,40],[4,0],[0,0]]){
+  const beats=buildingDriveByShots(gun);
+  assert.equal(buildingDriveByCondition(before,after,-1,gun),before);
+  assert.equal(buildingDriveByCondition(before,after,beats[0]-.001,gun),before);
+  let last=before;
+  for(const beat of beats){const shown=buildingDriveByCondition(before,after,beat,gun);assert.ok(shown<=last&&shown>=after);last=shown;}
+  assert.equal(last,after);assert.equal(buildingDriveByCondition(before,after,100,gun),after);
+ }
 });
