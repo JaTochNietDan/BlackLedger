@@ -1807,3 +1807,21 @@ no new gameplay command. Logs .runtime/search-turns-{tests,build}.log. Main8791
 remains8ba57c1 pending this and126357b's clean integration. These are procedural
 movement improvements; lifelike locomotion and occupied/failure scenes are still
 unfinished, and no full motion-capture-quality acceptance is implied.
+
+### Remove home-scene shadow banding — September 14
+
+Investigated the conspicuous concentric pattern previously described as repetitive
+wood grain. Cypress GLB contains zero images and23 plain materials; the pattern
+also crossed its rug. Root cause was HomeStrikeScene's unbounded default shadow
+camera depth (far500) and zero depth/normal bias, producing self-shadow artifacts.
+Set near0.1/far25 to cover the authored rooms, bias−0.0003, normalBias0.015, and
+explicit PCF filtering. Retained1024shadow resolution and existing asset geometry.
+
+Browser8954 fresh Cypress burglary replay directly confirms removal of the rings
+from parquet, rug, upholstered chairs and cabinet while preserving cast shadows
+under furniture and the actor. Production build passes2.59s; no new tests for this
+reversible lighting-only adjustment. Existing369 frontend checks passed in the
+preceding movement commit. Main8791 remains8ba57c1 and unchanged; this renderer
+fix joins126357b/0678fd8 for later clean release integration. Log:
+.runtime/home-shadow-build.log. Material/character fidelity still needs further
+work; correcting this rendering defect is not final visual acceptance.

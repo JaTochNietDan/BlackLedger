@@ -22,14 +22,17 @@ export function HomeStrikeScene({cue,world,motion,overlay,onDone}:{cue:VisualCue
   const intruder=cue.burglary?.intruder.id||cue.attacker!.id;
   const el=host.current!;let dead=false,frame=0,cast:CityAssassination|BurglarySearch|undefined,start=0,finished=false;
   const scene=new THREE.Scene();scene.background=new THREE.Color(0x171b18);
-  const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.shadowMap.enabled=true;
+  const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFShadowMap;
   renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;
   el.append(renderer.domElement);renderer.domElement.setAttribute('aria-label',search?'Recorded burglary inside the resident’s home':'Recorded attack inside the resident’s home');
   const camera=new THREE.PerspectiveCamera(43,1,.1,60);camera.position.set(5.7,6.4,10.8);camera.lookAt(0,.7,roomSettings.focusZ);
   if(search&&cue.target==='estate'){camera.position.set(-1,5.7,7.5);camera.lookAt(2,.7,.7);}
   const resize=()=>{renderer.setSize(el.clientWidth,el.clientHeight);camera.aspect=el.clientWidth/el.clientHeight;camera.updateProjectionMatrix();if(cast)renderer.render(scene,camera);};
   const observer=new ResizeObserver(resize);observer.observe(el);resize();
-  scene.add(new THREE.HemisphereLight(0xffe7bc,0x443e32,2));const sun=new THREE.DirectionalLight(0xffe3b0,3);sun.position.set(2,9,5);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);Object.assign(sun.shadow.camera,{left:-6,right:6,top:6,bottom:-6});scene.add(sun);
+  scene.add(new THREE.HemisphereLight(0xffe7bc,0x443e32,2));const sun=new THREE.DirectionalLight(0xffe3b0,3);sun.position.set(2,9,5);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);// Bound the shadow depth to this room. The default far=500 produced
+  // concentric self-shadow bands across otherwise untextured floors/furniture.
+  Object.assign(sun.shadow.camera,{left:-6,right:6,top:6,bottom:-6,near:.1,far:25});
+  sun.shadow.bias=-.0003;sun.shadow.normalBias=.015;scene.add(sun);
   const tier=search?0:cue.attacker!.weapon,weaponName=tier===3?'thompson':tier===2?'shotgun':tier===1?'revolver':undefined;
   const beats=weaponName?weaponShots(weaponName,cue.strike!.variant):MELEE_IMPACTS;
   const audio=new GunfireAudio(()=>weaponName?playCityGunshot(weaponName):playMoment('body-hit'),beats,true);
