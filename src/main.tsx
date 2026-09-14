@@ -128,6 +128,9 @@ function App() {
   const scenePending = !!playing && finishedCue !== playing.id;
   const sceneArticle=playing?articleForScene(playing,world?.newspaper||[]):undefined;
   const newspaperVisible=!!sceneArticle&&!!playing&&finishedCue===playing.id;
+  // Let the recorded cause of death finish, then its newspaper, before the
+  // memorial takes focus. A loaded death without playback opens immediately.
+  const deathVisible=!!world&&!world.player.alive&&!scenePending&&!newspaperVisible;
   const scene = useRef<HTMLElement | null>(null),
     latest = useRef(world),
     busyRef = useRef(false);
@@ -230,8 +233,8 @@ function App() {
     return () => clearTimeout(id);
   }, [notice]);
   useEffect(() => {
-    if (world && !world.player.alive) scene.current?.focus();
-  }, [world?.player.alive]);
+    if (deathVisible) scene.current?.focus();
+  }, [deathVisible]);
   useEffect(() => {
     stopVoice();
     if (world?.event) {
@@ -1216,7 +1219,7 @@ function App() {
           onLeave={() => commit({kind: 'rise', target: p.location})}
         />
       )}
-      {(event || !p.alive) && (
+      {(event || deathVisible) && (
         <div className="modal-shade encounter-shade">
           <section
             ref={scene}
