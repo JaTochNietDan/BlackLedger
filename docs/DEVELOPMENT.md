@@ -13294,3 +13294,19 @@ evidence, references and explicit limitations. The engine is not yet connected
 to campaign commands or a playable billiards view. Match rules, real funded
 wagers, opponent shots and tournaments remain required, as do additional
 physics and visual fidelity work. No main-save or public API changes this turn.
+
+
+## Eight-ball match adjudication — 2026-09-14
+
+Added `billiards.Match`: physical shots drive called pots, group assignment,
+turns, safety play, fouls, ball in hand and rack wins/losses. Break exceptions
+preserve player decisions; spotting and head-string restrictions use actual
+ball geometry and travel. Frozen-cushion and simultaneous-first-contact cases
+are covered. The match can be serialized and conceded, and rejected actions
+are atomic. All 33 physics/rules tests pass (2.593 seconds); package vet passes.
+Actual physical break and called-eight-win fixtures exercise the public match
+entry point, including a JSON restore before the winning shot.
+
+See `docs/BILLIARDS.md` for scope and limitations. Campaign stakes, settlement,
+AI, HTTP commands, table UI and tournaments remain unwired. This turn changes
+no campaign save or public HTTP API; the live release remains 16c1c95.

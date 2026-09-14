@@ -59,14 +59,46 @@ with the race detector (15.370 s). `go vet ./billiards` passed. Full-break bench
 on Apple M4 Max: 61.90 ms/shot, 517741 bytes and 266 allocations, three iterations
 (`.runtime/billiards-physics-bench.log`). This is backend timing only.
 
+## Match adjudication implemented — 2026-09-14
+
+`Match.Play` accepts a seat, physical cue input and a declared ball/pocket (or
+safety). It runs the solver itself; callers cannot submit a winning result.
+The private adjudicator uses ordered cue contacts, rail impacts and pocket
+entries. It supports open-table group assignment only on a legal called pot,
+wrong-group/no-contact/no-rail/scratch fouls, continued turns, safeties, eight-ball
+wins and premature/wrong-pocket/foul losses. A scratch while shooting at the
+eight does not itself lose the rack unless the eight also falls.
+
+Breaks keep groups open, count distinct object balls reaching cushions, and
+preserve the appropriate player's choice after an illegal break or a pocketed
+eight. Decisions support accepting the position, spotting the eight, taking
+cue ball behind the head string and re-racking with the selected breaker.
+Spotting finds free space on the long string rather than overlapping another
+ball. Head-string placement and actual pre-contact travel are checked. Frozen
+cushions count only after the ball has departed; simultaneous legal first
+contact is not discarded because another numbered ball is visited first.
+Concession records a winner without implementing any money payout itself.
+
+All 33 package tests pass (2.593 s) and `go vet ./billiards` passes. The 18 match
+tests cover break decisions, spotting, head-string paths, frozen cushions,
+called combinations, early/scratched eights, concession and JSON round trips.
+One test restores a serialized match, executes a real physical called-eight
+shot, and verifies the win. Another executes a complete physical break through
+`Match.Play`. Invalid actions and failed physics leave the match unchanged.
+These are package/serialization tests, not HTTP or campaign-save integration.
+
+The [WPA rules](https://wpapool.com/wp-content/uploads/2025/10/2025.09.15-WPA-Rules-NP.pdf)
+are the reference for called eight-ball and break options. The implementation
+automatically spots the nearest eligible ball when every target lies behind
+the head string. The opening breaker is currently supplied by the caller; lag
+play is not implemented. Unsupported physical events (jumping off the table,
+push shots and equipment/stance fouls) are not claimed to be adjudicated.
+
 ## Required next work
 
-1. Match rules driven by the actual ordered collision/pocket events: legal break,
-   solids/stripes, first contact, rail/pocket requirement, ball in hand, called
-   shots and eight-ball victory/loss. Use explicit posted rules, including break
-   exceptions. The current official
-   [WPA rulebook](https://www.wpapool.com/wp-content/uploads/2026/01/2026.01.02-WPA-Rules.pdf)
-   is the reference; distinguish any deliberate house variation.
+1. Connect match rules to campaign commands and post the rules in the playable
+   view, including break decisions and any deliberate house variation. Extend
+   adjudication as unsupported physical events become available.
 2. Saved matches and funded individual stakes through exactly-once Go commands;
    no renderer-owned results, hidden odds substitution or minted payouts.
 3. A close 3D table with aiming, power, tip position, ball placement, numbered
