@@ -81,3 +81,11 @@ Replaced the standing grid with deterministic booth/stool placements derived fro
 Geometry QA caught opposing booth guests' feet overlapping; seating them diagonally along the benches separated the physical bounds. Tests now cover stable assignment under roster reorder, exclusive positions, role-based service placement, both model rigs' floor clearance, pelvis height and pairwise actor bounds.222/222 frontend tests and production build pass (.runtime/interior-staging-tests.log, .runtime/interior-staging-build.log); bundle warning remains. Browser CUA on isolated8881 showed three seated guests and public bartender Aldo Olsen behind the counter, correct interior identity, Q input rendering, and no browser errors. Sampled232 draws/129232 triangles; the room renders on demand when unchanged. Main campaign untouched.
 
 This is initial static furniture staging for the currently modeled Saint Agnes interior. Animated service, drinking/conversation, arrivals/departures, authored semantic seat anchors, detailed furniture-contact verification and other building interiors remain unfinished. The broader interior/combat/gambling and production-art goals stay active.
+
+### 2026-09-13 — scene control styling and compact interior receipts
+
+Scene preview controls, playback/Skip panels, replay and exterior-return buttons now share the city HUD's paper/ink styling and explicit keyboard focus treatment. Interior latest-entry feedback defaults to a compact disclosure instead of obscuring the premises actions with an expanded fixed receipt; the full result and Ledger control remain inside. No entry is drawn before a result exists.
+
+Production build/TypeScript passed (.runtime/scene-slips-build.log). CUA isolated8881 verified the paper controls, a39px collapsed interior entry, expansion showing the complete result and Ledger link, re-collapse, and no browser errors. Existing gameplay handlers unchanged; main campaign untouched. Other interior/menu styling and compact viewport acceptance remain outstanding.
+
+Read amendment b0f58a61-526b-4ecb-9424-6b007c616bc4: The Mariner must support takeover, actual living NPC tenants, occupancy-based rental income and management obligations. This is the next gameplay priority; all prior visual/simulation requirements remain active.

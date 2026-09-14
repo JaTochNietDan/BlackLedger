@@ -85,3 +85,40 @@
 .city-accounts .books-lines summary{color:#715332;letter-spacing:.08em}.city-accounts .books-lines summary:hover{color:#302719}
 
 .hud-identity .hud-location{font-weight:bold;color:#733e2b;line-height:1.3}
+
+/* Scene slips share the same paper and ink as the permanent city controls. */
+.map-first .city3d-preview,
+.map-first .city3d-story > .theatre.theatre-city,
+.map-first .city3d-story > .street-journey {
+ --muted:#715d40;--ink:#382d1f;--line:#b3a07b;
+ color:#382d1f;background:var(--newsprint),#e7d8b9;
+ border:0;border-block:3px double #967a50;box-shadow:0 4px 14px #0005;
+ padding:10px 12px;
+}
+.map-first .city3d-preview label{display:flex;align-items:center;flex:1 1 260px;gap:10px;min-width:0;font:11px Georgia,serif}
+.map-first .city3d-preview select{min-width:0;flex:1;width:100%;max-width:100%;background:#eee2c8;color:#382d1f;border:1px solid #ac9167;font:12px Georgia,serif;padding:7px}
+.map-first .city3d-preview small,.map-first .city3d-story .eyebrow,.map-first .city3d-story .theatre-caption{color:#715d40}
+.map-first .city3d-preview small{font:10px/1.4 Georgia,serif}
+.map-first .city3d-preview button,
+.map-first .city3d-story button,
+.map-first .replay-scene,
+.map-first .map-leave-building {
+ background:var(--newsprint),#e2d0aa;color:#48351f;
+ border:1px solid #a58a5f;border-radius:0;box-shadow:inset 0 -2px #b09a72;
+ padding:8px 11px;font:12px Georgia,serif;transition:color .12s,box-shadow .12s;
+}
+.map-first .city3d-preview button:hover:not(:disabled),
+.map-first .city3d-story button:hover:not(:disabled),
+.map-first .replay-scene:hover,.map-first .map-leave-building:hover{background:var(--newsprint),#f0e2c2;color:#2d2518;box-shadow:inset 0 -2px #87402e}
+.map-first .city3d-preview button:disabled{opacity:.48}
+.map-first .city3d-preview :focus-visible,.map-first .city3d-story button:focus-visible,
+.map-first .replay-scene:focus-visible,.map-first .map-leave-building:focus-visible{outline:2px solid #873f2d;outline-offset:3px}
+.map-first .city3d-story .theatre-where b{color:#382d1f;font-family:Georgia,serif}
+.map-first .map-outcome-folded{width:min(330px,calc(100vw - 100px));background:var(--newsprint),#e7d8b9;color:#382d1f;border-block:3px double #967a50;box-shadow:0 4px 14px #0005}
+.map-outcome-folded>summary{cursor:pointer;padding:10px 14px;list-style:none;font:12px Georgia,serif}
+.map-outcome-folded>summary::-webkit-details-marker{display:none}
+.map-outcome-folded>summary span{float:right}
+.map-outcome-folded[open]>summary span{transform:rotate(45deg)}
+.map-first .map-outcome-folded[open]{width:min(540px,calc(100vw - 100px))}
+.map-first .map-outcome-folded .outcome-band{box-shadow:none;border-bottom:0}
+.map-outcome-folded>summary:focus-visible{outline:2px solid #873f2d;outline-offset:-4px}

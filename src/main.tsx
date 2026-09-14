@@ -1165,7 +1165,7 @@ function App() {
           </header>
           <CityAccounts world={world}/>
           <div className="map-main-scene" inert={tab!=='city'}>{content('city')}</div>
-          {!scenePending && !journey && <div className="map-outcome"><Outcome world={world} onLedger={() => setTab('ledger')} /></div>}
+          {!scenePending && !journey && world.last_result && (cityView==='interior' ? <details className="map-outcome map-outcome-folded"><summary>Latest entry <span>＋</span></summary><Outcome world={world} onLedger={()=>setTab('ledger')}/></details> : <div className="map-outcome"><Outcome world={world} onLedger={() => setTab('ledger')} /></div>)}
           {tab!=='city'&&<MapMenu edition={tab} title={({crew:'People',families:'Families',market:'Market',ledger:'Ledger',news:'The Bellwether Herald',settings:'Settings',help:'Guide'} as Record<string,string>)[tab]||tab} onClose={()=>setTab('city')}>{content()}</MapMenu>}
         </main>
       </div>

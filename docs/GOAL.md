@@ -17,7 +17,7 @@ so it starts promptly. Preserve all earlier simulation/visual requirements.
 
 ## User amendment — detail, interiors and event direction (2026-09-13)
 
-Current objective source: `/Users/jatochnietdan/.codex/attachments/19b29753-a6c4-4d03-b862-e273c86b1f90/goal-objective.md` (read September 13; supersedes the earlier 35be00d7 objective).
+Current objective source: `/Users/jatochnietdan/.codex/attachments/b0f58a61-526b-4ecb-9424-6b007c616bc4/goal-objective.md` (read September 13; supersedes the earlier 35be00d7 objective).
 
 The expanded scope also requires much richer gambling tables and slot-machine presentation, occupants and animations; consistent styling across every menu; debug access to every assassination variant; explosion preambles showing the planter leaving; new authoritative molotov and building drive-by actions with visible damage and escape; and attacks against the player during street travel. Also stage interior occupants at chairs and counters, render cause-specific player deaths, track and display personal/family backstories and interactions, and illustrate moonshine, untaxed cigarettes and crated arms. The latest amendment additionally requires assassinations inside buildings and plausible wire attacks from behind, with animation fidelity sufficient to support them. These additions remain outstanding and do not replace earlier requirements.
 
@@ -68,3 +68,5 @@ The isolated casino study is an asset test, not completion of the neighborhood r
 ## September 13 follow-up — personal HUD and travel continuity
 
 The user requests removal of redundant City navigation/briefing, a period-styled player identity, matching camera controls and latest-result treatment, no hover flash or clipped outcome, and separation of income/expenses from Ledger into persistent city accounts. Travel should visibly advance the clock at its playback pace, automatically zoom/follow the player, and return the camera to the player outside after leaving an interior. Implemented desktop checks are recorded in DEVELOPMENT.md; this does not close the broader production game goal.
+
+The latest amendment requires takeover and management of The Mariner as a lodging business. Living NPC tenants must actually rent rooms, rental income must derive from those occupants, and ownership must bring business obligations comparable to other premises. This gameplay expansion remains outstanding.
