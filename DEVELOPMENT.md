@@ -3324,3 +3324,8 @@ only routine86%, the now-corrected Families prop-order check and old manual
 restocking metric failed. Clean9aec451 long purchase-observation run session57475
 terminated PASS232.821s. Do not restart these terminal handles. No main8791
 actions/promotion; comprehensive jobs and broad visual/game scope incomplete.
+
+Robbery follow-up: personal-proprietor regression passed0.195s. Clean07ce79b
+checkout excluding unrelated local edits passed selected core1.370s and
+HTTP0.213s (.runtime/crew-robbery-clean.log), terminal session54541. Remaining
+unstaged robbery diff is exclusively the pre-existing armed-resistance work.
