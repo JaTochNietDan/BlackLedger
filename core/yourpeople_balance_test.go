@@ -16,6 +16,7 @@ func TestPeopleAreWorthWhatTheyCost(t *testing.T) {
 			w.Player.Cash, w.Player.Health, w.Player.Contacts = 40000, 100, 3
 			own(w, "laundry", "garage")
 			w.Player.Respect = OrganizationStanding
+			w.Incorporate()
 			w.OrganizationDay()
 			taken := 0
 			for _, n := range w.Civilians() {

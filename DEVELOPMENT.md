@@ -3136,3 +3136,21 @@ optional tag from the saved service receipt list to comply with the core list
 contract; no public receipt disclosure was added. The three formerly failing
 front/list/wire-shape checks pass 0.186s. Routine predictability remains under
 investigation; no full-suite pass or release is claimed.
+
+### September 14 — authoritative individual takeovers and fixture migration
+
+Routine investigation found multiple living NPCs with “Runs The Mariner”: the
+legacy ambitious takeover set a role/location but never the deed. It now writes
+the individual owner, refuses an existing proprietor, preserves competing deeds,
+and clears the actor's obsolete journey. Only trading businesses qualify. This
+is the existing criminal takeover path, distinct from funded proprietor buys.
+Regression verifies exclusive ownership and death returning the deed to market.
+
+Additional older family test setup helpers now explicitly Incorporate before
+daily updates; negative tests and daily simulation loops retain OrganizationDay
+without formation. Selected takeover/proprietor/headquarters/crew checks pass
+0.435s. Routine predictability still fails (86% after the ownership correction);
+logs show housing moves, changes in work and actual takeovers disrupting the old
+whole-fortnight metric. No threshold was lowered and no passing result claimed.
+Temporary diagnostic tests removed; evidence remains in .runtime/routine-context.log.
+Comprehensive queued dispatch and operations UI are still outstanding.

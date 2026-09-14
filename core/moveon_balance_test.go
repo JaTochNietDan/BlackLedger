@@ -16,6 +16,7 @@ func TestAWarCanNowBeWonAndCostsToWin(t *testing.T) {
 			w.Player.Cash, w.Player.Health = 60000, 100
 			own(w, "laundry", "garage")
 			w.Player.Respect = OrganizationStanding
+			w.Incorporate()
 			w.OrganizationDay()
 			holder := &w.Factions[0]
 			if c := w.Conflict(holder.ID, w.PlayerOrganizationID()); c != nil {

@@ -17,6 +17,7 @@ func TestWorkAimedAtSomebodyKnowsWhoItIsAimedAt(t *testing.T) {
 	w.Player.Cash, w.Player.Respect, w.Player.Contacts = 90000, 200, 4
 	w.Player.Crew = []Crew{{ID: "leo", Name: "Leo Carver", Loyalty: 70}}
 	w.ensureOfficials()
+	w.Incorporate()
 	w.OrganizationDay()
 	for _, n := range w.Civilians() {
 		if IsOfficial(n.ID) || w.isRoleHolder(n) || len(w.OwnPeople()) >= 2 {

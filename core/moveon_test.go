@@ -7,6 +7,7 @@ func warlord(t *testing.T) (*World, *Faction, string) {
 	w := proprietor(t)
 	own(w, "laundry", "garage")
 	w.Player.Respect = OrganizationStanding
+	w.Incorporate()
 	w.OrganizationDay()
 	holder := &w.Factions[0]
 	held := w.FamilyHoldings(holder.ID)

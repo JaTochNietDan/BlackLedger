@@ -13,6 +13,7 @@ func ownOrganization(t *testing.T, seed uint32) *World {
 	w.Player.Cash, w.Player.Respect, w.Player.Contacts = 9000, OrganizationStanding, 3
 	w.Properties["laundry"].Owner = "player:1"
 	w.Properties["garage"].Owner = "player:1"
+	w.Incorporate()
 	w.OrganizationDay()
 	if !w.Incorporated() {
 		t.Fatal("the player has no organization to have people in")

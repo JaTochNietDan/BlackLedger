@@ -133,9 +133,12 @@ func (w *World) takeFromAPerson(n *NPC) bool {
 // claimPremises is how an unaffiliated person stops being nobody: they take
 // over premises no organization holds. Never the player's, and never a rival's.
 func (w *World) claimPremises(n *NPC) bool {
+	if n == nil || n.Dead || n.Faction != "" || w.Inside(n) || len(w.FamilyHoldings(n.ID)) > 0 {
+		return false
+	}
 	for _, l := range Locations {
 		prop := w.Properties[l.ID]
-		if prop == nil || prop.Income <= 0 || w.Own(l.ID) || w.faction(prop.Owner) != nil {
+		if !personalBusiness(l.ID) || prop == nil || prop.Income <= 0 || w.Own(l.ID) || w.faction(prop.Owner) != nil {
 			continue
 		}
 		if prop.Owner != "independent" && !hasPrefix(prop.Owner, "former:") {
@@ -144,6 +147,11 @@ func (w *World) claimPremises(n *NPC) bool {
 		if n.Skill+n.Ambition < 90 {
 			return false // not yet somebody who could hold it
 		}
+		// A takeover must claim the deed, not leave the same business open for
+		// every subsequent ambitious resident to run at once.
+		prop.Owner = n.ID
+		prop.ProprietorDay = w.Minute/1440 + 1
+		n.Heading, n.Arrives, n.Sets, n.Errand = "", 0, 0, ""
 		n.Rank = max(n.Rank, RankSoldier)
 		n.Location = l.ID
 		n.Role = "Runs " + l.Name

@@ -31,6 +31,7 @@ func TestEveryActionOfferedCanActuallyBeTaken(t *testing.T) {
 	w.Player.Dress, w.Player.DressWear = 2, 100
 	w.Player.Stock = map[string]int{"moonshine": 4}
 	w.ensureOfficials()
+	w.Incorporate()
 	w.OrganizationDay()
 
 	tried, refused := 0, []string{}
@@ -109,6 +110,7 @@ func TestNoActionIsOfferedOnlyWhereItIsRefused(t *testing.T) {
 		w.Player.Fuel, w.Player.Fuelled = FuelFull, max(1, w.Minute)
 		w.Player.Dress, w.Player.DressWear = 1, 100
 		w.ensureOfficials()
+		w.Incorporate()
 		w.OrganizationDay()
 		if shape == "comfortable" {
 			// Everything in hand: a crew, premises trading well, an account

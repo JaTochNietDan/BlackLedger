@@ -40,6 +40,7 @@ func TestAManWithHisOwnThingDoesNotComeUpThroughSomebodyElses(t *testing.T) {
 	w, f := recruit(t)
 	own(w, "laundry", "garage")
 	w.Player.Respect = OrganizationStanding
+	w.Incorporate()
 	w.OrganizationDay()
 	if !w.Incorporated() {
 		t.Fatal("the fixture did not become an organization")

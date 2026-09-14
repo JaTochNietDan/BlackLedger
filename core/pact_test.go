@@ -9,6 +9,7 @@ func diplomat(t *testing.T) (*World, *Faction, *Faction) {
 	w := proprietor(t)
 	own(w, "laundry", "garage")
 	w.Player.Respect, w.Player.Contacts, w.Player.Location = OrganizationStanding, 3, "market"
+	w.Incorporate()
 	w.OrganizationDay()
 	if len(w.Factions) < 3 {
 		t.Fatal("the fixture needs two families and the player")

@@ -18,6 +18,7 @@ func TestBeingSomebodyIsWorseThanBeingNobody(t *testing.T) {
 			own(w, "laundry", "garage")
 			if incorporated {
 				w.Player.Respect = OrganizationStanding
+				w.Incorporate()
 				w.OrganizationDay()
 				// Somebody with a reason, so the machinery has something to run.
 				for i := range w.Factions {
