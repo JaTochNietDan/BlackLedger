@@ -846,7 +846,7 @@ func (w *World) CardsDescription() map[string]any {
 		// Nobody sees a hand before it is turned over.
 		if g.Done {
 			seat["cards"] = s.Cards
-			seat["hand"] = Rank(s.Cards).Name()
+			seat["hand"] = BestOfSeven(s.Cards, g.Board).Name()
 		}
 		seats = append(seats, seat)
 	}
