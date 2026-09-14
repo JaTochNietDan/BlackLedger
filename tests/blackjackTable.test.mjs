@@ -59,3 +59,19 @@ test('only public dealers are staged and both rigs clear the table',async()=>{
   });
  }
 });
+
+test('player rigs sit on the authored gaming chair with shoes above the floor',async()=>{
+ const {poseBlackjackPlayer,blackjackPlayerSeat:s}=await import('../.runtime/frontend-test/blackjackDealer.js');
+ const chair=await model('gaming-chair');chair.position.set(s.x,0,s.z);chair.rotation.y=s.yaw;chair.updateMatrixWorld(true);
+ for(const name of ['person','woman']){
+  const actor=await model(name);poseBlackjackPlayer(actor);
+  const shoes=new THREE.Box3();actor.traverse(o=>{if(o instanceof THREE.Mesh&&/shoe/i.test(o.name+' '+o.material.name))shoes.union(new THREE.Box3().setFromObject(o,true));});
+  assert.ok(shoes.min.y>=0&&shoes.min.y<.015,'shoes are buried or floating');
+  const support=new THREE.Raycaster(new THREE.Vector3(s.x,1,s.z),new THREE.Vector3(0,-1,0)).intersectObject(chair,true)[0];
+  assert.ok(support);assert.ok(Math.abs(support.point.y-s.height)<.002,'hips miss the cushion height');
+  actor.traverse(o=>{if(!(o instanceof THREE.Mesh))return;const points=o.geometry.getAttribute('position');for(let i=0;i<points.count;i++){
+   const v=new THREE.Vector3().fromBufferAttribute(points,i).applyMatrix4(o.matrixWorld);
+   assert.ok(!(v.y>.60&&v.y<.875&&v.x*v.x/(1.67*1.67)+v.z*v.z/(1.18*1.18)<1),'seated player enters apron or rail');
+  }});
+ }
+});

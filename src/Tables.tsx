@@ -1,4 +1,4 @@
-import type {Presence} from './types';
+import type {Person,Presence} from './types';
 import {planCards} from './blackjackPresentation';
 import {BlackjackTable3D} from './BlackjackTable3D';
 import {DiceTable3D} from './DiceTable3D';
@@ -147,6 +147,7 @@ function Chip({amount, money}: {amount: number; money: (n: number) => string}) {
 // stands, so it is drawn face down: that is what is true, not a decoration.
 export function CardTable({
   hand,
+  player,
   place,
   dealer,
   motion = true,
@@ -155,6 +156,7 @@ export function CardTable({
   act,
 }: {
   hand: HandState;
+  player?: Pick<Person,"name"|"face"|"alive">;
   place?: string;
   dealer?: Presence;
   motion?: boolean;
@@ -193,7 +195,7 @@ export function CardTable({
       </div>
       {/* The cloth itself, with the two seats on it and the money in the middle
           of the table where a stake actually sits. */}
-      <BlackjackTable3D dealer={dealer} mine={mine} theirs={theirs} hidden={hand.playing && theirs.length < 2 ? 1 : 0} presentation={presentation}/>
+      <BlackjackTable3D player={player} dealer={dealer} mine={mine} theirs={theirs} hidden={hand.playing && theirs.length < 2 ? 1 : 0} presentation={presentation}/>
       {occupied && <div className="blackjack-hand-summary">
       {presentation.active && <p className="blackjack-dealing" role="status">The cards are being dealt…</p>}
       <div className="baize" style={{visibility:presentation.active?"hidden":"visible"}} aria-hidden={presentation.active}>

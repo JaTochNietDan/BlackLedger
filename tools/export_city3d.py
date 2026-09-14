@@ -1609,6 +1609,24 @@ def gaming_die():
             bpy.context.view_layer.update();world=ob.matrix_world.copy();ob.parent=group;ob.matrix_world=world
 
 
+def gaming_chair():
+    wood=material('gaming chair walnut',(.12,.055,.028))
+    leather=material('gaming chair oxblood',(.14,.025,.018))
+    brass=material('gaming chair brass',(.55,.35,.12),.7)
+    box('chair seat frame',(0,0,.555),(.60,.58,.08),wood,.025)
+    box('chair seat cushion',(0,0,.62),(.57,.55,.09),leather,.038)
+    for x in (-.23,.23):
+        for y in (-.20,.20):
+            box('chair leg',(x,y,.26),(.065,.065,.52),wood,.009)
+            box('chair foot cap',(x,y,.025),(.069,.069,.05),brass,.007)
+        box('back upright',(x,.23,.85),(.065,.07,.60),wood,.012)
+    box('back wood surround',(0,.265,.96),(.56,.10,.42),wood,.025)
+    box('back leather cushion',(0,.198,.96),(.46,.055,.32),leather,.022)
+    for x in (-.16,0,.16):
+        for z in (.86,1.06):
+            cylinder('back upholstery tack',(x,.165,z),.008,.005,brass,rotation=(math.pi/2,0,0),vertices=12)
+
+
 def blackjack_table():
     wood=material('blackjack polished walnut',(.12,.055,.028))
     leather=material('blackjack oxblood leather',(.14,.025,.018))
@@ -2094,6 +2112,13 @@ def mercer_court():
                 box('tenant letter box',(x,6.28,.98+row*.19),(.20,.08,.16),brass,.009)
                 box('letter slot',(x,6.325,1.02+row*.19),(.13,.01,.014),iron)
 
+if __name__ == '__main__' and '--only=gaming-chair' in __import__('sys').argv:
+    manifest_path=os.path.join(OUT,'manifest.json')
+    with open(manifest_path) as f: selected_manifest=json.load(f)
+    clear();gaming_chair();selected_manifest['gaming-chair']=export('gaming-chair')
+    with open(manifest_path,'w') as f:json.dump(selected_manifest,f,indent=2)
+    raise SystemExit(0)
+
 if __name__ == '__main__' and '--only=blackjack-table' in __import__('sys').argv:
     manifest_path=os.path.join(OUT,'manifest.json')
     with open(manifest_path) as f: selected_manifest=json.load(f)
@@ -2201,6 +2226,7 @@ clear();blast_fragment();manifest['blast-fragment']=export('blast-fragment')
 clear();bar_cloth();manifest['bar-cloth']=export('bar-cloth')
 clear();mariner();manifest['mariner']=export('mariner')
 clear();gaming_die();manifest['gaming-die']=export('gaming-die')
+clear();gaming_chair();manifest['gaming-chair']=export('gaming-chair')
 clear();blackjack_table();manifest['blackjack-table']=export('blackjack-table')
 clear();playing_card();manifest['playing-card']=export('playing-card')
 clear();dice_tray();manifest['dice-tray']=export('dice-tray')

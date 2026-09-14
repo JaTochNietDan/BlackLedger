@@ -822,5 +822,21 @@
       ]
     ],
     "bytes": 9876
+  },
+  "gaming-chair": {
+    "file": "gaming-chair.glb",
+    "bounds_blender": [
+      [
+        -0.3,
+        -0.29,
+        0.0
+      ],
+      [
+        0.3,
+        0.315,
+        1.17
+      ]
+    ],
+    "bytes": 124744
   }
 }

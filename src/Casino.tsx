@@ -2,7 +2,7 @@ import {blackjackDealer} from './blackjackDealer';
 import './casinoRoom.css';
 import {useEffect, useRef, useState} from 'react';
 import {playTable, roomTone} from './sound';
-import type {Action, Presence, Record as Entry} from './types';
+import type {Action, Person, Presence, Record as Entry} from './types';
 import {CardTable, Craps, Machine, Money, Wheel} from './Tables';
 import type {DiceState, HandState, MachineState, WheelState} from './Tables';
 
@@ -44,6 +44,7 @@ type Game = 'cards' | 'wheel' | 'dice' | 'machine';
 
 export function Casino({
   motion,
+  player,
   place,
   actions,
   people,
@@ -59,6 +60,7 @@ export function Casino({
   act,
   onLeave,
 }: {
+  player?: Pick<Person,"name"|"face"|"alive">;
   motion: boolean;
   place: string;
   actions: Action[];
@@ -232,7 +234,7 @@ export function Casino({
           <div className="casino-game">
             {game === 'cards' ? (
               <div className="cards-panel">
-                <CardTable hand={hand} place={place} dealer={blackjackDealer(people)} motion={motion} onPresent={setPresenting} money={money} act={k => act({kind: k})} />
+                <CardTable hand={hand} player={player} place={place} dealer={blackjackDealer(people)} motion={motion} onPresent={setPresenting} money={money} act={k => act({kind: k})} />
                 {!dealt && !presenting && (
                   <div className="felt sit-down">
                     <p className="felt-note">

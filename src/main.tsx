@@ -1187,6 +1187,7 @@ function App() {
       )}
       {atTable && !inTheBackRoom && !event && p.alive && (
         <Casino
+          player={p}
           motion={motion}
           place={world.locations.find(l => l.id === p.location)?.name || 'the tables'}
           actions={(world.locations.find(l => l.id === p.location)?.actions || []).filter(a =>
