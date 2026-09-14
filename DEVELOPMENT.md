@@ -2131,3 +2131,18 @@ inspected standard and enlarged close views without a gameplay command. Main
 campaign untouched. Model4.96MB/83,312 mesh triangles versus3.43MB/61,584 previously;
 these are asset totals, not verified runtime performance. Multiple active matches,
 tournaments, character play animation and broader interior fidelity remain open.
+
+### 2026-09-14 — saved physical billiards tournament bracket
+
+Added single-elimination bracket state for2/4/8 distinct entrants. Every game is
+an actual eight-ball match; later pairings derive only from adjudicated match or
+concession winners. Save/reopen and repeat advancement preserve progress. Table
+allocation accounts for overlapping rounds instead of assuming earlier rounds
+finished together; the regression verifies an early semifinal does not displace
+an unfinished opening game.
+
+The full billiards suite passes (11.576s), vet passes, and a physical bracket
+fixture produces a legal called-eight champion after13 strokes. No campaign or
+HTTP interface changed. Entry fees, occasional scheduling, participant lifecycle,
+full-pool payout and playable bracket integration remain next; this foundation
+alone is not a completed tournament feature. Main campaign untouched.

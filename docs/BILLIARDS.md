@@ -353,3 +353,28 @@ These are GLB geometry totals, not draw-call/FPS measurements; fresh runtime
 performance acceptance remains needed. Joined corner/leather detail, character
 play/choreography, multiple live tables, tournament play and broader interior
 acceptance remain open.
+
+## Saved tournament bracket foundation — 2026-09-14
+
+`billiards.Bracket` stores two-, four- or eight-entrant single-elimination events,
+with actual `Match` instances, stable entrant identities, round pairings and table
+allocations. Advancement consumes the embedded match's adjudicated winner or its
+explicit concession result; it never rolls a separate tournament win chance.
+Later rounds wait for both actual winners. Repeated advancement is idempotent.
+Initial seed0 stays in seat0 if successful, matching the existing player-first
+minigame controls. Later ready rounds choose a genuinely free table, since they
+can overlap unfinished opening racks; no two active bracket games share a table.
+
+Tests cover partial-round JSON save/reopen, waiting entrants, all successive
+pairings, a completed bracket's repeated reconciliation, invalid/duplicate seeds,
+non-aliasing entrant lists, and an early semifinal alongside occupied opening
+tables. A physical two-entrant event finishes in13 actual strokes with Leo winning
+by a legally called eight. The full billiards suite passes (11.576s) and vet
+passes; logs `.runtime/pool-bracket-{suite,tests,final-tests,vet}.log`.
+
+This is internal bracket state only: it is not yet attached to campaign money or
+exposed as a playable tournament. Required next integration is scheduled entry,
+funded participant deposits, retention/forfeit rules on death/departure/closure,
+whole-prize-pool settlement exactly once, command receipts, public bracket and
+browser progression. Individual casual matches must also respect tournament table
+occupancy when those two systems are joined. No campaign save was used.
