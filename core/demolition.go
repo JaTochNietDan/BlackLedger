@@ -146,6 +146,9 @@ func (w *World) Plant(id string) error {
 		w.Report("attack", "EXPLOSION AT "+strings.ToUpper(place.Name),
 			fmt.Sprintf("An explosion at %s is being treated as deliberate. Witnesses described somebody leaving on foot. Police say a prosecution is likely.", place.Name))
 		w.Witness("explosion", id, "A charge went off early at "+place.Name+".", "EXPLOSION AT "+upper(place.Name))
+		cue := &w.VisualCues[len(w.VisualCues)-1]
+		cue.Detonation = "premature"
+		cue.Attacker = &CueAttacker{ID: "player", Name: w.Player.Name, Weapon: 0}
 		if w.Player.Health <= 0 {
 			w.DieOf("a charge of your own", "A charge at "+place.Name+" went off with you still under it.")
 		}
@@ -153,6 +156,7 @@ func (w *World) Plant(id string) error {
 	}
 
 	w.detonate(id, fmt.Sprintf("A charge went off under %s.", place.Name))
+	w.VisualCues[len(w.VisualCues)-1].Attacker = &CueAttacker{ID: "player", Name: w.Player.Name, Weapon: 0}
 	w.Player.Heat = min(100, w.Player.Heat+22)
 	w.Player.Respect += 8
 	if owner != nil {
@@ -239,6 +243,7 @@ func (w *World) detonate(id, cause string) {
 		fmt.Sprintf("An explosion at %s is being treated as deliberate. %s Police have appealed for witnesses and say they expect none.", place.Name, body))
 	w.igniteBuilding(id)
 	w.Witness("explosion", id, fmt.Sprintf("An explosion wrecked %s. Condition is now %d%%.", place.Name, prop.Condition), "EXPLOSION AT "+upper(place.Name))
+	w.VisualCues[len(w.VisualCues)-1].Detonation = "planted"
 }
 
 func max64(a, b float64) float64 {

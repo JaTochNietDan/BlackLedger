@@ -60,3 +60,20 @@ test('incendiary preview uses an unarmed attacker and an isolated target fire',(
  assert.equal(preview.building_fires[1].target,'club');assert.ok(preview.building_fires[1].brigade_at>state.minute);
  assert.equal(JSON.stringify(state),before);
 });
+
+test('explicit demolition outcome overrides an unrelated same-minute fire',async()=>{
+ const {internalDetonation}=await import('../.runtime/frontend-test/city3dBlast.js');
+ const cue={id:'accident',target:'club',minute:600,detonation:'premature'};
+ assert.equal(internalDetonation(cue,[{target:'club',minute:600}]),false);
+ assert.equal(internalDetonation({...cue,id:'preview:accident'},[]),false);
+ assert.equal(internalDetonation({...cue,detonation:'planted'},[]),true,'recorded planted charge lost its origin after fire cleanup');
+ assert.equal(internalDetonation({id:'old',target:'club',minute:600},[{target:'club',minute:600}]),true);
+});
+
+test('premature explosion preview retains its accident outcome without inventing a fire',()=>{
+ const state={id:'campaign',minute:600};
+ const {state:preview,cue}=previewScene(state,'club','Explosion · premature','accident');
+ assert.equal(cue.kind,'explosion');assert.equal(cue.detonation,'premature');
+ assert.equal(cue.attacker.id,'preview-planter');assert.equal(preview.building_fires,undefined);
+ assert.equal(previewScene(state,'club','Explosion','planted').cue.detonation,'planted');
+});

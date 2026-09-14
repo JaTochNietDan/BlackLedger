@@ -69,7 +69,8 @@ export function windowBurst(index:number,seconds:number,window:{x:number;y:numbe
 }
 
 /** Only a confirmed building fire (or explicit debug scene) identifies an internal detonation. */
-export function internalDetonation(cue:{id:string;target:string;minute?:number},fires:readonly {target:string;minute:number}[]){
+export function internalDetonation(cue:{id:string;target:string;minute?:number;detonation?:string},fires:readonly {target:string;minute:number}[]){
+ if(cue.detonation)return cue.detonation==='planted';
  return cue.id.startsWith('preview:')||fires.some(f=>f.target===cue.target&&f.minute===cue.minute);
 }
 

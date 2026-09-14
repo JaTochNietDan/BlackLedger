@@ -93,6 +93,18 @@ The active city renderer is now Three.js with locally authored Blender glTF mode
 
 A failed `plant` attempt also emits an `explosion` cue: the charge went off prematurely even when it did not destroy the building. Blast casualties are now chosen from living NPCs physically at the affected premises, excluding travellers. Previously the family-wide casualty selection could kill somebody across town and produce a contradictory death cue. The casualty chance is unchanged; an empty building cannot produce an NPC casualty.
 
+Explosion cues now optionally carry `detonation: "planted" | "premature"`.
+Successful `detonate` calls record `planted`; an early player charge accident
+records `premature`. Player planting outcomes also capture the existing `attacker`
+identity with weapon0. Faction detonations leave individual identity absent because
+the simulation does not select a named planter. Legacy cues omit this field.
+This records the resolved cause for presentation without changing damage, charge
+consumption, command duration, odds or fire rules. It survives result/save replay.
+The renderer prioritizes explicit detonation outcome over matching fire records;
+legacy cues retain their existing inference. Debug includes a separate premature
+explosion with no invented building fire. A planter-exit preamble remains to be
+implemented; the metadata must not be treated as proof that it is already rendered.
+
 Explicit scene replay can restage all cues in the selected committed result. Ordinary revision refreshes and reloads remain silent. Skip immediately clears the transient effects without posting an action or changing saved time.
 
 Street occupancy is presentation-only: rendered travellers may queue behind their
@@ -156,9 +168,10 @@ unmute. This affects presentation only and never advances or reverses a saved ev
 
 Confirmed building detonations start behind authored front-window glazing and burst outward,
 with a brief fire/light burst followed by rising smoke and a three-second fade.
-Confirmation uses a matching target/minute in public `building_fires`; explicit debug
-explosions also use this path. Early accidents and older snapshots without confirmation
-retain the exterior burst. Models without window anchors still need authored emitters.
+Confirmation prefers explicit `detonation: "planted"`; legacy cues use a matching
+target/minute in public `building_fires` or a legacy debug explosion. Explicit
+`premature` accidents retain the exterior burst even if a fire already exists.
+Older snapshots without confirmation also retain the exterior burst. Models without window anchors still need authored emitters.
 This uses the committed explosion cue; it adds no damage, ignition or physics rules.
 
 Explosion debris is cosmetic: confirmed internal blasts eject instanced masonry
@@ -172,7 +185,7 @@ introduce no collision, inventory, obstruction or damage rule in the simulation.
 Rendered explosions now own their onset audio, even when a higher-gravity
 casualty supplies the caption. A same-address/minute explosion or gunfight
 suppresses that casualty's generic Theatre sound. Late or muted onsets are not
-replayed. No new causal or damage field is added to public cues.
+replayed. Audio ownership does not change damage rules.
 
 Vehicle wheel animation follows actual presentation distance, using the authored
 0.37m tyre radius. Placement, waiting and parked states do not advance roll.

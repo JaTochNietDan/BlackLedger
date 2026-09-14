@@ -464,13 +464,16 @@ type CueStrike struct {
 }
 
 type VisualCue struct {
-	Strike   *CueStrike   `json:"strike,omitempty"`
-	Attacker *CueAttacker `json:"attacker,omitempty"`
-	Detainee *CueActor    `json:"detainee,omitempty"`
-	ID       string       `json:"id"`
-	Kind     string       `json:"kind"`
-	Target   string       `json:"target"`
-	Caption  string       `json:"caption"`
+	// Detonation distinguishes a planted blast from a premature charge accident.
+	// Empty on legacy or unrelated cues; it must not imply a safe escape.
+	Detonation string       `json:"detonation,omitempty"`
+	Strike     *CueStrike   `json:"strike,omitempty"`
+	Attacker   *CueAttacker `json:"attacker,omitempty"`
+	Detainee   *CueActor    `json:"detainee,omitempty"`
+	ID         string       `json:"id"`
+	Kind       string       `json:"kind"`
+	Target     string       `json:"target"`
+	Caption    string       `json:"caption"`
 	// Headline is what the Herald carries about it, so the paper can arrive
 	// after the scene rather than instead of it.
 	Headline string `json:"headline,omitempty"`

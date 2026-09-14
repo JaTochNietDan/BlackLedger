@@ -4,6 +4,7 @@ export interface Group {
   blurb: string;
 }
 export interface VisualCue {
+  detonation?: 'planted' | 'premature';
   id: string;
   kind: string;
   target: string;
