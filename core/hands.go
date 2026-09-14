@@ -755,6 +755,8 @@ func (w *World) fromBehindThisCounter(at string) string {
 		return ""
 	}
 	switch place.Kind {
+	case "mortuary", "cemetery", "crematorium", "undertaker":
+		return w.deathServiceCounter(at)
 	case "lodging":
 		if len(w.Residents(at)) == 0 {
 			return "No tenants on the register. Empty rooms do not pay rent."
@@ -772,21 +774,6 @@ func (w *World) fromBehindThisCounter(at string) string {
 				counted(broken, "car", "cars"))
 		}
 		return "Nothing on the road is broken this week, which is the wrong kind of quiet for a garage."
-	case "undertaker":
-		// The one counter in this city whose trade is made entirely by
-		// everybody else's. It counts the week's dead the way a garage counts
-		// broken glass.
-		week := 0
-		for i := range w.NPCs {
-			if n := &w.NPCs[i]; n.Dead && n.DiedAt > 0 && w.Minute-n.DiedAt <= 7*1440 {
-				week++
-			}
-		}
-		if week > 0 {
-			return fmt.Sprintf("%s buried out of this room since last week, and not one family asked a question about the arrangements.",
-				counted(week, "person", "people"))
-		}
-		return "Nobody has died in this district all week. It is restful, and it does not pay for the cars."
 	case "pawn":
 		for i := len(w.Window) - 1; i >= 0; i-- {
 			if s := w.Window[i]; s.Whose != "" {

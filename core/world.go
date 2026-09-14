@@ -548,6 +548,7 @@ type World struct {
 	LastPoolTournamentSlot int                              `json:"last_pool_tournament_slot"`
 	PoolTournament         *PoolTournament                  `json:"pool_tournament,omitempty"`
 	Pool                   *PoolGame                        `json:"pool,omitempty"`
+	DeathServiceReceipts   []DeathServiceReceipt            `json:"death_service_receipts,omitempty"`
 	HouseholdSavings       map[string]HouseholdAccount      `json:"household_savings,omitempty"`
 	Apartments             []ApartmentDeed                  `json:"apartments"`
 	PropertyPressure       map[int]DistrictPropertyPressure `json:"property_pressure,omitempty"`

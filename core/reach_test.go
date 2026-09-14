@@ -79,6 +79,9 @@ func holdingIt(t *testing.T, id string, hold bool) *World {
 func TestEveryTradeReachesPastItsOwnIncome(t *testing.T) {
 	t.Parallel()
 	links := []reaching{
+		{"mortuary", "funded preparation work from an ordinary death", "higher", funeralTradeBenefit},
+		{"cemetery", "funded burial work from an ordinary death", "higher", funeralTradeBenefit},
+		{"crematorium", "funded cremation work from an ordinary death", "higher", funeralTradeBenefit},
 		{"garage", "half off what the car costs to keep", "lower",
 			func(w *World, id string) int { return w.CarUpkeep() }},
 		{"filling", "your own petrol at what it cost the pumps", "lower",
@@ -243,4 +246,21 @@ func TestEveryTradeReachesPastItsOwnIncome(t *testing.T) {
 		}
 		t.Logf("%-11s %-52s %6d -> %-6d", link.kind, link.what, without, with)
 	}
+}
+
+// Exercise the ordinary death path rather than calling the payment helper.
+func funeralTradeBenefit(w *World, id string) int {
+	place, _ := PlaceByID(id)
+	for i := range w.NPCs {
+		n := &w.NPCs[i]
+		if n.Dead || (place.Kind != "mortuary" && deathDisposition(n.ID) != place.Kind) {
+			continue
+		}
+		n.Faction, n.Purse = "", FuneralCost
+		delete(w.HouseholdSavings, n.ID)
+		before := w.Player.Cash
+		w.Kill(n.ID, "Died at home.")
+		return w.Player.Cash - before
+	}
+	return 0
 }

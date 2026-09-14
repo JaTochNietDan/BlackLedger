@@ -56,7 +56,7 @@ func (w *World) Bury(person *NPC) {
 	if family != nil {
 		family.Cash -= paid - fromEstate
 	}
-	w.funeralProceeds(id, person.Name, paid)
+	w.funeralProceeds(id, person, paid)
 	w.deathServicePayments(person, (paid*FuneralOwn+FuneralCost-1)/FuneralCost)
 	w.ShiftCustom(id, "nobody in this district dying", BurialTrade)
 }
@@ -64,17 +64,18 @@ func (w *World) Bury(person *NPC) {
 // The plot, transport and notices are outside costs. Reduced means buy a
 // smaller service at the same cost ratio; only the funded margin reaches the
 // proprietor. An independent unowned business keeps its takings off-ledger.
-func (w *World) funeralProceeds(id, name string, paid int) {
-	if paid <= 0 {
+func (w *World) funeralProceeds(id string, person *NPC, paid int) {
+	if paid <= 0 || person == nil {
 		return
 	}
 	cost := (paid*FuneralOwn + FuneralCost - 1) / FuneralCost
 	margin := max(0, paid-cost)
+	w.recordDeathService(id, person.ID, paid, margin)
 	if w.Own(id) {
 		w.Earn(margin)
 		place, _ := PlaceByID(id)
 		w.Log("Funeral accounts at "+place.Name,
-			fmt.Sprintf("%s's funeral brought in $%d; $%d covered the plot, transport and notices. The remaining $%d went into your accounts.", name, paid, cost, margin), "business")
+			fmt.Sprintf("%s's funeral brought in $%d; $%d covered the plot, transport and notices. The remaining $%d went into your accounts.", person.Name, paid, cost, margin), "business")
 	} else {
 		w.changeBusinessFunds(id, margin)
 	}

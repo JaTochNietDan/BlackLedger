@@ -1,6 +1,10 @@
 package core
 
-import "testing"
+import (
+	"encoding/json"
+	"strings"
+	"testing"
+)
 
 func TestDeathServicesSplitTheExistingBillWithoutCreatingMoney(t *testing.T) {
 	w, chapel := theParlour(t)
@@ -87,5 +91,41 @@ func TestNewDeathBusinessesHaveDeedsTradesAndSaveRepair(t *testing.T) {
 		if p == nil || p.Owner != "independent" || p.Staff == 0 || p.Supply == 0 || p.Income != PlaceIncome[id] {
 			t.Fatalf("%s did not enter the saved city as a going concern", id)
 		}
+	}
+}
+
+func TestServiceBookReportsPaidWorkAcrossReloads(t *testing.T) {
+	w, chapel := theParlour(t)
+	person := w.AddCivilian()
+	person.Faction, person.Purse = "", FuneralCost
+	delete(w.HouseholdSavings, person.ID)
+	w.Kill(person.ID, "Died at home.")
+	if len(w.DeathServiceReceipts) != 3 {
+		t.Fatal("missing service receipts")
+	}
+	raw, err := json.Marshal(w)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var restored World
+	if err = json.Unmarshal(raw, &restored); err != nil {
+		t.Fatal(err)
+	}
+	restored.Properties["mortuary"].Owner = restored.PlayerOrganizationID()
+	line := restored.fromBehindThisCounter("mortuary")
+	if !strings.Contains(line, "$30") || !strings.Contains(line, "$15") || !strings.Contains(line, "1 paid arrangement") {
+		t.Fatalf("counter lost its actual receipts: %s", line)
+	}
+	if strings.Contains(restored.fromBehindThisCounter(chapel), "receiving and preparation") {
+		t.Fatal("receipts attributed to the wrong venue")
+	}
+	before := len(restored.DeathServiceReceipts)
+	restored.Bury(restored.NPC(person.ID))
+	if len(restored.DeathServiceReceipts) != before {
+		t.Fatal("reload repeated service receipts")
+	}
+	restored.Minute += 8 * 1440
+	if !strings.HasPrefix(restored.fromBehindThisCounter("mortuary"), "No paid work") {
+		t.Fatal("old receipt reported as recent")
 	}
 }

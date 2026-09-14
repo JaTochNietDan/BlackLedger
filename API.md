@@ -1358,3 +1358,18 @@ Default disposition is a stable hash of NPC ID (one third cremation), with no
 extra simulation RNG or new saved preference. Individual wishes and player
 selection of disposition are not implemented. These are functional map
 addresses; their distinct authored exteriors/interiors remain pending.
+
+## Death-service records and city integration
+
+Saved state now includes optional `death_service_receipts`: the last256 actual
+paid arrangements across funeral directors, mortuaries, cemeteries and
+crematoria, each with place/person ID, minute, paid amount and margin. Missing
+books in older saves start empty; historical deaths are never billed or
+fabricated as past work. Staff counter information summarizes matching receipts
+from the last seven game days within this bounded book. It distinguishes
+historical proceeds from the current owner's takings. A crew funeral at an
+owned parlour records the90 cost-only arrangement with no parlour margin.
+
+New service venues have street-trade worker roles and location-specific manner
+text. This does not establish complete visual choreography for generic NPC
+deaths. Public command and response structures remain unchanged.

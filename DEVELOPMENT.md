@@ -3037,3 +3037,26 @@ new front/interior plates. Fronts and mortuary interior plate now supplied;
 cemetery/crematorium interior plates and their 3D rooms remain, along with those
 simulation/content integration tasks. Do not restart this terminal handle or
 call this a passing full suite. No release promoted; live8791 remains4daa6c8.
+
+### September 14 — integrate service venues into the living city
+
+Previous turn was progress: distinct exteriors, rendered fallback plates and
+all404 frontend tests passed. Rechecked the worktree and preserved unrelated
+changes. Addressed the four core failures from the terminal86dd0d0 full run:
+added mortuary/grounds/furnace worker roles, location-specific manner text,
+trade-specific counter information, and three actual ordinary-death benefit
+cases in the every-trade reach sweep. Tests now exercise owner profit from
+Kill rather than directly invoking the payment helper.
+
+Replaced the undertaker counter's inaccurate all-city-deaths claim with actual
+saved receipts, also used by all three new providers. Bounded last256 service
+records retain paid/margin/place/person/minute across reload and ownership.
+No historical backfill. Counter summarizes its recent actual book; own-parlour
+crew arrangements record costs without a margin. Each finalized death remains
+exactly once through existing Buried handling.
+
+Targeted prior-failure plus funeral, death-service and JSON-reload checks passed
+0.947s (.runtime/death-integration-final-tests.log). Earlier initial integration
+selection passed0.945s. These are focused checks, not a new full-suite claim.
+Cemetery and crematorium 3D interiors/fallback room art remain release blockers;
+no main8791 release or QA mutation occurred. Broad goal remains incomplete.

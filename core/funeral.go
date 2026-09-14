@@ -137,7 +137,9 @@ func (w *World) BuryYourOwn(at, id string) error {
 	n.Buried = true
 	w.deathServicePayments(n, FuneralOwn)
 	if !w.Own(at) {
-		w.funeralProceeds(at, n.Name, fee)
+		w.funeralProceeds(at, n, fee)
+	} else {
+		w.recordDeathService(at, n.ID, fee, 0)
 	}
 	// The trade is somebody else's unless it is yours, the same as every other
 	// business in this city.

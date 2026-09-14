@@ -21,6 +21,9 @@ import "fmt"
 // Nobody is a he or a she in these. The city does not know and it does not
 // need to.
 var mannerByPlace = map[string][]string{
+	"mortuary":    {"shot beside the receiving register", "found behind the preparation trolley after the attendant left", "strangled between the cold cabinets and the basin", "followed through the ambulance entrance and shot in the passage"},
+	"cemetery":    {"shot on the gravel path between the plots", "found beside the caretaker's lodge before the gates opened", "strangled behind the gatehouse after closing", "followed along the boundary rail and beaten among the headstones"},
+	"crematorium": {"shot beside the memorial register", "found behind the furnace house after the last service", "strangled in the attendants' passage", "followed into the remembrance room and shot beside the chairs"},
 	"riverside":   {"shot beside the courtyard benches", "found on the landing between two apartment wings", "beaten beside the entrance directory after the porter left", "followed through the lobby and found beyond a closed corridor door"},
 	"mercercourt": {"shot beside the letter boxes before the morning shift", "strangled on a stair landing while a radio played behind a closed door", "followed onto the roof and found beneath the washing lines", "beaten in the basement beside the coal bins"},
 	"herald": {"shot in the alley behind the loading bay, between editions",
