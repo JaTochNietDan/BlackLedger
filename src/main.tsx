@@ -790,6 +790,7 @@ function App() {
               {inside && sceneOverlay}
               {!journey&&homeCue&&playing ? <HomeStrikeScene key={`${playing.id}:${sceneReplay.current}`} cue={homeCue} world={w} motion={motion} overlay={sceneOverlay} onDone={()=>setFinishedCue(playing.id)}/> : cityView === 'interior' && locationInfo.id === p.location ? (
                 <Interior
+                  tournament={w.pool_tournament}
                   activities={locationInfo.id==='poolhall'?<><PoolTournamentNotice notice={w.pool_tournament_notice} tournament={w.pool_tournament} busy={busy} act={commit} onOpen={()=>setTournamentOpen(true)}/><PoolChallenges opponents={w.pool_opponents||[]} cash={p.cash} busy={busy} act={commit}/></>:undefined}
                   motion={motion}
                   player={p}

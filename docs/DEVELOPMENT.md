@@ -13398,3 +13398,11 @@ escrow reaches zero. Improved elimination/final/completion wording. Browser
 played a legal called-eight from an isolated staged final, displayed $100 paid
 and $75 profit, then returned to the hall. Saved cash1075 and one settled award.
 Core/store/server checks, vet and build pass; see BILLIARDS.md for fixture limits.
+
+### 2026-09-14 — Match state in the 3D hall
+
+Connected tournament seats and resting ball layouts to the authored room tables.
+Active players stand at assigned tables; finished rounds restore ordinary room
+staging. Shared numbered textures preserve the close-table appearance. Browser
+standard/expanded views verified on the isolated fixture;385 frontend tests and
+build pass. Stroke/body animation remains next; live campaign unchanged.

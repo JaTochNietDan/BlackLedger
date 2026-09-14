@@ -61,3 +61,16 @@ test('Six-table billiard hall keeps staff, spectators and entrance clear for bot
   }
  }
 });
+
+test('Tournament players stand beside their physical table and leave resolved matches',async()=>{
+ const {poolhallTableOrigin,tournamentHallSpots}=await import('../.runtime/frontend-test/poolhallMatches.js');
+ const games=Array.from({length:6},(_,i)=>({index:i,table_number:i+1,players:[i===0?'p':`a${i}`,`b${i}`],resolved:false,table:{}}));
+ const t={player_id:'p',settled:false,games};
+ const spots=tournamentHallSpots(t);assert.equal(spots.size,12);assert.ok(spots.has('player'));
+ const room=await load('interior-poolhall');room.updateMatrixWorld(true);
+ for(let i=1;i<=6;i++){const [x,z]=poolhallTableOrigin(i);const hit=new THREE.Raycaster(new THREE.Vector3(x,.9,z),new THREE.Vector3(0,-1,0),0,.3).intersectObject(room,true)[0];assert.ok(hit&&Math.abs(hit.point.y-.78)<.003);}
+ for(const name of ['person','woman']){const source=await load(name),boxes=[];for(const spot of spots.values()){const actor=source.clone(true);poseInteriorOccupant(actor,spot);const box=new THREE.Box3().setFromObject(actor,true);for(const prior of boxes)assert.equal(box.intersectsBox(prior),false);boxes.push(box);assert.ok(box.min.y>-.02);}}
+ games[0].resolved=true;assert.equal(tournamentHallSpots(t).has('player'),false);
+ assert.equal(tournamentHallSpots({...t,settled:true}).size,0);
+ assert.equal(poolhallTableOrigin(0),null);assert.equal(poolhallTableOrigin(7),null);
+});

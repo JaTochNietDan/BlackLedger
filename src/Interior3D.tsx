@@ -1,3 +1,5 @@
+import {PoolhallMatches,tournamentHallSpots} from './poolhallMatches';
+import type {PoolTournamentState} from './billiards';
 import {interiorSettings} from './interiorSettings';
 import {LaundryMotion,laundryRunningMachines,type LaundryOperation} from './laundryMotion';
 import {InteriorArrival} from './interiorArrival';
@@ -16,7 +18,7 @@ import {pedestrianModel} from './city3dCast';
 import {disposeCityResources} from './city3dResources';
 import './interior3d.css';
 
-export function Interior3D(props:{place:InteriorPlace;operation?:LaundryOperation;motion:boolean;player:Pick<Person,'name'|'face'|'alive'>;people:Presence[];picked:string;onPick:(id:string)=>void;minute:number}) {
+export function Interior3D(props:{place:InteriorPlace;tournament?:PoolTournamentState|null;operation?:LaundryOperation;motion:boolean;player:Pick<Person,'name'|'face'|'alive'>;people:Presence[];picked:string;onPick:(id:string)=>void;minute:number}) {
  const host=useRef<HTMLDivElement>(null), latest=useRef(props);latest.current=props;
  const settings=interiorSettings[props.place],roomName=settings.name;
  const [enlarged,setEnlarged]=useState(false);
@@ -58,6 +60,7 @@ export function Interior3D(props:{place:InteriorPlace;operation?:LaundryOperatio
   const selected=new THREE.Mesh(new THREE.RingGeometry(.45,.5,40),new THREE.MeshBasicMaterial({color:0xcba85c,side:THREE.DoubleSide}));selected.rotation.x=-Math.PI/2;selected.position.y=.04;scene.add(selected);
   const playerMarker=new THREE.Mesh(new THREE.RingGeometry(.36,.41,40),new THREE.MeshBasicMaterial({color:0xede2bd,side:THREE.DoubleSide}));
   playerMarker.rotation.x=-Math.PI/2;playerMarker.position.y=.065;playerMarker.visible=false;scene.add(playerMarker);
+  let hallMatches:PoolhallMatches|undefined,lastTournament:PoolTournamentState|null|undefined;
   let machines:LaundryMotion|undefined;
   let fittingMirror:Reflector|undefined;
   renderer.info.autoReset=false;
@@ -76,6 +79,7 @@ export function Interior3D(props:{place:InteriorPlace;operation?:LaundryOperatio
     fittingMirror.name='fitting-mirror';fittingMirror.position.set(-3.83,1.65,-4.60);scene.add(fittingMirror);
     room.updateMatrixWorld(true);room.getObjectByName('interior-wall-back')!.attach(fittingMirror);
    }
+   if(props.place==='poolhall'){hallMatches=new PoolhallMatches(room);scene.add(hallMatches.group);hallMatches.update(latest.current.tournament);lastTournament=latest.current.tournament;}
    if(laundry)machines=new LaundryMotion(room);dirty=true;setStatus('');
   }).catch(()=>{if(!dead)setStatus('The 3D room could not load. The people and actions below remain available.');});
   let linenService:LinenPress|undefined;
@@ -118,9 +122,12 @@ export function Interior3D(props:{place:InteriorPlace;operation?:LaundryOperatio
     const before=controls.target.clone();controls.target.x=THREE.MathUtils.clamp(controls.target.x+delta.x,-6,6);controls.target.z=THREE.MathUtils.clamp(controls.target.z+delta.z,-5,5);
     camera.position.add(controls.target.clone().sub(before));dirty=true;
    }
-   const key=JSON.stringify([p.people.map(w=>[w.id,w.face,w.role]),[p.player.name,p.player.face,p.player.alive]]);
+   const matchSpots=p.place==='poolhall'?tournamentHallSpots(p.tournament):new Map();
+   if(hallMatches&&lastTournament!==p.tournament){hallMatches.update(p.tournament);lastTournament=p.tournament;dirty=true;}
+   const key=JSON.stringify([[...matchSpots],p.people.map(w=>[w.id,w.face,w.role]),[p.player.name,p.player.face,p.player.alive]]);
    if(models.size===modelNames.length&&key!==roster){roster=key;dirty=true;arrival=undefined;service=undefined;linenService=undefined;cloth?.removeFromParent();cloth=undefined;castBatch?.dispose();actors.forEach(a=>scene.remove(a));actors.clear();costumes.forEach(m=>m.dispose());costumes=[];
-    const placements=placementsForInterior(p.place,p.people);
+    const placements=placementsForInterior(p.place,p.people.filter(w=>!matchSpots.has(w.id)));
+    for(const [id,spot] of matchSpots)placements.set(id,spot);
     p.people.forEach(who=>{
      const spot=placements.get(who.id);if(!spot)return;
      const model=pedestrianModel(who.id,who.face),object=models.get(model)!.clone(true);
@@ -132,12 +139,13 @@ export function Interior3D(props:{place:InteriorPlace;operation?:LaundryOperatio
     if(p.player.alive){
      const model=pedestrianModel(p.player.name,p.player.face,true),object=models.get(model)!.clone(true);
      costumes.push(...dressPedestrian(object,model,wardrobe(p.player.name,p.player.face,true)));
-     const spot=interiorPlayerSpot(p.place);poseInteriorOccupant(object,spot);
+     const spot=matchSpots.get('player')??interiorPlayerSpot(p.place);poseInteriorOccupant(object,spot);
      object.userData.spot=spot.id;object.userData.person='player';
      object.traverse(o=>{if(o instanceof THREE.Mesh){o.castShadow=true;o.receiveShadow=true;}});
-     actors.set('player',object);scene.add(object);arrival=new InteriorArrival(object,p.place);
-     if(!p.motion||reduced)arrivalSeconds=arrival.duration;
-     arriving=arrival.pose(arrivalSeconds);
+     actors.set('player',object);scene.add(object);
+     if(!matchSpots.has('player')){arrival=new InteriorArrival(object,p.place);
+      if(!p.motion||reduced)arrivalSeconds=arrival.duration;
+      arriving=arrival.pose(arrivalSeconds);}
     }
     if(!lobby){const bartender=[...actors.values()].find(a=>a.userData.spot==='service');if(bartender){
      service=new CounterWipe(bartender);if(service.available){cloth=models.get('bar-cloth')!.clone(true);cloth.traverse(o=>{if(o instanceof THREE.Mesh){o.castShadow=true;o.receiveShadow=true;}});scene.add(cloth);service.pose(serviceSeconds);cloth.position.copy(service.clothPosition);}
@@ -179,7 +187,7 @@ export function Interior3D(props:{place:InteriorPlace;operation?:LaundryOperatio
       zoom:camera.zoom,linen:linenService?{seconds:linenService.seconds,active:linenService.active}:undefined,machines:machines?{count:machines.count,running,seconds:machines.seconds}:undefined,arrival:arrival?{seconds:arrivalSeconds,duration:arrival.duration,moving:arriving}:undefined,service:service?.available?{seconds:serviceSeconds,cloth:service.clothPosition.toArray()}:undefined,omitted:Math.max(0,p.people.length-actors.size+(playerActor?1:0)),cutawayWalls:[...(!left?.visible?['left']:[]),...(!back?.visible?['back']:[])]});
    }
   };frame=requestAnimationFrame(tick);
-  return()=>{reduce.removeEventListener('change',reduction);unbindPan();dead=true;cancelAnimationFrame(frame);observer.disconnect();controls.removeEventListener('change',changed);controls.dispose();canvas.removeEventListener('keydown',keys);canvas.removeEventListener('pointerdown',press);canvas.removeEventListener('pointerup',release);castBatch?.dispose();if(fittingMirror){fittingMirror.removeFromParent();fittingMirror.geometry.dispose();fittingMirror.dispose();}disposeCityResources([scene,...models.values()]);renderer.dispose();renderer.forceContextLoss();canvas.remove();};
+  return()=>{reduce.removeEventListener('change',reduction);unbindPan();dead=true;cancelAnimationFrame(frame);observer.disconnect();controls.removeEventListener('change',changed);controls.dispose();canvas.removeEventListener('keydown',keys);canvas.removeEventListener('pointerdown',press);canvas.removeEventListener('pointerup',release);castBatch?.dispose();hallMatches?.dispose();if(fittingMirror){fittingMirror.removeFromParent();fittingMirror.geometry.dispose();fittingMirror.dispose();}disposeCityResources([scene,...models.values()]);renderer.dispose();renderer.forceContextLoss();canvas.remove();};
  },[props.place]);
  return <div className={`interior3d${enlarged?' enlarged':''}`}>{(props.place==='flat'||props.place==='lodging')&&<button className="interior3d-drawer" aria-pressed={drawerOpen} onClick={()=>setDrawerOpen(!drawerOpen)}>{drawerOpen?'Close bedside drawer':'Open bedside drawer'}</button>}<button className="interior3d-expand" aria-pressed={enlarged} onClick={()=>{setEnlarged(!enlarged);host.current?.querySelector('canvas')?.focus();}}>{enlarged?'Standard room view':'Enlarge room'}</button><div ref={host} className="interior3d-canvas"/><span className="interior3d-caption">{roomName} · {props.player.name}: pale ring · Drag / Q/E: orbit · Scroll / +/−: zoom · WASD / arrows: pan · Home: reset{props.place!=='flat'&&props.place!=='lodging'&&' · Select a person'}{extraPeople>0&&` · ${extraPeople} more in the people list`}</span>{status&&<p role="status">{status}</p>}</div>;
 }

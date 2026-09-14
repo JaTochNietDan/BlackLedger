@@ -587,3 +587,23 @@ passes (0.338s), including winning receipt/reopen retaining prize_paid100; vet
 and build pass. Logs `.runtime/pool-result-{core,adapters,store,vet,build}.log`.
 The broad goal, human animation, expanded physics and full campaign acceptance
 remain open. Main campaign unchanged.
+
+## Hall tables reflect tournament matches (2026-09-14)
+
+The room now stages active tournament entrants at their assigned physical tables,
+including the player, instead of seating everyone on spectator benches. Resolved
+matches release entrants back to ordinary room staging. Each occupied table
+shows authoritative resting ball positions/orientations and hides its decorative
+balls. If a later round reuses a table, that round replaces the earlier setup.
+Numbered ball textures are shared with the close table renderer. The hall does
+not invent motion between saved positions; stroke playback remains in the close
+view. Human bridge/cue-body animation is still pending.
+
+Browser tab60 on isolated port8967 showed four entrants around tables1/2 and the
+saved post-break layouts, in standard and expanded room views at1235×1051.
+No game command was sent. Model-coordinate tests confirm all six table origins
+land on the actual cloth; both character rigs fit twelve tournament positions
+without overlapping one another. Resolved/settled rounds remove match staging.
+All385 frontend tests pass (14.049s) and build passes. Evidence logs
+`.runtime/poolhall-matches-{tests,build}.log`. No fresh frame-rate benchmark or
+live promotion was performed. Main campaign unchanged.
