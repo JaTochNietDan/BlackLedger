@@ -13413,3 +13413,10 @@ Table clicks now enter the selected tournament rack's close view. Reused tables
 resolve to the latest round; drag gestures retain camera control. Browser click
 opened the correct player match without changing revision/time/cash.386 frontend
 tests and build pass. No live campaign or release changes.
+
+### 2026-09-14 — Held billiards cues
+
+Added upright cue-grip poses for tournament entrants using the shared close-view
+cue geometry. Both character rigs pass grip/arm-length/floor checks;387 frontend
+tests and build pass. Enlarged browser view inspected on the isolated hall.
+Full shooting/bridge animation remains pending. Main unchanged.

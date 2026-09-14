@@ -624,3 +624,18 @@ tests pass; all386 frontend tests pass (14.133s), and build passes. Evidence
 `.runtime/pool-table-pick-{tests,build}.log` and `pool-table-pick-state.json`.
 Live campaign unchanged. Full human-played tournament, animation and broader
 visual/physics work remain open.
+
+## Cue-holding poses at occupied tables (2026-09-14)
+
+Tournament entrants now hold full-length cues upright while waiting beside their
+tables. Both rigid sleeve segments reach the grip without changing arm lengths.
+The hall and close-view renderer share the shaft, butt, ferrule and chalk-tip
+geometry; hall instances share resources across actors and release them with the
+room. This is a waiting pose, not the still-required bent-over stroke/bridge pose.
+
+Browser tab63 on isolated port8967 inspected the standard hall and an enlarged,
+zoomed view of the players' grips and cues. The props remain above the floor.
+Tests verify both person/woman models place the palm within2mm of the shaft grip,
+retain arm scale and leave floor clearance. All387 frontend tests pass (14.134s)
+and build passes (2.68s); logs `.runtime/pool-held-cue-{tests,build}.log`.
+No game command or live save/release change was made.

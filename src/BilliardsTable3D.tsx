@@ -1,3 +1,4 @@
+import {createBilliardsCue} from './billiardsCue';
 import {ballTexture} from './billiardsBallTexture';
 import {poolRails,poolCushionGeometry} from './billiardsTableGeometry';
 import {useEffect,useRef,useState} from 'react';
@@ -63,11 +64,7 @@ export function BilliardsTable3D(props:TableProps){
   });
   const headLine=new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-W/2,H+.003,L/4),new THREE.Vector3(W/2,H+.003,L/4)]),new THREE.LineDashedMaterial({color:'#e8d8b6',dashSize:.04,gapSize:.03,transparent:true,opacity:.65}));headLine.computeLineDistances();scene.add(headLine);
   const guide=new THREE.Line(new THREE.BufferGeometry(),new THREE.LineDashedMaterial({color:'#e7d6a5',dashSize:.04,gapSize:.025,transparent:true,opacity:.65}));scene.add(guide);
-  const cue=new THREE.Group();scene.add(cue);
-  const cueMaterials:THREE.MeshStandardMaterial[]=[];
-  const cuePart=(length:number,tip:number,butt:number,centre:number,colour:string)=>{const mat=material(colour);mat.transparent=true;cueMaterials.push(mat);const part=new THREE.Mesh(new THREE.CylinderGeometry(tip,butt,length,20),mat);part.position.y=centre;part.castShadow=true;cue.add(part);};
-  // Positive local Y is the chalked tip; front lies at +0.71 metres.
-  cuePart(1.08,.005,.010,.15,'#c4a46e');cuePart(.32,.010,.014,-.55,'#453124');cuePart(.016,.005,.005,.698,'#e9dfbb');cuePart(.008,.005,.005,.710,'#668f91');
+  const {cue,materials:cueMaterials}=createBilliardsCue();scene.add(cue);
   const cuePose=(origin:THREE.Vector3,angle:number,front:number,top:number,side:number,opacity:number)=>{const direction=new THREE.Vector3(Math.cos(angle),0,-Math.sin(angle)),across=new THREE.Vector3(-Math.sin(angle),0,-Math.cos(angle));cue.position.copy(origin).addScaledVector(direction,front-.714).addScaledVector(across,side);cue.position.y+=top;cue.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),direction);for(const m of cueMaterials){m.opacity=opacity;m.depthWrite=opacity>.99;}};
   let tape:PoolReplay|null=null,started=0,loading=false,key='',generation=0,playing=false,eventCursor=0,cueSound=false;
   const preference=matchMedia('(prefers-reduced-motion: reduce)');

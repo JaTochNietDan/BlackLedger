@@ -85,3 +85,16 @@ test('Hall table picking follows reused tables and excludes the aisles',async()=
  assert.equal(poolhallGameAt(t,NaN,z),null);
  assert.equal(poolhallGameAt(undefined,x,z),null);
 });
+
+test('Both hall rigs grip the cue without changing arm length or touching the floor',async()=>{
+ const {createBilliardsCue,holdBilliardsCue}=await import('../.runtime/frontend-test/billiardsCue.js');
+ for(const name of ['person','woman']){
+  const actor=await load(name);poseInteriorOccupant(actor,{id:'match',x:0,z:0,yaw:Math.PI/2});
+  const {cue}=createBilliardsCue();holdBilliardsCue(actor,cue);
+  const palm=actor.getObjectByName('elbow1').localToWorld(new THREE.Vector3(0,-.295,0));
+  const shaft=cue.localToWorld(new THREE.Vector3(0,.23,0));
+  assert.ok(palm.distanceTo(shaft)<.002,`${name}: cue misses palm`);
+  assert.ok(new THREE.Box3().setFromObject(cue,true).min.y>.07,`${name}: cue penetrates floor`);
+  assert.equal(actor.getObjectByName('arm1').scale.y,1);assert.equal(actor.getObjectByName('elbow1').scale.y,1);
+ }
+});
