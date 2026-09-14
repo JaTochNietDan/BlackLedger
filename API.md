@@ -1336,3 +1336,25 @@ owner now receives the170 service margin. Player-owned funeral receipts appear
 in the ledger and earned cash. Existing saved deaths are not retroactively
 billed. This adds no command or response fields; morgue/cemetery/crematorium
 venues and their separate services remain outstanding.
+
+## Mortuary, cemetery and crematorium premises
+
+Added purchasable trading addresses `mortuary` (Bellwether Mortuary), `cemetery`
+(Oak Ridge Cemetery), and `crematorium` (Stillwater Crematorium). They use normal
+property deeds, staffing, supplies, repair, individual proprietor acquisition,
+family acquisition and owner-death rules. SettleNewPlaces initializes them in
+older campaigns. Their baseline income represents retainers/grounds care;
+death-service margin is settled separately from funded funerals.
+
+The existing90 service allowance within a full260 funeral now pays30 for
+mortuary care and60 for either burial or cremation. Proportional smaller
+funerals use their actual allowance. Each provider spends half its receipt
+(rounding costs up) and its owner receives the remainder. No extra estate or
+player charge is added. Operating providers require condition>=60, staff,
+supplies and no active trouble; the deceased's home district is preferred.
+Absent local providers leave the relevant allowance as an outside expense.
+
+Default disposition is a stable hash of NPC ID (one third cremation), with no
+extra simulation RNG or new saved preference. Individual wishes and player
+selection of disposition are not implemented. These are functional map
+addresses; their distinct authored exteriors/interiors remain pending.

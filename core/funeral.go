@@ -135,6 +135,7 @@ func (w *World) BuryYourOwn(at, id string) error {
 	}
 	n := w.NPC(id)
 	n.Buried = true
+	w.deathServicePayments(n, FuneralOwn)
 	if !w.Own(at) {
 		w.funeralProceeds(at, n.Name, fee)
 	}

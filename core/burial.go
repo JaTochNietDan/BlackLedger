@@ -57,6 +57,7 @@ func (w *World) Bury(person *NPC) {
 		family.Cash -= paid - fromEstate
 	}
 	w.funeralProceeds(id, person.Name, paid)
+	w.deathServicePayments(person, (paid*FuneralOwn+FuneralCost-1)/FuneralCost)
 	w.ShiftCustom(id, "nobody in this district dying", BurialTrade)
 }
 

@@ -66,7 +66,10 @@ type Trade struct {
 }
 
 var trades = map[string]Trade{
-	"lodging": {Hands: 3, Wage: 6, Drain: 4, Restock: 100, RestockAmount: 40, Supplies: "coal and clean linen", Trouble: "The boiler has failed and the rooms have no hot water.", Remedy: "Repair the boiler", RemedyDetail: "Restore heat and hot water to the rented rooms.", RemedyCost: 140, Cover: 12},
+	"mortuary":    {Hands: 3, Wage: 8, Drain: 5, Restock: 110, RestockAmount: 40, Supplies: "refrigerant, linen and disinfectant", Trouble: "The cold cabinets have failed and the receiving room cannot take another case.", Remedy: "Repair the refrigeration", RemedyDetail: "A new compressor and a thorough cleaning of the receiving room.", RemedyCost: 180, Cover: 10, Hides: 3},
+	"cemetery":    {Hands: 3, Wage: 7, Drain: 3, Restock: 75, RestockAmount: 40, Supplies: "tools, gravel and grounds supplies", Trouble: "A collapsed drain has flooded the burial ground.", Remedy: "Drain the grounds", RemedyDetail: "Clear the drain and restore the paths and plots.", RemedyCost: 160, Cover: 8, Hides: 1},
+	"crematorium": {Hands: 3, Wage: 8, Drain: 6, Restock: 120, RestockAmount: 40, Supplies: "furnace fuel and urns", Trouble: "The furnace lining is cracked and the attendants have shut it down.", Remedy: "Reline the furnace", RemedyDetail: "Replace the firebrick and inspect the flue before reopening.", RemedyCost: 190, Cover: 10, Hides: 2},
+	"lodging":     {Hands: 3, Wage: 6, Drain: 4, Restock: 100, RestockAmount: 40, Supplies: "coal and clean linen", Trouble: "The boiler has failed and the rooms have no hot water.", Remedy: "Repair the boiler", RemedyDetail: "Restore heat and hot water to the rented rooms.", RemedyCost: 140, Cover: 12},
 	"laundry": {
 		Hands: 3, Wage: 6, Drain: 5, Restock: 90, RestockAmount: 40, Supplies: "soap and coal",
 		Trouble: "A press has broken and the back room is standing idle.",

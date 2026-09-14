@@ -2960,6 +2960,8 @@ var PlaceIncome = map[string]int{
 	"pawn": 17,
 	// An undertaker earns on a thing this city produces without being asked.
 	"chapel": 25,
+	// Retainers and grounds care; funeral service payments settle separately.
+	"mortuary": 12, "cemetery": 10, "crematorium": 12,
 	// A tailor earns on people who need to be taken seriously, and this city
 	// is full of them.
 	"tailor": 16,

@@ -322,5 +322,38 @@
   "y": 613,
   "cost": 100,
   "blurb": "Four brick apartment wings around a communal courtyard. Affordable leases and individual deeds along the eastern river road."
+ },
+ {
+  "id": "mortuary",
+  "name": "Bellwether Mortuary",
+  "type": "work",
+  "kind": "mortuary",
+  "district": 1,
+  "x": 1167,
+  "y": 95,
+  "cost": 480,
+  "blurb": "A private receiving house with chilled cabinets, tiled preparation rooms and a discreet ambulance entrance. Funeral directors pay for care before the service."
+ },
+ {
+  "id": "cemetery",
+  "name": "Oak Ridge Cemetery",
+  "type": "work",
+  "kind": "cemetery",
+  "district": 2,
+  "x": 1167,
+  "y": 267,
+  "cost": 650,
+  "blurb": "Iron gates, stone paths and a caretaker’s lodge. Burial fees support the grounds, the gravediggers and whoever holds the deed."
+ },
+ {
+  "id": "crematorium",
+  "name": "Stillwater Crematorium",
+  "type": "work",
+  "kind": "crematorium",
+  "district": 2,
+  "x": 1167,
+  "y": 786,
+  "cost": 580,
+  "blurb": "A brick furnace house beside a quiet remembrance room. Cremation services bring work to the attendants and income to the proprietor."
  }
 ]

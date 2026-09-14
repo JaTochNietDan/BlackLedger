@@ -2952,3 +2952,23 @@ reran the full focused death/funeral/ownership selection successfully (see
 .runtime/funeral-death-integration-final.log). The earlier integration selection
 passed9.085s before that additional test was added. This is targeted simulation
 coverage, not a new complete-suite or campaign acceptance claim.
+
+### September 14 — death-service premises and funded supply chain
+
+Previous turn was progress: funded funeral settlement committed and targeted
+integration passed. Rechecked the worktree; preserved unrelated work.
+Added Bellwether Mortuary, Oak Ridge Cemetery and Stillwater Crematorium along
+the eastern map column, each with price, trade, staffing/supplies, trouble/repair
+and income for retainer/grounds work. Standard deed and save-repair mechanisms
+apply. Their existing funeral allowance now funds care plus one disposition;
+only provider margins enter owner accounts. This does not levy an extra bill.
+Closed, damaged, unstaffed or unsupplied premises cannot receive service trade.
+Disposition is stable by NPC ID pending actual personal wishes/choice.
+
+Targeted funeral, service, new-place/save-repair and ownership-eligibility tests
+passed0.207s (.runtime/death-services-final-tests.log). They verify215 total
+owner profit from a260 bill when all involved premises are player-owned,
+separate burial/cremation custom, family and individual owner margins, closed
+providers, duplicate prevention and old-save initialization. Distinct 3D assets
+and interior staging for these addresses are still pending; currently they use
+the generic work-building map representation. Nothing promoted to8791.
