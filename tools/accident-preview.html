@@ -1,0 +1,19 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Charge accident motion review</title><style>body{margin:0;background:#1c211d;color:#e6d7b6;font:18px Georgia}p{position:absolute;top:10px;left:20px}canvas{display:block}</style></head><body><p>Charge accident · fall study <button id="play">Play</button> <button id="end">Final pose</button><output></output></p><canvas></canvas><script type="module">
+import * as THREE from '/node_modules/three/build/three.module.js';
+import {GLTFLoader} from '/node_modules/three/examples/jsm/loaders/GLTFLoader.js';
+import {OrbitControls} from '/node_modules/three/examples/jsm/controls/OrbitControls.js';
+import {CityAccident} from '/src/city3dAccident.ts';
+const renderer=new THREE.WebGLRenderer({canvas:document.querySelector('canvas'),antialias:true});renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+const scene=new THREE.Scene();scene.background=new THREE.Color(0x1c211d);const camera=new THREE.PerspectiveCamera(35,innerWidth/innerHeight,.1,100);camera.position.set(5,3,7);const controls=new OrbitControls(camera,renderer.domElement);controls.target.set(0,.7,0);controls.update();
+scene.add(new THREE.HemisphereLight(0xffefd5,0x334439,3));const sun=new THREE.DirectionalLight(0xffe8c0,3);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);sun.shadow.bias=-.0001;sun.position.set(-3,8,5);scene.add(sun);
+const floor=new THREE.Mesh(new THREE.BoxGeometry(12,.1,8),new THREE.MeshStandardMaterial({color:0x727267}));floor.receiveShadow=true;floor.position.y=-.05;scene.add(floor);
+const loader=new GLTFLoader(),casts=[];
+for(const [i,model] of ['person','woman'].entries())for(const fatal of [false,true]){
+ const actor=(await loader.loadAsync('/art/models/'+model+'.glb')).scene;
+ actor.traverse(o=>{if(o instanceof THREE.Mesh)o.castShadow=true;});const cast=new CityAccident(actor,fatal);cast.root.position.set(fatal?1.5:-1.5,0,i*3-1.5);scene.add(cast.root);casts.push(cast);
+}
+let request=0;const render=()=>renderer.render(scene,camera);controls.addEventListener('change',render);
+function pose(t){casts.forEach(c=>c.update(t));document.body.dataset.pose=JSON.stringify({seconds:t,done:t>=4});document.querySelector('output').value=t.toFixed(2)+'s · left: survivor / right: fatal';render();}
+document.getElementById('end').onclick=()=>{cancelAnimationFrame(request);pose(4);};
+document.getElementById('play').onclick=()=>{cancelAnimationFrame(request);const start=performance.now();function frame(now){const t=Math.min(4,(now-start)/1000);pose(t);if(t<4)request=requestAnimationFrame(frame);}request=requestAnimationFrame(frame);};pose(0);
+</script></body></html>

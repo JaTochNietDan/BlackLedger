@@ -171,3 +171,23 @@ test('villa approach joins stair descent with no body jump or tread penetration'
   cast.update(0);assert.ok(cast.actor.getWorldPosition(new THREE.Vector3()).z>-3);
  }
 });
+
+test('accident fall keeps both actual rigs above ground and preserves the recorded fatal outcome',async()=>{
+ const {CityAccident}=await import('../.runtime/frontend-test/city3dAccident.js');
+ for(const name of ['person','woman'])for(const fatal of [false,true]){
+  const cast=new CityAccident(await model(name),fatal);
+  cast.root.position.set(30,.2,40);cast.root.rotation.y=1.1;
+  let previous;
+  for(let frame=0;frame<=480;frame++){
+   const state=cast.update(frame/120),bounds=new THREE.Box3().setFromObject(cast.actor,true);
+   assert.ok(Math.abs(bounds.min.y-.205)<1e-6,`${name} lost ground contact at ${frame/120}`);
+   assert.equal(state.fatal,fatal);if(fatal)assert.equal(state.recovering,false);
+   assert.ok(Number.isFinite(bounds.max.y));
+   if(previous)assert.ok(cast.actor.position.distanceTo(previous)<.06,'discontinuous fall');
+   previous=cast.actor.position.clone();
+  }
+  assert.ok(fatal?cast.actor.rotation.x<-1.5:cast.actor.rotation.x>-.8);
+  assert.equal(cast.update(4).done,true);
+  cast.update(0);assert.equal(cast.actor.rotation.x,0);
+ }
+});
