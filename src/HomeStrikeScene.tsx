@@ -3,7 +3,8 @@ import {useEffect,useRef,useState,type ReactNode} from 'react';
 import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {CityAssassination,executionSpatter,MELEE_IMPACTS,ASSASSINATION_SHOT} from './city3dAssassination';
-import {homeStrikeRoom} from './homeStrike';
+import {strikeRoom} from './homeStrike';
+import {interiorStrikePlacement} from './interiorStrikePlacement';
 import {pedestrianModel} from './city3dCast';
 import {wardrobe,dressPedestrian} from './city3dWardrobe';
 import {GunfireAudio,BlastAudio,gunfightPose} from './city3dEvents';
@@ -16,15 +17,17 @@ import './homeStrike.css';
 /** A recorded result, never a second combat simulation. No actions are sent here. */
 export function HomeStrikeScene({cue,world,motion,overlay,onDone}:{cue:VisualCue;world:Snapshot;motion:boolean;overlay:ReactNode;onDone:(id:string)=>void}){
  const host=useRef<HTMLDivElement>(null),latest=useRef({motion,onDone});latest.current={motion,onDone};
- const [status,setStatus]=useState('Opening the home…');
+ const [status,setStatus]=useState('Opening the recorded interior…');
  useEffect(()=>{
-  const search=!!cue.burglary,roomSettings=homeStrikeRoom(cue.target),origin=roomSettings.origin;
+  const search=!!cue.burglary,roomSettings=strikeRoom(cue);
+  if(!roomSettings){setStatus('This building’s recorded interior scene is not available yet. Read the saved result below.');latest.current.onDone(cue.id);return;}
+  const origin=roomSettings.origin;
   const intruder=cue.burglary?.intruder.id||cue.attacker!.id;
   const el=host.current!;let dead=false,frame=0,cast:CityAssassination|BurglarySearch|undefined,start=0,finished=false;
   const scene=new THREE.Scene();scene.background=new THREE.Color(0x171b18);
   const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFShadowMap;
   renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;
-  el.append(renderer.domElement);renderer.domElement.setAttribute('aria-label',search?'Recorded burglary inside the resident’s home':'Recorded attack inside the resident’s home');
+  el.append(renderer.domElement);renderer.domElement.setAttribute('aria-label',search?'Recorded burglary inside the resident’s home':'Recorded assassination inside the building');
   const camera=new THREE.PerspectiveCamera(43,1,.1,60);camera.position.set(5.7,6.4,10.8);camera.lookAt(0,.7,roomSettings.focusZ);
   if(search&&cue.target==='estate'){camera.position.set(-1,5.7,7.5);camera.lookAt(2,.7,.7);}
   const resize=()=>{renderer.setSize(el.clientWidth,el.clientHeight);camera.aspect=el.clientWidth/el.clientHeight;camera.updateProjectionMatrix();if(cast)renderer.render(scene,camera);};
@@ -56,14 +59,25 @@ export function HomeStrikeScene({cue,world,motion,overlay,onDone}:{cue:VisualCue
    scene.add(room.scene);
    if(search){const drawer=room.scene.getObjectByName('burglary-drawer');if(!drawer)throw new Error('Missing search drawer');cast=new BurglarySearch(attacker,drawer,cue.target,cue.burglary!.taken);}
    else {cast=new CityAssassination(attacker,victim!,weapon?.scene,cue.strike!.variant,weaponName);cast.root.position.set(origin.x,0,origin.z);cast.root.rotation.y=roomSettings.yaw;}
+   if(!search&&cue.strike?.setting==='interior'){
+    const placement=interiorStrikePlacement(room.scene,cast as CityAssassination,roomSettings.bounds);
+    if(!placement)throw new Error('No clear interior staging area');
+    cast.root.position.set(placement.x,0,placement.z);cast.root.rotation.y=placement.yaw;
+    const center=new THREE.Vector3(2.5,.8,0).applyMatrix4((cast.root.updateMatrixWorld(true),cast.root.matrixWorld));
+    camera.position.set(center.x+5.7,7,center.z+10);camera.lookAt(center);
+   }
    scene.add(cast.root);
    scene.traverse(o=>{if(o instanceof THREE.Mesh){o.castShadow=true;o.receiveShadow=true;}});
    start=performance.now();setStatus('');
-  }).catch(()=>{if(!dead){setStatus('The home scene could not load. The recorded result is available below.');finished=true;latest.current.onDone(cue.id);}});
+  }).catch(()=>{if(!dead){setStatus('The interior scene could not load. The recorded result is available below.');finished=true;latest.current.onDone(cue.id);}});
+  let elapsed=0;
   const reduced=matchMedia('(prefers-reduced-motion: reduce)');
   const tick=(now:number)=>{
    if(dead)return;frame=requestAnimationFrame(tick);if(!cast||finished)return;
-   const enabled=latest.current.motion&&!reduced.matches,seconds=enabled?(now-start)/1000:cast.duration;
+   const delta=Math.min(100,Math.max(0,now-start));start=now;
+   if(document.hidden)return;
+   elapsed+=delta/1000;
+   const enabled=latest.current.motion&&!reduced.matches,seconds=enabled?elapsed:cast.duration;
    cast.update(Math.min(seconds,cast.duration));
    const pulse=weaponName?gunfightPose(seconds,beats).flash:false;
    const muzzle=cast instanceof CityAssassination?cast.weapon?.getObjectByName('muzzle'):undefined;if(muzzle)muzzle.getWorldPosition(flash.position);flash.intensity=pulse?12:0;muzzleGlow.position.copy(flash.position);muzzleGlow.visible=!!muzzle&&pulse;

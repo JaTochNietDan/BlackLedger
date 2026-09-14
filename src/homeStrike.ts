@@ -1,3 +1,4 @@
+import {hasInterior,interiorSettings} from './interiorSettings.js';
 import {isStagedStrike} from './city3dAssassination.js';
 import type {VisualCue} from './types';
 /** Only an explicit committed home setting selects private-room playback. */
@@ -16,4 +17,19 @@ export function homeStrikeFor(cue:VisualCue|null|undefined,batch:VisualCue[]):Vi
  if(cue&&isHomeStrike(cue))return cue;
  if(cue?.kind!=='killing')return;
  return batch.find(hit=>isHomeStrike(hit)&&hit.target===cue.target&&hit.minute===cue.minute&&cue.actors?.some(person=>person.id===hit.strike!.victim.id));
+}
+
+export function isInteriorStrike(cue:VisualCue|null|undefined):boolean {
+ return !!cue&&cue.strike?.setting==='interior'&&isStagedStrike(cue)&&!!cue.attacker;
+}
+export function interiorStrikeFor(cue:VisualCue|null|undefined,batch:VisualCue[]):VisualCue|undefined {
+ if(cue&&isInteriorStrike(cue))return cue;
+ if(cue?.kind!=='killing')return;
+ return batch.find(hit=>isInteriorStrike(hit)&&hit.target===cue.target&&hit.minute===cue.minute&&cue.actors?.some(person=>person.id===hit.strike!.victim.id));
+}
+export function strikeRoom(cue:VisualCue){
+ if(cue.strike?.setting!=='interior')return homeStrikeRoom(cue.target);
+ if(!hasInterior(cue.target))return undefined;
+ const room=interiorSettings[cue.target];
+ return {model:room.model,yaw:0,focusZ:0,origin:{x:-3,z:0},bounds:{x:room.span,z:room.span}};
 }

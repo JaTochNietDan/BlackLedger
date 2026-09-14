@@ -15,7 +15,7 @@ export interface VisualCue {
   caption: string;
   headline?: string;
   detainee?: {id: string; name: string};
-  strike?: {setting?: 'home'; variant: 'back-of-head' | 'close-shot' | 'burst' | 'close-quarters'; victim: {id: string; name: string}};
+  strike?: {setting?: 'home' | 'interior'; variant: 'back-of-head' | 'close-shot' | 'burst' | 'close-quarters'; victim: {id: string; name: string}};
   attacker?: {id: string; name: string; weapon: number};
   actors?: {id: string; name: string}[];
   gravity?: number;

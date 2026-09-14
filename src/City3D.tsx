@@ -1050,7 +1050,7 @@ export function City3D(props: Props) {
               first,
               playbackStarted,
             ).flatMap(policeCast))) {
-          if (!motion) continue;
+          if (!motion || cue.strike?.setting==='home' || cue.strike?.setting==='interior') continue;
           const lot = lots.get(cue.target);
           if (!lot) continue;
           const mesh = new THREE.InstancedMesh(

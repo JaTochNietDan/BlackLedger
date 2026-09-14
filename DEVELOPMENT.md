@@ -2716,3 +2716,28 @@ Final footer-space correction passed production build; small-width CSS is presen
 but phone-size visual acceptance and other venue panels remain to be checked.
 No main save commands or deployment; this is preview-only. No new tests for this
 reversible layout change; TypeScript and production build passed.
+
+### September 14 — recorded assassinations inside their venues
+
+Successful named player/crew strikes now capture interior versus home/travelling
+context before Kill. React resolves the selected attack or explicitly linked
+victim headline to the interior scene. Actual venue models come from existing
+interiorSettings, private homes retain their authored rooms, and missing rooms
+show an explicit result fallback. City3D no longer stages indoor cues outside.
+No outcome, time or combat RNG changes. Generic NPC deaths without captured
+attacker/scenario metadata remain outside this first named-strike implementation.
+
+Venue staging tests the recorded actor path for nearby room geometry and floor
+support, including body bounds through the fall. The browser revealed a body too
+near the floor edge on the first version; added body-corner floor checks and
+replayed successfully. These sampled checks do not replace all venue/choreography
+visual acceptance. Interior playback now caps frame advances and pauses while
+hidden, like the corrected city scene clock.
+
+Evidence:403 frontend tests passed14.461s, including explicit venue routing,
+linked victim identity, legacy omissions, missing models, and clear placements
+inside Saint Agnes and the cab office. Targeted strike/home tests passed0.168s;
+production build2.71s. Isolated strike-revolver fixture8983, tabs89/90, replayed
+inside Saint Agnes; final screenshot showed the casualty entirely on the interior
+floor. Main8791/save untouched. Preview-only; other weapons/venues and generic
+contract/NPC incident coverage still require broader acceptance.

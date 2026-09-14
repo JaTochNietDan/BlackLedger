@@ -125,3 +125,8 @@ Provide dynamic affordable rental moves and an ownership/management overview
 covering vacancies, residents, actual rent collections, arrears and sale values.
 Initial rental/overview and playback corrections are recorded in DEVELOPMENT.md;
 full incident visual acceptance and a richer dedicated management pane remain.
+
+Interior incidents must play where they happen: assassination scenes inside
+buildings must use their interiors, including private homes. Initial routing of
+recorded successful named strikes is implemented; generic NPC deaths/contracts,
+missing venue interiors, and complete per-venue choreography remain in scope.

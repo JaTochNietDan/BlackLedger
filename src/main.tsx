@@ -2,7 +2,7 @@ import {PoolTournamentRoom,PoolTournamentNotice} from './PoolTournamentRoom';
 import {BilliardsRoom,PoolChallenges} from './BilliardsRoom';
 import {isIndoorSearch} from './burglarySearch';
 import {HomeStrikeScene} from './HomeStrikeScene';
-import {homeStrikeFor} from './homeStrike';
+import {homeStrikeFor,interiorStrikeFor} from './homeStrike';
 import {KeyboardShortcuts} from './KeyboardShortcuts';
 import {CityAccounts} from './CityAccounts';
 import {SceneNewspaper} from './SceneNewspaper';
@@ -740,7 +740,7 @@ function App() {
   function content(view=tab) {
     const w = world!;
     if (view === 'city') {
-      const homeCue=homeStrikeFor(playing,w.last_result?.cues||[])||(isIndoorSearch(playing)?playing:undefined);
+      const homeCue=homeStrikeFor(playing,w.last_result?.cues||[])||interiorStrikeFor(playing,w.last_result?.cues||[])||(isIndoorSearch(playing)?playing:undefined);
       const inside = cityView === 'interior' && locationInfo.id === p.location;
       const theatre = playing && !journey && (
         <Theatre

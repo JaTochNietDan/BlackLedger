@@ -38,6 +38,8 @@ func (w *World) strikePresentation(victim *NPC, tier int) (CueStrike, string) {
 	setting := ""
 	if w.residentAtHome(victim) {
 		setting = "home"
+	} else if !w.Travelling(victim) {
+		setting = "interior"
 	}
 	return CueStrike{Setting: setting, Variant: variant, Victim: CueActor{ID: victim.ID, Name: victim.Name}},
 		fmt.Sprintf("At %s, %s: %s was %s.", place.Name, hourOf(w.Minute), victim.Name, how)

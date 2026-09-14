@@ -1269,3 +1269,16 @@ remains distinct from actual collections. At midnight households review affordab
 vacant rentals, with at most one voluntary rental move per day. Moves preserve
 unit ownership, other residents, existing travel endpoints and workplace posts.
 Rent remains collected by the existing household payment system.
+
+## Recorded venue assassinations
+
+Successful named `Strike` results now record `strike.setting: "interior"` when
+the victim is stationary at a venue, before death mutates their state. Physically
+present residents retain `"home"`; travelling targets retain the legacy omitted
+setting. This adds no combat draws, time or outcome changes. The attack and linked
+victim headline select the same recorded scene. Indoor cues are excluded from
+street choreography. Home events use private rooms; venue events use their own
+available 3D interior. Unsupported rooms show the saved-result fallback explicitly
+instead of fabricating an outdoor assassination. Legacy unlabelled results keep
+their prior meaning. Generic deaths without recorded attacker/scenario metadata
+are not yet full named interior assassination scenes.

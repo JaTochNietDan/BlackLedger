@@ -157,3 +157,21 @@ func TestStrikeScenarioVariesAndSurvivesSavedResult(t *testing.T) {
 		t.Fatalf("eligible contexts lack variation: %v", seen)
 	}
 }
+
+func TestStrikeRecordsIndoorVersusTravellingSetting(t *testing.T) {
+	w, n := striker(t)
+	n.Home = "room"
+	n.Location = "bar"
+	n.Heading = ""
+	n.Sets = 0
+	strike, _ := w.strikePresentation(n, 1)
+	if strike.Setting != "interior" {
+		t.Fatalf("stationary venue: %+v", strike)
+	}
+	n.Heading = "club"
+	n.Arrives = w.Minute + 30
+	strike, _ = w.strikePresentation(n, 1)
+	if strike.Setting != "" {
+		t.Fatalf("travelling target staged indoors: %+v", strike)
+	}
+}

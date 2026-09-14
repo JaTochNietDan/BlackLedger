@@ -55,3 +55,21 @@ test('Mariner private room excludes the public hall roster and has a clear groun
   }
  }
 });
+
+test('interior setting selects actual venue and explicitly links its death cue',async()=>{
+ const {interiorStrikeFor,strikeRoom}=await import('../.runtime/frontend-test/homeStrike.js');
+ const inside={...hit,target:'bar',strike:{...hit.strike,setting:'interior'}};
+ assert.equal(strikeRoom(inside).model,'interior-saint-agnes');
+ assert.equal(interiorStrikeFor(inside,[]),inside);
+ assert.equal(interiorStrikeFor({kind:'killing',target:'bar',minute:10,actors:[{id:'mara'}]},[inside]),inside);
+ assert.equal(interiorStrikeFor({...inside,strike:{...inside.strike,setting:undefined}},[]),undefined);
+ assert.equal(strikeRoom({...inside,target:'unknown'}),undefined);
+});
+test('venue assassination finds a clear approach in the bar and dispatch office',async()=>{
+ const {interiorStrikePlacement}=await import('../.runtime/frontend-test/interiorStrikePlacement.js');
+ for(const model of ['interior-saint-agnes','interior-cabstand']){
+  const room=await load(model),a=await load('person'),v=await load('woman'),weapon=await load('revolver');
+  const cast=new CityAssassination(a,v,weapon,'back-of-head','revolver');
+  assert.ok(interiorStrikePlacement(room,cast,{x:7,z:7}),model);
+ }
+});
