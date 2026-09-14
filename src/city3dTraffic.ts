@@ -4,7 +4,7 @@ import type {Point} from './city3dPlan.js';
 
 export type TrafficPose = Point & {heading: number};
 export type TrafficRequest = {id: string; model: string; points: Point[]; progress: number};
-export type TrafficPlacement = {pose: TrafficPose; progress: number; waiting: boolean; yielding?: boolean};
+export type TrafficPlacement = {pose: TrafficPose; progress: number; waiting: boolean; yielding?: boolean; blockedBy?: string};
 const lengths: Record<string, number> = {ford: 4.7, hudson: 5.1, packard: 5.8, police: 4.7, 'fire-engine':5.8};
 export function trafficSpeed(model: string) {
   return isPedestrian(model) ? 1.8 : 11;
@@ -72,14 +72,14 @@ function throughAxis(request: TrafficRequest, progress: number, length: number) 
 export class StreetTraffic {
   private entries = new Map<
     string,
-    {key: string; progress: number; pose: TrafficPose; model: string; waiting: boolean; yieldTo?: TrafficPose; yielding?: boolean; returnTo?: Point; joining?: Point}
+    {key: string; progress: number; pose: TrafficPose; model: string; waiting: boolean; blockedBy?: string; yieldTo?: TrafficPose; yielding?: boolean; returnTo?: Point; joining?: Point}
   >();
   clear() {
     this.entries.clear();
   }
   placement(id: string): TrafficPlacement | undefined {
     const e=this.entries.get(id);
-    return e ? {pose:{...e.pose},progress:e.progress,waiting:e.waiting,yielding:e.yielding} : undefined;
+    return e ? {pose:{...e.pose},progress:e.progress,waiting:e.waiting,yielding:e.yielding,blockedBy:e.blockedBy} : undefined;
   }
   /** Transfer a scene's reserved survivor position to a stationary pedestrian. */
   adoptFrontage(request:TrafficRequest, pose:TrafficPose) {
@@ -107,15 +107,15 @@ export class StreetTraffic {
         b.progress * lengths.get(b.id)! - a.progress * lengths.get(a.id)! ||
         a.id.localeCompare(b.id),
     );
-    const free = (pose: TrafficPose, model: string, id: string, progress: number) => {
+    const obstruction = (pose: TrafficPose, model: string, id: string, progress: number) => {
       // A waiting scene closes its approach to new moving traffic. Existing
       // occupants may finish leaving; the scene itself still waits for clearance.
       const current=this.entries.get(id);
       if((lengths.get(id)!>0||(current&&!current.waiting&&isPedestrian(model)))&&pending.some(space=>trafficOverlap(pose,model,space.pose,space.model)&&
-        !(current&&!current.waiting&&trafficOverlap(current.pose,current.model,space.pose,space.model))))return false;
+        !(current&&!current.waiting&&trafficOverlap(current.pose,current.model,space.pose,space.model))))return 'pending-scene';
       const crossing = junction(pose);
       const axis = crossing ? throughAxis(byID.get(id)!, progress, lengths.get(id)!) : null;
-      return ![...this.entries].some(([other, e]) => {
+      return [...this.entries].find(([other, e]) => {
         if (other === id || e.waiting) return false;
         if (trafficOverlap(pose, model, e.pose, e.model)) return true;
         if (!crossing || crossing !== junction(e.pose)) return false;
@@ -124,8 +124,9 @@ export class StreetTraffic {
         return (
           axis === null || axis !== throughAxis(byID.get(other)!, e.progress, lengths.get(other)!)
         );
-      });
+      })?.[0];
     };
+    const free = (pose:TrafficPose,model:string,id:string,progress:number) => !obstruction(pose,model,id,progress);
     for (const r of sorted) {
       const key = JSON.stringify([r.model, r.points]);
       let e = this.entries.get(r.id);
@@ -148,8 +149,10 @@ export class StreetTraffic {
         e = {key, model: r.model, progress, pose, waiting: !free(pose, r.model, r.id, progress)};
         this.entries.set(r.id, e);
       }
+      e.blockedBy=undefined;
       if (e.waiting) {
-        if (!free(e.pose, e.model, r.id, e.progress)) continue;
+        e.blockedBy=obstruction(e.pose,e.model,r.id,e.progress);
+        if (e.blockedBy) continue;
         e.waiting = false;
       }
       const length = lengths.get(r.id)!;
@@ -164,7 +167,8 @@ export class StreetTraffic {
           const step=Math.min(distance,.125,budget);
           const next=lateral?{x:e.pose.x,z:e.pose.z+Math.sign(delta)*step,heading:delta>0?0:Math.PI}
             :{x:e.pose.x+Math.sign(delta)*step,z:e.pose.z,heading:Math.sign(delta)*Math.PI/2};
-          if(!free(next,r.model,r.id,0))break;
+          e.blockedBy=obstruction(next,r.model,r.id,0);
+          if(e.blockedBy)break;
           e.pose=next;budget-=step;
         }
         // Journey progress stays at zero until its physical start is reached.
@@ -223,7 +227,8 @@ export class StreetTraffic {
       while (e.progress < target) {
         const next = Math.min(target, e.progress + 0.25 / length),
           pose = onRoute(r.points, next);
-        if (!free(pose, e.model, r.id, next)) break;
+        e.blockedBy=obstruction(pose,e.model,r.id,next);
+        if (e.blockedBy) break;
         e.progress = next;
         e.pose = pose;
       }
@@ -231,7 +236,7 @@ export class StreetTraffic {
     return new Map(
       [...this.entries].map(([id, e]) => [
         id,
-        {pose: e.pose, progress: e.progress, waiting: e.waiting, yielding:e.yielding},
+        {pose: e.pose, progress: e.progress, waiting: e.waiting, yielding:e.yielding, blockedBy:e.blockedBy},
       ]),
     );
   }

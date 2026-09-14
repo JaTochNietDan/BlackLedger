@@ -120,6 +120,7 @@ function App() {
   });
   const [journey, setJourney] = useState<Journey | null>(null);
   const [journeyProgress, setJourneyProgress] = useState(0);
+  const [journeyBlocked, setJourneyBlocked] = useState(false);
   // The moment the city thought was worth taking the player to.
   const [playing, setPlaying] = useState<VisualCue | null>(null);
   // How far through the moment the camera is holding on. Driven by the theatre,
@@ -317,7 +318,7 @@ function App() {
         if (from && to && from.id !== to.id) {
           setTab('city');
           setCityView('iso');
-          setJourneyProgress(0);
+          setJourneyProgress(0);setJourneyBlocked(false);
           setJourney({
             street: next.last_result?.street_travel ?? undefined,
             fromMinute: world.minute,
@@ -766,6 +767,7 @@ function App() {
                     ? `driving${cross.plate ? ` · ${cross.plate} of ${cross.plate_max} plated` : ' · no plate'}`
                     : 'on foot'}
                 </span>
+                {journeyBlocked && <small>Waiting for the way ahead to clear.</small>}
                 {cross?.note && <small>{cross.note}</small>}
               </div>
               <button onClick={() => setJourney(null)}>Skip journey →</button>
@@ -810,6 +812,7 @@ function App() {
                   onSceneDone={setFinishedCue}
                   onJourneyDone={() => setJourney(null)}
                   onJourneyProgress={setJourneyProgress}
+                  onJourneyBlocked={setJourneyBlocked}
                   selected={selected}
                   onSelect={setSelected}
                   onTravel={id => commit({kind: 'travel', target: id})}
@@ -1173,7 +1176,7 @@ function App() {
               ))}
               <div className="stat clock">
                 <b>{time(journey ? world.minute - journey.minutes + Math.round(journey.minutes * journeyProgress) : world.minute)}</b>
-                <small>{journey ? (journey.driving ? 'Driving through Bellwether' : 'Walking through Bellwether') : busy ? 'Resolving…' : 'Clock paused · awaiting your action'}</small>
+                <small>{journey ? (journeyBlocked ? 'Waiting for a clear path' : journey.driving ? 'Driving through Bellwether' : 'Walking through Bellwether') : busy ? 'Resolving…' : 'Clock paused · awaiting your action'}</small>
               </div>
             </div>
           </header>

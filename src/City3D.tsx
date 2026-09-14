@@ -68,6 +68,7 @@ type Props = {
   activeCue: VisualCue | null;
   onJourneyDone: () => void;
   onJourneyProgress?: (progress: number) => void;
+  onJourneyBlocked?: (blocked: boolean) => void;
   onSceneDone?: (id: string) => void;
 };
 type Actor = {
@@ -753,6 +754,7 @@ export function City3D(props: Props) {
       previous: Snapshot | null = null,
       journeyKey = '',
       reportedJourneyProgress = -1,
+      reportedJourneyBlocked = false,
       playedJourneyProgress = 0,
       wasFollowing = false,
       followZoom: number | null = null,
@@ -1188,6 +1190,7 @@ export function City3D(props: Props) {
         if (key !== journeyKey || motion !== motionWas) {
           journeyKey = key;
           reportedJourneyProgress = -1;
+          reportedJourneyBlocked=false;p.onJourneyBlocked?.(false);
           playedJourneyProgress = 0;
           if (p.journey) { setFollow(true); followZoom = 8; }
           const here = lots.get(w.player.location);
@@ -1422,6 +1425,8 @@ export function City3D(props: Props) {
         }
         playerRing.visible = !!actors.get('player')?.object.visible;
         const arrival = placements.get('player');
+        const journeyBlocked=!!p.journey&&!!arrival?.blockedBy;
+        if(journeyBlocked!==reportedJourneyBlocked){reportedJourneyBlocked=journeyBlocked;p.onJourneyBlocked?.(journeyBlocked);}
         if (p.journey && arrival) {
           if(!p.journey.street)playedJourneyProgress = Math.max(playedJourneyProgress, arrival.progress);
           const progress = Math.floor(THREE.MathUtils.clamp(playedJourneyProgress, 0, 1) * Math.max(1, p.journey.minutes)) / Math.max(1, p.journey.minutes);
@@ -1861,6 +1866,7 @@ export function City3D(props: Props) {
           headlightPools: headlightPools.count,
           harbour: {visible: !!harbourLot, waterClock},
           followingPlayer: followPlayer.current,
+          trafficBlocks: [...actors.keys()].flatMap(id=>{const by=traffic.placement(id)?.blockedBy;return by?[{id,by}]:[]}),
           streetMinute:p.journey?(p.journey.fromMinute??w.minute-p.journey.minutes)+p.journey.minutes*playedJourneyProgress:w.minute,
           cutawayBuildings: [...blockers],
           weather: {night:nightAmount>=.5,nightAmount,sunIntensity:sun.intensity,ambientIntensity:sky.intensity,lightingMinute:presentationMinute,clockHands:clockHands.map(h=>({name:h.name,angle:h.rotation.z})),kind: w.sky?.kind || 'clear', wet: w.sky?.wet || 0, rainVisible: rainfall.visible, rainClock},

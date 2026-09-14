@@ -317,3 +317,21 @@ test('recovery connectors yield to occupied pavement and reject unrelated locati
  for(let i=0;i<900;i++)traffic.update([person],1/60);
  assert.ok(traffic.placement('player').progress>.99);
 });
+
+test('visible traffic stops identify their obstruction and clear when movement resumes',()=>{
+ const traffic=new StreetTraffic(),path=[{x:100,z:16},{x:150,z:16}];
+ const player={id:'player',model:'person',points:path,progress:0};
+ const parked={id:'parked',model:'parked-ford',points:[{x:110,z:16}],progress:0};
+ traffic.update([player,parked],1/60);player.progress=1;
+ let placements;
+ for(let frame=0;frame<600;frame++)placements=traffic.update([player,parked],1/60);
+ const stopped=placements.get('player');
+ assert.equal(stopped.waiting,false,'an actor already on the street stays visible');
+ assert.equal(stopped.blockedBy,'parked');
+ assert.equal(trafficOverlap(stopped.pose,'person',placements.get('parked').pose,'parked-ford'),false);
+ const resumed=traffic.update([player],1/60).get('player');
+ assert.equal(resumed.blockedBy,undefined);assert.ok(resumed.progress>stopped.progress);
+ // Reaching the requested timeline fraction is not a traffic obstruction.
+ player.progress=resumed.progress;
+ for(let frame=0;frame<60;frame++)assert.equal(traffic.update([player],1/60).get('player').blockedBy,undefined);
+});
