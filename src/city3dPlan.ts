@@ -1,7 +1,7 @@
 import {grid, bounds} from './iso.js';
 import type {Place} from './types';
 
-export type Point = {x: number; z: number};
+export type Point = {x: number; z: number; heading?: number};
 export type Lot = Point & {id: string; col: number; row: number; model: string};
 export const PITCH = 32;
 export const STREET_WIDTH = 8;
@@ -191,7 +191,9 @@ export function onRoute(points: Point[], progress: number): Point & {heading: nu
     }
     left -= d;
   }
-  return {...points[0], heading: 0};
+  // Single-point scene reservations have an authored orientation. Erasing it
+  // rotates asymmetric swept footprints when traffic admits the scene.
+  return {...points[0], heading: points[0]?.heading ?? 0};
 }
 export function intersectsLot(point: Point, lot: Lot, clearance = 0) {
   return (

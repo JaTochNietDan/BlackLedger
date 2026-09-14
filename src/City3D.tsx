@@ -1921,6 +1921,7 @@ export function City3D(props: Props) {
             id: e.cue.id, kind: e.cue.kind, target: e.cue.target,
             accident:e.accident?{fatal:e.accident.fatal,seconds:(now-e.since)/1000,rotation:e.accident.actor.rotation.x}:undefined,
             staged: !e.extra || e.extra.visible, x: e.slot?.root.x, z: e.slot?.root.z,
+            reservation:e.slot?{model:e.slot.model,authored:e.slot.pose,admitted:traffic.placement(`scene:${e.cue.id}`)?.pose}:undefined,
             approach: e.cue.kind==='raid-officer'&&e.extra?{x:e.extra.position.x,z:e.extra.position.z,leg:e.extra.getObjectByName('leg1')?.rotation.x}:undefined,
             planter:e.planter?{seconds:(now-e.since)/1000+e.planter.duration,blastSeconds:(now-e.since)/1000,actor:e.planter.actor.getWorldPosition(new THREE.Vector3())}:undefined,
             debris: e.debris?.count,

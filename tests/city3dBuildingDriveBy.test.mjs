@@ -78,3 +78,22 @@ test('pending drive-by lets current cars exit, holds incoming cars, then release
  for(let i=0;i<1200;i++)poses=traffic.update([inside,behind],1/60);
  assert.ok(poses.get('behind').progress>.85,'car fails to resume after release');
 });
+
+test('admitted drive-by keeps its swept orientation in traffic',()=>{
+ const slot=sceneSlots({x:48,row:1},'driveby-building')[0];
+ const traffic=new StreetTraffic();
+ const request={id:'scene:driveby',model:slot.model,points:[slot.pose],progress:0};
+ let poses=traffic.update([request],1/60);
+ assert.equal(poses.get(request.id).pose.heading,slot.pose.heading);
+ // These two points distinguish a correct east-west sweep from a rotated one.
+ assert.equal(trafficOverlap(poses.get(request.id).pose,slot.model,{x:59,z:33.6,heading:Math.PI/2},'ford'),true);
+ assert.equal(trafficOverlap(poses.get(request.id).pose,slot.model,{x:48,z:43,heading:0},'person'),false);
+ const moving={id:'incoming',model:'ford',points:[{x:80,z:33.6},{x:20,z:33.6}],progress:0};
+ traffic.update([request,moving],1/60);moving.progress=1;
+ for(let i=0;i<600;i++){
+  poses=traffic.update([request,moving],1/60);
+  const car=poses.get(moving.id);
+  if(!car.waiting)assert.equal(trafficOverlap(car.pose,moving.model,slot.pose,slot.model),false,'traffic entered the actual swept footprint');
+ }
+ assert.ok(poses.get(moving.id).progress<.4);
+});
