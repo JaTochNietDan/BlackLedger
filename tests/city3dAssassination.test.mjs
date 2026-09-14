@@ -124,3 +124,26 @@ test('armed close-range strikes approach, aim into the victim and withdraw insid
   }
  }
 });
+
+test('every strike hands off identical victim geometry without resetting joints',async()=>{
+ const {CityAftermath,captureBodyJoints}=await import('../.runtime/frontend-test/city3dAftermath.js');
+ for(const name of ['person','woman'])for(const [variant,gunName] of [['back-of-head','revolver'],['close-shot','revolver'],['close-shot','shotgun'],['burst','thompson'],['close-quarters',null]]){
+  const attacker=await model('person'),victim=await model(name),gun=gunName?await model(gunName):undefined;
+  const cast=new CityAssassination(attacker,victim,gun,variant,gunName||'revolver');
+  cast.root.position.set(76,.2,38.35);cast.update(cast.duration);
+  const expected=[];cast.victim.traverse(n=>{if(n.isMesh)expected.push(n.matrixWorld.clone());});
+  const joints=captureBodyJoints(cast.victim),remembered=JSON.stringify(joints);
+  const city=new CityAftermath(),slot={root:{x:81,z:38.35},pose:{x:81.8,z:38.35,heading:0},model:'casualty'};
+  city.rememberBody('victim',slot,cast.victimYaw,joints);
+  cast.update(0);
+  assert.equal(JSON.stringify(joints),remembered,'captured pose holds references to the live rig');
+  for(const q of Object.values(joints))q.fill(0); // Caller cannot later corrupt the retained pose.
+  const records=[{id:'death',target:'bar',victim:{id:'victim'},minute:480,police_at:490,cleanup_at:660}];
+  city.update(records,480,new Map([['bar',{id:'bar',x:80,z:48,row:1,col:2}]]),new Map([[name,await model(name)]]),()=>name,[],new Set());
+  city.root.updateMatrixWorld(true);
+  const actual=[];city.object('aftermath:death:body').children.at(-1).traverse(n=>{if(n.isMesh)actual.push(n.matrixWorld);});
+  assert.equal(actual.length,expected.length);
+  for(let i=0;i<actual.length;i++)for(let j=0;j<16;j++)assert.ok(Math.abs(actual[i].elements[j]-expected[i].elements[j])<1e-7,`${name}/${variant} mesh ${i} jumps on handoff`);
+  city.dispose();
+ }
+});

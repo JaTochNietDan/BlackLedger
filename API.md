@@ -467,3 +467,10 @@ back-of-head and unarmed sequences remain6.5s. Anonymous legacy gunfights retain
 their original timing. These presentation beats do not add damage or ammunition
 rules. Audio, flash, recoil, blood and victim fall share the strike timing;
 body placement retains the victim's initial facing for the aftermath handoff.
+
+For staged strikes, the mounted aftermath renderer now retains a copied final
+joint pose (arms, elbows, legs and knees) alongside position and facing. It samples
+the completed visual pose before playback, so Skip also has a settled pose, without
+running audio or issuing commands. Model/material objects are never retained by
+this snapshot. This is still presentation-only mounted state; a full reload uses
+the existing canonical fallback placement and pose.

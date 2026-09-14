@@ -5,7 +5,7 @@ import {poseCustody,sceneWeapon,poseLongGun,weaponShots,pumpOffset} from './city
 import {CityRubble} from './city3dRubble';
 import {CitySuppression} from './city3dSuppression';
 import {CityFire, clearBlastWindows} from './city3dFire';
-import {CityAftermath} from './city3dAftermath';
+import {CityAftermath,captureBodyJoints} from './city3dAftermath';
 import {previewScenes, previewScene, type PreviewScene} from './city3dPreview';
 import {frameScene, stagedSceneBounds, impactPulse, renderImpact} from './city3dFraming';
 import {seatDriver} from './city3dSeating';
@@ -1239,7 +1239,10 @@ export function City3D(props: Props) {
             }
             if(e.assassination&&!e.cue.id.startsWith('preview:')){
               const root={x:e.slot.root.x+ASSASSINATION_VICTIM_X,z:e.slot.root.z};
-              aftermath.rememberBody(e.cue.strike!.victim.id,{root,pose:{x:root.x+.8,z:root.z,heading:0},model:'casualty'},e.assassination.victimYaw);
+              e.assassination.update(e.assassination.duration);
+              const joints=captureBodyJoints(e.assassination.victim);
+              e.assassination.update(0);
+              aftermath.rememberBody(e.cue.strike!.victim.id,{root,pose:{x:root.x+.8,z:root.z,heading:0},model:'casualty'},e.assassination.victimYaw,joints);
             }
           }
         }

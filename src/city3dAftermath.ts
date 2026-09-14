@@ -6,11 +6,19 @@ import {vehicleRootHeight} from './city3dPlan.js';
 import {dressPedestrian, wardrobe} from './city3dWardrobe.js';
 import type {Snapshot} from './types';
 
+export type BodyJoints = Record<string,[number,number,number,number]>;
+const bodyJointNames=['arm1','arm-1','elbow1','elbow-1','leg1','leg-1','knee1','knee-1'];
+/** Copy transforms only: the retained pose never owns a model or material. */
+export function captureBodyJoints(actor:THREE.Group):BodyJoints {
+  const pose:BodyJoints={};
+  for(const name of bodyJointNames){const joint=actor.getObjectByName(name);if(joint)pose[name]=joint.quaternion.toArray();}
+  return pose;
+}
 type Entry = {group: THREE.Group; slot: SceneSlot; owned: THREE.Material[]; victim?:string};
 export class CityAftermath {
   readonly root = new THREE.Group();
   private entries = new Map<string, Entry>();
-  private bodyPoses=new Map<string,{slot:SceneSlot;yaw:number}>();
+  private bodyPoses=new Map<string,{slot:SceneSlot;yaw:number;joints?:BodyJoints}>();
   private blood = new THREE.MeshStandardMaterial({color: 0x480a0b, roughness: .31, metalness: .05, polygonOffset: true, polygonOffsetFactor: -1});
   private pool: THREE.ShapeGeometry;
   constructor() {
@@ -22,7 +30,7 @@ export class CityAftermath {
     }
     this.pool=new THREE.ShapeGeometry(shape);
   }
-  rememberBody(id:string,slot:SceneSlot,yaw:number){this.bodyPoses.set(id,{slot,yaw});}
+  rememberBody(id:string,slot:SceneSlot,yaw:number,joints?:BodyJoints){this.bodyPoses.set(id,{slot,yaw,joints: joints?structuredClone(joints):undefined});}
   suppressVictims(ids:Set<string>){
     for(const [key,e] of this.entries)if(e.victim&&ids.has(e.victim)){
       this.root.remove(e.group);e.owned.forEach(m=>m.dispose());this.entries.delete(key);
@@ -58,6 +66,7 @@ export class CityAftermath {
         const owned=kind==='body'?dressPedestrian(object,model,wardrobe(record.victim.id)):[];
         group.position.set(slot.root.x,kind==='body'?0:vehicle?vehicleRootHeight(slot.root):.2,slot.root.z);
         if(kind==='body') {
+          for(const [name,rotation] of Object.entries(remembered?.joints||{}))object.getObjectByName(name)?.quaternion.fromArray(rotation);
           object.quaternion.setFromAxisAngle(new THREE.Vector3(0,1,0),remembered?.yaw||0)
             .premultiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,0,1),-Math.PI/2));object.position.y=.6;
           const pool=new THREE.Mesh(this.pool,this.blood);
