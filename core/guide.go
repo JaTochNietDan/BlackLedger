@@ -39,15 +39,18 @@ func need(blocked bool, reason string) string {
 	return ""
 }
 
-// firstOpen runs a readiness function against every place in the city and
-// returns the friendliest answer: empty if it can be done somewhere, otherwise
-// the reason given where it came closest to being possible.
-func firstOpen(check func(string) string) string {
+// Only eligible, owned premises can explain the next business improvement.
+// Refusals from unrelated addresses must not hide the remaining prerequisite.
+func (w *World) ownedPremisesReason(check func(string) string, eligible func(string) bool, missing string) string {
 	reasons := []string{}
-	for _, l := range Locations {
-		reasons = append(reasons, check(l.ID))
+	for _, place := range Locations {
+		prop := w.Properties[place.ID]
+		if place.District > w.District || !w.Own(place.ID) || prop == nil || prop.Income <= 0 || (eligible != nil && !eligible(place.ID)) {
+			continue
+		}
+		reasons = append(reasons, check(place.ID))
 	}
-	return shortest("There is nowhere in this city for that yet", reasons)
+	return shortest(missing, reasons)
 }
 
 // Guide is where the player stands, in the order these things usually happen.
@@ -95,11 +98,11 @@ func (w *World) Guide() []Step {
 		step("People who answer to you", "Hire a driver to start. Once your organization has a name, you can sign on more people. Your people add to what you are worth in a fight.",
 			w.guideHiringReason(), len(p.Crew) > 0 || len(w.OwnPeople()) > 0),
 		step("Somebody on the door", "One of your people, standing at a business. Harder to rob, harder to take, and they are the one standing in it when somebody comes. They have to walk there first, and the door is worth nothing until they arrive.",
-			firstOpen(w.PostReadiness), w.anyPosted()),
+			w.ownedPremisesReason(w.PostReadiness, nil, "First acquire a business of your own"), w.anyPosted()),
 		step("Money on the street", fmt.Sprintf("Lend at %d%% over %d days. It is the oldest business this trade has.", int(LoanRate*100), LoanTermDays),
 			firstOpenPerson(w, w.LendReadiness), len(w.Book()) > 0),
 		step("Something of your own to sell", "A still turns a business into a source. It is the most profitable thing premises can do and the most dangerous.",
-			firstOpen(w.StillReadiness), w.anyStill()),
+			w.ownedPremisesReason(w.StillReadiness, StillSite, "First acquire Bluebird Laundry or Russo Motor Works"), w.anyStill()),
 		step("Somebody in the building", "An official on a retainer. Files go to the bottom of piles, or licences arrive, or the paper does not run it.",
 			w.anyRetainerReason(), len(p.Retainers) > 0),
 		step("An understanding", "Stand with an organization. Protection bought with money and paid for in enemies.",

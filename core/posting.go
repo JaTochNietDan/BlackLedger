@@ -76,6 +76,9 @@ func (w *World) PostReadiness(id string) string {
 	if w.PostedAt(id) != nil {
 		return w.PostedAt(id).Name + " is already on the door here"
 	}
+	if len(w.OwnPeople()) == 0 {
+		return "Sign someone into your organization before assigning a guard"
+	}
 	if len(w.Unposted()) == 0 {
 		return "Everybody who answers to you is standing somewhere already"
 	}

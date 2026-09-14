@@ -345,3 +345,71 @@ func TestGuideHiringUsesActualCashAndAvailableCandidates(t *testing.T) {
 		}
 	}
 }
+
+func TestGuideBusinessStepsExplainOwnedPremises(t *testing.T) {
+	t.Parallel()
+	w := New(27)
+	w.Event = nil
+	step := func(title string) Step {
+		t.Helper()
+		for _, s := range w.Guide() {
+			if s.Title == title {
+				return s
+			}
+		}
+		t.Fatalf("missing step %s", title)
+		return Step{}
+	}
+	if s := step("Somebody on the door"); s.Open || s.Reason != "First acquire a business of your own" {
+		t.Fatalf("no premises: %+v", s)
+	}
+	own(w, "laundry")
+	w.Player.Location = "laundry"
+	if s := step("Somebody on the door"); s.Open || s.Reason != w.PostReadiness("laundry") || !strings.Contains(s.Reason, "Sign someone") {
+		t.Fatalf("no guard: %+v", s)
+	}
+	w.Properties["laundry"].Staff = 0
+	if s := step("Something of your own to sell"); s.Open || s.Reason != w.StillReadiness("laundry") {
+		t.Fatalf("unstaffed laundry: %+v", s)
+	}
+	w.Properties["laundry"].Staff = 1
+	w.Player.Cash = StillCost - 1
+	if s := step("Something of your own to sell"); s.Open || s.Reason != "Not enough cash" {
+		t.Fatalf("still capital: %+v", s)
+	}
+	w.Player.Cash = StillCost
+	if s := step("Something of your own to sell"); !s.Open {
+		t.Fatalf("funded still: %+v", s)
+	}
+	if err := w.BuildStill("laundry"); err != nil {
+		t.Fatal(err)
+	}
+	if s := step("Something of your own to sell"); !s.Done || s.Open {
+		t.Fatalf("built still: %+v", s)
+	}
+}
+
+func TestGuideGuardReadinessMatchesAssignment(t *testing.T) {
+	t.Parallel()
+	w, member := testator(t)
+	w.Player.Location = "laundry"
+	for _, s := range w.Guide() {
+		if s.Title == "Somebody on the door" && (!s.Open || s.Done) {
+			t.Fatalf("available guard: %+v", s)
+		}
+	}
+	if err := w.Post("laundry"); err != nil {
+		t.Fatal(err)
+	}
+	if w.Properties["laundry"].Posted != member.ID {
+		t.Fatal("guard was not assigned")
+	}
+	if got := w.PostReadiness("garage"); got != "Everybody who answers to you is standing somewhere already" {
+		t.Fatalf("assigned guard: %q", got)
+	}
+	for _, s := range w.Guide() {
+		if s.Title == "Somebody on the door" && (!s.Done || s.Open) {
+			t.Fatalf("assigned milestone: %+v", s)
+		}
+	}
+}
