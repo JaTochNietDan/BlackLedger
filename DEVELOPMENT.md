@@ -2334,3 +2334,23 @@ Existing replay tapes remain historical outcomes, with no retroactive
 resimulation/payout changes. Centre hits are unchanged. This fixes spin
 strength, not missing airborne/jump/massé/slate physics or shooting characters.
 The broader goal remains active.
+
+### 2026-09-14 — physical opponent position play
+
+Previous2bc008a corrected cue units. Opponents now preview draw/follow on their
+four strongest pot lines, then evaluate the actual settled cue ball for another
+clear pot. The extra candidates use ±8/12mm top offsets, the same physical
+preview/rules as existing shots, and full-resolution final execution. A small
+spin penalty preserves centre hits when outcomes and position are equivalent.
+
+The focused fixture chooses12mm draw, legally pockets its called ball and
+leaves a better next-pot line than an otherwise identical centre strike.
+Re-executing the advertised intent reproduces the complete match/physics result.
+Full billiards passed17.930s, core Pool/tournament checks25.899s, store/server
+0.302s/1.936s; vet passed. Three-iteration mid-rack benchmark measured248ms/op
+and7.13MB/op on this machine under concurrent tests. Logs are
+`.runtime/pool-bot-position-{tests,core,adapters,bench}.log`. This is added
+planning cost, not a whole-game performance certification.
+No browser/live promotion or main campaign commands. Side-spin planning,
+airborne physics, shooting-character animation and the remaining broad
+interior/gameplay goal are still unfinished.

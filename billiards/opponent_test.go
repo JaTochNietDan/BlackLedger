@@ -196,3 +196,40 @@ func BenchmarkOpponentMidRack(b *testing.B) {
 		}
 	}
 }
+
+func TestOpponentUsesPhysicalSpinForPosition(t *testing.T) {
+	m := botEightPosition()
+	*m.ball(1) = ball(1, .18, Length/2)
+	*m.ball(2) = ball(2, .92, .55)
+	*m.ball(0) = ball(0, .48, Length/2)
+	*m.ball(8) = ball(8, .95, 2.1)
+	turn, err := Opponent(New(), m, 0, 1, 17)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Logf("selected %+v outcome %+v", turn.Intent, turn.Result.Outcome)
+	if turn.Intent.Shot.Top == 0 {
+		t.Fatal("position fixture did not choose draw/follow")
+	}
+	if turn.Result.Outcome.Foul || !turn.Result.Outcome.KeptTurn {
+		t.Fatal("spin did not pot legally")
+	}
+	centre := *m
+	centre.Balls = append([]Ball(nil), m.Balls...)
+	centreShot := turn.Intent.Shot
+	centreShot.Top = 0
+	if _, err := centre.Play(New(), 0, centreShot, turn.Intent.Call); err != nil {
+		t.Fatal(err)
+	}
+	nextSpin := potCandidates(New(), &turn.Match, 0)
+	nextCentre := potCandidates(New(), &centre, 0)
+	if len(nextSpin) == 0 || len(nextCentre) > 0 && nextSpin[0].cost >= nextCentre[0].cost {
+		t.Fatal("draw did not improve the next pot line")
+	}
+	copy := *m
+	copy.Balls = append([]Ball(nil), m.Balls...)
+	result, err := copy.Play(New(), 0, turn.Intent.Shot, turn.Intent.Call)
+	if err != nil || !reflect.DeepEqual(result, turn.Result) || !reflect.DeepEqual(copy, turn.Match) {
+		t.Fatal("spin result was not produced by advertised input", err)
+	}
+}

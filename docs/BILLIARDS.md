@@ -693,3 +693,13 @@ The combined contact limit is 0.6 × radius =17.145mm; both UI sliders at12mm
 remain legal together. Historical recorded replays remain as played and are
 not resimulated. Centre-ball shots and current centre-ball NPC intent are
 unchanged; newly played off-centre shots use the corrected spin.
+
+## Opponent position play
+
+The four strongest pot lines also receive ±8mm/±12mm draw/follow candidates.
+Each is physically previewed, including scratches and rule outcomes. After a
+legal pot, the planner evaluates the settled cue-ball position against the next
+clear pot line. Winning and foul outcomes retain priority. Centre hits remain
+first, with a small tie penalty on unnecessary spin. Execution accuracy still
+uses the deterministic skill stream, and the final shot runs at full solver
+resolution. Side-spin planning, multi-shot search and jump shots remain open.

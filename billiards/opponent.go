@@ -194,6 +194,20 @@ func planOpponent(e *Engine, m *Match, seat int) (Intent, error) {
 	if len(plans) > 8 {
 		plans = plans[:8]
 	}
+	// Preview draw and follow on the strongest pot lines. All offsets are metres.
+	// Keep centre hits first so a needless spin stroke loses a tied evaluation.
+	potLines := append([]candidate(nil), plans...)
+	for i, line := range potLines {
+		if i >= 4 {
+			break
+		}
+		for _, top := range []float64{-.012, -.008, .008, .012} {
+			variation := line
+			variation.Shot.Top = top
+			variation.cost += .03
+			plans = append(plans, variation)
+		}
+	}
 	cue := m.ball(0)
 	if cue == nil || cue.Pocketed {
 		return Intent{}, errors.New("cue ball not on table")
@@ -260,6 +274,16 @@ func planOpponent(e *Engine, m *Match, seat int) (Intent, error) {
 		}
 		if out.KeptTurn {
 			score += 1000
+			if copy.Winner < 0 {
+				// Evaluate the actual settled cue ball: a clear next pot is worth
+				// more than stranding it behind traffic or against a cushion.
+				next := potCandidates(&preview, &copy, seat)
+				if len(next) == 0 {
+					score -= 80
+				} else {
+					score -= math.Min(80, next[0].cost*10)
+				}
+			}
 		}
 		if copy.Winner == seat {
 			score += 100000
