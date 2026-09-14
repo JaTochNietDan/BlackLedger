@@ -2498,6 +2498,20 @@ if __name__ == '__main__' and '--only=interior-tailor' in __import__('sys').argv
     raise SystemExit(0)
 
 
+def cabstand_interior():
+    from cabstand_interior import build
+    build(box,cylinder,material)
+
+
+if __name__ == '__main__' and '--only=interior-cabstand' in __import__('sys').argv:
+    clear();cabstand_interior()
+    manifest_path=os.path.join(OUT,'manifest.json')
+    with open(manifest_path) as f: selected_manifest=json.load(f)
+    selected_manifest['interior-cabstand']=export('interior-cabstand')
+    with open(manifest_path,'w') as f:json.dump(selected_manifest,f,indent=2)
+    raise SystemExit(0)
+
+
 def docks_interior():
     from docks_interior import build
     build(box,cylinder,material)
@@ -2763,6 +2777,7 @@ clear();lodging_room();manifest['interior-lodging-room']=export('interior-lodgin
 clear();precinct_interior();manifest['interior-precinct']=export('interior-precinct')
 clear();poolhall_interior();manifest['interior-poolhall']=export('interior-poolhall')
 clear();tailor_interior();manifest['interior-tailor']=export('interior-tailor')
+clear();cabstand_interior();manifest['interior-cabstand']=export('interior-cabstand')
 clear();docks_interior();manifest['interior-docks']=export('interior-docks')
 clear();chapel_interior();manifest['interior-chapel']=export('interior-chapel')
 clear();herald_interior();manifest['interior-herald']=export('interior-herald')

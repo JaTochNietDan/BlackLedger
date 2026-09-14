@@ -2480,3 +2480,26 @@ held-key behavior is automated-test evidence, not a browser hold-duration test.
 No gameplay commands or main-save QA writes. Main8791 remains01fb5cf;
 this change and preceding interior/property work await promotion. Broad
 interior and billiards fidelity work remains open.
+
+### 2026-09-14 — Vance Cab Company dispatch office
+
+Previous e045e79 was progress on shared table camera movement. Added an original
+10m dispatch office for the cab company, replacing its non-3D fallback: cream
+plaster/green dado, tiled linoleum, telephone counter with rotary dials, fare
+ledger and pigeonholes, schematic route board, lockers, coffee urn, driver
+bench, clock and pendants. The route board is decorative and does not assert
+live cab positions/jobs. Added selective/full Blender export and manifest,
+room camera/lighting settings, dispatcher position and eight visitor positions
+(two seated), and an isolated QA fixture. Existing business/person actions
+remain authoritative and unchanged.
+
+395 frontend tests passed (14.415s); real GLB/character tests cover stable
+placement, both rigs, bench support, separation, standing furniture clearance
+and sampled entrance path/floor support. Production build passed (3.02s).
+Logs `.runtime/cabstand-{export,tests,build}.log`. Browser77 on isolated8977
+reviewed standard and enlarged views at1280x720 and selected Mara at the
+counter into her matching Dispatcher action list. Fixture
+`.runtime/cabstand-interior-qa.sqlite3` remains revision0/minute600/receipts0.
+No main-save QA writes. This is the dispatch office; fleet yard, active
+telephone/dispatch animation, remaining interiors and billiards fidelity
+remain open. Main8791 stays01fb5cf; this and preceding changes await promotion.

@@ -1158,5 +1158,21 @@
       ]
     ],
     "bytes": 1283872
+  },
+  "interior-cabstand": {
+    "file": "interior-cabstand.glb",
+    "bounds_blender": [
+      [
+        -5.07,
+        -5.0,
+        -0.215
+      ],
+      [
+        5.0,
+        5.07,
+        3.6
+      ]
+    ],
+    "bytes": 697364
   }
 }
