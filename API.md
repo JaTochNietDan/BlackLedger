@@ -1310,3 +1310,10 @@ family-cash accounting. Pool tournament cuts, card-room fees and service margins
 now follow NPC or faction deeds; player-owned receipts keep existing semantics.
 Lodging proprietors receive actual tenant payments and pay operating bills without
 also receiving abstract hourly rent. These changes do not add new public commands.
+
+Rental reviews evaluate the highest affordable available tier directly, rather
+than using wealth bands that could skip cheaper neighborhoods. Private flats are
+considered first with a two-week rent reserve; existing shared-flat accommodation
+is also offered with a one-week reserve. Downgrades still require household strain
+and a lower rent. Ownership, existing occupants, travel and jobs remain unchanged.
+These eligibility reserves are checks, not deposits or extra charges.

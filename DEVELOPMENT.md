@@ -2832,3 +2832,32 @@ Current candidate session37894 reports modified:false. It predates these gate
 fixes and is NOT approved for promotion. Main8791 remains untouched.
 Targeted apartment/reference/one-family prose checks pass2.707s after the fixes.
 A new clean full suite with a longer package timeout is required before release.
+
+### September 14 — copied campaign reveals unreachable rental tiers
+
+Previous goal turn was progress: corrected release-gate failures and launched
+clean aa9b617 full tests. Same handle10830 revalidated RUNNING; do not restart it.
+Prepared clean aa9b617 binary/UI on8985, session58569, copied save only. Production
+build4.06s; frontend sources are identical to07e41c4, whose403 tests passed.
+Compatibility.json verifies clean build metadata, all saved bytes and2184 receipts
+preserved. Browser91 entered Riverside via G and inspected the market without
+sending gameplay commands. Six owned Riverside apartments were correctly listed
+as vacant. Interior header and controls were clear; collapsed Latest entry still
+covers part of the bottom camera-help caption, a remaining cosmetic defect.
+
+The tenant eligibility inspection caught a real logic error: wealth bands selected
+Mercer/Ashbury before a household could ever satisfy Riverside/Mercer upgrade
+reserves. Replaced the bands with direct affordable-tier selection. Added shared
+leases, already supported by NPCRent, after private options, using a smaller
+one-week reserve so ordinary room tenants can access affordable housing. Private
+leases retain two weeks; household strain permits cheaper downgrades. No deposits
+or artificial cash are introduced.
+
+Rental/home-purchase tests pass0.255s, covering boundaries69/70/84/105 for shared
+leases and280/349/350/489/490 for private tiers, plus middle-tier downsizing. A
+rental-only in-memory projection of the copied campaign, seven daily reviews and
+no budget adjustments, changes owned Riverside occupancy0→1. This proves current
+eligible demand, not a seven-day whole-campaign forecast or guaranteed occupancy.
+Source/output in.runtime/rental-projection and rental-projection-result.log.
+The running aa9b617 suite predates this rental correction. Candidate8985 also
+predates it. Main8791 was untouched; nothing promoted this turn.

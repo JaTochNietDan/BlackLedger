@@ -1,6 +1,9 @@
 package core
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 func TestRentalMoveFillsPlayerVacancyAndPaysLandlord(t *testing.T) {
 	w := homeBuyerWorld()
@@ -60,5 +63,40 @@ func TestRentalMoveDoesNotDisplaceOrMoveOwnerOccupants(t *testing.T) {
 	w.RentalMoveDay()
 	if old.Resident != n.ID {
 		t.Fatal("unfunded move")
+	}
+}
+
+func TestRentalUpgradeCanReachEveryAffordableTier(t *testing.T) {
+	for _, tc := range []struct {
+		wealth int
+		home   string
+	}{{69, "room"}, {70, "riverside"}, {84, "mercercourt"}, {105, "apartment"}, {280, "riverside"}, {349, "riverside"}, {350, "mercercourt"}, {489, "mercercourt"}, {490, "apartment"}} {
+		t.Run(tc.home+fmt.Sprint(tc.wealth), func(t *testing.T) {
+			w := homeBuyerWorld()
+			n := w.NPC("buyer")
+			n.Purse = tc.wealth
+			w.HouseholdSavings = nil
+			for _, id := range []string{"riverside", "mercercourt", "apartment"} {
+				w.Properties[id].Condition = 100
+				w.Properties[id].Trouble = false
+			}
+			w.RentalMoveDay()
+			if n.Home != tc.home {
+				t.Fatalf("$%d chose %s, want %s", tc.wealth, n.Home, tc.home)
+			}
+		})
+	}
+}
+func TestRentalDowngradeChoosesBestAffordableVacancy(t *testing.T) {
+	w := homeBuyerWorld()
+	n := w.NPC("buyer")
+	n.Home = "apartment"
+	n.Accommodation = "Private apartment"
+	n.Purse = 200
+	w.HouseholdSavings = nil
+	w.SettleApartments()
+	w.RentalMoveDay()
+	if n.Home != "mercercourt" {
+		t.Fatalf("expected affordable middle tier, got %s", n.Home)
 	}
 }
