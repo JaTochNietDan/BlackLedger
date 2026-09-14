@@ -153,7 +153,26 @@ export function Interior({
   const premises = found
     .filter(a => !personal.includes(a) && a.group === 'business')
     .sort((a, b) => rank(a.id) - rank(b.id));
-  const elsewhere = found.filter(a => !personal.includes(a) && a.group !== 'business');
+  // A customer's arrival must not remove a posted job from the work board.
+  // It remains available through their portrait too; those are separate views.
+  const elsewhere = found.filter(a => a.group !== 'business' && (!personal.includes(a) || a.group === 'work'));
+  const grouped = placeActions(
+    groups?.length ? groups : [{id: 'work', title: 'Everything else here', blurb: 'Work, standing, money and leaving'}],
+    elsewhere,
+  );
+  const management = {
+    id: 'premises',
+    title: place.owned ? 'Running ' + place.name : 'These premises',
+    blurb: place.owned
+      ? 'Staff, stock, repairs and what the house takes — the work of holding it'
+      : 'Property, improvements and the price of owning them',
+    mine: premises,
+  };
+  // Owners asked for management first. Visitors need paid work before the
+  // acquisition and upgrade prices, with every other section still available.
+  const sections = place.owned
+    ? [management, ...grouped]
+    : [...grouped.filter(g => g.id === 'work'), management, ...grouped.filter(g => g.id !== 'work')];
 
   const who = people.find(p => p.id === picked);
   const theirs = personal.filter(a => a.subject === picked);
@@ -437,36 +456,7 @@ export function Interior({
               </button>
             )}
 
-            {/* "When inside a building you own the top buttons should probably be
-            for owner management and under a separate subtitle for management
-            actions." They are the top block already; what was missing was the
-            subtitle saying so, and two of the actions that belong in it were
-            filed elsewhere by the core until this was written down. */}
-            <Work
-              title={place.owned ? 'Running ' + place.name : 'These premises'}
-              blurb={
-                place.owned
-                  ? 'Staff, stock, repairs and what the house takes — the work of holding it'
-                  : 'The same work, in the same order, in every building'
-              }
-              actions={premises}
-              render={render}
-            />
-
-            {/* Everything that is not the premises, in the order the core says the
-            work is for, rather than one heading with fifteen cards under it. */}
-            {placeActions(
-              groups?.length
-                ? groups
-                : [
-                    {
-                      id: 'work',
-                      title: 'Everything else here',
-                      blurb: 'Work, standing, money and leaving',
-                    },
-                  ],
-              elsewhere,
-            ).map(g => (
+            {sections.map(g => (
               <Work key={g.id} title={g.title} blurb={g.blurb} actions={g.mine} render={render} />
             ))}
 

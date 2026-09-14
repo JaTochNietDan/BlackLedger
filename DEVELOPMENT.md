@@ -1678,3 +1678,22 @@ payments, customer death/move/poverty, remote/closed/damaged rejection, completi
 and interruption, repeat prevention, reload/new-life persistence and next-day use.
 The broader goal remains active; this is an income addition, not final visual or
 campaign acceptance.
+
+### Keep paid work discoverable inside buildings — September 14
+
+Visitor interiors now show Work before acquisition/upgrades. Owned buildings keep
+the requested management-first ordering. A paid action with a present NPC subject
+stays on the shared work list as well as that person's separate interaction view;
+previously the customer's arrival removed the job from the shared list. Search,
+disabled reasons, other groups and authoritative command handling remain intact.
+
+Extended isolated household fixtures for a customer physically present at Mariner
+and a player-owned Mariner. Browser8950 shows Mara in the roster and her $45 job
+under Work before These premises; selecting her retains the same job. Browser8951
+shows Running The Mariner before Work. Visitor screenshot confirmed readable
+placement. No gameplay actions were needed in either fixture; main8791 unchanged.
+Frontend366/366 checks pass12.750s; production build passes2.79s. Logs:
+.runtime/interior-work-tests.log and .runtime/interior-work-build.log. This run used
+the current checkout (including the pre-existing aftermath edits); those unrelated
+files are excluded from this commit. These changes still await clean main release
+integration alongside9198e41. Remaining 3D interiors and scene fidelity stay open.
