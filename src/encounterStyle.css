@@ -1,0 +1,87 @@
+/* Conversations sit on a worn writing blotter; decisions read as paper slips. */
+.encounter-shade {background:#090d0bd1;backdrop-filter:blur(2px);padding:28px}
+.scene.encounter-surface {width:min(800px,100%);max-height:calc(100dvh - 56px);padding:30px 38px;border:0;border-radius:5px;
+ background:var(--newsprint),radial-gradient(ellipse at top,#414133,#222820 80%);color:#eee5d0;
+ box-shadow:inset 0 0 0 2px #151a16,inset 0 0 0 7px #514634,inset 0 0 0 8px #a28a59,0 20px 90px #000b;
+ scrollbar-color:#a28a59 #232820;overscroll-behavior:contain;outline:none}
+.encounter-surface .eyebrow {color:#c7ae7b;letter-spacing:.16em;font-size:9px;padding-bottom:12px;border-bottom:3px double #8a775350;gap:20px}
+.encounter-surface h2 {font:38px/1.1 var(--serif);letter-spacing:-.02em;color:#f0e6ce;margin:22px 0}
+.encounter-surface .person {gap:20px;margin:0 0 22px;padding:0 0 18px;border-bottom:1px solid #8a775350}
+.encounter-surface .person .portrait {width:76px;height:94px;border:5px solid #e3d5b8;outline:1px solid #938166;box-shadow:3px 4px 9px #0008;filter:sepia(.18)}
+.encounter-surface .person b {font:24px var(--serif);color:#eadbbe}
+.encounter-surface .person small {margin-top:5px;color:#c3bca8;font-size:11px}
+.encounter-surface .spoken {font:20px/1.6 var(--serif);color:#e6dfce;margin:20px 0;text-wrap:pretty}
+.encounter-surface .speech-control {border-bottom:1px solid #8a775350;padding-bottom:16px}
+.encounter-surface .speech-control .plain {border:1px solid #a28a59;color:#dbcca9;font:11px Georgia,serif;letter-spacing:.04em;padding:8px 12px}
+.encounter-surface .scene-conditions {background:#141b1670;color:#d2c4a7;border:1px solid #897450;border-left:3px solid #b0935e;margin-top:20px}
+.encounter-surface .scene-conditions small {color:#dbc48e}
+.encounter-surface .choices {gap:12px;margin-top:20px}
+.encounter-surface .choices .action {border:0;border-left:3px solid #998056;background:var(--newsprint),linear-gradient(110deg,#efe4cc,#daceb2);color:#30291d;border-radius:0;padding:15px 17px;box-shadow:1px 2px 2px #0006;align-items:flex-start;gap:15px}
+.encounter-surface .choices .action:hover:not(:disabled) {background:var(--newsprint),#f3e7cb;box-shadow:0 0 0 1px #d3b982,2px 3px 5px #0007}
+.encounter-surface .choices .action strong {font:600 16px/1.25 var(--serif);color:#30291d}
+.encounter-surface .choices .action .number {color:#8c7150;font:24px/1 var(--serif);padding-right:12px;border-right:1px solid #b3a183;min-width:40px}
+.encounter-surface .choices .action .desc {font-size:12px;line-height:1.5;color:#625744}
+.encounter-surface .terms b {color:#725222}
+.encounter-surface .terms b.cost,.encounter-surface .choices .desc.refused {color:#923c29}
+.encounter-surface .choices .action:disabled {opacity:1;background:var(--newsprint),#bcb29a;border-left-color:#6b675a;box-shadow:none}
+.encounter-surface .choices .action:disabled strong,.encounter-surface .choices .action:disabled .desc {color:#514b3f}
+.encounter-surface .source {color:#a79f8a;font-size:10px;letter-spacing:.025em;border-top:1px solid #8a775350;padding-top:13px;margin-top:20px}
+.encounter-surface button:focus-visible {outline:2px solid #f3dba1;outline-offset:4px}
+.scene.memorial-sheet {--ink:#28251e;--muted:#625b4c;--gold:#765d33;--red:#813e30;color:#28251e;border-radius:0;background:var(--newsprint),linear-gradient(100deg,#ded3bc,#eee7d6);box-shadow:inset 0 0 0 8px #292924,inset 0 0 0 12px #d9ceb6,inset 0 0 0 13px #504c40,0 20px 90px #000b;padding:36px 44px}
+.memorial-sheet .death-seal {font-size:44px;color:#4a4031}
+.memorial-sheet h2 {color:#29251c;text-align:center;border-bottom:3px double #6d6250;padding-bottom:18px}
+.memorial-sheet .eyebrow {justify-content:center;color:#6a5840}
+.memorial-sheet .spoken {color:#3b3428;font-size:18px}
+.memorial-sheet :is(.legacy-line,.legacy-properties,.legacy-press b) {color:#5c5140}
+.memorial-sheet .life-recap {border-color:#a9997a}
+.memorial-sheet .life-recap small {color:#6e614c}
+.memorial-sheet .life-recap b {color:#453624}
+.memorial-sheet .action.primary {margin-top:22px;background:transparent;border:3px double #746144;color:#3c3020;padding:13px;text-align:center}
+.memorial-sheet .action.primary:hover:not(:disabled) {background:#d0bd98}
+.memorial-sheet .source {color:#78684e;text-align:center}
+.memorial-sheet button:focus-visible {outline-color:#5b3c24}
+@media(min-width:1000px){.scene.encounter-surface.extended{width:min(960px,100%)}}
+@media(max-width:600px){
+ .encounter-shade{padding:12px}
+ .scene.encounter-surface{padding:24px;max-height:calc(100dvh - 24px)}
+ .encounter-surface h2{font-size:29px}
+ .encounter-surface .spoken{font-size:18px}
+ .encounter-surface .choices .action{padding:13px 12px;gap:10px}
+ .encounter-surface .choices .action .number{min-width:32px;padding-right:8px;font-size:21px}
+ .encounter-surface .eyebrow{font-size:8px;gap:12px;flex-wrap:wrap}
+ .scene.memorial-sheet{padding:28px}
+}
+/* Open folio: the message and replies are separate physical surfaces. */
+.scene.private-meeting,.scene.private-meeting.extended {width:min(1080px,100%);display:grid;grid-template-columns:minmax(0,1.45fr) minmax(280px,1fr);gap:22px;align-items:start;background:none;border:0;box-shadow:none;border-radius:0;padding:8px;overflow:auto}
+.private-meeting .meeting-page {padding:28px 30px;background:var(--newsprint),linear-gradient(100deg,#d7c7a6,#eee5d0 10%,#e3d6b9);border-left:8px solid #514333;box-shadow:3px 3px 0 #a28d67,0 10px 30px #0006;color:#332c20;min-width:0}
+.private-meeting .meeting-page .eyebrow {color:#745f3d;border-color:#9c886355}
+.private-meeting h2 {color:#30281d;font-size:34px}
+.private-meeting .person {border-color:#9c886355}
+.private-meeting .person b {color:#403421}
+.private-meeting .person small {color:#71634e}
+.private-meeting .spoken,.scene.private-meeting.extended .spoken {color:#413727;font:19px/1.6 var(--serif)}
+.private-meeting .speech-control {border-color:#9c886355}
+.private-meeting .speech-control .plain {color:#624c2d;border-color:#8f7954}
+.private-meeting .speech-control .plain:hover {background:#d0bb95}
+.private-meeting .scene-conditions {background:transparent;color:#685638;border-color:#ac9671;margin-bottom:0}
+.private-meeting .scene-conditions small {color:#795c32}
+.private-meeting .story-connection {background:#ceb99255;color:#57442e}
+.private-meeting .story-connection small,.private-meeting .story-connection p {color:#746044}
+.private-meeting .meeting-decisions {padding:14px 8px;min-width:0}
+.meeting-reply-label {font:italic 25px var(--serif);color:#ecdfc3;border-bottom:3px double #b9a076;padding:0 0 12px;text-shadow:0 2px 5px #000}
+.scene.private-meeting .choices {display:grid;grid-template-columns:minmax(0,1fr);gap:14px}
+.scene.private-meeting .choices .action {padding:17px 16px;min-height:76px;border-bottom:2px solid #a58d64}
+.private-meeting .source {color:#c6bca6;line-height:1.6}
+.private-meeting .meeting-page button:focus-visible {outline-color:#74512a}
+@media(max-width:800px){
+ .scene.private-meeting,.scene.private-meeting.extended{grid-template-columns:minmax(0,1fr);gap:12px}
+ .private-meeting .meeting-page{padding:24px;border-left-width:5px}
+ .private-meeting h2{font-size:29px}
+ .private-meeting .meeting-decisions{padding:8px 4px}
+}
+.scene.private-meeting .choices {max-height:none;overflow:visible;padding-right:0}
+.scene.memorial-sheet {width:min(900px,100%)}
+.memorial-sheet h2 {margin:12px 0 16px;font-size:34px}
+.memorial-sheet .spoken {margin:12px 0;font-size:17px}
+.memorial-sheet .life-recap {margin:16px 0;padding:10px 0}
+.memorial-sheet .legacy-line,.memorial-sheet .legacy-press {margin-top:12px}

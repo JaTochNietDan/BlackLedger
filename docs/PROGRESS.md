@@ -190,3 +190,26 @@ and menu-ledger.png. Closed temporary QA tab. No gameplay/save commands issued.
 Responsive rules were added but compact viewport acceptance remains unverified.
 Dialogue and other remaining game surfaces, fuller menu identity/illustration,
 interiors and cinematic requirements remain unfinished under the full goal.
+
+### Conversation folios and memorial sheets — September 13
+
+Read the current409771b4 goal; previous turn was progress (document-menu commit
+and browser evidence). Continued the menu amendment into mandatory encounters.
+Conversations now present an open paper folio with speaker portrait, message,
+voice control and shared conditions on one leaf, with separate numbered reply
+slips beside it. Paper choices retain all costs, durations, attention and refusal
+reasons. Compact layout stacks the leaves with one outer scroll owner. Removed
+the inherited nested choice scroller after browser inspection clipped reply four.
+Death records use a black-edged memorial sheet with integrated new-life action.
+No command semantics, voice handling, modal focus behavior or API were changed.
+
+Build passes. At1280×720 CUA verified all four offer choices fully visible,
+no horizontal overflow and one city canvas behind the folio. Declined the offer
+on new isolated .runtime/encounter-style-20260913.sqlite3 (8876): revision1,
+minute480, cash900, respect25, health100 and no pending event; UI returned to the
+same city canvas. This was the only QA command, and never touched the campaign.
+New isolated memorial fixture on8877 shows continuation button fully within the
+viewport and one city canvas; no new-life command issued. Screenshots saved as
+conversation-folio.png and memorial-sheet.png. Both temporary tabs closed.
+Compact viewport and varied long encounters still need acceptance; broader city
+assets, interiors, choreography and performance requirements remain unfinished.

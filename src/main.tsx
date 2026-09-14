@@ -1,6 +1,7 @@
 import {SceneNewspaper} from './SceneNewspaper';
 import {MapMenu} from './MapMenu';
 import './mapFirst.css';
+import './encounterStyle.css';
 import {cityOwnsAudio} from './city3dEvents';
 import type {VisualCue} from './types';
 import {paintedCar} from './cityAssets';
@@ -1264,11 +1265,11 @@ function App() {
         />
       )}
       {(event || !p.alive) && (
-        <div className="modal-shade">
+        <div className="modal-shade encounter-shade">
           <section
             ref={scene}
             tabIndex={-1}
-            className={'scene' + (event && event.choices.length > 3 ? ' extended' : '')}
+            className={'scene encounter-surface' + (!p.alive?' memorial-sheet':' private-meeting') + (event && event.choices.length > 3 ? ' extended' : '')}
             role="dialog"
             aria-modal="true"
             aria-labelledby="scene-title"
@@ -1360,6 +1361,7 @@ function App() {
             ) : (
               event && (
                 <>
+                 <div className="meeting-page">
                   <div className="eyebrow">
                     <span>
                       {event.kind === 'attack' ? 'A MOMENT TO ACT' : 'A PRIVATE CONVERSATION'}
@@ -1400,6 +1402,9 @@ function App() {
                       {event.conditions}
                     </p>
                   ) : null}
+                 </div>
+                 <div className="meeting-decisions">
+                  <div className="meeting-reply-label">Your reply</div>
                   <div className="choices">
                     {event.choices.map((c, i) => (
                       <button
@@ -1432,6 +1437,7 @@ function App() {
                     {event.source === 'local-ai' ? 'Local AI encounter' : 'City encounter'} ·
                     Decisions are saved immediately.
                   </p>
+                 </div>
                 </>
               )
             )}
