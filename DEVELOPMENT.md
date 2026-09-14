@@ -1878,3 +1878,29 @@ was read-only; actual release startup followed copied verification. No gameplay
 command was sent to main. Remaining civic/commercial interiors, occupied/failure
 burglary scenes, sound/aftermath, richer character/material fidelity and complete
 played-campaign acceptance remain open; the full goal is still active.
+
+### Ward Street Station 3D booking room — September 14
+
+Added original Blender public booking-room interior:10×11m terrazzo floor, green
+painted dado, timber sergeant's counter with open ruled register/nameplate/bell,
+rotary telephone with receiver/dial/cord, report desk with mechanical typewriter,
+steel lockers, reports board, waiting bench, pendant lamps and secured holding
+area door. All locally authored in tools/precinct_interior.py; targeted/full
+export integrated, interior-precinct.glb (~1.3MB) and manifest registered. Cells
+beyond the holding door remain unmodeled, with no invented prisoner cast.
+
+Placements use actual public people: three bench seats, eight standing visitor
+positions, two police staff stations and separate player entry. Desk-sergeant
+roles receive priority for the booking counter. Other officers beyond the two
+stations remain in the list. Both-rig tests cover full13NPC staging plus player,
+seat support, disjoint occupant bounds, standing furniture clearance and the
+supported entrance route. All371 frontend tests pass13.302s; build passes2.73s.
+
+Isolated precinct-interior fixture8957: browser reviewed standard/enlarged room;
+actual sergeant and commissioner at the two desks, three seated visitors, one
+standing visitor, player at entry;153draw calls/164968triangles (not an FPS or
+cross-device guarantee). Signage readable, no observed cast/furniture overlap.
+Main8791 remains8ada776; no QA gameplay command touched main. Logs
+.runtime/precinct-{export,tests,build}.log. Remaining holding cells/custody staging,
+physical desk interactions, other missing interiors and full visual/campaign
+acceptance remain open. Unrelated dirty files excluded from this commit.
