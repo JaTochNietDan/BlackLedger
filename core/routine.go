@@ -105,6 +105,12 @@ func (w *World) routine(n *NPC) (errand, bool) {
 		if w.CityAtWar() && w.staysIn(n) {
 			return errand{}, false
 		}
+		if w.poolTournamentVisit(n) {
+			if n.Location == PoolPlace {
+				return errand{}, false
+			}
+			return errand{PoolPlace, "entering the evening billiards tournament"}, true
+		}
 		where := haunt(n.ID)
 		// Unless somebody has put a night on within walking distance, which is
 		// the whole of what paying for a band buys. One night: tomorrow they

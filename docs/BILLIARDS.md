@@ -496,3 +496,28 @@ state `.runtime/tournament-entry-browser-state.json`.
 Remaining: tournament attendance through ordinary NPC travel, autonomous progress
 at other tables, complete multi-round browser playthrough and final payout UX,
 compact/touch layouts, human cue/bridge animation and fuller billiards physics.
+
+## Tournament attendance through city travel (2026-09-14)
+
+Eight funded regulars now plan a tournament evening from 17:00. Stable per-event
+selection ignores current travel so journeys cannot reshuffle invitations.
+Existing duty/urgent-errand priorities and war stay-in behavior still apply.
+Visitors depart within ten minutes and use normal street travel; those already
+at the hall wait until entry closes. The city clock visits both invitation and
+closing times. Funded entrants keep the existing tournament attendance lock.
+
+An isolated clock-driven test advances 16:59–18:00 and verifies real arrivals,
+then checks entry and retained participants. Separate checks cover custody,
+wrong days/times and hall closure. A three-seed probe with ordinary morning post
+initialization and unchanged NPC wallets/duties reached 18:00 with thirteen
+funded people at the hall on each seed (7,11,23); this measures available local
+fields, not automatic tournament entry or completed matches. Probe output is
+`.runtime/pool-attendance-probe.log`. No main-campaign mutation or promotion.
+
+Automatic strokes on unattended tables and full tournament browser playthrough
+remain pending. The earlier proxied hall-render limitation is still unresolved.
+
+Validation: focused attendance/routine tests and Go vet pass. The full core,
+store and HTTP server suites also pass; exact timings are recorded in
+`.runtime/pool-attendance-suite.log`. This broad run includes the existing city
+routine and campaign regression checks, not only the new attendance fixtures.

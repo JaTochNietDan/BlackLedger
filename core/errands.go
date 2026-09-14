@@ -227,7 +227,11 @@ func (w *World) SetOut() {
 		}
 		n.Heading = where.where
 		n.Errand = where.because
-		n.Sets = w.Minute + setsOff(n.ID)
+		delay := setsOff(n.ID)
+		if where.where == PoolPlace && w.poolTournamentVisit(n) {
+			delay = min(delay, 10)
+		}
+		n.Sets = w.Minute + delay
 		n.Arrives = n.Sets + TravelMinutes(n.Location, where.where)
 	}
 }

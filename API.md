@@ -1178,3 +1178,12 @@ the same 3D view, mapping commands to its match index. Spectators can request NP
 strokes and move the camera, but cannot supply player cue inputs. Returning to
 the draw or hall is a view change; withdrawal is an explicit command. Other
 tables currently progress when watched; autonomous table progression is pending.
+
+Tournament evenings also influence ordinary NPC routines from 17:00 until entry
+closes. Eight available regulars are selected deterministically per event from
+people with a daytime post and sufficient funds. Duty, custody, urgent errands
+and war-related decisions to stay indoors retain priority. Visitors use normal
+street journeys, with a departure delay capped at ten minutes for the scheduled
+event. Starting a journey does not change selection. Unentered visitors resume
+ordinary routines after closing; funded entrants remain pinned by their event.
+The clock visits invitation and closing boundaries even during long actions.

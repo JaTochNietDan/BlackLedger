@@ -13364,3 +13364,12 @@ and escrow100. Core/adapters/vet, all384 frontend tests and build pass. The room
 GLB was truncated on a proxied request but served fully without the proxy; its
 preview verification remains open. See BILLIARDS.md for exact evidence and next
 work. Main campaign remains unchanged.
+
+### 2026-09-14 — Tournament attendance and clock boundaries
+
+Added deterministic regulars, ordinary travel with timely departure, and clock
+boundaries for invitations and entry closing. Existing duties, urgent errands,
+custody and war behavior retain priority. Clock-driven arrival/entry tests,
+three-seed local-field probes, the full core/store/server suites and vet pass.
+See BILLIARDS.md and `.runtime/pool-attendance-*` for evidence. No live save or
+release changes. Automatic unattended matches remain next.

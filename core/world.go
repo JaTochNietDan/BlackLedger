@@ -2443,6 +2443,12 @@ func (w *World) Advance(minutes int) {
 			morning += 1440
 		}
 		next = min(next, morning)
+		opening, closing := w.poolTournamentWindow()
+		for _, boundary := range []int{opening - 60, closing} {
+			if boundary > w.Minute {
+				next = min(next, boundary)
+			}
+		}
 		if w.NextPressure > 0 {
 			next = min(next, max(w.Minute+1, w.NextPressure))
 		}
@@ -2500,6 +2506,9 @@ func (w *World) Advance(minutes int) {
 			w.SetOut()
 		}
 		if w.Minute%1440 == HomeUntil {
+			w.SetOut()
+		}
+		if w.Minute%poolTournamentPeriod == poolTournamentHour-60 || w.Minute%poolTournamentPeriod == poolTournamentHour+poolTournamentWindow {
 			w.SetOut()
 		}
 		w.Arrivals()
