@@ -39,7 +39,7 @@ import type {SceneSlot} from './city3dEvents';
 import {StreetTraffic, trafficSize, trafficModel, advanceWheel, wheelSteering, advanceSteering, frontWheelSteering} from './city3dTraffic';
 import {pedestrianModel, isPedestrian} from './city3dCast';
 import {playCityGunshot, playMoment, soundOn} from './sound';
-import {cameraCommand, screenPan} from './city3dControls';
+import {cameraCommand, KeyboardPan, bindKeyboardPan} from './city3dControls';
 import {blastParticle, windowBurst, internalDetonation, windowDebris, blastLight, blastOpacity, billowAlpha, debrisPose, fragmentBlocked} from './city3dBlast';
 
 type Props = {
@@ -556,6 +556,9 @@ export function City3D(props: Props) {
     canvas.addEventListener('pointermove', pointerMove);
     canvas.addEventListener('pointerdown', pointerDown);
     canvas.addEventListener('pointerup', pointerUp);
+    const keyboardPan = new KeyboardPan();
+    const unbindPan = bindKeyboardPan(canvas, keyboardPan);
+    let panTime = performance.now();
     const keys = (e: KeyboardEvent) => {
       const command = cameraCommand(e);
       if (!command) return;
@@ -581,13 +584,7 @@ export function City3D(props: Props) {
       if (command === 'reset') {
         reset();
       }
-      if (command.startsWith('pan-')) {
-        const pan = screenPan(camera.position, controls.target, command, 8.25 / camera.zoom);
-        const move = new THREE.Vector3(pan.x, 0, pan.z);
-        controls.target.add(move);
-        camera.position.add(move);
-        controls.update();
-      }
+      keyboardPan.press(e);
     };
     canvas.addEventListener('keydown', keys);
     const makeLabel = (name: string) => {
@@ -828,6 +825,13 @@ export function City3D(props: Props) {
     const tick = (now: number) => {
       if (dead) return;
       frame = requestAnimationFrame(tick);
+      const pan = keyboardPan.step(camera.position, controls.target, (now - panTime) / 1000, 110 / camera.zoom);
+      panTime = now;
+      if (pan.x || pan.z) {
+        setFollow(false);
+        camera.position.x += pan.x; camera.position.z += pan.z;
+        controls.target.x += pan.x; controls.target.z += pan.z;
+      }
       if (document.hidden) {
         last = now;
         return;
@@ -1616,6 +1620,7 @@ export function City3D(props: Props) {
       canvas.removeEventListener('pointerdown', pointerDown);
       canvas.removeEventListener('pointermove', pointerMove);
       canvas.removeEventListener('pointerup', pointerUp);
+      unbindPan();
       canvas.removeEventListener('keydown', keys);
       canvas.removeEventListener('webglcontextlost', lost);
       effects.forEach(effect => { effect.audio?.dispose(); effect.glassAudio?.dispose(); disposeDebris(effect); });

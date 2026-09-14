@@ -25,3 +25,50 @@ export function screenPan(camera: Point, target: Point, command: CameraCommand, 
   const sign = command === 'pan-left' || command === 'pan-down' ? -1 : 1;
   return {x: axis.x * distance * sign, z: axis.z * distance * sign};
 }
+
+/** Held keys drive every rendered frame, independently of OS key repeat. */
+export class KeyboardPan {
+  private held = new Map<string, CameraCommand>();
+  press(event: Parameters<typeof cameraCommand>[0]) {
+    const command = cameraCommand(event);
+    if (!command?.startsWith('pan-')) return false;
+    this.held.set(event.key.toLowerCase(), command);
+    return true;
+  }
+  release(key: string) { this.held.delete(key.toLowerCase()); }
+  clear() { this.held.clear(); }
+  step(camera: Point, target: Point, seconds: number, speed: number): Point {
+    const commands = new Set(this.held.values());
+    const horizontal = Number(commands.has('pan-right')) - Number(commands.has('pan-left'));
+    const vertical = Number(commands.has('pan-up')) - Number(commands.has('pan-down'));
+    const length = Math.hypot(horizontal, vertical);
+    if (!length) return {x: 0, z: 0};
+    // A suspended tab cannot accumulate a large camera jump on resumption.
+    const distance = Math.max(0, Math.min(seconds, .05)) * speed / length;
+    const right = screenPan(camera, target, 'pan-right', horizontal * distance);
+    const up = screenPan(camera, target, 'pan-up', vertical * distance);
+    return {x: right.x + up.x, z: right.z + up.z};
+  }
+}
+
+/** Release even outside the canvas; focus loss must never leave a stuck camera. */
+export function bindKeyboardPan(canvas: HTMLElement, pan: KeyboardPan) {
+  const release = (event: KeyboardEvent) => pan.release(event.key);
+  const clear = () => pan.clear();
+  const modifiers = (event: KeyboardEvent) => {
+    if (event.metaKey || event.ctrlKey || event.altKey || event.isComposing) clear();
+  };
+  window.addEventListener('keyup', release);
+  window.addEventListener('keydown', modifiers);
+  window.addEventListener('blur', clear);
+  canvas.addEventListener('blur', clear);
+  document.addEventListener('visibilitychange', clear);
+  return () => {
+    clear();
+    window.removeEventListener('keyup', release);
+    window.removeEventListener('keydown', modifiers);
+    window.removeEventListener('blur', clear);
+    canvas.removeEventListener('blur', clear);
+    document.removeEventListener('visibilitychange', clear);
+  };
+}

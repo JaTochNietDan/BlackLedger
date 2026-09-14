@@ -899,3 +899,22 @@ No QA command opened `.runtime/campaign.sqlite3`. Pre-existing edits in
 `core/mugging.go`, `core/robbery.go`, `core/armed.go`, and `sim/died_test.go` were
 preserved and are excluded from this checkpoint commit. Test runs include those
 pre-existing working-tree changes.
+
+
+### Smooth keyboard panning — September 13
+
+User follow-up: WASD/arrows felt choppy. Replaced per-key-repeat translation in both
+city and Saint Agnes with held-key state consumed each animation frame. City speed
+110/zoom metres per second; room speed 8/zoom. Opposing keys cancel, diagonal speed
+is normalized, and equivalent keys remain independently releasable. Keyup is global;
+canvas/window blur, visibility changes and modified shortcuts clear held movement.
+Long suspended frames are capped at 50ms. Existing camera bounds and room idle rendering
+remain intact. No campaign mutation.
+
+Validation: production build and all 179 frontend tests passed. New timing checks cover
+30/60/144 FPS, repeat independence, aliases, opposing/diagonal input, release, shortcut
+exclusion and stall clamping. Reloaded isolated 8872 preview: native W moved target
+(96,80) to (95.724,80.368), stable after release; local view reported 145 FPS. CUA's
+instantaneous arrow tap did not span a rendered frame, so it does not establish a
+held-key browser test; arrow mapping and continuous integration are covered by tests.
+Full subjective sustained-key feel remains for direct user review in the reloaded tab.

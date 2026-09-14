@@ -1,4 +1,4 @@
-import {cameraCommand, screenPan} from './city3dControls';
+import {cameraCommand, KeyboardPan, bindKeyboardPan} from './city3dControls';
 import {useEffect, useRef, useState} from 'react';
 import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
@@ -49,12 +49,12 @@ export function Interior3D(props:{people:Presence[];picked:string;onPick:(id:str
    if(object)latest.current.onPick(object.userData.person);
   };
   canvas.addEventListener('pointerdown',press);canvas.addEventListener('pointerup',release);
+  const keyboardPan=new KeyboardPan(), unbindPan=bindKeyboardPan(canvas,keyboardPan);
+  let panTime=performance.now();
   const keys=(event:KeyboardEvent)=>{
    const command=cameraCommand(event);if(!command)return;
    if(command.startsWith('pan-')){
-    const delta=screenPan({x:camera.position.x,z:camera.position.z},{x:controls.target.x,z:controls.target.z},command,.6/camera.zoom);
-    const before=controls.target.clone();controls.target.x=THREE.MathUtils.clamp(controls.target.x+delta.x,-6,6);controls.target.z=THREE.MathUtils.clamp(controls.target.z+delta.z,-5,5);
-    camera.position.add(controls.target.clone().sub(before));
+    keyboardPan.press(event);
    }else if(['rotate-left','rotate-right'].includes(command)){
     const offset=camera.position.clone().sub(controls.target);
     offset.applyAxisAngle(new THREE.Vector3(0,1,0),command==='rotate-left'?-.12:.12);
@@ -68,6 +68,11 @@ export function Interior3D(props:{people:Presence[];picked:string;onPick:(id:str
   };canvas.addEventListener('keydown',keys);
   const tick=(now:number)=>{
    if(dead)return;frame=requestAnimationFrame(tick);const p=latest.current;
+   const delta=keyboardPan.step(camera.position,controls.target,(now-panTime)/1000,8/camera.zoom);panTime=now;
+   if(delta.x||delta.z){
+    const before=controls.target.clone();controls.target.x=THREE.MathUtils.clamp(controls.target.x+delta.x,-6,6);controls.target.z=THREE.MathUtils.clamp(controls.target.z+delta.z,-5,5);
+    camera.position.add(controls.target.clone().sub(before));dirty=true;
+   }
    const key=JSON.stringify(p.people.slice(0,9).map(w=>[w.id,w.face]));
    if(models.size===3&&key!==roster){roster=key;dirty=true;actors.forEach(a=>scene.remove(a));actors.clear();costumes.forEach(m=>m.dispose());costumes=[];
     p.people.slice(0,9).forEach((who,i)=>{
@@ -93,7 +98,7 @@ export function Interior3D(props:{people:Presence[];picked:string;onPick:(id:str
       zoom:camera.zoom,cutawayWalls:[...(!left?.visible?['left']:[]),...(!back?.visible?['back']:[])]});
    }
   };frame=requestAnimationFrame(tick);
-  return()=>{dead=true;cancelAnimationFrame(frame);observer.disconnect();controls.removeEventListener('change',changed);controls.dispose();canvas.removeEventListener('keydown',keys);canvas.removeEventListener('pointerdown',press);canvas.removeEventListener('pointerup',release);disposeCityResources([scene,...models.values()]);renderer.dispose();renderer.forceContextLoss();canvas.remove();};
+  return()=>{unbindPan();dead=true;cancelAnimationFrame(frame);observer.disconnect();controls.removeEventListener('change',changed);controls.dispose();canvas.removeEventListener('keydown',keys);canvas.removeEventListener('pointerdown',press);canvas.removeEventListener('pointerup',release);disposeCityResources([scene,...models.values()]);renderer.dispose();renderer.forceContextLoss();canvas.remove();};
  },[]);
  return <div className="interior3d"><div ref={host} className="interior3d-canvas"/><span className="interior3d-caption">SAINT AGNES · Drag / Q/E: orbit · Scroll / +/−: zoom · WASD / arrows: pan · Home: reset · Select a person</span>{status&&<p role="status">{status}</p>}</div>;
 }

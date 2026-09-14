@@ -39,3 +39,22 @@ test('WASD matches arrow panning with case-insensitive keys and preserves shortc
   assert.equal(cameraCommand({key:letter,metaKey:true}),null);
  }
 });
+
+test('held panning is frame-rate independent, normalized and stops on release', async()=>{
+ const {KeyboardPan}=await import('../.runtime/frontend-test/city3dControls.js');
+ const camera={x:0,z:-10},target={x:0,z:0};
+ for(const fps of [30,60,144]){
+  const pan=new KeyboardPan();pan.press({key:'w'});
+  let z=0;for(let i=0;i<fps;i++){pan.press({key:'w'});z+=pan.step(camera,target,1/fps,10).z;}
+  assert.ok(Math.abs(z-10)<1e-10);
+  pan.press({key:'ArrowUp'});pan.release('w');
+  assert.ok(pan.step(camera,target,.02,10).z>0);
+  pan.press({key:'d'});
+  const diagonal=pan.step(camera,target,.02,10);assert.ok(Math.abs(Math.hypot(diagonal.x,diagonal.z)-.2)<1e-10);
+  pan.press({key:'s'});pan.press({key:'a'});assert.deepEqual(pan.step(camera,target,.02,10),{x:0,z:0});
+  pan.clear();assert.deepEqual(pan.step(camera,target,.02,10),{x:0,z:0});
+  pan.press({key:'W'});pan.release('w');assert.deepEqual(pan.step(camera,target,.02,10),{x:0,z:0});
+  assert.equal(pan.press({key:'w',metaKey:true}),false);
+  pan.press({key:'w'});assert.equal(pan.step(camera,target,100,10).z,.5);
+ }
+});

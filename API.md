@@ -335,3 +335,9 @@ two shots with a pump cycle; Thompson playback uses two three-shot bursts. These
 are cosmetic cadence choices, not additional backend damage/ammunition events.
 The articulated long-gun rig reaches both grip anchors without changing bone
 lengths. Replaying uses a distinct presentation serial while preserving saved cue IDs.
+
+Keyboard panning in the city and Saint Agnes interior now follows held WASD/arrow
+keys every animation frame instead of OS key-repeat steps. Speed scales inversely
+with zoom, diagonal input is normalized, and key release/focus loss clears movement.
+This supersedes the earlier per-press pan distance; command and saved state semantics
+are unchanged.
