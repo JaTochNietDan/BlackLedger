@@ -64,3 +64,30 @@ test('a second scene can reserve its approach beside an existing body',()=>{
   assert.ok(s.pose.x-4.1>64+4);
  }
 });
+
+test('close-quarters cast approaches before blows and falls only after the final impact',async()=>{
+ const {meleePose,MELEE_IMPACTS,isStagedStrike}=await import('../.runtime/frontend-test/city3dAssassination.js');
+ const cue={id:'attack',kind:'attack',target:'bar',minute:600,attacker:{id:'player',weapon:0},strike:{variant:'close-quarters',victim:{id:'victim'}}};
+ const death={id:'death',kind:'killing',target:'bar',minute:600,actors:[{id:'victim'}]};
+ assert.ok(isStagedStrike(cue));
+ assert.deepEqual(assassinationBatch([death,cue]),[cue]);
+ assert.equal(isStagedStrike({...cue,attacker:{weapon:1}}),false);
+ for(const name of ['person','woman']){
+  const attacker=await model(name),victim=await model('person');
+  const cast=new CityAssassination(attacker,victim);cast.root.position.y=.2;
+  for(let f=0;f<=390;f++){
+   const t=f/60;cast.update(t);
+   const b=new THREE.Box3().setFromObject(cast.root,true);
+   assert.ok(b.min.y>=.17,`pavement penetration at ${t}: ${b.min.y}`);
+   assert.ok(b.min.x>=-.7&&b.max.x<=7.5&&b.min.z>=-.7&&b.max.z<=.7,`cast leaves reserved forecourt at ${t}`);
+   if(t<MELEE_IMPACTS[2])assert.ok(meleePose(t).fall.rotation===0);
+  }
+  for(const at of MELEE_IMPACTS){
+   cast.update(at);
+   const hand=attacker.getObjectByName('elbow1').localToWorld(new THREE.Vector3(0,-.295,0));
+   assert.ok(hand.x>4.75&&hand.x<5.1,`blow misses victim: ${hand.x}`);
+   assert.ok(hand.y>1.5&&hand.y<1.9,`blow misses upper body: ${hand.y}`);
+  }
+  assert.equal(cast.weapon,undefined);
+ }
+});

@@ -315,6 +315,14 @@ export function playMoment(kind: string) {
           source.connect(band).connect(gain).connect(ctx.destination);startVoice(source,[band,gain],begin,begin+.23,scene);
         }
         break;
+      case 'body-hit': {
+        const source=noise(ctx,.13),band=ctx.createBiquadFilter(),gain=ctx.createGain();
+        band.type='lowpass';band.frequency.value=520;
+        gain.gain.setValueAtTime(.45,at);gain.gain.exponentialRampToValueAtTime(.0001,at+.13);
+        source.connect(band).connect(gain).connect(ctx.destination);
+        startVoice(source,[band,gain],at,at+.14,scene);
+        break;
+      }
       case 'glass-break': glassBreak(ctx,at,scene); break;
       case 'door-breach': doorBreach(ctx, at, scene); break;
       case 'explosion': blast(ctx, at, scene); break;

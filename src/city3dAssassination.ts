@@ -9,9 +9,12 @@ export const ASSASSINATION_VICTIM_X = 5;
 export function isExecution(cue: VisualCue) {
   return cue.kind==='gunfight' && cue.strike?.variant==='back-of-head' && cue.attacker?.weapon===1;
 }
+export function isStagedStrike(cue:VisualCue) {
+  return isExecution(cue) || (cue.kind==='attack' && cue.strike?.variant==='close-quarters' && cue.attacker?.weapon===0);
+}
 /** Collapse only an explicitly linked victim cue; unrelated deaths remain visible. */
 export function assassinationBatch(cues: VisualCue[]) {
-  return cues.filter(cue => !(cue.kind==='killing' && cues.some(gun => isExecution(gun) &&
+  return cues.filter(cue => !(cue.kind==='killing' && cues.some(gun => isStagedStrike(gun) &&
     gun.target===cue.target && gun.minute===cue.minute &&
     cue.actors?.some(actor=>actor.id===gun.strike!.victim.id))));
 }
@@ -25,16 +28,27 @@ export function assassinationPose(seconds:number) {
   return {distance,walking,phase:distance/1.15*Math.PI*2,aim,recoil,
     fall:casualtyFall(Math.max(0,age-.06)/3),age};
 }
+export const MELEE_IMPACTS = [3.7, 4.15, 4.6] as const;
+export function meleePose(seconds:number) {
+  const distance=Math.min(4.32,Math.max(0,seconds-.35)*1.35);
+  const walking=seconds>.35&&distance<4.32;
+  const age=seconds-MELEE_IMPACTS[2];
+  const punch=MELEE_IMPACTS.reduce((best,at)=>Math.max(best,
+    ease((seconds-at+.18)/.18)*(1-ease((seconds-at)/.24))),0);
+  return {distance,walking,phase:distance/1.15*Math.PI*2,punch,age,
+    fall:casualtyFall(Math.max(0,age-.06)/3)};
+}
 /** One shared world-aligned cast, facing +X. Its full path is reserved before playback. */
 export class CityAssassination {
   readonly root=new THREE.Group();
-  constructor(readonly attacker:THREE.Group,readonly victim:THREE.Group,readonly weapon:THREE.Group) {
-    this.root.add(attacker,victim);attacker.add(weapon);
+  constructor(readonly attacker:THREE.Group,readonly victim:THREE.Group,readonly weapon?:THREE.Group) {
+    this.root.add(attacker,victim);if(weapon)attacker.add(weapon);
     attacker.rotation.set(0,Math.PI/2,0);
     this.update(0);
   }
   update(seconds:number) {
-    const p=assassinationPose(seconds);
+    const armed=assassinationPose(seconds),melee=meleePose(seconds);
+    const p=this.weapon?armed:melee;
     this.attacker.position.set(p.distance,p.walking?Math.abs(Math.sin(p.phase))*.018:0,0);
     for(const name of ['leg1','leg-1','knee1','knee-1','arm-1']) {
       const limb=this.attacker.getObjectByName(name);if(!limb)continue;
@@ -42,12 +56,17 @@ export class CityAssassination {
       limb.rotation.x=!p.walking?0:name.startsWith('knee')?Math.max(0,Math.sin(phase+.7))*.65
         :Math.sin(phase+(name.startsWith('arm')?Math.PI:0))*(name.startsWith('arm')?.23:.35);
     }
-    this.weapon.position.set(.3+(.07-.3)*p.aim,.77+(1.564-.77)*p.aim,.47*p.aim-.035*p.recoil);
-    this.weapon.rotation.set(Math.PI/2*(1-p.aim)-.05*p.recoil,0,0);
-    aimArm(this.attacker,1,this.weapon.position);
+    if(this.weapon){
+      this.weapon.position.set(.3+(.07-.3)*armed.aim,.77+(1.564-.77)*armed.aim,.47*armed.aim-.035*armed.recoil);
+      this.weapon.rotation.set(Math.PI/2*(1-armed.aim)-.05*armed.recoil,0,0);
+      aimArm(this.attacker,1,this.weapon.position);
+    } else if(!p.walking) {
+      aimArm(this.attacker,1,new THREE.Vector3(.12,1.45,.22+.42*melee.punch));
+      aimArm(this.attacker,-1,new THREE.Vector3(-.18,1.38,.22));
+    }
     this.victim.position.set(ASSASSINATION_VICTIM_X,p.fall.height-.2,0);
     // World-space fall preserves the forward direction after starting with back to shooter.
-    this.victim.quaternion.setFromAxisAngle(new THREE.Vector3(0,1,0),Math.PI/2)
+    this.victim.quaternion.setFromAxisAngle(new THREE.Vector3(0,1,0),this.weapon?Math.PI/2:-Math.PI/2)
       .premultiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,0,1),p.fall.rotation));
     this.root.updateMatrixWorld(true);
     return p;

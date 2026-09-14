@@ -444,3 +444,14 @@ The renderer samples the recorded legs against the same playback clock used for
 the player, including playback-speed changes. Collision waits remain visual;
 they never issue commands, change outcomes or advance the backend clock. Skipping
 or finishing presentation reconciles to the final public street snapshot.
+
+### Close-quarters strike presentation
+
+An explicit `attack` with `strike.variant == close-quarters` and attacker weapon0
+now stages attacker and linked victim together, under the same forecourt reservation
+as the walk-up execution. The cosmetic sequence approaches, strikes at3.7/4.15/4.6s,
+and falls after the last blow, completing at6.5s. These are presentation beats of
+the single committed outcome, not extra combat rolls or damage. Only the exact
+same-time, same-place linked killing cue is merged; legacy attacks remain unchanged.
+Debug choices cover back-of-head, revolver close-shot, shotgun close-shot, Thompson
+burst and unarmed close-quarters; preview receipts carry no real action costs.

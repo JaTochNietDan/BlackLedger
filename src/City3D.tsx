@@ -1,6 +1,6 @@
 import {streetAt} from './streetPlayback';
 import {CityCustody} from './city3dCustody';
-import {CityAssassination, assassinationBatch, isExecution, ASSASSINATION_SECONDS, ASSASSINATION_VICTIM_X, executionSpatter} from './city3dAssassination';
+import {CityAssassination, assassinationBatch, isStagedStrike, MELEE_IMPACTS, ASSASSINATION_SECONDS, ASSASSINATION_VICTIM_X, executionSpatter} from './city3dAssassination';
 import {poseCustody,sceneWeapon,poseLongGun,weaponShots,pumpOffset} from './city3dWeapons';
 import {CityRubble} from './city3dRubble';
 import {CitySuppression} from './city3dSuppression';
@@ -1002,9 +1002,9 @@ export function City3D(props: Props) {
           let custody:CityCustody|undefined;
           const weaponModel=sceneWeapon(cue.attacker?.weapon);
           let extra: THREE.Group | undefined, gunArm: THREE.Object3D | undefined, muzzle: THREE.Object3D | undefined;
-          if (['killing', 'gunfight', 'raid', 'arrest','raid-unit','police-unit','officer','detainee','raid-officer'].includes(cue.kind)) {
+          if (['attack', 'killing', 'gunfight', 'raid', 'arrest','raid-unit','police-unit','officer','detainee','raid-officer'].includes(cue.kind)) {
             const model = ['killing','detainee'].includes(cue.kind) ? personModel(cue.actors?.[0]?.id || '')
-              : cue.kind === 'gunfight' ? personModel(cue.attacker?.id||'anonymous-shooter') : ['officer','raid-officer'].includes(cue.kind)?'police-officer':'police';
+              : ['gunfight','attack'].includes(cue.kind) ? personModel(cue.attacker?.id||'anonymous-shooter') : ['officer','raid-officer'].includes(cue.kind)?'police-officer':'police';
             extra = models.get(model)!.clone(true);
             if (isPedestrian(model)) costume = dressPedestrian(extra, model, personWardrobe(['killing','detainee'].includes(cue.kind) ? cue.actors?.[0]?.id || '' : cue.attacker?.id||'anonymous-shooter'));
             if (model === 'police') addVehicleShadow(extra, model);
@@ -1022,7 +1022,7 @@ export function City3D(props: Props) {
                 muzzle=weapon.getObjectByName('muzzle');
               }
             }
-            if(isExecution(cue)&&weapon){
+            if(isStagedStrike(cue)){
               const victimID=cue.strike!.victim.id, victimModel=personModel(victimID);
               const victim=models.get(victimModel)!.clone(true);
               costume=[...(costume||[]),...dressPedestrian(victim,victimModel,personWardrobe(victimID))];
@@ -1047,10 +1047,10 @@ export function City3D(props: Props) {
           }
           effects.push({cue, assassination, custody, since: now, mesh, light, debris, extra, wardrobe: costume, gunArm, muzzle, weapon, weaponModel:weaponModel||undefined,
             glazingBefore:(cue.id.startsWith('preview:')?undefined:p.beforeConditions?.[cue.target]) ?? buildings.get(cue.target)?.userData.condition ?? w.locations.find(p=>p.id===cue.target)?.condition ?? 100,
-            reactionAudio:cue.kind==='explosion'?new BlastAudio(()=>playRecordedEffect('panic'))
+            reactionAudio:cue.kind==='attack'&&assassination?new BlastAudio(()=>playRecordedEffect('pain')):cue.kind==='explosion'?new BlastAudio(()=>playRecordedEffect('panic'))
               :cue.kind==='killing'&&(w.last_result?.cues||[]).some(gun=>gunVictim(gun,cue))?new BlastAudio(()=>playRecordedEffect('pain')):undefined,
             glassAudio:cue.kind==='explosion'?new BlastAudio(()=>playMoment('glass-break')):undefined,
-            audio: cue.kind === 'gunfight' && weaponModel ? new GunfireAudio(()=>playCityGunshot(weaponModel),weaponShots(weaponModel||undefined,cue.strike?.variant),true)
+            audio: cue.kind==='attack'&&assassination?new GunfireAudio(()=>playMoment('body-hit'),MELEE_IMPACTS,true):cue.kind === 'gunfight' && weaponModel ? new GunfireAudio(()=>playCityGunshot(weaponModel),weaponShots(weaponModel||undefined,cue.strike?.variant),true)
               : cue.kind === 'raid-officer' ? new BlastAudio(() => playMoment('door-breach'))
               : ['explosion','raid','arrest'].includes(cue.kind) ? new BlastAudio(() => playMoment(cue.kind)) : undefined});
           if (p.activeCue?.id === cue.id || (assassination && p.activeCue?.strike?.victim.id===cue.strike?.victim.id)) {
@@ -1058,7 +1058,7 @@ export function City3D(props: Props) {
             const envelope = new THREE.Box3();
             const siblings = (w.last_result?.cues || []).filter(other => other.target === cue.target);
             for (const other of [...siblings, cue].flatMap(policeCast)) {
-              for (const slot of sceneSlots(lot, isExecution(other)?'assassination':other.kind)) {
+              for (const slot of sceneSlots(lot, isStagedStrike(other)?'assassination':other.kind)) {
                 envelope.expandByPoint(new THREE.Vector3(slot.root.x - 3.5, 0, slot.root.z - 3.5));
                 envelope.expandByPoint(new THREE.Vector3(slot.root.x + 3.5, 3, slot.root.z + 3.5));
               }
@@ -1413,7 +1413,8 @@ export function City3D(props: Props) {
           if(blast)addImpact(t*3,11);
           if(shot)for(const beat of weaponShots(e.weaponModel,e.cue.strike?.variant))addImpact(t*3-beat,3);
           if(e.cue.kind!=='raid-officer')e.audio?.update(t * 3, soundOn());
-          e.reactionAudio?.update(t*3-(blast?1:.06),soundOn());
+          e.reactionAudio?.update(t*3-(e.cue.kind==='attack'?MELEE_IMPACTS[2]:blast?1:.06),soundOn());
+          if(e.cue.kind==='attack'&&e.assassination)for(const beat of MELEE_IMPACTS)addImpact(t*3-beat,1.2);
           const muzzlePosition = new THREE.Vector3(at.x, 1.4, at.z);
           if (shot && e.gunArm && e.muzzle) {
             if(e.assassination){ /* the shared cast owns its arm and weapon rig */ }
@@ -1469,7 +1470,7 @@ export function City3D(props: Props) {
             const a = j * 2.399;
             const r = shot ? 0.35 : 1.8;
             tmp.position.set(at.x + Math.cos(a) * r, 1 + Math.sin(a) * r * 0.4, at.z + Math.sin(a) * r);
-            tmp.scale.setScalar(casualty || shot || personnel ? 0.001 : 0.25);
+            tmp.scale.setScalar(casualty || shot || personnel || e.assassination ? 0.001 : 0.25);
             const burst = blast ? blastParticle(j, t * 3) : null;
             if (burst && blastOrigin) {
               const window=blastWindows[j%blastWindows.length];
