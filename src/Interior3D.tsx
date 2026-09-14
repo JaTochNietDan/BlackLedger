@@ -1,3 +1,4 @@
+import {InteriorCastBatch} from './interiorCastBatch';
 import {interiorPlacements,mercerLobbyPlacements,interiorPlayerSpot,poseInteriorOccupant} from './interiorStaging';
 import {cameraCommand, KeyboardPan, bindKeyboardPan} from './city3dControls';
 import {useEffect, useRef, useState} from 'react';
@@ -46,13 +47,15 @@ export function Interior3D(props:{place:'bar'|'mercercourt';player:Pick<Person,'
   })).then(()=>{if(dead)return;const room=models.get(roomModel)!;
    room.traverse(o=>{if(o instanceof THREE.Mesh){o.castShadow=true;o.receiveShadow=true;}});scene.add(room);dirty=true;setStatus('');
   }).catch(()=>{if(!dead)setStatus('The 3D room could not load. The people and actions below remain available.');});
+  let castBatch:InteriorCastBatch|undefined;
   let roster='',presentation='';
   const pick=new THREE.Raycaster();const pointer=new THREE.Vector2();let down={x:0,y:0};
   const press=(event:PointerEvent)=>{down={x:event.clientX,y:event.clientY};};
   const release=(event:PointerEvent)=>{
    if(Math.hypot(event.clientX-down.x,event.clientY-down.y)>5)return;
    const rect=canvas.getBoundingClientRect();pointer.set((event.clientX-rect.left)/rect.width*2-1,1-(event.clientY-rect.top)/rect.height*2);
-   pick.setFromCamera(pointer,camera);const hit=pick.intersectObjects([...actors.values()],true)[0];
+   pick.setFromCamera(pointer,camera);const hit=pick.intersectObjects(castBatch?[castBatch.root,...castBatch.unbatched]:[...actors.values()],true)[0];
+   if(hit?.instanceId!==undefined){const id=hit.object.userData.people[hit.instanceId];latest.current.onPick(id==='player'?'':id);return;}
    let object:THREE.Object3D|undefined=hit?.object;while(object&&!object.userData.person)object=object.parent||undefined;
    if(object)latest.current.onPick(object.userData.person==='player'?'':object.userData.person);
   };
@@ -81,7 +84,7 @@ export function Interior3D(props:{place:'bar'|'mercercourt';player:Pick<Person,'
     camera.position.add(controls.target.clone().sub(before));dirty=true;
    }
    const key=JSON.stringify([p.people.map(w=>[w.id,w.face,w.role]),[p.player.name,p.player.face,p.player.alive]]);
-   if(models.size===3&&key!==roster){roster=key;dirty=true;actors.forEach(a=>scene.remove(a));actors.clear();costumes.forEach(m=>m.dispose());costumes=[];
+   if(models.size===3&&key!==roster){roster=key;dirty=true;castBatch?.dispose();actors.forEach(a=>scene.remove(a));actors.clear();costumes.forEach(m=>m.dispose());costumes=[];
     const placements=(lobby?mercerLobbyPlacements:interiorPlacements)(p.people);
     p.people.forEach(who=>{
      const spot=placements.get(who.id);if(!spot)return;
@@ -99,6 +102,7 @@ export function Interior3D(props:{place:'bar'|'mercercourt';player:Pick<Person,'
      object.traverse(o=>{if(o instanceof THREE.Mesh){o.castShadow=true;o.receiveShadow=true;}});
      actors.set('player',object);scene.add(object);
     }
+    castBatch=new InteriorCastBatch(actors);scene.add(castBatch.root);
    }
    const playerActor=actors.get('player');playerMarker.visible=!!playerActor;
    if(playerActor){playerMarker.position.x=playerActor.position.x;playerMarker.position.z=playerActor.position.z;}
@@ -111,13 +115,15 @@ export function Interior3D(props:{place:'bar'|'mercercourt';player:Pick<Person,'
     const left=room?.getObjectByName('interior-wall-left'),back=room?.getObjectByName('interior-wall-back');
     if(left)left.visible=camera.position.x>=-5.8;
     if(back)back.visible=lobby?camera.position.z>=-6.8:camera.position.z<=4.8;
+    // Cast matrices change only when the roster/pose is rebuilt; orbiting does
+    // not need to upload the same instance buffers again.
     renderer.render(scene,camera);renderedFrames++;dirty=false;
     if(models.size===3)canvas.dataset.interior=JSON.stringify({place:p.place,people:[...actors.keys()],occupants:[...actors].map(([id,a])=>({id,spot:a.userData.spot,x:a.position.x,y:a.position.y,z:a.position.z})),picked:p.picked,
       drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,renderedFrames,
       zoom:camera.zoom,omitted:Math.max(0,p.people.length-actors.size+(playerActor?1:0)),cutawayWalls:[...(!left?.visible?['left']:[]),...(!back?.visible?['back']:[])]});
    }
   };frame=requestAnimationFrame(tick);
-  return()=>{unbindPan();dead=true;cancelAnimationFrame(frame);observer.disconnect();controls.removeEventListener('change',changed);controls.dispose();canvas.removeEventListener('keydown',keys);canvas.removeEventListener('pointerdown',press);canvas.removeEventListener('pointerup',release);disposeCityResources([scene,...models.values()]);renderer.dispose();renderer.forceContextLoss();canvas.remove();};
+  return()=>{unbindPan();dead=true;cancelAnimationFrame(frame);observer.disconnect();controls.removeEventListener('change',changed);controls.dispose();canvas.removeEventListener('keydown',keys);canvas.removeEventListener('pointerdown',press);canvas.removeEventListener('pointerup',release);castBatch?.dispose();disposeCityResources([scene,...models.values()]);renderer.dispose();renderer.forceContextLoss();canvas.remove();};
  },[props.place]);
  return <div className="interior3d"><div ref={host} className="interior3d-canvas"/><span className="interior3d-caption">{roomName} · {props.player.name}: pale ring · Drag / Q/E: orbit · Scroll / +/−: zoom · WASD / arrows: pan · Home: reset · Select a person{extraPeople>0&&` · ${extraPeople} more in the people list`}</span>{status&&<p role="status">{status}</p>}</div>;
 }

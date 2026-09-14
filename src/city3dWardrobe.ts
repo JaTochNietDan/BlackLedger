@@ -46,7 +46,7 @@ export function dressPedestrian(object: THREE.Group, model: string, look: Return
     if (!colour) return source;
     let own = copies.get(source);
     if (!own) {
-      own = source.clone(); own.color.set(colour);
+      own = source.clone(); own.userData.castSource=source.uuid; own.color.set(colour);
       // Existing wool maps contain the original suit pigment: remove that tint
       // before applying the cast palette, retaining its weave and fibre contrast.
       if (source.name === 'wool suit') own.color.setRGB(own.color.r/woolBase.r,own.color.g/woolBase.g,own.color.b/woolBase.b);
