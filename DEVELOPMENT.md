@@ -2924,3 +2924,24 @@ business accounts, interior shell/footer improvements and recorded named
 indoor assassination routing. Broader goal remains open: generic NPC/contract
 interior incidents, missing venue interiors, death-service businesses, fuller
 billiards animation/physics, compact visual QA and fresh campaign acceptance.
+
+### September 14 — funded funeral accounts
+
+Previous goal turn was progress: promoted4daa6c8 with a byte-preserved campaign.
+Rechecked the worktree; unrelated mugging/robbery/armed/aftermath/sim work remains
+untouched. The next death-business step connects actual payment to ownership.
+
+Ordinary deaths settle an affordable funeral from the dead person's purse and
+savings, then available family cash. Full service260, external costs90 with
+proportional smaller services; under25 means an unpaid burial. Only the margin
+reaches the player/family/individual proprietor. The existing Buried marker
+prevents duplicates. Player crew remain unburied pending the player's existing
+choice; arranging their funeral now pays another parlour's proprietor without
+charging twice. Existing saves receive no retrospective bills.
+
+Focused funeral tests passed0.210s. Wider death/killing/succession/proprietor
+integration results are recorded in.runtime/funeral-death-integration.log.
+Added explicit estate/family split, all three owner types, poor means, repeat
+settlement, crew choice/payment, savings use and no family overdraft coverage.
+No live release or live-save QA commands;4daa6c8 remains on8791.
+New morgue/cemetery/crematorium venues and their authored interiors remain open.

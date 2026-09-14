@@ -1,28 +1,10 @@
 package core
 
-// What an undertaker lives on.
-//
-// The trade went into the city with a counter that counts the week's dead and a
-// line in the working brief calling it "the one trade in this city whose custom
-// is made entirely by everybody else's work". The counter said it and nothing
-// did it: the room earned its hourly figure whether the district buried two
-// people that week or twenty. That is a sentence describing a consequence with
-// no code behind it, which is the fault this log has now recorded five times,
-// and the fifth one was written by me the night before.
-//
-// It is the same shape as a garage and the city's broken glass. A car goes to
-// pieces in the street, every bench in the city has more work, and the one the
-// player holds is where their own city's business ends up. A funeral is that
-// with nobody to argue about the bill.
+import "fmt"
 
 const (
-	// BurialTrade is what one funeral does for the room that takes it. A city
-	// alone kills about twenty-eight people in a long campaign, so a parlour
-	// left to the city drifts up rather than jumps.
-	BurialTrade = 2
-	// BurialPauper is the exception. Somebody with no name in this city and
-	// nobody to send a card to is buried out of the parish's money, which is
-	// not money. The room does the work and is not better off for it.
+	// BurialTrade is the additional custom from a paid funeral.
+	BurialTrade  = 2
 	BurialPauper = 0
 )
 
@@ -45,24 +27,57 @@ func (w *World) TheParlour() string {
 	return first
 }
 
-// Bury is a funeral, and what it is worth to the room that takes it. Called
-// wherever somebody dies, so a quiet week is a quiet week for the parlour too.
+// Bury settles an ordinary funeral once. Player crew retain their explicit
+// arrangement window; their money is not spent before that decision.
 func (w *World) Bury(person *NPC) {
+	if person == nil || !person.Dead || person.Buried || person.Faction == w.PlayerOrganizationID() {
+		return
+	}
 	id := w.TheParlour()
-	if id == "" || person == nil {
+	if id == "" {
 		return
 	}
-	// Somebody nobody knew and nobody is paying for.
-	worth := BurialTrade
-	if person.Faction == "" && person.Rank < RankSoldier && person.Purse < BurialPurse {
-		worth = BurialPauper
+	person.Buried = true
+	estate := w.HouseholdWealth(person)
+	family := w.faction(person.Faction)
+	available := estate
+	if family != nil {
+		available += max(0, family.Cash)
 	}
-	if worth == 0 {
+	// An unfunded burial still takes place, without invented parish income.
+	if available < BurialPurse {
 		return
 	}
-	w.ShiftCustom(id, "nobody in this district dying", worth)
+	paid := min(FuneralCost, available)
+	fromEstate := min(estate, paid)
+	if !w.SpendHouseholdMoney(person, fromEstate) {
+		return
+	}
+	if family != nil {
+		family.Cash -= paid - fromEstate
+	}
+	w.funeralProceeds(id, person.Name, paid)
+	w.ShiftCustom(id, "nobody in this district dying", BurialTrade)
 }
 
-// BurialPurse is what somebody has to be carrying before anybody expects to be
-// paid for burying them.
+// The plot, transport and notices are outside costs. Reduced means buy a
+// smaller service at the same cost ratio; only the funded margin reaches the
+// proprietor. An independent unowned business keeps its takings off-ledger.
+func (w *World) funeralProceeds(id, name string, paid int) {
+	if paid <= 0 {
+		return
+	}
+	cost := (paid*FuneralOwn + FuneralCost - 1) / FuneralCost
+	margin := max(0, paid-cost)
+	if w.Own(id) {
+		w.Earn(margin)
+		place, _ := PlaceByID(id)
+		w.Log("Funeral accounts at "+place.Name,
+			fmt.Sprintf("%s's funeral brought in $%d; $%d covered the plot, transport and notices. The remaining $%d went into your accounts.", name, paid, cost, margin), "business")
+	} else {
+		w.changeBusinessFunds(id, margin)
+	}
+}
+
+// BurialPurse is the minimum available estate/family money for a paid service.
 const BurialPurse = 25

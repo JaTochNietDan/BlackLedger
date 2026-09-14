@@ -1317,3 +1317,22 @@ considered first with a two-week rent reserve; existing shared-flat accommodatio
 is also offered with a one-week reserve. Downgrades still require household strain
 and a lower rent. Ownership, existing occupants, travel and jobs remain unchanged.
 These eligibility reserves are checks, not deposits or extra charges.
+
+## Funded funeral trade
+
+Ordinary NPC deaths now settle one affordable funeral through the existing
+undertaker. The deceased's purse and household savings contribute first; an
+existing NPC family covers the remaining bill up to its available cash. The
+standard service is260; means below260 buy a proportional service, and available
+funds below25 incur no paid service. External plot/transport/notice costs consume
+90/260 of payment, rounded up; the deed's player, family or living individual
+proprietor receives only the remaining margin. A buried record prevents repeat
+settlement. No money is invented for an unfunded burial.
+
+Player organization members retain the existing six-day arrangement decision.
+Their death does not automatically spend their estate or mark them buried.
+BuryYourOwn still costs260 at another parlour or90 at the player's own; another
+owner now receives the170 service margin. Player-owned funeral receipts appear
+in the ledger and earned cash. Existing saved deaths are not retroactively
+billed. This adds no command or response fields; morgue/cemetery/crematorium
+venues and their separate services remain outstanding.

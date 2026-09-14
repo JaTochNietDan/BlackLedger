@@ -135,6 +135,9 @@ func (w *World) BuryYourOwn(at, id string) error {
 	}
 	n := w.NPC(id)
 	n.Buried = true
+	if !w.Own(at) {
+		w.funeralProceeds(at, n.Name, fee)
+	}
 	// The trade is somebody else's unless it is yours, the same as every other
 	// business in this city.
 	w.ShiftCustom(at, "", BurialTrade)
