@@ -2498,6 +2498,20 @@ if __name__ == '__main__' and '--only=interior-tailor' in __import__('sys').argv
     raise SystemExit(0)
 
 
+def herald_interior():
+    from herald_interior import build
+    build(box,cylinder,material)
+
+
+if __name__ == '__main__' and '--only=interior-herald' in __import__('sys').argv:
+    clear();herald_interior()
+    manifest_path=os.path.join(OUT,'manifest.json')
+    with open(manifest_path) as f: selected_manifest=json.load(f)
+    selected_manifest['interior-herald']=export('interior-herald')
+    with open(manifest_path,'w') as f:json.dump(selected_manifest,f,indent=2)
+    raise SystemExit(0)
+
+
 def pawn_interior():
     from pawn_interior import build
     build(box,cylinder,material)
@@ -2721,6 +2735,7 @@ clear();lodging_room();manifest['interior-lodging-room']=export('interior-lodgin
 clear();precinct_interior();manifest['interior-precinct']=export('interior-precinct')
 clear();poolhall_interior();manifest['interior-poolhall']=export('interior-poolhall')
 clear();tailor_interior();manifest['interior-tailor']=export('interior-tailor')
+clear();herald_interior();manifest['interior-herald']=export('interior-herald')
 clear();pawn_interior();manifest['interior-pawn']=export('interior-pawn')
 clear();exchange_interior();manifest['interior-exchange']=export('interior-exchange')
 clear();restaurant_interior();manifest['interior-restaurant']=export('interior-restaurant')

@@ -173,6 +173,18 @@ export function precinctPlacements(people:Presence[]) {
  return result;
 }
 
+export function heraldPlacements(people:Presence[]) {
+ const result=new Map<string,InteriorSpot>();
+ const staff:InteriorSpot[]=[-2.55,2.55].map((x,i)=>({id:`herald-desk-${i}`,x,z:-3.12,yaw:0,seat:.59}));
+ const visitors:InteriorSpot[]=[{id:'herald-aisle-0',x:0,z:-1,yaw:Math.PI/2},{id:'herald-aisle-1',x:0,z:.6,yaw:-Math.PI/2},...[-2.55,0,2.55].map((x,i)=>({id:`herald-visitor-${i}`,x,z:2.2,yaw:Math.PI}))];
+ for(const who of [...people].sort((a,b)=>a.id.localeCompare(b.id))){
+  if(result.has(who.id))continue;
+  const spot=/editor|reporter|journalist|copywriter/i.test(who.role||'')?staff.shift()??visitors.shift():visitors.shift();
+  if(spot)result.set(who.id,spot);
+ }
+ return result;
+}
+
 export function pawnPlacements(people:Presence[]) {
  const result=new Map<string,InteriorSpot>();
  const staff:InteriorSpot[]=[-2.2,0,2.2].map((x,i)=>({id:`pawn-staff-${i}`,x,z:-2.9,yaw:0}));
@@ -214,14 +226,14 @@ export function tailorPlacements(people:Presence[]) {
  return result;
 }
 
-export type InteriorPlace='poolhall'|'tailor'|'pawn'|'riverside'|'bar'|'mercercourt'|'room'|'laundry'|'estate'|'apartment'|'flat'|'butcher'|'garage'|'lodging'|'restaurant'|'market'|'precinct';
+export type InteriorPlace='herald'|'poolhall'|'tailor'|'pawn'|'riverside'|'bar'|'mercercourt'|'room'|'laundry'|'estate'|'apartment'|'flat'|'butcher'|'garage'|'lodging'|'restaurant'|'market'|'precinct';
 export function placementsForInterior(place:InteriorPlace,people:Presence[]){
  if(place==='riverside'){
   const spots:InteriorSpot[]=[...[-.6,.8,2.2].map(z=>({id:'bench',x:-4.2,z,yaw:Math.PI/2,seat:.69})),...[0,1.6].flatMap(z=>[-2.5,-.8,1,2.8].map(x=>({id:'lobby',x,z,yaw:Math.PI})))];
   return new Map([...people].sort((a,b)=>a.id.localeCompare(b.id)).slice(0,spots.length).map((p,i)=>[p.id,spots[i]]));
  }
  if(place==='flat'||place==='lodging')return new Map<string,InteriorSpot>();
- return (place==='poolhall'?poolhallPlacements:place==='tailor'?tailorPlacements:place==='pawn'?pawnPlacements:place==='precinct'?precinctPlacements:place==='market'?exchangePlacements:place==='restaurant'?restaurantPlacements:place==='garage'?garagePlacements:place==='butcher'?butcherPlacements:place==='apartment'?ashburyPlacements:place==='estate'?cypressPlacements:place==='laundry'?laundryPlacements:place==='bar'?interiorPlacements:place==='room'?marinerLobbyPlacements:mercerLobbyPlacements)(people);
+ return (place==='herald'?heraldPlacements:place==='poolhall'?poolhallPlacements:place==='tailor'?tailorPlacements:place==='pawn'?pawnPlacements:place==='precinct'?precinctPlacements:place==='market'?exchangePlacements:place==='restaurant'?restaurantPlacements:place==='garage'?garagePlacements:place==='butcher'?butcherPlacements:place==='apartment'?ashburyPlacements:place==='estate'?cypressPlacements:place==='laundry'?laundryPlacements:place==='bar'?interiorPlacements:place==='room'?marinerLobbyPlacements:mercerLobbyPlacements)(people);
 }
 
 export function poseInteriorOccupant(actor:THREE.Group,spot:InteriorSpot) {
@@ -242,6 +254,7 @@ export function poseInteriorOccupant(actor:THREE.Group,spot:InteriorSpot) {
 
 // Reserved clear floor positions; these never displace a public occupant.
 export function interiorPlayerSpot(place:InteriorPlace):InteriorSpot {
+ if(place==='herald')return {id:'player-entry',x:0,z:4.1,yaw:Math.PI};
  if(place==='poolhall')return {id:'player-entry',x:0,z:6.9,yaw:Math.PI};
  if(place==='tailor')return {id:'player-entry',x:0,z:4.1,yaw:Math.PI};
  if(place==='pawn')return {id:'player-entry',x:1.4,z:3.6,yaw:Math.PI};

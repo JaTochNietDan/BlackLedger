@@ -1110,5 +1110,21 @@
       ]
     ],
     "bytes": 4961068
+  },
+  "interior-herald": {
+    "file": "interior-herald.glb",
+    "bounds_blender": [
+      [
+        -5.08,
+        -5.0,
+        -0.19
+      ],
+      [
+        5.0,
+        5.08,
+        3.8
+      ]
+    ],
+    "bytes": 2004732
   }
 }

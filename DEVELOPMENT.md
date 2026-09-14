@@ -2237,3 +2237,30 @@ moves without a person. A complete pose must keep feet outside the cabinet,
 solve both hands to the shaft and handle shots needing a rest. This turn adds
 replay inspection, not that character animation or airborne/slate physics.
 The broad interiors, art and campaign goal remains active.
+
+### 2026-09-14 — Herald newsroom interior
+
+Previous acc8d2d was committed replay UX progress. Replaced the Herald's flat
+interior fallback with an original Blender newsroom: four copy desks with
+individual typewriter keys, platens and paper, green desk lamps, wooden chairs,
+filing cabinets, pigeonholes, clipping board, wire-service machine, pendant
+lights and a readable masthead. Source `tools/herald_interior.py` supports
+selective/full export via export_city3d.py. The GLB is 2,004,732 bytes.
+
+Registered Herald settings, authored two seated editorial positions and five
+visitor positions, and retained the normal people/action selection. Only
+publicly present occupants are rendered. Added herald-interior isolated fixture.
+390 frontend tests and production build pass, including real-geometry tests
+for both rigs, chair support, actor separation, standing furniture clearance
+and the sampled entrance path. Logs: `.runtime/herald-{export,tests,build}.log`.
+
+Browser tabs 67/68 on isolated port 8972 reviewed standard and enlarged room
+views, the final seated staff and direct character selection (Mara's current
+fixture identity/actions selected from her rendered model). Fixture
+`.runtime/herald-interior-qa.sqlite3` remains revision 0/minute 600 with no
+receipts; no gameplay commands issued and main save untouched. Main 8791
+continues to serve release 89cc61b; this room is preview-only until promotion.
+
+This is the city desk, not all three storeys of the Herald. Typing animation,
+upper offices, other unfinished interiors and full billiards character/physics
+fidelity remain open. The broad goal remains active.

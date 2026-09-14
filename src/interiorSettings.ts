@@ -3,6 +3,7 @@ type RoomSettings={lampIntensity?:number;name:string;model:string;span:number;le
 // Coordinates are glTF metres. Cutaway thresholds follow each authored wall;
 // fixtures are positioned in the room that owns them, never borrowed by fallback.
 export const interiorSettings:Record<InteriorPlace,RoomSettings>={
+ herald:{lampIntensity:2,name:'The Bellwether Herald',model:'interior-herald',span:7,leftWall:-5,backWall:-5,lamps:[[-2.5,2.98,0],[2.5,2.98,0]]},
  poolhall:{lampIntensity:2,name:'The Green Baize',model:'interior-poolhall',span:11,leftWall:-8,backWall:-9,lamps:[[-3.7,2.9,-4.25],[3.7,2.9,-4.25],[-3.7,2.9,0],[3.7,2.9,0],[-3.7,2.9,4.25],[3.7,2.9,4.25]]},
  tailor:{lampIntensity:2,name:'Ruttledge & Vance',model:'interior-tailor',span:7,leftWall:-5,backWall:-5,lamps:[[-2,2.82,-.6],[1.3,2.82,-.6]]},
  pawn:{lampIntensity:2,name:'Ackerman & Son',model:'interior-pawn',span:6,leftWall:-4,backWall:-4.5,lamps:[[-2,2.77,0],[1.9,2.77,0]]},
