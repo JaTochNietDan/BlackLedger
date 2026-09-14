@@ -73,3 +73,31 @@ test('player has clear floor space in both rooms without displacing any NPC',asy
   else assert.ok(playerBox.max.z<.7&&playerBox.min.z>-2,'player intrudes into bar stools or aisle crowd');
  }
 });
+
+test('Mariner stages its public landlady at reception and keeps every rig clear of desk, stairs and other occupants',async()=>{
+ const {marinerLobbyPlacements,interiorPlayerSpot,placementsForInterior}=await import('../.runtime/frontend-test/interiorStaging.js');
+ const people=[{id:'host',role:'Landlady'},...Array.from({length:15},(_,i)=>({id:`boarder-${i}`}))];
+ const placements=marinerLobbyPlacements(people);
+ assert.deepEqual([...placements],[...marinerLobbyPlacements([...people].reverse())]);
+ assert.deepEqual([...placements],[...placementsForInterior('room',people)]);
+ assert.equal(placements.size,12);assert.equal(placements.get('host').id,'boarding-reception');
+ assert.equal(marinerLobbyPlacements([{id:'guest',role:'Boarder'}]).get('guest').id,'boarding-bench-0');
+ assert.equal(new Set([...placements.values()].map(s=>s.id)).size,placements.size);
+ const desk=new THREE.Box3(new THREE.Vector3(-4.25,0,-4.85),new THREE.Vector3(-.75,1.34,-3.85));
+ const stair=new THREE.Box3(new THREE.Vector3(2.37,0,-5.7),new THREE.Vector3(4.85,4.2,.05));
+ for(const name of ['person','woman']){
+  const source=await model(name),boxes=[];
+  for(const [id,spot] of [...placements,['player',interiorPlayerSpot('room')]]){
+   const actor=source.clone(true);poseInteriorOccupant(actor,spot);const box=new THREE.Box3().setFromObject(actor,true);
+   assert.ok(box.min.y>=.0175,`${name}/${id} below floorboards`);
+   assert.ok(box.min.x> -4.75&&box.max.x<4.75&&box.min.z> -5.8&&box.max.z<3.95,`${name}/${id} clips wall or leaves floor`);
+   assert.equal(box.intersectsBox(desk),false,`${name}/${id} intersects reception`);
+   assert.equal(box.intersectsBox(stair),false,`${name}/${id} intersects stairs`);
+   if(spot.seat!==undefined){assert.ok(Math.abs(actor.getObjectByName('leg1').getWorldPosition(new THREE.Vector3()).y-.77)<1e-6);assert.ok(box.min.x> -4.59,'occupant penetrates bench back');}
+   for(const other of boxes)assert.equal(box.intersectsBox(other.box),false,`${name}/${id} overlaps ${other.id}`);
+   boxes.push({id,box});
+  }
+ }
+ const room=await model('interior-mariner');assert.ok(room.getObjectByName('interior-wall-left'));assert.ok(room.getObjectByName('interior-wall-back'));
+ const bounds=new THREE.Box3().setFromObject(room,true);assert.ok(bounds.min.x>=-5.12&&bounds.max.x<=5.01&&bounds.min.z>=-6.12&&bounds.max.z<=4.01);
+});

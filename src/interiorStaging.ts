@@ -32,6 +32,27 @@ export function mercerLobbyPlacements(people:Presence[]) {
  return result;
 }
 
+// Mariner reception and its own bench, with a clear approach to the stairs.
+export function marinerLobbyPlacements(people:Presence[]) {
+ const result=new Map<string,InteriorSpot>();
+ const available:InteriorSpot[]=[
+  ...[.05,1.75].map((z,i)=>({id:`boarding-bench-${i}`,x:-4.2,z,yaw:Math.PI/2,seat:.77})),
+  ...[-2.5,-.5,1.5].flatMap((z,row)=>[-2.3,-.5,1.3].map((x,col)=>({id:`boarding-floor-${row}-${col}`,x,z,yaw:row%2?Math.PI:0})))
+ ];
+ for(const who of [...people].sort((a,b)=>a.id.localeCompare(b.id))){
+  if(result.has(who.id))continue;
+  if(/\b(landlady|landlord|receptionist)\b/i.test(who.role||'')&&![...result.values()].some(s=>s.id==='boarding-reception'))
+   result.set(who.id,{id:'boarding-reception',x:-2.5,z:-5.23,yaw:0});
+  else {const spot=available.shift();if(spot)result.set(who.id,spot);}
+ }
+ return result;
+}
+
+export type InteriorPlace='bar'|'mercercourt'|'room';
+export function placementsForInterior(place:InteriorPlace,people:Presence[]){
+ return (place==='bar'?interiorPlacements:place==='room'?marinerLobbyPlacements:mercerLobbyPlacements)(people);
+}
+
 export function poseInteriorOccupant(actor:THREE.Group,spot:InteriorSpot) {
  actor.rotation.set(0,spot.yaw,0);
  actor.position.set(spot.x,spot.seat===undefined?.03:spot.seat-.86,spot.z);
@@ -49,7 +70,8 @@ export function poseInteriorOccupant(actor:THREE.Group,spot:InteriorSpot) {
 }
 
 // Reserved clear floor positions; these never displace a public occupant.
-export function interiorPlayerSpot(place:'bar'|'mercercourt'):InteriorSpot {
+export function interiorPlayerSpot(place:InteriorPlace):InteriorSpot {
+ if(place==='room')return {id:'player-entry',x:1.3,z:3.15,yaw:Math.PI};
  return place==='mercercourt'
   ? {id:'player-entry',x:2,z:4.15,yaw:Math.PI}
   : {id:'player-entry',x:3.65,z:-.7,yaw:-Math.PI/2};

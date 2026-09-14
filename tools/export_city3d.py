@@ -1593,6 +1593,105 @@ def bar_cloth():
     for i in range(4):box('soft linen fold',(-.05+i*.035,0,.011),(.017,.14,.002),linen,.001)
 
 
+def mariner_lobby():
+    """Boarding-house reception: 24 keys, rent book, waiting bench and stairs."""
+    plaster=material('Mariner tobacco cream plaster',(.52,.46,.34))
+    wood=material('Mariner worn oak',(.22,.115,.055))
+    green=material('Mariner painted dado',(.12,.21,.18))
+    brass=material('Mariner reception brass',(.50,.35,.13),.65)
+    iron=material('Mariner black iron',(.035,.045,.04),.45)
+    paper=material('Mariner ledger paper',(.70,.65,.50))
+    linen=material('Mariner folded linen',(.60,.57,.47))
+    amber=material('Mariner opal shades',(.85,.68,.38),0,.8)
+    # Deterministic fine oak grain, carried by exported UVs rather than nodes
+    # that only render inside Blender.
+    rng=random.Random(1963);n=128;pixels=[]
+    for y in range(n):
+        for x in range(n):
+            grain=.9+.09*math.sin(y*.62+math.sin(x*.06)*1.4)+rng.uniform(-.04,.04)
+            pixels.extend((*[1.055*(c*grain)**(1/2.4)-.055 for c in wood.diffuse_color[:3]],1))
+    img=bpy.data.images.new('Mariner oak grain',width=n,height=n);img.pixels=pixels;img.pack()
+    tex=wood.node_tree.nodes.new('ShaderNodeTexImage');tex.image=img
+    wood.node_tree.links.new(tex.outputs['Color'],wood.node_tree.nodes['Principled BSDF'].inputs['Base Color'])
+    box('foundation',(0,1,-.14),(10,10,.25),wood)
+    for row in range(40):
+        for col in range(5):
+            box('oak floorboard',(-4+col*2,-3.875+row*.25,0),(1.985,.242,.035),wood,.004)
+    box('rear plaster wall',(0,6,2.15),(10,.22,4.3),plaster)
+    box('west plaster wall',(-5,1,2.15),(.22,10,4.3),plaster)
+    for x in range(-19,20):box('rear dado board',(x*.25,5.85,.65),(.242,.08,1.3),green)
+    for y in range(-15,24):box('west dado board',(-4.85,y*.25,.65),(.08,.242,1.3),green)
+    for z in (.1,1.35,4.1):
+        box('rear moulding',(0,5.78,z),(10,.15,.12),wood,.025)
+        box('west moulding',(-4.78,1,z),(.15,10,.12),wood,.025)
+    # The desk faces the public floor, leaving an actual service aisle behind.
+    box('reception desk',(-2.5,4.35,.54),(3.3,.82,1.08),green,.025)
+    box('reception oak top',(-2.5,4.35,1.12),(3.5,1,.10),wood,.04)
+    for x in (-3.65,-2.5,-1.35):
+        box('reception recessed panel',(x,3.925,.56),(.9,.035,.72),wood,.025)
+        box('reception panel inset',(x,3.90,.56),(.72,.025,.54),green,.016)
+    cylinder('service bell base',(-1.4,4.17,1.20),.13,.05,iron,vertices=24)
+    cylinder('service bell dome',(-1.4,4.17,1.255),.10,.08,brass,vertices=32)
+    cylinder('service bell button',(-1.4,4.17,1.31),.035,.04,brass,vertices=16)
+    box('rent ledger cover',(-2.8,4.1,1.19),(.66,.43,.035),iron,.008)
+    box('open rent ledger',(-2.8,4.1,1.214),(.62,.40,.016),paper,.005)
+    for i in range(9):box('ledger ruled line',(-2.8,3.94+i*.039,1.224),(.56,.002,.002),green)
+    box('ledger spine',(-2.8,4.1,1.226),(.009,.40,.003),wood)
+    beam('ledger pencil',(-2.39,3.94,1.185),(-2.36,4.24,1.185),.014,brass)
+    box('rear key board',(-2.5,5.7,2.3),(3.7,.12,1.62),wood,.03)
+    for row in range(4):
+        for col in range(6):
+            x=-4+col*.6;z=1.76+row*.36
+            cylinder('rear key hook',(x,5.58,z),.022,.13,brass,(math.pi/2,0,0),12)
+            box('rear numbered key tag',(x,5.50,z-.09),(.14,.026,.18),paper,.01)
+            cylinder('rear hanging key stem',(x+.09,5.49,z-.11),.012,.14,brass,vertices=8)
+    # Wall labels remain physical lettering and are part of the cutaway.
+    def label(name,text,x,y,z,size):
+        curve=bpy.data.curves.new(name,'FONT');curve.body=text;curve.size=size;curve.align_x='CENTER';curve.extrude=.001
+        obj=bpy.data.objects.new(name,curve);bpy.context.collection.objects.link(obj);obj.location=(x,y,z);obj.rotation_euler=(math.pi/2,0,0);obj.data.materials.append(iron)
+        bpy.ops.object.select_all(action='DESELECT');obj.select_set(True);bpy.context.view_layer.objects.active=obj;bpy.ops.object.convert(target='MESH');obj.select_set(False)
+    label('rear house name','THE MARINER',-2.5,5.72,3.46,.36)
+    for row in range(4):
+        for col in range(6):label('rear room number',str(row*6+col+1),-4+col*.6,5.477,1.63+row*.36,.065)
+    # Corridor and linen cupboard, separate from the staircase clear space.
+    box('rear corridor door',(.45,5.83,1.35),(1.55,.12,2.7),wood,.03)
+    for x in (-.4,1.3):box('rear door jamb',(x,5.73,1.42),(.13,.19,2.84),green,.02)
+    box('rear door lintel',(.45,5.73,2.85),(1.84,.19,.13),green,.02)
+    box('rear door glass',(.45,5.745,1.93),(1.13,.035,.72),paper,.02)
+    label('rear corridor sign','ROOMS',.45,5.72,1.89,.16)
+    cylinder('rear door handle',(1.01,5.69,1.12),.045,.08,brass,(math.pi/2,0,0),16)
+    for step in range(14):
+        y=.2+step*.4;h=(step+1)*.2
+        box('stair tread',(3.6,y,h/2),(2.25,.4,h),wood,.016)
+        box('stair runner',(3.6,y-.01,h+.013),(1.05,.36,.022),green)
+        if step%2==0:
+            for x in (2.42,4.77):cylinder('stair spindle',(x,y,h+.46),.025,.92,iron,vertices=12)
+    for x in (2.42,4.77):beam('stair rail',(x,.2,1.03),(x,5.4,3.63),.07,wood)
+    # Two seated tenants face into the room from an oak bench.
+    for y in (-2.35,.65):
+        for x in (-4.5,-3.85):box('waiting bench leg',(x,y,.35),(.12,.12,.70),wood,.02)
+    for x in (-4.52,-4.30,-4.08,-3.86):box('waiting bench slat',(x,-.85,.72),(.19,3.25,.10),wood,.022)
+    for z in (1,1.22,1.44):box('waiting bench back',(-4.65,-.85,z),(.12,3.3,.16),green,.02)
+    for y in (-2.52,.82):box('waiting bench arm',(-4.23,y,1.06),(.94,.12,.10),wood,.03)
+    # Steam radiator, valve and piping under the stair; no floor occupants here.
+    for i in range(9):box('radiator fin',(4.28,4.6+i*.11,.58),(.60,.055,.90),iron,.025)
+    beam('radiator feed',(4.7,4.6,.18),(4.7,5.7,.18),.055,iron)
+    cylinder('radiator valve',(4.7,4.57,.4),.08,.035,brass,vertices=16)
+    # Spare folded sheets wait behind reception, clear of the clerk.
+    for i in range(3):box('folded boarding linen',(-3.8,4.4,1.2+i*.045),(.42,.52,.04),linen,.015)
+    for x in (-4.1,.5):
+        box('rear sconce back',(x,5.7,3.22),(.18,.1,.3),brass,.02)
+        cylinder('rear opal sconce',(x,5.46,3.27),.13,.30,amber,vertices=24)
+    box('entrance coir mat',(0,-2.9,.038),(2.2,1.35,.035),material('Mariner coir',(.20,.14,.07)))
+    walls={}
+    for side in ('left','back'):
+        group=bpy.data.objects.new('interior-wall-'+side,None);bpy.context.collection.objects.link(group);walls[side]=group
+    for ob in list(bpy.context.scene.objects):
+        if ob.type!='MESH':continue
+        if ob.name.startswith('west '):ob.parent=walls['left']
+        elif ob.name.startswith('rear '):ob.parent=walls['back']
+
+
 def mercer_lobby():
     plaster=material('aged cream plaster',(.56,.51,.40))
     wood=material('varnished walnut',(.18,.09,.045))
@@ -1729,6 +1828,14 @@ def mercer_court():
                 box('tenant letter box',(x,6.28,.98+row*.19),(.20,.08,.16),brass,.009)
                 box('letter slot',(x,6.325,1.02+row*.19),(.13,.01,.014),iron)
 
+if __name__ == '__main__' and '--only=interior-mariner' in __import__('sys').argv:
+    clear();mariner_lobby()
+    manifest_path=os.path.join(OUT,'manifest.json')
+    with open(manifest_path) as f: selected_manifest=json.load(f)
+    selected_manifest['interior-mariner']=export('interior-mariner')
+    with open(manifest_path,'w') as f:json.dump(selected_manifest,f,indent=2)
+    raise SystemExit(0)
+
 if __name__ == '__main__' and '--only=bar-cloth' in __import__('sys').argv:
     clear();bar_cloth()
     manifest_path=os.path.join(OUT,'manifest.json')
@@ -1795,6 +1902,7 @@ for name in ('shotgun','thompson'):
 clear();blast_fragment();manifest['blast-fragment']=export('blast-fragment')
 clear();bar_cloth();manifest['bar-cloth']=export('bar-cloth')
 clear();mariner();manifest['mariner']=export('mariner')
+clear();mariner_lobby();manifest['interior-mariner']=export('interior-mariner')
 clear();mercer_court();manifest['mercer-court']=export('mercer-court')
 clear();mercer_lobby();manifest['interior-mercer-court']=export('interior-mercer-court')
 clear();saint_agnes_interior();manifest['interior-saint-agnes']=export('interior-saint-agnes')

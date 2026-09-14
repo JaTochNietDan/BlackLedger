@@ -710,5 +710,21 @@
       ]
     ],
     "bytes": 53264
+  },
+  "interior-mariner": {
+    "file": "interior-mariner.glb",
+    "bounds_blender": [
+      [
+        -5.11,
+        -4.0,
+        -0.265
+      ],
+      [
+        5.0,
+        6.11,
+        4.3
+      ]
+    ],
+    "bytes": 2961852
   }
 }
