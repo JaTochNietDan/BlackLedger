@@ -2545,3 +2545,26 @@ errand/routine/journey/arrival, custody and pool tournament core tests pass
 `.runtime/home-move-journey-{tests,adapters}.log`. No main-save QA writes or
 browser claims. Main8791 remains01fb5cf; release promotion and broad interior,
 housing preference and billiards fidelity work remain open.
+
+### 2026-09-14 — clean 3e7ee26 release staged
+
+Prepared clean clone `.runtime/release-3e7ee26` at
+3e7ee26a10338b0a306b84989f472edd8274fd21, excluding unrelated dirty work.
+395 frontend tests pass16.255s; production build3.59s and Go vet pass.
+Binary health reports modified:false. Candidate8978 session97631 uses only
+`.runtime/candidate-3e7ee26.sqlite3`, copied from fresh SQLite backup
+`.runtime/pre-3e7ee26-campaign.sqlite3`. Complete state bytes and all2134 receipts
+match; revision2132/minute160825/life11 Jamie Moretti/$2625 are unchanged.
+SHA2564cca8f4fe0be17920d8e010f7a1fb2023a0ea7843eeb445e49ffb17759916af5.
+Release-local compatibility.json records verification. Cabstand/docks/poolhall
+compressed GLB transfers match source byte-for-byte (model-verification.json).
+Browser78 reviewed copied campaign and apartment exchange without commands.
+
+Full Go suite remains RUNNING in session45900, core PID74340 verified active
+with CPU use after five minutes; billiards passed18.829s. Keep this same test
+handle; do not restart it or claim full-suite success without its terminal
+result. Logs `.runtime/release-3e7ee26-{go,frontend,build,vet}.log`.
+Main8791 is still01fb5cf (PID64096), not promoted. Recheck live save/receipts
+against the backup immediately before eventual restart. This turn staged and
+verified the candidate and verified an active test wait; the broad goal remains
+open.
