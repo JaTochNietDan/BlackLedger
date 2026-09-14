@@ -65,11 +65,11 @@ export function casualtyFall(progress: number) {
 export const GUNFIRE_SHOTS = [0.7, 1.05, 1.5, 1.9] as const;
 
 /** Three-second schematic gunfire sequence; no inferred target or damage. */
-export function gunfightPose(seconds: number) {
+export function gunfightPose(seconds: number,beats:readonly number[]=GUNFIRE_SHOTS) {
   const ease = (t: number) => { const x = Math.max(0, Math.min(1, t)); return x*x*(3-2*x); };
   const aim = ease((seconds - 0.1) / 0.45) * (1 - ease((seconds - 2.3) / 0.6));
-  const index = GUNFIRE_SHOTS.filter(at => at <= seconds).length;
-  const age = index ? seconds - GUNFIRE_SHOTS[index - 1] : Infinity;
+  const index = beats.filter(at => at <= seconds).length;
+  const age = index ? seconds - beats[index - 1] : Infinity;
   const recoil = Math.max(0, 1 - age / 0.16) * 0.14;
   return {index, arm: -Math.PI / 2 * aim - recoil, flash: age < 0.065,
     smoke: age < 0.35 ? 1 - age / 0.35 : 0};
@@ -88,14 +88,14 @@ export class GunfireAudio {
   private consumed = 0;
   private stop?: () => void;
   private closed = false;
-  constructor(private fire: () => (() => void) | undefined) {}
+  constructor(private fire: () => (() => void) | undefined,private beats:readonly number[]=GUNFIRE_SHOTS) {}
   update(seconds: number, enabled = true) {
     if (this.closed) return;
     if (!enabled) {
       this.stop?.();
       this.stop = undefined;
     }
-    const pose = gunfightPose(seconds);
+    const pose = gunfightPose(seconds,this.beats);
     if (pose.index <= this.consumed) return;
     this.consumed = pose.index;
     if (!pose.flash || !enabled) return;
@@ -124,7 +124,7 @@ export class BlastAudio {
   private consumed = false;
   private closed = false;
   private stop?: () => void;
-  constructor(private fire: () => (() => void) | undefined) {}
+  constructor(private fire: () => (() => void) | undefined,private beats:readonly number[]=GUNFIRE_SHOTS) {}
   update(seconds: number, enabled = true) {
     if (this.closed) return;
     if (!enabled) { this.stop?.(); this.stop = undefined; }

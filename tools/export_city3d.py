@@ -615,9 +615,11 @@ def person(waved=False):
         attach(box('trouser lower',(side*.12,0,.29),(.16,.185,.39),coat,.035),knee)
         attach(box('shoe',(side*.12,-.07,.075),(.18,.32,.14),shoe,.05),knee)
         arm=joint('arm'+str(side),(side*.3,0,1.35))
-        attach(box('jacket sleeve',(side*.31,0,1.095),(.14,.19,.53),coat,.045),arm)
-        attach(box('shirt cuff',(side*.31,0,.842),(.125,.175,.045),shirt,.015),arm)
-        attach(oval('hand',(side*.31,-.005,.77),(.066,.065,.095),skin),arm)
+        attach(box('jacket upper sleeve',(side*.31,0,1.205),(.14,.19,.29),coat,.035),arm)
+        elbow=joint('elbow'+str(side),(side*.3,0,1.065),arm)
+        attach(box('jacket forearm',(side*.31,0,.953),(.135,.18,.245),coat,.033),elbow)
+        attach(box('shirt cuff',(side*.31,0,.842),(.125,.175,.045),shirt,.015),elbow)
+        attach(oval('hand',(side*.31,-.005,.77),(.066,.065,.095),skin),elbow)
     # Bake the weave at one physical scale before joints animate; torso meshes
     # and manufactured limb meshes share the same 20cm texture tile.
     bpy.context.view_layer.update()
@@ -652,11 +654,57 @@ def revolver():
     anchor.location=(0,-.307,.086)
 
 
+def long_gun(kind):
+    steel=material('blued gun steel',(.065,.078,.084),.82)
+    wood=material('oiled walnut stock',(.24,.105,.035))
+    rubber=material('stock butt plate',(.024,.024,.022))
+    bore=material('dark barrel bore',(.006,.008,.009))
+    # Packed grain follows the stock length; bevels keep small highlights legible.
+    n=128;image=bpy.data.images.new('walnut gun grain',width=n,height=n);pixels=[]
+    for y in range(n):
+        for x in range(n):
+            grain=.83+.12*math.sin(x*.47+math.sin(y*.05)*1.5)+.04*math.sin(x*2.9+y*.1)
+            pixels.extend((.32*grain,.15*grain,.058*grain,1))
+    image.pixels=pixels;image.pack();node=wood.node_tree.nodes.new('ShaderNodeTexImage');node.image=image
+    wood.node_tree.links.new(node.outputs['Color'],wood.node_tree.nodes['Principled BSDF'].inputs['Base Color'])
+    box('walnut shoulder stock',(0,.22,.03),(.068,.38,.135),wood,.032)
+    box('ribbed butt plate',(0,.414,.03),(.078,.018,.15),rubber,.009)
+    box('stock wrist',(0,.03,.025),(.05,.13,.09),wood,.018)
+    box('receiver',(0,-.085,.075),(.065,.20,.095),steel,.01)
+    for side in (-1,1):
+        box('trigger guard side',(side*.023,-.025,-.025),(.009,.09,.06),steel,.004)
+        cylinder('receiver pin',(side*.034,-.08,.073),.008,.006,steel,(0,math.pi/2,0),16)
+    box('trigger guard bow',(0,-.025,-.054),(.045,.09,.01),steel,.004)
+    box('trigger',(0,-.034,-.023),(.008,.018,.035),steel,.003)
+    box('ejection port',(.034,-.112,.082),(.004,.08,.032),bore,.004)
+    length=.51 if kind=='shotgun' else .32
+    end=-.18-length
+    cylinder('barrel',(0,-.18-length/2,.105),.023 if kind=='shotgun' else .021,length,steel,(math.pi/2,0,0),32)
+    cylinder('muzzle bore',(0,end-.002,.105),.014 if kind=='shotgun' else .011,.004,bore,(math.pi/2,0,0),24)
+    box('front sight',(0,end+.03,.133),(.01,.022,.018),steel,.003)
+    box('rear sight',(0,-.07,.13),(.035,.035,.025),steel,.003)
+    if kind=='shotgun':
+        cylinder('magazine tube',(0,-.345,.055),.02,.31,steel,(math.pi/2,0,0),24)
+        pump=bpy.data.objects.new('pump-slide',None);bpy.context.collection.objects.link(pump)
+        ob=box('pump forearm',(0,-.31,.045),(.074,.19,.075),wood,.025);ob.parent=pump
+        for i in range(10):
+            ob=box('pump groove',(0,-.23-i*.016,.078),(.066,.004,.007),rubber,.001);ob.parent=pump
+    else:
+        grip=box('pistol grip',(0,-.018,-.06),(.06,.075,.15),wood,.016);grip.rotation_euler.x=-.2
+        box('stick magazine',(0,-.165,-.07),(.038,.067,.27),steel,.008)
+        box('foregrip',(0,-.31,.055),(.07,.18,.065),wood,.014)
+        for i in range(11):cylinder('barrel cooling fin',(0,-.22-i*.019,.105),.029,.008,steel,(math.pi/2,0,0),24)
+        box('charging handle',(.055,-.07,.105),(.04,.021,.024),steel,.005)
+    for name,pos in [('muzzle',(0,end-.009,.105)),('support-grip',(0,-.27,.005))]:
+        anchor=bpy.data.objects.new(name,None);bpy.context.collection.objects.link(anchor);anchor.location=pos
+        if kind=='shotgun' and name=='support-grip':anchor.parent=pump
+
+
 def export(name):
     # Join by material except animated limbs: a building becomes ~6 draws.
     groups={}
     for ob in list(bpy.context.scene.objects):
-        if ob.type=='MESH' and (ob.parent is None or ob.parent.name.startswith(('wheel-roll-','interior-wall-','entrance-door-','window-'))) and not ob.name.startswith(('leg','arm','shoe','clock-hand')):
+        if ob.type=='MESH' and (ob.parent is None or ob.parent.name.startswith(('wheel-roll-','interior-wall-','entrance-door-','window-','pump-'))) and not ob.name.startswith(('leg','arm','shoe','clock-hand')):
             key=(ob.parent.name if ob.parent else '',ob.data.materials[0].name)
             groups.setdefault(key,[]).append(ob)
     for obs in groups.values():
@@ -1485,6 +1533,8 @@ clear();fire_engine();manifest['fire-engine']=export('fire-engine')
 clear();police_officer();manifest['police-officer']=export('police-officer')
 clear();undertaker();manifest['undertaker']=export('undertaker')
 clear();revolver();manifest['revolver']=export('revolver')
+for name in ('shotgun','thompson'):
+    clear();long_gun(name);manifest[name]=export(name)
 clear();blast_fragment();manifest['blast-fragment']=export('blast-fragment')
 clear();mariner();manifest['mariner']=export('mariner')
 clear();saint_agnes_interior();manifest['interior-saint-agnes']=export('interior-saint-agnes')

@@ -1,3 +1,4 @@
+import {sceneWeapon,poseLongGun,weaponShots,pumpOffset} from './city3dWeapons';
 import {CityRubble} from './city3dRubble';
 import {CitySuppression} from './city3dSuppression';
 import {CityFire, clearBlastWindows} from './city3dFire';
@@ -33,7 +34,7 @@ import {
 import type {Lot, Point} from './city3dPlan';
 import type {Journey} from './TravelPresentation';
 import './city3d.css';
-import {CityCueQueue, GUNFIRE_SHOTS, raidEntryPose, policeSceneSeconds, officerApproach, policeCast, sceneSlots, availableSceneSlot, casualtyFall, gunfightPose, casualtySceneStart, GunfireAudio, BlastAudio} from './city3dEvents';
+import {CityCueQueue, raidEntryPose, policeSceneSeconds, officerApproach, policeCast, sceneSlots, availableSceneSlot, casualtyFall, gunfightPose, casualtySceneStart, GunfireAudio, BlastAudio} from './city3dEvents';
 import type {SceneSlot} from './city3dEvents';
 import {StreetTraffic, trafficSize, trafficModel, advanceWheel, wheelSteering, advanceSteering, frontWheelSteering} from './city3dTraffic';
 import {pedestrianModel, isPedestrian} from './city3dCast';
@@ -44,6 +45,7 @@ import {blastParticle, windowBurst, internalDetonation, windowDebris, blastLight
 type Props = {
   state: Snapshot;
   beforeConditions?:Record<string,number>;
+  replaySerial?:number;
   overlay?: ReactNode;
   selected: string;
   onSelect: (id: string) => void;
@@ -87,6 +89,8 @@ type Effect = {
   wardrobe?: THREE.MeshStandardMaterial[];
   slot?: SceneSlot;
   gunArm?: THREE.Object3D;
+  weapon?:THREE.Group;
+  weaponModel?:string;
   muzzle?: THREE.Object3D;
   audio?: GunfireAudio | BlastAudio;
   glassAudio?: BlastAudio;
@@ -110,6 +114,8 @@ const modelNames = [
   'person',
   'woman',
   'revolver',
+  'shotgun',
+  'thompson',
   'blast-fragment',
   'street-bed',
   'vacant-lot',
@@ -834,8 +840,9 @@ export function City3D(props: Props) {
         motion = p.motion && !reduced.matches && !graphicsLost;
       const impact={x:0,y:0};
       const addImpact=(age:number,strength:number)=>{const pulse=impactPulse(age,strength);impact.x+=pulse.x;impact.y+=pulse.y;};
-      const playbackStarted = !!p.activeCue && lastActive !== p.activeCue.id;
-      if ((lastActive && !p.activeCue) || worldID !== `${w.id}:${w.life}`) {
+      const activePlayback=p.activeCue?`${p.activeCue.id}:${p.replaySerial??0}`:null;
+      const playbackStarted = !!activePlayback && lastActive !== activePlayback;
+      if ((lastActive && (!p.activeCue||playbackStarted)) || worldID !== `${w.id}:${w.life}`) {
         for (const effect of effects) {
           scene.remove(effect.mesh, effect.light);
           if (effect.extra) scene.remove(effect.extra);
@@ -943,21 +950,24 @@ export function City3D(props: Props) {
           light.position.set(at.x, 3, at.z);
           scene.add(light);
           let costume: THREE.MeshStandardMaterial[] | undefined;
+          let weapon:THREE.Group|undefined;
+          const weaponModel=sceneWeapon(cue.attacker?.weapon);
           let extra: THREE.Group | undefined, gunArm: THREE.Object3D | undefined, muzzle: THREE.Object3D | undefined;
           if (['killing', 'gunfight', 'raid', 'arrest','raid-unit','police-unit','officer','detainee','raid-officer'].includes(cue.kind)) {
             const model = ['killing','detainee'].includes(cue.kind) ? personModel(cue.actors?.[0]?.id || '')
-              : cue.kind === 'gunfight' ? 'person' : ['officer','raid-officer'].includes(cue.kind)?'police-officer':'police';
+              : cue.kind === 'gunfight' ? personModel(cue.attacker?.id||'anonymous-shooter') : ['officer','raid-officer'].includes(cue.kind)?'police-officer':'police';
             extra = models.get(model)!.clone(true);
-            if (isPedestrian(model)) costume = dressPedestrian(extra, model, personWardrobe(['killing','detainee'].includes(cue.kind) ? cue.actors?.[0]?.id || '' : 'anonymous-shooter'));
+            if (isPedestrian(model)) costume = dressPedestrian(extra, model, personWardrobe(['killing','detainee'].includes(cue.kind) ? cue.actors?.[0]?.id || '' : cue.attacker?.id||'anonymous-shooter'));
             if (model === 'police') addVehicleShadow(extra, model);
             if (cue.kind === 'gunfight') {
               extra.rotation.y = Math.PI / 2;
               gunArm = extra.getObjectByName('arm1');
-              const weapon = models.get('revolver')!.clone(true);
-              weapon.position.set(0, -0.58, 0);
-              weapon.rotation.x = Math.PI / 2;
-              gunArm?.add(weapon);
-              muzzle = weapon.getObjectByName('muzzle');
+              if(weaponModel){
+                weapon = models.get(weaponModel)!.clone(true);
+                if(weaponModel==='revolver'){weapon.position.set(0,-.58,0);weapon.rotation.x=Math.PI/2;gunArm?.add(weapon);}
+                else extra.add(weapon);
+                muzzle=weapon.getObjectByName('muzzle');
+              }
             }
             extra.visible = false;
             mesh.visible = false;
@@ -976,10 +986,10 @@ export function City3D(props: Props) {
               scene.add(debris);
             });
           }
-          effects.push({cue, since: now, mesh, light, debris, extra, wardrobe: costume, gunArm, muzzle,
+          effects.push({cue, since: now, mesh, light, debris, extra, wardrobe: costume, gunArm, muzzle, weapon, weaponModel:weaponModel||undefined,
             glazingBefore:(cue.id.startsWith('preview:')?undefined:p.beforeConditions?.[cue.target]) ?? buildings.get(cue.target)?.userData.condition ?? w.locations.find(p=>p.id===cue.target)?.condition ?? 100,
             glassAudio:cue.kind==='explosion'?new BlastAudio(()=>playMoment('glass-break')):undefined,
-            audio: cue.kind === 'gunfight' ? new GunfireAudio(playCityGunshot)
+            audio: cue.kind === 'gunfight' && weaponModel ? new GunfireAudio(playCityGunshot,weaponShots(weaponModel||undefined))
               : cue.kind === 'raid-officer' ? new BlastAudio(() => playMoment('door-breach'))
               : cue.kind === 'explosion' ? new BlastAudio(() => playMoment('explosion')) : undefined});
           if (p.activeCue?.id === cue.id) {
@@ -1270,14 +1280,15 @@ export function City3D(props: Props) {
           const blastWindows = (internal?blastBuilding?.userData.blastWindows || []:[]) as THREE.Vector3[];
           const debrisOrigin=blastBuilding?.userData.debrisOrigin;
           if (blast && blastOrigin) e.light.position.set(blastOrigin.x, blastOrigin.y, blastOrigin.z);
-          const shot = e.cue.kind === 'gunfight';
-          const firing = gunfightPose(t * 3);
+          const shot = e.cue.kind === 'gunfight' && !!e.weapon;
+          const firing = gunfightPose(t * 3,weaponShots(e.weaponModel));
           if(blast)addImpact(t*3,11);
-          if(shot)for(const beat of GUNFIRE_SHOTS)addImpact(t*3-beat,3);
+          if(shot)for(const beat of weaponShots(e.weaponModel))addImpact(t*3-beat,3);
           if(e.cue.kind!=='raid-officer')e.audio?.update(t * 3, soundOn());
           const muzzlePosition = new THREE.Vector3(at.x, 1.4, at.z);
           if (shot && e.gunArm && e.muzzle) {
-            e.gunArm.rotation.x = firing.arm;
+            if(e.weaponModel==='revolver')e.gunArm.rotation.x=firing.arm;
+            else {const pump=e.weapon?.getObjectByName('pump-slide');if(pump)pump.position.z=pumpOffset(t*3);poseLongGun(e.extra!,e.weapon!,firing.arm);}
             e.extra!.updateMatrixWorld(true);
             e.muzzle.getWorldPosition(muzzlePosition);
             e.light.position.copy(muzzlePosition);
@@ -1414,11 +1425,16 @@ export function City3D(props: Props) {
           }
         }
       }
-      if (!p.activeCue) completedScene = '';
-      if (ready && p.activeCue && effects.length===0 && completedScene!==p.activeCue.id) {
-        completedScene=p.activeCue.id;p.onSceneDone?.(p.activeCue.id);
+      const stagedAttackers=new Set(effects.filter(e=>e.cue.attacker&&e.extra?.visible).map(e=>e.cue.attacker!.id));
+      for(const e of effects)if(e.cue.attacker&&e.extra?.visible){
+        const actor=actors.get(e.cue.attacker.id);if(actor)actor.object.visible=false;
+        if(e.cue.attacker.id==='player')playerRing.visible=false;
       }
-      if (ready) lastActive = p.activeCue?.id || null;
+      if (!p.activeCue) completedScene = '';
+      if (ready && p.activeCue && effects.length===0 && completedScene!==activePlayback) {
+        completedScene=activePlayback!;p.onSceneDone?.(p.activeCue.id);
+      }
+      if (ready) lastActive = activePlayback;
       motionWas = motion;
       controls.enableDamping = motion;
       controls.update();
@@ -1542,7 +1558,7 @@ export function City3D(props: Props) {
               lampsOn: a.lamps.length ? a.lamps.some(m => m.emissiveIntensity > 0) : undefined,
               frontWheels: a.wheels.length ? a.wheels.filter(w => w.name.includes('-front-')).map(w => ({x: w.position.x, angle: w.rotation.y})) : undefined,
             })),
-          waiting: [...actors].filter(([, a]) => !a.arrived && !a.object.visible).map(([id]) => id),
+          waiting: [...actors].filter(([id, a]) => !a.arrived && !a.object.visible&&!stagedAttackers.has(id)).map(([id]) => id),
           aftermath: aftermath.inspect(),
           doors:[...buildings].flatMap(([id,b])=>{const door=b.getObjectByName('entrance-door-hinge');return door?[{id,angle:door.rotation.y}]:[];}),
           effects: effects.map(e => ({
@@ -1553,6 +1569,7 @@ export function City3D(props: Props) {
             blastOrigin: e.cue.kind === 'explosion' ? buildings.get(e.cue.target)?.userData[internalDetonation(e.cue,w.building_fires||[])?'blastOrigin':'debrisOrigin'] : undefined,
             blastWindows: e.cue.kind === 'explosion' && internalDetonation(e.cue,w.building_fires||[]) ? buildings.get(e.cue.target)?.userData.blastWindows : undefined,
             arm: e.gunArm?.rotation.x,
+            attacker:e.cue.attacker,weapon:e.cue.kind==='gunfight'?e.weaponModel:undefined,
             audioShots: e.cue.kind === 'gunfight' ? e.audio?.started : undefined,
             audioBreaches: e.cue.kind === 'raid-officer' ? e.audio?.started : undefined,
             glassBreaks:e.glassAudio?.started,
@@ -1577,7 +1594,7 @@ export function City3D(props: Props) {
         };
         canvas.dataset.metrics = JSON.stringify(metrics);
         setFps(`${metrics.fps} FPS · ${metrics.drawCalls} draws`);
-        setWaiting([...actors.values()].filter(a => !a.arrived && !a.object.visible).length);
+        setWaiting([...actors].filter(([id,a]) => !a.arrived && !a.object.visible&&!stagedAttackers.has(id)).length);
         samples = [];
         sampleStart = now;
       }

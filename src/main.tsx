@@ -120,6 +120,7 @@ function App() {
   const scene = useRef<HTMLElement | null>(null),
     latest = useRef(world),
     busyRef = useRef(false);
+  const sceneReplay=useRef(0);
   const sceneConditions=useRef<{world:string;revision:number;conditions:Record<string,number>}|null>(null);
   latest.current = world;
   const voicePlayer = useRef<VoicePlayer | null>(null);
@@ -869,6 +870,7 @@ function App() {
               ) : (
                 <City3D
                   state={w}
+                  replaySerial={sceneReplay.current}
                   beforeConditions={sceneConditions.current?.world===w.id&&sceneConditions.current.revision===w.revision?sceneConditions.current.conditions:undefined}
                   overlay={sceneOverlay || journeyOverlay}
                   activeCue={journey ? null : playing}
@@ -895,6 +897,7 @@ function App() {
                   const cues = w.last_result?.cues || [];
                   const cue = [...cues].sort((a, b) => (b.gravity || 0) - (a.gravity || 0))[0];
                   if (cue) {
+                    sceneReplay.current++;
                     setCityView('iso');
                     setSelected(cue.target);
                     setBeat(0);

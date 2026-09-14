@@ -349,7 +349,7 @@
         1.96
       ]
     ],
-    "bytes": 285192,
+    "bytes": 300688,
     "motion_bounds_blender": [
       [
         -0.38,
@@ -377,7 +377,7 @@
         1.84
       ]
     ],
-    "bytes": 322904,
+    "bytes": 333016,
     "motion_bounds_blender": [
       [
         -0.38,
@@ -614,5 +614,37 @@
       ]
     ],
     "bytes": 35940
+  },
+  "shotgun": {
+    "file": "shotgun.glb",
+    "bounds_blender": [
+      [
+        -0.039,
+        -0.694,
+        -0.059
+      ],
+      [
+        0.039,
+        0.423,
+        0.1425
+      ]
+    ],
+    "bytes": 207312
+  },
+  "thompson": {
+    "file": "thompson.glb",
+    "bounds_blender": [
+      [
+        -0.039,
+        -0.504,
+        -0.205
+      ],
+      [
+        0.075,
+        0.423,
+        0.1425
+      ]
+    ],
+    "bytes": 204980
   }
 }

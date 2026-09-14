@@ -326,3 +326,12 @@ armed ones emit `gunfight`. Their recorded manner of death matches the weapon.
 Other legacy gunfight cues remain anonymous unless they explicitly provide an
 attacker; renderers must not infer one from the victim’s `actors` list. Gun model
 selection and full coverage of other combat producers remain unfinished.
+
+City gunfight presentation now consumes recorded attacker identity and weapon tier
+for revolver, pump-shotgun and Thompson models. A staged attacker temporarily
+replaces its public street actor. Anonymous legacy gunfight cues retain a generic
+revolver; explicit invalid/unarmed tiers do not invent a gun. Shotgun playback uses
+two shots with a pump cycle; Thompson playback uses two three-shot bursts. These
+are cosmetic cadence choices, not additional backend damage/ammunition events.
+The articulated long-gun rig reaches both grip anchors without changing bone
+lengths. Replaying uses a distinct presentation serial while preserving saved cue IDs.
