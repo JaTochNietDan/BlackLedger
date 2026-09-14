@@ -10,6 +10,8 @@ export function trafficSpeed(model: string) {
   return isPedestrian(model) ? 1.8 : 11;
 }
 export function trafficSize(model: string) {
+  // Entire moving car/cast sweep, not just its position at the first frame.
+  if (model === 'driveby-building') return {length:26,width:3.6};
   if (model === 'accident') return {length:3,width:2.2};
   if (model === 'planter') return {length:6.4,width:3.4};
   if (model === 'incendiary') return {length:1.8,width:6.2};

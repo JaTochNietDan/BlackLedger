@@ -1,4 +1,4 @@
-import {PITCH} from './city3dPlan.js';
+import {PITCH,LANE} from './city3dPlan.js';
 import type {Lot, Point} from './city3dPlan.js';
 import {trafficOverlap} from './city3dTraffic.js';
 import type {TrafficPose} from './city3dTraffic.js';
@@ -37,6 +37,7 @@ export type SceneSlot = {root: Point; pose: TrafficPose; model: string};
 /** Dedicated forecourt/side bays keep reenactments out of public travel lanes.
  * The casualty reservation encloses the whole fall, including the standing pose. */
 export function sceneSlots(lot: Lot, kind: string): SceneSlot[] {
+  if(kind==='driveby-building')return [buildingDriveByReservation({x:lot.x,z:lot.row*PITCH+LANE})];
   if(kind==='accident')return [-4,0,4].map(offset=>accidentReservation({x:lot.x+offset,z:lot.row*PITCH+6.35}));
   if(kind==='incendiary')return [3,0,-3].map(offset=>{
     const root={x:lot.x+offset,z:lot.row*PITCH+6.35};
@@ -62,6 +63,12 @@ export function sceneSlots(lot: Lot, kind: string): SceneSlot[] {
       return {root, pose: {...root, heading: 0}, model: kind==='fire-engine'?'parked-fire-engine':'parked-police'};
     }));
   return [];
+}
+/** A drive-by uses the real near road lane. Its 19.2m pass and the longest
+ * captured car fit within this swept rectangle, including the passenger's gun.
+ * There is no pavement fallback: wait until this stretch of road is clear. */
+export function buildingDriveByReservation(root:Point):SceneSlot{
+ return {root:{...root},pose:{x:root.x+.4,z:root.z+.4,heading:Math.PI/2},model:'driveby-building'};
 }
 /** Swept exit bounds include the vestibule, turn and pavement walk. */
 export function planterReservation(root:Point,heading=0):SceneSlot{
