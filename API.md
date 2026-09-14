@@ -1196,3 +1196,10 @@ first automatic stroke. Watching a stroke accounts for its two-minute action,
 so it cannot also trigger an automatic duplicate on that same table. Saves keep
 the remaining time. Reconciliation of deaths, departure and hall closure occurs
 before a scheduled stroke; interrupted player time does not simulate catch-up.
+
+Tournament settlement now records `prize_paid` in the save and public bracket.
+It is the amount actually transferred to the champion before held `pot` becomes
+zero. Cancelled/unpaid events keep zero. Legacy settled saves without this field
+retain zero rather than inventing a historical payment. The result screen shows
+recorded prize/profit when available, distinguishes elimination and withdrawal,
+and labels the final and its completed result explicitly.

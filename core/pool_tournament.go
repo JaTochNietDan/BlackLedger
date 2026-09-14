@@ -7,6 +7,7 @@ import (
 )
 
 type PoolTournament struct {
+	PrizePaid   int                `json:"prize_paid"`
 	NextStrokes map[int]int        `json:"next_strokes"`
 	Replays     map[int]string     `json:"replays"`
 	Strokes     map[int]PoolStroke `json:"strokes"`
@@ -117,6 +118,7 @@ func (w *World) ReconcilePoolTournament() {
 			winnerName = n.Name
 		}
 		w.Log("The tournament is decided", fmt.Sprintf("%s wins the tournament and receives the entire $%d entry pool.", winnerName, t.Escrow), "personal")
+		t.PrizePaid = t.Escrow
 		t.Escrow = 0
 		t.Settled = true
 		return

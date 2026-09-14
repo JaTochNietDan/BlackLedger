@@ -66,7 +66,7 @@ func TestPoolTournamentFinalCommandAndPublicProjection(t *testing.T) {
 	}
 	poolReject(t, w, Command{Kind: "pool_tournament_shot", PoolGame: &index, Pool: &PoolInput{Angle: math.Pi, Speed: .6, Ball: 8, Pocket: 4}})
 	view = w.PoolTournamentDescription().(map[string]any)
-	if view["pot"] != 0 || view["winner"] != w.PoolTournament.PlayerID {
+	if view["prize_paid"] != 100 || view["pot"] != 0 || view["winner"] != w.PoolTournament.PlayerID {
 		t.Fatal("championship missing from view")
 	}
 }

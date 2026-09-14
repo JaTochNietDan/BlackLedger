@@ -153,5 +153,5 @@ func (w *World) PoolTournamentDescription() any {
 		}
 		games = append(games, map[string]any{"index": i, "round": cell.Round, "table_number": cell.Table, "players": cell.Players, "player_seat": seat, "resolved": cell.Resolved, "winner": cell.Winner, "table": table})
 	}
-	return map[string]any{"fee": t.Fee, "pot": t.Escrow, "settled": t.Settled, "voided": t.Voided, "finished": t.Bracket.Finished, "winner": t.Bracket.Winner, "player_id": t.PlayerID, "withdrawn": t.Bracket.Withdrawn[t.PlayerID], "names": names, "games": games}
+	return map[string]any{"fee": t.Fee, "pot": t.Escrow, "prize_paid": t.PrizePaid, "settled": t.Settled, "voided": t.Voided, "finished": t.Bracket.Finished, "winner": t.Bracket.Winner, "player_id": t.PlayerID, "withdrawn": t.Bracket.Withdrawn[t.PlayerID], "names": names, "games": games}
 }

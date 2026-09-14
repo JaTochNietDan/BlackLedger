@@ -13390,3 +13390,11 @@ Actual transfer shrank from4.96MB to1.21MB with exact byte identity after decode
 Standard/expanded hall render successfully in isolated browser tab58/port8967.
 Server tests verify large-model identity, refused encodings, ranges,304 and404;
 full server suite and vet pass. Main campaign and geometry unchanged.
+
+### 2026-09-14 — Recorded tournament awards and result presentation
+
+Persisted the actual championship transfer for result/profit display after
+escrow reaches zero. Improved elimination/final/completion wording. Browser
+played a legal called-eight from an isolated staged final, displayed $100 paid
+and $75 profit, then returned to the hall. Saved cash1075 and one settled award.
+Core/store/server checks, vet and build pass; see BILLIARDS.md for fixture limits.

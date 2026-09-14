@@ -114,7 +114,7 @@ func TestTournamentWinningShotReceiptsSurviveRetriesAndReopen(t *testing.T) {
 		t.Fatal("unexpected receipts", receipts)
 	}
 	w, err := s.Read()
-	if err != nil || w.Revision != 1 || w.PoolTournament.Bracket.Matches[2].Rack.Shots != 1 || !w.PoolTournament.Settled || w.Player.Cash != 1075 || w.NPC("leo").Purse != 275 || w.PoolTournament.Escrow != 0 {
+	if err != nil || w.Revision != 1 || w.PoolTournament.Bracket.Matches[2].Rack.Shots != 1 || !w.PoolTournament.Settled || w.Player.Cash != 1075 || w.NPC("leo").Purse != 275 || w.PoolTournament.Escrow != 0 || w.PoolTournament.PrizePaid != 100 {
 		t.Fatal("shot or payment duplicated", err)
 	}
 	if _, err = billiards.DecodeReplay(w.PoolTournament.Replays[2]); err != nil {

@@ -564,3 +564,26 @@ The prior room-load blocker is now resolved in this preview. Full server tests
 pass (1.924s), including exact decoded bytes for a large model and HTTP variants;
 Go vet passes. Evidence `.runtime/model-transfer-{tests,vet,headers}.log` (headers
 are `.txt`), `.runtime/model-transfer-wire.gz`. No live release/save promotion.
+
+## Championship result UX and browser payout (2026-09-14)
+
+The saved/public tournament now retains the actual paid prize after escrow is
+cleared. The result screen shows the recorded award and the player's net profit,
+distinguishes elimination from withdrawal, labels the final, and removes
+withdrawal/entry-preservation instructions after completion. Legacy results with
+no recorded prize do not invent a payment amount.
+
+Browser tab59 / port8968 used `.runtime/pool-final-qa.sqlite3`, an explicitly
+staged late-final fixture: semifinal outcomes were concessions and the final
+ball positions were authored for a legal called-eight shot. Browser controls
+set aim180°, speed0.6m/s, ball8, pocket5 (API4), then played the actual shot.
+The eight fell legally; returning to the draw showed the championship, $100 paid
+and $75 profit. Returning to the hall succeeded. Saved revision1/cash1075/pot0/
+prize_paid100 confirms settlement. This verifies final-shot/result controls,
+not a full human-played tournament. Evidence `.runtime/pool-final-result.json`.
+
+Focused core tests pass (6.102s), full server tests pass (1.767s), full store
+passes (0.338s), including winning receipt/reopen retaining prize_paid100; vet
+and build pass. Logs `.runtime/pool-result-{core,adapters,store,vet,build}.log`.
+The broad goal, human animation, expanded physics and full campaign acceptance
+remain open. Main campaign unchanged.
