@@ -889,3 +889,14 @@ card is inferred. Folded hands leave the 3D felt; the public text summary remain
 available. A restored sitting opens settled, while a new hand animates. The
 motion setting and reduced-motion preference settle the presentation immediately.
 These effects do not delay or compute any gameplay command or payout.
+
+The apartment broker now supports rental investment purchases as well as buying
+one's current rented home. `buy_apartment:<id>` remains a 60-minute, internally
+paid command, offered at the unit's address; it transfers only an independent
+broker's deed. Occupied units keep their resident and route future actual rent
+payments to the new owner; vacant units yield no rent. Existing pricing,
+neighborhood pressure, sale spread and NPC private-owner protections apply.
+`apartment_market` now includes up to three occupied and one vacant broker flat
+per building, plus all player holdings and their current unit. Listings replenish
+as units leave the broker board. The projection includes optional `locked` for
+district access. Listing reads are deterministic and never mutate residences.

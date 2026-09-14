@@ -2015,6 +2015,7 @@ func (w *World) Actions(id string) []Action {
 		}
 		add("sell_property", label, 30, 0, w.SellPropertyReadiness(id), detail)
 	}
+	listings := w.ApartmentListings()
 	for i := range w.Apartments {
 		u := &w.Apartments[i]
 		if u.Building != id {
@@ -2024,6 +2025,12 @@ func (w *World) Actions(id string) []Action {
 			add("sell_apartment:"+u.ID, fmt.Sprintf("Sell apartment %d for $%d", u.Number, w.ApartmentPrice(u)*65/100), 30, 0, "", "The deed transfers to a broker. Existing residents stay and pay rent to the new owner.")
 		} else if u.Resident == w.playerDeedID() {
 			asks("buy_apartment:"+u.ID, fmt.Sprintf("Buy your apartment for $%d", w.ApartmentPrice(u)), 60, w.ApartmentPrice(u), w.BuyApartmentReadiness(u), "Own your apartment separately from the building. Your rent ends, and the deed remains yours if you move.")
+		} else if listings[u.ID] {
+			detail := "Vacant apartment: no income until a resident moves in. Ownership does not move you or reserve another home."
+			if n := w.NPC(u.Resident); n != nil && !n.Dead {
+				detail = fmt.Sprintf("%s keeps their tenancy at $%d a day, collected from available cash. This buys the apartment, not the building; no tenant is evicted.", n.Name, w.NPCRent(n))
+			}
+			asks("buy_apartment:"+u.ID, fmt.Sprintf("Buy rental apartment %d for $%d", u.Number, w.ApartmentPrice(u)), 60, w.ApartmentPrice(u), w.BuyApartmentReadiness(u), detail)
 		}
 	}
 	if id == "estate" && !w.Own(id) {

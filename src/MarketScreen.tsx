@@ -46,13 +46,13 @@ export function MarketScreen({world,onFind}: {world: Snapshot;onFind?:(id:string
           {onFind && <button className="plain" disabled={property.locked} onClick={()=>onFind(property.id)}>{property.locked?'District not yet accessible':'Inspect the address ↗'}</button>}
         </article>)}</div>
       </section>}
-      {!!world.apartment_market?.length && <section className="property-exchange" aria-label="Your apartments">
-        <h2>Your apartments</h2><p>An apartment deed is separate from the building. Keep it when you move, collect rent from its next resident, or sell it through the broker.</p>
+      {!!world.apartment_market?.length && <section className="property-exchange" aria-label="Apartment exchange">
+        <h2>Apartment exchange</h2><p>Buy your home or a rental investment. Existing tenants stay; rent comes from their available cash. Vacant flats earn nothing until occupied. The broker lists a few homes at a time, with new listings as they sell.</p>
         <div className="market-board">{world.apartment_market.map(unit=><article className="market-good" key={unit.id}>
           <header><b>{unit.address} · Apartment {unit.number}</b><span>{money(unit.owned?unit.offer:unit.asking)}<small>{unit.owned?' broker offer':unit.available?' asking price':' reference price'}</small></span></header>
           <p>{unit.owned?'Your deed':`Owned by ${unit.owner}`} · {unit.home?'Your current home':unit.resident}</p>
-          {unit.owned && <p>{unit.home?'No rent to pay':unit.daily_rent>0?`${money(unit.daily_rent)} daily rent, collected from the resident’s available cash`:'No tenant income'}</p>}
-          {onFind && <button className="plain" onClick={()=>onFind(unit.building)}>Inspect the address ↗</button>}
+          {(unit.owned || unit.available) && <p>{unit.home?(unit.owned?'No rent to pay':'Buying ends your rent'):unit.daily_rent>0?`${money(unit.daily_rent)} daily rent, collected from the resident’s available cash`:'No tenant income'}</p>}
+          {onFind && <button className="plain" disabled={unit.locked} onClick={()=>onFind(unit.building)}>{unit.locked?'District not yet accessible':'Inspect the address ↗'}</button>}
         </article>)}</div>
       </section>}
       <h2>The underground market</h2>

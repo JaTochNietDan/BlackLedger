@@ -1208,3 +1208,35 @@ summary available, opponent heads included. No main-save QA mutation.
 Still incomplete: a physical dealer-hand/chip-pushing performance, richer poker
 room dressing, more expressive/anatomically detailed character models, all other
 requested interiors, housing expansion and remaining progression/campaign work.
+
+## September 14 — buy-to-let apartment progression
+
+Players can now buy broker-owned rental investments without moving into each
+flat first. At each apartment address, a bounded board offers three tenanted
+flats and one vacancy in addition to the player's current home/holdings. The
+board replenishes after a sale, while privately owned NPC homes remain protected.
+The market screen exposes tenant, contracted income, price and district access;
+it distinguishes buying one's home from a vacant investment. Purchases preserve
+resident/address/journey and only transfer the deed. Existing rent collection
+pays actual available tenant cash, not an invented guaranteed income. Existing
+crime-sensitive valuations and broker resale spread continue to apply.
+
+Capacity evidence: focused housing/Mercer tests pass, including the established
+30-new-arrival scenario with no shortage or displacement. This pass adds a
+usable property-income path, not additional building geometry or capacity.
+
+Validation:
+- Focused apartment/broker/housing/Mercer/property/save tests: core 2.067s, store
+  .123s pass (`.runtime/apartment-investment-final-tests.log`). New command test
+  checks purchase principal, preserved home and tenant location, collection of
+  only $7 from a $7 purse, and tenant retention on sale. Listing test checks
+  bounded/read-only ordering, replenishment and private-owner refusal.
+- Frontend production build passes (`.runtime/apartment-investment-build.log`).
+- Fresh isolated `.runtime/rental-investment-20260914.sqlite3` on port 8938:
+  browser bought Mercer unit 1 for $1200; cash 6000→4800, time 08:00→09:00,
+  player still rents unit 47, Zoltan Toth remains tenant of unit 1. Accounts
+  show $12 contracted income; market shows the owned deed/$780 sale offer,
+  and broker unit 4 replenishes the board. Vacant flats show no income.
+- Main campaign save untouched. Full simulation campaign/balance acceptance,
+  additional earning activities, additional residential districts as population
+  requires, and remaining 3D interiors/action choreography are still open.

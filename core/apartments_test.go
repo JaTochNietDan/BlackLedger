@@ -2,6 +2,7 @@ package core
 
 import (
 	"encoding/json"
+	"fmt"
 	"testing"
 )
 
@@ -144,5 +145,72 @@ func TestApartmentNPCOwnerCannotBeDisplacedByPlayerMove(t *testing.T) {
 	}
 	if _, why := w.PlanHomeMove("mercercourt"); why == "" {
 		t.Fatal("owner evicted to make room for player")
+	}
+}
+
+func TestBrokerInvestmentPurchaseKeepsTenantAndCollectsOnlyRealCash(t *testing.T) {
+	w := apartmentWorld()
+	w.District = 2
+	u := w.apartmentForResident("tenant")
+	id, home, location := u.ID, w.Player.Home, w.NPC("tenant").Location
+	cash, earned := w.Player.Cash, w.Player.Earned
+	act(t, &w, "buy_apartment:"+id, "mercercourt")
+	if w.Player.Cash != cash-1200 || w.Player.Earned != earned {
+		t.Fatal("investment charged wrong principal or invented earnings")
+	}
+	if w.Player.Home != home || w.NPC("tenant").Home != "mercercourt" || w.NPC("tenant").Location != location || w.apartment(id).Resident != "tenant" {
+		t.Fatal("deed transfer moved or evicted somebody")
+	}
+	w.NPC("tenant").Purse = 7
+	cash = w.Player.Cash
+	w.collectRent(w.NPC("tenant"))
+	if w.Player.Cash != cash+7 || w.NPC("tenant").Purse != 0 {
+		t.Fatal("investment rent was not funded by actual tenant cash")
+	}
+	act(t, &w, "sell_apartment:"+id, "mercercourt")
+	if w.apartment(id).Resident != "tenant" {
+		t.Fatal("sale evicted tenant")
+	}
+}
+
+func TestBrokerListingsAreBoundedStableAndRotateAfterPurchase(t *testing.T) {
+	w := apartmentWorld()
+	for i := 0; i < 12; i++ {
+		w.NPCs = append(w.NPCs, NPC{ID: fmt.Sprintf("listing-%02d", i), Name: "Tenant", Home: "mercercourt", Purse: 50})
+	}
+	w.SettleApartments()
+	before, _ := json.Marshal(w)
+	listed := w.ApartmentListings()
+	count := 0
+	for _, u := range w.Apartments {
+		if listed[u.ID] && u.Building == "mercercourt" {
+			count++
+		}
+	}
+	if count != 5 {
+		t.Fatalf("expected home, three tenants and one vacancy, got %d", count)
+	}
+	w.ApartmentMarket()
+	after, _ := json.Marshal(w)
+	if string(before) != string(after) {
+		t.Fatal("broker preview mutated world")
+	}
+	var bought string
+	for _, u := range w.Apartments {
+		if listed[u.ID] && u.Building == "mercercourt" && u.Resident != "" && u.Resident != w.playerDeedID() {
+			bought = u.ID
+			break
+		}
+	}
+	if err := w.BuyApartment(bought); err != nil {
+		t.Fatal(err)
+	}
+	next := w.ApartmentListings()
+	if !next[bought] || len(next) != len(listed)+1 {
+		t.Fatal("owned holding missing or broker failed to replenish")
+	}
+	w.apartment(bought).Owner = "tenant"
+	if w.BuyApartmentReadiness(w.apartment(bought)) == "" {
+		t.Fatal("private owner forced to sell")
 	}
 }

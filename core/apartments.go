@@ -118,8 +118,8 @@ func (w *World) ApartmentOwnerName(u *ApartmentDeed) string {
 	return "Independent broker"
 }
 func (w *World) BuyApartmentReadiness(u *ApartmentDeed) string {
-	if u == nil || u.Resident != w.playerDeedID() {
-		return "You can buy the apartment you currently rent"
+	if u == nil {
+		return "This apartment is not in the registry"
 	}
 	if u.Owner != "independent" {
 		return "This owner is not offering the apartment"
@@ -220,13 +220,48 @@ func (w *World) ApartmentDay() {
 	}
 }
 
+// A small broker board rotates as deeds sell: three occupied investments and
+// one vacant flat per building, plus every player holding/current home. Reads
+// never allocate units, evict tenants or change the order of the saved registry.
+func (w *World) ApartmentListings() map[string]bool {
+	listed := map[string]bool{}
+	units := make([]*ApartmentDeed, 0, len(w.Apartments))
+	for i := range w.Apartments {
+		units = append(units, &w.Apartments[i])
+	}
+	sort.Slice(units, func(i, j int) bool { return units[i].ID < units[j].ID })
+	occupied, vacant := map[string]int{}, map[string]int{}
+	for _, u := range units {
+		if u.Owner == w.playerDeedID() || u.Resident == w.playerDeedID() {
+			listed[u.ID] = true
+			continue
+		}
+		if u.Owner != "independent" {
+			continue
+		}
+		if u.Resident == "" && vacant[u.Building] < 1 {
+			listed[u.ID] = true
+			vacant[u.Building]++
+		} else if n := w.NPC(u.Resident); n != nil && !n.Dead && occupied[u.Building] < 3 {
+			listed[u.ID] = true
+			occupied[u.Building]++
+		}
+	}
+	return listed
+}
+
 func (w *World) ApartmentMarket() []map[string]any {
+	listed := w.ApartmentListings()
 	out := []map[string]any{}
 	for i := range w.Apartments {
 		u := &w.Apartments[i]
 		owned := u.Owner == w.playerDeedID()
 		home := u.Resident == w.playerDeedID()
-		if !owned && !home {
+		if !listed[u.ID] {
+			continue
+		}
+		location, ok := PlaceByID(u.Building)
+		if !ok {
 			continue
 		}
 		resident := "Vacant"
@@ -237,7 +272,7 @@ func (w *World) ApartmentMarket() []map[string]any {
 			resident = n.Name
 			rent = w.NPCRent(n)
 		}
-		out = append(out, map[string]any{"id": u.ID, "building": u.Building, "number": u.Number, "address": placeName(u.Building), "owned": owned, "home": home, "available": u.Owner == "independent", "owner": w.ApartmentOwnerName(u), "resident": resident, "asking": w.ApartmentPrice(u), "offer": w.ApartmentPrice(u) * 65 / 100, "daily_rent": rent})
+		out = append(out, map[string]any{"id": u.ID, "building": u.Building, "number": u.Number, "address": placeName(u.Building), "owned": owned, "home": home, "available": u.Owner == "independent", "owner": w.ApartmentOwnerName(u), "resident": resident, "asking": w.ApartmentPrice(u), "offer": w.ApartmentPrice(u) * 65 / 100, "daily_rent": rent, "locked": location.District > w.District})
 	}
 	return out
 }
