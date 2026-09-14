@@ -69,8 +69,8 @@ export function CityAccounts({world}: {world: Snapshot}) {
               ))}
             </ul>
           )}
-          <details className="books-lines" open>
-            <summary>What the {money(b.costs)} a day is</summary>
+          <section className="books-lines" aria-label="Daily cost breakdown">
+            <h2>What the {money(b.costs)} a day is</h2>
             <ul>
               {b.lines.map(l => (
                 <li key={l.label}>
@@ -84,7 +84,7 @@ export function CityAccounts({world}: {world: Snapshot}) {
                 <i>{money(b.costs)}</i>
               </li>
             </ul>
-          </details>
+          </section>
         </div>
       )}
 

@@ -82,7 +82,7 @@
 .city-accounts{--muted:#715d40;--ink:#3d301f;--red:#963e2d;--line:#b3a07b}
 .city-accounts .books{display:block}.city-accounts .books-figures>div{background:transparent;border:0;border-bottom:1px solid #b3a07b;padding:0 0 10px;min-width:0}.city-accounts .books-figures b.good{color:#4e6139}.city-accounts .books-figures b.bad{color:#963e2d}.city-accounts .books-lines{margin-top:12px}.city-accounts .books-lines li{border-color:#b3a07b}
 
-.city-accounts .books-lines summary{color:#715332;letter-spacing:.08em}.city-accounts .books-lines summary:hover{color:#302719}
+.city-accounts .books-lines h2{margin:0;padding:10px 0;color:#715332;font:11px/1.5 system-ui;letter-spacing:.08em;text-transform:uppercase}
 
 .hud-identity .hud-location{font-weight:bold;color:#733e2b;line-height:1.3}
 
