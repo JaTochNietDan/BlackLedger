@@ -1,6 +1,6 @@
 import {streetAt} from './streetPlayback';
 import {CityCustody} from './city3dCustody';
-import {CityAssassination, assassinationBatch, isStagedStrike, MELEE_IMPACTS, ASSASSINATION_SECONDS, ASSASSINATION_VICTIM_X, executionSpatter} from './city3dAssassination';
+import {CityAssassination, assassinationBatch, isStagedStrike, MELEE_IMPACTS, ASSASSINATION_SHOT, ASSASSINATION_VICTIM_X, executionSpatter} from './city3dAssassination';
 import {poseCustody,sceneWeapon,poseLongGun,weaponShots,pumpOffset} from './city3dWeapons';
 import {CityRubble} from './city3dRubble';
 import {CitySuppression} from './city3dSuppression';
@@ -1026,7 +1026,7 @@ export function City3D(props: Props) {
               const victimID=cue.strike!.victim.id, victimModel=personModel(victimID);
               const victim=models.get(victimModel)!.clone(true);
               costume=[...(costume||[]),...dressPedestrian(victim,victimModel,personWardrobe(victimID))];
-              assassination=new CityAssassination(extra,victim,weapon);extra=assassination.root;
+              assassination=new CityAssassination(extra,victim,weapon,cue.strike!.variant,weaponModel||'revolver');extra=assassination.root;
             }
             extra.visible = false;
             mesh.visible = false;
@@ -1047,7 +1047,7 @@ export function City3D(props: Props) {
           }
           effects.push({cue, assassination, custody, since: now, mesh, light, debris, extra, wardrobe: costume, gunArm, muzzle, weapon, weaponModel:weaponModel||undefined,
             glazingBefore:(cue.id.startsWith('preview:')?undefined:p.beforeConditions?.[cue.target]) ?? buildings.get(cue.target)?.userData.condition ?? w.locations.find(p=>p.id===cue.target)?.condition ?? 100,
-            reactionAudio:cue.kind==='attack'&&assassination?new BlastAudio(()=>playRecordedEffect('pain')):cue.kind==='explosion'?new BlastAudio(()=>playRecordedEffect('panic'))
+            reactionAudio:assassination?new BlastAudio(()=>playRecordedEffect('pain')):cue.kind==='explosion'?new BlastAudio(()=>playRecordedEffect('panic'))
               :cue.kind==='killing'&&(w.last_result?.cues||[]).some(gun=>gunVictim(gun,cue))?new BlastAudio(()=>playRecordedEffect('pain')):undefined,
             glassAudio:cue.kind==='explosion'?new BlastAudio(()=>playMoment('glass-break')):undefined,
             audio: cue.kind==='attack'&&assassination?new GunfireAudio(()=>playMoment('body-hit'),MELEE_IMPACTS,true):cue.kind === 'gunfight' && weaponModel ? new GunfireAudio(()=>playCityGunshot(weaponModel),weaponShots(weaponModel||undefined,cue.strike?.variant),true)
@@ -1239,7 +1239,7 @@ export function City3D(props: Props) {
             }
             if(e.assassination&&!e.cue.id.startsWith('preview:')){
               const root={x:e.slot.root.x+ASSASSINATION_VICTIM_X,z:e.slot.root.z};
-              aftermath.rememberBody(e.cue.strike!.victim.id,{root,pose:{x:root.x+.8,z:root.z,heading:0},model:'casualty'},Math.PI/2);
+              aftermath.rememberBody(e.cue.strike!.victim.id,{root,pose:{x:root.x+.8,z:root.z,heading:0},model:'casualty'},e.assassination.victimYaw);
             }
           }
         }
@@ -1387,7 +1387,7 @@ export function City3D(props: Props) {
           }
           const t = (now - e.since) / 3000,
             lot = lots.get(e.cue.target)!;
-          if (t * 3 >= (e.assassination?ASSASSINATION_SECONDS:policeSceneSeconds(e.cue.kind)) || !motion) {
+          if (t * 3 >= (e.assassination?.duration??policeSceneSeconds(e.cue.kind)) || !motion) {
             scene.remove(e.mesh, e.light);
             if (e.extra) scene.remove(e.extra);
             e.wardrobe?.forEach(material => material.dispose());
@@ -1413,7 +1413,7 @@ export function City3D(props: Props) {
           if(blast)addImpact(t*3,11);
           if(shot)for(const beat of weaponShots(e.weaponModel,e.cue.strike?.variant))addImpact(t*3-beat,3);
           if(e.cue.kind!=='raid-officer')e.audio?.update(t * 3, soundOn());
-          e.reactionAudio?.update(t*3-(e.cue.kind==='attack'?MELEE_IMPACTS[2]:blast?1:.06),soundOn());
+          e.reactionAudio?.update(t*3-(e.cue.kind==='attack'?MELEE_IMPACTS[2]:e.assassination?ASSASSINATION_SHOT:blast?1:.06),soundOn());
           if(e.cue.kind==='attack'&&e.assassination)for(const beat of MELEE_IMPACTS)addImpact(t*3-beat,1.2);
           const muzzlePosition = new THREE.Vector3(at.x, 1.4, at.z);
           if (shot && e.gunArm && e.muzzle) {
@@ -1483,7 +1483,7 @@ export function City3D(props: Props) {
               const smoke = j === 1 && firing.smoke > 0;
               if (smoke) tmp.position.y += (1 - firing.smoke) * 0.3;
               tmp.scale.setScalar(j === 0 && firing.flash ? 0.28 : smoke ? 0.15 + (1 - firing.smoke) * 0.3 : 0.001);
-              if(e.assassination&&j>=2){const drop=executionSpatter(j-2,t*3);
+              if(e.assassination&&j>=2){const drop=executionSpatter(j-2,t*3,e.cue.strike?.variant==='back-of-head');
                 tmp.position.set(at.x+drop.x,.2+drop.y,at.z+drop.z);tmp.scale.setScalar(Math.max(.001,drop.size));}
 
             }

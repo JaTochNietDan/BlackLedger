@@ -75,3 +75,16 @@ test('custody hands reach the authored restraints without exceeding the person r
   }
  }
 });
+
+
+test('close-range strike audio waits for approach and uses one shot or a three-shot burst',()=>{
+ for(const [model,variant,count] of [['revolver','close-shot',1],['shotgun','close-shot',1],['thompson','burst',3]]){
+  let played=0,cancelled=0;
+  const audio=new GunfireAudio(()=>{played++;return ()=>cancelled++;},weaponShots(model,variant),true);
+  for(let frame=0;frame<=8*60;frame++){
+   audio.update(frame/60);
+   if(frame/60<3.65)assert.equal(played,0,'gun fired during the approach');
+  }
+  assert.equal(played,count);audio.dispose();assert.equal(cancelled,count);
+ }
+});

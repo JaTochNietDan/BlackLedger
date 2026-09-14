@@ -91,3 +91,36 @@ test('close-quarters cast approaches before blows and falls only after the final
   assert.equal(cast.weapon,undefined);
  }
 });
+
+
+test('armed close-range strikes approach, aim into the victim and withdraw inside their reservation',async()=>{
+ const {isStagedStrike,armedStrikePose}=await import('../.runtime/frontend-test/city3dAssassination.js');
+ const {weaponShots}=await import('../.runtime/frontend-test/city3dWeapons.js');
+ for(const [variant,gunName,tier] of [['close-shot','revolver',1],['close-shot','shotgun',2],['burst','thompson',3]]){
+  const cue={kind:'gunfight',attacker:{weapon:tier},strike:{variant,victim:{id:'victim'}}};
+  assert.ok(isStagedStrike(cue));
+  assert.ok(weaponShots(gunName,variant).every(at=>at>=3.65));
+  for(const name of ['person','woman']){
+   const attacker=await model(name),victim=await model('person'),gun=await model(gunName);
+   const cast=new CityAssassination(attacker,victim,gun,variant,gunName);cast.root.position.y=.2;
+   for(let f=0;f<=cast.duration*60;f++){
+    const t=f/60,p=cast.update(t),box=new THREE.Box3().setFromObject(cast.root,true);
+    assert.ok(box.min.x>=-.7&&box.max.x<=7.5&&box.min.z>=-.7&&box.max.z<=.7,`${name}/${gunName} leaves reserve at ${t}: ${JSON.stringify({min:box.min,max:box.max})}`);
+    assert.ok(box.min.y>=.17,`${name}/${gunName} pavement penetration at ${t}`);
+    if(t<3.65)assert.ok(p.fall.rotation===0,'victim falls before the attack');
+    for(const side of gunName==='revolver'?[1]:[1,-1]){
+     const hand=attacker.getObjectByName(`elbow${side}`).localToWorld(new THREE.Vector3(0,-.295,0));
+     const grip=(side===1?gun:gun.getObjectByName('support-grip')).getWorldPosition(new THREE.Vector3());
+     assert.ok(hand.distanceTo(grip)<.02,`${name}/${gunName} hand ${side} detached at ${t}: ${hand.distanceTo(grip)}`);
+    }
+   }
+   cast.update(3.65);
+   const muzzle=gun.getObjectByName('muzzle').getWorldPosition(new THREE.Vector3());
+   const direction=new THREE.Vector3(0,0,1).applyQuaternion(gun.getWorldQuaternion(new THREE.Quaternion()));
+   const hits=new THREE.Raycaster(muzzle,direction,0,3).intersectObject(victim,true);
+   assert.ok(hits.length,`${gunName} muzzle does not aim into the victim`);
+   assert.ok(muzzle.x<4.75,'muzzle penetrates the victim');
+   assert.equal(armedStrikePose(8,variant,gunName).distance,0,'attacker never leaves');
+  }
+ }
+});

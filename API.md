@@ -455,3 +455,15 @@ the single committed outcome, not extra combat rolls or damage. Only the exact
 same-time, same-place linked killing cue is merged; legacy attacks remain unchanged.
 Debug choices cover back-of-head, revolver close-shot, shotgun close-shot, Thompson
 burst and unarmed close-quarters; preview receipts carry no real action costs.
+
+### Armed close-range strike choreography
+
+Recorded revolver/shotgun `close-shot` and Thompson `burst` strikes now merge
+only their explicitly linked victim into a shared cast. The attacker approaches,
+the victim raises their hands, and the weapon aims before firing at3.65s.
+Close-shot uses one cosmetic shot; burst uses3.65/3.74/3.83s. The attacker lowers
+the weapon, turns and withdraws; the sequence completes at8s. The existing
+back-of-head and unarmed sequences remain6.5s. Anonymous legacy gunfights retain
+their original timing. These presentation beats do not add damage or ammunition
+rules. Audio, flash, recoil, blood and victim fall share the strike timing;
+body placement retains the victim's initial facing for the aftermath handoff.

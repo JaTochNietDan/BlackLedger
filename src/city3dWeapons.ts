@@ -19,10 +19,10 @@ export function aimArm(actor:THREE.Group,side:number,target:THREE.Vector3,bendHi
  elbow.quaternion.setFromUnitVectors(new THREE.Vector3(0,-1,0),forearm);
 }
 
-export function poseLongGun(actor:THREE.Group,weapon:THREE.Group,armAngle:number){
+export function poseLongGun(actor:THREE.Group,weapon:THREE.Group,armAngle:number,carryPitch=.45){
  const aim=Math.max(0,Math.min(1,-armAngle/(Math.PI/2))),recoil=Math.max(0,-armAngle-Math.PI/2);
  weapon.position.set(0,1.12+.08*aim,.10+.04*aim-recoil*.06);
- weapon.rotation.set(.45*(1-aim)-recoil*.3,0,0);
+ weapon.rotation.set(carryPitch*(1-aim)-recoil*.3,0,0);
  actor.updateMatrixWorld(true);
  const grip=actor.worldToLocal(weapon.getWorldPosition(new THREE.Vector3()));
  const support=weapon.getObjectByName('support-grip');
@@ -31,10 +31,11 @@ export function poseLongGun(actor:THREE.Group,weapon:THREE.Group,armAngle:number
 }
 
 const singleShot=[3.65] as const;
+const strikeBurst=[3.65,3.74,3.83] as const;
 const revolverShots=[.7,1.05,1.5,1.9] as const;
 const shotgunShots=[.7,1.7] as const;
 const thompsonShots=[.7,.79,.88,1.5,1.59,1.68] as const;
-export function weaponShots(model?:string,variant?:string):readonly number[]{if(variant==='back-of-head')return singleShot;return model==='shotgun'?shotgunShots:model==='thompson'?thompsonShots:revolverShots;}
+export function weaponShots(model?:string,variant?:string):readonly number[]{if(variant==='back-of-head'||variant==='close-shot')return singleShot;if(variant==='burst')return strikeBurst;return model==='shotgun'?shotgunShots:model==='thompson'?thompsonShots:revolverShots;}
 export function pumpOffset(seconds:number){
  const age=seconds-(seconds>=1.7?1.7:.7);
  return age>.15&&age<.70?-.095*Math.sin((age-.15)/.55*Math.PI):0;
