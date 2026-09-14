@@ -7,7 +7,9 @@ export function previewScene(state: Snapshot, target: string, scene: PreviewScen
   const kinds = scene === 'Assassination' ? ['killing', 'gunfight'] : [scene.toLowerCase()];
   const cues: VisualCue[] = kinds.map((kind, i) => ({
     id: `preview:${token}:${i}`, kind, target, minute: state.minute,
-    caption: `Visual preview: ${scene}`, detainee: kind==='arrest'?{id:'preview-detainee',name:'Preview detainee'}:undefined, actors: kind === 'killing'
+    caption: `Visual preview: ${scene}`,
+    strike:scene==='Assassination'?{variant:'back-of-head',victim:{id:'preview-victim',name:'Preview character'}}:undefined,
+    attacker:scene==='Assassination'&&kind==='gunfight'?{id:'preview-assassin',name:'Preview assassin',weapon:1}:undefined, detainee: kind==='arrest'?{id:'preview-detainee',name:'Preview detainee'}:undefined, actors: kind === 'killing'
       ? [{id: 'preview-victim', name: 'Preview character'}] : [],
   }));
   return {state: {...state, id: `${state.id}:preview:${token}`,

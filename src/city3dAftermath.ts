@@ -6,10 +6,11 @@ import {vehicleRootHeight} from './city3dPlan.js';
 import {dressPedestrian, wardrobe} from './city3dWardrobe.js';
 import type {Snapshot} from './types';
 
-type Entry = {group: THREE.Group; slot: SceneSlot; owned: THREE.Material[]};
+type Entry = {group: THREE.Group; slot: SceneSlot; owned: THREE.Material[]; victim?:string};
 export class CityAftermath {
   readonly root = new THREE.Group();
   private entries = new Map<string, Entry>();
+  private bodyPoses=new Map<string,{slot:SceneSlot;yaw:number}>();
   private blood = new THREE.MeshStandardMaterial({color: 0x480a0b, roughness: .31, metalness: .05, polygonOffset: true, polygonOffsetFactor: -1});
   private pool: THREE.ShapeGeometry;
   constructor() {
@@ -21,9 +22,16 @@ export class CityAftermath {
     }
     this.pool=new THREE.ShapeGeometry(shape);
   }
+  rememberBody(id:string,slot:SceneSlot,yaw:number){this.bodyPoses.set(id,{slot,yaw});}
+  suppressBodies(ids:Set<string>){
+    for(const [key,e] of this.entries)if(e.victim&&ids.has(e.victim)){
+      this.root.remove(e.group);e.owned.forEach(m=>m.dispose());this.entries.delete(key);
+    }
+  }
   update(records: NonNullable<Snapshot['aftermath']>, minute: number, lots: Map<string,Lot>, models: Map<string,THREE.Group>,
     modelFor: (id:string)=>string, occupied: SceneSlot[], animating: Set<string>, presence: NonNullable<Snapshot['police_presence']> = [], activeRaids = new Set<string>(), fires: NonNullable<Snapshot['building_fires']> = []) {
     const desired=new Set<string>();
+    for(const id of this.bodyPoses.keys())if(!records.some(r=>r.victim.id===id&&minute<r.cleanup_at))this.bodyPoses.delete(id);
     const scenes = [
       ...records.map(record=>({...record,raid:false,fire:false})),
       ...presence.map(record=>({...record,raid:true,fire:false,police_at:record.minute,victim:{id:'',name:''}})),
@@ -42,14 +50,16 @@ export class CityAftermath {
         if(this.entries.has(key))continue;
         const lot=lots.get(record.target); if(!lot)continue;
         const taken=[...occupied,...[...this.entries.values()].map(e=>e.slot)];
-        const slot=availableSceneSlot(lot,kind==='fire-engine'?'fire-engine':vehicle?'arrest':'killing',taken);if(!slot)continue;
+        const remembered=kind==='body'?this.bodyPoses.get(record.victim.id):undefined;
+        const slot=remembered?.slot || availableSceneSlot(lot,kind==='fire-engine'?'fire-engine':vehicle?'arrest':'killing',taken);if(!slot)continue;
         const model=kind.startsWith('firefighter')?'firefighter':kind==='fire-engine'?'fire-engine':kind==='body'?modelFor(record.victim.id):vehicle?'police':'police-officer';
         const source=models.get(model);if(!source)continue;
         const group=new THREE.Group(), object=source.clone(true);
         const owned=kind==='body'?dressPedestrian(object,model,wardrobe(record.victim.id)):[];
         group.position.set(slot.root.x,kind==='body'?0:vehicle?vehicleRootHeight(slot.root):.2,slot.root.z);
         if(kind==='body') {
-          object.rotation.z=-Math.PI/2;object.position.y=.6;
+          object.quaternion.setFromAxisAngle(new THREE.Vector3(0,1,0),remembered?.yaw||0)
+            .premultiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,0,1),-Math.PI/2));object.position.y=.6;
           const pool=new THREE.Mesh(this.pool,this.blood);
           pool.rotation.x=-Math.PI/2;pool.position.set(1.1,.181,0);group.add(pool);
         }
@@ -59,7 +69,7 @@ export class CityAftermath {
           object.rotation.y=Math.atan2((body?.slot.root.x ?? lot.x)+.8-slot.root.x,(body?.slot.root.z ?? lot.z)-slot.root.z);
         }
         object.traverse(part=>{if(part instanceof THREE.Mesh){part.castShadow=true;part.receiveShadow=true;}});
-        group.add(object);this.root.add(group);this.entries.set(key,{group,slot,owned});
+        group.add(object);this.root.add(group);this.entries.set(key,{group,slot,owned,victim:kind==='body'?record.victim.id:undefined});
       }
     }
     for(const [key,entry] of this.entries) if(!desired.has(key)) {
@@ -73,5 +83,5 @@ export class CityAftermath {
     for(const [id,e] of this.entries)e.group.visible=!!placements.get(id)&&!placements.get(id)!.waiting;
   }
   inspect(){return [...this.entries].map(([id,e])=>({id,x:e.slot.root.x,z:e.slot.root.z,visible:e.group.visible}));}
-  dispose(){for(const e of this.entries.values())e.owned.forEach(m=>m.dispose());this.entries.clear();this.root.clear();this.pool.dispose();this.blood.dispose();}
+  dispose(){this.bodyPoses.clear();for(const e of this.entries.values())e.owned.forEach(m=>m.dispose());this.entries.clear();this.root.clear();this.pool.dispose();this.blood.dispose();}
 }

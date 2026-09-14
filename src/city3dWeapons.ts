@@ -30,7 +30,7 @@ export function poseLongGun(actor:THREE.Group,weapon:THREE.Group,armAngle:number
  aimArm(actor,1,grip);actor.updateMatrixWorld(true);
 }
 
-const singleShot=[.7] as const;
+const singleShot=[3.65] as const;
 const revolverShots=[.7,1.05,1.5,1.9] as const;
 const shotgunShots=[.7,1.7] as const;
 const thompsonShots=[.7,.79,.88,1.5,1.59,1.68] as const;

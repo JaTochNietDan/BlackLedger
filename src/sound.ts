@@ -1,5 +1,4 @@
-// Procedural Web Audio effects. Scene voices own cancellable audio graphs.
-// These are initial synthesized assets; production sound and mix review remain.
+// Sampled gunshots and procedural Web Audio effects, with cancellable scene voices.
 
 let context: AudioContext | null = null;
 
@@ -18,11 +17,12 @@ class SceneSound {
   };
 }
 
-function startVoice(source: AudioScheduledSourceNode, nodes: AudioNode[], at: number, end: number, scene?: SceneSound) {
+function startVoice(source: AudioScheduledSourceNode, nodes: AudioNode[], at: number, end: number, scene?: SceneSound, onFinish?:()=>void) {
   let finished = false;
   const cleanup = () => {
     if (finished) return;
     finished = true;
+    onFinish?.();
     source.disconnect();
     nodes.forEach(node => node.disconnect());
     scene?.release(stop);
@@ -100,15 +100,54 @@ function shot(ctx: AudioContext, at: number, level = 0.5, scene?: SceneSound) {
   return startVoice(source, [band, gain], at, at + 0.32, scene);
 }
 
-/** One visible city shot, cancellable on Skip, reduced motion or navigation. */
-export function playCityGunshot(): (() => void) | undefined {
+const gunSamples: Record<string,{url:string;gain:number}> = {
+  revolver:{url:'/audio/guns/revolver.wav',gain:.75},
+  shotgun:{url:'/audio/guns/shotgun.wav',gain:.65},
+  thompson:{url:'/audio/guns/thompson.wav',gain:.8},
+};
+const gunBuffers=new Map<string,AudioBuffer>();
+const sampledShots:Record<string,number>={};
+const activeSamples=new Set<AudioBufferSourceNode>();
+let loadingGuns:Promise<void>|undefined,gunBus:DynamicsCompressorNode|undefined,fallbackShots=0;
+/** Decode once ahead of playback. Completion never starts a late sound. */
+export function preloadCityGunshots():Promise<void> {
+  if(loadingGuns)return loadingGuns;
+  const ctx=audio();if(!ctx)return Promise.resolve();
+  loadingGuns=Promise.all(Object.entries(gunSamples).map(async([name,sample])=>{
+    try{
+      const response=await fetch(sample.url);if(!response.ok)return;
+      const buffer=await ctx.decodeAudioData(await response.arrayBuffer());gunBuffers.set(name,buffer);
+    }catch{ /* A failed asset retains the immediate synthesized fallback. */ }
+  })).then(()=>{});
+  return loadingGuns;
+}
+export function cityGunshotStatus(){return {loaded:[...gunBuffers.keys()],played:{...sampledShots},fallbacks:fallbackShots,active:activeSamples.size,context:context?.state};}
+/** Sample tails can overlap naturally; each voice remains cancellable on Skip/mute. */
+export function playCityGunshot(weapon='revolver'): (() => void) | undefined {
   if (!soundOn()) return;
   const ctx = audio();
   if (!ctx) return;
+  const scene=new SceneSound();
   try {
     if (ctx.state === 'suspended') ctx.resume().catch(() => {});
-    return shot(ctx, ctx.currentTime + 0.02, 0.4);
+    const buffer=gunBuffers.get(weapon),sample=gunSamples[weapon];
+    if(buffer&&sample){
+      if(!gunBus){
+        gunBus=ctx.createDynamicsCompressor();
+        gunBus.threshold.value=-4;gunBus.knee.value=6;gunBus.ratio.value=12;
+        gunBus.attack.value=.001;gunBus.release.value=.12;gunBus.connect(ctx.destination);
+      }
+      const source=ctx.createBufferSource(),gain=ctx.createGain();source.buffer=buffer;
+      gain.gain.value=sample.gain;source.connect(gain).connect(gunBus);
+      const at=ctx.currentTime+.005;activeSamples.add(source);
+      startVoice(source,[gain],at,at+buffer.duration,scene,()=>activeSamples.delete(source));
+      sampledShots[weapon]=(sampledShots[weapon]||0)+1;
+    }else{
+      shot(ctx,ctx.currentTime+.02,.4,scene);fallbackShots++;
+    }
+    return scene.cancel;
   } catch {
+    scene.cancel();
     // Sound failure must never interrupt the city animation loop.
     return undefined;
   }

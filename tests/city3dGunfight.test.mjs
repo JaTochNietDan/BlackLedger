@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
-import {gunfightPose,sceneSlots,casualtySceneStart} from '../.runtime/frontend-test/city3dEvents.js';
+import {gunfightPose,sceneSlots,casualtySceneStart,GunfireAudio} from '../.runtime/frontend-test/city3dEvents.js';
 import {trafficSize} from '../.runtime/frontend-test/city3dTraffic.js';
 test('gunfire raises, recoils four times and lowers at common frame rates',()=>{
  assert.ok(gunfightPose(0).arm===0);
@@ -122,4 +122,13 @@ test('blast audio starts once with the visible onset, cancels on mute/dispose an
  const active=new BlastAudio(()=>{started++;return()=>stopped++;});
  active.update(.01);active.update(.05,false);active.update(.06,true);active.dispose();
  assert.equal(started,1);assert.equal(stopped,1);
+});
+
+test('sampled burst tails overlap and all are cancelled together on mute or skip',()=>{
+ let starts=0,stops=0;
+ const sound=new GunfireAudio(()=>{starts++;return()=>stops++;},[.7,.79,.88],true);
+ for(const at of [.7,.79,.88])sound.update(at);
+ assert.equal(starts,3);assert.equal(stops,0,'burst cut off sample tails');
+ sound.update(.9,false);assert.equal(stops,3);
+ sound.update(.95,true);assert.equal(starts,3);sound.dispose();assert.equal(stops,3);
 });

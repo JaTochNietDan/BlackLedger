@@ -72,3 +72,35 @@ test('scene sound cancellation stops scheduled explosions and sirens, mute cance
   assert.ok(nodes.every(n=>n.disconnected===1));
  }finally{globalThis.window=previousWindow;globalThis.localStorage=previousStorage;}
 });
+
+test('provided gun samples preload once, retain full tails, select the recorded weapon and cancel on mute',async()=>{
+ const previousWindow=globalThis.window,previousStorage=globalThis.localStorage,previousFetch=globalThis.fetch;
+ let muted=false,fetches=0;const sources=[],gains=[];
+ const node=()=>({disconnected:0,connect(next){return next;},disconnect(){this.disconnected++;}});
+ class Context {
+  state='running';currentTime=10;destination={};
+  decodeAudioData(data){return Promise.resolve({duration:new Uint8Array(data)[0]/10});}
+  createBufferSource(){const s=Object.assign(node(),{starts:[],stops:[],start(at){this.starts.push(at);},stop(at){this.stops.push(at);}});sources.push(s);return s;}
+  createGain(){const g=Object.assign(node(),{gain:{value:0}});gains.push(g);return g;}
+  createDynamicsCompressor(){return Object.assign(node(),{threshold:{},knee:{},ratio:{},attack:{},release:{}});}
+ }
+ globalThis.window={AudioContext:Context};
+ globalThis.localStorage={getItem:()=>muted?'off':'on',setItem:(_,v)=>muted=v==='off'};
+ globalThis.fetch=async url=>{fetches++;return{ok:true,arrayBuffer:async()=>new Uint8Array([url.includes('revolver')?12:url.includes('shotgun')?10:11]).buffer};};
+ try{
+  const sound=await import('../.runtime/frontend-test/sound.js?provided-samples');
+  await Promise.all([sound.preloadCityGunshots(),sound.preloadCityGunshots()]);assert.equal(fetches,3);assert.equal(sources.length,0,'preload must not make a sound');
+  for(const [name,duration,gain] of [['revolver',1.2,.75],['shotgun',1,.65],['thompson',1.1,.8]]){
+   sound.playCityGunshot(name);const source=sources.at(-1);
+   assert.equal(source.buffer.duration,duration);assert.equal(gains.at(-1).gain.value,gain);
+   assert.ok(Math.abs(source.stops[0]-source.starts[0]-duration)<1e-10,'sample tail was truncated');
+  }
+  assert.equal(sound.cityGunshotStatus().fallbacks,0);assert.equal(sources.length,3);assert.equal(sound.cityGunshotStatus().active,3);
+  assert.ok(sources.every(s=>s.disconnected===0),'a later shot cancelled an earlier tail');
+  sound.setSound(false);assert.equal(sound.cityGunshotStatus().active,0);assert.ok(sources.every(s=>s.disconnected===1));assert.ok(gains.every(g=>g.disconnected===1));
+  assert.equal(sound.playCityGunshot('revolver'),undefined);
+  sound.setSound(true);assert.equal(sources.length,3,'unmute replayed old shots');
+  const stop=sound.playCityGunshot('thompson');sources.at(-1).onended();stop();
+  assert.equal(sources.at(-1).stops.length,1,'completed sample was stopped twice');
+ }finally{globalThis.window=previousWindow;globalThis.localStorage=previousStorage;globalThis.fetch=previousFetch;}
+});

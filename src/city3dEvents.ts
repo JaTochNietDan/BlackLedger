@@ -37,6 +37,10 @@ export type SceneSlot = {root: Point; pose: TrafficPose; model: string};
 /** Dedicated forecourt/side bays keep reenactments out of public travel lanes.
  * The casualty reservation encloses the whole fall, including the standing pose. */
 export function sceneSlots(lot: Lot, kind: string): SceneSlot[] {
+  if(kind==='assassination')return [-4,-8.6,-1].map(offset=>{
+    const root={x:lot.x+offset,z:lot.row*PITCH+6.35};
+    return {root,pose:{x:root.x+3.4,z:root.z,heading:0},model:'assassination'};
+  });
   if (['killing','gunfight','officer','detainee','raid-officer'].includes(kind))
     return (kind === 'gunfight' ? [-3, -6, 0, 3, 6] : [0, -3, 3, -6, 6]).map(offset => {
       const root = {x: lot.x + offset, z: lot.row * PITCH + 6.35};
@@ -86,27 +90,26 @@ export function casualtySceneStart(since: number, now: number, gunSince?: number
 export class GunfireAudio {
   started = 0;
   private consumed = 0;
-  private stop?: () => void;
+  private stops=new Set<()=>void>();
+  private cancel(){for(const stop of this.stops)stop();this.stops.clear();}
   private closed = false;
-  constructor(private fire: () => (() => void) | undefined,private beats:readonly number[]=GUNFIRE_SHOTS) {}
+  constructor(private fire: () => (() => void) | undefined,private beats:readonly number[]=GUNFIRE_SHOTS,private overlap=false) {}
   update(seconds: number, enabled = true) {
     if (this.closed) return;
     if (!enabled) {
-      this.stop?.();
-      this.stop = undefined;
+      this.cancel();
     }
     const pose = gunfightPose(seconds,this.beats);
     if (pose.index <= this.consumed) return;
     this.consumed = pose.index;
     if (!pose.flash || !enabled) return;
-    this.stop?.();
-    this.stop = this.fire();
-    if (this.stop) this.started++;
+    if(!this.overlap)this.cancel();
+    const stop=this.fire();
+    if(stop){this.stops.add(stop);this.started++;}
   }
   dispose() {
     this.closed = true;
-    this.stop?.();
-    this.stop = undefined;
+    this.cancel();
   }
 }
 

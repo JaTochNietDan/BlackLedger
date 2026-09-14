@@ -1,0 +1,54 @@
+{
+  "revolver": {
+    "loaded": [
+      "thompson",
+      "revolver",
+      "shotgun"
+    ],
+    "played": {
+      "revolver": 1
+    },
+    "fallbacks": 0,
+    "active": 1,
+    "context": "running"
+  },
+  "shotgun": {
+    "loaded": [
+      "shotgun",
+      "revolver",
+      "thompson"
+    ],
+    "played": {
+      "shotgun": 2
+    },
+    "fallbacks": 0,
+    "active": 1,
+    "context": "running"
+  },
+  "thompson": {
+    "loaded": [
+      "thompson",
+      "shotgun",
+      "revolver"
+    ],
+    "played": {
+      "thompson": 6
+    },
+    "fallbacks": 0,
+    "active": 3,
+    "context": "running"
+  },
+  "thompsonAfterSkip": {
+    "loaded": [
+      "thompson",
+      "shotgun",
+      "revolver"
+    ],
+    "played": {
+      "thompson": 6
+    },
+    "fallbacks": 0,
+    "active": 0,
+    "context": "running"
+  }
+}

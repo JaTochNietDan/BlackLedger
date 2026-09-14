@@ -51,10 +51,10 @@ test('weapon cadence uses two pumped shots or two automatic bursts with one audi
 
 
 test('recorded back-of-head strikes fire exactly once, including late playback',()=>{
- const beats=weaponShots('revolver','back-of-head');assert.deepEqual(beats,[.7]);
+ const beats=weaponShots('revolver','back-of-head');assert.deepEqual(beats,[3.65]);
  let count=0;const audio=new GunfireAudio(()=>{count++;return ()=>{};},beats);
- for(let i=0;i<180;i++)audio.update(i/60);
+ for(let i=0;i<390;i++)audio.update(i/60);
  assert.equal(count,1);audio.dispose();
  let late=0;const skipped=new GunfireAudio(()=>{late++;return ()=>{};},beats);
- skipped.update(1.5);skipped.update(2);assert.equal(late,0);skipped.dispose();
+ skipped.update(4.5);skipped.update(5);assert.equal(late,0);skipped.dispose();
 });

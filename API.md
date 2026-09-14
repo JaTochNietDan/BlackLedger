@@ -355,3 +355,27 @@ Death prose and saved scenario agree. These fields describe a resolved scene,
 without introducing ammunition accounting or browser-authoritative damage.
 Legacy cues omit them. The browser now uses one shot for back-of-head outcomes;
 its approach and head-level aim choreography are still pending integration.
+
+## Shared walk-up assassination playback
+
+A recorded `back-of-head` revolver strike now stages attacker and explicit victim
+as one cast, consuming only its matching killing cue. The victim waits while the
+attacker approaches from behind, raises the gun, fires once at 3.65 presentation
+seconds, and the victim falls after impact. Playback lasts 6.5 seconds. The full
+cast movement uses an 8.2m by 1.4m forecourt reservation; an alternate left bay can
+clear an existing body. Camera framing uses that actual reserved scene. Small
+forward blood droplets are cosmetic. Debug Assassination uses this same timeline
+in its private snapshot. All other strike variants retain their existing playback.
+
+The persistent body receives the playback position/yaw as a mounted-renderer hint,
+so the handoff keeps its fall position and suppresses duplicate corpses. This hint
+is not saved simulation geometry; reloads still select from the existing aftermath
+layout, and canonical placement across reloads remains unfinished. Cleanup still
+uses the saved deadline. Scene completion/Skip retains the existing news reveal gate.
+
+City gunfire now preloads the three user-provided WAV files under `/audio/guns/`.
+The recorded weapon selects the sample, full tails overlap, and Skip/mute/teardown
+cancel every active voice. A shared compressor moderates burst peaks. Decode or
+asset failures retain immediate synthesized fallback; loading never emits a late
+shot. Audio diagnostic counters report loaded models, sampled onsets, active voices
+and fallbacks without changing gameplay state. Other effects remain procedural.

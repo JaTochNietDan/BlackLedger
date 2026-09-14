@@ -36,3 +36,22 @@ test('raid cordon persists independently, yields to playback, and releases all r
  update(600);assert.equal(city.reservations().length,0);assert.equal(city.root.children.length,0);
  city.dispose();
 });
+
+test('execution hands off the body at its actual fall position and yaw',()=>{
+ const city=new CityAftermath(),lot={id:'bar',x:80,z:48,row:1,col:2};
+ const models=new Map([['person',new THREE.Group()]]),lots=new Map([['bar',lot]]);
+ const records=[{id:'death:mara',target:'bar',victim:{id:'mara'},minute:480,police_at:485,cleanup_at:660}];
+ city.update(records,480,lots,models,()=> 'person',[],new Set());
+ city.suppressBodies(new Set(['mara']));assert.equal(city.slots().length,0,'old body must not block shared scene');
+ const slot={root:{x:81,z:38.35},pose:{x:81.8,z:38.35,heading:0},model:'casualty'};
+ city.rememberBody('mara',slot,Math.PI/2);
+ city.update(records,480,lots,models,()=> 'person',[],new Set(['mara']));assert.equal(city.slots().length,0);
+ city.update(records,480,lots,models,()=> 'person',[],new Set());
+ assert.equal(city.inspect()[0].x,81);assert.equal(city.inspect()[0].z,38.35);
+ const object=city.root.children[0].children.at(-1);
+ const expected=new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0),Math.PI/2)
+  .premultiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,0,1),-Math.PI/2));
+ assert.ok(object.quaternion.angleTo(expected)<1e-7);
+ city.update(records,660,lots,models,()=> 'person',[],new Set());assert.equal(city.slots().length,0);
+ city.dispose();
+});

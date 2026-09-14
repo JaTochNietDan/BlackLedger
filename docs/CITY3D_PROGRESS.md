@@ -949,3 +949,56 @@ Strike records back-of-head metadata on both cues (`strike-scenario-cues.json`).
 CUA replay at ~2.1seconds records exactly one audio shot, falling victim, no waiting,
 and revision0/minute480 unchanged (`strike-single-shot.json`). This verifies onset
 count, not final auditory quality. Main campaign and port8791 remain untouched.
+
+### Walk-up assassination and supplied gunshot recordings — September 13
+
+Replaced the back-of-head variant's two independent static bays with one shared
+cast. Attacker walks 4.07m at 1.35m/s after a short lead-in; victim waits at local
+x5, facing away. The revolver raises through articulated elbow/shoulder alignment
+and fires once at3.65s. Its muzzle ray intersects the back of the authored head;
+victim starts falling60ms after the shot. Forward blood droplets clear the head,
+stay within the reservation and stop at pavement height. Scene lasts6.5s, with
+close camera framing and the existing scene-first result reveal. Debug Assassination
+uses the same implementation. Only the explicitly linked killing cue is folded
+into this cast; other victims/legacy cues remain separate.
+
+The full cast reserves8.2m×1.4m. Initial root is lot.x−4; alternate lot.x−8.6 clears
+an existing body and passes the actual street pole without intersection. Existing
+animated victims are removed from aftermath reservations before staging. On scene
+completion the body receives the actual fall position and yaw. This is currently
+a mounted-renderer hint: reloads still use the generic aftermath layout. Canonical
+body placement across reloads remains work; do not claim this is solved globally.
+The existing character models are still too blocky for final visual acceptance.
+
+User supplied revolver.wav, shotgun.wav and gunshot_thompson.wav in Downloads,
+explicitly for game use. Copied originals to public/audio/guns; no source files
+modified. All are48kHz stereo PCM16, roughly1–1.24s, with immediate onset. Provenance,
+checksums and mix notes are in public/audio/README.md. Preload/decode is silent;
+recorded weapon selects its own sample, with full overlapping tails and a shared
+compressor. Skip/mute/navigation cancel all active sources. Other sounds remain
+procedural. User offered more recordings; requested building blast, glass/masonry,
+fire/hose/siren, period vehicle movement, body impacts/shouts and forced-entry sounds.
+
+Validation: production build and all186 frontend tests pass. Tests parse actual
+person/woman/revolver GLBs across four cast pairings, sample the complete timeline,
+check grip attachment, head ray intersection, pavement/reservation/pole clearance,
+pre-shot stillness, paired-cue filtering, alternate occupied bays and body handoff.
+Audio tests verify silent single-load decode, correct sample/duration/gain, overlapping
+tails, natural completion and cancellation. Browser8873 actual saved strike:
+attacker x77.51 during approach while victim staysx81; at~3.96s one revolver sample,
+visible blood spray, no fallback; afterward bodyx81/z38.35, player restored,
+active audio0. Debug stages atx71.4 beside the real corpse, Stop restores it without
+new shots or revision/time changes. Screenshots assassination-aim.png and
+assassination-impact.png; details assassination-playback.json and sampled-gunshots.json.
+Browser8871 played two shotgun samples;8872 played six Thompson samples, three tails
+still active after the burst and zero after Skip. AudioContext was running, all three
+buffers loaded and fallback counts zero. Subjective listening/mix approval is still
+unproven; this verifies browser sample playback and lifecycle. Local assassination
+view reported145FPS/94 draws; it is not broad hardware acceptance.
+
+Additional observed issue: the user's continued8872 fixture now has a later Blue Hour
+strike (Day2, Zoltan Weiss). Its Thompson shooter stages, but the separate legacy
+casualty was waiting for space. Need extend coordinated victim/shooter staging to
+other weapon/scenario variants so firing cannot precede a blocked casualty. No QA
+commands were issued to that save this turn; only replay/Skip presentation checks.
+Main8791/campaign.sqlite3 remain untouched.
