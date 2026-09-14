@@ -1,0 +1,49 @@
+{
+  "revision": 0,
+  "minute": 480,
+  "cues": [
+    {
+      "strike": {
+        "variant": "back-of-head",
+        "victim": {
+          "id": "mara",
+          "name": "Mara Bell"
+        }
+      },
+      "id": "bc0e3490a50a00f045f46692880a0b83",
+      "kind": "killing",
+      "target": "bar",
+      "caption": "Mara Bell at Saint Agnes. At Saint Agnes, before the streets were properly awake: Mara Bell was caught unaware and shot once in the back of the head with a revolver.",
+      "headline": "MARA BELL FOUND DEAD",
+      "actors": [
+        {
+          "id": "mara",
+          "name": "Mara Bell"
+        }
+      ],
+      "gravity": 9,
+      "minute": 480
+    },
+    {
+      "strike": {
+        "variant": "back-of-head",
+        "victim": {
+          "id": "mara",
+          "name": "Mara Bell"
+        }
+      },
+      "attacker": {
+        "id": "player",
+        "name": "Alex Varga",
+        "weapon": 1
+      },
+      "id": "16ddd15e7f17ae8ee8561670e953f88c",
+      "kind": "gunfight",
+      "target": "bar",
+      "caption": "Mara Bell was killed at Saint Agnes.",
+      "actors": [],
+      "gravity": 7,
+      "minute": 480
+    }
+  ]
+}

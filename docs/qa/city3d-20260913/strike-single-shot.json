@@ -1,0 +1,137 @@
+{
+  "revision": 0,
+  "minute": 480,
+  "playbackRate": 1,
+  "impact": {
+    "x": 0,
+    "y": 0
+  },
+  "suppression": [],
+  "rubble": [],
+  "glazing": [
+    {
+      "id": "bar",
+      "broken": false
+    },
+    {
+      "id": "laundry",
+      "broken": false
+    },
+    {
+      "id": "club",
+      "broken": false
+    },
+    {
+      "id": "market",
+      "broken": false
+    },
+    {
+      "id": "apartment",
+      "broken": false
+    },
+    {
+      "id": "casino",
+      "broken": false
+    },
+    {
+      "id": "precinct",
+      "broken": false
+    },
+    {
+      "id": "herald",
+      "broken": false
+    },
+    {
+      "id": "restaurant",
+      "broken": false
+    },
+    {
+      "id": "poolhall",
+      "broken": false
+    },
+    {
+      "id": "butcher",
+      "broken": false
+    },
+    {
+      "id": "goldenlily",
+      "broken": false
+    },
+    {
+      "id": "steamworks",
+      "broken": false
+    },
+    {
+      "id": "burlesque",
+      "broken": false
+    },
+    {
+      "id": "pawn",
+      "broken": false
+    },
+    {
+      "id": "tailor",
+      "broken": false
+    }
+  ],
+  "buildingFire": {
+    "clock": 37.31250000000093,
+    "scenes": []
+  },
+  "headlightPools": 0,
+  "harbour": {
+    "visible": true,
+    "waterClock": 36.980700000000944
+  },
+  "followingPlayer": false,
+  "cutawayBuildings": [],
+  "weather": {
+    "kind": "clear",
+    "wet": 0,
+    "rainVisible": false,
+    "rainClock": 0
+  },
+  "camera": {
+    "zoom": 10.679943251678798,
+    "x": 260,
+    "z": -201.65,
+    "targetX": 80,
+    "targetZ": 38.35
+  },
+  "actors": [],
+  "waiting": [],
+  "aftermath": [],
+  "doors": [
+    {
+      "id": "bar",
+      "angle": 0
+    }
+  ],
+  "effects": [
+    {
+      "id": "bc0e3490a50a00f045f46692880a0b83",
+      "kind": "killing",
+      "target": "bar",
+      "staged": true,
+      "x": 83,
+      "z": 38.35,
+      "fall": -1.5707963267948966
+    },
+    {
+      "id": "16ddd15e7f17ae8ee8561670e953f88c",
+      "kind": "gunfight",
+      "target": "bar",
+      "staged": true,
+      "x": 77,
+      "z": 38.35,
+      "arm": -1.550587287493217,
+      "attacker": {
+        "id": "player",
+        "name": "Alex Varga",
+        "weapon": 1
+      },
+      "weapon": "revolver",
+      "audioShots": 1
+    }
+  ]
+}

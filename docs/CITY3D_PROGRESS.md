@@ -918,3 +918,34 @@ exclusion and stall clamping. Reloaded isolated 8872 preview: native W moved tar
 instantaneous arrow tap did not span a rendered frame, so it does not establish a
 held-key browser test; arrow mapping and continuous integration are covered by tests.
 Full subjective sustained-key feel remains for direct user review in the reloaded tab.
+
+### Saved strike scenarios and single-shot playback — September 13
+
+Added `strike` metadata with variant and explicit victim identity to the paired
+successful strike/death cues. Revolver versus a stationary unarmed target with
+`sore == 0` can resolve as `back-of-head` (65% of eligible successes); other revolver
+and shotgun scenes resolve as `close-shot`, Thompson as `burst`, and unarmed as
+`close-quarters`. This uses the existing single world RNG draw for manner wording,
+without changing combat RNG/success, damage, costs or aftermath deadlines. Selection
+happens before death invalidates `Travelling`; death prose and saved result agree.
+
+Browser gunfire/muzzle/impact cadence now uses one shot for `back-of-head` instead
+of the generic four. Both participants still use the older independent staging
+bays: this is the scenario foundation, not completion of the requested walk-up or
+head-level hit. The next visual change needs atomic shared cast reservation and
+synchronized approach/shot/fall; the current replay placed shooter x77 and victim
+x83 (z38.35), making the missing approach conspicuous. Preserve cleanup and
+scene-first result gating while replacing that arrangement. Blood spatter and
+realistic intense gun sounds also remain required.
+
+Evidence: full core suite passed (218.125s), store and HTTP tests passed; production
+build passed. Frontend suite passed 179 tests and initially failed the new test
+because its GunfireAudio import was missing. Corrected the import; all four weapon
+tests then passed, covering the remaining test. New Go checks cover seven context
+cases, variation, one-world-draw/no-combat-draw behavior, paired victim identity and
+full world JSON saved-result restoration. Fresh isolated save
+`.runtime/strike-scenario-20260913.sqlite3`, server8873: actual successful revolver
+Strike records back-of-head metadata on both cues (`strike-scenario-cues.json`).
+CUA replay at ~2.1seconds records exactly one audio shot, falling victim, no waiting,
+and revision0/minute480 unchanged (`strike-single-shot.json`). This verifies onset
+count, not final auditory quality. Main campaign and port8791 remain untouched.

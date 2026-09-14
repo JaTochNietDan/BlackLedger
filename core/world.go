@@ -450,7 +450,15 @@ type CueAttacker struct {
 	Weapon int    `json:"weapon"`
 }
 
+// CueStrike records the resolved attack scenario, shared by its attack and death
+// cues. Timings, poses and camera direction remain browser presentation.
+type CueStrike struct {
+	Variant string   `json:"variant"`
+	Victim  CueActor `json:"victim"`
+}
+
 type VisualCue struct {
+	Strike   *CueStrike   `json:"strike,omitempty"`
 	Attacker *CueAttacker `json:"attacker,omitempty"`
 	Detainee *CueActor    `json:"detainee,omitempty"`
 	ID       string       `json:"id"`

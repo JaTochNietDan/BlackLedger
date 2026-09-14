@@ -137,7 +137,9 @@ func (w *World) Strike(id string, hand Hand) error {
 func (w *World) finishThem(n *NPC, hand Hand, where string, crowd int, family *Faction) {
 	name := n.Name
 	attacker := w.strikeAttacker(hand)
-	w.Kill(n.ID, w.strikeManner(n, attacker.Weapon))
+	strike, manner := w.strikePresentation(n, attacker.Weapon)
+	firstCue := len(w.VisualCues)
+	w.Kill(n.ID, manner)
 	heat := StrikeQuiet
 	if crowd > 0 {
 		heat = StrikeHeat
@@ -156,6 +158,18 @@ func (w *World) finishThem(n *NPC, hand Hand, where string, crowd int, family *F
 	w.Witness(kind, n.Location, name+" was killed at "+where+".", "")
 	if len(w.VisualCues) > 0 {
 		w.VisualCues[len(w.VisualCues)-1].Attacker = &attacker
+		w.VisualCues[len(w.VisualCues)-1].Strike = &strike
+	}
+	for i := firstCue; i < len(w.VisualCues); i++ {
+		cue := &w.VisualCues[i]
+		if cue.Kind == "killing" {
+			for _, actor := range cue.Actors {
+				if actor.ID == n.ID {
+					cue.Strike = &strike
+					break
+				}
+			}
+		}
 	}
 	w.ReportAbout("killing", "KILLING AT "+upper(where),
 		w.unattributed(where, fmt.Sprintf("%s was found dead at %s. Police have no arrest and describe the killing as targeted.", name, where)), n.ID)

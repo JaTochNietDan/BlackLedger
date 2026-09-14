@@ -4,7 +4,7 @@ import * as THREE from 'three';
 import {readFileSync} from 'node:fs';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {sceneWeapon,poseLongGun,weaponShots,pumpOffset} from '../.runtime/frontend-test/city3dWeapons.js';
-import {gunfightPose} from '../.runtime/frontend-test/city3dEvents.js';
+import {gunfightPose,GunfireAudio} from '../.runtime/frontend-test/city3dEvents.js';
 async function model(name){
  const b=readFileSync(new URL(`../public/art/models/${name}.glb`,import.meta.url)),loader=new GLTFLoader();
  loader.register(p=>({name:'weapon-geometry',loadMaterial(){return Promise.resolve(new THREE.MeshStandardMaterial());}}));
@@ -47,4 +47,14 @@ test('weapon cadence uses two pumped shots or two automatic bursts with one audi
  }
  assert.equal(weaponShots('shotgun').length,2);assert.equal(weaponShots('thompson').length,6);
  assert.equal(pumpOffset(.7),0);assert.ok(pumpOffset(1.1)<-.08);assert.equal(pumpOffset(1.7),0);
+});
+
+
+test('recorded back-of-head strikes fire exactly once, including late playback',()=>{
+ const beats=weaponShots('revolver','back-of-head');assert.deepEqual(beats,[.7]);
+ let count=0;const audio=new GunfireAudio(()=>{count++;return ()=>{};},beats);
+ for(let i=0;i<180;i++)audio.update(i/60);
+ assert.equal(count,1);audio.dispose();
+ let late=0;const skipped=new GunfireAudio(()=>{late++;return ()=>{};},beats);
+ skipped.update(1.5);skipped.update(2);assert.equal(late,0);skipped.dispose();
 });

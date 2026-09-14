@@ -30,10 +30,11 @@ export function poseLongGun(actor:THREE.Group,weapon:THREE.Group,armAngle:number
  aimArm(actor,1,grip);actor.updateMatrixWorld(true);
 }
 
+const singleShot=[.7] as const;
 const revolverShots=[.7,1.05,1.5,1.9] as const;
 const shotgunShots=[.7,1.7] as const;
 const thompsonShots=[.7,.79,.88,1.5,1.59,1.68] as const;
-export function weaponShots(model?:string):readonly number[]{return model==='shotgun'?shotgunShots:model==='thompson'?thompsonShots:revolverShots;}
+export function weaponShots(model?:string,variant?:string):readonly number[]{if(variant==='back-of-head')return singleShot;return model==='shotgun'?shotgunShots:model==='thompson'?thompsonShots:revolverShots;}
 export function pumpOffset(seconds:number){
  const age=seconds-(seconds>=1.7?1.7:.7);
  return age>.15&&age<.70?-.095*Math.sin((age-.15)/.55*Math.PI):0;

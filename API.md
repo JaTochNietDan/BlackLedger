@@ -341,3 +341,17 @@ keys every animation frame instead of OS key-repeat steps. Speed scales inversel
 with zoom, diagonal input is normalized, and key release/focus loss clears movement.
 This supersedes the earlier per-press pan distance; command and saved state semantics
 are unchanged.
+
+
+Successful player-directed strikes additionally record optional
+`strike: {variant, victim: {id, name}}` on the paired attack and killing cues.
+Variants are `back-of-head`, `close-shot`, `burst`, and `close-quarters`.
+The back-of-head outcome is eligible for a revolver against a stationary, unarmed
+victim with no personal grievance (`sore == 0`), with 65% variation among eligible
+successful strikes. Shotguns use close-shot; Thompsons use burst; unarmed strikes
+use close-quarters. Selection occurs before death, consumes the existing single
+manner-of-death world RNG draw and never rerolls success or changes combat RNG.
+Death prose and saved scenario agree. These fields describe a resolved scene,
+without introducing ammunition accounting or browser-authoritative damage.
+Legacy cues omit them. The browser now uses one shot for back-of-head outcomes;
+its approach and head-level aim choreography are still pending integration.

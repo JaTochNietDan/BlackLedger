@@ -993,7 +993,7 @@ export function City3D(props: Props) {
           effects.push({cue, since: now, mesh, light, debris, extra, wardrobe: costume, gunArm, muzzle, weapon, weaponModel:weaponModel||undefined,
             glazingBefore:(cue.id.startsWith('preview:')?undefined:p.beforeConditions?.[cue.target]) ?? buildings.get(cue.target)?.userData.condition ?? w.locations.find(p=>p.id===cue.target)?.condition ?? 100,
             glassAudio:cue.kind==='explosion'?new BlastAudio(()=>playMoment('glass-break')):undefined,
-            audio: cue.kind === 'gunfight' && weaponModel ? new GunfireAudio(playCityGunshot,weaponShots(weaponModel||undefined))
+            audio: cue.kind === 'gunfight' && weaponModel ? new GunfireAudio(playCityGunshot,weaponShots(weaponModel||undefined,cue.strike?.variant))
               : cue.kind === 'raid-officer' ? new BlastAudio(() => playMoment('door-breach'))
               : cue.kind === 'explosion' ? new BlastAudio(() => playMoment('explosion')) : undefined});
           if (p.activeCue?.id === cue.id) {
@@ -1285,9 +1285,9 @@ export function City3D(props: Props) {
           const debrisOrigin=blastBuilding?.userData.debrisOrigin;
           if (blast && blastOrigin) e.light.position.set(blastOrigin.x, blastOrigin.y, blastOrigin.z);
           const shot = e.cue.kind === 'gunfight' && !!e.weapon;
-          const firing = gunfightPose(t * 3,weaponShots(e.weaponModel));
+          const firing = gunfightPose(t * 3,weaponShots(e.weaponModel,e.cue.strike?.variant));
           if(blast)addImpact(t*3,11);
-          if(shot)for(const beat of weaponShots(e.weaponModel))addImpact(t*3-beat,3);
+          if(shot)for(const beat of weaponShots(e.weaponModel,e.cue.strike?.variant))addImpact(t*3-beat,3);
           if(e.cue.kind!=='raid-officer')e.audio?.update(t * 3, soundOn());
           const muzzlePosition = new THREE.Vector3(at.x, 1.4, at.z);
           if (shot && e.gunArm && e.muzzle) {
