@@ -42,6 +42,8 @@ func main() {
 			w.Properties["laundry"].Owner = w.PlayerOrganizationID()
 			w.Event, w.Plots, w.Tasks = nil, nil, nil
 			if scenario == "crew-orders" {
+				w.Player.Charges = 1
+				w.NPC("leo").Skill = 90
 				w.Incorporate()
 				if err := w.EstablishHeadquarters("laundry", false); err != nil {
 					return err

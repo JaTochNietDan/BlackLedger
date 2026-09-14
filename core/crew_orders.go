@@ -16,6 +16,7 @@ type CrewOrder struct {
 	Stage    string `json:"stage"`
 	Due      int    `json:"due"`
 	Reserved int    `json:"reserved"`
+	Charges  int    `json:"charges"`
 	Recall   bool   `json:"recall"`
 	Result   string `json:"result"`
 }
@@ -74,6 +75,14 @@ func (w *World) CrewOrderReadiness(kind, actor, target string) string {
 		}
 	}
 	switch kind {
+	case "bomb":
+		if w.Player.Charges < 1 {
+			return "Acquire a charge before issuing this order"
+		}
+		if n := w.NPC(actor); n == nil || w.Poise(n) < PlantStanding {
+			return "The operative needs more experience for demolition"
+		}
+		return w.crewBombTarget(target)
 	case "restock":
 		return w.RestockReadiness(target)
 	case "assassinate":
@@ -104,16 +113,28 @@ func (w *World) StartCrewOrder(kind, actor, target string) error {
 	reserved := 0
 	if kind == "assassinate" {
 		at = w.crewTargetAddress(target)
-	} else {
+	} else if kind == "restock" {
 		reserved = w.RestockCost(target)
 	}
 	if err := w.Pay(reserved); err != nil {
 		return err
 	}
 	o := CrewOrder{ID: ID(), Life: w.Life, Actor: actor, Name: hand.Name, Kind: kind, Target: target, Place: at, Base: w.Headquarters(w.PlayerOrganizationID()), Stage: "outbound", Reserved: reserved}
+	if kind == "bomb" {
+		w.Player.Charges--
+		o.Charges = 1
+	}
 	w.CrewOrders = append(w.CrewOrders, o)
 	w.crewOrderJourney(&w.CrewOrders[len(w.CrewOrders)-1], at)
-	w.Log("An order from headquarters", fmt.Sprintf("%s sets out to %s at %s. The assignment continues while you attend to other business.", hand.Name, kind, at), "work")
+	place, _ := PlaceByID(at)
+	work := kind + " at " + place.Name
+	if kind == "bomb" {
+		work = "plant a charge at " + place.Name
+	}
+	if kind == "assassinate" {
+		work = "go after " + w.NPC(target).Name + " at " + place.Name
+	}
+	w.Log("An order from headquarters", fmt.Sprintf("%s sets out to %s. The assignment continues while you attend to other business.", hand.Name, work), "work")
 	return nil
 }
 func (w *World) crewOrderJourney(o *CrewOrder, to string) {
@@ -151,6 +172,13 @@ func (w *World) RecallCrewOrder(id string) error {
 	return fmt.Errorf("That assignment is no longer active")
 }
 func (w *World) refundCrewOrder(o *CrewOrder) {
+	if o.Charges > 0 {
+		n := w.NPC(o.Actor)
+		if o.Life == w.Life && w.Player.Alive && n != nil && !n.Dead && !w.Inside(n) {
+			w.Player.Charges += o.Charges
+		}
+		o.Charges = 0
+	}
 	if o.Reserved <= 0 {
 		return
 	}
@@ -206,15 +234,32 @@ func (w *World) SettleCrewOrders() {
 				w.returnCrewOrder(o, "The business changed hands before arrival")
 				continue
 			}
+			if o.Kind == "bomb" && w.crewBombTarget(o.Target) != "" {
+				w.returnCrewOrder(o, "The demolition target is no longer available")
+				continue
+			}
 			o.Stage = "working"
 			o.Due = w.Minute + 30
 			if o.Kind == "assassinate" {
 				o.Due = w.Minute + StrikeMinutes
 			}
+			if o.Kind == "bomb" {
+				o.Due = w.Minute + PlantMinutes
+			}
 		case "working":
 			result := "The target is no longer available"
 			if n.Location == o.Place && !w.Travelling(n) {
 				switch o.Kind {
+				case "bomb":
+					if o.Charges == 1 && w.crewBombTarget(o.Target) == "" {
+						o.Charges = 0
+						hand, _ := w.NamedHands(o.Actor)
+						if w.resolvePlant(o.Target, hand) {
+							result = "The charge detonated at the target"
+						} else {
+							result = "The charge went off prematurely"
+						}
+					}
 				case "restock":
 					trade, ok := TradeOf(o.Target)
 					p := w.Properties[o.Target]
@@ -263,6 +308,7 @@ func (w *World) PublicCrewOrders() []CrewOrder {
 }
 
 type CrewOrderOffer struct {
+	Charges int    `json:"charges"`
 	Actor   string `json:"actor"`
 	Name    string `json:"name"`
 	Kind    string `json:"kind"`
@@ -310,9 +356,16 @@ func (w *World) CrewOrderOffers() []CrewOrderOffer {
 			if at == "" {
 				duration = 0
 			}
-			out = append(out, CrewOrderOffer{Actor: id, Name: n.Name, Kind: kind, Target: target, Label: label, Cost: cost, Minutes: duration, Reason: w.CrewOrderReadiness(kind, id, target)})
+			charges := 0
+			if kind == "bomb" {
+				charges = 1
+			}
+			out = append(out, CrewOrderOffer{Charges: charges, Actor: id, Name: n.Name, Kind: kind, Target: target, Label: label, Cost: cost, Minutes: duration, Reason: w.CrewOrderReadiness(kind, id, target)})
 		}
 		for _, l := range Locations {
+			if p := w.Properties[l.ID]; p != nil && p.Income > 0 && !w.Own(l.ID) {
+				offer("bomb", l.ID, l.ID, "Bomb "+l.Name, 0, PlantMinutes)
+			}
 			if _, ok := TradeOf(l.ID); ok && w.Own(l.ID) {
 				offer("restock", l.ID, l.ID, "Restock "+l.Name, w.RestockCost(l.ID), 30)
 			}
@@ -327,4 +380,18 @@ func (w *World) CrewOrderOffers() []CrewOrderOffer {
 		}
 	}
 	return out
+}
+
+func (w *World) crewBombTarget(id string) string {
+	p := w.Properties[id]
+	if _, ok := PlaceByID(id); !ok || p == nil || p.Income <= 0 {
+		return "There is no business to target"
+	}
+	if w.Own(id) {
+		return "Your family owns this business"
+	}
+	if p.Condition <= 0 {
+		return "The building is already destroyed"
+	}
+	return ""
 }

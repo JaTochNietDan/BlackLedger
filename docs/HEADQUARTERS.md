@@ -26,12 +26,13 @@ shows a known family's base; personal homes are not exposed by this field.
 
 ## Current operations implementation
 
-Saved named orders now cover restocking and assassination, with outbound/work/
+Saved named orders now cover restocking, assassination and bombing, with outbound/work/
 return stages, parallel operatives, cash reservations, recall, arrival/commit
 validation and HTTP retry coverage. The Business panel at headquarters and the
 Families page contain an order selector and register. Assassination follows a
 recent sighting rather than hidden movement and shares combat/scene effects.
-Restocking shares the player supply effect. Losing the issuing life cancels
+Restocking shares the player supply effect. Bombing reserves one charge and
+shares demolition consequences with named injury, death and scene attribution. Losing the issuing life cancels
 orders; surviving operatives retain unused budget. This is not yet the full
 succession-continuation design below. Other operation adapters, comprehensive
 resource custody and all remaining practical-command coverage are outstanding.

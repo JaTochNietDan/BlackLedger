@@ -3197,3 +3197,29 @@ adjustment requires the focused cancellation checks again before release.
 Final cancellation regression explicitly retains the living actor's destination
 after new-life cancellation; focused core0.192s and HTTP0.152s pass. Diff
 whitespace check passes. Goal remains active; no release promotion.
+
+### September 14 — named bombing orders and charge custody
+
+Previous turn made progress on saved orders. Added bombing to the same catalogue
+and lifecycle. One charge is reserved once, persisted through reload, consumed
+on an actual attempt and returned once after recall/invalidated target. Captured
+or dead operatives lose the charge; cancellation across issuing lives never
+credits the new player. Arrival and work commitment recheck the deed/destruction.
+Shared resolvePlant preserves ordinary player RNG/consequences; named attempts
+use operative odds and injury/death, with the correct attacker on blast cues.
+Successful planters are excluded from collateral casualties rather than remaining
+in the victim pool while the scene shows them getting clear.
+
+Regression covers both outcomes across50 seeds, player position/health unchanged,
+charge accounting, recall through clone/reload, changed deed and custody. Selected
+order/demolition/cue/HTTP checks pass (.runtime/crew-bomb-final-tests.log); initial
+expanded core selection1.093s. Frontend build2.90s. No full-suite pass claimed.
+Browser104 isolated .runtime/crew-bomb-qa.sqlite3 on8992(session17306): Families
+order selector showed bombing,170min andonecharge terms; dispatch recorded Leo
+outbound20min after issuance and exposed Recall. Corrected dispatch log to show
+the place's actual name rather than internal ID observed in that check. Full
+end-to-end bombing scene and compact-layout acceptance remain outstanding.
+
+Unrelated dirty robbery/mugging/aftermath files preserved. Main8791 untouched.
+Robbery, other practical adapters and known broad campaign failures remain open;
+this is the third adapter, not completion of the requested operations system.

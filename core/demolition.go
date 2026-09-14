@@ -115,14 +115,24 @@ func (w *World) Plant(id string) error {
 	if reason := w.PlantReadiness(id); reason != "" {
 		return fmt.Errorf("%s", reason)
 	}
+	w.Player.Charges--
+	w.resolvePlant(id, w.OwnHands())
+	return nil
+}
+
+// resolvePlant consumes an already committed charge, with consequences on its actor.
+func (w *World) resolvePlant(id string, hand Hand) bool {
 	prop := w.Properties[id]
 	place, _ := PlaceByID(id)
 	owner := w.faction(prop.Owner)
-	w.Player.Charges--
+	attacker := w.strikeAttacker(hand)
+	attacker.Weapon = 0
 
 	// Getting to the underside of somebody else's floor is the hard part.
 	odds := .4 + float64(min(w.Presence(), 100))/300
-	if len(w.Player.Crew) > 0 && w.Player.Crew[0].Loyalty >= 40 && len(w.Tasks) == 0 {
+	if hand.Crew {
+		odds = .4 + w.HandEdge(hand)
+	} else if len(w.Player.Crew) > 0 && w.Player.Crew[0].Loyalty >= 40 && len(w.Tasks) == 0 {
 		odds += .12
 	}
 	if owner != nil {
@@ -131,6 +141,30 @@ func (w *World) Plant(id string) error {
 	odds = min64(.85, max64(.15, odds))
 
 	if w.Random() >= odds {
+		if hand.Crew {
+			w.HandHurt(hand, 30+int(w.Random()*35), "place a charge at "+place.Name)
+			w.Player.Heat = min(100, w.Player.Heat+w.HandHeat(hand, 30))
+			if owner != nil {
+				owner.Goodwill = max(-100, owner.Goodwill-45)
+				w.RetaliationFrom(owner.ID)
+			}
+			actor := w.NPC(hand.ID)
+			fatal := actor != nil && actor.Dead
+			account := hand.Name + " could not get clear before the charge went off."
+			if fatal {
+				account += " They did not survive."
+			} else {
+				account += " They survived with injuries."
+			}
+			w.Log("It went off early at "+place.Name, account, "danger")
+			w.Report("attack", "EXPLOSION AT "+strings.ToUpper(place.Name), "A premature explosion at "+place.Name+" is being treated as deliberate.")
+			w.Witness("explosion", id, account, "")
+			cue := &w.VisualCues[len(w.VisualCues)-1]
+			cue.Detonation = "premature"
+			cue.Attacker = &attacker
+			cue.Accident = &CueAccident{Fatal: fatal}
+			return false
+		}
 		// It goes off in your hands, or somebody finds it with your face still
 		// fresh in their memory.
 		injury := w.Absorb(30 + int(w.Random()*35))
@@ -167,25 +201,30 @@ func (w *World) Plant(id string) error {
 			})
 			w.DieOf("a charge of your own", "A charge at "+place.Name+" went off with you still under it.")
 		}
-		return nil
+		return false
 	}
 
-	w.detonate(id, fmt.Sprintf("A charge went off under %s.", place.Name))
-	w.VisualCues[len(w.VisualCues)-1].Attacker = &CueAttacker{ID: "player", Name: w.Player.Name, Weapon: 0}
-	w.Player.Heat = min(100, w.Player.Heat+22)
-	w.Player.Respect += 8
+	w.detonateExcept(id, fmt.Sprintf("A charge went off under %s.", place.Name), attacker.ID)
+	w.VisualCues[len(w.VisualCues)-1].Attacker = &attacker
+	w.Player.Heat = min(100, w.Player.Heat+w.HandHeat(hand, 22))
+	w.Player.Respect += w.HandRespectFor(hand, 8)
 	if owner != nil {
 		owner.Goodwill = max(-100, owner.Goodwill-50)
 		w.RetaliationFrom(owner.ID)
 		w.Log("There is no mistaking it", fmt.Sprintf("%s is wreckage. %s will not be wondering whether it was deliberate, and their standing with you is %+d.", place.Name, owner.Name, owner.Goodwill), "politics")
 	}
-	return nil
+	return true
 }
 
 // detonate is the whole of what a charge does to a place, whoever set it. The
 // same function for the player and for an organization, so a bombing is a
 // bombing whichever end of it you are on.
 func (w *World) detonate(id, cause string) {
+	w.detonateExcept(id, cause, "")
+}
+
+// A successful planter is already getting clear when the charge detonates.
+func (w *World) detonateExcept(id, cause, escaped string) {
 	prop := w.Properties[id]
 	place, _ := PlaceByID(id)
 	if prop == nil {
@@ -234,7 +273,7 @@ func (w *World) detonate(id, cause string) {
 		present := []*NPC{}
 		for i := range w.NPCs {
 			n := &w.NPCs[i]
-			if !n.Dead && n.Location == id && !w.Travelling(n) {
+			if n.ID != escaped && !n.Dead && n.Location == id && !w.Travelling(n) {
 				present = append(present, n)
 			}
 		}

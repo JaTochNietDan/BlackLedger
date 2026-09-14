@@ -1412,3 +1412,13 @@ The lifecycle supports simultaneous named assignments, natural travel, routine
 exclusion and recall after the current street leg. The present adapters are
 restocking and assassination only. Bombing, robbery and other practical work,
 rich equipment allocation and comprehensive succession continuation remain open.
+
+`crew_order:bomb` extends the assignment catalogue. It reserves one existing
+player charge at dispatch and consumes that charge only when the attempt is
+committed. Both offer and order projections include integer `charges`. Recall
+or invalidated targets return unused charges when a living operative returns;
+death/capture or loss of the issuing life removes that reserved charge and never
+credits the next protagonist. Planting takes PlantMinutes; the target must remain
+another owner's non-destroyed business. Demolition consequences share player
+resolution with explicit actor attribution. A successful planter is excluded
+from collateral victims; premature failure can kill the named operative.
