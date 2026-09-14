@@ -1,12 +1,17 @@
-<!doctype html><html><head><meta charset="utf-8"><title>Planter exit review</title><style>body{margin:0;background:#1c211d;color:#e6d7b6;font:18px Georgia}canvas{display:block;width:100vw;height:100vh}p{position:absolute;top:10px;left:25px;pointer-events:auto}</style></head><body><p>Planter exit review <button id="play">Play</button> <button id="windup">Open door</button> <button id="release">Threshold</button> <button id="impact">Blast ready</button> <output>Ready</output></p><canvas></canvas><script type="module">
+<!doctype html><html><head><meta charset="utf-8"><title>Planter exit review</title><style>body{margin:0;background:#1c211d;color:#e6d7b6;font:18px Georgia}canvas{display:block;width:100vw;height:100vh}p{position:absolute;top:10px;left:25px;pointer-events:auto}</style></head><body><p>Planter exit review <select aria-label="Building model"></select> <button id="play">Play</button> <button id="windup">Open door</button> <button id="release">Threshold</button> <button id="impact">Blast ready</button> <output>Ready</output></p><canvas></canvas><script type="module">
 import {CityPlanter} from '/src/city3dPlanter.ts';
+import {buildingGlazing} from '/src/city3dDamage.ts';
 import * as THREE from '/node_modules/three/build/three.module.js';
 import {GLTFLoader} from '/node_modules/three/examples/jsm/loaders/GLTFLoader.js';
 import {OrbitControls} from '/node_modules/three/examples/jsm/controls/OrbitControls.js';
 const renderer=new THREE.WebGLRenderer({canvas:document.querySelector('canvas'),antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);renderer.setClearColor(0x1c211d);renderer.outputColorSpace=THREE.SRGBColorSpace;
 const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(35,innerWidth/innerHeight,.001,10);camera.position.set(2,2.1,3);const controls=new OrbitControls(camera,renderer.domElement);controls.target.set(.15,1.25,0);controls.update();
 scene.add(new THREE.HemisphereLight(0xfff0d8,0x33433a,2));const light=new THREE.DirectionalLight(0xffe9c3,3);light.position.set(-1,2,2);scene.add(light);const rim=new THREE.DirectionalLight(0xc0dfef,2);rim.position.set(1,.2,-1);scene.add(rim);
-const loader=new GLTFLoader();const building=(await loader.loadAsync('/art/models/monarch.glb')).scene;scene.add(building);building.updateMatrixWorld(true);
+const names=['monarch','tavern','tenement','mercer-court','casino','civic','shop','warehouse','bluehour','goldenlily','papermoon'];
+const requested=new URL(location.href).searchParams.get('model'),name=names.includes(requested)?requested:'monarch';
+const select=document.querySelector('select');for(const id of names){const option=new Option(id,id);select.add(option);}select.value=name;
+select.onchange=()=>{location.search='?model='+encodeURIComponent(select.value);};
+const loader=new GLTFLoader();const building=(await loader.loadAsync('/art/models/'+name+'.glb')).scene;scene.add(building);buildingGlazing(building,100);building.updateMatrixWorld(true);
 const threshold=building.getObjectByName('entrance-threshold'),door=building.getObjectByName('entrance-door-hinge');
 const entry=threshold.getWorldPosition(new THREE.Vector3());
 const actor=(await loader.loadAsync('/art/models/person.glb')).scene;

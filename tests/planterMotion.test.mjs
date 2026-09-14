@@ -10,7 +10,7 @@ async function model(name){
  return (await loader.parseAsync(b.buffer.slice(b.byteOffset,b.byteOffset+b.byteLength),'')).scene;
 }
 test('planter exits the authored vestibule without crossing the door or masonry',async()=>{
- for(const name of ['monarch','tavern'])for(const person of ['person','woman']){
+ for(const name of ['monarch','tavern','tenement','mercer-court','casino','civic','shop','warehouse','bluehour','goldenlily','papermoon'])for(const person of ['person','woman']){
   const building=await model(name),actor=await model(person),cast=new CityPlanter(actor);
   building.updateMatrixWorld(true);
   cast.root.position.copy(building.getObjectByName('entrance-threshold').getWorldPosition(new THREE.Vector3()));
@@ -35,4 +35,24 @@ test('planter exits the authored vestibule without crossing the door or masonry'
   assert.ok(actor.position.z<-2&&actor.position.x<=-2);
   assert.equal(cast.update(PLANTER_BLAST-.001).blast,false);
  }
+});
+
+test('planter reservation covers both rigs through translated and rotated exits',async()=>{
+ const {planterReservation,availableSceneSlot}=await import('../.runtime/frontend-test/city3dEvents.js');
+ const {trafficSize}=await import('../.runtime/frontend-test/city3dTraffic.js');
+ for(const person of ['person','woman'])for(const heading of [0,Math.PI/2,Math.PI,1.1]){
+  const cast=new CityPlanter(await model(person)),slot=planterReservation({x:30,z:50},heading),size=trafficSize(slot.model);
+  cast.root.position.set(slot.root.x,.2,slot.root.z);cast.root.rotation.y=heading;
+  const inverse=new THREE.Matrix4().compose(new THREE.Vector3(slot.pose.x,0,slot.pose.z),new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0),heading),new THREE.Vector3(1,1,1)).invert();
+  for(let frame=0;frame<=186;frame++){
+   cast.update(frame/30);const bounds=new THREE.Box3();
+   cast.actor.traverse(o=>{if(!(o instanceof THREE.Mesh))return;const p=o.geometry.attributes.position;for(let i=0;i<p.count;i++)bounds.expandByPoint(new THREE.Vector3().fromBufferAttribute(p,i).applyMatrix4(o.matrixWorld).applyMatrix4(inverse));});
+   assert.ok(bounds.min.x>=-size.width/2&&bounds.max.x<=size.width/2,`${person} escapes reservation width`);
+   assert.ok(bounds.min.z>=-size.length/2&&bounds.max.z<=size.length/2,`${person} escapes reservation depth`);
+  }
+ }
+ const lot={x:0,z:16,row:0},entry={x:0,z:9},occupied=planterReservation(entry);
+ assert.equal(availableSceneSlot(lot,'planter',[],undefined),undefined,'invented a doorway');
+ assert.equal(availableSceneSlot(lot,'planter',[occupied],entry),undefined,'reserved an occupied exit');
+ assert.deepEqual(availableSceneSlot(lot,'planter',[],entry),occupied);
 });

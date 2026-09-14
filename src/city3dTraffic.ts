@@ -10,6 +10,7 @@ export function trafficSpeed(model: string) {
   return isPedestrian(model) ? 1.8 : 11;
 }
 export function trafficSize(model: string) {
+  if (model === 'planter') return {length:5.8,width:3.4};
   if (model === 'incendiary') return {length:1.8,width:6.2};
   if (model === 'custody') return {length:2,width:4.4};
   if (model === 'assassination') return {length:1.4,width:8.2};

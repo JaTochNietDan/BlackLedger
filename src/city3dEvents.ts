@@ -62,10 +62,15 @@ export function sceneSlots(lot: Lot, kind: string): SceneSlot[] {
     }));
   return [];
 }
+/** Swept exit bounds include the vestibule, turn and pavement walk. */
+export function planterReservation(root:Point,heading=0):SceneSlot{
+ const c=Math.cos(heading),s=Math.sin(heading);
+ return {root:{...root},pose:{x:root.x-c-.05*s,z:root.z+s-.05*c,heading},model:'planter'};
+}
 export function availableSceneSlot(
   lot: Lot, kind: string, occupied: {pose: TrafficPose; model: string}[], entry?:Point, accept?:(slot:SceneSlot)=>boolean,
 ): SceneSlot | undefined {
-  const candidates=sceneSlots(lot,kind);
+  const candidates=kind==='planter'&&entry?[planterReservation(entry)]:sceneSlots(lot,kind);
   if(kind==='raid-officer'&&entry){
     // Keep a door-aligned approach available when a body occupies the forecourt.
     // Its conservative swept reservation also protects the entry after contact.

@@ -596,3 +596,13 @@ Committed tools/planter-preview.html makes the animation review reproducible wit
 Geometry tests sample187 frames on both person and woman at Monarch and tavern: raised actor bounds do not intersect authored door/masonry triangles; beat checks verify clearance before detonation. This is sampled conservative body bounds, excluding the bottom12cm, not full foot-placement or all-building acceptance. All264 frontend tests pass11.319s (.runtime/planter-motion-tests.log); build2.21s (.runtime/planter-motion-build.log), known chunk warning unchanged; diff check clean.
 
 Next required integration includes traffic reservation, preserving the actual planter's identity, all eligible doorway geometry, blast/fire/glazing/audio/casualty timing and newspaper completion as one scene. Do not claim the preamble is in gameplay until that work is done and tested. The complete production objective remains active; previous534e671 was concrete progress.
+
+### 2026-09-14 — planter doorway coverage and swept traffic reservation
+
+Expanded the actor/triangle path check to all11 current models with animated entrance markers: monarch, tavern, tenement, mercer-court, casino, civic, shop, warehouse, bluehour, goldenlily, papermoon. Both rigs pass187 samples each. The remaining mariner, villa, undertaker and five industrial models lack these animated doorway markers and are not covered.
+
+Added a planter traffic footprint3.4m wide by5.8m deep, centered on the full vestibule/turn/pavement sweep. planterReservation supports translated/rotated placement; availableSceneSlot requires an explicit doorway and rejects an occupied exit. Vertex-level footprint tests cover both rigs across four headings. These helpers are ready for integration but are not yet consumed by live explosion staging.
+
+The committed browser review now has an11-model selector. CUA8897 Paper Moon threshold screenshot shows the exit through its doorway. Found the standalone loader displayed both glazing variants; review now initializes intact glazing through the same buildingGlazing helper used by the game. Selected casino through the UI and verified closed door/clear actor at the6.2s blast-ready beat. No campaign/main-save changes; caffeinate87182 alive.
+
+All265 frontend tests pass11.509s (.runtime/planter-reservation-tests.log); build2.31s (.runtime/planter-reservation-build.log), known chunk warning unchanged; diff check clean. Full scene integration, missing doorway assets, dynamic traffic behavior, aftermath/casualty/audio timing and the complete production objective remain outstanding. Previous969866d was concrete progress; this turn adds verified geometry coverage and the required reservation, not a claim of an in-game preamble.
