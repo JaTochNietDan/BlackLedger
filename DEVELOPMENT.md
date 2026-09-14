@@ -3275,3 +3275,24 @@ Initial broad manager/charge/running selection remains live session7693, log
 .runtime/manager-restock-tests.log; no completion claimed. A separate clean long
 publican run will validate the revised purchase measurement. No live8791 action
 or promotion; remaining campaign, job and visual scope stays open.
+
+### September 14 — temporary errands preserve workplaces
+
+Previous turn made progress on manager purchasing and observed campaign
+receipts. Investigation confirmed Arrivals treated nearly every daytime
+arrival as a new job: petrol, vehicle repair/purchase, grudges and collections
+could overwrite Post. These temporary errands now retain the existing post.
+Service visits finish their existing purchase/repair effects and reconsider an
+ordinary return journey from the actual counter, without teleporting. Named
+headquarters journeys and home journeys retain their prior exclusions.
+
+Tests cover all six temporary errand labels and a funded fuel purchase followed
+by an actual delayed return to the original job. Selected fuel/garage/forecourt,
+crew-order and morning/evening mobility checks pass0.387s. The broader same-hour
+routine metric remains86%; its failure was reproduced and not weakened. This
+change fixes a concrete workplace bug but does not claim that entire metric.
+
+Full c06c36c test session47957 and clean9aec451 long publican session57475 both
+re-polled as live; no restart. Prior broader manager/charge/running selection
+completed successfully139.025s (.runtime/manager-restock-tests.log). No main8791
+actions or promotion. Broader goal and comprehensive dispatch remain open.

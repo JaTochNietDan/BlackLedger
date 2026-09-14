@@ -268,15 +268,16 @@ func (w *World) Arrivals() {
 		if n.Arrives > w.Minute {
 			continue
 		}
+		// Temporary errands never appoint somebody to a new workplace.
+		serviceJourney := strings.HasPrefix(n.Errand, "wanting petrol at ") || strings.HasPrefix(n.Errand, "taking the car in to ") || strings.HasPrefix(n.Errand, "buying another car at ")
+		temporaryJourney := serviceJourney || strings.HasPrefix(n.Errand, "looking for ") || strings.HasPrefix(n.Errand, "on collections at ") || n.Errand == "coming back from the round"
 		crewJourney := n.Errand == "on a headquarters assignment"
 		homeJourney := strings.HasPrefix(n.Errand, "heading home to ")
 		n.Location = n.Heading
 		n.Heading, n.Arrives, n.Errand, n.Sets = "", 0, "", 0
-		// Arriving anywhere in the daytime is arriving at work: whatever
-		// reason brought them, this is now where their day is, and the evening
-		// has somewhere to send them back from. An evening arrival is a drink
-		// and changes nothing.
-		if !crewJourney && !homeJourney && !Evening(w.Minute) && n.Location != n.Home {
+		// Ordinary work arrivals can change a post; a service counter, social
+		// visit, homecoming or temporary assignment cannot become the day job.
+		if !temporaryJourney && !crewJourney && !homeJourney && !Evening(w.Minute) && n.Location != n.Home {
 			w.keepPost(n, n.Location)
 		}
 		// What they came for. A garage's trade and a forecourt's are somebody
@@ -289,7 +290,7 @@ func (w *World) Arrivals() {
 		// A deed may change home while this walk is already underway. Finish
 		// it first, then reconsider from the actual arrival address. The old
 		// residence never becomes the person's workplace through this detour.
-		if homeJourney && n.Home != "" && n.Location != n.Home {
+		if serviceJourney || (homeJourney && n.Home != "" && n.Location != n.Home) {
 			w.setOutNPC(n)
 		}
 	}
