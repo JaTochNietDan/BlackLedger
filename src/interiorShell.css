@@ -1,0 +1,48 @@
+/* Interior controls occupy the same safe area as the city HUD. */
+.map-first .inside .city-stage{padding:0;overflow:hidden}
+.map-first .interior-scene-shell{position:absolute;inset:96px 18px 48px 94px;display:block;min-height:0;background:#171b18;border:1px solid #8d7956;box-shadow:0 12px 40px #0005}
+.map-first .interior-scene-shell>.interior3d,.map-first .interior-scene-shell>.room{position:absolute;inset:0;width:100%;height:100%;min-height:0;margin:0;border:0}
+.map-first .interior-scene-shell .room-holder{position:absolute;z-index:3;left:14px;top:14px;right:155px;display:flex;gap:8px 16px;align-items:center;min-height:0;margin:0;padding:10px 14px;background:var(--newsprint),#e6d5b2;color:#392d20;border:0;border-left:4px solid #8c3d2e;box-shadow:0 4px 16px #0004}
+.map-first .interior-scene-shell .room-holder>b{font:20px Georgia,serif;color:#392d20}
+.map-first .interior-scene-shell .room-holder>span{color:#745737;letter-spacing:.04em;font-size:11px}
+.map-first .interior-scene-shell .private-room-toggle{margin:0 0 0 auto;color:#493522;white-space:normal}
+.map-first .interior-scene-shell .room-holder>small{display:none}
+.map-first .interior-scene-shell .room-facts{display:none}
+.map-first .interior-scene-shell[data-panel="info"] .room-facts{display:flex;position:absolute;top:calc(100% + 58px);left:0;margin:0;width:min(420px,calc(100vw - 140px));max-height:calc(100dvh - 320px);overflow:auto;gap:16px;padding:20px;background:var(--newsprint),#e6d5b2;border-block:3px double #94764a;box-shadow:0 12px 30px #0005}
+.map-first .interior-scene-shell .room-facts i{color:#70583a}
+.map-first .interior-scene-shell .room-facts i b{color:#32281d}
+.map-first .interior-dock{position:absolute;z-index:4;left:14px;top:80px;right:14px;display:flex;flex-wrap:wrap;gap:6px;pointer-events:none}
+.map-first .interior-dock button{pointer-events:auto;padding:9px 13px;background:var(--newsprint),#e1cca5;color:#48351f;border:1px solid #a0875e;box-shadow:0 3px 8px #0004;font:13px Georgia,serif}
+.map-first .interior-dock button:hover,.map-first .interior-dock button[aria-expanded="true"]{background:var(--newsprint),#f3e6cb;color:#672f24;border-bottom:3px solid #873f2d}
+.map-first .interior-dock button:focus-visible{outline:2px solid #f5ddac;outline-offset:3px}
+.map-first .interior-scene-shell>.room-people,.map-first .interior-scene-shell>.room-work,.map-first .interior-scene-shell>.lodging-register{display:none;position:absolute;z-index:3;top:130px;left:14px;width:min(540px,calc(100% - 28px));max-height:calc(100% - 150px);overflow:auto;overscroll-behavior:contain;margin:0;box-sizing:border-box;box-shadow:0 12px 35px #0006;background:var(--newsprint),#e7d6b3;color:#392d20;border-block:3px double #94764a}
+.map-first .interior-scene-shell[data-panel="people"]>.room-people{display:grid}
+.map-first .interior-scene-shell[data-panel="business"]>.room-work,.map-first .interior-scene-shell[data-panel="residents"]>.lodging-register{display:block}
+.map-first .interior-scene-shell>.lodging-register{padding:16px}
+.map-first .interior-scene-shell>.room-traffic{position:absolute;z-index:2;bottom:10px;left:14px;max-width:45%;max-height:65px;overflow:auto;background:#19231de8;pointer-events:none}
+.map-first .inside .map-leave-building{top:110px;right:30px}
+.map-first .interior-scene-shell .interior3d-expand{display:none}
+.map-first .interior-scene-shell .interior3d-caption{max-width:min(560px,65%);font-size:10px;letter-spacing:.02em}
+@media(max-width:800px){
+ .map-first .interior-scene-shell{inset:136px 8px 45px 72px}
+ .map-first .inside .map-leave-building{top:146px;right:18px;font-size:11px}
+ .map-first .interior-scene-shell .room-holder{left:8px;top:8px;right:132px;padding:8px;max-height:76px;overflow:auto}
+ .map-first .interior-scene-shell .room-holder>b{font-size:16px}
+ .map-first .interior-dock{top:96px;left:8px;right:8px;gap:4px}
+ .map-first .interior-dock button{padding:7px 9px;font-size:12px}
+ .map-first .interior-scene-shell>.room-people,.map-first .interior-scene-shell>.room-work,.map-first .interior-scene-shell>.lodging-register{top:174px;left:8px;width:calc(100% - 16px);max-height:calc(100% - 185px)}
+ .map-first .interior-scene-shell[data-panel="info"] .room-facts{position:fixed;left:80px;top:310px;width:calc(100vw - 98px);max-height:calc(100dvh - 365px)}
+ .map-first .interior-scene-shell .interior3d-caption{max-width:calc(100% - 28px);font-size:9px}
+}
+.map-first:has(.inside) .city-accounts{top:auto;bottom:60px;left:108px;width:270px}
+.map-first:has(.inside) .city-accounts .books{max-height:calc(100dvh - 300px)}
+.map-first .interior-scene-shell .room-facts p{flex-basis:100%;margin:0;line-height:1.5}
+@media(max-width:800px){
+ .map-first:has(.inside) .city-accounts{left:80px;bottom:55px;width:200px}
+ .map-first:has(.inside) .city-accounts:not([open]) summary{display:block;padding:8px}
+ .map-first:has(.inside) .city-accounts:not([open]) summary>span:not(:first-child){display:none}
+ .map-first .interior-scene-shell .room-holder{overflow:visible;max-height:none}
+}
+/* Leave a clear footer for accounts even while an action paper is open. */
+.map-first .interior-scene-shell>.room-people,.map-first .interior-scene-shell>.room-work,.map-first .interior-scene-shell>.lodging-register{max-height:calc(100% - 230px)}
+@media(max-width:800px){.map-first .interior-scene-shell>.room-people,.map-first .interior-scene-shell>.room-work,.map-first .interior-scene-shell>.lodging-register{max-height:calc(100% - 235px)}}

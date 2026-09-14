@@ -7,6 +7,7 @@ import type {Action, Coming, Group, Place, Presence, Person} from './types';
 import {interiorSVG, paintedRoom, roomLight, standingSpots, StandingRoom} from './roomart';
 import {placeActions} from './grouping';
 import {Portrait} from './Portrait';
+import './interiorShell.css';
 
 // Entering a building should open the building, not fill a column. The room is
 // the screen: the inside of the place, the people standing in it as things you
@@ -129,6 +130,9 @@ export function Interior({
   comings?: Coming[];
 }) {
   const [picked, setPicked] = useState('');
+  const [panel,setPanel]=useState('');
+  useEffect(()=>{setPanel('');setPicked('');},[place.id]);
+  const choosePerson=(id:string)=>{setPicked(id);setPanel(id?'business':'people');};
   const [residentQuery,setResidentQuery]=useState('');
   useEffect(()=>setResidentQuery(''),[place.id]);
   const registeredTenants=(place.rent_register?.tenants||[]).filter(t=>`${t.name} ${t.accommodation}`.toLocaleLowerCase().includes(residentQuery.trim().toLocaleLowerCase()));
@@ -269,22 +273,27 @@ export function Interior({
   }
 
   return (
-    <div className="interior-stage">
+    <div className="interior-stage interior-scene-shell" data-panel={panel} onKeyDown={e=>{if(e.key==='Escape'&&panel){e.stopPropagation();setPanel('');}}}>
       <div className={'room-holder' + (place.owned ? ' yours' : '')}>
         <b>{place.name}</b>
         <span>{held}</span>
-        <div className="room-facts">
+        <div className="room-facts" aria-label="Building details">
           {facts.map(f => (
             <i key={f.what}>
               {f.what}
               <b className={f.warn ? 'warning' : ''}>{f.is}</b>
             </i>
           ))}
+          {place.note&&<p className={place.note_warn?'warning':''}>{place.note}</p>}
         </div>
         {hasFlat&&<button className="plain private-room-toggle" aria-pressed={inFlat} onClick={()=>{setPrivateRoom(!inFlat);setPicked('');}}>{inFlat?'Return to entrance hall':place.id==='room'?'Go to your room':'Go to your apartment'}</button>}
         {place.note && <small className={place.note_warn ? 'warning' : ''}>{place.note}</small>}
       </div>
-      {place.rent_register && <details className="lodging-register">
+      <nav className="interior-dock" aria-label="Inside this building">
+        {[["info","Building"],["people",`People · ${people.length}`],["business","Business"],...(place.rent_register?[["residents","Residents"]]:[])].map(([id,label])=><button key={id} aria-expanded={panel===id} onClick={()=>setPanel(panel===id?'':id)}>{label}</button>)}
+        {panel&&<button className="interior-panel-close" onClick={()=>setPanel('')} aria-label="Close building panel">Close ×</button>}
+      </nav>
+      {place.rent_register && <details className="lodging-register" open={panel==='residents'}>
         <summary>Residents’ register <span>{place.rent_register.occupied} tenants · {place.rent_register.capacity} places</span></summary>
         <p>${place.rent_register.daily} current rent per day. {place.id === 'room' && 'Service and condition affect the rate. '}Payments settle daily; unpaid rent remains owing.</p>
         <input type="search" aria-label="Find a resident" placeholder="Find a resident…" value={residentQuery} onChange={e=>setResidentQuery(e.target.value)}/>
@@ -304,7 +313,7 @@ export function Interior({
           ))}
         </div>
       )}
-      {inFlat?<Interior3D key={`${place.id}-private`} place={place.id==='room'?'lodging':'flat'} player={player} motion={motion} people={[]} picked="" onPick={()=>{}} minute={minute}/>:hasInterior(place.id) ? <Interior3D key={place.id} place={place.id} tournament={tournament} onPoolTable={onPoolTable} operation={place} player={player} motion={motion} people={onFloor} picked={picked} onPick={id=>setPicked(id===picked?'':id)} minute={minute}/> : <div
+      {inFlat?<Interior3D key={`${place.id}-private`} place={place.id==='room'?'lodging':'flat'} player={player} motion={motion} people={[]} picked="" onPick={()=>{}} minute={minute}/>:hasInterior(place.id) ? <Interior3D key={place.id} place={place.id} tournament={tournament} onPoolTable={onPoolTable} operation={place} player={player} motion={motion} people={onFloor} picked={picked} onPick={id=>choosePerson(id===picked?'':id)} minute={minute}/> : <div
         className={'room' + (painted ? ' painted' : '')}
         style={painted ? {backgroundImage: `url(${paintedRoom(place.id)})`} : undefined}
       >
@@ -344,7 +353,7 @@ export function Interior({
               }}
               aria-pressed={who.id === picked}
               title={`${who.name} — ${who.standing}`}
-              onClick={() => setPicked(who.id === picked ? '' : who.id)}
+              onClick={() => choosePerson(who.id === picked ? '' : who.id)}
             >
               {/* What they are standing on. Nothing in the city is allowed to
               float and neither is anybody in here. */}
@@ -374,7 +383,7 @@ export function Interior({
               (p.overdue || p.sore ? ' sour' : '')
             }
             aria-pressed={p.id === picked}
-            onClick={() => {setPrivateRoom(false);setPicked(p.id === picked ? '' : p.id);}}
+            onClick={() => {setPrivateRoom(false);choosePerson(p.id === picked ? '' : p.id);}}
           >
             <Portrait id={p.id} face={p.face} size="tiny" />
             <span className="chip-name">

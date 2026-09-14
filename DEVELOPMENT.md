@@ -2696,3 +2696,23 @@ labels. No gameplay commands were sent to main8791 and no main save was changed.
 These changes are not yet promoted. Existing unrelated armed/robbery/aftermath
 work was left unstaged. Death-service businesses and individual proprietor
 purchase/succession remain outstanding after the ownership audit.
+
+### September 14 — scene-first interior shell
+
+Replaced the legacy stacked interior layout with a viewport-filling room and
+one-at-a-time floating Building, People, Business and Residents panels. Reused
+all authoritative actions, searches, tenancy accounts and private-room controls.
+Selecting an actor opens their business panel; Escape closes the panel and G
+retains contextual exit. Added paper/brass styling, readable ownership header,
+scrollable panel bounds, and compact-width rules. Daily accounts moves to the
+lower corner while inside, with panel space reserved above it. Removed the
+redundant enlarge control because the standard interior now uses the full stage.
+
+Browser evidence: isolated apartments fixture8982, tabs87/88. Initial screenshot
+exposed accounts covering the new header; moved accounts and rechecked at1280x720:
+Mercer Court title/ownership and private-room control visible, room centered,
+business paper readable with its own scrolling. Escape and G returned to city.
+Final footer-space correction passed production build; small-width CSS is present
+but phone-size visual acceptance and other venue panels remain to be checked.
+No main save commands or deployment; this is preview-only. No new tests for this
+reversible layout change; TypeScript and production build passed.
