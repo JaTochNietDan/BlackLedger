@@ -876,11 +876,15 @@ def industrial(kind):
     red=material('pump red',(.42,.07,.04),.3)
     anchor=bpy.data.objects.new('sign-anchor',None);bpy.context.collection.objects.link(anchor)
     anchor.location=(0,-3.28,4.05)
+    def fire_target(index,x,y,z):
+        vent=bpy.data.objects.new('fire-window-0-'+str(index),None)
+        bpy.context.collection.objects.link(vent);vent.location=(x,y,z)
     if kind=='filling':
         anchor.location=(0,-5.06,3.52)
         box('station office',(0,4,1.65),(12,5,3.3),wall)
         box('station roof',(0,4,3.4),(12.4,5.4,.25),cream)
         box('office glazing',(0,1.44,1.85),(8,.1,1.6),glass)
+        for i,x in enumerate((-3,0,3)):fire_target(i,x,1.30,1.85)
         box('pump canopy',(0,-2,3.4),(13,6,.25),cream,.1)
         box('canopy stripe',(0,-2,3.5),(13.1,6.1,.16),red,.05)
         for x in (-4,4):
@@ -908,6 +912,7 @@ def industrial(kind):
             for z in range(12):
                 box('door seam',(x,-3.24,.3+z*.29),(3.5,.035,.035),roof)
             box('bay windows',(x,-3.27,2.8),(3.2,.05,.6),glass)
+            fire_target(int(x+5),x,-3.38,2.8)
         if kind=='dealer':
             before=set(bpy.context.scene.objects)
             car('ford',articulated=False)
@@ -939,6 +944,10 @@ def industrial(kind):
     box('cargo shed',(-3,1.5,2.6),(7,10,5.2),wall)
     corrugated_roof('cargo corrugated roof',(-3,1.5,5.35),7.4,10.4,roof)
     box('loading gate',(-3,-3.58,1.9),(4.5,.16,3.7),iron)
+    for i,x in enumerate((-5,-3,-1)):
+        box('cargo clerestory frame',(x,-3.57,4.35),(1.65,.16,.72),cream)
+        box('cargo clerestory glazing',(x,-3.68,4.35),(1.43,.08,.52),glass)
+        fire_target(i,x,-3.80,4.35)
     for x,y in [(3,4),(5,4),(3,2),(5,2)]:
         box('shipping crate',(x,y,.65),(1.6,1.6,1.3),iron)
         for z in (.25,1.05):box('crate strapping',(x,y,z),(1.64,1.64,.07),roof)
@@ -2203,6 +2212,14 @@ def mercer_court():
                 x=side*(1.4+col*.22)
                 box('tenant letter box',(x,6.28,.98+row*.19),(.20,.08,.16),brass,.009)
                 box('letter slot',(x,6.325,1.02+row*.19),(.13,.01,.014),iron)
+
+if __name__ == '__main__' and '--only=industrial-fire' in __import__('sys').argv:
+    manifest_path=os.path.join(OUT,'manifest.json')
+    with open(manifest_path) as f: selected_manifest=json.load(f)
+    for name in ('filling','garage','dealer','docks','haulage'):
+        clear();industrial(name);selected_manifest[name]=export(name)
+    with open(manifest_path,'w') as f:json.dump(selected_manifest,f,indent=2)
+    raise SystemExit(0)
 
 if __name__ == '__main__' and '--only=mariner' in __import__('sys').argv:
     manifest_path=os.path.join(OUT,'manifest.json')
