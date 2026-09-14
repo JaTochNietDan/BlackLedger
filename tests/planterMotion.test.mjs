@@ -91,3 +91,26 @@ test('villa entrance landing and stair treads have consistent 20cm risers',async
   assert.ok(hit);assert.ok(Math.abs(hit.point.y-height)<1e-5,`tread ${z}: ${hit.point.y}`);
  }
 });
+
+
+test('stair leg poses reach independent ankle targets without tilting the soles',async()=>{
+ const {CityLegs}=await import('../.runtime/frontend-test/city3dLegs.js');
+ for(const name of ['person','woman']){
+  const actor=await model(name),legs=new CityLegs(actor);
+  actor.position.set(30,.5,20);actor.rotation.y=1.1;
+  for(const side of [-1,1])for(const y of [.14,.24,.34])for(const z of [-.2,0,.2]){
+   const target=new THREE.Vector3(side*.12,y,z);
+   assert.equal(legs.place(side,target),true);
+   const ankle=actor.getObjectByName(`ankle${side}`);
+   assert.ok(actor.worldToLocal(ankle.getWorldPosition(new THREE.Vector3())).distanceTo(target)<1e-6);
+   const up=new THREE.Vector3(0,1,0).transformDirection(ankle.matrixWorld);
+   assert.ok(up.distanceTo(new THREE.Vector3(0,1,0))<1e-6);
+   let sole=Infinity;
+   ankle.traverse(o=>{if(!(o instanceof THREE.Mesh))return;const vertices=o.geometry.attributes.position;for(let i=0;i<vertices.count;i++)sole=Math.min(sole,new THREE.Vector3().fromBufferAttribute(vertices,i).applyMatrix4(o.matrixWorld).y);});
+   assert.ok(Math.abs(sole-(.5+y-.095))<1e-6,`authored sole height ${sole}`);
+  }
+  const before=actor.getObjectByName('leg1').quaternion.clone();
+  assert.equal(legs.place(1,new THREE.Vector3(0,-10,0)),false);
+  assert.ok(before.equals(actor.getObjectByName('leg1').quaternion));
+ }
+});
