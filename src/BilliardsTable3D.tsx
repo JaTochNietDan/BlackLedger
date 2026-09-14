@@ -21,7 +21,7 @@ export function BilliardsTable3D(props:TableProps){
  useEffect(()=>{
   const el=host.current!;let dead=false,renderer:THREE.WebGLRenderer;
   try{renderer=new THREE.WebGLRenderer({antialias:true});}catch{setError('The 3D table could not start.');return;}
-  const canvas=renderer.domElement;canvas.setAttribute('aria-label','Billiards table. Click cloth to aim or preview cue placement, a ball to call it, or a numbered pocket to call it. Drag to orbit; right drag to pan; wheel to zoom; Home to reset.');el.append(canvas);
+  const canvas=renderer.domElement;canvas.setAttribute('aria-label','Billiards table. Click cloth to aim or preview cue placement, a ball to call it, or a numbered pocket to call it. Drag to orbit; right drag to pan; wheel to zoom; hold WASD or arrows to pan, Q/E to orbit; Home to reset.');el.append(canvas);
   renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFShadowMap;renderer.toneMapping=THREE.ACESFilmicToneMapping;
   const scene=new THREE.Scene();scene.background=new THREE.Color('#15231f');scene.add(new THREE.HemisphereLight(0xffedcb,0x192c26,2));
   const light=new THREE.DirectionalLight(0xffe0ad,3);light.position.set(-1,5,1);light.castShadow=true;light.shadow.mapSize.set(1024,1024);Object.assign(light.shadow.camera,{left:-2,right:2,top:3,bottom:-3});light.shadow.bias=-.00015;scene.add(light);

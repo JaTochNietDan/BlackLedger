@@ -2461,3 +2461,22 @@ no gameplay commands/main-save writes.
 This is the transit shed, not the full waterfront/loading yard or animated
 cargo work. Those, other missing interiors and full billiards fidelity remain
 open. Main8791 stays01fb5cf; this room awaits release promotion.
+
+### 2026-09-14 — smooth table camera keys
+
+Poker, blackjack and billiards now share continuous held-key pan/orbit using
+city camera input helpers. WASD/arrows move between keyboard repeat events;
+Q/E rotate continuously. Key release, focus loss, visibility changes and Home
+clear held input. Disposal cancels the added animation loop. Updated poker
+help and billiards accessibility instructions; gameplay commands are unchanged.
+
+394 frontend tests passed (14.693s), including the real TableCamera and
+OrbitControls with controlled animation frames for movement, release, blur,
+reset and disposal. Test compilation now uses bundler module resolution for
+Three's addon export. Production build passed (2.69s). Logs:
+`.runtime/table-camera-held-{tests,build}.log`. Browser75 on isolated8968
+opened the completed tournament final and confirmed close table rendering;
+held-key behavior is automated-test evidence, not a browser hold-duration test.
+No gameplay commands or main-save QA writes. Main8791 remains01fb5cf;
+this change and preceding interior/property work await promotion. Broad
+interior and billiards fidelity work remains open.
