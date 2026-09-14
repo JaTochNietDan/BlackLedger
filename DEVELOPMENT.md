@@ -1339,3 +1339,9 @@ Main stored-state digest still matches its pre-QA digest. No listener was on8791
 Full clean Go package checks caught Apartments' `omitempty` tag violating the
 project list contract; removed it. The apartment market API itself was already
 an explicit list. Release integration continues after remaining checks finish.
+
+The full clean core run additionally caught the fee guard's static call-site
+count (43) lagging the new rental-investment offer (44). Updated that count;
+the command-level investment test verifies the actual single principal debit.
+The original clean core package completed in170.226s with this sole failure;
+its corrected recheck and the remaining full simulation run are tracked below.
