@@ -6,7 +6,33 @@ const smooth=(n:number)=>{const t=THREE.MathUtils.clamp(n,0,1);return t*t*(3-2*t
 /** Doorway-local exit: +Z is inside, -Z is the pavement. Caller owns the door. */
 export class CityPlanter {
  readonly root=new THREE.Group();
- constructor(readonly actor:THREE.Group){this.root.add(actor);this.update(0);}
+ private readonly shoes:THREE.Mesh[]=[];
+ private readonly inverse=new THREE.Matrix4();
+ private readonly shoeMatrix=new THREE.Matrix4();
+ private readonly point=new THREE.Vector3();
+ constructor(readonly actor:THREE.Group){
+  this.root.add(actor);
+  actor.traverse(o=>{if(o instanceof THREE.Mesh&&o.name.startsWith('shoe'))this.shoes.push(o);});
+  this.update(0);
+ }
+ private groundFeet(){
+  // Match the authored soles to the local pavement after posing the joints.
+  // Inspect only the two shoe meshes; no whole-character bounds or allocations.
+  this.inverse.copy(this.root.matrixWorld).invert();
+  let floor=Infinity;
+  for(const shoe of this.shoes){
+   this.shoeMatrix.multiplyMatrices(this.inverse,shoe.matrixWorld);
+   const vertices=shoe.geometry.attributes.position;
+   for(let i=0;i<vertices.count;i++){
+    this.point.fromBufferAttribute(vertices,i).applyMatrix4(this.shoeMatrix);
+    floor=Math.min(floor,this.point.y);
+   }
+  }
+  if(Number.isFinite(floor)){
+   this.actor.position.y+=.005-floor;
+   this.root.updateMatrixWorld(true);
+  }
+ }
  update(seconds:number){
   // Stand behind the door's entire swing until the opening is clear.
   const exit=incendiaryStride(seconds-.5,4.6,3.4,.25);
@@ -21,6 +47,7 @@ export class CityPlanter {
     this.actor.getObjectByName(name)?.rotation.set(angle,0,0);
   }
   this.root.updateMatrixWorld(true);
+  this.groundFeet();
   // Do not close through the person crossing the threshold.
   const door=smooth(seconds/.4)*(1-smooth((seconds-3.3)/.5));
   return {door,blast:seconds>=PLANTER_BLAST,distance,weight};

@@ -17,7 +17,7 @@ test('planter exits the authored vestibule without crossing the door or masonry'
   const door=building.getObjectByName('entrance-door-hinge'),triangle=new THREE.Triangle(),bounds=new THREE.Box3();
   for(let frame=0;frame<=186;frame++){
    const pose=cast.update(frame/30);door.rotation.y=-Math.PI/2*pose.door;building.updateMatrixWorld(true);
-   const actorBounds=new THREE.Box3().setFromObject(actor,true);actorBounds.min.y+=.12;
+   const actorBounds=new THREE.Box3().setFromObject(actor,true);if(name!=='undertaker')actorBounds.min.y+=.12;
    building.traverse(o=>{
     if(!(o instanceof THREE.Mesh))return;
     o.geometry.computeBoundingBox();bounds.copy(o.geometry.boundingBox).applyMatrix4(o.matrixWorld);
@@ -55,4 +55,26 @@ test('planter reservation covers both rigs through translated and rotated exits'
  assert.equal(availableSceneSlot(lot,'planter',[],undefined),undefined,'invented a doorway');
  assert.equal(availableSceneSlot(lot,'planter',[occupied],entry),undefined,'reserved an occupied exit');
  assert.deepEqual(availableSceneSlot(lot,'planter',[],entry),occupied);
+});
+
+
+test('planter soles stay on the pavement through walking, stopping and turning',async()=>{
+ for(const person of ['person','woman'])for(const heading of [0,1.1]){
+  const cast=new CityPlanter(await model(person));
+  cast.root.position.set(30,.2,50);cast.root.rotation.y=heading;
+  let previousY;
+  for(let frame=0;frame<=816;frame++){
+   cast.update(frame/120);let low=Infinity,shoes=0;
+   cast.actor.traverse(o=>{
+    if(!(o instanceof THREE.Mesh)||!o.name.startsWith('shoe'))return;
+    shoes++;
+    const p=o.geometry.attributes.position;
+    for(let i=0;i<p.count;i++)low=Math.min(low,new THREE.Vector3().fromBufferAttribute(p,i).applyMatrix4(o.matrixWorld).y);
+   });
+   assert.equal(shoes,2);
+   assert.ok(Math.abs(low-.205)<1e-6,`${person} sole height ${low} at ${frame/120}`);
+   if(previousY!==undefined)assert.ok(Math.abs(cast.actor.position.y-previousY)<.012,'vertical pose snapped');
+   previousY=cast.actor.position.y;
+  }
+ }
 });
