@@ -1544,3 +1544,26 @@ All current residential addresses now select their appropriate indoor attack
 room, but this does not finish crimes/interiors: burglary animation, persistent
 indoor aftermath/police, other destinations and full visual/campaign acceptance
 remain. The new private lodging also does not depict player-fitted upgrades.
+
+## September 14 — authoritative burglary presentation outcomes
+
+Added optional CueBurglary to the existing completed robbery cue, capturing the
+intruder/resident, witnessed historical occupancy, success, actual cash taken,
+actual injury, identification and fatality. No private remaining savings are
+exposed, and no extra random draw or gameplay outcome changed. This prevents a
+future indoor scene from treating an empty successful search as a failed attack
+or animating an escape after a fatal confrontation. Legacy robbery cues omit it.
+
+Tests execute real burglary outcomes:180cash once, empty successful search,
+occupied failed attempt with untouched stash/actual injury/identification,
+fatal attempt with no escape, and persistence of the committed result after
+serialization and subsequent savings/movement changes. Initial save test used
+the intentionally unsaved transient VisualCues buffer; corrected it to Execute
+and persisted LastResult, matching actual command flow.
+
+Focused burglary/home core tests pass0.962s, store0.154s, server contract tests
+0.900s; frontend build passes. Evidence: `.runtime/burglary-presentation-tests.log`,
+`burglary-contract-tests.log`, `burglary-contract-build.log`. No main-save QA.
+This is required presentation data; the dedicated indoor search/confrontation/
+escape animation remains unfinished, alongside persistent indoor aftermath and
+remaining interiors. Main8791 remains the prior verified release.

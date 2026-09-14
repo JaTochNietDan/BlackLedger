@@ -479,6 +479,18 @@ type CueDriveBy struct {
 	ConditionAfter  int      `json:"condition_after"`
 }
 
+// CueBurglary describes the completed break-in, never a live household balance.
+type CueBurglary struct {
+	Intruder        CueActor `json:"intruder"`
+	Resident        CueActor `json:"resident"`
+	ResidentPresent bool     `json:"resident_present"`
+	Success         bool     `json:"success"`
+	Taken           int      `json:"taken"`
+	HealthLost      int      `json:"health_lost"`
+	Identified      bool     `json:"identified"`
+	Fatal           bool     `json:"fatal"`
+}
+
 type VisualCue struct {
 	// Detonation distinguishes a planted blast from a premature charge accident.
 	// Empty on legacy or unrelated cues; it must not imply a safe escape.
@@ -486,6 +498,7 @@ type VisualCue struct {
 	Accident   *CueAccident `json:"accident,omitempty"`
 	DriveBy    *CueDriveBy  `json:"drive_by,omitempty"`
 	Strike     *CueStrike   `json:"strike,omitempty"`
+	Burglary   *CueBurglary `json:"burglary,omitempty"`
 	Attacker   *CueAttacker `json:"attacker,omitempty"`
 	Detainee   *CueActor    `json:"detainee,omitempty"`
 	ID         string       `json:"id"`

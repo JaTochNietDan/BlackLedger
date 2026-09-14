@@ -970,3 +970,14 @@ Explicit Mariner home strikes use this lodging model with a diagonal full-size
 cast path. Spatter coordinates follow the same root transform as the actors.
 All four current residential addresses now have indoor home-strike playback;
 persistent indoor aftermath and burglary scenes remain separate unfinished work.
+
+Completed burglary robbery cues now include optional `burglary` with `intruder`
+and `resident` identities, historical `resident_present`, `success`, `taken`,
+`health_lost`, `identified` and `fatal`. These are committed action facts, not a
+live household balance or an advance estimate. A successful empty search has
+success:true/taken:0; a failed break-in has success:false/taken:0. Injury reflects
+actual absorbed health loss. Resident presence remains fixed if the resident
+later moves; amounts remain fixed if later savings change. The cue is persisted
+through last_result and normal command receipts. Legacy/unrelated robbery cues
+omit it. No extra RNG draws or gameplay rule changes are introduced. The dedicated
+burglary animation is still unfinished; this provides its authoritative outcome.

@@ -92,11 +92,13 @@ func (w *World) Burgle(id string) error {
 	home := n.Home
 	present := w.residentAtHome(n)
 	success := w.Random() < w.burglaryChance(n)
+	presentation := CueBurglary{Intruder: CueActor{ID: "player", Name: w.Player.Name}, Resident: CueActor{ID: n.ID, Name: n.Name}, ResidentPresent: present, Success: success}
 	headline := "BREAK-IN AT " + upper(placeName(home))
 	var detail string
 	if success {
 		a := w.HouseholdSavings[id]
 		loot := max(0, a.Cash)
+		presentation.Taken = loot
 		a.Cash = 0
 		if w.HouseholdSavings != nil {
 			w.HouseholdSavings[id] = a
@@ -115,6 +117,7 @@ func (w *World) Burgle(id string) error {
 		}
 		before := w.Player.Health
 		w.Player.Health = max(0, w.Player.Health-w.Absorb(injury))
+		presentation.HealthLost = before - w.Player.Health
 		w.Ruin(15)
 		w.Player.Heat = min(100, w.Player.Heat+14)
 		detail = fmt.Sprintf("The break-in at %s's home went wrong. You escaped with nothing and lost %d health.", n.Name, before-w.Player.Health)
@@ -122,18 +125,21 @@ func (w *World) Burgle(id string) error {
 	// A resident who sees the intruder can name them; otherwise witnesses may
 	// identify a failed intruder. There is no automatic knowledge from absence.
 	identified := present || (!success && w.Random() < .45)
+	presentation.Identified = identified
 	if identified {
 		w.Aggrieve(n.ID, 35, "the break-in at their home")
 		w.answerFor(n, w.OwnHands(), 25)
 		detail += " You were identified; " + n.Name + " knows who came through the door."
 	}
 	if !w.Player.Alive || w.Player.Health <= 0 {
+		presentation.Fatal = true
 		detail = "The break-in at " + n.Name + "'s home ended in a fatal confrontation."
 		w.DieOf("a burglary", detail)
 	}
 	w.Log("Burglary at "+placeName(home), detail, "danger")
 	w.Report("robbery", headline, "A resident's home at "+placeName(home)+" was broken into. Police are asking for witnesses.")
 	w.Witness("robbery", home, detail, headline)
+	w.VisualCues[len(w.VisualCues)-1].Burglary = &presentation
 	return nil
 }
 

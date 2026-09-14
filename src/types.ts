@@ -4,6 +4,7 @@ export interface Group {
   blurb: string;
 }
 export interface VisualCue {
+  burglary?: {intruder:{id:string;name:string};resident:{id:string;name:string};resident_present:boolean;success:boolean;taken:number;health_lost:number;identified:boolean;fatal:boolean};
   detonation?: 'planted' | 'premature';
   accident?: {health_lost: number; fatal: boolean};
   drive_by?: {driver: {id: string; name: string}; vehicle: string; vehicle_tier: number; condition_before: number; condition_after: number};
