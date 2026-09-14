@@ -2,6 +2,7 @@ import {SceneNewspaper} from './SceneNewspaper';
 import {MapMenu} from './MapMenu';
 import './mapFirst.css';
 import './encounterStyle.css';
+import './cityHud.css';
 import {cityOwnsAudio} from './city3dEvents';
 import type {VisualCue} from './types';
 import {paintedCar} from './cityAssets';
@@ -1170,6 +1171,7 @@ function App() {
               className={
                 (tab === id ? 'active' : '') + (id === 'news' && unreadNews > 0 ? ' has-news' : '')
               }
+              aria-current={tab === id ? 'page' : undefined}
               aria-label={
                 id === 'news' && unreadNews > 0 ? `${label}, ${unreadNews} unread` : label
               }
@@ -1195,7 +1197,7 @@ function App() {
         </nav>
         <main className="page">
           <header className="topbar" inert={tab!=='city'}>
-            <div>
+            <div className="hud-brand">
               <div className="eyebrow">A CITY REMEMBERS</div>
               <div className="brand">BLACK LEDGER</div>
             </div>

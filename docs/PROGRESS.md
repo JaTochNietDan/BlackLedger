@@ -237,3 +237,27 @@ adopted the remaining browser tab, so it was left open.
 
 Car entry/departure, more detailed actor production, other action variants,
 interiors and wider performance/visual acceptance remain unfinished.
+
+### Persistent HUD period styling — September 13 amendment
+
+Read new objective35be00d7-3965-49d2-a7a1-89871ff89fb3 and updated GOAL.md.
+Previous turn was progress (arrest escort). Reprioritized the newly requested
+persistent HUD before vehicle interaction work; no vehicle edits were made.
+
+Top HUD now separates a cloth-covered Black Ledger nameplate from a paper
+accounts strip, with ink values, brass rules and red warning values. Navigation
+is a book spine with labelled index tabs, a projecting active tab and existing
+unread badge. Active navigation now has aria-current. Camera controls use brass
+labels; selected addresses use a calling card with integrated travel/entry action,
+and address selection shares the paper palette. The empty What you did box is
+hidden until it has an actual outcome. Original stats, descriptions, tooltips,
+travel costs and command handling remain intact.
+
+Build passes. At1280×720, browser checks found all9 navigation controls and7
+status/clock groups inside the viewport, no peer overlaps, and one city canvas.
+People opens/closes over the same canvas; selecting The Monarch updates the card
+and authoritative25-minute travel label without travelling. Evidence:
+persistent-hud.png/json. Reload's initial empty DOM was discarded and verification
+repeated after loading. Temporary QA tab closed; no save commands or preference
+changes. Responsive rules included but compact-size acceptance remains open.
+The full cinematic/asset/interior scope remains unfinished.

@@ -1,0 +1,57 @@
+/* A book spine and a strip of accounts frame the city without a dashboard box. */
+.shell.map-first .topbar {background:none;border:0;box-shadow:none;border-radius:0;padding:0;gap:18px;align-items:stretch}
+.map-first .hud-brand {display:flex;flex-direction:column;justify-content:center;padding:10px 20px;min-width:205px;background:var(--newsprint),linear-gradient(110deg,#282b23,#171e19);border-left:5px solid #796442;box-shadow:inset 0 0 0 1px #b69a6260,3px 3px 0 #111710,0 5px 14px #0005}
+.map-first .hud-brand .eyebrow {color:#b5a27c;font:8px Georgia,serif;letter-spacing:.25em;margin-bottom:5px}
+.map-first .hud-brand .brand {color:#e0c895;font:22px Georgia,serif;letter-spacing:.09em;text-shadow:0 1px #000}
+.map-first .topbar .stats {flex:1;min-width:0;justify-content:space-between;align-items:center;gap:12px;padding:10px 18px;background:var(--newsprint),linear-gradient(100deg,#e7dbc0,#efe5cf 50%,#d7c4a0);color:#383021;border-top:3px double #a58d67;border-bottom:3px double #a58d67;box-shadow:0 3px 0 #8e7858,0 7px 18px #0005}
+.map-first .topbar .stat {position:relative;min-width:0}
+.map-first .topbar .stat>.icon {width:14px;height:14px;color:#8c7148;stroke-width:1.6}
+.map-first .topbar .stat b {font:20px Georgia,serif;color:#3a3021;letter-spacing:-.02em;font-variant-numeric:tabular-nums;margin-left:5px}
+.map-first .topbar .stat small {font:8px system-ui;color:#786446;letter-spacing:.10em;margin-top:4px}
+.map-first .topbar .stat small i {color:#786446;font-size:8px}
+.map-first .topbar .stat.warning b,.map-first .topbar .stat.warning>.icon {color:#953c2a}
+.map-first .topbar .clock {padding-left:15px;border-left:3px double #b49c74}
+.map-first .topbar .clock b {font-size:19px;margin:0}
+.map-first .topbar .clock small {font-size:8px;letter-spacing:.025em;white-space:normal;max-width:190px}
+.shell.map-first .rail {left:8px;width:70px;background:none;border:0;border-left:5px solid #4a3c2b;border-radius:0;padding:0 0 3px;box-shadow:-2px 0 0 #a78b59;gap:6px;overflow:visible;align-items:stretch}
+.shell.map-first .rail button {position:relative;width:64px;color:#655234;background:var(--newsprint),linear-gradient(100deg,#bba47a,#e2d1ab 20%,#dac69e);border:0;border-top:1px solid #bba47a;border-bottom:2px solid #8b704a;border-right:1px solid #a48b5f;border-radius:0 5px 5px 0;font:9px Georgia,serif;letter-spacing:.02em;gap:3px;box-shadow:1px 3px 6px #0004;padding:5px 2px;max-height:60px;min-height:38px}
+.shell.map-first .rail button.active {color:#30251a;background:var(--newsprint),#f1e3c6;border-left:3px solid #963e2b;transform:translateX(3px);box-shadow:2px 3px 7px #0006}
+.shell.map-first .rail button:hover {background:var(--newsprint),#f0dfb9;color:#32291b}
+.shell.map-first .rail button .icon {width:18px;height:18px;stroke-width:1.6}
+.shell.map-first .rail button.bottom {margin-top:auto;background:var(--newsprint),#baa781}
+.shell.map-first .rail button:last-child {background:var(--newsprint),#baa781}
+.shell.map-first .rail .news-count {background:#923b29;color:#fff0d0;border:1px solid #c6a47c;box-shadow:0 1px 3px #0004;font:9px Georgia,serif;right:2px;top:2px}
+.map-first .rail button:focus-visible {outline:2px solid #f6dfaa;outline-offset:3px}
+/* Brass-labelled camera controls and a location calling card share the palette. */
+.map-first .city3d-tools {gap:5px;background:none;border:0;box-shadow:none}
+.map-first .city3d-tools button,.map-first .replay-scene {background:linear-gradient(#33392c,#20281f);color:#dfcea6;border:1px solid #a18a5c;border-radius:0;font:11px Georgia,serif;box-shadow:inset 0 0 0 2px #293023,0 2px 5px #0005}
+.map-first .city3d-tools button[aria-checked="true"] {background:#dac59e;color:#3d3020}
+.map-first .map-briefing {background:var(--newsprint),#e2d2b1;color:#4d3e28;border:0;border-left:4px solid #866640;box-shadow:2px 3px 8px #0005}
+.map-first .map-briefing summary {font:12px Georgia,serif;letter-spacing:.03em}
+.map-first .map-briefing[open] {background:#17221ff5;color:#e4d3b0}
+@media(max-width:1100px){
+ .map-first .hud-brand {min-width:160px;padding:8px 12px}
+ .map-first .hud-brand .brand {font-size:17px}
+ .map-first .topbar .stats {gap:9px;padding:8px 12px}
+ .map-first .topbar .stat b {font-size:16px}
+ .map-first .topbar .clock b {font-size:16px}
+ .map-first .topbar .stat>.icon {display:none}
+}
+@media(max-width:950px){.map-first .hud-brand{display:none}}
+@media(max-width:800px){
+ .shell.map-first .rail{width:58px;left:6px;border-left-width:3px;gap:4px}
+ .shell.map-first .rail button{width:54px;min-height:36px;font-size:8px}
+ .map-first .topbar .stats{flex-wrap:wrap;justify-content:flex-start;column-gap:20px;row-gap:8px}
+ .map-first .topbar .stat{flex:1 0 12%}
+ .map-first .topbar .clock{flex:1 0 25%;padding-left:10px}
+}
+.map-first .city3d-address {background:var(--newsprint),linear-gradient(110deg,#eee2c8,#dac69e);border:0;border-top:3px double #947b52;border-bottom:3px double #947b52;padding:15px 17px;color:#3b2f1e;box-shadow:2px 3px 0 #987e55,0 6px 18px #0005}
+.map-first .city3d-address small {color:#7b6140;font:8px Georgia,serif;letter-spacing:.16em}
+.map-first .city3d-address strong {color:#3b2f1e;font:24px Georgia,serif}
+.map-first .city3d-address span {color:#6b5940;font-size:12px}
+.map-first .city3d-address button {background:transparent;border:3px double #92774d;color:#49381f;font:600 11px Georgia,serif;letter-spacing:.04em;padding:9px 8px}
+.map-first .city3d-address button:hover:not(:disabled){background:#cbb387}
+.map-first .city3d-address button:disabled {opacity:1;color:#817257;border-color:#b8a583}
+.map-first .city3d-directory {color:#e2d0aa;font:10px Georgia,serif;text-shadow:0 1px 3px #000}
+.map-first .city3d-directory select {background:#d9c59f;color:#40301d;border:1px solid #8b7149;font:11px Georgia,serif;padding:5px 8px;border-radius:0}
+.map-first .map-outcome .outcome-band.empty {display:none}

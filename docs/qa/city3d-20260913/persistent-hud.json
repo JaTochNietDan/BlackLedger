@@ -1,0 +1,48 @@
+{
+  "allStatsFit": true,
+  "canvas": 1,
+  "height": 720,
+  "nav": [
+    {
+      "fits": true,
+      "name": "City"
+    },
+    {
+      "fits": true,
+      "name": "People"
+    },
+    {
+      "fits": true,
+      "name": "Families"
+    },
+    {
+      "fits": true,
+      "name": "Market"
+    },
+    {
+      "fits": true,
+      "name": "Ledger"
+    },
+    {
+      "fits": true,
+      "name": "Herald"
+    },
+    {
+      "fits": true,
+      "name": "Guide"
+    },
+    {
+      "fits": true,
+      "name": "Disable voice acting"
+    },
+    {
+      "fits": true,
+      "name": "Settings"
+    }
+  ],
+  "navOverlaps": false,
+  "selected": "City",
+  "statCount": 7,
+  "statOverlaps": false,
+  "width": 1280
+}

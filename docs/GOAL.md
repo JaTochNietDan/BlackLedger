@@ -2,6 +2,9 @@
 
 ## Highest priority amendment — map-first UI
 
+The persistent HUD (left navigation and top bar) must now receive the same
+period styling as the improved menus (latest September 13 amendment).
+
 Menus must also match the 1950s mafia setting: replace generic menu boxes with
 styled in-game surfaces and integrated controls (September 13 amendment).
 
@@ -14,7 +17,7 @@ so it starts promptly. Preserve all earlier simulation/visual requirements.
 
 ## User amendment — detail, interiors and event direction (2026-09-13)
 
-Current objective source: `/Users/jatochnietdan/.codex/attachments/409771b4-1304-4bc4-ae42-631508727ff1/goal-objective.md` (read September 13; amended during weapon-model work).
+Current objective source: `/Users/jatochnietdan/.codex/attachments/35be00d7-3965-49d2-a7a1-89871ff89fb3/goal-objective.md` (read September 13; amended during weapon-model work).
 
 The user requires substantially more detailed, high-quality 1950s noir gangster architecture and characters; current blocky assets do not meet visual acceptance. Model detailed building interiors for display on entry, preserving the room's actual public occupants and available gameplay actions. For committed simulation events, automatically open the city and frame the complete action before presenting its animation. Provide a debug mode with selectable action scenes for visual review without mutating the campaign. The user also requests gore and persistent aftermath: bodies, blood and police response should remain until cleanup, while damaged buildings retain their authoritative condition until repaired. Explosions must originate inside the target building with window fire/smoke persisting until a fire-brigade response extinguishes them. Raids need multiple police units and officers; arrests must show officers taking a person into custody. Gun models must represent the actual weapon used by each participant, with NPC ownership of varied guns contributing to their power as player equipment does. Support WASD panning alongside the arrow keys. The user further requires high-fidelity, impactful action choreography with crisp sound, appropriate camera shake/impact, and variety. Raids must show police forcing entry and lingering afterward. Assassinations should support simulation-grounded variants such as a moving car drawing alongside a walking victim for a drive-by; all scenes should visibly play out rather than remain static cast arrangements. Reveal news/results only after the action scene finishes, preserving suspense during playback. Layer contextual audio into action timelines: cries for help, shouts/swearing, vehicle approach, gunfire, screams and tyre-screech escapes; feud-specific utterances should fit the actual public context. Keep the Mac awake during active work. Validate visual quality and performance in the browser as production work proceeds; local high FPS alone does not establish production readiness.
 
