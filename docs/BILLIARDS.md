@@ -243,3 +243,38 @@ The actual NPC receipt decodes in the browser-compatible module to 324 frames,
 within 1e-6 metres and all pocket statuses match. Evidence is in
 `.runtime/pool-browser-receipt.json` and `.runtime/pool-view-*` logs. Main port 8791
 and the live campaign are unchanged. This does not close full-fidelity acceptance.
+
+## Direct table interaction — 2026-09-14
+
+Cloth clicks now set aim, or preview cue placement while in hand. Placement stays
+local until the confirm button sends `pool_place`; a translucent cue and dashed
+head string show the proposed position and restriction. Invalid previews turn red
+and cannot be confirmed. Numeric placement remains under Precise placement.
+Clicking a visible ball sets aim toward its centre and calls it if legal; clicking
+a numbered pocket selects the matching call. Selected balls/pockets have rings.
+These inputs do not predict pot success or replace authoritative Go validation.
+
+A six-pixel movement threshold distinguishes taps from camera drags and retains
+movement even if a gesture returns to its start. Secondary buttons, cancellation
+and multiple pointers cannot become a cue tap. Orbit/pan/zoom remain available.
+Pointer-selected coordinates display three decimals and aim two decimals; the
+posted cue inputs use those displayed values. Pocket labels 1–6 map to API 0–5.
+
+All 380 frontend tests pass (14.044s). The final five billiards tests pass after
+adding the placement clearance tolerance; final typecheck/build pass (existing
+bundle-size warning). Tests cover gesture return-to-origin, multi-pointer/right
+button cancellation, aim axes, occupied placement and the strict head boundary.
+
+CUA tab53 on isolated port8964 started a second $20-per-player rack. Two placement
+previews left revision7/minute608/ball-in-hand unchanged. Clicking beyond the head
+string disabled confirmation. A valid click/confirmation enabled aiming; clicking
+the head ball set 89.9839°, and orbit dragging preserved it. The resulting real
+break was legal. Leo physically potted a called stripe, retained the turn, then
+passed. Clicking the visible blue ball selected 2; clicking pocket marker6 selected
+Right middle and retained the ball call. State remained revision11/minute614,
+three shots, $5960 player cash and $40 escrow after these local selections.
+The replay skip control was observed, but the shot finished before the attempted
+click; skip execution and compact/touch browser acceptance remain unverified.
+Main campaign untouched. Logs: `.runtime/pool-pointer-{tests,final-tests,
+verified-build}.log`. Table/character detail, cue animation, concurrent tables,
+tournaments and the retained physics limitations remain open.

@@ -2067,3 +2067,22 @@ placement/aiming, pocket picking, cue and player animation, richer table/pocket
 materials, corrected six-table hall props, compact/motion/skip browser checks and
 full-rack playtests. Concurrent tables and whole-pool tournaments remain open.
 See docs/BILLIARDS.md for evidence and retained physical fidelity limitations.
+
+### 2026-09-14 — direct billiards aiming, placement and calls
+
+Added cloth clicking for aim and cue-placement preview, direct legal-ball calls,
+numbered pocket picking, selected-call rings, ghost cue and visible head string.
+Placement requires confirmation and gives local bounds/overlap feedback before
+Go validates it. Numeric placement remains available in a disclosure. Camera
+movement retains its gestures; tap detection rejects drags, return-to-origin
+movement, secondary buttons and multiple pointers.
+
+380 frontend tests pass (14.044s); final five billiards tests and typecheck/build
+pass after small input-formatting/clearance changes. Isolated browser8964 proves
+preview clicks do not advance the save, invalid head placement disables confirm,
+valid placement commits, a head-ball click aims the cue, and a drag leaves aim
+unchanged. The actual pointer-aimed break was legal. Following two physical NPC
+shots, clicks selected ball2 and pocket6 with matching controls. The fixture now
+holds revision11/minute614/$5960/$40 escrow/three shots. Main save unchanged.
+Skip was visible but finished before the test click; compact, touch and successful
+skip checks remain. See docs/BILLIARDS.md for details and broader unfinished work.

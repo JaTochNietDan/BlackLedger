@@ -21,3 +21,25 @@ test('billiards replay bounds compressed and decompressed sizes',async()=>{
  await assert.rejects(decodePoolReplay('x'.repeat(2*1024*1024+1)),/size limit/);
  const bomb=deflateSync(' '.repeat(8*1024*1024+1)).toString('base64');await assert.rejects(decodePoolReplay(bomb),/size limit/);
 });
+
+const {PoolTap,poolAimAngle,poolPlacementHint,poolPocketCenters}=await import('../.runtime/frontend-test/billiards.js');
+test('table taps never reinterpret an orbit or multi-pointer gesture as cue input',()=>{
+ const tap=new PoolTap();tap.begin(1,100,100,true,0);assert.equal(tap.end(1,103,102),true);
+ tap.begin(1,100,100,true,0);tap.move(1,140,100);assert.equal(tap.end(1,100,100),false);
+ tap.begin(1,100,100,true,0);tap.begin(2,110,100,false,0);assert.equal(tap.end(1,100,100),false);
+ tap.begin(1,100,100,true,2);assert.equal(tap.end(1,100,100),false);
+ tap.begin(1,100,100,true,0);tap.cancel();assert.equal(tap.end(1,100,100),false);
+});
+test('cue aim follows cloth axes and placement preview respects occupied space/head string',()=>{
+ assert.equal(poolAimAngle([.5,.5],[.5,1]),Math.PI/2);
+ assert.equal(poolAimAngle([.5,.5],[0,.5]),Math.PI);
+ assert.equal(poolAimAngle([.5,.5],[.5,.5]),null);
+ assert.equal(poolAimAngle([.5,.5],[NaN,.5]),null);
+ const p={width:1.27,length:2.54,radius:.028575,behind_head_string:true,balls:[{id:0,position:[.5,.3,0],pocket:-1},{id:1,position:[.7,.3,0],pocket:-1}]};
+ assert.equal(poolPlacementHint(p,.5,.3),'');
+ assert.match(poolPlacementHint(p,.7,.3),/room/);
+ assert.match(poolPlacementHint(p,.5,.635),/head string/);
+ assert.match(poolPlacementHint(p,0,.3),/cushions/);
+ assert.equal(poolPlacementHint({...p,behind_head_string:false},.5,1),'');
+ const pockets=poolPocketCenters(1.27,2.54);assert.equal(pockets.length,6);assert.deepEqual(pockets[4],[-.045,1.27]);assert.deepEqual(pockets[5],[1.315,1.27]);
+});

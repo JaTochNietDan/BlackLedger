@@ -1110,3 +1110,9 @@ samples; clients must retain impact boundaries when interpolating. Playback is
 presentation only and cannot advance time or settle money. The first playable 3D client uses these commands for funded challenges, cue
 placement, aim/power/spin/calls, break decisions and opponent turns. Tournaments
 and multiple concurrent tables remain unimplemented.
+
+The billiards client additionally supports direct cloth aiming/placement previews,
+ball calls and pocket picking. Previews and camera gestures send no commands;
+placement confirmation and Play shot use the inputs above. Visible pocket labels
+1–6 translate to API indices0–5. Local placement hints are advisory; Go remains the
+validator. Pointer aiming toward a ball centre is not an automatic pocket solution.

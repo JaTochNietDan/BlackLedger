@@ -35,3 +35,28 @@ export function poolFramePair(r:PoolReplay,time:number){
  return {a,b,mix:b.t>a.t?Math.max(0,Math.min(1,(time-a.t)/(b.t-a.t))):0};
 }
 export const poolPockets=['Left near','Left far','Right near','Right far','Left middle','Right middle'];
+
+export function poolPocketCenters(width:number,length:number):[number,number][] {
+ return [[-.026,-.026],[-.026,length+.026],[width+.026,-.026],[width+.026,length+.026],[-.045,length/2],[width+.045,length/2]];
+}
+// Local placement feedback only; Go validates the committed position again.
+export function poolPlacementHint(p:Pick<PoolState,'width'|'length'|'radius'|'behind_head_string'|'balls'>,x:number,y:number):string {
+ if(!Number.isFinite(x)||!Number.isFinite(y)||x<p.radius||x>p.width-p.radius||y<p.radius||y>p.length-p.radius)return 'Keep the cue ball inside the cushions.';
+ if(p.behind_head_string&&y>=p.length/4)return 'Place behind the dashed head string.';
+ if(p.balls.some(b=>b.id!==0&&b.pocket<0&&Math.hypot(b.position[0]-x,b.position[1]-y)<2*p.radius+1e-5))return 'Leave room around the other balls.';
+ return '';
+}
+export function poolAimAngle(cue:[number,number],point:[number,number]):number|null {
+ if(![...cue,...point].every(Number.isFinite)||Math.hypot(point[0]-cue[0],point[1]-cue[1])<.001)return null;
+ return (Math.atan2(point[1]-cue[1],point[0]-cue[0])+Math.PI*2)%(Math.PI*2);
+}
+export class PoolTap {
+ private active:{id:number;x:number;y:number;moved:boolean}|null=null;
+ begin(id:number,x:number,y:number,primary:boolean,button:number){
+  if(this.active||!primary||button!==0){this.active=null;return;}
+  this.active={id,x,y,moved:false};
+ }
+ move(id:number,x:number,y:number){const a=this.active;if(a&&a.id===id&&Math.hypot(x-a.x,y-a.y)>6)a.moved=true;}
+ end(id:number,x:number,y:number){this.move(id,x,y);const a=this.active;this.active=null;return !!a&&a.id===id&&!a.moved;}
+ cancel(){this.active=null;}
+}
