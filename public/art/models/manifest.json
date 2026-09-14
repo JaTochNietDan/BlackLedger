@@ -854,5 +854,21 @@
       ]
     ],
     "bytes": 3114888
+  },
+  "incendiary-bottle": {
+    "file": "incendiary-bottle.glb",
+    "bounds_blender": [
+      [
+        -0.04,
+        -0.0413,
+        -0.25
+      ],
+      [
+        0.04,
+        0.04,
+        0.1145
+      ]
+    ],
+    "bytes": 203280
   }
 }

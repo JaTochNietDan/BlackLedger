@@ -1698,6 +1698,67 @@ def blackjack_table():
     felt.node_tree.links.new(tex.outputs['Color'],felt.node_tree.nodes['Principled BSDF'].inputs['Base Color'])
 
 
+def incendiary_bottle():
+    """Period bottle prop. Origin is the neck grip; metres, upright Z."""
+    glass=material('bottle olive glass',(.045,.095,.032))
+    glass.node_tree.nodes['Principled BSDF'].inputs['Roughness'].default_value=.19
+    paper=material('bottle aged paper',(.72,.63,.43))
+    ink=material('bottle label ink',(.09,.12,.055))
+    linen=material('bottle folded linen',(.48,.40,.25))
+    # Revolved profile gives a rounded heel, shoulders and a raised mouth lip.
+    profile=[(0,.0),(.032,.0),(.038,.006),(.040,.015),(.040,.175),(.038,.188),(.030,.202),(.017,.222),(.014,.232),(.014,.278),(.018,.280),(.018,.289),(.013,.292)]
+    vertices=[];faces=[];n=48
+    for r,z in profile:
+        for i in range(n):
+            a=i*math.tau/n;vertices.append((r*math.cos(a),r*math.sin(a),z-.25))
+    for j in range(len(profile)-1):
+        for i in range(n):faces.append((j*n+i,j*n+(i+1)%n,(j+1)*n+(i+1)%n,(j+1)*n+i))
+    mesh=bpy.data.meshes.new('bottle rounded profile');mesh.from_pydata(vertices,[],faces);mesh.update()
+    ob=bpy.data.objects.new('bottle glass body',mesh);bpy.context.collection.objects.link(ob);mesh.materials.append(glass)
+    for poly in mesh.polygons:poly.use_smooth=True
+    # A curved label shell is physically above the glass, including at edges.
+    verts=[];faces=[];n=32
+    for z in (.060,.165):
+        for i in range(n+1):
+            a=-math.pi/2+(i/n-.5)*2.8;verts.append((.0405*math.cos(a),.0405*math.sin(a),z-.25))
+    for i in range(n):faces.append((i,i+1,n+2+i,n+1+i))
+    mesh=bpy.data.meshes.new('curved paper label');mesh.from_pydata(verts,[],faces);mesh.update()
+    ob=bpy.data.objects.new('curved bottle label',mesh);bpy.context.collection.objects.link(ob);mesh.materials.append(paper)
+    uv=mesh.uv_layers.new(name='UVMap')
+    for poly in mesh.polygons:
+        for li in poly.loop_indices:
+            vi=mesh.loops[li].vertex_index;uv.data[li].uv=((vi%(n+1))/n,vi//(n+1))
+    rng=random.Random(1953);pixels=[]
+    for y in range(128):
+        for x in range(128):
+            border=x<4 or x>123 or y<4 or y>123
+            color=(.20,.24,.10) if border else (.80,.73,.55)
+            tone=rng.uniform(.92,1.04);pixels.extend((*[c*tone for c in color],1))
+    img=bpy.data.images.new('bottle printed paper grain',width=128,height=128);img.pixels=pixels;img.pack()
+    tex=paper.node_tree.nodes.new('ShaderNodeTexImage');tex.image=img;paper.node_tree.links.new(tex.outputs['Color'],paper.node_tree.nodes['Principled BSDF'].inputs['Base Color'])
+    for word,z,size in [('BELL',.142,.013),('RESERVE',.120,.008),('1953',.082,.009)]:
+        bpy.ops.object.text_add(location=(0,-.0412,z-.25),rotation=(math.pi/2,0,0));ob=bpy.context.object;ob.name='bottle label '+word
+        ob.data.body=word;ob.data.align_x='CENTER';ob.data.size=size;ob.data.extrude=.00008;ob.data.materials.append(ink)
+        bpy.ops.object.convert(target='MESH')
+    # Folded cloth emerges from the mouth; darkened end is a separate material.
+    char=material('bottle charred cloth',(.055,.035,.020))
+    verts=[];faces=[];rows=24;cols=8
+    for j in range(rows+1):
+        t=j/rows
+        for i in range(cols+1):
+            u=i/cols-.5
+            verts.append((.002+.018*t*t+u*.020,-.001+.0025*math.sin(u*math.tau*2+t*2),.037+.077*t))
+    for j in range(rows):
+        for i in range(cols):faces.append((j*(cols+1)+i,j*(cols+1)+i+1,(j+1)*(cols+1)+i+1,(j+1)*(cols+1)+i))
+    mesh=bpy.data.meshes.new('continuous folded cloth');mesh.from_pydata(verts,[],faces);mesh.update()
+    ob=bpy.data.objects.new('bottle folded cloth strip',mesh);bpy.context.collection.objects.link(ob);mesh.materials.append(linen);mesh.materials.append(char)
+    for poly in mesh.polygons:poly.material_index=int(poly.index//cols>18);poly.use_smooth=True
+    bpy.context.view_layer.objects.active=ob;ob.select_set(True)
+    mod=ob.modifiers.new('Cloth thickness','SOLIDIFY');mod.thickness=.002;bpy.ops.object.modifier_apply(modifier=mod.name)
+    marker=bpy.data.objects.new('bottle-grip',None);bpy.context.collection.objects.link(marker)
+    marker=bpy.data.objects.new('bottle-flame',None);marker.location=(.021,-.001,.115);bpy.context.collection.objects.link(marker)
+
+
 def playing_card():
     paper=material('card paper edge',(.88,.84,.72))
     face=material('card printed face',(1,1,1))
@@ -2140,6 +2201,13 @@ def mercer_court():
                 box('tenant letter box',(x,6.28,.98+row*.19),(.20,.08,.16),brass,.009)
                 box('letter slot',(x,6.325,1.02+row*.19),(.13,.01,.014),iron)
 
+if __name__ == '__main__' and '--only=incendiary-bottle' in __import__('sys').argv:
+    manifest_path=os.path.join(OUT,'manifest.json')
+    with open(manifest_path) as f: selected_manifest=json.load(f)
+    clear();incendiary_bottle();selected_manifest['incendiary-bottle']=export('incendiary-bottle')
+    with open(manifest_path,'w') as f:json.dump(selected_manifest,f,indent=2)
+    raise SystemExit(0)
+
 if __name__ == '__main__' and '--only=gaming-floor' in __import__('sys').argv:
     manifest_path=os.path.join(OUT,'manifest.json')
     with open(manifest_path) as f: selected_manifest=json.load(f)
@@ -2253,6 +2321,7 @@ clear();firefighter();manifest['firefighter']=export('firefighter')
 clear();fire_engine();manifest['fire-engine']=export('fire-engine')
 clear();police_officer();manifest['police-officer']=export('police-officer')
 clear();undertaker();manifest['undertaker']=export('undertaker')
+clear();incendiary_bottle();manifest['incendiary-bottle']=export('incendiary-bottle')
 clear();handcuffs();manifest['handcuffs']=export('handcuffs')
 clear();revolver();manifest['revolver']=export('revolver')
 for name in ('shotgun','thompson'):

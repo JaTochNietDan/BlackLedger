@@ -452,3 +452,10 @@ Final CUA8899 copied campaign: cash180→140, attention3→21,19:20→19:35, clu
 Core/store broad run passed115.365s/.146s; cmd initially failed the newly missing compatibility cue. After fixes cmd passed.812s (.runtime/incendiary-interface-tests.log); final targeted core checks passed.154s (.runtime/incendiary-targeted-verified.log). All246 frontend tests passed11.473s (.runtime/incendiary-frontend-tests.log); TypeScript/Vite build passed2.61s (.runtime/incendiary-build.log), retaining the known large-bundle warning. Caffeinate87182 remained live. The preceding daily-accounts verification confirmed the existing immediately visible15-dollar breakdown and required no edit.
 
 Outstanding: authored bottle/throw/flee choreography, debug incendiary staging, risk/balance and interior fire/evacuation behavior, plus the broader full-production objective. Current fire response is not acceptance of a complete molotov scene or whole-game60FPS.
+
+
+### 2026-09-14 — authored incendiary bottle prop
+
+Built incendiary-bottle.glb in Blender, with a48-sided revolved heel/body/shoulder/neck profile, glossy olive material, curved paper label with packed grain/border texture, physical Bell Reserve1953 lettering and a continuous folded cloth strip with charred tip. The origin is the neck grip; named bottle-grip and bottle-flame empties support the upcoming held/flight presentation. Added targeted export and full-export inclusion.
+
+CUA8897 WebGL close-up initially revealed block-like stacked cloth folds; replaced those with a continuous thickened curved sheet and inspected the corrected front/side view. Bottle is approximately8cm across, base25cm below grip; flame marker above cloth. Actual exported-GLB test passes: grip position, dimensions, outward label raycast in front of glass and under10000 triangles (.runtime viewer is an isolated asset study). No campaign or API changes. Caffeinate87182 confirmed alive. This supplies the required prop but is not yet attached to a live attacker or integrated into throwing/flight/escape choreography; those remain next, along with the full objective.
