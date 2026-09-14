@@ -2066,7 +2066,7 @@ export function City3D(props: Props) {
             setPreview(previewScene(props.state, props.selected, previewKind, crypto.randomUUID()));
           }}>Play preview</button>
           <button disabled={!preview} onClick={() => setPreview(null)}>Stop preview</button>
-          <small>{shownPreview ? 'VISUAL PREVIEW · Campaign unchanged' : 'At selected address · Scenes must be enabled'}</small>
+          <small>{shownPreview ? 'VISUAL PREVIEW · Campaign unchanged' : !props.motion ? 'Enable City animation in Settings' : 'At selected address'}</small>
         </div>}
         {props.overlay && <div className="city3d-story">{props.overlay}</div>}
       </div>

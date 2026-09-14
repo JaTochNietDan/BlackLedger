@@ -927,17 +927,17 @@ function App() {
           <div className="settings">
             <div className="setting">
               <div>
-                <h3>Scenes</h3>
+                <h3>City animation</h3>
                 <p>
-                  When something happens that the city would remember — a killing, an arrest, a fire
-                  — the game takes you there and holds for a moment before the headline. Turn this
-                  off and the result is reported in words only.
+                  Show moving traffic and play out journeys, killings, arrests and fires before
+                  their results appear. Turn this off to show destinations and results immediately.
                 </p>
               </div>
               <button
                 className={'toggle' + (motion ? ' on' : '')}
                 role="switch"
                 aria-checked={motion}
+                aria-label="City animation"
                 onClick={toggleMotion}
               >
                 <i />
@@ -955,6 +955,7 @@ function App() {
                 className={'toggle' + (sound ? ' on' : '')}
                 role="switch"
                 aria-checked={sound}
+                aria-label="Sound effects"
                 onClick={toggleSound}
               >
                 <i />
@@ -973,6 +974,7 @@ function App() {
                 className={'toggle' + (voice ? ' on' : '')}
                 role="switch"
                 aria-checked={voice}
+                aria-label="Voices"
                 onClick={toggleVoice}
               >
                 <i />
