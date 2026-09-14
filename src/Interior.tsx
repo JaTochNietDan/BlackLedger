@@ -326,11 +326,10 @@ export function Interior({
         )}
       </div>}
 
-      <div className="room-people" role="list">
+      <div className="room-people" role="group" aria-label="People in this building">
         {people.map(p => (
           <button
             key={p.id}
-            role="listitem"
             className={
               'room-chip' +
               (p.id === picked ? ' picked' : '') +

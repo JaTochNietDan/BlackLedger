@@ -213,3 +213,14 @@ Passed the existing scenes preference into interactive rooms. Motion pauses when
 Validation:230/230 frontend tests passed (.runtime/interior-service-tests.log), including360 sampled poses for each actual male/female GLB, hand/cloth contact, countertop clearance, cloth movement and unchanged feet/root. TypeScript/Vite passed2.53s (.runtime/interior-service-build.log). HTTP command/public-state/campaign tests passed.513s (.runtime/interior-service-http.log). Browser CUA isolated8891 showed all six actors,147 draw calls and167648 triangles. Successive live observations confirmed cloth movement; disabling scenes held both pose time17.5202 and rendered-frame count2519 unchanged across observations, and reenabling resumed motion. No browser errors; the screenshot was reviewed for staging/contact. System reduced-motion behavior is implemented but was not separately toggled in browser QA. Main campaign untouched.
 
 This adds one service animation, not full arrival/exit, crowd idle behavior or interior combat. Other interiors, higher visual fidelity, full event variants, gameplay progression and comprehensive campaign/performance acceptance remain outstanding.
+
+
+### 2026-09-14 — interior roster and action papers
+
+Replaced the remaining dark-green interior roster and action catalogue surfaces with the existing city paper stock, ink, ruled borders and visible focus treatments. Public character roles are visible again beneath names; selected, player-aligned and hostile states retain distinct borders. Action descriptions are no longer clamped to three lines, keeping costs/consequences readable. Disabled actions remain legible and unavailable. Responsive grids can shrink below their old fixed card minimum; search controls wrap. Styling is scoped to interior controls rather than gambling felt or other scenes.
+
+Corrected roster semantics: its containing group is named People in this building, and each occupant retains native button semantics and aria-pressed rather than overriding the button with listitem. Existing selection/action handlers are unchanged.
+
+Validation: TypeScript/Vite passed2.27s (.runtime/interior-paper-build.log); git diff --check clean. Browser CUA isolated8891 visually reviewed the bar roster and Mara's selected action panel. Her button selected the right character and exposed four actions with pressed=true. Step away restored premises actions. Searching envelope returned the one matching job with its full detail; Tab reached Back to the street with a solid visible focus outline. Zero clipped action descriptions or horizontal document overflow at the checked desktop size; no browser errors. Narrow viewport behavior is implemented but not separately browser-verified in this pass. No gameplay commands or main campaign writes.
+
+Broader room modelling, interior action animation, remaining menu outliers and full campaign/performance acceptance remain active.

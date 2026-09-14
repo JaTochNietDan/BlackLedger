@@ -135,3 +135,46 @@
 .interior-stage:has(.lodging-register) .lodging-register{grid-column:1;grid-row:3;margin:0}
 .interior-stage:has(.lodging-register) .room-people{grid-row:4}
 .interior-stage:has(.lodging-register) .room-work{grid-row:5}
+
+/* The room's public roster and available work are printed on the same stock
+   as the city papers. Scope this to interiors, leaving table felt intact. */
+.map-first .interior-stage .room-people,
+.map-first .interior-stage .room-work{
+ --ink:#382d1f;--muted:#715d40;--gold:#78582e;--red:#963e2d;--line:#b3a07b;
+ color:var(--ink);background:var(--newsprint),#e7d8b9;
+ border-block:3px double #967a50;
+}
+.map-first .interior-stage .room-people{gap:8px;padding:12px 18px;overflow:visible;grid-template-columns:repeat(auto-fit,minmax(min(180px,100%),1fr))}
+.map-first .interior-stage .room-chip{max-width:none;min-height:58px;padding:8px 10px;color:#382d1f;background:transparent;border:1px solid #b3a07b;border-left:3px solid #a18b66;border-radius:0;box-shadow:none;transition:background-color .12s,border-color .12s}
+.map-first .interior-stage .room-chip.yours{border-left-color:#536340}
+.map-first .interior-stage .room-chip.sour{border-left-color:#963e2d}
+.map-first .interior-stage .room-chip:hover{background:#f2e7ce;border-color:#78582e;transform:none}
+.map-first .interior-stage .room-chip.picked{background:#d5bd94;border-color:#78582e;box-shadow:inset 0 -2px #78582e}
+.map-first .interior-stage .room-chip .chip-name b{font:14px/1.35 Georgia,serif;white-space:normal;overflow-wrap:anywhere}
+.map-first .interior-stage .room-chip .chip-name small{display:block;color:#715d40;font-size:11px;white-space:normal}
+.map-first .interior-stage .room-chip i{color:#78582e}
+.map-first .interior-stage .room-work{padding:20px 22px 28px;border-top:0;overflow:visible}
+.map-first .room-work .action-group h4{color:#78582e;letter-spacing:.12em}
+.map-first .room-work .action,
+.map-first .room-work .plain,
+.map-first .room-work .action-commit{color:#382d1f;background:transparent;border:1px solid #aa9066;border-radius:0;box-shadow:none;transition:background-color .12s,border-color .12s}
+.map-first .room-work .action{padding:13px 15px;text-align:left}
+.map-first .room-work .action strong{color:#382d1f;font:16px/1.35 Georgia,serif}
+.map-first .room-work .action .desc{display:block;overflow:visible;-webkit-line-clamp:unset;color:#645039;font:12px/1.5 Georgia,serif}
+.map-first .room-work .action .meta{color:#78582e}
+.map-first .room-work .action:hover:not(:disabled),
+.map-first .room-work .plain:hover:not(:disabled),
+.map-first .room-work .action-commit:hover:not(:disabled){background:#f2e7ce;border-color:#78582e;transform:none}
+.map-first .room-work .action:disabled{opacity:1;background:#d9ccb2;border-color:#b7a589;cursor:not-allowed}
+.map-first .room-work .action:disabled strong{color:#74644f}
+.map-first .room-work .action:disabled .desc{color:#74644f;opacity:1}
+.map-first .room-work .plain{padding:8px 11px;font:13px Georgia,serif}
+.map-first .room-work .work-search{flex-wrap:wrap;max-width:100%}
+.map-first .room-work .work-search input{min-width:0;width:240px;max-width:100%;background:#f1e6cf;border:1px solid #aa9066;color:#382d1f;font:13px Georgia,serif;padding:9px 11px}
+.map-first .room-work .work-search input::placeholder{color:#715d40;opacity:1}
+.map-first .room-work .picked-person header b{color:#382d1f;font:24px/1.25 Georgia,serif}
+.map-first .room-work .said{background:#dac7a4;color:#493622;border-left-color:#963e2d}
+.map-first .interior-stage :is(.room-chip,.room-work button,.room-work input):focus-visible{outline:2px solid #873f2d;outline-offset:3px}
+.map-first .room-work .actions.compact,
+.map-first .room-work .picked-person .actions{grid-template-columns:repeat(auto-fill,minmax(min(260px,100%),1fr));grid-auto-rows:auto}
+@media(max-width:600px){.map-first .interior-stage .room-work{padding:16px 12px}.map-first .interior-stage .room-people{padding:10px 12px}.map-first .room-work .work-search{width:100%;margin-left:0}.map-first .room-work .work-search input{flex:1 1 180px}}
