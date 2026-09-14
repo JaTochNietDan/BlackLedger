@@ -2741,3 +2741,27 @@ production build2.71s. Isolated strike-revolver fixture8983, tabs89/90, replayed
 inside Saint Agnes; final screenshot showed the casualty entirely on the interior
 floor. Main8791/save untouched. Preview-only; other weapons/venues and generic
 contract/NPC incident coverage still require broader acceptance.
+
+### September 14 — funded civilian proprietors and ownership on death
+
+Previous goal turn classified as progress: committed interior assassination
+routing and verified an isolated replay. Continued the business-ownership audit.
+Added deterministic daily NPC purchases for ordinary civilian trades, with actual
+household spending and a reserve. Added personal business settlements using
+condition/capacity/custom, wages, stock and repairs. Saved settlement stamp
+prevents repeat daily revenue and a buyer gets no retroactive purchase-day income.
+
+NPC-owned properties are now protected from Unheld family expansion and holder
+labels resolve their owner's name. Kill releases the individual's deeds directly
+to purchase while preserving staff/condition; organizational deeds stay with the
+family. A stale dead personal owner is also handled by daily reconciliation.
+Gambling and other special financial trades still need proprietor integration;
+new morgue/cemetery/crematorium venues and richer insolvency remain outstanding.
+
+Evidence: targeted proprietor, family succession and expansion tests pass0.154s.
+They cover funded buying, working reserve, dead buyer rejection, acquisition and
+expansion protection, actual daily income/wage arithmetic, repeat settlement,
+personal-versus-family deed release, duplicate death idempotence and leadership
+succession retaining a family business. An initial test caught a misplaced name
+formatter edit; fixed it and reran. No main save commands/deployment. Unrelated
+armed/robbery/aftermath edits remain unstaged. Broad campaign validation is next.

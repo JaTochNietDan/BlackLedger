@@ -1282,3 +1282,21 @@ available 3D interior. Unsupported rooms show the saved-result fallback explicit
 instead of fabricating an outdoor assassination. Legacy unlabelled results keep
 their prior meaning. Generic deaths without recorded attacker/scenario metadata
 are not yet full named interior assassination scenes.
+
+## Individual business proprietors
+
+Ordinary independent NPCs can acquire available civilian trades at midnight from
+actual purse/household savings, retaining a working reserve. The first supported
+set is laundry, garage, restaurant, butcher, cabs, scrapyard, undertaker, tailor
+and haulage; other trades, including gambling bankroll settlement, remain to be
+connected. At most one purchase is considered successful in each daily pass.
+`Property.owner` can contain an NPC ID; public `holder` resolves the person's
+name. Existing faction IDs remain organizational deeds regardless of leadership.
+
+`proprietor_day` is an optional saved settlement stamp. Personal businesses earn
+from their condition, capacity and trade, pay wages and buy stock/repairs from
+household funds, and receive no retroactive daily earnings on purchase. Family
+expansion cannot treat NPC deeds as unheld. Kill immediately releases only deeds
+held by the deceased's NPC ID to `independent`, preserving premises/staff; family
+deeds follow existing succession. The daily pass also releases stale dead-owner
+deeds. This is not yet a complete proprietor insolvency or financial-trade model.

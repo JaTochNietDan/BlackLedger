@@ -260,7 +260,8 @@ type Property struct {
 	// The inside of a business: who works it, what it runs on, and whether
 	// something has gone wrong. Absent in older saves, which read as a business
 	// nobody has staffed yet.
-	Staff int `json:"staff,omitempty"`
+	Staff         int `json:"staff,omitempty"`
+	ProprietorDay int `json:"proprietor_day,omitempty"`
 	// Who fills those positions. The count stays because everything that reads
 	// it is right to read a count; this is the same number as a list of people
 	// who live in this city. Absent in saves written before anybody had a job,
@@ -2521,6 +2522,8 @@ func (w *World) Advance(minutes int) {
 		w.SettleCommissions()
 		if w.Minute%1440 == 0 {
 			w.FamilyDay()
+			w.ProprietorDay()
+			w.ConsiderProprietors()
 			w.BusinessDay()
 			w.ContrabandDay()
 			w.PoliceDay()
@@ -2901,7 +2904,7 @@ func (w *World) AcquireReadiness(id string) string {
 		return "This is already yours"
 	}
 	if !w.CanAcquire(id) {
-		return "This property belongs to another organization"
+		return "This property already has an owner"
 	}
 	// What it takes to be given the keys, by what the place is rather than by
 	// its name: a room that runs games wants somebody the city has heard of, a

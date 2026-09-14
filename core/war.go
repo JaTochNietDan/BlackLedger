@@ -559,6 +559,9 @@ func (w *World) HolderName(id string) string {
 	if f := w.faction(prop.Owner); f != nil {
 		return f.Name
 	}
+	if n := w.NPC(prop.Owner); n != nil {
+		return n.Name + " (individual proprietor)"
+	}
 	return prop.Owner
 }
 

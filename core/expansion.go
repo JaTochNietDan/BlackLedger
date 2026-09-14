@@ -55,7 +55,7 @@ func (w *World) Unheld(id string) bool {
 	if prop == nil || prop.Income <= 0 || w.Own(id) {
 		return false
 	}
-	if w.faction(prop.Owner) != nil {
+	if w.faction(prop.Owner) != nil || w.NPC(prop.Owner) != nil {
 		return false
 	}
 	if prop.Owner == "independent" || prop.Owner == "" {
