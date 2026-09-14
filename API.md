@@ -706,6 +706,15 @@ cleanup remain unfinished; a paused dead campaign does not advance their clock.
 
 ## Survivor presentation handoff
 
+A completed or skipped recorded assassination can also transfer a surviving,
+stationary pedestrian player at the recorded address to the attacker's final
+position and facing. Matching ordinary pedestrian attackers and victims are
+suppressed while the shared cast is active. Parked vehicles retain their own
+presence. Private previews, moving actors and different addresses do not adopt
+the stance. A following journey walks from this stance to the frontage and saved
+route under normal collision checks. Its displayed clock continues through that
+connection; the committed snapshot already contains the arrival minute.
+
 A completed or skipped real charge-accident scene can transfer a surviving,
 stationary pedestrian player to its final rendered frontage position. This
 changes no location, health, time, route progress or save. The next committed
