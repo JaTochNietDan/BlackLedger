@@ -1619,3 +1619,34 @@ build passes (`burglary-search-final-build.log`), and dedicated contact tests pa
 main-save QA. Main8791 remains the prior verified release. Search/confrontation
 sound design, occupied/failure/fatal and Cypress burglary choreography, indoor
 persistent aftermath and remaining interiors/campaign acceptance remain open.
+
+## September 14 — clean interior/crime release now on8791
+
+Released e4270de from clean local clone `.runtime/release-e4270de`, excluding
+pre-existing uncommitted armed/mugging/robbery/aftermath work and sim/died_test.go.
+Clean frontend366/366 tests pass12.946s; build passes. Targeted burglary/home/fee
+core checks0.942s, store0.158s, server contracts0.869s pass; qa-fixture builds.
+Binary health identity reports e4270de74b610a28c76cd641015b08024e2539b5,
+modified:false. The old server PID43340 was verified before replacement.
+
+Created SQLite backup `.runtime/campaign-pre-e4270de.sqlite3` and tested a copy
+on8947 before main startup. The first byte comparison found24 added fields:
+car/drove initialization for12 later-created NPCs. An independent copy opened
+by the OLD b4b7aee server on8948 produced the exact same state digest as the new
+release, establishing unchanged existing SettleCars loader behavior. No new
+migration/regression was inferred from that expected startup normalization.
+
+Both copied releases and the live release match SHA256
+63a214cca7228db606d159e88e4dd2df2eae332f37ec4083ffc9235eb1b5c25d.
+Complete player state, revision2115, minute160095 and all2117 receipt contents
+are preserved. Receipt identity used sorted id/result JSON contents, not count
+alone. Main-save access for QA was read-only; actual main startup followed copied
+verification and a backup. Evidence under `.runtime/release-e4270de`: check-before,
+check-diff, compatibility and live-verification JSON; sibling release-e4270de
+build/test/identity logs. Main session is71997, serving its own clean dist/binary.
+
+This release brings the butcher/workshop/private-lodging interiors, enlarged
+room controls, working residential drawers, indoor home strikes and successful
+unattended burglary searches into the main game. Occupied/failed/fatal/Cypress
+burglary scenes, persistent indoor aftermath, remaining interiors, richer income
+progression and broader visual/played-campaign acceptance are still unfinished.
