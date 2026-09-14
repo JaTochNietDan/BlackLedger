@@ -2894,3 +2894,33 @@ Targeted death-reading and seasonal house-edge tests passed0.797s in the
 working tree. Clean bb58284 frontend build passed4.00s and targeted rental,
 apartment, NPC home purchase and ownership-reference tests passed0.261s.
 Nothing has yet been promoted to8791; latest fixes require clean validation.
+
+### September 14 — promote4daa6c8 with preserved campaign
+
+Clean release-even-night validation: all403 frontend tests passed15.102s;
+production build2.62s; targeted death-reading/seasonal-house-edge, rental,
+apartment, NPC home purchase and ownership-reference tests passed1.187s.
+These checks cover the changes after the aa9b617 full run; the earlier full
+run's only failure was the now-passing death-reading report. A second complete
+suite was not claimed or run for this prose correction.
+
+Candidate8986 loaded a fresh SQLite backup of the actual campaign. Read-only
+health/state calls preserved all raw campaign bytes and all2184 ordered receipt
+pairs. Clean build4daa6c822320b80504ff272317924ac2aa1195eb, modifiedfalse.
+Browser95 entered Riverside with G and visually verified the large room,
+floating navigation, readable header and footer accounts at1235x1053.
+
+Rechecked live3e7ee26 and the complete save against the tested backup immediately
+before stopping its verifiedPID76368. Started4daa6c8 on8791 with the original
+campaign path (session57392). Post-start health/state and database comparison
+verified clean revision and exact preservation: revision2182, minute163810,
+life11 Jamie Moretti,2184 receipts, state SHA256
+ a12b3718954540bb3cec26d7ad952c9c1ebacf876194939c46350b184e5ed0d4.
+Backup:.runtime/pre-4daa6c8-campaign.sqlite3. No QA actions touched the live save.
+
+Now live: closer card cameras, contextual G and fresh incident clock, dynamic
+rental moves and ownership overview, independent NPC proprietors and funded
+business accounts, interior shell/footer improvements and recorded named
+indoor assassination routing. Broader goal remains open: generic NPC/contract
+interior incidents, missing venue interiors, death-service businesses, fuller
+billiards animation/physics, compact visual QA and fresh campaign acceptance.
