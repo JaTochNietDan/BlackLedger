@@ -6,6 +6,7 @@ const smooth=(n:number)=>{const t=THREE.MathUtils.clamp(n,0,1);return t*t*(3-2*t
 /** Doorway-local exit: +Z is inside, -Z is the pavement. Caller owns the door. */
 export class CityPlanter {
  readonly root=new THREE.Group();
+ readonly duration=PLANTER_BLAST;
  private readonly shoes:THREE.Mesh[]=[];
  private readonly inverse=new THREE.Matrix4();
  private readonly shoeMatrix=new THREE.Matrix4();

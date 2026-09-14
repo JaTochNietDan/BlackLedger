@@ -103,17 +103,19 @@ consumption, command duration, odds or fire rules. It survives result/save repla
 The renderer prioritizes explicit detonation outcome over matching fire records;
 legacy cues retain their existing inference. Debug includes a separate premature
 explosion with no invented building fire. Planted explosions with a recorded attacker and an authored animated doorway now
-play a 6.2-second planter exit before detonation. The city reserves the full exit,
+play a planter exit before detonation (6.2s on flat entrances,12.9s at the villa). The city reserves the full exit,
 uses the recorded person, and delays blast audio/light/debris, glazing damage,
 new fire and co-located casualty playback until the exit completes. Fire-brigade
 staging follows the scene and the newspaper waits for completion. This currently
-covers 18 doorway models, including lodging, funeral parlors and all industrial models; unnamed faction planters, missing doorway models
+covers all19 current building models, including the villa landing/stairs; unnamed faction planters
 and premature injury/escape choreography remain unsupported. Legacy explosions
 retain their existing playback. Debug also includes Explosion · casualty for
 reviewing the combined sequence without a campaign command.
 
-The planter preamble starts with a doorway view, then pulls back during4.6–6s
-to fit the building and blast envelope before detonation at6.2s. Camera pan,
+The planter preamble starts with a doorway view, then pulls back from1.6s to.2s
+before its detonation to fit the building and blast envelope. The villa adds a
+planted clearance step beyond the last tread before its turn/departure; the
+reserved path includes this extra pavement space. Camera pan,
 rotation, zoom, address/whole-city focus or enabling player-follow cancels that
 automatic pullback. This is presentation only and does not alter scene timing.
 

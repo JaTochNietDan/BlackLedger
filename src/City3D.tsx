@@ -1,4 +1,5 @@
-import {CityPlanter,PLANTER_BLAST} from './city3dPlanter';
+import {CityVillaExit} from './city3dVillaExit';
+import {CityPlanter} from './city3dPlanter';
 import {CityIncendiary, incendiaryStagingFlight, incendiaryShard, incendiaryShardObstructed, INCENDIARY_IMPACT} from './city3dIncendiary';
 import {streetAt} from './streetPlayback';
 import {CityCustody} from './city3dCustody';
@@ -112,7 +113,7 @@ type Effect = {
   assassination?:CityAssassination;
   custody?:CityCustody;
   incendiary?:CityIncendiary;
-  planter?:CityPlanter;
+  planter?:CityPlanter|CityVillaExit;
   pullback?:{move:ScenePullback;intent:number};
 };
 const modelNames = [
@@ -1018,10 +1019,10 @@ export function City3D(props: Props) {
           let assassination:CityAssassination|undefined;
           let custody:CityCustody|undefined;
           let incendiary:CityIncendiary|undefined;
-          let planter:CityPlanter|undefined;
+          let planter:CityPlanter|CityVillaExit|undefined;
           const planterBuilding=buildings.get(cue.target);
           const hasPlanter=cue.kind==='explosion'&&cue.detonation==='planted'&&!!cue.attacker&&
-            !!planterBuilding?.getObjectByName('entrance-threshold')&&!!planterBuilding.getObjectByName('entrance-door-hinge');
+            !!(planterBuilding?.getObjectByName('entrance-threshold')||planterBuilding?.getObjectByName('entrance-landing'))&&!!planterBuilding.getObjectByName('entrance-door-hinge');
           const weaponModel=sceneWeapon(cue.attacker?.weapon);
           let extra: THREE.Group | undefined, gunArm: THREE.Object3D | undefined, muzzle: THREE.Object3D | undefined;
           if (hasPlanter || ['incendiary', 'attack', 'killing', 'gunfight', 'raid', 'arrest','raid-unit','police-unit','officer','detainee','raid-officer'].includes(cue.kind)) {
@@ -1030,7 +1031,7 @@ export function City3D(props: Props) {
             extra = models.get(model)!.clone(true);
             if (isPedestrian(model)) costume = dressPedestrian(extra, model, personWardrobe(['killing','detainee'].includes(cue.kind) ? cue.actors?.[0]?.id || '' : cue.attacker?.id||'anonymous-shooter'));
             if (model === 'police') addVehicleShadow(extra, model);
-            if(hasPlanter){planter=new CityPlanter(extra);extra=planter.root;}
+            if(hasPlanter){planter=planterBuilding?.getObjectByName('entrance-landing')?new CityVillaExit(extra):new CityPlanter(extra);extra=planter.root;}
             if(cue.kind==='incendiary'){
               incendiary=new CityIncendiary(extra,models.get('incendiary-bottle')!.clone(true),new THREE.Vector3(0,3,4));extra=incendiary.root;
             }
@@ -1252,7 +1253,8 @@ export function City3D(props: Props) {
             ...effects.flatMap(other => other.slot ? [other.slot] : []),
             ...aftermath.slots(),
           ];
-          const entry=buildings.get(e.cue.target)?.getObjectByName('entrance-threshold')?.getWorldPosition(new THREE.Vector3());
+          const entryBuilding=buildings.get(e.cue.target);
+          const entry=(entryBuilding?.getObjectByName('entrance-threshold')||(e.planter?entryBuilding?.getObjectByName('entrance-landing'):undefined))?.getWorldPosition(new THREE.Vector3());
           const fireBuilding=e.incendiary?buildings.get(e.cue.target):undefined;
           const fireWindows=fireBuilding?clearBlastWindows(fireBuilding):[];
           let stagedFlight:ReturnType<typeof incendiaryStagingFlight>=null;
@@ -1266,7 +1268,7 @@ export function City3D(props: Props) {
             e.since = now;
             if(e.planter&&entry){
               e.extra.position.y=entry.y;
-              e.since=now+PLANTER_BLAST*1000;
+              e.since=now+e.planter.duration*1000;
               const bounds=new THREE.Box3().setFromPoints([
                 new THREE.Vector3(entry.x-3,0,entry.z-3.2),new THREE.Vector3(entry.x+1,3,entry.z+2.8)]);
               frameScene(camera,controls.target,bounds);controls.update();
@@ -1472,10 +1474,10 @@ export function City3D(props: Props) {
           if (blast && blastOrigin) e.light.position.set(blastOrigin.x, blastOrigin.y, blastOrigin.z);
           const shot = e.cue.kind === 'gunfight' && !!e.weapon;
           if(e.planter){
-            const pose=e.planter.update(t*3+PLANTER_BLAST);
+            const pose=e.planter.update(t*3+e.planter.duration);
             if(e.pullback){
               if(cameraIntent!==e.pullback.intent||followPlayer.current)e.pullback.move.cancel();
-              if(e.pullback.move.update(camera,controls.target,(t*3+PLANTER_BLAST-4.6)/1.4))controls.update();
+              if(e.pullback.move.update(camera,controls.target,(t*3+1.6)/1.4))controls.update();
             }
             const door=blastBuilding?.getObjectByName('entrance-door-hinge');if(door)door.rotation.y=-Math.PI/2*pose.door;
           }
@@ -1815,7 +1817,7 @@ export function City3D(props: Props) {
             id: e.cue.id, kind: e.cue.kind, target: e.cue.target,
             staged: !e.extra || e.extra.visible, x: e.slot?.root.x, z: e.slot?.root.z,
             approach: e.cue.kind==='raid-officer'&&e.extra?{x:e.extra.position.x,z:e.extra.position.z,leg:e.extra.getObjectByName('leg1')?.rotation.x}:undefined,
-            planter:e.planter?{seconds:(now-e.since)/1000+PLANTER_BLAST,blastSeconds:(now-e.since)/1000,actor:e.planter.actor.getWorldPosition(new THREE.Vector3())}:undefined,
+            planter:e.planter?{seconds:(now-e.since)/1000+e.planter.duration,blastSeconds:(now-e.since)/1000,actor:e.planter.actor.getWorldPosition(new THREE.Vector3())}:undefined,
             debris: e.debris?.count,
             glassShards:e.incendiary&&e.debris?{visible:e.debris.visible,blocked:e.glassBlocked?.size,
               shown:Array.from({length:12},(_,i)=>Math.hypot(...Array.from(e.debris!.instanceMatrix.array.slice(i*16,i*16+3)))>.001).filter(Boolean).length}:undefined,

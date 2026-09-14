@@ -8,9 +8,10 @@ export class CityLegs {
   for(const side of [-1,1]){
    const hip=actor.getObjectByName(`leg${side}`),knee=actor.getObjectByName(`knee${side}`);
    const shoe=knee?.children.find(o=>o instanceof THREE.Mesh&&o.name.startsWith('shoe'));
-   if(!hip||!knee||!shoe)continue;
-   const ankle=new THREE.Group();ankle.name=`ankle${side}`;ankle.position.set(0,-.37,0);
-   knee.add(ankle);actor.updateMatrixWorld(true);ankle.attach(shoe);
+   const existing=knee?.getObjectByName(`ankle${side}`);
+   if(!hip||!knee||(!shoe&&!(existing instanceof THREE.Group)))continue;
+   const ankle=existing instanceof THREE.Group?existing:new THREE.Group();
+   if(!existing){ankle.name=`ankle${side}`;ankle.position.set(0,-.37,0);knee.add(ankle);actor.updateMatrixWorld(true);ankle.attach(shoe!);}
    this.limbs.set(side,{hip,knee,ankle,upper:knee.position.length(),lower:.37});
   }
  }

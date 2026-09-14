@@ -22,7 +22,7 @@ camera.far=100;camera.position.copy(entry).add(new THREE.Vector3(5,3,-8));camera
 const floor=new THREE.Mesh(new THREE.BoxGeometry(12,.1,10),new THREE.MeshStandardMaterial({color:0x59594a}));floor.position.set(entry.x,-.055,entry.z-1);scene.add(floor);
 const render=()=>renderer.render(scene,camera);controls.addEventListener('change',render);
 let request=0;const show=t=>{const pose=cast.update(t);door.rotation.y=-Math.PI/2*pose.door;document.body.dataset.pose=JSON.stringify({t,door:pose.door,actor:actor.position,blast:pose.blast});document.querySelector('output').value=t.toFixed(2)+'s';document.body.dataset.seconds=t;render();};
-for(const [id,t] of [['windup',.4],['release',2.3],['impact',name==='villa'?8.55:6.2]])document.getElementById(id).onclick=()=>{cancelAnimationFrame(request);show(t);};
-document.getElementById('play').onclick=()=>{cancelAnimationFrame(request);const start=performance.now();const frame=now=>{const t=Math.min(name==='villa'?8.55:6.8,(now-start)/1000);show(t);if(t<(name==='villa'?8.55:6.8))request=requestAnimationFrame(frame);};request=requestAnimationFrame(frame);};
+for(const [id,t] of [['windup',.4],['release',2.3],['impact',name==='villa'?12.9:6.2]])document.getElementById(id).onclick=()=>{cancelAnimationFrame(request);show(t);};
+document.getElementById('play').onclick=()=>{cancelAnimationFrame(request);const start=performance.now();const frame=now=>{const t=Math.min(name==='villa'?12.9:6.8,(now-start)/1000);show(t);if(t<(name==='villa'?12.9:6.8))request=requestAnimationFrame(frame);};request=requestAnimationFrame(frame);};
 show(0);document.body.dataset.ready='true';
 </script></body></html>

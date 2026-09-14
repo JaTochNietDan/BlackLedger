@@ -146,8 +146,11 @@ test('villa approach joins stair descent with no body jump or tread penetration'
  const {CityVillaExit}=await import('../.runtime/frontend-test/city3dVillaExit.js');
  for(const name of ['person','woman']){
   const cast=new CityVillaExit(await model(name));cast.root.position.set(0,.6,-5.12);
+  const {planterReservation}=await import('../.runtime/frontend-test/city3dEvents.js');
+  const {trafficSize}=await import('../.runtime/frontend-test/city3dTraffic.js');
+  const slot=planterReservation({x:0,z:-5.12}),size=trafficSize(slot.model);
   let previous;
-  for(let frame=0;frame<=1026;frame++){
+  for(let frame=0;frame<=1548;frame++){
    const t=frame/120,p=cast.update(t);assert.ok(p.reached);
    cast.root.updateMatrixWorld(true);
    const body=cast.actor.getWorldPosition(new THREE.Vector3());
@@ -157,12 +160,13 @@ test('villa approach joins stair descent with no body jump or tread penetration'
     if(!(o instanceof THREE.Mesh))return;const vertices=o.geometry.attributes.position;
     for(let i=0;i<vertices.count;i++){
      const v=new THREE.Vector3().fromBufferAttribute(vertices,i).applyMatrix4(o.matrixWorld);
+     assert.ok(Math.abs(v.x-slot.pose.x)<=size.width/2&&Math.abs(v.z-slot.pose.z)<=size.length/2,'villa actor leaves reserved footprint');
      const surface=v.z> -6.4?.6:v.z> -6.8?.4:v.z> -7.2?.2:0;
      assert.ok(v.y>=surface-1e-5,`${name} intersects landing/tread at ${t}`);
     }
    });
   }
-  assert.ok(cast.update(8.55).done);assert.equal(cast.update(8.55).door,0);
+  assert.ok(cast.update(cast.duration).done);assert.equal(cast.update(cast.duration).door,0);
   // Replays can seek back across the rig handoff without retaining the stair pose.
   cast.update(0);assert.ok(cast.actor.getWorldPosition(new THREE.Vector3()).z>-3);
  }
