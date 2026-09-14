@@ -38,3 +38,11 @@ street dressing and richer district landmarks remain production work.
 The pedestrian has a tailored jacket, shirt/cuffs, hands and shaped fedora, with
 separate hip, knee and arm joints. The manifest includes bounds sampled across
 48 gait phases; traffic occupancy and pavement-clearance tests cover that stride.
+
+September 13 silhouette pass: person/woman jackets and limb clothing now use
+24-sided rounded cross sections with shoulder, waist, elbow and cuff profiles.
+The existing generated wool colour/normal/roughness maps retain physical UV scale.
+Joint locations, weapon grips and traffic envelopes are unchanged. The Blender
+source remains `tools/export_city3d.py`; GLBs and measured manifest were regenerated.
+This reduces box-shaped clothing; detailed anatomical/facial and wardrobe work
+remains necessary for hero close-ups.

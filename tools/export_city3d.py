@@ -534,15 +534,31 @@ def person(waved=False):
     def attach(ob,parent):
         matrix=ob.matrix_world.copy();ob.parent=parent;ob.matrix_world=matrix
         return ob
-    # Three jacket rings produce shoulders, a fitted waist and a wider hem.
-    vertices=[]
-    for z,w,d in ([(.88,.23,.15),(1.09,.17,.13),(1.4,.23,.15)] if waved else [(.83,.23,.15),(1.06,.20,.135),(1.4,.255,.15)]):
-        vertices.extend([(-w,-d,z),(w,-d,z),(w,d,z),(-w,d,z)])
-    faces=[(3,2,1,0),(8,9,10,11)]
-    for ring in range(2):
-        for i in range(4):faces.append((ring*4+i,ring*4+(i+1)%4,(ring+1)*4+(i+1)%4,(ring+1)*4+i))
-    mesh=bpy.data.meshes.new('tailored jacket');mesh.from_pydata(vertices,[],faces);mesh.materials.append(coat)
-    torso=bpy.data.objects.new('jacket',mesh);bpy.context.collection.objects.link(torso)
+    def tailored(name,center,rings,mat):
+        # Rounded cross sections retain a pressed front while removing box corners.
+        # Radius changes form shoulder caps, waist suppression and cloth folds.
+        segments=24;vertices=[];faces=[]
+        for z,w,d in rings:
+            for i in range(segments):
+                angle=i*math.tau/segments
+                x,y=math.cos(angle),math.sin(angle)
+                vertices.append((center[0]+w*math.copysign(abs(x)**.72,x),
+                                 center[1]+d*math.copysign(abs(y)**.72,y),z))
+        faces.append(tuple(reversed(range(segments))))
+        for row in range(len(rings)-1):
+            for i in range(segments):
+                a=row*segments+i;b=row*segments+(i+1)%segments
+                faces.append((a,b,b+segments,a+segments))
+        faces.append(tuple((len(rings)-1)*segments+i for i in range(segments)))
+        mesh=bpy.data.meshes.new(name);mesh.from_pydata(vertices,[],faces);mesh.update();mesh.materials.append(mat)
+        ob=bpy.data.objects.new(name,mesh);bpy.context.collection.objects.link(ob)
+        for polygon in mesh.polygons:polygon.use_smooth=len(polygon.vertices)==4
+        return ob
+    waist=.17 if waved else .20;shoulder=.23 if waved else .255
+    tailored('jacket',(0,0),[
+        (.88 if waved else .83,.215,.142),(.92,.23,.15),
+        (1.06,waist,.135),(1.19,shoulder*.95,.15),
+        (1.32,shoulder,.15),(1.38,shoulder*.91,.138),(1.4,.18,.12)],coat)
     oval('neck',(0,0,1.46),(.075,.08,.13),skin)
     oval('head',(0,-.005,1.64),(.125,.115,.17),skin)
     oval('nose',(0,-.119,1.63),(.035,.045,.045),skin)
@@ -610,14 +626,14 @@ def person(waved=False):
     for side in (-1,1):
         box('welt pocket',(side*.14,-.153,.995),(.115,.02,.018),shoe)
         hip=joint('leg'+str(side),(side*.12,0,.86))
-        attach(box('trouser upper',(side*.12,0,.67),(.19,.22,.4),coat,.045),hip)
+        attach(tailored('trouser upper',(side*.12,0),[(.47,.083,.094),(.51,.092,.103),(.65,.095,.11),(.80,.091,.106),(.87,.077,.085)],coat),hip)
         knee=joint('knee'+str(side),(side*.12,0,.47),hip)
-        attach(box('trouser lower',(side*.12,0,.29),(.16,.185,.39),coat,.035),knee)
+        attach(tailored('trouser lower',(side*.12,0),[(.095,.075,.086),(.125,.08,.0925),(.19,.072,.081),(.32,.073,.085),(.44,.08,.09),(.485,.074,.08)],coat),knee)
         attach(box('shoe',(side*.12,-.07,.075),(.18,.32,.14),shoe,.05),knee)
         arm=joint('arm'+str(side),(side*.3,0,1.35))
-        attach(box('jacket upper sleeve',(side*.31,0,1.205),(.14,.19,.29),coat,.035),arm)
+        attach(tailored('jacket upper sleeve',(side*.31,0),[(1.06,.057,.074),(1.10,.064,.082),(1.23,.07,.095),(1.32,.067,.088),(1.35,.044,.061)],coat),arm)
         elbow=joint('elbow'+str(side),(side*.3,0,1.065),arm)
-        attach(box('jacket forearm',(side*.31,0,.953),(.135,.18,.245),coat,.033),elbow)
+        attach(tailored('jacket forearm',(side*.31,0),[(.8305,.052,.071),(.86,.060,.078),(.92,.061,.083),(1.00,.0675,.09),(1.045,.060,.081),(1.0755,.053,.068)],coat),elbow)
         attach(box('shirt cuff',(side*.31,0,.842),(.125,.175,.045),shirt,.015),elbow)
         attach(oval('hand',(side*.31,-.005,.77),(.066,.065,.095),skin),elbow)
     # Bake the weave at one physical scale before joints animate; torso meshes

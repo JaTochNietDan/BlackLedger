@@ -1,0 +1,155 @@
+{
+  "revision": 0,
+  "minute": 480,
+  "playbackRate": 1,
+  "gunAudio": {
+    "loaded": [
+      "shotgun",
+      "thompson",
+      "revolver"
+    ],
+    "played": {
+      "revolver": 1
+    },
+    "fallbacks": 0,
+    "active": 0,
+    "context": "running"
+  },
+  "effectAudio": {
+    "loaded": [
+      "door-kick",
+      "fire",
+      "pain",
+      "engine-idle",
+      "siren",
+      "vehicle-approach",
+      "drive-away",
+      "raid",
+      "panic",
+      "explosion"
+    ],
+    "played": {},
+    "active": []
+  },
+  "impact": {
+    "x": 0,
+    "y": 0
+  },
+  "suppression": [],
+  "rubble": [],
+  "glazing": [
+    {
+      "id": "bar",
+      "broken": false
+    },
+    {
+      "id": "laundry",
+      "broken": false
+    },
+    {
+      "id": "club",
+      "broken": false
+    },
+    {
+      "id": "market",
+      "broken": false
+    },
+    {
+      "id": "apartment",
+      "broken": false
+    },
+    {
+      "id": "casino",
+      "broken": false
+    },
+    {
+      "id": "precinct",
+      "broken": false
+    },
+    {
+      "id": "herald",
+      "broken": false
+    },
+    {
+      "id": "restaurant",
+      "broken": false
+    },
+    {
+      "id": "poolhall",
+      "broken": false
+    },
+    {
+      "id": "butcher",
+      "broken": false
+    },
+    {
+      "id": "goldenlily",
+      "broken": false
+    },
+    {
+      "id": "steamworks",
+      "broken": false
+    },
+    {
+      "id": "burlesque",
+      "broken": false
+    },
+    {
+      "id": "pawn",
+      "broken": false
+    },
+    {
+      "id": "tailor",
+      "broken": false
+    }
+  ],
+  "buildingFire": {
+    "clock": 27.150000000000965,
+    "scenes": []
+  },
+  "headlightPools": 0,
+  "harbour": {
+    "visible": true,
+    "waterClock": 26.962700000000968
+  },
+  "followingPlayer": false,
+  "cutawayBuildings": [],
+  "weather": {
+    "kind": "clear",
+    "wet": 0,
+    "rainVisible": false,
+    "rainClock": 0
+  },
+  "camera": {
+    "zoom": 19.418315418601807,
+    "x": 254.75,
+    "z": -201.65,
+    "targetX": 74.75,
+    "targetZ": 38.35
+  },
+  "actors": [
+    {
+      "id": "player",
+      "model": "person",
+      "x": 80,
+      "z": 36.65,
+      "y": 0.2
+    }
+  ],
+  "waiting": [],
+  "aftermath": [
+    {
+      "id": "aftermath:bc0e3490a50a00f045f46692880a0b83:mara:body",
+      "x": 80,
+      "z": 38.35,
+      "visible": true
+    }
+  ],
+  "doors": [
+    {
+      "id": "bar",
+      "angle": 0
+    }
+  ],
+  "effects": []
+}

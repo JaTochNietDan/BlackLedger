@@ -25,3 +25,16 @@ in place. Screenshot reports145FPS/321draws; this is local evidence only. Stop
 restores the private preview and clears audio. Evidence: raid-door-corridor.json
 and PNG. All190 frontend tests pass; build passes. Other building models still
 need authored working entrances; hero character detail remains insufficient.
+
+### September 13 — rounded tailored character geometry
+
+Replaced rectangular jacket and sleeve/trouser meshes with shaped 24-sided
+cross sections, shoulder caps, fitted waists and tapered cloth profiles. Regenerated
+person/woman GLBs using local Blender and retained existing packed wool textures
+and joint coordinates. Asset growth is approximately20KB each. All190 frontend
+tests pass, including actual-model weapon-hand placement, walking surfaces and
+full assassination cast/fall envelopes; frontend build passes. Browser8873 private
+assassination review shows the updated silhouettes at145FPS/143draws. Screenshot
+and diagnostic evidence: tailored-characters.png/json. This is an incremental
+silhouette pass; toy-like anatomy, hands, faces and clothing variety still fall
+short of final visual acceptance. No campaign command was issued.
