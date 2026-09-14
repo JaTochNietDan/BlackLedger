@@ -604,5 +604,9 @@ The existing saved building-fire lifecycle supplies brigade arrival, extinguishi
 Pending planter exits now hold their future footprint against newly arriving moving
 traffic. Existing occupants can continue along their committed routes out of that
 space; the scene still waits for actual clearance before starting. Releasing or
-cancelling the scene releases the hold. This advances no simulation time and does
-not move stationary blockers, which still require separate staging recovery.
+cancelling the scene releases the hold. This advances no simulation time and allows a stationary pedestrian on the frontage pavement to walk aside when a
+collision-free space is available. This cosmetic movement preserves the saved
+location, activity and clock; the resulting stance persists until a new route is
+assigned. It stays on the same frontage, respects other traffic and held exits,
+and does not move parked vehicles or aftermath. Fully occupied frontages and
+other stationary blockers still require separate staging recovery.

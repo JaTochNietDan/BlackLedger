@@ -1,10 +1,10 @@
 import {isPedestrian} from './city3dCast.js';
-import {onRoute, PITCH} from './city3dPlan.js';
+import {onRoute, PITCH, FOOTWAY} from './city3dPlan.js';
 import type {Point} from './city3dPlan.js';
 
 export type TrafficPose = Point & {heading: number};
 export type TrafficRequest = {id: string; model: string; points: Point[]; progress: number};
-export type TrafficPlacement = {pose: TrafficPose; progress: number; waiting: boolean};
+export type TrafficPlacement = {pose: TrafficPose; progress: number; waiting: boolean; yielding?: boolean};
 const lengths: Record<string, number> = {ford: 4.7, hudson: 5.1, packard: 5.8, police: 4.7, 'fire-engine':5.8};
 export function trafficSpeed(model: string) {
   return isPedestrian(model) ? 1.8 : 11;
@@ -71,10 +71,14 @@ function throughAxis(request: TrafficRequest, progress: number, length: number) 
 export class StreetTraffic {
   private entries = new Map<
     string,
-    {key: string; progress: number; pose: TrafficPose; model: string; waiting: boolean}
+    {key: string; progress: number; pose: TrafficPose; model: string; waiting: boolean; yieldTo?: TrafficPose; yielding?: boolean}
   >();
   clear() {
     this.entries.clear();
+  }
+  placement(id: string): TrafficPlacement | undefined {
+    const e=this.entries.get(id);
+    return e ? {pose:{...e.pose},progress:e.progress,waiting:e.waiting,yielding:e.yielding} : undefined;
   }
   update(
     requests: TrafficRequest[],
@@ -97,7 +101,7 @@ export class StreetTraffic {
       // A waiting scene closes its approach to new moving traffic. Existing
       // occupants may finish leaving; the scene itself still waits for clearance.
       const current=this.entries.get(id);
-      if(lengths.get(id)!>0&&pending.some(space=>trafficOverlap(pose,model,space.pose,space.model)&&
+      if((lengths.get(id)!>0||(current&&!current.waiting&&isPedestrian(model)))&&pending.some(space=>trafficOverlap(pose,model,space.pose,space.model)&&
         !(current&&!current.waiting&&trafficOverlap(current.pose,current.model,space.pose,space.model))))return false;
       const crossing = junction(pose);
       const axis = crossing ? throughAxis(byID.get(id)!, progress, lengths.get(id)!) : null;
@@ -132,7 +136,37 @@ export class StreetTraffic {
         e.waiting = false;
       }
       const length = lengths.get(r.id)!;
-      if (!length) continue;
+      e.yielding=false;
+      if (!length) {
+        // A stationary pedestrian may make room along this frontage, without
+        // crossing a road or changing their authoritative location. Keep the
+        // resulting stance until a real route replaces this request.
+        const inScene=(pose:TrafficPose)=>pending.some(s=>trafficOverlap(pose,r.model,s.pose,s.model));
+        const row=Math.floor(e.pose.z/PITCH),col=Math.floor(e.pose.x/PITCH);
+        if(isPedestrian(r.model)&&Math.abs(e.pose.z-(row*PITCH+FOOTWAY))<.001){
+          if(!pending.length)e.yieldTo=undefined;
+          if(!e.yieldTo&&inScene(e.pose)){
+            for(let distance=.25;distance<=6&&!e.yieldTo;distance+=.25)for(const side of [-1,1]){
+              const target={x:e.pose.x+side*distance,z:e.pose.z,heading:side*Math.PI/2};
+              if(target.x<col*PITCH+8||target.x>col*PITCH+24||inScene(target))continue;
+              let clear=true;
+              for(let step=0;step<=distance;step+=.125){
+                if(!free({...target,x:e.pose.x+side*step},r.model,r.id,e.progress)){clear=false;break;}
+              }
+              if(clear){e.yieldTo=target;break;}
+            }
+          }
+          if(e.yieldTo){
+            const delta=e.yieldTo.x-e.pose.x;
+            const step=Math.min(Math.abs(delta),Math.min(.1,Math.max(0,seconds))*playbackRate*trafficSpeed(r.model));
+            const next={...e.yieldTo,x:e.pose.x+Math.sign(delta)*step};
+            if(free(next,r.model,r.id,e.progress)){e.pose=next;e.yielding=step>0;}
+            else e.yieldTo=undefined;
+            if(e.yieldTo&&Math.abs(e.pose.x-e.yieldTo.x)<1e-8)e.yieldTo=undefined;
+          }
+        }
+        continue;
+      }
       // A snapshot may jump minutes. Compress travel, but retain safe occupancy.
       const target = Math.max(
         e.progress,
@@ -153,7 +187,7 @@ export class StreetTraffic {
     return new Map(
       [...this.entries].map(([id, e]) => [
         id,
-        {pose: e.pose, progress: e.progress, waiting: e.waiting},
+        {pose: e.pose, progress: e.progress, waiting: e.waiting, yielding:e.yielding},
       ]),
     );
   }

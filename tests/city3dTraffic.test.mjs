@@ -181,3 +181,41 @@ test('pending scenes let existing traffic leave but stop new arrivals entering',
  for(let i=0;i<1200;i++)poses=traffic.update([inside,behind],1/60);
  assert.ok(poses.get('behind').progress>.9,'traffic failed to resume after scene release');
 });
+
+test('stationary pavement pedestrian walks aside continuously and retains their stance after release',()=>{
+ for(const fps of [30,60,144]){
+  const traffic=new StreetTraffic();
+  const person={id:'player',model:'person',points:[{x:48,z:4.65}],progress:0};
+  const space={pose:{x:48,z:6,heading:0},model:'planter'};
+  traffic.update([person],0);
+  let last=traffic.placement('player').pose, moved=false;
+  for(let i=0;i<fps*5;i++){
+   const p=traffic.update([person],1/fps,1,[space]).get('player');
+   assert.equal(p.waiting,false);
+   assert.equal(p.progress,0);
+   assert.ok(Math.hypot(p.pose.x-last.x,p.pose.z-last.z)<=1.8/fps+1e-8);
+   assert.equal(p.pose.z,4.65);
+   moved ||= !!p.yielding;last=p.pose;
+  }
+  assert.ok(moved);
+  assert.equal(trafficOverlap(last,'person',space.pose,space.model),false);
+  assert.deepEqual(traffic.update([person],1/fps).get('player').pose,last);
+  assert.deepEqual(person.points,[{x:48,z:4.65}]);
+ }
+});
+
+test('stationary exit recovery respects occupied pavement and leaves parked cars in place',()=>{
+ const traffic=new StreetTraffic();
+ const person={id:'player',model:'person',points:[{x:48,z:4.65}],progress:0};
+ const blocker={id:'blocker',model:'parked-ford',points:[{x:44,z:4.65}],progress:0};
+ const space={pose:{x:48,z:6,heading:0},model:'planter'};
+ let poses=traffic.update([blocker,person],0);
+ const car=poses.get('blocker').pose;
+ for(let i=0;i<300;i++){
+  poses=traffic.update([blocker,person],1/60,1,[space]);
+  clear([blocker,person],poses);
+  assert.deepEqual(poses.get('blocker').pose,car);
+ }
+ assert.ok(poses.get('player').pose.x>48,'person must choose the unoccupied side');
+ assert.equal(trafficOverlap(poses.get('player').pose,'person',space.pose,space.model),false);
+});

@@ -1235,8 +1235,8 @@ export function City3D(props: Props) {
         // Stationary actors own their known destination even before their first
         // visible frame. Otherwise response vehicles can steal a parked bay.
         const replacedActors=new Set(effects.filter(e=>e.incendiary||e.planter).map(e=>e.cue.attacker?.id));
-        const actorSpaces=[...actors].filter(([id])=>!replacedActors.has(id)).map(([,a])=>a).filter(a=>a.object.visible||a.start===a.end).map(a=>{
-          const pose=a.start===a.end?onRoute(a.points,1):{x:a.object.position.x,z:a.object.position.z,heading:a.object.rotation.y};
+        const actorSpaces=[...actors].filter(([id])=>!replacedActors.has(id)).filter(([,a])=>a.object.visible||a.start===a.end).map(([id,a])=>{
+          const pose=a.start===a.end?(traffic.placement(id)?.pose||onRoute(a.points,1)):{x:a.object.position.x,z:a.object.position.z,heading:a.object.rotation.y};
           return {model:trafficModel(a.model,a.start===a.end),root:{x:pose.x,z:pose.z},pose};
         });
         const animatingVictims=new Set(effects.flatMap(e=>e.assassination?[e.cue.strike!.victim.id]:e.cue.kind==='killing'?e.cue.actors?.map(a=>a.id)||[]:[]));
@@ -1349,13 +1349,14 @@ export function City3D(props: Props) {
           const at = placement.pose;
           const distance = Math.hypot(a.object.position.x - at.x, a.object.position.z - at.z);
           const moved = distance > 0.0001;
+          const walking = a.walking || !!placement.yielding;
           if(!isPedestrian(a.model)&&a.object.visible&&Math.hypot(at.x-controls.target.x,at.z-controls.target.z)<22){
             const key=`${a.since}:${a.start}:${a.end}`,previous=vehicleSounds.get(id);
             if(motion&&moved&&a.start!==a.end&&previous?.key!==key){
               previous?.stop?.();vehicleSounds.set(id,{key,stop:playRecordedEffect('vehicle-approach')});
             }else if(!moved)nearbyIdle.push('engine-idle');
           }
-          if (a.walking && moved)
+          if (walking && moved)
             a.phase = (a.phase + (distance / 1.15) * Math.PI * 2) % (Math.PI * 2);
           if (a.wheels.length && a.wheelPlaced && motion && a.start !== a.end && moved) {
             a.wheelPhase = advanceWheel(a.wheelPhase, distance);
@@ -1373,14 +1374,14 @@ export function City3D(props: Props) {
             const side = limb.name.endsWith('-1') ? 0 : Math.PI;
             const phase = a.phase + side;
             limb.rotation.x =
-              !a.walking || !moved || !motion
+              !walking || !moved || !motion
                 ? 0
                 : limb.name.startsWith('knee')
                   ? Math.max(0, Math.sin(phase + 0.7)) * 0.65
                   : Math.sin(phase + (limb.name.startsWith('arm') ? Math.PI : 0)) *
                     (limb.name.startsWith('arm') ? 0.23 : 0.35);
           }
-          if (a.walking && moved && motion)
+          if (walking && moved && motion)
             a.object.position.y += 0.05 + Math.abs(Math.sin(a.phase)) * 0.015;
           if (id === 'player') {
             playerRing.position.set(at.x, isPedestrian(a.model) ? surfaceHeight(at) + .045 : vehicleRootHeight(at) + .04, at.z);
