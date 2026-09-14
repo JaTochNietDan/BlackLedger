@@ -642,8 +642,11 @@ snapshot's condition (including undoing private preview damage). Aim points and
 impacts use the first visible authored building surface along a ray, rather
 than its bounding box; shot impacts sample the muzzle at the firing beat.
 The recorded newspaper is revealed after scene completion, through the existing
-result/newspaper flow. Normal completion has been exercised on an isolated
-campaign; replay, Skip/motion-off and broader visual acceptance remain to verify.
+result/newspaper flow. Normal completion, replay, Skip and disabled-animation
+presentation have been exercised on isolated campaigns. With City animation off,
+the recorded newspaper opens immediately; disabling animation during a scene
+finishes its presentation and retains its newspaper. Re-enabling animation does
+not restart that scene. Broader visual acceptance remains unfinished.
 
 
 Pending planter exits now hold their future footprint against newly arriving moving

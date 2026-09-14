@@ -298,9 +298,9 @@ function App() {
       const worst = cues.length
         ? [...cues].sort((a, b) => (b.gravity || 0) - (a.gravity || 0))[0]
         : undefined;
-      if (worst && !next.event && motionRef.current) {
+      if (worst && !next.event) {
         setBeat(0);
-        setFinishedCue('');
+        setFinishedCue(motionRef.current ? '' : worst.id);
         setPlaying(worst);
         setCityView('iso');
         setTab('city');
@@ -369,7 +369,7 @@ function App() {
       localStorage.setItem('black-ledger-motion', on ? 'on' : 'off');
     } catch {}
     if (!on) {
-      setPlaying(null);
+      if (playing) setFinishedCue(playing.id);
       setJourney(null);
     }
   }
@@ -838,7 +838,7 @@ function App() {
                     setCityView('iso');
                     setSelected(cue.target);
                     setBeat(0);
-                    setFinishedCue('');
+                    setFinishedCue(motion ? '' : cue.id);
                     setPlaying(cue);
                   }
                 }}
