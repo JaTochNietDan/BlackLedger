@@ -1943,3 +1943,28 @@ expanded stock; their focused rerun passed. Additional address checks caught mis
 Outstanding: other venue interiors, richer occupied/failed burglary choreography,
 further visual detail and progression/campaign acceptance remain in the active
 goal. This housing expansion does not close the overall request.
+
+Release checkpoint for 3105991: a clean shared clone at
+`.runtime/release-3105991` built successfully with `modified:false`. Its complete
+residential/home/property/rent/household test selection passed in 21.711s; store
+and server suites passed in 0.445s and 3.420s. Final authored assets passed all 20
+selected geometry/route/settings tests, and the final build passed. Browser
+inspection confirmed the corrected nine-storey wings and full-height doors;
+resident search reduced the 264-person register to Wanda Costa alone.
+
+The exact live-save backup was opened only by candidate port 8959. Comparison
+proved that only `properties.riverside` and 272 appended deeds changed; all old
+112 deeds, all NPCs, player state, minute 160095, revision 2115, and all 2,117
+receipts were preserved. Main state remains unchanged. Candidate startup's
+expected state SHA-256 is
+`2c407ead0ac62316d20a3c104857cf9741b8979fc0f1db7a7d505550b103b0ae`.
+Evidence is in the candidate's ignored `.runtime/compatibility.json` and
+`before.json`. An initial path mistake started an empty isolated compatibility
+save; it was stopped and retained as `empty-start.sqlite3`, then the actual
+backup was created and verified byte-for-byte before candidate startup.
+
+The broad working-tree simulation suite timed out at 600s, with an unrelated
+untracked 260-campaign sweep among its running tests. That is not a pass. Clean
+release simulation validation has been restarted with a 20-minute limit; the
+working-tree full core rerun is also still running. Main remains on release
+8ada776 pending this verification. Do not describe 3105991 as live yet.
