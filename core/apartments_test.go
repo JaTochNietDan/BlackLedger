@@ -240,3 +240,42 @@ func TestApartmentMarketExplainsCurrentNeighborhoodDiscount(t *testing.T) {
 		t.Fatal("reading discount mutated campaign")
 	}
 }
+
+func TestPrivateApartmentBuyerCanLiveAtMariner(t *testing.T) {
+	w := apartmentWorld()
+	seller, buyer := w.NPC("tenant"), w.NPC("buyer")
+	deed := w.apartmentForResident(seller.ID)
+	deed.Owner = seller.ID
+	seller.Purse = 50
+	buyer.Home = "room"
+	buyer.Accommodation = "Rented room"
+	buyer.Location = "garage"
+	buyer.Heading = "market"
+	buyer.Sets = w.Minute + 10
+	buyer.Arrives = w.Minute + 40
+	w.SettleApartments()
+	beforeMoney := w.HouseholdWealth(seller) + w.HouseholdWealth(buyer)
+	beforeBuyer := *buyer
+	resident := deed.Resident
+	price := w.ApartmentPrice(deed)
+	beforeCash := buyer.Purse
+	w.ApartmentDay()
+	if deed.Owner != buyer.ID || deed.Resident != resident {
+		t.Fatal("city-wide investor did not acquire tenanted deed", deed)
+	}
+	if buyer.Purse != beforeCash-price || seller.Purse != 50+price || w.HouseholdWealth(seller)+w.HouseholdWealth(buyer) != beforeMoney {
+		t.Fatal("private purchase did not transfer exact funds")
+	}
+	if buyer.Home != beforeBuyer.Home || buyer.Location != beforeBuyer.Location || buyer.Heading != beforeBuyer.Heading || buyer.Arrives != beforeBuyer.Arrives || buyer.Sets != beforeBuyer.Sets {
+		t.Fatal("investment moved buyer or interrupted journey")
+	}
+	if seller.Home != "mercercourt" {
+		t.Fatal("sale evicted seller")
+	}
+	beforeCash = buyer.Purse
+	rent := w.NPCRent(seller)
+	w.collectRent(seller)
+	if buyer.Purse != beforeCash+rent {
+		t.Fatal("Mariner landlord did not receive tenant-funded rent")
+	}
+}

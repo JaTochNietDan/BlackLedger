@@ -2422,3 +2422,21 @@ filter (0 of10) and case-insensitive MERCER search (5 of10). No gameplay command
 were issued; no main save writes. This is existing-market UX, not new housing
 stock or a claim that broader progression/visual requirements are complete.
 Main8791 remains clean01fb5cf; these changes are preview-only.
+
+### 2026-09-14 — city-wide NPC apartment investors
+
+Previous b9d9903 improved housing-market inspection. Removed the private deed
+buyer's arbitrary restriction to residents of the three apartment buildings.
+Living housed NPCs, including Mariner tenants and house residents, can now buy
+a cash-poor NPC's apartment investment. Stable identity ordering, real household
+funds, one daily transaction, existing tenancy and original housing/journeys
+remain in force. This does not force a move or create new wealth.
+
+A Mariner-investor regression verifies the exact buyer-to-seller payment,
+conserved household funds, retained seller tenancy, unchanged buyer home and
+active journey, and subsequent tenant-funded rent paid to the new landlord.
+Apartment/housing/private-trade checks passed7.190s, store/server0.325s/1.897s;
+vet passed. Logs `.runtime/citywide-landlords-{core,adapters}.log`.
+No frontend/interface changes, browser claims, main-save writes or promotion.
+Main8791 remains01fb5cf. NPC move-up housing behavior, other interiors and
+full billiards fidelity remain open within the broad goal.

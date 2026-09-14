@@ -199,9 +199,13 @@ func (w *World) ApartmentDay() {
 	}
 	// Owners with little cash can sell to another NPC with savings, retaining
 	// their tenancy. Stable identity order makes this independent of roster order.
-	buyers := w.Residents("apartment")
-	buyers = append(buyers, w.Residents("mercercourt")...)
-	buyers = append(buyers, w.Residents("riverside")...)
+	buyers := []*NPC{}
+	for i := range w.NPCs {
+		n := &w.NPCs[i]
+		if !n.Dead && n.Home != "" {
+			buyers = append(buyers, n)
+		}
+	}
 	sort.Slice(buyers, func(i, j int) bool { return buyers[i].ID < buyers[j].ID })
 	for i := range w.Apartments {
 		u := &w.Apartments[i]
