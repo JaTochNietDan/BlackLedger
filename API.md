@@ -701,7 +701,10 @@ Recorded NPC legs are now played in order. If an actor is delayed by cosmetic
 occupancy after its recorded arrival minute, its route remains visible until
 physical arrival. A later recorded leg waits for that handoff and is admitted
 at its observed starting fraction, then catches up within normal movement and
-collision limits. Partial legs stop at their last observed fraction. This queue
-exists only for the active travel presentation; Skip, completion and snapshot
-replacement still reconcile with the authoritative endpoint. Carrying unfinished
-NPC presentation across that final reconciliation remains open.
+collision limits. Partial legs stop at their last observed fraction. After a
+normal player arrival, the remaining NPC queue keeps its actors and occupancy
+until physical completion, using the fixed committed minute. This finishes
+already observed travel; it does not simulate new actions while the clock is
+paused. The queue belongs to one world, life and revision. Skip, disabled motion,
+a new snapshot or a new scene reconciles to the authoritative endpoint. A new
+actor assignment clears obsolete per-leg progress before using its new route.

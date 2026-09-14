@@ -733,6 +733,7 @@ export function City3D(props: Props) {
       // Arrivals hide their outdoor actor; a later journey must show it again.
       a.object.visible = true;
       a.arrived = false;
+      a.timelineProgress=undefined;a.legKey=undefined;
       a.wheelPlaced = false;
       a.points = points;
       a.start = start;
@@ -758,6 +759,8 @@ export function City3D(props: Props) {
       playedJourneyProgress = 0,
       renderedJourneyProgress = 0,
       streetPlayback:StreetPlayback|null = null,
+      streetPlaybackOwner = '',
+      settlingStreet = false,
       wasFollowing = false,
       followZoom: number | null = null,
       motionWas = true;
@@ -953,6 +956,13 @@ export function City3D(props: Props) {
           (effect.mesh.material as THREE.Material).dispose();
         }
         effects.length = 0;
+      }
+      const streetOwner=`${w.id}:${w.life}:${w.revision}`;
+      if(settlingStreet&&(streetPlaybackOwner!==streetOwner||!motion||playbackStarted)){
+        // A new authoritative state or explicit presentation change replaces the
+        // remainder. Disabling motion reconciles it immediately as well.
+        if(streetPlaybackOwner===streetOwner)revision=-1;
+        settlingStreet=false;streetPlayback=null;streetPlaybackOwner='';
       }
       if (
         ready &&
@@ -1188,13 +1198,18 @@ export function City3D(props: Props) {
         const key = p.journey
           ? `${w.id}:${w.life}:${p.journey.from.id}:${p.journey.to.id}:${w.revision}`
           : '';
-        if (journeyKey && !key) revision = -1;
+        if (journeyKey && !key) {
+          settlingStreet=!!streetPlayback&&streetPlaybackOwner===streetOwner&&completedJourney===journeyKey&&motion&&!playbackStarted&&!p.activeCue;
+          if(!settlingStreet)revision=-1;
+        }
         if (key !== journeyKey || motion !== motionWas) {
           journeyKey = key;
           reportedJourneyProgress = -1;
           reportedJourneyBlocked=false;p.onJourneyBlocked?.(false);
           playedJourneyProgress = 0;renderedJourneyProgress=0;
-          streetPlayback=p.journey?.street?new StreetPlayback(p.journey.street):null;
+          if(p.journey?.street){
+            streetPlayback=new StreetPlayback(p.journey.street);streetPlaybackOwner=streetOwner;settlingStreet=false;
+          }else if(!settlingStreet){streetPlayback=null;streetPlaybackOwner='';}
           if (p.journey) { setFollow(true); followZoom = 8; }
           const here = lots.get(w.player.location);
           if (here && w.player.alive) {
@@ -1235,13 +1250,14 @@ export function City3D(props: Props) {
             player.start = player.end = 0;
           }
         }
-        if (p.journey?.street) {
+        if (p.journey?.street || settlingStreet) {
           const traveller=actors.get('player');
-          if(traveller)playedJourneyProgress=motion?advanceJourneyClock(
+          if(traveller&&p.journey)playedJourneyProgress=motion?advanceJourneyClock(
             playedJourneyProgress,renderedJourneyProgress,Math.min(100,Math.max(0,dt))/1000*playback.current,
             traveller.duration/1000,pathLength(traveller.points)/trafficSpeed(traveller.model)):1;
-          const minute=(p.journey.fromMinute??w.minute-p.journey.minutes)+p.journey.minutes*playedJourneyProgress;
+          const minute=p.journey?(p.journey.fromMinute??w.minute-p.journey.minutes)+p.journey.minutes*playedJourneyProgress:w.minute;
           const samples=streetPlayback!.sample(minute,(id,key)=>actors.get(id)?.legKey===key&&!!actors.get(id)?.arrived);
+          if(settlingStreet&&!samples.size){settlingStreet=false;streetPlayback=null;streetPlaybackOwner='';}
           for(const [id,a] of actors)if(!id.startsWith('player')&&!samples.has(id)){releaseActor(a);actors.delete(id);}
           for(const [id,{segment,progress}] of samples){
             const from=lots.get(segment.from_id),to=lots.get(segment.to_id);if(!from||!to)continue;
@@ -1877,6 +1893,7 @@ export function City3D(props: Props) {
           harbour: {visible: !!harbourLot, waterClock},
           followingPlayer: followPlayer.current,
           journeyProgress: {clock:playedJourneyProgress,player:renderedJourneyProgress},
+          settlingStreet,
           trafficBlocks: [...actors.keys()].flatMap(id=>{const by=traffic.placement(id)?.blockedBy;return by?[{id,by}]:[]}),
           streetMinute:p.journey?(p.journey.fromMinute??w.minute-p.journey.minutes)+p.journey.minutes*playedJourneyProgress:w.minute,
           cutawayBuildings: [...blockers],
