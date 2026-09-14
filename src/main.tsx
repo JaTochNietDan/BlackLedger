@@ -1,5 +1,5 @@
 import {HomeStrikeScene} from './HomeStrikeScene';
-import {flatHomeStrikeFor} from './homeStrike';
+import {homeStrikeFor} from './homeStrike';
 import {KeyboardShortcuts} from './KeyboardShortcuts';
 import {CityAccounts} from './CityAccounts';
 import {SceneNewspaper} from './SceneNewspaper';
@@ -734,7 +734,7 @@ function App() {
   function content(view=tab) {
     const w = world!;
     if (view === 'city') {
-      const homeCue=flatHomeStrikeFor(playing,w.last_result?.cues||[]);
+      const homeCue=homeStrikeFor(playing,w.last_result?.cues||[]);
       const inside = cityView === 'interior' && locationInfo.id === p.location;
       const theatre = playing && !journey && (
         <Theatre

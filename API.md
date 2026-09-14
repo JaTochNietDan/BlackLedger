@@ -956,3 +956,9 @@ completion feeds the existing newspaper reveal. Replay sends no command. Motion
 off/reduced motion settles the recorded result immediately once assets load.
 Other residential addresses retain their prior presentation for now. Persistent
 indoor aftermath and burglary playback are not implemented by this scene.
+
+Cypress House (`estate`) now also routes explicit recorded home strikes into its
+own drawing-room model. Per-home scene metadata controls the model, reserved
+attack aisle and camera focus. Ashbury/Mercer continue to use the private flat.
+Mariner home strikes still retain the prior city presentation pending an authored
+private lodging room. This extension does not alter the attack outcome or timing.

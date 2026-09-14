@@ -1492,3 +1492,23 @@ Remaining: Cypress/boarding-house indoor crime choreography, burglary scenes,
 persistent indoor bodies/blood/police instead of the existing city aftermath,
 and broader visual/campaign acceptance. Audio events are wired to shared tested
 samples; subjective listening acceptance is not established by this check.
+
+## September 14 — Cypress home attack interior
+
+Extended recorded home-strike routing to estate and generalized the scene's
+per-home model/aisle/focus metadata. Cypress uses its actual drawing room, with
+the full-sized attacker/victim path across the foreground at glTFz3.4, clear of
+the sofa, chairs and sideboard. Flat staging remains unchanged. Estate camera
+focus moves forward to2.7 so the action has clearance above the playback band.
+
+All361 frontend tests pass (`.runtime/estate-strike-tests.log`); the geometry
+coverage now samples approach/impact/fall for melee, revolver, shotgun and
+Thompson in BOTH furnished homes. Final routing/geometry checks pass in
+`estate-strike-geometry-final.log`; build passes in `estate-strike-final-build.log`.
+Added estate-strike fixture using the actual home_strike command, isolated8944.
+Browser1280x720: initial cast, approach/fall and correct Cypress room observed;
+820x740: both participants fully visible on approach and newspaper follows the
+scene. No main campaign QA actions. Main8791 remains the prior release.
+
+Still unfinished: private Mariner room/home playback, persistent indoor crime
+aftermath, burglary choreography, remaining interiors and broader acceptance.
