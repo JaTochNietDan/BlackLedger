@@ -1,4 +1,5 @@
 import {useEffect, useRef} from 'react';
+import {PokerTable3D} from './PokerTable3D';
 import {BackRoom} from './Tables';
 import type {CardsState} from './Tables';
 import {playTable, roomTone} from './sound';
@@ -88,7 +89,7 @@ export function BackRoomScene({
   return (
     <div className="modal-shade table-shade">
       <section
-        className="casino back-room-scene"
+        className="casino casino-house back-room-scene"
         role="dialog"
         aria-modal="true"
         aria-label={'The back room at ' + place}
@@ -115,7 +116,7 @@ export function BackRoomScene({
         {cards ? (
           <BackRoom cards={cards} money={money} cash={cash} act={act} />
         ) : (
-          <div className="back-room-empty">
+          <div className="back-room-empty"><PokerTable3D cards={null}/>
             <p>
               Two cards each and five on the table. There is no house in this game: the pot is what
               everybody put in, and it goes to the best hand at the table.

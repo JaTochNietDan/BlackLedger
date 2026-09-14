@@ -1,5 +1,6 @@
 import type {Person,Presence} from './types';
 import {planCards} from './blackjackPresentation';
+import {PokerTable3D} from './PokerTable3D';
 import {BlackjackTable3D} from './BlackjackTable3D';
 import {DiceTable3D} from './DiceTable3D';
 import {DICE_ROLL_MS} from './dicePresentation';
@@ -927,11 +928,12 @@ export function BackRoom({
           {cards.hands > 1 ? ` · hand ${cards.hands}` : ''}
         </i>
       </div>
-      <div className="baize">
+      <PokerTable3D cards={cards}/>
+      <div className="baize poker-summary">
         {cards.seats.map(s => (
           <div key={s.who} className={'seat player-seat' + (s.folded ? ' folded' : '')}>
             <span className="seat-name">{s.name}</span>
-            <Row cards={s.cards ?? []} hidden={s.cards ? 0 : 2} />
+            <span className="poker-card-text">{s.cards?.map(c=>`${c.rank}${pipOf(c.suit)}`).join(" · ") || "Two hidden cards"}</span>
             <small className="seat-said">
               {s.folded ? 'out' : s.said || 'waiting'}
               {s.in > 0 && !s.folded ? ` · ${money(s.in)} in` : ''}
@@ -957,11 +959,11 @@ export function BackRoom({
           <span className="seat-name">The table</span>
           {/* Defensive on both counts: a board is never sent as null now, and
               a save written before it was published still opens. */}
-          <Row cards={cards.board ?? []} hidden={5 - (cards.board ?? []).length} />
+          <span className="poker-card-text">{(cards.board ?? []).map(c=>`${c.rank}${pipOf(c.suit)}`).join(" · ") || "Waiting for the flop"}</span>
         </div>
         <div className="seat mine">
           <span className="seat-name">You</span>
-          <Row cards={cards.mine} hidden={0} />
+          <span className="poker-card-text">{cards.mine.map(c=>`${c.rank}${pipOf(c.suit)}`).join(" · ")}</span>
           <small className="seat-said">
             {cards.hand}
             {cards.my_bet > 0 ? ` · ${money(cards.my_bet)} in` : ''}

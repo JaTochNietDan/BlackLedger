@@ -74,3 +74,17 @@ The latest amendment requires takeover and management of The Mariner as a lodgin
 The subsequent amendment requires all living NPCs to have homes appropriate to their wealth and standing, with additional housing where capacity requires it. Mariner leases must therefore be part of city-wide residential assignment, not an isolated occupancy counter.
 
 Latest amendments additionally require a real-estate market with houses changing hands, player purchases and sales, more residential housing, broader income opportunities across progression, and a guiding beginner questline. These remain outstanding.
+
+## September 14 amendment — card scenes and residential city
+
+The current user explicitly authorizes continued visual production: poker must
+join the other 3D games, with close overlooking cameras and readable cards,
+large scenes taking the map's screen area, and camera movement. Continue overall
+stylization, feeling and UX. Expand earning opportunities through progression,
+housing stock for every living NPC, individual ownership/purchases/sales and NPC
+house trading, with prices reacting to neighborhood crime. Add burglary and
+assassination at a target's home when they are present. Expand the map as needed
+and complete the planned 3D interiors. This supersedes the historical visual
+production restriction; no separate visual agent was launched in this session.
+First 3D poker/table-camera progress is recorded in DEVELOPMENT.md. These broader
+simulation and interior requirements remain outstanding.

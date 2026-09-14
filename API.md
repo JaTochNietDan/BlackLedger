@@ -760,3 +760,13 @@ already observed travel; it does not simulate new actions while the clock is
 paused. The queue belongs to one world, life and revision. Skip, disabled motion,
 a new snapshot or a new scene reconciles to the authoritative endpoint. A new
 actor assignment clears obsolete per-leg progress before using its new route.
+
+## Card-table camera presentation
+
+Poker now draws a 3D table directly from the public cards projection. Missing
+opponent cards remain face down; the renderer never inspects the private deck or
+calculates a hand. Folded seats clear their rendered cards. Poker currently
+reconciles immediately to each committed street; blackjack retains its existing
+dealing sequence. Both table cameras allow bounded local orbit/pan/zoom/reset,
+including focused-canvas keyboard input, without commands or saved camera state.
+Text summaries and transactional betting actions remain available below the scene.

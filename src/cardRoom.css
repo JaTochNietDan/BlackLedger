@@ -1,0 +1,21 @@
+.poker3d{position:relative;height:clamp(360px,62dvh,820px);background:#10251e;border-block:3px double #ad8c50}
+.poker3d>div{width:100%;height:100%}.poker3d canvas{display:block;width:100%;height:100%}
+.poker3d>p{position:absolute;top:40%;left:10%;right:10%;text-align:center;color:#eee0c2}
+.table-camera-reset{position:absolute;top:12px;right:12px;border:1px solid #a58b59;background:#ede0c3;color:#392b1b;font:13px Georgia,serif;padding:7px 12px;box-shadow:0 2px 8px #0005}
+.table-camera-help{position:absolute;bottom:8px;left:12px;right:12px;color:#eee0c2;text-shadow:0 1px 3px #000;font:12px/1.5 Georgia,serif;pointer-events:none}
+.poker3d canvas:focus-visible,.blackjack3d canvas:focus-visible{outline:2px solid #e8c885;outline-offset:-3px}
+.casino.casino-house,.casino.back-room-scene{width:100%;max-width:none}
+.casino.back-room-scene{overflow:auto}.back-room-scene>.back-room{flex:none}
+.casino-house .casino-game .felt{max-width:none}
+.casino-house .casino-floor{grid-template-columns:minmax(0,1fr)}
+.casino-house .casino-night{position:static;max-height:180px}
+.casino-house .blackjack3d{height:clamp(360px,60dvh,820px)}
+.back-room-empty .poker3d{width:100%;flex:none}
+.felt.back-room .poker-summary{padding:14px;gap:12px;min-height:0}
+.felt.back-room .poker-summary .seat{min-height:0;flex:1 1 150px;margin:0;padding:0;border:0}
+.felt.back-room .poker-summary .board{flex:1 1 270px;padding:0;border:0}
+.poker-summary .card-row{transform:scale(.8);transform-origin:center;margin-block:-7px}
+@media(max-width:600px){.poker3d{height:440px}.table-camera-help{font-size:11px}.back-room-empty{padding:12px}.casino-house .casino-floor{padding:10px}.casino-head{gap:10px;padding:12px}}
+.poker-summary .poker-card-text{display:block;font:18px/1.4 Georgia,serif;color:#f3e6c9;white-space:nowrap}
+.felt.back-room .poker-summary .seat,.felt.back-room .poker-summary .board{display:block}
+.casino-house .cards-panel{max-width:none;width:100%}.casino-house .cards-panel>.felt{width:100%;box-sizing:border-box}
