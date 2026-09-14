@@ -13429,3 +13429,10 @@ through ordinary clock waits in the isolated browser/API fixture and paid Mara
 $160 plus $40 owner commission. Core, receipt/reopen, HTTP, vet and build checks
 pass. API/GOAL/BILLIARDS document terms, evidence and remaining broader scope.
 No live save or release promotion.
+
+### 2026-09-14 — Funded tournament previews and waiting
+
+Owner setup now previews the eligible field and exact money split. A dedicated
+draw control lets NPC tables play for ten game minutes. Tests prove physical
+progress, paused-command rejection and fee/funding preview behavior; core,
+adapters, frontend suite, build and vet pass. Main unchanged.

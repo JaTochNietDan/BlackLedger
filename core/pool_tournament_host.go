@@ -18,14 +18,7 @@ func (w *World) HostPoolTournament(settings *PoolHostInput) error {
 	if settings == nil {
 		return fmt.Errorf("set the entry fee, house cut and whether you will play")
 	}
-	ids := []string{}
-	for i := range w.NPCs {
-		n := &w.NPCs[i]
-		if !n.Dead && n.Held <= w.Minute && n.Location == PoolPlace && !w.Travelling(n) && w.Pockets(n) >= settings.Fee {
-			ids = append(ids, n.ID)
-		}
-	}
-	sort.Strings(ids)
+	ids := w.poolHostCandidates(settings.Fee)
 	needed := 4
 	if settings.Enter {
 		needed = 3
@@ -44,4 +37,16 @@ func (w *World) HostPoolTournament(settings *PoolHostInput) error {
 		w.LastPoolTournamentSlot = opens
 	}
 	return nil
+}
+
+func (w *World) poolHostCandidates(fee int) []string {
+	ids := []string{}
+	for i := range w.NPCs {
+		n := &w.NPCs[i]
+		if !n.Dead && n.Held <= w.Minute && n.Location == PoolPlace && !w.Travelling(n) && w.Pockets(n) >= fee {
+			ids = append(ids, n.ID)
+		}
+	}
+	sort.Strings(ids)
+	return ids
 }

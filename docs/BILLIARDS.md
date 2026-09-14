@@ -665,3 +665,20 @@ field. Core pool tests pass (6.003s), full store tests (0.306s), full server tes
 (1.889s), vet and build pass. Logs `.runtime/pool-host-{core,adapters,http,vet,
 build}.log`. Main campaign and live release unchanged. This implements the
 proprietor amendment; broader animation/physics/interior goals remain active.
+
+## Funded owner preview and table-wait control (2026-09-14)
+
+The proprietor form now lists the actual field selected at the chosen fee,
+instead of presenting both hypothetical draw sizes. Candidate offers use the
+same availability/funding filter as server admission; the server still rechecks
+at commit. The preview displays gross fees, integer-dollar house cut and net
+prize, and disables an insufficient field or an unaffordable player entry.
+
+The draw offers a ten-minute wait while NPC-only tables remain. Its command
+advances normal game time, preserves interruption rules and never takes the
+player's turn. A core command test verifies five physical strokes on each of
+two unattended tables over ten minutes. Other tests cover read-only offers and
+fee-dependent field selection, rounding, owner entry funds and invalid input.
+Core pool tests, full adapters, frontend suite, build and vet pass; logs
+`.runtime/pool-host-preview-{core,adapters,tests,build,vet}.log`. This checkpoint
+was verified by tests/build, with no new browser or live-save mutation.

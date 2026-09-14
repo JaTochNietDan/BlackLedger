@@ -1227,3 +1227,15 @@ pot show the champion's net prize, while saved `Escrow` remains gross funding.
 The UI shows four/eight-entry prize/cut estimates before committing, separate
 host-only status, and recorded prize/commission after completion. Existing
 public tournaments retain zero house cut and pay the entire entry pool.
+
+Owner notices include `host_offers` (local candidate ID/name/max_fee), empty for
+non-owners. The setup preview uses those offers to select the funded four/eight
+field at the chosen fee and displays the exact gross, prize and cut. The server
+revalidates all candidates at commit. Insufficient fields or an unaffordable
+player entry disable starting in the UI without changing any funds.
+
+`pool_tournament_wait` advances ten game minutes while NPC-only tables play on
+their saved deadlines. It accepts no cue input or match index and requires an
+active local tournament, no interruption and at least one unattended rack.
+Normal clock interruptions and prize settlement still apply. It never shoots
+on behalf of the player and is offered on the tournament draw.

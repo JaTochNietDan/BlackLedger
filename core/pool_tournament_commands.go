@@ -77,6 +77,15 @@ func (w *World) poolTournamentCommand(c Command) (string, int, error) {
 		w.ReconcilePoolTournament()
 		return "Withdraw from the tournament", 0, nil
 	}
+	if c.Kind == "pool_tournament_wait" {
+		if w.Event != nil || w.poolUnplayable() {
+			return "", 0, fmt.Errorf("the tournament is interrupted")
+		}
+		if len(w.unattendedPoolGames()) == 0 {
+			return "", 0, fmt.Errorf("there are no unattended matches; open your table to continue")
+		}
+		return "Let the tournament tables play", 10, nil
+	}
 	if c.PoolGame == nil {
 		return "", 0, fmt.Errorf("a tournament game index is required")
 	}

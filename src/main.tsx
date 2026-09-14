@@ -643,7 +643,7 @@ function App() {
               </small>
             </div>
           )}
-          {l.id==='poolhall' && p.location===l.id && <><PoolTournamentNotice notice={world?.pool_tournament_notice} tournament={world?.pool_tournament} busy={busy} act={commit} onOpen={()=>{setTournamentGame(null);setTournamentOpen(true);}}/><PoolChallenges opponents={world?.pool_opponents||[]} cash={p.cash} busy={busy} act={commit}/></>}
+          {l.id==='poolhall' && p.location===l.id && <><PoolTournamentNotice cash={p.cash} notice={world?.pool_tournament_notice} tournament={world?.pool_tournament} busy={busy} act={commit} onOpen={()=>{setTournamentGame(null);setTournamentOpen(true);}}/><PoolChallenges opponents={world?.pool_opponents||[]} cash={p.cash} busy={busy} act={commit}/></>}
           {/* The poolhall is a racket rather than a casino, so none of the
               float rows reached it — and it is the one room that runs a card
               game and charges for the seat. Its money is a till: nothing is
@@ -793,7 +793,7 @@ function App() {
                 <Interior
                   tournament={w.pool_tournament}
                   onPoolTable={index=>{setTournamentGame(index);setTournamentOpen(true);}}
-                  activities={locationInfo.id==='poolhall'?<><PoolTournamentNotice notice={w.pool_tournament_notice} tournament={w.pool_tournament} busy={busy} act={commit} onOpen={()=>{setTournamentGame(null);setTournamentOpen(true);}}/><PoolChallenges opponents={w.pool_opponents||[]} cash={p.cash} busy={busy} act={commit}/></>:undefined}
+                  activities={locationInfo.id==='poolhall'?<><PoolTournamentNotice cash={p.cash} notice={w.pool_tournament_notice} tournament={w.pool_tournament} busy={busy} act={commit} onOpen={()=>{setTournamentGame(null);setTournamentOpen(true);}}/><PoolChallenges opponents={w.pool_opponents||[]} cash={p.cash} busy={busy} act={commit}/></>:undefined}
                   motion={motion}
                   player={p}
                   place={locationInfo}

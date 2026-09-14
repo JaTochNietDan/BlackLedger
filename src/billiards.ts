@@ -83,4 +83,16 @@ export interface PoolTournamentState {
  games:{index:number;round:number;table_number:number;players:[string,string];player_seat:number;resolved:boolean;winner:string;table:PoolState|null}[];
 }
 
-export interface PoolTournamentNoticeState {can_host?:boolean;opens:number;closes:number;fee:number;entrants:{id:string;name:string}[];pot:number;can_enter:boolean;unavailable:string}
+export interface PoolHostOffer {id:string;name:string;max_fee:number}
+export interface PoolTournamentNoticeState {host_offers?:PoolHostOffer[];can_host?:boolean;opens:number;closes:number;fee:number;entrants:{id:string;name:string}[];pot:number;can_enter:boolean;unavailable:string}
+
+export function poolHostPreview(offers:PoolHostOffer[],fee:number,percent:number,enter:boolean,cash:number){
+ const eligible=offers.filter(o=>o.max_fee>=fee).sort((a,b)=>a.id<b.id?-1:a.id>b.id?1:0);
+ const minimum=enter?3:4,needed=eligible.length>=minimum+4?minimum+4:minimum;
+ let reason='';
+ if(!Number.isInteger(fee)||fee<10||fee>500||!Number.isInteger(percent)||percent<0||percent>50)reason='Set a $10–$500 fee and a 0–50% cut.';
+ else if(enter&&cash<fee)reason='You cannot cover your entry fee.';
+ else if(eligible.length<minimum)reason=`Need ${minimum} funded opponents; ${eligible.length} can pay this fee.`;
+ const entrants=eligible.slice(0,needed),count=needed+(enter?1:0),gross=count*fee,cut=Math.floor(gross*percent/100);
+ return {entrants,count,gross,cut,prize:gross-cut,reason};
+}

@@ -70,3 +70,30 @@ func TestPoolOwnerEntryAndInvalidSettingsAreAtomic(t *testing.T) {
 		t.Fatal("cancelled event took a cut")
 	}
 }
+
+func TestPoolHostOffersAndWaitCommand(t *testing.T) {
+	w := hostFixture(t)
+	before, _ := json.Marshal(w)
+	notice := w.PoolTournamentNotice().(map[string]any)
+	offers := notice["host_offers"].([]map[string]any)
+	if len(offers) < 4 {
+		t.Fatal("owner did not see funded candidates")
+	}
+	after, _ := json.Marshal(w)
+	if string(before) != string(after) {
+		t.Fatal("offers changed save")
+	}
+	w = poolExecute(t, w, Command{Kind: "pool_tournament_host", PoolHost: &PoolHostInput{Fee: 50, CutPercent: 20}})
+	minute := w.Minute
+	w = poolExecute(t, w, Command{Kind: "pool_tournament_wait"})
+	if w.Minute != minute+10 {
+		t.Fatal("wait duration")
+	}
+	for i := 0; i < 2; i++ {
+		if w.PoolTournament.Bracket.Matches[i].Rack.Shots != 5 {
+			t.Fatal("unattended table did not progress", i)
+		}
+	}
+	w.Event = &Scene{ID: "pause", Title: "Interrupted"}
+	poolReject(t, w, Command{Kind: "pool_tournament_wait"})
+}
