@@ -8,7 +8,8 @@ const smooth=(n:number)=>{const t=THREE.MathUtils.clamp(n,0,1);return t*t*(3-2*t
 /** A presentation cast in local metres. The caller reserves and places its path. */
 export class CityIncendiary {
  readonly root=new THREE.Group();
- private readonly release=new THREE.Vector3();
+ readonly release=new THREE.Vector3();
+ loft=.8;
  private readonly hand=new THREE.Vector3();
  private readonly releaseRotation=new THREE.Quaternion();
  constructor(readonly actor:THREE.Group,readonly bottle:THREE.Group,readonly target:THREE.Vector3){
@@ -66,10 +67,31 @@ export class CityIncendiary {
   }else{
    const t=THREE.MathUtils.clamp((seconds-INCENDIARY_RELEASE)/(INCENDIARY_IMPACT-INCENDIARY_RELEASE),0,1);
    this.bottle.position.copy(this.release).lerp(this.target,t);
-   this.bottle.position.y+=.8*4*t*(1-t);
+   this.bottle.position.y+=this.loft*4*t*(1-t);
    this.bottle.quaternion.copy(this.releaseRotation).multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1,0,0),t*Math.PI*2));
   }
   this.root.updateMatrixWorld(true);
   return {released,impact:seconds>=INCENDIARY_IMPACT,escaping:seconds>4.25};
  }
+}
+
+/** Test a conservative sampled bottle envelope once when selecting a facade target. */
+export function incendiaryFlight(start:THREE.Vector3,windows:THREE.Vector3[],building:THREE.Object3D){
+ const offsets=[new THREE.Vector3(),...[-1,1].flatMap(side=>[new THREE.Vector3(side*.27,0,0),new THREE.Vector3(0,side*.27,0),new THREE.Vector3(0,0,side*.27)])];
+ const ray=new THREE.Raycaster();
+ for(const window of windows)for(const loft of [.8,.4,.15,1.4,2,2.8]){
+  // The bottle body contacts the facade before its grip reaches the glass.
+  const target=window.clone().add(new THREE.Vector3(0,0,-.30));
+  let clear=true,previous=start.clone();
+  for(let frame=1;frame<=48&&clear;frame++){
+   const t=frame/48,point=start.clone().lerp(target,t);point.y+=loft*4*t*(1-t);
+   const direction=point.clone().sub(previous),length=direction.length();direction.normalize();
+   for(const offset of offsets){ray.set(previous.clone().add(offset),direction);ray.near=0;ray.far=length;
+    if(ray.intersectObject(building,true).length){clear=false;break;}
+   }
+   previous=point;
+  }
+  if(clear)return {target,loft};
+ }
+ return null;
 }

@@ -1140,6 +1140,9 @@ def mariner():
             for floor in range(3):
                 for i,x in enumerate(positions):
                     z=1.75+floor*3.15
+                    if axis==0 and side==1:
+                        vent=bpy.data.objects.new('fire-window-'+str(floor)+'-'+str(i),None)
+                        bpy.context.collection.objects.link(vent);vent.location=(x,depth+.30,z+.25)
                     facade('sash stone lintel',x,z+1,(1.60,.3,.2),stone)
                     facade('sash painted frame',x,z,(1.35,.22,1.85),timber)
                     facade('sash pane',x,z,(1.10,.27,1.59),warm if (i+floor+axis+side)%6==0 else glass)
@@ -2200,6 +2203,13 @@ def mercer_court():
                 x=side*(1.4+col*.22)
                 box('tenant letter box',(x,6.28,.98+row*.19),(.20,.08,.16),brass,.009)
                 box('letter slot',(x,6.325,1.02+row*.19),(.13,.01,.014),iron)
+
+if __name__ == '__main__' and '--only=mariner' in __import__('sys').argv:
+    manifest_path=os.path.join(OUT,'manifest.json')
+    with open(manifest_path) as f: selected_manifest=json.load(f)
+    clear();mariner();selected_manifest['mariner']=export('mariner')
+    with open(manifest_path,'w') as f:json.dump(selected_manifest,f,indent=2)
+    raise SystemExit(0)
 
 if __name__ == '__main__' and '--only=incendiary-bottle' in __import__('sys').argv:
     manifest_path=os.path.join(OUT,'manifest.json')

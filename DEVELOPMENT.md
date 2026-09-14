@@ -483,3 +483,14 @@ CUA8894 preview at The Monarch: staged true at0.236s, held bottle, window fire e
 Actual person/woman GLB sweep checks sample181 frames per rig against the reserved footprint. Existing attachment/release/flight tests remain green. All249 tests passed11.393s (.runtime/incendiary-city-tests.log), then the additional private-fire preview test passed in the4-test preview file run. Final TypeScript/Vite build passed2.34s with the known large-bundle warning. Diff check clean.
 
 Remaining acceptance: actual facade/projectile clearance at every address, close-up integrated throwing/flame fidelity, glass/ignition impact detail, smooth escape handoff to the real player and fire evacuation/interior behavior. This is a first integrated scene, not completion of the full production goal or broad60FPS acceptance.
+
+
+### 2026-09-14 — facade-aware incendiary flight and Mariner fire anchors
+
+Actual exported-building checks exposed the original fixed arc crossing The Paper Moon's canvas awning. Raising the arc instead crossed facade trim. Added once-per-staging flight selection across candidate window targets and several lofts, tracing48 segments with centre and six27cm-offset clearance samples. The endpoint stands30cm outside the window so the bottle body can contact before its neck reaches the pane. Paper Moon selects the flatter0.4m loft in the browser. This is sampled clearance, not continuous full-mesh collision detection. Existing fallback for addresses without a validated window path remains unproven and needs broader work.
+
+The wider check also found Mariner had no authored fire-window markers. Added them in front of its sash panes, above the cross rails, and a targeted --only=mariner export. GLB grows699412→700472 bytes. Its existing geometry is retained.
+
+All three forecourt slots on12 exported models now pass the independent80-segment centre sweep after selecting an envelope-checked path, at the actual18cm building elevation. Models: tavern, monarch, tenement, shop, civic, casino, warehouse, bluehour, goldenlily, papermoon, mariner and mercer-court. CUA8894 Paper Moon diagnostic loft.4/staged true; Mariner loft.8/staged true and after completion48 particles/four vents. Mariner screenshot verified flames at sash windows. Preview revision36/minute1160 remained unchanged and preview was stopped. No campaign/main-save writes; caffeinate87182 alive.
+
+All251 frontend tests pass11.288s (.runtime/incendiary-clearance-tests.log), final TypeScript/Vite build passes2.17s (.runtime/incendiary-clearance-build-final.log) with the known bundle warning; diff check clean. Still outstanding: industrial/remaining special facades, robust no-path handling, continuous bottle/obstacle clearance, detailed impact/escape handoff and scene-start performance cost, plus the unchanged full production objective.

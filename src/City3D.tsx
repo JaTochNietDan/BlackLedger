@@ -1,4 +1,4 @@
-import {CityIncendiary, INCENDIARY_IMPACT} from './city3dIncendiary';
+import {CityIncendiary, incendiaryFlight, INCENDIARY_IMPACT} from './city3dIncendiary';
 import {streetAt} from './streetPlayback';
 import {CityCustody} from './city3dCustody';
 import {CityAssassination, assassinationBatch, isStagedStrike, MELEE_IMPACTS, ASSASSINATION_SHOT, ASSASSINATION_VICTIM_X, executionSpatter} from './city3dAssassination';
@@ -1244,6 +1244,8 @@ export function City3D(props: Props) {
               const building=buildings.get(e.cue.target)!;
               const windows=clearBlastWindows(building).sort((a,b)=>Math.abs(a.x-e.slot!.root.x)-Math.abs(b.x-e.slot!.root.x));
               const target=windows[0]??building.getObjectByName('entrance-threshold')?.getWorldPosition(new THREE.Vector3())??new THREE.Vector3(e.slot.root.x,3,e.slot.root.z+3);
+              const flight=incendiaryFlight(e.incendiary.root.localToWorld(e.incendiary.release.clone()),windows,building);
+              if(flight){target.copy(flight.target);e.incendiary.loft=flight.loft;}
               e.incendiary.target.copy(target).sub(e.extra.position);
               frameScene(camera,controls.target,new THREE.Box3().setFromPoints([
                 new THREE.Vector3(e.slot.root.x-5,0,e.slot.root.z-1.2),
@@ -1755,7 +1757,7 @@ export function City3D(props: Props) {
             blastOrigin: e.cue.kind === 'explosion' ? buildings.get(e.cue.target)?.userData[internalDetonation(e.cue,w.building_fires||[])?'blastOrigin':'debrisOrigin'] : undefined,
             blastWindows: e.cue.kind === 'explosion' && internalDetonation(e.cue,w.building_fires||[]) ? buildings.get(e.cue.target)?.userData.blastWindows : undefined,
             arm: e.gunArm?.rotation.x,
-            incendiary:e.incendiary?{seconds:(now-e.since)/1000,actor:e.incendiary.actor.getWorldPosition(new THREE.Vector3()),bottle:e.incendiary.bottle.getWorldPosition(new THREE.Vector3()),held:(now-e.since)<3100,visible:e.incendiary.bottle.visible,target:e.incendiary.target}:undefined,
+            incendiary:e.incendiary?{seconds:(now-e.since)/1000,actor:e.incendiary.actor.getWorldPosition(new THREE.Vector3()),bottle:e.incendiary.bottle.getWorldPosition(new THREE.Vector3()),held:(now-e.since)<3100,visible:e.incendiary.bottle.visible,target:e.incendiary.target,loft:e.incendiary.loft}:undefined,
             custody:e.custody?{officer:e.custody.officer.getWorldPosition(new THREE.Vector3()),detainee:e.custody.detainee.getWorldPosition(new THREE.Vector3()),restrained:e.custody.detainee.getObjectByName('custody-restraint')?.visible}:undefined,
             execution:e.assassination?{seconds:(now-e.since)/1000,attacker:e.assassination.attacker.getWorldPosition(new THREE.Vector3()),victim:e.assassination.victim.getWorldPosition(new THREE.Vector3()),muzzle:e.muzzle?.getWorldPosition(new THREE.Vector3())}:undefined,
             attacker:e.cue.attacker,weapon:e.cue.kind==='gunfight'?e.weaponModel:undefined,
