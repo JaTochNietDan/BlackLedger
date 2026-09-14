@@ -314,3 +314,36 @@ func TestFailedDelegatedStrikeNamesTheTargetAndPlace(t *testing.T) {
 		t.Fatal("did not exercise an injured returning crew member")
 	}
 }
+
+func TestFailedStrikeDoesNotReportADeadCrewMemberEscaping(t *testing.T) {
+	injured, dead := 0, 0
+	for seed := uint32(1); seed <= 128; seed++ {
+		w := withCrew(t, 80)
+		w.RNG = seed * 2654435761
+		w.NPCs = append(w.NPCs, NPC{ID: "strike-target", Name: "Morgan Dale", Location: "bar"})
+		hand, _ := w.CrewHands()
+		w.itWentWrong(w.NPC("strike-target"), hand, "Saint Agnes", nil)
+		escaped := false
+		for _, record := range w.History {
+			if record.Title == "They got away with nothing" {
+				escaped = true
+			}
+		}
+		crew := w.NPC("leo")
+		if crew != nil && crew.Dead {
+			dead++
+			if escaped {
+				t.Fatalf("seed %d: dead crew member reported escaping", seed)
+			}
+		}
+		if len(w.Player.Crew) > 0 {
+			injured++
+			if !escaped {
+				t.Fatal("surviving crew lost its escape report")
+			}
+		}
+	}
+	if dead == 0 || injured == 0 {
+		t.Fatalf("missing outcomes: dead=%d injured=%d", dead, injured)
+	}
+}

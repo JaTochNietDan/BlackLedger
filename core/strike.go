@@ -238,6 +238,11 @@ func (w *World) itWentWrong(n *NPC, hand Hand, where string, family *Faction) {
 		w.Log("They gave up a name", fmt.Sprintf("%s was taken alive at %s and questioned. Your name came out of it.", who.Name, where), "danger")
 	default:
 		w.HandHurt(hand, 40, "go after "+n.Name+" at "+where)
+		// A severe injury can still kill the person sent. HandHurt already
+		// records that death; do not follow it with a claim that they escaped.
+		if len(w.Player.Crew) == 0 {
+			return
+		}
 		w.Log("They got away with nothing", fmt.Sprintf("%s went for %s at %s, did not finish it, and got out. %s is alive and looking.",
 			who.Name, n.Name, where, n.Name), "danger")
 	}
