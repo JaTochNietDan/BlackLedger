@@ -214,3 +214,29 @@ func TestBrokerListingsAreBoundedStableAndRotateAfterPurchase(t *testing.T) {
 		t.Fatal("private owner forced to sell")
 	}
 }
+
+func TestApartmentMarketExplainsCurrentNeighborhoodDiscount(t *testing.T) {
+	w := apartmentWorld()
+	w.recordPropertyIncident("explosion", "mercercourt")
+	before, _ := json.Marshal(w)
+	found := false
+	for _, row := range w.ApartmentMarket() {
+		building := row["building"].(string)
+		if row["neighborhood_index"] != w.NeighborhoodPropertyIndex(building) {
+			t.Fatal("listing shows another neighborhood's pressure", row)
+		}
+		if building == "mercercourt" {
+			found = true
+			if row["neighborhood_index"] != 90 {
+				t.Fatal("discount omitted", row)
+			}
+		}
+	}
+	if !found {
+		t.Fatal("missing local listing")
+	}
+	after, _ := json.Marshal(w)
+	if string(before) != string(after) {
+		t.Fatal("reading discount mutated campaign")
+	}
+}

@@ -2403,3 +2403,22 @@ cue spin, physical opponent draw/follow position planning, Herald newsroom
 with occupied typing desks, and Thorne & Sons public chapel. Remaining rooms,
 full shooting characters, airborne billiards physics and broader art/campaign
 acceptance still prevent completion of the overall goal.
+
+### 2026-09-14 — apartment exchange usability
+
+Previous d71f2a3 completed verified live release progress. Added all/owned/for-sale
+listing filters, address/number/resident/owner search, address/value/rent sorting
+and an apartment holdings summary. Broker offers remain separate from scheduled
+rent and its tenant-cash limitation. Individual apartments now explain the
+public neighborhood discount already used to calculate their prices.
+
+The new neighborhood_index projection is documented in API.md; a core test
+verifies a recorded explosion's10% discount, per-building consistency and read
+purity. Apartment/property selection passed0.187s, store/server0.297s/1.883s,
+392 frontend tests and production build passed. Logs
+`.runtime/apartment-exchange-{core,adapters,frontend,build}.log`.
+Browser73 on isolated8975 reviewed the period market layout, empty owned-deed
+filter (0 of10) and case-insensitive MERCER search (5 of10). No gameplay commands
+were issued; no main save writes. This is existing-market UX, not new housing
+stock or a claim that broader progression/visual requirements are complete.
+Main8791 remains clean01fb5cf; these changes are preview-only.

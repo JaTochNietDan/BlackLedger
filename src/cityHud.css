@@ -184,3 +184,5 @@
 @media(max-width:600px){.map-first .interior-stage .room-work{padding:16px 12px}.map-first .interior-stage .room-people{padding:10px 12px}.map-first .room-work .work-search{width:100%;margin-left:0}.map-first .room-work .work-search input{flex:1 1 180px}}
 
 .lodging-register input[type="search"]{width:min(100%,360px);box-sizing:border-box;margin:0 0 10px;padding:8px 10px;background:#f2e6cc;color:#3d301f;border:1px solid #91734d;font:14px Georgia,serif}
+
+.apartment-holdings{padding:12px;border:1px solid #a78d63;background:#ddcca9}.apartment-filters{display:flex;gap:12px;flex-wrap:wrap;align-items:end}.apartment-filters label{display:flex;flex-direction:column;gap:5px;font:13px Georgia,serif}.apartment-filters input,.apartment-filters select{font:inherit;padding:9px;color:#382c20;background:#efe1bf;border:1px solid #9c825b;max-width:100%}.apartment-filters input{width:290px}

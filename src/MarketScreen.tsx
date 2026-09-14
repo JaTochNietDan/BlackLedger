@@ -1,3 +1,4 @@
+import {useState} from 'react';
 import type {Snapshot} from './types';
 
 // The underground market was a block inside the ledger.
@@ -23,6 +24,9 @@ const counter: Record<string, string> = {
 };
 
 export function MarketScreen({world,onFind}: {world: Snapshot;onFind?:(id:string)=>void}) {
+  const [apartmentFilter,setApartmentFilter]=useState('all'),[apartmentQuery,setApartmentQuery]=useState(''),[apartmentSort,setApartmentSort]=useState('address');
+  const units=world.apartment_market||[],ownedUnits=units.filter(u=>u.owned);
+  const apartmentListings=units.filter(u=>(apartmentFilter==='all'||apartmentFilter==='owned'&&u.owned||apartmentFilter==='available'&&u.available&&!u.owned)&&`${u.address} ${u.number} ${u.resident} ${u.owner}`.toLowerCase().includes(apartmentQuery.trim().toLowerCase())).sort((a,b)=>apartmentSort==='rent'?b.daily_rent-a.daily_rent||a.id.localeCompare(b.id):apartmentSort==='price'?(a.owned?a.offer:a.asking)-(b.owned?b.offer:b.asking)||a.id.localeCompare(b.id):a.address.localeCompare(b.address)||a.number-b.number);
   const goods = world.goods || [];
   const held = world.player.stock || {};
   const carrying = goods.filter(g => (held[g.id] || 0) > 0);
@@ -48,8 +52,17 @@ export function MarketScreen({world,onFind}: {world: Snapshot;onFind?:(id:string
       </section>}
       {!!world.apartment_market?.length && <section className="property-exchange" aria-label="Apartment exchange">
         <h2>Apartment exchange</h2><p>Buy your home or a rental investment. Existing tenants stay; rent comes from their available cash. Vacant flats earn nothing until occupied. The broker lists a few homes at a time, with new listings as they sell.</p>
-        <div className="market-board">{world.apartment_market.map(unit=><article className="market-good" key={unit.id}>
+        <p className="apartment-holdings"><b>{ownedUnits.length} apartment {ownedUnits.length===1?'deed':'deeds'} held</b> · {money(ownedUnits.reduce((sum,u)=>sum+u.offer,0))} in current broker offers · {money(ownedUnits.reduce((sum,u)=>sum+(u.home?0:u.daily_rent),0))} scheduled rent per day. Actual collections depend on tenants’ cash.</p>
+        <div className="apartment-filters">
+          <label>Show<select value={apartmentFilter} onChange={e=>setApartmentFilter(e.target.value)}><option value="all">All listed apartments</option><option value="owned">Your deeds</option><option value="available">Available to buy</option></select></label>
+          <label>Find an apartment<input type="search" value={apartmentQuery} onChange={e=>setApartmentQuery(e.target.value)} placeholder="Address, number, resident or owner"/></label>
+          <label>Sort by<select value={apartmentSort} onChange={e=>setApartmentSort(e.target.value)}><option value="address">Address</option><option value="price">Price or offer · low first</option><option value="rent">Scheduled rent · high first</option></select></label>
+        </div>
+        <p role="status">{apartmentListings.length} of {units.length} listed apartments shown.</p>
+        {apartmentListings.length===0&&<p>No apartments match these filters.</p>}
+        <div className="market-board">{apartmentListings.map(unit=><article className="market-good" key={unit.id}>
           <header><b>{unit.address} · Apartment {unit.number}</b><span>{money(unit.owned?unit.offer:unit.asking)}<small>{unit.owned?' broker offer':unit.available?' asking price':' reference price'}</small></span></header>
+          {unit.neighborhood_index!==undefined&&<p>{unit.neighborhood_index<100?`Neighborhood prices ${100-unit.neighborhood_index}% below normal after local violence. Quiet days help prices recover.`:'Neighborhood prices are at their normal level.'}</p>}
           <p>{unit.owned?'Your deed':`Owned by ${unit.owner}`} · {unit.home?'Your current home':unit.resident}</p>
           {(unit.owned || unit.available) && <p>{unit.home?(unit.owned?'No rent to pay':'Buying ends your rent'):unit.daily_rent>0?`${money(unit.daily_rent)} daily rent, collected from the resident’s available cash`:'No tenant income'}</p>}
           {onFind && <button className="plain" disabled={unit.locked} onClick={()=>onFind(unit.building)}>{unit.locked?'District not yet accessible':'Inspect the address ↗'}</button>}

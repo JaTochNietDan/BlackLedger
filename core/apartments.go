@@ -275,7 +275,7 @@ func (w *World) ApartmentMarket() []map[string]any {
 			resident = n.Name
 			rent = w.NPCRent(n)
 		}
-		out = append(out, map[string]any{"id": u.ID, "building": u.Building, "number": u.Number, "address": placeName(u.Building), "owned": owned, "home": home, "available": u.Owner == "independent", "owner": w.ApartmentOwnerName(u), "resident": resident, "asking": w.ApartmentPrice(u), "offer": w.ApartmentPrice(u) * 65 / 100, "daily_rent": rent, "locked": location.District > w.District})
+		out = append(out, map[string]any{"id": u.ID, "building": u.Building, "number": u.Number, "address": placeName(u.Building), "owned": owned, "home": home, "available": u.Owner == "independent", "owner": w.ApartmentOwnerName(u), "resident": resident, "asking": w.ApartmentPrice(u), "offer": w.ApartmentPrice(u) * 65 / 100, "daily_rent": rent, "neighborhood_index": w.NeighborhoodPropertyIndex(u.Building), "locked": location.District > w.District})
 	}
 	return out
 }

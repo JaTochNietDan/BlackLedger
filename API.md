@@ -1240,3 +1240,13 @@ their saved deadlines. It accepts no cue input or match index and requires an
 active local tournament, no interruption and at least one unattended rack.
 Normal clock interruptions and prize settlement still apply. It never shoots
 on behalf of the player and is offered on the tournament draw.
+
+## Apartment neighborhood price context
+
+Each `apartment_market` row adds `neighborhood_index` (60–100), the current
+public `NeighborhoodPropertyIndex` for its building, also used in the asking
+price. This projection is read-only and reveals no private incident plans.
+Older clients can ignore the additive field; new clients tolerate its absence.
+The market's deed/offer/scheduled-rent totals and search/filter/sort are local
+presentation of the existing listings. Scheduled rent is not guaranteed cash
+collection. No purchase/sale or simulation command changes.
