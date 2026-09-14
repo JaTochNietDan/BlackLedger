@@ -438,3 +438,25 @@ $25 debit per entrant. Core physical tests produce the final through the solver;
 the database fixture uses actual concession decisions to isolate persistence.
 Logs `.runtime/pool-tournament-{verified-core,adapters,verified-vet}.log`.
 Main campaign untouched; tournament play is still not user-accessible.
+
+## Tournament command boundary (2026-09-14)
+
+Player placement, break decisions and physical strokes now target an explicit
+bracket match index. NPC strokes use the existing actual opponent simulation;
+client-supplied NPC cue inputs are rejected. The local public bracket exposes
+entrant names, seats, round/table assignments, outcomes and each started rack's
+physical replay. Unstarted rounds remain nullable. Withdrawal preserves an active
+interruption and forfeits the player's entry under the existing settlement terms.
+
+Evidence: focused core tests cover wrong/missing table indices, forged NPC input,
+interruption, withdrawal, read-only/local projection and a physically potted final
+eight ball paying all four funded entries. A temporary SQLite test sends concurrent
+winning-shot retries, reopens the database and rejects a stale new request: one
+stroke, one receipt and one $100 payout. HTTP tests cover physical play and retries
+with complete public bracket/replay shapes. Core pool tests, full store/server
+tests, Go vet and the production frontend build pass. Logs are
+`.runtime/pool-tournament-command-{core,adapters,vet,build}.log`.
+
+This is a command/projection checkpoint, not a playable tournament UI release.
+Scheduled admission, screen controls and background table progression remain.
+Main port 8791 and its campaign database have not been modified.

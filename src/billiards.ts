@@ -76,3 +76,9 @@ export function poolCueStroke(seconds:number,speed:number,radius:number,top=0,si
  else {const u=Math.min(1,(t-.88)/.24);front=contact+(.03+.08*power)-.25*u;}
  return {front,opacity:t<=.88?1:Math.max(0,1-(t-.88)/.24),ballTime:Math.max(0,t-POOL_CUE_CONTACT),contact:t>=POOL_CUE_CONTACT,visible:t<POOL_CUE_END};
 }
+
+export interface PoolTournamentState {
+ fee:number;pot:number;settled:boolean;voided:boolean;finished:boolean;winner:string;player_id:string;withdrawn:boolean;
+ names:Record<string,string>;
+ games:{index:number;round:number;table_number:number;players:[string,string];player_seat:number;resolved:boolean;winner:string;table:PoolState|null}[];
+}

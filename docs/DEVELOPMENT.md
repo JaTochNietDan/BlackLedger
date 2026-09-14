@@ -13344,3 +13344,13 @@ wrong-turn and physical NPC payout are checked. Mid-rack backend benchmark is
 110.66 ms after pruning safety evaluations that cannot improve the score. See
 `docs/BILLIARDS.md` for detailed evidence. Commands, table controls, public
 projection and tournaments remain pending; no live campaign or release changed.
+
+### 2026-09-14 — Tournament commands and bracket projection
+
+Added explicit match-index placement/shot/break/NPC commands, withdrawal and a
+local public bracket with physical table DTOs. A final physical shot settles
+funded prizes through the existing receipt transaction. Isolated core, HTTP and
+SQLite tests cover invalid inputs, local read-only projection, concurrent winning
+retries, reopen and stale rejection. Focused core, full store/server, Go vet and
+frontend build pass; see `docs/BILLIARDS.md` for evidence and remaining work.
+Scheduled entry and UI are still pending. No live save or release promotion.

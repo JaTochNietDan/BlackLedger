@@ -3,6 +3,7 @@ package core
 import (
 	"blackledger/billiards"
 	"fmt"
+	"strings"
 )
 
 // PoolInput is cue intent, never a physical outcome or an NPC's chosen input.
@@ -22,8 +23,11 @@ func (w *World) poolCommand(c Command) (string, int, error) {
 	if c.Kind != "pool_start" && c.Target != "" && c.Target != PoolPlace {
 		return "", 0, fmt.Errorf("that is not the billiards table")
 	}
-	if c.Pool != nil && c.Kind != "pool_place" && c.Kind != "pool_shot" {
+	if c.Pool != nil && c.Kind != "pool_place" && c.Kind != "pool_shot" && c.Kind != "pool_tournament_place" && c.Kind != "pool_tournament_shot" {
 		return "", 0, fmt.Errorf("this command does not accept cue input")
+	}
+	if strings.HasPrefix(c.Kind, "pool_tournament_") {
+		return w.poolTournamentCommand(c)
 	}
 	switch c.Kind {
 	case "pool_start":
@@ -71,6 +75,15 @@ func (w *World) PoolDescription() any {
 	if g == nil || g.Match == nil || g.Life != w.Life || g.Place != w.Player.Location {
 		return nil
 	}
+	reason := ""
+	if !g.Settled {
+		if _, err := w.poolSession(); err != nil {
+			reason = err.Error()
+		}
+	}
+	return poolDescription(g, reason)
+}
+func poolDescription(g *PoolGame, reason string) any {
 	m := g.Match
 	balls := []map[string]any{}
 	legal := []int{}
@@ -96,12 +109,6 @@ func (w *World) PoolDescription() any {
 			item["placement"] = [3]float64{s.Placement.X, s.Placement.Y, s.Placement.Z}
 		}
 		stroke = item
-	}
-	reason := ""
-	if !g.Settled {
-		if _, err := w.poolSession(); err != nil {
-			reason = err.Error()
-		}
 	}
 	return map[string]any{"place": g.Place, "opponent": g.Opponent, "opponent_name": g.OpponentName, "stake": g.Stake, "pot": g.Escrow, "settled": g.Settled, "voided": g.Voided, "turn": m.Turn, "groups": m.Groups, "breaking": m.Breaking, "ball_in_hand": m.InHand, "behind_head_string": m.HeadOnly, "winner": m.Winner, "shots": m.Shots, "balls": balls, "legal_balls": legal, "break_choices": choices, "outcome": m.Last.Reason, "foul": m.Last.Foul, "replay": g.Replay, "stroke": stroke, "unavailable": reason, "width": billiards.Width, "length": billiards.Length, "radius": billiards.Radius}
 }

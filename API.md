@@ -1133,3 +1133,30 @@ forfeited entries go to the hall's till if the event has no champion. These term
 must be displayed when scheduled entry is exposed. A successor cannot receive the
 previous protagonist's fees. Eligible NPCs remain at the event, eliminated ones
 can resume their routines, and unpaid participant identities survive pruning.
+
+### Tournament play commands and local bracket
+
+`pool_tournament_place`, `pool_tournament_shot`, `pool_tournament_decide` and
+`pool_tournament_opponent` require integer `pool_game`, the bracket's zero-based
+match index (distinct from its one-based physical table number). Placement and
+shot accept the existing `pool` intent; decision accepts `choice`. An opponent
+command accepts no cue payload and can only execute an NPC's turn, including at
+an NPC-only table. Place/decide take no time; either stroke advances two minutes.
+`pool_tournament_withdraw` requires no match index and forfeits the player's entry.
+Player strokes require that player's active match, local availability and no
+interruption. Invalid commands are atomic; normal revision/request-ID receipts
+cover all tournament commands and final settlement.
+
+Public `pool_tournament` is nullable and local to the saved player's life and hall.
+It includes `fee`, held `pot`, `settled`, `voided`, `finished`, champion `winner`,
+`player_id`, player `withdrawn`, entrant `names`, and `games`. Each game carries
+`index`, `round`, `table_number`, two entrant IDs in `players`, `player_seat`
+(-1 for spectators), `resolved`, `winner`, and nullable `table`. A started table
+uses the existing physical pool DTO, including its exact stroke/replay. Its seats
+refer to that game's players; clients must not label seat zero as the player on
+spectator tables. Unstarted later rounds have no table. A resolved rack's table
+is settled even while the overall tournament remains open. The tournament pot
+is the total held event escrow, not a separate wager for every rack.
+
+This exposes play for saved funded tournaments. Scheduled entry and the user
+interface remain pending; no public tournament-start command exists yet.
