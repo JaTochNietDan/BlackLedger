@@ -683,3 +683,16 @@ until its known deadline. Skip uses the committed snapshot immediately. This is
 presentation memory only; no command, deadline or save changes. It cannot recreate
 an event absent from both endpoint snapshots, and does not replay every historical
 building condition or lighting change.
+
+### Collision-delayed journey clock
+
+During recorded travel playback, the browser budgets the remaining displayed
+minutes against the player's remaining route distance at its physical speed.
+The clock can continue while the player yields, so other recorded travellers
+and emergency-response deadlines keep advancing on that same minute. Traffic
+delays stretch the presentation rather than consuming all displayed time before
+the player finishes walking. Reaching the destination completes the clock;
+Skip and reduced motion still reconcile immediately to the committed endpoint.
+No travel duration, collision outcome or save is changed in Go. Individual NPC
+collision delays and events absent from the endpoint records still require
+broader historical-playback handling.

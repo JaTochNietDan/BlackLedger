@@ -2,7 +2,7 @@ import {CityVillaExit} from './city3dVillaExit';
 import {CityAccident} from './city3dAccident';
 import {CityPlanter} from './city3dPlanter';
 import {CityIncendiary, incendiaryStagingFlight, incendiaryShard, incendiaryShardObstructed, INCENDIARY_IMPACT} from './city3dIncendiary';
-import {streetAt,responseRecords} from './streetPlayback';
+import {streetAt,responseRecords,advanceJourneyClock} from './streetPlayback';
 import {CityCustody} from './city3dCustody';
 import {CityAssassination, assassinationBatch, isStagedStrike, MELEE_IMPACTS, ASSASSINATION_SHOT, ASSASSINATION_VICTIM_X, executionSpatter} from './city3dAssassination';
 import {poseCustody,sceneWeapon,poseLongGun,weaponShots,pumpOffset} from './city3dWeapons';
@@ -756,6 +756,7 @@ export function City3D(props: Props) {
       reportedJourneyProgress = -1,
       reportedJourneyBlocked = false,
       playedJourneyProgress = 0,
+      renderedJourneyProgress = 0,
       wasFollowing = false,
       followZoom: number | null = null,
       motionWas = true;
@@ -1191,7 +1192,7 @@ export function City3D(props: Props) {
           journeyKey = key;
           reportedJourneyProgress = -1;
           reportedJourneyBlocked=false;p.onJourneyBlocked?.(false);
-          playedJourneyProgress = 0;
+          playedJourneyProgress = 0;renderedJourneyProgress=0;
           if (p.journey) { setFollow(true); followZoom = 8; }
           const here = lots.get(w.player.location);
           if (here && w.player.alive) {
@@ -1234,7 +1235,9 @@ export function City3D(props: Props) {
         }
         if (p.journey?.street) {
           const traveller=actors.get('player');
-          if(traveller)playedJourneyProgress=motion?Math.min(1,Math.max(0,(movementClock-traveller.since)/Math.max(1,traveller.duration))):1;
+          if(traveller)playedJourneyProgress=motion?advanceJourneyClock(
+            playedJourneyProgress,renderedJourneyProgress,Math.min(100,Math.max(0,dt))/1000*playback.current,
+            traveller.duration/1000,pathLength(traveller.points)/trafficSpeed(traveller.model)):1;
           const minute=(p.journey.fromMinute??w.minute-p.journey.minutes)+p.journey.minutes*playedJourneyProgress;
           const samples=streetAt(p.journey.street,minute);
           for(const [id,a] of actors)if(!id.startsWith('player')&&!samples.has(id)){releaseActor(a);actors.delete(id);}
@@ -1428,6 +1431,8 @@ export function City3D(props: Props) {
         const journeyBlocked=!!p.journey&&!!arrival?.blockedBy;
         if(journeyBlocked!==reportedJourneyBlocked){reportedJourneyBlocked=journeyBlocked;p.onJourneyBlocked?.(journeyBlocked);}
         if (p.journey && arrival) {
+          renderedJourneyProgress=arrival.progress;
+          if(arrival.progress>=1)playedJourneyProgress=1;
           if(!p.journey.street)playedJourneyProgress = Math.max(playedJourneyProgress, arrival.progress);
           const progress = Math.floor(THREE.MathUtils.clamp(playedJourneyProgress, 0, 1) * Math.max(1, p.journey.minutes)) / Math.max(1, p.journey.minutes);
           if (progress !== reportedJourneyProgress) { reportedJourneyProgress = progress; p.onJourneyProgress?.(progress); }
@@ -1866,6 +1871,7 @@ export function City3D(props: Props) {
           headlightPools: headlightPools.count,
           harbour: {visible: !!harbourLot, waterClock},
           followingPlayer: followPlayer.current,
+          journeyProgress: {clock:playedJourneyProgress,player:renderedJourneyProgress},
           trafficBlocks: [...actors.keys()].flatMap(id=>{const by=traffic.placement(id)?.blockedBy;return by?[{id,by}]:[]}),
           streetMinute:p.journey?(p.journey.fromMinute??w.minute-p.journey.minutes)+p.journey.minutes*playedJourneyProgress:w.minute,
           cutawayBuildings: [...blockers],

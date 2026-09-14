@@ -13,3 +13,14 @@ export function streetAt(segments:readonly StreetSegment[],minute:number){
  }
  return active;
 }
+
+/** Spend the remaining displayed time over the physical travel still to render.
+ * Traffic can keep moving while the player yields, but the clock cannot consume
+ * its final minute before that player reaches the destination. */
+export function advanceJourneyClock(progress:number, playerProgress:number, seconds:number, duration:number, routeSeconds:number) {
+ if(playerProgress>=1)return 1;
+ const step=Math.max(0,seconds);
+ const remaining=Math.max(step,Math.max(0,1-playerProgress)*routeSeconds);
+ const rate=Math.min(1/Math.max(.001,duration),(1-progress)/Math.max(.001,remaining));
+ return Math.min(1-1e-7,Math.max(progress,progress+step*rate));
+}
