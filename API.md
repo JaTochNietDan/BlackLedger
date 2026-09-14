@@ -102,8 +102,15 @@ This records the resolved cause for presentation without changing damage, charge
 consumption, command duration, odds or fire rules. It survives result/save replay.
 The renderer prioritizes explicit detonation outcome over matching fire records;
 legacy cues retain their existing inference. Debug includes a separate premature
-explosion with no invented building fire. A planter-exit preamble remains to be
-implemented; the metadata must not be treated as proof that it is already rendered.
+explosion with no invented building fire. Planted explosions with a recorded attacker and an authored animated doorway now
+play a 6.2-second planter exit before detonation. The city reserves the full exit,
+uses the recorded person, and delays blast audio/light/debris, glazing damage,
+new fire and co-located casualty playback until the exit completes. Fire-brigade
+staging follows the scene and the newspaper waits for completion. This currently
+covers the 11 doorway models; unnamed faction planters, missing doorway models
+and premature injury/escape choreography remain unsupported. Legacy explosions
+retain their existing playback. Debug also includes Explosion · casualty for
+reviewing the combined sequence without a campaign command.
 
 Explicit scene replay can restage all cues in the selected committed result. Ordinary revision refreshes and reloads remain silent. Skip immediately clears the transient effects without posting an action or changing saved time.
 

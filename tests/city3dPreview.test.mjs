@@ -13,7 +13,7 @@ test('every debug scene uses a private world and leaves campaign results intact'
   assert.equal(preview.state.revision,42);assert.equal(preview.state.minute,600);
   assert.ok(preview.state.last_result.cues.every(c=>c.target==='bar'&&c.id.startsWith('preview:')));
   assert.equal(queue.take(preview.state.id,preview.state.last_result.cues,preview.cue,true).length,
-   name.startsWith('Assassination')?2:1);
+   name.startsWith('Assassination')||name==='Explosion · casualty'?2:1);
  }
  assert.equal(JSON.stringify(state),before);
  assert.deepEqual(queue.take(state.id,state.last_result.cues,null,true),[],'leaving debug must not replay saved events');
@@ -76,4 +76,13 @@ test('premature explosion preview retains its accident outcome without inventing
  assert.equal(cue.kind,'explosion');assert.equal(cue.detonation,'premature');
  assert.equal(cue.attacker.id,'preview-planter');assert.equal(preview.building_fires,undefined);
  assert.equal(previewScene(state,'club','Explosion','planted').cue.detonation,'planted');
+});
+
+test('combined explosion preview pairs the casualty with a recorded player planter',()=>{
+ const state={id:'campaign',minute:600,player:{name:'Alex Varga'}};
+ const {state:preview}=previewScene(state,'club','Explosion · casualty','paired');
+ const [victim,blast]=preview.last_result.cues;
+ assert.equal(victim.kind,'killing');assert.equal(victim.actors[0].id,'preview-victim');assert.equal(victim.attacker,undefined);
+ assert.equal(blast.kind,'explosion');assert.equal(blast.detonation,'planted');assert.equal(blast.attacker.id,'player');assert.equal(blast.attacker.name,'Alex Varga');
+ assert.equal(victim.target,blast.target);assert.equal(victim.minute,blast.minute);assert.equal(preview.building_fires.length,1);
 });
