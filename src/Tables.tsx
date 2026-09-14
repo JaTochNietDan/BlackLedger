@@ -147,6 +147,7 @@ function Chip({amount, money}: {amount: number; money: (n: number) => string}) {
 // stands, so it is drawn face down: that is what is true, not a decoration.
 export function CardTable({
   hand,
+  place,
   dealer,
   motion = true,
   onPresent,
@@ -154,6 +155,7 @@ export function CardTable({
   act,
 }: {
   hand: HandState;
+  place?: string;
   dealer?: Presence;
   motion?: boolean;
   onPresent?: (active:boolean)=>void;
@@ -176,7 +178,7 @@ export function CardTable({
     const done=setTimeout(()=>{setPresentation(p=>({...p,active:false}));onPresent?.(false);},plan.duration);
     return()=>{clearTimeout(done);onPresent?.(false);};
   },[handKey,animate,onPresent]);
-  if (!hand.playing && !hand.settled) return null;
+  const occupied=hand.playing||hand.settled;
   const mine = hand.mine ?? [],
     theirs = hand.theirs ?? [];
   const total = hand.player ?? 0;
@@ -186,13 +188,13 @@ export function CardTable({
   return (
     <div className="felt card-felt">
       <div className="felt-head">
-        <span>{hand.place}{dealer ? ` · ${dealer.name}, dealer` : ""}</span>
-        <b>{money(hand.stake ?? 0)} down</b>
+        <span>{place || hand.place || "Blackjack"}{dealer ? ` · ${dealer.name}, dealer` : ""}</span>
+        <b>{occupied ? `${money(hand.stake ?? 0)} down` : "Bets open"}</b>
       </div>
       {/* The cloth itself, with the two seats on it and the money in the middle
           of the table where a stake actually sits. */}
-      <BlackjackTable3D dealer={dealer} mine={mine} theirs={theirs} hidden={!over && theirs.length < 2 ? 1 : 0} presentation={presentation}/>
-      <div className="blackjack-hand-summary">
+      <BlackjackTable3D dealer={dealer} mine={mine} theirs={theirs} hidden={hand.playing && theirs.length < 2 ? 1 : 0} presentation={presentation}/>
+      {occupied && <div className="blackjack-hand-summary">
       {presentation.active && <p className="blackjack-dealing" role="status">The cards are being dealt…</p>}
       <div className="baize" style={{visibility:presentation.active?"hidden":"visible"}} aria-hidden={presentation.active}>
         <div className="seat dealer">
@@ -211,7 +213,8 @@ export function CardTable({
         </div>
       </div>
       </div>
-      {over ? (
+      }
+      {!occupied ? null : over ? (
         <p className={'felt-result' + (hand.won ? ' won' : '')} style={{visibility:presentation.active?'hidden':'visible'}} aria-hidden={presentation.active}>{hand.outcome}</p>
       ) : (
         <div className="felt-actions">

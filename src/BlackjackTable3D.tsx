@@ -46,11 +46,11 @@ export function BlackjackTable3D({mine,theirs,hidden,presentation,dealer}:{deale
   const observer=new ResizeObserver(resize);observer.observe(el);resize();
   const models:THREE.Group[]=[];let prototype:THREE.Group|undefined;
   const cards=new THREE.Group();scene.add(cards);
-  const textures:THREE.Texture[]=[],materials:THREE.Material[]=[];
+  const textures:THREE.Texture[]=[],materials:THREE.Material[]=[],costumes:THREE.Material[]=[];
   const loader=new GLTFLoader();
   if(dealer){const name=pedestrianModel(dealer.id,dealer.face);loader.loadAsync(`/art/models/${name}.glb`).then(g=>{
     if(dead){disposeCityResources([g.scene]);return;}models.push(g.scene);
-    const actor=g.scene.clone(true);materials.push(...dressPedestrian(actor,name,wardrobe(dealer.id,dealer.face)));
+    const actor=g.scene.clone(true);costumes.push(...dressPedestrian(actor,name,wardrobe(dealer.id,dealer.face)));
     poseBlackjackDealer(actor);scene.add(actor);dirty=true;
   }).catch(()=>{ /* The named dealer and authoritative hand remain readable if the model is unavailable. */ });}
   Promise.all(['blackjack-table','playing-card'].map(async name=>{const g=await loader.loadAsync(`/art/models/${name}.glb`);if(dead){disposeCityResources([g.scene]);return;}models.push(g.scene);return g.scene;})).then(([table,card])=>{if(dead||!table||!card)return;scene.add(table);prototype=card;key='';dirty=true;setStatus('');}).catch(()=>{if(!dead)setStatus('The table could not load. Your cards are listed below.');});
@@ -73,7 +73,7 @@ export function BlackjackTable3D({mine,theirs,hidden,presentation,dealer}:{deale
    if(p.presentation.active)dirty=true;
    if(!dirty||document.hidden)return;renderer.render(scene,camera);rendered++;canvas.dataset.blackjack=JSON.stringify({mine:p.mine,theirs:p.theirs,hidden:p.hidden,dealing:p.presentation.active,flips:p.presentation.plan.cards.filter(c=>c.flip).length,dealer:dealer?.id,rendered,drawCalls:renderer.info.render.calls});dirty=false;
   };frame=requestAnimationFrame(tick);
-  return()=>{dead=true;cancelAnimationFrame(frame);observer.disconnect();disposeCityResources([scene,...models],{textures,materials});renderer.dispose();renderer.forceContextLoss();canvas.remove();};
+  return()=>{dead=true;cancelAnimationFrame(frame);observer.disconnect();disposeCityResources([scene,...models],{textures,materials:[...materials,...costumes]});renderer.dispose();renderer.forceContextLoss();canvas.remove();};
  },[dealer?.id,dealer?.face]);
  return <div className="blackjack3d"><div ref={host}/>{status&&<p role="status">{status}</p>}</div>;
 }

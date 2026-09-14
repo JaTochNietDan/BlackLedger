@@ -232,7 +232,7 @@ export function Casino({
           <div className="casino-game">
             {game === 'cards' ? (
               <div className="cards-panel">
-                <CardTable hand={hand} dealer={blackjackDealer(people)} motion={motion} onPresent={setPresenting} money={money} act={k => act({kind: k})} />
+                <CardTable hand={hand} place={place} dealer={blackjackDealer(people)} motion={motion} onPresent={setPresenting} money={money} act={k => act({kind: k})} />
                 {!dealt && !presenting && (
                   <div className="felt sit-down">
                     <p className="felt-note">
