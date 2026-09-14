@@ -175,7 +175,7 @@ export function precinctPlacements(people:Presence[]) {
 
 export function heraldPlacements(people:Presence[]) {
  const result=new Map<string,InteriorSpot>();
- const staff:InteriorSpot[]=[-2.55,2.55].map((x,i)=>({id:`herald-desk-${i}`,x,z:-3.12,yaw:0,seat:.59}));
+ const staff:InteriorSpot[]=[-2.55,2.55].map((x,i)=>({id:`herald-desk-${i}`,x,z:-2.82,yaw:0,seat:.59}));
  const visitors:InteriorSpot[]=[{id:'herald-aisle-0',x:0,z:-1,yaw:Math.PI/2},{id:'herald-aisle-1',x:0,z:.6,yaw:-Math.PI/2},...[-2.55,0,2.55].map((x,i)=>({id:`herald-visitor-${i}`,x,z:2.2,yaw:Math.PI}))];
  for(const who of [...people].sort((a,b)=>a.id.localeCompare(b.id))){
   if(result.has(who.id))continue;

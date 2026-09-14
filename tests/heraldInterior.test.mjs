@@ -44,3 +44,18 @@ test('Herald staff, visitors and entrance clear desks and filing cabinets',async
   }
  }
 });
+
+test('Herald typing keeps both hands above real keys and stops for reduced motion',async()=>{
+ const {NewsroomTyping}=await import('../.runtime/frontend-test/newsroomTyping.js');
+ for(const name of ['person','woman']){
+  const actor=await load(name),spot=heraldPlacements([{id:'editor',role:'Editor'}]).get('editor');
+  poseInteriorOccupant(actor,spot);const typing=new NewsroomTyping(actor);
+  const hands=[];for(const side of [-1,1])actor.getObjectByName(`elbow${side}`).traverse(o=>{if(o instanceof THREE.Mesh&&o.name.startsWith('hand'))hands.push(o);});
+  for(let i=0;i<150;i++){
+   typing.step(.05,true,false);
+   for(const hand of hands){const box=new THREE.Box3().setFromObject(hand,true);assert.ok(box.min.y>=.969&&box.min.y<1.05,`${name}: hand height ${box.min.y}`);assert.ok(box.min.z> -2.4&&box.max.z< -2.0,`${name}: hand leaves keyboard`);assert.ok(box.min.x>spot.x-.6&&box.max.x<spot.x+.18);}
+   for(const side of [-1,1]){assert.equal(actor.getObjectByName(`arm${side}`).scale.y,1);assert.equal(actor.getObjectByName(`elbow${side}`).scale.y,1);}
+  }
+  const before=typing.seconds;assert.equal(typing.step(1,false,false),false);assert.equal(typing.step(1,true,true),false);assert.equal(typing.seconds,before);
+ }
+});

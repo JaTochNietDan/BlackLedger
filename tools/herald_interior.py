@@ -31,7 +31,7 @@ def build(box,cylinder,material):
     for row,y in enumerate([2,-.4]):
         for x in [-2.55,2.55]:
             # Desk chairs face the platen, with a real cushion for cast seating.
-            cy=y+1.12
+            cy=y+.82
             b('desk chair cushion',(x,cy,.555),(.55,.53,.07),trim,.03)
             for dx in [-.22,.22]:
                 for dy in [-.21,.21]:b('chair leg',(x+dx,cy+dy,.275),(.05,.05,.53),wood,.008)

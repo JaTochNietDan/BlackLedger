@@ -1,3 +1,4 @@
+import {NewsroomTyping} from './newsroomTyping';
 import {createBilliardsCue,holdBilliardsCue} from './billiardsCue';
 import {PoolTap} from './billiards';
 import {PoolhallMatches,tournamentHallSpots,poolhallGameAt} from './poolhallMatches';
@@ -64,6 +65,7 @@ export function Interior3D(props:{place:InteriorPlace;tournament?:PoolTournament
   const playerMarker=new THREE.Mesh(new THREE.RingGeometry(.36,.41,40),new THREE.MeshBasicMaterial({color:0xede2bd,side:THREE.DoubleSide}));
   playerMarker.rotation.x=-Math.PI/2;playerMarker.position.y=.065;playerMarker.visible=false;scene.add(playerMarker);
   let hallMatches:PoolhallMatches|undefined,lastTournament:PoolTournamentState|null|undefined;
+  let typists:NewsroomTyping[]=[];
   let machines:LaundryMotion|undefined;
   let fittingMirror:Reflector|undefined;
   renderer.info.autoReset=false;
@@ -137,7 +139,7 @@ export function Interior3D(props:{place:InteriorPlace;tournament?:PoolTournament
    const matchSpots=p.place==='poolhall'?tournamentHallSpots(p.tournament):new Map();
    if(hallMatches&&lastTournament!==p.tournament){hallMatches.update(p.tournament);lastTournament=p.tournament;dirty=true;}
    const key=JSON.stringify([[...matchSpots],p.people.map(w=>[w.id,w.face,w.role]),[p.player.name,p.player.face,p.player.alive]]);
-   if(models.size===modelNames.length&&key!==roster){roster=key;dirty=true;arrival=undefined;service=undefined;linenService=undefined;cloth?.removeFromParent();cloth=undefined;castBatch?.dispose();actors.forEach(a=>scene.remove(a));actors.clear();costumes.forEach(m=>m.dispose());costumes=[];
+   if(models.size===modelNames.length&&key!==roster){roster=key;dirty=true;typists=[];arrival=undefined;service=undefined;linenService=undefined;cloth?.removeFromParent();cloth=undefined;castBatch?.dispose();actors.forEach(a=>scene.remove(a));actors.clear();costumes.forEach(m=>m.dispose());costumes=[];
     const placements=placementsForInterior(p.place,p.people.filter(w=>!matchSpots.has(w.id)));
     for(const [id,spot] of matchSpots)placements.set(id,spot);
     p.people.forEach(who=>{
@@ -163,11 +165,13 @@ export function Interior3D(props:{place:InteriorPlace;tournament?:PoolTournament
      service=new CounterWipe(bartender);if(service.available){cloth=models.get('bar-cloth')!.clone(true);cloth.traverse(o=>{if(o instanceof THREE.Mesh){o.castShadow=true;o.receiveShadow=true;}});scene.add(cloth);service.pose(serviceSeconds);cloth.position.copy(service.clothPosition);}
     }}
     if(laundry){const worker=[...actors.values()].find(a=>a.userData.spot==='laundry-counter');if(worker)linenService=new LinenPress(worker);}
+    if(p.place==='herald')for(const actor of actors.values())if(String(actor.userData.spot).startsWith('herald-desk-'))typists.push(new NewsroomTyping(actor,typists.length*1.7));
     castBatch=new InteriorCastBatch(actors);scene.add(castBatch.root);
    }
    const running=laundryRunningMachines(p.operation);
    if(machines?.step(seconds,running,p.motion&&!reduced,document.hidden))dirty=true;
    let poseChanged=linenService?.step(seconds,running>0,p.motion&&!reduced,document.hidden)??false;
+   for(const typist of typists)if(typist.step(seconds,p.motion&&!reduced,document.hidden))poseChanged=true;
    if(arrival&&arriving&&!document.hidden){
     arrivalSeconds=!p.motion||reduced?arrival.duration:Math.min(arrival.duration,arrivalSeconds+Math.min(.05,Math.max(0,seconds)));
     arriving=arrival.pose(arrivalSeconds);poseChanged=true;
@@ -196,7 +200,7 @@ export function Interior3D(props:{place:InteriorPlace;tournament?:PoolTournament
     renderer.info.reset();renderer.render(scene,camera);renderedFrames++;dirty=false;
     if(models.size===modelNames.length)canvas.dataset.interior=JSON.stringify({place:p.place,people:[...actors.keys()],occupants:[...actors].map(([id,a])=>({id,spot:a.userData.spot,x:a.position.x,y:a.position.y,z:a.position.z})),picked:p.picked,
       mirror:fittingMirror?{visible:!!back?.visible,resolution:[512,1024]}:undefined,drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,renderedFrames,
-      zoom:camera.zoom,linen:linenService?{seconds:linenService.seconds,active:linenService.active}:undefined,machines:machines?{count:machines.count,running,seconds:machines.seconds}:undefined,arrival:arrival?{seconds:arrivalSeconds,duration:arrival.duration,moving:arriving}:undefined,service:service?.available?{seconds:serviceSeconds,cloth:service.clothPosition.toArray()}:undefined,omitted:Math.max(0,p.people.length-actors.size+(playerActor?1:0)),cutawayWalls:[...(!left?.visible?['left']:[]),...(!back?.visible?['back']:[])]});
+      zoom:camera.zoom,typing:typists.map(t=>t.seconds),linen:linenService?{seconds:linenService.seconds,active:linenService.active}:undefined,machines:machines?{count:machines.count,running,seconds:machines.seconds}:undefined,arrival:arrival?{seconds:arrivalSeconds,duration:arrival.duration,moving:arriving}:undefined,service:service?.available?{seconds:serviceSeconds,cloth:service.clothPosition.toArray()}:undefined,omitted:Math.max(0,p.people.length-actors.size+(playerActor?1:0)),cutawayWalls:[...(!left?.visible?['left']:[]),...(!back?.visible?['back']:[])]});
    }
   };frame=requestAnimationFrame(tick);
   return()=>{reduce.removeEventListener('change',reduction);unbindPan();dead=true;cancelAnimationFrame(frame);observer.disconnect();controls.removeEventListener('change',changed);controls.dispose();canvas.removeEventListener('keydown',keys);canvas.removeEventListener('pointerdown',press);canvas.removeEventListener('pointerup',release);canvas.removeEventListener('pointermove',move);canvas.removeEventListener('pointercancel',cancel);castBatch?.dispose();hallMatches?.dispose();if(fittingMirror){fittingMirror.removeFromParent();fittingMirror.geometry.dispose();fittingMirror.dispose();}disposeCityResources([scene,...models.values(),...(hallCue?[hallCue]:[])]);renderer.dispose();renderer.forceContextLoss();canvas.remove();};

@@ -2264,3 +2264,25 @@ continues to serve release 89cc61b; this room is preview-only until promotion.
 This is the city desk, not all three storeys of the Herald. Typing animation,
 upper offices, other unfinished interiors and full billiards character/physics
 fidelity remain open. The broad goal remains active.
+
+### 2026-09-14 — occupied newsroom typing
+
+Previous 5cecc1d was room-production progress. Moved desk chairs 30cm toward
+the keyboards so the seated rigs can reach without stretched arms. Added
+NewsroomTyping to actual occupied editorial spots: alternating hand presses,
+reading pauses and staggered timing. Both rigid sleeves solve toward the
+physical keyboard; hand undersides remain above its keys. The cast batch
+updates with the articulated pose. No fabricated news or gameplay time.
+Motion-disabled and hidden-tab states freeze the cosmetic clock.
+
+391 frontend tests pass, including 150 sampled poses for each actual rig,
+keyboard bounds/height, unchanged segment scales and disabled/hidden motion.
+Existing chair-support, actor separation and entrance-clearance checks still
+pass. Production build passes. Logs `.runtime/herald-typing-tests-final.log`,
+`.runtime/herald-typing-build.log`, `.runtime/herald-typing-export.log`.
+CUA tabs 69/70 reviewed close keyboard reach on isolated 8972; the first raised
+elbow hint was corrected to bend back toward the body and the final build was
+visually inspected. This is hand/arm motion, not individually articulated
+fingers, mechanical key depression or moving carriage animation.
+No main campaign commands or release promotion; 8791 stays at 89cc61b.
+Broader interiors and billiards fidelity remain unfinished.
