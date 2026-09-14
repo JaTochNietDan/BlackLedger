@@ -35,6 +35,10 @@ func (w *World) strikePresentation(victim *NPC, tier int) (CueStrike, string) {
 	}
 	how := variants[int(roll*float64(len(variants)))%len(variants)]
 	place, _ := PlaceByID(victim.Location)
-	return CueStrike{Variant: variant, Victim: CueActor{ID: victim.ID, Name: victim.Name}},
+	setting := ""
+	if w.residentAtHome(victim) {
+		setting = "home"
+	}
+	return CueStrike{Setting: setting, Variant: variant, Victim: CueActor{ID: victim.ID, Name: victim.Name}},
 		fmt.Sprintf("At %s, %s: %s was %s.", place.Name, hourOf(w.Minute), victim.Name, how)
 }

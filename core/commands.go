@@ -296,6 +296,16 @@ func (w *World) apply(c Command) error {
 				return err
 			}
 			w.Advance(a.Minutes)
+		} else if mark, ok := strings.CutPrefix(c.Kind, "burgle:"); ok {
+			if err := w.Burgle(mark); err != nil {
+				return err
+			}
+			w.Advance(a.Minutes)
+		} else if mark, ok := strings.CutPrefix(c.Kind, "home_strike:"); ok {
+			if err := w.HomeStrike(mark); err != nil {
+				return err
+			}
+			w.Advance(a.Minutes)
 		} else if mark, ok := strings.CutPrefix(c.Kind, "strike:"); ok {
 			// Resolved before the clock moves, so an attempt that kills the
 			// player cannot also collect the hour it never survived.

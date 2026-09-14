@@ -90,6 +90,8 @@ var actionGroup = map[string]string{
 // prefixGroup covers the actions that carry an id after a colon. The prefix is
 // the verb and the suffix is who or what it is done to, so the verb decides.
 var prefixGroup = [][2]string{
+	{"home_strike:", "street"},
+	{"burgle:", "street"},
 	{"buy_apartment:", "business"}, {"sell_apartment:", "business"},
 	{"sign:", "people"}, {"share:", "people"}, {"dismiss:", "people"}, {"poach:", "business"}, {"ask:", "people"}, {"about:", "people"}, {"incharge:", "business"},
 	{"lend:", "people"}, {"lean:", "people"}, {"extend:", "people"},

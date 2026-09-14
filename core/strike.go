@@ -260,3 +260,19 @@ func (w *World) factionOrStreet(n *NPC) string {
 
 // theirOrTheir keeps the sentence right whether the name has a family or not.
 func theirOrTheir(n *NPC) string { return n.Name }
+
+// HomeStrike preserves the ordinary combat rules but validates the residence
+// and physical presence again when the action is committed.
+func (w *World) HomeStrikeReadiness(id string) string {
+	n := w.NPC(id)
+	if !w.residentAtHome(n) || n.Home != w.Player.Location {
+		return "They are not at home here"
+	}
+	return w.StrikeReadiness(id)
+}
+func (w *World) HomeStrike(id string) error {
+	if why := w.HomeStrikeReadiness(id); why != "" {
+		return fmt.Errorf("%s", why)
+	}
+	return w.Strike(id, w.OwnHands())
+}

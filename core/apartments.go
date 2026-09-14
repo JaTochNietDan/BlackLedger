@@ -175,7 +175,7 @@ func (w *World) ApartmentDay() {
 		if u.Owner != "independent" && seller == nil {
 			continue
 		}
-		if seller != nil && seller.Purse >= 100 {
+		if seller != nil && w.HouseholdWealth(seller) >= 100 {
 			continue
 		}
 		buyer := w.NPC(u.Resident)
@@ -183,10 +183,10 @@ func (w *World) ApartmentDay() {
 			continue
 		}
 		price := w.ApartmentPrice(u)
-		if buyer.Purse < price+200 {
+		if w.HouseholdWealth(buyer) < price+200 {
 			continue
 		}
-		buyer.Purse -= price
+		w.SpendHouseholdMoney(buyer, price)
 		if seller != nil {
 			seller.Purse += price
 		}
@@ -203,15 +203,15 @@ func (w *World) ApartmentDay() {
 	for i := range w.Apartments {
 		u := &w.Apartments[i]
 		seller := w.NPC(u.Owner)
-		if seller == nil || seller.Dead || seller.Purse >= 100 {
+		if seller == nil || seller.Dead || w.HouseholdWealth(seller) >= 100 {
 			continue
 		}
 		price := w.ApartmentPrice(u)
 		for _, buyer := range buyers {
-			if buyer.ID == seller.ID || buyer.Purse < price+500 {
+			if buyer.ID == seller.ID || w.HouseholdWealth(buyer) < price+500 {
 				continue
 			}
-			buyer.Purse -= price
+			w.SpendHouseholdMoney(buyer, price)
 			seller.Purse += price
 			u.Owner = buyer.ID
 			w.Log("A private apartment sale", fmt.Sprintf("%s paid %s $%d for apartment %d at %s. Existing residents keep their tenancy.", buyer.Name, seller.Name, price, u.Number, placeName(u.Building)), "business")

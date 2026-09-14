@@ -459,6 +459,7 @@ type CueAttacker struct {
 // CueStrike records the resolved attack scenario, shared by its attack and death
 // cues. Timings, poses and camera direction remain browser presentation.
 type CueStrike struct {
+	Setting string   `json:"setting,omitempty"`
 	Variant string   `json:"variant"`
 	Victim  CueActor `json:"victim"`
 }
@@ -529,6 +530,7 @@ type Result struct {
 	Health  int `json:"health"`
 }
 type World struct {
+	HouseholdSavings map[string]HouseholdAccount      `json:"household_savings,omitempty"`
 	Apartments       []ApartmentDeed                  `json:"apartments,omitempty"`
 	PropertyPressure map[int]DistrictPropertyPressure `json:"property_pressure,omitempty"`
 	recordStreet     bool
@@ -1712,6 +1714,12 @@ func (w *World) Actions(id string) []Action {
 			about(mark.ID)
 		}
 	}
+	for _, resident := range w.Residents(id) {
+		if !w.Known(resident) {
+			continue
+		}
+		add("burgle:"+resident.ID, "Burgle "+resident.Name+"'s home", BurglaryMinutes, 0, w.BurglaryReadiness(resident.ID), "Search their home for saved cash. You may find nothing. Occupied homes are harder, failure can injure or kill you, and identification brings personal and family retaliation. Draws 7 attention on success or 14 on failure.")
+	}
 	// Going after somebody who is standing here. Two buttons, because they are
 	// two different bets: your own hands and your own risk, or somebody else's
 	// face and what happens to them if it goes wrong.
@@ -1720,7 +1728,11 @@ func (w *World) Actions(id string) []Action {
 		if !ok {
 			continue
 		}
-		add("strike:"+mark.ID, "Go after "+mark.Name+" yourself", StrikeMinutes, 0, w.StrikeReadiness(mark.ID),
+		strikeID, strikeLabel, readiness := "strike:"+mark.ID, "Go after "+mark.Name+" yourself", w.StrikeReadiness(mark.ID)
+		if w.residentAtHome(mark) {
+			strikeID, strikeLabel, readiness = "home_strike:"+mark.ID, "Go after "+mark.Name+" at home", w.HomeStrikeReadiness(mark.ID)
+		}
+		add(strikeID, strikeLabel, StrikeMinutes, 0, readiness,
 			fmt.Sprintf("Your own hands, and the best odds you can get: what you are carrying and what you are worth both count. It can kill you, a room with people in it remembers your face, and %s answers for %s either way.",
 				w.factionOrStreet(mark), theirOrTheir(mark)))
 		about(mark.ID)
@@ -2458,8 +2470,10 @@ func (w *World) Advance(minutes int) {
 			w.PoliceDay()
 			w.CustodyDay()
 			w.LoanDay()
+			w.HouseholdBills()
 			w.PeopleDay()
 			w.ApartmentDay()
+			w.HouseholdSavingsDay()
 			w.GrudgeDay()
 			w.SettleGrudges()
 			w.OperationsDay()

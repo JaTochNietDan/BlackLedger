@@ -839,3 +839,36 @@ asking/offer and daily_rent. Market shows reference prices when a private owner 
 not selling. Existing Presence.home_name now includes the flat number, and
 Accommodation says Owned apartment for NPC owner-occupants. HomeID remains the
 building destination. No private travel or plans are added to this projection.
+
+## Household cash, burglary and home attacks
+
+Private saved `household_savings` maps NPC IDs to `{cash, day}`. It is not included
+in public snapshots. At midnight, living residents can withdraw enough for living
+costs before PeopleDay, then save20% of pocket money above the larger of50 or three
+days' living costs, at most60 per day and1000 total. Actual purses fund every
+transfer. Repeated savings settlement within a day cannot deposit twice. Cash
+moves with its resident rather than with an apartment deed. Legacy saves begin
+with no household cash; no historical loot is invented. Apartment affordability
+and cash-poor seller checks now include this saved cash, spending purse first and
+then savings. Invalid/unfunded household payments mutate neither balance.
+
+`burgle:<npc-id>` is a45-minute personal action offered at a known living resident's
+home. It excludes the player's crew/organization and requires at least25 health
+and freedom from custody. It does not reveal savings or occupancy through its
+readiness message. Success takes only that household's existing cash, credits
+Earn, and adds7 attention; an empty account pays nothing. Failure retains the
+stash, adds14 attention, damages health/clothing and can be fatal. Occupancy lowers
+the success chance; it means physically at Home, not travelling or held. A present
+resident identifies the intruder; witnesses may identify a failed intruder when
+the resident is absent. Identification creates a personal grievance and the
+existing family retaliation consequences. The recorded robbery/news cue feeds
+neighborhood prices; replay never performs the crime again.
+
+`home_strike:<npc-id>` replaces the generic personal strike label for a resident
+physically at home. It revalidates home address and presence at execution, then
+uses existing Strike outcomes/weapon/health/time rules. Optional
+`VisualCue.strike.setting: "home"` captures the location context before the victim
+is killed or moves; generic street scenarios omit it. Already-departed residents
+cannot be attacked via this home command. This is authoritative action support;
+private-room 3D assassination/burglary choreography remains unfinished, and the
+current browser still uses the existing city result/news presentation.
