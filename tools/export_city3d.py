@@ -1062,21 +1062,34 @@ def undertaker():
     iron=material('funeral iron',(.055,.07,.065),.6)
     gravel=material('coach yard gravel',(.29,.285,.24));gravel_texture(gravel)
     box('coach yard',(0,-3.25,-.01),(15.4,8.9,.04),gravel)
-    box('funeral foundation',(0,4.4,.18),(13.2,6.2,.36),stone)
-    box('funeral premises',(0,4.4,3.3),(13,6,6.6),wall)
-    for z in (.42,3.45,6.55):box('front stone course',(0,7.47,z),(13.2,.2,.18),stone)
+    # Offset entrance: preserve the shop window and leave a real 3m vestibule.
+    for x,w,fx,fw in [(-1.5,10,-1.55,10.1),(6,1,6.05,1.1)]:
+        box('funeral masonry wing',(x,4.4,3.3),(w,6,6.6),wall)
+        box('funeral foundation wing',(fx,4.4,.18),(fw,6.2,.36),stone)
+        box('front lower stone course',(fx,7.47,.42),(fw,.2,.18),stone)
+    box('funeral vestibule lintel',(4.5,4.4,4.85),(2,6,3.5),wall)
+    box('funeral vestibule rear',(4.5,2.9,1.55),(2,3,3.1),wall)
+    box('funeral vestibule paving',(4.5,5.9,-.04),(2,3,.08),stone)
+    for z in (3.45,6.55):box('front stone course',(0,7.47,z),(13.2,.2,.18),stone)
     for x in (-6.2,2.8,6.2):box('front pilaster',(x,7.5,1.8),(.28,.28,3.25),stone,.02)
     box('long window surround',(-1.65,7.52,1.85),(7.4,.18,2.42),oak,.025)
     box('empty long window',(-1.65,7.64,1.85),(7.08,.08,2.12),glass)
     for x in (-4,-1.65,.7):box('display window mullion',(x,7.70,1.85),(.045,.06,2.15),brass)
     box('window sill',(-1.65,7.68,.7),(7.55,.40,.15),stone,.025)
-    box('funeral entry',(4.5,7.55,1.57),(1.75,.2,2.94),oak,.025)
+    hinge=bpy.data.objects.new('entrance-door-hinge',None)
+    bpy.context.collection.objects.link(hinge);hinge.location=(3.625,7.55,0)
+    def doorpart(name,xyz,dims,mat,bevel=.01):
+        ob=box(name,xyz,dims,mat,bevel);ob.parent=hinge;ob.location-=hinge.location
+        return ob
+    doorpart('funeral entry',(4.5,7.55,1.52),(1.75,.2,3.04),oak,.025)
     for x in (4.08,4.92):
-        for z in (.72,1.55,2.38):box('door panels',(x,7.675,z),(.65,.065,.61),oak,.02)
-    box('door pull',(4.35,7.73,1.42),(.04,.04,.26),brass,.008)
+        for z in (.72,1.55,2.38):doorpart('door panels',(x,7.675,z),(.65,.065,.61),oak,.02)
+    doorpart('door pull',(4.35,7.73,1.42),(.04,.04,.26),brass,.008)
+    entry=bpy.data.objects.new('entrance-threshold',None)
+    bpy.context.collection.objects.link(entry);entry.location=(4.5,7.55,0)
     box('brass business plate',(3.2,7.69,1.77),(.45,.045,.63),brass,.02)
     box('entry lintel',(4.5,7.59,3.17),(2.15,.28,.23),stone,.02)
-    box('entry threshold',(4.5,7.7,.075),(2.1,.62,.15),stone,.025)
+    box('entry threshold',(4.5,7.7,-.04),(2.1,.62,.08),stone,.025)
     anchor=bpy.data.objects.new('sign-anchor',None);bpy.context.collection.objects.link(anchor)
     anchor.location=(-1.2,7.61,3.13);anchor.scale=(.82,1,.40)
     def front_window(x):
@@ -2247,6 +2260,13 @@ if __name__ == '__main__' and '--only=bottle-shard' in __import__('sys').argv:
     clear();bottle_shard();selected_manifest['bottle-shard']=export('bottle-shard')
     with open(manifest_path,'w') as f: json.dump(selected_manifest,f,indent=2)
     raise SystemExit
+
+if __name__ == '__main__' and '--only=undertaker' in __import__('sys').argv:
+    manifest_path=os.path.join(OUT,'manifest.json')
+    with open(manifest_path) as f: selected_manifest=json.load(f)
+    clear();undertaker();selected_manifest['undertaker']=export('undertaker')
+    with open(manifest_path,'w') as f:json.dump(selected_manifest,f,indent=2)
+    raise SystemExit(0)
 
 if __name__ == '__main__' and '--only=special-fire' in __import__('sys').argv:
     manifest_path=os.path.join(OUT,'manifest.json')

@@ -107,7 +107,7 @@ play a 6.2-second planter exit before detonation. The city reserves the full exi
 uses the recorded person, and delays blast audio/light/debris, glazing damage,
 new fire and co-located casualty playback until the exit completes. Fire-brigade
 staging follows the scene and the newspaper waits for completion. This currently
-covers 12 doorway models, including the Mariner; unnamed faction planters, missing doorway models
+covers 13 doorway models, including the Mariner and funeral parlors; unnamed faction planters, missing doorway models
 and premature injury/escape choreography remain unsupported. Legacy explosions
 retain their existing playback. Debug also includes Explosion · casualty for
 reviewing the combined sequence without a campaign command.

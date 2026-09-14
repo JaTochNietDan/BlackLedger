@@ -7,7 +7,7 @@ import {OrbitControls} from '/node_modules/three/examples/jsm/controls/OrbitCont
 const renderer=new THREE.WebGLRenderer({canvas:document.querySelector('canvas'),antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);renderer.setClearColor(0x1c211d);renderer.outputColorSpace=THREE.SRGBColorSpace;
 const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(35,innerWidth/innerHeight,.001,10);camera.position.set(2,2.1,3);const controls=new OrbitControls(camera,renderer.domElement);controls.target.set(.15,1.25,0);controls.update();
 scene.add(new THREE.HemisphereLight(0xfff0d8,0x33433a,2));const light=new THREE.DirectionalLight(0xffe9c3,3);light.position.set(-1,2,2);scene.add(light);const rim=new THREE.DirectionalLight(0xc0dfef,2);rim.position.set(1,.2,-1);scene.add(rim);
-const names=['monarch','tavern','tenement','mercer-court','casino','civic','shop','warehouse','bluehour','goldenlily','papermoon','mariner'];
+const names=['monarch','tavern','tenement','mercer-court','casino','civic','shop','warehouse','bluehour','goldenlily','papermoon','mariner','undertaker'];
 const requested=new URL(location.href).searchParams.get('model'),name=names.includes(requested)?requested:'monarch';
 const select=document.querySelector('select');for(const id of names){const option=new Option(id,id);select.add(option);}select.value=name;
 select.onchange=()=>{location.search='?model='+encodeURIComponent(select.value);};
@@ -17,7 +17,7 @@ const entry=threshold.getWorldPosition(new THREE.Vector3());
 const actor=(await loader.loadAsync('/art/models/person.glb')).scene;
 const cast=new CityPlanter(actor);scene.add(cast.root);cast.root.position.copy(entry);
 camera.far=100;camera.position.copy(entry).add(new THREE.Vector3(5,3,-8));camera.updateProjectionMatrix();controls.target.copy(entry).add(new THREE.Vector3(0,1,-.5));controls.update();
-const floor=new THREE.Mesh(new THREE.BoxGeometry(12,.1,10),new THREE.MeshStandardMaterial({color:0x59594a}));floor.position.set(entry.x,-.05,entry.z-1);scene.add(floor);
+const floor=new THREE.Mesh(new THREE.BoxGeometry(12,.1,10),new THREE.MeshStandardMaterial({color:0x59594a}));floor.position.set(entry.x,-.055,entry.z-1);scene.add(floor);
 const render=()=>renderer.render(scene,camera);controls.addEventListener('change',render);
 let request=0;const show=t=>{const pose=cast.update(t);door.rotation.y=-Math.PI/2*pose.door;document.body.dataset.pose=JSON.stringify({t,door:pose.door,actor:actor.position,blast:pose.blast});document.querySelector('output').value=t.toFixed(2)+'s';document.body.dataset.seconds=t;render();};
 for(const [id,t] of [['windup',.4],['release',2.3],['impact',6.2]])document.getElementById(id).onclick=()=>{cancelAnimationFrame(request);show(t);};
