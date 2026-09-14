@@ -3,6 +3,8 @@ import * as THREE from '/node_modules/three/build/three.module.js';
 import {GLTFLoader} from '/node_modules/three/examples/jsm/loaders/GLTFLoader.js';
 import {OrbitControls} from '/node_modules/three/examples/jsm/controls/OrbitControls.js';
 import {CityAccident} from '/src/city3dAccident.ts';
+import {accidentReservation} from '/src/city3dEvents.ts';
+import {trafficSize} from '/src/city3dTraffic.ts';
 const renderer=new THREE.WebGLRenderer({canvas:document.querySelector('canvas'),antialias:true});renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,2));
 const scene=new THREE.Scene();scene.background=new THREE.Color(0x1c211d);const camera=new THREE.PerspectiveCamera(35,innerWidth/innerHeight,.1,100);camera.position.set(5,3,7);const controls=new OrbitControls(camera,renderer.domElement);controls.target.set(0,.7,0);controls.update();
 scene.add(new THREE.HemisphereLight(0xffefd5,0x334439,3));const sun=new THREE.DirectionalLight(0xffe8c0,3);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);sun.shadow.bias=-.0001;sun.position.set(-3,8,5);scene.add(sun);
@@ -11,6 +13,9 @@ const loader=new GLTFLoader(),casts=[];
 for(const [i,model] of ['person','woman'].entries())for(const fatal of [false,true]){
  const actor=(await loader.loadAsync('/art/models/'+model+'.glb')).scene;
  actor.traverse(o=>{if(o instanceof THREE.Mesh)o.castShadow=true;});const cast=new CityAccident(actor,fatal);cast.root.position.set(fatal?1.5:-1.5,0,i*3-1.5);scene.add(cast.root);casts.push(cast);
+ const slot=accidentReservation({x:cast.root.position.x,z:cast.root.position.z},0),size=trafficSize(slot.model);
+ const box=new THREE.Box3(new THREE.Vector3(slot.pose.x-size.width/2,0,slot.pose.z-size.length/2),new THREE.Vector3(slot.pose.x+size.width/2,2.1,slot.pose.z+size.length/2));
+ scene.add(new THREE.Box3Helper(box,0x997b4f));
 }
 let request=0;const render=()=>renderer.render(scene,camera);controls.addEventListener('change',render);
 function pose(t){casts.forEach(c=>c.update(t));document.body.dataset.pose=JSON.stringify({seconds:t,done:t>=4});document.querySelector('output').value=t.toFixed(2)+'s · left: survivor / right: fatal';render();}

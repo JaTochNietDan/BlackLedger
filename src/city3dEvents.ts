@@ -37,6 +37,7 @@ export type SceneSlot = {root: Point; pose: TrafficPose; model: string};
 /** Dedicated forecourt/side bays keep reenactments out of public travel lanes.
  * The casualty reservation encloses the whole fall, including the standing pose. */
 export function sceneSlots(lot: Lot, kind: string): SceneSlot[] {
+  if(kind==='accident')return [-4,0,4].map(offset=>accidentReservation({x:lot.x+offset,z:lot.row*PITCH+6.35}));
   if(kind==='incendiary')return [3,0,-3].map(offset=>{
     const root={x:lot.x+offset,z:lot.row*PITCH+6.35};
     return {root,pose:{x:root.x-1.5,z:root.z,heading:0},model:'incendiary'};
@@ -66,6 +67,10 @@ export function sceneSlots(lot: Lot, kind: string): SceneSlot[] {
 export function planterReservation(root:Point,heading=0):SceneSlot{
  const c=Math.cos(heading),s=Math.sin(heading);
  return {root:{...root},pose:{x:root.x-c-.25*s,z:root.z+s-.25*c,heading},model:'planter'};
+}
+/** Fall and recovery lie along the frontage, clear of the road and building. */
+export function accidentReservation(root:Point,heading=Math.PI/2):SceneSlot{
+ return {root:{...root},pose:{x:root.x-.45*Math.sin(heading),z:root.z-.45*Math.cos(heading),heading},model:'accident'};
 }
 export function availableSceneSlot(
   lot: Lot, kind: string, occupied: {pose: TrafficPose; model: string}[], entry?:Point, accept?:(slot:SceneSlot)=>boolean,

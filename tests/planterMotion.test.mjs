@@ -210,3 +210,37 @@ test('surviving accident recovery plants both palms before raising the body',asy
   assert.ok(reset.angleTo(new THREE.Quaternion())<1e-8,'replay retains arm brace');
  }
 });
+
+test('accident reservations enclose the whole posed cast and yield occupied frontage slots',async()=>{
+ const {CityAccident}=await import('../.runtime/frontend-test/city3dAccident.js');
+ const {accidentReservation,sceneSlots,availableSceneSlot}=await import('../.runtime/frontend-test/city3dEvents.js');
+ const {trafficSize}=await import('../.runtime/frontend-test/city3dTraffic.js');
+ const lot={id:'review',x:48,z:48,row:1,col:1,model:'shop'};
+ const slots=sceneSlots(lot,'accident');
+ assert.equal(slots.length,3);
+ assert.notDeepEqual(availableSceneSlot(lot,'accident',[slots[0]]),slots[0]);
+ assert.equal(availableSceneSlot(lot,'accident',slots),undefined);
+ for(const name of ['person','woman'])for(const fatal of [false,true])for(const heading of [0,Math.PI/2,Math.PI,1.1]){
+  const cast=new CityAccident(await model(name),fatal),slot=accidentReservation(slots[0].root,heading),size=trafficSize(slot.model);
+  cast.root.position.set(slot.root.x,.2,slot.root.z);cast.root.rotation.y=heading;
+  const inverse=new THREE.Matrix4().compose(new THREE.Vector3(slot.pose.x,0,slot.pose.z),new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0),heading),new THREE.Vector3(1,1,1)).invert();
+  for(let frame=0;frame<=120;frame++){
+   cast.update(frame/30);
+   cast.actor.traverse(part=>{
+    if(!(part instanceof THREE.Mesh))return;
+    const vertices=part.geometry.attributes.position,p=new THREE.Vector3();
+    for(let i=0;i<vertices.count;i++){
+     p.fromBufferAttribute(vertices,i).applyMatrix4(part.matrixWorld).applyMatrix4(inverse);
+     assert.ok(Math.abs(p.x)<=size.width/2&&Math.abs(p.z)<=size.length/2,`${name}/${fatal} leaves reserved footprint at ${frame/30}: ${p.toArray()}`);
+    }
+   });
+  }
+ }
+ // The reserved rectangle itself stays on this frontage's pavement, outside
+ // both the road (z<=36) and the conservative building envelope (z>=39.5).
+ for(const slot of slots){
+  const size=trafficSize(slot.model);
+  assert.ok(slot.pose.z-size.width/2>36);
+  assert.ok(slot.pose.z+size.width/2<39.5);
+ }
+});
