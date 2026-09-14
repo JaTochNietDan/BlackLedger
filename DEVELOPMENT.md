@@ -2568,3 +2568,27 @@ Main8791 is still01fb5cf (PID64096), not promoted. Recheck live save/receipts
 against the backup immediately before eventual restart. This turn staged and
 verified the candidate and verified an active test wait; the broad goal remains
 open.
+
+### 2026-09-14 — verified live promotion of3e7ee26
+
+Previous0308210 staged the candidate and verified the ongoing full-suite wait.
+The same session45900 completed successfully: billiards18.829s,
+core422.587s, store.388s, HTTP server2.570s. Together with395 frontend
+tests, production build, vet, browser and model-transfer checks, release
+validation passed.
+
+Rechecked live state and every receipt against the fresh backup immediately
+before stopping the verified01fb5cf process(PID64096). Main8791 now serves
+clean3e7ee26a10338b0a306b84989f472edd8274fd21 from
+`.runtime/release-3e7ee26`, session5478, health modified:false.
+After startup, complete saved state bytes and2134 receipts still match exactly:
+SHA2564cca8f4fe0be17920d8e010f7a1fb2023a0ea7843eeb445e49ffb17759916af5;
+revision2132/minute160825/life11 Jamie Moretti/$2625 preserved.
+Release-local `.runtime/live-verification.json` records the assertions.
+No gameplay QA commands were run against main.
+
+Now live: apartment exchange search/filters/holdings and neighborhood context,
+citywide NPC property investors, funded vacant-home purchases with onward
+journeys, smooth held table-camera controls, Pier14 cargo shed and Vance cab
+dispatch office. Other interiors, full billiards shooting/airborne physics,
+richer housing preferences and overall art/campaign acceptance remain open.
