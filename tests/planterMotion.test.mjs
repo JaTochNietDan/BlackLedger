@@ -10,13 +10,13 @@ async function model(name){
  return (await loader.parseAsync(b.buffer.slice(b.byteOffset,b.byteOffset+b.byteLength),'')).scene;
 }
 test('planter exits the authored vestibule without crossing the door or masonry',async()=>{
- for(const name of ['monarch','tavern','tenement','mercer-court','casino','civic','shop','warehouse','bluehour','goldenlily','papermoon','mariner','undertaker','filling','docks','haulage','garage','dealer'])for(const person of ['person','woman']){
+ for(const name of ['monarch','tavern','tenement','mercer-court','casino','civic','shop','warehouse','bluehour','goldenlily','papermoon','mariner','undertaker','filling','docks','haulage','garage','dealer','villa'])for(const person of ['person','woman']){
   const building=await model(name),actor=await model(person),cast=new CityPlanter(actor);
   if(['filling','docks','haulage','garage','dealer'].includes(name))building.rotation.y=Math.PI;
   building.updateMatrixWorld(true);
-  cast.root.position.copy(building.getObjectByName('entrance-threshold').getWorldPosition(new THREE.Vector3()));
+  cast.root.position.copy(building.getObjectByName(name==='villa'?'entrance-landing':'entrance-threshold').getWorldPosition(new THREE.Vector3()));
   const door=building.getObjectByName('entrance-door-hinge'),triangle=new THREE.Triangle(),bounds=new THREE.Box3();
-  for(let frame=0;frame<=186;frame++){
+  for(let frame=0;frame<=(name==='villa'?75:186);frame++){
    const pose=cast.update(frame/30);door.rotation.y=-Math.PI/2*pose.door;building.updateMatrixWorld(true);
    const actorBounds=new THREE.Box3().setFromObject(actor,true);if(name!=='undertaker')actorBounds.min.y+=.12;
    building.traverse(o=>{
@@ -32,6 +32,7 @@ test('planter exits the authored vestibule without crossing the door or masonry'
     }
    });
   }
+  if(name==='villa'){assert.equal(building.getObjectByName('entrance-threshold'),undefined,'stair exit enabled before choreography');continue;}
   const finish=cast.update(PLANTER_BLAST);assert.equal(finish.blast,true);assert.equal(finish.door,0);
   assert.ok(actor.position.z<-2&&actor.position.x<=-2);
   assert.equal(cast.update(PLANTER_BLAST-.001).blast,false);
@@ -77,5 +78,16 @@ test('planter soles stay on the pavement through walking, stopping and turning',
    if(previousY!==undefined)assert.ok(Math.abs(cast.actor.position.y-previousY)<.012,'vertical pose snapped');
    previousY=cast.actor.position.y;
   }
+ }
+});
+
+
+test('villa entrance landing and stair treads have consistent 20cm risers',async()=>{
+ const b=await model('villa');b.updateMatrixWorld(true);
+ const ray=new THREE.Raycaster();
+ for(const [z,height] of [[-5.5,.6],[-6.2,.6],[-6.6,.4],[-7,.2],[-3,.6]]){
+  ray.set(new THREE.Vector3(0,1,z),new THREE.Vector3(0,-1,0));
+  const hit=ray.intersectObject(b,true)[0];
+  assert.ok(hit);assert.ok(Math.abs(hit.point.y-height)<1e-5,`tread ${z}: ${hit.point.y}`);
  }
 });

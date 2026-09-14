@@ -507,7 +507,9 @@ def villa():
     glass=material('estate glazing',(.13,.22,.23),.2)
     timber=material('shutters',(.13,.22,.17))
     box('estate foundation',(0,0,.3),(11.5,10.5,.6),stone)
-    box('stucco residence',(0,0,3.25),(11,10,5.9),wall)
+    for x in (-3.25,3.25):box('stucco residence wing',(x,0,3.25),(4.5,10,5.9),wall)
+    box('estate vestibule lintel',(0,0,4.7),(2,10,3),wall)
+    box('estate vestibule rear',(0,-1.5,1.9),(2,7,2.6),wall)
     for side in (-1,1):
         vertices=[(x,side*5+dy,z) for dy in (-.08,.08) for x,z in [(-5.5,6.2),(5.5,6.2),(0,8.6)]]
         mesh=bpy.data.meshes.new('gable masonry')
@@ -528,6 +530,7 @@ def villa():
     for side in (-1,1):
         for x in (-3.4,0,3.4):
             for z in (1.8,4.7):
+                if side==1 and x==0 and z<3:continue
                 box('window frame',(x,side*5.05,z),(1.5,.16,1.85),stone)
                 box('estate window',(x,side*5.16,z),(1.22,.12,1.58),glass)
                 if side==1 and z>3:
@@ -538,7 +541,20 @@ def villa():
                     box('louvered shutter',(x+edge*.94,side*5.1,z),(.44,.18,1.8),timber)
                     for slat in range(8):
                         box('shutter slat',(x+edge*.94,side*5.22,z-.72+slat*.2),(.4,.055,.045),dark)
-    box('front door',(0,5.26,1.5),(1.4,.13,2.4),timber)
+    hinge=bpy.data.objects.new('entrance-door-hinge',None)
+    bpy.context.collection.objects.link(hinge);hinge.location=(-.875,5.12,.6)
+    def doorpart(name,xyz,dims,mat):
+        ob=box(name,xyz,dims,mat,.015);ob.parent=hinge;ob.location-=hinge.location
+    doorpart('estate oak door',(0,5.12,1.8),(1.75,.13,2.4),timber)
+    for x in (-.42,.42):
+        for z in (1.15,2.18):doorpart('estate raised door panel',(x,5.205,z),(.64,.05,.78),timber)
+    brass=material('estate door brass',(.52,.38,.15),.65)
+    doorpart('estate brass pull',(.59,5.26,1.7),(.04,.08,.27),brass)
+    for x in (-1.06,1.06):box('estate entry jamb',(x,5.07,1.9),(.12,.3,2.6),stone)
+    box('estate entry head',(0,5.07,3.13),(2.24,.3,.14),stone)
+    # Distinct landing marker until stair-aware city choreography is ready.
+    entry=bpy.data.objects.new('entrance-landing',None)
+    bpy.context.collection.objects.link(entry);entry.location=(0,5.12,.6)
     warm=material('estate occupied windows',(.73,.43,.16),0,.4)
     for side in (-1,1):
         for y in (-3,0,3):
@@ -546,8 +562,10 @@ def villa():
                 box('side window frame',(side*5.56,y,z),(.16,1.5,1.85),stone)
                 box('side glazing',(side*5.66,y,z),(.12,1.22,1.58),warm if y==0 else glass)
                 box('side window mullion',(side*5.74,y,z),(.045,.06,1.58),stone)
+    box('estate porch landing',(0,5.5,.3),(4,1,.6),stone)
     for step in range(3):
-        box('entry steps',(0,6.7-step*.38,.1+step*.13),(4,1.2,.2+step*.26),stone)
+        height=.6-step*.2
+        box('entry steps',(0,6.2+step*.4,height/2),(4,.4,height),stone)
     box('porch canopy',(0,5.9,3.15),(5.8,2.7,.28),stone)
     for x in (-2.5,2.5):
         cylinder('porch column',(x,6.8,1.6),.18,3,stone)
