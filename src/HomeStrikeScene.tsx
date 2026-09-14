@@ -26,6 +26,7 @@ export function HomeStrikeScene({cue,world,motion,overlay,onDone}:{cue:VisualCue
   renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;
   el.append(renderer.domElement);renderer.domElement.setAttribute('aria-label',search?'Recorded burglary inside the resident’s home':'Recorded attack inside the resident’s home');
   const camera=new THREE.PerspectiveCamera(43,1,.1,60);camera.position.set(5.7,6.4,10.8);camera.lookAt(0,.7,roomSettings.focusZ);
+  if(search&&cue.target==='estate'){camera.position.set(-1,5.7,7.5);camera.lookAt(2,.7,.7);}
   const resize=()=>{renderer.setSize(el.clientWidth,el.clientHeight);camera.aspect=el.clientWidth/el.clientHeight;camera.updateProjectionMatrix();if(cast)renderer.render(scene,camera);};
   const observer=new ResizeObserver(resize);observer.observe(el);resize();
   scene.add(new THREE.HemisphereLight(0xffe7bc,0x443e32,2));const sun=new THREE.DirectionalLight(0xffe3b0,3);sun.position.set(2,9,5);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);Object.assign(sun.shadow.camera,{left:-6,right:6,top:6,bottom:-6});scene.add(sun);

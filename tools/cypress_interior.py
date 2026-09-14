@@ -117,7 +117,9 @@ def build(box, cylinder, material):
             b('leather volume',(-4.46,y,z+h/2),(.34,.095,h),rng.choice(book_colors),.005,left)
             b('book spine band',(-4.275,y,z+h*.78),(.012,.095,.012),brass,parent=left)
     b('study desk top',(3.35,1.7,.82),(2.2,1,.12),trim,.035)
-    for x in [2.5,4.2]:
+    from residential_storage import bedside
+    bedside(box,2.5,1.7,.45,.86,.74,oak,trim,brass)
+    for x in [4.2]:
         b('desk pedestal',(x,1.7,.41),(.45,.86,.74),oak,.02)
         for z in [.2,.43,.66]:
             b('drawer front',(x,1.24,z),(.40,.045,.20),trim,.012)

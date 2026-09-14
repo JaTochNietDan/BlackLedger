@@ -1759,3 +1759,32 @@ copies/fixtures and read-only main inspection; no gameplay command touched main.
 The live release includes9198e41 household jobs,133a6a4 work-list UX and8ba57c1
 Vittoria's dining room/narrow camera correction. More interiors, scene animation,
 material/character fidelity and complete played-campaign acceptance remain open.
+
+### Cypress study burglary search — September 14
+
+Successful unattended estate burglaries now use the existing committed-result
+indoor search timeline. Replaced the study desk's solid left pedestal with a
+hollow case and physically sliding drawer, exported interior-cypress GLB from its
+original Blender source. Added a route along the clear east aisle to that drawer,
+then back out; no change to cash, odds, occupancy or Go command resolution. The
+estate camera frames the study route instead of the home-strike foreground, and
+was moved to the opposite side after the first review obscured the working hand.
+
+All368 frontend checks pass13.504s; build passes2.62s. Search geometry now covers
+both rigs in Cypress as well as flat/lodging: floor/furniture clearance over the
+full approach/exit, real sliding tray, hand centre inside tray horizontal bounds
+and at its opening height, actual-positive-only cash, closed drawer after exit.
+Existing Cypress seating and all residential assassination checks still pass.
+
+Isolated estate-search fixture on8954 executes actual burgle:mara at estate and
+records success, absent resident, taken180, health_lost0, identifiedfalse. Browser
+replay stages the search and reveals the newspaper after completion (~13.5s).
+First camera captured open-drawer search at6.987s; final angle was inspected during
+approach and exit. Exact final-angle hand contact is geometry-verified, not claimed
+as a paused visual inspection. Replay used no additional gameplay command; main
+8791 remains the clean8ba57c1 release. Export/build/test logs cypress-search-*.log.
+
+Occupied, failed and fatal burglary choreography, search audio, persistent indoor
+aftermath and more lifelike hand/body motion remain unfinished. No final visual
+acceptance is claimed; this completes basic unattended search coverage across the
+four residential addresses while the larger goal remains active.

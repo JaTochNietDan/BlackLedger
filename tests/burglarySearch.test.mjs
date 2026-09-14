@@ -9,10 +9,10 @@ test('search playback does not misrepresent occupied, failed, fatal or legacy bu
  const cue={kind:'robbery',target:'room',burglary:{success:true,taken:0,resident_present:false,fatal:false}};
  assert.ok(isIndoorSearch(cue));
  for(const change of [{success:false},{resident_present:true},{fatal:true}])assert.equal(isIndoorSearch({...cue,burglary:{...cue.burglary,...change}}),false);
- assert.equal(isIndoorSearch({...cue,target:'estate'}),false);assert.equal(isIndoorSearch({...cue,burglary:undefined}),false);
+ assert.ok(isIndoorSearch({...cue,target:'estate'}));assert.equal(isIndoorSearch({...cue,target:'restaurant'}),false);assert.equal(isIndoorSearch({...cue,burglary:undefined}),false);
 });
 test('burglar approaches and searches the real open tray without crossing furniture',async()=>{
- for(const [place,model] of [['room','interior-lodging-room'],['mercercourt','interior-flat']])for(const rig of ['person','woman']){
+ for(const [place,model] of [['room','interior-lodging-room'],['mercercourt','interior-flat'],['estate','interior-cypress']])for(const rig of ['person','woman']){
   const room=await load(model),actor=await load(rig),drawer=room.getObjectByName('burglary-drawer');
   const search=new BurglarySearch(actor,drawer,place,180);room.updateMatrixWorld(true);
   let moved=false,opened=false,sawCash=false;
@@ -27,6 +27,7 @@ test('burglar approaches and searches the real open tray without crossing furnit
   let hand;actor.getObjectByName('elbow1').traverse(o=>{if(o.isMesh&&o.name.startsWith('hand'))hand=o;});
   const handBox=new THREE.Box3().setFromObject(hand,true),tray=new THREE.Box3().setFromObject(drawer,true),p=handBox.getCenter(new THREE.Vector3());
   assert.ok(p.x>tray.min.x&&p.x<tray.max.x&&p.z<tray.max.z-.04&&p.z>tray.min.z,`${place}/${rig} hand stops short of the open tray: ${JSON.stringify({hand:p,tray})}`);
+  assert.ok(p.y>tray.min.y&&p.y<tray.max.y+.12,`${place}/${rig} hand misses tray height: ${JSON.stringify({hand:p,tray})}`);
   const empty=new BurglarySearch(actor,drawer,place,0);empty.update(empty.arrival+3);assert.equal(empty.money.visible,false);
  }
 });
