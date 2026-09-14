@@ -918,5 +918,21 @@
       ]
     ],
     "bytes": 3156748
+  },
+  "interior-flat": {
+    "file": "interior-flat.glb",
+    "bounds_blender": [
+      [
+        -4.07,
+        -3.5,
+        -0.17
+      ],
+      [
+        4.0,
+        3.57,
+        3.3
+      ]
+    ],
+    "bytes": 583852
   }
 }

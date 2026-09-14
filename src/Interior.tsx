@@ -93,7 +93,7 @@ export function Interior({
 }: {
   place: Place;
   motion: boolean;
-  player: Pick<Person,'name'|'face'|'alive'>;
+  player: Pick<Person,'name'|'face'|'alive'|'home'>;
   people: Presence[];
   actions: Action[];
   render: (a: Action) => ReactElement;
@@ -121,6 +121,10 @@ export function Interior({
   comings?: Coming[];
 }) {
   const [picked, setPicked] = useState('');
+  const [privateRoom,setPrivateRoom]=useState(false);
+  const hasFlat=player.home===place.id&&(place.id==='apartment'||place.id==='mercercourt');
+  const inFlat=privateRoom&&hasFlat;
+  useEffect(()=>{setPrivateRoom(false);},[place.id,player.home]);
   // The sidebar's action search came in here with the work. A room with
   // twenty-six things in it needs a way to find one by name.
   const [query, setQuery] = useState('');
@@ -247,6 +251,7 @@ export function Interior({
             </i>
           ))}
         </div>
+        {hasFlat&&<button className="plain private-room-toggle" aria-pressed={inFlat} onClick={()=>{setPrivateRoom(!inFlat);setPicked('');}}>{inFlat?'Return to entrance hall':'Go to your apartment'}</button>}
         {place.note && <small className={place.note_warn ? 'warning' : ''}>{place.note}</small>}
       </div>
       {place.rent_register && <details className="lodging-register">
@@ -267,7 +272,7 @@ export function Interior({
           ))}
         </div>
       )}
-      {place.id === 'bar' || place.id === 'mercercourt' || place.id === 'room' || place.id === 'laundry' || place.id === 'estate' || place.id === 'apartment' ? <Interior3D key={place.id} place={place.id} operation={place} player={player} motion={motion} people={onFloor} picked={picked} onPick={id=>setPicked(id===picked?'':id)} minute={minute}/> : <div
+      {inFlat?<Interior3D key={`${place.id}-private`} place="flat" player={player} motion={motion} people={[]} picked="" onPick={()=>{}} minute={minute}/>:place.id === 'bar' || place.id === 'mercercourt' || place.id === 'room' || place.id === 'laundry' || place.id === 'estate' || place.id === 'apartment' ? <Interior3D key={place.id} place={place.id} operation={place} player={player} motion={motion} people={onFloor} picked={picked} onPick={id=>setPicked(id===picked?'':id)} minute={minute}/> : <div
         className={'room' + (painted ? ' painted' : '')}
         style={painted ? {backgroundImage: `url(${paintedRoom(place.id)})`} : undefined}
       >
@@ -337,7 +342,7 @@ export function Interior({
               (p.overdue || p.sore ? ' sour' : '')
             }
             aria-pressed={p.id === picked}
-            onClick={() => setPicked(p.id === picked ? '' : p.id)}
+            onClick={() => {setPrivateRoom(false);setPicked(p.id === picked ? '' : p.id);}}
           >
             <Portrait id={p.id} face={p.face} size="tiny" />
             <span className="chip-name">
@@ -399,7 +404,7 @@ export function Interior({
           <>
             <div className="work-head">
               <p className="room-hint">
-                Pick somebody in the room to deal with them, or use the building itself.
+                {inFlat?'You are in your apartment. Select someone from the building list to return to the entrance hall.':'Pick somebody in the room to deal with them, or use the building itself.'}
               </p>
               <div className="work-search">
                 <input

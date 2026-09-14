@@ -95,8 +95,9 @@ export function ashburyPlacements(people:Presence[]) {
  return result;
 }
 
-export type InteriorPlace='bar'|'mercercourt'|'room'|'laundry'|'estate'|'apartment';
+export type InteriorPlace='bar'|'mercercourt'|'room'|'laundry'|'estate'|'apartment'|'flat';
 export function placementsForInterior(place:InteriorPlace,people:Presence[]){
+ if(place==='flat')return new Map<string,InteriorSpot>();
  return (place==='apartment'?ashburyPlacements:place==='estate'?cypressPlacements:place==='laundry'?laundryPlacements:place==='bar'?interiorPlacements:place==='room'?marinerLobbyPlacements:mercerLobbyPlacements)(people);
 }
 
@@ -118,6 +119,7 @@ export function poseInteriorOccupant(actor:THREE.Group,spot:InteriorSpot) {
 
 // Reserved clear floor positions; these never displace a public occupant.
 export function interiorPlayerSpot(place:InteriorPlace):InteriorSpot {
+ if(place==='flat')return {id:'player-entry',x:1,z:2.7,yaw:Math.PI};
  if(place==='apartment')return {id:'player-entry',x:1.6,z:4.15,yaw:Math.PI};
  if(place==='estate')return {id:'player-entry',x:1.6,z:3.3,yaw:Math.PI};
  if(place==='room'||place==='laundry')return {id:'player-entry',x:1.6,z:3.15,yaw:Math.PI};

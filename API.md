@@ -920,3 +920,11 @@ The daily population update and committed-command boundary now settle missing
 housing assignments before refreshing numbered flats. Later replacements and
 recruits therefore receive homes when capacity exists. Reads remain mutation-free;
 established residents keep their homes and assignment does not teleport them.
+
+At the player's current Ashbury or Mercer home, the interior offers a local
+private-apartment view and a return to the entrance hall. This presentation
+switch does not change authoritative location, time, tenancy or command state.
+Only the player appears in the private flat; public building occupants are not
+projected into it. Selecting someone in the building list returns to the hall.
+The control disappears when this is no longer the player's home. The shared
+furnished bedsit does not yet depict fitted upgrades or a bathroom interior.

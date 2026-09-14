@@ -1301,3 +1301,27 @@ Focused housing/household/apartment/broker/property/save checks pass (core2.805s
 store.170s, `.runtime/housing-progression-tests.log`). No main-save QA mutation.
 Broader visual fidelity, remaining interiors/indoor scenes, extra income activity
 and full campaign/balance acceptance remain outstanding.
+
+## September 14 — private apartment view
+
+Added a locally authored furnished bedsit, reached from the player's current
+Ashbury/Mercer home. The private scene contains the player only; the building
+list remains available, and selecting a person returns to the public hall.
+Changing home/place resets private-view state. The room has bed/linen/radio,
+living furniture, dining chairs/table and a detailed enamel kitchenette. It is
+currently a shared floor plan; differentiated unit layouts, fitted upgrades,
+bathroom interior and private-home action choreography remain outstanding.
+
+Browser inspection found the first return control under the absolute Back to
+city button; final spacing clears it at desktop and compact widths. Private
+caption removes person-picking advice and the action prompt explains returning
+to the hall. No command is sent to enter or leave this local view.
+
+Validation: build pass `.runtime/private-flat-build.log`; complete frontend suite
+354/354 pass `.runtime/private-flat-tests.log`. After dining chairs were added,
+final targeted GLB test passes `.runtime/private-flat-geometry-final.log`: both
+player rigs have a supported, unobstructed 41-sample entrance path; private
+staging rejects public occupants. Browser used existing isolated Ashbury fixture
+8939 (no main save), reviewed 1280×720 and820×740. Observed private cast exactly
+['player']; clicking Mara in building list returned to the Ashbury hall with
+Mara selected. Cash6000/time08:00 unchanged. Remaining broader scope is active.

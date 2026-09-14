@@ -70,3 +70,9 @@ September 14 Ashbury Court: `interior-ashbury.glb` is authored in
 `tools/export_city3d.py --only=interior-ashbury`. Locally built stone-floor hall,
 64 numbered brass mailboxes, reception/register, lift gate, staircase/landing,
 bench, sconces, tenant notices and plants. No external assets or textures.
+
+September 14 private dwelling: `interior-flat.glb` comes from
+`tools/private_flat.py`, exported through `tools/export_city3d.py
+--only=interior-flat`. Locally authored oak-floor bedsit with sleeping alcove,
+bed/linen/radio, sofa/coffee table, dining furniture, enamel kitchenette with
+sink/stove/refrigerator, shelves and crockery. No external assets or textures.
