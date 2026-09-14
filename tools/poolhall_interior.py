@@ -1,6 +1,7 @@
 """The Green Baize: six original billiard tables, Blender Z-up metres."""
 import math
 import bpy
+import bmesh
 
 
 def build(box,cylinder,material):
@@ -33,30 +34,55 @@ def build(box,cylinder,material):
         b('rear rail',(0,8.84,z),(16,.12,h),wood,.012,back);b('side rail',(-7.84,0,z),(.12,18,h),wood,.012,left)
     for x in [-3.7,3.7]:
         for row,y in enumerate([-4.25,0,4.25]):
-            for dx in [-.83,.83]:
-                for dy in [-1.03,1.03]:
-                    b('table turned foot',(x+dx,y+dy,.14),(.34,.34,.25),wood,.06)
-                    c('table leg',(x+dx,y+dy,.53),.14,.60,edge,vertices=16)
-                    c('leg brass collar',(x+dx,y+dy,.24),.16,.09,brass,vertices=16)
-            b('table apron',(x,y,.83),(2.42,2.94,.35),wood,.07)
-            b('table slate',(x,y,1.03),(2.50,3.04,.17),black,.035)
-            # Cut the cloth at every pocket so the mouth has real depth.
-            cloth=b('playing cloth',(x,y,1.122),(2.18,2.70,.028),felt)
-            for dx in [-1.09,1.09]:
-                for dy in [-1.35,0,1.35]:
-                    hole=c('pocket cutter',(x+dx,y+dy,1.13),.135,.30,black,vertices=24)
-                    bpy.context.view_layer.objects.active=cloth
-                    mod=cloth.modifiers.new('open pocket','BOOLEAN');mod.operation='DIFFERENCE';mod.object=hole
-                    bpy.ops.object.modifier_apply(modifier=mod.name);bpy.data.objects.remove(hole,do_unlink=True)
-                    c('pocket mouth',(x+dx,y+dy,1.097),.14,.018,black,vertices=24)
-                    c('leather pocket cup',(x+dx,y+dy,.95),.155,.24,leather,vertices=24)
-            for dx in [-1.19,1.19]:
-                for dy in [-.68,.68]:b('side cushion',(x+dx,y+dy,1.15),(.19,1.08,.14),edge,.025)
-            for dy in [-1.45,1.45]:b('end cushion',(x,y+dy,1.15),(1.91,.20,.14),edge,.025)
-            for dx in [-1.19,1.19]:
-                for dy in [-.97,-.39,.39,.97]:c('rail sight',(x+dx,y+dy,1.225),.019,.006,ivory,vertices=12)
+            width,length,radius,height=1.27,2.54,.028575,.78
+            for dx in [-.48,.48]:
+                for dy in [-.97,.97]:
+                    b('table turned foot',(x+dx,y+dy,.10),(.25,.25,.18),wood,.035)
+                    c('table leg',(x+dx,y+dy,.36),.10,.50,edge,vertices=16)
+                    c('leg brass collar',(x+dx,y+dy,.19),.115,.055,brass,vertices=16)
+            for dx in [-width/2-.10,width/2+.10]:
+                for dy in [-length/4,length/4]:
+                    b('split table apron',(x+dx,y+dy,height-.19),(.18,length/2-.18,.28),wood,.012)
+                    b('walnut side rail',(x+dx+( .02 if dx>0 else -.02),y+dy,height+.041),(.10,length/2-.19,.045),edge,.008)
+            for dy in [-length/2-.10,length/2+.10]:
+                b('table end apron',(x,y+dy,height-.19),(width-.18,.18,.28),wood,.012)
+                b('walnut end rail',(x,y+dy+(.02 if dy>0 else -.02),height+.041),(width-.17,.10,.045),edge,.008)
+            cloth=b('playing cloth',(x,y,height-.009),(width+.26,length+.26,.018),felt)
+            pockets=[(-width/2-.026,-length/2-.026),(-width/2-.026,length/2+.026),(width/2+.026,-length/2-.026),(width/2+.026,length/2+.026),(-width/2-.045,0),(width/2+.045,0)]
+            for dx,dy in pockets:
+                hole=c('pocket cutter',(x+dx,y+dy,height),.076,.35,black,vertices=32)
+                bpy.context.view_layer.objects.active=cloth
+                mod=cloth.modifiers.new('open pocket','BOOLEAN');mod.operation='DIFFERENCE';mod.object=hole
+                bpy.ops.object.modifier_apply(modifier=mod.name);bpy.data.objects.remove(hole,do_unlink=True)
+                # Open leather cup and recessed floor; no solid cylinder cap at cloth height.
+                verts=[(x+dx+math.cos(i*math.tau/32)*r,y+dy+math.sin(i*math.tau/32)*r,z) for r,z in [(.076,height),(.063,height-.15)] for i in range(32)]
+                faces=[(i,(i+1)%32,(i+1)%32+32,i+32) for i in range(32)]
+                faces.append(tuple(range(63,31,-1)))
+                mesh=bpy.data.meshes.new('leather pocket basket');mesh.from_pydata(verts,[],faces);mesh.materials.append(black)
+                cup=bpy.data.objects.new('leather pocket basket',mesh);bpy.context.collection.objects.link(cup)
+                bpy.ops.mesh.primitive_torus_add(major_segments=32,minor_segments=8,location=(x+dx,y+dy,height+.002),major_radius=.077,minor_radius=.006)
+                bpy.context.object.name='leather pocket lip';bpy.context.object.data.materials.append(leather)
+            rails=[(.085,0,width-.085,0),(.085,length,width-.085,length)]
+            for xx in [0,width]:
+                outside=-.045 if xx==0 else width+.045
+                rails.extend([(xx,.085,xx,length/2-.075),(xx,length/2+.075,xx,length-.085),(xx,length/2-.075,outside,length/2-.065),(xx,length/2+.075,outside,length/2+.065)])
+            for xx in [0,width]:
+                for yy in [0,length]:
+                    sx=1 if xx==0 else -1;sy=1 if yy==0 else -1
+                    rails.extend([(xx+sx*.085,yy,xx+sx*.049,yy-sy*.035),(xx,yy+sy*.085,xx-sx*.035,yy+sy*.049)])
+            for ax,ay,bx,by in rails:
+                distance=math.hypot(bx-ax,by-ay);nx,ny=-(by-ay)/distance,(bx-ax)/distance
+                if nx*(width/2-(ax+bx)/2)+ny*(length/2-(ay+by)/2)>0:nx,ny=-nx,-ny
+                profile=[(0,radius),(.012,.052),(.059,.052),(.065,0),(.024,0)]
+                verts=[(x+xx+nx*out-width/2,y+yy+ny*out-length/2,height+z) for xx,yy in [(ax,ay),(bx,by)] for out,z in profile]
+                faces=[(0,4,3,2,1),(5,6,7,8,9)]+[(i,(i+1)%5,(i+1)%5+5,i+5) for i in range(5)]
+                mesh=bpy.data.meshes.new('physical cushion profile');mesh.from_pydata(verts,[],faces);mesh.materials.append(felt)
+                ob=bpy.data.objects.new('physical cushion profile',mesh);bpy.context.collection.objects.link(ob)
+                bm=bmesh.new();bm.from_mesh(mesh);bmesh.ops.recalc_face_normals(bm,faces=list(bm.faces));bm.to_mesh(mesh);bm.free()
+            for dx in [-width/2-.12,width/2+.12]:
+                for i in [1,2,3,5,6,7]:c('rail sight',(x+dx,y-length/2+length*i/8,height+.065),.008,.003,ivory,vertices=4)
             for i,(dx,dy) in enumerate([(-.48,-.68),(.39,.82),(.16,-.33),(-.18,.60),(.57,.19)]):
-                bpy.ops.mesh.primitive_uv_sphere_add(segments=16,ring_count=8,radius=.053,location=(x+dx,y+dy,1.188))
+                bpy.ops.mesh.primitive_uv_sphere_add(segments=16,ring_count=8,radius=radius,location=(x+dx,y+dy,height+radius))
                 ob=bpy.context.object;ob.name='billiard ball';ob.data.materials.append(colors[(i+row)%len(colors)])
                 for poly in ob.data.polygons:poly.use_smooth=True
             # Individual green-shaded table lights leave the centre aisle open.

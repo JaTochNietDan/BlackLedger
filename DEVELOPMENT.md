@@ -2116,3 +2116,18 @@ the existing bundle warning. CUA55 inspected the table at isolated8964 with no
 command or save change (revision13/minute618). Main campaign untouched. The hall
 props still require matching dimensions, and corner/pocket detail, character
 choreography, tournaments and full-fidelity acceptance remain open.
+
+### 2026-09-14 — hall tables matched to the playable minigame
+
+Re-authored all six Blender table props to use the solver's1.27×2.54m cloth,
+0.78m playing height and28.575mm ball radius. Added matching cushion/jaw profiles,
+raised wood rails/sights, split aprons, open cups and pocket lips; resized legs.
+Existing room positions, lights and NPC staging remain usable.
+
+Targeted geometry/clearance test passes (3.684s):36 open pockets, six cloth/ball
+probes,24 cushion-dimension rays, both rigs and sampled entrance paths. Final
+build/typecheck passes with existing bundle warning. CUA56 on fresh isolated8965
+inspected standard and enlarged close views without a gameplay command. Main
+campaign untouched. Model4.96MB/83,312 mesh triangles versus3.43MB/61,584 previously;
+these are asset totals, not verified runtime performance. Multiple active matches,
+tournaments, character play animation and broader interior fidelity remain open.

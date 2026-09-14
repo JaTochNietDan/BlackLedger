@@ -329,3 +329,27 @@ This improves the playable table, not the hall's six existing props. Those still
 need matching dimensions/finish. Pocket baskets, joined corner detailing, player
 bodies/hands, scene surroundings and complete visual acceptance remain unfinished;
 the solver's previously documented physical limitations are also unchanged.
+
+## Six hall tables brought to physical scale — 2026-09-14
+
+Regenerated the original Blender hall tables with1.27×2.54m cloth dimensions,
+0.78m playing height and0.028575m ball radius. Previously they used2.18×2.70m
+cloth,1.136m height and0.053m ball radius. Each table now has the same18 cushion
+segments/profiles as the playable view, raised walnut rails/sights, split aprons,
+open leather cups and recessed pocket bottoms. Feet and legs fit the lower table.
+The six tables retain their room positions and existing spectator/staff staging.
+Their five decorative balls are scenery, not concurrent simulated matches.
+
+The targeted hall geometry/clearance test passes (3.684s), including all36 pocket
+openings, cloth height and a ball-size probe on each table,24 cushion-dimension
+ray checks, both rigs' standing/seated positions and sampled entrance paths.
+Final production build/typecheck passes with the existing bundle warning. CUA56
+at isolated8965 inspected standard and enlarged/zoomed views with real fixture
+occupants. No game command was sent. Fixture `.runtime/poolhall-scale-qa.sqlite3`;
+main campaign unchanged. Export/test/build logs use `.runtime/poolhall-dimensions-*`.
+
+The asset grew from3,425,888 to4,961,068 bytes and61,584 to83,312 mesh triangles.
+These are GLB geometry totals, not draw-call/FPS measurements; fresh runtime
+performance acceptance remains needed. Joined corner/leather detail, character
+play/choreography, multiple live tables, tournament play and broader interior
+acceptance remain open.

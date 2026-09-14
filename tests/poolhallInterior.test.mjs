@@ -11,12 +11,20 @@ test('Six-table billiard hall keeps staff, spectators and entrance clear for bot
  const room=await load('interior-poolhall');room.updateMatrixWorld(true);
  assert.ok(room.getObjectByName('interior-wall-left'));assert.ok(room.getObjectByName('interior-wall-back'));
  for(const x of [-3.7,3.7])for(const z of [-4.25,0,4.25]){
-  const top=new THREE.Raycaster(new THREE.Vector3(x,1.30,z),new THREE.Vector3(0,-1,0),0,.5).intersectObject(room,true)[0];
-  assert.ok(top&&Math.abs(top.point.y-1.136)<.003,`table ${x},${z}: missing cloth`);
-  for(const dx of [-1.09,1.09])for(const dz of [-1.35,0,1.35]){
-   const pocket=new THREE.Raycaster(new THREE.Vector3(x+dx,1.30,z+dz),new THREE.Vector3(0,-1,0),0,.5).intersectObject(room,true)[0];
-   assert.ok(pocket&&pocket.point.y<1.12,`table ${x},${z}: pocket is painted over`);
+  const top=new THREE.Raycaster(new THREE.Vector3(x,.95,z),new THREE.Vector3(0,-1,0),0,.5).intersectObject(room,true)[0];
+  assert.ok(top&&Math.abs(top.point.y-.78)<.003,`table ${x},${z}: missing cloth`);
+  for(const [dx,dz] of [[-.661,-1.296],[-.661,1.296],[.661,-1.296],[.661,1.296],[-.680,0],[.680,0]]){
+   const pocket=new THREE.Raycaster(new THREE.Vector3(x+dx,.95,z+dz),new THREE.Vector3(0,-1,0),0,.5).intersectObject(room,true)[0];
+   assert.ok(pocket&&pocket.point.y<.66,`table ${x},${z}: pocket is painted over`);
   }
+  for(const sign of [-1,1]){
+   const end=new THREE.Raycaster(new THREE.Vector3(x,.78+.028575,z),new THREE.Vector3(0,0,sign),0,1.4).intersectObject(room,true)[0];
+   assert.ok(end&&Math.abs(end.distance-1.27)<.002,`table ${x},${z}: end nose differs from physics`);
+   const side=new THREE.Raycaster(new THREE.Vector3(x,.78+.028575,z+.9),new THREE.Vector3(sign,0,0),0,.8).intersectObject(room,true)[0];
+   assert.ok(side&&Math.abs(side.distance-.635)<.002,`table ${x},${z}: side nose differs from physics`);
+  }
+  const ball=new THREE.Raycaster(new THREE.Vector3(x-.48,.95,z+.68),new THREE.Vector3(0,-1,0),0,.3).intersectObject(room,true)[0];
+  assert.ok(ball&&Math.abs(ball.point.y-(.78+2*.028575))<.001,`table ${x},${z}: ball scale differs from physics`);
  }
 
  const people=[{id:'a-worker',role:'Marker'},{id:'b-worker',role:'Table hand'},...Array.from({length:16},(_,i)=>({id:`visitor-${i}`}))];
