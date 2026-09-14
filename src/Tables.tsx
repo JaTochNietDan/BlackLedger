@@ -1,7 +1,7 @@
+import {SlotCabinet} from './SlotCabinet';
 import {useEffect, useRef, useState} from 'react';
 import type {CSSProperties} from 'react';
 import {playTable} from './sound';
-import {reelArt} from './reels';
 import {
   Card,
   pipOf,
@@ -16,8 +16,6 @@ import {
   wheelPaint,
   reelWindow,
   drumFaces,
-  drumRun,
-  drumRunIDs,
 } from './cards';
 
 // The tables, drawn as tables. Blackjack was two numbers in a sentence and
@@ -546,7 +544,8 @@ export function Machine({
   // one still has to go: TurnsADrum stops back at the moment the handle drops,
   // nought when it has landed.
 
-  const seen = useRef(-1);
+  // A saved result is already settled when the machine is first opened.
+  const seen = useRef(turn);
   useEffect(() => {
     if (!machine.pulled || turn === seen.current) return;
     seen.current = turn;
@@ -588,96 +587,13 @@ export function Machine({
         <b>keeps {machine.edge} in every 100</b>
       </div>
 
-      {/* The case. A bandit is a cabinet with a window, a line across the
-          middle of it, a handle down the side and a tray at the bottom that
-          the money falls into — not three letters in three boxes. */}
-      <div className="bandit">
-        <div className="bandit-case">
-          <div className="bandit-crown">
-            <span>{machine.stops} STOPS A DRUM</span>
-          </div>
-          <div className="bandit-window">
-            {/* The payline, across the middle of all three drums. */}
-            <span className="payline" aria-hidden="true" />
-            {[0, 1, 2].map(i => {
-              // The three it lands on, and behind them the run it travels
-              // past. The landing faces are the core's own and are decided
-              // before anything moves, so the drum arrives at the answer
-              // rather than snapping to it.
-              const faces = drumRun(strip, windows[i], i, TurnsADrum);
-              const ids = drumRunIDs(strip, windows[i], i, TurnsADrum);
-              return (
-                <div key={i} className={'drum' + (rolling[i] ? ' rolling' : '')}>
-                  <div
-                    className="drum-strip"
-                    style={
-                      {
-                        // How far back the column starts, and how long it takes
-                        // to arrive. A keyframe rather than a transition,
-                        // because a transition has to be told where the column
-                        // is before it is told it may move — and told in an
-                        // earlier frame, or it animates the wrong move and the
-                        // drum creeps a few pixels and stops.
-                        '--run': `${TurnsADrum * DrumStop}px`,
-                        animationDuration: `${700 + i * 450}ms`,
-                      } as CSSProperties
-                    }
-                  >
-                    {faces.map((face, at) => {
-                      const art = reelArt(ids[at]);
-                      return (
-                        <span
-                          key={at}
-                          className={
-                            'stop' + (at === 1 ? ' on-line' : '') + (art ? ' painted' : '')
-                          }
-                          aria-label={at < 3 ? face : undefined}
-                          aria-hidden={at >= 3 ? true : undefined}
-                        >
-                          {art ? (
-                            <svg
-                              viewBox="0 0 50 50"
-                              aria-hidden="true"
-                              dangerouslySetInnerHTML={{__html: art}}
-                            />
-                          ) : (
-                            face
-                          )}
-                        </span>
-                      );
-                    })}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-          {/* The handle is the handle. Drawing one beside a row of buttons and
-              expecting somebody to press the buttons is a picture of a machine,
-              not a machine. */}
-          <button
-            className="bandit-handle"
-            disabled={rolling.some(Boolean) || !!refused}
-            onClick={() => pull(amount)}
-            aria-label={`Pull the handle for ${money(amount)}`}
-            title={refused || `Pull the handle — ${money(amount)}`}
-          >
-            <i />
-          </button>
-          {/* The tray. What comes back lands in it. */}
-          <div className={'coin-tray' + (settled && machine.won ? ' paid' : '')}>
-            {settled && machine.won ? (
-              <b>{money((machine.stake ?? 0) * (machine.pays ?? 0))}</b>
-            ) : (
-              <small>NOTHING IN THE TRAY</small>
-            )}
-          </div>
-        </div>
-      </div>
+      <SlotCabinet strip={strip} line={line} pulled={!!machine.pulled} rolling={rolling} turn={turn}
+        paid={settled&&machine.won?(machine.stake??0)*(machine.pays??0):0} disabled={rolling.some(Boolean)||!!refused} onPull={()=>pull(amount)}/>
 
       {settled && (
         <p className={'felt-result' + (machine.won ? ' won' : '')}>
           {machine.won
-            ? `${windows.map(w => w[1]).join(' · ')} — pays ${machine.pays} to 1`
+            ? `${windows.map(w => w[1]).join(' · ')} — ${money((machine.stake??0)*(machine.pays??0))} paid (${machine.pays} to 1)`
             : `${windows.map(w => w[1]).join(' · ')} — nothing. The machine keeps it.`}
         </p>
       )}
@@ -928,8 +844,6 @@ export function Craps({
 // the screen. The height has to match the stylesheet: the column is moved by
 // whole stops, so a drum that travels 31 pixels a stop comes to rest between
 // two symbols.
-const TurnsADrum = 14;
-const DrumStop = 32;
 
 export interface CardsState {
   place: string;

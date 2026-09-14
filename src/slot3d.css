@@ -1,0 +1,3 @@
+.slot3d{position:relative;width:100%;height:clamp(340px,48vh,500px);background:#173128;overflow:hidden;border-block:3px double #ad8c50}
+.slot3d>div{width:100%;height:100%}.slot3d canvas{display:block;width:100%;height:100%;cursor:pointer}
+.slot3d>p{position:absolute;bottom:12px;left:16px;right:16px;background:#173128e8;color:#efdfb9;padding:10px;font:14px/1.5 Georgia,serif}

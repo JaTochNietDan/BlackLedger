@@ -742,5 +742,21 @@
       ]
     ],
     "bytes": 6331432
+  },
+  "slot-cabinet": {
+    "file": "slot-cabinet.glb",
+    "bounds_blender": [
+      [
+        -0.51,
+        -0.6175,
+        0.0
+      ],
+      [
+        0.7,
+        0.39,
+        1.7
+      ]
+    ],
+    "bytes": 502628
   }
 }

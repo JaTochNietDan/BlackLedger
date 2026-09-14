@@ -796,7 +796,7 @@ def export(name):
     # Join by material except animated limbs: a building becomes ~6 draws.
     groups={}
     for ob in list(bpy.context.scene.objects):
-        if ob.type=='MESH' and (ob.parent is None or ob.parent.name.startswith(('wheel-roll-','interior-wall-','entrance-door-','window-','pump-','car-door-','laundry-drum-'))) and not ob.name.startswith(('leg','arm','shoe','clock-hand')):
+        if ob.type=='MESH' and (ob.parent is None or ob.parent.name.startswith(('wheel-roll-','interior-wall-','entrance-door-','window-','pump-','car-door-','laundry-drum-','slot-coins'))) and not ob.name.startswith(('leg','arm','shoe','clock-hand')):
             key=(ob.parent.name if ob.parent else '',ob.data.materials[0].name)
             groups.setdefault(key,[]).append(ob)
     for obs in groups.values():
@@ -1593,6 +1593,70 @@ def bar_cloth():
     for i in range(4):box('soft linen fold',(-.05+i*.035,0,.011),(.017,.14,.002),linen,.001)
 
 
+def slot_cabinet():
+    """1950s electromechanical cabinet; curved reel paper receives public symbols."""
+    red=material('slot oxblood enamel',(.25,.035,.025),.22)
+    cream=material('slot ivory enamel',(.72,.65,.47),.18)
+    brass=material('slot satin brass',(.55,.35,.10),.8)
+    chrome=material('slot polished steel',(.55,.59,.56),.9)
+    dark=material('slot black bakelite',(.018,.023,.018),.15)
+    glass=material('slot opal crown',(.80,.64,.31),0,.3)
+    box('cabinet foot',(0,0,.07),(1.02,.72,.14),dark,.04)
+    box('cabinet body',(0,.08,.84),(.95,.62,1.50),red,.10)
+    box('lower face',(0,-.28,.49),(.91,.12,.66),cream,.07)
+    box('crown face',(0,-.25,1.39),(.91,.15,.35),cream,.09)
+    box('top crown',(0,.01,1.62),(.80,.58,.16),red,.08)
+    box('crown name plaque',(0,-.338,1.43),(.73,.023,.17),glass,.025)
+    def label(name,text,xyz,size,mat=dark):
+        curve=bpy.data.curves.new(name,'FONT');curve.body=text;curve.size=size;curve.align_x='CENTER';curve.extrude=.0005
+        ob=bpy.data.objects.new(name,curve);bpy.context.collection.objects.link(ob);ob.location=xyz;ob.rotation_euler=(math.pi/2,0,0);ob.data.materials.append(mat)
+        bpy.ops.object.select_all(action='DESELECT');ob.select_set(True);bpy.context.view_layer.objects.active=ob;bpy.ops.object.convert(target='MESH');ob.select_set(False)
+    label('machine title','LUCKY BELL',(0,-.355,1.40),.075)
+    label('payout label','PAY OUT',(0,-.350,.69),.035)
+    label('coin label','INSERT COIN',(.17,-.356,.49),.026)
+    for x in (-.455,.455):box('front bright trim',(x,-.35,.96),(.035,.035,1.14),chrome,.014)
+    # Curved paper strips, each its own material so the browser can print the
+    # backend's strip and animate its travel without inventing a symbol.
+    for i,x in enumerate((-.28,0,.28)):
+        paper=material(f'slot-reel-{i}',(.90,.87,.72))
+        verts=[];faces=[];steps=24
+        for row in range(steps+1):
+            a=-.65+row/steps*1.30
+            for side in (-1,1):verts.append((x+side*.115,-.29-.14*math.cos(a),1.055+.28*math.sin(a)))
+        for row in range(steps):faces.append((row*2,row*2+1,row*2+3,row*2+2))
+        mesh=bpy.data.meshes.new(f'reel paper {i}');mesh.from_pydata(verts,[],faces);mesh.materials.append(paper)
+        uv=mesh.uv_layers.new(name='Reel print')
+        for poly in mesh.polygons:
+            for index in poly.loop_indices:
+                v=mesh.loops[index].vertex_index;uv.data[index].uv=(v%2,v//2/steps)
+        ob=bpy.data.objects.new(f'reel-paper-{i}',mesh);bpy.context.collection.objects.link(ob)
+        for poly in mesh.polygons:poly.use_smooth=True
+        for edge in (-1,1):box('window side trim',(x+edge*.128,-.40,1.055),(.025,.055,.37),brass,.008)
+    for z in (.875,1.235):box('window rail',(0,-.415,z),(.87,.055,.04),chrome,.012)
+    for x in (-.445,.445):
+        ob=box('payline arrow',(x,-.442,1.055),(.065,.008,.018),red,.004)
+    # Recessed tray has a floor and raised rim, rather than a solid rectangle.
+    box('tray dark recess',(-.1,-.351,.31),(.67,.035,.24),dark,.025)
+    box('tray bottom',(-.1,-.46,.21),(.70,.27,.035),chrome,.016)
+    for x in (-.455,.255):box('tray side',(x,-.46,.255),(.03,.27,.11),chrome,.012)
+    box('tray lip',(-.1,-.60,.255),(.72,.035,.10),chrome,.013)
+    box('coin surround',(.23,-.35,.56),(.16,.025,.09),chrome,.01)
+    box('coin slot',(.23,-.369,.56),(.09,.008,.018),dark,.005)
+    for x in (-.4,.4):
+        for z in (.40,1.32):cylinder('face screw',(x,-.37,z),.012,.008,chrome,(math.pi/2,0,0),12)
+    coins=bpy.data.objects.new('slot-coins',None);bpy.context.collection.objects.link(coins)
+    for i in range(9):
+        coin=cylinder('payout coin',(-.31+(i%3)*.17,-.53+(i//3)*.073,.239+(i%2)*.006),.038,.009,brass,vertices=32);coin.parent=coins
+    # A proper pivot is retained for the handle's pull animation.
+    lever=bpy.data.objects.new('slot-lever',None);bpy.context.collection.objects.link(lever);lever.location=(.56,.05,1.0)
+    cylinder('lever axle',(.53,.05,1.0),.075,.18,chrome,(0,math.pi/2,0),32)
+    parts=[beam('lever stem',(.63,.05,1.0),(.63,.05,1.47),.025,chrome),cylinder('lever hub',(.63,.05,1.0),.055,.06,brass,(0,math.pi/2,0),24)]
+    bpy.ops.mesh.primitive_uv_sphere_add(segments=24,ring_count=12,radius=.07,location=(.63,.05,1.48));knob=bpy.context.object;knob.name='lever knob';knob.data.materials.append(dark);parts.append(knob)
+    bpy.context.view_layer.update()
+    for ob in parts:
+        world=ob.matrix_world.copy();ob.parent=lever;ob.matrix_world=world
+
+
 def laundry_interior():
     """Bluebird's working floor: belt-era drum washers, sorting and collection."""
     cream=material('Bluebird ivory enamel',(.66,.65,.54),.18)
@@ -1936,6 +2000,14 @@ def mercer_court():
                 box('tenant letter box',(x,6.28,.98+row*.19),(.20,.08,.16),brass,.009)
                 box('letter slot',(x,6.325,1.02+row*.19),(.13,.01,.014),iron)
 
+if __name__ == '__main__' and '--only=slot-cabinet' in __import__('sys').argv:
+    clear();slot_cabinet()
+    manifest_path=os.path.join(OUT,'manifest.json')
+    with open(manifest_path) as f: selected_manifest=json.load(f)
+    selected_manifest['slot-cabinet']=export('slot-cabinet')
+    with open(manifest_path,'w') as f:json.dump(selected_manifest,f,indent=2)
+    raise SystemExit(0)
+
 if __name__ == '__main__' and '--only=interior-laundry' in __import__('sys').argv:
     clear();laundry_interior()
     manifest_path=os.path.join(OUT,'manifest.json')
@@ -2018,6 +2090,7 @@ for name in ('shotgun','thompson'):
 clear();blast_fragment();manifest['blast-fragment']=export('blast-fragment')
 clear();bar_cloth();manifest['bar-cloth']=export('bar-cloth')
 clear();mariner();manifest['mariner']=export('mariner')
+clear();slot_cabinet();manifest['slot-cabinet']=export('slot-cabinet')
 clear();laundry_interior();manifest['interior-laundry']=export('interior-laundry')
 clear();mariner_lobby();manifest['interior-mariner']=export('interior-mariner')
 clear();mercer_court();manifest['mercer-court']=export('mercer-court')
