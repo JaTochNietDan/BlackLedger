@@ -13281,3 +13281,16 @@ is a setting for that work; its ball layouts are currently static scenery and
 are not a billiards simulation. Physics, eight-ball rules, aiming/shot UX,
 opponent play and tournament accounting are the next required work. Live port
 8791 still serves release 16c1c95 pending a verified promotion.
+
+
+## Billiards physics foundation — 2026-09-14
+
+Added the independent Go `billiards` solver: continuous collision detection,
+sliding/rolling/spin friction, spin-sensitive impacts, six pocket geometries,
+numbered rack, bounded cue input and impact-preserving quaternion replay. All
+15 physics tests pass, including 36 complete rack stress cases; measured full
+break cost is 61.90 ms on this machine. See `docs/BILLIARDS.md` for the numerical
+evidence, references and explicit limitations. The engine is not yet connected
+to campaign commands or a playable billiards view. Match rules, real funded
+wagers, opponent shots and tournaments remain required, as do additional
+physics and visual fidelity work. No main-save or public API changes this turn.
