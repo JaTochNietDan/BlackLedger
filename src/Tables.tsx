@@ -220,6 +220,8 @@ const BALL_TRACK = -80;
 
 export function Wheel({
   wheel,
+  motion = true,
+  onPresent,
   money,
   spin,
   amount,
@@ -231,6 +233,8 @@ export function Wheel({
   turn = 0,
 }: {
   wheel: WheelState;
+  motion?: boolean;
+  onPresent?: (active: boolean) => void;
   money: (n: number) => string;
   spin: (chips: {bet: string; amount: number}[]) => void;
   // What is going on the cloth, and what the room will take. The player names
@@ -266,60 +270,61 @@ export function Wheel({
   // what the core told it, which is what the board of numbers over a real wheel
   // is: a record, not a prediction.
   const [run, setRun] = useState<number[]>([]);
-  const seen = useRef(-1);
-
+  const seen = useRef(turn);
+  const recorded = useRef(-1);
+  const [reduced, setReduced] = useState(() => matchMedia('(prefers-reduced-motion: reduce)').matches);
   useEffect(() => {
-    if (!wheel.spun || turn === seen.current) return;
+    const preference = matchMedia('(prefers-reduced-motion: reduce)');
+    const changed = () => setReduced(preference.matches);
+    preference.addEventListener('change', changed);
+    changed();
+    return () => preference.removeEventListener('change', changed);
+  }, []);
+  const animate = motion && !reduced;
+
+  useLayoutEffect(() => {
+    if (!wheel.spun) {setFalling(false); onPresent?.(false); return;}
+    const fresh = turn !== seen.current;
     seen.current = turn;
     const pocket = wheel.pocket ?? 0;
-    const quiet = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const moving = fresh && animate;
     const was = at.current;
     const now = {
-      ball: ballAngle(was.ball, pocket, quiet ? 0 : TURNS),
-      head: quiet ? was.head : was.head - HEAD_TURNS * 360,
+      ball: ballAngle(was.ball, pocket, moving ? TURNS : 0),
+      head: moving ? was.head - HEAD_TURNS * 360 : was.head,
     };
     at.current = now;
-    setRun(r => [pocket, ...r].slice(0, 14));
-    // Where it ends up is written on the element, and the animation only covers
-    // the journey there. That order matters: a browser that is not animating —
-    // reduced motion, a tab nothing is drawing — shows the ball in the pocket
-    // the core spun rather than frozen wherever the flight began.
-    // Where it ends up is written on the element, and the animation only covers
-    // the journey there. That order matters: a browser that is not animating —
-    // reduced motion, or a tab whose clock is frozen because nothing is being
-    // drawn — shows the ball in the pocket the core spun instead of holding the
-    // first frame of a flight that never finishes.
-    const ease = 'cubic-bezier(.12,.58,.16,1)';
-    const flights: Animation[] = [];
-    const fly = (el: HTMLElement, from: string, to: string) => {
-      el.style.transform = to;
-      if (!quiet) {
-        flights.push(
-          el.animate([{transform: from}, {transform: to}], {duration: FALL, easing: ease}),
-        );
-      }
+    const record = () => {
+      if (recorded.current === turn) return;
+      recorded.current = turn;
+      setRun(r => [pocket, ...r].slice(0, 14));
     };
-    if (ball.current) {
-      fly(
-        ball.current,
-        `rotate(${was.ball}deg) translateY(${BALL_TRACK}px)`,
-        `rotate(${now.ball}deg) translateY(${BALL_TRACK}px)`,
-      );
-    }
-    if (head.current) {
-      fly(head.current, `rotate(${was.head}deg)`, `rotate(${now.head}deg)`);
-    }
-    if (quiet) return;
-    setFalling(true);
-    // And the flight is cancelled when its time is up, which uncovers the
-    // resting place underneath it. A timer runs even when a timeline does not,
-    // so this is what makes a frozen tab still show the right answer.
+    const flights: Animation[] = [];
+    const fly = (el: HTMLElement | null, from: string, to: string) => {
+      if (!el) return;
+      el.style.transform = to;
+      if (moving) flights.push(el.animate([{transform: from}, {transform: to}], {
+        duration: FALL, easing: 'cubic-bezier(.12,.58,.16,1)',
+      }));
+    };
+    fly(ball.current, `rotate(${was.ball}deg) translateY(${BALL_TRACK}px)`,
+      `rotate(${now.ball}deg) translateY(${BALL_TRACK}px)`);
+    fly(head.current, `rotate(${was.head}deg)`, `rotate(${now.head}deg)`);
+    setFalling(moving);
+    onPresent?.(moving);
+    if (!moving) {record(); return;}
     const done = setTimeout(() => {
-      setFalling(false);
       flights.forEach(f => f.cancel());
+      record();
+      setFalling(false);
+      onPresent?.(false);
     }, FALL);
-    return () => clearTimeout(done);
-  }, [turn, wheel.spun, wheel.pocket]);
+    return () => {
+      clearTimeout(done);
+      flights.forEach(f => f.cancel());
+      onPresent?.(false);
+    };
+  }, [turn, wheel.spun, wheel.pocket, animate, onPresent]);
 
   // While it is in the air the room does not know either. The number is the
   // core's from the moment it was spun; this only holds it back until the ball

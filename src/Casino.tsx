@@ -301,6 +301,8 @@ export function Casino({
             ) : (
               <Wheel
                 wheel={wheel}
+                motion={motion}
+                onPresent={setPresenting}
                 money={money}
                 turn={revision}
                 cash={cash}
