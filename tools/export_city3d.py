@@ -972,9 +972,24 @@ def industrial(kind):
         return
     anchor.location=(-3,-3.6,4.25)
     # Dock and haulage yard: cargo shed plus a lattice derrick, fully inside lot.
-    box('cargo shed',(-3,1.5,2.6),(7,10,5.2),wall)
+    for x in (-5.25,-.75):box('cargo shed wing',(x,1.5,2.6),(2.5,10,5.2),wall)
+    box('cargo passage lintel',(-3,1.5,3.9),(2,10,2.6),wall)
+    box('cargo passage rear',(-3,3,1.3),(2,7,2.6),wall)
+    box('cargo passage paving',(-3,-2,-.04),(2,3,.08),stone)
     corrugated_roof('cargo corrugated roof',(-3,1.5,5.35),7.4,10.4,roof)
-    box('loading gate',(-3,-3.58,1.9),(4.5,.16,3.7),iron)
+    # Pedestrian wicket within the large steel loading gate.
+    for x in (-4.625,-1.375):box('loading gate side',(x,-3.58,1.9),(1.25,.16,3.7),iron)
+    box('loading gate header',(-3,-3.58,3.175),(2,.16,1.15),iron)
+    hinge=bpy.data.objects.new('entrance-door-hinge',None)
+    bpy.context.collection.objects.link(hinge);hinge.location=(-2.125,-3.58,0)
+    def doorpart(name,xyz,dims,mat):
+        ob=box(name,xyz,dims,mat,.01);ob.parent=hinge;ob.location-=hinge.location
+    doorpart('loading wicket',(-3,-3.58,1.25),(1.75,.12,2.5),iron)
+    for z in (.2,1.25,2.3):doorpart('wicket steel brace',(-3,-3.67,z),(1.6,.06,.10),roof)
+    doorpart('wicket pull',(-3.6,-3.72,1.15),(.04,.08,.3),cream)
+    for x in (-3.96,-2.04):box('wicket jamb',(x,-3.58,1.3),(.08,.23,2.6),roof)
+    entry=bpy.data.objects.new('entrance-threshold',None)
+    bpy.context.collection.objects.link(entry);entry.location=(-3,-3.58,0)
     for i,x in enumerate((-5,-3,-1)):
         box('cargo clerestory frame',(x,-3.57,4.35),(1.65,.16,.72),cream)
         box('cargo clerestory glazing',(x,-3.68,4.35),(1.43,.08,.52),glass)
