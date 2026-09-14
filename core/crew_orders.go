@@ -5,6 +5,7 @@ import "fmt"
 // CrewOrder is a saved assignment. Its clock and actor belong to the simulation.
 // Targets and return addresses are captured at acceptance, never inferred by UI.
 type CrewOrder struct {
+	Estate   string `json:"estate,omitempty"`
 	Loot     int    `json:"loot"`
 	ID       string `json:"id"`
 	Life     int    `json:"life"`
@@ -186,6 +187,24 @@ func (w *World) RecallCrewOrder(id string) error {
 	return fmt.Errorf("That assignment is no longer active")
 }
 func (w *World) refundCrewOrder(o *CrewOrder) {
+	if o.Estate != "" {
+		// These funds belong to the successor organization, never a new protagonist.
+		// Cash carried by a dead or captured operative is lost with them.
+		n := w.NPC(o.Actor)
+		if n != nil && !n.Dead && !w.Inside(n) {
+			if f := w.faction(o.Estate); f != nil && n.Faction == f.ID {
+				f.Cash += o.Reserved + o.Loot
+			} else {
+				n.Purse += o.Reserved + o.Loot
+			}
+		}
+		if o.Charges > 0 {
+			o.Result += "; unused demolition charges removed from circulation after succession"
+		}
+		o.Reserved, o.Loot, o.Charges = 0, 0, 0
+		return
+	}
+
 	if o.Loot > 0 {
 		n := w.NPC(o.Actor)
 		if n != nil && !n.Dead && !w.Inside(n) {
@@ -227,7 +246,12 @@ func (w *World) SettleCrewOrders() {
 		}
 		n := w.NPC(o.Actor)
 		_, hired := w.NamedHands(o.Actor)
-		if n == nil || n.Dead || w.Inside(n) || !hired || o.Life != w.Life || !w.Player.Alive {
+		issuerAvailable := o.Life == w.Life && w.Player.Alive
+		if o.Estate != "" {
+			hired = n != nil && n.Faction == o.Estate
+			issuerAvailable = w.faction(o.Estate) != nil
+		}
+		if n == nil || n.Dead || w.Inside(n) || !hired || !issuerAvailable {
 			w.refundCrewOrder(o)
 			o.Stage, o.Result = "cancelled", "Assignment ended: operative or issuing family unavailable"
 			if n != nil && (n.Dead || w.Inside(n)) && n.Errand == "on a headquarters assignment" {
@@ -470,4 +494,32 @@ func (w *World) crewBombTarget(id string) string {
 		return "The building is already destroyed"
 	}
 	return ""
+}
+
+// inheritCrewOrders winds down the former leader's commitments. The successor
+// retains custody of family money while operatives complete their return legs.
+func (w *World) inheritCrewOrders(estate string) {
+	for i := range w.CrewOrders {
+		o := &w.CrewOrders[i]
+		if o.Life != w.Life || !o.active() || o.Estate != "" {
+			continue
+		}
+		n := w.NPC(o.Actor)
+		// Personally hired associates do not become sworn family members on death.
+		if n == nil || n.Dead || n.Faction != estate {
+			continue
+		}
+		o.Estate = estate
+		if base := w.Headquarters(estate); base != "" {
+			o.Base = base
+		}
+		if o.Stage == "returning" {
+			continue
+		}
+		o.Recall = true
+		o.Result = "Recalled after the change of leadership"
+		if o.Stage == "working" {
+			w.returnCrewOrder(o, o.Result)
+		}
+	}
 }

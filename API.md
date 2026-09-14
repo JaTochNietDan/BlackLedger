@@ -1443,3 +1443,13 @@ the deed and remaining need. If another worker already fixed the problem, the
 operative returns the unused budget. Effects share personal-action helpers and
 do not debit the player again. Existing rented-home personal repair permissions
 are unchanged; remote orders require a property deed.
+
+On player-family succession, active assignments by sworn members gain optional
+`estate`, identifying the successor faction. Uncommitted work is recalled;
+already-returning operatives finish their journey. Reserved cash and committed
+robbery proceeds go to that faction on return, never to the next protagonist.
+Capture/death loses carried funds; if the organization dissolves, a surviving
+operative retains them. Personal associates outside the inherited family retain
+the prior cancellation behavior. Unused charges are removed from circulation;
+no successor explosives inventory is implemented. This is an orderly wind-down,
+not automatic continuation of offensive orders under a new leader.

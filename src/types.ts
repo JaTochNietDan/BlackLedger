@@ -479,7 +479,7 @@ export interface Snapshot {
   event: Event | null;
   history: Record[];
   dead: {name: string; minute: number; life: number; cause: string; estate?: string}[];
-  crew_orders?: {id:string;life:number;actor:string;name:string;kind:string;target:string;place:string;base:string;stage:string;due:number;reserved:number;loot?:number;charges?:number;recall:boolean;result:string}[];
+  crew_orders?: {id:string;estate?:string;life:number;actor:string;name:string;kind:string;target:string;place:string;base:string;stage:string;due:number;reserved:number;loot?:number;charges?:number;recall:boolean;result:string}[];
   crew_order_offers?: {actor:string;name:string;kind:string;target:string;label:string;cost:number;charges?:number;minutes:number;reason:string}[];
   tasks: {id: string; name: string; due: number}[];
   director: {status: string; detail: string; last_request: number};

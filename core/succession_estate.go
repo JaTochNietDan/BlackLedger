@@ -44,6 +44,7 @@ func (w *World) Inherit() string {
 	for _, held := range holdings {
 		w.Properties[held].Owner = id
 	}
+	w.inheritCrewOrders(id)
 	// The city's opinion of the man carries to the thing he left.
 	for i := range w.Conflicts {
 		c := &w.Conflicts[i]

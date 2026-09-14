@@ -3351,3 +3351,23 @@ and succession continuation, compact-layout/remote-scene review, the previously
 recorded routine-predictability full-suite failure, and fresh campaign acceptance.
 The broad visual/game goal remains active. Unrelated armed-resistance and
 scene-aftermath work is preserved unstaged.
+
+
+### Assignment funds follow family succession
+
+Previous goal turn made authoritative progress (f3d8ded property orders). This
+turn fixes custody of assignment money across player-family succession: sworn
+members recall unfinished work, return naturally, and settle reserved funds or
+already-committed robbery proceeds into the successor faction. The saved estate
+recipient prevents a new protagonist receiving the funds. Captured/dead carriers
+lose their funds; a surviving carrier retains them if the family dissolves.
+Personal associates remain outside sworn-family inheritance. Unused demolition
+charges are removed from circulation, pending broader equipment custody work.
+
+`.runtime/crew-succession-final.log` passes the focused crew/HQ/succession tests
+(core 0.440s, command package 0.225s). New cases cover outbound, working and
+returning stages, reload plus new life, completed robbery proceeds, loss by death
+or capture, dissolved family and recall of an unfinished assassination. No live
+campaign was mutated or release promoted. Full offensive-order continuation
+under successor authority remains unfinished, along with broader job coverage,
+visual acceptance and the previously recorded full-suite routine failure.
