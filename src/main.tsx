@@ -794,7 +794,7 @@ function App() {
                   replaySerial={sceneReplay.current}
                   beforeConditions={sceneConditions.current?.world===w.id&&sceneConditions.current.revision===w.revision?sceneConditions.current.conditions:undefined}
                   overlay={sceneOverlay || journeyOverlay}
-                  activeCue={journey ? null : playing}
+                  activeCue={journey || !scenePending ? null : playing}
                   onSceneDone={setFinishedCue}
                   onJourneyDone={() => setJourney(null)}
                   onJourneyProgress={setJourneyProgress}
