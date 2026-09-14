@@ -2177,3 +2177,35 @@ withdrawals and actual death/new-life isolation. Temporary SQLite reopen checks
 preserve deposits, rounds and exactly one prize across restart. Main save unused.
 Next: scheduled entry, public bracket/player commands, receipt retries and browser
 progression; tournament funds are not exposed to normal player actions yet.
+
+### Verified live promotion — 89cc61b
+
+Port 8791 now serves clean release 89cc61b8a8dfad7a2aafc5428d071b88136b022d
+from `.runtime/release-89cc61b` (`modified:false`). This includes playable
+physical billiards, public multi-table tournaments, owner-set entry fees and
+house cuts, optional owner participation, funded field previews, unattended
+NPC match progression, hall table selection and the lossless GLB transfer fix.
+
+Clean checkout validation: 388 frontend tests passed, production build passed,
+Go vet passed, and full billiards/core/store/server suites passed in
+12.346s/320.209s/0.439s/2.216s. Logs are `.runtime/release-89cc61b-{frontend,build,go}.log`.
+The unrelated dirty gameplay/aftermath files were excluded from the release.
+
+Before promotion, SQLite backup `.runtime/pre-89cc61b-campaign.sqlite3` was
+loaded through the new server on isolated port 8971. Recursive comparison
+allowed only `last_pool_tournament_slot:0` and the existing last-result
+comings/cues null-to-empty-list normalization. Every other saved value and
+all 2,134 receipts were preserved. Browser review showed the city and Fassano
+Meats interior loading correctly on that copy, with actual occupants.
+No gameplay QA commands were submitted to the live campaign.
+
+The unchanged live save was rechecked immediately before stopping the old
+server. Post-startup state matched the verified candidate byte for byte:
+SHA256 `4cca8f4fe0be17920d8e010f7a1fb2023a0ea7843eeb445e49ffb17759916af5`.
+Revision 2132, minute 160825, life 11 Jamie Moretti, cash $2,625 and all receipts
+were retained. Release-local `.runtime/compatibility.json` and
+`.runtime/live-verification.json` record the assertions and clean health data.
+
+This is release progress, not completion of the broad goal. Full human
+shooting/bridge animation, airborne billiards physics, remaining planned
+interiors and broader visual/campaign acceptance remain open.
