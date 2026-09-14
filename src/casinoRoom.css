@@ -1,0 +1,49 @@
+/* The game room uses house stationery around its felt and machinery. */
+.casino.casino-house{width:min(1280px,100%);height:100dvh;max-height:100dvh;border:0;background:linear-gradient(120deg,#243b30,#10251e);box-shadow:0 0 100px #0009}
+.casino-house .casino-head{--ink:#382d1f;--muted:#715d40;--gold:#78582e;--line:#b3a07b;background:var(--newsprint),#e7d8b9;color:var(--ink);border-block:3px double #967a50;gap:18px;padding:16px 24px;flex-wrap:wrap}
+.casino-house .casino-head .eyebrow{color:#78582e;font-size:10px;letter-spacing:.18em}
+.casino-house .casino-head h2{font:30px/1.15 Georgia,serif;overflow-wrap:anywhere}
+.casino-house .casino-purse{white-space:nowrap}.casino-house .casino-purse b{font:24px Georgia,serif}
+.casino-house .leave-table{background:transparent;color:#49371f;border:1px solid #9c825b;box-shadow:none;border-radius:0;padding:10px 14px;font:14px Georgia,serif;white-space:normal}
+.casino-house .leave-table:hover:not(:disabled){background:#d5bd94;border-color:#78582e}
+.casino-house .leave-table:disabled{opacity:.55}
+.casino-house .casino-games{gap:0;flex-wrap:wrap;padding:0 24px;background:var(--newsprint),#d8c5a0;border-bottom:1px solid #a68a60}
+.casino-house .casino-games button{border:0;border-right:1px solid #ae956e;border-bottom:3px solid transparent;background:transparent;color:#59432b;padding:12px 18px;font:13px Georgia,serif;letter-spacing:.06em;border-radius:0;box-shadow:none}
+.casino-house .casino-games button[aria-pressed=true]{background:#f0e3c7;border-bottom-color:#8b3e2b;color:#382d1f}
+.casino-house .casino-games button:hover:not(:disabled){background:#eadbbd;color:#382d1f}
+.casino-house .casino-games button:disabled{opacity:.5}
+.casino-house .casino-head button:focus-visible,.casino-house .casino-games button:focus-visible{outline:2px solid #873f2d;outline-offset:-4px}
+.casino-house .casino-floor{overflow:auto;overscroll-behavior:contain;align-items:start;grid-template-columns:minmax(0,1fr) 270px;grid-template-rows:auto;gap:24px;padding:24px}
+.casino-house .casino-game{overflow:visible;min-width:0}
+.casino-house .casino-game .felt{border-radius:0;box-shadow:none}
+.casino-house .machine-felt{background:transparent;border:0;padding:0}
+.casino-house .machine-felt .felt-head{padding:0 4px 12px;gap:12px;flex-wrap:wrap}
+.casino-house .machine-felt .felt-result{padding:10px 14px;border-block:1px solid #76917955;font:15px/1.5 Georgia,serif}
+.casino-house .machine-felt .paytable{max-width:560px;background:var(--newsprint),#e7d8b9;color:#382d1f;border-block:3px double #967a50;margin-top:20px;font:13px/1.45 Georgia,serif}
+.casino-house .machine-felt .paytable th{color:#49371f;padding:6px 12px;letter-spacing:.02em}
+.casino-house .machine-felt .paytable td{color:#78582e;padding:6px 12px;white-space:nowrap}
+.casino-house .machine-felt .paytable tr:nth-child(even){background:#7155320c}
+.casino-house .casino-night{position:sticky;top:0;max-height:calc(100dvh - 200px);overflow:auto;align-self:start;background:var(--newsprint),#e7d8b9;color:#382d1f;border:0;border-block:3px double #967a50;padding:18px 20px;box-shadow:0 6px 14px #0003}
+.casino-house .casino-night h4{color:#78582e;font:12px Georgia,serif;letter-spacing:.15em;padding-bottom:10px;border-bottom:1px solid #b3a07b}
+.casino-house .casino-night p{font:13px/1.6 Georgia,serif;color:#715d40;margin-bottom:16px;overflow-wrap:anywhere}
+.casino-house .casino-night p:last-child{margin-bottom:0}
+.casino-house .casino-night b{font:bold 16px/1.4 Georgia,serif;color:#382d1f;margin-bottom:5px}
+@media(max-width:900px){
+ .casino-house .casino-floor{grid-template-columns:1fr;grid-template-rows:auto auto;padding:16px;gap:20px}
+ .casino-house .casino-night{position:static;max-height:none;width:100%;box-sizing:border-box}
+ .casino-house .casino-head{padding:12px 16px;gap:10px 16px}
+ .casino-house .casino-games{padding:0 8px}
+}
+@media(max-width:520px){
+ .casino-house .casino-head>div:first-child{flex:1 1 60%}
+ .casino-house .casino-head h2{font-size:25px}
+ .casino-house .leave-table{width:100%;padding:8px 12px}
+ .casino-house .casino-games button{flex:1 1 auto;padding:10px 12px}
+ .casino-house .casino-floor{padding:12px}
+ .casino-house .machine-felt .paytable th,.casino-house .machine-felt .paytable td{padding:6px 8px}
+}
+.casino-house .bandit-stakes .money-field{--ink:#382d1f;--muted:#715d40;--gold:#78582e;background:var(--newsprint),#e7d8b9;border:1px solid #9c825b;border-radius:0;color:#382d1f}
+.casino-house .bandit-stakes .money-field input:focus{color:#382d1f;outline:2px solid #873f2d;outline-offset:1px}
+.casino-house .bandit-stakes .spin-it{background:var(--newsprint),#e7d8b9;color:#49371f;border:1px solid #9c825b;border-block:3px double #967a50;border-radius:0;padding:9px 18px;box-shadow:none;font:14px Georgia,serif}
+.casino-house .bandit-stakes .spin-it:hover:not(:disabled){background:#d5bd94;color:#382d1f;border-color:#78582e}
+.casino-house .bandit-stakes .spin-it:focus-visible{outline:2px solid #e7d8b9;outline-offset:3px}

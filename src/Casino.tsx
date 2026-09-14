@@ -1,3 +1,4 @@
+import './casinoRoom.css';
 import {useEffect, useRef, useState} from 'react';
 import {playTable, roomTone} from './sound';
 import type {Action, Presence, Record as Entry} from './types';
@@ -170,18 +171,18 @@ export function Casino({
   return (
     <div className="modal-shade table-shade">
       <section
-        className="casino"
+        className="casino casino-house"
         role="dialog"
         aria-modal="true"
         aria-label={'The tables at ' + place}
       >
         <header className="casino-head">
           <div>
-            <div className="eyebrow">YOU ARE AT THE TABLES</div>
+            <div className="eyebrow">{tables ? 'THE GAMING ROOM' : 'THE MACHINES'}</div>
             <h2>{place}</h2>
           </div>
           <div className="casino-purse">
-            <small>ON YOU</small>
+            <small>CASH ON HAND</small>
             <b>{money(cash)}</b>
           </div>
           <button
