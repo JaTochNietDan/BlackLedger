@@ -7,7 +7,7 @@ function available(element:HTMLElement){for(let parent=element.parentElement;par
 function scope(){return [...document.querySelectorAll<HTMLElement>('[role="dialog"][aria-modal="true"]')].filter(available).at(-1)||document.body;}
 function actions():Entry[]{return [...scope().querySelectorAll<HTMLElement>('button,summary,select,input:not([type="hidden"]),textarea,a[href]')].filter(available).map(element=>{let label=(element.getAttribute('aria-label')||element.textContent||element.getAttribute('placeholder')||element.getAttribute('title')||'Input').replace(/\s+/g,' ').trim();const title=element.getAttribute('title');if(title&&!label.includes(title))label+=' — '+title;return{element,label};});}
 function activate(element:HTMLElement){if(!element.isConnected||!available(element))return;element.focus({preventScroll:true});element.scrollIntoView({block:'nearest'});if(element.matches('select,input,textarea'))return;element.click();}
-const hints=[['1–6','People · Families · Market · Ledger · Herald · Guide'],['7 / 8','Settings / daily accounts'],['V','Toggle voices'],['T','Toggle travel playback speed'],['G','Travel to selected address / step inside'],['B','Leave the building'],['F / O / Z','Follow character / whole city / selected address'],['J','Focus the address directory (type a name, then Enter)'],['WASD / arrows','Pan camera; stop following'],['Q / E','Rotate camera'],['+ / − / wheel','Zoom; stop following'],['Home','Whole city'],['/','Search available actions; arrows to select, Enter to use'],['Tab / Shift Tab','Move between controls; Enter or Space to use'],['Esc','Close the current paper or menu'],['?','This keyboard reference']];
+const hints=[['1–6','People · Families · Market · Ledger · Herald · Guide'],['7 / 8','Settings / daily accounts'],['V','Toggle voices'],['T','Toggle travel playback speed'],['G','Travel to selected address / step inside'],['B','Leave the building'],['F / O / Z','Follow character / whole city / selected address'],['J','Focus the address directory (type a name, then Enter)'],['WASD / arrows','Pan the visible table, room or city camera'],['Q / E','Rotate camera'],['+ / − / wheel','Zoom; stop following'],['Home','Reset the visible camera'],['/','Search available actions; arrows to select, Enter to use'],['Tab / Shift Tab','Move between controls; Enter or Space to use'],['Esc','Close the current paper or menu'],['?','This keyboard reference']];
 export function KeyboardShortcuts(){
  const [mode,setMode]=useState<'actions'|'help'|null>(null),[entries,setEntries]=useState<Entry[]>([]),[query,setQuery]=useState(''),[index,setIndex]=useState(0);
  const current=useRef(mode);current.current=mode;
@@ -21,11 +21,11 @@ export function KeyboardShortcuts(){
    if(event.key==='/'||event.key==='?'){
     event.preventDefault();previous.current=document.activeElement as HTMLElement;setEntries(actions());setQuery('');setIndex(0);setMode(event.key==='/'?'actions':'help');return;
    }
-   if(scope()!==document.body)return;
-   const shortcut=[...document.querySelectorAll<HTMLElement>('[data-shortcut]')].find(el=>el.dataset.shortcut===event.key.toLowerCase()&&available(el));
+   const activeScope=scope();
+   const shortcut=activeScope===document.body?[...document.querySelectorAll<HTMLElement>('[data-shortcut]')].find(el=>el.dataset.shortcut===event.key.toLowerCase()&&available(el)):undefined;
    if(shortcut){event.preventDefault();activate(shortcut);return;}
    if(cameraCommand(event)){
-    const canvas=document.querySelector<HTMLElement>('.city3d canvas');
+    const canvas=['.poker3d canvas','.blackjack3d canvas','.pool-render canvas','.interior3d canvas','.city3d canvas'].flatMap(selector=>[...activeScope.querySelectorAll<HTMLElement>(selector)]).find(available);
     if(canvas&&available(canvas)&&target!==canvas){event.preventDefault();canvas.focus({preventScroll:true});canvas.dispatchEvent(new KeyboardEvent('keydown',{key:event.key,code:event.code,shiftKey:event.shiftKey}));}
    }
   };

@@ -2649,3 +2649,20 @@ entered the tables and dealt a$50 fixture hand, reviewing the exposed dealer9,
 hidden card and playerK/7 in both camera views; button contrast is readable.
 No main-save QA writes. Main8791 remains3e7ee26. Card-camera and billiards-guide
 changes await promotion; broader interior and full billiards work remain open.
+
+### 2026-09-14 — camera shortcuts follow the active game view
+
+Previous9567a5f aligned blackjack camera framing. Shortcut fallback now searches
+visible poker, blackjack, pool, interior and city canvases within the current
+modal scope, instead of only the city canvas. Betting/text inputs retain their
+native keys. Global data-shortcut navigation stays restricted to the body;
+a modal without a camera cannot move an underlying scene. Updated keyboard
+reference for pan/reset. First browser attempt exposed the old early modal
+return; corrected routing to search within that modal rather than bypass it.
+
+Production build passes2.64s (`.runtime/active-camera-build.log`). Browser85 on
+isolated8980 verified zoom and Home from the focused poker framing button,
+with focus transferred to the poker canvas inside the game modal. Browser84
+also confirmed the existing action-search shortcut. No gameplay commands or
+main-save QA writes in this turn. Main8791 remains3e7ee26; camera/aim changes
+await promotion. Remaining interiors and full billiards fidelity remain open.
