@@ -35,3 +35,12 @@ export class PoolhallMatches {
  }
  dispose(){this.group.removeFromParent();this.group.clear();this.geometry.dispose();for(const m of this.materials){m.map?.dispose();m.dispose();}}
 }
+
+export function poolhallGameAt(t:PoolTournamentState|null|undefined,x:number,z:number):number|null {
+ if(!Number.isFinite(x)||!Number.isFinite(z))return null;
+ for(const g of [...(t?.games??[])].reverse()){
+  const origin=poolhallTableOrigin(g.table_number);
+  if(g.table&&origin&&Math.abs(x-origin[0])<=g.table.width/2+.17&&Math.abs(z-origin[1])<=g.table.length/2+.17)return g.index;
+ }
+ return null;
+}

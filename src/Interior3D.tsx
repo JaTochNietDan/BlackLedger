@@ -1,4 +1,5 @@
-import {PoolhallMatches,tournamentHallSpots} from './poolhallMatches';
+import {PoolTap} from './billiards';
+import {PoolhallMatches,tournamentHallSpots,poolhallGameAt} from './poolhallMatches';
 import type {PoolTournamentState} from './billiards';
 import {interiorSettings} from './interiorSettings';
 import {LaundryMotion,laundryRunningMachines,type LaundryOperation} from './laundryMotion';
@@ -18,7 +19,7 @@ import {pedestrianModel} from './city3dCast';
 import {disposeCityResources} from './city3dResources';
 import './interior3d.css';
 
-export function Interior3D(props:{place:InteriorPlace;tournament?:PoolTournamentState|null;operation?:LaundryOperation;motion:boolean;player:Pick<Person,'name'|'face'|'alive'>;people:Presence[];picked:string;onPick:(id:string)=>void;minute:number}) {
+export function Interior3D(props:{place:InteriorPlace;tournament?:PoolTournamentState|null;onPoolTable?:(index:number)=>void;operation?:LaundryOperation;motion:boolean;player:Pick<Person,'name'|'face'|'alive'>;people:Presence[];picked:string;onPick:(id:string)=>void;minute:number}) {
  const host=useRef<HTMLDivElement>(null), latest=useRef(props);latest.current=props;
  const settings=interiorSettings[props.place],roomName=settings.name;
  const [enlarged,setEnlarged]=useState(false);
@@ -87,17 +88,26 @@ export function Interior3D(props:{place:InteriorPlace;tournament?:PoolTournament
   let castBatch:InteriorCastBatch|undefined;
   let arrival:InteriorArrival|undefined,arrivalSeconds=0,arriving=false;
   let roster='',presentation='',drawerTravel=0;
-  const pick=new THREE.Raycaster();const pointer=new THREE.Vector2();let down={x:0,y:0};
-  const press=(event:PointerEvent)=>{down={x:event.clientX,y:event.clientY};};
+  const pick=new THREE.Raycaster();const pointer=new THREE.Vector2();const tap=new PoolTap();
+  const press=(e:PointerEvent)=>{tap.begin(e.pointerId,e.clientX,e.clientY,e.isPrimary,e.button);};
+  const move=(e:PointerEvent)=>tap.move(e.pointerId,e.clientX,e.clientY);
+  const cancel=()=>tap.cancel();
   const release=(event:PointerEvent)=>{
-   if(Math.hypot(event.clientX-down.x,event.clientY-down.y)>5)return;
+   if(!tap.end(event.pointerId,event.clientX,event.clientY))return;
    const rect=canvas.getBoundingClientRect();pointer.set((event.clientX-rect.left)/rect.width*2-1,1-(event.clientY-rect.top)/rect.height*2);
    pick.setFromCamera(pointer,camera);const hit=pick.intersectObjects(castBatch?[castBatch.root,...castBatch.unbatched]:[...actors.values()],true)[0];
+   if(latest.current.place==='poolhall'&&latest.current.onPoolTable){
+    const point=pick.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0,1,0),-.78),new THREE.Vector3());
+    if(point&&(!hit||pick.ray.origin.distanceTo(point)<hit.distance)){
+     const game=poolhallGameAt(latest.current.tournament,point.x,point.z);
+     if(game!==null){latest.current.onPoolTable(game);return;}
+    }
+   }
    if(hit?.instanceId!==undefined){const id=hit.object.userData.people[hit.instanceId];latest.current.onPick(id==='player'?'':id);return;}
    let object:THREE.Object3D|undefined=hit?.object;while(object&&!object.userData.person)object=object.parent||undefined;
    if(object)latest.current.onPick(object.userData.person==='player'?'':object.userData.person);
   };
-  canvas.addEventListener('pointerdown',press);canvas.addEventListener('pointerup',release);
+  canvas.addEventListener('pointerdown',press);canvas.addEventListener('pointerup',release);canvas.addEventListener('pointermove',move);canvas.addEventListener('pointercancel',cancel);
   const keyboardPan=new KeyboardPan(), unbindPan=bindKeyboardPan(canvas,keyboardPan);
   let panTime=performance.now();
   const keys=(event:KeyboardEvent)=>{
@@ -187,7 +197,7 @@ export function Interior3D(props:{place:InteriorPlace;tournament?:PoolTournament
       zoom:camera.zoom,linen:linenService?{seconds:linenService.seconds,active:linenService.active}:undefined,machines:machines?{count:machines.count,running,seconds:machines.seconds}:undefined,arrival:arrival?{seconds:arrivalSeconds,duration:arrival.duration,moving:arriving}:undefined,service:service?.available?{seconds:serviceSeconds,cloth:service.clothPosition.toArray()}:undefined,omitted:Math.max(0,p.people.length-actors.size+(playerActor?1:0)),cutawayWalls:[...(!left?.visible?['left']:[]),...(!back?.visible?['back']:[])]});
    }
   };frame=requestAnimationFrame(tick);
-  return()=>{reduce.removeEventListener('change',reduction);unbindPan();dead=true;cancelAnimationFrame(frame);observer.disconnect();controls.removeEventListener('change',changed);controls.dispose();canvas.removeEventListener('keydown',keys);canvas.removeEventListener('pointerdown',press);canvas.removeEventListener('pointerup',release);castBatch?.dispose();hallMatches?.dispose();if(fittingMirror){fittingMirror.removeFromParent();fittingMirror.geometry.dispose();fittingMirror.dispose();}disposeCityResources([scene,...models.values()]);renderer.dispose();renderer.forceContextLoss();canvas.remove();};
+  return()=>{reduce.removeEventListener('change',reduction);unbindPan();dead=true;cancelAnimationFrame(frame);observer.disconnect();controls.removeEventListener('change',changed);controls.dispose();canvas.removeEventListener('keydown',keys);canvas.removeEventListener('pointerdown',press);canvas.removeEventListener('pointerup',release);canvas.removeEventListener('pointermove',move);canvas.removeEventListener('pointercancel',cancel);castBatch?.dispose();hallMatches?.dispose();if(fittingMirror){fittingMirror.removeFromParent();fittingMirror.geometry.dispose();fittingMirror.dispose();}disposeCityResources([scene,...models.values()]);renderer.dispose();renderer.forceContextLoss();canvas.remove();};
  },[props.place]);
- return <div className={`interior3d${enlarged?' enlarged':''}`}>{(props.place==='flat'||props.place==='lodging')&&<button className="interior3d-drawer" aria-pressed={drawerOpen} onClick={()=>setDrawerOpen(!drawerOpen)}>{drawerOpen?'Close bedside drawer':'Open bedside drawer'}</button>}<button className="interior3d-expand" aria-pressed={enlarged} onClick={()=>{setEnlarged(!enlarged);host.current?.querySelector('canvas')?.focus();}}>{enlarged?'Standard room view':'Enlarge room'}</button><div ref={host} className="interior3d-canvas"/><span className="interior3d-caption">{roomName} · {props.player.name}: pale ring · Drag / Q/E: orbit · Scroll / +/−: zoom · WASD / arrows: pan · Home: reset{props.place!=='flat'&&props.place!=='lodging'&&' · Select a person'}{extraPeople>0&&` · ${extraPeople} more in the people list`}</span>{status&&<p role="status">{status}</p>}</div>;
+ return <div className={`interior3d${enlarged?' enlarged':''}`}>{(props.place==='flat'||props.place==='lodging')&&<button className="interior3d-drawer" aria-pressed={drawerOpen} onClick={()=>setDrawerOpen(!drawerOpen)}>{drawerOpen?'Close bedside drawer':'Open bedside drawer'}</button>}<button className="interior3d-expand" aria-pressed={enlarged} onClick={()=>{setEnlarged(!enlarged);host.current?.querySelector('canvas')?.focus();}}>{enlarged?'Standard room view':'Enlarge room'}</button><div ref={host} className="interior3d-canvas"/><span className="interior3d-caption">{roomName} · {props.player.name}: pale ring · Drag / Q/E: orbit · Scroll / +/−: zoom · WASD / arrows: pan · Home: reset{props.place!=='flat'&&props.place!=='lodging'&&' · Select a person'}{props.place==='poolhall'&&props.tournament&&' · Click a table to open its match'}{extraPeople>0&&` · ${extraPeople} more in the people list`}</span>{status&&<p role="status">{status}</p>}</div>;
 }

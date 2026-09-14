@@ -74,3 +74,14 @@ test('Tournament players stand beside their physical table and leave resolved ma
  assert.equal(tournamentHallSpots({...t,settled:true}).size,0);
  assert.equal(poolhallTableOrigin(0),null);assert.equal(poolhallTableOrigin(7),null);
 });
+
+test('Hall table picking follows reused tables and excludes the aisles',async()=>{
+ const {poolhallGameAt,poolhallTableOrigin}=await import('../.runtime/frontend-test/poolhallMatches.js');
+ const games=[{index:0,table_number:1,table:{width:1.27,length:2.54}},{index:2,table_number:1,table:{width:1.27,length:2.54}}];
+ const t={games};const [x,z]=poolhallTableOrigin(1);
+ assert.equal(poolhallGameAt(t,x,z),2);
+ assert.equal(poolhallGameAt(t,0,z),null);
+ assert.equal(poolhallGameAt(t,x,z+2),null);
+ assert.equal(poolhallGameAt(t,NaN,z),null);
+ assert.equal(poolhallGameAt(undefined,x,z),null);
+});

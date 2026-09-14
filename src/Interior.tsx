@@ -82,6 +82,7 @@ function Work({
 export function Interior({
   activities,
   tournament,
+  onPoolTable,
   place,
   player,
   motion,
@@ -97,6 +98,7 @@ export function Interior({
 }: {
   activities?: ReactElement;
   tournament?:PoolTournamentState|null;
+  onPoolTable?:(index:number)=>void;
   place: Place;
   motion: boolean;
   player: Pick<Person,'name'|'face'|'alive'|'home'>;
@@ -302,7 +304,7 @@ export function Interior({
           ))}
         </div>
       )}
-      {inFlat?<Interior3D key={`${place.id}-private`} place={place.id==='room'?'lodging':'flat'} player={player} motion={motion} people={[]} picked="" onPick={()=>{}} minute={minute}/>:hasInterior(place.id) ? <Interior3D key={place.id} place={place.id} tournament={tournament} operation={place} player={player} motion={motion} people={onFloor} picked={picked} onPick={id=>setPicked(id===picked?'':id)} minute={minute}/> : <div
+      {inFlat?<Interior3D key={`${place.id}-private`} place={place.id==='room'?'lodging':'flat'} player={player} motion={motion} people={[]} picked="" onPick={()=>{}} minute={minute}/>:hasInterior(place.id) ? <Interior3D key={place.id} place={place.id} tournament={tournament} onPoolTable={onPoolTable} operation={place} player={player} motion={motion} people={onFloor} picked={picked} onPick={id=>setPicked(id===picked?'':id)} minute={minute}/> : <div
         className={'room' + (painted ? ' painted' : '')}
         style={painted ? {backgroundImage: `url(${paintedRoom(place.id)})`} : undefined}
       >

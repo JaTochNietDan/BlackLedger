@@ -607,3 +607,20 @@ without overlapping one another. Resolved/settled rounds remove match staging.
 All385 frontend tests pass (14.049s) and build passes. Evidence logs
 `.runtime/poolhall-matches-{tests,build}.log`. No fresh frame-rate benchmark or
 live promotion was performed. Main campaign unchanged.
+
+## Direct table selection from the hall (2026-09-14)
+
+Clicking a tournament table in the hall opens that rack's close view directly.
+The most recent round owns a reused physical table. Nearer character picks
+retain their person actions, aisles do not select a table, and camera gestures
+use the existing peak-distance/primary-pointer tap guard instead of treating a
+returned drag as a click. The draw buttons remain the keyboard-accessible route.
+A room caption explains table selection.
+
+Browser tab62 at1280×720 clicked the front-left occupied table on isolated
+port8967 and opened You/Elena's existing match. No gameplay command was sent:
+revision4/minute1084/cash975 stayed unchanged. Table reuse/aisle/invalid-coordinate
+tests pass; all386 frontend tests pass (14.133s), and build passes. Evidence
+`.runtime/pool-table-pick-{tests,build}.log` and `pool-table-pick-state.json`.
+Live campaign unchanged. Full human-played tournament, animation and broader
+visual/physics work remain open.

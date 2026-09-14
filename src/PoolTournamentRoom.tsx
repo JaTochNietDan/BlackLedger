@@ -11,8 +11,8 @@ export function PoolTournamentNotice({notice,tournament,busy,act,onOpen}:{notice
  {(!tournament||tournament.settled)&&<><p>{notice.entrants.length} eligible opponents here{notice.can_enter?` · $${notice.pot} winner's prize`:''}. {notice.unavailable}</p><button disabled={busy||!notice.can_enter} onClick={()=>{act({kind:'pool_tournament_enter'});onOpen();}}>Pay ${notice.fee} and enter</button></>}
  <small>The champion takes every entry fee. Leaving or withdrawing forfeits your fee. If the hall closes, unforfeited entries are returned; forfeited fees go to the hall if there is no champion.</small></section>;
 }
-export function PoolTournamentRoom({tournament,busy,motion,act,onClose}:{tournament:PoolTournamentState;busy:boolean;motion:boolean;act:(c:Command)=>void;onClose:()=>void}){
- const [selected,setSelected]=useState<number|null>(null);
+export function PoolTournamentRoom({tournament,busy,motion,act,onClose,initialGame=null}:{tournament:PoolTournamentState;busy:boolean;motion:boolean;act:(c:Command)=>void;onClose:()=>void;initialGame?:number|null}){
+ const [selected,setSelected]=useState<number|null>(initialGame);
  const eliminated=tournament.games.some(g=>g.resolved&&g.players.includes(tournament.player_id)&&g.winner!==tournament.player_id);
  const finalRound=Math.max(...tournament.games.map(g=>g.round));
  const paid=tournament.prize_paid??0;

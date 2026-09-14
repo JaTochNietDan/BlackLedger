@@ -90,6 +90,7 @@ function App() {
     [error, setError] = useState('');
   useEffect(()=>{if(tab==='news')return playMoment('newspaper');},[tab]);
   const [tournamentOpen,setTournamentOpen]=useState(false);
+  const [tournamentGame,setTournamentGame]=useState<number|null>(null);
   const [cityView, setCityView] = useState<'interior' | 'iso'>(remembered);
   // Whether the player is sitting at a table. A game takes the whole screen and
   // holds it until they get up: playing one out of the corner of a sidebar, with
@@ -642,7 +643,7 @@ function App() {
               </small>
             </div>
           )}
-          {l.id==='poolhall' && p.location===l.id && <><PoolTournamentNotice notice={world?.pool_tournament_notice} tournament={world?.pool_tournament} busy={busy} act={commit} onOpen={()=>setTournamentOpen(true)}/><PoolChallenges opponents={world?.pool_opponents||[]} cash={p.cash} busy={busy} act={commit}/></>}
+          {l.id==='poolhall' && p.location===l.id && <><PoolTournamentNotice notice={world?.pool_tournament_notice} tournament={world?.pool_tournament} busy={busy} act={commit} onOpen={()=>{setTournamentGame(null);setTournamentOpen(true);}}/><PoolChallenges opponents={world?.pool_opponents||[]} cash={p.cash} busy={busy} act={commit}/></>}
           {/* The poolhall is a racket rather than a casino, so none of the
               float rows reached it — and it is the one room that runs a card
               game and charges for the seat. Its money is a till: nothing is
@@ -791,7 +792,8 @@ function App() {
               {!journey&&homeCue&&playing ? <HomeStrikeScene key={`${playing.id}:${sceneReplay.current}`} cue={homeCue} world={w} motion={motion} overlay={sceneOverlay} onDone={()=>setFinishedCue(playing.id)}/> : cityView === 'interior' && locationInfo.id === p.location ? (
                 <Interior
                   tournament={w.pool_tournament}
-                  activities={locationInfo.id==='poolhall'?<><PoolTournamentNotice notice={w.pool_tournament_notice} tournament={w.pool_tournament} busy={busy} act={commit} onOpen={()=>setTournamentOpen(true)}/><PoolChallenges opponents={w.pool_opponents||[]} cash={p.cash} busy={busy} act={commit}/></>:undefined}
+                  onPoolTable={index=>{setTournamentGame(index);setTournamentOpen(true);}}
+                  activities={locationInfo.id==='poolhall'?<><PoolTournamentNotice notice={w.pool_tournament_notice} tournament={w.pool_tournament} busy={busy} act={commit} onOpen={()=>{setTournamentGame(null);setTournamentOpen(true);}}/><PoolChallenges opponents={w.pool_opponents||[]} cash={p.cash} busy={busy} act={commit}/></>:undefined}
                   motion={motion}
                   player={p}
                   place={locationInfo}
@@ -1199,7 +1201,7 @@ function App() {
         </main>
       </div>
       {playing&&sceneArticle&&!event&&<SceneNewspaper key={`${playing.id}:${sceneReplay.current}`} article={sceneArticle} visible={newspaperVisible} voice={voice} onClose={()=>{setPlaying(null);setTab('city');}}/>}
-      {tournamentOpen && world.pool_tournament && !world.pool && !event && p.alive && <PoolTournamentRoom tournament={world.pool_tournament} busy={busy} motion={motion} act={commit} onClose={()=>setTournamentOpen(false)}/>}
+      {tournamentOpen && world.pool_tournament && !world.pool && !event && p.alive && <PoolTournamentRoom initialGame={tournamentGame} tournament={world.pool_tournament} busy={busy} motion={motion} act={commit} onClose={()=>setTournamentOpen(false)}/>}
       {world.pool && !event && p.alive && <BilliardsRoom pool={world.pool} busy={busy} motion={motion} act={commit}/>}
       {atTable && inTheBackRoom && !event && p.alive && (
         <BackRoomScene

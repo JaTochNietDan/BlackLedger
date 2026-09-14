@@ -13406,3 +13406,10 @@ Active players stand at assigned tables; finished rounds restore ordinary room
 staging. Shared numbered textures preserve the close-table appearance. Browser
 standard/expanded views verified on the isolated fixture;385 frontend tests and
 build pass. Stroke/body animation remains next; live campaign unchanged.
+
+### 2026-09-14 — Select matches directly in the hall
+
+Table clicks now enter the selected tournament rack's close view. Reused tables
+resolve to the latest round; drag gestures retain camera control. Browser click
+opened the correct player match without changing revision/time/cash.386 frontend
+tests and build pass. No live campaign or release changes.
