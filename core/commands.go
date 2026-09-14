@@ -21,6 +21,11 @@ func (w *World) apply(c Command) error {
 	p := &w.Player
 	w.VisualCues = nil
 	w.Comings = nil
+	w.recordStreet = c.Kind == "travel"
+	w.streetTravel = nil
+	if w.recordStreet {
+		w.streetTravel = []StreetSegment{}
+	}
 	oldTime := w.Minute
 	oldLoc := p.Location
 	// What the player had before they decided, so the result can say what the
@@ -1023,7 +1028,7 @@ func (w *World) apply(c Command) error {
 		}
 	}
 	w.LastResult = &Result{
-		Action: chosen, Kind: c.Kind,
+		Action: chosen, Kind: c.Kind, StreetTravel: w.streetTravel,
 		From: oldLoc, To: w.Player.Location, Elapsed: w.Minute - oldTime,
 		Records: newRecords, Cues: w.VisualCues, Comings: w.Comings,
 		Cash:    w.Player.Cash - wasCash,

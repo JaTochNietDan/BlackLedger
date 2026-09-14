@@ -154,7 +154,7 @@ export function playCityGunshot(weapon='revolver'): (() => void) | undefined {
 }
 
 const effectSamples:Record<string,{gain:number;loop?:boolean}>={
-  explosion:{gain:.65},raid:{gain:.65},siren:{gain:.35},'door-kick':{gain:.7},
+  newspaper:{gain:.5},explosion:{gain:.65},raid:{gain:.65},siren:{gain:.35},'door-kick':{gain:.7},
   pain:{gain:.4},panic:{gain:.22},fire:{gain:.16,loop:true},
   'engine-idle':{gain:.12,loop:true},'vehicle-approach':{gain:.3},'drive-away':{gain:.4},
 };
@@ -298,7 +298,7 @@ function knock(ctx: AudioContext, at: number, scene: SceneSound) {
 // than nothing — silence reads as a bug.
 export function playMoment(kind: string) {
   if (!soundOn()) return;
-  const sample=({explosion:'explosion',raid:'raid',arrest:'siren','door-breach':'door-kick'} as Record<string,string>)[kind];
+  const sample=({newspaper:'newspaper',explosion:'explosion',raid:'raid',arrest:'siren','door-breach':'door-kick'} as Record<string,string>)[kind];
   if(sample){const cancel=playRecordedEffect(sample);if(cancel)return cancel;}
   const ctx = audio();
   if (!ctx) return;

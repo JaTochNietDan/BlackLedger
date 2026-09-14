@@ -78,5 +78,13 @@
     "channels": 2,
     "bits": 16,
     "sha256": "8f7716e50708f85868b0eecec55d46bd6ba9a08ce35cc47b5865b41b05ef8681"
+  },
+  "newspaper": {
+    "source": "newspaper opening.wav",
+    "seconds": 1.68,
+    "rate": 48000,
+    "channels": 2,
+    "bits": 16,
+    "sha256": "901a30471fcad6a4d337e1f80912a1a0143fb80a8764ce93a4a07513b43100a9"
   }
 }

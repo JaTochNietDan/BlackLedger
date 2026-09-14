@@ -121,7 +121,7 @@ test('recorded effects preserve tails, crossfade stereo loops, and release ambie
  globalThis.fetch=async()=>{fetches++;return{ok:true,arrayBuffer:async()=>new ArrayBuffer(1)};};
  try{
   const sound=await import('../.runtime/frontend-test/sound.js?recorded-effects');
-  await Promise.all([sound.preloadCityEffects(),sound.preloadCityEffects()]);assert.equal(fetches,10);assert.equal(sources.length,0);
+  await Promise.all([sound.preloadCityEffects(),sound.preloadCityEffects()]);assert.equal(fetches,11);assert.equal(sources.length,0);
   sound.playMoment('explosion');assert.equal(sources.length,1);assert.equal(sources[0].stops[0]-sources[0].at,14);
   const ambient=new sound.CityAmbientAudio();ambient.update(['fire','fire','engine-idle']);ambient.update(['fire','engine-idle']);assert.equal(sources.length,3);
   assert.ok(sources.slice(1).every(s=>s.loop&&s.stops.length===0));
@@ -131,5 +131,6 @@ test('recorded effects preserve tails, crossfade stereo loops, and release ambie
   sound.setSound(false);assert.deepEqual(sound.cityEffectStatus().active,[]);
   ambient.update(['fire']);sound.setSound(true);ambient.update(['fire']);assert.equal(sources.length,4);
   ambient.dispose();ambient.dispose();assert.deepEqual(sound.cityEffectStatus().active,[]);assert.ok(sources.every(s=>s.disconnected));
+  const closePaper=sound.playMoment('newspaper');assert.deepEqual(sound.cityEffectStatus().active,['newspaper']);assert.equal(sound.cityEffectStatus().played.newspaper,1);closePaper();assert.deepEqual(sound.cityEffectStatus().active,[]);
  }finally{Object.assign(globalThis,old);}
 });

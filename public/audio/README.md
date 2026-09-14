@@ -29,3 +29,8 @@ when stationary. Fire/idle have a 50ms decoded-buffer seam crossfade; source fil
 remain unchanged. Loops stop on mute, hidden tab, context loss or view disposal.
 The drive-away recording is imported for the still-unfinished moving getaway
 choreography; it is not played over stationary cars. Subjective mix review remains.
+
+The user's `newspaper opening.wav` is imported unchanged as `effects/newspaper.wav`
+(1.68s, stereo48kHz PCM16). It plays at gain0.5 on newspaper reveal and when opening
+Herald, respecting the sound preference and cancellation on closing. The previous
+procedural rustle remains a fallback if the recording has not loaded.

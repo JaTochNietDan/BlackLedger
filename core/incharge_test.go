@@ -74,9 +74,18 @@ func TestAManagerKeepsThePlaceStocked(t *testing.T) {
 	if managed.Properties[id].Supply <= alone.Properties[id].Supply {
 		t.Fatal("somebody running the place kept it no better stocked than nobody did")
 	}
-	// And it is the player's money that bought them.
-	if managed.Player.Cash >= alone.Player.Cash {
-		t.Fatal("the supplies were bought with nobody's money")
+	// Restocking must debit the actual purchase. Net cash after ten days is
+	// not that debit: serving arrivals on time can earn more than the stock costs.
+	purchase, place := toRun(t)
+	if err := purchase.PutInCharge(place, purchase.Properties[place].Hands[0]); err != nil {
+		t.Fatal(err)
+	}
+	purchase.Properties[place].Supply = 0
+	trade, _ := TradeOf(place)
+	cash := purchase.Player.Cash
+	purchase.TheyRunIt()
+	if purchase.Player.Cash != cash-trade.Restock || purchase.Properties[place].Supply != trade.RestockAmount {
+		t.Fatal("restocking did not exchange the player's money for supplies")
 	}
 }
 

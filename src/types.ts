@@ -194,6 +194,7 @@ export interface Journeying {
   progress: number;
   yours?: boolean;
 }
+export interface StreetSegment extends Journeying {from_minute:number;to_minute:number;end_progress:number;}
 export interface Snapshot {
   house?: {
     games: boolean;
@@ -467,6 +468,7 @@ export interface Snapshot {
   police_presence?: {id: string; target: string; minute: number; cleanup_at: number}[];
   aftermath?: {id: string; target: string; victim: {id: string; name: string}; minute: number; police_at: number; cleanup_at: number}[];
   last_result: {
+    street_travel?: StreetSegment[] | null;
     comings?: Coming[];
     cues?: VisualCue[];
     action?: string;

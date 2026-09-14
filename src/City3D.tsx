@@ -1,3 +1,4 @@
+import {streetAt} from './streetPlayback';
 import {CityCustody} from './city3dCustody';
 import {CityAssassination, assassinationBatch, isExecution, ASSASSINATION_SECONDS, ASSASSINATION_VICTIM_X, executionSpatter} from './city3dAssassination';
 import {poseCustody,sceneWeapon,poseLongGun,weaponShots,pumpOffset} from './city3dWeapons';
@@ -39,12 +40,13 @@ import type {Journey} from './TravelPresentation';
 import './city3d.css';
 import {CityCueQueue, gunVictim, gunCastReady, raidEntryPose, policeSceneSeconds, officerApproach, policeCast, sceneSlots, availableSceneSlot, casualtyFall, gunfightPose, casualtySceneStart, GunfireAudio, BlastAudio} from './city3dEvents';
 import type {SceneSlot} from './city3dEvents';
-import {StreetTraffic, trafficSize, trafficModel, advanceWheel, wheelSteering, advanceSteering, frontWheelSteering} from './city3dTraffic';
+import {StreetTraffic, trafficSpeed, trafficSize, trafficModel, advanceWheel, wheelSteering, advanceSteering, frontWheelSteering} from './city3dTraffic';
 import {pedestrianModel, isPedestrian} from './city3dCast';
 import {playCityGunshot, preloadCityGunshots, cityGunshotStatus, preloadCityEffects, CityAmbientAudio, cityEffectStatus, playRecordedEffect, playMoment, soundOn} from './sound';
 import {cameraCommand, KeyboardPan, bindKeyboardPan} from './city3dControls';
 import {blastParticle, windowBurst, internalDetonation, windowDebris, blastLight, blastOpacity, billowAlpha, debrisPose, fragmentBlocked} from './city3dBlast';
 
+const pathLength=(points:Point[])=>points.slice(1).reduce((sum,p,i)=>sum+Math.hypot(p.x-points[i].x,p.z-points[i].z),0);
 type Props = {
   immersive?:boolean;
   state: Snapshot;
@@ -84,6 +86,8 @@ type Actor = {
   wardrobeKey: string;
   driver?: THREE.Group;
   arrived?: boolean;
+  timelineProgress?:number;
+  legKey?:string;
 };
 type Effect = {
   cue: VisualCue;
@@ -726,6 +730,7 @@ export function City3D(props: Props) {
       previous: Snapshot | null = null,
       journeyKey = '',
       reportedJourneyProgress = -1,
+      playedJourneyProgress = 0,
       wasFollowing = false,
       followZoom: number | null = null,
       motionWas = true;
@@ -908,7 +913,7 @@ export function City3D(props: Props) {
           previous = null;
         }
         const seen = new Set<string>();
-        for (const j of w.street || []) {
+        for (const j of p.journey?.street ? [] : w.street || []) {
           const from = lots.get(j.from_id),
             to = lots.get(j.to_id);
           if (!from || !to) continue;
@@ -927,7 +932,7 @@ export function City3D(props: Props) {
             now,
           );
         }
-        for (const person of w.everyone || []) {
+        for (const person of p.journey?.street ? [] : w.everyone || []) {
           if (seen.has(person.id) || !person.where_id) continue;
           const lot = lots.get(person.where_id);
           if (!lot) continue;
@@ -1137,9 +1142,11 @@ export function City3D(props: Props) {
         const key = p.journey
           ? `${w.id}:${w.life}:${p.journey.from.id}:${p.journey.to.id}:${w.revision}`
           : '';
+        if (journeyKey && !key) revision = -1;
         if (key !== journeyKey || motion !== motionWas) {
           journeyKey = key;
           reportedJourneyProgress = -1;
+          playedJourneyProgress = 0;
           if (p.journey) { setFollow(true); followZoom = 8; }
           const here = lots.get(w.player.location);
           if (here && w.player.alive) {
@@ -1152,7 +1159,15 @@ export function City3D(props: Props) {
                 route(from, here, driving),
                 0,
                 1,
-                2400,
+                p.journey?.street ? Math.max(2400,
+                  pathLength(route(from,here,driving))/trafficSpeed(driving?carModel(p.journey?.vehicle):personModel('player'))*1000,
+                  ...p.journey.street.map(segment=>{
+                    const a=lots.get(segment.from_id),b=lots.get(segment.to_id);
+                    if(!a||!b)return 0;
+                    return pathLength(route(a,b,!!segment.vehicle))*(segment.end_progress-segment.progress)
+                      /trafficSpeed(segment.vehicle?carModel(segment.vehicle):personModel(segment.id))
+                      *p.journey!.minutes/Math.max(1,segment.to_minute-segment.from_minute)*1000;
+                  })) : 2400,
                 now,
               );
             else assign('player', personModel('player'), [entrance(here)], 0, 0, 0, now);
@@ -1170,6 +1185,22 @@ export function City3D(props: Props) {
           if (here) {
             player.points = [entrance(here)];
             player.start = player.end = 0;
+          }
+        }
+        if (p.journey?.street) {
+          const traveller=actors.get('player');
+          if(traveller)playedJourneyProgress=motion?Math.min(1,Math.max(0,(movementClock-traveller.since)/Math.max(1,traveller.duration))):1;
+          const minute=(p.journey.fromMinute??w.minute-p.journey.minutes)+p.journey.minutes*playedJourneyProgress;
+          const samples=streetAt(p.journey.street,minute);
+          for(const [id,a] of actors)if(!id.startsWith('player')&&!samples.has(id)){releaseActor(a);actors.delete(id);}
+          for(const [id,{segment,progress}] of samples){
+            const from=lots.get(segment.from_id),to=lots.get(segment.to_id);if(!from||!to)continue;
+            const legKey=`${segment.from_id}:${segment.to_id}:${segment.from_minute}:${segment.vehicle||''}`;
+            if(actors.get(id)?.legKey!==legKey){
+              assign(id,segment.vehicle?carModel(segment.vehicle):personModel(id),route(from,to,!!segment.vehicle),segment.progress,segment.end_progress,1,now);
+              actors.get(id)!.legKey=legKey;
+            }
+            actors.get(id)!.timelineProgress=progress;
           }
         }
         if (!motion) traffic.clear();
@@ -1230,7 +1261,7 @@ export function City3D(props: Props) {
                 id,
                 model: trafficModel(a.model,a.start === a.end),
                 points: a.points,
-                progress: a.start + (a.end - a.start) * t,
+                progress: a.timelineProgress ?? a.start + (a.end - a.start) * t,
               };
             })
             .concat(effects.flatMap(e => e.slot ? [{
@@ -1302,7 +1333,8 @@ export function City3D(props: Props) {
         playerRing.visible = !!actors.get('player')?.object.visible;
         const arrival = placements.get('player');
         if (p.journey && arrival) {
-          const progress = Math.floor(THREE.MathUtils.clamp(arrival.progress, 0, 1) * Math.max(1, p.journey.minutes)) / Math.max(1, p.journey.minutes);
+          if(!p.journey.street)playedJourneyProgress = Math.max(playedJourneyProgress, arrival.progress);
+          const progress = Math.floor(THREE.MathUtils.clamp(playedJourneyProgress, 0, 1) * Math.max(1, p.journey.minutes)) / Math.max(1, p.journey.minutes);
           if (progress !== reportedJourneyProgress) { reportedJourneyProgress = progress; p.onJourneyProgress?.(progress); }
         }
         if (
@@ -1656,6 +1688,7 @@ export function City3D(props: Props) {
           headlightPools: headlightPools.count,
           harbour: {visible: !!harbourLot, waterClock},
           followingPlayer: followPlayer.current,
+          streetMinute:p.journey?(p.journey.fromMinute??w.minute-p.journey.minutes)+p.journey.minutes*playedJourneyProgress:w.minute,
           cutawayBuildings: [...blockers],
           weather: {kind: w.sky?.kind || 'clear', wet: w.sky?.wet || 0, rainVisible: rainfall.visible, rainClock},
           camera: {zoom: camera.zoom, x: camera.position.x, z: camera.position.z,
@@ -1847,7 +1880,7 @@ export function City3D(props: Props) {
           <strong>{place.name}</strong>
           <span>{place.blurb}</span>
           {place.id === props.state.player.location ? (
-            <button data-shortcut="g" aria-keyshortcuts="G" title="Step inside (G)" disabled={!!shownPreview} onClick={props.onEnter}>Step inside · G →</button>
+            <button data-shortcut="g" aria-keyshortcuts="G" title="Step inside (G)" disabled={!!shownPreview||props.busy||!!props.journey} onClick={props.onEnter}>Step inside · G →</button>
           ) : (
             <button
               data-shortcut="g" aria-keyshortcuts="G"

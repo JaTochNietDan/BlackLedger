@@ -422,3 +422,25 @@ scene completion (or explicit Skip), and starts the prepared clip on reveal. Clo
 voice-off and scene replacement cancel pending work and dispose playback. A missing
 article retains the existing scene caption. Preparation failure leaves the paper
 readable, with an explicit retry control. Scene replay can reopen its article.
+
+## Committed NPC travel playback
+
+`last_result.street_travel` records public NPC travel observed during a `travel`
+command. It is an array (including an explicit empty array) for recorded travel,
+empty for other commands in HTTP responses, and may be null or absent in older
+saves/servers. Each segment
+contains the existing `Journeying` public fields at its start, plus `from_minute`,
+`to_minute`, and `end_progress`. `progress` is the start fraction; `minutes` is
+remaining scheduled travel at that start. Times never exceed the completed
+command's interval. Consecutive portions of the same leg are coalesced. A leg
+that finishes during the command ends at progress1; a continuing leg ends at its
+observed final fraction. No future departure or private plan is published.
+
+NPC departure and arrival times are now simulation boundaries in `Advance`, so
+an NPC can depart, arrive and perform the arrival's existing counter work within
+one long action rather than waiting until that action ends. This can change
+business income and subsequent city outcomes compared with late settlement.
+The renderer samples the recorded legs against the same playback clock used for
+the player, including playback-speed changes. Collision waits remain visual;
+they never issue commands, change outcomes or advance the backend clock. Skipping
+or finishing presentation reconciles to the final public street snapshot.

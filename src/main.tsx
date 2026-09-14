@@ -34,7 +34,7 @@ import {PeopleScreen} from './PeopleScreen';
 import {LedgerScreen} from './LedgerScreen';
 import {FamiliesScreen} from './FamiliesScreen';
 import {Theatre} from './Theatre';
-import {setSound, soundOn} from './sound';
+import {playMoment, setSound, soundOn} from './sound';
 import {Herald} from './Herald';
 import type {Snapshot, Command, Action, Place} from './types';
 import './style.css';
@@ -82,6 +82,7 @@ function App() {
     [voice, setVoice] = useState(localStorage.getItem('black-ledger-voice') === 'yes'),
     [speech, setSpeech] = useState('Read aloud'),
     [error, setError] = useState('');
+  useEffect(()=>{if(tab==='news')return playMoment('newspaper');},[tab]);
   const [cityView, setCityView] = useState<'interior' | 'iso'>(remembered);
   // Whether the player is sitting at a table. A game takes the whole screen and
   // holds it until they get up: playing one out of the corner of a sidebar, with
@@ -314,6 +315,8 @@ function App() {
           setCityView('iso');
           setJourneyProgress(0);
           setJourney({
+            street: next.last_result?.street_travel ?? undefined,
+            fromMinute: world.minute,
             from,
             to,
             minutes: next.last_result?.elapsed || 0,
@@ -1142,7 +1145,7 @@ function App() {
         </nav>
         <main className="page">
           <header className="topbar" inert={tab!=='city'}>
-            <div className="hud-identity" aria-label={`Playing as ${p.name}`}><Portrait id={p.name} face={p.face} size="small"/><div><small>Bellwether · Life {world.life}</small><strong>{p.name}</strong><span>{p.crew.length ? "Crew leader" : p.respect < 6 ? "An unknown face" : "Neighborhood operator"}</span></div></div>
+            <div className="hud-identity" aria-label={`Playing as ${p.name}`}><Portrait id={p.name} face={p.face} size="small"/><div><small>Bellwether · Life {world.life}</small><strong>{p.name}</strong><span className={cityView==='interior'?'hud-location':undefined}>{cityView==='interior' ? `Inside ${world.locations.find(place=>place.id===p.location)?.name||p.location}` : p.crew.length ? "Crew leader" : p.respect < 6 ? "An unknown face" : "Neighborhood operator"}</span></div></div>
             <div className="stats">
               {(world.dashboard || []).map(s => (
                 <div className={'stat' + (s.warn ? ' warning' : '')} key={s.id} title={s.meaning}>

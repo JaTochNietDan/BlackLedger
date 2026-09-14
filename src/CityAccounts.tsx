@@ -69,7 +69,7 @@ export function CityAccounts({world}: {world: Snapshot}) {
               ))}
             </ul>
           )}
-          <details className="books-lines">
+          <details className="books-lines" open>
             <summary>What the {money(b.costs)} a day is</summary>
             <ul>
               {b.lines.map(l => (

@@ -83,7 +83,7 @@ func TestEveryAddressGetsItsOwnBlock(t *testing.T) {
 func TestOneBrowserCityWithAccessibleAddresses(t *testing.T) {
 	t.Parallel()
 	body := source(t, "src/main.tsx")
-	if !holds(body, "<City3D state={w}") || holds(body, "<CityStreet") || holds(body, "<CityIso") {
+	if !regexp.MustCompile(`<City3D\s[^>]*state=\{w\}`).MatchString(body) || holds(body, "<CityStreet") || holds(body, "<CityIso") {
 		t.Fatal("the active city must be the single 3D scene")
 	}
 	city := source(t, "src/City3D.tsx")

@@ -1,6 +1,8 @@
 import {useEffect, useRef, useState} from 'react';
-import type {Place} from './types';
+import type {Place,StreetSegment} from './types';
 export interface Journey {
+  street?: StreetSegment[];
+  fromMinute?: number;
   driving?: boolean;
   vehicle?: string;
   from: Place;

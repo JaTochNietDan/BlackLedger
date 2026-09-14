@@ -484,7 +484,8 @@ type VisualCue struct {
 // not what it cost — so the interface could only ever show the city's minutes
 // and never the player's decision.
 type Result struct {
-	Cues []VisualCue `json:"cues"`
+	StreetTravel []StreetSegment `json:"street_travel"`
+	Cues         []VisualCue     `json:"cues"`
 	// Who came into or left the room while this was being done.
 	Comings []Coming `json:"comings"`
 	// Action is what the player chose, in their own words, and Kind its id.
@@ -502,6 +503,8 @@ type Result struct {
 	Health  int `json:"health"`
 }
 type World struct {
+	recordStreet bool
+	streetTravel []StreetSegment
 	SuspendedJob *SuspendedJob `json:"suspended_job,omitempty"`
 	VisualCues   []VisualCue   `json:"-"`
 	// What walked in or out of the room the player is standing in during this
@@ -2318,6 +2321,22 @@ func (w *World) Advance(minutes int) {
 					next = min(next, max(w.Minute+1, plot.Due-90))
 				}
 			}
+		}
+		// Departures and arrivals are real simulation boundaries, including
+		// trips which start and finish during a single player journey.
+		for _, npc := range w.NPCs {
+			if npc.Dead || npc.Heading == "" {
+				continue
+			}
+			if npc.Sets > w.Minute {
+				next = min(next, npc.Sets)
+			}
+			if npc.Arrives > w.Minute {
+				next = min(next, npc.Arrives)
+			}
+		}
+		if w.recordStreet {
+			w.recordStreetSegment(w.OnTheStreet(), w.Minute, next)
 		}
 		elapsed := next - w.Minute
 		w.Minute = next

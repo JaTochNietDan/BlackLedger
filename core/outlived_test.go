@@ -34,7 +34,19 @@ func TestAnAgreementDoesNotOutliveTheFamily(t *testing.T) {
 			w.Pacts = append(w.Pacts, Pact{With: f.ID, Since: w.Minute, Life: w.Life})
 		}
 		before := len(w.Pacts)
-		w.Advance(120 * 1440)
+		// History retains only 180 entries. Observe notifications while time
+		// passes, rather than requiring an early notice to survive 120 days.
+		end := w.Minute + 120*1440
+		notices := map[string]bool{}
+		for w.Minute < end && w.Player.Alive && w.Event == nil {
+			w.Advance(min(1440, end-w.Minute))
+			for _, record := range w.History {
+				if strings.Contains(record.Title, "understanding with nobody") {
+					notices[record.ID] = true
+				}
+			}
+		}
+		told += len(notices)
 
 		alive := map[string]bool{}
 		for _, f := range w.Factions {
@@ -52,11 +64,7 @@ func TestAnAgreementDoesNotOutliveTheFamily(t *testing.T) {
 		}
 		kept += len(w.Pacts)
 		dropped += before - len(w.Pacts)
-		for _, r := range w.History {
-			if strings.Contains(r.Title, "understanding with nobody") {
-				told++
-			}
-		}
+
 	}
 	t.Logf("across forty cities: %d understandings kept, %d ended with the family, %d said so",
 		kept, dropped, told)
