@@ -673,14 +673,15 @@ type World struct {
 	BuildingFires  []BuildingFire   `json:"building_fires"`
 }
 type Command struct {
-	PoolGame  *int       `json:"pool_game,omitempty"`
-	Pool      *PoolInput `json:"pool,omitempty"`
-	RequestID string     `json:"request_id"`
-	Revision  int        `json:"revision"`
-	Kind      string     `json:"kind"`
-	Target    string     `json:"target"`
-	Event     string     `json:"event"`
-	Choice    string     `json:"choice"`
+	PoolHost  *PoolHostInput `json:"pool_host,omitempty"`
+	PoolGame  *int           `json:"pool_game,omitempty"`
+	Pool      *PoolInput     `json:"pool,omitempty"`
+	RequestID string         `json:"request_id"`
+	Revision  int            `json:"revision"`
+	Kind      string         `json:"kind"`
+	Target    string         `json:"target"`
+	Event     string         `json:"event"`
+	Choice    string         `json:"choice"`
 	// Amount is money the player typed rather than picked: what to put down on
 	// a bet, what to put behind the tables, what to wire out of the city. Zero
 	// means they did not name one, and whatever the action would have done with
@@ -1932,7 +1933,7 @@ func (w *World) Actions(id string) []Action {
 					fmt.Sprintf("Into the float, currently $%d. %s The house keeps roughly %d%% of what crosses the tables over a season and loses on plenty of single nights. A house that cannot pay a winner is finished as a room worth playing in.", prop.Bankroll, coverage(w.NightHandleAt(id)), HouseEdge))
 				sum(BankrollLeast, p.Cash, BankrollLot, "Behind the tables")
 				add("draw", out, 45, 0, w.DrawReadiness(id, 0),
-					fmt.Sprintf("Out of the $%d float and into your hands. It is the only way this room's winnings reach you, and everything taken is action it can no longer attract.", prop.Bankroll))
+					fmt.Sprintf("Out of the $%d float and into your hands. This draws the room's betting float; everything taken is action it can no longer attract.", prop.Bankroll))
 				sum(BankrollLeast, prop.Bankroll, min(BankrollLot, prop.Bankroll), "Taken out")
 			}
 			if w.Properties[id].Income > 0 {

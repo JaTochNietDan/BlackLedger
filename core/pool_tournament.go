@@ -7,53 +7,83 @@ import (
 )
 
 type PoolTournament struct {
-	PrizePaid   int                `json:"prize_paid"`
-	NextStrokes map[int]int        `json:"next_strokes"`
-	Replays     map[int]string     `json:"replays"`
-	Strokes     map[int]PoolStroke `json:"strokes"`
-	Life        int                `json:"life"`
-	PlayerID    string             `json:"player_id"`
-	Fee         int                `json:"fee"`
-	Escrow      int                `json:"escrow"`
-	Deposits    map[string]int     `json:"deposits"`
-	Bracket     *billiards.Bracket `json:"bracket"`
-	Settled     bool               `json:"settled"`
-	Voided      bool               `json:"voided"`
+	HouseCutPercent int                `json:"house_cut_percent"`
+	HouseCutPaid    int                `json:"house_cut_paid"`
+	PrizePaid       int                `json:"prize_paid"`
+	NextStrokes     map[int]int        `json:"next_strokes"`
+	Replays         map[int]string     `json:"replays"`
+	Strokes         map[int]PoolStroke `json:"strokes"`
+	Life            int                `json:"life"`
+	PlayerID        string             `json:"player_id"`
+	Fee             int                `json:"fee"`
+	Escrow          int                `json:"escrow"`
+	Deposits        map[string]int     `json:"deposits"`
+	Bracket         *billiards.Bracket `json:"bracket"`
+	Settled         bool               `json:"settled"`
+	Voided          bool               `json:"voided"`
 }
 
 // Shared funding entry point; scheduled admission calls this after checking its window.
 // All participants and all money are validated before any wallet is touched.
 func (w *World) StartPoolTournament(npcs []string, fee int) error {
-	if len(npcs) != 3 && len(npcs) != 7 {
+	return w.startPoolTournament(npcs, fee, 0, true)
+}
+func (w *World) startPoolTournament(npcs []string, fee, cut int, enter bool) error {
+	count := len(npcs)
+	if enter {
+		count++
+	}
+	if count != 4 && count != 8 {
 		return fmt.Errorf("a hall tournament needs four or eight entrants")
+	}
+	if fee < PoolMinStake || fee > PoolMaxStake || cut < 0 || cut > 50 {
+		return fmt.Errorf("entry must be $10–$500 and the house cut 0–50 percent")
 	}
 	if w.PoolTournament != nil && !w.PoolTournament.Settled {
 		return fmt.Errorf("a tournament is already underway")
 	}
+	if !w.Player.Alive || w.Held() || w.Event != nil || w.Player.Location != PoolPlace || w.poolUnplayable() {
+		return fmt.Errorf("the hall or host is unavailable")
+	}
+	if (w.Pool != nil && !w.Pool.Settled) || w.Seated != "" || (w.Game != nil && !w.Game.Over) || (w.Hand != nil && !w.Hand.Done) {
+		return fmt.Errorf("finish the other game first")
+	}
+	if enter && w.Player.Cash < fee {
+		return fmt.Errorf("you cannot cover your entry fee")
+	}
 	for _, id := range npcs {
-		if reason := w.PoolReadiness(id, fee); reason != "" {
-			return fmt.Errorf("%s", reason)
+		n := w.NPC(id)
+		if n == nil || n.Dead || n.Held > w.Minute || n.Location != PoolPlace || w.Travelling(n) || w.Pockets(n) < fee {
+			return fmt.Errorf("every entrant must be here and able to pay")
 		}
 	}
 	player := fmt.Sprintf("player:%d", w.Life)
-	entrants := append([]string{player}, npcs...)
+	entrants := append([]string{}, npcs...)
+	if enter {
+		entrants = append([]string{player}, npcs...)
+	}
 	bracket, err := billiards.NewBracket(entrants)
 	if err != nil {
 		return err
 	}
-	if err = w.Pay(fee); err != nil {
-		return err
+	if enter {
+		if err = w.Pay(fee); err != nil {
+			return err
+		}
 	}
-	deposits := map[string]int{player: fee}
+	deposits := map[string]int{}
+	if enter {
+		deposits[player] = fee
+	}
 	for _, id := range npcs {
 		n := w.NPC(id)
 		n.Purse -= fee
 		n.Heading, n.Errand, n.Sets, n.Arrives = "", "", 0, 0
 		deposits[id] = fee
 	}
-	w.PoolTournament = &PoolTournament{Life: w.Life, PlayerID: player, Fee: fee, Escrow: fee * len(entrants), Deposits: deposits, Bracket: bracket, Replays: map[int]string{}, Strokes: map[int]PoolStroke{}}
+	w.PoolTournament = &PoolTournament{HouseCutPercent: cut, Life: w.Life, PlayerID: player, Fee: fee, Escrow: fee * len(entrants), Deposits: deposits, Bracket: bracket, Replays: map[int]string{}, Strokes: map[int]PoolStroke{}}
 	w.schedulePoolTournament()
-	w.Log("Entry money on the baize", fmt.Sprintf("%d entrants each pay $%d. The tournament winner takes the whole $%d pool. Leaving forfeits entry money.", len(entrants), fee, fee*len(entrants)), "personal")
+	w.Log("Entry money on the baize", fmt.Sprintf("%d entrants each pay $%d. The winner receives $%d after the posted %d%% house cut. Entrants forfeit their fee by leaving.", len(entrants), fee, fee*len(entrants)-fee*len(entrants)*cut/100, cut), "personal")
 	return nil
 }
 func (w *World) tournamentParticipant(id string) bool {
@@ -102,23 +132,35 @@ func (w *World) ReconcilePoolTournament() {
 	}
 	if t.Bracket.Finished && t.Bracket.Winner != "" {
 		winner := t.Bracket.Winner
+		property := w.Properties[PoolPlace]
+		if property == nil {
+			return
+		}
+		houseCut := t.Escrow * t.HouseCutPercent / 100
+		prize := t.Escrow - houseCut
 		winnerName := w.Player.Name
 		if winner == t.PlayerID {
 			if t.Life != w.Life {
 				return
 			}
-			w.Player.Cash += t.Escrow
-			w.Player.Earned += max(0, t.Escrow-t.Fee)
+			w.Player.Cash += prize
+			w.Player.Earned += max(0, prize-t.Fee)
 		} else {
 			n := w.NPC(winner)
 			if n == nil {
 				return
 			}
-			n.Purse += t.Escrow
+			n.Purse += prize
 			winnerName = n.Name
 		}
-		w.Log("The tournament is decided", fmt.Sprintf("%s wins the tournament and receives the entire $%d entry pool.", winnerName, t.Escrow), "personal")
-		t.PrizePaid = t.Escrow
+		if w.Own(PoolPlace) {
+			w.Earn(houseCut)
+		} else {
+			property.Bankroll += houseCut
+		}
+		t.HouseCutPaid = houseCut
+		w.Log("The tournament is decided", fmt.Sprintf("%s wins the tournament and receives the $%d prize. The hall takes $%d.", winnerName, prize, houseCut), "personal")
+		t.PrizePaid = prize
 		t.Escrow = 0
 		t.Settled = true
 		return

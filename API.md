@@ -1203,3 +1203,27 @@ zero. Cancelled/unpaid events keep zero. Legacy settled saves without this field
 retain zero rather than inventing a historical payment. The result screen shows
 recorded prize/profit when available, distinguishes elimination and withdrawal,
 and labels the final and its completed result explicitly.
+
+### Proprietor-arranged billiards tournaments
+
+The Green Baize remains purchasable/staffable like other businesses. Its owner
+may send `pool_tournament_host` with `pool_host:{fee,cut_percent,enter}` while
+inside the usable hall. Fee is an integer $10–$500; cut is an integer0–50%.
+The owner can enter at the same fee or host without paying/occupying a bracket
+seat. The server selects a funded four/eight-person local field. No partial
+payments occur if ownership, availability, settings or funding are invalid.
+Owner events can start outside the public schedule; terms freeze at entry.
+
+Gross entry escrow stays held until a champion is determined. Integer-dollar
+house cut is floor(gross*percent/100); champion receives the remainder. The cut
+is income to the current player owner, or goes to the property's bankroll if
+it no longer belongs to the player. Cancellation takes no cut and preserves the
+existing refund/forfeiture terms. Non-playing hosts may leave while NPC matches
+continue as game time advances. Player entrants still forfeit on departure.
+
+Public notice adds `can_host`. Tournament state/view adds `house_cut_percent`,
+`house_cut_paid`, and public `entered`/`gross_pool`. Public `pot` and each table's
+pot show the champion's net prize, while saved `Escrow` remains gross funding.
+The UI shows four/eight-entry prize/cut estimates before committing, separate
+host-only status, and recorded prize/commission after completion. Existing
+public tournaments retain zero house cut and pay the entire entry pool.

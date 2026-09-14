@@ -1,5 +1,13 @@
 # Current goal and workstream ownership
 
+## User amendment — proprietor tournaments (2026-09-14)
+
+The player can own the billiard hall like other businesses, arrange tournaments,
+set entry fees and a house cut, and choose to enter or let NPCs play it out.
+The configured fee funds the prize pool; the posted house cut is deducted from
+that pool. This amends the earlier whole-pool requirement for owner-run events.
+
+
 ## User amendment — playable billiards (2026-09-14)
 
 The pool hall must support playing billiards across its tables, individual games

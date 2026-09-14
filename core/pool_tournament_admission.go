@@ -76,5 +76,5 @@ func (w *World) PoolTournamentNotice() any {
 	for _, id := range ids {
 		entrants = append(entrants, map[string]any{"id": id, "name": w.NPC(id).Name})
 	}
-	return map[string]any{"opens": opens, "closes": closes, "fee": PoolTournamentFee, "entrants": entrants, "pot": PoolTournamentFee * (len(ids) + 1), "can_enter": reason == "", "unavailable": reason}
+	return map[string]any{"can_host": w.Own(PoolPlace), "opens": opens, "closes": closes, "fee": PoolTournamentFee, "entrants": entrants, "pot": PoolTournamentFee * (len(ids) + 1), "can_enter": reason == "", "unavailable": reason}
 }

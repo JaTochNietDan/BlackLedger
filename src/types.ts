@@ -550,6 +550,7 @@ export interface Snapshot {
 export interface Command {
   pool?:PoolInput;
   pool_game?:number;
+  pool_host?:{fee:number;cut_percent:number;enter:boolean};
   kind: string;
   target?: string;
   event?: string;

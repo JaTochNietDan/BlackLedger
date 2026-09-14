@@ -78,9 +78,9 @@ export function poolCueStroke(seconds:number,speed:number,radius:number,top=0,si
 }
 
 export interface PoolTournamentState {
- fee:number;pot:number;prize_paid?:number;settled:boolean;voided:boolean;finished:boolean;winner:string;player_id:string;withdrawn:boolean;
+ fee:number;pot:number;entered?:boolean;house_cut_percent?:number;house_cut_paid?:number;gross_pool?:number;prize_paid?:number;settled:boolean;voided:boolean;finished:boolean;winner:string;player_id:string;withdrawn:boolean;
  names:Record<string,string>;
  games:{index:number;round:number;table_number:number;players:[string,string];player_seat:number;resolved:boolean;winner:string;table:PoolState|null}[];
 }
 
-export interface PoolTournamentNoticeState {opens:number;closes:number;fee:number;entrants:{id:string;name:string}[];pot:number;can_enter:boolean;unavailable:string}
+export interface PoolTournamentNoticeState {can_host?:boolean;opens:number;closes:number;fee:number;entrants:{id:string;name:string}[];pot:number;can_enter:boolean;unavailable:string}

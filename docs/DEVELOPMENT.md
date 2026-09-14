@@ -13420,3 +13420,12 @@ Added upright cue-grip poses for tournament entrants using the shared close-view
 cue geometry. Both character rigs pass grip/arm-length/floor checks;387 frontend
 tests and build pass. Enlarged browser view inspected on the isolated hall.
 Full shooting/bridge animation remains pending. Main unchanged.
+
+### 2026-09-14 — Proprietor-arranged tournaments
+
+Implemented the user's ownership amendment: configurable entry fee/cut, optional
+owner entry, funded NPC fields and split settlement. Full owner-only draw ran
+through ordinary clock waits in the isolated browser/API fixture and paid Mara
+$160 plus $40 owner commission. Core, receipt/reopen, HTTP, vet and build checks
+pass. API/GOAL/BILLIARDS document terms, evidence and remaining broader scope.
+No live save or release promotion.

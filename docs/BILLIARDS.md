@@ -639,3 +639,29 @@ Tests verify both person/woman models place the palm within2mm of the shaft grip
 retain arm scale and leave floor clearance. All387 frontend tests pass (14.134s)
 and build passes (2.68s); logs `.runtime/pool-held-cue-{tests,build}.log`.
 No game command or live save/release change was made.
+
+## Proprietor tournaments (2026-09-14 user amendment)
+
+Owners can arrange a tournament immediately, set a $10–$500 entry fee and0–50%
+house cut, and choose whether to enter. Four/eight actual funded entrants pay
+before the event starts; the owner pays only when entering. Fees and commission
+are fixed once committed. The champion receives gross entries minus the cut;
+the cut becomes owner income at settlement. Cancellation takes no commission.
+A host who is not playing can leave while NPC games continue. The existing
+public schedule still has zero cut. Hall ownership uses the normal business
+purchase, staffing, stock, repairs and income systems.
+
+Browser tab64/isolated port8969 configured fee50/cut20/enterfalse and started
+four NPCs: gross200, net prize160, no player entry debit. Two ordinary wait
+commands let the full physical draw play out: semifinals24/17 strokes, final23,
+Mara champion, prize_paid160, house_cut_paid40, pot0. Revision3/minute1200/cash1072
+includes $32 ordinary hall income plus $40 commission. Evidence
+`.runtime/pool-owner-wait-{1,2}.json`; DB `.runtime/pool-owner-qa.sqlite3` only.
+
+Core tests cover ownership/settings, optional entry, immutable terms, refunds,
+non-playing owner departure and physical split settlement. SQLite concurrent
+winning retries/reopen preserve one prize and one cut; HTTP retries reserve one
+field. Core pool tests pass (6.003s), full store tests (0.306s), full server tests
+(1.889s), vet and build pass. Logs `.runtime/pool-host-{core,adapters,http,vet,
+build}.log`. Main campaign and live release unchanged. This implements the
+proprietor amendment; broader animation/physics/interior goals remain active.

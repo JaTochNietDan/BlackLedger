@@ -145,7 +145,7 @@ func (w *World) PoolTournamentDescription() any {
 					reason = err.Error()
 				}
 			}
-			g := &PoolGame{Place: PoolPlace, Life: t.Life, Opponent: cell.Players[1], OpponentName: names[cell.Players[1]], Stake: t.Fee, Escrow: t.Escrow, Settled: cell.Resolved || t.Settled, Voided: t.Voided, Match: cell.Rack, Replay: t.Replays[i]}
+			g := &PoolGame{Place: PoolPlace, Life: t.Life, Opponent: cell.Players[1], OpponentName: names[cell.Players[1]], Stake: t.Fee, Escrow: t.Escrow - t.Escrow*t.HouseCutPercent/100, Settled: cell.Resolved || t.Settled, Voided: t.Voided, Match: cell.Rack, Replay: t.Replays[i]}
 			if stroke, ok := t.Strokes[i]; ok {
 				g.LastStroke = &stroke
 			}
@@ -153,5 +153,5 @@ func (w *World) PoolTournamentDescription() any {
 		}
 		games = append(games, map[string]any{"index": i, "round": cell.Round, "table_number": cell.Table, "players": cell.Players, "player_seat": seat, "resolved": cell.Resolved, "winner": cell.Winner, "table": table})
 	}
-	return map[string]any{"fee": t.Fee, "pot": t.Escrow, "prize_paid": t.PrizePaid, "settled": t.Settled, "voided": t.Voided, "finished": t.Bracket.Finished, "winner": t.Bracket.Winner, "player_id": t.PlayerID, "withdrawn": t.Bracket.Withdrawn[t.PlayerID], "names": names, "games": games}
+	return map[string]any{"fee": t.Fee, "pot": t.Escrow - t.Escrow*t.HouseCutPercent/100, "gross_pool": t.Escrow, "house_cut_percent": t.HouseCutPercent, "house_cut_paid": t.HouseCutPaid, "entered": t.Deposits[t.PlayerID] > 0, "prize_paid": t.PrizePaid, "settled": t.Settled, "voided": t.Voided, "finished": t.Bracket.Finished, "winner": t.Bracket.Winner, "player_id": t.PlayerID, "withdrawn": t.Bracket.Withdrawn[t.PlayerID], "names": names, "games": games}
 }

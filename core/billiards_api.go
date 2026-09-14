@@ -20,11 +20,17 @@ type PoolInput struct {
 }
 
 func (w *World) poolCommand(c Command) (string, int, error) {
+	if c.PoolHost != nil && c.Kind != "pool_tournament_host" {
+		return "", 0, fmt.Errorf("host settings are only accepted when arranging a tournament")
+	}
 	if c.Kind != "pool_start" && c.Target != "" && c.Target != PoolPlace {
 		return "", 0, fmt.Errorf("that is not the billiards table")
 	}
 	if c.Pool != nil && c.Kind != "pool_place" && c.Kind != "pool_shot" && c.Kind != "pool_tournament_place" && c.Kind != "pool_tournament_shot" {
 		return "", 0, fmt.Errorf("this command does not accept cue input")
+	}
+	if c.Kind == "pool_tournament_host" {
+		return "Arrange a billiards tournament", 0, w.HostPoolTournament(c.PoolHost)
 	}
 	if c.Kind == "pool_tournament_enter" {
 		return "Enter the Green Baize tournament", 0, w.EnterPoolTournament()
