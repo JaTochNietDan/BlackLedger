@@ -1238,5 +1238,37 @@
       ]
     ],
     "bytes": 450712
+  },
+  "interior-cemetery": {
+    "file": "interior-cemetery.glb",
+    "bounds_blender": [
+      [
+        -5.08,
+        -5.0,
+        -0.2
+      ],
+      [
+        5.0,
+        5.08,
+        3.7
+      ]
+    ],
+    "bytes": 528208
+  },
+  "interior-crematorium": {
+    "file": "interior-crematorium.glb",
+    "bounds_blender": [
+      [
+        -5.08,
+        -5.0,
+        -0.2
+      ],
+      [
+        5.0,
+        5.08,
+        3.7
+      ]
+    ],
+    "bytes": 507760
   }
 }

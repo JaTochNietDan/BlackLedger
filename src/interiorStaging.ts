@@ -261,10 +261,11 @@ export function tailorPlacements(people:Presence[]) {
  return result;
 }
 
-export type InteriorPlace='mortuary'|'cabstand'|'docks'|'chapel'|'herald'|'poolhall'|'tailor'|'pawn'|'riverside'|'bar'|'mercercourt'|'room'|'laundry'|'estate'|'apartment'|'flat'|'butcher'|'garage'|'lodging'|'restaurant'|'market'|'precinct';
+export type InteriorPlace='cemetery'|'crematorium'|'mortuary'|'cabstand'|'docks'|'chapel'|'herald'|'poolhall'|'tailor'|'pawn'|'riverside'|'bar'|'mercercourt'|'room'|'laundry'|'estate'|'apartment'|'flat'|'butcher'|'garage'|'lodging'|'restaurant'|'market'|'precinct';
 export function placementsForInterior(place:InteriorPlace,people:Presence[]){
- if(place==='mortuary'){
+ if(place==='mortuary'||place==='cemetery'||place==='crematorium'){
   const spots:InteriorSpot[]=[{id:'registry-clerk',x:3.1,z:-1.5,yaw:Math.PI},...[-1,1,2.7].flatMap((z,row)=>[-.8,.9].map((x,col)=>({id:`receiving-${row}-${col}`,x,z,yaw:Math.PI})))];
+  if(place!=='mortuary')spots.push(...[-.3,1.3,3].map((z,i)=>({id:`memorial-aisle-${i}`,x:-2.5,z,yaw:Math.PI})),{id:'memorial-front',x:-.8,z:4.2,yaw:Math.PI});
   if(!people.some(p=>/attendant|receptionist|clerk/i.test(p.role||'')))spots.shift();
   return new Map([...people].sort((a,b)=>Number(/attendant|receptionist|clerk/i.test(b.role||''))-Number(/attendant|receptionist|clerk/i.test(a.role||''))||a.id.localeCompare(b.id)).slice(0,spots.length).map((p,i)=>[p.id,spots[i]]));
  }
@@ -295,7 +296,7 @@ export function poseInteriorOccupant(actor:THREE.Group,spot:InteriorSpot) {
 
 // Reserved clear floor positions; these never displace a public occupant.
 export function interiorPlayerSpot(place:InteriorPlace):InteriorSpot {
- if(place==='mortuary')return {id:"player-entry",x:1.7,z:4,yaw:Math.PI};
+ if(place==='mortuary'||place==='cemetery'||place==='crematorium')return {id:"player-entry",x:1.7,z:4,yaw:Math.PI};
  if(place==='cabstand')return {id:'player-entry',x:0,z:4,yaw:Math.PI};
  if(place==='docks')return {id:'player-entry',x:0,z:4.5,yaw:Math.PI};
  if(place==='chapel')return {id:'player-entry',x:0,z:3.6,yaw:Math.PI};

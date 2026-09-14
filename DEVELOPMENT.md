@@ -3060,3 +3060,32 @@ Targeted prior-failure plus funeral, death-service and JSON-reload checks passed
 selection passed0.945s. These are focused checks, not a new full-suite claim.
 Cemetery and crematorium 3D interiors/fallback room art remain release blockers;
 no main8791 release or QA mutation occurred. Broad goal remains incomplete.
+
+### September 14 — cemetery and crematorium interiors
+
+Previous turn was progress: integrated workers and actual saved service books.
+Rechecked the worktree; preserved unrelated work. Authored original Blender
+Oak Ridge plot office (plot map, archive drawers, grounds tools, registry and
+visitor benches) and Stillwater remembrance/furnace room (closed furnace doors,
+flues/gauges, urn shelves, registry and benches). Registered room models,
+camera/cutaway settings, public occupant positions and player entry points.
+Both now participate in existing named indoor-strike room selection.
+Export path: --only=memorial-interiors; fallback plates rendered from those GLBs.
+Restored the unchanged older front/mortuary plates after the batch renderer
+regenerated them, avoiding unrelated render-noise changes in this commit.
+
+Initial browser99 cemetery/100 crematorium fixtures exposed a title obscured
+by the plot map and more public people than reserved positions. Lowered the
+map, expanded the clear aisle positions, re-exported/rebuilt. Browser101 final
+cemetery check at1280x720 shows readable title and spaced occupants. Reviewed
+crematorium browser scene and rendered fallback plate; expanded actual-geometry
+checks cover both rooms with11 public occupants plus player, pairwise body
+bounds and furnishing clearance at three heights. Existing indoor-strike
+placement test now also loads both room GLBs.
+
+All405 frontend tests passed17.879s; final build3.85s. Go front/interior plate
+coverage passed0.199s. Fixtures:.runtime/cemetery-room-qa.sqlite3 on8988
+(session44565) and crematorium-room-qa.sqlite3 on8989(session93862). These are
+isolated staged fixtures, not campaign acceptance. No live8791 commands or
+release promotion. Broader goal remains open, including remaining city venues,
+full generic indoor incident choreography and continued billiards fidelity.

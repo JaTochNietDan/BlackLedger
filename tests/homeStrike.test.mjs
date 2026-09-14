@@ -67,7 +67,7 @@ test('interior setting selects actual venue and explicitly links its death cue',
 });
 test('venue assassination finds a clear approach in the bar and dispatch office',async()=>{
  const {interiorStrikePlacement}=await import('../.runtime/frontend-test/interiorStrikePlacement.js');
- for(const model of ['interior-saint-agnes','interior-cabstand','interior-mortuary']){
+ for(const model of ['interior-saint-agnes','interior-cabstand','interior-mortuary','interior-cemetery','interior-crematorium']){
   const room=await load(model),a=await load('person'),v=await load('woman'),weapon=await load('revolver');
   const cast=new CityAssassination(a,v,weapon,'back-of-head','revolver');
   assert.ok(interiorStrikePlacement(room,cast,{x:7,z:7}),model);

@@ -2540,6 +2540,20 @@ if __name__ == '__main__' and '--only=death-service-exteriors' in __import__('sy
     raise SystemExit(0)
 
 
+def memorial_interior(kind):
+    from memorial_interiors import build
+    build(kind,box,cylinder,material)
+
+
+if __name__ == '__main__' and '--only=memorial-interiors' in __import__('sys').argv:
+    manifest_path=os.path.join(OUT,'manifest.json')
+    with open(manifest_path) as f: selected_manifest=json.load(f)
+    for kind in ('cemetery','crematorium'):
+        clear();memorial_interior(kind);selected_manifest['interior-'+kind]=export('interior-'+kind)
+    with open(manifest_path,'w') as f:json.dump(selected_manifest,f,indent=2)
+    raise SystemExit(0)
+
+
 def mortuary_interior():
     from mortuary_interior import build
     build(box,cylinder,material)
@@ -2809,6 +2823,8 @@ clear();cabstand_interior();manifest['interior-cabstand']=export('interior-cabst
 clear();docks_interior();manifest['interior-docks']=export('interior-docks')
 clear();chapel_interior();manifest['interior-chapel']=export('interior-chapel')
 clear();mortuary_interior();manifest['interior-mortuary']=export('interior-mortuary')
+for kind in ('cemetery','crematorium'):
+    clear();memorial_interior(kind);manifest['interior-'+kind]=export('interior-'+kind)
 for kind in ('mortuary','cemetery','crematorium'):
     clear();death_service_exterior(kind);manifest[kind]=export(kind)
 clear();herald_interior();manifest['interior-herald']=export('interior-herald')

@@ -27,4 +27,5 @@ def render(model, destination, interior=False):
 
 for kind in ('mortuary','cemetery','crematorium'):
     render(kind,'public/art/fronts/front-'+kind+'-v1.jpg')
-render('interior-mortuary','public/art/rooms/room-mortuary-v1.jpg',True)
+for kind in ('mortuary','cemetery','crematorium'):
+    render('interior-'+kind,'public/art/rooms/room-'+kind+'-v1.jpg',True)

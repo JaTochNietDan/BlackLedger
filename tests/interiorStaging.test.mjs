@@ -110,3 +110,23 @@ test('mortuary registry is reserved for a public attendant and receiving spots s
  assert.equal(new Set([...a.values()].map(s=>s.id)).size,a.size);
  assert.equal([...placementsForInterior('mortuary',[{id:'visitor'}]).values()].some(s=>s.id==='registry-clerk'),false);
 });
+
+test('memorial rooms give a full public cast separate space clear of furnishings',async()=>{
+ for(const place of ['cemetery','crematorium']){
+  const room=await model('interior-'+place);room.updateMatrixWorld(true);
+  const people=[{id:'clerk',role:'Memorial clerk'},...Array.from({length:10},(_,i)=>({id:`visitor-${i}`}))];
+  const spots=placementsForInterior(place,people);
+  assert.equal(spots.size,people.length);
+  const source=await model('person'),boxes=[];
+  for(const spot of [...spots.values(),{x:1.7,z:4,yaw:Math.PI}]){
+   const actor=source.clone(true);poseInteriorOccupant(actor,spot);
+   const bounds=new THREE.Box3().setFromObject(actor,true);
+   for(const other of boxes)assert.equal(bounds.intersectsBox(other),false,`${place}: occupants intersect`);
+   boxes.push(bounds);
+   for(const height of [.4,1,1.6])for(let angle=0;angle<Math.PI*2;angle+=Math.PI/4){
+    const ray=new THREE.Raycaster(new THREE.Vector3(spot.x,height,spot.z),new THREE.Vector3(Math.sin(angle),0,Math.cos(angle)),0,.35);
+    assert.equal(ray.intersectObject(room,true).length,0,`${place}/${spot.id}: actor touches furnishing`);
+   }
+  }
+ }
+});
