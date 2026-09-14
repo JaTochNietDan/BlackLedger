@@ -48,9 +48,25 @@ export function marinerLobbyPlacements(people:Presence[]) {
  return result;
 }
 
-export type InteriorPlace='bar'|'mercercourt'|'room';
+// The washers occupy the rear strip; the collection counter has its own clerk aisle.
+export function laundryPlacements(people:Presence[]) {
+ const result=new Map<string,InteriorSpot>();
+ const available:InteriorSpot[]=[
+  ...[-.4,1.1].map((z,i)=>({id:`laundry-bench-${i}`,x:-4.2,z,yaw:Math.PI/2,seat:.77})),
+  ...[-2,-.2,1.6].flatMap((z,row)=>[-2.3,-.5,1.1].map((x,col)=>({id:`laundry-floor-${row}-${col}`,x,z,yaw:row%2?Math.PI:0})))
+ ];
+ for(const who of [...people].sort((a,b)=>a.id.localeCompare(b.id))){
+  if(result.has(who.id))continue;
+  if(/\b(launderer|laundress|laundry worker|clerk)\b/i.test(who.role||'')&&![...result.values()].some(s=>s.id==='laundry-counter'))
+   result.set(who.id,{id:'laundry-counter',x:3.35,z:-2.15,yaw:0});
+  else {const spot=available.shift();if(spot)result.set(who.id,spot);}
+ }
+ return result;
+}
+
+export type InteriorPlace='bar'|'mercercourt'|'room'|'laundry';
 export function placementsForInterior(place:InteriorPlace,people:Presence[]){
- return (place==='bar'?interiorPlacements:place==='room'?marinerLobbyPlacements:mercerLobbyPlacements)(people);
+ return (place==='laundry'?laundryPlacements:place==='bar'?interiorPlacements:place==='room'?marinerLobbyPlacements:mercerLobbyPlacements)(people);
 }
 
 export function poseInteriorOccupant(actor:THREE.Group,spot:InteriorSpot) {
@@ -71,7 +87,7 @@ export function poseInteriorOccupant(actor:THREE.Group,spot:InteriorSpot) {
 
 // Reserved clear floor positions; these never displace a public occupant.
 export function interiorPlayerSpot(place:InteriorPlace):InteriorSpot {
- if(place==='room')return {id:'player-entry',x:1.6,z:3.15,yaw:Math.PI};
+ if(place==='room'||place==='laundry')return {id:'player-entry',x:1.6,z:3.15,yaw:Math.PI};
  return place==='mercercourt'
   ? {id:'player-entry',x:2,z:4.15,yaw:Math.PI}
   : {id:'player-entry',x:3.65,z:-.7,yaw:-Math.PI/2};

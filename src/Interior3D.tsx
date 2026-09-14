@@ -15,12 +15,12 @@ import './interior3d.css';
 
 export function Interior3D(props:{place:InteriorPlace;motion:boolean;player:Pick<Person,'name'|'face'|'alive'>;people:Presence[];picked:string;onPick:(id:string)=>void;minute:number}) {
  const host=useRef<HTMLDivElement>(null), latest=useRef(props);latest.current=props;
- const roomName=props.place==='mercercourt'?'Mercer Court':props.place==='room'?'The Mariner':'Saint Agnes';
+ const roomName=props.place==='laundry'?'Bluebird Laundry':props.place==='mercercourt'?'Mercer Court':props.place==='room'?'The Mariner':'Saint Agnes';
  const extraPeople=props.people.length-placementsForInterior(props.place,props.people).size;
  const [status,setStatus]=useState(`Opening ${roomName}…`);
  useEffect(()=>{
-  const boarding=props.place==='room',lobby=props.place!=='bar', roomModel=boarding?'interior-mariner':lobby?'interior-mercer-court':'interior-saint-agnes';
-  const origin=new THREE.Vector3(13,14,lobby?17:-17), centre=new THREE.Vector3(0,1,lobby?-1:0), span=boarding?7.5:lobby?8.5:7;
+  const laundry=props.place==='laundry',boarding=props.place==='room',compact=boarding||laundry,lobby=props.place!=='bar', roomModel=laundry?'interior-laundry':boarding?'interior-mariner':lobby?'interior-mercer-court':'interior-saint-agnes';
+  const origin=new THREE.Vector3(13,14,lobby?17:-17), centre=new THREE.Vector3(0,1,lobby?-1:0), span=compact?7.5:lobby?8.5:7;
   setStatus(`Opening ${roomName}…`);
   const el=host.current!;let dead=false,frame=0,dirty=true,renderedFrames=0;
   const scene=new THREE.Scene();scene.background=new THREE.Color(0x171b18);
@@ -37,7 +37,7 @@ export function Interior3D(props:{place:InteriorPlace;motion:boolean;player:Pick
   const ambient=new THREE.HemisphereLight(0xffe7bc,0x443e32,2);scene.add(ambient);
   const sun=new THREE.DirectionalLight(0xffe3b0,3);sun.position.set(2,10,lobby?8:-8);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);
   Object.assign(sun.shadow.camera,{left:-9,right:9,top:9,bottom:-9,near:.1,far:35});sun.shadow.bias=-.0003;scene.add(sun);
-  for(const x of (boarding?[-4.1,.5]:lobby?[-4.7,.1]:[-3,1,4])){const lamp=new THREE.PointLight(0xffba68,12,7,2);lamp.position.set(x,boarding?3.27:lobby?3.78:2.65,boarding?-5.46:lobby?-6.2:2.7);scene.add(lamp);}
+  for(const x of (laundry?[-2.5,2.5]:boarding?[-4.1,.5]:lobby?[-4.7,.1]:[-3,1,4])){const lamp=new THREE.PointLight(0xffba68,12,7,2);lamp.position.set(x,laundry?3.08:boarding?3.27:lobby?3.78:2.65,laundry?-1.5:boarding?-5.46:lobby?-6.2:2.7);scene.add(lamp);}
   const reduce=matchMedia('(prefers-reduced-motion: reduce)');let reduced=reduce.matches;
   const reduction=()=>{reduced=reduce.matches;dirty=true;};reduce.addEventListener('change',reduction);
   const models=new Map<string,THREE.Group>();const actors=new Map<string,THREE.Group>();let costumes:THREE.Material[]=[];
@@ -132,8 +132,8 @@ export function Interior3D(props:{place:InteriorPlace;motion:boolean;player:Pick
    if(dirty&&!document.hidden){
     const room=models.get(roomModel);
     const left=room?.getObjectByName('interior-wall-left'),back=room?.getObjectByName('interior-wall-back');
-    if(left)left.visible=camera.position.x>=(boarding?-4.8:-5.8);
-    if(back)back.visible=lobby?camera.position.z>=(boarding?-5.8:-6.8):camera.position.z<=4.8;
+    if(left)left.visible=camera.position.x>=(compact?-4.8:-5.8);
+    if(back)back.visible=lobby?camera.position.z>=(compact?-5.8:-6.8):camera.position.z<=4.8;
     // Moving service poses refresh the cast above; orbiting a static room
     // does not re-upload its unchanged instance buffers.
     renderer.render(scene,camera);renderedFrames++;dirty=false;

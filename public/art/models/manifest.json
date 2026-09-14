@@ -726,5 +726,21 @@
       ]
     ],
     "bytes": 2961852
+  },
+  "interior-laundry": {
+    "file": "interior-laundry.glb",
+    "bounds_blender": [
+      [
+        -5.1,
+        -4.0,
+        -0.255
+      ],
+      [
+        5.0,
+        6.1,
+        4.2
+      ]
+    ],
+    "bytes": 6325108
   }
 }

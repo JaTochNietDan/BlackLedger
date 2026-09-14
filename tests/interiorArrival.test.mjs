@@ -8,11 +8,11 @@ import {placementsForInterior,interiorPlayerSpot,poseInteriorOccupant} from '../
 async function load(name){const b=readFileSync(new URL(`../public/art/models/${name}.glb`,import.meta.url)),loader=new GLTFLoader();loader.register(()=>({name:'geometry-only',loadMaterial(){return Promise.resolve(new THREE.MeshStandardMaterial());}}));return (await loader.parseAsync(b.buffer.slice(b.byteOffset,b.byteOffset+b.byteLength),'')).scene;}
 
 test('every interior entrance keeps both real rigs on the floor, clear of occupants and furniture, and settles without replay',async()=>{
- for(const name of ['person','woman'])for(const place of ['bar','room','mercercourt']){
+ for(const name of ['person','woman'])for(const place of ['bar','room','mercercourt','laundry']){
   const source=await load(name),actor=source.clone(true),arrival=new InteriorArrival(actor,place),end=interiorPlayerSpot(place);
-  const people=[{id:'worker',role:place==='bar'?'Barman':place==='room'?'Landlady':'Superintendent'},...Array.from({length:20},(_,i)=>({id:`guest-${i}`}))];
+  const people=[{id:'worker',role:place==='bar'?'Barman':place==='room'?'Landlady':place==='laundry'?'Laundress':'Superintendent'},...Array.from({length:20},(_,i)=>({id:`guest-${i}`}))];
   const occupied=[...placementsForInterior(place,people)].map(([id,s])=>{const npc=source.clone(true);poseInteriorOccupant(npc,s);return {id,box:new THREE.Box3().setFromObject(npc,true)};});
-  const obstacle=place==='room'?new THREE.Box3(new THREE.Vector3(2.37,0,-5.7),new THREE.Vector3(4.85,4.2,.05)):place==='mercercourt'?new THREE.Box3(new THREE.Vector3(2.85,0,-6.31),new THREE.Vector3(5.65,4.2,.02)):new THREE.Box3(new THREE.Vector3(-5,0,2.0),new THREE.Vector3(5.3,1.3,3.3));
+  const obstacle=place==='laundry'?new THREE.Box3(new THREE.Vector3(1.97,0,-1.67),new THREE.Vector3(4.73,1.5,-.53)):place==='room'?new THREE.Box3(new THREE.Vector3(2.37,0,-5.7),new THREE.Vector3(4.85,4.2,.05)):place==='mercercourt'?new THREE.Box3(new THREE.Vector3(2.85,0,-6.31),new THREE.Vector3(5.65,4.2,.02)):new THREE.Box3(new THREE.Vector3(-5,0,2.0),new THREE.Vector3(5.3,1.3,3.3));
   let previous;let swung=false;
   for(let frame=0;frame<=180;frame++){
    const seconds=arrival.duration*frame/180,active=arrival.pose(seconds),box=new THREE.Box3().setFromObject(actor,true);

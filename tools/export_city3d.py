@@ -1593,6 +1593,107 @@ def bar_cloth():
     for i in range(4):box('soft linen fold',(-.05+i*.035,0,.011),(.017,.14,.002),linen,.001)
 
 
+def laundry_interior():
+    """Bluebird's working floor: belt-era drum washers, sorting and collection."""
+    cream=material('Bluebird ivory enamel',(.66,.65,.54),.18)
+    teal=material('Bluebird machine green',(.10,.24,.22),.25)
+    iron=material('Bluebird dark cast iron',(.035,.045,.044),.55)
+    steel=material('Bluebird polished rims',(.42,.46,.43),.82)
+    brass=material('Bluebird valves',(.45,.29,.09),.7)
+    plaster=material('Bluebird limewash',(.52,.49,.38))
+    tile=material('Bluebird worn floor',(.29,.31,.27))
+    wood=material('Bluebird scrubbed beech',(.38,.25,.12))
+    linen=material('Bluebird cotton weave',(.68,.65,.52))
+    ink=material('Bluebird printed ink',(.035,.075,.065))
+    # Packed fine weave survives the browser export, including at close zoom.
+    n=128;pixels=[];rng=random.Random(1953)
+    for y in range(n):
+        for x in range(n):
+            tone=.95+(.04 if (x+y)%2 else -.04)+rng.uniform(-.018,.018)
+            pixels.extend((*[1.055*(c*tone)**(1/2.4)-.055 for c in linen.diffuse_color[:3]],1))
+    img=bpy.data.images.new('Bluebird cotton weave',width=n,height=n);img.pixels=pixels;img.pack()
+    tex=linen.node_tree.nodes.new('ShaderNodeTexImage');tex.image=img
+    linen.node_tree.links.new(tex.outputs['Color'],linen.node_tree.nodes['Principled BSDF'].inputs['Base Color'])
+    box('floor foundation',(0,1,-.13),(10,10,.25),iron)
+    for x in range(20):
+        for y in range(20):box('quarry tile',(-4.75+x*.5,-3.75+y*.5,0),(.488,.488,.035),tile,.003)
+    box('rear plaster',(0,6,2.1),(10,.2,4.2),plaster)
+    box('west plaster',(-5,1,2.1),(.2,10,4.2),plaster)
+    for z in range(6):
+        for x in range(20):box('rear glazed tile',(-4.75+x*.5,5.88,.15+z*.3),(.485,.045,.285),cream,.004)
+        for y in range(20):box('west glazed tile',(-4.88,-3.75+y*.5,.15+z*.3),(.045,.485,.285),cream,.004)
+    for z in (.12,1.87):
+        box('rear green border',(0,5.83,z),(10,.06,.08),teal)
+        box('west green border',(-4.83,1,z),(.06,10,.08),teal)
+    def ring(name,xyz,major,minor,mat):
+        bpy.ops.mesh.primitive_torus_add(major_radius=major,minor_radius=minor,major_segments=48,minor_segments=10,location=xyz,rotation=(math.pi/2,0,0))
+        ob=bpy.context.object;ob.name=name;ob.data.materials.append(mat)
+        for p in ob.data.polygons:p.use_smooth=True
+    def label(name,text,xyz,size):
+        curve=bpy.data.curves.new(name,'FONT');curve.body=text;curve.size=size;curve.align_x='CENTER';curve.extrude=.001
+        ob=bpy.data.objects.new(name,curve);bpy.context.collection.objects.link(ob);ob.location=xyz;ob.rotation_euler=(math.pi/2,0,0);ob.data.materials.append(ink)
+        bpy.ops.object.select_all(action='DESELECT');ob.select_set(True);bpy.context.view_layer.objects.active=ob;bpy.ops.object.convert(target='MESH');ob.select_set(False)
+    label('rear bluebird sign','BLUEBIRD LAUNDRY',(0,5.85,3.3),.43)
+    label('rear service sign','WASH  /  PRESS  /  FOLD',(0,5.84,2.91),.19)
+    # Three front-loading industrial washers face a reserved service aisle.
+    for i,x in enumerate((-3.35,-1.35,.65)):
+        box('washer plinth',(x,4.55,.12),(1.65,1.5,.24),iron,.06)
+        box('washer enamel cabinet',(x,4.55,.99),(1.55,1.35,1.5),cream,.10)
+        box('washer green crown',(x,4.55,1.78),(1.58,1.39,.18),teal,.06)
+        cylinder('washer dark drum',(x,3.86,.94),.49,.04,iron,(math.pi/2,0,0),48)
+        ring('washer polished door rim',(x,3.81,.94),.49,.047,steel)
+        ring('washer rubber seal',(x,3.805,.94),.421,.017,iron)
+        for j in range(16):
+            a=j*math.tau/16
+            cylinder('drum perforation',(x+math.sin(a)*.33,3.827,.94+math.cos(a)*.33),.026,.015,steel,(math.pi/2,0,0),8)
+        for j in range(3):
+            ob=box('linen inside drum',(x-.16+j*.14,3.815,.80+j*.10),(.20,.028,.15),linen,.04);ob.rotation_euler.y=j*.45
+        box('washer door hinge',(x-.54,3.79,.94),(.10,.13,.28),steel,.025)
+        beam('washer locking handle',(x+.52,3.74,.82),(x+.52,3.74,1.07),.045,brass)
+        cylinder('washer selector dial',(x-.44,3.83,1.53),.075,.05,iron,(math.pi/2,0,0),24)
+        label('washer number',f'No. {i+1}',(x+.19,3.855,1.51),.11)
+        beam('washer supply riser',(x,5.35,.3),(x,5.35,2.3),.045,steel)
+        beam('washer fill elbow',(x,5.35,2.3),(x,4.8,2.3),.045,steel)
+        cylinder('washer valve wheel',(x,5.25,2.17),.09,.025,brass,(math.pi/2,0,0),16)
+    beam('rear steam main',(-4.6,5.6,2.5),(4.6,5.6,2.5),.085,steel)
+    for x in (-4.6,4.6):beam('rear steam riser',(x,5.6,.15),(x,5.6,3.9),.085,steel)
+    # Collection counter on the right, leaving the centre and entrance open.
+    box('folding counter',(3.35,1.1,.51),(2.6,1,.98),teal,.035)
+    box('scrubbed folding top',(3.35,1.1,1.04),(2.75,1.14,.10),wood,.035)
+    for x in (2.55,3.35,4.15):box('counter recessed panel',(x,.585,.52),(.65,.025,.67),cream,.02)
+    for i in range(5):
+        box('folded sheets',(2.7,1.05,1.115+i*.055),(.65,.50,.05),linen,.025)
+        box('linen blue binding',(2.7,1.05,1.143+i*.055),(.052,.51,.008),teal)
+    box('collection ticket book',(3.85,.85,1.115),(.35,.27,.05),linen,.01)
+    label('counter collection sign','COLLECTION',(3.35,.557,.65),.13)
+    # Rear shelving beside the washers, with individually wrapped bundles.
+    for z in (.3,1.05,1.8,2.55):box('linen shelf',(3.35,5.12,z),(2.3,.8,.07),wood,.018)
+    for x in (2.17,4.53):box('shelf upright',(x,5.12,1.4),(.09,.85,2.8),teal,.014)
+    for row in range(3):
+        for col in range(3):
+            x=2.62+col*.73;z=.48+row*.75
+            box('wrapped laundry bundle',(x,5.10,z),(.61,.62,.27),linen,.055)
+            box('bundle tie',(x,4.782,z),(.025,.012,.28),wood)
+    # A low waiting bench along the left wall, facing the public floor.
+    for y in (-1.8,.8):
+        for x in (-4.5,-3.85):box('waiting bench leg',(x,y,.35),(.10,.10,.70),iron,.015)
+    for x in (-4.52,-4.30,-4.08,-3.86):box('waiting bench slat',(x,-.5,.72),(.19,3.1,.10),wood,.02)
+    for z in (1,1.22,1.44):box('waiting bench back',(-4.65,-.5,z),(.12,3.15,.16),teal,.02)
+    # Ceiling-free room keeps suspended opal work lights visible in cutaway.
+    glow=material('Bluebird opal shades',(.78,.76,.59),0,.7)
+    for x in (-2.5,2.5):
+        cylinder('work lamp stem',(x,1.5,3.45),.018,.55,iron)
+        cylinder('work lamp shade',(x,1.5,3.14),.33,.09,teal,vertices=40)
+        cylinder('work lamp opal',(x,1.5,3.08),.24,.055,glow,vertices=32)
+    walls={}
+    for side in ('left','back'):
+        group=bpy.data.objects.new('interior-wall-'+side,None);bpy.context.collection.objects.link(group);walls[side]=group
+    for ob in list(bpy.context.scene.objects):
+        if ob.type!='MESH':continue
+        if ob.name.startswith('west '):ob.parent=walls['left']
+        elif ob.name.startswith('rear '):ob.parent=walls['back']
+
+
 def mariner_lobby():
     """Boarding-house reception: 24 keys, rent book, waiting bench and stairs."""
     plaster=material('Mariner tobacco cream plaster',(.52,.46,.34))
@@ -1828,6 +1929,14 @@ def mercer_court():
                 box('tenant letter box',(x,6.28,.98+row*.19),(.20,.08,.16),brass,.009)
                 box('letter slot',(x,6.325,1.02+row*.19),(.13,.01,.014),iron)
 
+if __name__ == '__main__' and '--only=interior-laundry' in __import__('sys').argv:
+    clear();laundry_interior()
+    manifest_path=os.path.join(OUT,'manifest.json')
+    with open(manifest_path) as f: selected_manifest=json.load(f)
+    selected_manifest['interior-laundry']=export('interior-laundry')
+    with open(manifest_path,'w') as f:json.dump(selected_manifest,f,indent=2)
+    raise SystemExit(0)
+
 if __name__ == '__main__' and '--only=interior-mariner' in __import__('sys').argv:
     clear();mariner_lobby()
     manifest_path=os.path.join(OUT,'manifest.json')
@@ -1902,6 +2011,7 @@ for name in ('shotgun','thompson'):
 clear();blast_fragment();manifest['blast-fragment']=export('blast-fragment')
 clear();bar_cloth();manifest['bar-cloth']=export('bar-cloth')
 clear();mariner();manifest['mariner']=export('mariner')
+clear();laundry_interior();manifest['interior-laundry']=export('interior-laundry')
 clear();mariner_lobby();manifest['interior-mariner']=export('interior-mariner')
 clear();mercer_court();manifest['mercer-court']=export('mercer-court')
 clear();mercer_lobby();manifest['interior-mercer-court']=export('interior-mercer-court')
