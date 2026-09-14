@@ -1997,7 +1997,11 @@ func (w *World) Actions(id string) []Action {
 				}
 				leaving = " You would be leaving " + joinNames(labels) + " behind."
 			}
-			add("move_home", label, 60, cost, reason, fmt.Sprintf("$%d/day upkeep. Moving resets hired security. Respect is earned only for a new housing tier.%s", w.HomeCost(id), leaving))
+			changes, housingReason := w.PlanHomeMove(id)
+			if reason == "" {
+				reason = housingReason
+			}
+			add("move_home", label, 60, cost, reason, fmt.Sprintf("$%d/day upkeep. Moving resets hired security. Respect is earned only for a new housing tier.%s%s", w.HomeCost(id), leaving, homeMoveDetail(changes)))
 		} else {
 			add("rest", "Rest for four hours", 240, 0, "", "Recover up to 25 health as you rest. Rivals can act while you sleep.")
 			add("security", "Hire another security detail", 30, 100, need(p.Security >= 3, "Maximum security hired"), "Improves detection and survival at home. Adds $10/day upkeep.")

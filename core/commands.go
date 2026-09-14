@@ -257,6 +257,10 @@ func (w *World) apply(c Command) error {
 		chosen = a.Label
 		// Whose evening this is, decided before the clock moves. See
 		// CallSitdownAs.
+		var homeChanges []HomeChange
+		if c.Kind == "move_home" {
+			homeChanges, _ = w.PlanHomeMove(target)
+		}
 		var agreed Quarrel
 		if c.Kind == "sitdown" {
 			agreed, _ = w.OpenQuarrel()
@@ -1004,6 +1008,17 @@ func (w *World) apply(c Command) error {
 					w.Properties[target].Condition += restored
 					w.Log("Repairs arranged", fmt.Sprintf("The property is restored by %d condition, to %d%%.", restored, w.Properties[target].Condition), "business")
 				case "move_home":
+					current, reason := w.PlanHomeMove(target)
+					if reason != "" || !homePlansMatch(homeChanges, current) {
+						p.Cash += a.Cost
+						detail := "The housing arrangements changed during the paperwork. Review the available accommodation again."
+						if a.Cost > 0 {
+							detail += " Your payment has been returned."
+						}
+						w.Log("The move is postponed", detail, "personal")
+						break
+					}
+					w.applyHomeChanges(current)
 					p.BestHome = max(p.BestHome, HomeRank(p.Home))
 					if HomeRank(target) > p.BestHome {
 						p.Respect += 3
