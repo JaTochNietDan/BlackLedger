@@ -24,3 +24,32 @@ export function advanceJourneyClock(progress:number, playerProgress:number, seco
  const rate=Math.min(1/Math.max(.001,duration),(1-progress)/Math.max(.001,remaining));
  return Math.min(1-1e-7,Math.max(progress,progress+step*rate));
 }
+
+export const streetLegKey=(segment:StreetSegment)=>`${segment.from_id}:${segment.to_id}:${segment.from_minute}:${segment.vehicle||''}`;
+/** Keep observed legs in order when cosmetic traffic delays an arrival. */
+export class StreetPlayback {
+ private legs=new Map<string,StreetSegment[]>();
+ private next=new Map<string,number>();
+ constructor(segments:readonly StreetSegment[]){
+  for(const segment of segments){
+   const legs=this.legs.get(segment.id)||[];legs.push(segment);this.legs.set(segment.id,legs);
+  }
+  for(const legs of this.legs.values())legs.sort((a,b)=>a.from_minute-b.from_minute);
+ }
+ sample(minute:number,arrived:(id:string,key:string)=>boolean){
+  const samples=new Map<string,{segment:StreetSegment;progress:number}>();
+  for(const [id,legs] of this.legs){
+   let index=this.next.get(id)||0;
+   while(index<legs.length){
+    const segment=legs[index];
+    if(minute<segment.from_minute)break;
+    if(segment.end_progress>=1&&minute>=segment.to_minute&&arrived(id,streetLegKey(segment))){index++;continue;}
+    const fraction=Math.max(0,Math.min(1,(minute-segment.from_minute)/Math.max(1,segment.to_minute-segment.from_minute)));
+    samples.set(id,{segment,progress:segment.progress+(segment.end_progress-segment.progress)*fraction});
+    break;
+   }
+   this.next.set(id,index);
+  }
+  return samples;
+ }
+}

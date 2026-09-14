@@ -60,3 +60,52 @@ test('unobstructed travel retains its pace and paused playback cannot spend time
  assert.equal(advanceJourneyClock(.45,.25,-1,10,10),.45);
  assert.equal(advanceJourneyClock(.99,1,0,10,10),1);
 });
+
+test('delayed NPCs finish their current leg before a later recorded departure',async()=>{
+ const {StreetPlayback,streetLegKey}=await import('../.runtime/frontend-test/streetPlayback.js');
+ const second={...leg,from_id:'market',to_id:'club',from_minute:116,to_minute:126};
+ const timeline=new StreetPlayback([second,leg]);let arrived='';
+ const sample=minute=>timeline.sample(minute,(id,key)=>key===arrived);
+ assert.equal(sample(100).size,0);
+ assert.equal(sample(110).get('mara').progress,.5);
+ assert.equal(sample(119).get('mara').segment,leg,'an overdue first leg must not disappear or jump to its successor');
+ assert.equal(sample(119).get('mara').progress,1);
+ arrived=streetLegKey(leg);
+ assert.equal(sample(120).get('mara').segment,second);
+ assert.equal(sample(120).get('mara').progress,.4);
+ assert.equal(sample(130).get('mara').segment,second);
+ arrived=streetLegKey(second);assert.equal(sample(130).size,0);
+ assert.equal(sample(140).size,0,'finished legs must not reappear');
+});
+
+test('partial observed legs stop at their saved fraction without inventing an arrival',async()=>{
+ const {StreetPlayback}=await import('../.runtime/frontend-test/streetPlayback.js');
+ const partial={...leg,progress:.25,end_progress:.75};
+ const timeline=new StreetPlayback([partial]);
+ assert.equal(timeline.sample(120,()=>true).get('mara').progress,.75);
+ const completed=new StreetPlayback([leg]);
+ assert.equal(completed.sample(114,()=>true).get('mara').progress,.9,'rendering ahead cannot erase a leg before its recorded arrival');
+ assert.equal(completed.sample(115,()=>true).size,0);
+});
+
+test('a queued NPC leg enters at the door after physical collision recovery',async()=>{
+ const {StreetPlayback,streetLegKey}=await import('../.runtime/frontend-test/streetPlayback.js');
+ const {StreetTraffic}=await import('../.runtime/frontend-test/city3dTraffic.js');
+ const second={...leg,from_id:'market',to_id:'club',from_minute:116,to_minute:126};
+ const timeline=new StreetPlayback([leg,second]),traffic=new StreetTraffic();
+ let currentKey='',arrived=false,previousPose,finished=0;
+ for(let frame=0;frame<1800;frame++){
+  const samples=timeline.sample(130,(id,key)=>key===currentKey&&arrived),sample=samples.get('mara');
+  if(!sample){assert.equal(finished,2);break;}
+  const key=streetLegKey(sample.segment),starting=key!==currentKey;
+  const points=sample.segment===leg?[{x:100,z:16},{x:120,z:16}]:[{x:120,z:16},{x:140,z:16}];
+  const requests=[{id:'mara',model:'person',points,progress:starting?sample.segment.progress:sample.progress}];
+  if(frame<180)requests.push({id:'obstacle',model:'parked-ford',points:[{x:107,z:16}],progress:0});
+  const placed=traffic.update(requests,1/60).get('mara');
+  if(previousPose)assert.ok(Math.hypot(placed.pose.x-previousPose.x,placed.pose.z-previousPose.z)<=1.8/60+1e-8,'late successor must not teleport down its route');
+  previousPose={...placed.pose};currentKey=key;arrived=placed.progress>=1;
+  if(arrived)finished++;
+  if(frame===179){assert.equal(sample.segment,leg);assert.equal(placed.blockedBy,'obstacle');}
+ }
+ assert.equal(finished,2);
+});

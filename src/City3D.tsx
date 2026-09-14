@@ -2,7 +2,7 @@ import {CityVillaExit} from './city3dVillaExit';
 import {CityAccident} from './city3dAccident';
 import {CityPlanter} from './city3dPlanter';
 import {CityIncendiary, incendiaryStagingFlight, incendiaryShard, incendiaryShardObstructed, INCENDIARY_IMPACT} from './city3dIncendiary';
-import {streetAt,responseRecords,advanceJourneyClock} from './streetPlayback';
+import {StreetPlayback,streetLegKey,responseRecords,advanceJourneyClock} from './streetPlayback';
 import {CityCustody} from './city3dCustody';
 import {CityAssassination, assassinationBatch, isStagedStrike, MELEE_IMPACTS, ASSASSINATION_SHOT, ASSASSINATION_VICTIM_X, executionSpatter} from './city3dAssassination';
 import {poseCustody,sceneWeapon,poseLongGun,weaponShots,pumpOffset} from './city3dWeapons';
@@ -757,6 +757,7 @@ export function City3D(props: Props) {
       reportedJourneyBlocked = false,
       playedJourneyProgress = 0,
       renderedJourneyProgress = 0,
+      streetPlayback:StreetPlayback|null = null,
       wasFollowing = false,
       followZoom: number | null = null,
       motionWas = true;
@@ -1193,6 +1194,7 @@ export function City3D(props: Props) {
           reportedJourneyProgress = -1;
           reportedJourneyBlocked=false;p.onJourneyBlocked?.(false);
           playedJourneyProgress = 0;renderedJourneyProgress=0;
+          streetPlayback=p.journey?.street?new StreetPlayback(p.journey.street):null;
           if (p.journey) { setFollow(true); followZoom = 8; }
           const here = lots.get(w.player.location);
           if (here && w.player.alive) {
@@ -1239,16 +1241,19 @@ export function City3D(props: Props) {
             playedJourneyProgress,renderedJourneyProgress,Math.min(100,Math.max(0,dt))/1000*playback.current,
             traveller.duration/1000,pathLength(traveller.points)/trafficSpeed(traveller.model)):1;
           const minute=(p.journey.fromMinute??w.minute-p.journey.minutes)+p.journey.minutes*playedJourneyProgress;
-          const samples=streetAt(p.journey.street,minute);
+          const samples=streetPlayback!.sample(minute,(id,key)=>actors.get(id)?.legKey===key&&!!actors.get(id)?.arrived);
           for(const [id,a] of actors)if(!id.startsWith('player')&&!samples.has(id)){releaseActor(a);actors.delete(id);}
           for(const [id,{segment,progress}] of samples){
             const from=lots.get(segment.from_id),to=lots.get(segment.to_id);if(!from||!to)continue;
-            const legKey=`${segment.from_id}:${segment.to_id}:${segment.from_minute}:${segment.vehicle||''}`;
-            if(actors.get(id)?.legKey!==legKey){
+            const legKey=streetLegKey(segment);
+            const startingLeg=actors.get(id)?.legKey!==legKey;
+            if(startingLeg){
               assign(id,segment.vehicle?carModel(segment.vehicle):personModel(id),route(from,to,!!segment.vehicle),segment.progress,segment.end_progress,1,now);
               actors.get(id)!.legKey=legKey;
             }
-            actors.get(id)!.timelineProgress=progress;
+            // Admit a delayed successor at its observed start, never halfway
+            // down the next street merely because its scheduled time has passed.
+            actors.get(id)!.timelineProgress=startingLeg?segment.progress:progress;
           }
         }
         presentationMinute=p.journey?(p.journey.fromMinute??w.minute-p.journey.minutes)+p.journey.minutes*playedJourneyProgress:w.minute;

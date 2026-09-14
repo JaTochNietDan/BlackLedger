@@ -696,3 +696,12 @@ Skip and reduced motion still reconcile immediately to the committed endpoint.
 No travel duration, collision outcome or save is changed in Go. Individual NPC
 collision delays and events absent from the endpoint records still require
 broader historical-playback handling.
+
+Recorded NPC legs are now played in order. If an actor is delayed by cosmetic
+occupancy after its recorded arrival minute, its route remains visible until
+physical arrival. A later recorded leg waits for that handoff and is admitted
+at its observed starting fraction, then catches up within normal movement and
+collision limits. Partial legs stop at their last observed fraction. This queue
+exists only for the active travel presentation; Skip, completion and snapshot
+replacement still reconcile with the authoritative endpoint. Carrying unfinished
+NPC presentation across that final reconciliation remains open.
