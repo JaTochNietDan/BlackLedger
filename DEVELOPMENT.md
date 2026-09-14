@@ -1732,3 +1732,30 @@ Remaining: detailed kitchen/private back room behind the doors, dining/serving
 choreography, richer glass/material/character fidelity and the other unbuilt
 interiors. This is a furnished dining-room integration, not final whole-game art
 or campaign acceptance. Export/build/test logs are .runtime/restaurant-*.log.
+
+### Clean release8ba57c1 integrated on main8791 — September 14
+
+Built a clean local clone at `.runtime/release-8ba57c1`, excluding unrelated dirty
+armed/robbery/mugging/aftermath/simulation files. Frontend367/367 pass13.090s;
+production build passes2.64s. Targeted household/rush/group/price core checks
+pass1.266s; store0.164s and full HTTP server0.878s pass; qa-fixture builds. Final
+Go binary stamps revision8ba57c136d28dc7f313bbf58fbdd5477ba42a5c4, modified:false.
+An initially untracked verification JSON was moved under ignored .runtime before
+rebuilding the binary; the final source tree is clean.
+
+Created SQLite backup `.runtime/campaign-pre-8ba57c1.sqlite3` and verified integrity.
+Loaded its separate campaign-check.sqlite3 copy on8953 using the release binary
+and dist. Complete state and all receipts were byte-identical to the backup.
+Rechecked live state against that backup, verified old mainPID60866's executable,
+then replaced it with the release on8791 (session83919). Live startup remains
+byte-identical: revision2115, minute160095, full player preserved, 2117receipts.
+StateSHA63a214cca7228db606d159e88e4dd2df2eae332f37ec4083ffc9235eb1b5c25d;
+receiptSHA5f9dc235c96c51baa248fb740553ffe5030ce9a683d3fadd2c94eede2979d30b.
+Health confirms clean new revision; index and restaurantGLB both serve200.
+
+Evidence: release-8ba57c1/.runtime/{before,compatibility,live-verification}.json;
+sibling release-8ba57c1-{frontend,build,core,server,identity}.log. QA used isolated
+copies/fixtures and read-only main inspection; no gameplay command touched main.
+The live release includes9198e41 household jobs,133a6a4 work-list UX and8ba57c1
+Vittoria's dining room/narrow camera correction. More interiors, scene animation,
+material/character fidelity and complete played-campaign acceptance remain open.
