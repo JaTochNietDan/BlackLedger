@@ -209,7 +209,7 @@ func (w *World) wanted(n *NPC) (errand, bool) {
 func (w *World) SetOut() {
 	for i := range w.NPCs {
 		n := &w.NPCs[i]
-		if n.Dead || n.Location == "" || w.Travelling(n) || n.Held > w.Minute {
+		if n.Dead || n.Location == "" || w.Travelling(n) || n.Held > w.Minute || w.PoolOpponentPlaying(n.ID) {
 			continue
 		}
 		n.Heading, n.Arrives, n.Errand, n.Sets = "", 0, "", 0

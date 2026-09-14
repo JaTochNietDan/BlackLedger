@@ -43,6 +43,7 @@ func (w *World) apply(c Command) error {
 		if p.Alive {
 			return fmt.Errorf("this life is still in progress")
 		}
+		w.ReconcilePool()
 		// Whatever the city had started calling them dies with them.
 		w.Dissolve(w.PlayerOrganizationID())
 		w.Life++

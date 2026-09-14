@@ -1036,3 +1036,21 @@ deeds on decode without advancing the clock, altering cash or moving established
 tenants. This is additive content, not a new save schema or command. The Riverside
 lobby and four-wing courtyard have authored 3D models; rented private apartments
 and recorded home scenes use the existing private-flat interior.
+
+
+## Saved billiards stake foundation
+
+An optional saved `pool` record holds a life-bound eight-ball match, opponent
+identity, each player's stake, the combined escrow, settlement/void status and
+the latest compact replay. Older saves omit it. Money is removed from both
+actual purses before a rack starts and settlement consumes escrow once. Only
+net profit increments player earnings. Death/departure reconciles forfeits; an
+unplayable or burning hall returns original stakes without earnings. Routine
+NPC departures pause during an active rack.
+
+Replay is version-1 base64/zlib JSON, produced from the Go solver. Frames retain
+every impact time and numbered ball position/quaternion/pocket status. It is
+presentation data and cannot be submitted as an outcome. This is currently a
+save/core foundation: billiards HTTP commands, public projection, opponent-shot
+commands and playable controls are not exposed yet. Command receipt/retry tests
+remain required when those commands are connected.

@@ -13310,3 +13310,20 @@ entry point, including a JSON restore before the winning shot.
 See `docs/BILLIARDS.md` for scope and limitations. Campaign stakes, settlement,
 AI, HTTP commands, table UI and tournaments remain unwired. This turn changes
 no campaign save or public HTTP API; the live release remains 16c1c95.
+
+
+## Funded billiards matches and compact replay — 2026-09-14
+
+Added `World.Pool` and core methods for reserving both players' actual stakes,
+placing/shooting/deciding, conceding and settling once. Lifecycle reconciliation
+resolves departure/death; fire/unusable premises refund both original stakes.
+Routine departures keep the opponent at the table, and unpaid opponents remain
+referenced. Only net profit increments earnings. Compressed replay preserves
+impact frames and rotation at about 50 KB for the measured break.
+
+All 35 physics/rules/replay tests pass; 11 core pool tests and selected lifecycle
+regressions pass. Store tests include closing/reopening a temporary SQLite DB
+before a physical winning shot and again before duplicate reconciliation. Vet
+passes for billiards/core/store. See `docs/BILLIARDS.md` for exact evidence and
+remaining work. Commands, receipt retry coverage, public state, AI and playable
+controls remain unwired; no live campaign QA or promotion occurred.

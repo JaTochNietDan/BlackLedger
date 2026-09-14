@@ -94,13 +94,43 @@ the head string. The opening breaker is currently supplied by the caller; lag
 play is not implemented. Unsupported physical events (jumping off the table,
 push shots and equipment/stance fouls) are not claimed to be adjudicated.
 
+## Campaign stake foundation — 2026-09-14
+
+The optional saved `World.Pool` now owns the opponent, life, $10–$500 stake per
+player, combined escrow, match, settlement/void flags and latest replay. Starting
+checks the actual location, availability and both purses before taking either
+stake. A physical win, concession or interruption pays the held amount once;
+only profit adds to player earnings. Fire or an unusable hall refunds both
+original stakes. A failed shot or placement does not change the ledger.
+
+The active opponent does not leave through an ordinary routine change and
+cannot be pruned before settlement. Advance/death/new-life paths reconcile the
+stake. Corrupted old-life winning records are not credited to a new protagonist;
+a missing winning opponent's escrow stays held rather than being invented or
+redirected. Normal lifecycle hooks settle before changing lives.
+
+Replays use base64/zlib JSON with compact pose arrays; they omit velocity and
+repeated ball field names but retain all impacts and quaternion orientation.
+The tested break encodes to 50388 bytes for 235 frames / 39 events. Round-trip
+position and orientation errors stay below 1e-6. Decoder sizes are bounded.
+
+Evidence: all 35 billiards tests pass (2.663 s); all 11 core pool tests pass
+(0.244 s); the selected departure/death/new-life/card-seating regression tests
+pass (0.262 s). Store tests pass (0.227 s), including a real temporary SQLite
+close/reopen between reserving stakes and physically winning, then a second
+reopen and repeated reconciliation. `go vet ./billiards ./core ./store` passes.
+Only disposable fixtures were used. This proves persistence and settlement
+idempotence in the core/store-change path, not request-ID receipt handling:
+player-facing command routes and the table UI are still to be connected.
+
 ## Required next work
 
 1. Connect match rules to campaign commands and post the rules in the playable
    view, including break decisions and any deliberate house variation. Extend
    adjudication as unsupported physical events become available.
-2. Saved matches and funded individual stakes through exactly-once Go commands;
-   no renderer-owned results, hidden odds substitution or minted payouts.
+2. Connect saved funded matches to exactly-once Go commands and test HTTP
+   receipt retries, stale revisions, interrupted requests and public projections.
+   Core/stake and SQLite persistence already exist; routes are still pending.
 3. A close 3D table with aiming, power, tip position, ball placement, numbered
    rotating balls, cue motion and impact/pocket sound. The hall's initial table
    props have stylized proportions; align the playable model and the six hall

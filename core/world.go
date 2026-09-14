@@ -544,6 +544,7 @@ type Result struct {
 	Health  int `json:"health"`
 }
 type World struct {
+	Pool             *PoolGame                        `json:"pool,omitempty"`
 	HouseholdSavings map[string]HouseholdAccount      `json:"household_savings,omitempty"`
 	Apartments       []ApartmentDeed                  `json:"apartments"`
 	PropertyPressure map[int]DistrictPropertyPressure `json:"property_pressure,omitempty"`
@@ -2352,6 +2353,7 @@ func (w *World) DieOf(why, cause string) {
 	w.SuspendedJob = nil
 	p := &w.Player
 	p.Alive = false
+	w.ReconcilePool()
 	p.Health = 0
 	w.Dead = append(w.Dead, Death{Name: p.Name, Minute: w.Minute, Life: w.Life, Cause: cause, Why: why})
 	// What they built outlives them if anybody was left to hold it. Whoever
@@ -2412,6 +2414,8 @@ func (w *World) Attack(plot Plot) {
 	w.survived()
 }
 func (w *World) Advance(minutes int) {
+	w.ReconcilePool()
+	defer w.ReconcilePool()
 	// Standing in a room is seeing who is in it, and being seen in it. Written
 	// down as the clock moves rather than as the world is read: reading must
 	// not change anything, which is a rule this project holds and a guard that
