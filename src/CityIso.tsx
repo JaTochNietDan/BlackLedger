@@ -351,6 +351,16 @@ function moment(kind: string, t: number, across: number): Graphics {
   const g = new Graphics();
   const ease = 1 - t;
   switch (kind) {
+    case 'incendiary': {
+      // Compatibility view: a local fire, without an explosive shockwave.
+      for (let i = 0; i < 7; i++) {
+        const phase = (t * 2 + i / 7) % 1;
+        const x = (i - 3) * across * 0.045;
+        g.ellipse(x, -phase * across * 0.3, across * 0.035, across * 0.08)
+          .fill({color: i % 2 ? 0xffbb49 : 0xd85a27, alpha: (1 - phase) * ease});
+      }
+      break;
+    }
     case 'explosion': {
       const r = (reach('explosion', t) / 1.55) * across;
       if (r > 0) {

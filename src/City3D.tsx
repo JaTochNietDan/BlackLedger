@@ -1475,7 +1475,9 @@ export function City3D(props: Props) {
             const a = j * 2.399;
             const r = shot ? 0.35 : 1.8;
             tmp.position.set(at.x + Math.cos(a) * r, 1 + Math.sin(a) * r * 0.4, at.z + Math.sin(a) * r);
-            tmp.scale.setScalar(casualty || shot || personnel || e.assassination ? 0.001 : 0.25);
+            // Saved window fire owns the incendiary effect; do not add the
+            // generic incident's floating ring of particles at the doorway.
+            tmp.scale.setScalar(casualty || shot || personnel || e.assassination || e.cue.kind === 'incendiary' ? 0.001 : 0.25);
             const burst = blast ? blastParticle(j, t * 3) : null;
             if (burst && blastOrigin) {
               const window=blastWindows[j%blastWindows.length];

@@ -373,46 +373,19 @@ func TestThePortraitsColumnIsTheWidthOfAPortrait(t *testing.T) {
 // the result is shown already."
 func TestTheDrumsTravelToWhereTheyStop(t *testing.T) {
 	t.Parallel()
-	felt := source(t, "src/Tables.tsx")
-	style := source(t, "src/style.css")
-	// A column that moves, rather than a case that shakes.
-	if holds(style, "@keyframes drumroll") {
-		t.Fatal("the drums still shake on the spot")
-	}
-	if !holds(style, ".drum-strip{") || !holds(style, "@keyframes drumspin{") {
-		t.Fatal("nothing about the drum travels")
-	}
-	// A keyframe rather than a transition. A transition has to be told where the
-	// column is in one frame and that it may move in the next, and the wrong
-	// order animates the jump back to the start: the drum crept a few pixels and
-	// stopped — "the drums are not animated at all they are fuked lol".
-	if holds(style, "transition-property:transform;transition-timing-function") {
-		t.Fatal("the drum is back on a transition, which has to be driven in the right frame order")
-	}
-	if !holds(style, "from{transform:translateY(calc(var(--run) * -1))}to{transform:translateY(0)}") {
-		t.Fatal("the column does not travel from the start of its run to its rest")
-	}
-	if !holds(felt, "'--run': `${TurnsADrum * DrumStop}px`") {
-		t.Fatal("the column is not moved by whole stops")
-	}
-	// The stop height in the stylesheet has to match the one the column is
-	// moved by, or a drum comes to rest between two symbols.
-	if !holds(style, "grid-auto-rows:32px") || !holds(felt, "const DrumStop = 32") {
-		t.Fatal("the drum's stop height and the distance it travels a stop disagree")
-	}
-	// And it lands on the core's own faces: the run is built behind them, not
-	// instead of them. This machine already had the fault where the drums
-	// showed one thing and flipped to another at the end.
-	if !holds(felt, "drumRun(strip, windows[i], i, TurnsADrum)") {
-		t.Fatal("the drum travels through something other than the faces the core sent")
+	cabinet := source(t, "src/SlotCabinet.tsx")
+	for _, required := range []string{"drumFaces(p.strip,p.line,p.pulled)", "drumRun(p.strip,windows[i],i,14)", "offset=14*Math.pow(1-progress,3)", "cell=surface.height/3", "(at-offset)*cell", "texture.needsUpdate=true"} {
+		if !holds(cabinet, required) {
+			t.Errorf("3D reel travel lost %q", required)
+		}
 	}
 	if !holds(source(t, "src/cards.ts"), "const out = [...window];") {
-		t.Fatal("the run does not begin with the faces the drum lands on")
+		t.Fatal("run no longer lands on committed faces")
 	}
-	// Somebody who has asked for less motion gets none.
-	if !holds(style, "@media(prefers-reduced-motion:reduce){.drum.rolling .drum-strip{animation:none") {
-		t.Fatal("a player who asked for no motion still gets a spinning drum")
+	if !holds(source(t, "src/Tables.tsx"), "const animate=motion&&!reduced") {
+		t.Fatal("machine ignores motion preference")
 	}
+
 }
 
 // Two rules in this stylesheet name the drum, and the first one makes it a

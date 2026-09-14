@@ -678,6 +678,10 @@ func (w *World) apply(c Command) error {
 				if err := w.BuyCharge(); err != nil {
 					return err
 				}
+			case "incendiary":
+				if err := w.Incendiary(target); err != nil {
+					return err
+				}
 			case "plant":
 				// Resolved before the clock moves, so a charge that kills the
 				// player cannot also collect the hours it never survived.

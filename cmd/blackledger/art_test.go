@@ -560,24 +560,14 @@ func TestEverySymbolOnTheStripIsPainted(t *testing.T) {
 			t.Errorf("the strip has a %q on it and nothing paints one", s.ID)
 		}
 	}
-	// The drums ask what to paint rather than working it out, and the fallback
-	// is the word.
-	tables := source(t, "src/Tables.tsx")
-	// Asked of the run the drum travels rather than of the three it lands on,
-	// now that the drum turns: every face that goes past the window is painted,
-	// not only the ones it stops on. The spelling moved with the code and the
-	// thing guarded did not.
-	if !holds(tables, "const art = reelArt(ids[at])") {
-		t.Error("the case decides for itself what a symbol looks like")
+	// The 3D cabinet paints the authoritative strip onto its curved paper.
+	cabinet := source(t, "src/SlotCabinet.tsx")
+	for _, required := range []string{"const art=reelArt(s.id)", "drumRunIDs(p.strip,windows[i],i,14)", "c.drawImage(img", "c.fillText(faces[at]??'—'"} {
+		if !holds(cabinet, required) {
+			t.Errorf("3D strip rendering lost %q", required)
+		}
 	}
-	if !holds(tables, "drumRunIDs(strip, windows[i], i, TurnsADrum)") {
-		t.Error("the drum is painted from something other than the strip it turns through")
-	}
-	// The fallback, named: `") : ("` matched every ternary in the file and
-	// could not have failed.
-	if !holds(tables, "art ? ( <svg") || !holds(tables, "/> ) : ( face )") {
-		t.Error("a symbol nothing paints leaves the drum blank")
-	}
+
 }
 
 // A field the player types a figure into says what is wrong with the figure,

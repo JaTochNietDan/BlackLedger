@@ -563,3 +563,12 @@ Property `rush_order_day` is an optional one-based calendar-day reservation; zer
 Acceptance reserves today's order and consumes two of the premises' supplies before time advances. Interruption pays nothing and leaves the order/supplies used; it is not a resumable arrangement. A successful job does not add attention or count toward the fixer's envelope-job milestones. Another order is available the next day subject to the same operating requirements. Owners receive their business's ordinary income rather than this helper payment.
 
 The action appears under Work with its actual terms/refusal. Opening earning guidance tries it after unavailable envelopes and before repeatable cargo work. No new frontend command shape is required. This is an external customer order, not a new fully modeled hotel business or NPC-paid contract market.
+
+
+## Incendiary property attack
+
+`incendiary` targets a business at the player's current address. It requires a nonowned property with positive income and condition, no active unextinguished fire, and40 dollars. Normal action command life/custody/pending-event/revision/idempotency checks apply. The method charges40 once; the projected generic action cost remains zero, with the actual supplies cost disclosed in its detail. The command advances15 minutes after resolution.
+
+The attack removes15–30 condition points, bounded by remaining condition, removes up to10 supply units and marks operating trouble. It adds18 player attention (capped100); a faction owner loses25 goodwill and receives the existing retaliation scheduling call. It does not directly kill occupants, remove staff, destroy bankroll, consume an explosive charge or grant respect. This is the initial balance, not a completed broader arson economy.
+
+The existing saved building-fire lifecycle supplies brigade arrival, extinguishing and cleanup; extinguishing does not repair condition. A new `incendiary` visual cue has gravity8, the target address and an attacker identifying the player with weapon0. Its news is an attack-category arson report. No save schema or endpoint shape changes. The browser currently presents persistent window fire and brigade response before revealing the newspaper; authored bottle throwing and flight choreography remain outstanding.

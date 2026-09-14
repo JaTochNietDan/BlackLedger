@@ -1708,6 +1708,10 @@ func (w *World) Actions(id string) []Action {
 			about(mark.ID)
 		}
 	}
+	if prop := w.Properties[id]; prop != nil && prop.Income > 0 && !w.Own(id) {
+		add("incendiary", "Throw an incendiary bottle at "+l.Name, IncendiaryMinutes, 0, w.IncendiaryReadiness(id),
+			fmt.Sprintf("Costs $%d. Damages the premises and destroys supplies, starts a fire and draws %d attention. The owner will retaliate. Cannot target premises already burning.", IncendiaryCost, IncendiaryHeat))
+	}
 	if prop := w.Properties[id]; prop != nil && prop.Income > 0 && !w.Own(id) && p.Charges > 0 {
 		add("plant", "Put the charge under "+l.Name, PlantMinutes, 0, w.PlantReadiness(id),
 			fmt.Sprintf("Wrecks %s, empties it of stock and staff, and kills somebody who worked there about a third of the time. The owner will know exactly what it was. Going wrong means it goes off with you under it.", l.Name))

@@ -21,7 +21,7 @@ import "fmt"
 // show. It is deliberately the same ordering the city uses for its own
 // temperature: what a city notices.
 var gravity = map[string]int{
-	"killing": 9, "explosion": 8, "gunfight": 7, "raid": 6,
+	"killing": 9, "explosion": 8, "incendiary": 8, "gunfight": 7, "raid": 6,
 	"seizure": 5, "arrest": 5, "attack": 4, "robbery": 2,
 }
 
