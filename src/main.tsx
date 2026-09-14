@@ -1028,7 +1028,7 @@ function App() {
       );
     return (
       <section className="section-content help">
-        {w.opportunity && <section className="card"><h2>{w.opportunity.title}</h2><p>{w.opportunity.detail}</p><button onClick={()=>{setSelected(w.opportunity!.target);setTab('city');setCityView('iso');}}>Find the address ↗</button></section>}
+        {w.opportunity && <section className="guide-next" aria-label="Your next move"><div className="eyebrow">Your next move</div><h2>{w.opportunity.title}</h2><p>{w.opportunity.detail}</p><button onClick={()=>{setSelected(w.opportunity!.target);setTab('city');setCityView('iso');}}>Find the address ↗</button></section>}
             {!!w.grudges?.length && (
               <section className="known-threats" aria-label="What people are saying">
                 <strong>Bad blood</strong>
@@ -1068,8 +1068,8 @@ function App() {
         <div className="eyebrow">WHERE YOU STAND</div>
         <h1 className="screen-title">What you can do, and what you cannot yet</h1>
         <p className="subtle">
-          This page is not written down anywhere. It asks the game the same question the buttons
-          ask, so it cannot tell you something the rules do not.
+          Follow the next move above, or choose your own path. The milestones below track what
+          you have built in this life. Travel takes time; check the terms again when you arrive.
         </p>
         <ol className="guide-steps">
           {(w.guide || []).map(s => (

@@ -542,3 +542,10 @@ This is a rehousing rule for voluntary move-in, not a complete tenancy-law, evic
 ## Additional residential address — Mercer Court
 
 `mercercourt` is a district-zero rental residence with 48 resident places. Existing homes retain priority; missing homes may use its shared flats ($12/day) or private apartments ($25/day), based on the same standing threshold as Ashbury. A player lease costs $120 and $25/day, grants apartment-tier protection/progression and uses the normal capacity-checked `move_home` command. It does not transfer the building deed. The address has ordinary public occupants, rent-register projection and street journeys. Old saves receive its independent property record through `SettleNewPlaces`; no save field or command shape changes. Its map lot fills an existing vacancy without relocating any previous address.
+
+
+## Action-grounded next-step guidance
+
+The existing `opportunity` shape is unchanged. Its suggested work now comes from the current action projection at the destination, including actual timing, price, availability and detail. A local value copy changes only the inspected player location; reading guidance does not move the real player, alter the save or advance time. Arrival can change the action's availability, so the frontend still selects an address and requires normal travel/action handling.
+
+Early guidance routes to available envelope work, then cargo work when envelopes are unavailable; it suggests earning capital before an unaffordable purchase or hire, and offers only currently available repair, recruitment, district expansion and move-in actions. It does not reveal private plans. Custody, death and pending events suppress these street-work hints. These are public next-step suggestions and existing milestone progress, not a new persisted quest/reward system.

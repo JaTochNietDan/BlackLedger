@@ -76,3 +76,11 @@
 .document-menu .guide-steps p,.document-menu .guide-rules li {color:#625746}
 .document-menu .guide-steps li.done .guide-mark {color:#386040}
 @media(max-width:800px){.document-menu .anywhere-strip .actions{grid-template-columns:minmax(0,1fr)}}
+
+/* The handbook's next step is a note, not a playing-card component. */
+.document-menu .guide-next{max-width:760px;margin:0 0 26px;padding:18px 20px;background:#dac7a480;border-block:3px double #a28a63;color:#382d1f}
+.document-menu .guide-next h2{margin:8px 0;font:26px/1.2 Georgia,serif}
+.document-menu .guide-next p{font:15px/1.55 Georgia,serif;color:#594831;margin:10px 0 14px;overflow-wrap:anywhere}
+.document-menu .guide-next button{background:#eee1c5;border:1px solid #9b7f52;color:#382d1f;padding:9px 13px;font:13px Georgia,serif;border-radius:0}
+.document-menu .guide-next button:hover{background:#f4ead6}
+.document-menu .guide-next button:focus-visible{outline:2px solid #873f2d;outline-offset:3px}
