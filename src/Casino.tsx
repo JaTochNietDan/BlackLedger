@@ -268,6 +268,7 @@ export function Casino({
               </div>
             ) : game === 'dice' ? (
               <Craps
+                motion={motion}
                 dice={dice}
                 money={money}
                 turn={revision}

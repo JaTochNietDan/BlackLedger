@@ -796,7 +796,7 @@ def export(name):
     # Join by material except animated limbs: a building becomes ~6 draws.
     groups={}
     for ob in list(bpy.context.scene.objects):
-        if ob.type=='MESH' and (ob.parent is None or ob.parent.name.startswith(('wheel-roll-','interior-wall-','entrance-door-','window-','pump-','car-door-','laundry-drum-','slot-coins'))) and not ob.name.startswith(('leg','arm','shoe','clock-hand')):
+        if ob.type=='MESH' and (ob.parent is None or ob.parent.name.startswith(('wheel-roll-','interior-wall-','entrance-door-','window-','pump-','car-door-','laundry-drum-','slot-coins','die-face-'))) and not ob.name.startswith(('leg','arm','shoe','clock-hand')):
             key=(ob.parent.name if ob.parent else '',ob.data.materials[0].name)
             groups.setdefault(key,[]).append(ob)
     for obs in groups.values():
@@ -1593,6 +1593,46 @@ def bar_cloth():
     for i in range(4):box('soft linen fold',(-.05+i*.035,0,.011),(.017,.14,.002),linen,.001)
 
 
+def gaming_die():
+    ivory=material('dice polished ivory',(.78,.73,.59));ivory.node_tree.nodes['Principled BSDF'].inputs['Roughness'].default_value=.26
+    black=material('dice inset pips',(.018,.012,.01))
+    box('rounded die body',(0,0,0),(.18,.18,.18),ivory,.012)
+    corner=[(-1,-1),(1,1)];four=[(-1,-1),(-1,1),(1,-1),(1,1)]
+    layouts={1:[(0,0)],2:corner,3:corner+[(0,0)],4:four,5:four+[(0,0)],6:[(x,y) for x in (-1,1) for y in (-1,0,1)]}
+    normals={1:(0,0,1),6:(0,0,-1),2:(1,0,0),5:(-1,0,0),3:(0,-1,0),4:(0,1,0)}
+    for face,xyz in normals.items():
+        normal=Vector(xyz);u=Vector((1,0,0)) if face in (1,6,3,4) else Vector((0,1,0));v=normal.cross(u)
+        group=bpy.data.objects.new(f'die-face-{face}',None);bpy.context.collection.objects.link(group);group.location=normal*.0905
+        for a,b in layouts[face]:
+            point=normal*.0905+u*a*.043+v*b*.043
+            ob=cylinder('inlaid pip',point,.012,.0015,black,Vector((0,0,1)).rotation_difference(normal).to_euler(),24)
+            bpy.context.view_layer.update();world=ob.matrix_world.copy();ob.parent=group;ob.matrix_world=world
+
+
+def dice_tray():
+    felt=material('dice forest baize',(.035,.17,.095))
+    wood=material('dice tray walnut',(.16,.07,.035))
+    leather=material('dice padded rail',(.065,.09,.065))
+    brass=material('dice tray brass',(.49,.31,.11),.65)
+    box('tray foundation',(0,0,-.07),(2.7,1.7,.14),wood,.05)
+    box('baize bed',(0,0,.012),(2.47,1.47,.024),felt,.018)
+    # Packed baize weave provides detail when the camera is close.
+    pixels=[];rng=random.Random(1954)
+    for y in range(128):
+        for x in range(128):
+            tone=.92+rng.uniform(-.08,.08)+(.025 if (x+y)%2 else -.025)
+            pixels.extend((*[1.055*(c*tone)**(1/2.4)-.055 for c in felt.diffuse_color[:3]],1))
+    img=bpy.data.images.new('dice woven baize',width=128,height=128);img.pixels=pixels;img.pack();tex=felt.node_tree.nodes.new('ShaderNodeTexImage');tex.image=img;felt.node_tree.links.new(tex.outputs['Color'],felt.node_tree.nodes['Principled BSDF'].inputs['Base Color'])
+    for x in (-1.28,1.28):box('side padded bolster',(x,0,.10),(.15,1.7,.20),leather,.06)
+    for y in (-.78,.78):box('end padded bolster',(0,y,.10),(2.45,.15,.20),leather,.06)
+    for x in (-1,-.5,0,.5,1):
+        ob=box('rail diamond',(x,.78,.205),(.042,.042,.004),brass,.002);ob.rotation_euler.z=math.pi/4
+    # Printed inner border stays clear of the rolling floor.
+    ink=material('dice layout gold',(.58,.46,.20))
+    for x in (-1.08,1.08):box('baize side rule',(x,0,.025),(.008,1.13,.001),ink)
+    for y in (-.56,.56):box('baize end rule',(0,y,.025),(2.16,.008,.001),ink)
+
+
 def slot_cabinet():
     """1950s electromechanical cabinet; curved reel paper receives public symbols."""
     red=material('slot oxblood enamel',(.25,.035,.025),.22)
@@ -2000,6 +2040,14 @@ def mercer_court():
                 box('tenant letter box',(x,6.28,.98+row*.19),(.20,.08,.16),brass,.009)
                 box('letter slot',(x,6.325,1.02+row*.19),(.13,.01,.014),iron)
 
+if __name__ == '__main__' and '--only=dice-table' in __import__('sys').argv:
+    manifest_path=os.path.join(OUT,'manifest.json')
+    with open(manifest_path) as f: selected_manifest=json.load(f)
+    clear();gaming_die();selected_manifest['gaming-die']=export('gaming-die')
+    clear();dice_tray();selected_manifest['dice-tray']=export('dice-tray')
+    with open(manifest_path,'w') as f:json.dump(selected_manifest,f,indent=2)
+    raise SystemExit(0)
+
 if __name__ == '__main__' and '--only=slot-cabinet' in __import__('sys').argv:
     clear();slot_cabinet()
     manifest_path=os.path.join(OUT,'manifest.json')
@@ -2090,6 +2138,8 @@ for name in ('shotgun','thompson'):
 clear();blast_fragment();manifest['blast-fragment']=export('blast-fragment')
 clear();bar_cloth();manifest['bar-cloth']=export('bar-cloth')
 clear();mariner();manifest['mariner']=export('mariner')
+clear();gaming_die();manifest['gaming-die']=export('gaming-die')
+clear();dice_tray();manifest['dice-tray']=export('dice-tray')
 clear();slot_cabinet();manifest['slot-cabinet']=export('slot-cabinet')
 clear();laundry_interior();manifest['interior-laundry']=export('interior-laundry')
 clear();mariner_lobby();manifest['interior-mariner']=export('interior-mariner')

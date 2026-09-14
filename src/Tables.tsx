@@ -1,3 +1,5 @@
+import {DiceTable3D} from './DiceTable3D';
+import {DICE_ROLL_MS} from './dicePresentation';
 import {SlotCabinet} from './SlotCabinet';
 import {useEffect, useRef, useState} from 'react';
 import type {CSSProperties} from 'react';
@@ -682,58 +684,9 @@ export type DiceState = {
   bets?: {id: string; label: string; detail: string}[];
 };
 
-// The pips, laid out the way they are on a die. Drawn rather than lettered,
-// because a die with a "5" printed on it is not a die.
-const pips: Record<number, [number, number][]> = {
-  1: [[50, 50]],
-  2: [
-    [28, 28],
-    [72, 72],
-  ],
-  3: [
-    [28, 28],
-    [50, 50],
-    [72, 72],
-  ],
-  4: [
-    [28, 28],
-    [72, 28],
-    [28, 72],
-    [72, 72],
-  ],
-  5: [
-    [28, 28],
-    [72, 28],
-    [50, 50],
-    [28, 72],
-    [72, 72],
-  ],
-  6: [
-    [28, 25],
-    [72, 25],
-    [28, 50],
-    [72, 50],
-    [28, 75],
-    [72, 75],
-  ],
-};
-
-function Die({face, rolling}: {face: number; rolling: boolean}) {
-  const shown = face >= 1 && face <= 6 ? face : 1;
-  return (
-    <span className={'die' + (rolling ? ' rolling' : '')} aria-label={`${shown}`}>
-      <svg viewBox="0 0 100 100" aria-hidden="true">
-        <rect x="3" y="3" width="94" height="94" rx="14" />
-        {(pips[shown] || []).map(([x, y], i) => (
-          <circle key={i} cx={x} cy={y} r="9" />
-        ))}
-      </svg>
-    </span>
-  );
-}
-
 export function Craps({
   dice,
+  motion = true,
   money,
   play,
   roll,
@@ -746,6 +699,7 @@ export function Craps({
   turn = 0,
 }: {
   dice: DiceState;
+  motion?: boolean;
   money: (n: number) => string;
   play: (amount: number, bet: string) => void;
   roll: () => void;
@@ -759,15 +713,18 @@ export function Craps({
 }) {
   const [bet, setBet] = useState('pass');
   const [shaking, setShaking] = useState(false);
-  const seen = useRef(-1);
+  const [reduced,setReduced]=useState(()=>matchMedia('(prefers-reduced-motion: reduce)').matches);
+  useEffect(()=>{const preference=matchMedia('(prefers-reduced-motion: reduce)');const changed=()=>setReduced(preference.matches);preference.addEventListener('change',changed);changed();return()=>preference.removeEventListener('change',changed);},[]);
+  const animate=motion&&!reduced;
+  const seen = useRef(turn);
   useEffect(() => {
-    if (turn === seen.current || (!dice.playing && !dice.settled)) return;
+    if (!animate || (!dice.playing && !dice.settled)) {seen.current=turn;setShaking(false);return;}
+    if (turn === seen.current) return;
     seen.current = turn;
-    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     setShaking(true);
-    const stop = setTimeout(() => setShaking(false), 650);
+    const stop = setTimeout(() => setShaking(false), DICE_ROLL_MS);
     return () => clearTimeout(stop);
-  }, [turn, dice.playing, dice.settled]);
+  }, [turn, dice.playing, dice.settled, animate]);
 
   const live = dice.playing;
   const bets = dice.bets ?? [];
@@ -783,11 +740,7 @@ export function Craps({
       </div>
 
       <div className="dice-table">
-        <div className={'dice-pair' + (shaking ? ' shaking' : '')}>
-          {faces.length === 2
-            ? faces.map((f, i) => <Die key={i} face={f} rolling={shaking} />)
-            : [1, 1].map((f, i) => <Die key={i} face={f} rolling={false} />)}
-        </div>
+        <DiceTable3D faces={faces} rolling={shaking} turn={turn}/>
         {/* The point, kept where the box is on a real layout: a number that is
           on, and everybody at the table looking at it. */}
         <div className={'point-box' + (point > 0 ? ' on' : '')}>
@@ -796,7 +749,7 @@ export function Craps({
         </div>
       </div>
 
-      {(dice.playing || dice.settled) && dice.outcome && (
+      {!shaking && (dice.playing || dice.settled) && dice.outcome && (
         <p className={'felt-result' + (dice.settled && dice.won ? ' won' : '')}>{dice.outcome}</p>
       )}
 

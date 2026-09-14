@@ -1,0 +1,4 @@
+.dice3d{position:relative;width:100%;height:clamp(250px,38vh,390px);overflow:hidden;background:#173128;border-block:3px double #ad8c50}
+.dice3d>div{width:100%;height:100%}.dice3d canvas{display:block;width:100%;height:100%}
+.dice3d>p,.dice3d-caption{position:absolute;bottom:12px;left:14px;right:14px;margin:0;text-align:center;color:#efdfb9;font:15px/1.5 Georgia,serif;background:#173128dd;padding:7px}
+.dice-felt .dice-table{display:block}.dice-felt .point-box{margin:12px auto;width:100px}
