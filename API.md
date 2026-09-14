@@ -671,3 +671,15 @@ to the saved route start, using ordinary traffic collision checks. Moving actors
 vehicles, different locations, fatalities and private previews do not use this
 handoff. Browser reload restores the canonical position; stance coordinates are
 not persisted. Fully blocked connectors wait rather than teleporting.
+
+## Emergency-response timing during travel playback
+
+The browser retains the pre-travel public aftermath, police-presence and
+building-fire records for the active journey, merging them by ID with the
+committed result (newer records win). Body visibility, police/brigade attendance,
+fire extinction, rubble cleanup and held-open raid doors use the interpolated
+travel minute. A record absent at the journey's end can therefore remain visible
+until its known deadline. Skip uses the committed snapshot immediately. This is
+presentation memory only; no command, deadline or save changes. It cannot recreate
+an event absent from both endpoint snapshots, and does not replay every historical
+building condition or lighting change.

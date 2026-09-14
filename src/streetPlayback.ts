@@ -1,4 +1,8 @@
 import type {StreetSegment} from './types';
+/** Retain scenes which expire mid-journey; newer saved records win by ID. */
+export function responseRecords<T extends {id:string}>(before:readonly T[] = [],after:readonly T[] = []):T[]{
+ return [...new Map([...before,...after].map(record=>[record.id,record])).values()];
+}
 /** Sample only travel actually observed within the committed command. */
 export function streetAt(segments:readonly StreetSegment[],minute:number){
  const active=new Map<string,{segment:StreetSegment;progress:number}>();

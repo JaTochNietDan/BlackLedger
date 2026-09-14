@@ -70,3 +70,18 @@ test('authored broken glazing has a missing centre and retains separate intact p
   assert.equal(hits[0].object.material.name,'unlit window recess');
  }
 });
+
+test('a fire absent from the final snapshot remains until its mid-journey extinction',async()=>{
+ const {responseRecords}=await import('../.runtime/frontend-test/streetPlayback.js');
+ const {CityAftermath}=await import('../.runtime/frontend-test/city3dAftermath.js');
+ const records=responseRecords([{id:'fire',target:'bar',minute:480,brigade_at:490,extinguished_at:525,cleanup_at:570}],[]);
+ const texture=new THREE.Texture(),fire=new CityFire(texture),aftermath=new CityAftermath(),camera=new THREE.PerspectiveCamera();
+ const building=new THREE.Group(),vent=new THREE.Object3D();vent.name='fire-window-0-0';building.add(vent);
+ const buildings=new Map([['bar',building]]),lots=new Map([['bar',{id:'bar',x:80,z:48,row:1,col:2}]]),models=new Map(['fire-engine','firefighter'].map(n=>[n,new THREE.Group()]));
+ for(const [minute,flames,responders] of [[489,1,0],[490,1,3],[524.9,1,3],[525,0,3],[570,0,0]]){
+  fire.update(records,minute,buildings,camera,0,false);
+  aftermath.update([],minute,lots,models,()=> 'person',[],new Set(),[],new Set(),records);
+  assert.equal(fire.inspect().scenes.length,flames);assert.equal(aftermath.inspect().length,responders);
+ }
+ fire.dispose();aftermath.dispose();texture.dispose();
+});

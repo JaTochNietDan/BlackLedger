@@ -2,7 +2,7 @@ import {CityVillaExit} from './city3dVillaExit';
 import {CityAccident} from './city3dAccident';
 import {CityPlanter} from './city3dPlanter';
 import {CityIncendiary, incendiaryStagingFlight, incendiaryShard, incendiaryShardObstructed, INCENDIARY_IMPACT} from './city3dIncendiary';
-import {streetAt} from './streetPlayback';
+import {streetAt,responseRecords} from './streetPlayback';
 import {CityCustody} from './city3dCustody';
 import {CityAssassination, assassinationBatch, isStagedStrike, MELEE_IMPACTS, ASSASSINATION_SHOT, ASSASSINATION_VICTIM_X, executionSpatter} from './city3dAssassination';
 import {poseCustody,sceneWeapon,poseLongGun,weaponShots,pumpOffset} from './city3dWeapons';
@@ -905,6 +905,10 @@ export function City3D(props: Props) {
       const p = latest.current,
         w = p.state,
         motion = p.motion && !reduced.matches && !graphicsLost;
+      let presentationMinute=w.minute;
+      const aftermathRecords=p.journey?responseRecords(p.journey.beforeResponse?.aftermath,w.aftermath):w.aftermath||[];
+      const policeRecords=p.journey?responseRecords(p.journey.beforeResponse?.police_presence,w.police_presence):w.police_presence||[];
+      const fireRecords=p.journey?responseRecords(p.journey.beforeResponse?.building_fires,w.building_fires):w.building_fires||[];
       const nearbyIdle:string[]=[];
       const impact={x:0,y:0};
       const addImpact=(age:number,strength:number)=>{const pulse=impactPulse(age,strength);impact.x+=pulse.x;impact.y+=pulse.y;};
@@ -1251,6 +1255,7 @@ export function City3D(props: Props) {
             actors.get(id)!.timelineProgress=progress;
           }
         }
+        presentationMinute=p.journey?(p.journey.fromMinute??w.minute-p.journey.minutes)+p.journey.minutes*playedJourneyProgress:w.minute;
         if (!motion) traffic.clear();
         // Stationary actors own their known destination even before their first
         // visible frame. Otherwise response vehicles can steal a parked bay.
@@ -1336,9 +1341,9 @@ export function City3D(props: Props) {
           const bounds=stagedSceneBounds(group.flatMap(e=>e.slot?[e.slot]:[]));
           frameScene(camera,controls.target,bounds);controls.update();
         }
-        aftermath.update(w.aftermath || [], w.minute, lots, models, personModel,
-          [...effects.flatMap(e=>e.slot?[e.slot]:[]), ...actorSpaces], animatingVictims, w.police_presence || [],
-          new Set(effects.filter(e=>['raid','raid-officer','raid-unit'].includes(e.cue.kind)).map(e=>e.cue.target)),(w.building_fires || []).filter(f=>!effects.some(e=>(e.incendiary||e.planter)&&e.cue.target===f.target)));
+        aftermath.update(aftermathRecords, presentationMinute, lots, models, personModel,
+          [...effects.flatMap(e=>e.slot?[e.slot]:[]), ...actorSpaces], animatingVictims, policeRecords,
+          new Set(effects.filter(e=>['raid','raid-officer','raid-unit'].includes(e.cue.kind)).map(e=>e.cue.target)),fireRecords.filter(f=>!effects.some(e=>(e.incendiary||e.planter)&&e.cue.target===f.target)));
         const placements = traffic.update(
           [...actors]
             .filter(([id, a]) => !a.arrived&&!replacedActors.has(id))
@@ -1459,7 +1464,7 @@ export function City3D(props: Props) {
         for(const [id,building] of buildings){
           const door=building.getObjectByName('entrance-door-hinge');if(!door)continue;
           const playing=effects.some(e=>e.cue.target===id&&e.cue.kind==='raid-officer');
-          door.rotation.y=!playing&&w.police_presence?.some(p=>p.target===id&&w.minute<p.cleanup_at)?-Math.PI/2:0;
+          door.rotation.y=!playing&&policeRecords.some(p=>p.target===id&&presentationMinute>=p.minute&&presentationMinute<p.cleanup_at)?-Math.PI/2:0;
         }
         for (let i = effects.length - 1; i >= 0; i--) {
           const e = effects[i];
@@ -1800,14 +1805,14 @@ export function City3D(props: Props) {
         buildingGlazing(b,blast?glazingDuringBlast(condition,before,age,preview):condition);
         if(blast&&before>=60&&(preview||condition<60)&&b.getObjectByName('window-broken'))blast.glassAudio?.update(age-GLASS_BREAK_AT,soundOn());
       }
-      const revealedFires=(w.building_fires||[]).filter(f=>!effects.some(e=>e.cue.target===f.target&&((e.incendiary&&(!e.slot||now-e.since<INCENDIARY_IMPACT*1000))||(e.planter&&(!e.slot||now<e.since)))));
+      const revealedFires=fireRecords.filter(f=>!effects.some(e=>e.cue.target===f.target&&((e.incendiary&&(!e.slot||now-e.since<INCENDIARY_IMPACT*1000))||(e.planter&&(!e.slot||now<e.since)))));
       const responseFires=revealedFires.filter(f=>!effects.some(e=>(e.incendiary||e.planter)&&e.cue.target===f.target));
-      rubble.update(revealedFires,w.minute,buildings,models.get('blast-fragment'),new Set(effects.filter(e=>e.cue.kind==='explosion'&&now-e.since<3000).map(e=>e.cue.target)));
-      suppression.update(responseFires,w.minute,buildings,models,aftermath,dt,motion);
-      buildingFire.update(revealedFires,w.minute,buildings,camera,dt,motion);
+      rubble.update(revealedFires,presentationMinute,buildings,models.get('blast-fragment'),new Set(effects.filter(e=>e.cue.kind==='explosion'&&now-e.since<3000).map(e=>e.cue.target)));
+      suppression.update(responseFires,presentationMinute,buildings,models,aftermath,dt,motion);
+      buildingFire.update(revealedFires,presentationMinute,buildings,camera,dt,motion);
       const nearFire=revealedFires.some(f=>{
         const b=buildings.get(f.target);
-        return b&&w.minute<f.extinguished_at&&Math.hypot(b.position.x-controls.target.x,b.position.z-controls.target.z)<28;
+        return b&&presentationMinute>=f.minute&&presentationMinute<f.extinguished_at&&Math.hypot(b.position.x-controls.target.x,b.position.z-controls.target.z)<28;
       });
       ambientAudio.update(graphicsLost?[]:[...(nearFire?['fire']:[]),...nearbyIdle]);
       for(const [id,voice] of vehicleSounds)if(!actors.has(id)){voice.stop?.();vehicleSounds.delete(id);}

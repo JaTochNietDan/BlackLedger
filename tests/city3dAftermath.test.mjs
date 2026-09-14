@@ -70,3 +70,21 @@ test('a replay yields only its own later response and retains an older nearby cr
  update(new Set());assert.ok(city.inspect().some(e=>e.id.startsWith('aftermath:current:')),'response did not return after playback');
  city.dispose();
 });
+
+test('travel response retains expired records until the displayed clock reaches cleanup',async()=>{
+ const {responseRecords}=await import('../.runtime/frontend-test/streetPlayback.js');
+ const before=[{id:'old',target:'bar',victim:{id:'mara'},minute:480,police_at:485,cleanup_at:490}];
+ const after=[{id:'new',target:'bar',victim:{id:'leo'},minute:491,police_at:496,cleanup_at:671}];
+ const records=responseRecords(before,after),city=new CityAftermath();
+ const lot={id:'bar',x:80,z:48,row:1,col:2},models=new Map([['person',new THREE.Group()],['police',new THREE.Group()],['police-officer',new THREE.Group()]]);
+ const inspect=minute=>{city.update(records,minute,new Map([['bar',lot]]),models,()=> 'person',[],new Set());return city.inspect().map(e=>e.id);};
+ assert.deepEqual(inspect(484),['aftermath:old:body']);
+ assert.equal(inspect(485).length,4);
+ assert.equal(inspect(489.99).length,4);
+ assert.deepEqual(inspect(490),[]);
+ assert.deepEqual(inspect(491),['aftermath:new:body']);
+ assert.equal(inspect(496).length,4);
+ assert.equal(before.length,1);assert.equal(after.length,1);
+ const updated={...before[0],cleanup_at:488};assert.deepEqual(responseRecords(before,[updated]),[updated]);
+ city.dispose();
+});

@@ -1,6 +1,7 @@
 import {useEffect, useRef, useState} from 'react';
-import type {Place,StreetSegment} from './types';
+import type {Place,StreetSegment,Snapshot} from './types';
 export interface Journey {
+  beforeResponse?: Pick<Snapshot,'aftermath'|'police_presence'|'building_fires'>;
   street?: StreetSegment[];
   fromMinute?: number;
   driving?: boolean;

@@ -318,3 +318,33 @@ test('survivors rise over stationary level soles and finish upright',async()=>{
   cast.update(0);assert.equal(cast.actor.position.z,0);
  }
 });
+
+test('persistent victims and police meshes fit the traffic reservations they claim',async()=>{
+ const {CityAftermath,captureBodyJoints}=await import('../.runtime/frontend-test/city3dAftermath.js');
+ const {CityAssassination}=await import('../.runtime/frontend-test/city3dAssassination.js');
+ const {trafficSize,trafficOverlap}=await import('../.runtime/frontend-test/city3dTraffic.js');
+ const lot={id:'bar',x:80,z:48,row:1,col:2},lots=new Map([['bar',lot]]);
+ const models=new Map(await Promise.all(['person','woman','police','police-officer'].map(async name=>[name,await model(name)])));
+ for(const rig of ['person','woman'])for(const variant of ['back-of-head','close-shot','burst','close-quarters']){
+  const city=new CityAftermath(),cast=new CityAssassination(models.get('person').clone(true),models.get(rig).clone(true),variant==='close-quarters'?undefined:new THREE.Group(),variant);
+  cast.update(cast.duration);
+  const slot={root:{x:81,z:38.35},pose:{x:81.8,z:38.35,heading:0},model:'casualty'};
+  city.rememberBody('victim',slot,cast.victimYaw,captureBodyJoints(cast.victim));
+  city.update([{id:'death',target:'bar',victim:{id:'victim'},minute:480,police_at:485,cleanup_at:660}],485,lots,models,()=>rig,[],new Set());
+  city.root.updateMatrixWorld(true);
+  const reservations=city.reservations();assert.equal(reservations.length,4);
+  for(const r of reservations){
+   const pose=r.points[0],size=trafficSize(r.model),inverse=new THREE.Matrix4().compose(new THREE.Vector3(pose.x,0,pose.z),new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0),pose.heading),new THREE.Vector3(1,1,1)).invert();
+   city.object(r.id).children.at(-1).traverseVisible(mesh=>{
+    if(!(mesh instanceof THREE.Mesh))return;
+    const vertices=mesh.geometry.attributes.position,p=new THREE.Vector3();
+    for(let i=0;i<vertices.count;i++){
+     p.fromBufferAttribute(vertices,i).applyMatrix4(mesh.matrixWorld).applyMatrix4(inverse);
+     assert.ok(Math.abs(p.x)<=size.width/2+1e-6&&Math.abs(p.z)<=size.length/2+1e-6,`${rig}/${variant} ${r.id}/${mesh.name} outside reservation at ${p.toArray()}`);
+    }
+   });
+   for(const other of reservations)if(other.id!==r.id)assert.equal(trafficOverlap(pose,r.model,other.points[0],other.model),false);
+  }
+  city.dispose();
+ }
+});

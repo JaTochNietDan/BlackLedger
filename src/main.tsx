@@ -321,6 +321,7 @@ function App() {
           setJourney({
             street: next.last_result?.street_travel ?? undefined,
             fromMinute: world.minute,
+            beforeResponse: {aftermath:world.aftermath,police_presence:world.police_presence,building_fires:world.building_fires},
             from,
             to,
             minutes: next.last_result?.elapsed || 0,
