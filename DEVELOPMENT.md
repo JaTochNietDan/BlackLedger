@@ -2440,3 +2440,24 @@ vet passed. Logs `.runtime/citywide-landlords-{core,adapters}.log`.
 No frontend/interface changes, browser claims, main-save writes or promotion.
 Main8791 remains01fb5cf. NPC move-up housing behavior, other interiors and
 full billiards fidelity remain open within the broad goal.
+
+### 2026-09-14 — Pier 14 cargo shed
+
+Previous34651aa expanded funded NPC investment. Added an original Blender
+receiving/dispatch shed for Pier14: corrugated walls and columns, timber crates
+on pallets, freight tags, mechanical scale/dial, telephone and shipping ledger,
+hand truck, rope coils and hanging industrial lamps. Crates are neutral scenery,
+not authoritative stock counts. Added selective/full export, room settings,
+dispatch/aisle cast positions and a clear foreground entrance route.
+
+393 frontend tests passed14.632s, including real-geometry checks for both rigs,
+occupant separation, equipment clearance and sampled entrance motion.
+Production build passed. Logs `.runtime/docks-{export,tests,build}.log`.
+Browser74 on isolated8976 reviewed the room, actual fixture occupants and
+clerk selection into the matching existing action list. Fixture
+`.runtime/docks-interior-qa.sqlite3` remains revision0/minute600/no receipts;
+no gameplay commands/main-save writes.
+
+This is the transit shed, not the full waterfront/loading yard or animated
+cargo work. Those, other missing interiors and full billiards fidelity remain
+open. Main8791 stays01fb5cf; this room awaits release promotion.

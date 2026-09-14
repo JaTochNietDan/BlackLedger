@@ -1142,5 +1142,21 @@
       ]
     ],
     "bytes": 1717960
+  },
+  "interior-docks": {
+    "file": "interior-docks.glb",
+    "bounds_blender": [
+      [
+        -6.06,
+        -6.0,
+        -0.215
+      ],
+      [
+        6.0,
+        6.06,
+        4.3
+      ]
+    ],
+    "bytes": 1283872
   }
 }
