@@ -1,25 +1,8 @@
 package core
 
-// Measured before this was written: over one simulated week, sampled every
-// hour, forty-seven of fifty people never moved at all and three moved once.
-// The busiest places at three in the morning were the busiest places at three
-// in the afternoon, by the same margin. The city had errands — a man crosses
-// town to settle a grudge, a family sends somebody to mind a holding it has
-// just taken — but every one of them is a reason that ends, and once everybody
-// had a reason to be where they already were, nobody ever moved again.
-//
-// What was missing is the ordinary reason: the day ends and people go out.
-// This gives the city a shift. In the first half of the day people are at
-// their posts; in the second they are where they drink. Which half it is comes
-// from the clock, and where a person drinks never changes, so the player can
-// learn that Ivo Costa is at The Blue Hour in the evening and find him there
-// every evening for the rest of his life.
-//
-// The resolution is a half-day because that is the resolution the clock has:
-// the world only stops at twelve-hour boundaries, and pretending to finer
-// grain than that would be a lie told by this file rather than a fact about
-// the city. In practice a person sets off around noon and is drinking by half
-// past, which for this city is not early.
+// Ordinary residents return home overnight, commute from six in the morning,
+// and visit their usual evening venues after noon. Work and urgent errands
+// take precedence in wanted(). Destinations remain stable across saved games.
 
 // Haunts are the places somebody goes when the day's work is done. All three
 // sell a drink; two of them will also take a bet.
@@ -47,6 +30,10 @@ var haunted = map[string]int{"bar": 4, "club": 4, "casino": 3, "poolhall": 1}
 const EveningFrom = 720
 
 func Evening(minute int) bool { return minute%1440 >= EveningFrom }
+
+const HomeUntil = 6 * 60
+
+func overnight(minute int) bool { return minute%1440 < HomeUntil }
 
 // haunt is where this person drinks, fixed for life. It is derived from their
 // id rather than stored, so it survives every save ever written and cannot
@@ -80,6 +67,11 @@ func (w *World) keepsPost(n *NPC) bool {
 	if n.Held > w.Minute || IsOfficial(n.ID) {
 		return true
 	}
+	for _, office := range officials {
+		if n.Role == office.Role {
+			return true
+		}
+	}
 	for _, r := range roles {
 		if n.Role == r.Title {
 			return true
@@ -98,6 +90,12 @@ func (w *World) keepsPost(n *NPC) bool {
 // reason wanted() considers, so anybody with work to do does the work.
 func (w *World) routine(n *NPC) (errand, bool) {
 	if w.keepsPost(n) || n.Post == "" {
+		return errand{}, false
+	}
+	if overnight(w.Minute) && n.Home != "" {
+		if place, ok := PlaceByID(n.Home); ok && n.Home != n.Location {
+			return errand{n.Home, "heading home to " + place.Name}, true
+		}
 		return errand{}, false
 	}
 	if Evening(w.Minute) {

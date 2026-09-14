@@ -151,6 +151,10 @@ func (w *World) takeTheOffice(o Official) {
 		return
 	}
 	successor.Role, successor.Location = o.Role, o.Place()
+	successor.Post = o.Place()
+	// Taking office replaces the previous assignment and any journey to it.
+	successor.Heading, successor.Errand = "", ""
+	successor.Sets, successor.Arrives = 0, 0
 	successor.Faction, successor.Rank = "", RankLieutenant
 	successor.Trust = 0 // a stranger is a stranger, whatever the last one knew
 	kept := make([]string, 0, len(w.Player.Retainers))

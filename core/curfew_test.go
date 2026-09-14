@@ -136,12 +136,19 @@ func findable(moved map[string]int, place map[string]map[int]map[string]int) flo
 // fortnight and says the rhythm bends without breaking.
 func TestAWarThinsTheStreetWithoutErasingIt(t *testing.T) {
 	t.Parallel()
-	quiet, _, quietPlace := weekUnder(t, 404, 14, keepPeace)
-	loud, _, loudPlace := weekUnder(t, 404, 14, keepWar)
+	quiet, quietHours, quietPlace := weekUnder(t, 404, 14, keepPeace)
+	loud, loudHours, loudPlace := weekUnder(t, 404, 14, keepWar)
 	peace, war := findable(quiet, quietPlace), findable(loud, loudPlace)
 	t.Logf("a face is where it usually is on %.0f%% of person-hours at peace, %.0f%% with a war on", peace*100, war*100)
-	if war >= peace {
-		t.Fatalf("a fortnight of war changed nobody's evening: %.0f%% against %.0f%%", war*100, peace*100)
+	// Staying home can make a resident more predictable. Measure the actual
+	// evening crowd, rather than requiring war to reduce predictability.
+	peaceCrowd, warCrowd := 0, 0
+	for _, id := range haunts {
+		peaceCrowd += quietHours[21][id]
+		warCrowd += loudHours[21][id]
+	}
+	if warCrowd >= peaceCrowd {
+		t.Fatalf("war did not thin the evening crowd: %d against %d", warCrowd, peaceCrowd)
 	}
 	if war < .7 {
 		t.Fatalf("a war made the city unlearnable: a face is findable on only %.0f%% of person-hours", war*100)

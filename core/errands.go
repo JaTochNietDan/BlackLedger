@@ -2,18 +2,9 @@ package core
 
 import "fmt"
 
-// Everybody in this city stood still. A person had an address and kept it for
-// life: the woman who ran the laundry was inside the laundry at every hour of
-// every day, and the man who had spent six weeks deciding he hated somebody
-// across town never once walked over to look at him. The only thing that moved
-// anybody was a takeover, and it moved them instantly.
-//
-// This gives the city's people errands. Twice a day, somebody with a reason to
-// be elsewhere sets off, and until they get there they are on the street rather
-// than in either building — which is the first thing in this game that makes
-// the city look like it is being lived in rather than staffed.
-//
-// Journeys are on foot. Nobody in this city but the player has a car.
+// Errands use authoritative departures and arrivals, shared by room occupancy
+// and the public city journey view. Routines dispatch at midnight, six and noon;
+// fixed departure offsets keep the whole city from leaving simultaneously.
 
 // Coming is somebody arriving in or leaving the room the player is standing in.
 // Everything else in this city happens at a distance and is read about; this is
@@ -213,9 +204,8 @@ func (w *World) wanted(n *NPC) (errand, bool) {
 	return errand{}, false
 }
 
-// SetOut sends the people who have somewhere to be. Called twice a day from
-// the clock, so the city is not permanently in motion: a person makes at most
-// one journey in a half-day, and most people make none.
+// SetOut schedules journeys at routine boundaries without interrupting an
+// active trip or moving somebody in custody.
 func (w *World) SetOut() {
 	for i := range w.NPCs {
 		n := &w.NPCs[i]
@@ -225,7 +215,7 @@ func (w *World) SetOut() {
 		n.Heading, n.Arrives, n.Errand, n.Sets = "", 0, "", 0
 		// Where a person is standing in the daytime is where their day is,
 		// unless something better has already claimed them.
-		if n.Post == "" && !Evening(w.Minute) {
+		if n.Post == "" && !Evening(w.Minute) && n.Location != n.Home {
 			w.keepPost(n, n.Location)
 		}
 		where, ok := w.wanted(n)
@@ -274,7 +264,7 @@ func (w *World) Arrivals() {
 		// reason brought them, this is now where their day is, and the evening
 		// has somewhere to send them back from. An evening arrival is a drink
 		// and changes nothing.
-		if !Evening(w.Minute) {
+		if !Evening(w.Minute) && n.Location != n.Home {
 			w.keepPost(n, n.Location)
 		}
 		// What they came for. A garage's trade and a forecourt's are somebody

@@ -502,3 +502,7 @@ a player/family-owned house. Capacity shortages leave homes unassigned and appea
 in the public `housing_shortage` count and People screen. Additional housing remains
 planned. Existing income, rent payments, ownership and movement rules are unchanged:
 this residence assignment is not yet a paid lease or NPC return-home schedule.
+
+## Residential routines
+
+Ordinary NPCs with a home and workplace now schedule homeward journeys at midnight, with deterministic departure staggering, and reconsider work at 06:00. Existing noon evening routines remain. Duties, custody and urgent errands retain priority; this is not a complete shift system for officials or business managers. Home arrivals preserve the separate workplace. These trips use the existing public street and recorded travel segments; no frontend clock or endpoint changes. Taking office clears a successor's previous journey and sets their new workplace.

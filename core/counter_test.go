@@ -113,6 +113,12 @@ func TestEachCounterSeesSomethingItsOwn(t *testing.T) {
 func TestTheCounterSeesWhoIsWalkingOver(t *testing.T) {
 	t.Parallel()
 	w, id := counterAt(t, "butcher")
+	// The fixture advances eight days to establish the business. Ordinary
+	// commutes can already be underway; isolate the journey being tested.
+	for i := range w.NPCs {
+		w.NPCs[i].Heading = ""
+		w.NPCs[i].Sets, w.NPCs[i].Arrives = 0, 0
+	}
 	if w.walkingOver(id) != "" {
 		t.Fatal("somebody is walking over before anybody set off")
 	}

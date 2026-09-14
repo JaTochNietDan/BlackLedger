@@ -2306,6 +2306,11 @@ func (w *World) Advance(minutes int) {
 		}
 		// Jump to the next meaningful boundary; presentation never drives this clock.
 		next := min(end, (w.Minute/720+1)*720)
+		morning := w.Minute/1440*1440 + HomeUntil
+		if morning <= w.Minute {
+			morning += 1440
+		}
+		next = min(next, morning)
 		if w.NextPressure > 0 {
 			next = min(next, max(w.Minute+1, w.NextPressure))
 		}
@@ -2360,6 +2365,9 @@ func (w *World) Advance(minutes int) {
 			w.FactionTurn()
 			w.MarketPrices()
 			w.ConsiderRobbery()
+			w.SetOut()
+		}
+		if w.Minute%1440 == HomeUntil {
 			w.SetOut()
 		}
 		w.Arrivals()
