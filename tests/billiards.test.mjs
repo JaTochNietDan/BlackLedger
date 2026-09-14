@@ -43,3 +43,19 @@ test('cue aim follows cloth axes and placement preview respects occupied space/h
  assert.equal(poolPlacementHint({...p,behind_head_string:false},.5,1),'');
  const pockets=poolPocketCenters(1.27,2.54);assert.equal(pockets.length,6);assert.deepEqual(pockets[4],[-.045,1.27]);assert.deepEqual(pockets[5],[1.315,1.27]);
 });
+
+const {poolCueStroke,POOL_CUE_CONTACT,POOL_CUE_END}=await import('../.runtime/frontend-test/billiards.js');
+test('cue contacts the sphere before physical replay advances, including off-centre spin',()=>{
+ const radius=.028575,top=.012,side=-.01;
+ for(const speed of [.1,4,8]){
+  const start=poolCueStroke(0,speed,radius,top,side),back=poolCueStroke(.42,speed,radius,top,side),contact=poolCueStroke(POOL_CUE_CONTACT,speed,radius,top,side);
+  assert.ok(back.front<start.front);assert.equal(back.ballTime,0);
+  assert.ok(Math.abs(contact.front**2+top**2+side**2-radius**2)<1e-12);assert.equal(contact.ballTime,0);assert.equal(contact.contact,true);
+  assert.ok(poolCueStroke(.719,speed,radius).front < -radius);
+  assert.ok(Math.abs(poolCueStroke(.82,speed,radius).ballTime-.1)<1e-12);
+  assert.equal(poolCueStroke(POOL_CUE_END,speed,radius).visible,false);
+ }
+});
+test('cue motion is continuous at phase boundaries',()=>{
+ for(const t of [.42,POOL_CUE_CONTACT,.88,POOL_CUE_END])assert.ok(Math.abs(poolCueStroke(t-1e-8,7,.028575).front-poolCueStroke(t+1e-8,7,.028575).front)<1e-6);
+});

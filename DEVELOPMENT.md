@@ -2086,3 +2086,19 @@ shots, clicks selected ball2 and pocket6 with matching controls. The fixture now
 holds revision11/minute614/$5960/$40 escrow/three shots. Main save unchanged.
 Skip was visible but finished before the test click; compact, touch and successful
 skip checks remain. See docs/BILLIARDS.md for details and broader unfinished work.
+
+### 2026-09-14 — committed billiards cue animation
+
+Added a detailed tapered cue and saved-intent draw-back/strike/follow-through/
+withdrawal for both player and NPC strokes. Top/side offsets place the chalked tip
+on the correct sphere surface. Physical replay starts at visible cue contact;
+all original impact samples remain intact. Skip and motion preference cancellation
+cover both cue and balls. Idle cue orientation reflects the spin controls too.
+
+382 frontend tests pass (14.120s), final billiards tests pass, and final production
+build/typecheck pass with the existing bundle warning. Isolated CUA54 captured
+player and NPC cue playback; successful active replay skip unlocked the next turn.
+The fixture ends revision13/minute618/five shots/$5960 cash/$40 escrow, with exactly
+13 receipts and no extra skip command. Main campaign unchanged. Human bridge/hand
+and body choreography, table/hall detail, tournament/concurrent-table work and
+remaining physics fidelity acceptance are still open. See docs/BILLIARDS.md.

@@ -278,3 +278,32 @@ click; skip execution and compact/touch browser acceptance remain unverified.
 Main campaign untouched. Logs: `.runtime/pool-pointer-{tests,final-tests,
 verified-build}.log`. Table/character detail, cue animation, concurrent tables,
 tournaments and the retained physics limitations remain open.
+
+## Visible cue strokes — 2026-09-14
+
+Saved player and NPC intent now drives a draw-back, accelerating strike,
+follow-through and withdrawal before/alongside the physical replay. The front
+of the cue reaches the sphere at the actual top/side contact offset. Cloth
+playback begins at contact after a 0.72-second presentation preparation; the
+server's frame times and outcomes remain unchanged. The cue fades out by1.12s.
+Older replay records without saved intent still play without invented cue input.
+A tapered shaft, contrasting butt, ivory-coloured ferrule and chalked tip replace
+the original single cylinder. Idle cue placement also reflects selected spin.
+
+Skip, motion-off and stale-decode cancellation apply to the complete stroke and
+ball sequence. Contact audio is emitted only when its phase is reached; skipped
+or substantially overdue contact is not sounded later. No character pose or
+hand/bridge animation is implied: these are still missing.
+
+All382 frontend tests pass (14.120s); the final seven billiards tests pass after
+removing a redundant equal-input assertion. They check off-centre tip/sphere
+contact, no ball motion before contact, phase continuity and finish visibility.
+Final typecheck/build passes with the existing bundle warning. CUA54 at isolated
+8964 captured the player cue during committed playback and the NPC cue on its
+separate saved direction. Clicking Skip ball motion succeeded while active,
+removed the animation and enabled the next-turn control. The subsequent NPC shot
+used the ordinary command path. Final fixture revision13/minute618/five shots,
+$5960 cash/$40 escrow, exactly13 receipts: skipping added no command or payment.
+Evidence logs: `.runtime/pool-cue-{tests,final-tests,final-build}.log`.
+Main campaign unchanged. Character choreography, richer table/hall assets,
+compact/touch/motion-off acceptance, multiple tables and tournaments remain open.

@@ -60,3 +60,19 @@ export class PoolTap {
  end(id:number,x:number,y:number){this.move(id,x,y);const a=this.active;this.active=null;return !!a&&a.id===id&&!a.moved;}
  cancel(){this.active=null;}
 }
+
+export const POOL_CUE_CONTACT=.72;
+export const POOL_CUE_END=1.12;
+// Cue front is measured along the shot direction from the initial cue-ball
+// centre. Only presentation time is delayed; saved physical samples are intact.
+export function poolCueStroke(seconds:number,speed:number,radius:number,top=0,side=0){
+ const t=Math.max(0,seconds),power=Math.max(0,Math.min(1,speed/8));
+ const contact=-Math.sqrt(Math.max(0,radius*radius-top*top-side*side));
+ const ready=contact-.045,pull=.08+.18*power;
+ let front:number;
+ if(t<.42){const u=t/.42;front=ready-pull*(u*u*(3-2*u));}
+ else if(t<POOL_CUE_CONTACT){const u=(t-.42)/.30;front=ready-pull+(contact-ready+pull)*u*u;}
+ else if(t<.88){const u=(t-POOL_CUE_CONTACT)/.16;front=contact+(.03+.08*power)*(1-(1-u)*(1-u));}
+ else {const u=Math.min(1,(t-.88)/.24);front=contact+(.03+.08*power)-.25*u;}
+ return {front,opacity:t<=.88?1:Math.max(0,1-(t-.88)/.24),ballTime:Math.max(0,t-POOL_CUE_CONTACT),contact:t>=POOL_CUE_CONTACT,visible:t<POOL_CUE_END};
+}
