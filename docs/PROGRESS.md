@@ -141,3 +141,28 @@ fixture (narrator-timing.json). Standalone UI replay measured106ms preparation a
 22ms reveal-to-play. These are playback API timings, not an auditory quality
 review. Cold-start latency still needs improvement; production-wide acceptance
 and the broader city/interior requirements remain open.
+
+### Reuse the local narrator model — September 13
+
+Previous goal turn classified as progress: standalone newspaper committed and
+browser-verified. Continued the full goal by reducing preparation latency for new
+articles. Kokoro now runs in one persistent subprocess under the existing serial
+render lock, retaining its model across requests while resolving each character's
+own voice recipe. Requests have matching IDs, bounded responses and an18-second
+deadline. Timeout, process exit or invalid reply terminates/reaps that worker;
+next request starts a fresh one. Cache bounds, offline assets, text validation
+and WAV validation remain intact. No public interface change.
+
+Four process-level tests pass: reuse across distinct articles, timeout recovery,
+crash recovery and mismatched-response rejection. Python compilation passes.
+Actual uncached synthesis of two different articles took3978ms then346ms in the
+same PID, both valid RIFF outputs (narrator-worker-timing.json). An isolated local
+voice service on8788 with an empty cache and game preview8875 prepared the saved
+article in3202ms; browser playback began26ms after reveal, while preserving the
+city canvas (narrator-worker-browser.json). QA only replayed a committed fixture;
+no campaign commands/save mutations. Temporary browser closed and voice preference
+restored. Main local voice service8787 restarted with this implementation.
+
+This improves new-article reuse; it does not prove latency on every machine or
+long article, nor auditory quality. Broader cinematic, interior and visual-quality
+acceptance remains unfinished.

@@ -2,9 +2,10 @@
 import hashlib
 try:
     from .voice_cast import assignment, resolve
+    from .voice_worker import VoiceWorker
 except ImportError:
     from voice_cast import assignment, resolve
-import os
+    from voice_worker import VoiceWorker
 import re
 import subprocess
 import tempfile
@@ -17,6 +18,7 @@ _render_lock = threading.Lock()
 MAX_FILES = 128
 ROOT = Path(__file__).resolve().parents[1]
 VOICE_PYTHON = ROOT / ".tools" / "voice-venv" / "bin" / "python"
+_worker = VoiceWorker([str(VOICE_PYTHON), str(ROOT / 'director/kokoro_voice.py'), '--worker'])
 NARRATOR_VERSION = "kokoro-82m-bf16-bm_george-speed1-pcm16-v1"
 
 
@@ -56,12 +58,7 @@ def render(payload):
             aiff = Path(folder) / 'voice.aiff'
             wav = Path(folder) / 'voice.wav'
             if voice == 'narrator' or character:
-                env = os.environ.copy()
-                # Runtime must use the auditioned local assets, never download mid-game.
-                env.update(HF_HUB_OFFLINE='1', HF_HUB_DISABLE_TELEMETRY='1', AFTERLIGHT_KOKORO_VOICE=character or 'bm_george', AFTERLIGHT_KOKORO_PROFILE=profile_id or '')
-                subprocess.run([str(VOICE_PYTHON), str(ROOT / 'director/kokoro_voice.py'), str(wav)],
-                               input=text.encode(), env=env, stdout=subprocess.DEVNULL,
-                               stderr=subprocess.PIPE, timeout=18, check=True)
+                _worker.render(text, profile_id, wav)
             else:
                 subprocess.run(['/usr/bin/say', '-v', VOICES[voice], '-r', '165',
                                 '-o', str(aiff)], input=text.encode(),
