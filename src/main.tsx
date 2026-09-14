@@ -1,3 +1,4 @@
+import {SceneNewspaper} from './SceneNewspaper';
 import {MapMenu} from './MapMenu';
 import './mapFirst.css';
 import {cityOwnsAudio} from './city3dEvents';
@@ -8,7 +9,7 @@ import {useCallback, useEffect, useRef, useState} from 'react';
 import {createRoot} from 'react-dom/client';
 import {City3D} from './City3D';
 import {VoicePlayer, speaking, speakerOf} from './voice';
-import {unreadInLatest} from './paper';
+import {unreadInLatest,articleForScene} from './paper';
 import {paintedAsset, paintedFront, paintedMask} from './cityAssets';
 import {type Journey} from './TravelPresentation';
 import {icon, pressPlate} from './art';
@@ -119,6 +120,8 @@ function App() {
   const [beat, setBeat] = useState(0);
   const [finishedCue, setFinishedCue] = useState('');
   const scenePending = !!playing && finishedCue !== playing.id;
+  const sceneArticle=playing?articleForScene(playing,world?.newspaper||[]):undefined;
+  const newspaperVisible=!!sceneArticle&&!!playing&&finishedCue===playing.id;
   const scene = useRef<HTMLElement | null>(null),
     latest = useRef(world),
     busyRef = useRef(false);
@@ -723,7 +726,7 @@ function App() {
           onProgress={setBeat}
           plate={cityView !== 'iso'}
           stagedAudio={cityView === 'iso' && cityOwnsAudio(playing, w.last_result?.cues || [])}
-          onDone={() => setPlaying(null)}
+          onDone={() => {if(sceneArticle&&playing)setFinishedCue(playing.id);else setPlaying(null);}}
         />
       );
       const journeyOverlay = journey &&
@@ -1147,7 +1150,7 @@ function App() {
   }
   return (
     <>
-      <div className={'shell map-first ' + (busy ? 'busy' : '')} inert={!!event || !p.alive || atTable}>
+      <div className={'shell map-first ' + (busy ? 'busy' : '')} inert={!!event || !p.alive || atTable || newspaperVisible}>
         <nav className="rail" aria-label="Main navigation" inert={tab!=='city'}>
           <div className="monogram">
             <span>B</span>
@@ -1217,6 +1220,7 @@ function App() {
           {tab!=='city'&&<MapMenu title={({crew:'People',families:'Families',market:'Market',ledger:'Ledger',news:'The Bellwether Herald',settings:'Settings',help:'Guide'} as Record<string,string>)[tab]||tab} onClose={()=>setTab('city')}>{content()}</MapMenu>}
         </main>
       </div>
+      {playing&&sceneArticle&&!event&&<SceneNewspaper key={`${playing.id}:${sceneReplay.current}`} article={sceneArticle} visible={newspaperVisible} voice={voice} onClose={()=>{setPlaying(null);setTab('city');}}/>}
       {atTable && inTheBackRoom && !event && p.alive && (
         <BackRoomScene
           place={world.locations.find(l => l.id === p.location)?.name || 'the back room'}

@@ -83,3 +83,8 @@ export function pressFace(id?: string): string | null {
   const n = castFace(id);
   return `${((n % CAST_COLS) * 100) / (CAST_COLS - 1)}% ${(Math.floor(n / CAST_COLS) * 100) / (CAST_ROWS - 1)}%`;
 }
+
+/** Printed portraits must use the same sheet and grid as their character card. */
+export function pressFaceSheet(id:string){
+ return painted[id]?{backgroundImage:"url('/art/cast-noir-v1.png')",backgroundSize:'300% 200%'}:{backgroundImage:"url('/art/faces-noir-v1.png')",backgroundSize:'600% 400%'};
+}

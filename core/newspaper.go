@@ -327,7 +327,7 @@ func deskFor(kind string) string {
 func (w *World) standfirst(s Story) string {
 	subject := w.SubjectOf(s)
 	where := "the district"
-	if subject.Kind != "city" && subject.Name != "" {
+	if subject.Kind == "place" && subject.Name != "" {
 		where = subject.Name
 	}
 	switch s.Kind {

@@ -49,7 +49,7 @@ test('scene sound cancellation stops scheduled explosions and sirens, mute cance
  globalThis.localStorage={getItem:()=>muted?'off':'on',setItem:(_,v)=>{muted=v==='off';}};
  try{
   const {playMoment,setSound}=await import('../.runtime/frontend-test/sound.js?scene-lifecycle');
-  for(const [kind,count] of [['glass-break',6],['door-breach',3],['explosion',2],['arrest',4],['raid',4],['killing',2],['gunfight',5],['robbery',1]]){
+  for(const [kind,count] of [['newspaper',3],['glass-break',6],['door-breach',3],['explosion',2],['arrest',4],['raid',4],['killing',2],['gunfight',5],['robbery',1]]){
    const begin=sources.length;const cancel=playMoment(kind);assert.equal(sources.length-begin,count);
    assert.ok(sources.slice(begin).every(s=>s.starts[0]>=10.02));
    if(kind==='arrest')assert.ok(sources.at(-1).starts[0]>11,'future siren pulses are actually scheduled');

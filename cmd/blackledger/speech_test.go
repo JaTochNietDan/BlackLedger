@@ -88,3 +88,74 @@ func TestVoiceResponseRejectedWhenDecisionEndsConversation(t *testing.T) {
 		t.Fatal("late audio escaped")
 	}
 }
+
+func TestPublishedArticleNarrationIsCachedAndReadOnly(t *testing.T) {
+	a := testApp(t)
+	var calls atomic.Int32
+	provider := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		calls.Add(1)
+		var payload map[string]string
+		json.NewDecoder(r.Body).Decode(&payload)
+		if payload["text"] != "Public headline. Published facts." || payload["speaker"] != "Bellwether Herald narrator" {
+			t.Error(payload)
+		}
+		w.Write([]byte("RIFFarticle-wave"))
+	}))
+	defer provider.Close()
+	t.Setenv("AFTERLIGHT_DIRECTOR_URL", provider.URL)
+	a.s.Change(func(w *core.World) error {
+		w.News = append(w.News, core.Story{ID: "published", Headline: "Public headline", Body: "Published facts.", Life: w.Life})
+		return nil
+	})
+	before, _ := a.s.Read()
+	for i := 0; i < 2; i++ {
+		response := request(a, "POST", "/api/newspaper/speech", `{"story":"published"}`)
+		if response.Code != 200 || response.Header().Get("Content-Type") != "audio/wav" {
+			t.Fatal(response.Code, response.Body.String())
+		}
+	}
+	if calls.Load() != 1 {
+		t.Fatal("article resynthesized", calls.Load())
+	}
+	response := request(a, "POST", "/api/newspaper/speech", `{"story":"private-plot"}`)
+	if response.Code != 404 {
+		t.Fatal("unknown article accepted")
+	}
+	after, _ := a.s.Read()
+	aJSON, _ := json.Marshal(before)
+	bJSON, _ := json.Marshal(after)
+	if !bytes.Equal(aJSON, bJSON) {
+		t.Fatal("narration mutated campaign")
+	}
+}
+
+func TestArticleNarrationRejectsTextChangedDuringSynthesis(t *testing.T) {
+	a := testApp(t)
+	started, release := make(chan struct{}), make(chan struct{})
+	provider := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		close(started)
+		<-release
+		w.Write([]byte("RIFFold-article"))
+	}))
+	defer provider.Close()
+	t.Setenv("AFTERLIGHT_DIRECTOR_URL", provider.URL)
+	a.s.Change(func(w *core.World) error {
+		w.News = append(w.News, core.Story{ID: "changing", Headline: "Old headline", Body: "Old facts."})
+		return nil
+	})
+	done := make(chan *httptest.ResponseRecorder, 1)
+	go func() { done <- request(a, "POST", "/api/newspaper/speech", `{"story":"changing"}`) }()
+	<-started
+	a.s.Change(func(w *core.World) error {
+		for i := range w.News {
+			if w.News[i].ID == "changing" {
+				w.News[i].Body = "Corrected facts."
+			}
+		}
+		return nil
+	})
+	close(release)
+	if response := <-done; response.Code != 409 {
+		t.Fatal("stale article audio returned", response.Code)
+	}
+}

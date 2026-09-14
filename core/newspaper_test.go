@@ -444,3 +444,11 @@ func TestTheOrdinaryEditionIsTrue(t *testing.T) {
 		t.Fatalf("the market went unreported: %v", items[0])
 	}
 }
+
+func TestPersonNewsDoesNotUsePersonAsLocation(t *testing.T) {
+	w := New(41)
+	story := Story{Kind: "killing", Headline: "MARA BELL FOUND DEAD", About: "mara"}
+	if strings.Contains(w.standfirst(story), "Police at Mara Bell") {
+		t.Fatal("person treated as location")
+	}
+}

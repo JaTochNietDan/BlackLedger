@@ -406,3 +406,19 @@ switches the main scene to its interior; leaving switches back. HUD/menu state i
 local presentation state. Existing action requests, revision/idempotency and
 server outcomes retain their meaning. Newspaper narration/reveal migration is
 not yet implemented by this shell change.
+
+### Published-article narration and post-scene reveal
+
+`POST /api/newspaper/speech` accepts `{story: publishedStoryID}` and returns WAV
+narration of that saved article's headline and body. Text is resolved from the
+published archive; the client cannot provide speech text. Unknown IDs return404,
+changed/removed text during synthesis returns409, and an unavailable voice service
+returns503. This endpoint advances no time and does not mutate the save. It uses
+a stable Herald narrator profile and the bounded process-local voice cache.
+
+The browser links a scene to an article by exact headline and minute. It prepares
+narration during playback when voices are enabled, reveals the paper only after
+scene completion (or explicit Skip), and starts the prepared clip on reveal. Close,
+voice-off and scene replacement cancel pending work and dispose playback. A missing
+article retains the existing scene caption. Preparation failure leaves the paper
+readable, with an explicit retry control. Scene replay can reopen its article.

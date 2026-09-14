@@ -2,7 +2,7 @@ import {useEffect, useState} from 'react';
 import type {Snapshot} from './types';
 import {pressPlate} from './art';
 import type {PressSubject} from './art';
-import {pressFace} from './Portrait';
+import {pressFace,pressFaceSheet} from './Portrait';
 import {paintedAsset} from './cityAssets';
 
 // The Herald was a rolling list: one flat run of the current life's stories,
@@ -20,7 +20,7 @@ import {paintedAsset} from './cityAssets';
 //
 // The drawn plate stays underneath as the fallback, for a subject with no
 // picture and for the moment before one loads.
-function PressCut({
+export function PressCut({
   kind,
   subject,
   headline,
@@ -40,7 +40,7 @@ function PressCut({
       {picture ? (
         <span className="screen">
           {face !== null ? (
-            <span className="printed printed-face" style={{backgroundPosition: face}} />
+            <span className="printed printed-face" style={{...pressFaceSheet(subject.id!),backgroundPosition: face}} />
           ) : (
             <img className="printed" src={front!} alt="" loading="lazy" />
           )}

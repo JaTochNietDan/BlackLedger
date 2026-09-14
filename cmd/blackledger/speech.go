@@ -109,3 +109,58 @@ func (a *app) speech(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Cache-Control", "private, max-age=3600")
 	_, _ = w.Write(data)
 }
+
+// Article narration is restricted to already-published text; callers supply an ID,
+// never arbitrary speech or private simulation state.
+func (a *app) newsSpeech(w http.ResponseWriter, r *http.Request) {
+	var q struct {
+		Story string `json:"story"`
+	}
+	if err := body(r, &q); err != nil {
+		fail(w, 400, err)
+		return
+	}
+	state, err := a.s.Read()
+	if err != nil {
+		fail(w, 500, err)
+		return
+	}
+	var article *core.Story
+	for i := range state.News {
+		if state.News[i].ID == q.Story {
+			article = &state.News[i]
+			break
+		}
+	}
+	if article == nil {
+		fail(w, 404, fmt.Errorf("article unavailable"))
+		return
+	}
+	scene := &core.Scene{ID: "newspaper:" + article.ID, Body: article.Headline + ". " + article.Body}
+	ctx, cancel := context.WithTimeout(r.Context(), 25*time.Second)
+	defer cancel()
+	data, err := a.voiceData(ctx, scene, "Bellwether Herald narrator", core.VoiceProfile("bellwether-herald-narrator", 1))
+	if err != nil {
+		fail(w, 503, err)
+		return
+	}
+	current, err := a.s.Read()
+	if err != nil {
+		fail(w, 500, err)
+		return
+	}
+	valid := false
+	for _, story := range current.News {
+		if story.ID == article.ID && story.Headline == article.Headline && story.Body == article.Body {
+			valid = true
+			break
+		}
+	}
+	if !valid {
+		fail(w, 409, fmt.Errorf("article changed"))
+		return
+	}
+	w.Header().Set("Content-Type", "audio/wav")
+	w.Header().Set("Cache-Control", "no-store")
+	_, _ = w.Write(data)
+}

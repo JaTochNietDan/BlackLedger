@@ -94,3 +94,27 @@ is supported by browser evidence, not those simulation/geometry tests. Narrow
 viewport and full action flows still need acceptance. Automatic post-scene
 newspaper reveal, entrance sound and pre-generated narrator audio remain the next
 priority; no completion claim for that requirement.
+
+### September 13 — post-scene newspaper and narrator preparation
+
+Added an automatic single-article Herald overlay after the city reports scene
+completion; explicit Skip also reveals it. Exact headline/minute matching avoids
+substituting unrelated weather or another event. A short cancellable paper-rustle
+sound accompanies reveal. Enabled voices start a cancellable article-ID request
+during animation and play the returned blob on reveal. Added server endpoint
+restricted to saved published text, stable narrator profile, bounded cache and
+post-synthesis stale-text check. Tests verify read-only state, unknown-ID rejection
+and cache reuse. Browser8874 isolated strike fixture showed no article at1.4s and
+an automatic paper after6.5s while retaining one city canvas. The speech service
+on8787 is offline: browser fallback displayed Narration unavailable and Close
+worked. Actual synthesized narrator quality/latency remains unverified; cache
+behavior was tested with an isolated HTTP provider fixture, not real TTS.
+
+Browser review exposed and fixed the newspaper using the generated face sheet for
+hand-painted cast members, and a standfirst treating a person as a location.
+Screenshot now shows Mara's correct portrait and corrected location phrasing.
+All203 frontend tests pass, targeted newspaper core and speech HTTP tests pass,
+and build passes. Evidence newspaper-reveal.png/json. No campaign actions issued;
+QA save is .runtime/newspaper-reveal-20260913.sqlite3 on8874. Remaining work includes
+real narrator playback acceptance, mobile UI, full event coverage and the larger
+visual/choreography/interior requirements.

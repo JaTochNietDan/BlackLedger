@@ -34,3 +34,11 @@ test('an empty paper is nothing to read', () => {
   assert.equal(unreadInLatest([], null), 0);
   assert.equal(unreadInLatest([], 'f'), 0);
 });
+
+test('scene article requires the committed headline and minute, preserving suspense for unrelated stories',async()=>{
+ const {articleForScene}=await import('../.runtime/frontend-test/paper.js');
+ const stories=[{id:'weather',headline:'Rain tonight',minute:500},{id:'kill',headline:'Killing at Saint Agnes',minute:480}];
+ assert.equal(articleForScene({headline:'Killing at Saint Agnes',minute:480},stories)?.id,'kill');
+ assert.equal(articleForScene({headline:'Killing at Saint Agnes',minute:500},stories),undefined);
+ assert.equal(articleForScene({minute:480},stories),undefined);
+});

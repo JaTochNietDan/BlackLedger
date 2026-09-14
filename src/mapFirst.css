@@ -64,3 +64,14 @@
 .map-first .rail .bottom {margin-top:auto}
 .map-first .rail {height:calc(100dvh - 114px);min-height:0}
 @media(max-width:800px){.map-first .rail{height:calc(100dvh - 154px)}}
+.scene-newspaper {padding:22px;animation:paper-arrival .32s ease-out}
+.scene-newspaper .paper-sheet {margin:0 0 18px}
+.scene-article {display:flow-root;padding:24px 8px}
+.scene-article h2 {font:700 clamp(28px,4vw,48px)/1.06 var(--serif);text-transform:uppercase;letter-spacing:-.035em;margin:8px 0 20px}
+.scene-article .cut {float:right;width:38%;margin:0 0 18px 24px}
+.scene-article .body {font:19px/1.65 var(--serif);white-space:pre-line}
+.scene-article .byline {font:11px system-ui;text-transform:uppercase;border-block:1px solid #544b3b;padding:8px 0}
+.newspaper-voice {display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px;font-size:12px}
+.newspaper-voice button {background:#23352c;border:1px solid #89754c;padding:7px;color:#eadbb9}
+@keyframes paper-arrival {from{opacity:0;transform:translateY(18px) rotate(-1deg)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.scene-newspaper{animation:none}}

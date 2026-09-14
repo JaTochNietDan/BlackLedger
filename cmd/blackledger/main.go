@@ -133,6 +133,8 @@ func (a *app) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 	case "/api/director":
 		reply(w, 200, map[string]bool{"started": a.prepare()})
+	case "/api/newspaper/speech":
+		a.newsSpeech(w, r)
 	case "/api/speech", "/api/speech/prepare":
 		a.speech(w, r)
 

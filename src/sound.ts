@@ -307,6 +307,14 @@ export function playMoment(kind: string) {
     if (ctx.state === 'suspended') ctx.resume().catch(() => {});
     const at = ctx.currentTime + 0.02;
     switch (kind) {
+      case 'newspaper':
+        for(let i=0;i<3;i++){
+          const source=noise(ctx,.22),band=ctx.createBiquadFilter(),gain=ctx.createGain(),begin=at+i*.07;
+          band.type='bandpass';band.frequency.value=900+i*600;band.Q.value=.7;
+          gain.gain.setValueAtTime(.0001,begin);gain.gain.linearRampToValueAtTime(.08,begin+.025);gain.gain.exponentialRampToValueAtTime(.0001,begin+.22);
+          source.connect(band).connect(gain).connect(ctx.destination);startVoice(source,[band,gain],begin,begin+.23,scene);
+        }
+        break;
       case 'glass-break': glassBreak(ctx,at,scene); break;
       case 'door-breach': doorBreach(ctx, at, scene); break;
       case 'explosion': blast(ctx, at, scene); break;

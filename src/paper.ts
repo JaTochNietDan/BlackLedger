@@ -27,3 +27,8 @@ export function unreadInLatest(paper: readonly Filed[], seen: string | null): nu
   // Seen a story from an older issue, or none of these: the whole issue is new.
   return at < 0 ? today.length : at;
 }
+
+/** Exact public headline/minute linkage avoids showing an unrelated new story. */
+export function articleForScene<T extends {headline:string;minute:number}>(cue:{headline?:string;minute?:number},stories:readonly T[]):T|undefined {
+ return cue.headline&&cue.minute!==undefined?stories.find(story=>story.headline===cue.headline&&story.minute===cue.minute):undefined;
+}

@@ -1,0 +1,455 @@
+{
+  "during": {
+    "canvasCount": 1,
+    "paperVisible": false,
+    "presentation": {
+      "actors": [],
+      "aftermath": [],
+      "buildingFire": {
+        "clock": 11.786600000000044,
+        "scenes": []
+      },
+      "camera": {
+        "targetX": 79.35,
+        "targetZ": 38.35,
+        "x": 259.35,
+        "z": -201.65,
+        "zoom": 22.943668002038272
+      },
+      "cutawayBuildings": [],
+      "doors": [
+        {
+          "angle": 0,
+          "id": "bar"
+        },
+        {
+          "angle": 0,
+          "id": "laundry"
+        },
+        {
+          "angle": 0,
+          "id": "club"
+        },
+        {
+          "angle": 0,
+          "id": "market"
+        },
+        {
+          "angle": 0,
+          "id": "apartment"
+        },
+        {
+          "angle": 0,
+          "id": "casino"
+        },
+        {
+          "angle": 0,
+          "id": "precinct"
+        },
+        {
+          "angle": 0,
+          "id": "herald"
+        },
+        {
+          "angle": 0,
+          "id": "restaurant"
+        },
+        {
+          "angle": 0,
+          "id": "poolhall"
+        },
+        {
+          "angle": 0,
+          "id": "butcher"
+        },
+        {
+          "angle": 0,
+          "id": "goldenlily"
+        },
+        {
+          "angle": 0,
+          "id": "steamworks"
+        },
+        {
+          "angle": 0,
+          "id": "burlesque"
+        },
+        {
+          "angle": 0,
+          "id": "pawn"
+        },
+        {
+          "angle": 0,
+          "id": "tailor"
+        }
+      ],
+      "effectAudio": {
+        "active": [],
+        "loaded": [
+          "door-kick",
+          "pain",
+          "siren",
+          "engine-idle",
+          "fire",
+          "vehicle-approach",
+          "drive-away",
+          "raid",
+          "panic",
+          "explosion"
+        ],
+        "played": {}
+      },
+      "effects": [
+        {
+          "arm": 0.037313937581422214,
+          "attacker": {
+            "id": "player",
+            "name": "Alex Varga",
+            "weapon": 1
+          },
+          "audioShots": 0,
+          "execution": {
+            "attacker": {
+              "x": 77.740285,
+              "y": 0.20150146443196695,
+              "z": 38.35
+            },
+            "muzzle": {
+              "x": 77.82628500292063,
+              "y": 0.6645014532262938,
+              "z": 38.05
+            },
+            "seconds": 1.6390999999999984,
+            "victim": {
+              "x": 81,
+              "y": 0.2,
+              "z": 38.35
+            }
+          },
+          "id": "11e1fca4d1418fa9d2f1941d983891dc",
+          "kind": "gunfight",
+          "staged": true,
+          "target": "bar",
+          "weapon": "revolver",
+          "x": 76,
+          "z": 38.35
+        }
+      ],
+      "followingPlayer": false,
+      "glazing": [
+        {
+          "broken": false,
+          "id": "bar"
+        },
+        {
+          "broken": false,
+          "id": "laundry"
+        },
+        {
+          "broken": false,
+          "id": "club"
+        },
+        {
+          "broken": false,
+          "id": "market"
+        },
+        {
+          "broken": false,
+          "id": "apartment"
+        },
+        {
+          "broken": false,
+          "id": "casino"
+        },
+        {
+          "broken": false,
+          "id": "precinct"
+        },
+        {
+          "broken": false,
+          "id": "herald"
+        },
+        {
+          "broken": false,
+          "id": "restaurant"
+        },
+        {
+          "broken": false,
+          "id": "poolhall"
+        },
+        {
+          "broken": false,
+          "id": "butcher"
+        },
+        {
+          "broken": false,
+          "id": "goldenlily"
+        },
+        {
+          "broken": false,
+          "id": "steamworks"
+        },
+        {
+          "broken": false,
+          "id": "burlesque"
+        },
+        {
+          "broken": false,
+          "id": "pawn"
+        },
+        {
+          "broken": false,
+          "id": "tailor"
+        }
+      ],
+      "gunAudio": {
+        "active": 0,
+        "context": "suspended",
+        "fallbacks": 0,
+        "loaded": [
+          "thompson",
+          "revolver",
+          "shotgun"
+        ],
+        "played": {}
+      },
+      "harbour": {
+        "visible": true,
+        "waterClock": 11.59910000000004
+      },
+      "headlightPools": 0,
+      "impact": {
+        "x": 0,
+        "y": 0
+      },
+      "minute": 480,
+      "playbackRate": 1,
+      "revision": 0,
+      "rubble": [],
+      "suppression": [],
+      "waiting": [],
+      "weather": {
+        "kind": "overcast",
+        "rainClock": 0,
+        "rainVisible": false,
+        "wet": 0
+      }
+    }
+  },
+  "afterClose": {
+    "revision": 0,
+    "minute": 480,
+    "playbackRate": 1,
+    "gunAudio": {
+      "loaded": [
+        "thompson",
+        "shotgun",
+        "revolver"
+      ],
+      "played": {
+        "revolver": 1
+      },
+      "fallbacks": 0,
+      "active": 0,
+      "context": "running"
+    },
+    "effectAudio": {
+      "loaded": [
+        "pain",
+        "fire",
+        "door-kick",
+        "engine-idle",
+        "vehicle-approach",
+        "drive-away",
+        "siren",
+        "raid",
+        "panic",
+        "explosion"
+      ],
+      "played": {},
+      "active": []
+    },
+    "impact": {
+      "x": 0,
+      "y": 0
+    },
+    "suppression": [],
+    "rubble": [],
+    "glazing": [
+      {
+        "id": "bar",
+        "broken": false
+      },
+      {
+        "id": "laundry",
+        "broken": false
+      },
+      {
+        "id": "club",
+        "broken": false
+      },
+      {
+        "id": "market",
+        "broken": false
+      },
+      {
+        "id": "apartment",
+        "broken": false
+      },
+      {
+        "id": "casino",
+        "broken": false
+      },
+      {
+        "id": "precinct",
+        "broken": false
+      },
+      {
+        "id": "herald",
+        "broken": false
+      },
+      {
+        "id": "restaurant",
+        "broken": false
+      },
+      {
+        "id": "poolhall",
+        "broken": false
+      },
+      {
+        "id": "butcher",
+        "broken": false
+      },
+      {
+        "id": "goldenlily",
+        "broken": false
+      },
+      {
+        "id": "steamworks",
+        "broken": false
+      },
+      {
+        "id": "burlesque",
+        "broken": false
+      },
+      {
+        "id": "pawn",
+        "broken": false
+      },
+      {
+        "id": "tailor",
+        "broken": false
+      }
+    ],
+    "buildingFire": {
+      "clock": 86.06849999999628,
+      "scenes": []
+    },
+    "headlightPools": 0,
+    "harbour": {
+      "visible": true,
+      "waterClock": 85.88819999999629
+    },
+    "followingPlayer": false,
+    "cutawayBuildings": [],
+    "weather": {
+      "kind": "overcast",
+      "wet": 0,
+      "rainVisible": false,
+      "rainClock": 0
+    },
+    "camera": {
+      "zoom": 22.943668002038272,
+      "x": 259.35,
+      "z": -201.65,
+      "targetX": 79.35,
+      "targetZ": 38.35
+    },
+    "actors": [
+      {
+        "id": "player",
+        "model": "person",
+        "x": 80,
+        "z": 36.65,
+        "y": 0.2
+      }
+    ],
+    "waiting": [],
+    "aftermath": [
+      {
+        "id": "aftermath:d9af59c6d4b45f83a54adc7f47256d0b:mara:body",
+        "x": 81,
+        "z": 38.35,
+        "visible": true
+      }
+    ],
+    "doors": [
+      {
+        "id": "bar",
+        "angle": 0
+      },
+      {
+        "id": "laundry",
+        "angle": 0
+      },
+      {
+        "id": "club",
+        "angle": 0
+      },
+      {
+        "id": "market",
+        "angle": 0
+      },
+      {
+        "id": "apartment",
+        "angle": 0
+      },
+      {
+        "id": "casino",
+        "angle": 0
+      },
+      {
+        "id": "precinct",
+        "angle": 0
+      },
+      {
+        "id": "herald",
+        "angle": 0
+      },
+      {
+        "id": "restaurant",
+        "angle": 0
+      },
+      {
+        "id": "poolhall",
+        "angle": 0
+      },
+      {
+        "id": "butcher",
+        "angle": 0
+      },
+      {
+        "id": "goldenlily",
+        "angle": 0
+      },
+      {
+        "id": "steamworks",
+        "angle": 0
+      },
+      {
+        "id": "burlesque",
+        "angle": 0
+      },
+      {
+        "id": "pawn",
+        "angle": 0
+      },
+      {
+        "id": "tailor",
+        "angle": 0
+      }
+    ],
+    "effects": []
+  },
+  "narration": "Local TTS service offline; browser showed Narration unavailable and allowed Close. Real playback latency not verified."
+}
