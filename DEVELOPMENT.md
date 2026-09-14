@@ -3248,3 +3248,30 @@ Routine predictability and long-publican manual-restocking coverage still have
 no passing rerun. Other jobs, full scene/layout checks and broad original goal
 remain incomplete. Live8791 was not changed or used for QA. A fresh clean full
 run will check the accumulated headquarters/job changes and these fixes.
+
+### September 14 — visible, consistently priced manager restocking
+
+Previous turn was progress on ownership/staffing and explicit leadership.
+The clean c06c36c full run remains live (session47957); current output has a
+Families prop-order source-check failure, repaired by keeping world/actions
+adjacent without changing behavior. Focused source-check passes0.284s.
+
+Managers previously debited the undiscounted trade price and refilled supplies
+without any receipt, despite the comment promising shared purchasing rules.
+They now use Restock readiness/payment/effect: the player's haulage discount
+applies and the ledger records actual spending. Managers in custody or on a
+headquarters assignment cannot simultaneously purchase supplies. Regression
+verifies exact discounted debit, one receipt, no duplicate full-stock charge
+and no purchase from custody. Focused manager checks pass0.389s.
+
+The campaign report now counts stock-purchase records in public last-result
+receipts (observed_restocks). Long-campaign coverage uses these purchases,
+including managers and operatives, instead of requiring the protagonist to
+press Restock personally. It still requires actual purchases and wage-setting.
+The short publican check now asserts observed receipts and passes5.024s. This
+metric counts observed receipt entries, not a complete lifetime accounting book.
+
+Initial broad manager/charge/running selection remains live session7693, log
+.runtime/manager-restock-tests.log; no completion claimed. A separate clean long
+publican run will validate the revised purchase measurement. No live8791 action
+or promotion; remaining campaign, job and visual scope stays open.

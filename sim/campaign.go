@@ -96,12 +96,14 @@ type Step struct {
 	PerTask int `json:"per_task,omitempty"`
 }
 type Report struct {
-	Seed     uint32 `json:"seed"`
-	Strategy string `json:"strategy"`
-	Director string `json:"director"`
-	Commands int    `json:"commands"`
-	Minutes  int    `json:"game_minutes"`
-	Alive    bool   `json:"alive"`
+	// Stock purchases observed in public command receipts, including managers.
+	ObservedRestocks int    `json:"observed_restocks"`
+	Seed             uint32 `json:"seed"`
+	Strategy         string `json:"strategy"`
+	Director         string `json:"director"`
+	Commands         int    `json:"commands"`
+	Minutes          int    `json:"game_minutes"`
+	Alive            bool   `json:"alive"`
 	// Died is the rule that ended it, in the game's own three or four words.
 	// Not the sentence in the ledger: that carries a name and an address, so
 	// grouping deaths by it reports eleven distinct causes where there are two.
@@ -1530,6 +1532,13 @@ func RunRecorded(seed uint32, strategy, director string, limit int, trace bool, 
 		}
 		if v.Event != nil {
 			r.Events[v.Event.Kind]++
+		}
+		if n.LastResult != nil {
+			for _, record := range n.LastResult.Records {
+				if record.Kind == "business" && strings.HasPrefix(record.Title, "Restocked at ") {
+					r.ObservedRestocks++
+				}
+			}
 		}
 		r.Actions[c.Kind]++
 		// And which branch of a scene, because "choice" recorded 1,093 times

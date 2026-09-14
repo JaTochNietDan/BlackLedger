@@ -896,9 +896,9 @@ function App() {
       return (
         <FamiliesScreen
           world={w}
+          actions={anywhere}
           act={commit}
           busy={busy||!!journey}
-          actions={anywhere}
           render={actionButton}
           onMeet={id => {
             const seat = id === 'bellandi' ? 'club' : 'garage';

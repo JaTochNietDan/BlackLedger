@@ -154,19 +154,16 @@ func TestALongCampaignReachesTheWorkOfRunningABusiness(t *testing.T) {
 		t.Skip("long campaigns: run without -short to measure them")
 	}
 	t.Parallel()
-	// Eight campaigns rather than three. Buying stock happens about once in a
-	// campaign of ninety days — nine loads across ten — so at three seeds
-	// whether this reads zero is a coin toss, and it read zero the night an
-	// address was added to the city and moved every draw after it. A guard
-	// that goes off at the weather is not guarding anything.
+	// Keep eight independent long campaigns. Purchases made by a manager
+	// count alongside manual restocking; both spend real money on stock.
 	stocked, ran, days, runs := 0, 0, 0, 8
 	for i := 0; i < runs; i++ {
 		r := Run(uint32(i+1)*0x9e3779b9, "publican", "authored", 1200, false)
 		days += r.Minutes / 1440
+		// A manager or hired operative can buy the stock. Count actual
+		// purchase receipts rather than require the proprietor to do it by hand.
+		stocked += r.ObservedRestocks
 		for id, count := range r.Actions {
-			if id == "restock" || strings.HasPrefix(id, "restock:") {
-				stocked += count
-			}
 			if id == "wage" || strings.HasPrefix(id, "wage:") {
 				ran += count
 			}

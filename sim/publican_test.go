@@ -35,6 +35,9 @@ func TestThePublicanActuallyRunsWhatItBuys(t *testing.T) {
 			t.Errorf("a policy written to run its businesses never used %q", kind)
 		}
 	}
+	if r.ObservedRestocks == 0 {
+		t.Fatal("managed businesses never recorded a stock purchase")
+	}
 	// And it holds what it bought, staffed and run by somebody.
 	if r.Milestones["laundry"] == 0 {
 		t.Fatal("the publican never bought anything to run")

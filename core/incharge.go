@@ -86,16 +86,16 @@ func (w *World) TheyRunIt() {
 		if prop == nil || !ok || !w.Own(l.ID) {
 			continue
 		}
-		if w.RunsIt(l.ID) == nil || prop.Supply >= trade.RestockAmount {
+		manager := w.RunsIt(l.ID)
+		if manager == nil || w.Inside(manager) || w.CrewOrderFor(manager.ID) != nil || prop.Supply >= trade.RestockAmount {
 			continue
 		}
-		if w.Player.Cash < trade.Restock {
-			continue
+		// Use the same funded purchase, haulage discount and ledger receipt
+		// as an order or a visit to the counter.
+		if w.RestockReadiness(l.ID) == "" {
+			_ = w.Restock(l.ID)
 		}
-		// The same purchase the player would have walked over to make, which is
-		// why it is the same function rather than a second set of arithmetic.
-		w.Player.Cash -= trade.Restock
-		prop.Supply = trade.RestockAmount
+
 	}
 }
 
