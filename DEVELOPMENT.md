@@ -1325,3 +1325,17 @@ staging rejects public occupants. Browser used existing isolated Ashbury fixture
 8939 (no main save), reviewed 1280×720 and820×740. Observed private cast exactly
 ['player']; clicking Mara in building list returned to the Ashbury hall with
 Mara selected. Cash6000/time08:00 unchanged. Remaining broader scope is active.
+
+## September 14 — clean release integration check
+
+Prepared a clean archive of f1cfbc0, excluding the pre-existing uncommitted
+armed/mugging/robbery/aftermath work. Frontend build and all354 tests pass there.
+A read-only SQLite backup of the main campaign was upgraded on isolated port8940:
+Jamie Moretti, life11/revision2115/minute160095, complete player object preserved.
+All2117 receipt contents match by SHA256, not only count. Migration14→19 adds
+housing/presentation fields, Mercer Court and one required population role.
+Main stored-state digest still matches its pre-QA digest. No listener was on8791.
+
+Full clean Go package checks caught Apartments' `omitempty` tag violating the
+project list contract; removed it. The apartment market API itself was already
+an explicit list. Release integration continues after remaining checks finish.

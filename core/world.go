@@ -531,7 +531,7 @@ type Result struct {
 }
 type World struct {
 	HouseholdSavings map[string]HouseholdAccount      `json:"household_savings,omitempty"`
-	Apartments       []ApartmentDeed                  `json:"apartments,omitempty"`
+	Apartments       []ApartmentDeed                  `json:"apartments"`
 	PropertyPressure map[int]DistrictPropertyPressure `json:"property_pressure,omitempty"`
 	recordStreet     bool
 	streetTravel     []StreetSegment
