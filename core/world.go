@@ -469,11 +469,21 @@ type CueAccident struct {
 	Fatal      bool `json:"fatal"`
 }
 
+// CueDriveBy preserves the car, driver and property damage at the attack.
+type CueDriveBy struct {
+	Driver          CueActor `json:"driver"`
+	Vehicle         string   `json:"vehicle"`
+	VehicleTier     int      `json:"vehicle_tier"`
+	ConditionBefore int      `json:"condition_before"`
+	ConditionAfter  int      `json:"condition_after"`
+}
+
 type VisualCue struct {
 	// Detonation distinguishes a planted blast from a premature charge accident.
 	// Empty on legacy or unrelated cues; it must not imply a safe escape.
 	Detonation string       `json:"detonation,omitempty"`
 	Accident   *CueAccident `json:"accident,omitempty"`
+	DriveBy    *CueDriveBy  `json:"drive_by,omitempty"`
 	Strike     *CueStrike   `json:"strike,omitempty"`
 	Attacker   *CueAttacker `json:"attacker,omitempty"`
 	Detainee   *CueActor    `json:"detainee,omitempty"`

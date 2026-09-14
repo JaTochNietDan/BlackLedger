@@ -6,6 +6,7 @@ export interface Group {
 export interface VisualCue {
   detonation?: 'planted' | 'premature';
   accident?: {health_lost: number; fatal: boolean};
+  drive_by?: {driver: {id: string; name: string}; vehicle: string; vehicle_tier: number; condition_before: number; condition_after: number};
   id: string;
   kind: string;
   target: string;

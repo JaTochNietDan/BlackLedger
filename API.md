@@ -605,6 +605,36 @@ The attack removes15–30 condition points, bounded by remaining condition, remo
 
 The existing saved building-fire lifecycle supplies brigade arrival, extinguishing and cleanup; extinguishing does not repair condition. A new `incendiary` visual cue has gravity8, the target address and an attacker identifying the player with weapon0. Its news is an attack-category arson report. No save schema or endpoint shape changes. The browser stages an authored held-bottle approach, throw, flight and escape before revealing the newspaper. A reserved forecourt footprint protects the actor path. Presentation hides window fire until impact and defers the saved brigade response until the cast exits; authoritative fire timestamps and damage remain unchanged. An Incendiary debug scene uses a private snapshot. Facade/path clearance across all addresses, impact detail and animation quality remain under development.
 
+## Building drive-by foundation — not yet exposed as a command
+
+`World.BuildingDriveBy` resolves an attack against a nonowned operating business
+at the player's current address. The player must be alive, free, carrying an
+equipped firearm (tier1–3), and have an operational personal car with petrol.
+The first crew member must satisfy existing delegation availability and loyalty
+rules and already be at that address to drive. The driver's own car is irrelevant.
+Wrecked premises and buildings with an active unextinguished fire are refused.
+
+Initial balance:35 dollars,24 attention capped at100, and the fuel consumed by
+10 minutes of driving. Revolver damage is14–19 condition points, shotgun20–25,
+Thompson26–31, capped by remaining condition. Supply loss is floor(actual damage/3),
+bounded at zero; operating trouble is set. A faction owner loses25 goodwill and
+receives the existing retaliation scheduling call. The attack itself does not
+start a fire, create casualties, remove staff/bankroll, consume charges or grant
+respect. The method does not advance the clock; future command integration must
+advance the quoted10 minutes once through the normal transactional action path.
+
+The resulting `driveby-building` cue has gravity7 and captures the player in
+`attacker`, the driver in `actors`, and optional `drive_by` data:
+`{driver: {id, name}, vehicle, vehicle_tier, condition_before, condition_after}`.
+Names, equipment and actual damage refer to the event time, including after
+serialization in `last_result.cues`. The attack-category newspaper headline is
+shared with the cue. Legacy and unrelated cues omit `drive_by`.
+
+This is a staged core contract. No action listing, command dispatch, moment
+workshop entry or browser scene is enabled yet. A moving car with distinct
+driver/shooter, weapon-specific fire, impact damage, escape, traffic clearance
+and delayed news must be implemented and browser-verified before exposing it.
+
 
 Pending planter exits now hold their future footprint against newly arriving moving
 traffic. Existing occupants can continue along their committed routes out of that
