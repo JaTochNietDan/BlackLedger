@@ -219,3 +219,43 @@ test('stationary exit recovery respects occupied pavement and leaves parked cars
  assert.ok(poses.get('player').pose.x>48,'person must choose the unoccupied side');
  assert.equal(trafficOverlap(poses.get('player').pose,'person',space.pose,space.model),false);
 });
+
+test('a new journey rejoins its start from the visible sidestep without teleporting',()=>{
+ for(const fps of [30,60,144]){
+  const traffic=new StreetTraffic();
+  const request={id:'player',model:'person',points:[{x:48,z:4.65}],progress:0};
+  const space={pose:{x:48,z:6,heading:0},model:'planter'};
+  for(let i=0;i<fps*3;i++)traffic.update([request],1/fps,1,[space]);
+  let last=traffic.placement('player').pose;
+  assert.ok(last.x<46);
+  request.points=[{x:48,z:4.65},{x:60,z:4.65}];request.progress=1;
+  let reachedStart=false;
+  for(let i=0;i<fps*12;i++){
+   const p=traffic.update([request],1/fps).get('player');
+   assert.equal(p.waiting,false);
+   assert.ok(Math.hypot(p.pose.x-last.x,p.pose.z-last.z)<=1.8/fps+1e-8,'handoff teleported');
+   if(p.pose.x<48-1e-8)assert.equal(p.progress,0);
+   if(Math.abs(p.pose.x-48)<1e-8)reachedStart=true;
+   last=p.pose;
+  }
+  assert.ok(reachedStart);
+  assert.ok(last.x>59);
+ }
+});
+
+test('the connector waits for an occupied route start and resumes after clearance',()=>{
+ const traffic=new StreetTraffic();
+ const person={id:'player',model:'person',points:[{x:48,z:4.65}],progress:0};
+ const space={pose:{x:48,z:6,heading:0},model:'planter'};
+ for(let i=0;i<180;i++)traffic.update([person],1/60,1,[space]);
+ const obstacle={id:'blocker',model:'person',points:[{x:48,z:4.65}],progress:0};
+ traffic.update([person,obstacle],1/60);
+ person.points=[{x:48,z:4.65},{x:60,z:4.65}];person.progress=1;
+ for(let i=0;i<180;i++){
+  const poses=traffic.update([person,obstacle],1/60);
+  clear([person,obstacle],poses);
+  assert.equal(poses.get('player').progress,0);
+ }
+ for(let i=0;i<600;i++)traffic.update([person],1/60);
+ assert.ok(traffic.placement('player').progress>.9);
+});

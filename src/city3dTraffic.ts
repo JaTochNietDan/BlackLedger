@@ -71,7 +71,7 @@ function throughAxis(request: TrafficRequest, progress: number, length: number) 
 export class StreetTraffic {
   private entries = new Map<
     string,
-    {key: string; progress: number; pose: TrafficPose; model: string; waiting: boolean; yieldTo?: TrafficPose; yielding?: boolean}
+    {key: string; progress: number; pose: TrafficPose; model: string; waiting: boolean; yieldTo?: TrafficPose; yielding?: boolean; returnTo?: Point; joining?: Point}
   >();
   clear() {
     this.entries.clear();
@@ -119,6 +119,13 @@ export class StreetTraffic {
     for (const r of sorted) {
       const key = JSON.stringify([r.model, r.points]);
       let e = this.entries.get(r.id);
+      if(e?.key!==key&&e?.returnTo&&!e.waiting&&e.model===r.model&&lengths.get(r.id)!>0&&
+        Math.hypot(r.points[0].x-e.returnTo.x,r.points[0].z-e.returnTo.z)<1e-8){
+        // Rejoin a newly committed journey from the stance we actually rendered.
+        // Only a known same-frontage sidestep can use this short connector.
+        e={key,model:r.model,progress:0,pose:e.pose,waiting:false,joining:{...r.points[0]}};
+        this.entries.set(r.id,e);
+      }
       if (e?.key !== key || e.progress > r.progress + 1e-8) {
         this.entries.delete(r.id);
         let progress = Math.max(0, Math.min(1, r.progress));
@@ -137,6 +144,19 @@ export class StreetTraffic {
       }
       const length = lengths.get(r.id)!;
       e.yielding=false;
+      if(e.joining){
+        let budget=Math.min(.1,Math.max(0,seconds))*playbackRate*trafficSpeed(r.model);
+        while(budget>1e-8){
+          const delta=e.joining.x-e.pose.x,distance=Math.abs(delta);
+          if(distance<1e-8){e.joining=undefined;break;}
+          const step=Math.min(distance,.125,budget);
+          const next={x:e.pose.x+Math.sign(delta)*step,z:e.pose.z,heading:Math.sign(delta)*Math.PI/2};
+          if(!free(next,r.model,r.id,0))break;
+          e.pose=next;budget-=step;
+        }
+        // Journey progress stays at zero until its physical start is reached.
+        continue;
+      }
       if (!length) {
         // A stationary pedestrian may make room along this frontage, without
         // crossing a road or changing their authoritative location. Keep the
@@ -160,7 +180,10 @@ export class StreetTraffic {
             const delta=e.yieldTo.x-e.pose.x;
             const step=Math.min(Math.abs(delta),Math.min(.1,Math.max(0,seconds))*playbackRate*trafficSpeed(r.model));
             const next={...e.yieldTo,x:e.pose.x+Math.sign(delta)*step};
-            if(free(next,r.model,r.id,e.progress)){e.pose=next;e.yielding=step>0;}
+            if(free(next,r.model,r.id,e.progress)){
+              if(step>0)e.returnTo={...r.points[0]};
+              e.pose=next;e.yielding=step>0;
+            }
             else e.yieldTo=undefined;
             if(e.yieldTo&&Math.abs(e.pose.x-e.yieldTo.x)<1e-8)e.yieldTo=undefined;
           }

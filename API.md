@@ -610,3 +610,9 @@ location, activity and clock; the resulting stance persists until a new route is
 assigned. It stays on the same frontage, respects other traffic and held exits,
 and does not move parked vehicles or aftermath. Fully occupied frontages and
 other stationary blockers still require separate staging recovery.
+
+After a cosmetic pavement sidestep, a new pedestrian journey from the same
+original start first walks back along that frontage under traffic collision
+checks. Presentation journey progress remains zero until the start is reached.
+This preserves continuity without changing the saved route, elapsed minutes or
+outcome. Different models/starts retain their existing transition behavior.
