@@ -2354,3 +2354,25 @@ planning cost, not a whole-game performance certification.
 No browser/live promotion or main campaign commands. Side-spin planning,
 airborne physics, shooting-character animation and the remaining broad
 interior/gameplay goal are still unfinished.
+
+### Clean release candidate — 01fb5cf (validation still running)
+
+Prepared isolated clean clone `.runtime/release-01fb5cf` at
+01fb5cf613d01a45b48e441ffb012742f1a595bc, excluding the unrelated dirty
+gameplay/aftermath work. Clean frontend392 tests pass15.222s, production build
+passes2.60s and Go vet passes. Binary health reports modified:false.
+Fresh SQLite backup `.runtime/pre-01fb5cf-campaign.sqlite3` and candidate copy
+`.runtime/candidate-01fb5cf.sqlite3` preserve all state bytes and2,134 receipts.
+Candidate on8974 (session49933) matches SHA256
+4cca8f4fe0be17920d8e010f7a1fb2023a0ea7843eeb445e49ffb17759916af5;
+revision2132/minute160825/Jamie Moretti life11/$2,625 retained.
+Release-local `.runtime/compatibility.json` records exact assertions.
+Browser72 reviewed the clean city view on the copy, without commands.
+
+Full billiards/core/store/server suite is STILL RUNNING in session25227.
+Billiards passed18.540s; core PID62583 was confirmed active with CPU use.
+Poll this same handle; do not restart or claim success until its terminal
+result is known. Logs `.runtime/release-01fb5cf-{go,frontend,build,vet}.log`.
+Build session49560 completed successfully. Main8791 remains release89cc61b
+(PID54030); no promotion or main-save mutation yet. Recheck live save against
+the backup immediately before any eventual restart. Broad goal remains active.
