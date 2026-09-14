@@ -39,3 +39,12 @@ export function pumpOffset(seconds:number){
  const age=seconds-(seconds>=1.7?1.7:.7);
  return age>.15&&age<.70?-.095*Math.sin((age-.15)/.55*Math.PI):0;
 }
+
+/** Bring both hands behind the waist, then reveal the closed restraint. */
+export function poseCustody(actor:THREE.Group,seconds:number){
+ const t=Math.max(0,Math.min(1,(seconds-.35)/1.15)),ease=t*t*(3-2*t);
+ for(const side of [-1,1])aimArm(actor,side,new THREE.Vector3(side*(.31+(.085-.31)*ease),.77+.21*ease,-.24*ease));
+ const cuffs=actor.getObjectByName('custody-restraint');
+ if(cuffs){cuffs.position.set(0,.98,-.24);cuffs.visible=t>=1;}
+ actor.updateMatrixWorld(true);
+}

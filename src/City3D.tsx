@@ -1,5 +1,5 @@
 import {CityAssassination, assassinationBatch, isExecution, ASSASSINATION_SECONDS, ASSASSINATION_VICTIM_X, executionSpatter} from './city3dAssassination';
-import {sceneWeapon,poseLongGun,weaponShots,pumpOffset} from './city3dWeapons';
+import {poseCustody,sceneWeapon,poseLongGun,weaponShots,pumpOffset} from './city3dWeapons';
 import {CityRubble} from './city3dRubble';
 import {CitySuppression} from './city3dSuppression';
 import {CityFire, clearBlastWindows} from './city3dFire';
@@ -117,6 +117,7 @@ const modelNames = [
   'person',
   'woman',
   'revolver',
+  'handcuffs',
   'shotgun',
   'thompson',
   'blast-fragment',
@@ -975,6 +976,9 @@ export function City3D(props: Props) {
             extra = models.get(model)!.clone(true);
             if (isPedestrian(model)) costume = dressPedestrian(extra, model, personWardrobe(['killing','detainee'].includes(cue.kind) ? cue.actors?.[0]?.id || '' : cue.attacker?.id||'anonymous-shooter'));
             if (model === 'police') addVehicleShadow(extra, model);
+            if(cue.kind==='detainee'){
+              const cuffs=models.get('handcuffs')!.clone(true);cuffs.name='custody-restraint';cuffs.visible=false;extra.add(cuffs);
+            }
             if (cue.kind === 'gunfight') {
               extra.rotation.y = Math.PI / 2;
               gunArm = extra.getObjectByName('arm1');
@@ -1383,9 +1387,7 @@ export function City3D(props: Props) {
                 if(leg)leg.rotation.x-=breach.kick*.9;
                 if(knee)knee.rotation.x+=breach.kick*.5;
               }
-            }else if(e.cue.kind==='detainee')for(const name of ['arm1','arm-1']){
-              const arm=e.extra.getObjectByName(name);if(arm)arm.rotation.x=.55*Math.min(1,t*4);
-            }
+            }else if(e.cue.kind==='detainee')poseCustody(e.extra,t*3);
             else e.extra.rotation.y=Math.atan2(lot.x-at.x,lot.row*PITCH+6.35-at.z);
           }
           for (let j = 0; j < 32; j++) {

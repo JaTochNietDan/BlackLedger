@@ -58,3 +58,20 @@ test('recorded back-of-head strikes fire exactly once, including late playback',
  let late=0;const skipped=new GunfireAudio(()=>{late++;return ()=>{};},beats);
  skipped.update(4.5);skipped.update(5);assert.equal(late,0);skipped.dispose();
 });
+
+test('custody hands reach the authored restraints without exceeding the person reservation',async()=>{
+ const {poseCustody}=await import('../.runtime/frontend-test/city3dWeapons.js');
+ for(const name of ['person','woman']){
+  const actor=await model(name),cuffs=await model('handcuffs');cuffs.name='custody-restraint';actor.add(cuffs);
+  for(let frame=0;frame<=180;frame++){
+   poseCustody(actor,frame/60);
+   assert.equal(cuffs.visible,frame/60>=1.5);
+   const bounds=new THREE.Box3().setFromObject(actor,true);
+   assert.ok(bounds.min.x>-.7&&bounds.max.x<.7&&bounds.min.z>-.7&&bounds.max.z<.7,'restraint exceeds reserved pavement space');
+   if(cuffs.visible)for(const side of [-1,1]){
+    const wrist=actor.getObjectByName(`elbow${side}`).localToWorld(new THREE.Vector3(0,-.295,0));
+    assert.ok(wrist.distanceTo(new THREE.Vector3(side*.085,.98,-.24))<.015,'restraint detached from wrist');
+   }
+  }
+ }
+});

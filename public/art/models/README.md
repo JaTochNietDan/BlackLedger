@@ -53,3 +53,7 @@ share a real two-metre vestibule, independent oak/glass/brass door leaf and name
 hinge/threshold. Front windows and piers clear the entrance. Geometry tests sweep
 open passages and floors across all ten GLBs. Specialist industrial, villa,
 Mariner and other unique exports still require their own working entrances.
+
+The handcuffs export is authored locally in Blender: two smooth steel wrist
+rings and three interlocking chain links. It is positioned by the detainee pose;
+no downloaded asset or external texture is used.

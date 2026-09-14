@@ -51,3 +51,17 @@ door and triggered one recorded kick. Blue Hour screenshot145FPS/277draws. Evide
 bluehour-entry.png and venue-entries.json. No campaign commands issued. Specialist
 buildings remain without working entrances; full interior and entry art variety
 are still unfinished.
+
+### September 13 — custody pose foundation
+
+Replaced the detainee's identical rigid arm tilt with two-segment arm placement
+that brings both wrists behind the waist over1.15s. Added a locally authored
+steel handcuff GLB, revealed after the hands reach its position. Actual person and
+woman rig tests verify wrist alignment and the full animation's reservation
+bounds. All201 tests and build pass. Browser8873 arrest preview rendered the new
+pose with two police cars and two officers; wide framing prevents detailed cuff
+inspection, so no close-up visual acceptance is claimed. Evidence custody-pose
+PNG/JSON. The arrest remains incomplete: an officer must approach/apply the
+restraint and escort the detainee along a collision-checked shared path into a
+vehicle with an opening door. Current work only supplies the restrained pose
+and accessory for that sequence. No campaign command issued.

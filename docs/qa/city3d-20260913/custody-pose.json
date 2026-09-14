@@ -1,0 +1,258 @@
+{
+  "revision": 0,
+  "minute": 480,
+  "playbackRate": 1,
+  "gunAudio": {
+    "loaded": [
+      "thompson",
+      "shotgun",
+      "revolver"
+    ],
+    "played": {},
+    "fallbacks": 0,
+    "active": 0,
+    "context": "running"
+  },
+  "effectAudio": {
+    "loaded": [
+      "door-kick",
+      "fire",
+      "vehicle-approach",
+      "siren",
+      "drive-away",
+      "pain",
+      "engine-idle",
+      "raid",
+      "panic",
+      "explosion"
+    ],
+    "played": {
+      "siren": 1
+    },
+    "active": [
+      "siren"
+    ]
+  },
+  "impact": {
+    "x": 0,
+    "y": 0
+  },
+  "suppression": [],
+  "rubble": [],
+  "glazing": [
+    {
+      "id": "bar",
+      "broken": false
+    },
+    {
+      "id": "laundry",
+      "broken": false
+    },
+    {
+      "id": "club",
+      "broken": false
+    },
+    {
+      "id": "market",
+      "broken": false
+    },
+    {
+      "id": "apartment",
+      "broken": false
+    },
+    {
+      "id": "casino",
+      "broken": false
+    },
+    {
+      "id": "precinct",
+      "broken": false
+    },
+    {
+      "id": "herald",
+      "broken": false
+    },
+    {
+      "id": "restaurant",
+      "broken": false
+    },
+    {
+      "id": "poolhall",
+      "broken": false
+    },
+    {
+      "id": "butcher",
+      "broken": false
+    },
+    {
+      "id": "goldenlily",
+      "broken": false
+    },
+    {
+      "id": "steamworks",
+      "broken": false
+    },
+    {
+      "id": "burlesque",
+      "broken": false
+    },
+    {
+      "id": "pawn",
+      "broken": false
+    },
+    {
+      "id": "tailor",
+      "broken": false
+    }
+  ],
+  "buildingFire": {
+    "clock": 13.782800000000067,
+    "scenes": []
+  },
+  "headlightPools": 0,
+  "harbour": {
+    "visible": true,
+    "waterClock": 13.595400000000067
+  },
+  "followingPlayer": false,
+  "cutawayBuildings": [],
+  "weather": {
+    "kind": "clear",
+    "wet": 0,
+    "rainVisible": false,
+    "rainClock": 0
+  },
+  "camera": {
+    "zoom": 4.541244242613682,
+    "x": 260,
+    "z": -193.825,
+    "targetX": 80,
+    "targetZ": 46.175
+  },
+  "actors": [
+    {
+      "id": "player",
+      "model": "person",
+      "x": 80,
+      "z": 36.65,
+      "y": 0.2
+    }
+  ],
+  "waiting": [],
+  "aftermath": [
+    {
+      "id": "aftermath:bc0e3490a50a00f045f46692880a0b83:mara:body",
+      "x": 80,
+      "z": 38.35,
+      "visible": true
+    }
+  ],
+  "doors": [
+    {
+      "id": "bar",
+      "angle": 0
+    },
+    {
+      "id": "laundry",
+      "angle": 0
+    },
+    {
+      "id": "club",
+      "angle": 0
+    },
+    {
+      "id": "market",
+      "angle": 0
+    },
+    {
+      "id": "apartment",
+      "angle": 0
+    },
+    {
+      "id": "casino",
+      "angle": 0
+    },
+    {
+      "id": "precinct",
+      "angle": 0
+    },
+    {
+      "id": "herald",
+      "angle": 0
+    },
+    {
+      "id": "restaurant",
+      "angle": 0
+    },
+    {
+      "id": "poolhall",
+      "angle": 0
+    },
+    {
+      "id": "butcher",
+      "angle": 0
+    },
+    {
+      "id": "goldenlily",
+      "angle": 0
+    },
+    {
+      "id": "steamworks",
+      "angle": 0
+    },
+    {
+      "id": "burlesque",
+      "angle": 0
+    },
+    {
+      "id": "pawn",
+      "angle": 0
+    },
+    {
+      "id": "tailor",
+      "angle": 0
+    }
+  ],
+  "effects": [
+    {
+      "id": "preview:fa9fcd93-f84b-4484-ad26-8945c0db8f0e:0",
+      "kind": "arrest",
+      "target": "bar",
+      "staged": true,
+      "x": 89.6,
+      "z": 42
+    },
+    {
+      "id": "preview:fa9fcd93-f84b-4484-ad26-8945c0db8f0e:0:police-unit:0",
+      "kind": "police-unit",
+      "target": "bar",
+      "staged": true,
+      "x": 89.6,
+      "z": 48
+    },
+    {
+      "id": "preview:fa9fcd93-f84b-4484-ad26-8945c0db8f0e:0:detainee:0",
+      "kind": "detainee",
+      "target": "bar",
+      "staged": true,
+      "x": 77,
+      "z": 38.35
+    },
+    {
+      "id": "preview:fa9fcd93-f84b-4484-ad26-8945c0db8f0e:0:officer:0",
+      "kind": "officer",
+      "target": "bar",
+      "staged": true,
+      "x": 83,
+      "z": 38.35
+    },
+    {
+      "id": "preview:fa9fcd93-f84b-4484-ad26-8945c0db8f0e:0:officer:1",
+      "kind": "officer",
+      "target": "bar",
+      "staged": true,
+      "x": 74,
+      "z": 38.35
+    }
+  ]
+}

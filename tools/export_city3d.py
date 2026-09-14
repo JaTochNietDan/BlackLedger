@@ -647,6 +647,17 @@ def person(waved=False):
                 uv.data[index].uv=(co[axes[0]]/.2,co[axes[1]]/.2)
 
 
+def handcuffs():
+    steel=material('brushed restraint steel',(.42,.45,.47),.8)
+    for side in (-1,1):
+        bpy.ops.mesh.primitive_torus_add(major_radius=.065,minor_radius=.008,major_segments=32,minor_segments=8,location=(side*.085,0,0),rotation=(0,math.pi/2,0))
+        ring=bpy.context.object;ring.name='wrist cuff';ring.data.materials.append(steel)
+        for polygon in ring.data.polygons:polygon.use_smooth=True
+    for i in range(3):
+        bpy.ops.mesh.primitive_torus_add(major_radius=.022,minor_radius=.006,major_segments=16,minor_segments=6,location=((i-1)*.035,0,-.06),rotation=(math.pi/2 if i%2 else 0,0,0))
+        link=bpy.context.object;link.name='cuff chain link';link.data.materials.append(steel)
+
+
 def revolver():
     steel=material('blued revolver steel',(.055,.065,.075),.8)
     wood=material('walnut grip',(.17,.07,.025))
@@ -1545,6 +1556,7 @@ clear();firefighter();manifest['firefighter']=export('firefighter')
 clear();fire_engine();manifest['fire-engine']=export('fire-engine')
 clear();police_officer();manifest['police-officer']=export('police-officer')
 clear();undertaker();manifest['undertaker']=export('undertaker')
+clear();handcuffs();manifest['handcuffs']=export('handcuffs')
 clear();revolver();manifest['revolver']=export('revolver')
 for name in ('shotgun','thompson'):
     clear();long_gun(name);manifest[name]=export(name)
