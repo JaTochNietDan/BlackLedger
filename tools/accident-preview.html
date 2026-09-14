@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset="utf-8"><title>Charge accident motion review</title><style>body{margin:0;background:#1c211d;color:#e6d7b6;font:18px Georgia}p{position:absolute;top:10px;left:20px}canvas{display:block}</style></head><body><p>Charge accident · fall study <button id="play">Play</button> <button id="end">Final pose</button><output></output></p><canvas></canvas><script type="module">
+<!doctype html><html><head><meta charset="utf-8"><title>Charge accident motion review</title><style>body{margin:0;background:#1c211d;color:#e6d7b6;font:18px Georgia}p{position:absolute;top:10px;left:20px}canvas{display:block}</style></head><body><p>Charge accident · fall and recovery study <button id="play">Play</button> <button id="end">Final pose</button><label>Time <input id="time" type="number" min="0" max="7.5" step=".01" value="0"></label><output></output></p><canvas></canvas><script type="module">
 import * as THREE from '/node_modules/three/build/three.module.js';
 import {GLTFLoader} from '/node_modules/three/examples/jsm/loaders/GLTFLoader.js';
 import {OrbitControls} from '/node_modules/three/examples/jsm/controls/OrbitControls.js';
@@ -18,7 +18,8 @@ for(const [i,model] of ['person','woman'].entries())for(const fatal of [false,tr
  scene.add(new THREE.Box3Helper(box,0x997b4f));
 }
 let request=0;const render=()=>renderer.render(scene,camera);controls.addEventListener('change',render);
-function pose(t){casts.forEach(c=>c.update(t));document.body.dataset.pose=JSON.stringify({seconds:t,done:t>=4});document.querySelector('output').value=t.toFixed(2)+'s · left: survivor / right: fatal';render();}
-document.getElementById('end').onclick=()=>{cancelAnimationFrame(request);pose(4);};
-document.getElementById('play').onclick=()=>{cancelAnimationFrame(request);const start=performance.now();function frame(now){const t=Math.min(4,(now-start)/1000);pose(t);if(t<4)request=requestAnimationFrame(frame);}request=requestAnimationFrame(frame);};pose(0);
+function pose(t){document.getElementById('time').value=t.toFixed(2);casts.forEach(c=>c.update(t));document.body.dataset.pose=JSON.stringify({seconds:t,done:t>=7.5});document.querySelector('output').value=t.toFixed(2)+'s · left: survivor / right: fatal';render();}
+document.getElementById('time').oninput=e=>{cancelAnimationFrame(request);pose(Number(e.target.value));};
+document.getElementById('end').onclick=()=>{cancelAnimationFrame(request);pose(7.5);};
+document.getElementById('play').onclick=()=>{cancelAnimationFrame(request);const start=performance.now();function frame(now){const t=Math.min(7.5,(now-start)/1000);pose(t);if(t<7.5)request=requestAnimationFrame(frame);}request=requestAnimationFrame(frame);};pose(0);
 </script></body></html>

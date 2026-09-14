@@ -178,7 +178,7 @@ test('accident fall keeps both actual rigs above ground and preserves the record
   const cast=new CityAccident(await model(name),fatal);
   cast.root.position.set(30,.2,40);cast.root.rotation.y=1.1;
   let previous;
-  for(let frame=0;frame<=480;frame++){
+  for(let frame=0;frame<=cast.duration*120;frame++){
    const state=cast.update(frame/120),bounds=new THREE.Box3().setFromObject(cast.actor,true);
    assert.ok(Math.abs(bounds.min.y-.205)<1e-6,`${name} lost ground contact at ${frame/120}`);
    assert.equal(state.fatal,fatal);if(fatal)assert.equal(state.recovering,false);
@@ -187,7 +187,8 @@ test('accident fall keeps both actual rigs above ground and preserves the record
    previous=cast.actor.position.clone();
   }
   assert.ok(fatal?cast.actor.rotation.x<-1.5:cast.actor.rotation.x>-.8);
-  assert.equal(cast.update(4).done,true);
+  assert.equal(cast.update(4).done,fatal);
+  assert.equal(cast.update(cast.duration).done,true);
   cast.update(0);assert.equal(cast.actor.rotation.x,0);
  }
 });
@@ -224,7 +225,7 @@ test('accident reservations enclose the whole posed cast and yield occupied fron
   const cast=new CityAccident(await model(name),fatal),slot=accidentReservation(slots[0].root,heading),size=trafficSize(slot.model);
   cast.root.position.set(slot.root.x,.2,slot.root.z);cast.root.rotation.y=heading;
   const inverse=new THREE.Matrix4().compose(new THREE.Vector3(slot.pose.x,0,slot.pose.z),new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0),heading),new THREE.Vector3(1,1,1)).invert();
-  for(let frame=0;frame<=120;frame++){
+  for(let frame=0;frame<=cast.duration*30;frame++){
    cast.update(frame/30);
    cast.actor.traverse(part=>{
     if(!(part instanceof THREE.Mesh))return;
@@ -292,5 +293,28 @@ test('strike victims stay grounded throughout every fall and its retained afterm
    if(previous!==undefined)assert.ok(Math.abs(victim.position.y-previous)<.09,`${name}/${variant} ground correction jumped`);
    previous=victim.position.y;
   }
+ }
+});
+
+test('survivors rise over stationary level soles and finish upright',async()=>{
+ const {CityAccident}=await import('../.runtime/frontend-test/city3dAccident.js');
+ for(const name of ['person','woman']){
+  const cast=new CityAccident(await model(name),false);cast.root.position.set(8,.2,13);cast.root.rotation.y=.7;
+  let planted;
+  for(let frame=0;frame<=264;frame++){
+   cast.update(5.3+frame/120);
+   const feet=[];
+   cast.actor.traverse(part=>{
+    if(!(part instanceof THREE.Mesh)||!part.name.startsWith('shoe'))return;
+    const positions=part.geometry.attributes.position;
+    for(let i=0;i<positions.count;i++)feet.push(new THREE.Vector3().fromBufferAttribute(positions,i).applyMatrix4(part.matrixWorld));
+   });
+   assert.ok(feet.length>0);
+   if(!planted)planted=feet;
+   feet.forEach((p,i)=>assert.ok(p.distanceTo(planted[i])<1e-6,`${name} foot slides while standing`));
+  }
+  assert.ok(Math.abs(cast.actor.rotation.x)<1e-8);
+  for(const side of [-1,1])for(const joint of ['leg','knee','arm','elbow'])assert.ok(cast.actor.getObjectByName(joint+side).quaternion.angleTo(new THREE.Quaternion())<1e-8);
+  cast.update(0);assert.equal(cast.actor.position.z,0);
  }
 });
