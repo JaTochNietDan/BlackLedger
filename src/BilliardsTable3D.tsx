@@ -1,3 +1,4 @@
+import {poolAimContact} from './billiardsAim';
 import {createBilliardsCue} from './billiardsCue';
 import {ballTexture} from './billiardsBallTexture';
 import {poolRails,poolCushionGeometry} from './billiardsTableGeometry';
@@ -65,6 +66,7 @@ export function BilliardsTable3D(props:TableProps){
   });
   const headLine=new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-W/2,H+.003,L/4),new THREE.Vector3(W/2,H+.003,L/4)]),new THREE.LineDashedMaterial({color:'#e8d8b6',dashSize:.04,gapSize:.03,transparent:true,opacity:.65}));headLine.computeLineDistances();scene.add(headLine);
   const guide=new THREE.Line(new THREE.BufferGeometry(),new THREE.LineDashedMaterial({color:'#e7d6a5',dashSize:.04,gapSize:.025,transparent:true,opacity:.65}));scene.add(guide);
+  const contactRing=new THREE.Mesh(new THREE.RingGeometry(R*.94,R*1.06,48),new THREE.MeshBasicMaterial({color:'#e7d6a5',side:THREE.DoubleSide,transparent:true,opacity:.75}));contactRing.rotation.x=-Math.PI/2;scene.add(contactRing);
   const {cue,materials:cueMaterials}=createBilliardsCue();scene.add(cue);
   const cuePose=(origin:THREE.Vector3,angle:number,front:number,top:number,side:number,opacity:number)=>{const direction=new THREE.Vector3(Math.cos(angle),0,-Math.sin(angle)),across=new THREE.Vector3(-Math.sin(angle),0,-Math.cos(angle));cue.position.copy(origin).addScaledVector(direction,front-.714).addScaledVector(across,side);cue.position.y+=top;cue.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),direction);for(const m of cueMaterials){m.opacity=opacity;m.depthWrite=opacity>.99;}};
   const clock=new PoolReplayClock();let clockRate=1,clockPaused=false;
@@ -133,8 +135,8 @@ export function BilliardsTable3D(props:TableProps){
    const called=p.balls.find(b=>b.id===live.current.calledBall);selection.visible=interactive&&!p.breaking&&!p.ball_in_hand&&!!called&&called.pocket<0;if(called)selection.position.set(called.position[0]-W/2,H+.003,L/2-called.position[1]);
    for(let i=0;i<pocketMarkers.length;i++){const marker=pocketMarkers[i];marker.group.visible=interactive&&!p.breaking&&!p.ball_in_hand;marker.ring.material.opacity=i===live.current.calledPocket?1:.35;marker.ring.material.color.set(i===live.current.calledPocket?'#ffd071':'#dcc38b');}
    const aiming=interactive&&!p.settled&&p.turn===0&&!p.ball_in_hand&&!p.break_choices.length;
-   guide.visible=aiming;cue.visible=aiming||stroking;
-   if(aiming&&(dirty||lastAngle!==live.current.angle)){lastAngle=live.current.angle;const ball=p.balls.find(b=>b.id===0)!;const start=new THREE.Vector3(ball.position[0]-W/2,H+R,L/2-ball.position[1]);const direction=new THREE.Vector3(Math.cos(lastAngle),0,-Math.sin(lastAngle));guide.geometry.dispose();guide.geometry=new THREE.BufferGeometry().setFromPoints([start,start.clone().addScaledVector(direction,.7)]);guide.computeLineDistances();cuePose(start,lastAngle,-R-.06,live.current.top,live.current.side,1);dirty=true;}
+   guide.visible=aiming;if(!aiming)contactRing.visible=false;cue.visible=aiming||stroking;
+   if(aiming&&(dirty||lastAngle!==live.current.angle)){lastAngle=live.current.angle;const ball=p.balls.find(b=>b.id===0)!;const start=new THREE.Vector3(ball.position[0]-W/2,H+R,L/2-ball.position[1]);const contact=poolAimContact(p,lastAngle);const end=contact?new THREE.Vector3(contact.x-W/2,H+R,L/2-contact.y):start.clone();contactRing.visible=!!contact&&contact.kind!=='edge';contactRing.position.set(end.x,H+.004,end.z);guide.geometry.dispose();guide.geometry=new THREE.BufferGeometry().setFromPoints([start,end]);guide.computeLineDistances();cuePose(start,lastAngle,-R-.06,live.current.top,live.current.side,1);dirty=true;}
    if(dirty){renderer.render(scene,camera);dirty=false;}
   };frame=requestAnimationFrame(tick);
   return ()=>{dead=true;generation++;cancelAnimationFrame(frame);observer.disconnect();canvas.removeEventListener('pool-skip',skip);canvas.removeEventListener('pool-replay',replay);canvas.removeEventListener('pointerdown',down);canvas.removeEventListener('pointermove',move);canvas.removeEventListener('pointerup',up);canvas.removeEventListener('pointercancel',cancel);canvas.removeEventListener('lostpointercapture',cancel);view.dispose();disposeCityResources([scene]);renderer.dispose();canvas.remove();};

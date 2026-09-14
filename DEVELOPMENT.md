@@ -2592,3 +2592,24 @@ citywide NPC property investors, funded vacant-home purchases with onward
 journeys, smooth held table-camera controls, Pier14 cargo shed and Vance cab
 dispatch office. Other interiors, full billiards shooting/airborne physics,
 richer housing preferences and overall art/campaign acceptance remain open.
+
+### 2026-09-14 — billiards first-contact aiming guide
+
+Previous495f4e1 promoted the verified housing/interior release. Replaced the
+fixed.7m aiming line with a geometric first-contact guide: circle sweeps against
+object balls and the shared physical cushion segments/endpoints, including
+pocket jaws. A cloth ring marks the cue-ball centre at contact. Pocket openings
+end beyond the bed. The helper reads current balls without mutating state;
+it does not predict spin, rebounds, pockets or game outcomes. Added that
+explanation to table help. Actual shots remain Go-authoritative.
+
+399 frontend tests pass14.081s, including straight/cut hits, misses, pocketed
+balls, rail-before-ball, jaw/opening geometry, touching-ball direction and
+read-only behavior. Build passes2.71s. Logs
+`.runtime/billiards-aim-{tests,build}.log`. Browser79 on isolated8979 started a
+$20 rack against Mara and confirmed initial cue placement, then checked the
+line/contact ring against the front rack ball and a cushion with a different
+local aim. Fixture `.runtime/billiards-aim-qa.sqlite3` revision2/minute602/two
+receipts; no stroke committed and no main-save QA writes. Main8791 remains
+3e7ee26; this awaits promotion. Full shooting character/bridge pose, cue-rail
+clearance, airborne physics and remaining interiors still need work.
