@@ -38,3 +38,15 @@ test('assassination previews cover recorded variants with the actual weapon and 
   assert.equal(preview.last_result.kind,undefined,'preview must not inherit a campaign action');
  });
 });
+
+test('ordinary gunfire previews use each public gun tier without inventing a fatality',()=>{
+ const state=Object.freeze({id:'campaign',minute:600,revision:10});
+ for(const [name,weapon] of [['Gunfight',1],['Gunfight · shotgun',2],['Gunfight · Thompson',3]]){
+  assert.ok(previewScenes.includes(name));
+  const {state:preview}=previewScene(state,'laundry',name,name);
+  const cues=preview.last_result.cues;assert.equal(cues.length,1);
+  assert.equal(cues[0].kind,weapon?'gunfight':'attack');assert.equal(cues[0].attacker.weapon,weapon);
+  assert.equal(cues[0].strike,undefined);assert.deepEqual(cues[0].actors,[]);
+  assert.equal(preview.revision,state.revision);assert.equal(preview.minute,state.minute);
+ }
+});

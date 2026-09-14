@@ -7,17 +7,19 @@ const strikes = {
   'Assassination · Thompson': {variant: 'burst', weapon: 3},
   'Assassination · close quarters': {variant: 'close-quarters', weapon: 0},
 } as const;
-export const previewScenes = ['Gunfight', ...Object.keys(strikes) as (keyof typeof strikes)[], 'Explosion', 'Arrest', 'Raid'] as const;
+const gunfights = {'Gunfight':1,'Gunfight · shotgun':2,'Gunfight · Thompson':3} as const;
+export const previewScenes = [...Object.keys(gunfights) as (keyof typeof gunfights)[], ...Object.keys(strikes) as (keyof typeof strikes)[], 'Explosion', 'Arrest', 'Raid'] as const;
 export type PreviewScene = typeof previewScenes[number];
 /** A private presentation snapshot. No API command or campaign object is changed. */
 export function previewScene(state: Snapshot, target: string, scene: PreviewScene, token: string) {
   const strike = scene in strikes ? strikes[scene as keyof typeof strikes] : undefined;
-  const kinds = strike ? ['killing', strike.weapon ? 'gunfight' : 'attack'] : [scene.toLowerCase()];
+  const firearm=scene in gunfights?gunfights[scene as keyof typeof gunfights]:undefined;
+  const kinds = strike ? ['killing', strike.weapon ? 'gunfight' : 'attack'] : [firearm?'gunfight':scene.toLowerCase()];
   const cues: VisualCue[] = kinds.map((kind, i) => ({
     id: `preview:${token}:${i}`, kind, target, minute: state.minute,
     caption: `Visual preview: ${scene}`,
     strike:strike?{variant:strike.variant,victim:{id:'preview-victim',name:'Preview character'}}:undefined,
-    attacker:strike&&kind!=='killing'?{id:'preview-assassin',name:'Preview assassin',weapon:strike.weapon}:undefined, detainee: kind==='arrest'?{id:'preview-detainee',name:'Preview detainee'}:undefined, actors: kind === 'killing'
+    attacker:strike&&kind!=='killing'?{id:'preview-assassin',name:'Preview assassin',weapon:strike.weapon}:firearm?{id:'preview-attacker',name:'Preview attacker',weapon:firearm??0}:undefined, detainee: kind==='arrest'?{id:'preview-detainee',name:'Preview detainee'}:undefined, actors: kind === 'killing'
       ? [{id: 'preview-victim', name: 'Preview character'}] : [],
   }));
   return {state: {...state,
