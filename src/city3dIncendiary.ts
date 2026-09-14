@@ -154,3 +154,11 @@ export function incendiaryCorridorClear(root:{x:number;z:number},building:THREE.
  });
  return clear;
 }
+
+/** Validate a forecourt before reserving it; the release is local to the cast. */
+export function incendiaryStagingFlight(root:{x:number;z:number},release:THREE.Vector3,windows:THREE.Vector3[],building:THREE.Object3D){
+ if(!incendiaryCorridorClear(root,building))return null;
+ const origin=new THREE.Vector3(root.x,.2,root.z);
+ const ordered=[...windows].sort((a,b)=>Math.abs(a.x-root.x)-Math.abs(b.x-root.x));
+ return incendiaryFlight(release.clone().add(origin),ordered,building);
+}

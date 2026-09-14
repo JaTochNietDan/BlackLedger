@@ -1,4 +1,4 @@
-import {CityIncendiary, incendiaryCorridorClear, incendiaryFlight, INCENDIARY_IMPACT} from './city3dIncendiary';
+import {CityIncendiary, incendiaryStagingFlight, INCENDIARY_IMPACT} from './city3dIncendiary';
 import {streetAt} from './streetPlayback';
 import {CityCustody} from './city3dCustody';
 import {CityAssassination, assassinationBatch, isStagedStrike, MELEE_IMPACTS, ASSASSINATION_SHOT, ASSASSINATION_VICTIM_X, executionSpatter} from './city3dAssassination';
@@ -1235,17 +1235,23 @@ export function City3D(props: Props) {
             ...aftermath.slots(),
           ];
           const entry=buildings.get(e.cue.target)?.getObjectByName('entrance-threshold')?.getWorldPosition(new THREE.Vector3());
-          e.slot = availableSceneSlot(lots.get(e.cue.target)!, e.assassination?'assassination':e.custody?'custody':e.cue.kind, occupied,entry,e.incendiary?slot=>incendiaryCorridorClear(slot.root,buildings.get(e.cue.target)!):undefined);
+          const fireBuilding=e.incendiary?buildings.get(e.cue.target):undefined;
+          const fireWindows=fireBuilding?clearBlastWindows(fireBuilding):[];
+          let stagedFlight:ReturnType<typeof incendiaryStagingFlight>=null;
+          e.slot = availableSceneSlot(lots.get(e.cue.target)!, e.assassination?'assassination':e.custody?'custody':e.cue.kind, occupied,entry,e.incendiary?slot=>{
+            stagedFlight=fireBuilding?incendiaryStagingFlight(slot.root,e.incendiary!.release,fireWindows,fireBuilding):null;
+            return stagedFlight!==null;
+          }:undefined);
           if (e.slot) {
             e.extra.position.set(e.slot.root.x, e.slot.model === 'parked-police' ? vehicleRootHeight(e.slot.root) : 0.2, e.slot.root.z);
             e.light.position.set(e.slot.root.x, 3, e.slot.root.z);
             e.since = now;
             if(e.incendiary){
-              const building=buildings.get(e.cue.target)!;
-              const windows=clearBlastWindows(building).sort((a,b)=>Math.abs(a.x-e.slot!.root.x)-Math.abs(b.x-e.slot!.root.x));
-              const target=windows[0]??building.getObjectByName('entrance-threshold')?.getWorldPosition(new THREE.Vector3())??new THREE.Vector3(e.slot.root.x,3,e.slot.root.z+3);
-              const flight=incendiaryFlight(e.incendiary.root.localToWorld(e.incendiary.release.clone()),windows,building);
-              if(flight){target.copy(flight.target);e.incendiary.loft=flight.loft;}
+              // A slot is accepted only with a checked flight. Never invent a
+              // fallback through a facade when a window has no clear approach.
+              const flight=stagedFlight!;
+              const target=flight.target;
+              e.incendiary.loft=flight.loft;
               e.incendiary.target.copy(target).sub(e.extra.position);
               frameScene(camera,controls.target,new THREE.Box3().setFromPoints([
                 new THREE.Vector3(e.slot.root.x-5,0,e.slot.root.z-1.2),

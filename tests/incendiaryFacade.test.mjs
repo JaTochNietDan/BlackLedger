@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
-import {CityIncendiary,incendiaryCorridorClear,incendiaryFlight,INCENDIARY_RELEASE,INCENDIARY_IMPACT} from '../.runtime/frontend-test/city3dIncendiary.js';
+import {CityIncendiary,incendiaryStagingFlight,incendiaryCorridorClear,incendiaryFlight,INCENDIARY_RELEASE,INCENDIARY_IMPACT} from '../.runtime/frontend-test/city3dIncendiary.js';
 import {clearBlastWindows} from '../.runtime/frontend-test/city3dFire.js';
 async function model(name){
  const b=readFileSync(new URL(`../public/art/models/${name}.glb`,import.meta.url)),loader=new GLTFLoader();
@@ -96,4 +96,20 @@ test('staging chooses another corridor when a facade obstacle blocks the first',
  assert.equal(incendiaryCorridorClear({x:3,z:6.35},building),false);
  fence.position.x=20;assert.equal(incendiaryCorridorClear({x:3,z:6.35},building),true);
  fence.geometry.dispose();fence.material.dispose();
+});
+
+test('staging rejects a blocked flight and reserves an alternate clear throw',async()=>{
+ const {availableSceneSlot}=await import('../.runtime/frontend-test/city3dEvents.js');
+ const building=new THREE.Group(),wall=new THREE.Mesh(new THREE.BoxGeometry(2,10,.1),new THREE.MeshBasicMaterial({side:THREE.DoubleSide}));
+ wall.position.set(3,5,8);building.add(wall);
+ const lot={x:0,z:16,row:0},release=new THREE.Vector3(.4,1.8,.4),windows=[new THREE.Vector3(3,4,12)];
+ assert.ok(incendiaryCorridorClear({x:3,z:6.35},building),'fixture blocks the bottle, not the walking corridor');
+ assert.equal(incendiaryStagingFlight({x:3,z:6.35},release,windows,building),null);
+ const slot=availableSceneSlot(lot,'incendiary',[],undefined,s=>!!incendiaryStagingFlight(s.root,release,windows,building));
+ assert.equal(slot.root.x,0);
+ assert.deepEqual(release.toArray(),[.4,1.8,.4],'planning mutated the cast release');
+ assert.equal(incendiaryStagingFlight(slot.root,release,[],building),null,'missing windows invented a target');
+ wall.scale.x=20;
+ assert.equal(availableSceneSlot(lot,'incendiary',[],undefined,s=>!!incendiaryStagingFlight(s.root,release,windows,building)),undefined,'all blocked flights invented a slot');
+ wall.geometry.dispose();wall.material.dispose();
 });
