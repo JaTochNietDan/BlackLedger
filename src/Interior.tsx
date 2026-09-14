@@ -123,7 +123,7 @@ export function Interior({
 }) {
   const [picked, setPicked] = useState('');
   const [privateRoom,setPrivateRoom]=useState(false);
-  const hasFlat=player.home===place.id&&(place.id==='apartment'||place.id==='mercercourt');
+  const hasFlat=player.home===place.id&&(place.id==='apartment'||place.id==='mercercourt'||place.id==='room');
   const inFlat=privateRoom&&hasFlat;
   useEffect(()=>{setPrivateRoom(false);},[place.id,player.home]);
   // The sidebar's action search came in here with the work. A room with
@@ -252,7 +252,7 @@ export function Interior({
             </i>
           ))}
         </div>
-        {hasFlat&&<button className="plain private-room-toggle" aria-pressed={inFlat} onClick={()=>{setPrivateRoom(!inFlat);setPicked('');}}>{inFlat?'Return to entrance hall':'Go to your apartment'}</button>}
+        {hasFlat&&<button className="plain private-room-toggle" aria-pressed={inFlat} onClick={()=>{setPrivateRoom(!inFlat);setPicked('');}}>{inFlat?'Return to entrance hall':place.id==='room'?'Go to your room':'Go to your apartment'}</button>}
         {place.note && <small className={place.note_warn ? 'warning' : ''}>{place.note}</small>}
       </div>
       {place.rent_register && <details className="lodging-register">
@@ -273,7 +273,7 @@ export function Interior({
           ))}
         </div>
       )}
-      {inFlat?<Interior3D key={`${place.id}-private`} place="flat" player={player} motion={motion} people={[]} picked="" onPick={()=>{}} minute={minute}/>:hasInterior(place.id) ? <Interior3D key={place.id} place={place.id} operation={place} player={player} motion={motion} people={onFloor} picked={picked} onPick={id=>setPicked(id===picked?'':id)} minute={minute}/> : <div
+      {inFlat?<Interior3D key={`${place.id}-private`} place={place.id==='room'?'lodging':'flat'} player={player} motion={motion} people={[]} picked="" onPick={()=>{}} minute={minute}/>:hasInterior(place.id) ? <Interior3D key={place.id} place={place.id} operation={place} player={player} motion={motion} people={onFloor} picked={picked} onPick={id=>setPicked(id===picked?'':id)} minute={minute}/> : <div
         className={'room' + (painted ? ' painted' : '')}
         style={painted ? {backgroundImage: `url(${paintedRoom(place.id)})`} : undefined}
       >
@@ -405,7 +405,7 @@ export function Interior({
           <>
             <div className="work-head">
               <p className="room-hint">
-                {inFlat?'You are in your apartment. Select someone from the building list to return to the entrance hall.':'Pick somebody in the room to deal with them, or use the building itself.'}
+                {inFlat?'You are in your private room. Select someone from the building list to return to the entrance hall.':'Pick somebody in the room to deal with them, or use the building itself.'}
               </p>
               <div className="work-search">
                 <input

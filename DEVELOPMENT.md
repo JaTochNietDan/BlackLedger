@@ -1512,3 +1512,35 @@ scene. No main campaign QA actions. Main8791 remains the prior release.
 
 Still unfinished: private Mariner room/home playback, persistent indoor crime
 aftermath, burglary choreography, remaining interiors and broader acceptance.
+
+## September 14 — private Mariner lodging and indoor home attacks
+
+Authored a distinct6x6m lodging room in `tools/lodging_room.py`: iron bed/frame,
+linen/blanket, bedside drawers/lamp, sash window/curtains, writing desk/paper/chair,
+washstand/basin/jug, trunk and coat hooks. Targeted export:
+`.venv-blender/bin/python tools/export_city3d.py --only=interior-lodging-room`.
+Full exporter includes it. Original local assets only. The public lobby's roster
+is never placed in this private room; the player can open it at their Mariner
+home and return to the hall. Camera/enlargement and existing commands remain.
+
+Mariner recorded home attacks use the new room and a diagonal aisle (root yawπ/4)
+without shrinking people or furniture. Spatter now transforms through the cast
+root so particles follow the diagonal too. Sampled geometry tests cover all four
+weapon variants in lodging, flat and Cypress, plus both-rig grounded private-room
+arrival and exclusion of public lobby occupants. All361 frontend tests passed
+before the final entrance test; the final3 home geometry/routing tests pass.
+Build passes. Evidence: `.runtime/lodging-room-tests.log`,
+`lodging-final-geometry.log`, `lodging-final-build.log`, `lodging-room-export.log`.
+
+Isolated lodging-strike fixture uses the real home_strike command, port8945.
+Browser checked recorded initial cast/room, completion→newspaper, and then
+Mariner lobby→Go to your room at820x740. The latter shows only the player, with
+return-to-hall control and actual public roster below. Reduced the small bedside
+lamp from generic12 to1.4 after observed wall blowout; final build includes it.
+The lower intensity has not yet received a fresh browser screenshot check.
+No main-save QA actions. Main8791 still serves the prior verified release.
+
+All current residential addresses now select their appropriate indoor attack
+room, but this does not finish crimes/interiors: burglary animation, persistent
+indoor aftermath/police, other destinations and full visual/campaign acceptance
+remain. The new private lodging also does not depict player-fitted upgrades.

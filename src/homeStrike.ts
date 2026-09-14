@@ -2,12 +2,14 @@ import {isStagedStrike} from './city3dAssassination.js';
 import type {VisualCue} from './types';
 /** Only an explicit committed home setting selects private-room playback. */
 export function isHomeStrike(cue:VisualCue|null|undefined):boolean {
- return !!cue&&cue.strike?.setting==='home'&&['apartment','mercercourt','estate'].includes(cue.target)&&isStagedStrike(cue)&&!!cue.attacker;
+ return !!cue&&cue.strike?.setting==='home'&&['apartment','mercercourt','estate','room'].includes(cue.target)&&isStagedStrike(cue)&&!!cue.attacker;
 }
 export function homeStrikeRoom(target:string){
- return target==='estate'
-  ? {model:'interior-cypress',focusZ:2.7,origin:{x:-3.3,z:3.4},bounds:{x:5,z:4.5}}
-  : {model:'interior-flat',focusZ:2,origin:{x:-3.3,z:2.95},bounds:{x:4,z:3.5}};
+ return target==='room'
+  ? {model:'interior-lodging-room',yaw:Math.PI/4,focusZ:0,origin:{x:-2.45,z:2.45},bounds:{x:3,z:3}}
+  : target==='estate'
+  ? {model:'interior-cypress',yaw:0,focusZ:2.7,origin:{x:-3.3,z:3.4},bounds:{x:5,z:4.5}}
+  : {model:'interior-flat',yaw:0,focusZ:2,origin:{x:-3.3,z:2.95},bounds:{x:4,z:3.5}};
 }
 /** A selected death headline can own the explicitly linked attack playback. */
 export function homeStrikeFor(cue:VisualCue|null|undefined,batch:VisualCue[]):VisualCue|undefined {

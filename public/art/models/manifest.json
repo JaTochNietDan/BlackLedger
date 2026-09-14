@@ -966,5 +966,21 @@
       ]
     ],
     "bytes": 3417152
+  },
+  "interior-lodging-room": {
+    "file": "interior-lodging-room.glb",
+    "bounds_blender": [
+      [
+        -3.07,
+        -3.0,
+        -0.17
+      ],
+      [
+        3.0,
+        3.07,
+        3.1
+      ]
+    ],
+    "bytes": 356800
   }
 }

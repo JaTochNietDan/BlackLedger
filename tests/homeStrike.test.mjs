@@ -1,3 +1,5 @@
+import {InteriorArrival} from '../.runtime/frontend-test/interiorArrival.js';
+import {placementsForInterior} from '../.runtime/frontend-test/interiorStaging.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
@@ -12,18 +14,18 @@ test('private room playback requires an explicit supported home setting and link
  assert.equal(isHomeStrike({...hit,target:'estate'}),true);
  assert.equal(homeStrikeRoom('estate').model,'interior-cypress');
  assert.equal(isHomeStrike({...hit,strike:{...hit.strike,setting:undefined}}),false);
- assert.equal(isHomeStrike({...hit,target:'room'}),false);
+ assert.equal(isHomeStrike({...hit,target:'bar'}),false);
  const death={id:'death',kind:'killing',target:'mercercourt',minute:10,actors:[{id:'mara'}]};
  assert.equal(homeStrikeFor(death,[hit]),hit);
  assert.equal(homeStrikeFor({...death,actors:[{id:'leo'}]},[hit]),undefined);
  assert.equal(homeStrikeFor({...death,minute:11},[hit]),undefined);
 });
 test('full-sized home strike cast stays inside furnished homes for approach, impact and fall',async()=>{
- for(const target of ['mercercourt','estate']){
+ for(const target of ['mercercourt','estate','room']){
  const settings=homeStrikeRoom(target),room=await load(settings.model);room.updateMatrixWorld(true);
  for(const [model,variant,gun] of [['person','back-of-head','revolver'],['woman','close-shot','shotgun'],['person','burst','thompson'],['woman','close-quarters',undefined]]){
   const a=await load(model),v=await load(model),weapon=gun?await load(gun):undefined;
-  const cast=new CityAssassination(a,v,weapon,variant,gun);cast.root.position.set(settings.origin.x,0,settings.origin.z);
+  const cast=new CityAssassination(a,v,weapon,variant,gun);cast.root.position.set(settings.origin.x,0,settings.origin.z);cast.root.rotation.y=settings.yaw;
   for(let i=0;i<=80;i++){
    cast.update(cast.duration*i/80);
    for(const who of [a,v]){
@@ -36,5 +38,20 @@ test('full-sized home strike cast stays inside furnished homes for approach, imp
    }
   }
  }
+ }
+});
+
+test('Mariner private room excludes the public hall roster and has a clear grounded entrance',async()=>{
+ assert.equal(placementsForInterior('lodging',[{id:'resident'}]).size,0);
+ const room=await load('interior-lodging-room');room.updateMatrixWorld(true);
+ for(const name of ['person','woman']){
+  const actor=await load(name),arrival=new InteriorArrival(actor,'lodging');
+  for(let i=0;i<=60;i++){
+   arrival.pose(arrival.duration*i/60);const box=new THREE.Box3().setFromObject(actor,true);
+   assert.ok(box.min.x> -3&&box.max.z<3&&box.min.y>=.0175);
+   for(const y of [.4,1,1.6])for(const dir of [[1,0,0],[-1,0,0],[0,0,1],[0,0,-1]]){
+    assert.equal(new THREE.Raycaster(new THREE.Vector3(actor.position.x,y,actor.position.z),new THREE.Vector3(...dir),0,.3).intersectObject(room,true).length,0);
+   }
+  }
  }
 });

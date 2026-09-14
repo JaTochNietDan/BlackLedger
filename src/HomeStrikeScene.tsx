@@ -48,7 +48,7 @@ export function HomeStrikeScene({cue,world,motion,overlay,onDone}:{cue:VisualCue
    models.push(room.scene);if(weapon)models.push(weapon.scene);
    if(dead){disposeCityResources(models);return;}
    scene.add(room.scene);cast=new CityAssassination(attacker,victim,weapon?.scene,cue.strike!.variant,weaponName);
-   cast.root.position.set(origin.x,0,origin.z);scene.add(cast.root);
+   cast.root.position.set(origin.x,0,origin.z);cast.root.rotation.y=roomSettings.yaw;scene.add(cast.root);
    scene.traverse(o=>{if(o instanceof THREE.Mesh){o.castShadow=true;o.receiveShadow=true;}});
    start=performance.now();setStatus('');
   }).catch(()=>{if(!dead){setStatus('The home scene could not load. The recorded result is available below.');finished=true;latest.current.onDone(cue.id);}});
@@ -61,7 +61,7 @@ export function HomeStrikeScene({cue,world,motion,overlay,onDone}:{cue:VisualCue
    const muzzle=cast.weapon?.getObjectByName('muzzle');if(muzzle)muzzle.getWorldPosition(flash.position);flash.intensity=pulse?12:0;muzzleGlow.position.copy(flash.position);muzzleGlow.visible=!!muzzle&&pulse;
    for(let i=0;i<20;i++){
     const drop=executionSpatter(i,seconds,cue.strike!.variant==='back-of-head');
-    temp.position.set(origin.x+drop.x,drop.y,origin.z+drop.z);temp.scale.setScalar(weaponName?drop.size:0);temp.updateMatrix();droplets.setMatrixAt(i,temp.matrix);
+    temp.position.set(drop.x,drop.y,drop.z).applyMatrix4(cast.root.matrixWorld);temp.scale.setScalar(weaponName?drop.size:0);temp.updateMatrix();droplets.setMatrixAt(i,temp.matrix);
    }
    droplets.instanceMatrix.needsUpdate=true;
    audio.update(seconds,enabled&&soundOn());reaction.update(seconds-(weaponName?ASSASSINATION_SHOT:MELEE_IMPACTS[2]),enabled&&soundOn());

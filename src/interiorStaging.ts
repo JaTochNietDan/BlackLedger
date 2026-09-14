@@ -119,9 +119,9 @@ export function garagePlacements(people:Presence[]) {
  return result;
 }
 
-export type InteriorPlace='bar'|'mercercourt'|'room'|'laundry'|'estate'|'apartment'|'flat'|'butcher'|'garage';
+export type InteriorPlace='bar'|'mercercourt'|'room'|'laundry'|'estate'|'apartment'|'flat'|'butcher'|'garage'|'lodging';
 export function placementsForInterior(place:InteriorPlace,people:Presence[]){
- if(place==='flat')return new Map<string,InteriorSpot>();
+ if(place==='flat'||place==='lodging')return new Map<string,InteriorSpot>();
  return (place==='garage'?garagePlacements:place==='butcher'?butcherPlacements:place==='apartment'?ashburyPlacements:place==='estate'?cypressPlacements:place==='laundry'?laundryPlacements:place==='bar'?interiorPlacements:place==='room'?marinerLobbyPlacements:mercerLobbyPlacements)(people);
 }
 
@@ -143,6 +143,7 @@ export function poseInteriorOccupant(actor:THREE.Group,spot:InteriorSpot) {
 
 // Reserved clear floor positions; these never displace a public occupant.
 export function interiorPlayerSpot(place:InteriorPlace):InteriorSpot {
+ if(place==='lodging')return {id:'player-entry',x:-1.8,z:1.8,yaw:Math.PI/4};
  if(place==='garage')return {id:'player-entry',x:-3,z:4.25,yaw:Math.PI};
  if(place==='butcher')return {id:'player-entry',x:2.7,z:3.5,yaw:Math.PI};
  if(place==='flat')return {id:'player-entry',x:1,z:2.7,yaw:Math.PI};

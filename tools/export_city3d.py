@@ -2418,6 +2418,20 @@ if __name__ == '__main__' and '--only=slot-cabinet' in __import__('sys').argv:
     with open(manifest_path,'w') as f:json.dump(selected_manifest,f,indent=2)
     raise SystemExit(0)
 
+def lodging_room():
+    from lodging_room import build
+    build(box,cylinder,material)
+
+
+if __name__ == '__main__' and '--only=interior-lodging-room' in __import__('sys').argv:
+    clear();lodging_room()
+    manifest_path=os.path.join(OUT,'manifest.json')
+    with open(manifest_path) as f: selected_manifest=json.load(f)
+    selected_manifest['interior-lodging-room']=export('interior-lodging-room')
+    with open(manifest_path,'w') as f:json.dump(selected_manifest,f,indent=2)
+    raise SystemExit(0)
+
+
 def garage_interior():
     from garage_interior import build
     build(box,cylinder,material)
@@ -2578,6 +2592,7 @@ clear();blackjack_table();manifest['blackjack-table']=export('blackjack-table')
 clear();playing_card();manifest['playing-card']=export('playing-card')
 clear();dice_tray();manifest['dice-tray']=export('dice-tray')
 clear();slot_cabinet();manifest['slot-cabinet']=export('slot-cabinet')
+clear();lodging_room();manifest['interior-lodging-room']=export('interior-lodging-room')
 clear();garage_interior();manifest['interior-garage']=export('interior-garage')
 clear();butcher_interior();manifest['interior-butcher']=export('interior-butcher')
 clear();private_flat();manifest['interior-flat']=export('interior-flat')

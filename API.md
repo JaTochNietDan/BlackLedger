@@ -962,3 +962,11 @@ own drawing-room model. Per-home scene metadata controls the model, reserved
 attack aisle and camera focus. Ashbury/Mercer continue to use the private flat.
 Mariner home strikes still retain the prior city presentation pending an authored
 private lodging room. This extension does not alter the attack outcome or timing.
+
+The Mariner now offers a private lodging-room view when it is the player's home.
+This is separate from its public lobby and shows only the player. Returning to
+the hall or selecting a public person preserves existing location/actions/time.
+Explicit Mariner home strikes use this lodging model with a diagonal full-size
+cast path. Spatter coordinates follow the same root transform as the actors.
+All four current residential addresses now have indoor home-strike playback;
+persistent indoor aftermath and burglary scenes remain separate unfinished work.

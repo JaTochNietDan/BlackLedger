@@ -23,7 +23,7 @@ export function Interior3D(props:{place:InteriorPlace;operation?:LaundryOperatio
  const extraPeople=props.people.length-placementsForInterior(props.place,props.people).size;
  const [status,setStatus]=useState(`Opening ${roomName}…`);
  useEffect(()=>{
-  const flat=props.place==='flat',laundry=props.place==='laundry',lobby=props.place!=='bar',roomModel=settings.model;
+  const flat=props.place==='flat'||props.place==='lodging',laundry=props.place==='laundry',lobby=props.place!=='bar',roomModel=settings.model;
   const origin=new THREE.Vector3(13,14,lobby?17:-17), centre=new THREE.Vector3(0,1,lobby?-1:0),span=settings.span;
   setStatus(`Opening ${roomName}…`);
   const el=host.current!;let dead=false,frame=0,dirty=true,renderedFrames=0;
@@ -41,7 +41,7 @@ export function Interior3D(props:{place:InteriorPlace;operation?:LaundryOperatio
   const ambient=new THREE.HemisphereLight(0xffe7bc,0x443e32,2);scene.add(ambient);
   const sun=new THREE.DirectionalLight(0xffe3b0,3);sun.position.set(2,10,lobby?8:-8);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);
   Object.assign(sun.shadow.camera,{left:-9,right:9,top:9,bottom:-9,near:.1,far:35});sun.shadow.bias=-.0003;scene.add(sun);
-  for(const position of settings.lamps){const lamp=new THREE.PointLight(0xffba68,12,7,2);lamp.position.set(...position);scene.add(lamp);}
+  for(const position of settings.lamps){const lamp=new THREE.PointLight(0xffba68,settings.lampIntensity??12,7,2);lamp.position.set(...position);scene.add(lamp);}
   const reduce=matchMedia('(prefers-reduced-motion: reduce)');let reduced=reduce.matches;
   const reduction=()=>{reduced=reduce.matches;dirty=true;};reduce.addEventListener('change',reduction);
   const models=new Map<string,THREE.Group>();const actors=new Map<string,THREE.Group>();let costumes:THREE.Material[]=[];
@@ -154,5 +154,5 @@ export function Interior3D(props:{place:InteriorPlace;operation?:LaundryOperatio
   };frame=requestAnimationFrame(tick);
   return()=>{reduce.removeEventListener('change',reduction);unbindPan();dead=true;cancelAnimationFrame(frame);observer.disconnect();controls.removeEventListener('change',changed);controls.dispose();canvas.removeEventListener('keydown',keys);canvas.removeEventListener('pointerdown',press);canvas.removeEventListener('pointerup',release);castBatch?.dispose();disposeCityResources([scene,...models.values()]);renderer.dispose();renderer.forceContextLoss();canvas.remove();};
  },[props.place]);
- return <div className={`interior3d${enlarged?' enlarged':''}`}><button className="interior3d-expand" aria-pressed={enlarged} onClick={()=>{setEnlarged(!enlarged);host.current?.querySelector('canvas')?.focus();}}>{enlarged?'Standard room view':'Enlarge room'}</button><div ref={host} className="interior3d-canvas"/><span className="interior3d-caption">{roomName} · {props.player.name}: pale ring · Drag / Q/E: orbit · Scroll / +/−: zoom · WASD / arrows: pan · Home: reset{props.place!=='flat'&&' · Select a person'}{extraPeople>0&&` · ${extraPeople} more in the people list`}</span>{status&&<p role="status">{status}</p>}</div>;
+ return <div className={`interior3d${enlarged?' enlarged':''}`}><button className="interior3d-expand" aria-pressed={enlarged} onClick={()=>{setEnlarged(!enlarged);host.current?.querySelector('canvas')?.focus();}}>{enlarged?'Standard room view':'Enlarge room'}</button><div ref={host} className="interior3d-canvas"/><span className="interior3d-caption">{roomName} · {props.player.name}: pale ring · Drag / Q/E: orbit · Scroll / +/−: zoom · WASD / arrows: pan · Home: reset{props.place!=='flat'&&props.place!=='lodging'&&' · Select a person'}{extraPeople>0&&` · ${extraPeople} more in the people list`}</span>{status&&<p role="status">{status}</p>}</div>;
 }
