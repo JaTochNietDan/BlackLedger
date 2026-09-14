@@ -2,6 +2,7 @@ package core
 
 import (
 	"encoding/json"
+	"strings"
 	"testing"
 )
 
@@ -188,6 +189,26 @@ func TestPrematureBlastCapturesTheInjuryIndependentlyOfLaterPlayerState(t *testi
 			t.Fatalf("wrong accident outcome: %+v health=%d alive=%v", cue.Accident, w.Player.Health, w.Player.Alive)
 		}
 		seen[cue.Accident.Fatal] = true
+		linked := false
+		for _, story := range w.News {
+			if story.Headline != cue.Headline || story.Minute != cue.Minute {
+				continue
+			}
+			linked = true
+			if strings.Contains(w.standfirst(story), "extensive") {
+				t.Fatal("premature blast invented extensive building damage")
+			}
+			if cue.Accident.Fatal {
+				if !strings.Contains(story.Headline, "ONE DEAD") || !strings.Contains(story.Body, "One person was killed") || strings.Contains(story.Body, "leaving on foot") || strings.Contains(story.Body, "prosecution is likely") {
+					t.Fatalf("fatal accident reported an escape: %+v", story)
+				}
+			} else if strings.Contains(story.Headline, "DEAD") || !strings.Contains(story.Body, "leaving on foot") {
+				t.Fatalf("survivor reported as dead: %+v", story)
+			}
+		}
+		if !linked {
+			t.Fatal("accident has no matching newspaper article")
+		}
 		expected := *cue.Accident
 		w.Player.Health, w.Player.Alive = 100, true
 		raw, err := json.Marshal(cue)

@@ -34,9 +34,11 @@ export function Theatre({
   plate = true,
   stagedAudio = false,
   finished,
+  focusOnStart = false,
 }: {
   cue: VisualCue;
   finished?: boolean;
+  focusOnStart?: boolean;
   place: Place;
   onDone: () => void;
   // Whether to show the painted plate for this kind of moment. In the city
@@ -135,7 +137,7 @@ export function Theatre({
           <b>{cue.headline}</b>
         </div>
       )}
-      <button className="plain theatre-done" onClick={onDone}>
+      <button className="plain theatre-done" autoFocus={focusOnStart} onClick={onDone}>
         {paper ? 'Go on' : 'Skip'} →
       </button>
     </div>

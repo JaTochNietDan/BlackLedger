@@ -11,6 +11,7 @@ import {paintedCar} from './cityAssets';
 import {SumAction} from './SumAction';
 import {useCallback, useEffect, useRef, useState} from 'react';
 import {createRoot} from 'react-dom/client';
+import {createPortal} from 'react-dom';
 import {City3D} from './City3D';
 import {VoicePlayer, speaking, speakerOf} from './voice';
 import {unreadInLatest,articleForScene} from './paper';
@@ -730,8 +731,9 @@ function App() {
     const w = world!;
     if (view === 'city') {
       const inside = cityView === 'interior' && locationInfo.id === p.location;
-      const sceneOverlay = playing && !journey && (
+      const theatre = playing && !journey && (
         <Theatre
+          focusOnStart={!p.alive}
           cue={playing}
           finished={cityView==='iso' ? finishedCue===playing.id : undefined}
           place={w.locations.find(l => l.id === playing.target) || w.locations[0]}
@@ -741,6 +743,12 @@ function App() {
           onDone={() => {if(sceneArticle&&playing)setFinishedCue(playing.id);else setPlaying(null);}}
         />
       );
+      // Presentation controls remain usable after death; the gameplay shell
+      // stays inert. Hide the controls while the newspaper owns focus.
+      const sceneOverlay = !p.alive
+        ? theatre && !newspaperVisible && !deathVisible && createPortal(
+          <div className="map-first fatal-scene-playback"><div className="city3d-story">{theatre}</div></div>, document.body)
+        : theatre;
       const journeyOverlay = journey &&
         (() => {
           const cross = w.locations.find(l => l.id === journey.to.id)?.crossing;

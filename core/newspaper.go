@@ -334,7 +334,7 @@ func (w *World) standfirst(s Story) string {
 	case "killing":
 		return fmt.Sprintf("Police at %s say they are pursuing several lines of inquiry. Neighbours describe a quiet street.", where)
 	case "attack":
-		return fmt.Sprintf("Damage at %s is described as extensive. No arrests have been made and none appear imminent.", where)
+		return fmt.Sprintf("From %s: our crime desk reports on the attack.", where)
 	case "robbery":
 		return fmt.Sprintf("The proprietor of %s declined to be photographed. Officers have asked witnesses to come forward.", where)
 	case "police":

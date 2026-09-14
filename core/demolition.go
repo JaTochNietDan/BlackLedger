@@ -143,10 +143,17 @@ func (w *World) Plant(id string) error {
 			owner.Goodwill = max(-100, owner.Goodwill-45)
 			w.RetaliationFrom(owner.ID)
 		}
-		w.Log("It went off early at "+place.Name, fmt.Sprintf("Something was wrong with it, or with the hour you chose. You are burned and cut (-%d health) and half the street saw somebody running.", injury), "danger")
-		w.Report("attack", "EXPLOSION AT "+strings.ToUpper(place.Name),
-			fmt.Sprintf("An explosion at %s is being treated as deliberate. Witnesses described somebody leaving on foot. Police say a prosecution is likely.", place.Name))
-		w.Witness("explosion", id, "A charge went off early at "+place.Name+".", "EXPLOSION AT "+upper(place.Name))
+		headline := "EXPLOSION AT " + strings.ToUpper(place.Name)
+		account := fmt.Sprintf("Something was wrong with it, or with the hour you chose. You are burned and cut (-%d health) and half the street saw somebody running.", injury)
+		report := fmt.Sprintf("An explosion at %s is being treated as deliberate. Witnesses described somebody leaving on foot. Police say a prosecution is likely.", place.Name)
+		if w.Player.Health <= 0 {
+			headline = "ONE DEAD IN EXPLOSION AT " + strings.ToUpper(place.Name)
+			account = "The charge went off before you could get clear. The injuries were fatal."
+			report = fmt.Sprintf("One person was killed in an explosion at %s. Police are treating the blast as deliberate. Enquiries into the circumstances are continuing.", place.Name)
+		}
+		w.Log("It went off early at "+place.Name, account, "danger")
+		w.Report("attack", headline, report)
+		w.Witness("explosion", id, "A charge went off early at "+place.Name+".", headline)
 		cue := &w.VisualCues[len(w.VisualCues)-1]
 		cue.Detonation = "premature"
 		cue.Attacker = &CueAttacker{ID: "player", Name: w.Player.Name, Weapon: 0}
