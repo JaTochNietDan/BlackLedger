@@ -463,10 +463,17 @@ type CueStrike struct {
 	Victim  CueActor `json:"victim"`
 }
 
+// CueAccident captures the resolved injury before later healing or a new life.
+type CueAccident struct {
+	HealthLost int  `json:"health_lost"`
+	Fatal      bool `json:"fatal"`
+}
+
 type VisualCue struct {
 	// Detonation distinguishes a planted blast from a premature charge accident.
 	// Empty on legacy or unrelated cues; it must not imply a safe escape.
 	Detonation string       `json:"detonation,omitempty"`
+	Accident   *CueAccident `json:"accident,omitempty"`
 	Strike     *CueStrike   `json:"strike,omitempty"`
 	Attacker   *CueAttacker `json:"attacker,omitempty"`
 	Detainee   *CueActor    `json:"detainee,omitempty"`

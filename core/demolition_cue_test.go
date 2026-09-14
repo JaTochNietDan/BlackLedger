@@ -34,6 +34,9 @@ func TestPlantCuePreservesOutcomeAndPlanter(t *testing.T) {
 		if cue.Detonation != want || cue.Attacker == nil || cue.Attacker.ID != "player" || cue.Attacker.Name != name || cue.Attacker.Weapon != 0 {
 			t.Fatalf("wrong causal cast: %+v", cue)
 		}
+		if (want == "premature") != (cue.Accident != nil) {
+			t.Fatal("accident outcome attached to the wrong detonation")
+		}
 		seen[want] = true
 		raw, err := json.Marshal(w)
 		if err != nil {
@@ -47,6 +50,9 @@ func TestPlantCuePreservesOutcomeAndPlanter(t *testing.T) {
 		for _, c := range restored.LastResult.Cues {
 			if c.ID == cue.ID {
 				found = c.Detonation == want && c.Attacker != nil && c.Attacker.Name == name
+				if cue.Accident != nil {
+					found = found && c.Accident != nil && *c.Accident == *cue.Accident
+				}
 			}
 		}
 		if !found {
@@ -155,5 +161,55 @@ func TestFactionPlanterEscapesEvenWhenAnOccupantDies(t *testing.T) {
 	}
 	if casualties == 0 {
 		t.Fatal("did not exercise a fatal blast")
+	}
+}
+
+func TestPrematureBlastCapturesTheInjuryIndependentlyOfLaterPlayerState(t *testing.T) {
+	seen := map[bool]bool{}
+	for seed := uint32(1); seed <= 128; seed++ {
+		w := bomber(t)
+		w.Player.Location, w.Player.Charges = "club", 1
+		w.Player.Health = 40
+		w.RNG = seed * 2654435761
+		if err := w.Plant("club"); err != nil {
+			t.Fatal(err)
+		}
+		var cue *VisualCue
+		for i := range w.VisualCues {
+			if w.VisualCues[i].Detonation == "premature" {
+				cue = &w.VisualCues[i]
+				break
+			}
+		}
+		if cue == nil {
+			continue
+		}
+		if cue.Accident == nil || cue.Accident.HealthLost != 40-w.Player.Health || cue.Accident.Fatal == w.Player.Alive {
+			t.Fatalf("wrong accident outcome: %+v health=%d alive=%v", cue.Accident, w.Player.Health, w.Player.Alive)
+		}
+		seen[cue.Accident.Fatal] = true
+		expected := *cue.Accident
+		w.Player.Health, w.Player.Alive = 100, true
+		raw, err := json.Marshal(cue)
+		if err != nil {
+			t.Fatal(err)
+		}
+		var restored VisualCue
+		if err = json.Unmarshal(raw, &restored); err != nil {
+			t.Fatal(err)
+		}
+		if restored.Accident == nil || *restored.Accident != expected {
+			t.Fatal("replay lost the resolved injury")
+		}
+	}
+	if len(seen) != 2 {
+		t.Fatalf("missing fatal or surviving accident: %v", seen)
+	}
+	var legacy VisualCue
+	if err := json.Unmarshal([]byte(`{"kind":"explosion","detonation":"premature"}`), &legacy); err != nil {
+		t.Fatal(err)
+	}
+	if legacy.Accident != nil {
+		t.Fatal("legacy cue invented an injury outcome")
 	}
 }

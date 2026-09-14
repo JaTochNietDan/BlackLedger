@@ -631,3 +631,12 @@ The same cosmetic pavement clearance now also responds to a pedestrian waiting
 at an occupied departure. It uses the waiting actor's traffic footprint, keeps
 both saved journeys/locations unchanged, and does not advance a zero-progress
 departure merely to free space. Vehicle departures are not included.
+
+Premature explosion cues now optionally include `accident: {health_lost, fatal}`.
+This records the player's actual health decrease after armour and the zero-health
+fatal result at detonation, before later command time, healing or a new life.
+It applies to the recorded attacker. Successful planted blasts and legacy cues
+omit it; absence must not be interpreted as survival. Existing result/save JSON
+retains the value without a migration or altered damage/odds/time rules. The
+browser type accepts the field; accident injury/death choreography is still
+pending and must use this event outcome rather than current player state.

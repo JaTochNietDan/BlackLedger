@@ -134,6 +134,7 @@ func (w *World) Plant(id string) error {
 		// It goes off in your hands, or somebody finds it with your face still
 		// fresh in their memory.
 		injury := w.Absorb(30 + int(w.Random()*35))
+		healthBefore := w.Player.Health
 		w.Ruin(70)
 		w.Damage(45)
 		w.Player.Health = max(0, w.Player.Health-injury)
@@ -149,6 +150,7 @@ func (w *World) Plant(id string) error {
 		cue := &w.VisualCues[len(w.VisualCues)-1]
 		cue.Detonation = "premature"
 		cue.Attacker = &CueAttacker{ID: "player", Name: w.Player.Name, Weapon: 0}
+		cue.Accident = &CueAccident{HealthLost: healthBefore - w.Player.Health, Fatal: w.Player.Health <= 0}
 		if w.Player.Health <= 0 {
 			w.DieOf("a charge of your own", "A charge at "+place.Name+" went off with you still under it.")
 		}
