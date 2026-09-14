@@ -71,6 +71,9 @@ export function FamiliesScreen({
           </div>
         </div>
 
+        {f.headquarters && <p className="family-ground"><span>Headquarters</span> {world.locations.find(p=>p.id===f.headquarters)?.name||f.headquarters}</p>}
+        {f.yours&&!f.headquarters&&<p className="family-note warning">No usable headquarters deed. Establish your base at an owned business.</p>}
+
         {!!f.holdings?.length && (
           <p className="family-ground">
             <span>Holds</span> {f.holdings.join(' · ')}
@@ -118,6 +121,8 @@ export function FamiliesScreen({
       <p className="subtle">
         The city does not scale its dangers to your experience. Some doors are better left unopened.
       </p>
+
+      {!world.organization?.named&&<p className="family-note">Form a family at an owned business and choose it as headquarters. You need 25 respect; acquiring businesses no longer forms a family automatically.</p>}
 
       {!!world.known_threats?.length && (
         <section className="known-threats" style={{margin: '0 0 22px'}}>

@@ -1373,3 +1373,19 @@ owned parlour records the90 cost-only arrangement with no parlour margin.
 New service venues have street-trade worker roles and location-specific manner
 text. This does not establish complete visual choreography for generic NPC
 deaths. Public command and response structures remain unchanged.
+
+## Explicit family formation and headquarters
+
+`form_family` is a30-minute action at an owned trading business in usable
+condition, requiring25 respect and no service to another family. One business
+suffices. The selected action target becomes headquarters. Formation no longer
+happens automatically in OrganizationDay. `set_headquarters` is a30-minute
+action at another owned usable business for an existing family.
+
+Faction saved state gains optional `headquarters`; public known-family entries
+and `organization` expose the valid address. Existing families receive a base
+on migration. NPC succession and player-estate succession preserve it. NPC
+families relocate when its deed is lost; the player explicitly selects a
+replacement. Housing is separate from headquarters. A damaged base can retain
+its deed while its operations are unavailable. Full HQ crew dispatch is still
+under development; these fields/actions do not imply it has been implemented.

@@ -22,6 +22,7 @@ var holdingIncome = map[string]int{"club": 30, "market": 18, "docks": 22, "bar":
 // MigrateLivingWorld is idempotent: running it on an already-migrated save
 // changes nothing.
 func (w *World) MigrateLivingWorld() {
+	defer w.SettleHeadquarters()
 	for id, p := range w.Properties {
 		if p != nil && w.Own(id) && p.BoughtLife == 0 {
 			p.BoughtLife = w.Life

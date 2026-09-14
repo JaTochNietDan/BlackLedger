@@ -93,7 +93,7 @@ func (w *World) Guide() []Step {
 			need(p.Contacts >= 5, "Your information network is fully developed"), p.Contacts > 1),
 		step("Premises of your own", "A business can earn while you are elsewhere. Staff, stock, rent and repairs determine what you keep.",
 			w.acquisitionReason(), owned > 0),
-		step("A name of your own", fmt.Sprintf("%s premises and %d respect and the city files you with the families.", upper1(spelled(OrganizationHoldings)), OrganizationStanding),
+		step("A name of your own", fmt.Sprintf("Own a business and earn %d respect, then form your family there and choose it as headquarters.", OrganizationStanding),
 			w.incorporationReason(), w.Incorporated()),
 		step("People who answer to you", "Hire a driver to start. Once your organization has a name, you can sign on more people. Your people add to what you are worth in a fight.",
 			w.guideHiringReason(), len(p.Crew) > 0 || len(w.OwnPeople()) > 0),

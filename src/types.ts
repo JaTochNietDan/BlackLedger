@@ -251,7 +251,7 @@ export interface Snapshot {
     wage: number;
     restless: boolean;
   }[];
-  organization?: {named: boolean; name?: string; power?: number; peak?: number; needs?: string[]};
+  organization?: {headquarters?: string; named: boolean; name?: string; power?: number; peak?: number; needs?: string[]};
   roles?: {role: string; title: string; name: string; id?: string}[];
   machine?: {
     pulled: boolean;
@@ -456,6 +456,7 @@ export interface Snapshot {
   player: Person;
   district: number;
   factions: {
+    headquarters?: string;
     id: string;
     name: string;
     leader: string;

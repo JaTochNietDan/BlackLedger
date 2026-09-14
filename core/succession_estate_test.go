@@ -7,6 +7,7 @@ func testator(t *testing.T) (*World, *NPC) {
 	w := proprietor(t)
 	own(w, "laundry", "garage")
 	w.Player.Respect, w.Player.Contacts = OrganizationStanding, 3
+	w.Incorporate()
 	w.OrganizationDay()
 	var member *NPC
 	for _, n := range w.Civilians() {
@@ -85,6 +86,7 @@ func TestNobodyIsLeftAnsweringToNothing(t *testing.T) {
 	w := proprietor(t)
 	own(w, "laundry", "garage")
 	w.Player.Respect = OrganizationStanding
+	w.Incorporate()
 	w.OrganizationDay()
 	me := w.PlayerOrganizationID()
 	w.Die("Shot.")

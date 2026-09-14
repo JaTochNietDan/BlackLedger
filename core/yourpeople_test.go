@@ -10,6 +10,7 @@ func boss(t *testing.T) (*World, *NPC) {
 	w := proprietor(t)
 	own(w, "laundry", "garage")
 	w.Player.Respect, w.Player.Contacts = OrganizationStanding, 3
+	w.Incorporate()
 	w.OrganizationDay()
 	if !w.Incorporated() {
 		t.Fatal("the fixture did not become an organization")
@@ -34,6 +35,7 @@ func TestNobodySignsOnWithAMan(t *testing.T) {
 	w := proprietor(t)
 	own(w, "laundry")
 	w.Player.Respect, w.Player.Contacts = 5, 3
+	w.Incorporate()
 	w.OrganizationDay()
 	for _, n := range w.Civilians() {
 		w.Player.Location = n.Location

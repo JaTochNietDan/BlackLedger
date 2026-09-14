@@ -227,12 +227,13 @@ type NPC struct {
 	Sets int `json:"sets,omitempty"`
 }
 type Faction struct {
-	ID       string `json:"id"`
-	Name     string `json:"name"`
-	Leader   string `json:"leader"`
-	Power    int    `json:"power"`
-	Goodwill int    `json:"goodwill"`
-	Cash     int    `json:"cash"`
+	Headquarters string `json:"headquarters,omitempty"`
+	ID           string `json:"id"`
+	Name         string `json:"name"`
+	Leader       string `json:"leader"`
+	Power        int    `json:"power"`
+	Goodwill     int    `json:"goodwill"`
+	Cash         int    `json:"cash"`
 	// Peak is the strength this family recovers toward once its holdings are
 	// repaired. Saves written before families held property carry no peak.
 	Peak int `json:"peak,omitempty"`
@@ -884,6 +885,7 @@ func New(seed uint32) *World {
 		}
 		w.Properties[p.ID] = property
 	}
+	w.SettleHeadquarters()
 	// Each organization is people, not a name and a number. These are the ones
 	// who would step up if the person above them died.
 	w.ensureOfficials()
@@ -2307,6 +2309,13 @@ func (w *World) Actions(id string) []Action {
 	if offer, ok := w.AvailableCommission(id); ok {
 		add("commission", "Hear what "+offer.GiverName+" wants", 30, 0, w.CommissionReadiness(id),
 			fmt.Sprintf("%s $%d, %d respect and %d standing with %s. Three days. Failing costs %d standing with them.", offer.Brief, offer.Pay, offer.Respect, offer.Goodwill, w.factionName(offer.PatronID), offer.Penalty))
+	}
+	if w.headquartersSite(w.PlayerOrganizationID(), id) {
+		if !w.Incorporated() {
+			add("form_family", "Form your family with headquarters here", 30, 0, w.HeadquartersReadiness(id, true), "Establish your family at this owned business. Requires 25 respect. Your family enters the same rivalries and risks as the other organizations.")
+		} else if w.Headquarters(w.PlayerOrganizationID()) != id {
+			add("set_headquarters", "Move headquarters here", 30, 0, w.HeadquartersReadiness(id, false), "Make this owned business your base of operations. The previous business remains yours.")
+		}
 	}
 	add("wait", "Let an hour pass", 60, 0, "", "Income, rent, operations and rival plans continue.")
 	// One rule, applied once, over everything aimed at a person: somebody out

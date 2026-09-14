@@ -8,15 +8,13 @@ import "fmt"
 // was not an organization. They were a man with businesses, standing outside
 // the machinery that runs everybody else.
 //
-// Past a certain point that stops being true. A man holding two premises with a
-// name people know is not a man any more, and the city starts filing him where
-// it files the others: in the same list, with the same strength, in the same
-// conflicts, raided by the same function.
+// Explicit formation at an owned headquarters enters the player into the same
+// list as the other families, with the same conflicts and exposure to raids.
 
 const (
 	// OrganizationHoldings is the ground it takes before anybody thinks of you
 	// as a thing rather than a person.
-	OrganizationHoldings = 2
+	OrganizationHoldings = 1
 	// PremisesRespect is the standing it takes before anybody will sell you
 	// premises. It was written out three times as a bare 6 — in the rule, in
 	// the opportunity that suggests it, and in the guide page whose own header
@@ -47,8 +45,15 @@ func (w *World) OrganizationReady() bool {
 	if w.Player.Serves != "" {
 		return false
 	}
-	return len(w.FamilyHoldings(w.PlayerOrganizationID())) >= OrganizationHoldings &&
-		w.Player.Respect >= OrganizationStanding
+	if w.Player.Respect < OrganizationStanding {
+		return false
+	}
+	for _, p := range Locations {
+		if w.headquartersSite(w.PlayerOrganizationID(), p.ID) {
+			return true
+		}
+	}
+	return false
 }
 
 // PlayerStrength is what the player's organization is worth in a fight: the
@@ -83,6 +88,7 @@ func (w *World) Incorporate() {
 		ID: w.PlayerOrganizationID(), Name: name, Leader: w.Player.Name,
 		Power: w.PlayerStrength(), Peak: w.PlayerStrength(), Cash: w.Player.Cash,
 	})
+	w.SettleHeadquarters()
 	// Everybody already in the city has a view on a new organization, which is
 	// the same cold start any splinter gets.
 	for i := range w.Factions {
@@ -99,7 +105,7 @@ func (w *World) Incorporate() {
 		c.Hostility = min(100, max(0, 40-other.Goodwill/2))
 		c.State, c.Since = classify(c), w.Minute
 	}
-	w.Log("They have started calling you something", fmt.Sprintf("%s. Two premises and a name is the point at which this city stops thinking of you as a person and starts thinking of you as a thing it has to deal with. You are in the same book as the others now, and the same things are done to what is in that book.", name), "politics")
+	w.Log("They have started calling you something", fmt.Sprintf("%s. An owned business and an established name give your family a place in the city. You are in the same book as the others now, and the same things are done to what is in that book.", name), "politics")
 	w.Report("politics", "A NEW NAME ON THE WATERFRONT",
 		fmt.Sprintf("Interests associated with %s are now spoken of as an organization rather than a proprietor. Rivals are said to have noticed.", w.Player.Name))
 }
@@ -107,7 +113,7 @@ func (w *World) Incorporate() {
 // OrganizationDay keeps the player's entry true: their strength is whatever
 // their holdings, name and people are worth today, and their money is theirs.
 func (w *World) OrganizationDay() {
-	w.Incorporate()
+	w.SettleHeadquarters()
 	f := w.PlayerOrganization()
 	if f == nil {
 		return
@@ -148,15 +154,24 @@ func (w *World) PlayerOrganizationDescription() map[string]any {
 	f := w.PlayerOrganization()
 	if f == nil {
 		needs := []string{}
-		if held := len(w.FamilyHoldings(w.PlayerOrganizationID())); held < OrganizationHoldings {
-			needs = append(needs, fmt.Sprintf("%d more premises", OrganizationHoldings-held))
+		held := 0
+		for _, p := range Locations {
+			if w.headquartersSite(w.PlayerOrganizationID(), p.ID) {
+				held++
+			}
+		}
+		if held < OrganizationHoldings {
+			needs = append(needs, fmt.Sprintf("%d owned business", OrganizationHoldings-held))
 		}
 		if w.Player.Respect < OrganizationStanding {
 			needs = append(needs, fmt.Sprintf("%d more respect", OrganizationStanding-w.Player.Respect))
 		}
+		if len(needs) == 0 {
+			needs = append(needs, "choose an owned business as headquarters and form your family there")
+		}
 		return map[string]any{"named": false, "needs": needs}
 	}
 	return map[string]any{
-		"named": true, "name": f.Name, "power": f.Power, "peak": f.Peak,
+		"named": true, "name": f.Name, "power": f.Power, "peak": f.Peak, "headquarters": w.Headquarters(f.ID),
 	}
 }

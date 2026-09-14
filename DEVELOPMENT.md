@@ -3089,3 +3089,24 @@ coverage passed0.199s. Fixtures:.runtime/cemetery-room-qa.sqlite3 on8988
 isolated staged fixtures, not campaign acceptance. No live8791 commands or
 release promotion. Broader goal remains open, including remaining city venues,
 full generic indoor incident choreography and continued billiards fidelity.
+
+### September 14 — explicit family formation and headquarters foundation
+
+Latest user amendment now recorded in docs/HEADQUARTERS.md and docs/GOAL.md.
+Formation requires one owned usable business, 25 respect, independence and an
+explicit action at the chosen address. No daily auto-formation. Headquarters
+survives saves and family succession; NPC families replace lost bases while the
+player chooses a replacement. Known family cards display the base. This is the
+foundation, not the requested comprehensive crew dispatch system: named actors,
+travel, reserved resources and operation-specific resolution remain to implement.
+
+Focused formation/migration/lost-deed checks passed 0.442s; succession checks
+0.163s; inherited-organization integration checks 3.909s. Frontend build 5.36s.
+Isolated headquarters fixture on 8990 (.runtime/headquarters-qa.sqlite3), browser
+102: entered laundry, formed through Business action, API revision 1 recorded
+headquarters laundry, Families displayed Bluebird Laundry. No live-save action.
+
+Earlier clean c123527 full suite terminated: sim passed 484.227s, core failed
+routine predictability (87% vs 90%), cmd failed missing three front manifest
+entries and an omitted receipt-list tag. These remain tracked failures, not a
+passing release. Live 8791 remains the earlier 4daa6c8 build.

@@ -42,6 +42,7 @@ func Groups() []Group { return groups }
 // rules below. Kept as one map so a new action is one line rather than a
 // decision spread across the file that offers it.
 var actionGroup = map[string]string{
+	"form_family": "business", "set_headquarters": "business",
 	// Work that pays on the day.
 	"courier": "work", "dockwork": "work", "rushorder": "work", "householdwork": "work", "delegate": "work", "commission": "work",
 	"contract": "work", "order": "work",

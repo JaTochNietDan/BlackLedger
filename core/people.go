@@ -174,6 +174,9 @@ func (w *World) AddMember(faction, role string, rank int, base string) *NPC {
 // homeOf is where an organization's people are usually found: its best holding,
 // or the street if it holds nothing.
 func (w *World) homeOf(faction string) string {
+	if base := w.Headquarters(faction); base != "" {
+		return base
+	}
 	holdings := w.FamilyHoldings(faction)
 	if len(holdings) == 0 {
 		return "bar"

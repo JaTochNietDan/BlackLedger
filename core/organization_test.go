@@ -40,11 +40,12 @@ func TestAManWithOneShopIsStillAMan(t *testing.T) {
 	}
 }
 
-func TestTwoPremisesAndANameIsAnOrganization(t *testing.T) {
+func TestExplicitFormationCreatesAnOrganization(t *testing.T) {
 	t.Parallel()
 	w := proprietor(t)
 	own(w, "laundry", "garage")
 	w.Player.Respect = OrganizationStanding
+	w.Incorporate()
 	w.OrganizationDay()
 	f := w.PlayerOrganization()
 	if f == nil {
@@ -66,7 +67,9 @@ func TestTwoPremisesAndANameIsAnOrganization(t *testing.T) {
 	}
 	// Filing them twice does not file them twice.
 	before := len(w.Factions)
+	w.Incorporate()
 	w.OrganizationDay()
+	w.Incorporate()
 	w.OrganizationDay()
 	if len(w.Factions) != before {
 		t.Fatalf("the city listed them %d times", len(w.Factions)-before+1)
@@ -78,6 +81,7 @@ func TestStrengthComesFromWhatTheyActuallyHave(t *testing.T) {
 	w := proprietor(t)
 	own(w, "laundry", "garage")
 	w.Player.Respect = 30
+	w.Incorporate()
 	w.OrganizationDay()
 	base := w.PlayerStrength()
 	w.Player.Respect = 90
@@ -105,6 +109,7 @@ func TestEverybodyInTheCityHasAViewOnANewOrganization(t *testing.T) {
 	own(w, "laundry", "garage")
 	w.Player.Respect = OrganizationStanding
 	w.Factions[0].Goodwill = -60
+	w.Incorporate()
 	w.OrganizationDay()
 	me := w.PlayerOrganizationID()
 	for i := range w.Factions {
@@ -130,6 +135,7 @@ func TestARaidOnThePlayerTakesTheirOwnMoney(t *testing.T) {
 	w := proprietor(t)
 	own(w, "laundry", "garage")
 	w.Player.Respect = OrganizationStanding
+	w.Incorporate()
 	w.OrganizationDay()
 	me := w.PlayerOrganization()
 	attacker := &w.Factions[0]
@@ -155,6 +161,7 @@ func TestARaidOnThePlayerCanReachTheirCrew(t *testing.T) {
 		own(w, "laundry", "garage")
 		w.Player.Respect = OrganizationStanding
 		w.Player.Crew = []Crew{{ID: "leo", Name: "Leo Carver", Loyalty: 90}}
+		w.Incorporate()
 		w.OrganizationDay()
 		attacker := &w.Factions[0]
 		attacker.Power = 100
@@ -178,6 +185,7 @@ func TestTheCityDoesNotRepairThePlayersPremisesForFree(t *testing.T) {
 	w := proprietor(t)
 	own(w, "laundry", "garage")
 	w.Player.Respect = OrganizationStanding
+	w.Incorporate()
 	w.OrganizationDay()
 	w.Properties["laundry"].Condition = 40
 	for i := 0; i < 10; i++ {
@@ -193,6 +201,7 @@ func TestAnOrganizationEndsWithThePersonItBelongedTo(t *testing.T) {
 	w := proprietor(t)
 	own(w, "laundry", "garage")
 	w.Player.Respect = OrganizationStanding
+	w.Incorporate()
 	w.OrganizationDay()
 	before := len(w.Factions)
 	w.Player.Alive = false
@@ -218,6 +227,7 @@ func TestABadMonthDoesNotEndTheirOrganization(t *testing.T) {
 	w := proprietor(t)
 	own(w, "laundry", "garage")
 	w.Player.Respect = OrganizationStanding
+	w.Incorporate()
 	w.OrganizationDay()
 	w.Properties["laundry"].Owner = "independent"
 	w.Properties["garage"].Owner = "independent"

@@ -992,6 +992,10 @@ func (w *World) apply(c Command) error {
 					}
 				case "audience":
 					w.OpenAudience(target)
+				case "form_family", "set_headquarters":
+					if err := w.EstablishHeadquarters(target, c.Kind == "form_family"); err != nil {
+						return err
+					}
 				case "acquire":
 					if w.NextPressure == 0 {
 						w.NextPressure = w.Minute + 180

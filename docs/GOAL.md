@@ -130,3 +130,14 @@ Interior incidents must play where they happen: assassination scenes inside
 buildings must use their interiors, including private homes. Initial routing of
 recorded successful named strikes is implemented; generic NPC deaths/contracts,
 missing venue interiors, and complete per-venue choreography remain in scope.
+
+## User amendment — headquarters and full crew operations
+
+Family formation must require an owned business and explicit selection of a
+base of operations. From that base the player should be able to send hired
+people to perform practical commands including robbery, bombing, assassination
+and the broader job/business command set. Integrate named operatives, resources,
+travel, risk, concurrent availability, succession and consequences with existing
+simulation and save authority. See HEADQUARTERS.md for the implementation and
+remaining dispatch contract. This is the current priority; preserve all earlier
+visual/simulation requirements.

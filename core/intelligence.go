@@ -113,8 +113,9 @@ func roughly(n int) string {
 // PublicFaction is an organization as the player can see it. The name and
 // whether you are at odds are common knowledge; everything else is not.
 type PublicFaction struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+	Headquarters string `json:"headquarters,omitempty"`
+	ID           string `json:"id"`
+	Name         string `json:"name"`
 	// Leader is known once anybody will talk to you about them.
 	Leader string `json:"leader"`
 	// Goodwill is what they think of the player, which the player can always
@@ -180,6 +181,9 @@ func (w *World) PublicFactions() []PublicFaction {
 		entry := PublicFaction{
 			ID: f.ID, Name: f.Name, Goodwill: f.Goodwill, Knowledge: level,
 			Strength: "nobody will say", Money: "nobody will say",
+		}
+		if level >= 1 || f.ID == w.PlayerOrganizationID() {
+			entry.Headquarters = w.Headquarters(f.ID)
 		}
 		if level >= 1 {
 			entry.Leader = f.Leader

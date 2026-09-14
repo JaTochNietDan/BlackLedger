@@ -143,6 +143,7 @@ func TestYouAlwaysKnowWhatTheyThinkOfYouAndYourOwnBooks(t *testing.T) {
 	// And their own organization is not something they have to ask about.
 	own(w, "laundry", "garage")
 	w.Player.Respect = OrganizationStanding
+	w.Incorporate()
 	w.OrganizationDay()
 	if w.Intelligence(w.PlayerOrganizationID()) != 3 {
 		t.Fatal("the player had to ask around about themselves")

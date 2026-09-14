@@ -34,7 +34,7 @@ func (w *World) Inherit() string {
 	id, name := "estate:"+successor.ID, successor.Name+"'s people"
 	power := max(10, w.PlayerStrength()-InheritCost)
 	w.Factions = append(w.Factions, Faction{
-		ID: id, Name: name, Leader: successor.Name,
+		ID: id, Name: name, Leader: successor.Name, Headquarters: w.Headquarters(me),
 		Power: power, Peak: power, Cash: max(0, w.Player.Cash/3),
 	})
 	for _, n := range people {
