@@ -183,9 +183,7 @@ func (w *World) settleHand(won bool, why string) error {
 		w.Earn(returned)
 	}
 	net := returned - stake.Amount
-	if house != nil {
-		house.Cash = max(0, house.Cash-net)
-	}
+	w.changeBusinessFunds(hand.Place, -net)
 	w.tableAftermath(place.Name, house, net, stake.Amount)
 	hand.Won = won
 	if won {

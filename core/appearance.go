@@ -167,9 +167,7 @@ func (w *World) BuyAttire(tier int) error {
 	// The shop keeps its margin, and if the player holds it they are buying
 	// from themselves — the money never leaves their pocket.
 	if shop := w.Properties[w.Player.Location]; shop != nil && !w.Own(w.Player.Location) {
-		if house := w.faction(shop.Owner); house != nil {
-			house.Cash += next.Cost * DressMargin / 100
-		}
+		w.changeBusinessFunds(w.Player.Location, next.Cost*DressMargin/100)
 	}
 	w.Player.Dress, w.Player.DressWear = next.Tier, 100
 	place, _ := PlaceByID(w.Player.Location)

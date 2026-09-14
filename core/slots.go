@@ -184,9 +184,7 @@ func (w *World) PullHandle(id string, amount int) error {
 		w.Earn(returned)
 	}
 	net := returned - stake.Amount
-	if house != nil {
-		house.Cash = max(0, house.Cash-net)
-	}
+	w.changeBusinessFunds(id, -net)
 	w.tableAftermath(place.Name, house, net, stake.Amount)
 	faces := line[0].Face + " · " + line[1].Face + " · " + line[2].Face
 	if pays > 0 {

@@ -120,9 +120,7 @@ func (w *World) FillUp(id string) error {
 	}
 	w.Player.Fuel, w.Player.Fuelled = FuelFull, max(1, w.Minute)
 	place, _ := PlaceByID(id)
-	if house := w.faction(w.Properties[id].Owner); house != nil {
-		house.Cash += fee
-	}
+	w.changeBusinessFunds(id, fee)
 	w.ShiftCustom(id, "cars in off the road", PumpTrade)
 	who := fmt.Sprintf("$%d at %s", fee, place.Name)
 	if w.Own(id) {
@@ -183,9 +181,7 @@ func (w *World) fillFor(n *NPC) {
 	}
 	n.Purse -= FuelPrice
 	n.Dry = false
-	if house := w.faction(w.Properties[station].Owner); house != nil {
-		house.Cash += FuelPrice
-	}
+	w.changeBusinessFunds(station, FuelPrice)
 	w.ShiftCustom(station, "cars in off the road", PumpTrade)
 	if w.Own(station) {
 		w.Earn(FuelPrice)

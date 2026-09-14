@@ -303,9 +303,7 @@ func (w *World) BuyVehicle(tier int) error {
 		w.Earn(change)
 	}
 	if lot != nil && !w.Own(w.Player.Location) {
-		if house := w.faction(lot.Owner); house != nil {
-			house.Cash += margin
-		}
+		w.changeBusinessFunds(w.Player.Location, margin)
 	}
 	// Plate is fitted to a car, not to a person. What you had on the last one
 	// is on the last one.
@@ -537,9 +535,7 @@ func (w *World) sellCarTo(n *NPC) {
 	}
 	n.Purse -= price
 	n.Car, n.Drove = 1, max(1, w.Minute)
-	if house := w.faction(w.Properties[lot].Owner); house != nil {
-		house.Cash += price * DealerMargin / 100
-	}
+	w.changeBusinessFunds(lot, price*DealerMargin/100)
 	if w.Own(lot) {
 		w.Earn(price * DealerMargin / 100)
 		place, _ := PlaceByID(lot)
@@ -617,9 +613,7 @@ func (w *World) ScrapCar(id string) error {
 	// The yard has one more of the city on its weighbridge.
 	w.ShiftCustom(id, "another one in off a low-loader", WreckTrade)
 	if prop := w.Properties[id]; prop != nil && !w.Own(id) {
-		if house := w.faction(prop.Owner); house != nil {
-			house.Cash = max(0, house.Cash-paid)
-		}
+		w.changeBusinessFunds(id, -paid)
 	}
 	place, _ := PlaceByID(id)
 	mine := ""

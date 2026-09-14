@@ -245,9 +245,7 @@ func (w *World) settleDice(returned int) {
 	place, _ := PlaceByID(g.Place)
 	house := w.faction(w.Properties[g.Place].Owner)
 	net := returned - g.Down
-	if house != nil {
-		house.Cash = max(0, house.Cash-net)
-	}
+	w.changeBusinessFunds(g.Place, -net)
 	w.tableAftermath(place.Name, house, net, g.Down)
 	bet, _ := DiceBetByID(g.Bet)
 	w.Log("The dice at "+place.Name, fmt.Sprintf("%s. %s", bet.Label, g.Outcome), "business")

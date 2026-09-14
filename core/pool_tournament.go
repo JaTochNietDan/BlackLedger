@@ -155,7 +155,7 @@ func (w *World) ReconcilePoolTournament() {
 		}
 		if w.Own(PoolPlace) {
 			w.Earn(houseCut)
-		} else {
+		} else if !w.changeBusinessFunds(PoolPlace, houseCut) {
 			property.Bankroll += houseCut
 		}
 		t.HouseCutPaid = houseCut

@@ -224,9 +224,7 @@ func (w *World) SpinChips(id string, chips []Chip) error {
 	place, _ := PlaceByID(id)
 	house := w.faction(w.Properties[id].Owner)
 	net := returned - total
-	if house != nil {
-		house.Cash = max(0, house.Cash-net)
-	}
+	w.changeBusinessFunds(id, -net)
 	w.tableAftermath(place.Name, house, net, total)
 	dropped := fmt.Sprintf("%s, %s.", NumberWord(pocket), PocketColour(pocket))
 	what := chipWords(settled)

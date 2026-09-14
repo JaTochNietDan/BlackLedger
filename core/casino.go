@@ -73,7 +73,7 @@ func min64(a, b float64) float64 {
 // its staffing and stock, how hard it is being run, and what it can cover.
 func (w *World) NightHandleAt(id string) int {
 	prop := w.Properties[id]
-	if prop == nil || !HasBankroll(id) || !w.Own(id) {
+	if prop == nil || !HasBankroll(id) || (!w.Own(id) && !w.personalCasino(id)) {
 		return 0
 	}
 	// And who is actually in the room. A room's action is the people in it, and
@@ -102,7 +102,7 @@ func (w *World) roomAction(id string) float64 {
 // stays behind the tables; taking it out is a decision of its own.
 func (w *World) CasinoDay() {
 	for _, l := range Locations {
-		if !HasBankroll(l.ID) || !w.Own(l.ID) {
+		if !HasBankroll(l.ID) || (!w.Own(l.ID) && !w.personalCasino(l.ID)) {
 			continue
 		}
 		w.night(l)
@@ -149,7 +149,9 @@ func (w *World) night(l Place) {
 		short := -prop.Bankroll
 		prop.Bankroll = 0
 		prop.Condition = max(0, prop.Condition-RuinCondition)
-		w.Player.Respect = max(0, w.Player.Respect-5)
+		if w.Own(l.ID) {
+			w.Player.Respect = max(0, w.Player.Respect-5)
+		}
 		w.Log("The tables could not cover it at "+l.Name,
 			fmt.Sprintf("A winner was owed $%d more than there was behind the tables. Word of that travels faster than anything else in this city, and the serious money will drink somewhere else now.", short), "danger")
 		w.Report("business", "HOUSE CANNOT PAY AT "+upper(l.Name),

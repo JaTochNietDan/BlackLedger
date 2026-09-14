@@ -92,8 +92,8 @@ func (w *World) collectRent(n *NPC) {
 		}
 	} else if w.Own(n.Home) {
 		w.Earn(account.Paid)
-	} else if f := w.faction(p.Owner); f != nil {
-		f.Cash += account.Paid
+	} else {
+		w.changeBusinessFunds(n.Home, account.Paid)
 	}
 }
 

@@ -160,9 +160,7 @@ func (w *World) chargeForTheTable(n *NPC, where string) {
 		prop.Bankroll += TableCharge
 		return
 	}
-	if f := w.faction(prop.Owner); f != nil {
-		f.Cash += TableCharge
-	}
+	w.changeBusinessFunds(where, TableCharge)
 }
 
 // worldDeck is a shuffled deck for a hand nobody watches. It runs on a stream

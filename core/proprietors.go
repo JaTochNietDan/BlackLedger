@@ -18,19 +18,14 @@ func (w *World) releaseProprietor(id string) {
 	}
 }
 
-// Ordinary premises can be bought from actual household savings. Gambling
-// houses keep their separate bankroll system; their proprietor settlement is
-// handled separately from this first set of civilian trades.
+// Priced trading premises can be acquired by individual proprietors.
 func personalBusiness(id string) bool {
 	l, ok := PlaceByID(id)
-	if !ok || l.Cost <= 0 || IsRentalHome(id) || l.Type == "home" {
+	if !ok || ((l.Cost <= 0 || IsRentalHome(id) || l.Type == "home") && id != "room") {
 		return false
 	}
-	switch l.Kind {
-	case "laundry", "garage", "restaurant", "butcher", "cabs", "scrapyard", "undertaker", "tailor", "haulage":
-		return true
-	}
-	return false
+	_, trading := TradeOf(id)
+	return trading
 }
 
 // At most one funded purchase per day; existing NPCs can enter the market later
@@ -56,11 +51,16 @@ func (w *World) ConsiderProprietors() {
 				continue
 			}
 			price := AcquisitionCost(w, l.ID)
+			float := 0
+			if HasBankroll(l.ID) {
+				float = BankrollLot
+			}
 			reserve := max(500, 7*(trade.Hands*trade.Wage+w.NPCLivingCost(n))+trade.Restock)
-			if price <= 0 || w.HouseholdWealth(n) < price+reserve || !w.SpendHouseholdMoney(n, price) {
+			if price <= 0 || w.HouseholdWealth(n) < price+reserve+float || !w.SpendHouseholdMoney(n, price+float) {
 				continue
 			}
 			prop.Owner = n.ID
+			prop.Bankroll += float
 			prop.ProprietorDay = w.Minute/1440 + 1 // No full day's takings on purchase morning.
 			w.Log("An independent proprietor", fmt.Sprintf("%s bought %s for $%d from their household funds. The premises remain individually owned.", n.Name, l.Name, price), "business")
 			return
@@ -89,12 +89,23 @@ func (w *World) ProprietorDay() {
 			continue
 		}
 		trade, ok := TradeOf(l.ID)
-		if !ok || IsRentalHome(l.ID) {
+		if !ok || (IsRentalHome(l.ID) && l.ID != "room") {
 			continue
 		}
 		prop.ProprietorDay = day
+		if HasBankroll(l.ID) {
+			take := max(0, prop.Bankroll-BankrollFull)
+			prop.Bankroll -= take
+			n.Purse += take
+			funding := min(max(0, BankrollLot-prop.Bankroll), max(0, w.HouseholdWealth(n)-500))
+			if funding > 0 && w.SpendHouseholdMoney(n, funding) {
+				prop.Bankroll += funding
+			}
+		}
 		income := int(float64(prop.Income*24*prop.Condition) / 100 * w.Capacity(l.ID) * w.TradeMultiplier(l.ID))
-		n.Purse += max(0, income)
+		if l.ID != "room" {
+			n.Purse += max(0, income)
+		} // Lodging earns actual tenant payments.
 		wages := prop.Staff * trade.Wage
 		if w.SpendHouseholdMoney(n, wages) {
 			prop.Unpaid = 0

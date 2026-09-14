@@ -109,9 +109,7 @@ func (w *World) Play(id, stakeID string) error {
 		w.Earn(returned)
 	}
 
-	if house != nil {
-		house.Cash = max(0, house.Cash-net)
-	}
+	w.changeBusinessFunds(id, -net)
 	w.tableAftermath(place.Name, house, net, stake.Amount)
 	return nil
 }

@@ -72,12 +72,11 @@ func (w *World) TableNight() {
 			}
 			// The house has to be able to pay them. A room that cannot cover
 			// what is put down in front of it is not running a game.
-			house := w.faction(prop.Owner)
 			mine := w.Own(l.ID)
 			switch {
 			case mine && prop.Bankroll < stake:
 				continue
-			case !mine && (house == nil || house.Cash < stake):
+			case !mine && w.businessFunds(l.ID) < stake:
 				continue
 			}
 			// An even-money bet with the house's edge on it: the same edge the
@@ -100,8 +99,8 @@ func (w *World) TableNight() {
 				if won {
 					w.Log("A winner at "+place.Name, fmt.Sprintf("%s took $%d off the table.", n.Name, stake), "business")
 				}
-			} else if house != nil {
-				house.Cash = max(0, house.Cash+take)
+			} else {
+				w.changeBusinessFunds(l.ID, take)
 			}
 			break // one a night, per room
 		}

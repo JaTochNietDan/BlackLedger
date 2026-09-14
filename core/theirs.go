@@ -86,9 +86,7 @@ func (w *World) BuyCarFor(id string) error {
 	}
 	lot := w.Properties[w.Player.Location]
 	if lot != nil && !w.Own(w.Player.Location) {
-		if house := w.faction(lot.Owner); house != nil {
-			house.Cash += TheirCarCost * DealerMargin / 100
-		}
+		w.changeBusinessFunds(w.Player.Location, TheirCarCost*DealerMargin/100)
 	}
 	n.Car, n.Drove = 1, max(1, w.Minute)
 	n.Trust = min(100, n.Trust+4)

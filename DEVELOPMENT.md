@@ -2765,3 +2765,33 @@ personal-versus-family deed release, duplicate death idempotence and leadership
 succession retaining a family business. An initial test caught a misplaced name
 formatter edit; fixed it and reran. No main save commands/deployment. Unrelated
 armed/robbery/aftermath edits remain unstaged. Broad campaign validation is next.
+
+### September 14 — special-trade proprietor accounting
+
+Previous goal turn was progress: committed funded personal business ownership and
+started clean full tests for cc4a6ea. Revalidated that exact test process/session;
+it is still running, with billiards and command packages passing so far. No
+replacement run was started for that checkout.
+
+Expanded proprietor acquisition to all priced trading premises plus the Mariner.
+Casino purchases separately fund an initial float from the household; personal
+casino nights use it, daily accounts fund a low float only above the household
+reserve and draw excess above the full-float target. A failed personal casino
+cannot penalize the player's respect. Existing family casino semantics remain.
+
+Added non-player deed-based settlement for card/dice/roulette/slot outcomes,
+NPC floor bets, back-room fees, tournament cuts, fuel, dealer and tailor margins,
+vehicle disposal and garage repair receipts. Player-owned branches keep existing
+semantics. The Mariner receives real tenant rent and operating expenses, without
+a second abstract rental-income payment. NPC ownership no longer leaves those
+receipts in an ownerless sink. New death-service venues remain outstanding.
+
+Evidence: new funds/purchase/casino/reputation/hall-cut/fuel tests pass0.256s;
+proprietor/rental/Mariner selection passes0.526s; vet passes. The cut test resolves
+an escrow-funded bracket and checks the NPC owner receives $40 exactly once;
+fuel checks both payer and proprietor; lodging checks actual transfer and no
+phantom income. Prior casino/tournament/floor selection passed58.597s. Expanded
+integration selection is still running in session27100 (log
+.runtime/business-owner-integration-tests.log); clean cc4a6ea full suite remains
+session71514 (.runtime/check-cc4a6ea-tests.log). Neither is treated as complete.
+These changes are not deployed and no main-save commands were issued.

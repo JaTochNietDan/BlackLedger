@@ -1286,10 +1286,9 @@ are not yet full named interior assassination scenes.
 ## Individual business proprietors
 
 Ordinary independent NPCs can acquire available civilian trades at midnight from
-actual purse/household savings, retaining a working reserve. The first supported
-set is laundry, garage, restaurant, butcher, cabs, scrapyard, undertaker, tailor
-and haulage; other trades, including gambling bankroll settlement, remain to be
-connected. At most one purchase is considered successful in each daily pass.
+actual purse/household savings, retaining a working reserve. All priced trading premises and The Mariner freehold are eligible, including
+casinos and the billiard hall. Unpriced civic/other venues remain outside this
+purchase path. At most one purchase is considered successful in each daily pass.
 `Property.owner` can contain an NPC ID; public `holder` resolves the person's
 name. Existing faction IDs remain organizational deeds regardless of leadership.
 
@@ -1300,3 +1299,14 @@ expansion cannot treat NPC deeds as unheld. Kill immediately releases only deeds
 held by the deceased's NPC ID to `independent`, preserving premises/staff; family
 deeds follow existing succession. The daily pass also releases stale dead-owner
 deeds. This is not yet a complete proprietor insolvency or financial-trade model.
+
+
+Personal casino acquisition separately funds an initial gambling float from the
+buyer's household. Nightly casino outcomes and direct table wins/losses affect
+that float. Personal casino losses never change player respect. Owners can fund
+a low float from money above their household reserve and draw excess above the
+full-float target in their daily accounts. Family gambling retains its existing
+family-cash accounting. Pool tournament cuts, card-room fees and service margins
+now follow NPC or faction deeds; player-owned receipts keep existing semantics.
+Lodging proprietors receive actual tenant payments and pay operating bills without
+also receiving abstract hourly rent. These changes do not add new public commands.

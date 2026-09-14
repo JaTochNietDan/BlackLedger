@@ -93,9 +93,7 @@ func (w *World) putRight(n *NPC) {
 	}
 	n.Purse -= GlassCost
 	n.Hurt = false
-	if house := w.faction(w.Properties[garage].Owner); house != nil {
-		house.Cash += GlassCost
-	}
+	w.changeBusinessFunds(garage, GlassCost)
 	w.ShiftCustom(garage, "glass and locks after a night's thieving", RepairTrade)
 	if w.Own(garage) {
 		w.Earn(GlassCost)
