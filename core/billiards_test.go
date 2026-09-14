@@ -268,3 +268,51 @@ func TestPoolCannotShootThroughAnUnreconciledFire(t *testing.T) {
 		t.Fatal("leaving burning table forfeited instead of refunding")
 	}
 }
+
+func TestPoolOpponentUsesPhysicsAndPaysOnlyItsActualWin(t *testing.T) {
+	w := beginPool(t)
+	winningPoolPosition(w)
+	w.Pool.Match.Turn = 1
+	w.Pool.Match.Groups = [2]int{2, 1}
+	rng, worldRNG := w.RNG, w.WorldRNG
+	copy := w.Clone()
+	if err := w.PlayPoolOpponent(); err != nil {
+		t.Fatal(err)
+	}
+	if err := copy.PlayPoolOpponent(); err != nil {
+		t.Fatal(err)
+	}
+	if w.Pool.Match.Winner != 1 || !w.Pool.Settled || w.Player.Cash != 960 || w.NPC("leo").Purse != 340 {
+		t.Fatal("opponent physical win did not settle", w.Pool.Match.Last)
+	}
+	if w.Pool.Replay == "" || w.Pool.Replay != copy.Pool.Replay || w.Pool.LastStroke == nil || w.Pool.LastStroke.Shooter != 1 || w.Pool.LastStroke.Intent.Call.Ball != 8 {
+		t.Fatal("opponent intent/replay was not stable")
+	}
+	if w.RNG != rng || w.WorldRNG != worldRNG {
+		t.Fatal("opponent consumed campaign RNG")
+	}
+	if err := w.PlayPoolOpponent(); err == nil {
+		t.Fatal("replayed settled opponent stroke")
+	}
+}
+func TestPoolOpponentCannotTakePlayersTurnOrMoveInvalidMatch(t *testing.T) {
+	w := beginPool(t)
+	before, _ := json.Marshal(w)
+	if err := w.PlayPoolOpponent(); err == nil {
+		t.Fatal("opponent took player's break")
+	}
+	after, _ := json.Marshal(w)
+	if string(before) != string(after) {
+		t.Fatal("rejected opponent turn changed world")
+	}
+	w.Pool.Match.Turn = 1
+	w.NPC("leo").Location = "bar"
+	before, _ = json.Marshal(w)
+	if err := w.PlayPoolOpponent(); err == nil {
+		t.Fatal("absent opponent played")
+	}
+	after, _ = json.Marshal(w)
+	if string(before) != string(after) {
+		t.Fatal("absent opponent altered stake")
+	}
+}

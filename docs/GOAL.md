@@ -7,9 +7,9 @@ with wagers, and occasional entry-fee tournaments whose winner receives the
 whole prize pool. The user explicitly requires a full-fidelity billiards
 minigame with proper physics simulation. An authored room with static balls does
 not satisfy this requirement. Eight-ball is the initial implementation choice;
-physics and match-rule packages now exist, but the playable integration,
-opponent play, stakes and tournament settlement remain to be implemented and
-verified. This extends all earlier requirements.
+physics, match rules, funded stakes and physical opponent play now exist in
+the backend. Playable integration, command/receipt coverage and tournaments
+remain to be implemented and verified. This extends all earlier requirements.
 
 ## Highest priority amendment — map-first UI
 

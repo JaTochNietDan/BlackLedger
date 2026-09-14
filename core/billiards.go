@@ -3,13 +3,22 @@ package core
 import (
 	"blackledger/billiards"
 	"fmt"
+	"hash/fnv"
 )
 
 const PoolPlace = "poolhall"
 const PoolMinStake = 10
 const PoolMaxStake = 500
 
+type PoolStroke struct {
+	Shooter   int              `json:"shooter"`
+	Intent    billiards.Intent `json:"intent"`
+	Placement *billiards.Vec   `json:"placement,omitempty"`
+	Decision  string           `json:"decision,omitempty"`
+}
+
 type PoolGame struct {
+	LastStroke   *PoolStroke      `json:"last_stroke,omitempty"`
 	Place        string           `json:"place"`
 	Life         int              `json:"life"`
 	Opponent     string           `json:"opponent"`
@@ -136,10 +145,40 @@ func (w *World) PlayPoolShot(shot billiards.Shot, call billiards.Call) error {
 		return err
 	}
 	g.Match = &next
+	g.LastStroke = &PoolStroke{Shooter: 0, Intent: billiards.Intent{Shot: shot, Call: call}}
 	g.Replay = replay
 	w.settlePool()
 	return nil
 }
+
+// The opponent owns the next stroke. A stable local seed varies execution by
+// identity and shot number, without consuming the campaign RNG or accepting
+// a client-specified NPC shot/result.
+func (w *World) PlayPoolOpponent() error {
+	g, err := w.poolSession()
+	if err != nil {
+		return err
+	}
+	hash := fnv.New64a()
+	_, _ = hash.Write([]byte(g.Opponent))
+	identity := hash.Sum64()
+	skill := .65 + float64(identity%26)/100
+	seed := identity ^ uint64(g.Life)*0x9e3779b97f4a7c15 ^ uint64(g.Match.Shots)*0xbf58476d1ce4e5b9
+	turn, err := billiards.Opponent(billiards.New(), g.Match, 1, skill, seed)
+	if err != nil {
+		return err
+	}
+	replay, err := billiards.EncodeReplay(turn.Result.Physics)
+	if err != nil {
+		return err
+	}
+	g.Match = &turn.Match
+	g.Replay = replay
+	g.LastStroke = &PoolStroke{Shooter: 1, Intent: turn.Intent, Placement: turn.Placement, Decision: turn.Decision}
+	w.settlePool()
+	return nil
+}
+
 func (w *World) ConcedePool() error {
 	g := w.Pool
 	if g == nil || g.Settled || g.Match == nil || g.Life != w.Life {

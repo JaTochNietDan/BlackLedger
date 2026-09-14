@@ -123,6 +123,45 @@ Only disposable fixtures were used. This proves persistence and settlement
 idempotence in the core/store-change path, not request-ID receipt handling:
 player-facing command routes and the table UI are still to be connected.
 
+## Physical opponent play — 2026-09-14
+
+`billiards.Opponent` prepares break decisions and ball-in-hand placement, then
+plays one actual stroke. Geometry generates direct pots and one-cushion banks;
+blocked positions also generate direct safeties and cushion escapes. Candidate
+strokes are evaluated through `Match.Play`. Normal-shot previews use 1/600 s
+cloth steps; the executed shot always uses the production solver. Skill affects
+cue-angle and speed error, not a post-hoc win probability or pocket override.
+
+Breaks evaluate seven physical aims. The initial fixed break was not robust:
+perfect rack geometry frequently sent only three distinct object balls to rails,
+and one self-play run repeated illegal breaks to its 160-shot limit. Searching
+alternative impacts solved this without changing physics, rack layout or the
+four-ball rule. Cushion escapes also needed more power and a bounded angle
+search to account for dissipative rail rebounds. Safeties are skipped only when
+their maximum possible score cannot improve the current evaluated result.
+
+`World.PlayPoolOpponent` derives stable skill and execution seeds from opponent
+identity, life and shot number. It cannot act for the player or an absent NPC.
+It stores the actual intent, placement/decision and compressed replay, then uses
+the existing funded settlement. Planning does not consume either campaign RNG.
+The saved optional `last_stroke` also records the player's cue input for future
+cue animation. No HTTP or UI path is exposed yet.
+
+Evidence: all 42 billiards tests pass (10.311 s); all 13 core pool tests pass
+(0.213 s), store tests pass (0.213 s), and vet passes. The tests re-execute an
+advertised bot stroke and require identical physical output, restore and retry
+with identical intent/replay, reject wrong-seat/absent/finished play, exercise a
+blocked cushion escape, and check eight first-break variations. Full physical
+self-play at skill 0.9 finishes seeds 7 and 41 after 18 and 17 strokes, both by a
+legally called eight-ball win. The core fixture verifies the NPC's physical win
+pays the actual held stake and leaves both world RNGs unchanged.
+
+Measured mid-rack planning/execution on Apple M4 Max, three iterations: 110.66 ms,
+2625434 bytes and 1603 allocations per stroke. Before eliminating provably
+uncompetitive safety evaluations it was 863.80 ms / 25651618 bytes. These are
+backend benchmarks, not browser frame-time measurements. Logs are under
+`.runtime/pool-opponent-*`.
+
 ## Required next work
 
 1. Connect match rules to campaign commands and post the rules in the playable
@@ -135,7 +174,7 @@ player-facing command routes and the table UI are still to be connected.
    rotating balls, cue motion and impact/pocket sound. The hall's initial table
    props have stylized proportions; align the playable model and the six hall
    tables with the solver's 2:1 cloth dimensions and actual ball radius.
-4. Opponents must choose and execute physical shots. Tournament scheduling,
+4. Connect the implemented physical opponents to the playable view. Tournament scheduling,
    entrants' entry payments, brackets and whole-pool settlement must use real
    participant funds and survive saves/retries/interruption.
 5. Airborne/jump/masse and slate impacts are not implemented: this is currently

@@ -13327,3 +13327,20 @@ before a physical winning shot and again before duplicate reconciliation. Vet
 passes for billiards/core/store. See `docs/BILLIARDS.md` for exact evidence and
 remaining work. Commands, receipt retry coverage, public state, AI and playable
 controls remain unwired; no live campaign QA or promotion occurred.
+
+
+## Physical billiards opponents — 2026-09-14
+
+Added one-stroke opponent planning with direct pots, banks, cushion escapes,
+physical previews, execution error, cue placement and break decisions. Fixed
+repeated illegal breaks through a bounded physical aim search, and weak blocked
+escapes through stronger strokes and angle candidates. No physics/rule bypass
+is used to produce a win. Core opponent turns save actual intent/replay and use
+the existing escrow settlement with stable local randomness.
+
+All 42 billiards tests, 13 core pool tests, store tests and vet pass. Two complete
+self-play racks finish with called-eight wins in 18/17 strokes; restore/retry,
+wrong-turn and physical NPC payout are checked. Mid-rack backend benchmark is
+110.66 ms after pruning safety evaluations that cannot improve the score. See
+`docs/BILLIARDS.md` for detailed evidence. Commands, table controls, public
+projection and tournaments remain pending; no live campaign or release changed.

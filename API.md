@@ -1054,3 +1054,10 @@ presentation data and cannot be submitted as an outcome. This is currently a
 save/core foundation: billiards HTTP commands, public projection, opponent-shot
 commands and playable controls are not exposed yet. Command receipt/retry tests
 remain required when those commands are connected.
+
+
+The saved pool record now also retains `last_stroke` (shooter, actual cue input
+and call, optional ball-in-hand placement and break decision). The opponent
+core entry point chooses and executes its own physical stroke with a stable
+local seed. Clients will request an opponent turn, not submit its cue input or
+result. HTTP routing/public projection and request-retry tests remain pending.
