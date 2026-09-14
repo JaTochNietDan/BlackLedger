@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
-import {CityIncendiary,incendiaryShard,incendiaryStride,INCENDIARY_RELEASE,INCENDIARY_IMPACT} from '../.runtime/frontend-test/city3dIncendiary.js';
+import {CityIncendiary,incendiaryShardObstructed,incendiaryShard,incendiaryStride,INCENDIARY_RELEASE,INCENDIARY_IMPACT} from '../.runtime/frontend-test/city3dIncendiary.js';
 async function model(name){
  const b=readFileSync(new URL(`../public/art/models/${name}.glb`,import.meta.url));const loader=new GLTFLoader();
  loader.register(p=>({name:'geometry-only',loadMaterial(i){return Promise.resolve(new THREE.MeshBasicMaterial({name:p.json.materials[i].name}));}}));
@@ -81,4 +81,28 @@ test('glass scatter begins at impact and settles above the pavement',async()=>{
   for(let age=0;age<2.4;age+=.01){const p=incendiaryShard(j,age,height);assert.ok(p.y>=-height);assert.ok(p.z<=0,'shard travels into facade');assert.ok(p.scale>=0);}
   assert.equal(incendiaryShard(j,2.4,height).scale,0);
  }
+});
+
+test('glass clearance catches an awning crossed between widely spaced frames',()=>{
+ const impact=new THREE.Vector3(0,5,0),building=new THREE.Group();
+ const awning=new THREE.Mesh(new THREE.BoxGeometry(1,.02,.1),new THREE.MeshBasicMaterial({side:THREE.DoubleSide}));
+ awning.position.set(0,4.8,-.15);building.add(awning);building.updateMatrixWorld(true);
+ const end=incendiaryShard(0,.8,4.8),to=impact.clone().add(new THREE.Vector3(end.x,end.y,end.z)),delta=to.clone().sub(impact);
+ assert.equal(new THREE.Raycaster(impact,delta.clone().normalize(),0,delta.length()).intersectObject(building,true).length,0,'fixture must miss the old endpoint chord');
+ assert.equal(incendiaryShardObstructed(0,0,.8,4.8,impact,building),true);
+ let hit=false;for(let frame=1;frame<=48;frame++)hit ||= incendiaryShardObstructed(0,(frame-1)/60,frame/60,4.8,impact,building);
+ assert.equal(hit,true,'ordinary frames disagree with the skipped interval');
+ awning.position.x=10;
+ assert.equal(incendiaryShardObstructed(0,0,.8,4.8,impact,building),false,'moved obstacle retained stale bounds');
+ assert.equal(incendiaryShardObstructed(0,-1,-.2,4.8,impact,building),false);
+ awning.geometry.dispose();awning.material.dispose();
+});
+
+test('glass clearance includes the edge of a rotating chip',()=>{
+ const impact=new THREE.Vector3(0,5,0),building=new THREE.Group();
+ const wall=new THREE.Mesh(new THREE.BoxGeometry(.01,2,.1),new THREE.MeshBasicMaterial({side:THREE.DoubleSide}));
+ wall.position.set(.07,4,-.25);building.add(wall);
+ assert.equal(incendiaryShardObstructed(0,0,.5,4.8,impact,building),true,'centre-clear path ignored the chip edge');
+ wall.position.x=.2;assert.equal(incendiaryShardObstructed(0,0,.5,4.8,impact,building),false);
+ wall.geometry.dispose();wall.material.dispose();
 });

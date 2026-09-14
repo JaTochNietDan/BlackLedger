@@ -189,3 +189,37 @@ export function incendiaryShard(index:number,age:number,height:number){
   rx:index+t*5,ry:index*1.7+t*3,rz:index*.8+t*4,
   scale:age<0?0:(.65+index%4*.12)*fade};
 }
+
+/** Trace the curved interval, including skipped frames, with chip clearance samples. */
+export function incendiaryShardObstructed(index:number,fromAge:number,toAge:number,height:number,impact:THREE.Vector3,building:THREE.Object3D){
+ if(toAge<0||toAge<=fromAge)return false;
+ const start=Math.max(0,fromAge),end=Math.min(2.4,toAge);
+ if(start>=end)return false;
+ const meshes:{mesh:THREE.Mesh;bounds:THREE.Box3}[]=[];
+ building.updateWorldMatrix(true,true);
+ building.traverse(o=>{if(o instanceof THREE.Mesh){if(!o.geometry.boundingBox)o.geometry.computeBoundingBox();meshes.push({mesh:o,bounds:o.geometry.boundingBox!.clone().applyMatrix4(o.matrixWorld)});}});
+ const ray=new THREE.Raycaster(),entry=new THREE.Vector3(),from=new THREE.Vector3(),to=new THREE.Vector3(),delta=new THREE.Vector3();
+ const offsets=[[0,0,0],[.07,0,0],[-.07,0,0],[0,.07,0],[0,-.07,0],[0,0,.07],[0,0,-.07]];
+ const steps=Math.ceil((end-start)*120);
+ let previous=incendiaryShard(index,start,height);
+ for(let step=1;step<=steps;step++){
+  const next=incendiaryShard(index,start+(end-start)*step/steps,height);
+  from.set(previous.x,previous.y,previous.z).add(impact);to.set(next.x,next.y,next.z).add(impact);
+  delta.copy(to).sub(from);const length=delta.length();
+  if(length>1e-7){
+   ray.ray.direction.copy(delta).divideScalar(length);ray.near=0;ray.far=length;
+   for(const offset of offsets){
+    ray.ray.origin.copy(from).add(new THREE.Vector3(...offset));
+    for(const {mesh,bounds} of meshes){
+     if(!bounds.containsPoint(ray.ray.origin)){
+      const contact=ray.ray.intersectBox(bounds,entry);
+      if(!contact||entry.distanceToSquared(ray.ray.origin)>length*length+1e-12)continue;
+     }
+     if(ray.intersectObject(mesh,false).length)return true;
+    }
+   }
+  }
+  previous=next;
+ }
+ return false;
+}

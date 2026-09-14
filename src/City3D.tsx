@@ -1,4 +1,4 @@
-import {CityIncendiary, incendiaryStagingFlight, incendiaryShard, INCENDIARY_IMPACT} from './city3dIncendiary';
+import {CityIncendiary, incendiaryStagingFlight, incendiaryShard, incendiaryShardObstructed, INCENDIARY_IMPACT} from './city3dIncendiary';
 import {streetAt} from './streetPlayback';
 import {CityCustody} from './city3dCustody';
 import {CityAssassination, assassinationBatch, isStagedStrike, MELEE_IMPACTS, ASSASSINATION_SHOT, ASSASSINATION_VICTIM_X, executionSpatter} from './city3dAssassination';
@@ -1562,14 +1562,10 @@ export function City3D(props: Props) {
             for(let j=0;j<12;j++){
               const floor=surfaceHeight({x:impact.x,z:impact.z-1})+.07;
               const height=impact.y-floor;
-              const piece=incendiaryShard(j,age,height),before=incendiaryShard(j,Math.max(0,age-dt/1000),height);
-              const from=impact.clone().add(new THREE.Vector3(before.x,before.y,before.z));
+              const piece=incendiaryShard(j,age,height);
               const to=impact.clone().add(new THREE.Vector3(piece.x,piece.y,piece.z));
-              const delta=to.clone().sub(from),length=delta.length();
-              if(age>=0&&piece.scale>0&&!e.glassBlocked!.has(j)&&length>1e-5&&blastBuilding){
-                const ray=new THREE.Raycaster(from,delta.normalize(),0,length+.07);
-                if(ray.intersectObject(blastBuilding,true).length)e.glassBlocked!.add(j);
-              }
+              if(piece.scale>0&&!e.glassBlocked!.has(j)&&blastBuilding&&
+                incendiaryShardObstructed(j,age-dt/1000,age,height,impact,blastBuilding))e.glassBlocked!.add(j);
               tmp.position.copy(to);tmp.rotation.set(piece.rx,piece.ry,piece.rz);
               tmp.scale.setScalar(e.glassBlocked!.has(j)?0:piece.scale);tmp.updateMatrix();e.debris.setMatrixAt(j,tmp.matrix);
             }
