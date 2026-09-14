@@ -7,6 +7,7 @@ export const INCENDIARY_SECONDS=6.8;
 const smooth=(n:number)=>{const t=THREE.MathUtils.clamp(n,0,1);return t*t*(3-2*t);};
 /** Fixed-distance walk with smooth acceleration/braking and unchanged beat times. */
 export function incendiaryStride(seconds:number,distance:number,duration:number,ramp:number){
+ if(distance===0)return {distance:0,weight:0};
  const t=THREE.MathUtils.clamp(seconds,0,duration),r=Math.min(ramp,duration/2),peak=distance/(duration-r);
  const integral=(u:number)=>u*u*u-u*u*u*u/2;
  let travelled:number,speed:number;

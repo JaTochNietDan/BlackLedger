@@ -141,3 +141,29 @@ test('stair descent keeps support planted and actor geometry above the authored 
   const finish=cast.update(cast.duration);assert.ok(finish.done);assert.ok(Math.abs(cast.actor.position.y+.605)<1e-6,'did not stand upright');assert.ok(finish.feet.every(f=>Math.abs(f.y+.5)<1e-6&&Math.abs(f.z+1.2)<1e-6));
  }
 });
+
+test('villa approach joins stair descent with no body jump or tread penetration',async()=>{
+ const {CityVillaExit}=await import('../.runtime/frontend-test/city3dVillaExit.js');
+ for(const name of ['person','woman']){
+  const cast=new CityVillaExit(await model(name));cast.root.position.set(0,.6,-5.12);
+  let previous;
+  for(let frame=0;frame<=1026;frame++){
+   const t=frame/120,p=cast.update(t);assert.ok(p.reached);
+   cast.root.updateMatrixWorld(true);
+   const body=cast.actor.getWorldPosition(new THREE.Vector3());
+   if(previous)assert.ok(body.distanceTo(previous)<.025,`${name} body jumps at ${t}`);
+   previous=body;
+   cast.actor.traverse(o=>{
+    if(!(o instanceof THREE.Mesh))return;const vertices=o.geometry.attributes.position;
+    for(let i=0;i<vertices.count;i++){
+     const v=new THREE.Vector3().fromBufferAttribute(vertices,i).applyMatrix4(o.matrixWorld);
+     const surface=v.z> -6.4?.6:v.z> -6.8?.4:v.z> -7.2?.2:0;
+     assert.ok(v.y>=surface-1e-5,`${name} intersects landing/tread at ${t}`);
+    }
+   });
+  }
+  assert.ok(cast.update(8.55).done);assert.equal(cast.update(8.55).door,0);
+  // Replays can seek back across the rig handoff without retaining the stair pose.
+  cast.update(0);assert.ok(cast.actor.getWorldPosition(new THREE.Vector3()).z>-3);
+ }
+});

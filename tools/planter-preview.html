@@ -1,4 +1,5 @@
 <!doctype html><html><head><meta charset="utf-8"><title>Planter exit review</title><style>body{margin:0;background:#1c211d;color:#e6d7b6;font:18px Georgia}canvas{display:block;width:100vw;height:100vh}p{position:absolute;top:10px;left:25px;pointer-events:auto}</style></head><body><p>Planter exit review <select aria-label="Building model"></select> <button id="play">Play</button> <button id="windup">Open door</button> <button id="release">Threshold</button> <button id="impact">Blast ready</button> <output>Ready</output></p><canvas></canvas><script type="module">
+import {CityVillaExit} from '/src/city3dVillaExit.ts';
 import {CityPlanter} from '/src/city3dPlanter.ts';
 import {buildingGlazing} from '/src/city3dDamage.ts';
 import * as THREE from '/node_modules/three/build/three.module.js';
@@ -9,19 +10,19 @@ const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(35,innerWidth/i
 scene.add(new THREE.HemisphereLight(0xfff0d8,0x33433a,2));const light=new THREE.DirectionalLight(0xffe9c3,3);light.position.set(-1,2,2);scene.add(light);const rim=new THREE.DirectionalLight(0xc0dfef,2);rim.position.set(1,.2,-1);scene.add(rim);
 const names=['monarch','tavern','tenement','mercer-court','casino','civic','shop','warehouse','bluehour','goldenlily','papermoon','mariner','undertaker','filling','docks','haulage','garage','dealer','villa'];
 const requested=new URL(location.href).searchParams.get('model'),name=names.includes(requested)?requested:'monarch';
-if(name==='villa')document.getElementById('impact').textContent='Landing only';
+if(name==='villa')document.getElementById('impact').textContent='Pavement';
 const select=document.querySelector('select');for(const id of names){const option=new Option(id,id);select.add(option);}select.value=name;
 select.onchange=()=>{location.search='?model='+encodeURIComponent(select.value);};
 const loader=new GLTFLoader();const building=(await loader.loadAsync('/art/models/'+name+'.glb')).scene;scene.add(building);if(['filling','docks','haulage','garage','dealer'].includes(name))building.rotation.y=Math.PI;buildingGlazing(building,100);building.updateMatrixWorld(true);
 const threshold=building.getObjectByName(name==='villa'?'entrance-landing':'entrance-threshold'),door=building.getObjectByName('entrance-door-hinge');
 const entry=threshold.getWorldPosition(new THREE.Vector3());
 const actor=(await loader.loadAsync('/art/models/person.glb')).scene;
-const cast=new CityPlanter(actor);scene.add(cast.root);cast.root.position.copy(entry);
+const cast=name==='villa'?new CityVillaExit(actor):new CityPlanter(actor);scene.add(cast.root);cast.root.position.copy(entry);
 camera.far=100;camera.position.copy(entry).add(new THREE.Vector3(5,3,-8));camera.updateProjectionMatrix();controls.target.copy(entry).add(new THREE.Vector3(0,1,-.5));controls.update();
 const floor=new THREE.Mesh(new THREE.BoxGeometry(12,.1,10),new THREE.MeshStandardMaterial({color:0x59594a}));floor.position.set(entry.x,-.055,entry.z-1);scene.add(floor);
 const render=()=>renderer.render(scene,camera);controls.addEventListener('change',render);
-let request=0;const show=t=>{if(name==='villa')t=Math.min(t,2.5);const pose=cast.update(t);door.rotation.y=-Math.PI/2*pose.door;document.body.dataset.pose=JSON.stringify({t,door:pose.door,actor:actor.position,blast:pose.blast});document.querySelector('output').value=t.toFixed(2)+'s';document.body.dataset.seconds=t;render();};
-for(const [id,t] of [['windup',.4],['release',2.3],['impact',6.2]])document.getElementById(id).onclick=()=>{cancelAnimationFrame(request);show(t);};
-document.getElementById('play').onclick=()=>{cancelAnimationFrame(request);const start=performance.now();const frame=now=>{const t=Math.min(6.8,(now-start)/1000);show(t);if(t<(name==='villa'?2.5:6.8))request=requestAnimationFrame(frame);};request=requestAnimationFrame(frame);};
+let request=0;const show=t=>{const pose=cast.update(t);door.rotation.y=-Math.PI/2*pose.door;document.body.dataset.pose=JSON.stringify({t,door:pose.door,actor:actor.position,blast:pose.blast});document.querySelector('output').value=t.toFixed(2)+'s';document.body.dataset.seconds=t;render();};
+for(const [id,t] of [['windup',.4],['release',2.3],['impact',name==='villa'?8.55:6.2]])document.getElementById(id).onclick=()=>{cancelAnimationFrame(request);show(t);};
+document.getElementById('play').onclick=()=>{cancelAnimationFrame(request);const start=performance.now();const frame=now=>{const t=Math.min(name==='villa'?8.55:6.8,(now-start)/1000);show(t);if(t<(name==='villa'?8.55:6.8))request=requestAnimationFrame(frame);};request=requestAnimationFrame(frame);};
 show(0);document.body.dataset.ready='true';
 </script></body></html>

@@ -10,7 +10,7 @@ export class CityPlanter {
  private readonly inverse=new THREE.Matrix4();
  private readonly shoeMatrix=new THREE.Matrix4();
  private readonly point=new THREE.Vector3();
- constructor(readonly actor:THREE.Group){
+ constructor(readonly actor:THREE.Group,private readonly exitDistance=4.6,private readonly leaveDistance=2){
   this.root.add(actor);
   actor.traverse(o=>{if(o instanceof THREE.Mesh&&o.name.startsWith('shoe'))this.shoes.push(o);});
   this.update(0);
@@ -35,15 +35,15 @@ export class CityPlanter {
  }
  update(seconds:number){
   // Stand behind the door's entire swing until the opening is clear.
-  const exit=incendiaryStride(seconds-.5,4.6,3.4,.25);
-  const leave=incendiaryStride(seconds-4.3,2,1.5,.25);
+  const exit=incendiaryStride(seconds-.5,this.exitDistance,3.4,.25);
+  const leave=incendiaryStride(seconds-4.3,this.leaveDistance,1.5,.25);
   const distance=exit.distance+leave.distance,weight=Math.max(exit.weight,leave.weight);
   const phase=distance/1.15*Math.PI*2;
   this.actor.position.set(-leave.distance,.02+Math.abs(Math.sin(phase))*.025*weight,2.25-exit.distance);
-  this.actor.rotation.set(0,Math.PI+Math.PI/2*smooth((seconds-3.9)/.4),0);
+  this.actor.rotation.set(0,Math.PI+(this.leaveDistance?Math.PI/2*smooth((seconds-3.9)/.4):0),0);
   for(const side of [-1,1]){
    const p=phase+(side<0?0:Math.PI);
-   for(const [name,angle] of [[`leg${side}`,Math.sin(p)*.35*weight],[`knee${side}`,Math.max(0,Math.sin(p+.7))*.65*weight],[`arm${side}`,-Math.sin(p)*.23*weight],[`elbow${side}`,0]] as const)
+   for(const [name,angle] of [[`leg${side}`,Math.sin(p)*.35*weight],[`knee${side}`,Math.max(0,Math.sin(p+.7))*.65*weight],[`arm${side}`,-Math.sin(p)*.23*weight],[`elbow${side}`,0],[`ankle${side}`,0]] as const)
     this.actor.getObjectByName(name)?.rotation.set(angle,0,0);
   }
   this.root.updateMatrixWorld(true);
