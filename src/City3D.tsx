@@ -17,7 +17,7 @@ import {seatDriver} from './city3dSeating';
 import {wardrobe, dressPedestrian} from './city3dWardrobe';
 import {headlightAlpha, headlightCentre} from './city3dHeadlights';
 import {cityNightAmount, cityWeather, rainVertices} from './city3dWeather';
-import {blockingBuildings} from './city3dOcclusion';
+import {blockingBuildings, characterSightPoints} from './city3dOcclusion';
 import {buildingCondition, buildingGlazing, glazingDuringBlast, GLASS_BREAK_AT, buildingCutaway} from './city3dDamage';
 import {disposeCityResources} from './city3dResources';
 import {useEffect, useRef, useState, type ReactNode} from 'react';
@@ -457,6 +457,7 @@ export function City3D(props: Props) {
     let blockers = new Set<string>(), lastSightCheck = -Infinity;
     const cutawayAmounts = new Map<string, number>();
     const cutawayWindow = new THREE.Vector3();
+    const streetCutawayMaterials=new Set<THREE.MeshStandardMaterial>();
     const actors = new Map<string, Actor>();
     const effects: Effect[] = [];
     let completedScene = "";
@@ -799,7 +800,13 @@ export function City3D(props: Props) {
         furniture.updateMatrixWorld(true);
         furniture.traverse(part => {
           if (!(part instanceof THREE.Mesh)) return;
-          const instances = new THREE.InstancedMesh(part.geometry, part.material, plan.lots.length);
+          const cutawayMaterial=(source:THREE.Material)=>{
+            if(!(source instanceof THREE.MeshStandardMaterial))return source;
+            const material=source.clone();buildingCondition(material,100,new THREE.Vector3());
+            streetCutawayMaterials.add(material);return material;
+          };
+          const material=Array.isArray(part.material)?part.material.map(cutawayMaterial):cutawayMaterial(part.material);
+          const instances = new THREE.InstancedMesh(part.geometry, material, plan.lots.length);
           plan.lots.forEach((lot, index) => {
             const at = streetsidePosition(lot);
             const transform = new THREE.Matrix4().makeTranslation(at.x, 0.18, at.z);
@@ -1721,17 +1728,21 @@ export function City3D(props: Props) {
         ? [followed.object.position.clone().add(new THREE.Vector3(0, .9, 0))]
         : ready ? effects.filter(e => e.extra?.visible && e.slot && e.cue.target === eventTarget)
           .flatMap(e => e.planter?[e.planter.actor.getWorldPosition(new THREE.Vector3()).add(new THREE.Vector3(0,1.35,0))]:e.incendiary?[e.incendiary.actor.getWorldPosition(new THREE.Vector3()).add(new THREE.Vector3(0,1.35,0))]:e.custody?[e.custody.officer,e.custody.detainee].map(a=>a.getWorldPosition(new THREE.Vector3()).add(new THREE.Vector3(0,.9,0))):e.assassination?[e.assassination.attacker,e.assassination.victim].map(a=>a.getWorldPosition(new THREE.Vector3()).add(new THREE.Vector3(0,.9,0))):[e.extra!.position.clone().add(new THREE.Vector3(0, .9, 0))]) : [];
+      let cutawayDepth=0;
       if (sightPoints.length) {
+        const sightEnvelope=sightPoints.flatMap(sight => characterSightPoints(camera,sight));
         if (now - lastSightCheck >= 100) {
-          blockers = new Set(sightPoints.flatMap(sight => [...blockingBuildings(camera, sight, buildings)]));
+          blockers = new Set(sightEnvelope
+            .flatMap(sight => [...blockingBuildings(camera, sight, buildings)]));
           // An authored doorway should occlude an entering officer naturally;
           // dissolving the target would erase the door being breached.
           for(const e of effects)if(e.cue.kind==='raid-officer'&&buildings.get(e.cue.target)?.getObjectByName('entrance-door-hinge'))blockers.delete(e.cue.target);
           lastSightCheck = now;
         }
         const size = renderer.getDrawingBufferSize(new THREE.Vector2());
-        const projected = sightPoints.map(sight => {
+        const projected = sightEnvelope.map(sight => {
           const screen = sight.project(camera);
+          cutawayDepth=Math.max(cutawayDepth,(screen.z+1)/2);
           return new THREE.Vector2((screen.x + 1) * size.x / 2, (screen.y + 1) * size.y / 2);
         });
         const centre = projected.reduce((sum, point) => sum.add(point), new THREE.Vector2()).divideScalar(projected.length);
@@ -1739,6 +1750,10 @@ export function City3D(props: Props) {
           + (65 + camera.zoom * 2) * renderer.getPixelRatio();
         cutawayWindow.set(centre.x, centre.y, radius);
       } else { blockers.clear(); lastSightCheck = -Infinity; }
+      // Repeated trees and street furniture keep their instanced draw calls.
+      // Only fragments in front of the watched cast dissolve in the opening.
+      for(const material of streetCutawayMaterials)
+        buildingCutaway(material,sightPoints.length?1:0,cutawayWindow,cutawayDepth);
       for (const [id, building] of buildings) {
         const desired = blockers.has(id) ? 1 : 0, previous = cutawayAmounts.get(id) || 0;
         const amount = motion ? THREE.MathUtils.lerp(previous, desired, 1 - Math.exp(-Math.min(dt, 100) / 90)) : desired;

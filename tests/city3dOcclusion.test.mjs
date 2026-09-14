@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as THREE from 'three';
-import {blockingBuildings} from '../.runtime/frontend-test/city3dOcclusion.js';
+import {blockingBuildings,characterSightPoints} from '../.runtime/frontend-test/city3dOcclusion.js';
 import {buildingCondition, buildingCutaway} from '../.runtime/frontend-test/city3dDamage.js';
 
 test('orthographic cutaways select actual intervening geometry, including off-centre sight lines',()=>{
@@ -20,11 +20,41 @@ test('cutaways update private shader uniforms and fully restore without changing
  for(const m of [a,b])buildingCondition(m,100,new THREE.Vector3());
  const shader={uniforms:{},vertexShader:THREE.ShaderLib.standard.vertexShader,fragmentShader:THREE.ShaderLib.standard.fragmentShader};
  a.onBeforeCompile(shader,{});const version=a.version;
- buildingCutaway(a,1,new THREE.Vector3(300,200,120));
+ buildingCutaway(a,1,new THREE.Vector3(300,200,120),.45);
+ assert.equal(shader.uniforms.cityWindowDepth.value,.45);
  assert.equal(shader.uniforms.cityCutaway.value,1);
  assert.deepEqual(shader.uniforms.cityWindow.value.toArray(),[300,200,120]);
  assert.equal(b.userData.cityWear.cutaway.value,0);
  buildingCutaway(a,0,new THREE.Vector3());
  assert.equal(shader.uniforms.cityCutaway.value,0);assert.equal(a.version,version);
+ assert.equal(shader.uniforms.cityWindowDepth.value,1);
  assert.equal(a.opacity,1);assert.equal(a.transparent,false);assert.equal(a.depthWrite,true);
+});
+
+
+test('the character outline catches roof edges above and below a clear torso ray',()=>{
+ const camera=new THREE.OrthographicCamera(-10,10,10,-10,.1,3000);
+ camera.position.set(0,1,20);camera.lookAt(0,1,0);camera.updateMatrixWorld();
+ for(const y of [.2,1.8]){
+  const roof=new THREE.Group();roof.add(new THREE.Mesh(new THREE.BoxGeometry(2,.1,2),new THREE.MeshStandardMaterial()));
+  roof.position.set(0,y,5);roof.updateMatrixWorld(true);roof.userData.sightBounds=new THREE.Box3().setFromObject(roof);
+  const buildings=new Map([['roof',roof]]),centre=new THREE.Vector3(0,1,0);
+  assert.equal(blockingBuildings(camera,centre,buildings).size,0);
+  const blocked=new Set(characterSightPoints(camera,centre).flatMap(point=>[...blockingBuildings(camera,point,buildings)]));
+  assert.deepEqual([...blocked],['roof']);assert.deepEqual(centre.toArray(),[0,1,0]);
+ }
+});
+
+test('hidden damage variants and hidden materials do not dissolve visible buildings',()=>{
+ const camera=new THREE.OrthographicCamera(-10,10,10,-10,.1,3000);
+ camera.position.set(0,1,20);camera.lookAt(0,1,0);camera.updateMatrixWorld();
+ const building=new THREE.Group(),variant=new THREE.Group(),material=new THREE.MeshStandardMaterial();
+ variant.add(new THREE.Mesh(new THREE.BoxGeometry(2,3,2),material));building.add(variant);
+ building.position.set(0,1,5);building.updateMatrixWorld(true);
+ const buildings=new Map([['front',building]]),target=new THREE.Vector3(0,1,0);
+ assert.equal(blockingBuildings(camera,target,buildings).size,1);
+ variant.visible=false;assert.equal(blockingBuildings(camera,target,buildings).size,0);
+ variant.visible=true;material.visible=false;assert.equal(blockingBuildings(camera,target,buildings).size,0);
+ material.visible=true;building.visible=false;assert.equal(blockingBuildings(camera,target,buildings).size,0);
+ building.visible=true;assert.equal(blockingBuildings(camera,target,buildings).size,1);
 });
