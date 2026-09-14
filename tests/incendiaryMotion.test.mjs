@@ -30,3 +30,18 @@ test('bottle stays at the authored hand, releases continuously and reaches the i
   cast.update(cast.duration);assert.ok(actor.position.x<=-4);assert.equal(bottle.visible,false);
  }
 });
+
+test('the actor sweep fits the reserved city forecourt footprint',async()=>{
+ const {sceneSlots}=await import('../.runtime/frontend-test/city3dEvents.js');
+ const {trafficSize}=await import('../.runtime/frontend-test/city3dTraffic.js');
+ const slot=sceneSlots({x:40,z:40,row:1},'incendiary')[0],size=trafficSize(slot.model);
+ for(const name of ['person','woman']){
+  const actor=await model(name),cast=new CityIncendiary(actor,await model('incendiary-bottle'),new THREE.Vector3(0,4,4));
+  cast.root.position.set(slot.root.x,.2,slot.root.z);
+  for(let frame=0;frame<=180;frame++){
+   cast.update(frame/180*cast.duration);const bounds=new THREE.Box3().setFromObject(actor,true);
+   assert.ok(bounds.min.x>=slot.pose.x-size.width/2&&bounds.max.x<=slot.pose.x+size.width/2,'actor escapes lateral reservation');
+   assert.ok(bounds.min.z>=slot.pose.z-size.length/2&&bounds.max.z<=slot.pose.z+size.length/2,'actor escapes forecourt depth');
+  }
+ }
+});

@@ -50,3 +50,13 @@ test('ordinary gunfire previews use each public gun tier without inventing a fat
   assert.equal(preview.revision,state.revision);assert.equal(preview.minute,state.minute);
  }
 });
+
+test('incendiary preview uses an unarmed attacker and an isolated target fire',()=>{
+ const existing={id:'other',target:'bar',minute:500,brigade_at:510,extinguished_at:680,cleanup_at:740};
+ const state={id:'campaign',revision:10,minute:600,building_fires:[existing]};
+ const before=JSON.stringify(state),{state:preview,cue}=previewScene(state,'club','Incendiary','fire');
+ assert.equal(cue.kind,'incendiary');assert.equal(cue.attacker.weapon,0);assert.deepEqual(cue.actors,[]);
+ assert.equal(preview.building_fires.length,2);assert.equal(preview.building_fires[0],existing);
+ assert.equal(preview.building_fires[1].target,'club');assert.ok(preview.building_fires[1].brigade_at>state.minute);
+ assert.equal(JSON.stringify(state),before);
+});

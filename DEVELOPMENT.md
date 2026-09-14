@@ -470,3 +470,16 @@ Browser study on isolated Vite8897 first exposed the body hanging inside the for
 Actual person/woman GLB tests sample held poses under a translated/rotated scene root, check attachment error below1e-6m and bottle-body clearance from the forearm segment, continuous release position/quaternion, flight height, exact target contact, disappearance at impact and escape endpoint. All248 frontend tests pass10.942s (.runtime/incendiary-motion-tests-final.log), TypeScript check passes, diff check clean. No campaign state was changed; existing unrelated core files remain unstaged.
 
 Not yet wired into City3D: traffic reservation for the complete cast path, target selection on the actual facade, flame/impact audio and timed persistent fire/brigade reveal, debug entry and committed-scene browser acceptance. The isolated study does not establish whole-city collision safety or production animation quality. Full goal remains active.
+
+
+### 2026-09-14 — city incendiary cast integration
+
+Loaded the authored bottle in City3D and wired incendiary cues to CityIncendiary using the actual public attacker rig/wardrobe. Scene slots reserve a6.2m by1.8m forecourt sweep; the player's ordinary street actor is excluded while its staged counterpart owns that reservation. A clear fire-window marker nearest the slot sets the flight endpoint, with entrance fallback. Camera includes the swept path and impact point. Added burning-cloth particles/light, impact glass sound and modest camera impulse. Cast duration6.8s gates normal scene completion/news.
+
+Window fire/rubble are withheld until impact; saved brigade/hoses are deferred until the cast exits to prevent the earlier occupied-frontage stall. Those filters only affect presentation, preserving saved timestamps/condition. Incendiary is now selectable in debug previews with a private synthetic unarmed attacker/fire, no casualties or campaign mutations.
+
+CUA8894 preview at The Monarch: staged true at0.236s, held bottle, window fire empty; after completion effects empty and48 fire particles/four vents. Revision36/minute1160 unchanged. Final build CUA8899 recorded attack replay: actual Alex Varga stages, initial fire/suppression empty; natural completion opens ARSON AT THE MONARCH. After folding newspaper, effects empty and saved fire plus two hose streams restored, revision37/minute1175/cash140 unchanged. A longer read-only browser sample exceeded the CUA evaluation deadline; it was not treated as a failed scene or used as mid-flight evidence. No new campaign commands/main-save writes.
+
+Actual person/woman GLB sweep checks sample181 frames per rig against the reserved footprint. Existing attachment/release/flight tests remain green. All249 tests passed11.393s (.runtime/incendiary-city-tests.log), then the additional private-fire preview test passed in the4-test preview file run. Final TypeScript/Vite build passed2.34s with the known large-bundle warning. Diff check clean.
+
+Remaining acceptance: actual facade/projectile clearance at every address, close-up integrated throwing/flame fidelity, glass/ignition impact detail, smooth escape handoff to the real player and fire evacuation/interior behavior. This is a first integrated scene, not completion of the full production goal or broad60FPS acceptance.
