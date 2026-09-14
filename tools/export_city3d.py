@@ -936,14 +936,33 @@ def industrial(kind):
             cylinder('vent flashing',(x,2,4.72),.52,.08,roof,vertices=24)
             cylinder('vent rain cap',(x,2,5.50),.50,.10,roof,vertices=24)
 
-        box('workshop',(0,2,2.25),(14,10,4.5),wall)
+        for x in (-4,4):box('workshop wing',(x,2,2.25),(6,10,4.5),wall)
+        box('workshop passage lintel',(0,2,3.475),(2,10,2.05),wall)
+        box('workshop passage rear',(0,3.5,1.225),(2,7,2.45),wall)
+        box('workshop passage paving',(0,-1.5,-.04),(2,3,.08),stone)
+        hinge=bpy.data.objects.new('entrance-door-hinge',None)
+        bpy.context.collection.objects.link(hinge);hinge.location=(.875,-3.1,0)
+        def doorpart(name,xyz,dims,mat):
+            ob=box(name,xyz,dims,mat,.01);ob.parent=hinge;ob.location-=hinge.location
+        doorpart('workshop wicket',(0,-3.1,1.175),(1.75,.12,2.35),iron)
+        for z in (.2,1.17,2.15):doorpart('wicket reinforcing rib',(0,-3.2,z),(1.6,.07,.09),roof)
+        doorpart('workshop wicket handle',(-.6,-3.24,1.1),(.04,.08,.25),cream)
+        for x in (-.96,.96):box('workshop entry jamb',(x,-3.1,1.225),(.08,.24,2.45),cream)
         corrugated_roof('workshop corrugated roof',(0,2,4.675),14.4,10.4,roof)
         for x in (-4.5,0,4.5):
-            box('garage bay',(x,-3.1,1.9),(3.6,.2,3.6),iron)
+            if x==0:
+                for side in (-1,1):box('central bay side',(side*1.4,-3.1,1.9),(.8,.2,3.6),iron)
+                box('central bay header',(0,-3.1,3.075),(2,.2,1.25),iron)
+            else:box('garage bay',(x,-3.1,1.9),(3.6,.2,3.6),iron)
             for z in range(12):
-                box('door seam',(x,-3.24,.3+z*.29),(3.5,.035,.035),roof)
+                height=.3+z*.29
+                if x==0 and height<2.45:
+                    for side in (-1,1):box('central door seam',(side*1.4,-3.24,height),(.7,.035,.035),roof)
+                else:box('door seam',(x,-3.24,height),(3.5,.035,.035),roof)
             box('bay windows',(x,-3.27,2.8),(3.2,.05,.6),glass)
             fire_target(int(x+5),x,-3.38,2.8)
+        entry=bpy.data.objects.new('entrance-threshold',None)
+        bpy.context.collection.objects.link(entry);entry.location=(0,-3.1,0)
         if kind=='dealer':
             before=set(bpy.context.scene.objects)
             car('ford',articulated=False)

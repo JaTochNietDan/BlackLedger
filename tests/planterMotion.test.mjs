@@ -10,9 +10,9 @@ async function model(name){
  return (await loader.parseAsync(b.buffer.slice(b.byteOffset,b.byteOffset+b.byteLength),'')).scene;
 }
 test('planter exits the authored vestibule without crossing the door or masonry',async()=>{
- for(const name of ['monarch','tavern','tenement','mercer-court','casino','civic','shop','warehouse','bluehour','goldenlily','papermoon','mariner','undertaker','filling','docks','haulage'])for(const person of ['person','woman']){
+ for(const name of ['monarch','tavern','tenement','mercer-court','casino','civic','shop','warehouse','bluehour','goldenlily','papermoon','mariner','undertaker','filling','docks','haulage','garage','dealer'])for(const person of ['person','woman']){
   const building=await model(name),actor=await model(person),cast=new CityPlanter(actor);
-  if(['filling','docks','haulage'].includes(name))building.rotation.y=Math.PI;
+  if(['filling','docks','haulage','garage','dealer'].includes(name))building.rotation.y=Math.PI;
   building.updateMatrixWorld(true);
   cast.root.position.copy(building.getObjectByName('entrance-threshold').getWorldPosition(new THREE.Vector3()));
   const door=building.getObjectByName('entrance-door-hinge'),triangle=new THREE.Triangle(),bounds=new THREE.Box3();
