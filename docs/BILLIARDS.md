@@ -307,3 +307,25 @@ $5960 cash/$40 escrow, exactly13 receipts: skipping added no command or payment.
 Evidence logs: `.runtime/pool-cue-{tests,final-tests,final-build}.log`.
 Main campaign unchanged. Character choreography, richer table/hall assets,
 compact/touch/motion-off acceptance, multiple tables and tournaments remain open.
+
+## Cushion contact geometry and table finish — 2026-09-14
+
+The original centred cushion boxes intruded12.5mm into the playing area. New
+closed profiles put their noses exactly on the solver's segment at ball-centre
+height, with the remaining material on the outward side. All18 segments include
+the short angled pocket facings. Raised wood rails now carry visible sights;
+locally generated grain, contrasting cushion slopes, leather-coloured pocket lips
+and recessed dark cups replace the thin rail/flat-pocket appearance. Aprons are
+split around pocket openings so wood no longer fills their interiors.
+
+All384 frontend tests pass (14.076s). Geometry checks cover every profile vertex
+against its contact half-plane, nose height and a raycast against the end cushion.
+Final typecheck/build passes (existing bundle warning). CUA55 on isolated8964
+visually inspected the revised table without sending a gameplay command; the
+fixture remains revision13/minute618. Main campaign unchanged. Evidence logs:
+`.runtime/pool-cushion-{tests,final-build}.log`.
+
+This improves the playable table, not the hall's six existing props. Those still
+need matching dimensions/finish. Pocket baskets, joined corner detailing, player
+bodies/hands, scene surroundings and complete visual acceptance remain unfinished;
+the solver's previously documented physical limitations are also unchanged.

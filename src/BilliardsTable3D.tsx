@@ -1,3 +1,4 @@
+import {poolRails,poolCushionGeometry} from './billiardsTableGeometry';
 import {useEffect,useRef,useState} from 'react';
 import * as THREE from 'three';
 import {TableCamera} from './tableCamera';
@@ -34,24 +35,29 @@ export function BilliardsTable3D(props:TableProps){
   const view=new TableCamera(camera,canvas,()=>{dirty=true;},new THREE.Vector3(0,H,0),3.6,Math.PI/2);
   const material=(colour:string)=>new THREE.MeshStandardMaterial({color:colour,roughness:.65});
   const wood=material('#39251b'),felt=material('#285b49'),cushion=material('#204a39');
+  const grain=document.createElement('canvas');grain.width=512;grain.height=128;const gc=grain.getContext('2d')!;gc.fillStyle='#856346';gc.fillRect(0,0,512,128);
+  for(let i=0;i<90;i++){gc.strokeStyle=i%3===0?'#46332055':'#c39b6030';gc.lineWidth=i%4===0?1.5:.5;gc.beginPath();for(let x=0;x<=512;x+=4){const y=(i*13.73)%128+Math.sin(x*.015+i*.63)*2.5+Math.sin(x*.045+i)*.6;x===0?gc.moveTo(x,y):gc.lineTo(x,y);}gc.stroke();}
+  const grainMap=new THREE.CanvasTexture(grain);grainMap.colorSpace=THREE.SRGBColorSpace;grainMap.wrapS=grainMap.wrapT=THREE.RepeatWrapping;wood.map=grainMap;wood.color.set('#8c674a');wood.roughness=.32;
+
   function box(w:number,h:number,d:number,x:number,y:number,z:number,mat:THREE.Material){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;scene.add(m);return m;}
   box(12,.1,12,0,-.06,0,material('#252821'));
-  for(const x of [-W/2-.10,W/2+.10])box(.18,.28,L+.28,x,H-.19,0,wood);
-  for(const z of [-L/2-.10,L/2+.10])box(W+.38,.28,.18,0,H-.19,z,wood);
+  for(const x of [-W/2-.10,W/2+.10])for(const z of [-L/4,L/4])box(.18,.28,L/2-.18,x,H-.19,z,wood);
+  for(const z of [-L/2-.10,L/2+.10])box(W-.18,.28,.18,0,H-.19,z,wood);
   for(const x of [-W*.36,W*.36])for(const z of [-L*.38,L*.38])box(.16,.54,.16,x,.27,z,wood);
+  for(const x of [-W/2-.12,W/2+.12])for(const z of [-L/4,L/4])box(.10,.045,L/2-.19,x,H+.041,z,wood);
+  for(const z of [-L/2-.12,L/2+.12])box(W-.17,.045,.10,0,H+.041,z,wood);
   const pockets=poolPocketCenters(W,L);
   // The bed extends beneath the cushions; holes are actual mesh apertures.
   const shape=new THREE.Shape();shape.moveTo(-.13,-.13);shape.lineTo(W+.13,-.13);shape.lineTo(W+.13,L+.13);shape.lineTo(-.13,L+.13);shape.closePath();
   for(const [x,y] of pockets){const hole=new THREE.Path();hole.absarc(x,y,.076,0,Math.PI*2,true);shape.holes.push(hole);
-   const cup=new THREE.Mesh(new THREE.CylinderGeometry(.076,.063,.15,32,1,true),material('#171411'));cup.position.set(x-W/2,H-.075,L/2-y);scene.add(cup);
+   const cup=new THREE.Mesh(new THREE.CylinderGeometry(.076,.063,.15,32,1,true),material('#171411'));cup.material.side=THREE.DoubleSide;cup.position.set(x-W/2,H-.075,L/2-y);scene.add(cup);
+   const bottom=new THREE.Mesh(new THREE.CircleGeometry(.066,32),material('#080b09'));bottom.rotation.x=-Math.PI/2;bottom.position.set(x-W/2,H-.145,L/2-y);scene.add(bottom);
+   const lip=new THREE.Mesh(new THREE.TorusGeometry(.077,.006,8,40),material('#352b21'));lip.rotation.x=Math.PI/2;lip.position.set(x-W/2,H+.002,L/2-y);scene.add(lip);
+
   }
   const bed=new THREE.Mesh(new THREE.ShapeGeometry(shape,48),felt);bed.rotation.x=-Math.PI/2;bed.position.set(-W/2,H,L/2);bed.receiveShadow=true;scene.add(bed);
-  const rails:number[][]=[[.085,0,W-.085,0],[.085,L,W-.085,L]];
-  for(const x of [0,W]){const outside=x===0?-.045:W+.045;rails.push([x,.085,x,L/2-.075],[x,L/2+.075,x,L-.085],[x,L/2-.075,outside,L/2-.065],[x,L/2+.075,outside,L/2+.065]);}
-  for(const x of [0,W])for(const y of [0,L]){const sx=x===0?1:-1,sy=y===0?1:-1;rails.push([x+sx*.085,y,x+sx*.049,y-sy*.035],[x,y+sy*.085,x-sx*.035,y+sy*.049]);}
-  // Narrow cushion noses follow the solver segments including angled jaws.
-  for(const [ax,ay,bx,by] of rails){const rail=box(Math.hypot(bx-ax,by-ay),.045,.025,(ax+bx)/2-W/2,H+.016,L/2-(ay+by)/2,cushion);rail.rotation.y=Math.atan2(by-ay,bx-ax);}
-  for(const x of [-W/2-.10,W/2+.10])for(let i=1;i<8;i++){const diamond=new THREE.Mesh(new THREE.CircleGeometry(.008,4),material('#e0d0a6'));diamond.rotation.x=-Math.PI/2;diamond.position.set(x,H-.045,L/2-L*i/8);scene.add(diamond);}
+  for(const segment of poolRails(W,L)){const rail=new THREE.Mesh(poolCushionGeometry(segment,W,L,R,H),cushion);rail.castShadow=true;rail.receiveShadow=true;scene.add(rail);}
+  for(const x of [-W/2-.12,W/2+.12])for(let i=1;i<8;i++){if(i===4)continue;const diamond=new THREE.Mesh(new THREE.CircleGeometry(.008,4),material('#e0d0a6'));diamond.rotation.x=-Math.PI/2;diamond.position.set(x,H+.064,L/2-L*i/8);scene.add(diamond);}
   const balls=new Map<number,THREE.Mesh>();const geometry=new THREE.SphereGeometry(R,32,24);
   for(let id=0;id<16;id++){const mesh=new THREE.Mesh(geometry,new THREE.MeshStandardMaterial({map:ballTexture(id),roughness:.22,metalness:0}));mesh.castShadow=true;mesh.receiveShadow=true;mesh.userData.poolBall=id;balls.set(id,mesh);scene.add(mesh);}
   const ghost=new THREE.Mesh(geometry,new THREE.MeshStandardMaterial({color:'#f5edd6',transparent:true,opacity:.65,depthWrite:false}));scene.add(ghost);

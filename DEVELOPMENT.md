@@ -2102,3 +2102,17 @@ The fixture ends revision13/minute618/five shots/$5960 cash/$40 escrow, with exa
 13 receipts and no extra skip command. Main campaign unchanged. Human bridge/hand
 and body choreography, table/hall detail, tournament/concurrent-table work and
 remaining physics fidelity acceptance are still open. See docs/BILLIARDS.md.
+
+### 2026-09-14 — billiards cushions matched to collision geometry
+
+Replaced centred boxes (12.5mm visual intrusion) with closed cushion profiles whose
+nose lies on the authoritative segment at ball-centre height. Added raised wood
+rails with grain and sights, contrasting cushion slopes, pocket lips and recessed
+dark cups; split the aprons so they do not block the pocket openings.
+
+384 frontend tests pass (14.076s), including all18 profiles' contact half-planes,
+nose heights and a rendered end-cushion raycast. Final typecheck/build passes with
+the existing bundle warning. CUA55 inspected the table at isolated8964 with no
+command or save change (revision13/minute618). Main campaign untouched. The hall
+props still require matching dimensions, and corner/pocket detail, character
+choreography, tournaments and full-fidelity acceptance remain open.
