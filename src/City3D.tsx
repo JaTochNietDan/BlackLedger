@@ -16,7 +16,7 @@ import {frameScene, stagedSceneBounds,ScenePullback, impactPulse, renderImpact} 
 import {seatDriver} from './city3dSeating';
 import {wardrobe, dressPedestrian} from './city3dWardrobe';
 import {headlightAlpha, headlightCentre} from './city3dHeadlights';
-import {cityWeather, rainVertices} from './city3dWeather';
+import {cityNightAmount, cityWeather, rainVertices} from './city3dWeather';
 import {blockingBuildings} from './city3dOcclusion';
 import {buildingCondition, buildingGlazing, glazingDuringBlast, GLASS_BREAK_AT, buildingCutaway} from './city3dDamage';
 import {disposeCityResources} from './city3dResources';
@@ -450,7 +450,8 @@ export function City3D(props: Props) {
     const models = new Map<string, THREE.Group>();
     const buildings = new Map<string, THREE.Group>();
     const clockHands:THREE.Object3D[]=[];
-    let lightingKey="";
+    let lightingKey="", lastNightAmount=-1;
+    const luminousMaterials=new Set<THREE.MeshStandardMaterial>();
     const landings: THREE.Group[] = [];
     const labels = new Map<string, THREE.Sprite>();
     let blockers = new Set<string>(), lastSightCheck = -Infinity;
@@ -1756,22 +1757,33 @@ export function City3D(props: Props) {
         headlightPools.frustumCulled = false; scene.add(headlightPools);
       }
       headlightPools.count = 0;
-      const lampHour = (presentationMinute % 1440) / 60, lampsOn = lampHour < 6 || lampHour >= 20;
-      const nextLightingKey=JSON.stringify([lampsOn,w.sky]);
-      if(ready&&lightingKey!==nextLightingKey){
-        lightingKey=nextLightingKey;
-        const weather=cityWeather(w.sky,lampsOn);
+      const nightAmount=cityNightAmount(presentationMinute), lampsOn=nightAmount>0;
+      const nextLightingKey=JSON.stringify(w.sky);
+      const lightingChanged=lightingKey!==nextLightingKey;
+      if(ready&&(lightingChanged||lastNightAmount!==nightAmount)){
+        // Snapshot changes can replace damage/cutaway materials. Cache their new
+        // references once; twilight itself must not traverse every building.
+        if(lightingChanged){
+          luminousMaterials.clear();
+          for(const b of buildings.values())b.traverse(o=>{
+            if(o instanceof THREE.Mesh)for(const m of Array.isArray(o.material)?o.material:[o.material])
+              if(m instanceof THREE.MeshStandardMaterial&&m.emissive.getHex()!==0)luminousMaterials.add(m);
+          });
+        }
+        lightingKey=nextLightingKey;lastNightAmount=nightAmount;
+        const weather=cityWeather(w.sky,nightAmount);
         sky.intensity=weather.ambient;sun.intensity=weather.sun;
         groundMat.color.setHex(0x646460).multiplyScalar(weather.roadTone);
         pavementMat.color.setHex(0xaaa18b).multiplyScalar(weather.pavementTone);
         groundMat.roughness=weather.roadRoughness;pavementMat.roughness=weather.pavementRoughness;
-        pools.visible=lampsOn;
-        for(const b of buildings.values())b.traverse(o=>{
-          if(o instanceof THREE.Mesh)for(const m of Array.isArray(o.material)?o.material:[o.material])
-            if(m instanceof THREE.MeshStandardMaterial&&m.emissive.getHex()!==0)m.emissiveIntensity=lampsOn?1.2:.2;
-        });
-        scene.background=new THREE.Color(weather.background);scene.fog=new THREE.Fog(scene.background,260,weather.fogFar);
-        renderer.shadowMap.needsUpdate=true;
+        pools.visible=lampsOn;pools.material.opacity=.24*nightAmount;
+        headlightMaterial.opacity=.28*nightAmount;
+        for(const material of luminousMaterials)material.emissiveIntensity=.2+nightAmount;
+        if(scene.background instanceof THREE.Color)scene.background.setHex(weather.background);
+        else scene.background=new THREE.Color(weather.background);
+        if(scene.fog instanceof THREE.Fog){scene.fog.color.setHex(weather.background);scene.fog.far=weather.fogFar;}
+        else scene.fog=new THREE.Fog(weather.background,260,weather.fogFar);
+        if(lightingChanged)renderer.shadowMap.needsUpdate=true;
       }
       for(const hand of clockHands){
         const period=hand.name==='clock-hand-minute'?60:720;
@@ -1779,7 +1791,7 @@ export function City3D(props: Props) {
       }
       for (const actor of actors.values()) {
         const lit = ready && lampsOn && actor.object.visible && actor.points.length > 1;
-        for (const material of actor.lamps) material.emissiveIntensity = lit ? (material.name === 'headlamps' ? 1.6 : .8) : 0;
+        for (const material of actor.lamps) material.emissiveIntensity = lit ? (material.name === 'headlamps' ? 1.6 : .8)*nightAmount : 0;
         if (!lit || !actor.lamps.length) continue;
         for (const side of [-1, 1]) {
           const at = headlightCentre(actor.object.position.x, actor.object.position.z, actor.object.rotation.y, trafficSize(actor.model).length, side);
@@ -1836,7 +1848,7 @@ export function City3D(props: Props) {
           followingPlayer: followPlayer.current,
           streetMinute:p.journey?(p.journey.fromMinute??w.minute-p.journey.minutes)+p.journey.minutes*playedJourneyProgress:w.minute,
           cutawayBuildings: [...blockers],
-          weather: {night:lampsOn,lightingMinute:presentationMinute,clockHands:clockHands.map(h=>({name:h.name,angle:h.rotation.z})),kind: w.sky?.kind || 'clear', wet: w.sky?.wet || 0, rainVisible: rainfall.visible, rainClock},
+          weather: {night:nightAmount>=.5,nightAmount,sunIntensity:sun.intensity,ambientIntensity:sky.intensity,lightingMinute:presentationMinute,clockHands:clockHands.map(h=>({name:h.name,angle:h.rotation.z})),kind: w.sky?.kind || 'clear', wet: w.sky?.wet || 0, rainVisible: rainfall.visible, rainClock},
           camera: {zoom: camera.zoom, x: camera.position.x, z: camera.position.z,
             targetX: controls.target.x, targetZ: controls.target.z},
           actors: [...actors]

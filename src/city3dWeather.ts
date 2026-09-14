@@ -1,10 +1,26 @@
-export function cityWeather(sky: {kind: string; wet: number} | undefined, night: boolean) {
+/** Cosmetic twilight follows game minutes, including interpolated travel time. */
+export function cityNightAmount(minute: number) {
+  const time = ((minute % 1440) + 1440) % 1440;
+  const smooth = (v: number) => { const t = Math.max(0, Math.min(1, v)); return t * t * (3 - 2 * t); };
+  return time < 720 ? 1 - smooth((time - 330) / 60) : smooth((time - 1170) / 60);
+}
+const blendColor = (day: number, night: number, amount: number) => {
+  let color = 0;
+  for (const shift of [16, 8, 0]) {
+    const a = (day >> shift) & 255, b = (night >> shift) & 255;
+    color |= Math.round(a + (b - a) * amount) << shift;
+  }
+  return color;
+};
+export function cityWeather(sky: {kind: string; wet: number} | undefined, night: boolean | number) {
+  const amount = typeof night === 'boolean' ? Number(night) : Math.max(0, Math.min(1, night));
+  const blend = (day: number, dark: number) => day + (dark - day) * amount;
   const wet = Number.isFinite(sky?.wet) ? Math.max(0, Math.min(1, sky!.wet)) : 0;
   const rain = sky?.kind === 'rain';
   const dull = rain || sky?.kind === 'overcast' || sky?.kind === 'fog';
-  return {wet, rain, sun: night ? .35 : dull ? 1.05 : 3.2,
-    ambient: night ? .9 : dull ? 1.8 : 2.1,
-    background: night ? 0x17232c : dull ? 0x5f6970 : 0x657477,
+  return {wet, rain, sun: blend(dull ? 1.05 : 3.2, .35),
+    ambient: blend(dull ? 1.8 : 2.1, .9),
+    background: blendColor(dull ? 0x5f6970 : 0x657477, 0x17232c, amount),
     fogFar: sky?.kind === 'fog' ? 440 : rain ? 560 : 850,
     roadRoughness: .92 - wet * .48, pavementRoughness: .9 - wet * .25,
     roadTone: 1 - wet * .28, pavementTone: 1 - wet * .12};
