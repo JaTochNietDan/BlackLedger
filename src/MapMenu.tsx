@@ -2,7 +2,7 @@ import {useEffect,useRef,type ReactNode} from 'react';
 import './documentMenu.css';
 const editions:Record<string,{label:string;mark:string}>={
  crew:{label:'Personal address book',mark:'Contacts'},families:{label:'Private family dossiers',mark:'Confidential'},
- market:{label:'Mercer Exchange · Trade circular',mark:'Market quotations'},ledger:{label:'Private accounts & memoranda',mark:'Black Ledger'},
+ market:{label:'Mercer Exchange · Trade circular',mark:'Market quotations'},ledger:{label:'Private memoranda',mark:'Black Ledger'},
  news:{label:'The Bellwether Herald · Reading room',mark:'Press archive'},settings:{label:'Black Ledger · Control desk',mark:'Preferences'},
  help:{label:'A newcomer’s handbook',mark:'Bellwether'},
 };

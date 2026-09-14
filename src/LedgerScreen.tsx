@@ -2,22 +2,7 @@ import {useMemo, useState} from 'react';
 import type {ReactElement} from 'react';
 import type {Action, Snapshot, Record as CityRecord} from './types';
 
-// The Ledger showed the market, two figures and then sixty rows of
-// undifferentiated history: five screens of scrolling for a page whose whole
-// job is to answer "what am I worth and what is this costing me". The core now
-// adds the books up; this reads them, and turns the history into something a
-// person can search rather than a wall they scroll past.
-//
-// The underground market has since moved out to a page of its own. A price is
-// not an account — it is a reason to go somewhere — and somebody checking
-// whether moonshine is worth moving today is not doing bookkeeping. What is
-// left here is what the player owes, owns and earns, and what they did.
-//
-// The breakdown of the day's costs stays, because that is genuinely owed money,
-// but it folds away: it is the detail behind a figure that is already on the
-// page twice, and open by default it pushed the history below the fold.
-
-const money = (n: number) => (n < 0 ? '−$' : '$') + Math.abs(Math.floor(n)).toLocaleString();
+// Public history remains searchable here; the city account slip owns finances.
 const time = (m: number) =>
   `Day ${Math.floor(m / 1440) + 1} · ${String(Math.floor((m % 1440) / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
 
@@ -47,7 +32,6 @@ export function LedgerScreen({
   actions?: Action[];
   render?: (a: Action) => ReactElement;
 }) {
-  const b = world.books;
   const [query, setQuery] = useState('');
   const [kind, setKind] = useState<string | null>(null);
   const [showAll, setShowAll] = useState(false);
@@ -76,92 +60,9 @@ export function LedgerScreen({
 
   return (
     <section className="section-content">
-      <div className="eyebrow">ACCOUNTS &amp; CONSEQUENCES</div>
+      <div className="eyebrow">PRIVATE MEMORANDA</div>
       <h1 className="screen-title">The ledger</h1>
 
-      {b && (
-        <div className="books">
-          <div className="books-figures">
-            <div>
-              <span>Coming in</span>
-              <b className="good">{money(b.income)}</b>
-              <small>
-                a day from {b.holdings} {b.holdings === 1 ? 'business' : 'businesses'}
-              </small>
-            </div>
-            <div>
-              <span>Going out</span>
-              <b className="bad">{money(b.costs)}</b>
-              <small>a day, every day</small>
-            </div>
-            <div>
-              <span>Net</span>
-              <b className={b.net < 0 ? 'bad' : 'good'}>{money(b.net)}</b>
-              <small>{b.net < 0 ? 'you are losing money' : 'a day to the good'}</small>
-            </div>
-            <div>
-              <span>On hand</span>
-              <b>{money(b.cash)}</b>
-              <small>
-                {b.sheltered > 0
-                  ? `${money(b.sheltered)} a fine cannot reach`
-                  : 'all of it reachable'}
-              </small>
-            </div>
-            {b.lent > 0 && (
-              <div>
-                <span>Out on the street</span>
-                <b>{money(b.lent)}</b>
-                <small>{money(b.owed)} due back</small>
-              </div>
-            )}
-            {b.offshore > 0 && (
-              <div>
-                <span>Outside the city</span>
-                <b>{money(b.offshore)}</b>
-                <small>survives you</small>
-              </div>
-            )}
-          </div>
-          {/* What is already unpaid, above the breakdown, because the day's
-              costs are what is owed and this is where it has already gone
-              wrong. Wages are the last thing the night gives up and the only
-              one with people on the other side of it: a week of this and
-              somebody stops coming in, and nobody new takes the job until it
-              is paid. */}
-          {!!b.behind?.length && (
-            <ul className="books-behind" aria-label="Premises behind on wages">
-              {b.behind.map(w => (
-                <li key={w.id} className={w.shut ? 'warning shut' : 'warning'}>
-                  <b>{w.place}</b>
-                  <small>
-                    {w.nights === 1 ? 'one night unpaid' : w.nights + ' nights unpaid'}
-                    {w.shut
-                      ? ' · nobody will take the job until it is paid'
-                      : ' · ' + w.hands + ' of ' + w.positions + ' still coming in'}
-                  </small>
-                </li>
-              ))}
-            </ul>
-          )}
-          <details className="books-lines">
-            <summary>What the {money(b.costs)} a day is</summary>
-            <ul>
-              {b.lines.map(l => (
-                <li key={l.label}>
-                  <b>{l.label}</b>
-                  {l.detail && <small>{l.detail}</small>}
-                  <i>{money(l.amount)}</i>
-                </li>
-              ))}
-              <li className="total">
-                <b>Every day</b>
-                <i>{money(b.costs)}</i>
-              </li>
-            </ul>
-          </details>
-        </div>
-      )}
 
       {!!render && actions.length > 0 && (
         <section className="anywhere-strip" aria-label="What you can do about your attention">

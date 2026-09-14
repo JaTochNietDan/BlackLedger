@@ -62,3 +62,7 @@ Visual-agent deliverables (project requirements retained; no longer Codex produc
 - Browser visual QA at practical desktop and compact sizes, and motion controls/reduced-motion behavior.
 
 The isolated casino study is an asset test, not completion of the neighborhood requirement. Do not shrink the gameplay goal to an art demo. Keep implementation and validation records in DEVELOPMENT.md and commit coherent changes in this independent repository.
+
+## September 13 follow-up — personal HUD and travel continuity
+
+The user requests removal of redundant City navigation/briefing, a period-styled player identity, matching camera controls and latest-result treatment, no hover flash or clipped outcome, and separation of income/expenses from Ledger into persistent city accounts. Travel should visibly advance the clock at its playback pace, automatically zoom/follow the player, and return the camera to the player outside after leaving an interior. Implemented desktop checks are recorded in DEVELOPMENT.md; this does not close the broader production game goal.

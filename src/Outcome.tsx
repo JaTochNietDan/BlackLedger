@@ -1,11 +1,7 @@
 import {useEffect, useRef, useState} from 'react';
 import type {Snapshot, Record as CityRecord} from './types';
 
-// The result of an action was a strip along the bottom of the screen, below
-// the fold, in the place a page puts a status bar. It is not a status: it is
-// the answer to the thing the player just decided, and it is the only reason
-// they pressed the button. It belongs at the top of whatever pane they pressed
-// it in, where their eye already is.
+// A compact paper entry reports the committed result over the persistent city.
 
 const weight = (r: CityRecord) =>
   ({death: 6, danger: 5, intel: 4, politics: 3, story: 2, personal: 1})[r.kind] ?? 0;
@@ -48,7 +44,7 @@ export function Outcome({world, onLedger}: {world: Snapshot; onLedger: () => voi
   if (!result || (!records.length && !result.action)) {
     return (
       <section className="outcome-band empty" aria-hidden="true">
-        <span className="eyebrow">WHAT YOU DID</span>
+        <span className="eyebrow">LATEST ENTRY</span>
         <b className="outcome-idle">Nothing yet. The clock is paused.</b>
       </section>
     );
@@ -89,7 +85,7 @@ export function Outcome({world, onLedger}: {world: Snapshot; onLedger: () => voi
     >
       <div className="outcome-line">
         <div className="outcome-did">
-          <span className="eyebrow">WHAT YOU DID</span>
+          <span className="eyebrow">LATEST ENTRY</span>
           <b>{result.action || 'Time passed'}</b>
         </div>
         {moved.length > 0 && (

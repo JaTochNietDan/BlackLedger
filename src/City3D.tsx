@@ -59,6 +59,7 @@ type Props = {
   busy: boolean;
   activeCue: VisualCue | null;
   onJourneyDone: () => void;
+  onJourneyProgress?: (progress: number) => void;
   onSceneDone?: (id: string) => void;
 };
 type Actor = {
@@ -160,8 +161,8 @@ export function City3D(props: Props) {
   const controlsRef = useRef<OrbitControls | null>(null);
   const focus = useRef<(id?: string) => void>(() => {});
   const [expanded, setExpanded] = useState(false);
-  const [following, setFollowing] = useState(false);
-  const followPlayer = useRef(false);
+  const [following, setFollowing] = useState(true);
+  const followPlayer = useRef(true);
   const setFollow = (value: boolean) => { followPlayer.current = value; setFollowing(value); };
   const [status, setStatus] = useState('Loading Bellwether…');
   const [failure, setFailure] = useState('');
@@ -712,6 +713,9 @@ export function City3D(props: Props) {
       worldID = '',
       previous: Snapshot | null = null,
       journeyKey = '',
+      reportedJourneyProgress = -1,
+      wasFollowing = false,
+      followZoom: number | null = null,
       motionWas = true;
     let lastActive: string | null = null;
     let completedJourney = '';
@@ -1116,6 +1120,8 @@ export function City3D(props: Props) {
           : '';
         if (key !== journeyKey || motion !== motionWas) {
           journeyKey = key;
+          reportedJourneyProgress = -1;
+          if (p.journey) { setFollow(true); followZoom = 8; }
           const here = lots.get(w.player.location);
           if (here && w.player.alive) {
             const from = p.journey ? lots.get(p.journey.from.id) : undefined;
@@ -1275,6 +1281,10 @@ export function City3D(props: Props) {
         }
         playerRing.visible = !!actors.get('player')?.object.visible;
         const arrival = placements.get('player');
+        if (p.journey && arrival) {
+          const progress = Math.floor(THREE.MathUtils.clamp(arrival.progress, 0, 1) * Math.max(1, p.journey.minutes)) / Math.max(1, p.journey.minutes);
+          if (progress !== reportedJourneyProgress) { reportedJourneyProgress = progress; p.onJourneyProgress?.(progress); }
+        }
         if (
           p.journey &&
           completedJourney !== journeyKey &&
@@ -1508,9 +1518,17 @@ export function City3D(props: Props) {
       controls.enableDamping = motion;
       controls.update();
       const followed = actors.get('player');
+      if (followPlayer.current && !wasFollowing) followZoom = 8;
+      wasFollowing = followPlayer.current;
       if (followPlayer.current && ready && followed?.object.visible) {
-        const dx = followed.object.position.x - controls.target.x;
-        const dz = followed.object.position.z - controls.target.z;
+        const ease = motion ? 1 - Math.exp(-Math.min(dt, 100) / 170) : 1;
+        const dx = (followed.object.position.x - controls.target.x) * ease;
+        const dz = (followed.object.position.z - controls.target.z) * ease;
+        if (followZoom !== null) {
+          camera.zoom += (followZoom - camera.zoom) * ease;
+          if (Math.abs(followZoom - camera.zoom) < .005) followZoom = null;
+          camera.updateProjectionMatrix();
+        }
         camera.position.x += dx; camera.position.z += dz;
         controls.target.x += dx; controls.target.z += dz;
       }

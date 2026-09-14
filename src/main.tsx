@@ -1,3 +1,4 @@
+import {CityAccounts} from './CityAccounts';
 import {SceneNewspaper} from './SceneNewspaper';
 import {MapMenu} from './MapMenu';
 import './mapFirst.css';
@@ -115,6 +116,7 @@ function App() {
     }
   });
   const [journey, setJourney] = useState<Journey | null>(null);
+  const [journeyProgress, setJourneyProgress] = useState(0);
   // The moment the city thought was worth taking the player to.
   const [playing, setPlaying] = useState<VisualCue | null>(null);
   // How far through the moment the camera is holding on. Driven by the theatre,
@@ -309,6 +311,7 @@ function App() {
         if (from && to && from.id !== to.id) {
           setTab('city');
           setCityView('iso');
+          setJourneyProgress(0);
           setJourney({
             from,
             to,
@@ -756,104 +759,7 @@ function App() {
       return (
         <div className={'workspace city-workspace' + (inside ? ' inside' : '')}>
           <section className="city-pane">
-            <details className="map-briefing"><summary>City briefing</summary><header className="city-header">
-              <div className="map-heading">
-                <div className="eyebrow">THE CITY OF</div>
-                <h1>Bellwether</h1>
-                <p>A place to make your name. Or lose it.</p>
-                <div className="chapter-chip">
-                  {p.respect < 6
-                    ? 'I · A FOOT IN THE DOOR'
-                    : p.crew.length
-                      ? 'II · SOMETHING OF YOUR OWN'
-                      : 'I · MAKING CONNECTIONS'}
-                </div>
-              </div>
-              <div className="city-view-switch">
-                <button
-                  aria-pressed={cityView === 'iso'}
-                  onClick={() => {
-                    setCityView('iso');
-                    try {
-                      localStorage.setItem('black-ledger-view', 'iso');
-                    } catch {}
-                  }}
-                >
-                  The city
-                </button>
-                <button
-                  className="enter"
-                  aria-pressed={cityView === 'interior'}
-                  onClick={() => {
-                    setSelected(p.location);
-                    setCityView('interior');
-                  }}
-                >
-                  Step inside {w.locations.find(l => l.id === p.location)?.name}
-                </button>
-              </div>
-              <div className="map-key">
-                {!w.known_threats?.length && w.opportunity && (
-                  <button
-                    className="next-opportunity"
-                    title={w.opportunity.detail}
-                    onClick={() => {
-                      setSelected(w.opportunity!.target);
-                      setCityView('iso');
-                    }}
-                  >
-                    <small>AN OPPORTUNITY</small>
-                    {w.opportunity.title} ↗
-                  </button>
-                )}
-              </div>
-            </header>
-            {!scenePending && unreadNews > 0 && !!w.newspaper?.length && (
-              <section className="headline-notice" role="status" aria-label="Latest news">
-                <small>THE BELLWETHER HERALD · DAY {headline.day}</small>
-                <strong>{headline.headline}</strong>
-                <p>{headline.body}</p>
-                <button className="plain" onClick={() => setTab('news')}>
-                  Read today's paper ({unreadNews}) ↗
-                </button>
-              </section>
-            )}
-            {!!w.grudges?.length && (
-              <section className="known-threats" aria-label="What people are saying">
-                <strong>Bad blood</strong>
-                {w.grudges.map((g, i) => (
-                  <p key={i}>
-                    {g.holder} has not forgiven {g.against} for {g.because}.
-                  </p>
-                ))}
-              </section>
-            )}
-            {!!w.commissions?.length && (
-              <section className="known-threats" aria-label="Work you have taken on">
-                <strong>What you owe people</strong>
-                {w.commissions.map(c => (
-                  <p key={c.id}>
-                    <b>
-                      {c.giver} · {c.patron}
-                    </b>{' '}
-                    — {c.brief} <i>{c.met ? 'Ready to settle.' : c.progress}</i> {money(c.pay)} ·{' '}
-                    {Math.round(c.minutes_left / 60)}h left
-                  </p>
-                ))}
-              </section>
-            )}
-            {!!w.known_threats?.length && (
-              <section className="known-threats" aria-label="Known threats">
-                <strong>Word on the street</strong>
-                {w.known_threats.map((threat, i) => (
-                  <p key={i}>{threat}</p>
-                ))}
-                <button className="plain" onClick={() => setTab('families')}>
-                  Consider negotiations ↗
-                </button>
-              </section>
-            )}
-            </details><div className="city-stage">
+            <div className="city-stage">
               {inside&&<button className="map-leave-building" onClick={()=>setCityView('iso')}>Back to city ↗</button>}
               {inside && sceneOverlay}
               {cityView === 'interior' && locationInfo.id === p.location ? (
@@ -885,6 +791,7 @@ function App() {
                   activeCue={journey ? null : playing}
                   onSceneDone={setFinishedCue}
                   onJourneyDone={() => setJourney(null)}
+                  onJourneyProgress={setJourneyProgress}
                   selected={selected}
                   onSelect={setSelected}
                   onTravel={id => commit({kind: 'travel', target: id})}
@@ -1115,6 +1022,43 @@ function App() {
       );
     return (
       <section className="section-content help">
+        {w.opportunity && <section className="card"><h2>{w.opportunity.title}</h2><p>{w.opportunity.detail}</p><button onClick={()=>{setSelected(w.opportunity!.target);setTab('city');setCityView('iso');}}>Find the address ↗</button></section>}
+            {!!w.grudges?.length && (
+              <section className="known-threats" aria-label="What people are saying">
+                <strong>Bad blood</strong>
+                {w.grudges.map((g, i) => (
+                  <p key={i}>
+                    {g.holder} has not forgiven {g.against} for {g.because}.
+                  </p>
+                ))}
+              </section>
+            )}
+            {!!w.commissions?.length && (
+              <section className="known-threats" aria-label="Work you have taken on">
+                <strong>What you owe people</strong>
+                {w.commissions.map(c => (
+                  <p key={c.id}>
+                    <b>
+                      {c.giver} · {c.patron}
+                    </b>{' '}
+                    — {c.brief} <i>{c.met ? 'Ready to settle.' : c.progress}</i> {money(c.pay)} ·{' '}
+                    {Math.round(c.minutes_left / 60)}h left
+                  </p>
+                ))}
+              </section>
+            )}
+            {!!w.known_threats?.length && (
+              <section className="known-threats" aria-label="Known threats">
+                <strong>Word on the street</strong>
+                {w.known_threats.map((threat, i) => (
+                  <p key={i}>{threat}</p>
+                ))}
+                <button className="plain" onClick={() => setTab('families')}>
+                  Consider negotiations ↗
+                </button>
+              </section>
+            )}
+
         <div className="eyebrow">WHERE YOU STAND</div>
         <h1 className="screen-title">What you can do, and what you cannot yet</h1>
         <p className="subtle">
@@ -1158,7 +1102,6 @@ function App() {
             <span>B</span>
           </div>
           {[
-            ['city', 'City'],
             ['crew', 'People'],
             ['families', 'Families'],
             ['market', 'Market'],
@@ -1197,10 +1140,7 @@ function App() {
         </nav>
         <main className="page">
           <header className="topbar" inert={tab!=='city'}>
-            <div className="hud-brand">
-              <div className="eyebrow">A CITY REMEMBERS</div>
-              <div className="brand">BLACK LEDGER</div>
-            </div>
+            <div className="hud-identity" aria-label={`Playing as ${p.name}`}><Portrait id={p.name} face={p.face} size="small"/><div><small>Bellwether · Life {world.life}</small><strong>{p.name}</strong><span>{p.crew.length ? "Crew leader" : p.respect < 6 ? "An unknown face" : "Neighborhood operator"}</span></div></div>
             <div className="stats">
               {(world.dashboard || []).map(s => (
                 <div className={'stat' + (s.warn ? ' warning' : '')} key={s.id} title={s.meaning}>
@@ -1213,13 +1153,14 @@ function App() {
                 </div>
               ))}
               <div className="stat clock">
-                <b>{time(world.minute)}</b>
-                <small>{busy ? 'Resolving…' : 'Clock paused · awaiting your action'}</small>
+                <b>{time(journey ? world.minute - journey.minutes + Math.round(journey.minutes * journeyProgress) : world.minute)}</b>
+                <small>{journey ? (journey.driving ? 'Driving through Bellwether' : 'Walking through Bellwether') : busy ? 'Resolving…' : 'Clock paused · awaiting your action'}</small>
               </div>
             </div>
           </header>
+          <CityAccounts world={world}/>
           <div className="map-main-scene" inert={tab!=='city'}>{content('city')}</div>
-          {!scenePending && <div className="map-outcome"><Outcome world={world} onLedger={() => setTab('ledger')} /></div>}
+          {!scenePending && !journey && <div className="map-outcome"><Outcome world={world} onLedger={() => setTab('ledger')} /></div>}
           {tab!=='city'&&<MapMenu edition={tab} title={({crew:'People',families:'Families',market:'Market',ledger:'Ledger',news:'The Bellwether Herald',settings:'Settings',help:'Guide'} as Record<string,string>)[tab]||tab} onClose={()=>setTab('city')}>{content()}</MapMenu>}
         </main>
       </div>

@@ -55,3 +55,31 @@
 .map-first .city3d-directory {color:#e2d0aa;font:10px Georgia,serif;text-shadow:0 1px 3px #000}
 .map-first .city3d-directory select {background:#d9c59f;color:#40301d;border:1px solid #8b7149;font:11px Georgia,serif;padding:5px 8px;border-radius:0}
 .map-first .map-outcome .outcome-band.empty {display:none}
+/* Personal papers stay legible over the city, without application chrome. */
+.map-first .hud-identity{display:flex;align-items:center;gap:10px;flex:0 0 220px;padding:7px 12px;background:var(--newsprint),#e7d6b5;color:#372d20;border-block:3px double #92764e;box-shadow:2px 3px 0 #8e7858,0 6px 16px #0005;min-width:0}
+.hud-identity .portrait{width:42px;height:48px;flex-shrink:0;border:1px solid #8d7856;filter:sepia(.25)}
+.hud-identity>div{min-width:0}.hud-identity small,.hud-identity span{display:block;font:9px Georgia,serif;color:#715a3b}.hud-identity strong{display:block;font:20px/1.12 Georgia,serif;margin:3px 0;overflow-wrap:anywhere}
+.shell.map-first .rail button{transition:color .12s,box-shadow .12s;background-color:#dac69e;background-image:var(--newsprint)}
+.shell.map-first .rail button:hover:not(:disabled),.shell.map-first .rail button.active{background-image:var(--newsprint);background-color:#efdfbd}
+.map-first .city3d-tools{padding:4px;gap:0;background:var(--newsprint),#d9c59f;border-block:3px double #92764e;box-shadow:2px 3px 0 #8e7858}
+.map-first .city3d-tools button{background:transparent;color:#49371f;border:0;border-right:1px solid #a88c62;box-shadow:none;padding:7px 11px;font:11px Georgia,serif;transition:color .12s,box-shadow .12s}
+.map-first .city3d-tools button:last-child{border-right:0}.map-first .city3d-tools button:hover:not(:disabled),.map-first .city3d-tools button[aria-pressed=true]{background:#bfaa81;color:#2d2518;box-shadow:inset 0 -2px #87402e}
+.map-first .map-outcome{left:auto;right:24px;bottom:64px;transform:none;width:min(620px,calc(100vw - 400px));max-width:none;max-height:calc(100dvh - 230px);overflow:auto}
+.map-first .outcome-band{padding:14px 18px;background:var(--newsprint),#e7d8b9;color:#382d1f;border:0;border-block:3px double #967a50;box-shadow:0 4px 14px #0005}
+.map-first .outcome-line{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px 16px;align-items:start}
+.map-first .outcome-did{max-width:none;min-width:0;padding-left:10px;grid-column:1/-1;border-left-color:#947346}
+.map-first .outcome-did .eyebrow{font:8px Georgia,serif;color:#7d603a;letter-spacing:.18em;margin-bottom:4px}
+.map-first .outcome-did b{font:19px/1.2 Georgia,serif;overflow-wrap:anywhere}
+.map-first .outcome-figures{grid-column:1/-1;gap:5px 16px}.map-first .outcome-figures small{color:#705a3b}.map-first .outcome-figures li.good b{color:#4e6139}.map-first .outcome-figures li.bad b{color:#963e2d}
+.map-first .outcome-said{padding:0;border:0;min-width:0}.map-first .outcome-said b{font:14px/1.25 Georgia,serif}.map-first .outcome-said span,.map-first .outcome-rest li p{color:#715d40}
+.map-first .outcome-tools{flex-wrap:wrap;justify-content:flex-end;gap:6px}.map-first .outcome-tools .plain{background:transparent;color:#49371f;border:1px solid #9c825b;font:11px Georgia,serif;padding:6px 8px}.map-first .outcome-tools .plain:hover{background:#d0ba92}
+.map-first .outcome-rest{border-color:#a08760}.map-first .outcome-rest li{border-color:#b4a17c}
+.city-accounts{position:absolute;z-index:5;left:94px;top:100px;width:280px;background:var(--newsprint),#e5d4b2;color:#3d301f;border-block:3px double #91734d;box-shadow:2px 3px 0 #8e7858;font:11px Georgia,serif}
+.city-accounts summary{cursor:pointer;display:grid;grid-template-columns:repeat(3,1fr);padding:8px 12px;gap:5px 10px}.city-accounts summary>span:first-child{grid-column:1/-1;text-transform:uppercase;font-size:9px;letter-spacing:.13em}.city-accounts summary>span:first-child:after{content:' ＋';float:right}.city-accounts[open] summary>span:first-child:after{content:' −'}.city-accounts summary b{display:block;font:16px Georgia,serif;margin-top:2px}
+.city-accounts .books{padding:12px;margin:0;max-height:calc(100dvh - 280px);overflow:auto;color:#3d301f}.city-accounts .books-figures{display:grid;grid-template-columns:1fr 1fr;gap:12px}.city-accounts .books-figures b{font-size:20px}.city-accounts small,.city-accounts .books-lines{color:#705a3b}.city-accounts .good{color:#4e6139}.city-accounts .bad{color:#963e2d}.city-accounts .books-lines summary{display:block;padding:10px 0}
+@media(max-width:1100px){.map-first .hud-identity{flex-basis:185px;padding:6px 9px}.hud-identity strong{font-size:17px}.hud-identity .portrait{width:34px;height:43px}.city-accounts{width:245px}.map-first .city3d-tools button{padding:7px 8px}}
+@media(max-width:800px){.map-first .hud-identity{flex-basis:150px;gap:6px}.hud-identity .portrait{display:none}.hud-identity strong{font-size:17px}.city-accounts{left:72px;top:136px;width:210px}.map-first .city3d-tools{max-width:calc(100vw - 310px);flex-wrap:wrap;justify-content:flex-end}.map-first .map-outcome{right:12px;bottom:64px;width:min(440px,calc(100vw - 90px));max-height:45dvh}.map-first .outcome-line{grid-template-columns:minmax(0,1fr)}.map-first .outcome-tools{justify-content:flex-start}}
+.city-accounts{--muted:#715d40;--ink:#3d301f;--red:#963e2d;--line:#b3a07b}
+.city-accounts .books{display:block}.city-accounts .books-figures>div{background:transparent;border:0;border-bottom:1px solid #b3a07b;padding:0 0 10px;min-width:0}.city-accounts .books-figures b.good{color:#4e6139}.city-accounts .books-figures b.bad{color:#963e2d}.city-accounts .books-lines{margin-top:12px}.city-accounts .books-lines li{border-color:#b3a07b}
+
+.city-accounts .books-lines summary{color:#715332;letter-spacing:.08em}.city-accounts .books-lines summary:hover{color:#302719}
