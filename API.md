@@ -880,3 +880,12 @@ occupants remain in the complete person list. Seating, entrance motion, camera
 orbit/zoom/pan, and cutaway walls are presentation only; they do not assign homes,
 advance time or change action availability. The room does not yet illustrate
 purchased house fixtures or stage residential assaults inside it.
+
+Poker's 3D presentation now seats only the public `cards.seats` participants,
+using matching public presence faces when available, plus the current player.
+Cards deal round-robin from a common deck position; new board cards slide in and
+newly public showdown cards turn over against a physical back face. No private
+card is inferred. Folded hands leave the 3D felt; the public text summary remains
+available. A restored sitting opens settled, while a new hand animates. The
+motion setting and reduced-motion preference settle the presentation immediately.
+These effects do not delay or compute any gameplay command or payout.

@@ -1191,6 +1191,7 @@ function App() {
       {playing&&sceneArticle&&!event&&<SceneNewspaper key={`${playing.id}:${sceneReplay.current}`} article={sceneArticle} visible={newspaperVisible} voice={voice} onClose={()=>{setPlaying(null);setTab('city');}}/>}
       {atTable && inTheBackRoom && !event && p.alive && (
         <BackRoomScene
+          player={p} motion={motion} people={world.locations.find(l => l.id === p.location)?.people || []}
           place={world.locations.find(l => l.id === p.location)?.name || 'the back room'}
           cards={world.cards ?? null}
           seat={(world.locations.find(l => l.id === p.location)?.actions || []).find(

@@ -1180,3 +1180,31 @@ Evidence:
 
 Other requested interiors, richer poker cast/dealing, expanded residential map,
 additional progression income and integrated campaign acceptance remain open.
+
+## September 14 — poker cast and public card movement
+
+Added seated poker participants using the existing locally authored rigs and
+chairs, with public presence costumes, plus the player's foreground seat.
+Adjusted the close camera after browser inspection found clipped opponent heads.
+Added a pure public-state animation plan: round-robin initial deal, new board
+cards, and physical-backed showdown flips. Unchanged cards remain settled;
+folded hands leave the felt; new hands discard old exposed cards. Restored games
+never replay a deal. Starting from the empty sitting passes an explicit initial
+deal flag through the newly mounted hand component. Motion-off/reduced-motion
+settles immediately; idle presentation does not force continuous rendering.
+
+Evidence: `npm test` passed all 351 tests (`.runtime/poker-cast-tests.log`),
+including new privacy, round-robin ordering, flop-only movement, reveal, folded
+hand removal, new-hand and motion-off plan checks. `npm run build` passes
+(`.runtime/poker-cast-build.log`). Fresh isolated poker fixture
+`.runtime/poker-cast-20260914.sqlite3`, port 8937: browser played through flop,
+turn, river and showdown, then dealt hand 2. Four actors followed the actual
+roster change. During turn and showdown, `data-poker.dealing` was true; exposed
+card counts stayed zero until showdown and returned to zero next hand. Reload
+of hand 2 showed `dealing:false` with the saved cards. Desktop 1280×720 and compact
+820×740 screenshots reviewed; player cards remain unobstructed, public hand
+summary available, opponent heads included. No main-save QA mutation.
+
+Still incomplete: a physical dealer-hand/chip-pushing performance, richer poker
+room dressing, more expressive/anatomically detailed character models, all other
+requested interiors, housing expansion and remaining progression/campaign work.

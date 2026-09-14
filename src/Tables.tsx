@@ -903,11 +903,16 @@ export interface CardsState {
 // which is the whole of what there is to go on, because nobody changes a card
 // in this game and everybody can see the same five.
 export function BackRoom({
+  player,people,motion,animateOnMount,
   cards,
   money,
   cash,
   act,
 }: {
+  player?:Pick<Person,"name"|"face"|"alive">;
+  people?:Presence[];
+  motion?:boolean;
+  animateOnMount?:boolean;
   cards: CardsState;
   money: (n: number) => string;
   cash: number;
@@ -928,7 +933,7 @@ export function BackRoom({
           {cards.hands > 1 ? ` · hand ${cards.hands}` : ''}
         </i>
       </div>
-      <PokerTable3D cards={cards}/>
+      <PokerTable3D animateOnMount={animateOnMount} player={player} people={people} motion={motion} cards={cards}/>
       <div className="baize poker-summary">
         {cards.seats.map(s => (
           <div key={s.who} className={'seat player-seat' + (s.folded ? ' folded' : '')}>

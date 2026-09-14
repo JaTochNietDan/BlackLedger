@@ -3,7 +3,7 @@ import {PokerTable3D} from './PokerTable3D';
 import {BackRoom} from './Tables';
 import type {CardsState} from './Tables';
 import {playTable, roomTone} from './sound';
-import type {Action} from './types';
+import type {Action,Person,Presence} from './types';
 
 // The room behind the poolhall takes the screen.
 //
@@ -24,8 +24,11 @@ export function BackRoomScene({
   cash,
   money,
   act,
-  onLeave,
+  onLeave, player, people, motion,
 }: {
+  player:Pick<Person,"name"|"face"|"alive">;
+  people:Presence[];
+  motion:boolean;
   place: string;
   // The hand on the table, or nothing when the player has taken a seat and not
   // bought in yet — which is a real state: you can sit down and look at the
@@ -39,6 +42,7 @@ export function BackRoomScene({
   act: (command: {kind: string; choice?: string; amount?: number}) => void;
   onLeave: () => void;
 }) {
+  const enteredWithoutHand=useRef(cards===null);
   const dealt = !!cards && !cards.done;
 
   // The room behind the poolhall, out loud. It was the one table in the game
@@ -114,9 +118,9 @@ export function BackRoomScene({
         </header>
 
         {cards ? (
-          <BackRoom cards={cards} money={money} cash={cash} act={act} />
+          <BackRoom animateOnMount={enteredWithoutHand.current} player={player} people={people} motion={motion} cards={cards} money={money} cash={cash} act={act} />
         ) : (
-          <div className="back-room-empty"><PokerTable3D cards={null}/>
+          <div className="back-room-empty"><PokerTable3D player={player} people={people} motion={motion} cards={null}/>
             <p>
               Two cards each and five on the table. There is no house in this game: the pot is what
               everybody put in, and it goes to the best hand at the table.
