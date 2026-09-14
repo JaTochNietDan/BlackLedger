@@ -1,3 +1,4 @@
+import {InteriorArrival} from './interiorArrival';
 import {CounterWipe} from './interiorService';
 import {InteriorCastBatch} from './interiorCastBatch';
 import {placementsForInterior,interiorPlayerSpot,poseInteriorOccupant,type InteriorPlace} from './interiorStaging';
@@ -53,6 +54,7 @@ export function Interior3D(props:{place:InteriorPlace;motion:boolean;player:Pick
   }).catch(()=>{if(!dead)setStatus('The 3D room could not load. The people and actions below remain available.');});
   let service:CounterWipe|undefined,cloth:THREE.Group|undefined,serviceSeconds=0;
   let castBatch:InteriorCastBatch|undefined;
+  let arrival:InteriorArrival|undefined,arrivalSeconds=0,arriving=false;
   let roster='',presentation='';
   const pick=new THREE.Raycaster();const pointer=new THREE.Vector2();let down={x:0,y:0};
   const press=(event:PointerEvent)=>{down={x:event.clientX,y:event.clientY};};
@@ -89,7 +91,7 @@ export function Interior3D(props:{place:InteriorPlace;motion:boolean;player:Pick
     camera.position.add(controls.target.clone().sub(before));dirty=true;
    }
    const key=JSON.stringify([p.people.map(w=>[w.id,w.face,w.role]),[p.player.name,p.player.face,p.player.alive]]);
-   if(models.size===modelNames.length&&key!==roster){roster=key;dirty=true;service=undefined;cloth?.removeFromParent();cloth=undefined;castBatch?.dispose();actors.forEach(a=>scene.remove(a));actors.clear();costumes.forEach(m=>m.dispose());costumes=[];
+   if(models.size===modelNames.length&&key!==roster){roster=key;dirty=true;arrival=undefined;service=undefined;cloth?.removeFromParent();cloth=undefined;castBatch?.dispose();actors.forEach(a=>scene.remove(a));actors.clear();costumes.forEach(m=>m.dispose());costumes=[];
     const placements=placementsForInterior(p.place,p.people);
     p.people.forEach(who=>{
      const spot=placements.get(who.id);if(!spot)return;
@@ -105,14 +107,22 @@ export function Interior3D(props:{place:InteriorPlace;motion:boolean;player:Pick
      const spot=interiorPlayerSpot(p.place);poseInteriorOccupant(object,spot);
      object.userData.spot=spot.id;object.userData.person='player';
      object.traverse(o=>{if(o instanceof THREE.Mesh){o.castShadow=true;o.receiveShadow=true;}});
-     actors.set('player',object);scene.add(object);
+     actors.set('player',object);scene.add(object);arrival=new InteriorArrival(object,p.place);
+     if(!p.motion||reduced)arrivalSeconds=arrival.duration;
+     arriving=arrival.pose(arrivalSeconds);
     }
     if(!lobby){const bartender=[...actors.values()].find(a=>a.userData.spot==='service');if(bartender){
      service=new CounterWipe(bartender);if(service.available){cloth=models.get('bar-cloth')!.clone(true);cloth.traverse(o=>{if(o instanceof THREE.Mesh){o.castShadow=true;o.receiveShadow=true;}});scene.add(cloth);service.pose(serviceSeconds);cloth.position.copy(service.clothPosition);}
     }}
     castBatch=new InteriorCastBatch(actors);scene.add(castBatch.root);
    }
-   if(service?.available&&cloth&&p.motion&&!reduced&&!document.hidden){serviceSeconds+=Math.min(.05,Math.max(0,seconds));service.pose(serviceSeconds);cloth.position.copy(service.clothPosition);castBatch?.update();dirty=true;}
+   let poseChanged=false;
+   if(arrival&&arriving&&!document.hidden){
+    arrivalSeconds=!p.motion||reduced?arrival.duration:Math.min(arrival.duration,arrivalSeconds+Math.min(.05,Math.max(0,seconds)));
+    arriving=arrival.pose(arrivalSeconds);poseChanged=true;
+   }
+   if(service?.available&&cloth&&p.motion&&!reduced&&!document.hidden){serviceSeconds+=Math.min(.05,Math.max(0,seconds));service.pose(serviceSeconds);cloth.position.copy(service.clothPosition);poseChanged=true;}
+   if(poseChanged){castBatch?.update();dirty=true;}
    const playerActor=actors.get('player');playerMarker.visible=!!playerActor;
    if(playerActor){playerMarker.position.x=playerActor.position.x;playerMarker.position.z=playerActor.position.z;}
    const chosen=actors.get(p.picked);selected.visible=!!chosen;if(chosen){selected.position.x=chosen.position.x;selected.position.z=chosen.position.z;}
@@ -129,7 +139,7 @@ export function Interior3D(props:{place:InteriorPlace;motion:boolean;player:Pick
     renderer.render(scene,camera);renderedFrames++;dirty=false;
     if(models.size===modelNames.length)canvas.dataset.interior=JSON.stringify({place:p.place,people:[...actors.keys()],occupants:[...actors].map(([id,a])=>({id,spot:a.userData.spot,x:a.position.x,y:a.position.y,z:a.position.z})),picked:p.picked,
       drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,renderedFrames,
-      zoom:camera.zoom,service:service?.available?{seconds:serviceSeconds,cloth:service.clothPosition.toArray()}:undefined,omitted:Math.max(0,p.people.length-actors.size+(playerActor?1:0)),cutawayWalls:[...(!left?.visible?['left']:[]),...(!back?.visible?['back']:[])]});
+      zoom:camera.zoom,arrival:arrival?{seconds:arrivalSeconds,duration:arrival.duration,moving:arriving}:undefined,service:service?.available?{seconds:serviceSeconds,cloth:service.clothPosition.toArray()}:undefined,omitted:Math.max(0,p.people.length-actors.size+(playerActor?1:0)),cutawayWalls:[...(!left?.visible?['left']:[]),...(!back?.visible?['back']:[])]});
    }
   };frame=requestAnimationFrame(tick);
   return()=>{reduce.removeEventListener('change',reduction);unbindPan();dead=true;cancelAnimationFrame(frame);observer.disconnect();controls.removeEventListener('change',changed);controls.dispose();canvas.removeEventListener('keydown',keys);canvas.removeEventListener('pointerdown',press);canvas.removeEventListener('pointerup',release);castBatch?.dispose();disposeCityResources([scene,...models.values()]);renderer.dispose();renderer.forceContextLoss();canvas.remove();};

@@ -71,7 +71,7 @@ export function poseInteriorOccupant(actor:THREE.Group,spot:InteriorSpot) {
 
 // Reserved clear floor positions; these never displace a public occupant.
 export function interiorPlayerSpot(place:InteriorPlace):InteriorSpot {
- if(place==='room')return {id:'player-entry',x:1.3,z:3.15,yaw:Math.PI};
+ if(place==='room')return {id:'player-entry',x:1.6,z:3.15,yaw:Math.PI};
  return place==='mercercourt'
   ? {id:'player-entry',x:2,z:4.15,yaw:Math.PI}
   : {id:'player-entry',x:3.65,z:-.7,yaw:-Math.PI/2};
