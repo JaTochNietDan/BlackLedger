@@ -1,4 +1,4 @@
-import {CityBuildingDriveBy,buildingDriveByCondition} from './city3dBuildingDriveBy';
+import {CityBuildingDriveBy,buildingDriveByHit,buildingDriveByTarget,buildingDriveByCondition} from './city3dBuildingDriveBy';
 import {CityVillaExit} from './city3dVillaExit';
 import {CityAccident} from './city3dAccident';
 import {CityPlanter} from './city3dPlanter';
@@ -117,6 +117,8 @@ type Effect = {
   glazingBefore?:number;
   assassination?:CityAssassination;
   driveBy?:CityBuildingDriveBy;
+  driveByImpact?:THREE.Vector3|null;
+  driveByShot?:number;
   custody?:CityCustody;
   incendiary?:CityIncendiary;
   planter?:CityPlanter|CityVillaExit;
@@ -1315,17 +1317,20 @@ export function City3D(props: Props) {
           const fireBuilding=e.incendiary?buildings.get(e.cue.target):undefined;
           const fireWindows=fireBuilding?clearBlastWindows(fireBuilding):[];
           let stagedFlight:ReturnType<typeof incendiaryStagingFlight>=null;
+          let driveTarget:THREE.Vector3|null=null;
           e.slot = availableSceneSlot(lots.get(e.cue.target)!, e.accident?'accident':e.planter?'planter':e.assassination?'assassination':e.custody?'custody':e.cue.kind, occupied,entry,e.incendiary?slot=>{
             stagedFlight=fireBuilding?incendiaryStagingFlight(slot.root,e.incendiary!.release,fireWindows,fireBuilding):null;
             return stagedFlight!==null;
+          }:e.driveBy?slot=>{
+            driveTarget=entryBuilding?buildingDriveByTarget(entryBuilding,new THREE.Vector3(slot.root.x,vehicleRootHeight(slot.root),slot.root.z)):null;
+            return driveTarget!==null;
           }:undefined);
           if (e.slot) {
             e.extra.position.set(e.slot.root.x, (e.slot.model === 'parked-police'||e.driveBy) ? vehicleRootHeight(e.slot.root) : 0.2, e.slot.root.z);
             e.light.position.set(e.slot.root.x, 3, e.slot.root.z);
             e.since = now;
             if(e.driveBy){
-              const facade=entryBuilding?.userData.sightBounds as THREE.Box3|undefined;
-              e.driveBy.target.set(0,1.8,(facade?.min.z??e.slot.root.z+8)-e.slot.root.z);
+              e.driveBy.target.copy(driveTarget!).sub(e.extra.position);
               frameScene(camera,controls.target,new THREE.Box3(new THREE.Vector3(e.slot.root.x-13,0,e.slot.root.z-2),new THREE.Vector3(e.slot.root.x+14,3,e.slot.root.z+e.driveBy.target.z+1)));controls.update();
             }
             if(e.accident){
@@ -1586,6 +1591,17 @@ export function City3D(props: Props) {
             e.muzzle.getWorldPosition(muzzlePosition);
             e.light.position.copy(muzzlePosition);
           }
+          if(e.driveBy&&blastBuilding){
+            const shotIndex=e.driveBy.shots.filter(beat=>t*3>=beat).length;
+            if(shotIndex>0&&e.driveByShot!==shotIndex){
+              e.driveByShot=shotIndex;
+              // Sample the actual muzzle at the beat, even on a delayed frame.
+              e.driveBy.update(e.driveBy.shots[shotIndex-1]);
+              const origin=e.muzzle!.getWorldPosition(new THREE.Vector3());
+              e.driveByImpact=buildingDriveByHit(blastBuilding,origin,e.driveBy.root.localToWorld(e.driveBy.target.clone()));
+              e.driveBy.update(t*3);
+            }
+          }
           const casualty = e.cue.kind === 'killing';
           if (casualty && e.extra) {
             const fall = casualtyFall(t);
@@ -1661,10 +1677,10 @@ export function City3D(props: Props) {
             }
             if(e.driveBy&&j>=2){
               const beat=[...e.driveBy.shots].reverse().find(at=>t*3>=at),age=beat===undefined?-1:t*3-beat;
-              const hit=e.driveBy.root.localToWorld(e.driveBy.target.clone());
+              const hit=e.driveByImpact??e.driveBy.root.localToWorld(e.driveBy.target.clone());
               const drift=Math.max(0,age);
               tmp.position.set(hit.x+Math.cos(a)*drift*.7,hit.y+Math.sin(a)*drift*.45+.25*drift,hit.z-.12-drift*(.35+(j%4)*.1));
-              tmp.scale.setScalar(age>=0&&age<.48?(.07+(j%3)*.025)*(1-age/.48):.001);
+              tmp.scale.setScalar(e.driveByImpact&&age>=0&&age<.48?(.07+(j%3)*.025)*(1-age/.48):.001);
             }
             if (police) {
               // A period rotating red roof beacon, rather than sparks around the car.
@@ -1961,7 +1977,7 @@ export function City3D(props: Props) {
           doors:[...buildings].flatMap(([id,b])=>{const door=b.getObjectByName('entrance-door-hinge');return door?[{id,angle:door.rotation.y}]:[];}),
           effects: effects.map(e => ({
             id: e.cue.id, kind: e.cue.kind, target: e.cue.target,
-            driveBy:e.driveBy?{seconds:(now-e.since)/1000,car:e.driveBy.car.getWorldPosition(new THREE.Vector3()),shots:e.audio?.started}:undefined,
+            driveBy:e.driveBy?{seconds:(now-e.since)/1000,car:e.driveBy.car.getWorldPosition(new THREE.Vector3()),shots:e.audio?.started,target:e.driveBy.root.localToWorld(e.driveBy.target.clone()),impact:e.driveByImpact}:undefined,
             accident:e.accident?{fatal:e.accident.fatal,seconds:(now-e.since)/1000,rotation:e.accident.actor.rotation.x}:undefined,
             staged: !e.extra || e.extra.visible, x: e.slot?.root.x, z: e.slot?.root.z,
             reservation:e.slot?{model:e.slot.model,authored:e.slot.pose,admitted:traffic.placement(`scene:${e.cue.id}`)?.pose}:undefined,

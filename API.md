@@ -637,9 +637,11 @@ Building drive-by debug preview uses a private Packard/Thompson cast without
 changing campaign condition. Material wear and glazing reveal the captured
 condition loss across the firing beats; before firing they show the recorded
 starting condition. Scene completion or cancellation restores the current
-snapshot's condition (including undoing private preview damage). Verified facade
-targets across buildings, recorded-result news sequencing and actual command
-acceptance remain required before exposing the gameplay action.
+snapshot's condition (including undoing private preview damage). Aim points and
+impacts use the first visible authored building surface along a ray, rather
+than its bounding box; shot impacts sample the muzzle at the firing beat.
+Recorded-result news sequencing and actual command acceptance remain required
+before exposing the gameplay action.
 
 
 Pending planter exits now hold their future footprint against newly arriving moving

@@ -1,9 +1,20 @@
 import test from 'node:test';import assert from 'node:assert/strict';import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';import {readFileSync} from 'node:fs';
-import {CityBuildingDriveBy,buildingDriveByCondition,buildingDriveByShots,buildingDriveByPose,BUILDING_DRIVEBY_SECONDS} from '../.runtime/frontend-test/city3dBuildingDriveBy.js';
+import {CityBuildingDriveBy,buildingDriveByHit,buildingDriveByTarget,buildingDriveByCondition,buildingDriveByShots,buildingDriveByPose,BUILDING_DRIVEBY_SECONDS} from '../.runtime/frontend-test/city3dBuildingDriveBy.js';
 import {sceneSlots,availableSceneSlot} from '../.runtime/frontend-test/city3dEvents.js';
 import {StreetTraffic,trafficOverlap,trafficSize} from '../.runtime/frontend-test/city3dTraffic.js';
 const models=new Map();
+test('drive-by impacts ignore hidden variants and invisible materials',()=>{
+ const building=new THREE.Group(),hidden=new THREE.Group();hidden.visible=false;
+ for(const [z,parent,invisible]of[[2,hidden,false],[4,building,true],[6,building,false]]){
+  const m=new THREE.MeshBasicMaterial();m.visible=!invisible;
+  const mesh=new THREE.Mesh(new THREE.BoxGeometry(2,2,.2),m);mesh.position.set(0,1,z);parent.add(mesh);
+ }
+ building.add(hidden);
+ const hit=buildingDriveByHit(building,new THREE.Vector3(0,1,0),new THREE.Vector3(0,1,10));
+ assert.ok(hit&&Math.abs(hit.z-5.9)<1e-6);
+ assert.equal(buildingDriveByHit(building,new THREE.Vector3(5,1,0),new THREE.Vector3(5,1,10)),null);
+});
 async function load(name){if(!models.has(name)){const b=readFileSync(`public/art/models/${name}.glb`),l=new GLTFLoader();l.register(parser=>({name:'driveby-geometry',loadMaterial(index){const m=new THREE.MeshStandardMaterial();m.name=parser.json.materials[index].name;return Promise.resolve(m);}}));models.set(name,(await l.parseAsync(b.buffer.slice(b.byteOffset,b.byteOffset+b.byteLength),'')).scene);}return models.get(name).clone(true);}
 test('drive-by slows for gunfire then accelerates with continuous speed',()=>{
  for(const fps of [30,60,144]){let old=buildingDriveByPose(0);for(let i=1;i<=Math.ceil(BUILDING_DRIVEBY_SECONDS*fps);i++){const p=buildingDriveByPose(i/fps);assert.ok(p.distance>=old.distance);assert.ok((p.distance-old.distance)*fps<=6.001);old=p;}}
@@ -106,5 +117,21 @@ for(const gun of ['revolver','shotgun','thompson'])test(`${gun}: damage reveals 
   let last=before;
   for(const beat of beats){const shown=buildingDriveByCondition(before,after,beat,gun);assert.ok(shown<=last&&shown>=after);last=shown;}
   assert.equal(last,after);assert.equal(buildingDriveByCondition(before,after,100,gun),after);
+ }
+});
+
+for(const name of ['tavern','monarch','tenement','shop','civic','casino','warehouse','bluehour','goldenlily','papermoon','mariner','mercer-court','filling','garage','dealer','docks','haulage','villa','undertaker'])test(`${name}: drive-by finds an authored surface from the road`,async()=>{
+ const building=await load(name);building.position.set(48,.18,48);
+ if(['filling','garage','dealer','docks','haulage'].includes(name))building.rotation.y=Math.PI;
+ const root=new THREE.Vector3(48,-.115,33.6),target=buildingDriveByTarget(building,root);
+ assert.ok(target,'no actual surface found');assert.ok(target.z>root.z&&target.z<root.z+40);
+ for(const gun of ['revolver','shotgun','thompson']){
+  const c=new CityBuildingDriveBy(await load('packard'),await load('person'),await load('person'),await load(gun),gun,target.clone().sub(root));c.root.position.copy(root);
+  for(const beat of c.shots){c.update(beat);const origin=c.weapon.getObjectByName('muzzle').getWorldPosition(new THREE.Vector3());const hit=buildingDriveByHit(building,origin,target);assert.ok(hit,`${gun} shot at ${beat} misses actual geometry`);assert.ok(hit.distanceTo(origin)>1,'impact occurs inside the car');
+   const grip=c.car.worldToLocal(c.weapon.getWorldPosition(new THREE.Vector3())),muzzle=c.car.worldToLocal(origin.clone());
+   const window=grip.clone().lerp(muzzle,(.745-grip.x)/(muzzle.x-grip.x));
+   assert.ok(window.y>1.055&&window.y<1.425&&window.z>-.06&&window.z<.60,`${gun} target causes window collision: ${window.toArray()}`);
+  }
+  c.dispose();
  }
 });

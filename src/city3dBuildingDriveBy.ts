@@ -14,6 +14,31 @@ export function buildingDriveByCondition(before:number,after:number,seconds:numb
 }
 const ease=(v:number)=>{const t=Math.max(0,Math.min(1,v));return t*t*(3-2*t);};
 
+/** First visible authored surface along the shot, not the building's box.
+ * Hidden intact/broken variants and invisible materials cannot catch bullets. */
+export function buildingDriveByHit(building:THREE.Object3D,origin:THREE.Vector3,toward:THREE.Vector3){
+ building.updateWorldMatrix(true,true);
+ const delta=toward.clone().sub(origin),distance=delta.length();
+ if(distance<.001)return null;
+ const meshes:THREE.Mesh[]=[];
+ building.traverseVisible(o=>{if(o instanceof THREE.Mesh)meshes.push(o);});
+ const ray=new THREE.Raycaster(origin,delta.divideScalar(distance),.001,distance+.05);
+ const hit=ray.intersectObjects(meshes,false).find(h=>{
+  const m=(h.object as THREE.Mesh).material;
+  return (Array.isArray(m)?m[h.face?.materialIndex??0]:m)?.visible;
+ });
+ return hit?.point.clone()??null;
+}
+
+export function buildingDriveByTarget(building:THREE.Object3D,root:THREE.Vector3){
+ for(const offset of [0,1.5,-1.5,3,-3]){
+  const origin=root.clone().add(new THREE.Vector3(offset,1.8,0));
+  const hit=buildingDriveByHit(building,origin,origin.clone().add(new THREE.Vector3(0,0,40)));
+  if(hit)return hit;
+ }
+ return null;
+}
+
 /** Integrated continuous velocity: approach, slow firing pass, accelerating exit.
  * Local +Z faces the target facade; the car drives toward -X in the near lane. */
 export function buildingDriveByPose(seconds:number){
@@ -82,7 +107,7 @@ export class CityBuildingDriveBy {
   const last=[...this.shots].reverse().find(at=>seconds>=at);
   const recoil=last===undefined?0:Math.max(0,1-(seconds-last)/.13);
   if(this.weaponModel==='revolver'){
-   this.weapon.position.set(.20-.15*p.aim,.9+.80*p.aim,.10+.24*p.aim-.025*recoil);
+   this.weapon.position.set(.20-.18*p.aim,.9+.80*p.aim,.10+.24*p.aim-.025*recoil);
    this.weapon.rotation.set(-.38*p.aim-.07*recoil,0,0);
    aimArm(this.shooter,1,this.weapon.position);
    aimArm(this.shooter,-1,new THREE.Vector3(-.14,1.06,.24));
