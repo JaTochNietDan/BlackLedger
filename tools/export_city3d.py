@@ -1669,6 +1669,8 @@ def laundry_interior():
     for i in range(5):
         box('folded sheets',(2.7,1.05,1.115+i*.055),(.65,.50,.05),linen,.025)
         box('linen blue binding',(2.7,1.05,1.143+i*.055),(.052,.51,.008),teal)
+    box('linen under hands',(3.35,1.49,1.100),(.64,.32,.014),linen,.006)
+    for x in (3.06,3.64):box('linen stitched hem',(x,1.49,1.108),(.012,.30,.002),teal)
     box('collection ticket book',(3.85,.85,1.115),(.35,.27,.05),linen,.01)
     label('counter collection sign','COLLECTION',(3.35,.557,.65),.13)
     # Rear shelving beside the washers, with individually wrapped bundles.

@@ -1,6 +1,6 @@
 import {LaundryMotion,laundryRunningMachines,type LaundryOperation} from './laundryMotion';
 import {InteriorArrival} from './interiorArrival';
-import {CounterWipe} from './interiorService';
+import {CounterWipe,LinenPress} from './interiorService';
 import {InteriorCastBatch} from './interiorCastBatch';
 import {placementsForInterior,interiorPlayerSpot,poseInteriorOccupant,type InteriorPlace} from './interiorStaging';
 import {cameraCommand, KeyboardPan, bindKeyboardPan} from './city3dControls';
@@ -54,6 +54,7 @@ export function Interior3D(props:{place:InteriorPlace;operation?:LaundryOperatio
   })).then(()=>{if(dead)return;const room=models.get(roomModel)!;
    room.traverse(o=>{if(o instanceof THREE.Mesh){o.castShadow=true;o.receiveShadow=true;}});scene.add(room);if(laundry)machines=new LaundryMotion(room);dirty=true;setStatus('');
   }).catch(()=>{if(!dead)setStatus('The 3D room could not load. The people and actions below remain available.');});
+  let linenService:LinenPress|undefined;
   let service:CounterWipe|undefined,cloth:THREE.Group|undefined,serviceSeconds=0;
   let castBatch:InteriorCastBatch|undefined;
   let arrival:InteriorArrival|undefined,arrivalSeconds=0,arriving=false;
@@ -93,7 +94,7 @@ export function Interior3D(props:{place:InteriorPlace;operation?:LaundryOperatio
     camera.position.add(controls.target.clone().sub(before));dirty=true;
    }
    const key=JSON.stringify([p.people.map(w=>[w.id,w.face,w.role]),[p.player.name,p.player.face,p.player.alive]]);
-   if(models.size===modelNames.length&&key!==roster){roster=key;dirty=true;arrival=undefined;service=undefined;cloth?.removeFromParent();cloth=undefined;castBatch?.dispose();actors.forEach(a=>scene.remove(a));actors.clear();costumes.forEach(m=>m.dispose());costumes=[];
+   if(models.size===modelNames.length&&key!==roster){roster=key;dirty=true;arrival=undefined;service=undefined;linenService=undefined;cloth?.removeFromParent();cloth=undefined;castBatch?.dispose();actors.forEach(a=>scene.remove(a));actors.clear();costumes.forEach(m=>m.dispose());costumes=[];
     const placements=placementsForInterior(p.place,p.people);
     p.people.forEach(who=>{
      const spot=placements.get(who.id);if(!spot)return;
@@ -116,11 +117,12 @@ export function Interior3D(props:{place:InteriorPlace;operation?:LaundryOperatio
     if(!lobby){const bartender=[...actors.values()].find(a=>a.userData.spot==='service');if(bartender){
      service=new CounterWipe(bartender);if(service.available){cloth=models.get('bar-cloth')!.clone(true);cloth.traverse(o=>{if(o instanceof THREE.Mesh){o.castShadow=true;o.receiveShadow=true;}});scene.add(cloth);service.pose(serviceSeconds);cloth.position.copy(service.clothPosition);}
     }}
+    if(laundry){const worker=[...actors.values()].find(a=>a.userData.spot==='laundry-counter');if(worker)linenService=new LinenPress(worker);}
     castBatch=new InteriorCastBatch(actors);scene.add(castBatch.root);
    }
    const running=laundryRunningMachines(p.operation);
    if(machines?.step(seconds,running,p.motion&&!reduced,document.hidden))dirty=true;
-   let poseChanged=false;
+   let poseChanged=linenService?.step(seconds,running>0,p.motion&&!reduced,document.hidden)??false;
    if(arrival&&arriving&&!document.hidden){
     arrivalSeconds=!p.motion||reduced?arrival.duration:Math.min(arrival.duration,arrivalSeconds+Math.min(.05,Math.max(0,seconds)));
     arriving=arrival.pose(arrivalSeconds);poseChanged=true;
@@ -143,7 +145,7 @@ export function Interior3D(props:{place:InteriorPlace;operation?:LaundryOperatio
     renderer.render(scene,camera);renderedFrames++;dirty=false;
     if(models.size===modelNames.length)canvas.dataset.interior=JSON.stringify({place:p.place,people:[...actors.keys()],occupants:[...actors].map(([id,a])=>({id,spot:a.userData.spot,x:a.position.x,y:a.position.y,z:a.position.z})),picked:p.picked,
       drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,renderedFrames,
-      zoom:camera.zoom,machines:machines?{count:machines.count,running,seconds:machines.seconds}:undefined,arrival:arrival?{seconds:arrivalSeconds,duration:arrival.duration,moving:arriving}:undefined,service:service?.available?{seconds:serviceSeconds,cloth:service.clothPosition.toArray()}:undefined,omitted:Math.max(0,p.people.length-actors.size+(playerActor?1:0)),cutawayWalls:[...(!left?.visible?['left']:[]),...(!back?.visible?['back']:[])]});
+      zoom:camera.zoom,linen:linenService?{seconds:linenService.seconds,active:linenService.active}:undefined,machines:machines?{count:machines.count,running,seconds:machines.seconds}:undefined,arrival:arrival?{seconds:arrivalSeconds,duration:arrival.duration,moving:arriving}:undefined,service:service?.available?{seconds:serviceSeconds,cloth:service.clothPosition.toArray()}:undefined,omitted:Math.max(0,p.people.length-actors.size+(playerActor?1:0)),cutawayWalls:[...(!left?.visible?['left']:[]),...(!back?.visible?['back']:[])]});
    }
   };frame=requestAnimationFrame(tick);
   return()=>{reduce.removeEventListener('change',reduction);unbindPan();dead=true;cancelAnimationFrame(frame);observer.disconnect();controls.removeEventListener('change',changed);controls.dispose();canvas.removeEventListener('keydown',keys);canvas.removeEventListener('pointerdown',press);canvas.removeEventListener('pointerup',release);castBatch?.dispose();disposeCityResources([scene,...models.values()]);renderer.dispose();renderer.forceContextLoss();canvas.remove();};

@@ -58,7 +58,7 @@ export function laundryPlacements(people:Presence[]) {
  for(const who of [...people].sort((a,b)=>a.id.localeCompare(b.id))){
   if(result.has(who.id))continue;
   if(/\b(launderer|laundress|laundry worker|clerk)\b/i.test(who.role||'')&&![...result.values()].some(s=>s.id==='laundry-counter'))
-   result.set(who.id,{id:'laundry-counter',x:3.35,z:-2.15,yaw:0});
+   result.set(who.id,{id:'laundry-counter',x:3.35,z:-2.0,yaw:0});
   else {const spot=available.shift();if(spot)result.set(who.id,spot);}
  }
  return result;

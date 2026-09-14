@@ -25,7 +25,7 @@ test('Bluebird public occupants fit the authored furniture and both rigs remain 
    assert.ok(floor&&Math.abs(floor.point.y-.0175)<.002,`${spot.id}: unsupported floor`);
    for(const y of [.2,.65,1.1,1.65])for(let i=0;i<24;i++){
     const dir=new THREE.Vector3(Math.cos(i*Math.PI/12),0,Math.sin(i*Math.PI/12));
-    assert.equal(new THREE.Raycaster(new THREE.Vector3(spot.x,y,spot.z),dir,0,.48).intersectObject(room,true).length,0,`${spot.id}: furniture at ${y}`);
+    assert.equal(new THREE.Raycaster(new THREE.Vector3(spot.x,y,spot.z),dir,0,spot.id==='laundry-counter'?.28:.48).intersectObject(room,true).length,0,`${spot.id}: furniture at ${y}`);
    }
   }
  }

@@ -29,3 +29,38 @@ test('male and female bartender hands remain on the cloth and clear the counter 
 });
 
 test('missing service rig is safely unavailable',()=>{assert.equal(new CounterWipe(new THREE.Group()).available,false);});
+
+test('laundry hands smooth linen without penetrating the counter or stretching the rig',async()=>{
+ const {LinenPress}=await import('../.runtime/frontend-test/interiorService.js');
+ for(const name of ['person','woman']){
+  const actor=await load(name);poseInteriorOccupant(actor,{id:'laundry-counter',x:3.35,z:-2,yaw:0});
+  const service=new LinenPress(actor),hands=[];assert.equal(service.available,true);
+  for(const side of [-1,1])actor.getObjectByName('elbow'+side).traverse(o=>{if(o.isMesh&&o.name.startsWith('hand'))hands.push(o);});
+  let min=Infinity,max=-Infinity;
+  for(let frame=0;frame<360;frame++){
+   assert.equal(service.step(1/30,true,true,false),true);
+   const boxes=hands.map(hand=>new THREE.Box3().setFromObject(hand,true));
+   for(const box of boxes){
+    assert.ok(Math.abs(box.min.y-1.109)<.003,`${name} loses linen contact: ${box.min.y}`);
+    assert.ok(box.min.x>3.02&&box.max.x<3.68&&box.min.z> -1.66&&box.max.z< -1.32,`${name} leaves linen: ${JSON.stringify(box)}`);
+   }
+   assert.equal(boxes[0].intersectsBox(boxes[1]),false,'hands cross');
+   min=Math.min(min,boxes[0].min.x);max=Math.max(max,boxes[0].min.x);
+   for(const side of [-1,1]){
+    assert.equal(actor.getObjectByName('leg'+side).rotation.x,0);
+    assert.deepEqual(actor.getObjectByName('arm'+side).scale.toArray(),[1,1,1]);
+    // The lower sleeve must remain above the solid countertop wherever it
+    // crosses the rear edge, not merely put its hand on the correct height.
+    actor.getObjectByName('arm'+side).traverse(o=>{if(!o.isMesh)return;const attr=o.geometry.attributes.position,v=new THREE.Vector3();for(let i=0;i<attr.count;i++){v.fromBufferAttribute(attr,i).applyMatrix4(o.matrixWorld);if(v.z>=-1.67)assert.ok(v.y>=1.089,`${name} sleeve penetrates counter`);}});
+   }
+  }
+  assert.ok(max-min>.07,'smoothing is motionless');
+  const seconds=service.seconds;
+  assert.equal(service.step(2,true,false,false),false);assert.equal(service.step(2,true,true,true),false);assert.equal(service.seconds,seconds);
+  assert.equal(service.step(1,false,true,false),true);assert.equal(service.active,false);
+  for(const side of [-1,1])for(const part of ['arm','elbow'])assert.ok(actor.getObjectByName(part+side).quaternion.angleTo(new THREE.Quaternion())<1e-7);
+  assert.equal(service.step(1,false,true,false),false);
+  assert.equal(service.step(120,true,true,false),true);assert.ok(Math.abs(service.seconds-seconds-.05)<1e-8);
+ }
+ assert.equal(new LinenPress(new THREE.Group()).available,false);
+});
