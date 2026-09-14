@@ -1,0 +1,37 @@
+{
+  "coldEarly": {
+    "article": "f1e6bc3b9ce1d3edb502bcae800db74d",
+    "visible": false,
+    "status": "Preparing narration…",
+    "preparedMs": null,
+    "startDelayMs": null
+  },
+  "coldReveal": {
+    "article": "f1e6bc3b9ce1d3edb502bcae800db74d",
+    "visible": true,
+    "status": "Preparing narration…",
+    "preparedMs": null,
+    "startDelayMs": null
+  },
+  "coldCompleted": {
+    "article": "f1e6bc3b9ce1d3edb502bcae800db74d",
+    "visible": true,
+    "status": "Narrating…",
+    "preparedMs": 8418,
+    "startDelayMs": 1915
+  },
+  "cachedEarly": {
+    "article": "f1e6bc3b9ce1d3edb502bcae800db74d",
+    "visible": false,
+    "status": "Narration ready",
+    "preparedMs": 19,
+    "startDelayMs": null
+  },
+  "cachedReveal": {
+    "article": "f1e6bc3b9ce1d3edb502bcae800db74d",
+    "visible": true,
+    "status": "Narrating…",
+    "preparedMs": 19,
+    "startDelayMs": 7
+  }
+}

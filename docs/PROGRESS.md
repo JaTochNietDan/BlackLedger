@@ -118,3 +118,26 @@ and build passes. Evidence newspaper-reveal.png/json. No campaign actions issued
 QA save is .runtime/newspaper-reveal-20260913.sqlite3 on8874. Remaining work includes
 real narrator playback acceptance, mobile UI, full event coverage and the larger
 visual/choreography/interior requirements.
+
+### Standalone newspaper and real narration — September 13
+
+Removed the generic green menu frame and duplicate title from the scene edition.
+The newsprint itself is now the modal, with a stamped Fold away control above the
+masthead and matching narration controls inside its ruled footer. Keyboard focus
+is contained, Escape closes it, and closing restores prior focus. Paper scrolls
+on smaller viewports; reduced-motion preference is retained. Fixed paused audio
+resuming without updating its status; loading/playing disables redundant Read
+aloud requests.
+
+Production build passes. Browser QA on isolated8874 at1280×720 confirms zero
+map-menu frames, all buttons inside paper, entire sheet within viewport, and one
+city canvas retained through reveal and close. Pause reports Narration paused;
+Resume reading reports Narrating. Screenshot: standalone-newspaper.png. No save
+commands were issued. The temporary QA tab was closed.
+
+Real local narration on8787 now plays: cold synthesis prepared in8418ms, beginning
+1915ms after reveal; cached preparation19ms and reveal-to-play7ms in the timing
+fixture (narrator-timing.json). Standalone UI replay measured106ms preparation and
+22ms reveal-to-play. These are playback API timings, not an auditory quality
+review. Cold-start latency still needs improvement; production-wide acceptance
+and the broader city/interior requirements remain open.

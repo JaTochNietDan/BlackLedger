@@ -64,14 +64,35 @@
 .map-first .rail .bottom {margin-top:auto}
 .map-first .rail {height:calc(100dvh - 114px);min-height:0}
 @media(max-width:800px){.map-first .rail{height:calc(100dvh - 154px)}}
-.scene-newspaper {padding:22px;animation:paper-arrival .32s ease-out}
-.scene-newspaper .paper-sheet {margin:0 0 18px}
-.scene-article {display:flow-root;padding:24px 8px}
-.scene-article h2 {font:700 clamp(28px,4vw,48px)/1.06 var(--serif);text-transform:uppercase;letter-spacing:-.035em;margin:8px 0 20px}
-.scene-article .cut {float:right;width:38%;margin:0 0 18px 24px}
-.scene-article .body {font:19px/1.65 var(--serif);white-space:pre-line}
-.scene-article .byline {font:11px system-ui;text-transform:uppercase;border-block:1px solid #544b3b;padding:8px 0}
-.newspaper-voice {display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px;font-size:12px}
-.newspaper-voice button {background:#23352c;border:1px solid #89754c;padding:7px;color:#eadbb9}
+/* The edition is the dialog: no application frame around the newsprint. */
+.newspaper-backdrop {position:fixed;inset:0;z-index:8;background:#07100d88;overflow:auto;overscroll-behavior:contain;display:grid;align-items:safe center;justify-items:center;padding:28px 24px}
+.scene-newspaper {width:min(1080px,100%);min-width:0;outline:none;animation:paper-arrival .32s ease-out}
+.scene-newspaper .paper-sheet {margin:0;max-width:none}
+.scene-newspaper .paper {padding:22px 34px 28px;max-width:none}
+.newspaper-tools {display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:16px;font:10px system-ui;letter-spacing:.15em;text-transform:uppercase}
+.scene-newspaper button {color:#28251d;background:transparent;border:1px solid #6d6553;border-radius:0;padding:8px 12px;font:600 11px var(--serif);letter-spacing:.06em;text-transform:uppercase;cursor:pointer;box-shadow:inset 0 0 0 2px #e5dfcf,inset 0 0 0 3px #aaa18a}
+.scene-newspaper button:hover:not(:disabled) {background:#29261f;color:#eee7d5;box-shadow:inset 0 0 0 2px #29261f,inset 0 0 0 3px #b5aa91}
+.scene-newspaper button:focus-visible {outline:2px solid #28251d;outline-offset:3px}
+.scene-newspaper button:disabled {opacity:.4;cursor:default}
+.newspaper-tools button {white-space:nowrap}
+.newspaper-tools button span {font-size:18px;line-height:10px;margin-left:10px}
+.scene-newspaper .scene-article {display:flow-root;padding:24px 8px 16px;margin-bottom:12px;border-bottom:0}
+.scene-newspaper .scene-article h2 {font:700 clamp(28px,4vw,48px)/1.06 var(--serif);text-transform:uppercase;letter-spacing:-.035em;margin:8px 0 20px}
+.scene-newspaper .scene-article .cut {float:right;width:38%;margin:0 0 18px 24px}
+.scene-newspaper .scene-article .body {font:17px/1.65 var(--serif);white-space:pre-line}
+.scene-newspaper .scene-article .byline {font:10px system-ui;text-transform:uppercase;border-block:1px solid #544b3b;padding:8px 0}
+.newspaper-footer {border-top:3px double #514a3b;padding-top:12px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.newspaper-voice {display:flex;gap:10px;align-items:center;flex-wrap:wrap;font:italic 12px var(--serif)}
+.newspaper-imprint {font:9px system-ui;letter-spacing:.12em;text-transform:uppercase;color:#5c5547}
+@media(max-width:600px){
+ .newspaper-backdrop {padding:12px 8px}
+ .scene-newspaper .paper {padding:20px 20px 26px}
+ .newspaper-tools>span {max-width:120px;font-size:8px}
+ .scene-newspaper .masthead h1 {font-size:30px}
+ .scene-newspaper .masthead .rule {font-size:8px;gap:8px;flex-wrap:wrap}
+ .scene-newspaper .scene-article {padding:16px 0 8px}
+ .scene-newspaper .scene-article .cut {width:42%;margin-left:14px}
+ .scene-newspaper .scene-article .body {font-size:15px}
+}
 @keyframes paper-arrival {from{opacity:0;transform:translateY(18px) rotate(-1deg)}to{opacity:1;transform:none}}
 @media(prefers-reduced-motion:reduce){.scene-newspaper{animation:none}}
