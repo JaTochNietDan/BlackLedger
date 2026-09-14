@@ -259,3 +259,26 @@ test('the connector waits for an occupied route start and resumes after clearanc
  for(let i=0;i<600;i++)traffic.update([person],1/60);
  assert.ok(traffic.placement('player').progress>.9);
 });
+
+test('a stationary person clears a waiting pedestrian departure without scene reservations',()=>{
+ for(const fps of [30,60,144]){
+  const traffic=new StreetTraffic();
+  const player={id:'player',model:'person',points:[{x:48,z:4.65}],progress:0};
+  traffic.update([player],0);
+  const departing={id:'departing',model:'person',points:[{x:48,z:4.65},{x:60,z:4.65}],progress:0};
+  let poses;
+  for(let i=0;i<fps*3;i++){
+   poses=traffic.update([player,departing],1/fps);
+   clear([player,departing],poses);
+   assert.equal(poses.get('player').waiting,false);
+  }
+  assert.equal(poses.get('departing').waiting,false);
+  assert.ok(poses.get('player').pose.x<48);
+  assert.equal(poses.get('departing').progress,0,'clearance must not advance a committed journey');
+  departing.progress=1;
+  for(let i=0;i<fps*8;i++){
+   poses=traffic.update([player,departing],1/fps);clear([player,departing],poses);
+  }
+  assert.ok(poses.get('departing').progress>.9);
+ }
+});

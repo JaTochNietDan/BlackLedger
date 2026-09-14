@@ -626,3 +626,8 @@ Planted explosion cues now use the exact headline filed by their damage/casualty
 report, retaining the same minute. This lets automatic newspaper presentation
 match both fatal and nonfatal blasts without guessing among unrelated articles.
 Previously those cues used a shorter headline which prevented automatic reveal.
+
+The same cosmetic pavement clearance now also responds to a pedestrian waiting
+at an occupied departure. It uses the waiting actor's traffic footprint, keeps
+both saved journeys/locations unchanged, and does not advance a zero-progress
+departure merely to free space. Vehicle departures are not included.

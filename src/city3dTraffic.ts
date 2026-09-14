@@ -161,10 +161,18 @@ export class StreetTraffic {
         // A stationary pedestrian may make room along this frontage, without
         // crossing a road or changing their authoritative location. Keep the
         // resulting stance until a real route replaces this request.
-        const inScene=(pose:TrafficPose)=>pending.some(s=>trafficOverlap(pose,r.model,s.pose,s.model));
+        const departures=requests.flatMap(other=>{
+          if(!lengths.get(other.id)||!isPedestrian(other.model))return [];
+          const entry=this.entries.get(other.id);
+          if(entry?.waiting)return [{pose:entry.pose,model:other.model}];
+          if(!entry&&other.progress===0)return [{pose:onRoute(other.points,0),model:other.model}];
+          return [];
+        });
+        const spaces=[...pending,...departures];
+        const inScene=(pose:TrafficPose)=>spaces.some(s=>trafficOverlap(pose,r.model,s.pose,s.model));
         const row=Math.floor(e.pose.z/PITCH),col=Math.floor(e.pose.x/PITCH);
         if(isPedestrian(r.model)&&Math.abs(e.pose.z-(row*PITCH+FOOTWAY))<.001){
-          if(!pending.length)e.yieldTo=undefined;
+          if(!spaces.length)e.yieldTo=undefined;
           if(!e.yieldTo&&inScene(e.pose)){
             for(let distance=.25;distance<=6&&!e.yieldTo;distance+=.25)for(const side of [-1,1]){
               const target={x:e.pose.x+side*distance,z:e.pose.z,heading:side*Math.PI/2};
