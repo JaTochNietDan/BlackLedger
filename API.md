@@ -474,3 +474,9 @@ the completed visual pose before playback, so Skip also has a settled pose, with
 running audio or issuing commands. Model/material objects are never retained by
 this snapshot. This is still presentation-only mounted state; a full reload uses
 the existing canonical fallback placement and pose.
+
+Saint Agnes interior seating is cosmetic and consumes only its existing public
+Presence roster. Explicit bartender roles can stand in the service aisle; seating
+never changes NPC activity, location or availability. The HTML roster remains
+available beyond the modeled seating capacity. Interior Q/E uses held-key
+rotation; neither staging nor camera movement advances simulation time.

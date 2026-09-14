@@ -1,3 +1,4 @@
+import {interiorPlacements,poseInteriorOccupant} from './interiorStaging';
 import {cameraCommand, KeyboardPan, bindKeyboardPan} from './city3dControls';
 import {useEffect, useRef, useState} from 'react';
 import * as THREE from 'three';
@@ -53,12 +54,8 @@ export function Interior3D(props:{people:Presence[];picked:string;onPick:(id:str
   let panTime=performance.now();
   const keys=(event:KeyboardEvent)=>{
    const command=cameraCommand(event);if(!command)return;
-   if(command.startsWith('pan-')){
+   if(command.startsWith('pan-')||command.startsWith('rotate-')){
     keyboardPan.press(event);
-   }else if(['rotate-left','rotate-right'].includes(command)){
-    const offset=camera.position.clone().sub(controls.target);
-    offset.applyAxisAngle(new THREE.Vector3(0,1,0),command==='rotate-left'?-.12:.12);
-    camera.position.copy(controls.target).add(offset);
    }else if(['+','=','-'].includes(event.key)){
     camera.zoom=THREE.MathUtils.clamp(camera.zoom*(event.key==='-'?1/1.12:1.12),controls.minZoom,controls.maxZoom);camera.updateProjectionMatrix();
    }else if(event.key==='Home'){
@@ -68,17 +65,22 @@ export function Interior3D(props:{people:Presence[];picked:string;onPick:(id:str
   };canvas.addEventListener('keydown',keys);
   const tick=(now:number)=>{
    if(dead)return;frame=requestAnimationFrame(tick);const p=latest.current;
-   const delta=keyboardPan.step(camera.position,controls.target,(now-panTime)/1000,8/camera.zoom);panTime=now;
+   const seconds=(now-panTime)/1000;
+   const delta=keyboardPan.step(camera.position,controls.target,seconds,8/camera.zoom);panTime=now;
+   const turn=keyboardPan.rotation(seconds);
+   if(turn){const offset=camera.position.clone().sub(controls.target).applyAxisAngle(new THREE.Vector3(0,1,0),turn);camera.position.copy(controls.target).add(offset);dirty=true;}
    if(delta.x||delta.z){
     const before=controls.target.clone();controls.target.x=THREE.MathUtils.clamp(controls.target.x+delta.x,-6,6);controls.target.z=THREE.MathUtils.clamp(controls.target.z+delta.z,-5,5);
     camera.position.add(controls.target.clone().sub(before));dirty=true;
    }
-   const key=JSON.stringify(p.people.slice(0,9).map(w=>[w.id,w.face]));
+   const key=JSON.stringify(p.people.map(w=>[w.id,w.face,w.role]));
    if(models.size===3&&key!==roster){roster=key;dirty=true;actors.forEach(a=>scene.remove(a));actors.clear();costumes.forEach(m=>m.dispose());costumes=[];
-    p.people.slice(0,9).forEach((who,i)=>{
+    const placements=interiorPlacements(p.people);
+    p.people.forEach(who=>{
+     const spot=placements.get(who.id);if(!spot)return;
      const model=pedestrianModel(who.id,who.face),object=models.get(model)!.clone(true);
      costumes.push(...dressPedestrian(object,model,wardrobe(who.id,who.face)));
-     object.position.set(-1+(i%3)*2,.03,-Math.floor(i/3)*2);object.rotation.y=Math.PI;
+     poseInteriorOccupant(object,spot);object.userData.spot=spot.id;
      object.userData.person=who.id;object.traverse(o=>{if(o instanceof THREE.Mesh){o.castShadow=true;o.receiveShadow=true;}});
      actors.set(who.id,object);scene.add(object);
     });
@@ -93,7 +95,7 @@ export function Interior3D(props:{people:Presence[];picked:string;onPick:(id:str
     if(left)left.visible=camera.position.x>=-5.8;
     if(back)back.visible=camera.position.z<=4.8;
     renderer.render(scene,camera);renderedFrames++;dirty=false;
-    if(models.size===3)canvas.dataset.interior=JSON.stringify({people:[...actors.keys()],picked:p.picked,
+    if(models.size===3)canvas.dataset.interior=JSON.stringify({people:[...actors.keys()],occupants:[...actors].map(([id,a])=>({id,spot:a.userData.spot,x:a.position.x,y:a.position.y,z:a.position.z})),picked:p.picked,
       drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,renderedFrames,
       zoom:camera.zoom,cutawayWalls:[...(!left?.visible?['left']:[]),...(!back?.visible?['back']:[])]});
    }
