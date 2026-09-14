@@ -2,3 +2,14 @@
 .home-strike-canvas{position:absolute;inset:0}.home-strike-canvas canvas{display:block;width:100%;height:100%}
 .home-strike-scene>p{position:absolute;left:24px;top:32px;background:#171b18e8;color:#ebdcbb;padding:14px}
 .home-strike-scene .city3d-story{position:absolute;left:18px;right:18px;bottom:18px;z-index:2}
+/* Recorded interiors share the room HUD's clear margins. */
+.map-first .home-strike-scene{position:absolute;inset:96px 18px 48px 94px;min-height:0;height:auto;border:1px solid #8d7956}
+.map-first .home-strike-scene .city3d-story{left:auto;right:14px;bottom:14px;width:min(460px,calc(100% - 28px));max-height:55%;overflow:auto}
+.map-first:has(.home-strike-scene) .city-accounts{top:auto;bottom:60px;left:108px}
+@media(max-width:800px){
+ .map-first .home-strike-scene{inset:136px 8px 45px 72px}
+ .map-first .home-strike-scene .city3d-story{bottom:55px;max-height:40%}
+ .map-first:has(.home-strike-scene) .city-accounts{left:80px;bottom:55px}
+ .map-first:has(.home-strike-scene) .city-accounts:not([open]) summary{display:block;padding:8px}
+ .map-first:has(.home-strike-scene) .city-accounts:not([open]) summary>span:not(:first-child){display:none}
+}

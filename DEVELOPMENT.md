@@ -2861,3 +2861,23 @@ eligible demand, not a seven-day whole-campaign forecast or guaranteed occupancy
 Source/output in.runtime/rental-projection and rental-projection-result.log.
 The running aa9b617 suite predates this rental correction. Candidate8985 also
 predates it. Main8791 was untouched; nothing promoted this turn.
+
+### September 14 — clearer room footer and cinematic safe area
+
+Previous goal turn was progress: fixed unreachable rental tiers and verified
+eligible demand from a copied campaign. Revalidated the ongoing aa9b617 clean
+suite via session10830; still active, no replacement started.
+
+Replaced the permanent room camera caption with an accessible Room controls
+summary/panel. It sits above footer accounts/latest-entry panels, with private
+room drawer controls offset above it. Recorded interior scenes now respect the
+same HUD/rail margins as rooms; their playback card is compact at lower right,
+with accounts in the lower left rather than covering the top of the scene.
+
+Evidence: production build6.09s. Isolated browser93 opened Room controls in
+Mercer Court at1280x720; screenshot verified readable expanded help clear of
+accounts. Browser94 replayed the Saint Agnes fixture and verified the scene,
+actors and compact playback card clear of the main HUD. Browser92 had loaded
+the prior bundle during build and was not used as acceptance evidence. No new
+tests for this reversible layout change; compact-width visual acceptance remains.
+No gameplay commands were sent to main8791, and no release was promoted.

@@ -14,3 +14,9 @@
 .interior3d .interior3d-drawer[aria-pressed="true"]{background:#e5d4ad;color:#342b20}
 .interior3d .interior3d-drawer:hover,.interior3d .interior3d-expand:hover{background:#f2e4c6;color:#342b20}
 .interior3d .interior3d-drawer:focus-visible{outline:2px solid #ebdcbb;outline-offset:3px}
+.interior3d-help{position:absolute;right:14px;bottom:12px;z-index:2;width:max-content;max-width:min(360px,calc(100% - 28px));color:#493622;background:var(--newsprint),#e5d4b2;border:1px solid #a38b64;font:12px/1.5 Georgia,serif;box-shadow:0 3px 12px #0004}
+.interior3d-help summary{padding:8px 12px;cursor:pointer}
+.interior3d-help summary:focus-visible{outline:2px solid #873f2d;outline-offset:3px}
+.interior3d-help p{padding:0 12px 12px;margin:0;max-height:180px;overflow:auto;white-space:normal}
+.map-first .interior-scene-shell .interior3d-help{bottom:100px}
+.map-first .interior-scene-shell .interior3d-drawer{bottom:148px}
