@@ -2043,3 +2043,27 @@ store/server. Evidence: `.runtime/pool-api-core-verified.log`,
 No frontend changes or live campaign QA/promotion in this increment. Next is the
 close playable 3D table and controls, with physical replay and corrected table
 proportions; full fidelity, multiple active tables and tournaments remain open.
+
+### 2026-09-14 — first playable 3D billiards client
+
+Added funded local challenges and a full-screen 3D billiards table using the
+existing exactly-once command client. Aim/power/tip controls, placement, calls,
+safety, break decisions, physical NPC turns, concession and close now connect to
+Go. Numbered spheres rotate through the compressed physical replay; collision
+samples are preserved. The playable table uses the solver's cloth/radius/jaw
+coordinates. Camera review changed the default view across the table. The room's
+main activity area now offers opponents, after browser QA found an initial offer
+placement reachable only in property details. Error notices display over the game.
+
+378 frontend tests pass (14.879s); final typecheck/build pass with the existing
+bundle warning. Isolated 8964 browser play covers funded start, placement, player
+stroke/replay locking, NPC reply, restore, camera reset, concession and close.
+The actual NPC replay has 324 frames and 156 events over 5.5875s; all 16 final ball
+positions/pocket states match the public result (positions within 1e-6m). The
+fixture ends revision6/minute606/$5980/pool=null. Main save was not used.
+
+This is a playable first pass, not full visual/physics acceptance. Next: pointer
+placement/aiming, pocket picking, cue and player animation, richer table/pocket
+materials, corrected six-table hall props, compact/motion/skip browser checks and
+full-rack playtests. Concurrent tables and whole-pool tournaments remain open.
+See docs/BILLIARDS.md for evidence and retained physical fidelity limitations.

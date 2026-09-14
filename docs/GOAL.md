@@ -9,7 +9,9 @@ minigame with proper physics simulation. An authored room with static balls does
 not satisfy this requirement. Eight-ball is the initial implementation choice;
 physics, match rules, funded stakes and physical opponent play now exist in
 the backend. Exactly-once commands, public table/replay projection and HTTP
-retry coverage are implemented. Playable 3D integration and tournaments
+retry coverage are implemented. A first playable 3D view has isolated browser
+coverage for funded start, placement, physical player/NPC strokes and concession.
+Visual refinement, fuller controls/animation, multiple tables and tournaments
 remain to be implemented and verified. This extends all earlier requirements.
 
 ## Highest priority amendment — map-first UI

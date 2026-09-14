@@ -79,6 +79,7 @@ function Work({
 }
 
 export function Interior({
+  activities,
   place,
   player,
   motion,
@@ -92,6 +93,7 @@ export function Interior({
   comings,
   minute,
 }: {
+  activities?: ReactElement;
   place: Place;
   motion: boolean;
   player: Pick<Person,'name'|'face'|'alive'|'home'>;
@@ -427,6 +429,7 @@ export function Interior({
           </section>
         ) : (
           <>
+            {activities}
             <div className="work-head">
               <p className="room-hint">
                 {inFlat?'You are in your private room. Select someone from the building list to return to the entrance hall.':'Pick somebody in the room to deal with them, or use the building itself.'}

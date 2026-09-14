@@ -1,3 +1,4 @@
+import {BilliardsRoom,PoolChallenges} from './BilliardsRoom';
 import {isIndoorSearch} from './burglarySearch';
 import {HomeStrikeScene} from './HomeStrikeScene';
 import {homeStrikeFor} from './homeStrike';
@@ -639,6 +640,7 @@ function App() {
               </small>
             </div>
           )}
+          {l.id==='poolhall' && p.location===l.id && <PoolChallenges opponents={world?.pool_opponents||[]} cash={p.cash} busy={busy} act={commit}/>}
           {/* The poolhall is a racket rather than a casino, so none of the
               float rows reached it — and it is the one room that runs a card
               game and charges for the seat. Its money is a till: nothing is
@@ -786,6 +788,7 @@ function App() {
               {inside && sceneOverlay}
               {!journey&&homeCue&&playing ? <HomeStrikeScene key={`${playing.id}:${sceneReplay.current}`} cue={homeCue} world={w} motion={motion} overlay={sceneOverlay} onDone={()=>setFinishedCue(playing.id)}/> : cityView === 'interior' && locationInfo.id === p.location ? (
                 <Interior
+                  activities={locationInfo.id==='poolhall'?<PoolChallenges opponents={w.pool_opponents||[]} cash={p.cash} busy={busy} act={commit}/>:undefined}
                   motion={motion}
                   player={p}
                   place={locationInfo}
@@ -1123,7 +1126,7 @@ function App() {
   }
   return (
     <>
-      <div className={'shell map-first ' + (busy ? 'busy' : '')} inert={!!event || !p.alive || atTable || newspaperVisible}>
+      <div className={'shell map-first ' + (busy ? 'busy' : '')} inert={!!event || !p.alive || atTable || !!world.pool || newspaperVisible}>
         <nav className="rail" aria-label="Main navigation" inert={tab!=='city'}>
           <div className="monogram">
             <span>B</span>
@@ -1193,6 +1196,7 @@ function App() {
         </main>
       </div>
       {playing&&sceneArticle&&!event&&<SceneNewspaper key={`${playing.id}:${sceneReplay.current}`} article={sceneArticle} visible={newspaperVisible} voice={voice} onClose={()=>{setPlaying(null);setTab('city');}}/>}
+      {world.pool && !event && p.alive && <BilliardsRoom pool={world.pool} busy={busy} motion={motion} act={commit}/>}
       {atTable && inTheBackRoom && !event && p.alive && (
         <BackRoomScene
           player={p} motion={motion} people={world.locations.find(l => l.id === p.location)?.people || []}

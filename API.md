@@ -1050,17 +1050,14 @@ NPC departures pause during an active rack.
 
 Replay is version-1 base64/zlib JSON, produced from the Go solver. Frames retain
 every impact time and numbered ball position/quaternion/pocket status. It is
-presentation data and cannot be submitted as an outcome. This is currently a
-save/core foundation: billiards HTTP commands, public projection, opponent-shot
-commands and playable controls are not exposed yet. Command receipt/retry tests
-remain required when those commands are connected.
+presentation data and cannot be submitted as an outcome. The command, receipt and playable-client integrations are documented below.
 
 
 The saved pool record now also retains `last_stroke` (shooter, actual cue input
 and call, optional ball-in-hand placement and break decision). The opponent
 core entry point chooses and executes its own physical stroke with a stable
 local seed. Clients will request an opponent turn, not submit its cue input or
-result. HTTP routing/public projection and request-retry tests remain pending.
+result. HTTP routing, public projection and request-retry tests are implemented below.
 
 ## Funded physical billiards
 
@@ -1110,5 +1107,6 @@ left far, right near, right far, left middle, right middle.
 for pocketed (subtract one to match the public ball pocket index). Events use
 `Time`, `Kind`, `Ball`, `Other`, `Speed`. Frames include impacts as well as regular
 samples; clients must retain impact boundaries when interpolating. Playback is
-presentation only and cannot advance time or settle money. This API is ready for
-the playable 3D client; table controls and tournaments are not yet connected.
+presentation only and cannot advance time or settle money. The first playable 3D client uses these commands for funded challenges, cue
+placement, aim/power/spin/calls, break decisions and opponent turns. Tournaments
+and multiple concurrent tables remain unimplemented.

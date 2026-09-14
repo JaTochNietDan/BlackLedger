@@ -210,3 +210,36 @@ full store tests pass (0.271 s), full HTTP/server tests pass (1.286 s), and vet
 passes. The expanded HTTP shape check also found null travel/effect lists in
 command receipts; command initialization now publishes empty lists. Logs are
 `.runtime/pool-api-{core-verified,adapters-verified,vet-final}.log`.
+
+## First playable 3D client — 2026-09-14
+
+`BilliardsRoom` offers real local opponents and held stakes through the existing
+command client. A map-sized table has placement, direction, power, top/side spin,
+ball/pocket calls, safety, break choices, NPC turns and explicit concession/close.
+Controls lock during physical replay; reloading shows the saved final position.
+Motion preferences and a skip control apply only to presentation. A late decode
+cannot overwrite a newer or skipped stroke. Errors remain above the table overlay.
+
+The Three.js table uses solver cloth dimensions and ball radius, six real mesh
+holes, cushions with the solver's segment/jaw coordinates, rotating numbered balls
+and a visible cue/direction line. Browser review changed its default camera from
+lengthwise to across the table for better use of a wide screen. Orbit, pan, zoom
+and reset remain available. This is still a rough table asset: cushion profiles,
+wood/pocket detail, surrounding room/players, physical cue stroke and matching hall
+props need further work. Numeric placement/aim controls need pointer interaction;
+compact layout, motion-off/skip and complete rack UX need further browser review.
+
+All 378 frontend tests pass (14.879s), including zlib decoding, malformed/oversized
+replay rejection and preservation of adjacent collision samples. Final TypeScript
+and production build pass (existing bundle-size warning). Isolated browser port
+8964 uses `.runtime/pool-playable-qa.sqlite3` only. Actual clicks reserved $20 each,
+placed the cue, played a missed/illegal player break, then an NPC `hand-behind`
+decision and physical safety. The browser displayed moving balls and locked turns;
+restoring the page showed the final table. Concession and return left revision 6,
+minute 606, cash $5,980 and no pool session. No second stake or payout occurred.
+
+The actual NPC receipt decodes in the browser-compatible module to 324 frames,
+156 events, 5.5875 seconds; every final ball position matches the public projection
+within 1e-6 metres and all pocket statuses match. Evidence is in
+`.runtime/pool-browser-receipt.json` and `.runtime/pool-view-*` logs. Main port 8791
+and the live campaign are unchanged. This does not close full-fidelity acceptance.

@@ -6,7 +6,7 @@ export class TableCamera {
  readonly controls:OrbitControls;
  private distance:number;
  private aspectScale=1;
- constructor(private camera:THREE.PerspectiveCamera,private canvas:HTMLCanvasElement,private changed:()=>void,private center:THREE.Vector3,distance:number){
+ constructor(private camera:THREE.PerspectiveCamera,private canvas:HTMLCanvasElement,private changed:()=>void,private center:THREE.Vector3,distance:number,private azimuth=0){
   this.distance=distance;
   this.controls=new OrbitControls(camera,canvas);
   this.controls.minDistance=1.8;this.controls.maxDistance=9;
@@ -18,7 +18,7 @@ export class TableCamera {
  }
  private change=()=>{const t=this.controls.target;t.x=THREE.MathUtils.clamp(t.x,-1.5,1.5);t.z=THREE.MathUtils.clamp(t.z,-1.3,1.3);t.y=this.center.y;this.changed();};
  private focus=()=>this.canvas.focus({preventScroll:true});
- private reset=()=>{this.controls.target.copy(this.center);this.aspectScale=Math.max(1,.95/this.camera.aspect);const d=this.distance*this.aspectScale;this.camera.position.copy(this.center).add(new THREE.Vector3(0,d*.84,d*.54));this.controls.update();this.changed();};
+ private reset=()=>{this.controls.target.copy(this.center);this.aspectScale=Math.max(1,.95/this.camera.aspect);const d=this.distance*this.aspectScale;this.camera.position.copy(this.center).add(new THREE.Vector3(0,d*.84,d*.54).applyAxisAngle(new THREE.Vector3(0,1,0),this.azimuth));this.controls.update();this.changed();};
  private key=(e:KeyboardEvent)=>{
   if(e.ctrlKey||e.metaKey||e.altKey)return;
   const k=e.key.toLowerCase();

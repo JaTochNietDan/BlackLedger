@@ -402,6 +402,12 @@ export function playTable(kind: string, count = 1) {
   if (ctx.state === 'suspended') ctx.resume().catch(() => {});
   const at = ctx.currentTime + 0.02;
   switch (kind) {
+    case 'pool-impact':
+      clunk(ctx, at, 1250, .04 + Math.max(0, Math.min(1, count)) * .10);
+      break;
+    case 'pool-pocket':
+      clunk(ctx, at, 180, .13);
+      break;
     case 'handle':
       clunk(ctx, at, 150, 0.35);
       clunk(ctx, at + 0.11, 110, 0.2);
