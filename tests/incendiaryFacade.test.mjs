@@ -55,3 +55,22 @@ test('special facade fire markers sit in front of upper-window glazing',async()=
   }
  }
 });
+
+test('flight cache avoids repeated raycasts and invalidates changed obstacles',()=>{
+ const building=new THREE.Group(),wall=new THREE.Mesh(new THREE.BoxGeometry(30,30,.2),new THREE.MeshBasicMaterial({side:THREE.DoubleSide}));
+ wall.position.set(40,3,2);building.add(wall);
+ let rays=0;const original=wall.raycast;wall.raycast=function(ray,hits){rays++;original.call(this,ray,hits);};
+ const start=new THREE.Vector3(0,1.7,0),windows=[new THREE.Vector3(0,2,5)];
+ const first=incendiaryFlight(start,windows,building);assert.ok(first);const initial=rays;assert.ok(initial>0);
+ const expected=first.target.clone();first.target.set(999,999,999);
+ assert.deepEqual(incendiaryFlight(start,windows,building).target,expected);assert.equal(rays,initial,'repeat recalculated the same flight');
+ wall.position.x=0;assert.equal(incendiaryFlight(start,windows,building),null,'moved wall reused clear path');assert.ok(rays>initial);
+ const blocked=rays;assert.equal(incendiaryFlight(start,windows,building),null);assert.equal(rays,blocked,'blocked result was not cached');
+ wall.geometry.translate(40,0,0);assert.ok(incendiaryFlight(start,windows,building),'changed geometry reused blocked result');assert.ok(rays>blocked);
+ const fresh=wall.geometry.attributes.position.array.slice();
+ wall.geometry.setAttribute('position',new THREE.BufferAttribute(fresh,3));incendiaryFlight(start,windows,building);
+ const replacement=fresh.slice();for(let i=0;i<replacement.length;i+=3)replacement[i]-=40;
+ wall.geometry.setAttribute('position',new THREE.BufferAttribute(replacement,3));wall.geometry.computeBoundingBox();wall.geometry.computeBoundingSphere();
+ assert.equal(incendiaryFlight(start,windows,building),null,'replacement attribute reused old geometry at the same version');
+ wall.geometry.dispose();wall.material.dispose();
+});

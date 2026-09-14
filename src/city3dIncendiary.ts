@@ -75,8 +75,32 @@ export class CityIncendiary {
  }
 }
 
-/** Test a conservative sampled bottle envelope once when selecting a facade target. */
+type Flight={target:THREE.Vector3;loft:number};
+const flightCache=new WeakMap<THREE.Object3D,{geometry:string;paths:Map<string,Flight|null>}>();
+const bufferIDs=new WeakMap<object,number>();let nextBufferID=1;
+const bufferID=(buffer:object)=>{let id=bufferIDs.get(buffer);if(id===undefined){id=nextBufferID++;bufferIDs.set(buffer,id);}return id;};
+const copyFlight=(flight:Flight|null)=>flight?{target:flight.target.clone(),loft:flight.loft}:null;
+/** Cached only for static building geometry; matrices and buffer versions invalidate it. */
 export function incendiaryFlight(start:THREE.Vector3,windows:THREE.Vector3[],building:THREE.Object3D){
+ building.updateWorldMatrix(true,true);
+ const geometry:string[]=[];
+ building.traverse(o=>{if(o instanceof THREE.Mesh){
+  const attributes=(Object.values(o.geometry.attributes) as (THREE.BufferAttribute|THREE.InterleavedBufferAttribute)[]).map(a=>a instanceof THREE.InterleavedBufferAttribute?`${bufferID(a)}:${bufferID(a.data)}:${a.data.version}`:`${bufferID(a)}:${a.version}`);
+  const materials=Array.isArray(o.material)?o.material:[o.material];
+  geometry.push(o.geometry.uuid+':'+attributes.join(',')+':'+(o.geometry.index?`${bufferID(o.geometry.index)}:${o.geometry.index.version}`:'none')+':'+o.matrixWorld.elements.join(',')+':'+materials.map(m=>m.side).join(','));
+ }});
+ const signature=geometry.join(';');
+ let cache=flightCache.get(building);
+ if(!cache||cache.geometry!==signature){cache={geometry:signature,paths:new Map()};flightCache.set(building,cache);}
+ const key=JSON.stringify([start.toArray(),windows.map(w=>w.toArray())]);
+ if(cache.paths.has(key))return copyFlight(cache.paths.get(key)!);
+ const result=findIncendiaryFlight(start,windows,building);
+ if(cache.paths.size>=12)cache.paths.delete(cache.paths.keys().next().value!);
+ cache.paths.set(key,copyFlight(result));return result;
+}
+
+/** Test a conservative sampled bottle envelope once when selecting a facade target. */
+function findIncendiaryFlight(start:THREE.Vector3,windows:THREE.Vector3[],building:THREE.Object3D):Flight|null{
  const offsets=[new THREE.Vector3(),...[-1,1].flatMap(side=>[new THREE.Vector3(side*.27,0,0),new THREE.Vector3(0,side*.27,0),new THREE.Vector3(0,0,side*.27)])];
  const ray=new THREE.Raycaster();
  for(const window of windows)for(const loft of [.8,.4,.15,1.4,2,2.8]){
