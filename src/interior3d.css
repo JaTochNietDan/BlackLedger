@@ -10,3 +10,7 @@
 .interior3d-expand:focus-visible{outline:2px solid #ebdcbb;outline-offset:3px}
 
 .interior3d .interior3d-expand[aria-pressed="true"]{background:#e5d4ad;color:#342b20;border-color:#ac9469}
+.interior3d .interior3d-drawer{position:absolute;z-index:2;right:14px;bottom:104px;border:1px solid #ac9469;background:#e5d4ad;color:#342b20;padding:8px 12px;font:13px Georgia,serif;cursor:pointer}
+.interior3d .interior3d-drawer[aria-pressed="true"]{background:#e5d4ad;color:#342b20}
+.interior3d .interior3d-drawer:hover,.interior3d .interior3d-expand:hover{background:#f2e4c6;color:#342b20}
+.interior3d .interior3d-drawer:focus-visible{outline:2px solid #ebdcbb;outline-offset:3px}

@@ -40,10 +40,8 @@ def build(box,cylinder,material):
     for x in [-3,-2.15]:b('bed pillow',(x,2.36,.73),(.65,.45,.12),linen,.09)
     for x in [-3.22,-1.88]:
         for y in [.58,2.58]:b('bed leg',(x,y,.12),(.08,.08,.22),chrome)
-    b('bedside cabinet',(-1.25,2.65,.42),(.68,.64,.78),wood,.02)
-    for z in [.22,.52]:
-        b('bedside drawer',(-1.25,2.31,z),(.59,.035,.24),edge,.02)
-        b('drawer pull',(-1.25,2.27,z),(.17,.025,.025),chrome,.01)
+    from residential_storage import bedside
+    bedside(box,-1.25,2.65,.68,.64,.78,wood,edge,chrome)
     b('radio',(-1.25,2.65,.99),(.47,.25,.31),edge,.035)
     for x in [-1.4,-1.32,-1.24]:b('radio grille',(x,2.515,1),(.018,.015,.18),chrome)
     # Window and folded curtains beside the bed.

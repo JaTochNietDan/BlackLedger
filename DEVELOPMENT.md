@@ -1567,3 +1567,27 @@ Focused burglary/home core tests pass0.962s, store0.154s, server contract tests
 This is required presentation data; the dedicated indoor search/confrontation/
 escape animation remains unfinished, alongside persistent indoor aftermath and
 remaining interiors. Main8791 remains the prior verified release.
+
+## September 14 — working residential drawers for search staging
+
+Replaced solid bedside props in private-flat and Mariner lodging models with
+hollow cabinet cases and physically sliding upper trays. Reusable original
+Blender source `tools/residential_storage.py`; grouped as burglary-drawer,
+travel+.34m glTFZ, preserving case/lamp/radio positions. Re-exported only the
+two interiors through their existing --only targets. Geometry tests verify a
+real accessible tray floor, whole-drawer travel and closed-position restoration.
+
+Private player rooms now offer local opening/closing to review and interact
+with these props. This is presentation only, not a household inventory or loot
+command. Smooth motion follows the current preference; reduced/off settles.
+Browser isolated8945 verified visible open tray and fully closed case. Also
+verified the previously reduced Mariner lamp intensity after loading fresh
+assets. The closing screenshot exposed dark hover contrast; added explicit
+light hover colours to drawer/enlargement controls in the final build.
+
+All364 frontend tests pass (`.runtime/storage-tests.log`), build passes
+(`storage-final-build.log`). Exports: storage-flat-export.log and
+storage-lodging-export.log. Main campaign untouched for QA and main8791 remains
+on the prior release. Recorded burglary approach/search/outcome animation is
+still unfinished; these assets remove the solid-furniture obstacle to staging
+that interaction. Remaining interiors/aftermath/campaign work remain active.

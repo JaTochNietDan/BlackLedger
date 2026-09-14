@@ -981,3 +981,9 @@ later moves; amounts remain fixed if later savings change. The cue is persisted
 through last_result and normal command receipts. Legacy/unrelated robbery cues
 omit it. No extra RNG draws or gameplay rule changes are introduced. The dedicated
 burglary animation is still unfinished; this provides its authoritative outcome.
+
+Private flat/lodging views offer local bedside-drawer opening/closing. This moves
+the authored tray only; it is not a cash inventory, search command or loot claim.
+It sends no action and resets with the room view. Motion off/reduced motion
+settles the drawer immediately. The articulated `burglary-drawer` model group is
+available for the pending recorded burglary search animation.

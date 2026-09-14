@@ -40,10 +40,8 @@ def build(box,cylinder,material):
         for x in [-2.62,-1.28]:c('bedpost',(x,y,.50),.035,.96,metal)
         c('bed end rail',(-1.95,y,.97),.034,1.40,metal,(0,math.pi/2,0))
         for x in [-2.45,-2.2,-1.95,-1.7,-1.45]:c('bed spindle',(x,y,.69),.018,.52,metal)
-    b('bedside drawer',(-.67,2.48,.42),(.61,.65,.77),wood,.025)
-    for z in [.24,.57]:
-        b('drawer face',(-.67,2.137,z),(.53,.03,.25),dark,.012)
-        c('drawer knob',(-.67,2.1,z),.035,.045,nickel,(math.pi/2,0,0))
+    from residential_storage import bedside
+    bedside(box,-.67,2.48,.61,.65,.77,wood,dark,nickel)
     c('bedside lamp base',(-.67,2.47,.85),.13,.055,nickel)
     c('bedside lamp stem',(-.67,2.47,1.05),.018,.36,nickel)
     bpy.ops.mesh.primitive_cone_add(vertices=24,radius1=.22,radius2=.12,depth=.28,location=(-.67,2.47,1.3));bpy.context.object.name='linen lamp shade';bpy.context.object.data.materials.append(linen)

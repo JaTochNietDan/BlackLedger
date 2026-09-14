@@ -19,6 +19,7 @@ export function Interior3D(props:{place:InteriorPlace;operation?:LaundryOperatio
  const host=useRef<HTMLDivElement>(null), latest=useRef(props);latest.current=props;
  const settings=interiorSettings[props.place],roomName=settings.name;
  const [enlarged,setEnlarged]=useState(false);
+ const [drawerOpen,setDrawerOpen]=useState(false),drawerState=useRef(false);drawerState.current=drawerOpen;
  const expanded=useRef(false);expanded.current=enlarged;
  const extraPeople=props.people.length-placementsForInterior(props.place,props.people).size;
  const [status,setStatus]=useState(`Opening ${roomName}…`);
@@ -61,7 +62,7 @@ export function Interior3D(props:{place:InteriorPlace;operation?:LaundryOperatio
   let service:CounterWipe|undefined,cloth:THREE.Group|undefined,serviceSeconds=0;
   let castBatch:InteriorCastBatch|undefined;
   let arrival:InteriorArrival|undefined,arrivalSeconds=0,arriving=false;
-  let roster='',presentation='';
+  let roster='',presentation='',drawerTravel=0;
   const pick=new THREE.Raycaster();const pointer=new THREE.Vector2();let down={x:0,y:0};
   const press=(event:PointerEvent)=>{down={x:event.clientX,y:event.clientY};};
   const release=(event:PointerEvent)=>{
@@ -138,6 +139,12 @@ export function Interior3D(props:{place:InteriorPlace;operation?:LaundryOperatio
    const chosen=actors.get(p.picked);selected.visible=!!chosen;if(chosen){selected.position.x=chosen.position.x;selected.position.z=chosen.position.z;}
    const hour=((p.minute/60)%24+24)%24;sun.intensity=hour>=6&&hour<20?3:.5;
    const stateKey=`${p.picked}:${p.minute}`;if(stateKey!==presentation){presentation=stateKey;dirty=true;}
+   const drawer=models.get(roomModel)?.getObjectByName('burglary-drawer');
+   if(drawer){
+    const goal=drawerState.current ? .34 : 0;
+    const next=(!p.motion||reduced)?goal:THREE.MathUtils.damp(drawerTravel,goal,12,Math.min(seconds,.1));
+    if(Math.abs(next-drawerTravel)>.00001){drawerTravel=next;drawer.position.z=next;dirty=true;}
+   }
    controls.update();
    if(dirty&&!document.hidden){
     const room=models.get(roomModel);
@@ -154,5 +161,5 @@ export function Interior3D(props:{place:InteriorPlace;operation?:LaundryOperatio
   };frame=requestAnimationFrame(tick);
   return()=>{reduce.removeEventListener('change',reduction);unbindPan();dead=true;cancelAnimationFrame(frame);observer.disconnect();controls.removeEventListener('change',changed);controls.dispose();canvas.removeEventListener('keydown',keys);canvas.removeEventListener('pointerdown',press);canvas.removeEventListener('pointerup',release);castBatch?.dispose();disposeCityResources([scene,...models.values()]);renderer.dispose();renderer.forceContextLoss();canvas.remove();};
  },[props.place]);
- return <div className={`interior3d${enlarged?' enlarged':''}`}><button className="interior3d-expand" aria-pressed={enlarged} onClick={()=>{setEnlarged(!enlarged);host.current?.querySelector('canvas')?.focus();}}>{enlarged?'Standard room view':'Enlarge room'}</button><div ref={host} className="interior3d-canvas"/><span className="interior3d-caption">{roomName} · {props.player.name}: pale ring · Drag / Q/E: orbit · Scroll / +/−: zoom · WASD / arrows: pan · Home: reset{props.place!=='flat'&&props.place!=='lodging'&&' · Select a person'}{extraPeople>0&&` · ${extraPeople} more in the people list`}</span>{status&&<p role="status">{status}</p>}</div>;
+ return <div className={`interior3d${enlarged?' enlarged':''}`}>{(props.place==='flat'||props.place==='lodging')&&<button className="interior3d-drawer" aria-pressed={drawerOpen} onClick={()=>setDrawerOpen(!drawerOpen)}>{drawerOpen?'Close bedside drawer':'Open bedside drawer'}</button>}<button className="interior3d-expand" aria-pressed={enlarged} onClick={()=>{setEnlarged(!enlarged);host.current?.querySelector('canvas')?.focus();}}>{enlarged?'Standard room view':'Enlarge room'}</button><div ref={host} className="interior3d-canvas"/><span className="interior3d-caption">{roomName} · {props.player.name}: pale ring · Drag / Q/E: orbit · Scroll / +/−: zoom · WASD / arrows: pan · Home: reset{props.place!=='flat'&&props.place!=='lodging'&&' · Select a person'}{extraPeople>0&&` · ${extraPeople} more in the people list`}</span>{status&&<p role="status">{status}</p>}</div>;
 }
