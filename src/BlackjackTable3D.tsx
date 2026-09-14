@@ -1,3 +1,4 @@
+import {blackjackCamera} from './blackjackPresentation';
 import type {Person,Presence} from './types';
 import {pedestrianModel} from './city3dCast';
 import {wardrobe,dressPedestrian} from './city3dWardrobe';
@@ -15,7 +16,7 @@ import './blackjackTable3d.css';
 
 export function BlackjackTable3D({mine,theirs,hidden,presentation,dealer,player}:{player?:Pick<Person,"name"|"face"|"alive">;dealer?:Presence;mine:Card[];theirs:Card[];hidden:number;presentation:{plan:ReturnType<typeof planCards>;start:number;active:boolean}}){
  const host=useRef<HTMLDivElement>(null),latest=useRef({mine,theirs,hidden,presentation});latest.current={mine,theirs,hidden,presentation};
- const [status,setStatus]=useState('Opening the card table…');
+ const [status,setStatus]=useState('Opening the card table…'),[wide,setWide]=useState(false);
  useEffect(()=>{
   const el=host.current!;let dead=false,frame=0,dirty=true,key='',stateKey='',rendered=0,cardBuilds=0,previousFrame=0,wasPresenting=false;
   let intervals:number[]=[],playback:{frames:number;fps:number;p95FrameMs:number;worstFrameMs:number}|undefined;
@@ -24,7 +25,9 @@ export function BlackjackTable3D({mine,theirs,hidden,presentation,dealer,player}
   renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFShadowMap;
   const canvas=renderer.domElement;canvas.setAttribute('aria-label','3D blackjack table with your cards nearest you and the dealer opposite.');el.append(canvas);
   const camera=new THREE.PerspectiveCamera(38,1,.01,20);
-  const view=new TableCamera(camera,canvas,()=>{dirty=true;},new THREE.Vector3(0,.87,0),4.1);
+  const view=new TableCamera(camera,canvas,()=>{dirty=true;},new THREE.Vector3(0,.87,0),wide?blackjackCamera.wide:blackjackCamera.close,0,blackjackCamera.fitAspect);
+  const framing=(event:Event)=>view.frameView(new THREE.Vector3(0,.87,0),(event as CustomEvent<boolean>).detail?blackjackCamera.wide:blackjackCamera.close);
+  canvas.addEventListener('blackjack-frame',framing);
   scene.add(new THREE.HemisphereLight(0xffebcb,0x17271f,1.6));
   const light=new THREE.DirectionalLight(0xffe0b5,2.4);light.position.set(-2,5,2);light.castShadow=true;light.shadow.mapSize.set(2048,2048);Object.assign(light.shadow.camera,{left:-3.5,right:3.5,top:3.5,bottom:-3.5,near:.1,far:12});light.shadow.bias=-.0001;light.shadow.normalBias=.008;scene.add(light);
   const resize=()=>{const w=el.clientWidth,h=Math.max(1,el.clientHeight);renderer.setSize(w,h);camera.aspect=w/h;camera.updateProjectionMatrix();view.resize();dirty=true;};
@@ -74,7 +77,7 @@ export function BlackjackTable3D({mine,theirs,hidden,presentation,dealer,player}
    cards.children.forEach((object,i)=>{const move=p.presentation.plan.cards[i];if(!move)return;const pose=cardPose(move,elapsed);object.visible=pose.visible;object.position.fromArray(pose.position);object.rotation.z=pose.rotation;});
    renderer.render(scene,camera);rendered++;canvas.dataset.blackjack=JSON.stringify({mine:p.mine,theirs:p.theirs,hidden:p.hidden,dealing:p.presentation.active,flips:p.presentation.plan.cards.filter(c=>c.flip).length,dealer:dealer?.id,player:player?.alive?player.name:undefined,rendered,cardBuilds,playback,camera:camera.position.toArray(),drawCalls:renderer.info.render.calls});dirty=false;
   };frame=requestAnimationFrame(tick);
-  return()=>{dead=true;cancelAnimationFrame(frame);observer.disconnect();view.dispose();disposeCityResources([scene,...models],{textures,materials:[...materials,...costumes]});renderer.dispose();renderer.forceContextLoss();canvas.remove();};
+  return()=>{dead=true;cancelAnimationFrame(frame);observer.disconnect();canvas.removeEventListener('blackjack-frame',framing);view.dispose();disposeCityResources([scene,...models],{textures,materials:[...materials,...costumes]});renderer.dispose();renderer.forceContextLoss();canvas.remove();};
  },[dealer?.id,dealer?.face,player?.name,player?.face,player?.alive]);
- return <div className="blackjack3d"><div ref={host}/><button className="table-camera-reset" onClick={()=>host.current?.querySelector("canvas")?.dispatchEvent(new Event("table-reset"))}>Reset view</button><small className="table-camera-help">Drag to orbit · Right-drag to pan · Wheel to zoom · Focus table for WASD / arrows</small>{status&&<p role="status">{status}</p>}</div>;
+ return <div className="blackjack3d"><div ref={host}/><button className="table-camera-framing" aria-pressed={wide} onClick={()=>{const next=!wide;setWide(next);host.current?.querySelector('canvas')?.dispatchEvent(new CustomEvent('blackjack-frame',{detail:next}));}}>{wide?'Read cards':'Whole table'}</button><button className="table-camera-reset" onClick={()=>host.current?.querySelector("canvas")?.dispatchEvent(new Event("table-reset"))}>Reset view</button><small className="table-camera-help">Drag to orbit · Right-drag to pan · Wheel to zoom · Focus table · Hold WASD / arrows to pan · Q/E to orbit</small>{status&&<p role="status">{status}</p>}</div>;
 }

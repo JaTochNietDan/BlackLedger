@@ -2631,3 +2631,21 @@ and flop together at1280x720. One Check command dealt the fixture flop; camera
 toggles remained local. No main-save QA writes. Main8791 remains3e7ee26;
 this and the aiming guide await promotion. Further interior production and
 full billiards fidelity remain open.
+
+### 2026-09-14 — matching blackjack camera views
+
+Previous1541f0e added poker cards-first framing. Blackjack now opens with a
+3m close frame and the same Whole table / Read cards toggle (wide4.1m), free
+camera controls and selected-frame reset. Camera buttons share styling across
+both games. Added configurable TableCamera aspect fit, default unchanged for
+other tables; blackjack uses1.15 to contain long hands on narrow screens.
+Initial projection check exposed clipping at360x440; corrected before final
+verification. Camera changes still clear held keys through frameView.
+
+400 frontend tests pass14.813s, including both rows with2/7/12 cards at1280x440,
+800x600 and360x440 using the actual blackjack camera settings. Build passes2.71s.
+Logs `.runtime/blackjack-framing-{tests,build}.log`. Browser83 on isolated8981
+entered the tables and dealt a$50 fixture hand, reviewing the exposed dealer9,
+hidden card and playerK/7 in both camera views; button contrast is readable.
+No main-save QA writes. Main8791 remains3e7ee26. Card-camera and billiards-guide
+changes await promotion; broader interior and full billiards work remain open.

@@ -25,3 +25,5 @@ export function cardPose(move:CardMove,elapsed:number){
  const lift=move.flip?.147*Math.abs(Math.sin(rotation)):0;
  return {rotation,visible:move.flip||elapsed>=move.delay,position:t===1?[...move.to]:move.to.map((v,i)=>move.from[i]+(v-move.from[i])*ease+(i===1?lift+(move.flip?.02:.12)*Math.sin(Math.PI*t):0))};
 }
+
+export const blackjackCamera={close:3,wide:4.1,fitAspect:1.15} as const;
