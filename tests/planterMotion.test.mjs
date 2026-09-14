@@ -191,3 +191,22 @@ test('accident fall keeps both actual rigs above ground and preserves the record
   cast.update(0);assert.equal(cast.actor.rotation.x,0);
  }
 });
+
+test('surviving accident recovery plants both palms before raising the body',async()=>{
+ const {CityAccident}=await import('../.runtime/frontend-test/city3dAccident.js');
+ for(const name of ['person','woman']){
+  const cast=new CityAccident(await model(name),false);cast.root.position.set(12,.2,9);cast.root.rotation.y=.7;
+  for(let frame=240;frame<=480;frame++){
+   cast.update(frame/120);
+   for(const side of [-1,1]){
+    const wrist=cast.actor.getObjectByName('accident-wrist'+side);
+    const at=cast.root.worldToLocal(wrist.getWorldPosition(new THREE.Vector3()));
+    assert.ok(at.distanceTo(new THREE.Vector3(side*.43,.084,-.6))<1e-5,`${name} palm slides at ${frame/120}: ${at.toArray()}`);
+    const hand=wrist.children[0],bounds=new THREE.Box3().setFromObject(hand,true);
+    assert.ok(bounds.min.y>=.2-1e-6,'palm penetrates floor');
+   }
+  }
+  cast.update(0);const reset=cast.actor.getObjectByName('arm1').quaternion;
+  assert.ok(reset.angleTo(new THREE.Quaternion())<1e-8,'replay retains arm brace');
+ }
+});
