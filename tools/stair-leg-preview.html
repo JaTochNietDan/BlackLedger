@@ -11,6 +11,6 @@ const floor=new THREE.Mesh(new THREE.BoxGeometry(20,.1,20),new THREE.MeshStandar
 const render=()=>renderer.render(scene,camera);controls.addEventListener('change',render);
 let request=0;
 function pose(seconds){const p=stairs.update(seconds);document.body.dataset.pose=JSON.stringify({seconds,reached:p.reached,feet:p.feet,done:p.done});document.querySelector('output').value=seconds.toFixed(2)+'s';render();}
-for(const button of document.querySelectorAll('[data-step]'))button.onclick=()=>{cancelAnimationFrame(request);pose([.65,1.95,3.9][Number(button.dataset.step)]);};
+for(const button of document.querySelectorAll('[data-step]'))button.onclick=()=>{cancelAnimationFrame(request);pose([1,2.3,4.65][Number(button.dataset.step)]);};
 document.getElementById('play').onclick=()=>{cancelAnimationFrame(request);const start=performance.now();const frame=now=>{const t=Math.min(stairs.duration,(now-start)/1000);pose(t);if(t<stairs.duration)request=requestAnimationFrame(frame);};request=requestAnimationFrame(frame);};pose(0);
 </script></body></html>

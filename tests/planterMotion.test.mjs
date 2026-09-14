@@ -116,27 +116,28 @@ test('stair leg poses reach independent ankle targets without tilting the soles'
 });
 
 
-test('stair descent keeps support planted and every shoe above the authored treads',async()=>{
+test('stair descent keeps support planted and actor geometry above the authored treads',async()=>{
  const {CityStairDescent}=await import('../.runtime/frontend-test/city3dStairs.js');
  const building=await model('villa');building.updateMatrixWorld(true);
  for(const name of ['person','woman']){
   const cast=new CityStairDescent(await model(name));cast.root.position.set(0,.6,-6.23);
   let last;
-  for(let frame=0;frame<=468;frame++){
+  for(let frame=0;frame<=Math.ceil(cast.duration*120);frame++){
    const t=frame/120,pose=cast.update(t);assert.ok(pose.reached.every(Boolean),`${name} unreachable at ${t}`);
    const support=1-pose.moving;
    if(last&&last.moving===pose.moving)assert.ok(last.feet[support].distanceTo(pose.feet[support])<1e-8,'support foot slides');
    cast.actor.traverse(o=>{
-    if(!(o instanceof THREE.Mesh)||!o.name.startsWith('shoe'))return;
+    if(!(o instanceof THREE.Mesh))return;
     const p=o.geometry.attributes.position;
     for(let i=0;i<p.count;i++){
      const v=new THREE.Vector3().fromBufferAttribute(p,i).applyMatrix4(o.matrixWorld);
      const surface=v.z> -6.4?.6:v.z> -6.8?.4:v.z> -7.2?.2:0;
-     assert.ok(v.y>=surface-.00001,`${name} shoe penetrates tread at ${t}: ${v.toArray()}`);
+     assert.ok(v.y>=surface-.00001,`${name} geometry penetrates tread at ${t}: ${v.toArray()}`);
     }
    });
-   last=pose;
+   if(last)assert.ok(cast.actor.position.distanceTo(last.body)<.025,'body position snapped');
+   last={...pose,body:cast.actor.position.clone()};
   }
-  const finish=cast.update(cast.duration);assert.ok(finish.done);assert.ok(finish.feet.every(f=>Math.abs(f.y+.5)<1e-6&&Math.abs(f.z+1.2)<1e-6));
+  const finish=cast.update(cast.duration);assert.ok(finish.done);assert.ok(Math.abs(cast.actor.position.y+.605)<1e-6,'did not stand upright');assert.ok(finish.feet.every(f=>Math.abs(f.y+.5)<1e-6&&Math.abs(f.z+1.2)<1e-6));
  }
 });
