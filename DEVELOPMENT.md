@@ -1994,3 +1994,25 @@ were the subject. Commit 6dd6e29 preserves the full clause for the already-exist
 agreement checker; the exact failing campaign now passes (0.711s). All other
 core tests in that run passed. This changes only the test, not game prose or rules.
 The clean release simulation suite remains in progress; no live promotion yet.
+
+### Verified live promotion — 16c1c95
+
+The clean 3105991 simulation suite passed in 397.132s. Release 16c1c95 adds only
+the pawnshop presentation/QA fixture and corrected prose test beyond that tested
+ruleset. Its clean build reports `modified:false`; the corrected naming test,
+store suite and server suite passed in 0.376s, 0.187s and 1.138s respectively.
+
+A fresh SQLite backup `.runtime/campaign-pre-16c1c95.sqlite3` preceded candidate
+startup on isolated port 8961. Candidate comparison again proved that only the
+Riverside property and its 272 new deeds are added, preserving every existing
+field and all receipts. Port 8791 now serves the clean release from
+`.runtime/release-16c1c95`, including Ward Street Station, Riverside Courts and
+Ackerman & Son. No QA command was executed against the live campaign.
+
+Read-only live verification matches the expected upgraded state hash exactly:
+`2c407ead0ac62316d20a3c104857cf9741b8979fc0f1db7a7d505550b103b0ae`.
+Revision 2115, minute 160095, all 2,117 receipts, and Jamie Moretti (cash $2,976,
+health 100, home Ashbury Court, location Fassano Meats) are preserved. There are
+384 apartment deeds. The release's `.runtime/compatibility.json` and
+`.runtime/live-verification.json` hold the assertions and clean health response.
+The broader interior/scenes/progression goal remains active.
