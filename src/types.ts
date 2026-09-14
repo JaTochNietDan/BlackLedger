@@ -203,7 +203,7 @@ export interface Journeying {
 }
 export interface StreetSegment extends Journeying {from_minute:number;to_minute:number;end_progress:number;}
 export interface Snapshot {
-	property_market?: {id:string;name:string;owned:boolean;available:boolean;holder:string;asking:number;offer:number;condition:number;residents:number;home:boolean;locked:boolean}[];
+	property_market?: {id:string;name:string;owned:boolean;available:boolean;holder:string;asking:number;offer:number;condition:number;neighborhood_index?:number;residents:number;home:boolean;locked:boolean}[];
   housing_shortage?: number;
   house?: {
     games: boolean;

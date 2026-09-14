@@ -529,10 +529,11 @@ type Result struct {
 	Health  int `json:"health"`
 }
 type World struct {
-	recordStreet bool
-	streetTravel []StreetSegment
-	SuspendedJob *SuspendedJob `json:"suspended_job,omitempty"`
-	VisualCues   []VisualCue   `json:"-"`
+	PropertyPressure map[int]DistrictPropertyPressure `json:"property_pressure,omitempty"`
+	recordStreet     bool
+	streetTravel     []StreetSegment
+	SuspendedJob     *SuspendedJob `json:"suspended_job,omitempty"`
+	VisualCues       []VisualCue   `json:"-"`
 	// What walked in or out of the room the player is standing in during this
 	// command. Like VisualCues, it belongs to the command rather than the save.
 	Comings        []Coming             `json:"-"`
@@ -2001,7 +2002,7 @@ func (w *World) Actions(id string) []Action {
 		add("sell_property", label, 30, 0, w.SellPropertyReadiness(id), detail)
 	}
 	if id == "estate" && !w.Own(id) {
-		add("buy_residence", "Buy the deed to "+l.Name, 60, l.Cost, w.BuyResidenceReadiness(id), "Own the residence without moving home. Existing residents keep their accommodation. Moving in is a separate decision.")
+		add("buy_residence", "Buy the deed to "+l.Name, 60, w.ResidencePrice(id), w.BuyResidenceReadiness(id), "Own the residence without moving home. Existing residents keep their accommodation. Moving in is a separate decision.")
 	}
 
 	if l.Type == "home" {
@@ -2013,6 +2014,7 @@ func (w *World) Actions(id string) []Action {
 			}
 			if id == "estate" {
 				label = "Buy this residence"
+				cost = w.ResidencePrice(id)
 				if w.Own(id) {
 					label, cost = "Return to your residence", 0
 				} else if w.Properties[id].Owner != "independent" {
@@ -2767,7 +2769,7 @@ func AcquisitionCost(w *World, id string) int {
 	}
 	cost := float64(place.Cost * Freehold)
 	if id == "room" {
-		cost = MarinerFreehold
+		cost = float64(w.ResidencePrice(id))
 	}
 	if prop := w.Properties[id]; prop != nil && strings.HasPrefix(prop.Owner, "former:") {
 		cost *= 2

@@ -39,6 +39,7 @@ export function MarketScreen({world,onFind}: {world: Snapshot;onFind?:(id:string
         <div className="market-board">{world.property_market.map(property=><article className="market-good" key={property.id}>
           <header><b>{property.name}</b><span>{money(property.owned?property.offer:property.asking)}<small>{property.owned?' broker offer':property.available?' asking price':' reference price'}</small></span></header>
           <p>{property.owned?'Your deed':property.available?'Offered for sale':'Not currently offered'} · {property.condition}% condition</p>
+          <p>{(property.neighborhood_index??100)<100 ? `Neighborhood prices ${100-(property.neighborhood_index??100)}% below normal after local violence. Quiet days help prices recover.` : 'Neighborhood prices are at their normal level.'}</p>
           <p>{property.residents} {property.home?'other ':''}{property.residents===1?'resident':'residents'}{property.home?' · Your current home':''}</p>
           <p>{property.owned?'A sale transfers the building and tenant accounts.':`Held by ${property.holder}.`}</p>
           {property.owned && property.home && <p>You can stay as a renter after selling; the terms are shown at the property.</p>}

@@ -24,6 +24,7 @@ func TestEveryActionOfferedCanActuallyBeTaken(t *testing.T) {
 	w.District = 2
 	w.Player.Cash, w.Player.Respect, w.Player.Contacts = 90000, 200, 4
 	w.Player.Health = 100
+	w.Player.Weapon = 1
 	w.Player.Crew = []Crew{{ID: "leo", Name: "Leo Carver", Loyalty: 70}}
 	w.Player.Car, w.Player.CarWear = 2, 100
 	w.Player.Fuel, w.Player.Fuelled = FuelFull, max(1, w.Minute)
@@ -40,6 +41,13 @@ func TestEveryActionOfferedCanActuallyBeTaken(t *testing.T) {
 		here := w.Clone()
 		here.Player.Location = l.ID
 		here.Event = nil
+		// An equipped, co-located driver exercises the playable vehicle attack
+		// alongside the other actions instead of leaving it disabled in every fixture.
+		if len(here.Player.Crew) > 0 {
+			if driver := here.NPC(here.Player.Crew[0].ID); driver != nil {
+				driver.Location, driver.Heading, driver.Arrives = l.ID, "", 0
+			}
+		}
 		for _, a := range here.Actions(l.ID) {
 			if a.Disabled {
 				continue
@@ -95,6 +103,7 @@ func TestNoActionIsOfferedOnlyWhereItIsRefused(t *testing.T) {
 		w.District = 2
 		w.Player.Cash, w.Player.Respect, w.Player.Contacts = 90000, 200, 4
 		w.Player.Health = 100
+		w.Player.Weapon = 1
 		w.Player.Crew = []Crew{{ID: "leo", Name: "Leo Carver", Loyalty: 70}}
 		w.Player.Car, w.Player.CarWear = 1, 100
 		w.Player.Fuel, w.Player.Fuelled = FuelFull, max(1, w.Minute)
@@ -157,6 +166,13 @@ func TestNoActionIsOfferedOnlyWhereItIsRefused(t *testing.T) {
 			here := w.Clone()
 			here.Player.Location = l.ID
 			here.Event = nil
+			// An equipped, co-located driver exercises the playable vehicle attack
+			// alongside the other actions instead of leaving it disabled in every fixture.
+			if len(here.Player.Crew) > 0 {
+				if driver := here.NPC(here.Player.Crew[0].ID); driver != nil {
+					driver.Location, driver.Heading, driver.Arrives = l.ID, "", 0
+				}
+			}
 			for _, a := range here.Actions(l.ID) {
 				if _, had := seen[a.ID]; !had {
 					seen[a.ID] = l.ID + ": " + a.Reason

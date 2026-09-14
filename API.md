@@ -770,3 +770,29 @@ reconciles immediately to each committed street; blackjack retains its existing
 dealing sequence. Both table cameras allow bounded local orbit/pan/zoom/reset,
 including focused-canvas keyboard input, without commands or saved camera state.
 Text summaries and transactional betting actions remain available below the scene.
+
+## Neighborhood residential prices
+
+The optional public `property_market[].neighborhood_index` is a percentage of
+normal local residential value (60–100, default100 for older servers). Mariner
+freehold acquisition and Cypress deed/buy-and-move actions use this index. Broker
+offers apply the same index before their existing65% spread and condition factor;
+Mariner acquisition premiums still apply. Rental bills are unchanged.
+
+Core records pressure when a committed, located Witness incident occurs: robbery2,
+attack3, gunfight/vehicle gunfire6, incendiary7, killing8, explosion10 percentage
+points, capped at40 total. District boundaries define neighborhoods for this first
+market model. Quiet game time recovers one point per1,440 minutes; fractional-day
+recovery is retained when another incident occurs. A public integer discount
+rounds remaining pressure up, so an incident does not lose a whole point after
+one minute. Multiple kinds of incident at one address can contribute separately.
+Unknown locations, nonviolent political cues, private plans, UI previews and
+presentation replay do not contribute. No new random draws or elapsed time occur
+when calculating/reading prices.
+
+Saved `property_pressure` stores pressure units and last incident minute by
+district. Missing data starts at normal prices without reconstructing old crime
+from newspaper prose. This additive field survives JSON/SQLite saves and lives;
+market reads apply decay without mutating it. Existing command revision and
+exactly-once checks continue to protect transactional prices. NPC deed transfers,
+new individual homes and broader market demand are still pending.

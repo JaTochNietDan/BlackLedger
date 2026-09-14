@@ -2,6 +2,54 @@ package core
 
 import "fmt"
 
+// DistrictPropertyPressure keeps sub-point decay so frequent incidents cannot
+// postpone recovery by repeatedly discarding partial days. It survives lives.
+type DistrictPropertyPressure struct {
+	Units  int `json:"units"`
+	Minute int `json:"minute"`
+}
+
+// Each 1,440 pressure units reduces prices by one percentage point. Pressure
+// recovers one unit per game minute, bounded at a forty-percent discount.
+func (w *World) propertyPressure(district int) int {
+	p := w.PropertyPressure[district]
+	return max(0, min(40*1440, p.Units)-max(0, w.Minute-p.Minute))
+}
+
+func (w *World) recordPropertyIncident(kind, id string) {
+	points := map[string]int{"killing": 8, "explosion": 10, "incendiary": 7, "gunfight": 6, "driveby-building": 6, "attack": 3, "robbery": 2}[kind]
+	place, ok := PlaceByID(id)
+	if !ok || points == 0 {
+		return
+	}
+	units := min(40*1440, w.propertyPressure(place.District)+points*1440)
+	if w.PropertyPressure == nil {
+		w.PropertyPressure = map[int]DistrictPropertyPressure{}
+	}
+	w.PropertyPressure[place.District] = DistrictPropertyPressure{Units: units, Minute: w.Minute}
+}
+
+func (w *World) NeighborhoodPropertyIndex(id string) int {
+	place, ok := PlaceByID(id)
+	if !ok {
+		return 100
+	}
+	return 100 - (w.propertyPressure(place.District)+1439)/1440
+}
+
+// ResidencePrice is shared by standalone deed and buy-and-move commands.
+func (w *World) ResidencePrice(id string) int {
+	place, ok := PlaceByID(id)
+	if !ok {
+		return 0
+	}
+	base := place.Cost
+	if id == "room" {
+		base = MarinerFreehold
+	}
+	return base * w.NeighborhoodPropertyIndex(id) / 100
+}
+
 func saleableResidence(id string) bool { return id == "room" || id == "estate" }
 
 // Broker offers exclude acquisition premiums and retain a spread, so selling
@@ -10,12 +58,7 @@ func (w *World) PropertyOffer(id string) int {
 	if !saleableResidence(id) || w.Properties[id] == nil {
 		return 0
 	}
-	base := MarinerFreehold
-	if id == "estate" {
-		l, _ := PlaceByID(id)
-		base = l.Cost
-	}
-	return base * 65 * max(0, min(100, w.Properties[id].Condition)) / 10000
+	return w.ResidencePrice(id) * 65 * max(0, min(100, w.Properties[id].Condition)) / 10000
 }
 
 func (w *World) SellPropertyReadiness(id string) string {
@@ -55,8 +98,7 @@ func (w *World) BuyResidenceReadiness(id string) string {
 	if w.Properties[id] == nil || !w.CanAcquire(id) {
 		return "The owner is not offering this residence"
 	}
-	l, _ := PlaceByID(id)
-	if w.Player.Cash < l.Cost {
+	if w.Player.Cash < w.ResidencePrice(id) {
 		return "Not enough cash"
 	}
 	return ""
@@ -72,9 +114,9 @@ func (w *World) PropertyMarket() []map[string]any {
 		}
 		asking := AcquisitionCost(w, id)
 		if id == "estate" {
-			asking = l.Cost
+			asking = w.ResidencePrice(id)
 		}
-		out = append(out, map[string]any{"id": id, "name": l.Name, "owned": w.Own(id), "available": w.CanAcquire(id), "holder": w.HolderName(id), "asking": asking, "offer": w.PropertyOffer(id), "condition": p.Condition, "residents": len(w.Residents(id)), "home": w.Player.Home == id, "locked": l.District > w.District})
+		out = append(out, map[string]any{"id": id, "name": l.Name, "owned": w.Own(id), "available": w.CanAcquire(id), "holder": w.HolderName(id), "asking": asking, "offer": w.PropertyOffer(id), "condition": p.Condition, "neighborhood_index": w.NeighborhoodPropertyIndex(id), "residents": len(w.Residents(id)), "home": w.Player.Home == id, "locked": l.District > w.District})
 	}
 	return out
 }

@@ -53,6 +53,7 @@ func (w *World) Witness(kind, place, caption, headline string, actors ...string)
 		ID: ID(), Kind: kind, Target: place, Caption: caption,
 		Headline: headline, Actors: named, Gravity: Gravity(kind), Minute: w.Minute,
 	}
+	w.recordPropertyIncident(kind, place)
 	w.VisualCues = append(w.VisualCues, cue)
 	w.recordAftermath(cue)
 	w.recordPolicePresence(cue)
