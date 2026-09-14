@@ -13214,3 +13214,35 @@ eleven distinct causes where there were three, and every name in the city looked
 like a separate way to die. A death carries the rule now as well as the
 sentence, in the game's own three or four words, and `TestEveryWayToDieNamesTheRuleThatDidIt`
 makes sure the twelfth way to die carries it too.
+
+
+## Ruttledge & Vance salon — 2026-09-14
+
+Added the tailor's authored 3D salon: walnut cutting/finishing counter, patterns,
+scissors, measuring tape, finishing machine, swatch book, fabric shelves, garment
+rack, three headless suit forms, client chair, curtained fitting alcove and stairs
+to the upstairs door. Actual Cutter, Finisher and Fitting clerk occupants use
+the corresponding stations. Seven customer positions and a reserved player
+entrance avoid furniture; overflow remains available in the people list.
+
+The fitting mirror uses a 512×1024 Three Reflector target, follows the rear-wall
+cutaway and disposes its target/material/geometry on unmount. Replaced the
+authored opaque silver pane and used zero clip bias after browser inspection
+showed the backing through the orthographic reflection. Reflection now visibly
+shows the curtain and floor when viewed from the left. Renderer counters include
+both mirror and main passes.
+
+Verification: `npm test` passed all 374 tests (13.989 seconds), production build
+passed (2.62 seconds). The geometry test checks both character rigs, ten public
+spots plus the player, chair support and sampled entrance clearance. Disposable
+`tailor-interior` fixture at port 8962 showed eight NPCs plus the player and one
+overflow person; expanded default view used 222 draw calls / 304374 triangles.
+Orbiting behind the room hid the mirror with the rear wall (127 calls / 184944
+triangles). Inspected standard 820×740 and expanded 1280×720 framing and Home
+reset; browser reported no console warnings/errors. Main campaign was not used
+for QA.
+
+Remaining: the upstairs cutting room is represented by its stair and door, not
+a separately staged room. Fitting/cutting work animations and other unbuilt
+venue interiors remain in scope. This salon is committed source progress; live
+port 8791 still serves release 16c1c95 pending the next verified promotion.

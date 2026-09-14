@@ -9,6 +9,7 @@ import {useEffect, useRef, useState} from 'react';
 import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+import {Reflector} from 'three/addons/objects/Reflector.js';
 import type {Presence, Person} from './types';
 import {wardrobe, dressPedestrian} from './city3dWardrobe';
 import {pedestrianModel} from './city3dCast';
@@ -58,13 +59,24 @@ export function Interior3D(props:{place:InteriorPlace;operation?:LaundryOperatio
   const playerMarker=new THREE.Mesh(new THREE.RingGeometry(.36,.41,40),new THREE.MeshBasicMaterial({color:0xede2bd,side:THREE.DoubleSide}));
   playerMarker.rotation.x=-Math.PI/2;playerMarker.position.y=.065;playerMarker.visible=false;scene.add(playerMarker);
   let machines:LaundryMotion|undefined;
+  let fittingMirror:Reflector|undefined;
+  renderer.info.autoReset=false;
   const loader=new GLTFLoader();
   const modelNames=[roomModel,'person','woman',...(!lobby?['bar-cloth']:[])];
   Promise.all(modelNames.map(async name=>{
    const gltf=await loader.loadAsync(`/art/models/${name}.glb`);
    if(dead){disposeCityResources([gltf.scene]);return;}models.set(name,gltf.scene);
   })).then(()=>{if(dead)return;const room=models.get(roomModel)!;
-   room.traverse(o=>{if(o instanceof THREE.Mesh){o.castShadow=true;o.receiveShadow=true;}});scene.add(room);if(laundry)machines=new LaundryMotion(room);dirty=true;setStatus('');
+   room.traverse(o=>{if(o instanceof THREE.Mesh){o.castShadow=true;o.receiveShadow=true;}});scene.add(room);
+   if(props.place==='tailor'){
+    // Replace the authored silver surface so the reflected camera cannot see
+    // its opaque back face through the oblique clipping plane.
+    room.traverse(o=>{if(o instanceof THREE.Mesh&&(Array.isArray(o.material)?o.material:[o.material]).some(m=>m.name==='Ruttledge silver mirror'))o.visible=false;});
+    fittingMirror=new Reflector(new THREE.PlaneGeometry(1.36,2.47),{color:0xd8d8cd,textureWidth:512,textureHeight:1024,multisample:0,clipBias:0});
+    fittingMirror.name='fitting-mirror';fittingMirror.position.set(-3.83,1.65,-4.60);scene.add(fittingMirror);
+    room.updateMatrixWorld(true);room.getObjectByName('interior-wall-back')!.attach(fittingMirror);
+   }
+   if(laundry)machines=new LaundryMotion(room);dirty=true;setStatus('');
   }).catch(()=>{if(!dead)setStatus('The 3D room could not load. The people and actions below remain available.');});
   let linenService:LinenPress|undefined;
   let service:CounterWipe|undefined,cloth:THREE.Group|undefined,serviceSeconds=0;
@@ -161,13 +173,13 @@ export function Interior3D(props:{place:InteriorPlace;operation?:LaundryOperatio
     if(back)back.visible=lobby?camera.position.z>=settings.backWall:camera.position.z<=settings.backWall;
     // Moving service poses refresh the cast above; orbiting a static room
     // does not re-upload its unchanged instance buffers.
-    renderer.render(scene,camera);renderedFrames++;dirty=false;
+    renderer.info.reset();renderer.render(scene,camera);renderedFrames++;dirty=false;
     if(models.size===modelNames.length)canvas.dataset.interior=JSON.stringify({place:p.place,people:[...actors.keys()],occupants:[...actors].map(([id,a])=>({id,spot:a.userData.spot,x:a.position.x,y:a.position.y,z:a.position.z})),picked:p.picked,
-      drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,renderedFrames,
+      mirror:fittingMirror?{visible:!!back?.visible,resolution:[512,1024]}:undefined,drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,renderedFrames,
       zoom:camera.zoom,linen:linenService?{seconds:linenService.seconds,active:linenService.active}:undefined,machines:machines?{count:machines.count,running,seconds:machines.seconds}:undefined,arrival:arrival?{seconds:arrivalSeconds,duration:arrival.duration,moving:arriving}:undefined,service:service?.available?{seconds:serviceSeconds,cloth:service.clothPosition.toArray()}:undefined,omitted:Math.max(0,p.people.length-actors.size+(playerActor?1:0)),cutawayWalls:[...(!left?.visible?['left']:[]),...(!back?.visible?['back']:[])]});
    }
   };frame=requestAnimationFrame(tick);
-  return()=>{reduce.removeEventListener('change',reduction);unbindPan();dead=true;cancelAnimationFrame(frame);observer.disconnect();controls.removeEventListener('change',changed);controls.dispose();canvas.removeEventListener('keydown',keys);canvas.removeEventListener('pointerdown',press);canvas.removeEventListener('pointerup',release);castBatch?.dispose();disposeCityResources([scene,...models.values()]);renderer.dispose();renderer.forceContextLoss();canvas.remove();};
+  return()=>{reduce.removeEventListener('change',reduction);unbindPan();dead=true;cancelAnimationFrame(frame);observer.disconnect();controls.removeEventListener('change',changed);controls.dispose();canvas.removeEventListener('keydown',keys);canvas.removeEventListener('pointerdown',press);canvas.removeEventListener('pointerup',release);castBatch?.dispose();if(fittingMirror){fittingMirror.removeFromParent();fittingMirror.geometry.dispose();fittingMirror.dispose();}disposeCityResources([scene,...models.values()]);renderer.dispose();renderer.forceContextLoss();canvas.remove();};
  },[props.place]);
  return <div className={`interior3d${enlarged?' enlarged':''}`}>{(props.place==='flat'||props.place==='lodging')&&<button className="interior3d-drawer" aria-pressed={drawerOpen} onClick={()=>setDrawerOpen(!drawerOpen)}>{drawerOpen?'Close bedside drawer':'Open bedside drawer'}</button>}<button className="interior3d-expand" aria-pressed={enlarged} onClick={()=>{setEnlarged(!enlarged);host.current?.querySelector('canvas')?.focus();}}>{enlarged?'Standard room view':'Enlarge room'}</button><div ref={host} className="interior3d-canvas"/><span className="interior3d-caption">{roomName} · {props.player.name}: pale ring · Drag / Q/E: orbit · Scroll / +/−: zoom · WASD / arrows: pan · Home: reset{props.place!=='flat'&&props.place!=='lodging'&&' · Select a person'}{extraPeople>0&&` · ${extraPeople} more in the people list`}</span>{status&&<p role="status">{status}</p>}</div>;
 }
