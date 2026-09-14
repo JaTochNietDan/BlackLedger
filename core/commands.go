@@ -948,7 +948,11 @@ func (w *World) apply(c Command) error {
 					}
 					p.Respect += 4
 					l, _ := PlaceByID(target)
-					w.Log("A foothold in the city", l.Name+" now produces income for you. Earnings accrue as game time passes.", "business")
+					detail := l.Name + " now produces income for you. Earnings accrue as game time passes."
+					if target == "room" {
+						detail = l.Name + " is yours, including its existing tenants and rent accounts. Rent is collected daily; wages, supplies and repairs are your responsibility."
+					}
+					w.Log("A foothold in the city", detail, "business")
 					// Taking premises in a family's district is noticed by them.
 					if previous := priorOwner; previous != "" && previous != "independent" {
 						if f := w.FactionByID(previous); f != nil {
@@ -957,7 +961,11 @@ func (w *World) apply(c Command) error {
 					}
 				case "inspect":
 					l, _ := PlaceByID(target)
-					w.Log("The books are open", fmt.Sprintf("%s: %d%% condition, earning $%d/hour of a possible $%d/hour. Repairs cost $50 and restore up to 40 condition.", l.Name, w.Properties[target].Condition, w.Properties[target].Income*w.Properties[target].Condition/100, w.Properties[target].Income), "business")
+					detail := fmt.Sprintf("%s: %d%% condition, earning $%d/hour of a possible $%d/hour. Repairs cost $50 and restore up to 40 condition.", l.Name, w.Properties[target].Condition, w.Properties[target].Income*w.Properties[target].Condition/100, w.Properties[target].Income)
+					if target == "room" {
+						detail = fmt.Sprintf("%s: %d living tenants, $%d daily rent after service credits, %d%% condition. Payments and arrears are in the residents’ register. Repairs cost $50 and restore up to 40 condition.", l.Name, len(w.Residents(target)), w.RentalDaily(target), w.Properties[target].Condition)
+					}
+					w.Log("The books are open", detail, "business")
 				case "sit_out":
 					if err := w.SitOut(); err != nil {
 						return err

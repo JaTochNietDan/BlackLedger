@@ -50,7 +50,7 @@ func TestEveryTradeInTheCityCanActuallyBeRun(t *testing.T) {
 		// the best business in the city rather than the only address in it that
 		// runs on nothing. So the rule is that every trade can end up yours,
 		// and a seat proves it the other way.
-		if place.Cost <= 0 {
+		if AcquisitionCost(w, id) <= 0 {
 			if w.faction(prop.Owner) == nil {
 				t.Errorf("%s (%s) has no price and belongs to no family, so nobody can ever hold it", id, place.Name)
 			}
@@ -178,7 +178,7 @@ func TestSomewhereWithNoPriceIsNotForSale(t *testing.T) {
 	w.Player.Cash, w.Player.Respect, w.Player.Health = 40000, 90, 100
 	for _, l := range Locations {
 		prop := w.Properties[l.ID]
-		if prop == nil || prop.Income <= 0 || l.Cost > 0 {
+		if prop == nil || prop.Income <= 0 || AcquisitionCost(w, l.ID) > 0 {
 			continue
 		}
 		// Nobody holds it, so the only thing left that can refuse is the

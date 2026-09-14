@@ -37,10 +37,10 @@ func TestABusinessComesAsAGoingConcern(t *testing.T) {
 		}
 	}
 	// Somewhere that does not trade has no inside to manage.
-	if _, running := TradeOf("room"); running {
-		t.Fatal("a rented room is a business")
+	if _, running := TradeOf("apartment"); running {
+		t.Fatal("an unmanaged apartment was given a business trade")
 	}
-	if w.Capacity("room") != 1 {
+	if w.Capacity("apartment") != 1 {
 		t.Fatal("a place with no trade was given a capacity")
 	}
 }

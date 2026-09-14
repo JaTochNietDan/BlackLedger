@@ -1,5 +1,7 @@
 package core
 
+import "math"
+
 // RentAccount belongs to the premises, including any outstanding tenant debt.
 // A transfer of the premises transfers these receivables; a visit does not.
 type RentAccount struct {
@@ -14,13 +16,16 @@ type RentAccount struct {
 // Earnings now cover the actual accommodation instead of charging both costs.
 const npcOtherLivingCost = 4
 
+const MarinerFreehold = 3600
+
 func (w *World) NPCRent(n *NPC) int {
 	if n == nil || n.Dead || w.Properties[n.Home] == nil {
 		return 0
 	}
 	switch n.Home {
 	case "room":
-		return 15
+		p := w.Properties[n.Home]
+		return max(0, int(15*float64(p.Condition)/100*math.Min(1, w.Capacity(n.Home))*operatingMode(p.Mode).Take))
 	case "apartment":
 		if n.Accommodation == "Shared flat" {
 			return 15

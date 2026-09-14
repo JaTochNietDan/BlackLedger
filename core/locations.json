@@ -2,6 +2,7 @@
  {
   "id": "room",
   "name": "The Mariner",
+  "kind": "lodging",
   "type": "home",
   "district": 0,
   "x": 220,

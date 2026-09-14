@@ -86,6 +86,7 @@ func TestEveryTradeReachesPastItsOwnIncome(t *testing.T) {
 				w.Player.Fuel, w.Player.Fuelled = 1, w.Minute
 				return w.FuelFee(id)
 			}},
+		{"lodging", "a room without paying rent to yourself", "lower", func(w *World, id string) int { return w.HomeCost(id) }},
 		{"dealer", "a car without the forecourt's margin", "lower",
 			func(w *World, id string) int {
 				cash := w.Player.Cash

@@ -8,7 +8,7 @@ package core
 // to somebody.
 
 // SaveVersion is the shape the current build writes.
-const SaveVersion = 16
+const SaveVersion = 17
 
 // seedHoldings is the property each established family holds in a new city.
 var seedHoldings = map[string][]string{
@@ -151,11 +151,21 @@ func (w *World) MigrateLivingWorld() {
 	}
 
 	w.SettleNewPlaces()
+	marinerAdded := false
+	if p := w.Properties["room"]; p != nil {
+		marinerAdded = p.Income == 0
+		p.Income = PlaceIncome["room"]
+	}
 
 	// Businesses acquired before they had an inside were working concerns all
 	// along. Without this they would read as unstaffed and unstocked, and start
 	// earning a fraction of what the campaign had come to expect.
 	for _, l := range Locations {
+		// This upgrade only equips the newly introduced lodging trade. Do not
+		// refill existing businesses whose owner ran out of stock or staff.
+		if w.Version >= 16 && (l.ID != "room" || !marinerAdded) {
+			continue
+		}
 		prop := w.Properties[l.ID]
 		trade, running := TradeOf(l.ID)
 		if !running || prop == nil {

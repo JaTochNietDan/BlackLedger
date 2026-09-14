@@ -210,7 +210,7 @@ export function Interior({
     });
   }
   if (place.owned && place.income > 0) {
-    facts.push({what: 'Earns', is: '$' + place.income + '/hr'});
+    facts.push(place.rent_register ? {what: 'Daily rent', is: '$' + place.rent_register.daily} : {what: 'Earns', is: '$' + place.income + '/hr'});
   }
   // What it pays, now that the wage is a decision rather than a rate. Beside
   // what it earns, because that is the comparison an owner is making.
@@ -247,7 +247,7 @@ export function Interior({
       </div>
       {place.rent_register && <details className="lodging-register">
         <summary>Residents’ register <span>{place.rent_register.occupied} tenants · {place.rent_register.capacity} places</span></summary>
-        <p>${place.rent_register.daily} contracted per day · Payments settle daily; unpaid rent remains owing.</p>
+        <p>${place.rent_register.daily} current rent per day · Service and condition affect the rate. Payments settle daily; unpaid rent remains owing.</p>
         <ul>{place.rent_register.tenants.map(tenant=><li key={tenant.id}>
           <strong>{tenant.name}</strong><span>{tenant.accommodation} · ${tenant.daily} a day</span>
           {tenant.account && <small>Last payment ${tenant.account.paid} · {tenant.account.arrears ? `$${tenant.account.arrears} owing` : 'Account settled'}</small>}

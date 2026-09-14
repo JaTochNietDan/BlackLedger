@@ -755,6 +755,11 @@ func (w *World) fromBehindThisCounter(at string) string {
 		return ""
 	}
 	switch place.Kind {
+	case "lodging":
+		if len(w.Residents(at)) == 0 {
+			return "No tenants on the register. Empty rooms do not pay rent."
+		}
+		return fmt.Sprintf("%s on the register, owing $%d a day between them at the current room rate. The register records who has paid; a tenant out at work still rents their room.", counted(len(w.Residents(at)), "resident", "residents"), w.RentalDaily(at))
 	case "garage":
 		broken := 0
 		for i := range w.NPCs {

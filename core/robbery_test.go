@@ -16,8 +16,8 @@ func TestRobberyNeedsSomethingWorthTakingThatIsNotYours(t *testing.T) {
 	if w.RobberyReadiness("club") != "" {
 		t.Fatal("premises with takings were refused:", w.RobberyReadiness("club"))
 	}
-	if w.RobberyReadiness("room") == "" {
-		t.Fatal("a rented room with no takings was offered as a robbery")
+	if w.RobberyReadiness("apartment") == "" {
+		t.Fatal("an apartment building without a cash trade was offered as a robbery")
 	}
 	w.Properties["laundry"].Owner = "player:1"
 	if w.RobberyReadiness("laundry") == "" {

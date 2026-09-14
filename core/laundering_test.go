@@ -82,9 +82,9 @@ func TestOnlyYourOwnCashBusinessLaunders(t *testing.T) {
 	if w.launderCapacity("casino") <= w.launderCapacity("laundry") {
 		t.Errorf("a casino absorbs %d and a laundry %d", w.launderCapacity("casino"), w.launderCapacity("laundry"))
 	}
-	w.Properties["room"].Owner = "player:1"
-	if w.LaunderReadiness("room") == "" {
-		t.Fatal("a rented room with no trade in it was treated as a cash-handling front")
+	w.Properties["apartment"].Owner = "player:1"
+	if w.LaunderReadiness("apartment") == "" {
+		t.Fatal("an apartment without a cash trade was treated as a cash-handling front")
 	}
 	// Nothing to clean is nothing to do.
 	w.Properties["laundry"].Owner = "player:1"

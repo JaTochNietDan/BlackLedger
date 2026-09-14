@@ -95,7 +95,7 @@ func TestRentalSettlementSurvivesReload(t *testing.T) {
 func TestOwnerDoesNotPayRoomRentToThemselves(t *testing.T) {
 	w := rentalWorld()
 	w.Player.Home = "room"
-	if w.HomeCost("room") != 0 || w.DailyCost() != 0 || w.Books()["costs"].(int) != 0 {
+	if w.HomeCost("room") != 0 || w.DailyCost() != w.Wages() || w.Books()["costs"].(int) != w.Wages() {
 		t.Fatal("owner charged their own rent")
 	}
 	w.Properties["room"].Owner = "independent"

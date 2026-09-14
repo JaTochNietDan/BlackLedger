@@ -104,6 +104,9 @@ func (w *World) CustomDay() {
 
 // OrderReadiness explains why a standing order cannot be taken on, or "".
 func (w *World) OrderReadiness(id string) string {
+	if id == "room" {
+		return "Room income comes from the residents’ rent"
+	}
 	trade, running := TradeOf(id)
 	if !running || !w.Own(id) {
 		return "This is not a business of yours"

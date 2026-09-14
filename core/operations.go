@@ -66,6 +66,7 @@ type Trade struct {
 }
 
 var trades = map[string]Trade{
+	"lodging": {Hands: 3, Wage: 6, Drain: 4, Restock: 100, RestockAmount: 40, Supplies: "coal and clean linen", Trouble: "The boiler has failed and the rooms have no hot water.", Remedy: "Repair the boiler", RemedyDetail: "Restore heat and hot water to the rented rooms.", RemedyCost: 140, Cover: 12},
 	"laundry": {
 		Hands: 3, Wage: 6, Drain: 5, Restock: 90, RestockAmount: 40, Supplies: "soap and coal",
 		Trouble: "A press has broken and the back room is standing idle.",

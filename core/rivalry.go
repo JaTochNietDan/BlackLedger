@@ -61,7 +61,9 @@ func (w *World) FamilyDay() {
 			prop := w.Properties[id]
 			count++
 			condition += prop.Condition
-			income += prop.Income * prop.Condition / 100
+			if id != "room" && id != "apartment" {
+				income += prop.Income * prop.Condition / 100
+			}
 			if prop.Condition < 100 {
 				damaged = append(damaged, prop)
 			}
@@ -351,12 +353,16 @@ func (w *World) FamilyIncome(f *Faction) int {
 	if f == nil {
 		return 0
 	}
-	income := 0
+	income, rent := 0, 0
 	for _, id := range w.FamilyHoldings(f.ID) {
 		prop := w.Properties[id]
-		income += prop.Income * prop.Condition / 100
+		if id == "room" || id == "apartment" {
+			rent += w.RentalDaily(id)
+		} else {
+			income += prop.Income * prop.Condition / 100
+		}
 	}
-	return income * 24
+	return income*24 + rent
 }
 
 // DaysOfCover is how long an organization could go on paying everybody if the

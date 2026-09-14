@@ -1786,7 +1786,7 @@ func (w *World) Actions(id string) []Action {
 					fmt.Sprintf("%d of %d positions filled. A week's wages up front at $%d a day after. Short-handed, it earns less and attracts trouble.", prop.Staff, trade.Hands, trade.Wage))
 				add("layoff", "Let somebody go", 30, 0, w.LayOffReadiness(id),
 					fmt.Sprintf("Cuts $%d a day from the wage bill and what the place can handle.", trade.Wage))
-				if !prop.Order {
+				if !prop.Order && id != "room" {
 					add("order", "Take on a standing order", 60, 0, w.OrderReadiness(id),
 						fmt.Sprintf("$%d a day from somebody respectable, for as long as %s keeps working at %d%%. It needs %d%% trade before anybody offers one, and losing it costs %d trade on top of the money.", OrderBonus, l.Name, int(OrderCapacity*100), OrderCustom, OrderLoss))
 				}
@@ -1923,8 +1923,18 @@ func (w *World) Actions(id string) []Action {
 			// reading "$0 for the freehold", which is a figure that says
 			// nothing while looking like one — the same fault the guard for it
 			// was written to catch.
-			add("acquire", label, 60, cost, w.AcquireReadiness(id),
-				fmt.Sprintf("%s It earns up to $%d an hour while it is working, and every rival in the city can see who holds it now.", taking, w.Properties[id].Income))
+			detail := fmt.Sprintf("%s It earns up to $%d an hour while it is working, and every rival in the city can see who holds it now.", taking, w.Properties[id].Income)
+			if id == "room" {
+				rent := "There are no living tenants on the register."
+				if count := len(w.Residents(id)); count > 0 {
+					rent = fmt.Sprintf("%d living tenants are on the register, but the current service and condition leave no rent due.", count)
+					if daily := w.RentalDaily(id); daily > 0 {
+						rent = fmt.Sprintf("%d living tenants currently owe $%d per day in total.", count, daily)
+					}
+				}
+				detail = taking + " " + rent + " Only collected rent reaches you; poor service and damage reduce rent. Your own room has no rent while you own the building."
+			}
+			add("acquire", label, 60, cost, w.AcquireReadiness(id), detail)
 		}
 	}
 	for i := range w.Factions {
@@ -2705,6 +2715,9 @@ func AcquisitionCost(w *World, id string) int {
 		return 0
 	}
 	cost := float64(place.Cost * Freehold)
+	if id == "room" {
+		cost = MarinerFreehold
+	}
 	if prop := w.Properties[id]; prop != nil && strings.HasPrefix(prop.Owner, "former:") {
 		cost *= 2
 	}
@@ -2715,7 +2728,7 @@ func AcquisitionCost(w *World, id string) int {
 func (w *World) Holdings() int {
 	n := 0
 	for _, l := range Locations {
-		if w.Own(l.ID) && l.Cost > 0 {
+		if w.Own(l.ID) && (l.Cost > 0 || l.ID == "room") {
 			n++
 		}
 	}
@@ -2731,10 +2744,8 @@ func (w *World) Holdings() int {
 // So a player with $51 and 33 respect was told premises were available now
 // while every door in the city said "Not enough cash".
 func (w *World) AcquireReadiness(id string) string {
-	// Only somewhere that earns is for sale. A rented room, the station and the
-	// newspaper are not premises anybody takes over, and the button is not
-	// offered there — so neither is this, or the guide would count a door
-	// nobody can walk through as an opportunity.
+	// Only somewhere that earns is for sale. The Mariner is a lodging
+	// business with a separate freehold price; the station and newspaper are not.
 	if prop := w.Properties[id]; prop == nil || prop.Income <= 0 {
 		return "There is nothing here to take over"
 	}
@@ -2742,7 +2753,7 @@ func (w *World) AcquireReadiness(id string) string {
 	// exchange and the club all earn and all carry a cost of nothing, because
 	// none of them was ever meant to change hands — opening the business block
 	// to everywhere that earns offered them for free.
-	if place, ok := PlaceByID(id); !ok || place.Cost <= 0 {
+	if place, ok := PlaceByID(id); !ok || (place.Cost <= 0 && id != "room") {
 		return "This is not somewhere that changes hands"
 	}
 	if w.Own(id) {
@@ -2784,6 +2795,8 @@ func (w *World) AcquireReadiness(id string) string {
 // ordinary business earns here and the most it costs to run — six men on the
 // books before it has moved anything.
 var PlaceIncome = map[string]int{
+	// Lodging capacity reference only; cash comes from tenant rent settlement.
+	"room":    15,
 	"laundry": 14, "garage": 24, "casino": 18, "club": 30,
 	"market": 18, "docks": 22, "bar": 12,
 	"restaurant": 20, "poolhall": 16, "butcher": 28, "haulage": 40,
