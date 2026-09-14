@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import {CityAccident} from './city3dAccident.js';
 import {pedestrianModel} from './city3dCast.js';
+import {groundCharacter} from './city3dGround.js';
 import {availableSceneSlot} from './city3dEvents.js';
 import type {SceneSlot} from './city3dEvents.js';
 import type {Lot} from './city3dPlan.js';
@@ -87,7 +88,9 @@ export class CityAftermath {
           object.rotation.y=Math.atan2((body?.slot.root.x ?? lot.x)+.8-slot.root.x,(body?.slot.root.z ?? lot.z)-slot.root.z);
         }
         object.traverse(part=>{if(part instanceof THREE.Mesh){part.castShadow=true;part.receiveShadow=true;}});
-        group.add(object);this.root.add(group);this.entries.set(key,{group,slot,owned,victim:record.victim.id||undefined});
+        group.add(object);
+        if(kind==='body'&&!accident)groundCharacter(object,.205);
+        this.root.add(group);this.entries.set(key,{group,slot,owned,victim:record.victim.id||undefined});
       }
     }
     for(const [key,entry] of this.entries) if(!desired.has(key)) {

@@ -127,8 +127,11 @@ test('armed close-range strikes approach, aim into the victim and withdraw insid
 
 test('every strike hands off identical victim geometry without resetting joints',async()=>{
  const {CityAftermath,captureBodyJoints}=await import('../.runtime/frontend-test/city3dAftermath.js');
+ const {dressPedestrian,wardrobe}=await import('../.runtime/frontend-test/city3dWardrobe.js');
  for(const name of ['person','woman'])for(const [variant,gunName] of [['back-of-head','revolver'],['close-shot','revolver'],['close-shot','shotgun'],['burst','thompson'],['close-quarters',null]]){
   const attacker=await model('person'),victim=await model(name),gun=gunName?await model(gunName):undefined;
+  // Match the live scene's visible hair/hat selection before measuring contact.
+  dressPedestrian(victim,name,wardrobe('victim'));
   const cast=new CityAssassination(attacker,victim,gun,variant,gunName||'revolver');
   cast.root.position.set(76,.2,38.35);cast.update(cast.duration);
   const expected=[];cast.victim.traverse(n=>{if(n.isMesh)expected.push(n.matrixWorld.clone());});

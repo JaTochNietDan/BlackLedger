@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import {groundCharacter} from './city3dGround.js';
 import {aimArm,poseLongGun,weaponShots} from './city3dWeapons.js';
 import {casualtyFall} from './city3dEvents.js';
 import type {VisualCue} from './types';
@@ -92,6 +93,7 @@ export class CityAssassination {
     // Fall away from the attacker, independent of the victim’s initial facing.
     this.victim.quaternion.setFromAxisAngle(new THREE.Vector3(0,1,0),this.victimYaw)
       .premultiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,0,1),p.fall.rotation));
+    groundCharacter(this.victim,.005);
     this.root.updateMatrixWorld(true);
     return p;
   }

@@ -273,3 +273,24 @@ test('fatal accident aftermath retains the final rig pose and occupied slot unti
   city.update(records,780,lots,models,()=>'',[],new Set());assert.equal(city.slots().length,0);city.dispose();
  }
 });
+
+test('strike victims stay grounded throughout every fall and its retained aftermath',async()=>{
+ const {CityAssassination}=await import('../.runtime/frontend-test/city3dAssassination.js');
+ for(const name of ['person','woman'])for(const variant of ['back-of-head','close-shot','burst','close-quarters']){
+  const victim=await model(name),cast=new CityAssassination(await model('person'),victim,variant==='close-quarters'?undefined:new THREE.Group(),variant);
+  cast.root.position.set(11,.2,23);cast.root.rotation.y=1.1;
+  let previous;
+  for(let frame=0;frame<=cast.duration*30;frame++){
+   cast.update(frame/30);
+   let lowest=Infinity;
+   victim.traverseVisible(part=>{
+    if(!(part instanceof THREE.Mesh))return;
+    const vertices=part.geometry.attributes.position,p=new THREE.Vector3();
+    for(let i=0;i<vertices.count;i++)lowest=Math.min(lowest,p.fromBufferAttribute(vertices,i).applyMatrix4(part.matrixWorld).y);
+   });
+   assert.ok(Math.abs(lowest-.205)<1e-6,`${name}/${variant} at ${frame/30} has floor ${lowest}`);
+   if(previous!==undefined)assert.ok(Math.abs(victim.position.y-previous)<.09,`${name}/${variant} ground correction jumped`);
+   previous=victim.position.y;
+  }
+ }
+});

@@ -10,6 +10,7 @@ import {CityRubble} from './city3dRubble';
 import {CitySuppression} from './city3dSuppression';
 import {CityFire, clearBlastWindows} from './city3dFire';
 import {CityAftermath,captureBodyJoints} from './city3dAftermath';
+import {groundCharacter} from './city3dGround';
 import {previewScenes, previewScene, type PreviewScene} from './city3dPreview';
 import {frameScene, stagedSceneBounds,ScenePullback, impactPulse, renderImpact} from './city3dFraming';
 import {seatDriver} from './city3dSeating';
@@ -1524,6 +1525,7 @@ export function City3D(props: Props) {
             const fall = casualtyFall(t);
             e.extra.rotation.z = fall.rotation;
             e.extra.position.y = fall.height;
+            groundCharacter(e.extra,.205);
           }
           const police = ['raid', 'arrest','raid-unit','police-unit'].includes(e.cue.kind);
           const personnel=['officer','detainee','raid-officer'].includes(e.cue.kind);
