@@ -1345,3 +1345,32 @@ count (43) lagging the new rental-investment offer (44). Updated that count;
 the command-level investment test verifies the actual single principal debit.
 The original clean core package completed in170.226s with this sole failure;
 its corrected recheck and the remaining full simulation run are tracked below.
+
+## September 14 — verified release running on8791
+
+Release b4b7aee is now serving the main campaign. All clean packages passed:
+cmd/blackledger corrected recheck1.103s, core corrected full recheck195.778s,
+sim394.306s, store0.128s, cmd/simulate7.115s and cmd/playtest0.076s.
+Frontend clean build and all354 tests passed. These checks excluded the existing
+uncommitted armed/mugging/robbery/aftermath files and sim/died_test.go.
+
+Go1.23's VCS detection ignored the nested worktree .git file and reported the
+outer checkout's dirty state. The final binary instead comes from a clean local
+clone at `.runtime/release-live-b4b7aee`; /api/health verifies revisionb4b7aee
+and modified:false. Its frontend is the tested release build. Main port8791 had
+no listener before startup; no running campaign process was replaced.
+
+Before startup, made `.runtime/campaign-pre-b4b7aee.sqlite3` with SQLite backup
+and verified integrity. Main startup performed the reviewed v14→19 migration.
+Read-only verification confirms its complete resulting state equals the isolated
+upgrade copy, including revision2115, player object and all2117 receipt contents.
+Live state SHA256: db1471392f15b1bc3381f5456e169e6a1ba67eb4d000626f379190b352d1ec55.
+Evidence: `.runtime/release-live-verification.json`, clean test/build logs and
+`.runtime/release-live-identity.log`. No gameplay QA action used the main save.
+
+This release integrates poker/table cameras, apartment ownership and trading,
+crime-sensitive prices, actual household savings/burglary/home-strike rules,
+rental investments, Cypress/Ashbury/private-flat interiors and population housing
+settlement. It does not close the goal: indoor assault/burglary choreography,
+remaining commercial/civic/industrial interiors, broader income progression,
+visual fidelity acceptance and a fresh coherent played campaign remain.
