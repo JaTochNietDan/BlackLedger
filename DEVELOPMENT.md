@@ -459,3 +459,14 @@ Outstanding: authored bottle/throw/flee choreography, debug incendiary staging, 
 Built incendiary-bottle.glb in Blender, with a48-sided revolved heel/body/shoulder/neck profile, glossy olive material, curved paper label with packed grain/border texture, physical Bell Reserve1953 lettering and a continuous folded cloth strip with charred tip. The origin is the neck grip; named bottle-grip and bottle-flame empties support the upcoming held/flight presentation. Added targeted export and full-export inclusion.
 
 CUA8897 WebGL close-up initially revealed block-like stacked cloth folds; replaced those with a continuous thickened curved sheet and inspected the corrected front/side view. Bottle is approximately8cm across, base25cm below grip; flame marker above cloth. Actual exported-GLB test passes: grip position, dimensions, outward label raycast in front of glass and under10000 triangles (.runtime viewer is an isolated asset study). No campaign or API changes. Caffeinate87182 confirmed alive. This supplies the required prop but is not yet attached to a live attacker or integrated into throwing/flight/escape choreography; those remain next, along with the full objective.
+
+
+### 2026-09-14 — held bottle, release and escape motion study
+
+Added CityIncendiary presentation cast: short approach, right-arm windup using the existing two-segment IK, release at3.1s, arced flight to a caller-provided target at3.9s and retreat through6.8s. The held prop follows the actual elbow/hand transform; release caches that position and quaternion so there is no visual snap. The cast is expressed in local metres for future city placement/path reservations. It does not change simulation outcomes.
+
+Browser study on isolated Vite8897 first exposed the body hanging inside the forearm. Orienting the bottle along the forearm exposed the body but crowded its protruding cloth; the final perpendicular grip keeps the bottle body outside the sleeve and makes the label readable in the close-up windup screenshot. Playback reached6.80s normally. This remains a basic rigid-hand pose, not finished finger articulation.
+
+Actual person/woman GLB tests sample held poses under a translated/rotated scene root, check attachment error below1e-6m and bottle-body clearance from the forearm segment, continuous release position/quaternion, flight height, exact target contact, disappearance at impact and escape endpoint. All248 frontend tests pass10.942s (.runtime/incendiary-motion-tests-final.log), TypeScript check passes, diff check clean. No campaign state was changed; existing unrelated core files remain unstaged.
+
+Not yet wired into City3D: traffic reservation for the complete cast path, target selection on the actual facade, flame/impact audio and timed persistent fire/brigade reveal, debug entry and committed-scene browser acceptance. The isolated study does not establish whole-city collision safety or production animation quality. Full goal remains active.
