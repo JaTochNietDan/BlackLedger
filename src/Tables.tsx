@@ -189,7 +189,9 @@ export function CardTable({
       {/* The cloth itself, with the two seats on it and the money in the middle
           of the table where a stake actually sits. */}
       <BlackjackTable3D mine={mine} theirs={theirs} hidden={!over && theirs.length < 2 ? 1 : 0} presentation={presentation}/>
-      {presentation.active ? <p role="status">The cards are being dealt…</p> : <div className="baize">
+      <div className="blackjack-hand-summary">
+      {presentation.active && <p className="blackjack-dealing" role="status">The cards are being dealt…</p>}
+      <div className="baize" style={{visibility:presentation.active?"hidden":"visible"}} aria-hidden={presentation.active}>
         <div className="seat dealer">
           <span className="seat-name">Dealer</span>
           <span className="hand-description">{theirs.map(c=>knownCard(c)?`${c.rank}${pipOf(c.suit)}`:"Face down").join(" · ")}{!over && theirs.length < 2 ? " · Face down" : ""}</span>
@@ -205,16 +207,16 @@ export function CardTable({
           <b className={'seat-total' + (total > 21 ? ' warning' : '')}>{total}</b>
         </div>
       </div>
-      }
-      {presentation.active ? null : over ? (
-        <p className={'felt-result' + (hand.won ? ' won' : '')}>{hand.outcome}</p>
+      </div>
+      {over ? (
+        <p className={'felt-result' + (hand.won ? ' won' : '')} style={{visibility:presentation.active?'hidden':'visible'}} aria-hidden={presentation.active}>{hand.outcome}</p>
       ) : (
         <div className="felt-actions">
-          <button onClick={() => act('hit')} disabled={total > 21}>
+          <button onClick={() => act('hit')} disabled={presentation.active || total > 21}>
             Another card
           </button>
-          <button onClick={() => act('stand')} disabled={total > 21}>
-            Stand on {total}
+          <button onClick={() => act('stand')} disabled={presentation.active || total > 21}>
+            {presentation.active ? "Wait for the cards" : `Stand on ${total}`}
           </button>
         </div>
       )}

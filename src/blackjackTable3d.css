@@ -6,3 +6,7 @@
 .card-felt .baize .seat{position:static;display:flex;gap:10px;align-items:center}
 .card-felt .baize .seat-total{position:static}
 .card-felt .baize .seat{flex-wrap:wrap;justify-content:center;min-width:0;flex:1}.hand-description{font:14px Georgia,serif;color:#f0dfb7}
+
+.blackjack-hand-summary{position:relative}.blackjack-dealing{position:absolute;inset:0;display:grid;place-items:center;margin:0;color:#f0dfb7;font:15px Georgia,serif}
+@media(max-width:520px){.card-felt .baize{flex-direction:column;gap:12px}.card-felt .baize .seat{width:100%;display:grid;grid-template-columns:55px minmax(0,1fr) 30px}.card-felt .baize .seat-total{text-align:right}.card-felt .hand-description{overflow-wrap:anywhere}}
+.card-felt .baize .seat{min-height:0;padding:0}
