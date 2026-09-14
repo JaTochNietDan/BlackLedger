@@ -7,16 +7,17 @@ import (
 )
 
 type PoolTournament struct {
-	Replays  map[int]string     `json:"replays"`
-	Strokes  map[int]PoolStroke `json:"strokes"`
-	Life     int                `json:"life"`
-	PlayerID string             `json:"player_id"`
-	Fee      int                `json:"fee"`
-	Escrow   int                `json:"escrow"`
-	Deposits map[string]int     `json:"deposits"`
-	Bracket  *billiards.Bracket `json:"bracket"`
-	Settled  bool               `json:"settled"`
-	Voided   bool               `json:"voided"`
+	NextStrokes map[int]int        `json:"next_strokes"`
+	Replays     map[int]string     `json:"replays"`
+	Strokes     map[int]PoolStroke `json:"strokes"`
+	Life        int                `json:"life"`
+	PlayerID    string             `json:"player_id"`
+	Fee         int                `json:"fee"`
+	Escrow      int                `json:"escrow"`
+	Deposits    map[string]int     `json:"deposits"`
+	Bracket     *billiards.Bracket `json:"bracket"`
+	Settled     bool               `json:"settled"`
+	Voided      bool               `json:"voided"`
 }
 
 // Shared funding entry point; scheduled admission calls this after checking its window.
@@ -50,6 +51,7 @@ func (w *World) StartPoolTournament(npcs []string, fee int) error {
 		deposits[id] = fee
 	}
 	w.PoolTournament = &PoolTournament{Life: w.Life, PlayerID: player, Fee: fee, Escrow: fee * len(entrants), Deposits: deposits, Bracket: bracket, Replays: map[int]string{}, Strokes: map[int]PoolStroke{}}
+	w.schedulePoolTournament()
 	w.Log("Entry money on the baize", fmt.Sprintf("%d entrants each pay $%d. The tournament winner takes the whole $%d pool. Leaving forfeits entry money.", len(entrants), fee, fee*len(entrants)), "personal")
 	return nil
 }
@@ -164,7 +166,7 @@ func (w *World) refundPoolTournament() {
 	w.Log("The tournament is called off", "Unforfeited entry fees are returned. Forfeited entries remain in the hall’s till.", "personal")
 }
 
-// One physical NPC stroke, for later spectator/background command integration.
+// One physical NPC stroke shared by spectator commands and scheduled play.
 // It cannot choose a shot on behalf of the player.
 func (w *World) PlayPoolTournamentBot(index int) error {
 	t := w.PoolTournament
@@ -213,6 +215,10 @@ func (w *World) PlayPoolTournamentBot(index int) error {
 	}
 	t.Replays[index] = replay
 	t.Strokes[index] = PoolStroke{Shooter: cell.Rack.Turn, Intent: turn.Intent, Placement: turn.Placement, Decision: turn.Decision}
+	if t.NextStrokes == nil {
+		t.NextStrokes = map[int]int{}
+	}
+	t.NextStrokes[index] = w.Minute + 2
 	cell.Rack = &turn.Match
 	w.ReconcilePoolTournament()
 	return nil

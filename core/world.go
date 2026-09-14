@@ -2419,6 +2419,7 @@ func (w *World) Attack(plot Plot) {
 }
 func (w *World) Advance(minutes int) {
 	w.ReconcilePool()
+	w.schedulePoolTournament()
 	defer w.ReconcilePool()
 	// Standing in a room is seeing who is in it, and being seen in it. Written
 	// down as the clock moves rather than as the world is read: reading must
@@ -2443,6 +2444,9 @@ func (w *World) Advance(minutes int) {
 			morning += 1440
 		}
 		next = min(next, morning)
+		if due := w.nextPoolTournamentStroke(); due > 0 {
+			next = min(next, due)
+		}
 		opening, closing := w.poolTournamentWindow()
 		for _, boundary := range []int{opening - 60, closing} {
 			if boundary > w.Minute {
@@ -2600,6 +2604,7 @@ func (w *World) Advance(minutes int) {
 		if w.Event == nil && p.Alive && w.NextPressure > 0 && w.Minute >= w.NextPressure {
 			w.BusinessPressure()
 		}
+		w.advancePoolTournament()
 	}
 }
 

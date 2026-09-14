@@ -13373,3 +13373,12 @@ custody and war behavior retain priority. Clock-driven arrival/entry tests,
 three-seed local-field probes, the full core/store/server suites and vet pass.
 See BILLIARDS.md and `.runtime/pool-attendance-*` for evidence. No live save or
 release changes. Automatic unattended matches remain next.
+
+### 2026-09-14 — Unattended physical tournament play
+
+NPC-only tournament racks now advance on saved two-minute clock deadlines using
+actual opponent physics. Player tables remain controlled by the player. Watched
+strokes cannot double-fire during their action time. An unattended semifinal and
+final completed in17/23 strokes; timing/reload, payout, pause and closure tests
+pass, along with full store/server suites, vet and build. Exact evidence and
+remaining visual/playthrough requirements are in BILLIARDS.md. Main unchanged.

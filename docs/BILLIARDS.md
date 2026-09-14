@@ -521,3 +521,27 @@ Validation: focused attendance/routine tests and Go vet pass. The full core,
 store and HTTP server suites also pass; exact timings are recorded in
 `.runtime/pool-attendance-suite.log`. This broad run includes the existing city
 routine and campaign regression checks, not only the new attendance fixtures.
+
+## Physical progress at unattended tournament tables (2026-09-14)
+
+NPC-only racks now take one actual opponent stroke every two game minutes.
+Saved per-match deadlines survive reloads. The clock visits those deadlines,
+reconciles entrants/hall conditions first, then runs the same physics and stores
+the replay. Qualifying rounds start with a fresh two-minute interval. Human
+matches retain explicit controls; the clock never chooses the player's shot.
+Watched NPC strokes reserve their action time so the same table cannot take an
+extra automatic stroke before that command returns. Other tables continue.
+
+Evidence: a fully unattended draw after the player's withdrawal completed its
+remaining semifinal in17 strokes and final in23 strokes (3.34s test). No outcome
+or ball positions were supplied for those racks. A separate physical final
+fixture verifies the full $100 payout and no repeated award. Tests also cover
+save/reload at the halfway point of a shot deadline, no early or human stroke,
+watched-shot deduplication, paused time and hall closure before play. Focused
+core pool tests pass (5.975s), full store/server tests pass (0.278s/1.840s), vet
+and frontend production build pass. Logs `.runtime/pool-clock-{core,full-draw,
+adapters,vet,build}.log`.
+
+No browser/live release was promoted for this checkpoint. Full player tournament
+browser completion, human cue/bridge animation, compact/touch acceptance and
+expanded billiards physics remain, as does the proxied hall asset load issue.

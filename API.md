@@ -1176,8 +1176,9 @@ Local nullable `pool_tournament_notice` exposes absolute-minute `opens`/`closes`
 The hall notice presents entry terms and opens the draw. Each started rack opens
 the same 3D view, mapping commands to its match index. Spectators can request NPC
 strokes and move the camera, but cannot supply player cue inputs. Returning to
-the draw or hall is a view change; withdrawal is an explicit command. Other
-tables currently progress when watched; autonomous table progression is pending.
+the draw or hall is a view change; withdrawal is an explicit command. NPC-only
+tables progress automatically every two game minutes as the city clock advances.
+Player matches retain explicit controls, including their opponent’s shots.
 
 Tournament evenings also influence ordinary NPC routines from 17:00 until entry
 closes. Eight available regulars are selected deterministically per event from
@@ -1187,3 +1188,11 @@ street journeys, with a departure delay capped at ten minutes for the scheduled
 event. Starting a journey does not change selection. Unentered visitors resume
 ordinary routines after closing; funded entrants remain pinned by their event.
 The clock visits invitation and closing boundaries even during long actions.
+
+Unattended tournament racks store per-match `next_strokes` deadlines. Clock
+boundaries execute real deterministic NPC strokes, retain their physical replay
+and advance the bracket. Newly opened rounds receive two minutes before their
+first automatic stroke. Watching a stroke accounts for its two-minute action,
+so it cannot also trigger an automatic duplicate on that same table. Saves keep
+the remaining time. Reconciliation of deaths, departure and hall closure occurs
+before a scheduled stroke; interrupted player time does not simulate catch-up.

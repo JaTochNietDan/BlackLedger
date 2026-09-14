@@ -85,7 +85,11 @@ func (w *World) poolTournamentCommand(c Command) (string, int, error) {
 		if w.Event != nil {
 			return "", 0, fmt.Errorf("finish the current situation before watching a game")
 		}
-		return "Watch a tournament stroke", 2, w.PlayPoolTournamentBot(index)
+		err := w.PlayPoolTournamentBot(index)
+		if err == nil {
+			t.NextStrokes[index] = w.Minute + 4
+		} // watched stroke consumes the next two minutes
+		return "Watch a tournament stroke", 2, err
 	}
 	cell, seat, err := w.tournamentPlayerMatch(index)
 	if err != nil {
