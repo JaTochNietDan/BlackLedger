@@ -159,12 +159,15 @@ func (w *World) night(l Place) {
 	case roller && rollerNet < 0:
 		w.Log("A bad night at "+l.Name,
 			fmt.Sprintf("Somebody sat down with intent and left $%d of the house's money up. There is $%d behind the tables now.", -rollerNet, prop.Bankroll), "business")
-	case roller:
+	case roller && rollerNet > 0:
 		w.Log("A good night at "+l.Name,
 			fmt.Sprintf("Somebody with real money played long and left $%d of it here. The float is up to $%d.", rollerNet, prop.Bankroll), "business")
 	case result < 0:
 		w.Log("The tables lost at "+l.Name,
 			fmt.Sprintf("$%d of the float went out of the door tonight, leaving $%d behind the tables. The house wins over a season, not over a night.", -result, prop.Bankroll), "business")
+	case result == 0:
+		w.Log("An even night at "+l.Name,
+			fmt.Sprintf("$%d across the tables. The house broke even, leaving the float unchanged at $%d.", handle, prop.Bankroll), "business")
 	default:
 		w.Log("A night at "+l.Name,
 			fmt.Sprintf("$%d across the tables, $%d of it kept. The float stands at $%d.", handle, result, prop.Bankroll), "business")

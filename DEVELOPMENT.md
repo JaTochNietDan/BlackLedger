@@ -2881,3 +2881,16 @@ actors and compact playback card clear of the main HUD. Browser92 had loaded
 the prior bundle during build and was not used as acceptance evidence. No new
 tests for this reversible layout change; compact-width visual acceptance remains.
 No gameplay commands were sent to main8791, and no release was promoted.
+
+### September 14 — release validation and even casino nights
+
+The clean aa9b617 full suite finished: sim passed498.253s; core ran573.270s
+and failed only TestTheCityReadsAfterThePlayerDies (seed219), which found a
+casino report saying "$0 of it kept". Other packages passed. This is a terminal
+failure, not a timed-out or still-running suite. Corrected an even night's
+report to say the house broke even; a high roller who breaks even no longer
+gets a false "good night" report. No economic calculation changed.
+Targeted death-reading and seasonal house-edge tests passed0.797s in the
+working tree. Clean bb58284 frontend build passed4.00s and targeted rental,
+apartment, NPC home purchase and ownership-reference tests passed0.261s.
+Nothing has yet been promoted to8791; latest fixes require clean validation.
