@@ -1,7 +1,7 @@
 import {DiceTable3D} from './DiceTable3D';
 import {DICE_ROLL_MS} from './dicePresentation';
 import {SlotCabinet} from './SlotCabinet';
-import {useEffect, useRef, useState} from 'react';
+import {useEffect, useLayoutEffect, useRef, useState} from 'react';
 import type {CSSProperties} from 'react';
 import {playTable} from './sound';
 import {
@@ -518,6 +518,7 @@ export interface MachineState {
 export function Machine({
   machine,
   motion = true,
+  onPresent,
   money,
   pull,
   amount,
@@ -530,6 +531,7 @@ export function Machine({
 }: {
   machine: MachineState;
   motion?: boolean;
+  onPresent?: (active:boolean)=>void;
   money: (n: number) => string;
   pull: (amount: number) => void;
   // What goes in, and the most this machine takes — a tenth of what the tables
@@ -558,15 +560,15 @@ export function Machine({
 
   // A saved result is already settled when the machine is first opened.
   const seen = useRef(turn);
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!machine.pulled || !animate) {
       seen.current=turn;
-      setRolling([false,false,false]);
+      setRolling([false,false,false]);onPresent?.(false);
       return;
     }
     if (turn === seen.current) return;
     seen.current = turn;
-    setRolling([true, true, true]);
+    setRolling([true, true, true]);onPresent?.(true);
     playTable('handle');
     const stops = [0, 1, 2].map(i =>
       setTimeout(
@@ -574,13 +576,14 @@ export function Machine({
           playTable('reel');
           setRolling(r => r.map((was, at) => (at === i ? false : was)));
           // The tray, once the last drum is down and only if it paid.
+          if (i === 2) onPresent?.(false);
           if (i === 2 && machine.won) playTable('coins', (machine.pays ?? 0) * 2);
         },
         700 + i * 450,
       ),
     );
-    return () => stops.forEach(clearTimeout);
-  }, [turn, machine.pulled, animate]);
+    return () => {stops.forEach(clearTimeout);onPresent?.(false);};
+  }, [turn, machine.pulled, animate, onPresent]);
 
   // Which of the house's machines you are standing at. A nickel machine and a
   // dollar machine are two different machines against the same wall.
@@ -687,6 +690,7 @@ export type DiceState = {
 export function Craps({
   dice,
   motion = true,
+  onPresent,
   money,
   play,
   roll,
@@ -700,6 +704,7 @@ export function Craps({
 }: {
   dice: DiceState;
   motion?: boolean;
+  onPresent?: (active:boolean)=>void;
   money: (n: number) => string;
   play: (amount: number, bet: string) => void;
   roll: () => void;
@@ -717,14 +722,14 @@ export function Craps({
   useEffect(()=>{const preference=matchMedia('(prefers-reduced-motion: reduce)');const changed=()=>setReduced(preference.matches);preference.addEventListener('change',changed);changed();return()=>preference.removeEventListener('change',changed);},[]);
   const animate=motion&&!reduced;
   const seen = useRef(turn);
-  useEffect(() => {
-    if (!animate || (!dice.playing && !dice.settled)) {seen.current=turn;setShaking(false);return;}
+  useLayoutEffect(() => {
+    if (!animate || (!dice.playing && !dice.settled)) {seen.current=turn;setShaking(false);onPresent?.(false);return;}
     if (turn === seen.current) return;
     seen.current = turn;
-    setShaking(true);
-    const stop = setTimeout(() => setShaking(false), DICE_ROLL_MS);
-    return () => clearTimeout(stop);
-  }, [turn, dice.playing, dice.settled, animate]);
+    setShaking(true);onPresent?.(true);
+    const stop = setTimeout(() => {setShaking(false);onPresent?.(false);}, DICE_ROLL_MS);
+    return () => {clearTimeout(stop);onPresent?.(false);};
+  }, [turn, dice.playing, dice.settled, animate, onPresent]);
 
   const live = dice.playing;
   const bets = dice.bets ?? [];
@@ -736,7 +741,7 @@ export function Craps({
     <div className="felt dice-felt">
       <div className="felt-head">
         <span>{dice.place ?? 'The dice'}</span>
-        <b>{point > 0 ? `The point is ${point}` : 'Come out'}</b>
+        <b>{shaking ? 'Dice in motion' : point > 0 ? `The point is ${point}` : 'Come out'}</b>
       </div>
 
       <div className="dice-table">
@@ -745,7 +750,7 @@ export function Craps({
           on, and everybody at the table looking at it. */}
         <div className={'point-box' + (point > 0 ? ' on' : '')}>
           <small>POINT</small>
-          <b>{point > 0 ? point : '—'}</b>
+          <b>{!shaking && point > 0 ? point : '—'}</b>
         </div>
       </div>
 
@@ -756,8 +761,8 @@ export function Craps({
       {live ? (
         <div className="felt-actions dice-actions">
           <p className="felt-note">
-            {money(dice.stake ?? 0)} on {(dice.bet_label ?? 'the line').toLowerCase()}. Nothing to
-            decide now: the {point} or a seven.
+            {shaking ? 'The dice are still in motion.' : <>{money(dice.stake ?? 0)} on {(dice.bet_label ?? 'the line').toLowerCase()}. Nothing to
+            decide now: the {point} or a seven.</>}
           </p>
           <button className="spin-it" disabled={shaking} onClick={roll}>
             {shaking ? 'The dice are still going' : `Throw again for the ${point}`}
@@ -788,11 +793,11 @@ export function Craps({
               onChange={onAmount}
             />
             <button
-              disabled={!!refused}
+              disabled={shaking || !!refused}
               title={refused || undefined}
               onClick={() => play(amount, bet)}
             >
-              Throw {money(amount)}
+              {shaking ? 'The dice are still going' : `Throw ${money(amount)}`}
             </button>
           </div>
         </>

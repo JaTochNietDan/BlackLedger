@@ -138,6 +138,7 @@ export function Casino({
 
   // What the night has done so far. The ledger has all of this and always did;
   // what it did not have is a player watching one hand turn into the next.
+  const [presenting,setPresenting]=useState(false);
   const [night, setNight] = useState<Entry[]>([]);
   // Null until the first look, so sitting down is not treated as a thing that
   // just happened: it used to deal the last result into "this sitting" and,
@@ -269,6 +270,7 @@ export function Casino({
             ) : game === 'dice' ? (
               <Craps
                 motion={motion}
+                onPresent={setPresenting}
                 dice={dice}
                 money={money}
                 turn={revision}
@@ -284,6 +286,7 @@ export function Casino({
             ) : game === 'machine' ? (
               <Machine
                 motion={motion}
+                onPresent={setPresenting}
                 machine={machine}
                 money={money}
                 turn={revision}
@@ -313,7 +316,7 @@ export function Casino({
 
           <aside className="casino-night" aria-label="What the table has done">
             <h4>This sitting</h4>
-            {night.length === 0 ? (
+            {presenting ? <p role="status">The result will be recorded when play settles.</p> : night.length === 0 ? (
               <p className="subtle">Nothing played yet.</p>
             ) : (
               night.map(r => (
