@@ -982,5 +982,21 @@
       ]
     ],
     "bytes": 432064
+  },
+  "interior-restaurant": {
+    "file": "interior-restaurant.glb",
+    "bounds_blender": [
+      [
+        -5.075,
+        -5.5,
+        -0.17
+      ],
+      [
+        5.0,
+        5.575,
+        3.6
+      ]
+    ],
+    "bytes": 2204360
   }
 }

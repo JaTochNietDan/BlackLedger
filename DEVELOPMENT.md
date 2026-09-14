@@ -1697,3 +1697,38 @@ Frontend366/366 checks pass12.750s; production build passes2.79s. Logs:
 the current checkout (including the pre-existing aftermath edits); those unrelated
 files are excluded from this commit. These changes still await clean main release
 integration alongside9198e41. Remaining 3D interiors and scene fidelity stay open.
+
+### Vittoria's 3D dining room — September 14
+
+Replaced the restaurant's flat fallback with an original Blender dining-room GLB:
+10×11m terrazzo floor, walnut wainscoting and mouldings, four set tables with facing
+oxblood banquettes, plate settings/cutlery/napkins/goblets and carnations, pendant
+lamps, wine sideboard/racks, service hatch with stacked plates and coffee urn,
+private panelled door and original geometric still-life wall decorations. Source
+`tools/restaurant_interior.py`, targeted/full export integrated in export_city3d.py;
+2.1MB interior-restaurant.glb plus manifest. No external asset pack.
+
+Registered independent room lamps, cutaways, framing and entry. Public diners use
+eight authored seats and two waiting positions. Cook/cellarman/two waiters have
+separate service stations; additional staff remain in the roster instead of being
+posed as dining customers. The first browser pass exposed that fallback seating
+issue and the second pass verified its correction. No decorative fake occupants.
+
+Geometry checks use both character rigs: full14-person roster plus reserved player
+position, seat cushion support, disjoint occupant bounds, standing furniture
+clearance and clear supported entrance. All367 frontend checks pass12.997s; final
+build passes2.81s. Browser8952 isolated restaurant-interior fixture shows nine
+actual NPCs plus player, omitted0, 157draw calls and246296triangles (not an FPS or
+cross-device performance guarantee). Inspected standard/enlarged view and zoom.
+
+At820×740 the enlarged dining room initially clipped its left wall. Interior3D
+resize now preserves a minimum horizontal field as aspect narrows while keeping
+authored vertical framing on wide screens; it preserves user zoom. Fresh browser
+review at820×740 shows the complete room with visible side margins. Desktop
+viewport restored. Main8791 and its campaign remain unchanged; this and the prior
+household-work/UX commits await clean release integration.
+
+Remaining: detailed kitchen/private back room behind the doors, dining/serving
+choreography, richer glass/material/character fidelity and the other unbuilt
+interiors. This is a furnished dining-room integration, not final whole-game art
+or campaign acceptance. Export/build/test logs are .runtime/restaurant-*.log.

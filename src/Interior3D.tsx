@@ -37,7 +37,15 @@ export function Interior3D(props:{place:InteriorPlace;operation?:LaundryOperatio
   const controls=new OrbitControls(camera,canvas);controls.target.copy(centre);controls.minZoom=.7;controls.maxZoom=3;
   controls.minPolarAngle=.35;controls.maxPolarAngle=1.15;controls.enablePan=false;controls.update();
   const changed=()=>{dirty=true;};controls.addEventListener('change',changed);
-  const resize=()=>{const w=el.clientWidth,h=el.clientHeight;renderer.setSize(w,h);camera.left=-span*w/h;camera.right=span*w/h;camera.top=span;camera.bottom=-span;camera.updateProjectionMatrix();dirty=true;};
+  const resize=()=>{
+   const w=Math.max(1,el.clientWidth),h=Math.max(1,el.clientHeight),aspect=w/h;
+   // Enlarging a room in a narrow window must not crop its side walls.
+   // Keep the authored vertical framing on wide screens, and preserve a
+   // minimum horizontal field of view as the viewport becomes taller.
+   const viewSpan=span*Math.max(1,1.35/aspect);
+   renderer.setSize(w,h);camera.left=-viewSpan*aspect;camera.right=viewSpan*aspect;
+   camera.top=viewSpan;camera.bottom=-viewSpan;camera.updateProjectionMatrix();dirty=true;
+  };
   const observer=new ResizeObserver(resize);observer.observe(el);resize();
   const ambient=new THREE.HemisphereLight(0xffe7bc,0x443e32,2);scene.add(ambient);
   const sun=new THREE.DirectionalLight(0xffe3b0,3);sun.position.set(2,10,lobby?8:-8);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);
