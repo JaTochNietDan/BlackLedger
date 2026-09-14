@@ -1,6 +1,9 @@
 package core
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 // Errands use authoritative departures and arrivals, shared by room occupancy
 // and the public city journey view. Routines dispatch at midnight, six and noon;
@@ -208,32 +211,35 @@ func (w *World) wanted(n *NPC) (errand, bool) {
 // active trip or moving somebody in custody.
 func (w *World) SetOut() {
 	for i := range w.NPCs {
-		n := &w.NPCs[i]
-		if n.Dead || n.Location == "" || w.Travelling(n) || n.Held > w.Minute || w.PoolOpponentPlaying(n.ID) {
-			continue
-		}
-		n.Heading, n.Arrives, n.Errand, n.Sets = "", 0, "", 0
-		// Where a person is standing in the daytime is where their day is,
-		// unless something better has already claimed them.
-		if n.Post == "" && !Evening(w.Minute) && n.Location != n.Home {
-			w.keepPost(n, n.Location)
-		}
-		where, ok := w.wanted(n)
-		if !ok {
-			continue
-		}
-		if _, exists := PlaceByID(where.where); !exists || where.where == n.Location {
-			continue
-		}
-		n.Heading = where.where
-		n.Errand = where.because
-		delay := setsOff(n.ID)
-		if where.where == PoolPlace && w.poolTournamentVisit(n) {
-			delay = min(delay, 10)
-		}
-		n.Sets = w.Minute + delay
-		n.Arrives = n.Sets + TravelMinutes(n.Location, where.where)
+		w.setOutNPC(&w.NPCs[i])
 	}
+}
+
+func (w *World) setOutNPC(n *NPC) {
+	if n.Dead || n.Location == "" || w.Travelling(n) || n.Held > w.Minute || w.PoolOpponentPlaying(n.ID) {
+		return
+	}
+	n.Heading, n.Arrives, n.Errand, n.Sets = "", 0, "", 0
+	// Where a person is standing in the daytime is where their day is,
+	// unless something better has already claimed them.
+	if n.Post == "" && !Evening(w.Minute) && n.Location != n.Home {
+		w.keepPost(n, n.Location)
+	}
+	where, ok := w.wanted(n)
+	if !ok {
+		return
+	}
+	if _, exists := PlaceByID(where.where); !exists || where.where == n.Location {
+		return
+	}
+	n.Heading = where.where
+	n.Errand = where.because
+	delay := setsOff(n.ID)
+	if where.where == PoolPlace && w.poolTournamentVisit(n) {
+		delay = min(delay, 10)
+	}
+	n.Sets = w.Minute + delay
+	n.Arrives = n.Sets + TravelMinutes(n.Location, where.where)
 }
 
 // Arrivals puts down everybody whose walk is over. Called on every step of the
@@ -262,13 +268,14 @@ func (w *World) Arrivals() {
 		if n.Arrives > w.Minute {
 			continue
 		}
+		homeJourney := strings.HasPrefix(n.Errand, "heading home to ")
 		n.Location = n.Heading
 		n.Heading, n.Arrives, n.Errand, n.Sets = "", 0, "", 0
 		// Arriving anywhere in the daytime is arriving at work: whatever
 		// reason brought them, this is now where their day is, and the evening
 		// has somewhere to send them back from. An evening arrival is a drink
 		// and changes nothing.
-		if !Evening(w.Minute) && n.Location != n.Home {
+		if !homeJourney && !Evening(w.Minute) && n.Location != n.Home {
 			w.keepPost(n, n.Location)
 		}
 		// What they came for. A garage's trade and a forecourt's are somebody
@@ -278,6 +285,12 @@ func (w *World) Arrivals() {
 		w.sellCarTo(n)
 		w.fillFor(n)
 		w.noticed(n, false)
+		// A deed may change home while this walk is already underway. Finish
+		// it first, then reconsider from the actual arrival address. The old
+		// residence never becomes the person's workplace through this detour.
+		if homeJourney && n.Home != "" && n.Location != n.Home {
+			w.setOutNPC(n)
+		}
 	}
 }
 

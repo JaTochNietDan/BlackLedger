@@ -2525,3 +2525,23 @@ writes. Initial new test fixture needed its savings map initialized; corrected
 before passing verification. Main8791 remains01fb5cf; this awaits promotion.
 Downsizing, richer moving preferences and the remaining interior/billiards
 fidelity work remain open within the full goal.
+
+### 2026-09-14 — finish old-home walks without losing the workplace
+
+Previous0c4c07c added voluntary funded home purchases. Follow-up inspection
+found midnight schedules journeys before apartment trading: a buyer's old-home
+arrival could overwrite their job and strand them at the former residence.
+Arrival now recognizes the existing saved home-journey reason, preserves Post,
+finishes the original walk, and reuses ordinary per-NPC departure planning from
+the actual arrival address when Home changed. Night arrivals walk to the new
+home; after dawn the normal work/urgent-duty priorities apply. No teleport,
+new save fields or frontend-calculated route. SetOut delegates unchanged
+scheduling rules to the same helper.
+
+New regressions exercise purchase during an active walk, onward departure,
+new-home arrival and an old-home arrival after dawn. Broader home/housing,
+errand/routine/journey/arrival, custody and pool tournament core tests pass
+28.181s; store.303s, HTTP server1.863s and Go vet pass. Logs
+`.runtime/home-move-journey-{tests,adapters}.log`. No main-save QA writes or
+browser claims. Main8791 remains01fb5cf; release promotion and broad interior,
+housing preference and billiards fidelity work remain open.

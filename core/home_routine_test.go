@@ -94,3 +94,52 @@ func TestReplacementOfficialKeepsOfficeDuty(t *testing.T) {
 		}
 	}
 }
+
+func TestHomePurchaseDuringWalkContinuesFromOldAddress(t *testing.T) {
+	w := homeBuyerWorld()
+	w.Minute = 1440
+	n := w.NPC("buyer")
+	n.Location = "club"
+	n.Heading = ""
+	n.Sets = 0
+	n.Arrives = 0
+	w.SetOut()
+	if n.Heading != "room" {
+		t.Fatalf("initial trip %+v", n)
+	}
+	walksOut(w, n)
+	arrives := n.Arrives
+	if !w.purchaseNPCHome() {
+		t.Fatal("purchase failed")
+	}
+	if n.Heading != "room" || n.Arrives != arrives || n.Location != "club" {
+		t.Fatal("purchase changed in-flight trip")
+	}
+	w.Minute = arrives
+	w.Arrivals()
+	if n.Location != "room" || n.Heading != "apartment" || n.Post != "cabstand" || n.Sets <= w.Minute {
+		t.Fatalf("no onward journey: %+v", n)
+	}
+	walksOut(w, n)
+	w.Minute = n.Arrives
+	w.Arrivals()
+	if n.Location != "apartment" || n.Heading != "" || n.Post != "cabstand" {
+		t.Fatalf("new home arrival: %+v", n)
+	}
+}
+
+func TestOldHomeArrivalAfterDawnReturnsToWork(t *testing.T) {
+	w := homeBuyerWorld()
+	w.Minute = 1440 + HomeUntil
+	n := w.NPC("buyer")
+	n.Home = "apartment"
+	n.Location = "club"
+	n.Heading = "room"
+	n.Errand = "heading home to The Mariner"
+	n.Sets = 0
+	n.Arrives = w.Minute
+	w.Arrivals()
+	if n.Location != "room" || n.Post != "cabstand" || n.Heading != "cabstand" {
+		t.Fatalf("dawn detour lost work: %+v", n)
+	}
+}

@@ -831,7 +831,9 @@ tier (Mariner, Riverside, Mercer, Ashbury) with at least $500 left in actual
 purse/savings. Owner-occupants stay put; existing tenants are never displaced.
 The buyer receives that exact unit and releases the old tenancy, preserving
 old rent debt, workplace and current journey. At most one apartment purchase
-occurs per daily call.
+occurs per daily call. A previously scheduled walk home finishes at its original
+destination; if the home changed, arrival preserves the workplace and schedules
+the next ordinary errand from that address (new home overnight, work after dawn).
 
 NPC rents go to the unit owner, capped by tenant cash through the existing daily
 rent account. Player-owned occupied flats contribute contracted rent to Books;
