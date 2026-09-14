@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as THREE from 'three';
-import {frameScene,stagedSceneBounds} from '../.runtime/frontend-test/city3dFraming.js';
+import {frameScene,stagedSceneBounds,ScenePullback} from '../.runtime/frontend-test/city3dFraming.js';
 
 test('event envelope fits at extreme previous zooms, rotations and narrow viewports',()=>{
  for(const aspect of [.35,1,2.4]) for(const zoom of [.6,32]) for(const angle of [0,1,3,5]) {
@@ -54,5 +54,30 @@ test('arrest framing contains both police cars and every corner of the escort re
    const p=new THREE.Vector3(x,y,z).project(camera);
    assert.ok(Math.abs(p.x)<=.580001&&Math.abs(p.y)<=.580001);
   }
+ }
+});
+
+test('planter pullback fits the blast envelope and yields permanently to manual control',()=>{
+ for(const aspect of [.6,1.5]){
+  const camera=new THREE.OrthographicCamera(-100*aspect,100*aspect,100,-100,.1,3000),target=new THREE.Vector3();
+  camera.position.set(180,200,-240);camera.lookAt(target);
+  const close=new THREE.Box3(new THREE.Vector3(-3,0,-3.2),new THREE.Vector3(1,3,2.8));
+  const wide=new THREE.Box3(new THREE.Vector3(-8,0,-8),new THREE.Vector3(8,15,5));
+  frameScene(camera,target,close);const closeZoom=camera.zoom,position=camera.position.clone();
+  const move=new ScenePullback(camera,target,wide);
+  assert.equal(move.update(camera,target,-.1),false);assert.deepEqual(camera.position,position);
+  let previous=closeZoom;
+  for(let frame=0;frame<=60;frame++){
+   move.update(camera,target,frame/60);assert.ok(camera.zoom<=previous+1e-8,'pullback zooms inward');previous=camera.zoom;
+  }
+  for(const x of [-8,8])for(const y of [0,15])for(const z of [-8,5]){
+   const screen=new THREE.Vector3(x,y,z).project(camera);assert.ok(Math.abs(screen.x)<=.580001&&Math.abs(screen.y)<=.580001,'blast clipped at pullback end');
+  }
+  assert.ok(camera.zoom<closeZoom);
+  const cancelled=new ScenePullback(camera,target,close);cancelled.update(camera,target,.3);cancelled.cancel();
+  camera.position.x+=20;target.x+=20;camera.zoom=3;
+  const userPosition=camera.position.clone(),userTarget=target.clone();
+  assert.equal(cancelled.update(camera,target,1),false);assert.deepEqual(camera.position,userPosition);assert.deepEqual(target,userTarget);assert.equal(camera.zoom,3);
+  assert.equal(move.update(camera,target,2),false,'completed pullback reclaimed manual view');
  }
 });

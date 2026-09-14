@@ -52,3 +52,31 @@ export function renderImpact(camera: THREE.OrthographicCamera, x: number, y: num
     camera.projectionMatrixInverse.copy(matrix).invert();
   }
 }
+
+/** One smooth pullback between two fitted views; explicit cancellation is final. */
+export class ScenePullback {
+ private readonly startPosition:THREE.Vector3;
+ private readonly startTarget:THREE.Vector3;
+ private readonly startZoom:number;
+ private readonly endPosition:THREE.Vector3;
+ private readonly endTarget:THREE.Vector3;
+ private readonly endZoom:number;
+ private stopped=false;
+ constructor(camera:THREE.OrthographicCamera,target:THREE.Vector3,bounds:THREE.Box3){
+  this.startPosition=camera.position.clone();this.startTarget=target.clone();this.startZoom=camera.zoom;
+  const endCamera=camera.clone(),endTarget=target.clone();frameScene(endCamera,endTarget,bounds);
+  this.endPosition=endCamera.position.clone();this.endTarget=endTarget;this.endZoom=endCamera.zoom;
+ }
+ cancel(){this.stopped=true;}
+ update(camera:THREE.OrthographicCamera,target:THREE.Vector3,progress:number){
+  if(this.stopped||progress<0)return false;
+  const t=Math.min(1,progress),ease=t*t*(3-2*t);
+  camera.position.lerpVectors(this.startPosition,this.endPosition,ease);
+  target.lerpVectors(this.startTarget,this.endTarget,ease);
+  // Interpolate visible world span, avoiding an abrupt perceived zoom near the end.
+  camera.zoom=1/THREE.MathUtils.lerp(1/this.startZoom,1/this.endZoom,ease);
+  camera.lookAt(target);camera.updateProjectionMatrix();camera.updateMatrixWorld(true);
+  if(t===1)this.stopped=true;
+  return true;
+ }
+}

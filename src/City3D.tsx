@@ -9,7 +9,7 @@ import {CitySuppression} from './city3dSuppression';
 import {CityFire, clearBlastWindows} from './city3dFire';
 import {CityAftermath,captureBodyJoints} from './city3dAftermath';
 import {previewScenes, previewScene, type PreviewScene} from './city3dPreview';
-import {frameScene, stagedSceneBounds, impactPulse, renderImpact} from './city3dFraming';
+import {frameScene, stagedSceneBounds,ScenePullback, impactPulse, renderImpact} from './city3dFraming';
 import {seatDriver} from './city3dSeating';
 import {wardrobe, dressPedestrian} from './city3dWardrobe';
 import {headlightAlpha, headlightCentre} from './city3dHeadlights';
@@ -113,6 +113,7 @@ type Effect = {
   custody?:CityCustody;
   incendiary?:CityIncendiary;
   planter?:CityPlanter;
+  pullback?:{move:ScenePullback;intent:number};
 };
 const modelNames = [
   'tenement',
@@ -237,7 +238,9 @@ export function City3D(props: Props) {
     const plan = cityPlan(latest.current.state.locations);
     const lots = new Map(plan.lots.map(l => [l.id, l]));
     const home = new THREE.Vector3(plan.width / 2, 0, plan.depth / 2);
+    let cameraIntent=0;
     const reset = () => {
+      cameraIntent++;
       controls.target.copy(home);
       camera.position.copy(home).add(new THREE.Vector3(180, 200, -240));
       camera.zoom = 1;
@@ -245,6 +248,7 @@ export function City3D(props: Props) {
       controls.update();
     };
     focus.current = id => {
+      cameraIntent++;
       setFollow(false);
       const lot = id ? lots.get(id) : undefined;
       if (!lot) {
@@ -543,6 +547,7 @@ export function City3D(props: Props) {
     let hoveredAt = 0;
     let down = {x: 0, y: 0};
     const pointerDown = (e: PointerEvent) => {
+      cameraIntent++;
       setFollow(false);
       down = {x: e.clientX, y: e.clientY};
     };
@@ -579,7 +584,7 @@ export function City3D(props: Props) {
     canvas.addEventListener('pointermove', pointerMove);
     canvas.addEventListener('pointerdown', pointerDown);
     canvas.addEventListener('pointerup', pointerUp);
-    const manualZoom=()=>setFollow(false);
+    const manualZoom=()=>{cameraIntent++;setFollow(false);};
     canvas.addEventListener('wheel',manualZoom,{passive:true});
     const keyboardPan = new KeyboardPan();
     const unbindPan = bindKeyboardPan(canvas, keyboardPan);
@@ -587,6 +592,7 @@ export function City3D(props: Props) {
     const keys = (e: KeyboardEvent) => {
       const command = cameraCommand(e);
       if (!command) return;
+      cameraIntent++;
       e.preventDefault();
       if (command === 'reset' || command.startsWith('pan-') || command.startsWith('zoom-')) setFollow(false);
       if (command === 'zoom-in' || command === 'zoom-out') {
@@ -872,6 +878,7 @@ export function City3D(props: Props) {
       const inputSeconds = (now - panTime) / 1000;
       const turn = keyboardPan.rotation(inputSeconds);
       if (turn) {
+        cameraIntent++;
         const offset = camera.position.clone().sub(controls.target);
         offset.applyAxisAngle(new THREE.Vector3(0, 1, 0), turn);
         camera.position.copy(controls.target).add(offset);
@@ -879,6 +886,7 @@ export function City3D(props: Props) {
       const pan = keyboardPan.step(camera.position, controls.target, inputSeconds, 110 / camera.zoom);
       panTime = now;
       if (pan.x || pan.z) {
+        cameraIntent++;
         setFollow(false);
         camera.position.x += pan.x; camera.position.z += pan.z;
         controls.target.x += pan.x; controls.target.z += pan.z;
@@ -1261,9 +1269,11 @@ export function City3D(props: Props) {
               e.since=now+PLANTER_BLAST*1000;
               const bounds=new THREE.Box3().setFromPoints([
                 new THREE.Vector3(entry.x-3,0,entry.z-3.2),new THREE.Vector3(entry.x+1,3,entry.z+2.8)]);
-              const facade=buildings.get(e.cue.target)?.userData.sightBounds as THREE.Box3|undefined;
-              if(facade)bounds.union(facade);
               frameScene(camera,controls.target,bounds);controls.update();
+              const wide=new THREE.Box3(new THREE.Vector3(entry.x-8,0,entry.z-8),new THREE.Vector3(entry.x+8,15,entry.z+5));
+              const facade=buildings.get(e.cue.target)?.userData.sightBounds as THREE.Box3|undefined;
+              if(facade)wide.union(facade);
+              e.pullback={move:new ScenePullback(camera,controls.target,wide),intent:cameraIntent};
             }
             if(e.incendiary){
               // A slot is accepted only with a checked flight. Never invent a
@@ -1463,6 +1473,10 @@ export function City3D(props: Props) {
           const shot = e.cue.kind === 'gunfight' && !!e.weapon;
           if(e.planter){
             const pose=e.planter.update(t*3+PLANTER_BLAST);
+            if(e.pullback){
+              if(cameraIntent!==e.pullback.intent||followPlayer.current)e.pullback.move.cancel();
+              if(e.pullback.move.update(camera,controls.target,(t*3+PLANTER_BLAST-4.6)/1.4))controls.update();
+            }
             const door=blastBuilding?.getObjectByName('entrance-door-hinge');if(door)door.rotation.y=-Math.PI/2*pose.door;
           }
           e.assassination?.update(t*3);
@@ -1680,7 +1694,7 @@ export function City3D(props: Props) {
       const sightPoints = ready && followPlayer.current && followed?.object.visible
         ? [followed.object.position.clone().add(new THREE.Vector3(0, .9, 0))]
         : ready ? effects.filter(e => e.extra?.visible && e.slot && e.cue.target === eventTarget)
-          .flatMap(e => e.custody?[e.custody.officer,e.custody.detainee].map(a=>a.getWorldPosition(new THREE.Vector3()).add(new THREE.Vector3(0,.9,0))):e.assassination?[e.assassination.attacker,e.assassination.victim].map(a=>a.getWorldPosition(new THREE.Vector3()).add(new THREE.Vector3(0,.9,0))):[e.extra!.position.clone().add(new THREE.Vector3(0, .9, 0))]) : [];
+          .flatMap(e => e.planter?[e.planter.actor.getWorldPosition(new THREE.Vector3()).add(new THREE.Vector3(0,1.35,0))]:e.incendiary?[e.incendiary.actor.getWorldPosition(new THREE.Vector3()).add(new THREE.Vector3(0,1.35,0))]:e.custody?[e.custody.officer,e.custody.detainee].map(a=>a.getWorldPosition(new THREE.Vector3()).add(new THREE.Vector3(0,.9,0))):e.assassination?[e.assassination.attacker,e.assassination.victim].map(a=>a.getWorldPosition(new THREE.Vector3()).add(new THREE.Vector3(0,.9,0))):[e.extra!.position.clone().add(new THREE.Vector3(0, .9, 0))]) : [];
       if (sightPoints.length) {
         if (now - lastSightCheck >= 100) {
           blockers = new Set(sightPoints.flatMap(sight => [...blockingBuildings(camera, sight, buildings)]));

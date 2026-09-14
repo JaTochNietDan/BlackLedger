@@ -112,6 +112,11 @@ and premature injury/escape choreography remain unsupported. Legacy explosions
 retain their existing playback. Debug also includes Explosion · casualty for
 reviewing the combined sequence without a campaign command.
 
+The planter preamble starts with a doorway view, then pulls back during4.6–6s
+to fit the building and blast envelope before detonation at6.2s. Camera pan,
+rotation, zoom, address/whole-city focus or enabling player-follow cancels that
+automatic pullback. This is presentation only and does not alter scene timing.
+
 Explicit scene replay can restage all cues in the selected committed result. Ordinary revision refreshes and reloads remain silent. Skip immediately clears the transient effects without posting an action or changing saved time.
 
 Street occupancy is presentation-only: rendered travellers may queue behind their
