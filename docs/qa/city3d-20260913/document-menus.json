@@ -1,0 +1,44 @@
+[
+  {
+    "canvasCount": 1,
+    "closeVisible": true,
+    "fits": true,
+    "horizontalOverflow": false,
+    "title": "Ledger"
+  },
+  {
+    "canvasCount": 1,
+    "closeVisible": true,
+    "fits": true,
+    "horizontalOverflow": false,
+    "title": "People"
+  },
+  {
+    "canvasCount": 1,
+    "closeVisible": true,
+    "fits": true,
+    "horizontalOverflow": false,
+    "title": "Families"
+  },
+  {
+    "canvasCount": 1,
+    "closeVisible": true,
+    "fits": true,
+    "horizontalOverflow": false,
+    "title": "Market"
+  },
+  {
+    "canvasCount": 1,
+    "closeVisible": true,
+    "fits": true,
+    "horizontalOverflow": false,
+    "title": "Guide"
+  },
+  {
+    "canvasCount": 1,
+    "closeVisible": true,
+    "fits": true,
+    "horizontalOverflow": false,
+    "title": "Settings"
+  }
+]

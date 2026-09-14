@@ -1217,7 +1217,7 @@ function App() {
           </header>
           <div className="map-main-scene" inert={tab!=='city'}>{content('city')}</div>
           {!scenePending && <div className="map-outcome"><Outcome world={world} onLedger={() => setTab('ledger')} /></div>}
-          {tab!=='city'&&<MapMenu title={({crew:'People',families:'Families',market:'Market',ledger:'Ledger',news:'The Bellwether Herald',settings:'Settings',help:'Guide'} as Record<string,string>)[tab]||tab} onClose={()=>setTab('city')}>{content()}</MapMenu>}
+          {tab!=='city'&&<MapMenu edition={tab} title={({crew:'People',families:'Families',market:'Market',ledger:'Ledger',news:'The Bellwether Herald',settings:'Settings',help:'Guide'} as Record<string,string>)[tab]||tab} onClose={()=>setTab('city')}>{content()}</MapMenu>}
         </main>
       </div>
       {playing&&sceneArticle&&!event&&<SceneNewspaper key={`${playing.id}:${sceneReplay.current}`} article={sceneArticle} visible={newspaperVisible} voice={voice} onClose={()=>{setPlaying(null);setTab('city');}}/>}

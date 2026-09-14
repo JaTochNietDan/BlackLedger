@@ -166,3 +166,27 @@ restored. Main local voice service8787 restarted with this implementation.
 This improves new-article reuse; it does not prove latency on every machine or
 long article, nor auditory quality. Broader cinematic, interior and visual-quality
 acceptance remains unfinished.
+
+### In-game document menus — September 13 amendment
+
+Read the amended objective409771b4-1304-4bc4-ae42-631508727ff1 and updated
+GOAL.md. Previous turn was progress (persistent voice worker and real playback
+verification). Reprioritized menu presentation before further custody choreography.
+
+The six navigation menus now use period document surfaces: a contact book, family
+dossiers, a trade circular, private ledger, handbook and control desk. Added cloth
+spines, index tabs, textured stock, ink rules and an integrated Put away control.
+Each edition keeps its original content/actions and focus/close handling. Local
+palette overrides cover cards, search/filter controls, settings switches, account
+figures, risk text and unavailable actions. Browser review caught residual dark
+panels and low-contrast disabled labels; these were corrected before acceptance.
+The archive also receives a paper reading-room treatment; its full content was not
+included in this six-menu QA pass.
+
+Production build passes. CUA reviewed all six menus at1280×720 on isolated8875:
+one city canvas retained, menu within viewport, visible close button and no
+horizontal body overflow for each. Recorded document-menus.json, menu-contacts.png
+and menu-ledger.png. Closed temporary QA tab. No gameplay/save commands issued.
+Responsive rules were added but compact viewport acceptance remains unverified.
+Dialogue and other remaining game surfaces, fuller menu identity/illustration,
+interiors and cinematic requirements remain unfinished under the full goal.
