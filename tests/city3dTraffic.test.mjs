@@ -282,3 +282,38 @@ test('a stationary person clears a waiting pedestrian departure without scene re
   assert.ok(poses.get('departing').progress>.9);
  }
 });
+
+test('a recovered pedestrian retains the scene position and rejoins travel without teleporting',()=>{
+ for(const fps of [30,60,144]){
+  const traffic=new StreetTraffic(),person={id:'player',model:'person',points:[{x:80,z:36.65}],progress:1};
+  const recovered={x:76.23,z:38.35,heading:Math.PI/2};
+  assert.equal(traffic.adoptFrontage(person,recovered),true);
+  for(let i=0;i<fps;i++)assert.deepEqual(traffic.update([person],1/fps).get('player').pose,recovered);
+  person.points=[{x:80,z:36.65},{x:92,z:36.65}];
+  let previous=recovered,joined=false;
+  for(let i=0;i<fps*13;i++){
+   const pose=traffic.update([person],1/fps).get('player');
+   assert.ok(Math.hypot(pose.pose.x-previous.x,pose.pose.z-previous.z)<=1.8/fps+1e-7);
+   if(pose.progress>0)joined=true;
+   else assert.ok(pose.pose.z>=36.65&&pose.pose.z<=38.35);
+   previous=pose.pose;
+  }
+  assert.ok(joined);assert.ok(traffic.placement('player').progress>.99);
+ }
+});
+
+test('recovery connectors yield to occupied pavement and reject unrelated locations or cars',()=>{
+ const traffic=new StreetTraffic(),person={id:'player',model:'person',points:[{x:80,z:36.65}],progress:1};
+ assert.equal(traffic.adoptFrontage({...person,model:'ford'},{x:76,z:38.35,heading:0}),false);
+ assert.equal(traffic.adoptFrontage(person,{x:108,z:70.35,heading:0}),false);
+ assert.equal(traffic.adoptFrontage(person,{x:76,z:38.35,heading:0}),true);
+ const blocker={id:'blocker',model:'person',points:[{x:76,z:36.65}],progress:0};
+ traffic.update([person,blocker],0);
+ person.points=[{x:80,z:36.65},{x:92,z:36.65}];
+ for(let i=0;i<180;i++){
+  const placements=traffic.update([person,blocker],1/60);clear([person,blocker],placements);
+  assert.equal(placements.get('player').progress,0);
+ }
+ for(let i=0;i<900;i++)traffic.update([person],1/60);
+ assert.ok(traffic.placement('player').progress>.99);
+});

@@ -660,3 +660,14 @@ the same final fall pose from the saved appearance. Reloads choose an available
 accident frontage slot; exact presentation coordinates are not saved. Blood and
 response reservations remain presentation-only. Animated police arrival and
 cleanup remain unfinished; a paused dead campaign does not advance their clock.
+
+## Survivor presentation handoff
+
+A completed or skipped real charge-accident scene can transfer a surviving,
+stationary pedestrian player to its final rendered frontage position. This
+changes no location, health, time, route progress or save. The next committed
+journey first connects that stance to the same frontage's walking lane and then
+to the saved route start, using ordinary traffic collision checks. Moving actors,
+vehicles, different locations, fatalities and private previews do not use this
+handoff. Browser reload restores the canonical position; stance coordinates are
+not persisted. Fully blocked connectors wait rather than teleporting.

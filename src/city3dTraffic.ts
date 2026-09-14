@@ -81,6 +81,15 @@ export class StreetTraffic {
     const e=this.entries.get(id);
     return e ? {pose:{...e.pose},progress:e.progress,waiting:e.waiting,yielding:e.yielding} : undefined;
   }
+  /** Transfer a scene's reserved survivor position to a stationary pedestrian. */
+  adoptFrontage(request:TrafficRequest, pose:TrafficPose) {
+    if(!isPedestrian(request.model)||routeLength(request.points)>0||!request.points.length)return false;
+    const home=request.points[0],row=Math.floor(home.z/PITCH),col=Math.floor(home.x/PITCH);
+    const frontage=(p:Point)=>p.x>=col*PITCH+8&&p.x<=col*PITCH+24&&p.z>=row*PITCH+FOOTWAY-.001&&p.z<=row*PITCH+6.8;
+    if(!frontage(home)||!frontage(pose))return false;
+    this.entries.set(request.id,{key:JSON.stringify([request.model,request.points]),model:request.model,progress:request.progress,pose:{...pose},waiting:false,returnTo:{...home}});
+    return true;
+  }
   update(
     requests: TrafficRequest[],
     seconds: number,
@@ -123,7 +132,7 @@ export class StreetTraffic {
       if(e?.key!==key&&e?.returnTo&&!e.waiting&&e.model===r.model&&lengths.get(r.id)!>0&&
         Math.hypot(r.points[0].x-e.returnTo.x,r.points[0].z-e.returnTo.z)<1e-8){
         // Rejoin a newly committed journey from the stance we actually rendered.
-        // Only a known same-frontage sidestep can use this short connector.
+        // Only a known sidestep or recovered position on this frontage uses the connector.
         e={key,model:r.model,progress:0,pose:e.pose,waiting:false,joining:{...r.points[0]}};
         this.entries.set(r.id,e);
       }
@@ -148,10 +157,13 @@ export class StreetTraffic {
       if(e.joining){
         let budget=Math.min(.1,Math.max(0,seconds))*playbackRate*trafficSpeed(r.model);
         while(budget>1e-8){
-          const delta=e.joining.x-e.pose.x,distance=Math.abs(delta);
+          // Return to the walking lane first, then along this same frontage.
+          const lateral=Math.abs(e.joining.z-e.pose.z)>1e-8;
+          const delta=lateral?e.joining.z-e.pose.z:e.joining.x-e.pose.x,distance=Math.abs(delta);
           if(distance<1e-8){e.joining=undefined;break;}
           const step=Math.min(distance,.125,budget);
-          const next={x:e.pose.x+Math.sign(delta)*step,z:e.pose.z,heading:Math.sign(delta)*Math.PI/2};
+          const next=lateral?{x:e.pose.x,z:e.pose.z+Math.sign(delta)*step,heading:delta>0?0:Math.PI}
+            :{x:e.pose.x+Math.sign(delta)*step,z:e.pose.z,heading:Math.sign(delta)*Math.PI/2};
           if(!free(next,r.model,r.id,0))break;
           e.pose=next;budget-=step;
         }

@@ -910,8 +910,21 @@ export function City3D(props: Props) {
       const addImpact=(age:number,strength:number)=>{const pulse=impactPulse(age,strength);impact.x+=pulse.x;impact.y+=pulse.y;};
       const activePlayback=p.activeCue?`${p.activeCue.id}:${p.replaySerial??0}`:null;
       const playbackStarted = !!activePlayback && lastActive !== activePlayback;
+      const handOffSurvivor=(effect:Effect)=>{
+        if(!effect.accident||effect.accident.fatal||!effect.slot||effect.cue.id.startsWith('preview:')||
+          effect.cue.attacker?.id!=='player'||!w.player.alive||w.player.location!==effect.cue.target)return;
+        const actor=actors.get('player');if(!actor||actor.start!==actor.end||!isPedestrian(actor.model))return;
+        effect.accident.update(effect.accident.duration);
+        const at=effect.accident.actor.getWorldPosition(new THREE.Vector3());
+        const pose={x:at.x,z:at.z,heading:effect.slot.pose.heading};
+        if(traffic.adoptFrontage({id:'player',model:actor.model,points:actor.points,progress:actor.end},pose)){
+          actor.object.position.set(at.x,at.y,at.z);actor.object.rotation.set(0,pose.heading,0);
+          actor.limbs.forEach(limb=>limb.rotation.x=0);actor.object.visible=true;
+        }
+      };
       if ((lastActive && (!p.activeCue||playbackStarted)) || worldID !== `${w.id}:${w.life}`) {
         for (const effect of effects) {
+          if(!playbackStarted&&worldID===`${w.id}:${w.life}`)handOffSurvivor(effect);
           scene.remove(effect.mesh, effect.light);
           if (effect.extra) scene.remove(effect.extra);
           effect.wardrobe?.forEach(material => material.dispose());
@@ -1473,6 +1486,7 @@ export function City3D(props: Props) {
           const t = (now - e.since) / 3000,
             lot = lots.get(e.cue.target)!;
           if (t * 3 >= (e.incendiary?.duration??e.assassination?.duration??policeSceneSeconds(e.cue.kind)) || !motion) {
+            handOffSurvivor(e);
             scene.remove(e.mesh, e.light);
             if (e.extra) scene.remove(e.extra);
             e.wardrobe?.forEach(material => material.dispose());
