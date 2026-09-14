@@ -2795,3 +2795,13 @@ integration selection is still running in session27100 (log
 .runtime/business-owner-integration-tests.log); clean cc4a6ea full suite remains
 session71514 (.runtime/check-cc4a6ea-tests.log). Neither is treated as complete.
 These changes are not deployed and no main-save commands were issued.
+
+### September 14 — release preparation and purchase eligibility
+
+Previous turn was progress: expanded gaming/service owner accounting and added
+fund-transfer tests. Both earlier long-running test handles71514/27100 were
+revalidated live this turn; no test restart was inferred from their quiet logs.
+Added an early household-funds eligibility check before scanning holdings and
+listings: every purchase already requires more than the $500 minimum reserve.
+Targeted proprietor/Mariner/tournament-owner checks pass0.257s. Preparing a clean
+release and copied-save compatibility evidence while broader tests finish.

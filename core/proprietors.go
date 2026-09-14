@@ -34,7 +34,7 @@ func (w *World) ConsiderProprietors() {
 	buyers := []*NPC{}
 	for i := range w.NPCs {
 		n := &w.NPCs[i]
-		if !n.Dead && n.Faction == "" && !IsOfficial(n.ID) && len(w.FamilyHoldings(n.ID)) == 0 {
+		if !n.Dead && n.Faction == "" && !IsOfficial(n.ID) && w.HouseholdWealth(n) > 500 && len(w.FamilyHoldings(n.ID)) == 0 {
 			buyers = append(buyers, n)
 		}
 	}
