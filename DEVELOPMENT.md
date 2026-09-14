@@ -1788,3 +1788,22 @@ Occupied, failed and fatal burglary choreography, search audio, persistent indoo
 aftermath and more lifelike hand/body motion remain unfinished. No final visual
 acceptance is claimed; this completes basic unattended search coverage across the
 four residential addresses while the larger goal remains active.
+
+### Continuous burglary direction changes — September 14
+
+Replaced instantaneous waypoint yaw changes with deterministic look-ahead heading
+samples along the same furniture-tested routes. Ease into facing the drawer during
+the final approach; reduce limb swing at arrival/exit; after closing the drawer,
+take an0.8s turning step before departing. Preserve the exit heading instead of
+snapping back toward the furniture when movement finishes. This affects only the
+successful unattended search presentation, not the committed outcome or game time.
+
+New frame-by-frame checks at60Hz bound heading changes below0.12radians through all
+corners, arrival, turn and exit for each residential route, and verify backwards
+seeking reconstructs the same orientation. Existing both-rig route/tray/contact/
+empty-cash checks pass. All369 frontend checks pass13.031s; build passes2.63s.
+Browser8954 fresh replay confirms the final Cypress camera and open drawer at8.483s;
+no new gameplay command. Logs .runtime/search-turns-{tests,build}.log. Main8791
+remains8ba57c1 pending this and126357b's clean integration. These are procedural
+movement improvements; lifelike locomotion and occupied/failure scenes are still
+unfinished, and no full motion-capture-quality acceptance is implied.

@@ -31,3 +31,20 @@ test('burglar approaches and searches the real open tray without crossing furnit
   const empty=new BurglarySearch(actor,drawer,place,0);empty.update(empty.arrival+3);assert.equal(empty.money.visible,false);
  }
 });
+
+test('search turns continuously at corners, drawer arrival, departure and exit',async()=>{
+ for(const place of ['room','mercercourt','estate']){
+  const actor=await load('person'),search=new BurglarySearch(actor,new THREE.Group(),place,0);
+  let previous=actor.rotation.y;
+  for(let frame=1;frame<=Math.ceil(search.duration*60);frame++){
+   search.update(frame/60);
+   const difference=Math.abs(Math.atan2(Math.sin(actor.rotation.y-previous),Math.cos(actor.rotation.y-previous)));
+   assert.ok(difference<.12,`${place}: abrupt heading change at ${frame/60}: ${difference}`);
+   previous=actor.rotation.y;
+  }
+  // Seeking backwards must reconstruct the pose rather than depend on frame history.
+  search.update(search.arrival+2);const expected=actor.quaternion.clone();
+  search.update(0);search.update(search.arrival+2);
+  assert.ok(expected.angleTo(actor.quaternion)<1e-6);
+ }
+});
