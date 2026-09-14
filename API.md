@@ -796,3 +796,46 @@ from newspaper prose. This additive field survives JSON/SQLite saves and lives;
 market reads apply decay without mutating it. Existing command revision and
 exactly-once checks continue to protect transactional prices. NPC deed transfers,
 new individual homes and broader market demand are still pending.
+
+## Separately owned apartments
+
+World saves now include optional `apartments`: stable numbered deeds for the64
+existing Ashbury Court places and48 Mercer Court places. These subdivide existing
+residential capacity; they are not112 new buildings or additional beds. Each deed
+has `id`, `building`, `number`, `owner` (independent, NPC ID, or player life ID),
+and optional `resident`. Committed housing reconciliation retains existing unit
+assignments, clears departed/dead residents and prefers a returning resident's
+vacant owned flat. It does not move their current location or journey. Housing
+move previews never mutate this registry. A player move cannot displace an NPC
+who owns the apartment they occupy.
+
+`buy_apartment:<id>` buys the current rented flat only when the independent broker
+owns it, for60 minutes and the quoted internal payment. `sell_apartment:<id>` sells
+one of this life's flats at its address for30 minutes and65% of current asking.
+Actions remain on the normal revision/request-ID path and are grouped as business.
+Base prices are1200 Mercer/1800 Ashbury, multiplied by neighborhood index. Ownership
+ends that resident's rent but grants no building freehold. Moving retains the deed;
+selling retains the resident and restores their rent. Sales are asset proceeds,
+not earned-income progress.
+
+At midnight after PeopleDay, at most one funded NPC purchase occurs. A resident
+with price+200 cash can buy their broker-owned flat or buy from a cash-poor NPC
+owner (under100 cash); otherwise an NPC with price+500 can buy from such an owner
+as an investment. NPC-to-NPC sale conserves their combined purses. Existing
+residents retain their tenancy and journeys; no actor is teleported. Deceased
+NPC/previous-player deeds become broker stock through this daily process. New
+protagonists never inherit prior player deeds. This is a first property market,
+not yet mortgage, bidding, probate-beneficiary or voluntary moving-house AI.
+
+NPC rents go to the unit owner, capped by tenant cash through the existing daily
+rent account. Player-owned occupied flats contribute contracted rent to Books;
+actual receipts use Earn. An NPC owner renting to the player receives the housing
+part of a fully paid daily bill. Owner-occupants pay no rent (NPCs still pay other
+living costs). Repairs/common-part economics remain on the existing building.
+
+Optional public `apartment_market` lists the player's rented flat and owned deeds,
+with ID/building/number/address, owned/home/available flags, owner/resident names,
+asking/offer and daily_rent. Market shows reference prices when a private owner is
+not selling. Existing Presence.home_name now includes the flat number, and
+Accommodation says Owned apartment for NPC owner-occupants. HomeID remains the
+building destination. No private travel or plans are added to this projection.

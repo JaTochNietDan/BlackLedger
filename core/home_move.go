@@ -26,6 +26,9 @@ func (w *World) PlanHomeMove(target string) ([]HomeChange, string) {
 			return nil, "There is no vacant accommodation for " + n.Name + "; this move cannot be arranged"
 		}
 		if n.Home != after.Home {
+			if u := w.apartmentForResident(n.ID); u != nil && u.Building == n.Home && u.Owner == n.ID {
+				return nil, n.Name + " owns their apartment; this move cannot displace them"
+			}
 			changes = append(changes, HomeChange{n.ID, n.Name, n.Home, after.Home, after.Accommodation})
 		}
 	}

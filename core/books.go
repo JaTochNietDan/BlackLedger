@@ -37,7 +37,12 @@ func (w *World) Books() map[string]any {
 		holdings++
 		income += w.HourlyIncome(l.ID)
 	}
-	daily := int(income * 24)
+	for _, u := range w.Apartments {
+		if u.Owner == w.playerDeedID() {
+			holdings++
+		}
+	}
+	daily := int(income*24) + w.ApartmentRentIncome()
 	for _, id := range []string{"room", "apartment", "mercercourt"} {
 		if w.Own(id) {
 			daily += w.RentalDaily(id)

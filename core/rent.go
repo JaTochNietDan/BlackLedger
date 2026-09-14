@@ -22,6 +22,9 @@ func (w *World) NPCRent(n *NPC) int {
 	if n == nil || n.Dead || w.Properties[n.Home] == nil {
 		return 0
 	}
+	if u := w.apartmentForResident(n.ID); u != nil && u.Building == n.Home && u.Owner == n.ID {
+		return 0
+	}
 	switch n.Home {
 	case "room":
 		p := w.Properties[n.Home]
@@ -41,6 +44,11 @@ func (w *World) NPCRent(n *NPC) int {
 }
 
 func (w *World) NPCLivingCost(n *NPC) int {
+	if n != nil {
+		if u := w.apartmentForResident(n.ID); u != nil && u.Building == n.Home && u.Owner == n.ID {
+			return npcOtherLivingCost
+		}
+	}
 	if rent := w.NPCRent(n); rent > 0 {
 		return npcOtherLivingCost + rent
 	}
@@ -71,7 +79,13 @@ func (w *World) collectRent(n *NPC) {
 	n.Purse -= account.Paid
 	account.Arrears -= account.Paid
 	account.Collected += account.Paid
-	if w.Own(n.Home) {
+	if u := w.apartmentForResident(n.ID); u != nil && u.Building == n.Home {
+		if u.Owner == w.playerDeedID() {
+			w.Earn(account.Paid)
+		} else if owner := w.NPC(u.Owner); owner != nil && !owner.Dead {
+			owner.Purse += account.Paid
+		}
+	} else if w.Own(n.Home) {
 		w.Earn(account.Paid)
 	} else if f := w.faction(p.Owner); f != nil {
 		f.Cash += account.Paid
@@ -108,6 +122,9 @@ func (w *World) RentRegister(id string) map[string]any {
 // HomeCost keeps the player's room rental separate from the deed. Cypress's
 // existing upkeep remains a household cost even when its resident owns it.
 func (w *World) HomeCost(id string) int {
+	if u := w.apartmentForResident(w.playerDeedID()); u != nil && u.Building == id && u.Owner == w.playerDeedID() {
+		return 0
+	}
 	if IsRentalHome(id) && w.Own(id) {
 		return 0
 	}

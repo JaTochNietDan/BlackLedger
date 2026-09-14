@@ -276,6 +276,12 @@ func (w *World) see(n *NPC) Presence {
 	}
 	if n.Home != "" {
 		p.HomeName = placeName(n.Home)
+		if u := w.apartmentForResident(n.ID); u != nil && u.Building == n.Home {
+			p.HomeName += fmt.Sprintf(" · Apartment %d", u.Number)
+			if u.Owner == n.ID {
+				p.Accommodation = "Owned apartment"
+			}
+		}
 	}
 	if known {
 		p.Faction = w.factionName(n.Faction)

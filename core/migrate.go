@@ -110,6 +110,7 @@ func (w *World) MigrateLivingWorld() {
 	// somebody doing every job the game speaks through.
 	w.Populate()
 	w.SettleHousing()
+	w.SettleApartments()
 
 	// A campaign that already had a car is driving one in working order.
 	if w.Player.Car > 0 && w.Player.CarWear == 0 {

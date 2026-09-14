@@ -575,6 +575,16 @@ func (w *World) apply(c Command) error {
 				return err
 			}
 			w.Advance(a.Minutes)
+		} else if unit, ok := strings.CutPrefix(c.Kind, "buy_apartment:"); ok {
+			if err := w.BuyApartment(unit); err != nil {
+				return err
+			}
+			w.Advance(a.Minutes)
+		} else if unit, ok := strings.CutPrefix(c.Kind, "sell_apartment:"); ok {
+			if err := w.SellApartment(unit); err != nil {
+				return err
+			}
+			w.Advance(a.Minutes)
 		} else if c.Kind == "sell_property" {
 			if err := w.SellProperty(target); err != nil {
 				return err
@@ -1042,6 +1052,7 @@ func (w *World) apply(c Command) error {
 						w.Properties[target].Owner = fmt.Sprintf("player:%d", w.Life)
 					}
 					p.Home = target
+					w.SettleApartments()
 					// Whatever anybody had learned about where to find you was
 					// about the old address.
 					w.MovedHouse()
@@ -1070,6 +1081,7 @@ func (w *World) apply(c Command) error {
 			w.OfferIfReady()
 		}
 	}
+	w.SettleApartments()
 	w.Revision++
 	// History is capped. Its old length is not a stable cursor once new entries
 	// evict old ones; identify this command's records by their persistent IDs.

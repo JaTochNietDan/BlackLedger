@@ -132,6 +132,7 @@ func (w *World) Populate() {
 		}
 	}
 	w.SettleHousing()
+	w.SettleApartments()
 }
 
 // fillOut takes an organization up to a size, giving each new person a standing

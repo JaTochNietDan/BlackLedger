@@ -51,6 +51,11 @@ func (w *World) Settle() {
 	// And the wages, last, because they are the thing worth keeping.
 	if p.Cash >= bill {
 		p.Cash -= bill
+		if u := w.apartmentForResident(w.playerDeedID()); u != nil && u.Building == p.Home {
+			if owner := w.NPC(u.Owner); owner != nil && !owner.Dead {
+				owner.Purse += w.HomeCost(p.Home)
+			}
+		}
 		w.EverybodyGotPaid()
 	} else {
 		// There is nothing left to pay anybody with. What the player was
