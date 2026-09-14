@@ -6,6 +6,22 @@ export function CityAccounts({world}: {world: Snapshot}) {
  return <details className="city-accounts"><summary data-shortcut="8" aria-keyshortcuts="8"><span>Daily accounts</span><span>In <b>{money(b.income)}</b></span><span>Out <b>{money(b.costs)}</b></span><span>Net <b className={b.net < 0 ? 'bad' : 'good'}>{money(b.net)}</b></span></summary>
       {b && (
         <div className="books">
+          <section className="books-lines" aria-label="Daily cost breakdown">
+            <h2>What the {money(b.costs)} a day is</h2>
+            <ul>
+              {b.lines.map(l => (
+                <li key={l.label}>
+                  <b>{l.label}</b>
+                  {l.detail && <small>{l.detail}</small>}
+                  <i>{money(l.amount)}</i>
+                </li>
+              ))}
+              <li className="total">
+                <b>Every day</b>
+                <i>{money(b.costs)}</i>
+              </li>
+            </ul>
+          </section>
           <div className="books-figures">
             <div>
               <span>Coming in</span>
@@ -69,22 +85,7 @@ export function CityAccounts({world}: {world: Snapshot}) {
               ))}
             </ul>
           )}
-          <section className="books-lines" aria-label="Daily cost breakdown">
-            <h2>What the {money(b.costs)} a day is</h2>
-            <ul>
-              {b.lines.map(l => (
-                <li key={l.label}>
-                  <b>{l.label}</b>
-                  {l.detail && <small>{l.detail}</small>}
-                  <i>{money(l.amount)}</i>
-                </li>
-              ))}
-              <li className="total">
-                <b>Every day</b>
-                <i>{money(b.costs)}</i>
-              </li>
-            </ul>
-          </section>
+
         </div>
       )}
 
