@@ -155,6 +155,17 @@ def blast_fragment():
             vertex.co.x-=.009*(1+math.sin(vertex.co.y*91+vertex.co.z*73))
 
 
+def bottle_shard():
+    glass=material('fractured olive bottle glass',(.23,.36,.19),.18)
+    glass.node_tree.nodes.get('Principled BSDF').inputs['Roughness'].default_value=.16
+    mesh=bpy.data.meshes.new('irregular curved glass chip')
+    outline=[(-.055,-.026),(.018,-.035),(.061,.008),(.005,.04)]
+    verts=[(x,y,.003+ x*x*1.5+offset) for offset in [-.002,.002] for x,y in outline]
+    mesh.from_pydata(verts,[],[(0,3,2,1),(4,5,6,7),(0,1,5,4),(1,2,6,5),(2,3,7,6),(3,0,4,7)])
+    mesh.materials.append(glass)
+    ob=bpy.data.objects.new('bottle glass shard',mesh);bpy.context.collection.objects.link(ob)
+
+
 def rooftop_tank(height, iron):
     # Coopered timber cistern, strapped steel hoops and a braced rooftop stand.
     wood=material('weathered cistern cedar',(.58,.49,.35))
@@ -2218,6 +2229,13 @@ def mercer_court():
                 box('tenant letter box',(x,6.28,.98+row*.19),(.20,.08,.16),brass,.009)
                 box('letter slot',(x,6.325,1.02+row*.19),(.13,.01,.014),iron)
 
+if __name__ == '__main__' and '--only=bottle-shard' in __import__('sys').argv:
+    manifest_path=os.path.join(OUT,'manifest.json')
+    with open(manifest_path) as f: selected_manifest=json.load(f)
+    clear();bottle_shard();selected_manifest['bottle-shard']=export('bottle-shard')
+    with open(manifest_path,'w') as f: json.dump(selected_manifest,f,indent=2)
+    raise SystemExit
+
 if __name__ == '__main__' and '--only=special-fire' in __import__('sys').argv:
     manifest_path=os.path.join(OUT,'manifest.json')
     with open(manifest_path) as f: selected_manifest=json.load(f)
@@ -2362,6 +2380,7 @@ clear();fire_engine();manifest['fire-engine']=export('fire-engine')
 clear();police_officer();manifest['police-officer']=export('police-officer')
 clear();undertaker();manifest['undertaker']=export('undertaker')
 clear();incendiary_bottle();manifest['incendiary-bottle']=export('incendiary-bottle')
+clear();bottle_shard();manifest['bottle-shard']=export('bottle-shard')
 clear();handcuffs();manifest['handcuffs']=export('handcuffs')
 clear();revolver();manifest['revolver']=export('revolver')
 for name in ('shotgun','thompson'):

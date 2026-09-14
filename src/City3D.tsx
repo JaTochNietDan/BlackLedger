@@ -1,4 +1,4 @@
-import {CityIncendiary, incendiaryStagingFlight, INCENDIARY_IMPACT} from './city3dIncendiary';
+import {CityIncendiary, incendiaryStagingFlight, incendiaryShard, INCENDIARY_IMPACT} from './city3dIncendiary';
 import {streetAt} from './streetPlayback';
 import {CityCustody} from './city3dCustody';
 import {CityAssassination, assassinationBatch, isStagedStrike, MELEE_IMPACTS, ASSASSINATION_SHOT, ASSASSINATION_VICTIM_X, executionSpatter} from './city3dAssassination';
@@ -99,6 +99,7 @@ type Effect = {
   extra?: THREE.Group;
   wardrobe?: THREE.MeshStandardMaterial[];
   slot?: SceneSlot;
+  glassBlocked?: Set<number>;
   gunArm?: THREE.Object3D;
   weapon?:THREE.Group;
   weaponModel?:string;
@@ -132,6 +133,7 @@ const modelNames = [
   'revolver',
   'handcuffs',
   'incendiary-bottle',
+  'bottle-shard',
   'shotgun',
   'thompson',
   'blast-fragment',
@@ -1042,8 +1044,8 @@ export function City3D(props: Props) {
             scene.add(extra);
           }
           let debris: THREE.InstancedMesh | undefined;
-          if (cue.kind === 'explosion') {
-            const model = models.get('blast-fragment')!;
+          if (cue.kind === 'explosion' || incendiary) {
+            const model = models.get(incendiary?'bottle-shard':'blast-fragment')!;
             model.updateMatrixWorld(true);
             model.traverse(part => {
               if (!(part instanceof THREE.Mesh) || debris) return;
@@ -1051,10 +1053,11 @@ export function City3D(props: Props) {
               material.transparent = true;
               debris = new THREE.InstancedMesh(part.geometry.clone().applyMatrix4(part.matrixWorld), material, 12);
               debris.frustumCulled = false;
+              if(incendiary)debris.visible=false;
               scene.add(debris);
             });
           }
-          effects.push({cue, assassination, custody, incendiary, since: now, mesh, light, debris, extra, wardrobe: costume, gunArm, muzzle, weapon, weaponModel:weaponModel||undefined,
+          effects.push({cue, assassination, custody, incendiary, glassBlocked:incendiary?new Set():undefined, since: now, mesh, light, debris, extra, wardrobe: costume, gunArm, muzzle, weapon, weaponModel:weaponModel||undefined,
             glazingBefore:(cue.id.startsWith('preview:')?undefined:p.beforeConditions?.[cue.target]) ?? buildings.get(cue.target)?.userData.condition ?? w.locations.find(p=>p.id===cue.target)?.condition ?? 100,
             reactionAudio:assassination?new BlastAudio(()=>playRecordedEffect('pain')):cue.kind==='explosion'?new BlastAudio(()=>playRecordedEffect('panic'))
               :cue.kind==='killing'&&(w.last_result?.cues||[]).some(gun=>gunVictim(gun,cue))?new BlastAudio(()=>playRecordedEffect('pain')):undefined,
@@ -1407,6 +1410,7 @@ export function City3D(props: Props) {
             });
             const staged = !!e.slot && !placements.get(`scene:${e.cue.id}`)?.waiting && castReady;
             e.extra.visible = e.mesh.visible = staged;
+            if(e.incendiary&&e.debris)e.debris.visible=staged;
             if (!staged) {
               e.since += dt;
               continue;
@@ -1552,7 +1556,26 @@ export function City3D(props: Props) {
               ),
             );
           }
-          if (e.debris && debrisOrigin) {
+          if(e.debris&&e.incendiary){
+            const impact=e.incendiary.root.localToWorld(e.incendiary.target.clone());
+            const age=t*3-INCENDIARY_IMPACT;
+            for(let j=0;j<12;j++){
+              const floor=surfaceHeight({x:impact.x,z:impact.z-1})+.07;
+              const height=impact.y-floor;
+              const piece=incendiaryShard(j,age,height),before=incendiaryShard(j,Math.max(0,age-dt/1000),height);
+              const from=impact.clone().add(new THREE.Vector3(before.x,before.y,before.z));
+              const to=impact.clone().add(new THREE.Vector3(piece.x,piece.y,piece.z));
+              const delta=to.clone().sub(from),length=delta.length();
+              if(age>=0&&piece.scale>0&&!e.glassBlocked!.has(j)&&length>1e-5&&blastBuilding){
+                const ray=new THREE.Raycaster(from,delta.normalize(),0,length+.07);
+                if(ray.intersectObject(blastBuilding,true).length)e.glassBlocked!.add(j);
+              }
+              tmp.position.copy(to);tmp.rotation.set(piece.rx,piece.ry,piece.rz);
+              tmp.scale.setScalar(e.glassBlocked!.has(j)?0:piece.scale);tmp.updateMatrix();e.debris.setMatrixAt(j,tmp.matrix);
+            }
+            e.debris.instanceMatrix.needsUpdate=true;
+          }
+          if (e.debris && debrisOrigin && !e.incendiary) {
             for (let j = 0; j < 12; j++) {
               const window=blastWindows[j%blastWindows.length];
               const airborne=window?windowDebris(j,t*3,window,surfaceHeight({x:window.x,z:window.z-3}),blastWindows.length) : null;
@@ -1760,6 +1783,8 @@ export function City3D(props: Props) {
             staged: !e.extra || e.extra.visible, x: e.slot?.root.x, z: e.slot?.root.z,
             approach: e.cue.kind==='raid-officer'&&e.extra?{x:e.extra.position.x,z:e.extra.position.z,leg:e.extra.getObjectByName('leg1')?.rotation.x}:undefined,
             debris: e.debris?.count,
+            glassShards:e.incendiary&&e.debris?{visible:e.debris.visible,blocked:e.glassBlocked?.size,
+              shown:Array.from({length:12},(_,i)=>Math.hypot(...Array.from(e.debris!.instanceMatrix.array.slice(i*16,i*16+3)))>.001).filter(Boolean).length}:undefined,
             blastOrigin: e.cue.kind === 'explosion' ? buildings.get(e.cue.target)?.userData[internalDetonation(e.cue,w.building_fires||[])?'blastOrigin':'debrisOrigin'] : undefined,
             blastWindows: e.cue.kind === 'explosion' && internalDetonation(e.cue,w.building_fires||[]) ? buildings.get(e.cue.target)?.userData.blastWindows : undefined,
             arm: e.gunArm?.rotation.x,

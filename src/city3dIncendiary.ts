@@ -179,3 +179,13 @@ export function incendiaryStagingFlight(root:{x:number;z:number},release:THREE.V
  const ordered=[...windows].sort((a,b)=>Math.abs(a.x-root.x)-Math.abs(b.x-root.x));
  return incendiaryFlight(release.clone().add(origin),ordered,building);
 }
+
+/** Local ballistic glass scatter; begins exactly at the bottle's impact. */
+export function incendiaryShard(index:number,age:number,height:number){
+ const vx=Math.sin(index*2.399)*(.3+index%3*.12),vz=-(.65+index%4*.22),vy=.3+index%3*.22;
+ const landing=(vy+Math.sqrt(vy*vy+19.62*Math.max(0,height)))/9.81;
+ const t=THREE.MathUtils.clamp(age,0,landing),fade=1-smooth((age-1.7)/.7);
+ return {x:vx*t,y:Math.max(-height,vy*t-4.905*t*t),z:vz*t,
+  rx:index+t*5,ry:index*1.7+t*3,rz:index*.8+t*4,
+  scale:age<0?0:(.65+index%4*.12)*fade};
+}

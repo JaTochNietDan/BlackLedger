@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
-import {CityIncendiary,incendiaryStride,INCENDIARY_RELEASE,INCENDIARY_IMPACT} from '../.runtime/frontend-test/city3dIncendiary.js';
+import {CityIncendiary,incendiaryShard,incendiaryStride,INCENDIARY_RELEASE,INCENDIARY_IMPACT} from '../.runtime/frontend-test/city3dIncendiary.js';
 async function model(name){
  const b=readFileSync(new URL(`../public/art/models/${name}.glb`,import.meta.url));const loader=new GLTFLoader();
  loader.register(p=>({name:'geometry-only',loadMaterial(i){return Promise.resolve(new THREE.MeshBasicMaterial({name:p.json.materials[i].name}));}}));
@@ -69,5 +69,16 @@ test('approach and escape brake continuously without a limb reset',async()=>{
    assert.ok(position.distanceTo(actor.position)<.001,'root jumps at a movement boundary');
    joints.forEach((j,i)=>assert.ok(before[i].angleTo(j.quaternion)<.001,`${name} ${j.name} snaps at ${t}`));
   }
+ }
+});
+
+test('glass scatter begins at impact and settles above the pavement',async()=>{
+ const shard=await model('bottle-shard'),bounds=new THREE.Box3().setFromObject(shard,true);
+ assert.ok(bounds.max.x-bounds.min.x<.13);assert.ok(bounds.max.y-bounds.min.y<.02,'glass is a thick masonry fragment');
+ for(const height of [1.5,3,5])for(let j=0;j<12;j++){
+  assert.equal(incendiaryShard(j,-.01,height).scale,0);
+  const origin=incendiaryShard(j,0,height);assert.equal(Math.abs(origin.x),0);assert.equal(origin.y,0);assert.equal(Math.abs(origin.z),0);
+  for(let age=0;age<2.4;age+=.01){const p=incendiaryShard(j,age,height);assert.ok(p.y>=-height);assert.ok(p.z<=0,'shard travels into facade');assert.ok(p.scale>=0);}
+  assert.equal(incendiaryShard(j,2.4,height).scale,0);
  }
 });
