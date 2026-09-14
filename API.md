@@ -825,7 +825,13 @@ as an investment. NPC-to-NPC sale conserves their combined purses. Existing
 residents retain their tenancy and journeys; no actor is teleported. Deceased
 NPC/previous-player deeds become broker stock through this daily process. New
 protagonists never inherit prior player deeds. This is a first property market,
-not yet mortgage, bidding, probate-beneficiary or voluntary moving-house AI.
+not yet mortgage, bidding or probate-beneficiary AI. After those transactions,
+if no sale occurred, a tenant may buy a vacant broker flat in a higher residential
+tier (Mariner, Riverside, Mercer, Ashbury) with at least $500 left in actual
+purse/savings. Owner-occupants stay put; existing tenants are never displaced.
+The buyer receives that exact unit and releases the old tenancy, preserving
+old rent debt, workplace and current journey. At most one apartment purchase
+occurs per daily call.
 
 NPC rents go to the unit owner, capped by tenant cash through the existing daily
 rent account. Player-owned occupied flats contribute contracted rent to Books;

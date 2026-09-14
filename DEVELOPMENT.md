@@ -2503,3 +2503,25 @@ counter into her matching Dispatcher action list. Fixture
 No main-save QA writes. This is the dispatch office; fleet yard, active
 telephone/dispatch animation, remaining interiors and billiards fidelity
 remain open. Main8791 stays01fb5cf; this and preceding changes await promotion.
+
+### 2026-09-14 — NPC purchases that improve their home
+
+Previous7c00441 completed the Vance dispatch interior. ApartmentDay now has a
+funded voluntary purchase fallback after existing resident/private sales: a
+renter can buy a vacant broker apartment in a higher residential tier, preferring
+Ashbury, then Mercer, then Riverside as actual funds permit. The purchase leaves
+$500 in purse/savings, skips ruined premises, transfers that exact deed and
+releases only the buyer's old unit. Owner-occupants remain settled, other tenants
+are not displaced, and workplace/current journey/old rent debt remain intact.
+Uses existing neighborhood-adjusted asking prices and daily simulation hook;
+no new save fields or public command shapes. API contract updated.
+
+Targeted core apartment/housing/home tests pass7.814s, including new funded
+purchase/savings, rent-free ownership, reserve boundary, deed protection,
+old-tenancy release, debt and journey preservation cases. Store tests pass.303s,
+HTTP server tests1.916s, Go vet passes. Logs
+`.runtime/npc-home-purchase-{tests,adapters}.log`. No browser claims or main-save
+writes. Initial new test fixture needed its savings map initialized; corrected
+before passing verification. Main8791 remains01fb5cf; this awaits promotion.
+Downsizing, richer moving preferences and the remaining interior/billiards
+fidelity work remain open within the full goal.

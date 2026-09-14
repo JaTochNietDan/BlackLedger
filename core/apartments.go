@@ -225,6 +225,7 @@ func (w *World) ApartmentDay() {
 			return
 		}
 	}
+	w.purchaseNPCHome()
 }
 
 // A small broker board rotates as deeds sell: three occupied investments and
