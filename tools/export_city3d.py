@@ -1609,6 +1609,34 @@ def gaming_die():
             bpy.context.view_layer.update();world=ob.matrix_world.copy();ob.parent=group;ob.matrix_world=world
 
 
+def gaming_floor():
+    woods=[material('gaming parquet '+str(i),(.12+i*.012,.065+i*.006,.033+i*.003)) for i in range(5)]
+    rng=random.Random(1956)
+    # Alternating square parquet blocks; seams and bevels remain actual geometry.
+    for row in range(10):
+        for col in range(10):
+            for strip in range(4):
+                cx=-2.7+col*.6;cy=-2.7+row*.6;offset=(strip-1.5)*.15
+                dims=(.59,.144,.025) if (row+col)%2==0 else (.144,.59,.025)
+                box('parquet strip',(cx+(offset if (row+col)%2 else 0),cy+(0 if (row+col)%2 else offset),-.0245),dims,woods[rng.randrange(5)],.003)
+    rug=material('gaming woven rug',(.16,.025,.02))
+    pixels=[];n=256
+    for y in range(n):
+        for x in range(n):
+            edge=min(x,y,n-1-x,n-1-y)
+            border=edge in (5,6,16,17,24,25)
+            diamond=abs(x%32-16)+abs(y%32-16)<3
+            base=(.40,.26,.095) if border or (edge>26 and diamond) else (.12,.025,.022)
+            tone=rng.uniform(.92,1.08)
+            pixels.extend((*[1.055*(c*tone)**(1/2.4)-.055 for c in base],1))
+    img=bpy.data.images.new('gaming rug weave and borders',width=n,height=n);img.pixels=pixels;img.pack()
+    tex=rug.node_tree.nodes.new('ShaderNodeTexImage');tex.image=img;rug.node_tree.links.new(tex.outputs['Color'],rug.node_tree.nodes['Principled BSDF'].inputs['Base Color'])
+    ob=box('woven table rug',(0,0,-.004),(4.3,4.6,.008),rug,.006)
+    for loop in ob.data.loops:
+        co=ob.data.vertices[loop.vertex_index].co
+        ob.data.uv_layers.active.data[loop.index].uv=(co.x/4.3+.5,co.y/4.6+.5)
+
+
 def gaming_chair():
     wood=material('gaming chair walnut',(.12,.055,.028))
     leather=material('gaming chair oxblood',(.14,.025,.018))
@@ -2112,6 +2140,13 @@ def mercer_court():
                 box('tenant letter box',(x,6.28,.98+row*.19),(.20,.08,.16),brass,.009)
                 box('letter slot',(x,6.325,1.02+row*.19),(.13,.01,.014),iron)
 
+if __name__ == '__main__' and '--only=gaming-floor' in __import__('sys').argv:
+    manifest_path=os.path.join(OUT,'manifest.json')
+    with open(manifest_path) as f: selected_manifest=json.load(f)
+    clear();gaming_floor();selected_manifest['gaming-floor']=export('gaming-floor')
+    with open(manifest_path,'w') as f:json.dump(selected_manifest,f,indent=2)
+    raise SystemExit(0)
+
 if __name__ == '__main__' and '--only=gaming-chair' in __import__('sys').argv:
     manifest_path=os.path.join(OUT,'manifest.json')
     with open(manifest_path) as f: selected_manifest=json.load(f)
@@ -2226,6 +2261,7 @@ clear();blast_fragment();manifest['blast-fragment']=export('blast-fragment')
 clear();bar_cloth();manifest['bar-cloth']=export('bar-cloth')
 clear();mariner();manifest['mariner']=export('mariner')
 clear();gaming_die();manifest['gaming-die']=export('gaming-die')
+clear();gaming_floor();manifest['gaming-floor']=export('gaming-floor')
 clear();gaming_chair();manifest['gaming-chair']=export('gaming-chair')
 clear();blackjack_table();manifest['blackjack-table']=export('blackjack-table')
 clear();playing_card();manifest['playing-card']=export('playing-card')

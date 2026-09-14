@@ -75,3 +75,13 @@ test('player rigs sit on the authored gaming chair with shoes above the floor',a
   }});
  }
 });
+
+test('gaming rug supports the cast at floor height and has a single full-face texture',async()=>{
+ const floor=await model('gaming-floor');
+ for(const [x,z] of [[0,0],[0,-1.56],[-.85,1.6],[-1,-.55],[1,.55]]){
+  const hit=new THREE.Raycaster(new THREE.Vector3(x,2,z),new THREE.Vector3(0,-1,0)).intersectObject(floor,true)[0];
+  assert.ok(hit);assert.equal(hit.object.material.name,'gaming woven rug');assert.ok(Math.abs(hit.point.y)<1e-6);
+  assert.ok(Math.abs(hit.uv.x-(x/4.3+.5))<1e-5);assert.ok(Math.abs(hit.uv.y-(z/4.6+.5))<1e-5);
+ }
+ const bound=new THREE.Box3().setFromObject(floor,true);assert.ok(bound.max.x<=3&&bound.min.x>=-3&&bound.max.z<=3&&bound.min.z>=-3);
+});

@@ -40,26 +40,28 @@ export function BlackjackTable3D({mine,theirs,hidden,presentation,dealer,player}
   renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFShadowMap;
   const canvas=renderer.domElement;canvas.setAttribute('aria-label','3D blackjack table with your cards nearest you and the dealer opposite.');el.append(canvas);
   const camera=new THREE.PerspectiveCamera(38,1,.01,20);camera.position.set(0,player?.alive?4.8:3.8,player?.alive?5.3:3.5);camera.lookAt(0,player?.alive?.8:dealer?1.02:.72,player?.alive?.25:dealer?-.18:0);
-  scene.add(new THREE.HemisphereLight(0xffebcb,0x17271f,2.5));
-  const light=new THREE.DirectionalLight(0xffe0b5,2.4);light.position.set(-2,5,2);scene.add(light);
+  scene.add(new THREE.HemisphereLight(0xffebcb,0x17271f,1.6));
+  const light=new THREE.DirectionalLight(0xffe0b5,2.4);light.position.set(-2,5,2);light.castShadow=true;light.shadow.mapSize.set(2048,2048);Object.assign(light.shadow.camera,{left:-3.5,right:3.5,top:3.5,bottom:-3.5,near:.1,far:12});light.shadow.bias=-.0001;light.shadow.normalBias=.008;scene.add(light);
   const resize=()=>{const w=el.clientWidth,h=el.clientHeight;renderer.setSize(w,h);camera.aspect=w/h;camera.position.set(0,player?.alive?4.8:3.8,player?.alive?5.3:3.5).multiplyScalar(Math.max(1,1.35/camera.aspect));camera.lookAt(0,player?.alive?.8:dealer?1.02:.72,player?.alive?.25:dealer?-.18:0);camera.updateProjectionMatrix();dirty=true;};
   const observer=new ResizeObserver(resize);observer.observe(el);resize();
   const models:THREE.Group[]=[];let prototype:THREE.Group|undefined;
   const cards=new THREE.Group();scene.add(cards);
   const textures:THREE.Texture[]=[],materials:THREE.Material[]=[],costumes:THREE.Material[]=[];
+  const shadow=(root:THREE.Object3D,cast=true)=>root.traverse(o=>{if(o instanceof THREE.Mesh){o.castShadow=cast;o.receiveShadow=true;}});
   const loader=new GLTFLoader();
+  loader.loadAsync('/art/models/gaming-floor.glb').then(g=>{if(dead){disposeCityResources([g.scene]);return;}models.push(g.scene);shadow(g.scene,false);scene.add(g.scene);dirty=true;}).catch(()=>{});
   if(dealer){const name=pedestrianModel(dealer.id,dealer.face);loader.loadAsync(`/art/models/${name}.glb`).then(g=>{
     if(dead){disposeCityResources([g.scene]);return;}models.push(g.scene);
     const actor=g.scene.clone(true);costumes.push(...dressPedestrian(actor,name,wardrobe(dealer.id,dealer.face)));
-    poseBlackjackDealer(actor);scene.add(actor);dirty=true;
+    poseBlackjackDealer(actor);shadow(actor);scene.add(actor);dirty=true;
   }).catch(()=>{ /* The named dealer and authoritative hand remain readable if the model is unavailable. */ });}
   if(player?.alive){const name=pedestrianModel(player.name,player.face,true);
    Promise.all([name,'gaming-chair'].map(async n=>{const g=await loader.loadAsync(`/art/models/${n}.glb`);if(dead){disposeCityResources([g.scene]);return;}models.push(g.scene);return g.scene;})).then(([rig,chair])=>{
     if(dead||!rig||!chair)return;const actor=rig.clone(true);costumes.push(...dressPedestrian(actor,name,wardrobe(player.name,player.face,true)));poseBlackjackPlayer(actor);
-    chair.position.set(blackjackPlayerSeat.x,0,blackjackPlayerSeat.z);chair.rotation.y=blackjackPlayerSeat.yaw;scene.add(actor,chair);dirty=true;
+    chair.position.set(blackjackPlayerSeat.x,0,blackjackPlayerSeat.z);chair.rotation.y=blackjackPlayerSeat.yaw;shadow(actor);shadow(chair);scene.add(actor,chair);dirty=true;
    }).catch(()=>{});
   }
-  Promise.all(['blackjack-table','playing-card'].map(async name=>{const g=await loader.loadAsync(`/art/models/${name}.glb`);if(dead){disposeCityResources([g.scene]);return;}models.push(g.scene);return g.scene;})).then(([table,card])=>{if(dead||!table||!card)return;scene.add(table);prototype=card;key='';dirty=true;setStatus('');}).catch(()=>{if(!dead)setStatus('The table could not load. Your cards are listed below.');});
+  Promise.all(['blackjack-table','playing-card'].map(async name=>{const g=await loader.loadAsync(`/art/models/${name}.glb`);if(dead){disposeCityResources([g.scene]);return;}models.push(g.scene);return g.scene;})).then(([table,card])=>{if(dead||!table||!card)return;shadow(table);scene.add(table);prototype=card;key='';dirty=true;setStatus('');}).catch(()=>{if(!dead)setStatus('The table could not load. Your cards are listed below.');});
   const tick=()=>{
    if(dead)return;frame=requestAnimationFrame(tick);const p=latest.current,k=JSON.stringify(p);
    if(prototype&&k!==key){
@@ -71,7 +73,7 @@ export function BlackjackTable3D({mine,theirs,hidden,presentation,dealer,player}
       let face:THREE.Mesh|undefined;
       object.traverse(o=>{if(o instanceof THREE.Mesh&&o.material.name==='card printed face')face=o;});
       if(face){const reverse=face.clone();const back=cardTexture();textures.push(back);const material=(face.material as THREE.MeshStandardMaterial).clone();material.map=back;materials.push(material);reverse.material=material;reverse.rotation.z=Math.PI;object.add(reverse);}
-      object.scale.set(1.4,1,1.4);cards.add(object);
+      object.scale.set(1.4,1,1.4);shadow(object);cards.add(object);
     });dirty=true;
    }
    const elapsed=p.presentation.active?performance.now()-p.presentation.start:Infinity;

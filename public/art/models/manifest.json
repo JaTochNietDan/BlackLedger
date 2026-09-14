@@ -838,5 +838,21 @@
       ]
     ],
     "bytes": 124744
+  },
+  "gaming-floor": {
+    "file": "gaming-floor.glb",
+    "bounds_blender": [
+      [
+        -2.997,
+        -2.997,
+        -0.037
+      ],
+      [
+        2.997,
+        2.997,
+        0.0
+      ]
+    ],
+    "bytes": 3114888
   }
 }
