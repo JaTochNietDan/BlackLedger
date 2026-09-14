@@ -1151,8 +1151,13 @@ def mariner():
     glass=material('mariner sash glass',(.13,.21,.23),.2)
     warm=material('mariner occupied room',(.68,.44,.20),0,.25)
     brass=material('mariner door brass',(.48,.36,.16),.6)
-    box('lodging house brick',(0,0,4.725),(12,10,9.45),wall)
-    box('lodging house foundation',(0,0,.22),(12.25,10.25,.44),stone)
+    # Leave a full-height passage behind the working front door.
+    for side in (-1,1):
+        box('lodging house brick wing',(side*3.5,0,4.725),(5,10,9.45),wall)
+        box('lodging house foundation wing',(side*3.5625,0,.22),(5.125,10.25,.44),stone)
+    box('lodging vestibule lintel',(0,0,6.025),(2,10,6.85),wall)
+    box('lodging vestibule rear',(0,-1.5,1.3),(2,7,2.6),wall)
+    box('lodging vestibule paving',(0,3.5,-.04),(2,3,.08),stone)
     for z in (3.12,6.27,9.42):box('lodging house string course',(0,0,z),(12.3,10.3,.15),stone)
     for axis in (0,1):
         for side in (-1,1):
@@ -1175,14 +1180,21 @@ def mariner():
                     facade('sash upright',x,z,(.055,.32,1.6),stone)
                     facade('sash sill',x,z-.96,(1.62,.42,.14),stone)
     # One public entrance and a shallow shelter facing the frontage.
-    box('mariner oak door',(0,5.2,1.25),(1.6,.18,2.5),timber,.02)
+    pivot=bpy.data.objects.new('entrance-door-hinge',None)
+    bpy.context.collection.objects.link(pivot);pivot.location=(-.8,5.2,.02)
+    def doorpart(name,xyz,dims,mat,bevel=.01):
+        ob=box(name,xyz,dims,mat,bevel);ob.parent=pivot;ob.location-=pivot.location
+        return ob
+    doorpart('mariner oak door',(0,5.2,1.25),(1.6,.18,2.5),timber,.02)
     for side in (-1,1):
         box('door jamb',(side*.94,5.15,1.42),(.22,.32,2.84),stone)
-        box('door raised panel',(side*.38,5.305,.7),(.57,.035,.88),timber,.025)
-        box('door glazing',(side*.38,5.31,1.72),(.56,.04,.84),glass)
+        doorpart('door raised panel',(side*.38,5.305,.7),(.57,.035,.88),timber,.025)
+        doorpart('door glazing',(side*.38,5.31,1.72),(.56,.04,.84),glass)
         box('shelter post',(side*1.38,6.4,1.40),(.13,.13,2.8),timber)
         beam('shelter bracket',(side*1.38,6.4,2.2),(side*.90,6.4,2.75),.09,timber)
-    box('door pull',(.20,5.355,1.24),(.045,.055,.28),brass,.012)
+    doorpart('door pull',(.20,5.355,1.24),(.045,.055,.28),brass,.012)
+    entry=bpy.data.objects.new('entrance-threshold',None)
+    bpy.context.collection.objects.link(entry);entry.location=(0,5.2,0)
     box('entry transom',(0,5.17,2.73),(1.65,.26,.22),stone)
     box('entry shelter',(0,5.78,2.88),(3.2,1.65,.19),slate)
     box('lodging sign board',(0,5.21,3.50),(5.5,.22,.67),timber)
