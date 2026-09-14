@@ -1258,3 +1258,14 @@ Older clients can ignore the additive field; new clients tolerate its absence.
 The market's deed/offer/scheduled-rent totals and search/filter/sort are local
 presentation of the existing listings. Scheduled rent is not guaranteed cash
 collection. No purchase/sale or simulation command changes.
+
+## Apartment occupancy and accounts
+
+`apartment_market` additively exposes `vacant`, `rent_paid_today`, and
+`rent_arrears`. Accounts are the current resident's account at the building;
+collections are reported only for the current simulation day and player-owned
+units. They are not a historical owner's lifetime yield. Scheduled `daily_rent`
+remains distinct from actual collections. At midnight households review affordable
+vacant rentals, with at most one voluntary rental move per day. Moves preserve
+unit ownership, other residents, existing travel endpoints and workplace posts.
+Rent remains collected by the existing household payment system.

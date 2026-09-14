@@ -2529,6 +2529,7 @@ func (w *World) Advance(minutes int) {
 			w.HouseholdBills()
 			w.PeopleDay()
 			w.ApartmentDay()
+			w.RentalMoveDay()
 			w.HouseholdSavingsDay()
 			w.GrudgeDay()
 			w.SettleGrudges()

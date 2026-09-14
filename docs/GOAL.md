@@ -110,3 +110,18 @@ and complete the planned 3D interiors. This supersedes the historical visual
 production restriction; no separate visual agent was launched in this session.
 First 3D poker/table-camera progress is recorded in DEVELOPMENT.md. These broader
 simulation and interior requirements remain outstanding.
+
+## September 14 follow-ups — ownership, controls and playback
+
+Add funeral/death-service businesses (morgue, cemetery, mortuary/crematorium),
+with player and NPC ownership and death-driven trade. Verify individual NPC and
+family business acquisition. A dead individual proprietor's business becomes
+available to purchase; a surviving family retains its businesses through
+succession. These business additions remain outstanding.
+
+G should contextually travel, skip travel presentation, enter, and exit. Jumping
+to recorded incidents must show their opening rather than only the aftermath.
+Provide dynamic affordable rental moves and an ownership/management overview
+covering vacancies, residents, actual rent collections, arrears and sale values.
+Initial rental/overview and playback corrections are recorded in DEVELOPMENT.md;
+full incident visual acceptance and a richer dedicated management pane remain.

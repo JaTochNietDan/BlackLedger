@@ -209,7 +209,7 @@ export interface Snapshot {
   pool_tournament?:PoolTournamentState|null;
   pool_tournament_notice?:PoolTournamentNoticeState|null;
   pool_opponents?:PoolOpponent[];
-	apartment_market?: {id:string;building:string;number:number;address:string;owned:boolean;home:boolean;available:boolean;locked?:boolean;owner:string;resident:string;asking:number;offer:number;daily_rent:number;neighborhood_index?:number}[];
+	apartment_market?: {id:string;building:string;number:number;address:string;owned:boolean;home:boolean;available:boolean;locked?:boolean;owner:string;resident:string;asking:number;offer:number;daily_rent:number;rent_paid_today?:number;rent_arrears?:number;vacant?:boolean;neighborhood_index?:number}[];
 	property_market?: {id:string;name:string;owned:boolean;available:boolean;holder:string;asking:number;offer:number;condition:number;neighborhood_index?:number;residents:number;home:boolean;locked:boolean}[];
   housing_shortage?: number;
   house?: {

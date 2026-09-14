@@ -221,3 +221,16 @@ export function raidEntryPose(seconds: number, distance: number) {
 export function policeSceneSeconds(kind: string) {
   return ['arrest','police-unit','officer','detainee'].includes(kind)?9:kind==='explosion'?14:['raid','raid-unit','raid-officer'].includes(kind)?10:3;
 }
+
+/** Presentation time advances only through visible frames. Returning from a
+ * hidden tab or a stalled frame must not skip the opening of a recorded scene. */
+export class ScenePlaybackClock {
+ private wall:number;
+ private elapsed:number;
+ constructor(now:number){this.wall=now;this.elapsed=now;}
+ step(now:number,hidden:boolean){
+  const delta=Math.max(0,now-this.wall);this.wall=now;
+  if(!hidden)this.elapsed+=Math.min(100,delta);
+  return this.elapsed;
+ }
+}

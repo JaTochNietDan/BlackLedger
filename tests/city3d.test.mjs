@@ -174,3 +174,12 @@ test('Mercer Court occupies a vacant block without shifting existing addresses',
  assert.ok(previous.vacant.some(v=>v.col===court.col&&v.row===court.row));
  assert.equal(plan.cols,previous.cols);assert.equal(plan.rows,previous.rows);
 });
+
+test('scene clock preserves opening beats across stalls and hidden tabs',async()=>{
+ const {ScenePlaybackClock}=await import('../.runtime/frontend-test/city3dEvents.js');
+ const clock=new ScenePlaybackClock(1000);
+ assert.equal(clock.step(1016,false),1016);
+ assert.equal(clock.step(9000,true),1016);
+ assert.equal(clock.step(20000,false),1116);
+ assert.equal(clock.step(20016,false),1132);
+});

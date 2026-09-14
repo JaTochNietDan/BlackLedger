@@ -2666,3 +2666,33 @@ with focus transferred to the poker canvas inside the game modal. Browser84
 also confirmed the existing action-search shortcut. No gameplay commands or
 main-save QA writes in this turn. Main8791 remains3e7ee26; camera/aim changes
 await promotion. Remaining interiors and full billiards fidelity remain open.
+
+### September 14 — rental mobility, apartment accounts and contextual G
+
+Added a daily, deterministic review of vacant rentals. Households with funds can
+upgrade; strained tenants can seek cheaper accommodation. At most one moves per
+day, no resident is displaced, owner-occupants remain, and player-held vacancies
+are eligible without a deed transfer. Existing travel and workplace fields stay
+unchanged. Rent collection uses the existing real-cash payment path. The market
+ownership overview adds owned/vacant shortcuts and current-day collections and
+current-tenant arrears alongside rent and broker values. This is an initial
+management overview; adjustable leases and a dedicated property paper remain.
+
+G now enters, leaves or skips the journey using the visible contextual action;
+the existing travel G remains. Leaving is unavailable during journey playback so
+it cannot compete with skipping. Input and modal shortcut guards remain.
+
+Scene playback now explicitly requeues a selected cue at playback start regardless
+of result revision. Its clock stops in hidden tabs and caps stalled-frame advance
+at 100ms, preserving opening beats on return. Full explosion/fire-response browser
+acceptance remains; these timing fixes alone do not establish full scene fidelity.
+
+Evidence: targeted rental/home-purchase Go tests passed (0.146s), including a
+player-owned vacancy taking a tenant, $35 rent reaching the landlord, public
+collection data, preserved journey/deed, and refusal of unfunded/owner moves.
+401 frontend tests passed (14.262s); production build passed (2.64s). Isolated
+apartments fixture on 8982, browser tab86, verified overview controls and vacancy
+labels. No gameplay commands were sent to main8791 and no main save was changed.
+These changes are not yet promoted. Existing unrelated armed/robbery/aftermath
+work was left unstaged. Death-service businesses and individual proprietor
+purchase/succession remain outstanding after the ownership audit.

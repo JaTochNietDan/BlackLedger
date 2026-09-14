@@ -779,7 +779,7 @@ function App() {
                 {journeyBlocked && <small>Waiting for the way ahead to clear.</small>}
                 {cross?.note && <small>{cross.note}</small>}
               </div>
-              <button onClick={() => setJourney(null)}>Skip journey →</button>
+              <button data-shortcut="g" aria-keyshortcuts="G" onClick={() => setJourney(null)}>Skip journey · G →</button>
             </div>
           );
         })();
@@ -787,7 +787,7 @@ function App() {
         <div className={'workspace city-workspace' + (inside ? ' inside' : '')}>
           <section className="city-pane">
             <div className="city-stage">
-              {inside&&<button data-shortcut="b" aria-keyshortcuts="B" className="map-leave-building" onClick={()=>setCityView('iso')}>Back to city ↗</button>}
+              {inside&&!journey&&<button data-shortcut="g" aria-keyshortcuts="G" className="map-leave-building" onClick={()=>setCityView('iso')}>Back to city · G ↗</button>}
               {inside && sceneOverlay}
               {!journey&&homeCue&&playing ? <HomeStrikeScene key={`${playing.id}:${sceneReplay.current}`} cue={homeCue} world={w} motion={motion} overlay={sceneOverlay} onDone={()=>setFinishedCue(playing.id)}/> : cityView === 'interior' && locationInfo.id === p.location ? (
                 <Interior

@@ -44,7 +44,7 @@ import {
 import type {Lot, Point} from './city3dPlan';
 import type {Journey} from './TravelPresentation';
 import './city3d.css';
-import {CityCueQueue, gunVictim, gunCastReady, raidEntryPose, policeSceneSeconds, officerApproach, policeCast, sceneSlots, availableSceneSlot, planterReservation, casualtyFall, gunfightPose, casualtySceneStart, GunfireAudio, BlastAudio} from './city3dEvents';
+import {CityCueQueue, ScenePlaybackClock, gunVictim, gunCastReady, raidEntryPose, policeSceneSeconds, officerApproach, policeCast, sceneSlots, availableSceneSlot, planterReservation, casualtyFall, gunfightPose, casualtySceneStart, GunfireAudio, BlastAudio} from './city3dEvents';
 import type {SceneSlot} from './city3dEvents';
 import {StreetTraffic, trafficSpeed, trafficSize, trafficModel, advanceWheel, wheelSteering, advanceSteering, frontWheelSteering} from './city3dTraffic';
 import {pedestrianModel, isPedestrian} from './city3dCast';
@@ -900,7 +900,9 @@ export function City3D(props: Props) {
     let sampleStart = performance.now(),
       samples: number[] = [],
       last = sampleStart;
-    const tick = (now: number) => {
+    const sceneClock = new ScenePlaybackClock(sampleStart);
+    const tick = (wallNow: number) => {
+      const now = sceneClock.step(wallNow, document.hidden);
       if (dead) return;
       frame = requestAnimationFrame(tick);
       const inputSeconds = (now - panTime) / 1000;
@@ -1046,7 +1048,7 @@ export function City3D(props: Props) {
               w.last_result?.cues || [],
               p.activeCue,
               first,
-              !first && revision === w.revision && playbackStarted,
+              playbackStarted,
             ).flatMap(policeCast))) {
           if (!motion) continue;
           const lot = lots.get(cue.target);
