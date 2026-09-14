@@ -379,3 +379,10 @@ cancel every active voice. A shared compressor moderates burst peaks. Decode or
 asset failures retain immediate synthesized fallback; loading never emits a late
 shot. Audio diagnostic counters report loaded models, sampled onsets, active voices
 and fallbacks without changing gameplay state. Other effects remain procedural.
+
+During killing replay, the victim's own later police response yields with the body;
+other death scenes retain their attendance. Response returns after playback under
+its original deadlines. Generic gunfight playback waits for all co-located,
+same-minute casualty cues to have visible reservations; explicit strike identity
+narrows this match to its recorded victim. This prevents firing at an unstaged
+casualty and does not add police, deaths or gameplay time.

@@ -1,0 +1,525 @@
+{
+  "before": {
+    "revision": 11,
+    "minute": 1725,
+    "playbackRate": 1,
+    "gunAudio": {
+      "loaded": [
+        "shotgun",
+        "revolver",
+        "thompson"
+      ],
+      "played": {},
+      "fallbacks": 0,
+      "active": 0,
+      "context": "suspended"
+    },
+    "impact": {
+      "x": 0,
+      "y": 0
+    },
+    "suppression": [],
+    "rubble": [],
+    "glazing": [
+      {
+        "id": "bar",
+        "broken": false
+      },
+      {
+        "id": "laundry",
+        "broken": false
+      },
+      {
+        "id": "club",
+        "broken": false
+      },
+      {
+        "id": "market",
+        "broken": false
+      },
+      {
+        "id": "apartment",
+        "broken": false
+      },
+      {
+        "id": "casino",
+        "broken": false
+      },
+      {
+        "id": "precinct",
+        "broken": false
+      },
+      {
+        "id": "herald",
+        "broken": false
+      },
+      {
+        "id": "restaurant",
+        "broken": false
+      },
+      {
+        "id": "poolhall",
+        "broken": false
+      },
+      {
+        "id": "butcher",
+        "broken": false
+      },
+      {
+        "id": "goldenlily",
+        "broken": false
+      },
+      {
+        "id": "steamworks",
+        "broken": false
+      },
+      {
+        "id": "burlesque",
+        "broken": false
+      },
+      {
+        "id": "pawn",
+        "broken": false
+      },
+      {
+        "id": "tailor",
+        "broken": false
+      }
+    ],
+    "buildingFire": {
+      "clock": 0.2854340000000001,
+      "scenes": []
+    },
+    "headlightPools": 0,
+    "harbour": {
+      "visible": true,
+      "waterClock": 0.11390000000000004
+    },
+    "followingPlayer": false,
+    "cutawayBuildings": [],
+    "weather": {
+      "kind": "rain",
+      "wet": 1,
+      "rainVisible": true,
+      "rainClock": 0.11390000000000004
+    },
+    "camera": {
+      "zoom": 1.65,
+      "x": 276,
+      "z": -160.00000000000003,
+      "targetX": 96,
+      "targetZ": 79.99999999999997
+    },
+    "actors": [
+      {
+        "id": "player",
+        "model": "person",
+        "x": 112,
+        "z": 100.65,
+        "y": 0.2
+      }
+    ],
+    "waiting": [],
+    "aftermath": [
+      {
+        "id": "aftermath:35854795b6e52078415cc1ef774f8853:street-33:body",
+        "x": 112,
+        "z": 102.35,
+        "visible": true
+      },
+      {
+        "id": "aftermath:35854795b6e52078415cc1ef774f8853:street-33:police",
+        "x": 121.6,
+        "z": 106,
+        "visible": true
+      },
+      {
+        "id": "aftermath:35854795b6e52078415cc1ef774f8853:street-33:officer-a",
+        "x": 109,
+        "z": 102.35,
+        "visible": true
+      },
+      {
+        "id": "aftermath:35854795b6e52078415cc1ef774f8853:street-33:officer-b",
+        "x": 115,
+        "z": 102.35,
+        "visible": true
+      },
+      {
+        "id": "aftermath:446f379df1e460f5c0cadef8ab3ac0a7:street-76:body",
+        "x": 106,
+        "z": 102.35,
+        "visible": true
+      },
+      {
+        "id": "aftermath:446f379df1e460f5c0cadef8ab3ac0a7:street-76:police",
+        "x": 121.6,
+        "z": 112,
+        "visible": true
+      },
+      {
+        "id": "aftermath:446f379df1e460f5c0cadef8ab3ac0a7:street-76:officer-a",
+        "x": 118,
+        "z": 102.35,
+        "visible": true
+      }
+    ],
+    "doors": [
+      {
+        "id": "bar",
+        "angle": 0
+      }
+    ],
+    "effects": []
+  },
+  "during": {
+    "revision": 11,
+    "minute": 1725,
+    "playbackRate": 1,
+    "gunAudio": {
+      "loaded": [
+        "shotgun",
+        "revolver",
+        "thompson"
+      ],
+      "played": {
+        "thompson": 3
+      },
+      "fallbacks": 0,
+      "active": 3,
+      "context": "running"
+    },
+    "impact": {
+      "x": 0,
+      "y": 0
+    },
+    "suppression": [],
+    "rubble": [],
+    "glazing": [
+      {
+        "id": "bar",
+        "broken": false
+      },
+      {
+        "id": "laundry",
+        "broken": false
+      },
+      {
+        "id": "club",
+        "broken": false
+      },
+      {
+        "id": "market",
+        "broken": false
+      },
+      {
+        "id": "apartment",
+        "broken": false
+      },
+      {
+        "id": "casino",
+        "broken": false
+      },
+      {
+        "id": "precinct",
+        "broken": false
+      },
+      {
+        "id": "herald",
+        "broken": false
+      },
+      {
+        "id": "restaurant",
+        "broken": false
+      },
+      {
+        "id": "poolhall",
+        "broken": false
+      },
+      {
+        "id": "butcher",
+        "broken": false
+      },
+      {
+        "id": "goldenlily",
+        "broken": false
+      },
+      {
+        "id": "steamworks",
+        "broken": false
+      },
+      {
+        "id": "burlesque",
+        "broken": false
+      },
+      {
+        "id": "pawn",
+        "broken": false
+      },
+      {
+        "id": "tailor",
+        "broken": false
+      }
+    ],
+    "buildingFire": {
+      "clock": 1.517533999999999,
+      "scenes": []
+    },
+    "headlightPools": 0,
+    "harbour": {
+      "visible": true,
+      "waterClock": 1.3459999999999992
+    },
+    "followingPlayer": false,
+    "cutawayBuildings": [],
+    "weather": {
+      "kind": "rain",
+      "wet": 1,
+      "rainVisible": true,
+      "rainClock": 1.3459999999999992
+    },
+    "camera": {
+      "zoom": 6.905532861633193,
+      "x": 292,
+      "z": -137.64999999999998,
+      "targetX": 112,
+      "targetZ": 102.35000000000002
+    },
+    "actors": [],
+    "waiting": [],
+    "aftermath": [
+      {
+        "id": "aftermath:35854795b6e52078415cc1ef774f8853:street-33:body",
+        "x": 112,
+        "z": 102.35,
+        "visible": true
+      },
+      {
+        "id": "aftermath:35854795b6e52078415cc1ef774f8853:street-33:police",
+        "x": 121.6,
+        "z": 106,
+        "visible": true
+      },
+      {
+        "id": "aftermath:35854795b6e52078415cc1ef774f8853:street-33:officer-a",
+        "x": 109,
+        "z": 102.35,
+        "visible": true
+      },
+      {
+        "id": "aftermath:35854795b6e52078415cc1ef774f8853:street-33:officer-b",
+        "x": 115,
+        "z": 102.35,
+        "visible": true
+      }
+    ],
+    "doors": [
+      {
+        "id": "bar",
+        "angle": 0
+      }
+    ],
+    "effects": [
+      {
+        "id": "446f379df1e460f5c0cadef8ab3ac0a7",
+        "kind": "killing",
+        "target": "casino",
+        "staged": true,
+        "x": 118,
+        "z": 102.35,
+        "fall": -0.7179848210391673
+      },
+      {
+        "id": "77f30f5329a6338a2671b19492b820fa",
+        "kind": "gunfight",
+        "target": "casino",
+        "staged": true,
+        "x": 106,
+        "z": 102.35,
+        "arm": -0.005488847879156762,
+        "attacker": {
+          "id": "player",
+          "name": "Alex Varga",
+          "weapon": 3
+        },
+        "weapon": "thompson",
+        "audioShots": 3
+      }
+    ]
+  },
+  "after": {
+    "revision": 11,
+    "minute": 1725,
+    "playbackRate": 1,
+    "gunAudio": {
+      "loaded": [
+        "shotgun",
+        "revolver",
+        "thompson"
+      ],
+      "played": {
+        "thompson": 6
+      },
+      "fallbacks": 0,
+      "active": 0,
+      "context": "running"
+    },
+    "impact": {
+      "x": 0,
+      "y": 0
+    },
+    "suppression": [],
+    "rubble": [],
+    "glazing": [
+      {
+        "id": "bar",
+        "broken": false
+      },
+      {
+        "id": "laundry",
+        "broken": false
+      },
+      {
+        "id": "club",
+        "broken": false
+      },
+      {
+        "id": "market",
+        "broken": false
+      },
+      {
+        "id": "apartment",
+        "broken": false
+      },
+      {
+        "id": "casino",
+        "broken": false
+      },
+      {
+        "id": "precinct",
+        "broken": false
+      },
+      {
+        "id": "herald",
+        "broken": false
+      },
+      {
+        "id": "restaurant",
+        "broken": false
+      },
+      {
+        "id": "poolhall",
+        "broken": false
+      },
+      {
+        "id": "butcher",
+        "broken": false
+      },
+      {
+        "id": "goldenlily",
+        "broken": false
+      },
+      {
+        "id": "steamworks",
+        "broken": false
+      },
+      {
+        "id": "burlesque",
+        "broken": false
+      },
+      {
+        "id": "pawn",
+        "broken": false
+      },
+      {
+        "id": "tailor",
+        "broken": false
+      }
+    ],
+    "buildingFire": {
+      "clock": 194.6493340000303,
+      "scenes": []
+    },
+    "headlightPools": 0,
+    "harbour": {
+      "visible": true,
+      "waterClock": 194.47780000003021
+    },
+    "followingPlayer": false,
+    "cutawayBuildings": [],
+    "weather": {
+      "kind": "rain",
+      "wet": 1,
+      "rainVisible": true,
+      "rainClock": 194.47780000003021
+    },
+    "camera": {
+      "zoom": 5.164633263726205,
+      "x": 292,
+      "z": -137.64999999999998,
+      "targetX": 112,
+      "targetZ": 102.35000000000002
+    },
+    "actors": [
+      {
+        "id": "player",
+        "model": "person",
+        "x": 112,
+        "z": 100.65,
+        "y": 0.2
+      }
+    ],
+    "waiting": [],
+    "aftermath": [
+      {
+        "id": "aftermath:35854795b6e52078415cc1ef774f8853:street-33:body",
+        "x": 112,
+        "z": 102.35,
+        "visible": true
+      },
+      {
+        "id": "aftermath:35854795b6e52078415cc1ef774f8853:street-33:police",
+        "x": 121.6,
+        "z": 106,
+        "visible": true
+      },
+      {
+        "id": "aftermath:35854795b6e52078415cc1ef774f8853:street-33:officer-a",
+        "x": 109,
+        "z": 102.35,
+        "visible": true
+      },
+      {
+        "id": "aftermath:35854795b6e52078415cc1ef774f8853:street-33:officer-b",
+        "x": 115,
+        "z": 102.35,
+        "visible": true
+      },
+      {
+        "id": "aftermath:446f379df1e460f5c0cadef8ab3ac0a7:street-76:body",
+        "x": 106,
+        "z": 102.35,
+        "visible": true
+      },
+      {
+        "id": "aftermath:446f379df1e460f5c0cadef8ab3ac0a7:street-76:police",
+        "x": 121.6,
+        "z": 112,
+        "visible": true
+      },
+      {
+        "id": "aftermath:446f379df1e460f5c0cadef8ab3ac0a7:street-76:officer-a",
+        "x": 118,
+        "z": 102.35,
+        "visible": true
+      }
+    ],
+    "doors": [
+      {
+        "id": "bar",
+        "angle": 0
+      }
+    ],
+    "effects": []
+  }
+}

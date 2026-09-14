@@ -1002,3 +1002,20 @@ casualty was waiting for space. Need extend coordinated victim/shooter staging t
 other weapon/scenario variants so firing cannot precede a blocked casualty. No QA
 commands were issued to that save this turn; only replay/Skip presentation checks.
 Main8791/campaign.sqlite3 remain untouched.
+
+### Queued victim and future responders — September 13
+
+Corrected the observed Blue Hour replay: the current victim's later police response
+was taking the available forecourt bays even while its body was hidden. Playback
+now suppresses that complete victim response before choosing slots, while preserving
+other victims' attendance. Gunfire additionally waits until same-address/minute
+casualties have visible traffic reservations; explicit modern strike victim identity
+narrows the pairing. Casualty shot synchronization now also checks minute.
+
+Build and all188 frontend tests passed. The exact8872 revision11 replay now stages
+both Zoltan (x118/z102.35) and the Thompson shooter (x106/z102.35), with three recorded
+sample shots at the capture and the older Piet crime scene's body/car/two officers
+unchanged. Completion restores the response (seven entries fit), same revision11.
+Evidence queued-victim.json. No gameplay command or save write was issued. These
+legacy actors still use independent bays and may be widely separated; coordinated
+blocking, facing and clear lines of fire for all weapon variants remain unfinished.

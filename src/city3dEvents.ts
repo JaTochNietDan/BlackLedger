@@ -79,6 +79,15 @@ export function gunfightPose(seconds: number,beats:readonly number[]=GUNFIRE_SHO
     smoke: age < 0.35 ? 1 - age / 0.35 : 0};
 }
 
+/** Match only the same recorded moment; explicit victim identity narrows modern strikes. */
+export function gunVictim(gun:VisualCue,victim:VisualCue){
+  return gun.kind==='gunfight'&&victim.kind==='killing'&&gun.target===victim.target&&gun.minute===victim.minute&&
+    (!gun.strike||!!victim.actors?.some(actor=>actor.id===gun.strike!.victim.id));
+}
+export function gunCastReady(gun:VisualCue,cues:VisualCue[],ready:(id:string)=>boolean){
+  return cues.filter(cue=>gunVictim(gun,cue)).every(cue=>ready(cue.id));
+}
+
 /** Co-located casualty playback waits until the associated gun scene fires.
  * Repeated holds also cover a gun scene waiting for an available staging slot. */
 export function casualtySceneStart(since: number, now: number, gunSince?: number) {

@@ -132,3 +132,21 @@ test('sampled burst tails overlap and all are cancelled together on mute or skip
  sound.update(.9,false);assert.equal(stops,3);
  sound.update(.95,true);assert.equal(starts,3);sound.dispose();assert.equal(stops,3);
 });
+
+test('a queued victim holds all gunfire until its cast is ready without matching other moments',async()=>{
+ const {gunCastReady,gunVictim}=await import('../.runtime/frontend-test/city3dEvents.js');
+ const gun={id:'gun',kind:'gunfight',target:'casino',minute:1665};
+ const victim={id:'victim',kind:'killing',target:'casino',minute:1665,actors:[{id:'zoltan'}]};
+ assert.equal(gunVictim(gun,{...victim,minute:1605}),false);
+ assert.equal(gunVictim(gun,{...victim,target:'bar'}),false);
+ assert.equal(gunVictim({...gun,strike:{victim:{id:'piet'}}},victim),false);
+ const cues=[gun,victim];let since=0,fired=0;
+ const audio=new GunfireAudio(()=>{fired++;return()=>{};});
+ for(let frame=1;frame<=300;frame++){
+  const now=frame/60;
+  if(!gunCastReady(gun,cues,id=>id==='victim'&&now>=2))since=now;
+  else audio.update(now-since);
+  if(now<2.68)assert.equal(fired,0,'shot preceded staged victim');
+ }
+ assert.equal(fired,4);audio.dispose();
+});

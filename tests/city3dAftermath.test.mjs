@@ -16,7 +16,7 @@ test('aftermath persists, reserves separate body/police bays and clears on clean
  const root=city.root.children[0];update(484);assert.equal(city.root.children[0],root);
  update(485);assert.equal(city.reservations().length,4);
  for(const [i,a] of city.slots().entries())for(const b of city.slots().slice(i+1))assert.equal(trafficOverlap(a.pose,a.model,b.pose,b.model),false);
- update(486,new Set(['mara']));assert.equal(city.reservations().length,3,'replay hides duplicate corpse');
+ update(486,new Set(['mara']));assert.equal(city.reservations().length,0,'replay hides the corpse and its later police response');
  update(487);assert.equal(city.reservations().length,4);
  update(660);assert.equal(city.reservations().length,0);assert.equal(city.root.children.length,0);
  city.dispose();
@@ -42,7 +42,7 @@ test('execution hands off the body at its actual fall position and yaw',()=>{
  const models=new Map([['person',new THREE.Group()]]),lots=new Map([['bar',lot]]);
  const records=[{id:'death:mara',target:'bar',victim:{id:'mara'},minute:480,police_at:485,cleanup_at:660}];
  city.update(records,480,lots,models,()=> 'person',[],new Set());
- city.suppressBodies(new Set(['mara']));assert.equal(city.slots().length,0,'old body must not block shared scene');
+ city.suppressVictims(new Set(['mara']));assert.equal(city.slots().length,0,'old body must not block shared scene');
  const slot={root:{x:81,z:38.35},pose:{x:81.8,z:38.35,heading:0},model:'casualty'};
  city.rememberBody('mara',slot,Math.PI/2);
  city.update(records,480,lots,models,()=> 'person',[],new Set(['mara']));assert.equal(city.slots().length,0);
@@ -53,5 +53,20 @@ test('execution hands off the body at its actual fall position and yaw',()=>{
   .premultiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,0,1),-Math.PI/2));
  assert.ok(object.quaternion.angleTo(expected)<1e-7);
  city.update(records,660,lots,models,()=> 'person',[],new Set());assert.equal(city.slots().length,0);
+ city.dispose();
+});
+
+test('a replay yields only its own later response and retains an older nearby crime scene',()=>{
+ const city=new CityAftermath(),lot={id:'casino',x:112,z:112,row:3,col:3};
+ const lots=new Map([['casino',lot]]),models=new Map([['person',new THREE.Group()],['police',new THREE.Group()],['police-officer',new THREE.Group()]]);
+ const records=[{id:'older',target:'casino',victim:{id:'piet'},minute:1605,police_at:1610,cleanup_at:1785},
+  {id:'current',target:'casino',victim:{id:'zoltan'},minute:1665,police_at:1670,cleanup_at:1845}];
+ const update=animating=>city.update(records,1725,lots,models,()=> 'person',[],animating);
+ update(new Set());const older=city.inspect().filter(e=>e.id.startsWith('aftermath:older:'));
+ assert.equal(older.length,4);
+ city.suppressVictims(new Set(['zoltan']));
+ assert.deepEqual(city.inspect(),older,'unrelated attendance changed');
+ update(new Set(['zoltan']));assert.deepEqual(city.inspect(),older,'response returned during replay');
+ update(new Set());assert.ok(city.inspect().some(e=>e.id.startsWith('aftermath:current:')),'response did not return after playback');
  city.dispose();
 });

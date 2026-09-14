@@ -35,7 +35,7 @@ import {
 import type {Lot, Point} from './city3dPlan';
 import type {Journey} from './TravelPresentation';
 import './city3d.css';
-import {CityCueQueue, raidEntryPose, policeSceneSeconds, officerApproach, policeCast, sceneSlots, availableSceneSlot, casualtyFall, gunfightPose, casualtySceneStart, GunfireAudio, BlastAudio} from './city3dEvents';
+import {CityCueQueue, gunVictim, gunCastReady, raidEntryPose, policeSceneSeconds, officerApproach, policeCast, sceneSlots, availableSceneSlot, casualtyFall, gunfightPose, casualtySceneStart, GunfireAudio, BlastAudio} from './city3dEvents';
 import type {SceneSlot} from './city3dEvents';
 import {StreetTraffic, trafficSize, trafficModel, advanceWheel, wheelSteering, advanceSteering, frontWheelSteering} from './city3dTraffic';
 import {pedestrianModel, isPedestrian} from './city3dCast';
@@ -1136,7 +1136,7 @@ export function City3D(props: Props) {
           return {model:trafficModel(a.model,a.start===a.end),root:{x:pose.x,z:pose.z},pose};
         });
         const animatingVictims=new Set(effects.flatMap(e=>e.assassination?[e.cue.strike!.victim.id]:e.cue.kind==='killing'?e.cue.actors?.map(a=>a.id)||[]:[]));
-        aftermath.suppressBodies(animatingVictims);
+        aftermath.suppressVictims(animatingVictims);
         // Reserve the shooter before associated casualties, so a full batch
         // cannot occupy every slot while waiting for an unstaged first shot.
         const stagingOrder = [...effects].sort((a, b) =>
@@ -1274,7 +1274,12 @@ export function City3D(props: Props) {
         for (let i = effects.length - 1; i >= 0; i--) {
           const e = effects[i];
           if (e.extra && motion) {
-            const staged = !!e.slot && !placements.get(`scene:${e.cue.id}`)?.waiting;
+            const castReady=gunCastReady(e.cue,effects.map(other=>other.cue),id=>{
+              const victim=effects.find(other=>other.cue.id===id);
+              const placement=placements.get(`scene:${id}`);
+              return !!victim?.slot&&!!placement&&!placement.waiting;
+            });
+            const staged = !!e.slot && !placements.get(`scene:${e.cue.id}`)?.waiting && castReady;
             e.extra.visible = e.mesh.visible = staged;
             if (!staged) {
               e.since += dt;
@@ -1282,7 +1287,7 @@ export function City3D(props: Props) {
             }
           }
           if (e.cue.kind === 'killing') {
-            const gunScene = effects.find(other => other.cue.kind === 'gunfight' && other.cue.target === e.cue.target);
+            const gunScene = effects.find(other => gunVictim(other.cue,e.cue));
             e.since = casualtySceneStart(e.since, now, gunScene?.since);
           }
           const t = (now - e.since) / 3000,

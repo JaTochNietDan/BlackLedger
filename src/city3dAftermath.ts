@@ -23,7 +23,7 @@ export class CityAftermath {
     this.pool=new THREE.ShapeGeometry(shape);
   }
   rememberBody(id:string,slot:SceneSlot,yaw:number){this.bodyPoses.set(id,{slot,yaw});}
-  suppressBodies(ids:Set<string>){
+  suppressVictims(ids:Set<string>){
     for(const [key,e] of this.entries)if(e.victim&&ids.has(e.victim)){
       this.root.remove(e.group);e.owned.forEach(m=>m.dispose());this.entries.delete(key);
     }
@@ -40,12 +40,12 @@ export class CityAftermath {
     for(const record of scenes) {
       if(minute<record.minute || minute>=record.cleanup_at)continue;
       if(record.raid && activeRaids.has(record.target))continue;
+      if(!record.raid&&!record.fire&&animating.has(record.victim.id))continue;
       const cast=record.fire ? (minute>=record.police_at?['fire-engine','firefighter-a','firefighter-b']:[]) : record.raid ? ['police','police-b','police-c','officer-a','officer-b','officer-c','officer-d']
         : minute>=record.police_at ? ['body','police','officer-a','officer-b'] : ['body'];
       for(const kind of cast) {
         const vehicle=kind.startsWith('police')||kind==='fire-engine';
         const key=`aftermath:${record.id}:${kind}`;
-        if(kind==='body' && animating.has(record.victim.id))continue;
         desired.add(key);
         if(this.entries.has(key))continue;
         const lot=lots.get(record.target); if(!lot)continue;
@@ -69,7 +69,7 @@ export class CityAftermath {
           object.rotation.y=Math.atan2((body?.slot.root.x ?? lot.x)+.8-slot.root.x,(body?.slot.root.z ?? lot.z)-slot.root.z);
         }
         object.traverse(part=>{if(part instanceof THREE.Mesh){part.castShadow=true;part.receiveShadow=true;}});
-        group.add(object);this.root.add(group);this.entries.set(key,{group,slot,owned,victim:kind==='body'?record.victim.id:undefined});
+        group.add(object);this.root.add(group);this.entries.set(key,{group,slot,owned,victim:record.victim.id||undefined});
       }
     }
     for(const [key,entry] of this.entries) if(!desired.has(key)) {
