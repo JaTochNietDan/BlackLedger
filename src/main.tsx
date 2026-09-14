@@ -1,3 +1,5 @@
+import {HomeStrikeScene} from './HomeStrikeScene';
+import {flatHomeStrikeFor} from './homeStrike';
 import {KeyboardShortcuts} from './KeyboardShortcuts';
 import {CityAccounts} from './CityAccounts';
 import {SceneNewspaper} from './SceneNewspaper';
@@ -732,6 +734,7 @@ function App() {
   function content(view=tab) {
     const w = world!;
     if (view === 'city') {
+      const homeCue=flatHomeStrikeFor(playing,w.last_result?.cues||[]);
       const inside = cityView === 'interior' && locationInfo.id === p.location;
       const theatre = playing && !journey && (
         <Theatre
@@ -780,7 +783,7 @@ function App() {
             <div className="city-stage">
               {inside&&<button data-shortcut="b" aria-keyshortcuts="B" className="map-leave-building" onClick={()=>setCityView('iso')}>Back to city ↗</button>}
               {inside && sceneOverlay}
-              {cityView === 'interior' && locationInfo.id === p.location ? (
+              {!journey&&homeCue&&playing ? <HomeStrikeScene key={`${playing.id}:${sceneReplay.current}`} cue={homeCue} world={w} motion={motion} overlay={sceneOverlay} onDone={()=>setFinishedCue(playing.id)}/> : cityView === 'interior' && locationInfo.id === p.location ? (
                 <Interior
                   motion={motion}
                   player={p}

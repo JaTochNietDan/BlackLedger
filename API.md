@@ -947,3 +947,12 @@ positions, one reserved public mechanic position and a separate player entrance.
 The lift, engine stand, tools, tyres and service desk are cosmetic room dressing;
 they do not assign or service any vehicle or alter inventory. Existing garage
 commands remain authoritative, and the full public roster remains available.
+
+Explicit home strikes at Ashbury or Mercer Court now play inside the shared
+private-flat 3D scene. The renderer uses the recorded attacker, victim, weapon
+and variant; a selected death cue may use only its same-place/same-minute attack
+with an explicitly matching victim. Asset loading precedes animation timing;
+completion feeds the existing newspaper reveal. Replay sends no command. Motion
+off/reduced motion settles the recorded result immediately once assets load.
+Other residential addresses retain their prior presentation for now. Persistent
+indoor aftermath and burglary playback are not implemented by this scene.

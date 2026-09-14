@@ -1460,3 +1460,35 @@ Final browser inspection confirms separate controls and suspended fixtures.
 Main8791 remains the verifiedb4b7aee release; these changes are in development.
 Remaining: player vehicle/service staging, more surface wear, other business and
 civic interiors, indoor crimes and the broader campaign/visual acceptance.
+
+## September 14 — first private-flat home attack playback
+
+Connected explicit home strikes at apartment/mercercourt to HomeStrikeScene,
+reusing the full-size CityAssassination articulated approach/weapon/fall routines
+inside the furnished flat. The clear front aisle fits all four variants without
+rescaling rigs. Recorded identity/face/wardrobe, actual weapon model, muzzle
+pulse, timed shot/impact and pain audio, spatter and fall are presentation only.
+Scene clock starts after room/cast assets load, completion drives the existing
+newspaper timing, and motion/reduced-motion settles immediately. Cleanup stops
+audio and disposes resources; final frames redraw on resize. No core outcomes
+or main campaign state are changed by playback.
+
+Added explicit home-cue routing with same-target/minute/victim linkage when the
+selected headline is a death cue. It refuses street settings, unsupported homes
+and unrelated deaths. Replay remounts with the existing replay serial. Fresh
+isolated home-strike fixture uses the real home_strike command, not a fabricated
+outcome; served at8943. Browser observed apartment action, completed fall then
+newspaper, and compact820x740 framing. Raised the camera's focus toward the
+front aisle after the first desktop frame placed the body too close to controls.
+Final compact frame shows body and attacker clear of the playback band.
+
+All361 frontend tests pass (`.runtime/home-strike-tests.log`), including sampled
+full-size room bounds/furniture clearance for melee/revolver/shotgun/Thompson.
+Build passes (`home-strike-reviewed-build.log`). Browser replay preserved the
+fixture's displayed revision-independent clock/cash/health; no gameplay action
+was issued from the browser. Main8791 remains the prior verified release.
+
+Remaining: Cypress/boarding-house indoor crime choreography, burglary scenes,
+persistent indoor bodies/blood/police instead of the existing city aftermath,
+and broader visual/campaign acceptance. Audio events are wired to shared tested
+samples; subjective listening acceptance is not established by this check.

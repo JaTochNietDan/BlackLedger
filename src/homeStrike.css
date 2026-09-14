@@ -1,0 +1,4 @@
+.home-strike-scene{position:relative;min-height:560px;height:calc(100dvh - 100px);background:#171b18;overflow:hidden}
+.home-strike-canvas{position:absolute;inset:0}.home-strike-canvas canvas{display:block;width:100%;height:100%}
+.home-strike-scene>p{position:absolute;left:24px;top:32px;background:#171b18e8;color:#ebdcbb;padding:14px}
+.home-strike-scene .city3d-story{position:absolute;left:18px;right:18px;bottom:18px;z-index:2}
