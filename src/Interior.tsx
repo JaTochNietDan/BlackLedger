@@ -247,7 +247,7 @@ export function Interior({
       </div>
       {place.rent_register && <details className="lodging-register">
         <summary>Residents’ register <span>{place.rent_register.occupied} tenants · {place.rent_register.capacity} places</span></summary>
-        <p>${place.rent_register.daily} current rent per day · Service and condition affect the rate. Payments settle daily; unpaid rent remains owing.</p>
+        <p>${place.rent_register.daily} current rent per day. {place.id === 'room' && 'Service and condition affect the rate. '}Payments settle daily; unpaid rent remains owing.</p>
         <ul>{place.rent_register.tenants.map(tenant=><li key={tenant.id}>
           <strong>{tenant.name}</strong><span>{tenant.accommodation} · ${tenant.daily} a day</span>
           {tenant.account && <small>Last payment ${tenant.account.paid} · {tenant.account.arrears ? `$${tenant.account.arrears} owing` : 'Account settled'}</small>}
@@ -263,7 +263,7 @@ export function Interior({
           ))}
         </div>
       )}
-      {place.id === 'bar' ? <Interior3D people={onFloor} picked={picked} onPick={id=>setPicked(id===picked?'':id)} minute={minute}/> : <div
+      {place.id === 'bar' || place.id === 'mercercourt' ? <Interior3D key={place.id} place={place.id} people={onFloor} picked={picked} onPick={id=>setPicked(id===picked?'':id)} minute={minute}/> : <div
         className={'room' + (painted ? ' painted' : '')}
         style={painted ? {backgroundImage: `url(${paintedRoom(place.id)})`} : undefined}
       >

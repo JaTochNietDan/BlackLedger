@@ -1646,6 +1646,16 @@ def mercer_lobby():
         box('sconce back',(x,6.65,3.72),(.22,.15,.46),brass,.03)
         cylinder('sconce opal globe',(x,6.37,3.78),.17,.35,material('opal lamp '+str(x),(.9,.72,.42),0,1.5),vertices=24)
     box('entrance mat',(0,-3.4,.04),(2.8,1.5,.035),material('coir doormat',(.22,.16,.08)))
+    # Keep walls and their mounted fixtures independently removable when the
+    # browser camera orbits behind them. Furniture remains on the floor.
+    walls={}
+    for side in ('left','back'):
+        group=bpy.data.objects.new('interior-wall-'+side,None);bpy.context.collection.objects.link(group);walls[side]=group
+    for ob in list(bpy.context.scene.objects):
+        if ob.type!='MESH':continue
+        if ob.name.startswith('west '):ob.parent=walls['left']
+        elif ob.name.startswith(('rear ','letterbox ','individual letterbox','mail slot','mailbox number','corridor door','door ','recessed door','sconce ')):ob.parent=walls['back']
+
 
 
 def mercer_plate(path, camera_at, target, scale):

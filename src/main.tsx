@@ -810,7 +810,7 @@ function App() {
               )}
               {inside && journeyOverlay}
             </div>
-            {!playing && !w.event && w.last_result?.cues?.length && (
+            {!playing && !w.event && !!w.last_result?.cues?.length && (
               <button
                 className="replay-scene"
                 onClick={() => {

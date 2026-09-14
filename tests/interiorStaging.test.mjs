@@ -32,3 +32,29 @@ test('seated rigs remain above the floor and occupants have separate physical sp
   }
  }
 });
+
+test('Mercer lobby uses exclusive bench and floor positions, with a superintendent at the register',async()=>{
+ const {mercerLobbyPlacements}=await import('../.runtime/frontend-test/interiorStaging.js');
+ const people=[{id:'super',role:'Superintendent'},...Array.from({length:14},(_,i)=>({id:`tenant-${i}`}))];
+ const placements=mercerLobbyPlacements(people);
+ assert.deepEqual([...placements],[...mercerLobbyPlacements([...people].reverse())]);
+ assert.equal(placements.size,15);assert.equal(placements.get('super').id,'lobby-register');
+ for(const name of ['person','woman']){
+  const source=await model(name),boxes=[];
+  for(const [id,spot] of placements){
+   const actor=source.clone(true);poseInteriorOccupant(actor,spot);
+   const box=new THREE.Box3().setFromObject(actor,true);
+   assert.ok(box.min.y>=.0175,`${name}/${spot.id} below terrazzo`);
+   assert.ok(box.min.x> -5.7&&box.max.x<2.8&&box.min.z> -6.3&&box.max.z<4.8,`${name}/${spot.id} clips wall or stair`);
+   if(spot.seat!==undefined){
+    assert.ok(Math.abs(actor.getObjectByName('leg1').getWorldPosition(new THREE.Vector3()).y-.77)<1e-6);
+    assert.ok(box.min.x> -5.25,'seated occupant intersects bench back');
+   }
+   for(const other of boxes)assert.equal(box.intersectsBox(other.box),false,`${name}/${id} overlaps ${other.id}`);
+   boxes.push({id,box});
+  }
+ }
+ const room=await model('interior-mercer-court');
+ assert.ok(room.getObjectByName('interior-wall-left'));
+ assert.ok(room.getObjectByName('interior-wall-back'));
+});

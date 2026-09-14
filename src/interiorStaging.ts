@@ -16,6 +16,22 @@ export function interiorPlacements(people:Presence[]) {
  }
  return result;
 }
+// Mercer Court uses its own authored bench and clear lobby floor, not bar seats.
+export function mercerLobbyPlacements(people:Presence[]) {
+ const result=new Map<string,InteriorSpot>();
+ const available:InteriorSpot[]=[
+  ...[.15,1.85].map((z,i)=>({id:`lobby-bench-${i}`,x:-4.85,z,yaw:Math.PI/2,seat:.77})),
+  ...[-3.5,-1.5,.5,2.5].flatMap((z,row)=>[-2.6,-.7,1.2].map((x,col)=>({id:`lobby-floor-${row}-${col}`,x,z,yaw:row%2?Math.PI:0})))
+ ];
+ for(const who of [...people].sort((a,b)=>a.id.localeCompare(b.id))){
+  if(result.has(who.id))continue;
+  if(/\bsuperintendent\b/i.test(who.role||'')&&![...result.values()].some(s=>s.id==='lobby-register'))
+   result.set(who.id,{id:'lobby-register',x:-2,z:-5.5,yaw:0});
+  else {const spot=available.shift();if(spot)result.set(who.id,spot);}
+ }
+ return result;
+}
+
 export function poseInteriorOccupant(actor:THREE.Group,spot:InteriorSpot) {
  actor.rotation.set(0,spot.yaw,0);
  actor.position.set(spot.x,spot.seat===undefined?.03:spot.seat-.86,spot.z);

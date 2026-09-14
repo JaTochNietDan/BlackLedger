@@ -130,3 +130,8 @@
 
 /* Put the itemized bill in view immediately when daily accounts opens. */
 .city-accounts .books-lines:first-child{margin-top:0;margin-bottom:16px}
+
+/* Keep the residence register next to the room, ahead of its action catalogue. */
+.interior-stage:has(.lodging-register) .lodging-register{grid-column:1;grid-row:3;margin:0}
+.interior-stage:has(.lodging-register) .room-people{grid-row:4}
+.interior-stage:has(.lodging-register) .room-work{grid-row:5}
