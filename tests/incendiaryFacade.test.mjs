@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
-import {CityIncendiary,incendiaryFlight,INCENDIARY_RELEASE,INCENDIARY_IMPACT} from '../.runtime/frontend-test/city3dIncendiary.js';
+import {CityIncendiary,incendiaryCorridorClear,incendiaryFlight,INCENDIARY_RELEASE,INCENDIARY_IMPACT} from '../.runtime/frontend-test/city3dIncendiary.js';
 import {clearBlastWindows} from '../.runtime/frontend-test/city3dFire.js';
 async function model(name){
  const b=readFileSync(new URL(`../public/art/models/${name}.glb`,import.meta.url)),loader=new GLTFLoader();
@@ -15,6 +15,7 @@ test('incendiary bottle centre reaches facade without passing through earlier ma
  for(const name of ['tavern','monarch','tenement','shop','civic','casino','warehouse','bluehour','goldenlily','papermoon','mariner','mercer-court','filling','garage','dealer','docks','haulage','villa','undertaker']){
   const building=await model(name);building.position.set(0,.18,16);if(['filling','garage','dealer','docks','haulage'].includes(name))building.rotation.y=Math.PI;building.updateMatrixWorld(true);
   for(const x of [3,0,-3]){
+   assert.ok(incendiaryCorridorClear({x,z:6.35},building),`${name} x=${x} actor corridor overlaps authored geometry`);
    const origin=new THREE.Vector3(x,.2,6.35),windows=clearBlastWindows(building).sort((a,b)=>Math.abs(a.x-x)-Math.abs(b.x-x));
    assert.ok(windows.length,name);const target=windows[0].clone().sub(origin);
    const cast=new CityIncendiary(actor.clone(true),bottle.clone(true),target);cast.root.position.copy(origin);
@@ -84,4 +85,15 @@ test('short flight segments reject distant geometry but retain nearer blockers',
  assert.ok(incendiaryFlight(start,windows,building));assert.equal(rays,0,'triangles beyond every segment were still tested');
  wall.position.z=2;assert.equal(incendiaryFlight(start,windows,building),null,'near blocker was rejected with distant geometry');assert.ok(rays>0);
  wall.geometry.dispose();wall.material.dispose();
+});
+
+test('staging chooses another corridor when a facade obstacle blocks the first',async()=>{
+ const {availableSceneSlot}=await import('../.runtime/frontend-test/city3dEvents.js');
+ const lot={x:0,z:16,row:0},building=new THREE.Group();
+ const fence=new THREE.Mesh(new THREE.BoxGeometry(.12,2,2),new THREE.MeshBasicMaterial());fence.position.set(4,1,6.35);building.add(fence);
+ const slot=availableSceneSlot(lot,'incendiary',[],undefined,s=>incendiaryCorridorClear(s.root,building));
+ assert.ok(slot);assert.equal(slot.root.x,0,'selected the corridor through the fence');
+ assert.equal(incendiaryCorridorClear({x:3,z:6.35},building),false);
+ fence.position.x=20;assert.equal(incendiaryCorridorClear({x:3,z:6.35},building),true);
+ fence.geometry.dispose();fence.material.dispose();
 });

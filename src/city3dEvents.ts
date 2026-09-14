@@ -63,7 +63,7 @@ export function sceneSlots(lot: Lot, kind: string): SceneSlot[] {
   return [];
 }
 export function availableSceneSlot(
-  lot: Lot, kind: string, occupied: {pose: TrafficPose; model: string}[], entry?:Point,
+  lot: Lot, kind: string, occupied: {pose: TrafficPose; model: string}[], entry?:Point, accept?:(slot:SceneSlot)=>boolean,
 ): SceneSlot | undefined {
   const candidates=sceneSlots(lot,kind);
   if(kind==='raid-officer'&&entry){
@@ -74,7 +74,7 @@ export function availableSceneSlot(
       candidates.splice(entry.z-candidates[0].root.z>3.65?0:1,0,{root,pose:{x:root.x,z:root.z+2.6,heading:0},model:'police-approach'});
   }
   return candidates.find(slot =>
-    occupied.every(other => !trafficOverlap(slot.pose, slot.model, other.pose, other.model)));
+    occupied.every(other => !trafficOverlap(slot.pose, slot.model, other.pose, other.model)) && (!accept || accept(slot)));
 }
 export function casualtyFall(progress: number) {
   const angle = Math.min(1, Math.max(0, progress) * 2.5) * Math.PI / 2;

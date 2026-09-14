@@ -133,3 +133,24 @@ function findIncendiaryFlight(start:THREE.Vector3,windows:THREE.Vector3[],buildi
  }
  return null;
 }
+
+/** Check the complete actor corridor against authored triangles, not whole-building boxes. */
+export function incendiaryCorridorClear(root:{x:number;z:number},building:THREE.Object3D){
+ const corridor=new THREE.Box3(new THREE.Vector3(root.x-4.6,.20,root.z-.9),new THREE.Vector3(root.x+1.6,2.5,root.z+.9));
+ const triangle=new THREE.Triangle(),bounds=new THREE.Box3();let clear=true;
+ building.updateWorldMatrix(true,true);
+ building.traverse(o=>{
+  if(!clear||!(o instanceof THREE.Mesh))return;
+  o.geometry.computeBoundingBox();bounds.copy(o.geometry.boundingBox!).applyMatrix4(o.matrixWorld);
+  if(!bounds.intersectsBox(corridor))return;
+  const position=o.geometry.attributes.position,index=o.geometry.index;
+  const count=index?.count??position.count;
+  for(let i=0;i<count;i+=3){
+   triangle.a.fromBufferAttribute(position,index?index.getX(i):i).applyMatrix4(o.matrixWorld);
+   triangle.b.fromBufferAttribute(position,index?index.getX(i+1):i+1).applyMatrix4(o.matrixWorld);
+   triangle.c.fromBufferAttribute(position,index?index.getX(i+2):i+2).applyMatrix4(o.matrixWorld);
+   if(corridor.intersectsTriangle(triangle)){clear=false;break;}
+  }
+ });
+ return clear;
+}

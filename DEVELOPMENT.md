@@ -536,3 +536,11 @@ Initial cache test expected a distant mesh to receive raycasts; the new broad ph
 CUA8897 first-use planning benchmark: Monarch16.9ms (previous58.7), Paper Moon9.8ms (previous45.2), undertaker5.1ms (previous12.9); cached repeats0–.1ms at timer resolution. Node cold measurements20.8/14.2/2.1ms. These are planning timings only: Monarch still consumes roughly a60FPS frame by itself, so first-use frame-budget work remains open.
 
 All254 existing frontend tests pass11.806s (.runtime/incendiary-bounds-tests.log); subsequently added broad-phase test passes with all facade/cache tests (5 tests,1.225s), including57 sampled authored flight paths. TypeScript/Vite build passes2.37s (.runtime/incendiary-bounds-build.log), known bundle warning unchanged; diff check clean. No campaign writes or API changes. Caffeinate87182 alive. Full goal remains active, including robust no-path handling, continuous physical clearance, choreography fidelity and remaining game systems.
+
+### 2026-09-14 — incendiary actor corridor geometry
+
+Scene selection now checks the complete approach/escape corridor against the target building's authored triangles before accepting an otherwise unoccupied incendiary slot. Mesh bounds prune candidates, but actual triangle intersections decide whether a facade detail obstructs the corridor. All57 existing corridors across19 models pass. A new fence fixture blocks the first slot and verifies selection of another; moving the fence away restores clearance.
+
+All255 existing frontend tests pass11.101s (.runtime/incendiary-corridor-tests.log); subsequently added fence-selection test passes with all facade/cache checks (6 tests,1.218s, .runtime/incendiary-corridor-targeted.log). TypeScript/Vite build passes2.15s (.runtime/incendiary-corridor-build.log), known bundle warning unchanged. CUA8894 Monarch preview staged normally with loft.8; after stopping, effects empty and revision36/minute1160 unchanged. No campaign commands or main-save changes. Caffeinate87182 confirmed alive during verification.
+
+This is a surface-intersection guard for known exterior slots, not generalized solid-volume collision detection. Neighboring props, moving obstacles, fully blocked staging/no-flight behavior, escape handoff and the broader production objective remain unfinished.

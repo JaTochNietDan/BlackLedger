@@ -1,4 +1,4 @@
-import {CityIncendiary, incendiaryFlight, INCENDIARY_IMPACT} from './city3dIncendiary';
+import {CityIncendiary, incendiaryCorridorClear, incendiaryFlight, INCENDIARY_IMPACT} from './city3dIncendiary';
 import {streetAt} from './streetPlayback';
 import {CityCustody} from './city3dCustody';
 import {CityAssassination, assassinationBatch, isStagedStrike, MELEE_IMPACTS, ASSASSINATION_SHOT, ASSASSINATION_VICTIM_X, executionSpatter} from './city3dAssassination';
@@ -1235,7 +1235,7 @@ export function City3D(props: Props) {
             ...aftermath.slots(),
           ];
           const entry=buildings.get(e.cue.target)?.getObjectByName('entrance-threshold')?.getWorldPosition(new THREE.Vector3());
-          e.slot = availableSceneSlot(lots.get(e.cue.target)!, e.assassination?'assassination':e.custody?'custody':e.cue.kind, occupied,entry);
+          e.slot = availableSceneSlot(lots.get(e.cue.target)!, e.assassination?'assassination':e.custody?'custody':e.cue.kind, occupied,entry,e.incendiary?slot=>incendiaryCorridorClear(slot.root,buildings.get(e.cue.target)!):undefined);
           if (e.slot) {
             e.extra.position.set(e.slot.root.x, e.slot.model === 'parked-police' ? vehicleRootHeight(e.slot.root) : 0.2, e.slot.root.z);
             e.light.position.set(e.slot.root.x, 3, e.slot.root.z);
