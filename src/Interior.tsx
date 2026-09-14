@@ -1,7 +1,7 @@
 import {Interior3D} from './Interior3D';
 import {useEffect, useState} from 'react';
 import type {ReactElement} from 'react';
-import type {Action, Coming, Group, Place, Presence} from './types';
+import type {Action, Coming, Group, Place, Presence, Person} from './types';
 import {interiorSVG, paintedRoom, roomLight, standingSpots, StandingRoom} from './roomart';
 import {placeActions} from './grouping';
 import {Portrait} from './Portrait';
@@ -79,6 +79,7 @@ function Work({
 
 export function Interior({
   place,
+  player,
   people,
   actions,
   render,
@@ -90,6 +91,7 @@ export function Interior({
   minute,
 }: {
   place: Place;
+  player: Pick<Person,'name'|'face'|'alive'>;
   people: Presence[];
   actions: Action[];
   render: (a: Action) => ReactElement;
@@ -263,7 +265,7 @@ export function Interior({
           ))}
         </div>
       )}
-      {place.id === 'bar' || place.id === 'mercercourt' ? <Interior3D key={place.id} place={place.id} people={onFloor} picked={picked} onPick={id=>setPicked(id===picked?'':id)} minute={minute}/> : <div
+      {place.id === 'bar' || place.id === 'mercercourt' ? <Interior3D key={place.id} place={place.id} player={player} people={onFloor} picked={picked} onPick={id=>setPicked(id===picked?'':id)} minute={minute}/> : <div
         className={'room' + (painted ? ' painted' : '')}
         style={painted ? {backgroundImage: `url(${paintedRoom(place.id)})`} : undefined}
       >

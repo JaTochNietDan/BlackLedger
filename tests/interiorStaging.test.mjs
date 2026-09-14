@@ -58,3 +58,18 @@ test('Mercer lobby uses exclusive bench and floor positions, with a superintende
  assert.ok(room.getObjectByName('interior-wall-left'));
  assert.ok(room.getObjectByName('interior-wall-back'));
 });
+
+test('player has clear floor space in both rooms without displacing any NPC',async()=>{
+ const {interiorPlayerSpot,mercerLobbyPlacements}=await import('../.runtime/frontend-test/interiorStaging.js');
+ for(const place of ['bar','mercercourt'])for(const name of ['person','woman']){
+  const source=await model(name),actor=source.clone(true),spot=interiorPlayerSpot(place);
+  poseInteriorOccupant(actor,spot);const playerBox=new THREE.Box3().setFromObject(actor,true);
+  assert.ok(playerBox.min.y>=.0175);
+  assert.ok(playerBox.min.x>-5.7&&playerBox.max.x<5.7&&playerBox.min.z>-4.8&&playerBox.max.z<4.9);
+  const people=[{id:'worker',role:place==='bar'?'Barman':'Superintendent'},...Array.from({length:14},(_,i)=>({id:`guest-${i}`}))];
+  const placements=(place==='bar'?interiorPlacements:mercerLobbyPlacements)(people);
+  for(const [id,s] of placements){const npc=source.clone(true);poseInteriorOccupant(npc,s);assert.equal(playerBox.intersectsBox(new THREE.Box3().setFromObject(npc,true)),false,`${place}/${name} overlaps ${id}`);}
+  if(place==='mercercourt')assert.ok(playerBox.max.x<2.8&&playerBox.min.z>3.7,'player intrudes into staircase or lobby crowd');
+  else assert.ok(playerBox.max.z<.7&&playerBox.min.z>-2,'player intrudes into bar stools or aisle crowd');
+ }
+});

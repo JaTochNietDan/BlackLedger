@@ -47,3 +47,10 @@ export function poseInteriorOccupant(actor:THREE.Group,spot:InteriorSpot) {
  }
  actor.updateMatrixWorld(true);
 }
+
+// Reserved clear floor positions; these never displace a public occupant.
+export function interiorPlayerSpot(place:'bar'|'mercercourt'):InteriorSpot {
+ return place==='mercercourt'
+  ? {id:'player-entry',x:2,z:4.15,yaw:Math.PI}
+  : {id:'player-entry',x:3.65,z:-.7,yaw:-Math.PI/2};
+}
