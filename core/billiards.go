@@ -44,6 +44,9 @@ func (w *World) poolUnplayable() bool {
 }
 
 func (w *World) PoolReadiness(who string, stake int) string {
+	if w.PoolTournament != nil && !w.PoolTournament.Settled {
+		return "The hall is holding a tournament."
+	}
 	if !w.Player.Alive || w.Held() || w.Event != nil {
 		return "Finish the current situation before starting a rack."
 	}
@@ -195,6 +198,9 @@ func (w *World) ConcedePool() error {
 	return nil
 }
 func (w *World) PoolOpponentPlaying(id string) bool {
+	if w.tournamentParticipant(id) {
+		return true
+	}
 	g := w.Pool
 	return g != nil && !g.Settled && g.Match != nil && g.Match.Winner < 0 && g.Life == w.Life && w.Player.Alive && w.Player.Location == g.Place && g.Opponent == id
 }
@@ -203,6 +209,7 @@ func (w *World) PoolOpponentPlaying(id string) bool {
 // command is unrelated to billiards. A different life never receives an old
 // protagonist's winnings. The unpaid opponent remains referenced for settlement.
 func (w *World) ReconcilePool() {
+	w.ReconcilePoolTournament()
 	g := w.Pool
 	if g == nil || g.Settled || g.Match == nil {
 		return

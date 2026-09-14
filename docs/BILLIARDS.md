@@ -402,3 +402,39 @@ physical concessions and immutable finished champions. Vet passes. Logs:
 not connected in this increment; this closes a lifecycle gap needed before money
 can safely be attached. Core/HTTP/UI integration and scheduling remain open.
 No campaign save was used.
+
+## Funded tournament campaign state — 2026-09-14
+
+Added optional saved `PoolTournament` with original entry deposits, fee, life-bound
+player ID, whole-pool escrow, actual bracket and per-match physical replay/intent.
+`StartPoolTournament` validates all3/7 NPCs and the player before debiting anyone.
+The existing lifecycle reconciliation now handles event participants and settlement;
+eligible NPCs stay at the hall, eliminated entrants can resume routines, and unpaid
+identities cannot be pruned. Casual entry is held while a tournament occupies the
+hall, pending explicit shared-table integration.
+
+The champion receives all deposits. Player Earned records only net profit.
+Withdrawal forfeits an entry; hall closure refunds entries not previously
+forfeited. If an event ends without a champion, forfeited money transfers to the
+hall's till, preserving the money rather than creating a false winner or crediting
+a new protagonist. These house terms must be shown in the eventual entry UI.
+A missing payout recipient preserves the unsettled escrow for recovery.
+
+`PlayPoolTournamentBot` executes one actual NPC stroke and saves its compressed
+replay and cue input before settlement. It cannot play for the protagonist or an
+unavailable entrant. No automatic/background progression or HTTP/UI tournament
+entry is enabled yet, so this does not introduce unattended funded events into
+the live campaign. Scheduling, player commands, request receipts and playable
+bracket progression are next.
+
+Core pool/tournament tests pass (0.373s), full store tests pass (0.287s), server
+tests pass (1.190s), and vet passes. Coverage includes invalid/duplicate/unfunded
+entry atomicity, full player/NPC physical-final payout, net profit, repeated
+settlement, closure refunds, prior-withdrawal forfeiture, active/removed entrant
+retention, simultaneous departures and actual DieOf→new_life protection. A real
+temporary SQLite database closes/reopens between entry, semifinal advancement,
+final settlement and repeated reconciliation, preserving one $100 prize and one
+$25 debit per entrant. Core physical tests produce the final through the solver;
+the database fixture uses actual concession decisions to isolate persistence.
+Logs `.runtime/pool-tournament-{verified-core,adapters,verified-vet}.log`.
+Main campaign untouched; tournament play is still not user-accessible.

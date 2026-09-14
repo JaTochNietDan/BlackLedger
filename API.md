@@ -1116,3 +1116,20 @@ ball calls and pocket picking. Previews and camera gestures send no commands;
 placement confirmation and Play shot use the inputs above. Visible pocket labels
 1–6 translate to API indices0–5. Local placement hints are advisory; Go remains the
 validator. Pointer aiming toward a ball centre is not an automatic pocket solution.
+
+## Tournament campaign state (internal integration)
+
+Saves may now contain optional `pool_tournament`: life-bound player identity,
+entry fee, original participant deposits, remaining escrow, the physical bracket,
+per-match replays/cue intent, and settled/voided status. No tournament entry or
+play command/public projection is exposed yet. Scheduled entry and UI integration
+remain required before enabling this feature.
+
+Internal entry supports four/eight actual participants and validates every wallet
+before reserving any fee. A champion takes the entire held pool; player earnings
+count only profit above their own fee. Departure, death or custody withdraws an
+entrant. An unusable hall refunds entries which have not already been forfeited;
+forfeited entries go to the hall's till if the event has no champion. These terms
+must be displayed when scheduled entry is exposed. A successor cannot receive the
+previous protagonist's fees. Eligible NPCs remain at the event, eliminated ones
+can resume their routines, and unpaid participant identities survive pruning.

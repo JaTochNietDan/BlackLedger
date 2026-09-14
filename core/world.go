@@ -544,6 +544,7 @@ type Result struct {
 	Health  int `json:"health"`
 }
 type World struct {
+	PoolTournament   *PoolTournament                  `json:"pool_tournament,omitempty"`
 	Pool             *PoolGame                        `json:"pool,omitempty"`
 	HouseholdSavings map[string]HouseholdAccount      `json:"household_savings,omitempty"`
 	Apartments       []ApartmentDeed                  `json:"apartments"`

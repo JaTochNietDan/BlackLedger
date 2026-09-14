@@ -2160,3 +2160,20 @@ save/reopen, active concessions, all-entrant withdrawal, malformed batch atomici
 and finished-event protection. No campaign money or live save changed. Entry-fee,
 payout, scheduling and UI integration remain outstanding; withdrawal lifecycle
 was completed first so those integrations can distinguish winners from void events.
+
+### 2026-09-14 — funded tournament entries and whole-pool settlement
+
+Added internal tournament campaign state and atomic fee reservation for4/8 actual
+entrants. Reconciliation pays the champion the entire escrow, records only player
+profit as earnings, handles withdrawal/closure, protects prior-life money, pins
+eligible NPCs and retains unpaid identities. Cancelled events return unforfeited
+fees; forfeited fees go to the hall till. One-stroke NPC execution uses real
+physics and saves replay/intent. Scheduling and command/UI integration remain off.
+
+Pool/tournament tests pass (0.373s), store suite (0.287s), server suite (1.190s),
+and vet pass. Tests verify physical player/NPC final payouts, money conservation,
+invalid-entry atomicity, repeated settlement, refunds/forfeitures, simultaneous
+withdrawals and actual death/new-life isolation. Temporary SQLite reopen checks
+preserve deposits, rounds and exactly one prize across restart. Main save unused.
+Next: scheduled entry, public bracket/player commands, receipt retries and browser
+progression; tournament funds are not exposed to normal player actions yet.

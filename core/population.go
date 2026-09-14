@@ -225,6 +225,9 @@ func (w *World) PrunePeople() {
 
 // referenced reports whether anything still needs this person to exist.
 func (w *World) referenced(id string) bool {
+	if t := w.PoolTournament; t != nil && !t.Settled && t.Deposits[id] > 0 {
+		return true
+	}
 	if w.Pool != nil && !w.Pool.Settled && w.Pool.Opponent == id {
 		return true
 	}
