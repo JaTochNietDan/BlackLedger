@@ -934,5 +934,21 @@
       ]
     ],
     "bytes": 583852
+  },
+  "interior-butcher": {
+    "file": "interior-butcher.glb",
+    "bounds_blender": [
+      [
+        -4.57,
+        -4.5,
+        -0.17
+      ],
+      [
+        4.5,
+        4.57,
+        3.685
+      ]
+    ],
+    "bytes": 1224432
   }
 }

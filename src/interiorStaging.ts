@@ -95,10 +95,22 @@ export function ashburyPlacements(people:Presence[]) {
  return result;
 }
 
-export type InteriorPlace='bar'|'mercercourt'|'room'|'laundry'|'estate'|'apartment'|'flat';
+export function butcherPlacements(people:Presence[]) {
+ const result=new Map<string,InteriorSpot>();
+ const available:InteriorSpot[]=[-.6,.7,2].flatMap((z,row)=>[-2.5,-.7,1.1].map((x,col)=>({id:`butcher-customer-${row}-${col}`,x,z:z+1.7,yaw:Math.PI})));
+ for(const who of [...people].sort((a,b)=>a.id.localeCompare(b.id))){
+  if(result.has(who.id))continue;
+  if(/\b(butcher|shopkeeper|clerk)\b/i.test(who.role||'')&&![...result.values()].some(s=>s.id==='butcher-service'))
+   result.set(who.id,{id:'butcher-service',x:-.6,z:-1.8,yaw:0});
+  else {const spot=available.shift();if(spot)result.set(who.id,spot);}
+ }
+ return result;
+}
+
+export type InteriorPlace='bar'|'mercercourt'|'room'|'laundry'|'estate'|'apartment'|'flat'|'butcher';
 export function placementsForInterior(place:InteriorPlace,people:Presence[]){
  if(place==='flat')return new Map<string,InteriorSpot>();
- return (place==='apartment'?ashburyPlacements:place==='estate'?cypressPlacements:place==='laundry'?laundryPlacements:place==='bar'?interiorPlacements:place==='room'?marinerLobbyPlacements:mercerLobbyPlacements)(people);
+ return (place==='butcher'?butcherPlacements:place==='apartment'?ashburyPlacements:place==='estate'?cypressPlacements:place==='laundry'?laundryPlacements:place==='bar'?interiorPlacements:place==='room'?marinerLobbyPlacements:mercerLobbyPlacements)(people);
 }
 
 export function poseInteriorOccupant(actor:THREE.Group,spot:InteriorSpot) {
@@ -119,6 +131,7 @@ export function poseInteriorOccupant(actor:THREE.Group,spot:InteriorSpot) {
 
 // Reserved clear floor positions; these never displace a public occupant.
 export function interiorPlayerSpot(place:InteriorPlace):InteriorSpot {
+ if(place==='butcher')return {id:'player-entry',x:2.7,z:3.5,yaw:Math.PI};
  if(place==='flat')return {id:'player-entry',x:1,z:2.7,yaw:Math.PI};
  if(place==='apartment')return {id:'player-entry',x:1.6,z:4.15,yaw:Math.PI};
  if(place==='estate')return {id:'player-entry',x:1.6,z:3.3,yaw:Math.PI};

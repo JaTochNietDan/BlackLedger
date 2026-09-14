@@ -16,12 +16,12 @@ import './interior3d.css';
 
 export function Interior3D(props:{place:InteriorPlace;operation?:LaundryOperation;motion:boolean;player:Pick<Person,'name'|'face'|'alive'>;people:Presence[];picked:string;onPick:(id:string)=>void;minute:number}) {
  const host=useRef<HTMLDivElement>(null), latest=useRef(props);latest.current=props;
- const roomName=props.place==='flat'?'Your apartment':props.place==='apartment'?'Ashbury Court':props.place==='estate'?'Cypress House':props.place==='laundry'?'Bluebird Laundry':props.place==='mercercourt'?'Mercer Court':props.place==='room'?'The Mariner':'Saint Agnes';
+ const roomName=props.place==='butcher'?'Fassano Meats':props.place==='flat'?'Your apartment':props.place==='apartment'?'Ashbury Court':props.place==='estate'?'Cypress House':props.place==='laundry'?'Bluebird Laundry':props.place==='mercercourt'?'Mercer Court':props.place==='room'?'The Mariner':'Saint Agnes';
  const extraPeople=props.people.length-placementsForInterior(props.place,props.people).size;
  const [status,setStatus]=useState(`Opening ${roomName}…`);
  useEffect(()=>{
-  const flat=props.place==='flat',ashbury=props.place==='apartment',estate=props.place==='estate',laundry=props.place==='laundry',boarding=props.place==='room',compact=boarding||laundry||estate||flat,lobby=props.place!=='bar', roomModel=flat?'interior-flat':ashbury?'interior-ashbury':estate?'interior-cypress':laundry?'interior-laundry':boarding?'interior-mariner':lobby?'interior-mercer-court':'interior-saint-agnes';
-  const origin=new THREE.Vector3(13,14,lobby?17:-17), centre=new THREE.Vector3(0,1,lobby?-1:0), span=flat?5.7:ashbury?7:estate?6.5:compact?7.5:lobby?8.5:7;
+  const flat=props.place==='flat',ashbury=props.place==='apartment',estate=props.place==='estate',laundry=props.place==='laundry',boarding=props.place==='room',compact=boarding||laundry||estate||flat,lobby=props.place!=='bar', roomModel=props.place==='butcher'?'interior-butcher':flat?'interior-flat':ashbury?'interior-ashbury':estate?'interior-cypress':laundry?'interior-laundry':boarding?'interior-mariner':lobby?'interior-mercer-court':'interior-saint-agnes';
+  const origin=new THREE.Vector3(13,14,lobby?17:-17), centre=new THREE.Vector3(0,1,lobby?-1:0), span=props.place==='butcher'?6.5:flat?5.7:ashbury?7:estate?6.5:compact?7.5:lobby?8.5:7;
   setStatus(`Opening ${roomName}…`);
   const el=host.current!;let dead=false,frame=0,dirty=true,renderedFrames=0;
   const scene=new THREE.Scene();scene.background=new THREE.Color(0x171b18);

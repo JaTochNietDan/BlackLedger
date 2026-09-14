@@ -1374,3 +1374,34 @@ rental investments, Cypress/Ashbury/private-flat interiors and population housin
 settlement. It does not close the goal: indoor assault/burglary choreography,
 remaining commercial/civic/industrial interiors, broader income progression,
 visual fidelity acceptance and a fresh coherent played campaign remain.
+
+## September 14 — Fassano Meats interactive shop interior
+
+Replaced the butcher's flat plate with original Blender-authored 3D shop dressing:
+glazed wall tiles/borders, quarry floor, refrigerated display with glass/rails and
+meat trays, end-grain block, knife rack, wrapping-paper stand, mechanical scale
+with dial/ticks/needle, cold-room door and shop lettering. Source is
+`tools/butcher_interior.py`; reproducible targeted export:
+`.venv-blender/bin/python tools/export_city3d.py --only=interior-butcher`.
+Full export includes it; other reviewed model files were not regenerated.
+The model is1,224,432 bytes. No third-party assets or invented sale prices.
+
+Actual public occupants fill nine customer positions and a reserved service
+position for a present butcher/shopkeeper/clerk. The complete roster remains
+available. The separate player entrance clears the fullest roster. Tests use
+the actual GLB and both character rigs for floor support, furniture clearance,
+non-overlap and sampled arrival. All355 frontend tests passed before adding the
+final entrance check; both final butcher geometry tests pass, build passes.
+Evidence: `.runtime/butcher-tests.log`, `butcher-geometry-final.log`,
+`butcher-final-build.log` and `butcher-export.log`.
+
+Isolated fixture `qa-fixture ... butcher`, port8941, browser verified1280x720
+and820x740: room loads, camera zoom/orbit/reset work, clicking the rendered
+butcher selects the correct public person/actions. The first preview opened
+before the export reached dist and correctly showed the fallback; a fresh
+completed build loads successfully. No main-save QA commands. Main8791 still
+serves releasedb4b7aee; this shop is currently in the development preview.
+
+Remaining: cold-room interior/work animations, richer surface wear and prop
+variation, and the other commercial/civic/industrial rooms. This is one further
+interactive destination, not completion of the full interiors/visual goal.

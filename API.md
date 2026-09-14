@@ -928,3 +928,10 @@ Only the player appears in the private flat; public building occupants are not
 projected into it. Selecting someone in the building list returns to the hall.
 The control disappears when this is no longer the player's home. The shared
 furnished bedsit does not yet depict fitted upgrades or a bathroom interior.
+
+Fassano Meats (`butcher`) now displays an authored 3D shop interior. Public
+occupants use nine customer positions and one reserved butcher/shopkeeper/clerk
+position behind the counter; excess occupants remain in the complete roster.
+The player has a separate clear entrance aisle. Shop dressing, display trays,
+scale and cold-room door are cosmetic, not public inventory or new actions.
+Existing selection, camera controls and authoritative building commands apply.

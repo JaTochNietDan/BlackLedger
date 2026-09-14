@@ -12,14 +12,14 @@ import (
 
 func main() {
 	if len(os.Args) < 2 || len(os.Args) > 3 {
-		log.Fatal("usage: go run ./cmd/qa-fixture <new-qa.sqlite3> [ashbury|cypress|burglary|apartments|poker|building-driveby|city3d-dusk|fatal-charge-car|survivor-charge|fatal-charge|faction-planter|strike-unarmed|strike-revolver|strike-shotgun|strike-thompson|raid-presence|city3d-rain|gunfight-killing|gunfight|city3d-walk|city3d-junction|city3d-traffic|city3d|city3d-night|city3d-blast|police|damage|warning|russo-warning|attack|voice|contact|paused-job|leader|doorman|arrest|debt|herald|killing|dead|offer|audience|street|room|gone|post|round|bereaved|inside|writeoff|writeoff-dead|worn|tables|bench|petrol]")
+		log.Fatal("usage: go run ./cmd/qa-fixture <new-qa.sqlite3> [butcher|ashbury|cypress|burglary|apartments|poker|building-driveby|city3d-dusk|fatal-charge-car|survivor-charge|fatal-charge|faction-planter|strike-unarmed|strike-revolver|strike-shotgun|strike-thompson|raid-presence|city3d-rain|gunfight-killing|gunfight|city3d-walk|city3d-junction|city3d-traffic|city3d|city3d-night|city3d-blast|police|damage|warning|russo-warning|attack|voice|contact|paused-job|leader|doorman|arrest|debt|herald|killing|dead|offer|audience|street|room|gone|post|round|bereaved|inside|writeoff|writeoff-dead|worn|tables|bench|petrol]")
 	}
 	scenario := "police"
 	if len(os.Args) == 3 {
 		scenario = os.Args[2]
 	}
 	weaponTier, weaponFixture := map[string]int{"strike-unarmed": 0, "strike-revolver": 1, "strike-shotgun": 2, "strike-thompson": 3}[scenario]
-	if !weaponFixture && scenario != "ashbury" && scenario != "cypress" && scenario != "burglary" && scenario != "apartments" && scenario != "poker" && scenario != "building-driveby" && scenario != "city3d-dusk" && scenario != "fatal-charge-car" && scenario != "survivor-charge" && scenario != "fatal-charge" && scenario != "faction-planter" && scenario != "raid-presence" && scenario != "city3d-rain" && scenario != "gunfight-killing" && scenario != "gunfight" && scenario != "city3d-walk" && scenario != "city3d-junction" && scenario != "city3d-traffic" && scenario != "city3d-blast" && scenario != "city3d" && scenario != "city3d-night" && scenario != "police" && scenario != "damage" && scenario != "warning" && scenario != "russo-warning" && scenario != "attack" && scenario != "voice" && scenario != "contact" && scenario != "paused-job" && scenario != "leader" && scenario != "doorman" && scenario != "arrest" && scenario != "debt" && scenario != "herald" && scenario != "killing" && scenario != "dead" && scenario != "offer" && scenario != "audience" && scenario != "street" && scenario != "room" && scenario != "gone" && scenario != "post" && scenario != "round" && scenario != "bereaved" && scenario != "inside" && scenario != "writeoff" && scenario != "writeoff-dead" && scenario != "worn" && scenario != "tables" && scenario != "bench" && scenario != "petrol" {
+	if !weaponFixture && scenario != "butcher" && scenario != "ashbury" && scenario != "cypress" && scenario != "burglary" && scenario != "apartments" && scenario != "poker" && scenario != "building-driveby" && scenario != "city3d-dusk" && scenario != "fatal-charge-car" && scenario != "survivor-charge" && scenario != "fatal-charge" && scenario != "faction-planter" && scenario != "raid-presence" && scenario != "city3d-rain" && scenario != "gunfight-killing" && scenario != "gunfight" && scenario != "city3d-walk" && scenario != "city3d-junction" && scenario != "city3d-traffic" && scenario != "city3d-blast" && scenario != "city3d" && scenario != "city3d-night" && scenario != "police" && scenario != "damage" && scenario != "warning" && scenario != "russo-warning" && scenario != "attack" && scenario != "voice" && scenario != "contact" && scenario != "paused-job" && scenario != "leader" && scenario != "doorman" && scenario != "arrest" && scenario != "debt" && scenario != "herald" && scenario != "killing" && scenario != "dead" && scenario != "offer" && scenario != "audience" && scenario != "street" && scenario != "room" && scenario != "gone" && scenario != "post" && scenario != "round" && scenario != "bereaved" && scenario != "inside" && scenario != "writeoff" && scenario != "writeoff-dead" && scenario != "worn" && scenario != "tables" && scenario != "bench" && scenario != "petrol" {
 		log.Fatal("unsupported QA scenario")
 	}
 	path := os.Args[1]
@@ -353,6 +353,20 @@ func main() {
 			w.HouseholdSavings = map[string]core.HouseholdAccount{n.ID: {Cash: 180, Day: 1}}
 			w.SettleApartments()
 			w.RNG = 1
+			return nil
+		}
+		if scenario == "butcher" {
+			w.Player.Location, w.Player.Cash = "butcher", 6000
+			w.District, w.Minute = 9, 600
+			w.Event, w.Plots, w.Tasks = nil, nil, nil
+			for i := 0; i < 6 && i < len(w.NPCs); i++ {
+				n := &w.NPCs[i]
+				n.Location, n.Heading, n.Arrives, n.Sets = "butcher", "", 0, 0
+				if i == 0 {
+					n.Role = "Butcher"
+				}
+				w.MeetPerson(n.ID)
+			}
 			return nil
 		}
 		if scenario == "apartments" || scenario == "ashbury" {
