@@ -1434,3 +1434,12 @@ operative retains it if the issuing life ends. Reload/retry cannot pay it twice.
 Tracked faction/proprietor proceeds are bounded by and debited from their actual
 funds; unowned trade retains its existing modeled daily-takings source. The
 committed robbery cue identifies the operative and records neighborhood activity.
+
+`crew_order:repair` and `crew_order:remedy` extend headquarters orders to owned
+property maintenance. Repairs reserve $50 and restore up to 40 condition;
+remedies reserve the trade-specific remedy price and clear its trouble. Both
+require 60 minutes at the address, plus travel. Arrival and completion recheck
+the deed and remaining need. If another worker already fixed the problem, the
+operative returns the unused budget. Effects share personal-action helpers and
+do not debit the player again. Existing rented-home personal repair permissions
+are unchanged; remote orders require a property deed.

@@ -1072,9 +1072,7 @@ func (w *World) apply(c Command) error {
 						return err
 					}
 				case "repair":
-					restored := min(40, 100-w.Properties[target].Condition)
-					w.Properties[target].Condition += restored
-					w.Log("Repairs arranged", fmt.Sprintf("The property is restored by %d condition, to %d%%.", restored, w.Properties[target].Condition), "business")
+					w.applyRepair(target)
 				case "move_home":
 					current, reason := w.PlanHomeMove(target)
 					if reason != "" || !homePlansMatch(homeChanges, current) {

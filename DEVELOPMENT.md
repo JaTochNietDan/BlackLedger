@@ -3329,3 +3329,25 @@ Robbery follow-up: personal-proprietor regression passed0.195s. Clean07ce79b
 checkout excluding unrelated local edits passed selected core1.370s and
 HTTP0.213s (.runtime/crew-robbery-clean.log), terminal session54541. Remaining
 unstaged robbery diff is exclusively the pre-existing armed-resistance work.
+
+
+### Headquarters property maintenance adapters
+
+Added named repair and remedy assignments to the saved dispatch catalogue and
+operation picker. Both reserve their actual budget, travel, work for 60 minutes,
+and return. Deed changes, already-completed work and recall refund the unused
+reservation. The work shares personal repair/remedy effects without charging a
+second time. Owned residences can receive repair orders as well as businesses.
+
+Evidence: `.runtime/crew-property-tests.log` passes targeted crew, repair,
+remedy, HQ and workplace UX checks (core 0.413s, HTTP package 0.207s).
+New tests cover exact reservation with an empty remaining wallet, JSON reload
+mid-work, exactly-once settlement, lost deeds before arrival/during work,
+already-resolved problems and working recall. `.runtime/crew-property-build.log`
+passes TypeScript/Vite (3.00s; existing bundle-size advisory).
+
+Not promoted to port8791. Remaining: broader practical job coverage, custody
+and succession continuation, compact-layout/remote-scene review, the previously
+recorded routine-predictability full-suite failure, and fresh campaign acceptance.
+The broad visual/game goal remains active. Unrelated armed-resistance and
+scene-aftermath work is preserved unstaged.

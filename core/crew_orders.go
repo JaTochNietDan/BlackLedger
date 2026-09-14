@@ -76,6 +76,15 @@ func (w *World) CrewOrderReadiness(kind, actor, target string) string {
 		}
 	}
 	switch kind {
+	case "repair", "remedy":
+		cost, why := w.crewPropertyWork(kind, target)
+		if why != "" {
+			return why
+		}
+		if w.Player.Cash < cost {
+			return "Not enough cash"
+		}
+		return ""
 	case "rob":
 		return w.robberyReadinessBy(target, hand)
 	case "bomb":
@@ -118,6 +127,8 @@ func (w *World) StartCrewOrder(kind, actor, target string) error {
 		at = w.crewTargetAddress(target)
 	} else if kind == "restock" {
 		reserved = w.RestockCost(target)
+	} else if kind == "repair" || kind == "remedy" {
+		reserved, _ = w.crewPropertyWork(kind, target)
 	}
 	if err := w.Pay(reserved); err != nil {
 		return err
@@ -259,6 +270,12 @@ func (w *World) SettleCrewOrders() {
 					continue
 				}
 			}
+			if o.Kind == "repair" || o.Kind == "remedy" {
+				if _, why := w.crewPropertyWork(o.Kind, o.Target); why != "" {
+					w.returnCrewOrder(o, why)
+					continue
+				}
+			}
 			o.Stage = "working"
 			o.Due = w.Minute + 30
 			if o.Kind == "assassinate" {
@@ -270,10 +287,27 @@ func (w *World) SettleCrewOrders() {
 			if o.Kind == "rob" {
 				o.Due = w.Minute + 60
 			}
+			if o.Kind == "repair" || o.Kind == "remedy" {
+				o.Due = w.Minute + PropertyWorkMinutes
+			}
 		case "working":
 			result := "The target is no longer available"
 			if n.Location == o.Place && !w.Travelling(n) {
 				switch o.Kind {
+				case "repair", "remedy":
+					cost, why := w.crewPropertyWork(o.Kind, o.Target)
+					if why == "" && cost <= o.Reserved {
+						o.Reserved -= cost
+						if o.Kind == "repair" {
+							w.applyRepair(o.Target)
+							result = "Property repairs completed"
+						} else {
+							w.applyRemedy(o.Target, cost)
+							result = "Business trouble resolved"
+						}
+					} else if why != "" {
+						result = why
+					}
 				case "rob":
 					hand, _ := w.NamedHands(o.Actor)
 					if err := w.robWithOrder(o.Target, hand, o); err == nil {
@@ -398,6 +432,12 @@ func (w *World) CrewOrderOffers() []CrewOrderOffer {
 			out = append(out, CrewOrderOffer{Charges: charges, Actor: id, Name: n.Name, Kind: kind, Target: target, Label: label, Cost: cost, Minutes: duration, Reason: w.CrewOrderReadiness(kind, id, target)})
 		}
 		for _, l := range Locations {
+			if p := w.Properties[l.ID]; p != nil && w.Own(l.ID) {
+				offer("repair", l.ID, l.ID, "Repair "+l.Name, RepairCost, PropertyWorkMinutes)
+				if trade, ok := TradeOf(l.ID); ok {
+					offer("remedy", l.ID, l.ID, trade.Remedy+" at "+l.Name, trade.RemedyCost, PropertyWorkMinutes)
+				}
+			}
 			if p := w.Properties[l.ID]; p != nil && p.Income > 0 && !w.Own(l.ID) {
 				offer("bomb", l.ID, l.ID, "Bomb "+l.Name, 0, PlantMinutes)
 				offer("rob", l.ID, l.ID, "Rob "+l.Name, 0, 60)

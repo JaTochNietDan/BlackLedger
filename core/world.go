@@ -1893,7 +1893,7 @@ func (w *World) Actions(id string) []Action {
 							stocking, w.Holding("moonshine")))
 				}
 				if prop.Trouble {
-					asks("remedy", trade.Remedy, 60, trade.RemedyCost, w.RemedyReadiness(id),
+					asks("remedy", trade.Remedy, PropertyWorkMinutes, trade.RemedyCost, w.RemedyReadiness(id),
 						fmt.Sprintf("$%d. %s %s", trade.RemedyCost, trade.Trouble, trade.RemedyDetail))
 				}
 				if ArmourySite(id) {
@@ -1983,7 +1983,7 @@ func (w *World) Actions(id string) []Action {
 					fmt.Sprintf("$%d on a band, a barrel and the word going round. For one evening the people who drink within %d minutes' walk drink here instead, and what a room takes is who is standing in it.",
 						NightCost, NightDraw))
 			}
-			add("repair", "Repair the property", 60, 50, need(w.Properties[id].Condition >= 100, "Already in good condition"), "Restore 40 condition.")
+			add("repair", "Repair the property", PropertyWorkMinutes, RepairCost, need(w.Properties[id].Condition >= 100, "Already in good condition"), "Restore 40 condition.")
 		} else {
 			// "Is buying a business called 'establish protection'? That's not
 			// super clear what that means." It is not, and it was not: this is
@@ -2113,7 +2113,7 @@ func (w *World) Actions(id string) []Action {
 					fmt.Sprintf("$%d, then $%d a day. %s It stays with the building if you move out.", c.Cost, c.Upkeep, c.Detail))
 			}
 			if w.Properties[id].Condition < 100 {
-				add("repair", "Repair the residence", 60, 50, "", "Restore 40 condition.")
+				add("repair", "Repair the residence", PropertyWorkMinutes, RepairCost, "", "Restore 40 condition.")
 			}
 		}
 	}

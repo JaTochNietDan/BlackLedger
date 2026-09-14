@@ -513,10 +513,15 @@ func (w *World) Remedy(id string) error {
 	if err := w.Pay(trade.RemedyCost); err != nil {
 		return err
 	}
+	w.applyRemedy(id, trade.RemedyCost)
+	return nil
+}
+
+// applyRemedy applies work funded by an already-paid or reserved budget.
+func (w *World) applyRemedy(id string, cost int) {
 	w.Properties[id].Trouble = false
 	place, _ := PlaceByID(id)
-	w.Log("Sorted at "+place.Name, fmt.Sprintf("$%d and it is dealt with. %s is earning what it should again.", trade.RemedyCost, place.Name), "business")
-	return nil
+	w.Log("Sorted at "+place.Name, fmt.Sprintf("$%d and it is dealt with. %s is earning what it should again.", cost, place.Name), "business")
 }
 
 // OwnsKind reports whether the player owns any business of this kind. Rules
@@ -546,4 +551,37 @@ func tradeHands(id string) int {
 		return trade.Hands
 	}
 	return 0
+}
+
+const RepairCost = 50
+const PropertyWorkMinutes = 60
+
+// applyRepair shares the effect between personal work and funded assignments.
+func (w *World) applyRepair(id string) {
+	restored := min(40, 100-w.Properties[id].Condition)
+	w.Properties[id].Condition += restored
+	w.Log("Repairs arranged", fmt.Sprintf("The property is restored by %d condition, to %d%%.", restored, w.Properties[id].Condition), "business")
+}
+
+// crewPropertyWork checks the deed and remaining work without checking cash
+// again: the order's budget has already left the player's wallet.
+func (w *World) crewPropertyWork(kind, id string) (int, string) {
+	p := w.Properties[id]
+	if _, ok := PlaceByID(id); !ok || p == nil || !w.Own(id) {
+		return 0, "Your family no longer owns this property"
+	}
+	if kind == "repair" {
+		if p.Condition >= 100 {
+			return RepairCost, "Already in good condition"
+		}
+		return RepairCost, ""
+	}
+	trade, ok := TradeOf(id)
+	if !ok {
+		return 0, "This is not a trading business"
+	}
+	if !p.Trouble {
+		return trade.RemedyCost, "Nothing is wrong here"
+	}
+	return trade.RemedyCost, ""
 }
