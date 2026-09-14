@@ -37,6 +37,10 @@ export type SceneSlot = {root: Point; pose: TrafficPose; model: string};
 /** Dedicated forecourt/side bays keep reenactments out of public travel lanes.
  * The casualty reservation encloses the whole fall, including the standing pose. */
 export function sceneSlots(lot: Lot, kind: string): SceneSlot[] {
+  if(kind==='custody')return [-3,-7,1].map(offset=>{
+    const root={x:lot.x+offset,z:lot.row*PITCH+6.35};
+    return {root,pose:{x:root.x+1.5,z:root.z,heading:0},model:'custody'};
+  });
   if(kind==='assassination')return [-4,-8.6,-1].map(offset=>{
     const root={x:lot.x+offset,z:lot.row*PITCH+6.35};
     return {root,pose:{x:root.x+3.4,z:root.z,heading:0},model:'assassination'};
@@ -169,7 +173,7 @@ export function policeCast(cue: VisualCue): VisualCue[] {
   const add=(kind:string,index:number,actors=cue.actors)=>result.push({...cue,id:`${cue.id}:${kind}:${index}`,kind,actors});
   for(let i=0;i<(cue.kind==='raid'?2:1);i++)add(cue.kind==='raid'?'raid-unit':'police-unit',i,[]);
   if(cue.kind==='arrest'&&cue.detainee)add('detainee',0,[cue.detainee]);
-  for(let i=0;i<(cue.kind==='raid'?4:2);i++)add(cue.kind==='raid'?'raid-officer':'officer',i,[]);
+  for(let i=0;i<(cue.kind==='raid'?4:cue.detainee?1:2);i++)add(cue.kind==='raid'?'raid-officer':'officer',i,[]);
   return result;
 }
 
@@ -194,5 +198,5 @@ export function raidEntryPose(seconds: number, distance: number) {
   return {travelled,walking,phase:travelled/1.15*Math.PI*2,kick,door};
 }
 export function policeSceneSeconds(kind: string) {
-  return kind==='explosion'?14:['raid','raid-unit','raid-officer'].includes(kind)?10:3;
+  return ['arrest','police-unit','officer','detainee'].includes(kind)?6:kind==='explosion'?14:['raid','raid-unit','raid-officer'].includes(kind)?10:3;
 }

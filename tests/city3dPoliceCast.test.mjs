@@ -14,7 +14,7 @@ test('arrest uses explicit detainee identity and never substitutes its detective
  const cue={id:'arrest',kind:'arrest',target:'precinct',caption:'',actors:[{id:'detective',name:'Detective'}]};
  assert.equal(policeCast(cue).filter(c=>c.kind==='detainee').length,0);
  const cast=policeCast({...cue,detainee:{id:'player',name:'Alex'}});
- assert.equal(cast.length,5);assert.deepEqual(cast.find(c=>c.kind==='detainee').actors,[{id:'player',name:'Alex'}]);
+ assert.equal(cast.length,4);assert.deepEqual(cast.find(c=>c.kind==='detainee').actors,[{id:'player',name:'Alex'}]);
  assert.equal(new Set(cast.map(c=>c.id)).size,cast.length);
 });
 

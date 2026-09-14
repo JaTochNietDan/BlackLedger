@@ -65,3 +65,14 @@ PNG/JSON. The arrest remains incomplete: an officer must approach/apply the
 restraint and escort the detainee along a collision-checked shared path into a
 vehicle with an opening door. Current work only supplies the restrained pose
 and accessory for that sequence. No campaign command issued.
+
+### September 13 — paired custody contact
+
+Added shared officer/detainee choreography and a4.4m swept reservation. Officer
+approach precedes wrist contact and visible handcuffs. Regenerated the police
+asset with current elbow joints; actual-model tests verify both prisoner rigs,
+contact accuracy, ground clearance and complete swept bounds. Arrest presentation
+now lasts6s. Browser8873 private close-up verified the paired pose beside existing
+aftermath; screenshot145FPS/167draws. All202 tests and build pass. Evidence:
+paired-custody PNG/JSON. Escort/car-door/departure remain unfinished. No campaign
+command issued. User then reprioritized map-first UI; continuing that migration.

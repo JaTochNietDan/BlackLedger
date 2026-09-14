@@ -1,3 +1,4 @@
+import {CityCustody} from './city3dCustody';
 import {CityAssassination, assassinationBatch, isExecution, ASSASSINATION_SECONDS, ASSASSINATION_VICTIM_X, executionSpatter} from './city3dAssassination';
 import {poseCustody,sceneWeapon,poseLongGun,weaponShots,pumpOffset} from './city3dWeapons';
 import {CityRubble} from './city3dRubble';
@@ -98,6 +99,7 @@ type Effect = {
   reactionAudio?:BlastAudio;
   glazingBefore?:number;
   assassination?:CityAssassination;
+  custody?:CityCustody;
 };
 const modelNames = [
   'tenement',
@@ -968,6 +970,7 @@ export function City3D(props: Props) {
           let costume: THREE.MeshStandardMaterial[] | undefined;
           let weapon:THREE.Group|undefined;
           let assassination:CityAssassination|undefined;
+          let custody:CityCustody|undefined;
           const weaponModel=sceneWeapon(cue.attacker?.weapon);
           let extra: THREE.Group | undefined, gunArm: THREE.Object3D | undefined, muzzle: THREE.Object3D | undefined;
           if (['killing', 'gunfight', 'raid', 'arrest','raid-unit','police-unit','officer','detainee','raid-officer'].includes(cue.kind)) {
@@ -978,6 +981,7 @@ export function City3D(props: Props) {
             if (model === 'police') addVehicleShadow(extra, model);
             if(cue.kind==='detainee'){
               const cuffs=models.get('handcuffs')!.clone(true);cuffs.name='custody-restraint';cuffs.visible=false;extra.add(cuffs);
+              custody=new CityCustody(extra,models.get('police-officer')!.clone(true));extra=custody.root;
             }
             if (cue.kind === 'gunfight') {
               extra.rotation.y = Math.PI / 2;
@@ -1012,7 +1016,7 @@ export function City3D(props: Props) {
               scene.add(debris);
             });
           }
-          effects.push({cue, assassination, since: now, mesh, light, debris, extra, wardrobe: costume, gunArm, muzzle, weapon, weaponModel:weaponModel||undefined,
+          effects.push({cue, assassination, custody, since: now, mesh, light, debris, extra, wardrobe: costume, gunArm, muzzle, weapon, weaponModel:weaponModel||undefined,
             glazingBefore:(cue.id.startsWith('preview:')?undefined:p.beforeConditions?.[cue.target]) ?? buildings.get(cue.target)?.userData.condition ?? w.locations.find(p=>p.id===cue.target)?.condition ?? 100,
             reactionAudio:cue.kind==='explosion'?new BlastAudio(()=>playRecordedEffect('panic'))
               :cue.kind==='killing'&&(w.last_result?.cues||[]).some(gun=>gunVictim(gun,cue))?new BlastAudio(()=>playRecordedEffect('pain')):undefined,
@@ -1163,11 +1167,12 @@ export function City3D(props: Props) {
             ...aftermath.slots(),
           ];
           const entry=buildings.get(e.cue.target)?.getObjectByName('entrance-threshold')?.getWorldPosition(new THREE.Vector3());
-          e.slot = availableSceneSlot(lots.get(e.cue.target)!, e.assassination?'assassination':e.cue.kind, occupied,entry);
+          e.slot = availableSceneSlot(lots.get(e.cue.target)!, e.assassination?'assassination':e.custody?'custody':e.cue.kind, occupied,entry);
           if (e.slot) {
             e.extra.position.set(e.slot.root.x, e.slot.model === 'parked-police' ? vehicleRootHeight(e.slot.root) : 0.2, e.slot.root.z);
             e.light.position.set(e.slot.root.x, 3, e.slot.root.z);
             e.since = now;
+            if(e.custody){frameScene(camera,controls.target,new THREE.Box3(new THREE.Vector3(e.slot.root.x-.7,0,e.slot.root.z-1),new THREE.Vector3(e.slot.root.x+3.7,2.4,e.slot.root.z+1)));controls.update();}
             if(e.assassination){
               frameScene(camera,controls.target,new THREE.Box3(
                 new THREE.Vector3(e.slot.root.x-.8,0,e.slot.root.z-1.2),
@@ -1334,6 +1339,7 @@ export function City3D(props: Props) {
           if (blast && blastOrigin) e.light.position.set(blastOrigin.x, blastOrigin.y, blastOrigin.z);
           const shot = e.cue.kind === 'gunfight' && !!e.weapon;
           e.assassination?.update(t*3);
+          e.custody?.update(t*3);
           const firing = gunfightPose(t * 3,weaponShots(e.weaponModel,e.cue.strike?.variant));
           if(blast)addImpact(t*3,11);
           if(shot)for(const beat of weaponShots(e.weaponModel,e.cue.strike?.variant))addImpact(t*3-beat,3);
@@ -1387,7 +1393,7 @@ export function City3D(props: Props) {
                 if(leg)leg.rotation.x-=breach.kick*.9;
                 if(knee)knee.rotation.x+=breach.kick*.5;
               }
-            }else if(e.cue.kind==='detainee')poseCustody(e.extra,t*3);
+            }else if(e.cue.kind==='detainee'){ /* Shared custody rig owns both participants. */ }
             else e.extra.rotation.y=Math.atan2(lot.x-at.x,lot.row*PITCH+6.35-at.z);
           }
           for (let j = 0; j < 32; j++) {
@@ -1512,7 +1518,7 @@ export function City3D(props: Props) {
       const sightPoints = ready && followPlayer.current && followed?.object.visible
         ? [followed.object.position.clone().add(new THREE.Vector3(0, .9, 0))]
         : ready ? effects.filter(e => e.extra?.visible && e.slot && e.cue.target === eventTarget)
-          .flatMap(e => e.assassination?[e.assassination.attacker,e.assassination.victim].map(a=>a.getWorldPosition(new THREE.Vector3()).add(new THREE.Vector3(0,.9,0))):[e.extra!.position.clone().add(new THREE.Vector3(0, .9, 0))]) : [];
+          .flatMap(e => e.custody?[e.custody.officer,e.custody.detainee].map(a=>a.getWorldPosition(new THREE.Vector3()).add(new THREE.Vector3(0,.9,0))):e.assassination?[e.assassination.attacker,e.assassination.victim].map(a=>a.getWorldPosition(new THREE.Vector3()).add(new THREE.Vector3(0,.9,0))):[e.extra!.position.clone().add(new THREE.Vector3(0, .9, 0))]) : [];
       if (sightPoints.length) {
         if (now - lastSightCheck >= 100) {
           blockers = new Set(sightPoints.flatMap(sight => [...blockingBuildings(camera, sight, buildings)]));
@@ -1633,6 +1639,7 @@ export function City3D(props: Props) {
             blastOrigin: e.cue.kind === 'explosion' ? buildings.get(e.cue.target)?.userData[internalDetonation(e.cue,w.building_fires||[])?'blastOrigin':'debrisOrigin'] : undefined,
             blastWindows: e.cue.kind === 'explosion' && internalDetonation(e.cue,w.building_fires||[]) ? buildings.get(e.cue.target)?.userData.blastWindows : undefined,
             arm: e.gunArm?.rotation.x,
+            custody:e.custody?{officer:e.custody.officer.getWorldPosition(new THREE.Vector3()),detainee:e.custody.detainee.getWorldPosition(new THREE.Vector3()),restrained:e.custody.detainee.getObjectByName('custody-restraint')?.visible}:undefined,
             execution:e.assassination?{seconds:(now-e.since)/1000,attacker:e.assassination.attacker.getWorldPosition(new THREE.Vector3()),victim:e.assassination.victim.getWorldPosition(new THREE.Vector3()),muzzle:e.muzzle?.getWorldPosition(new THREE.Vector3())}:undefined,
             attacker:e.cue.attacker,weapon:e.cue.kind==='gunfight'?e.weaponModel:undefined,
             audioShots: e.cue.kind === 'gunfight' ? e.audio?.started : undefined,
