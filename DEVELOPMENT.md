@@ -2376,3 +2376,30 @@ result is known. Logs `.runtime/release-01fb5cf-{go,frontend,build,vet}.log`.
 Build session49560 completed successfully. Main8791 remains release89cc61b
 (PID54030); no promotion or main-save mutation yet. Recheck live save against
 the backup immediately before any eventual restart. Broad goal remains active.
+
+### Verified live promotion — 01fb5cf
+
+Previous71efe7f prepared the clean candidate and verified a live test wait.
+Resolved the same full-suite session25227 successfully: billiards18.540s,
+core281.208s, store0.385s and server2.402s. Together with392 frontend tests,
+production build and vet, this completes the release checks.
+
+Verified compressed candidate transfers of Herald, chapel and pool-hall GLBs
+against the clean source files byte for byte; release-local
+`.runtime/model-verification.json` records lengths and SHA256. Live save and
+all receipts were rechecked against the fresh backup immediately before
+stopping only the old main server. Port8791 now serves clean
+01fb5cf613d01a45b48e441ffb012742f1a595bc from `.runtime/release-01fb5cf`.
+Health reports modified:false. New main session57534.
+
+Post-startup state remains byte-identical to the backup (SHA256
+4cca8f4fe0be17920d8e010f7a1fb2023a0ea7843eeb445e49ffb17759916af5),
+with all2,134 receipts unchanged. Revision2132/minute160825/life11 Jamie
+Moretti/$2,625 preserved. Release-local `.runtime/live-verification.json`
+records the assertions. No QA gameplay commands were executed against main.
+
+Live additions: inspectable slow-motion billiards replays, corrected metre-based
+cue spin, physical opponent draw/follow position planning, Herald newsroom
+with occupied typing desks, and Thorne & Sons public chapel. Remaining rooms,
+full shooting characters, airborne billiards physics and broader art/campaign
+acceptance still prevent completion of the overall goal.
