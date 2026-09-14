@@ -515,6 +515,7 @@ export interface MachineState {
 // the core's answer and nothing else.
 export function Machine({
   machine,
+  motion = true,
   money,
   pull,
   amount,
@@ -526,6 +527,7 @@ export function Machine({
   turn = 0,
 }: {
   machine: MachineState;
+  motion?: boolean;
   money: (n: number) => string;
   pull: (amount: number) => void;
   // What goes in, and the most this machine takes — a tenth of what the tables
@@ -538,6 +540,14 @@ export function Machine({
   refused?: string;
   turn?: number;
 }) {
+  const [reduced,setReduced]=useState(()=>matchMedia('(prefers-reduced-motion: reduce)').matches);
+  useEffect(()=>{
+    const preference=matchMedia('(prefers-reduced-motion: reduce)');
+    const changed=()=>setReduced(preference.matches);
+    preference.addEventListener('change',changed);changed();
+    return()=>preference.removeEventListener('change',changed);
+  },[]);
+  const animate=motion&&!reduced;
   const [rolling, setRolling] = useState([false, false, false]);
   // Where each drum's column is sitting. The drums used to shake on the spot
   // with the answer already on them; they travel now, and this is how far each
@@ -547,9 +557,13 @@ export function Machine({
   // A saved result is already settled when the machine is first opened.
   const seen = useRef(turn);
   useEffect(() => {
-    if (!machine.pulled || turn === seen.current) return;
+    if (!machine.pulled || !animate) {
+      seen.current=turn;
+      setRolling([false,false,false]);
+      return;
+    }
+    if (turn === seen.current) return;
     seen.current = turn;
-    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     setRolling([true, true, true]);
     playTable('handle');
     const stops = [0, 1, 2].map(i =>
@@ -564,7 +578,7 @@ export function Machine({
       ),
     );
     return () => stops.forEach(clearTimeout);
-  }, [turn, machine.pulled]);
+  }, [turn, machine.pulled, animate]);
 
   // Which of the house's machines you are standing at. A nickel machine and a
   // dollar machine are two different machines against the same wall.

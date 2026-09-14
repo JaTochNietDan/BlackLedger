@@ -41,6 +41,7 @@ export function isTableAction(id: string) {
 type Game = 'cards' | 'wheel' | 'dice' | 'machine';
 
 export function Casino({
+  motion,
   place,
   actions,
   people,
@@ -56,6 +57,7 @@ export function Casino({
   act,
   onLeave,
 }: {
+  motion: boolean;
   place: string;
   actions: Action[];
   // Who else is in the room. Not drawn here any more — the room itself shows
@@ -279,6 +281,7 @@ export function Casino({
               />
             ) : game === 'machine' ? (
               <Machine
+                motion={motion}
                 machine={machine}
                 money={money}
                 turn={revision}
