@@ -261,3 +261,28 @@ persistent-hud.png/json. Reload's initial empty DOM was discarded and verificati
 repeated after loading. Temporary QA tab closed; no save commands or preference
 changes. Responsive rules included but compact-size acceptance remains open.
 The full cinematic/asset/interior scope remains unfinished.
+
+### Articulated vehicle cabins — September 13
+
+Read35be00d7 objective; prior turn was progress (persistent HUD). Replaced the
+solid glass/body cabin in the four moving vehicle assets with an open floor pan,
+separate glazing, pillars, four independently hinged doors and stable seat anchors.
+Added bench cushions/backrests with piping, dashboard dials, steering wheel,
+inside/outside door pulls, mirrors and window trim. Police cream panels now belong
+to the door leaves instead of a solid slab crossing the cabin. Existing wheel
+pivots remain. Browser review rejected the first upright box profile; raked and
+tapered the greenhouse, added round headlamps and weighted surface normals.
+
+Authored/exported locally using Blender, updating ford/hudson/packard/police GLBs
+and their manifest entries. All207 frontend tests pass; new tests open all16 doors
+and ray-check that entry apertures no longer contain the old solid chassis/glass.
+These checks establish openings, not completed person-sized seated-entry motion.
+Existing wheel/pavement/traffic tests pass. Production build passes.
+
+Browser inspection uses tools/car-cabin-review.html through local Vite8880, loading
+the exact game GLBs with working door controls. Reviewed Ford and police closed/
+open, corrected self-shadow bias in the inspection lighting. Evidence police-cabin.png
+and car-cabin-open.png. Temporary inspection tab closed; no campaign mutations.
+This is asset preparation: car entry/departure choreography is not yet integrated,
+and fuller vehicle silhouette/texture fidelity remains below final acceptance.
+The wider city/interior/action goal remains active.

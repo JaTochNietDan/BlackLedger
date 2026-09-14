@@ -276,7 +276,7 @@
     "bounds_blender": [
       [
         -1.04,
-        -2.32,
+        -2.3275,
         0.02
       ],
       [
@@ -285,14 +285,14 @@
         1.59
       ]
     ],
-    "bytes": 232856
+    "bytes": 470788
   },
   "hudson": {
     "file": "hudson.glb",
     "bounds_blender": [
       [
         -1.04,
-        -2.52,
+        -2.5275,
         0.02
       ],
       [
@@ -301,14 +301,14 @@
         1.59
       ]
     ],
-    "bytes": 232896
+    "bytes": 470864
   },
   "packard": {
     "file": "packard.glb",
     "bounds_blender": [
       [
         -1.04,
-        -2.87,
+        -2.8775,
         0.02
       ],
       [
@@ -317,14 +317,14 @@
         1.59
       ]
     ],
-    "bytes": 233088
+    "bytes": 470856
   },
   "police": {
     "file": "police.glb",
     "bounds_blender": [
       [
         -1.04,
-        -2.32,
+        -2.3275,
         0.02
       ],
       [
@@ -333,7 +333,7 @@
         1.9
       ]
     ],
-    "bytes": 238540
+    "bytes": 474828
   },
   "person": {
     "file": "person.glb",

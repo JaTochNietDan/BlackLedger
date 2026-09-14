@@ -378,10 +378,11 @@ def building(kind, floors, width=12, depth=12, seed=0, palette=None, accent=None
                 box('door rib',(x,-depth/2-.25,.3+z*.35),(3.8,.08,.035),stone)
 
 
-def car(kind, articulated=True):
+def car(kind, articulated=True, police=False):
+    car_objects_before=set(bpy.context.scene.objects)
     length = {'ford':4.5,'hudson':4.9,'packard':5.6}[kind]
     color = {'ford':(.23,.31,.27),'hudson':(.30,.12,.09),'packard':(.08,.1,.12)}[kind]
-    paint=material('enamel',color,.5)
+    paint=material('enamel',(.065,.075,.08) if police else color,.5)
     chrome=material('chrome',(.65,.67,.63),.85)
     glass=material('car glass',(.15,.24,.27),.45)
     rubber=material('rubber',(.025,.027,.025))
@@ -389,10 +390,55 @@ def car(kind, articulated=True):
     lamp=material('headlamps',(.95,.81,.48),0,.7)
     red=material('tail lamps',(.55,.035,.015),0,.3)
     # Nose along -Y; exporter maps this to browser +Z.
-    box('chassis',(0,0,.56),(1.8,length,.55),paint,.19)
+    if not articulated:
+        box('chassis',(0,0,.56),(1.8,length,.55),paint,.19)
+        box('cabin glass',(0,.14,1.15),(1.50,length*.4,.63),glass,.20)
+    else:
+        # Open cabin above the floor: entry no longer passes through a solid box.
+        leather=material('oxblood seat leather',(.12,.065,.043))
+        lining=material('door lining',(.22,.17,.105))
+        door_paint=material('police cream',(.7,.69,.60)) if police else paint
+        box('floor pan',(0,0,.48),(1.70,length-.25,.17),rubber,.07)
+        box('front body',(0,-length*.335,.64),(1.8,length*.33,.44),paint,.17)
+        box('rear body',(0,length*.365,.67),(1.8,length*.27,.48),paint,.17)
+        # Separate front/rear glazing, pillars and door leaves expose real seats.
+        front=-length*.17;rear=length*.22
+        box('split windscreen',(0,front,1.19),(1.40,.045,.53),glass,.055)
+        box('rear windscreen',(0,rear,1.20),(1.39,.045,.49),glass,.06)
+        box('windscreen divider',(0,front-.035,1.20),(.025,.028,.55),chrome,.005)
+        for x in (-.72,.72):
+            for y in (front,rear):box('window pillar',(x,y,1.19),(.07,.09,.59),paint,.025)
+        for y in (-length*.05,length*.15):
+            box('bench cushion',(0,y,.72),(1.34,.43,.16),leather,.07)
+            box('bench backrest',(0,y+.18,1.0),(1.34,.13,.48),leather,.065)
+            for x in range(9):box('upholstery piping',(-.56+x*.14,y-.015,.806),(.014,.31,.008),lining,.004)
+        box('dashboard',(0,front+.1,1.02),(1.4,.22,.19),paint,.05)
+        for x in (-.43,-.25,-.07):
+            cylinder('dashboard dial',(x,front+.22,1.035),.055,.015,chrome,(math.pi/2,0,0),24)
+            cylinder('dial face',(x,front+.232,1.035),.044,.017,rubber,(math.pi/2,0,0),24)
+        bpy.ops.mesh.primitive_torus_add(major_radius=.16,minor_radius=.017,major_segments=32,minor_segments=8,location=(-.42,front+.40,1.08),rotation=(math.radians(60),0,0))
+        bpy.context.object.name='steering wheel';bpy.context.object.data.materials.append(rubber)
+        for side in (-1,1):
+            box('cabin sill',(side*.79,.08,.62),(.12,length*.41,.13),paint,.035)
+            for index,(a,b) in enumerate(((front+.05,.09),(.19,rear-.04))):
+                before=set(bpy.context.scene.objects);middle=(a+b)/2;span=b-a
+                box('door skin',(side*.80,middle,.855),(.095,span,.38),door_paint,.035)
+                box('door upholstery',(side*.744,middle,.865),(.025,span-.05,.30),lining,.015)
+                box('door window',(side*.755,middle,1.225),(.032,span-.07,.36),glass,.025)
+                for y in (a+.025,b-.025):box('door window surround',(side*.78,y,1.23),(.04,.04,.45),chrome,.01)
+                for z in (1.04,1.445):box('window belt trim',(side*.785,middle,z),(.045,span,.03),chrome,.01)
+                box('outside door handle',(side*.866,b-.13,.99),(.035,.17,.028),chrome,.013)
+                box('inside door pull',(side*.712,middle,.9),(.03,.16,.025),chrome,.01)
+                meshes=set(bpy.context.scene.objects)-before
+                hinge=bpy.data.objects.new('car-door-'+('front' if index==0 else 'rear')+('-left' if side<0 else '-right'),None)
+                bpy.context.collection.objects.link(hinge);hinge.location=(side*.8,a,.68)
+                for ob in meshes:ob.parent=hinge;ob.location-=hinge.location
+                seat=bpy.data.objects.new('seat-'+('front' if index==0 else 'rear')+('-left' if side<0 else '-right'),None)
+                bpy.context.collection.objects.link(seat);seat.location=(side*.40,middle,.79)
+            box('mirror stem',(side*.86,front+.08,1.07),(.16,.025,.025),chrome,.008)
+            box('wing mirror',(side*.94,front+.08,1.11),(.065,.16,.10),chrome,.025)
     box('bonnet',(0,-length*.3,.87),(1.7,length*.34,.32),paint,.14)
-    box('cabin glass',(0,.14,1.15),(1.50,length*.4,.63),glass,.20)
-    box('roof',(0,.2,1.51),(1.48,length*.31,.16),paint,.12)
+    box('roof',(0,.2,1.51),(1.48,length*(.42 if articulated else .31),.16),paint,.12)
     for side in (-1,1):
         box('centre pillar',(side*.78,.15,1.22),(.065,.1,.5),chrome)
         box('chrome sill',(side*.91,0,.7),(.045,length*.85,.05),chrome)
@@ -412,12 +458,31 @@ def car(kind, articulated=True):
                 bpy.context.collection.objects.link(pivot);pivot.location=(side*.87,y,.39)
                 for ob in meshes:
                     ob.parent=pivot;ob.location-=pivot.location
-        box('headlight',(side*.61,-length/2-.015,.77),(.32,.06,.22),lamp,.08)
+        cylinder('headlamp bezel',(side*.61,-length/2-.025,.77),.16,.07,chrome,(math.pi/2,0,0),32)
+        cylinder('headlight',(side*.61,-length/2-.065,.77),.135,.025,lamp,(math.pi/2,0,0),32)
         box('tail lamp',(side*.65,length/2,.75),(.18,.07,.16),red,.04)
     for y in (-length/2,length/2):
         box('bumper',(0,y,.46),(1.9,.14,.16),chrome,.05)
     for x in range(9):
         box('grille',(-.48+x*.12,-length/2-.025,.69),(.04,.07,.23),chrome)
+    if articulated:
+        # Taper the greenhouse into a raked sedan roof; transform door geometry
+        # in world space so each separately hinged window keeps the same seam.
+        bpy.context.view_layer.update()
+        for ob in set(bpy.context.scene.objects)-car_objects_before:
+            if ob.type!='MESH':continue
+            world=ob.matrix_world.copy();inverse=world.inverted()
+            for vertex in ob.data.vertices:
+                co=world @ vertex.co
+                t=max(0,min(1,(co.z-1.03)/.50))
+                if t:
+                    co.x*=1-.16*t
+                    co.y+=(.15-co.y)*(.35 if co.y<.15 else .22)*t
+                    vertex.co=inverse @ co
+            for polygon in ob.data.polygons:polygon.use_smooth=True
+            bpy.context.view_layer.objects.active=ob
+            normal=ob.modifiers.new('Manufactured surface normals','WEIGHTED_NORMAL');normal.keep_sharp=True
+            bpy.ops.object.modifier_apply(modifier=normal.name)
 
 
 def villa():
@@ -728,7 +793,7 @@ def export(name):
     # Join by material except animated limbs: a building becomes ~6 draws.
     groups={}
     for ob in list(bpy.context.scene.objects):
-        if ob.type=='MESH' and (ob.parent is None or ob.parent.name.startswith(('wheel-roll-','interior-wall-','entrance-door-','window-','pump-'))) and not ob.name.startswith(('leg','arm','shoe','clock-hand')):
+        if ob.type=='MESH' and (ob.parent is None or ob.parent.name.startswith(('wheel-roll-','interior-wall-','entrance-door-','window-','pump-','car-door-'))) and not ob.name.startswith(('leg','arm','shoe','clock-hand')):
             key=(ob.parent.name if ob.parent else '',ob.data.materials[0].name)
             groups.setdefault(key,[]).append(ob)
     for obs in groups.values():
@@ -1534,9 +1599,7 @@ for name,floors,width,depth,seed,palette,accent in [
     manifest[name]=export(name)
 for name in ('ford','hudson','packard'):
     clear();car(name);manifest[name]=export(name)
-clear();car('ford')
-paint=bpy.data.materials['enamel'];paint.diffuse_color=(.065,.075,.08,1);paint.node_tree.nodes['Principled BSDF'].inputs['Base Color'].default_value=paint.diffuse_color
-box('police door panel',(0,0,.82),(1.83,1.5,.32),material('police cream',(.7,.69,.60)))
+clear();car('ford',police=True)
 cylinder('red beacon',(0,0,1.76),.18,.28,material('beacon',(.8,.02,.01),0,2))
 manifest['police']=export('police')
 for name in ('person','woman'):
