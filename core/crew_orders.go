@@ -5,6 +5,7 @@ import "fmt"
 // CrewOrder is a saved assignment. Its clock and actor belong to the simulation.
 // Targets and return addresses are captured at acceptance, never inferred by UI.
 type CrewOrder struct {
+	Loot     int    `json:"loot"`
 	ID       string `json:"id"`
 	Life     int    `json:"life"`
 	Actor    string `json:"actor"`
@@ -75,6 +76,8 @@ func (w *World) CrewOrderReadiness(kind, actor, target string) string {
 		}
 	}
 	switch kind {
+	case "rob":
+		return w.robberyReadinessBy(target, hand)
 	case "bomb":
 		if w.Player.Charges < 1 {
 			return "Acquire a charge before issuing this order"
@@ -172,6 +175,17 @@ func (w *World) RecallCrewOrder(id string) error {
 	return fmt.Errorf("That assignment is no longer active")
 }
 func (w *World) refundCrewOrder(o *CrewOrder) {
+	if o.Loot > 0 {
+		n := w.NPC(o.Actor)
+		if n != nil && !n.Dead && !w.Inside(n) {
+			if o.Life == w.Life && w.Player.Alive && o.Stage == "returning" {
+				w.Earn(o.Loot)
+			} else {
+				n.Purse += o.Loot
+			}
+		}
+		o.Loot = 0
+	}
 	if o.Charges > 0 {
 		n := w.NPC(o.Actor)
 		if o.Life == w.Life && w.Player.Alive && n != nil && !n.Dead && !w.Inside(n) {
@@ -238,6 +252,13 @@ func (w *World) SettleCrewOrders() {
 				w.returnCrewOrder(o, "The demolition target is no longer available")
 				continue
 			}
+			if o.Kind == "rob" {
+				hand, _ := w.NamedHands(o.Actor)
+				if w.robberyReadinessBy(o.Target, hand) != "" {
+					w.returnCrewOrder(o, "The robbery target is no longer available")
+					continue
+				}
+			}
 			o.Stage = "working"
 			o.Due = w.Minute + 30
 			if o.Kind == "assassinate" {
@@ -246,10 +267,24 @@ func (w *World) SettleCrewOrders() {
 			if o.Kind == "bomb" {
 				o.Due = w.Minute + PlantMinutes
 			}
+			if o.Kind == "rob" {
+				o.Due = w.Minute + 60
+			}
 		case "working":
 			result := "The target is no longer available"
 			if n.Location == o.Place && !w.Travelling(n) {
 				switch o.Kind {
+				case "rob":
+					hand, _ := w.NamedHands(o.Actor)
+					if err := w.robWithOrder(o.Target, hand, o); err == nil {
+						result = "The robbery brought back no money"
+						if o.Loot > 0 {
+							result = fmt.Sprintf("Robbery resolved; $%d carried back", o.Loot)
+						}
+					} else {
+						result = err.Error()
+					}
+
 				case "bomb":
 					if o.Charges == 1 && w.crewBombTarget(o.Target) == "" {
 						o.Charges = 0
@@ -365,6 +400,7 @@ func (w *World) CrewOrderOffers() []CrewOrderOffer {
 		for _, l := range Locations {
 			if p := w.Properties[l.ID]; p != nil && p.Income > 0 && !w.Own(l.ID) {
 				offer("bomb", l.ID, l.ID, "Bomb "+l.Name, 0, PlantMinutes)
+				offer("rob", l.ID, l.ID, "Rob "+l.Name, 0, 60)
 			}
 			if _, ok := TradeOf(l.ID); ok && w.Own(l.ID) {
 				offer("restock", l.ID, l.ID, "Restock "+l.Name, w.RestockCost(l.ID), 30)

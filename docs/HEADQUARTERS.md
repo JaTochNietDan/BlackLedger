@@ -26,7 +26,7 @@ shows a known family's base; personal homes are not exposed by this field.
 
 ## Current operations implementation
 
-Saved named orders now cover restocking, assassination and bombing, with outbound/work/
+Saved named orders now cover restocking, robbery, assassination and bombing, with outbound/work/
 return stages, parallel operatives, cash reservations, recall, arrival/commit
 validation and HTTP retry coverage. The Business panel at headquarters and the
 Families page contain an order selector and register. Assassination follows a

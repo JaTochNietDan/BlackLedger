@@ -13,7 +13,9 @@ import (
 // place in the city, not anonymous thieves, and they can be answered.
 
 // RobberyReadiness explains why premises cannot be robbed, or returns "".
-func (w *World) RobberyReadiness(id string) string {
+func (w *World) RobberyReadiness(id string) string { return w.robberyReadinessBy(id, w.OwnHands()) }
+
+func (w *World) robberyReadinessBy(id string, hand Hand) string {
 	prop := w.Properties[id]
 	if prop == nil || prop.Income <= 0 {
 		return "There is nothing here worth taking"
@@ -21,7 +23,7 @@ func (w *World) RobberyReadiness(id string) string {
 	if w.Own(id) {
 		return "You would be robbing yourself"
 	}
-	if w.Player.Health < 40 {
+	if !hand.Crew && w.Player.Health < 40 {
 		return "You are in no condition for this"
 	}
 	if left := w.Shy(id); left > 0 {
@@ -55,13 +57,22 @@ func (w *World) robberyOdds(id string, hand Hand) float64 {
 func (w *World) Rob(id string) error { return w.RobBy(id, w.OwnHands()) }
 
 // RobBy is the same robbery whoever is standing there.
-func (w *World) RobBy(id string, hand Hand) error {
-	if reason := w.RobberyReadiness(id); reason != "" {
+func (w *World) RobBy(id string, hand Hand) error { return w.robWithOrder(id, hand, nil) }
+
+func (w *World) robWithOrder(id string, hand Hand, order *CrewOrder) error {
+	if reason := w.robberyReadinessBy(id, hand); reason != "" {
 		return fmt.Errorf("%s", reason)
 	}
 	if hand.Crew {
-		if reason := w.DelegateReadiness(); reason != "" {
-			return fmt.Errorf("%s", reason)
+		if order == nil {
+			if reason := w.HandReadiness(hand); reason != "" {
+				return fmt.Errorf("%s", reason)
+			}
+		} else {
+			n := w.NPC(hand.ID)
+			if w.CrewOrderFor(hand.ID) != order || order.Kind != "rob" || order.Stage != "working" || order.Target != id || n == nil || n.Dead || w.Inside(n) || w.Travelling(n) || n.Location != id {
+				return fmt.Errorf("The operative cannot carry out this robbery")
+			}
 		}
 	}
 	prop := w.Properties[id]
@@ -69,6 +80,13 @@ func (w *World) RobBy(id string, hand Hand) error {
 	if !ok {
 		return fmt.Errorf("unknown premises")
 	}
+	attacker := w.strikeAttacker(hand)
+	defer func() {
+		w.Witness("robbery", id, "A robbery was attempted at "+place.Name+".", "")
+		if len(w.VisualCues) > 0 {
+			w.VisualCues[len(w.VisualCues)-1].Attacker = &attacker
+		}
+	}()
 	owner := w.faction(prop.Owner)
 	// However it goes from here, the place knows somebody came for the till.
 	// A failed attempt puts them on guard more than a successful one, not less:
@@ -97,7 +115,15 @@ func (w *World) RobBy(id string, hand Hand) error {
 
 	take := prop.Income*8 + int(w.Random()*float64(prop.Income*10))
 	take = take * prop.Condition / 100
-	w.Earn(take)
+	if w.faction(prop.Owner) != nil || w.NPC(prop.Owner) != nil {
+		take = min(take, w.businessFunds(id))
+		w.changeBusinessFunds(id, -take)
+	}
+	if order != nil {
+		order.Loot += take
+	} else {
+		w.Earn(take)
+	}
 	// Not all of it is money. What comes out of a till in a bag goes over a
 	// counter somewhere, and the only counter in this city that takes it
 	// without asking is the pawnbroker's.
@@ -111,13 +137,27 @@ func (w *World) RobBy(id string, hand Hand) error {
 		w.Player.Heat = min(100, w.Player.Heat+trail*4)
 		w.Log("Somebody described the car", fmt.Sprintf("A %s was parked where it had no business being. Attention is now %d.", lowerFirst(VehicleByTier(w.Player.Car).Label), w.Player.Heat), "danger")
 	}
+	if take <= 0 {
+		w.Log("No takings at "+place.Name, "The till held nothing worth bringing back.", "business")
+		w.Report("robbery", "ROBBERY AT "+strings.ToUpper(place.Name), "A robbery at "+place.Name+" left the raiders empty-handed.")
+		return nil
+	}
 	if owner != nil {
-		owner.Cash = max(0, owner.Cash-take)
-		owner.Goodwill = max(-100, owner.Goodwill-25-w.CarTrail()*3)
+		trail := 0
+		if !hand.Crew {
+			trail = w.CarTrail()
+		}
+		owner.Goodwill = max(-100, owner.Goodwill-25-trail*3)
 		w.RetaliationFrom(owner.ID)
 		w.Log("Taken from "+place.Name, fmt.Sprintf("$%d out of %s. %s will not need long to work out who would dare.", take, place.Name, owner.Name), "politics")
 		w.Report("robbery", "ROBBERY AT "+strings.ToUpper(place.Name),
 			w.unattributed(place.Name, fmt.Sprintf("A substantial sum was taken from %s, an establishment associated with %s.", place.Name, owner.Name)))
+		return nil
+	}
+	if proprietor := w.NPC(prop.Owner); proprietor != nil && !proprietor.Dead {
+		w.Aggrieve(proprietor.ID, 25, "the robbery of "+place.Name)
+		w.Log("Taken from "+place.Name, fmt.Sprintf("$%d taken from %s. Its proprietor, %s, will be asking who sent them.", take, place.Name, proprietor.Name), "business")
+		w.Report("robbery", "ROBBERY AT "+strings.ToUpper(place.Name), w.unattributed(place.Name, "Takings were stolen from "+place.Name+". The proprietor is assisting police."))
 		return nil
 	}
 	w.Log("Taken from "+place.Name, fmt.Sprintf("$%d out of the till at %s. Nobody there answers to anyone who will come looking.", take, place.Name), "business")

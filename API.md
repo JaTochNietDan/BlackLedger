@@ -1426,3 +1426,11 @@ from collateral victims; premature failure can kill the named operative.
 Taking leadership of an existing family remains an explicit formation path:
 its transferred business deeds support incorporation and its existing headquarters
 is retained. This does not restore automatic formation from ordinary purchases.
+
+`crew_order:rob` targets a business with a named operative, using the ordinary
+robbery rules after travel and 60 minutes of work. Saved `loot` is held by the
+operative and only credited on return; capture/death loses it and a surviving
+operative retains it if the issuing life ends. Reload/retry cannot pay it twice.
+Tracked faction/proprietor proceeds are bounded by and debited from their actual
+funds; unowned trade retains its existing modeled daily-takings source. The
+committed robbery cue identifies the operative and records neighborhood activity.

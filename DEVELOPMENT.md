@@ -3296,3 +3296,31 @@ Full c06c36c test session47957 and clean9aec451 long publican session57475 both
 re-polled as live; no restart. Prior broader manager/charge/running selection
 completed successfully139.025s (.runtime/manager-restock-tests.log). No main8791
 actions or promotion. Broader goal and comprehensive dispatch remain open.
+
+### September 14 — named robbery orders and loot custody
+
+Previous turn was progress on routine detours. Extended the shared robbery
+handler to a named saved order, including arrival/commit checks, 60min work and
+loot held until return. Player location/health are not substituted for the actor.
+Death/capture loses carried loot; surviving operatives retain it if authority
+ends. Faction/personal-owner payouts now debit actual bounded funds instead of
+paying more than an owner has. Unowned daily trade retains its existing modeled
+takings. Personal proprietors remember the robbery. Shared robbery attempts
+now emit a scene cue with their actual actor and neighborhood crime pressure.
+
+The robbery file had pre-existing armed-resistance additions. Kept an exact
+patch in .runtime/pre-crew-robbery.patch; staged the HEAD base plus only this
+task's edits via index blob. Verified those unrelated added lines remain
+byte-for-byte in the unstaged diff. Other unrelated files untouched.
+
+Named loot tests cover delayed payment, clone/reload, no second payout, custody,
+new ownership and personal proprietor funds/grievance. Core selected robbery/
+actor checks1.336s and HTTP0.211s before final proprietor branch; frontend
+build2.92s. Final proprietor and clean-check evidence follows when complete.
+Actual complete robbery scene choreography and compact UI checks remain open.
+
+Prior full c06c36c session47957 terminated FAILED: core542.498s, sim574.874s;
+only routine86%, the now-corrected Families prop-order check and old manual
+restocking metric failed. Clean9aec451 long purchase-observation run session57475
+terminated PASS232.821s. Do not restart these terminal handles. No main8791
+actions/promotion; comprehensive jobs and broad visual/game scope incomplete.
