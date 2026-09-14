@@ -1,6 +1,9 @@
 package core
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 // The Guide was prose written when this game had eight actions, and it rotted.
 // It still told the player that "broader autonomous family politics" was future
@@ -89,8 +92,8 @@ func (w *World) Guide() []Step {
 			w.acquisitionReason(), owned > 0),
 		step("A name of your own", fmt.Sprintf("%s premises and %d respect and the city files you with the families.", upper1(spelled(OrganizationHoldings)), OrganizationStanding),
 			w.incorporationReason(), w.Incorporated()),
-		step("People who answer to you", "Sign somebody on. They add to what you are worth in a fight and stand in front of what comes at you.",
-			firstOpenPerson(w, w.SignOnReadiness), len(w.OwnPeople()) > 0),
+		step("People who answer to you", "Hire a driver to start. Once your organization has a name, you can sign on more people. Your people add to what you are worth in a fight.",
+			w.guideHiringReason(), len(p.Crew) > 0 || len(w.OwnPeople()) > 0),
 		step("Somebody on the door", "One of your people, standing at a business. Harder to rob, harder to take, and they are the one standing in it when somebody comes. They have to walk there first, and the door is worth nothing until they arrive.",
 			firstOpen(w.PostReadiness), w.anyPosted()),
 		step("Money on the street", fmt.Sprintf("Lend at %d%% over %d days. It is the oldest business this trade has.", int(LoanRate*100), LoanTermDays),
@@ -226,4 +229,28 @@ func (w *World) acquisitionReason() string {
 		reasons = append(reasons, w.AcquireReadiness(id))
 	}
 	return shortest("There is nothing in this city to take over yet", reasons)
+}
+
+// Both the first associate and later organization members are real hiring
+// routes. Inspect actual destination actions so a travelling/unavailable
+// candidate, locked district or lack of cash cannot become an open promise.
+func (w *World) guideHiringReason() string {
+	reasons := []string{}
+	view := *w
+	for _, place := range Locations {
+		if place.District > w.District {
+			continue
+		}
+		view.Player.Location = place.ID
+		for _, a := range view.Actions(place.ID) {
+			if a.ID != "recruit" && !strings.HasPrefix(a.ID, "sign:") {
+				continue
+			}
+			if !a.Disabled {
+				return ""
+			}
+			reasons = append(reasons, a.Reason)
+		}
+	}
+	return shortest("There is nobody available to hire yet", reasons)
 }

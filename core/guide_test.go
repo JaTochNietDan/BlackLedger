@@ -288,3 +288,60 @@ func TestTheGuideStatesNoFigureOfItsOwn(t *testing.T) {
 		}
 	}
 }
+
+func TestGuideRecognizesFirstAssociateBeforeIncorporation(t *testing.T) {
+	w := New(81)
+	w.Event = nil
+	w.Player.Respect = PremisesRespect
+	w.Player.Cash = 90
+	w.Player.Location = "room"
+	var step Step
+	for _, s := range w.Guide() {
+		if s.Title == "People who answer to you" {
+			step = s
+		}
+	}
+	if !step.Open || step.Done || step.Reason != "" {
+		t.Fatalf("available first driver blocked by organization rule: %+v", step)
+	}
+	if w.Incorporated() {
+		t.Fatal("fixture is already incorporated")
+	}
+	if w.Player.Location != "room" {
+		t.Fatal("guide moved player to hiring address")
+	}
+	w.Player.Location = "bar"
+	next, err := Execute(w, Command{RequestID: ID(), Revision: w.Revision, Kind: "recruit", Target: "bar"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(next.Player.Crew) != 1 {
+		t.Fatal("recruitment did not occur")
+	}
+	for _, s := range next.Guide() {
+		if s.Title == "People who answer to you" && (!s.Done || s.Open) {
+			t.Fatalf("hired driver did not complete milestone: %+v", s)
+		}
+	}
+}
+
+func TestGuideHiringUsesActualCashAndAvailableCandidates(t *testing.T) {
+	w := New(81)
+	w.Event = nil
+	w.Player.Respect = PremisesRespect
+	w.Player.Cash = 89
+	for _, s := range w.Guide() {
+		if s.Title == "People who answer to you" && (s.Open || s.Reason != "Not enough cash") {
+			t.Fatalf("unaffordable first hire misdescribed: %+v", s)
+		}
+	}
+	w.Player.Cash = 90
+	if driver := w.Holder("driver"); driver != nil {
+		driver.Dead = true
+	}
+	for _, s := range w.Guide() {
+		if s.Title == "People who answer to you" && s.Open {
+			t.Fatalf("guide offered dead driver: %+v", s)
+		}
+	}
+}

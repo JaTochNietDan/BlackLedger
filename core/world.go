@@ -1194,7 +1194,7 @@ func (w *World) Actions(id string) []Action {
 			fmt.Sprintf("$%d and %d hours on the bench. Worth %d%% against somebody who pulls level with you out on the street, and nothing at all to somebody who walks in a door after you. Plate is weight: it costs %d%% of what the car is worth for speed. Currently %d of %d stages on it.",
 				PlateCost, PlateMinutes/60, int(PlateCover*100), int(PlateWeight*100), w.Plating(), PlateStages))
 	case "docks":
-		add("dockwork", "Work the night cargo", 90, 0, "", "Earn $75 and 1 respect. Small chance of a work injury.")
+		add("dockwork", "Work a cargo shift", 90, 0, "", "Earn $75 and 1 respect. Small chance of a work injury.")
 		// A boat is in at a pier of yours. One night, and then it is gone,
 		// which is the whole of what holding the wharf buys: not a better
 		// price, but knowing when.
