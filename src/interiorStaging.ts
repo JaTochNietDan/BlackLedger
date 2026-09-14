@@ -64,9 +64,25 @@ export function laundryPlacements(people:Presence[]) {
  return result;
 }
 
-export type InteriorPlace='bar'|'mercercourt'|'room'|'laundry';
+// Cypress drawing-room seats match the authored sofa and facing armchairs.
+export function cypressPlacements(people:Presence[]) {
+ const available:InteriorSpot[]=[
+  ...[-1.25,-.3,.65].map((z,i)=>({id:`cypress-sofa-${i}`,x:-3.58,z,yaw:Math.PI/2,seat:.69})),
+  ...[-1.35,.8].map((z,i)=>({id:`cypress-chair-${i}`,x:.86,z,yaw:-Math.PI/2,seat:.69})),
+  {id:'cypress-study',x:3.35,z:-.4,yaw:Math.PI},
+  {id:'cypress-visitor',x:-1.2,z:2.8,yaw:Math.PI},
+ ];
+ const result=new Map<string,InteriorSpot>();
+ for(const who of [...people].sort((a,b)=>a.id.localeCompare(b.id))){
+  if(result.has(who.id))continue;
+  const spot=available.shift();if(spot)result.set(who.id,spot);
+ }
+ return result;
+}
+
+export type InteriorPlace='bar'|'mercercourt'|'room'|'laundry'|'estate';
 export function placementsForInterior(place:InteriorPlace,people:Presence[]){
- return (place==='laundry'?laundryPlacements:place==='bar'?interiorPlacements:place==='room'?marinerLobbyPlacements:mercerLobbyPlacements)(people);
+ return (place==='estate'?cypressPlacements:place==='laundry'?laundryPlacements:place==='bar'?interiorPlacements:place==='room'?marinerLobbyPlacements:mercerLobbyPlacements)(people);
 }
 
 export function poseInteriorOccupant(actor:THREE.Group,spot:InteriorSpot) {
@@ -87,6 +103,7 @@ export function poseInteriorOccupant(actor:THREE.Group,spot:InteriorSpot) {
 
 // Reserved clear floor positions; these never displace a public occupant.
 export function interiorPlayerSpot(place:InteriorPlace):InteriorSpot {
+ if(place==='estate')return {id:'player-entry',x:1.6,z:3.3,yaw:Math.PI};
  if(place==='room'||place==='laundry')return {id:'player-entry',x:1.6,z:3.15,yaw:Math.PI};
  return place==='mercercourt'
   ? {id:'player-entry',x:2,z:4.15,yaw:Math.PI}

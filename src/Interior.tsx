@@ -267,7 +267,7 @@ export function Interior({
           ))}
         </div>
       )}
-      {place.id === 'bar' || place.id === 'mercercourt' || place.id === 'room' || place.id === 'laundry' ? <Interior3D key={place.id} place={place.id} operation={place} player={player} motion={motion} people={onFloor} picked={picked} onPick={id=>setPicked(id===picked?'':id)} minute={minute}/> : <div
+      {place.id === 'bar' || place.id === 'mercercourt' || place.id === 'room' || place.id === 'laundry' || place.id === 'estate' ? <Interior3D key={place.id} place={place.id} operation={place} player={player} motion={motion} people={onFloor} picked={picked} onPick={id=>setPicked(id===picked?'':id)} minute={minute}/> : <div
         className={'room' + (painted ? ' painted' : '')}
         style={painted ? {backgroundImage: `url(${paintedRoom(place.id)})`} : undefined}
       >

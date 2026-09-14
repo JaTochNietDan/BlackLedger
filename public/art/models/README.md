@@ -57,3 +57,10 @@ Mariner and other unique exports still require their own working entrances.
 The handcuffs export is authored locally in Blender: two smooth steel wrist
 rings and three interlocking chain links. It is positioned by the detainee pose;
 no downloaded asset or external texture is used.
+
+September 14 Cypress House: `interior-cypress.glb` is locally authored Blender
+geometry from `tools/cypress_interior.py`, exported through
+`tools/export_city3d.py --only=interior-cypress`. Staggered parquet, paneled walls,
+sash windows and pleated curtains, limestone fireplace/clock/mirror, bookcase,
+oxblood sofa, ochre armchairs, patterned rug, study desk/radio and drinks sideboard.
+No external models or images. Independent wall groups support camera cutaways.

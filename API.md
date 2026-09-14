@@ -872,3 +872,11 @@ is killed or moves; generic street scenarios omit it. Already-departed residents
 cannot be attacked via this home command. This is authoritative action support;
 private-room 3D assassination/burglary choreography remains unfinished, and the
 current browser still uses the existing city result/news presentation.
+
+Cypress House now uses its own locally authored 3D drawing room and study on
+entry (`estate`). The room seats five existing public occupants and provides two
+standing positions, plus the player's reserved entry aisle. Additional public
+occupants remain in the complete person list. Seating, entrance motion, camera
+orbit/zoom/pan, and cutaway walls are presentation only; they do not assign homes,
+advance time or change action availability. The room does not yet illustrate
+purchased house fixtures or stage residential assaults inside it.

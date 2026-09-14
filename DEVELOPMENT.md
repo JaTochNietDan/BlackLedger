@@ -1142,3 +1142,41 @@ Validation: TypeScript/Vite build passes (.runtime/burglary-build.log); focused 
 Next work remains private residential rooms and additional 3D interiors, playable home scene staging, expanded housing capacity/detached homes and NPC relocation preferences, plus richer poker/table cast/dealing/materials. Whole goal remains active. Pre-existing armed-resistance/aftermath changes and untracked long death diagnostic remain untouched. Caffeinate16576/87182 verified active during this turn.
 
 Final focused results: core3.226s, store0.184s, sim8.723s, all pass. The previous full-suite timeout diagnostic was not rerun.
+
+## September 14 — Cypress House drawing room and study
+
+Added the estate's own Blender-authored interior, rather than a renamed lobby.
+The model has staggered parquet, raised wall panels/cornices, sash windows and
+curtains, fireplace/mantel/clock, bookcase with individual volumes, leather sofa,
+velvet armchairs, rug, reading lamps, newspaper table, study desk/radio and drinks
+sideboard. Only the new GLB/manifest entry was exported. Both walls cut away when
+the camera passes outside them. Existing orbit, keyboard pan/zoom/reset and
+reduced-motion entrance behavior remain available.
+
+Seven public occupants fit five measured cushions and two clear standing bays;
+the player has a separately tested entrance route. Overflow remains visible in
+the complete person list. No new public-state contract or invented NPC occupancy.
+This is a drawing room, not completion of every room in the estate or every city
+interior. Fitted house upgrades and burglary/home-assassination choreography are
+still outstanding, as are broader texture/character fidelity improvements.
+
+Evidence:
+- `npm run build`: pass (`.runtime/cypress-build.log`).
+- `npm test`: all 348 pass (`.runtime/cypress-frontend-tests.log`), including a new
+  actual-GLB test of both character rigs, cushion support, cast separation, clear
+  standing bays and a 41-sample entrance sweep. Floor-board seams exposed a gap
+  in the first geometry check; a continuous substrate now supports those seams.
+- Isolated `cypress` QA fixture added. The first fixture omitted district access;
+  corrected fixture `.runtime/cypress-interior-v2-20260914.sqlite3` serves 8936.
+  Main `.runtime/campaign.sqlite3` was never changed for QA.
+- Browser at 1280×720 and 820×740: room fits, eight rendered actors (seven public
+  plus player), two overflow occupants explicitly counted and listed. Completed
+  entrance, zoom 1→1.12 and Home reset, pointer orbit with wall cutaways, and
+  direct click on seated Mara selected her actual action panel. Clock remained
+  17:00 and cash $12,000 throughout presentation checks. Property upgrade/sale,
+  rest and security commands remain visible in the corrected fixture.
+- Observed default scene: 169 draw calls / 191,440 triangles with eight actors;
+  this is a scene measurement, not a hardware performance acceptance claim.
+
+Other requested interiors, richer poker cast/dealing, expanded residential map,
+additional progression income and integrated campaign acceptance remain open.
