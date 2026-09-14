@@ -17,7 +17,7 @@ import './cardRoom.css';
 export function PokerTable3D({cards,player,people=[],motion=true,animateOnMount=false}:{cards:CardsState|null;player?:Pick<Person,"name"|"face"|"alive">;people?:Presence[];motion?:boolean;animateOnMount?:boolean}){
  const host=useRef<HTMLDivElement>(null),latest=useRef(cards);latest.current=cards;
  const castProps=useRef({player,people,motion});castProps.current={player,people,motion};
- const [failed,setFailed]=useState(false);
+ const [failed,setFailed]=useState(false),[wide,setWide]=useState(false);
  useEffect(()=>{
   const el=host.current!;let dead=false;let renderer:THREE.WebGLRenderer;
   try{renderer=new THREE.WebGLRenderer({antialias:true});}catch{setFailed(true);return;}
@@ -28,7 +28,9 @@ export function PokerTable3D({cards,player,people=[],motion=true,animateOnMount=
   scene.add(new THREE.HemisphereLight(0xffeed0,0x182821,2.5));
   const light=new THREE.DirectionalLight(0xffddaa,3);light.position.set(-2,6,3);light.castShadow=true;light.shadow.mapSize.set(1024,1024);Object.assign(light.shadow.camera,{left:-3,right:3,top:3,bottom:-3});light.shadow.bias=-.0002;scene.add(light);
   const camera=new THREE.PerspectiveCamera(38,1,.01,30);let dirty=true;
-  const view=new TableCamera(camera,canvas,()=>{dirty=true;},new THREE.Vector3(0,1.08,-.12),4.6);
+  const view=new TableCamera(camera,canvas,()=>{dirty=true;},new THREE.Vector3(0,.924,.20),3.35);
+  const framing=(event:Event)=>{const whole=(event as CustomEvent<boolean>).detail;view.frameView(whole?new THREE.Vector3(0,1.08,-.12):new THREE.Vector3(0,.924,.20),whole?4.6:3.35);};
+  canvas.addEventListener('poker-frame',framing);
   function oval(radius:number,height:number,y:number,color:string,scaleX:number){
    const mesh=new THREE.Mesh(new THREE.CylinderGeometry(radius,radius,height,96),new THREE.MeshStandardMaterial({color,roughness:.75}));mesh.scale.x=scaleX;mesh.position.y=y;mesh.castShadow=true;mesh.receiveShadow=true;scene.add(mesh);return mesh;
   }
@@ -102,7 +104,7 @@ export function PokerTable3D({cards,player,people=[],motion=true,animateOnMount=
    if(dealing||wasDealing)dirty=true;wasDealing=dealing;
    if(dirty&&!document.hidden){renderer.render(scene,camera);canvas.dataset.poker=JSON.stringify({board:p?.board??[],mine:p?.mine??[],seats:p?.seats.map(s=>({who:s.who,exposed:s.cards?.length??0,folded:s.folded})),camera:camera.position.toArray(),dealing:elapsed<plan.duration,cast:cast.children.length/2,drawCalls:renderer.info.render.calls});dirty=false;}
   };tick();
-  return()=>{dead=true;cancelAnimationFrame(frame);observer.disconnect();view.dispose();costumes.forEach(m=>m.dispose());disposeCityResources([scene,...models.values()]);renderer.dispose();renderer.forceContextLoss();canvas.remove();};
+  return()=>{dead=true;cancelAnimationFrame(frame);observer.disconnect();canvas.removeEventListener('poker-frame',framing);view.dispose();costumes.forEach(m=>m.dispose());disposeCityResources([scene,...models.values()]);renderer.dispose();renderer.forceContextLoss();canvas.remove();};
  },[]);
- return <div className="poker3d"><div ref={host}/><button className="table-camera-reset" onClick={()=>host.current?.querySelector('canvas')?.dispatchEvent(new Event('table-reset'))}>Reset view</button><small className="table-camera-help">Drag to orbit · Right-drag to pan · Wheel to zoom · Focus table · Hold WASD / arrows to pan · Q/E to orbit</small>{failed&&<p role="status">The 3D table is unavailable. Read the cards below.</p>}</div>;
+ return <div className="poker3d"><div ref={host}/><button className="poker-camera-framing" aria-pressed={wide} onClick={()=>{const next=!wide;setWide(next);host.current?.querySelector('canvas')?.dispatchEvent(new CustomEvent('poker-frame',{detail:next}));}}>{wide?'Read cards':'Whole table'}</button><button className="table-camera-reset" onClick={()=>host.current?.querySelector('canvas')?.dispatchEvent(new Event('table-reset'))}>Reset view</button><small className="table-camera-help">Drag to orbit · Right-drag to pan · Wheel to zoom · Focus table · Hold WASD / arrows to pan · Q/E to orbit</small>{failed&&<p role="status">The 3D table is unavailable. Read the cards below.</p>}</div>;
 }

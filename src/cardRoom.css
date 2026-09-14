@@ -19,3 +19,6 @@
 .poker-summary .poker-card-text{display:block;font:18px/1.4 Georgia,serif;color:#f3e6c9;white-space:nowrap}
 .felt.back-room .poker-summary .seat,.felt.back-room .poker-summary .board{display:block}
 .casino-house .cards-panel{max-width:none;width:100%}.casino-house .cards-panel>.felt{width:100%;box-sizing:border-box}
+
+.poker-camera-framing{position:absolute;top:12px;left:12px;border:1px solid #a58b59;background:#ede0c3;color:#392b1b;font:13px Georgia,serif;padding:7px 12px;box-shadow:0 2px 8px #0005}
+.poker3d .poker-camera-framing:hover,.poker3d .poker-camera-framing[aria-pressed=true]{background:#dac69d;color:#392b1b;border-color:#a58b59}

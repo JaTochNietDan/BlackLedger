@@ -47,6 +47,7 @@ export class TableCamera {
   offset.multiplyScalar(command==='zoom-out'?1.08:.92).clampLength(this.controls.minDistance,this.controls.maxDistance);
   this.camera.position.copy(this.controls.target).add(offset);this.controls.update();this.changed();
  };
+ frameView(center:THREE.Vector3,distance:number,azimuth=this.azimuth){this.center.copy(center);this.distance=distance;this.azimuth=azimuth;this.reset();}
  resize(){const scale=Math.max(1,.95/this.camera.aspect);this.camera.position.sub(this.controls.target).multiplyScalar(scale/this.aspectScale).add(this.controls.target);this.aspectScale=scale;this.controls.update();this.changed();}
  dispose(){cancelAnimationFrame(this.frame);this.unbind();this.controls.removeEventListener('change',this.change);this.controls.dispose();this.canvas.removeEventListener('keydown',this.key);this.canvas.removeEventListener('pointerdown',this.focus);this.canvas.removeEventListener('table-reset',this.reset);}
 }

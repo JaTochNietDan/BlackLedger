@@ -2613,3 +2613,21 @@ local aim. Fixture `.runtime/billiards-aim-qa.sqlite3` revision2/minute602/two
 receipts; no stroke committed and no main-save QA writes. Main8791 remains
 3e7ee26; this awaits promotion. Full shooting character/bridge pose, cue-rail
 clearance, airborne physics and remaining interiors still need work.
+
+### 2026-09-14 — poker cards-first camera preset
+
+Previouse5be150 improved billiards aim feedback. Poker now opens at a closer
+3.35m camera frame centred between the hand and board, with a Whole table /
+Read cards toggle for the former4.6m view. Pan/orbit/zoom remain available;
+Reset returns to the selected frame. Shared TableCamera.frameView clears held
+keys when changing frame and keeps responsive aspect compensation. Corrected
+selected/hover button contrast after browser review.
+
+399 frontend tests pass14.638s, including frame selection clearing held input
+and Home restoring the selected centre/distance. Final build passes3.00s.
+Logs `.runtime/poker-framing-{tests,build}.log`. Browsers80–82 on isolated8980
+compared the former view with close/whole-table views, including the player hand
+and flop together at1280x720. One Check command dealt the fixture flop; camera
+toggles remained local. No main-save QA writes. Main8791 remains3e7ee26;
+this and the aiming guide await promotion. Further interior production and
+full billiards fidelity remain open.

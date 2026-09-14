@@ -19,6 +19,11 @@ test('table camera moves between key repeats and releases on keyup, focus loss a
   key(canvas,'keydown','q');step();const orbit=camera.position.clone();step();assert.ok(camera.position.distanceTo(orbit)>.01);
   canvas.dispatchEvent(new Event('blur'));const blurred=camera.position.clone();step();assert.ok(camera.position.distanceTo(blurred)<1e-10);
   key(canvas,'keydown','w');key(canvas,'keydown','Home');const reset=camera.position.clone();step();assert.ok(camera.position.distanceTo(reset)<1e-10);
+  const oldDistance=camera.position.distanceTo(view.controls.target);
+  key(canvas,'keydown','d');view.frameView(new THREE.Vector3(0,.924,.20),3.35);
+  const framed=camera.position.clone();step();assert.ok(camera.position.distanceTo(framed)<1e-10,'framing must clear held input');
+  assert.ok(camera.position.distanceTo(view.controls.target)<oldDistance);assert.equal(view.controls.target.z,.20);
+  key(canvas,'keydown','Home');assert.ok(camera.position.distanceTo(framed)<1e-10,'Home preserves selected framing');
   view.dispose();view=undefined;assert.equal(frames.size,0,'unmounted table must cancel its animation loop');
  }finally{view?.dispose();Object.assign(globalThis,old);}
 });
