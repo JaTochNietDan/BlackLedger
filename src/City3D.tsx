@@ -1,4 +1,5 @@
 import {CityVillaExit} from './city3dVillaExit';
+import {CityAccident} from './city3dAccident';
 import {CityPlanter} from './city3dPlanter';
 import {CityIncendiary, incendiaryStagingFlight, incendiaryShard, incendiaryShardObstructed, INCENDIARY_IMPACT} from './city3dIncendiary';
 import {streetAt} from './streetPlayback';
@@ -114,6 +115,7 @@ type Effect = {
   custody?:CityCustody;
   incendiary?:CityIncendiary;
   planter?:CityPlanter|CityVillaExit;
+  accident?:CityAccident;
   pullback?:{move:ScenePullback;intent:number};
 };
 const modelNames = [
@@ -1020,17 +1022,20 @@ export function City3D(props: Props) {
           let custody:CityCustody|undefined;
           let incendiary:CityIncendiary|undefined;
           let planter:CityPlanter|CityVillaExit|undefined;
+          let accident:CityAccident|undefined;
+          const hasAccident=cue.kind==='explosion'&&cue.detonation==='premature'&&!!cue.accident&&!!cue.attacker;
           const planterBuilding=buildings.get(cue.target);
           const hasPlanter=cue.kind==='explosion'&&cue.detonation==='planted'&&!!cue.attacker&&
             !!(planterBuilding?.getObjectByName('entrance-threshold')||planterBuilding?.getObjectByName('entrance-landing'))&&!!planterBuilding.getObjectByName('entrance-door-hinge');
           const weaponModel=sceneWeapon(cue.attacker?.weapon);
           let extra: THREE.Group | undefined, gunArm: THREE.Object3D | undefined, muzzle: THREE.Object3D | undefined;
-          if (hasPlanter || ['incendiary', 'attack', 'killing', 'gunfight', 'raid', 'arrest','raid-unit','police-unit','officer','detainee','raid-officer'].includes(cue.kind)) {
+          if (hasAccident || hasPlanter || ['incendiary', 'attack', 'killing', 'gunfight', 'raid', 'arrest','raid-unit','police-unit','officer','detainee','raid-officer'].includes(cue.kind)) {
             const model = ['killing','detainee'].includes(cue.kind) ? personModel(cue.actors?.[0]?.id || '')
-              : hasPlanter || ['gunfight','attack','incendiary'].includes(cue.kind) ? personModel(cue.attacker?.id||'anonymous-shooter') : ['officer','raid-officer'].includes(cue.kind)?'police-officer':'police';
+              : hasAccident || hasPlanter || ['gunfight','attack','incendiary'].includes(cue.kind) ? personModel(cue.attacker?.id||'anonymous-shooter') : ['officer','raid-officer'].includes(cue.kind)?'police-officer':'police';
             extra = models.get(model)!.clone(true);
             if (isPedestrian(model)) costume = dressPedestrian(extra, model, personWardrobe(['killing','detainee'].includes(cue.kind) ? cue.actors?.[0]?.id || '' : cue.attacker?.id||'anonymous-shooter'));
             if (model === 'police') addVehicleShadow(extra, model);
+            if(hasAccident){accident=new CityAccident(extra,cue.accident!.fatal);extra=accident.root;}
             if(hasPlanter){planter=planterBuilding?.getObjectByName('entrance-landing')?new CityVillaExit(extra):new CityPlanter(extra);extra=planter.root;}
             if(cue.kind==='incendiary'){
               incendiary=new CityIncendiary(extra,models.get('incendiary-bottle')!.clone(true),new THREE.Vector3(0,3,4));extra=incendiary.root;
@@ -1069,11 +1074,11 @@ export function City3D(props: Props) {
               material.transparent = true;
               debris = new THREE.InstancedMesh(part.geometry.clone().applyMatrix4(part.matrixWorld), material, 12);
               debris.frustumCulled = false;
-              if(incendiary||planter)debris.visible=false;
+              if(incendiary||planter||accident)debris.visible=false;
               scene.add(debris);
             });
           }
-          effects.push({cue, assassination, custody, incendiary, planter, glassBlocked:incendiary?new Set():undefined, since: now, mesh, light, debris, extra, wardrobe: costume, gunArm, muzzle, weapon, weaponModel:weaponModel||undefined,
+          effects.push({cue, accident, assassination, custody, incendiary, planter, glassBlocked:incendiary?new Set():undefined, since: now, mesh, light, debris, extra, wardrobe: costume, gunArm, muzzle, weapon, weaponModel:weaponModel||undefined,
             glazingBefore:(cue.id.startsWith('preview:')?undefined:p.beforeConditions?.[cue.target]) ?? buildings.get(cue.target)?.userData.condition ?? w.locations.find(p=>p.id===cue.target)?.condition ?? 100,
             reactionAudio:assassination?new BlastAudio(()=>playRecordedEffect('pain')):cue.kind==='explosion'?new BlastAudio(()=>playRecordedEffect('panic'))
               :cue.kind==='killing'&&(w.last_result?.cues||[]).some(gun=>gunVictim(gun,cue))?new BlastAudio(()=>playRecordedEffect('pain')):undefined,
@@ -1234,7 +1239,7 @@ export function City3D(props: Props) {
         if (!motion) traffic.clear();
         // Stationary actors own their known destination even before their first
         // visible frame. Otherwise response vehicles can steal a parked bay.
-        const replacedActors=new Set(effects.filter(e=>e.incendiary||e.planter).map(e=>e.cue.attacker?.id));
+        const replacedActors=new Set(effects.filter(e=>e.incendiary||e.planter||e.accident).map(e=>e.cue.attacker?.id));
         const actorSpaces=[...actors].filter(([id])=>!replacedActors.has(id)).filter(([,a])=>a.object.visible||a.start===a.end).map(([id,a])=>{
           const pose=a.start===a.end?(traffic.placement(id)?.pose||onRoute(a.points,1)):{x:a.object.position.x,z:a.object.position.z,heading:a.object.rotation.y};
           return {model:trafficModel(a.model,a.start===a.end),root:{x:pose.x,z:pose.z},pose};
@@ -1258,7 +1263,7 @@ export function City3D(props: Props) {
           const fireBuilding=e.incendiary?buildings.get(e.cue.target):undefined;
           const fireWindows=fireBuilding?clearBlastWindows(fireBuilding):[];
           let stagedFlight:ReturnType<typeof incendiaryStagingFlight>=null;
-          e.slot = availableSceneSlot(lots.get(e.cue.target)!, e.planter?'planter':e.assassination?'assassination':e.custody?'custody':e.cue.kind, occupied,entry,e.incendiary?slot=>{
+          e.slot = availableSceneSlot(lots.get(e.cue.target)!, e.accident?'accident':e.planter?'planter':e.assassination?'assassination':e.custody?'custody':e.cue.kind, occupied,entry,e.incendiary?slot=>{
             stagedFlight=fireBuilding?incendiaryStagingFlight(slot.root,e.incendiary!.release,fireWindows,fireBuilding):null;
             return stagedFlight!==null;
           }:undefined);
@@ -1266,6 +1271,11 @@ export function City3D(props: Props) {
             e.extra.position.set(e.slot.root.x, e.slot.model === 'parked-police' ? vehicleRootHeight(e.slot.root) : 0.2, e.slot.root.z);
             e.light.position.set(e.slot.root.x, 3, e.slot.root.z);
             e.since = now;
+            if(e.accident){
+              e.extra.rotation.y=e.slot.pose.heading;
+              frameScene(camera,controls.target,new THREE.Box3(new THREE.Vector3(e.slot.root.x-3,0,e.slot.root.z-2),new THREE.Vector3(e.slot.root.x+3,3,e.slot.root.z+2)));
+              controls.update();
+            }
             if(e.planter&&entry){
               e.extra.position.y=entry.y;
               e.since=now+e.planter.duration*1000;
@@ -1446,7 +1456,7 @@ export function City3D(props: Props) {
             const staged = !!e.slot && !placements.get(`scene:${e.cue.id}`)?.waiting && castReady;
             e.extra.visible = staged;
             e.mesh.visible = staged&&(!e.planter||now>=e.since);
-            if((e.incendiary||e.planter)&&e.debris)e.debris.visible=staged&&(!e.planter||now>=e.since);
+            if((e.incendiary||e.planter||e.accident)&&e.debris)e.debris.visible=staged&&(!e.planter||now>=e.since);
             if (!staged) {
               e.since += dt;
               continue;
@@ -1475,9 +1485,9 @@ export function City3D(props: Props) {
           const blast = e.cue.kind === 'explosion';
           const blastBuilding=buildings.get(lot.id);
           const internal=internalDetonation(e.cue,w.building_fires||[]);
-          const blastOrigin = internal?blastBuilding?.userData.blastOrigin:blastBuilding?.userData.debrisOrigin;
+          const blastOrigin = e.accident?{x:at.x,y:.95,z:at.z}:internal?blastBuilding?.userData.blastOrigin:blastBuilding?.userData.debrisOrigin;
           const blastWindows = (internal?blastBuilding?.userData.blastWindows || []:[]) as THREE.Vector3[];
-          const debrisOrigin=blastBuilding?.userData.debrisOrigin;
+          const debrisOrigin=e.accident?{x:at.x,y:.2,z:at.z}:blastBuilding?.userData.debrisOrigin;
           if (blast && blastOrigin) e.light.position.set(blastOrigin.x, blastOrigin.y, blastOrigin.z);
           const shot = e.cue.kind === 'gunfight' && !!e.weapon;
           if(e.planter){
@@ -1488,6 +1498,7 @@ export function City3D(props: Props) {
             }
             const door=blastBuilding?.getObjectByName('entrance-door-hinge');if(door)door.rotation.y=-Math.PI/2*pose.door;
           }
+          e.accident?.update(t*3);
           e.assassination?.update(t*3);
           e.custody?.update(t*3);
           e.incendiary?.update(t*3);
@@ -1822,13 +1833,14 @@ export function City3D(props: Props) {
           doors:[...buildings].flatMap(([id,b])=>{const door=b.getObjectByName('entrance-door-hinge');return door?[{id,angle:door.rotation.y}]:[];}),
           effects: effects.map(e => ({
             id: e.cue.id, kind: e.cue.kind, target: e.cue.target,
+            accident:e.accident?{fatal:e.accident.fatal,seconds:(now-e.since)/1000,rotation:e.accident.actor.rotation.x}:undefined,
             staged: !e.extra || e.extra.visible, x: e.slot?.root.x, z: e.slot?.root.z,
             approach: e.cue.kind==='raid-officer'&&e.extra?{x:e.extra.position.x,z:e.extra.position.z,leg:e.extra.getObjectByName('leg1')?.rotation.x}:undefined,
             planter:e.planter?{seconds:(now-e.since)/1000+e.planter.duration,blastSeconds:(now-e.since)/1000,actor:e.planter.actor.getWorldPosition(new THREE.Vector3())}:undefined,
             debris: e.debris?.count,
             glassShards:e.incendiary&&e.debris?{visible:e.debris.visible,blocked:e.glassBlocked?.size,
               shown:Array.from({length:12},(_,i)=>Math.hypot(...Array.from(e.debris!.instanceMatrix.array.slice(i*16,i*16+3)))>.001).filter(Boolean).length}:undefined,
-            blastOrigin: e.cue.kind === 'explosion' ? buildings.get(e.cue.target)?.userData[internalDetonation(e.cue,w.building_fires||[])?'blastOrigin':'debrisOrigin'] : undefined,
+            blastOrigin: e.accident&&e.slot?{x:e.slot.root.x,y:.95,z:e.slot.root.z}:e.cue.kind === 'explosion' ? buildings.get(e.cue.target)?.userData[internalDetonation(e.cue,w.building_fires||[])?'blastOrigin':'debrisOrigin'] : undefined,
             blastWindows: e.cue.kind === 'explosion' && internalDetonation(e.cue,w.building_fires||[]) ? buildings.get(e.cue.target)?.userData.blastWindows : undefined,
             arm: e.gunArm?.rotation.x,
             incendiary:e.incendiary?{seconds:(now-e.since)/1000,actor:e.incendiary.actor.getWorldPosition(new THREE.Vector3()),bottle:e.incendiary.bottle.getWorldPosition(new THREE.Vector3()),held:(now-e.since)<3100,visible:e.incendiary.bottle.visible,target:e.incendiary.target,loft:e.incendiary.loft}:undefined,

@@ -8,20 +8,22 @@ const strikes = {
   'Assassination · close quarters': {variant: 'close-quarters', weapon: 0},
 } as const;
 const gunfights = {'Gunfight':1,'Gunfight · shotgun':2,'Gunfight · Thompson':3} as const;
-export const previewScenes = [...Object.keys(gunfights) as (keyof typeof gunfights)[], ...Object.keys(strikes) as (keyof typeof strikes)[], 'Explosion', 'Explosion · casualty', 'Explosion · premature', 'Incendiary', 'Arrest', 'Raid'] as const;
+export const previewScenes = [...Object.keys(gunfights) as (keyof typeof gunfights)[], ...Object.keys(strikes) as (keyof typeof strikes)[], 'Explosion', 'Explosion · casualty', 'Explosion · premature', 'Explosion · fatal accident', 'Incendiary', 'Arrest', 'Raid'] as const;
 export type PreviewScene = typeof previewScenes[number];
 /** A private presentation snapshot. No API command or campaign object is changed. */
 export function previewScene(state: Snapshot, target: string, scene: PreviewScene, token: string) {
   const strike = scene in strikes ? strikes[scene as keyof typeof strikes] : undefined;
   const firearm=scene in gunfights?gunfights[scene as keyof typeof gunfights]:undefined;
   const explosion=scene.startsWith('Explosion');
+  const premature=scene==='Explosion · premature'||scene==='Explosion · fatal accident';
   const kinds = scene==='Explosion · casualty'?['killing','explosion']:strike ? ['killing', strike.weapon ? 'gunfight' : 'attack'] : [firearm?'gunfight':explosion?'explosion':scene.toLowerCase()];
   const cues: VisualCue[] = kinds.map((kind, i) => ({
     id: `preview:${token}:${i}`, kind, target, minute: state.minute,
     caption: `Visual preview: ${scene}`,
-    detonation:kind==='explosion'?(scene==='Explosion · premature'?'premature':'planted'):undefined,
+    detonation:kind==='explosion'?(premature?'premature':'planted'):undefined,
+    accident:premature?{health_lost:scene==='Explosion · fatal accident'?40:30,fatal:scene==='Explosion · fatal accident'}:undefined,
     strike:strike?{variant:strike.variant,victim:{id:'preview-victim',name:'Preview character'}}:undefined,
-    attacker:kind==='explosion'?{id:scene!=='Explosion · premature'?'player':'preview-planter',name:scene!=='Explosion · premature'?state.player?.name||'Preview planter':'Preview planter',weapon:0}:scene==='Incendiary'?{id:'preview-arsonist',name:'Preview arsonist',weapon:0}:strike&&kind!=='killing'?{id:'preview-assassin',name:'Preview assassin',weapon:strike.weapon}:firearm?{id:'preview-attacker',name:'Preview attacker',weapon:firearm??0}:undefined, detainee: kind==='arrest'?{id:'preview-detainee',name:'Preview detainee'}:undefined, actors: kind === 'killing'
+    attacker:kind==='explosion'?{id:!premature?'player':'preview-planter',name:!premature?state.player?.name||'Preview planter':'Preview planter',weapon:0}:scene==='Incendiary'?{id:'preview-arsonist',name:'Preview arsonist',weapon:0}:strike&&kind!=='killing'?{id:'preview-assassin',name:'Preview assassin',weapon:strike.weapon}:firearm?{id:'preview-attacker',name:'Preview attacker',weapon:firearm??0}:undefined, detainee: kind==='arrest'?{id:'preview-detainee',name:'Preview detainee'}:undefined, actors: kind === 'killing'
       ? [{id: 'preview-victim', name: 'Preview character'}] : [],
   }));
   return {state: {...state,

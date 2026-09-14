@@ -638,5 +638,9 @@ fatal result at detonation, before later command time, healing or a new life.
 It applies to the recorded attacker. Successful planted blasts and legacy cues
 omit it; absence must not be interpreted as survival. Existing result/save JSON
 retains the value without a migration or altered damage/odds/time rules. The
-browser type accepts the field; accident injury/death choreography is still
-pending and must use this event outcome rather than current player state.
+city renderer uses this event outcome for a reserved frontage fall: fatal actors
+stay prone, while survivors begin a supported sit-up. Blast effects originate
+at the staged actor, with no invented building fire or broken windows. The
+normal attacker is suppressed during the cast. Debug offers separate surviving
+and fatal accident previews. Persistent aftermath, seamless handoffs and actual
+player-death overlay timing still require further integration.

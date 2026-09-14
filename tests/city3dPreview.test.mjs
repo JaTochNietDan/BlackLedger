@@ -74,6 +74,11 @@ test('premature explosion preview retains its accident outcome without inventing
  const state={id:'campaign',minute:600};
  const {state:preview,cue}=previewScene(state,'club','Explosion · premature','accident');
  assert.equal(cue.kind,'explosion');assert.equal(cue.detonation,'premature');
+ assert.deepEqual(cue.accident,{health_lost:30,fatal:false});
+ const fatal=previewScene(state,'club','Explosion · fatal accident','fatal');
+ assert.equal(fatal.cue.detonation,'premature');assert.equal(fatal.cue.attacker.id,'preview-planter');
+ assert.deepEqual(fatal.cue.accident,{health_lost:40,fatal:true});assert.equal(fatal.state.building_fires,undefined);
+ assert.equal(state.accident,undefined);
  assert.equal(cue.attacker.id,'preview-planter');assert.equal(preview.building_fires,undefined);
  assert.equal(previewScene(state,'club','Explosion','planted').cue.detonation,'planted');
 });
