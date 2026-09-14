@@ -480,3 +480,8 @@ Presence roster. Explicit bartender roles can stand in the service aisle; seatin
 never changes NPC activity, location or availability. The HTML roster remains
 available beyond the modeled seating capacity. Interior Q/E uses held-key
 rotation; neither staging nor camera movement advances simulation time.
+
+Daily accounts now use the same current HourlyIncome calculation as clock payouts,
+including actual room footfall and custody collection share. This corrects the
+reported daily rate; it does not change the existing operating factors or add
+Mariner rental income.

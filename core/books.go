@@ -35,9 +35,7 @@ func (w *World) Books() map[string]any {
 			continue
 		}
 		holdings++
-		income += float64(prop.Income*prop.Condition) / 100 *
-			operatingMode(prop.Mode).Take * w.Capacity(l.ID) * w.TradeMultiplier(l.ID) *
-			(1 + w.LicenceTake())
+		income += w.HourlyIncome(l.ID)
 	}
 	daily := int(income * 24)
 

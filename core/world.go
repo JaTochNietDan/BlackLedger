@@ -2345,7 +2345,7 @@ func (w *World) Advance(minutes int) {
 				// The room itself. A bar at nine at night holds twenty-five
 				// people and at four in the morning holds none, and until this
 				// was written both nights paid the same.
-				prop.Carry += float64(prop.Income*prop.Condition*elapsed) * operatingMode(prop.Mode).Take * w.Capacity(id) * w.TradeMultiplier(id) * w.RoomTrade(id) * (1 + w.LicenceTake()) * w.CollectionShare(id) / 6000
+				prop.Carry += w.HourlyIncome(id) * float64(elapsed) / 60
 				n := int(prop.Carry + 1e-9)
 				prop.Carry -= float64(n)
 				w.Earn(n)

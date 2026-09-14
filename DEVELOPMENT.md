@@ -89,3 +89,9 @@ Scene preview controls, playback/Skip panels, replay and exterior-return buttons
 Production build/TypeScript passed (.runtime/scene-slips-build.log). CUA isolated8881 verified the paper controls, a39px collapsed interior entry, expansion showing the complete result and Ledger link, re-collapse, and no browser errors. Existing gameplay handlers unchanged; main campaign untouched. Other interior/menu styling and compact viewport acceptance remain outstanding.
 
 Read amendment b0f58a61-526b-4ecb-9424-6b007c616bc4: The Mariner must support takeover, actual living NPC tenants, occupancy-based rental income and management obligations. This is the next gameplay priority; all prior visual/simulation requirements remain active.
+
+### 2026-09-13 — income consistency before residential integration
+
+Read the Mariner amendment and its successor903a4109-a113-4a4f-b726-f6ef277f7e41, which additionally requires wealth/standing-appropriate homes for every living NPC. Traced acquisition, workplace/travel state, business obligations, purse settlement and housing charges. Findings and remaining integration are recorded in docs/MARINER_IMPLEMENTATION.md; residential leases and Mariner takeover are not yet implemented.
+
+Fixed a prerequisite accounting discrepancy: Books omitted RoomTrade and CollectionShare while Advance included them. Both now use HourlyIncome, retaining the existing operating factors and fractional payout carry. Targeted exact-hour and account-rate tests pass; full core/store/cmd/blackledger suites pass (109.8s/.128s/.694s), logs .runtime/income-consistency-tests.log and .runtime/income-consistency-integration.log. No save migration or main-campaign mutation. Existing unrelated mugging/robbery edits remain untouched.
