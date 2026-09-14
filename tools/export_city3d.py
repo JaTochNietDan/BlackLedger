@@ -519,6 +519,9 @@ def villa():
             for z in (1.8,4.7):
                 box('window frame',(x,side*5.05,z),(1.5,.16,1.85),stone)
                 box('estate window',(x,side*5.16,z),(1.22,.12,1.58),glass)
+                if side==1 and z>3:
+                    vent=bpy.data.objects.new('fire-window-1-'+str(x),None)
+                    bpy.context.collection.objects.link(vent);vent.location=(x,5.33,z+.25)
                 box('window crossbar',(x,side*5.24,z),(1.25,.055,.07),stone)
                 for edge in (-1,1):
                     box('louvered shutter',(x+edge*.94,side*5.1,z),(.44,.18,1.8),timber)
@@ -1068,6 +1071,8 @@ def undertaker():
     def front_window(x):
         box('upper surround',(x,7.46,4.9),(1.45,.18,1.88),stone)
         box('upper window',(x,7.58,4.9),(1.2,.08,1.63),glass)
+        vent=bpy.data.objects.new('fire-window-1-'+str(x),None)
+        bpy.context.collection.objects.link(vent);vent.location=(x,7.74,5.15)
         box('sash horizontal',(x,7.64,4.9),(1.23,.04,.055),oak)
         box('upper sill',(x,7.62,3.99),(1.57,.34,.13),stone)
     for x in (-4.75,-1.65,1.45,4.55):front_window(x)
@@ -2212,6 +2217,14 @@ def mercer_court():
                 x=side*(1.4+col*.22)
                 box('tenant letter box',(x,6.28,.98+row*.19),(.20,.08,.16),brass,.009)
                 box('letter slot',(x,6.325,1.02+row*.19),(.13,.01,.014),iron)
+
+if __name__ == '__main__' and '--only=special-fire' in __import__('sys').argv:
+    manifest_path=os.path.join(OUT,'manifest.json')
+    with open(manifest_path) as f: selected_manifest=json.load(f)
+    for name,author in [('villa',villa),('undertaker',undertaker)]:
+        clear();author();selected_manifest[name]=export(name)
+    with open(manifest_path,'w') as f:json.dump(selected_manifest,f,indent=2)
+    raise SystemExit(0)
 
 if __name__ == '__main__' and '--only=industrial-fire' in __import__('sys').argv:
     manifest_path=os.path.join(OUT,'manifest.json')

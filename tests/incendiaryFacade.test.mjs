@@ -12,7 +12,7 @@ async function model(name){
 }
 test('incendiary bottle centre reaches facade without passing through earlier masonry',async()=>{
  const actor=await model('person'),bottle=await model('incendiary-bottle');
- for(const name of ['tavern','monarch','tenement','shop','civic','casino','warehouse','bluehour','goldenlily','papermoon','mariner','mercer-court','filling','garage','dealer','docks','haulage']){
+ for(const name of ['tavern','monarch','tenement','shop','civic','casino','warehouse','bluehour','goldenlily','papermoon','mariner','mercer-court','filling','garage','dealer','docks','haulage','villa','undertaker']){
   const building=await model(name);building.position.set(0,.18,16);if(['filling','garage','dealer','docks','haulage'].includes(name))building.rotation.y=Math.PI;building.updateMatrixWorld(true);
   for(const x of [3,0,-3]){
    const origin=new THREE.Vector3(x,.2,6.35),windows=clearBlastWindows(building).sort((a,b)=>Math.abs(a.x-x)-Math.abs(b.x-x));
@@ -41,6 +41,17 @@ test('industrial fire markers face the street and have real glazing behind them'
    const hit=new THREE.Raycaster(point,new THREE.Vector3(0,0,1),0,.25).intersectObject(building,true)[0];
    assert.ok(hit,`${name} marker is not attached to a facade`);
    assert.match(hit.object.material.name,/glazing/,`${name} marker points at solid wall`);
+  }
+ }
+});
+
+test('special facade fire markers sit in front of upper-window glazing',async()=>{
+ for(const [name,count] of [['villa',3],['undertaker',4]]){
+  const building=await model(name),windows=clearBlastWindows(building);assert.equal(windows.length,count);
+  for(const point of windows){
+   assert.ok(point.y>4);
+   const hit=new THREE.Raycaster(point,new THREE.Vector3(0,0,1),0,.25).intersectObject(building,true)[0];
+   assert.ok(hit,`${name} marker lacks backing`);assert.match(hit.object.material.name,/glazing/);
   }
  }
 });

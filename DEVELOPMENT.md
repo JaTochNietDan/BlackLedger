@@ -505,3 +505,14 @@ Extended flight checks to the industrial models at their actual180-degree city r
 CUA8894 Kessler's Filling Station staged a target under its canopy (loft.8); afterward effects empty and36 particles/three window vents. Pier14 screenshot shows flame/smoke at the three new high cargo windows after playback, again36 particles and no active effect. Both previews retained revision36/minute1160/cash180 and were stopped normally. No campaign commands or main-save changes. Caffeinate87182 confirmed alive.
 
 All251 frontend tests passed11.362s (.runtime/industrial-fire-tests.log); the subsequently added marker test passed together with the full51-path test (2 tests,3.601s). TypeScript/Vite build passed2.60s (.runtime/industrial-fire-build.log), known bundle warning unchanged, diff check clean. Remaining special residential/undertaker facades, no-path fallback, complete physical collision/impact detail, evacuation and the broader production goal remain outstanding.
+
+
+### 2026-09-14 — special facade fire coverage
+
+Added authored upper-window fire markers to the undertaker and villa, offset above sash rails, plus --only=special-fire export. Expanded sampled flight checks to all three slots on these models:57 paths across19 models now pass. Additional tests verify four undertaker and three villa markers have actual upper-window glazing behind them. No command/schema changes.
+
+Regeneration corrected villa manifest height10.7513→9.45. Investigated the apparent geometry change by loading the old committed GLB and new export: both actual tops are9.4500006, roof max8.8870216, identical roof vertex count3432. The old manifest was stale; roof/chimney geometry was not shortened.
+
+CUA8894 initially selected Ackerman & Son (pawn/shop), then checked core/locations.json and selected the actual undertaker Thorne & Sons. Its preview stages at chapel and finishes with48 particles/four upper-window vents. Cypress House finishes with36 particles/three vents. Screenshots verify both window fires. Previews stopped normally; revision36/minute1160/cash180 unchanged. No main or QA campaign commands. Caffeinate87182 live.
+
+Full252-test frontend suite passed11.317s (.runtime/special-fire-tests.log); subsequently added special-marker test passed with the complete57-path and industrial-marker tests (3 tests,3.846s). TypeScript/Vite build passed2.66s (.runtime/special-fire-build.log), known bundle warning unchanged; diff check clean. No-path fallback, full continuous collision safety, scene-start cost, detailed impact/escape handoff and broader production acceptance remain open.
