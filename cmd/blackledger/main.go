@@ -93,7 +93,7 @@ func (a *app) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		} else if strings.HasPrefix(path, "/assets/") {
 			w.Header().Set("Cache-Control", "public, max-age=31536000, immutable")
 		}
-		http.FileServer(http.Dir(root)).ServeHTTP(w, r)
+		serveStatic(w, r, root)
 		return
 	}
 	if r.Method != "POST" {

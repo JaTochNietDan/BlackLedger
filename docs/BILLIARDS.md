@@ -545,3 +545,22 @@ adapters,vet,build}.log`.
 No browser/live release was promoted for this checkpoint. Full player tournament
 browser completion, human cue/bridge animation, compact/touch acceptance and
 expanded billiards physics remain, as does the proxied hall asset load issue.
+
+## Detailed hall model transfer repaired (2026-09-14)
+
+Resolved the earlier proxied room-load failure with lossless gzip transfer for
+GLB files when accepted by the client. The fast compression setting sends the
+4,961,068-byte hall in1,214,461 bytes; decompression exactly matches the authored
+asset (SHA256 dfa93c7a013e71499c0148db66c1e62616cb600bd436f3210f7c1fab89a3f022).
+Geometry and textures were not changed. Range requests retain ordinary bytes;
+conditional304, missing files and clients refusing gzip retain normal behavior.
+Compressed responses omit the original Content-Length and vary by encoding.
+
+On isolated port8967, `.runtime/model-transfer-qa.sqlite3` is a SQLite backup of
+the earlier tournament QA fixture. Browser tab58 successfully loaded the hall,
+all six tables and its NPCs; both standard and expanded room screenshots were
+visually inspected at1235×1051. No gameplay command was sent for this check.
+The prior room-load blocker is now resolved in this preview. Full server tests
+pass (1.924s), including exact decoded bytes for a large model and HTTP variants;
+Go vet passes. Evidence `.runtime/model-transfer-{tests,vet,headers}.log` (headers
+are `.txt`), `.runtime/model-transfer-wire.gz`. No live release/save promotion.

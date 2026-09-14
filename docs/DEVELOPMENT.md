@@ -13382,3 +13382,11 @@ strokes cannot double-fire during their action time. An unattended semifinal and
 final completed in17/23 strokes; timing/reload, payout, pause and closure tests
 pass, along with full store/server suites, vet and build. Exact evidence and
 remaining visual/playthrough requirements are in BILLIARDS.md. Main unchanged.
+
+### 2026-09-14 — Lossless large-model delivery
+
+Fixed the hall's truncated proxied download by negotiating gzip for GLB assets.
+Actual transfer shrank from4.96MB to1.21MB with exact byte identity after decode.
+Standard/expanded hall render successfully in isolated browser tab58/port8967.
+Server tests verify large-model identity, refused encodings, ranges,304 and404;
+full server suite and vet pass. Main campaign and geometry unchanged.
