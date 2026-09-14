@@ -154,7 +154,9 @@ func TestThePlayersOwnOrganizationReadsInEverySentence(t *testing.T) {
 			if i < 0 || strings.Contains(strings.ToLower(sentence[:max(0, i)]), "between ") {
 				continue
 			}
-			if m := disagreements.FindString(sentence[i:]); m != "" {
+			// Keep the subject before the family name: "Greta of X’s people is"
+			// refers to Greta, as the shared agreement scanner already recognizes.
+			if m := disagrees(sentence); m != "" {
 				t.Errorf("the player's own organization reads %q:\n  %s", m, sentence)
 			}
 		}
