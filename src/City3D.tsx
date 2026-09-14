@@ -1,3 +1,4 @@
+import {CityBuildingDriveBy} from './city3dBuildingDriveBy';
 import {CityVillaExit} from './city3dVillaExit';
 import {CityAccident} from './city3dAccident';
 import {CityPlanter} from './city3dPlanter';
@@ -112,8 +113,10 @@ type Effect = {
   audio?: GunfireAudio | BlastAudio;
   glassAudio?: BlastAudio;
   reactionAudio?:BlastAudio;
+  departureAudio?:BlastAudio;
   glazingBefore?:number;
   assassination?:CityAssassination;
+  driveBy?:CityBuildingDriveBy;
   custody?:CityCustody;
   incendiary?:CityIncendiary;
   planter?:CityPlanter|CityVillaExit;
@@ -950,8 +953,8 @@ export function City3D(props: Props) {
           scene.remove(effect.mesh, effect.light);
           if (effect.extra) scene.remove(effect.extra);
           effect.wardrobe?.forEach(material => material.dispose());
-          effect.audio?.dispose(); effect.glassAudio?.dispose(); effect.reactionAudio?.dispose();
-          disposeDebris(effect);
+          effect.audio?.dispose(); effect.glassAudio?.dispose(); effect.reactionAudio?.dispose(); effect.departureAudio?.dispose();
+          effect.driveBy?.dispose(); disposeDebris(effect);
           effect.mesh.dispose();
           (effect.mesh.material as THREE.Material).dispose();
         }
@@ -1062,6 +1065,7 @@ export function City3D(props: Props) {
           let costume: THREE.MeshStandardMaterial[] | undefined;
           let weapon:THREE.Group|undefined;
           let assassination:CityAssassination|undefined;
+          let driveBy:CityBuildingDriveBy|undefined;
           let custody:CityCustody|undefined;
           let incendiary:CityIncendiary|undefined;
           let planter:CityPlanter|CityVillaExit|undefined;
@@ -1107,6 +1111,16 @@ export function City3D(props: Props) {
             mesh.visible = false;
             scene.add(extra);
           }
+          if(cue.kind==='driveby-building'&&cue.drive_by&&cue.attacker&&weaponModel){
+            const vehicleModel=carModel(cue.drive_by.vehicle),car=models.get(vehicleModel)!.clone(true);
+            const shooterModel=personModel(cue.attacker.id),driverModel=personModel(cue.drive_by.driver.id);
+            const shooter=models.get(shooterModel)!.clone(true),driver=models.get(driverModel)!.clone(true);
+            costume=[...dressPedestrian(shooter,shooterModel,personWardrobe(cue.attacker.id)),...dressPedestrian(driver,driverModel,personWardrobe(cue.drive_by.driver.id))];
+            weapon=models.get(weaponModel)!.clone(true);gunArm=shooter.getObjectByName('arm1');muzzle=weapon.getObjectByName('muzzle');
+            addVehicleShadow(car,vehicleModel);
+            driveBy=new CityBuildingDriveBy(car,driver,shooter,weapon,weaponModel);extra=driveBy.root;
+            extra.visible=false;mesh.visible=false;scene.add(extra);
+          }
           let debris: THREE.InstancedMesh | undefined;
           if (cue.kind === 'explosion' || incendiary) {
             const model = models.get(incendiary?'bottle-shard':'blast-fragment')!;
@@ -1121,12 +1135,13 @@ export function City3D(props: Props) {
               scene.add(debris);
             });
           }
-          effects.push({cue, accident, assassination, custody, incendiary, planter, glassBlocked:incendiary?new Set():undefined, since: now, mesh, light, debris, extra, wardrobe: costume, gunArm, muzzle, weapon, weaponModel:weaponModel||undefined,
+          effects.push({cue, accident, driveBy, assassination, custody, incendiary, planter, glassBlocked:incendiary?new Set():undefined, since: now, mesh, light, debris, extra, wardrobe: costume, gunArm, muzzle, weapon, weaponModel:weaponModel||undefined,
             glazingBefore:(cue.id.startsWith('preview:')?undefined:p.beforeConditions?.[cue.target]) ?? buildings.get(cue.target)?.userData.condition ?? w.locations.find(p=>p.id===cue.target)?.condition ?? 100,
-            reactionAudio:assassination?new BlastAudio(()=>playRecordedEffect('pain')):cue.kind==='explosion'?new BlastAudio(()=>playRecordedEffect('panic'))
+            departureAudio:driveBy?new BlastAudio(()=>playRecordedEffect('drive-away')):undefined,
+            reactionAudio:driveBy?new BlastAudio(()=>playRecordedEffect('vehicle-approach')):assassination?new BlastAudio(()=>playRecordedEffect('pain')):cue.kind==='explosion'?new BlastAudio(()=>playRecordedEffect('panic'))
               :cue.kind==='killing'&&(w.last_result?.cues||[]).some(gun=>gunVictim(gun,cue))?new BlastAudio(()=>playRecordedEffect('pain')):undefined,
             glassAudio:['explosion','incendiary'].includes(cue.kind)?new BlastAudio(()=>playMoment('glass-break')):undefined,
-            audio: cue.kind==='attack'&&assassination?new GunfireAudio(()=>playMoment('body-hit'),MELEE_IMPACTS,true):cue.kind === 'gunfight' && weaponModel ? new GunfireAudio(()=>playCityGunshot(weaponModel),weaponShots(weaponModel||undefined,cue.strike?.variant),true)
+            audio: driveBy?new GunfireAudio(()=>playCityGunshot(weaponModel!),driveBy.shots,true):cue.kind==='attack'&&assassination?new GunfireAudio(()=>playMoment('body-hit'),MELEE_IMPACTS,true):cue.kind === 'gunfight' && weaponModel ? new GunfireAudio(()=>playCityGunshot(weaponModel),weaponShots(weaponModel||undefined,cue.strike?.variant),true)
               : cue.kind === 'raid-officer' ? new BlastAudio(() => playMoment('door-breach'))
               : ['explosion','raid','arrest'].includes(cue.kind) ? new BlastAudio(() => playMoment(cue.kind)) : undefined});
           if (p.activeCue?.id === cue.id || (assassination && p.activeCue?.strike?.victim.id===cue.strike?.victim.id)) {
@@ -1276,7 +1291,7 @@ export function City3D(props: Props) {
         if (!motion) traffic.clear();
         // Stationary actors own their known destination even before their first
         // visible frame. Otherwise response vehicles can steal a parked bay.
-        const replacedActors=new Set(effects.filter(e=>e.incendiary||e.planter||e.accident).map(e=>e.cue.attacker?.id));
+        const replacedActors=new Set(effects.flatMap(e=>e.driveBy?[e.cue.attacker?.id,...(isPedestrian(actors.get(e.cue.drive_by?.driver.id||'')?.model||'')?[e.cue.drive_by?.driver.id]:[]),...(e.cue.attacker?.id==='player'?['player-car']:[])]:e.incendiary||e.planter||e.accident?[e.cue.attacker?.id]:[]));
         const actorSpaces=[...actors].filter(([id])=>!replacedActors.has(id)).filter(([,a])=>a.object.visible||a.start===a.end).map(([id,a])=>{
           const pose=a.start===a.end?(traffic.placement(id)?.pose||onRoute(a.points,1)):{x:a.object.position.x,z:a.object.position.z,heading:a.object.rotation.y};
           return {model:trafficModel(a.model,a.start===a.end),root:{x:pose.x,z:pose.z},pose};
@@ -1305,9 +1320,14 @@ export function City3D(props: Props) {
             return stagedFlight!==null;
           }:undefined);
           if (e.slot) {
-            e.extra.position.set(e.slot.root.x, e.slot.model === 'parked-police' ? vehicleRootHeight(e.slot.root) : 0.2, e.slot.root.z);
+            e.extra.position.set(e.slot.root.x, (e.slot.model === 'parked-police'||e.driveBy) ? vehicleRootHeight(e.slot.root) : 0.2, e.slot.root.z);
             e.light.position.set(e.slot.root.x, 3, e.slot.root.z);
             e.since = now;
+            if(e.driveBy){
+              const facade=entryBuilding?.userData.sightBounds as THREE.Box3|undefined;
+              e.driveBy.target.set(0,1.8,(facade?.min.z??e.slot.root.z+8)-e.slot.root.z);
+              frameScene(camera,controls.target,new THREE.Box3(new THREE.Vector3(e.slot.root.x-13,0,e.slot.root.z-2),new THREE.Vector3(e.slot.root.x+14,3,e.slot.root.z+e.driveBy.target.z+1)));controls.update();
+            }
             if(e.accident){
               e.extra.rotation.y=e.slot.pose.heading;
               if(e.accident.fatal&&!e.cue.id.startsWith('preview:'))aftermath.rememberBody(`player:${w.life}`,e.slot,0);
@@ -1383,7 +1403,9 @@ export function City3D(props: Props) {
           dt / 1000,
           playback.current,
           effects.flatMap(e=>{
-            if(!e.planter||e.slot)return [];
+            if(e.slot)return [];
+            if(e.driveBy)return sceneSlots(lots.get(e.cue.target)!,'driveby-building');
+            if(!e.planter)return [];
             const building=buildings.get(e.cue.target);
             const entry=(building?.getObjectByName('entrance-threshold')||building?.getObjectByName('entrance-landing'))?.getWorldPosition(new THREE.Vector3());
             return entry?[planterReservation(entry)]:[];
@@ -1512,12 +1534,13 @@ export function City3D(props: Props) {
           }
           const t = (now - e.since) / 3000,
             lot = lots.get(e.cue.target)!;
-          if (t * 3 >= (e.incendiary?.duration??e.assassination?.duration??policeSceneSeconds(e.cue.kind)) || !motion) {
+          if (t * 3 >= (e.driveBy?.duration??e.incendiary?.duration??e.assassination?.duration??policeSceneSeconds(e.cue.kind)) || !motion) {
             handOffSurvivor(e);
             scene.remove(e.mesh, e.light);
             if (e.extra) scene.remove(e.extra);
+            e.driveBy?.dispose();
             e.wardrobe?.forEach(material => material.dispose());
-            e.audio?.dispose(); e.glassAudio?.dispose(); e.reactionAudio?.dispose();
+            e.audio?.dispose(); e.glassAudio?.dispose(); e.reactionAudio?.dispose(); e.departureAudio?.dispose();
             disposeDebris(e);
             e.mesh.dispose();
             (e.mesh.material as THREE.Material).dispose();
@@ -1532,7 +1555,7 @@ export function City3D(props: Props) {
           const blastWindows = (internal?blastBuilding?.userData.blastWindows || []:[]) as THREE.Vector3[];
           const debrisOrigin=e.accident?{x:at.x,y:.2,z:at.z}:blastBuilding?.userData.debrisOrigin;
           if (blast && blastOrigin) e.light.position.set(blastOrigin.x, blastOrigin.y, blastOrigin.z);
-          const shot = e.cue.kind === 'gunfight' && !!e.weapon;
+          const shot = (e.cue.kind === 'gunfight'||!!e.driveBy) && !!e.weapon;
           if(e.planter){
             const pose=e.planter.update(t*3+e.planter.duration);
             if(e.pullback){
@@ -1543,18 +1566,20 @@ export function City3D(props: Props) {
           }
           e.accident?.update(t*3);
           e.assassination?.update(t*3);
+          e.driveBy?.update(t*3);
+          e.departureAudio?.update(t*3-3.8,soundOn());
           e.custody?.update(t*3);
           e.incendiary?.update(t*3);
           if(e.incendiary){e.glassAudio?.update(t*3-INCENDIARY_IMPACT,soundOn());addImpact(t*3-INCENDIARY_IMPACT,1.4);}
-          const firing = gunfightPose(t * 3,weaponShots(e.weaponModel,e.cue.strike?.variant));
+          const firing = gunfightPose(t * 3,e.driveBy?.shots??weaponShots(e.weaponModel,e.cue.strike?.variant));
           if(blast)addImpact(t*3,11);
-          if(shot)for(const beat of weaponShots(e.weaponModel,e.cue.strike?.variant))addImpact(t*3-beat,3);
+          if(shot)for(const beat of e.driveBy?.shots??weaponShots(e.weaponModel,e.cue.strike?.variant))addImpact(t*3-beat,3);
           if(e.cue.kind!=='raid-officer')e.audio?.update(t * 3, soundOn());
           e.reactionAudio?.update(t*3-(e.cue.kind==='attack'?MELEE_IMPACTS[2]:e.assassination?ASSASSINATION_SHOT:blast?1:.06),soundOn());
           if(e.cue.kind==='attack'&&e.assassination)for(const beat of MELEE_IMPACTS)addImpact(t*3-beat,1.2);
           const muzzlePosition = new THREE.Vector3(at.x, 1.4, at.z);
           if (shot && e.gunArm && e.muzzle) {
-            if(e.assassination){ /* the shared cast owns its arm and weapon rig */ }
+            if(e.assassination||e.driveBy){ /* the shared cast owns its arm and weapon rig */ }
             else if(e.weaponModel==='revolver')e.gunArm.rotation.x=firing.arm;
             else {const pump=e.weapon?.getObjectByName('pump-slide');if(pump)pump.position.z=pumpOffset(t*3);poseLongGun(e.extra!,e.weapon!,firing.arm);}
             e.extra!.updateMatrixWorld(true);
@@ -1634,6 +1659,13 @@ export function City3D(props: Props) {
                 tmp.position.set(at.x+drop.x,.2+drop.y,at.z+drop.z);tmp.scale.setScalar(Math.max(.001,drop.size));}
 
             }
+            if(e.driveBy&&j>=2){
+              const beat=[...e.driveBy.shots].reverse().find(at=>t*3>=at),age=beat===undefined?-1:t*3-beat;
+              const hit=e.driveBy.root.localToWorld(e.driveBy.target.clone());
+              const drift=Math.max(0,age);
+              tmp.position.set(hit.x+Math.cos(a)*drift*.7,hit.y+Math.sin(a)*drift*.45+.25*drift,hit.z-.12-drift*(.35+(j%4)*.1));
+              tmp.scale.setScalar(age>=0&&age<.48?(.07+(j%3)*.025)*(1-age/.48):.001);
+            }
             if (police) {
               // A period rotating red roof beacon, rather than sparks around the car.
               tmp.position.set(at.x, (e.extra?.position.y ?? 0.2) + 1.76, at.z);
@@ -1645,7 +1677,7 @@ export function City3D(props: Props) {
             e.mesh.setColorAt(
               j,
               new THREE.Color(
-                e.incendiary ? (j?0xff7b23:0xffd37b) : e.assassination&&j>=2 ? 0x720c12 : burst ? burst.color : (shot && j === 1)
+                e.driveBy&&j>=2?0xa99d85:e.incendiary ? (j?0xff7b23:0xffd37b) : e.assassination&&j>=2 ? 0x720c12 : burst ? burst.color : (shot && j === 1)
                   ? 0x55534e
                   : police
                     ? 0xde3426
@@ -1705,7 +1737,7 @@ export function City3D(props: Props) {
           }
           e.mesh.instanceMatrix.needsUpdate = true;
           if (e.mesh.instanceColor) e.mesh.instanceColor.needsUpdate = true;
-          (e.mesh.material as THREE.MeshBasicMaterial).opacity = blast ? blastOpacity(t * 3) : e.assassination||e.incendiary?1:Math.max(0,1 - t*3/policeSceneSeconds(e.cue.kind));
+          (e.mesh.material as THREE.MeshBasicMaterial).opacity = blast ? blastOpacity(t * 3) : e.assassination||e.incendiary||e.driveBy?1:Math.max(0,1 - t*3/policeSceneSeconds(e.cue.kind));
           e.light.intensity = e.planter&&t<0?0:e.incendiary ? (e.incendiary.bottle.visible?1.5:0) : blast
             ? blastLight(t * 3)
             : shot && firing.flash
@@ -1758,7 +1790,7 @@ export function City3D(props: Props) {
       const sightPoints = ready && followPlayer.current && followed?.object.visible
         ? [followed.object.position.clone().add(new THREE.Vector3(0, .9, 0))]
         : ready ? effects.filter(e => e.extra?.visible && e.slot && e.cue.target === eventTarget)
-          .flatMap(e => e.planter?[e.planter.actor.getWorldPosition(new THREE.Vector3()).add(new THREE.Vector3(0,1.35,0))]:e.incendiary?[e.incendiary.actor.getWorldPosition(new THREE.Vector3()).add(new THREE.Vector3(0,1.35,0))]:e.custody?[e.custody.officer,e.custody.detainee].map(a=>a.getWorldPosition(new THREE.Vector3()).add(new THREE.Vector3(0,.9,0))):e.assassination?[e.assassination.attacker,e.assassination.victim].map(a=>a.getWorldPosition(new THREE.Vector3()).add(new THREE.Vector3(0,.9,0))):[e.extra!.position.clone().add(new THREE.Vector3(0, .9, 0))]) : [];
+          .flatMap(e => e.driveBy?[e.driveBy.driver,e.driveBy.shooter].map(a=>a.getWorldPosition(new THREE.Vector3()).add(new THREE.Vector3(0,1.35,0))):e.planter?[e.planter.actor.getWorldPosition(new THREE.Vector3()).add(new THREE.Vector3(0,1.35,0))]:e.incendiary?[e.incendiary.actor.getWorldPosition(new THREE.Vector3()).add(new THREE.Vector3(0,1.35,0))]:e.custody?[e.custody.officer,e.custody.detainee].map(a=>a.getWorldPosition(new THREE.Vector3()).add(new THREE.Vector3(0,.9,0))):e.assassination?[e.assassination.attacker,e.assassination.victim].map(a=>a.getWorldPosition(new THREE.Vector3()).add(new THREE.Vector3(0,.9,0))):[e.extra!.position.clone().add(new THREE.Vector3(0, .9, 0))]) : [];
       let cutawayDepth=0;
       if (sightPoints.length) {
         const sightEnvelope=sightPoints.flatMap(sight => characterSightPoints(camera,sight));
@@ -1919,6 +1951,7 @@ export function City3D(props: Props) {
           doors:[...buildings].flatMap(([id,b])=>{const door=b.getObjectByName('entrance-door-hinge');return door?[{id,angle:door.rotation.y}]:[];}),
           effects: effects.map(e => ({
             id: e.cue.id, kind: e.cue.kind, target: e.cue.target,
+            driveBy:e.driveBy?{seconds:(now-e.since)/1000,car:e.driveBy.car.getWorldPosition(new THREE.Vector3()),shots:e.audio?.started}:undefined,
             accident:e.accident?{fatal:e.accident.fatal,seconds:(now-e.since)/1000,rotation:e.accident.actor.rotation.x}:undefined,
             staged: !e.extra || e.extra.visible, x: e.slot?.root.x, z: e.slot?.root.z,
             reservation:e.slot?{model:e.slot.model,authored:e.slot.pose,admitted:traffic.placement(`scene:${e.cue.id}`)?.pose}:undefined,
@@ -1968,7 +2001,7 @@ export function City3D(props: Props) {
       e.preventDefault();
       graphicsLost = true;
       silenceAmbient();
-      effects.forEach(effect => {effect.audio?.dispose();effect.glassAudio?.dispose(); effect.reactionAudio?.dispose();});
+      effects.forEach(effect => {effect.audio?.dispose();effect.glassAudio?.dispose(); effect.reactionAudio?.dispose(); effect.departureAudio?.dispose();});
       setFailure('The graphics context was interrupted. Reload the city to restore it.');
     };
     canvas.addEventListener('webglcontextlost', lost);
@@ -1987,7 +2020,7 @@ export function City3D(props: Props) {
       unbindPan();
       canvas.removeEventListener('keydown', keys);
       canvas.removeEventListener('webglcontextlost', lost);
-      effects.forEach(effect => { effect.audio?.dispose(); effect.glassAudio?.dispose(); effect.reactionAudio?.dispose(); disposeDebris(effect); });
+      effects.forEach(effect => { effect.audio?.dispose(); effect.glassAudio?.dispose(); effect.reactionAudio?.dispose(); effect.departureAudio?.dispose(); effect.driveBy?.dispose(); disposeDebris(effect); });
       rubble.dispose();
       suppression.dispose();
       buildingFire.dispose();

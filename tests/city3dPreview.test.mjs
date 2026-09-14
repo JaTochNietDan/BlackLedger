@@ -1,6 +1,18 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {previewScene, previewScenes} from '../.runtime/frontend-test/city3dPreview.js';
+
+test('building drive-by preview captures distinct cast and equipment without damaging campaign',()=>{
+ const state={id:'qa',minute:600,player:{name:'Alex'},locations:[{id:'bar',condition:100}]};
+ const before=JSON.stringify(state),preview=previewScene(state,'bar','Building drive-by','drive');
+ assert.equal(JSON.stringify(state),before);
+ assert.equal(preview.cue.kind,'driveby-building');
+ assert.equal(preview.cue.attacker.weapon,3);
+ assert.notEqual(preview.cue.attacker.id,preview.cue.drive_by.driver.id);
+ assert.equal(preview.cue.drive_by.vehicle_tier,3);
+ assert.equal(preview.state.locations[0].condition,100);
+ assert.equal(preview.state.last_result.elapsed,0);
+});
 import {CityCueQueue} from '../.runtime/frontend-test/city3dEvents.js';
 
 test('every debug scene uses a private world and leaves campaign results intact',()=>{

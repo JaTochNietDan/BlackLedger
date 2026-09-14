@@ -630,10 +630,13 @@ Names, equipment and actual damage refer to the event time, including after
 serialization in `last_result.cues`. The attack-category newspaper headline is
 shared with the cue. Legacy and unrelated cues omit `drive_by`.
 
-This is a staged core contract. No action listing, command dispatch, moment
-workshop entry or browser scene is enabled yet. A moving car with distinct
-driver/shooter, weapon-specific fire, impact damage, escape, traffic clearance
-and delayed news must be implemented and browser-verified before exposing it.
+This is a staged core contract. No action listing or command dispatch is enabled
+yet. City3D now plays the captured car and distinct driver/shooter through a
+reserved road sweep, with timed gunfire, facade dust and vehicle audio; the
+Building drive-by debug preview uses a private Packard/Thompson cast without
+changing campaign condition. Captured condition reveal, verified facade targets
+across buildings, recorded-result news sequencing and actual command acceptance
+remain required before exposing the gameplay action.
 
 
 Pending planter exits now hold their future footprint against newly arriving moving
