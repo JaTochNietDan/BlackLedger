@@ -5,6 +5,16 @@ export const INCENDIARY_RELEASE=3.1;
 export const INCENDIARY_IMPACT=3.9;
 export const INCENDIARY_SECONDS=6.8;
 const smooth=(n:number)=>{const t=THREE.MathUtils.clamp(n,0,1);return t*t*(3-2*t);};
+/** Fixed-distance walk with smooth acceleration/braking and unchanged beat times. */
+export function incendiaryStride(seconds:number,distance:number,duration:number,ramp:number){
+ const t=THREE.MathUtils.clamp(seconds,0,duration),r=Math.min(ramp,duration/2),peak=distance/(duration-r);
+ const integral=(u:number)=>u*u*u-u*u*u*u/2;
+ let travelled:number,speed:number;
+ if(t<r){const u=t/r;travelled=peak*r*integral(u);speed=peak*smooth(u);}
+ else if(t>duration-r){const u=(duration-t)/r;travelled=distance-peak*r*integral(u);speed=peak*smooth(u);}
+ else {travelled=peak*(t-r/2);speed=peak;}
+ return {distance:travelled,weight:speed/peak};
+}
 /** A presentation cast in local metres. The caller reserves and places its path. */
 export class CityIncendiary {
  readonly root=new THREE.Group();
@@ -40,22 +50,29 @@ export class CityIncendiary {
   this.bottle.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),across);
  }
  private poseActor(seconds:number){
-  const approach=THREE.MathUtils.clamp((seconds-.2)*1.2,0,2);
-  const fleeing=Math.max(0,seconds-4.25),escape=Math.min(4,fleeing*2.1);
-  const walking=approach>0&&approach<2||escape>0&&escape<4;
+  const incoming=incendiaryStride(seconds-.2,2,2/1.2,.22);
+  const outgoing=incendiaryStride(seconds-4.25,4,4/2.1,.28);
+  const approach=incoming.distance,escape=outgoing.distance;
+  const weight=Math.max(incoming.weight,outgoing.weight);
   const phase=(approach+escape)/1.15*Math.PI*2;
-  this.actor.position.set(-2+approach-escape,.02+(walking?Math.abs(Math.sin(phase))*.025:0),0);
+  this.actor.position.set(-2+approach-escape,.02+Math.abs(Math.sin(phase))*.025*weight,0);
   this.actor.rotation.set(0,seconds<1.87?Math.PI/2*(1-smooth((seconds-1.45)/.42)):-Math.PI/2*smooth((seconds-4)/.25),0);
   for(const side of [-1,1]){
    const swing=phase+(side<0?0:Math.PI);
-   for(const [name,angle] of [[`leg${side}`,walking?Math.sin(swing)*.4:0],[`knee${side}`,walking?Math.max(0,Math.sin(swing+.7))*.65:0],[`arm${side}`,walking?-Math.sin(swing)*.25:0],[`elbow${side}`,0]] as const){
+   for(const [name,angle] of [[`leg${side}`,Math.sin(swing)*.4*weight],[`knee${side}`,Math.max(0,Math.sin(swing+.7))*.65*weight],[`arm${side}`,-Math.sin(swing)*.25*weight],[`elbow${side}`,0]] as const){
     this.actor.getObjectByName(name)?.rotation.set(angle,0,0);
    }
   }
   const wind=smooth((seconds-1.9)/.7),throwing=smooth((seconds-2.75)/.35),lower=smooth((seconds-3.25)/.5);
   const carry=new THREE.Vector3(.43,1.02,.18),back=new THREE.Vector3(.46,1.65,-.28),forward=new THREE.Vector3(.40,1.65,.43);
   const grip=carry.clone().lerp(back,wind).lerp(forward,throwing).lerp(carry,lower);
-  if(seconds<4)aimArm(this.actor,1,grip,new THREE.Vector3(1,0,-.2));
+  if(seconds<4){
+   const joints=['arm1','elbow1'].map(name=>this.actor.getObjectByName(name)).filter((joint):joint is THREE.Object3D=>!!joint);
+   const relaxed=joints.map(joint=>joint.quaternion.clone());
+   aimArm(this.actor,1,grip,new THREE.Vector3(1,0,-.2));
+   const settle=smooth((seconds-3.75)/.25);
+   joints.forEach((joint,i)=>joint.quaternion.slerp(relaxed[i],settle));
+  }
   this.actor.updateMatrixWorld(true);
  }
  update(seconds:number){
