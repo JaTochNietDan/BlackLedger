@@ -3,6 +3,7 @@ type RoomSettings={lampIntensity?:number;name:string;model:string;span:number;le
 // Coordinates are glTF metres. Cutaway thresholds follow each authored wall;
 // fixtures are positioned in the room that owns them, never borrowed by fallback.
 export const interiorSettings:Record<InteriorPlace,RoomSettings>={
+ casino:{lampIntensity:2,name:"The Blue Hour",model:"interior-blue-hour",span:8.5,leftWall:-6,backWall:-6,lamps:[[-2.7,3.16,-1.8],[2.7,3.16,-.5],[-2.7,3.16,2.8]]},
  cemetery:{lampIntensity:2,name:"Oak Ridge Cemetery plot office",model:"interior-cemetery",span:7,leftWall:-5,backWall:-5,lamps:[[-2,2.94,0],[2,2.94,0]]},
  crematorium:{lampIntensity:2,name:"Stillwater Crematorium",model:"interior-crematorium",span:7,leftWall:-5,backWall:-5,lamps:[[-2,2.94,0],[2,2.94,0]]},
  mortuary:{lampIntensity:2,name:"Bellwether Mortuary",model:"interior-mortuary",span:7,leftWall:-5,backWall:-5,lamps:[[-2,2.94,0],[2,2.94,0]]},

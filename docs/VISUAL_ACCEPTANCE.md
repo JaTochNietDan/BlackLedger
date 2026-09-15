@@ -30,7 +30,6 @@ are separate and do not establish completion of each venue's general interior.
 | Missing authored public room | Address ID |
 | --- | --- |
 | The Monarch | `club` |
-| The Blue Hour | `casino` |
 | Kerrigan Haulage | `haulage` |
 | The Golden Lily | `goldenlily` |
 | Ordway Steam Laundry | `steamworks` |
@@ -41,7 +40,7 @@ are separate and do not establish completion of each venue's general interior.
 | Kessler's Filling Station | `filling` |
 | The Viaduct Pumps | `pumps` |
 
-Next room-production groups: casino/club floors (Monarch, Blue Hour, Golden Lily,
+Next room-production groups: casino/club floors (Monarch, Golden Lily,
 Paper Moon), industrial premises (haulage and steam laundry), then vehicle
 businesses (dealer, repair garage, salvage and filling stations). Reusing props
 is appropriate; a generic borrowed room does not prove an address's fixtures,
@@ -52,3 +51,15 @@ normal/compact windows, wall cutaways, actual public occupants, seated/standing
 clearance, selectable actions, arrival paths and relevant indoor incidents.
 Existing22 rooms still require broader fidelity/incident review. The current
 poker desktop review and automated GLB tests are narrower evidence.
+
+### Blue Hour room increment
+
+The casino now adds an authored public room: current coverage is23/33 public
+addresses, with10 remaining in the table above. Its original Blender source
+exports midnight-blue walls, gaming tables, slots, cashier cage and lounge
+seats. Browser review on isolated fixture8998 at1235×1053 shows the full room,
+six actual occupants, clear header and hover-menu controls. Automated tests
+verify both character rigs, all12 placement slots, seat support, collision
+clearance and40 entrance-path samples against exported geometry. Build passes.
+Compact windows, room cutaway interaction and casino incident choreography
+remain to be reviewed; this is not full visual acceptance.

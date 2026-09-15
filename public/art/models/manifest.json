@@ -1270,5 +1270,21 @@
       ]
     ],
     "bytes": 507760
+  },
+  "interior-blue-hour": {
+    "file": "interior-blue-hour.glb",
+    "bounds_blender": [
+      [
+        -6.08,
+        -6.0,
+        -0.2
+      ],
+      [
+        6.0,
+        6.08,
+        4.2
+      ]
+    ],
+    "bytes": 1353624
   }
 }

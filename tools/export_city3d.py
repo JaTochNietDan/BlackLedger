@@ -2554,6 +2554,20 @@ if __name__ == '__main__' and '--only=memorial-interiors' in __import__('sys').a
     raise SystemExit(0)
 
 
+def blue_hour_interior():
+    from blue_hour_interior import build
+    build(box,cylinder,material)
+
+
+if __name__ == '__main__' and '--only=interior-blue-hour' in __import__('sys').argv:
+    clear();blue_hour_interior()
+    manifest_path=os.path.join(OUT,'manifest.json')
+    with open(manifest_path) as f: selected_manifest=json.load(f)
+    selected_manifest['interior-blue-hour']=export('interior-blue-hour')
+    with open(manifest_path,'w') as f:json.dump(selected_manifest,f,indent=2)
+    raise SystemExit(0)
+
+
 def mortuary_interior():
     from mortuary_interior import build
     build(box,cylinder,material)
@@ -2822,6 +2836,7 @@ clear();tailor_interior();manifest['interior-tailor']=export('interior-tailor')
 clear();cabstand_interior();manifest['interior-cabstand']=export('interior-cabstand')
 clear();docks_interior();manifest['interior-docks']=export('interior-docks')
 clear();chapel_interior();manifest['interior-chapel']=export('interior-chapel')
+clear();blue_hour_interior();manifest['interior-blue-hour']=export('interior-blue-hour')
 clear();mortuary_interior();manifest['interior-mortuary']=export('interior-mortuary')
 for kind in ('cemetery','crematorium'):
     clear();memorial_interior(kind);manifest['interior-'+kind]=export('interior-'+kind)

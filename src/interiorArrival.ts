@@ -16,7 +16,7 @@ export class InteriorArrival {
  private readonly shoeBox=new THREE.Box3();
  constructor(private actor:THREE.Group,private place:InteriorPlace){
   this.end=interiorPlayerSpot(place);
-  this.start=place==='docks'?new THREE.Vector3(0,.03,5.6):place==='poolhall'?new THREE.Vector3(0,.03,8.5):place==='pawn'?new THREE.Vector3(0,.03,4.15):place==='lodging'?new THREE.Vector3(-2.45,.03,2.45):place==='garage'?new THREE.Vector3(-3,.03,5.02):place==='butcher'?new THREE.Vector3(2.7,.03,4.12):place==='flat'?new THREE.Vector3(0,.03,3.3):place==='estate'?new THREE.Vector3(0,.03,4.3):place==='bar'?new THREE.Vector3(5.25,.03,-.7):(place==='room'||place==='laundry')?new THREE.Vector3(0,.03,3.6):new THREE.Vector3(0,.03,4.6);
+  this.start=place==='docks'?new THREE.Vector3(0,.03,5.6):place==='casino'?new THREE.Vector3(0,.03,5.8):place==='poolhall'?new THREE.Vector3(0,.03,8.5):place==='pawn'?new THREE.Vector3(0,.03,4.15):place==='lodging'?new THREE.Vector3(-2.45,.03,2.45):place==='garage'?new THREE.Vector3(-3,.03,5.02):place==='butcher'?new THREE.Vector3(2.7,.03,4.12):place==='flat'?new THREE.Vector3(0,.03,3.3):place==='estate'?new THREE.Vector3(0,.03,4.3):place==='bar'?new THREE.Vector3(5.25,.03,-.7):(place==='room'||place==='laundry')?new THREE.Vector3(0,.03,3.6):new THREE.Vector3(0,.03,4.6);
   this.distance=Math.hypot(this.end.x-this.start.x,this.end.z-this.start.z);
   this.duration=this.distance/1.15+.4;
   this.heading=Math.atan2(this.end.x-this.start.x,this.end.z-this.start.z);

@@ -3608,3 +3608,22 @@ variants. Exact missing address inventory and per-room completion requirements
 are now in docs/VISUAL_ACCEPTANCE.md. This is a scope audit, not visual approval
 of the22 existing rooms; it prevents3D gambling-table views being mistaken for
 complete venue interiors. Broader goal remains active.
+
+
+### Blue Hour authored interior and completed guard integration
+
+Added original Blender casino room source and reproducible single/full exports,
+registered the GLB, staged cashier/slot/table/lounge occupants deterministically,
+and routed entrance movement through a tested clear lane. Added isolated
+casino-interior QA fixture. Browser8998 at1235×1053 shows the full room with six
+actual occupants and unobscured controls. Geometry tests cover both rigs, all12
+placements, seat support and40 entrance samples; PASS1 test in2.697s,
+`.runtime/blue-hour-placement-tests.log`. Frontend build PASS2.59s in
+`.runtime/blue-hour-final-build.log`. Original asset provenance is the checked-in
+Blender code. Compact and incident review remain outstanding.
+
+Full clean bf4dd93 guard integration session16200 is now terminal PASS: all Go
+packages, core530.209s and sim499.772s. Final output is in
+`.runtime/guard-integration-full.log`; do not restart or poll this completed run.
+It predates the separately passing same-version HQ store fix and this room.
+No main campaign QA writes or live release in this increment. Broad goal active.
