@@ -3537,3 +3537,28 @@ Clean full integration started atbf4dd93 in`.runtime/check-guard-integration`,
 `GOMAXPROCS=4 go test -p 2 ./... -count=1 -timeout 25m`, session16200,
 log`.runtime/guard-integration-full.log`. Poll this handle before restarting.
 Prior clean full session22511 and frontend37161 are terminal PASS; do not poll them.
+
+
+### Campaign-copy release preparation found same-version HQ migration gap
+
+Previous turn progressed with shared guard availability. Main8791 health still
+reports clean4daa6c8. Created isolated SQLite backup
+`.runtime/guard-release-campaign-copy.sqlite3`; baseline manifest records raw
+state SHAa12b3718954540bb3cec26d7ad952c9c1ebacf876194939c46350b184e5ed0d4,
+2184 receipts, revision2182, minute163810, life11, version19. Clean bf4dd93
+candidate8996/session54324 built in`.runtime/check-guard-integration` (frontend
+`.runtime/guard-release-build.log`3.04s). Startup added mortuary/cemetery/crematorium
+properties and empty crew_orders/death_service_receipts; all other top-level
+state, including player/time/revision, and ordered receipt bytes were unchanged.
+The raw-state checksum therefore changed as expected; no live mutation occurred.
+
+Candidate public state exposed an existing family with blank headquarters:
+SettleHeadquarters was gated behind a save-version migration even though current
+version19 saves predate the feature. Store decode now settles missing bases
+regardless of version. Full store tests pass0.401s in
+`.runtime/headquarters-upgrade-store-tests.log`; new cases cover missing base,
+read-only DB behavior, explicit choice/lost deed preservation and no automatic
+formation of independent property owners. Candidate8996 predates this fix.
+Clean Go integration16200 remains running on bf4dd93; do not restart it, and do
+not treat its result as covering this later store fix. Live promotion remains
+pending; the broad goal and missing gameplay/visual acceptance remain active.

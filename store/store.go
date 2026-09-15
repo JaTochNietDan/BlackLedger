@@ -83,6 +83,9 @@ func decode(data string) (*core.World, error) {
 		w.MigrateLivingWorld()
 		w.Version = core.SaveVersion
 	}
+	if e == nil {
+		w.SettleHeadquarters()
+	}
 	return &w, e
 }
 func (s *Store) Read() (*core.World, error) {

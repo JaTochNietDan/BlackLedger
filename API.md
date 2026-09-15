@@ -1472,3 +1472,8 @@ Hired associates use their paid loyalty for guard reliability and remain persona
 employed rather than becoming family members. Their orders end on employer death;
 sworn members retain the existing succession rules. Same-address dispatch and
 report-back keep a one-minute processing stage without creating a street journey.
+
+Existing families with missing headquarters are settled on every successful save
+decode, including saves already at the current version. Explicit player choices
+(including a lost deed awaiting replacement) are preserved. Decode does not
+incorporate independent proprietors or advance simulation time.
