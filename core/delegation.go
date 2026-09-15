@@ -51,6 +51,11 @@ func (w *World) CrewHands() (Hand, bool) {
 
 // DelegateReadiness explains why nobody can be sent, or returns "".
 func (w *World) DelegateReadiness() string {
+	for _, o := range w.CrewOrders {
+		if o.Kind == "collections" && o.active() {
+			return "The headquarters collection round must finish first"
+		}
+	}
 	if len(w.Player.Crew) == 0 {
 		return "You have nobody to send"
 	}

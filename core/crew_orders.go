@@ -77,6 +77,8 @@ func (w *World) CrewOrderReadiness(kind, actor, target string) string {
 		}
 	}
 	switch kind {
+	case "collections":
+		return w.crewCollectionTarget(target, "")
 	case "guard":
 		return w.crewGuardTarget(target, "")
 	case "repair", "remedy":
@@ -331,12 +333,19 @@ func (w *World) SettleCrewOrders() {
 					continue
 				}
 			}
+			if o.Kind == "collections" && w.crewCollectionTarget(o.Target, o.ID) != "" {
+				w.returnCrewOrder(o, "The collection round is no longer available")
+				continue
+			}
 			if o.Kind == "guard" && w.crewGuardTarget(o.Target, "") != "" {
 				w.returnCrewOrder(o, "The guard post is no longer available")
 				continue
 			}
 			o.Stage = "working"
 			o.Due = w.Minute + 30
+			if o.Kind == "collections" {
+				o.Due = w.Minute + CollectionMinutes
+			}
 			if o.Kind == "assassinate" {
 				o.Due = w.Minute + StrikeMinutes
 			}
@@ -356,6 +365,11 @@ func (w *World) SettleCrewOrders() {
 			result := "The target is no longer available"
 			if n.Location == o.Place && !w.Travelling(n) {
 				switch o.Kind {
+				case "collections":
+					if w.crewCollectionTarget(o.Target, o.ID) == "" {
+						o.Loot += CollectionPay
+						result = fmt.Sprintf("Collection round finished; $%d carried back", CollectionPay)
+					}
 				case "guard":
 					if w.crewGuardTarget(o.Target, "") == "" {
 						w.Properties[o.Target].Posted = o.Actor
@@ -507,6 +521,7 @@ func (w *World) CrewOrderOffers() []CrewOrderOffer {
 		for _, l := range Locations {
 			if p := w.Properties[l.ID]; p != nil && w.Own(l.ID) {
 				if p.Income > 0 {
+					offer("collections", l.ID, l.ID, fmt.Sprintf("Collections at %s · $%d on return", l.Name, CollectionPay), 0, CollectionMinutes)
 					offer("guard", l.ID, l.ID, "Guard "+l.Name, 0, PostingMinutes)
 				}
 				offer("repair", l.ID, l.ID, "Repair "+l.Name, RepairCost, PropertyWorkMinutes)
@@ -586,6 +601,27 @@ func (w *World) crewGuardTarget(id, actor string) string {
 	}
 	if n := w.PostedAt(id); n != nil && n.ID != actor {
 		return n.Name + " is already on the door"
+	}
+	return ""
+}
+
+// Collections retain the established two-hour round's modeled fee. This is
+// supplemental work, not a second withdrawal of automatic business income.
+func (w *World) crewCollectionTarget(id, order string) string {
+	p := w.Properties[id]
+	if p == nil || !w.Own(id) || p.Income <= 0 {
+		return "Choose a business your family owns"
+	}
+	if p.Condition <= 0 || p.Trouble {
+		return "Restore the business before sending a collection round"
+	}
+	if len(w.Tasks) > 0 {
+		return "An existing collection round must finish first"
+	}
+	for _, o := range w.CrewOrders {
+		if o.ID != order && o.Kind == "collections" && o.Target == id && o.active() {
+			return "Someone is already handling this collection round"
+		}
 	}
 	return ""
 }

@@ -1484,3 +1484,14 @@ forfeits unused reserved cash as well as loot and charges. Cancellation clears
 these balances once, including after reload; a living operative returning from
 a recalled or invalidated job still returns unused budget under the existing
 issuer/succession rules. No request or save field changes.
+
+
+`crew_order:collections` dispatches the named `choice` operative to an owned,
+non-ruined, trouble-free business in `target`. It retains the established
+CollectionMinutes (120) and modeled CollectionPay (65) supplemental round,
+separate from automatic business income. Quotes include travel; proceeds use
+saved order `loot` and settle only on return. Arrival and completion recheck
+the deed/condition/trouble. Each address permits one outstanding round; legacy
+collections and headquarters rounds cannot overlap. Recall before completion
+pays nothing; death/capture forfeits carried proceeds. Existing succession and
+request-idempotency rules apply. No new request or save fields.

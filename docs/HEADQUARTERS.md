@@ -27,7 +27,7 @@ shows a known family's base; personal homes are not exposed by this field.
 ## Current operations implementation
 
 Saved named orders cover restocking, robbery, assassination, bombing, repairs,
-business remedies and persistent guarding. They support outbound/work/return
+business remedies, collections and persistent guarding. They support outbound/work/return
 stages, concurrent operatives, reserved resources, recall, arrival/commit
 validation and HTTP retry coverage. The headquarters Business panel and Families
 page contain the selector and order register. Each operation uses shared gameplay

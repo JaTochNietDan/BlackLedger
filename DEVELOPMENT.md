@@ -3641,3 +3641,27 @@ missing actors, with reloads before and after cancellation to check exact-once
 settlement. Targeted crew/succession tests PASS0.441s, session69063 terminal,
 `.runtime/crew-custody-budget-tests.log`. Updated the current headquarters
 implementation summary; remaining command coverage is still explicit.
+
+
+### Named headquarters collection rounds
+
+Previous goal turn made authoritative progress with the Blue Hour room and
+budget-custody fix. Added collections to saved named headquarters orders and
+its UI selector. Each owned usable business supports one outstanding round;
+legacy task rounds cannot overlap headquarters collections. Work retains the
+existing120-minute/$65 supplemental activity, adds real outbound/return travel,
+and keeps payment in order loot until the operative returns. This is modeled
+work revenue, not another withdrawal of already-paid business income. Rechecks
+at arrival/completion cover ownership, destruction and trouble. Recall before
+completion earns nothing; carrier loss forfeits proceeds through shared custody.
+
+Tests cover actual Execute with a signed member other than the first associate,
+public quotes, legacy/duplicate exclusion, reload before work/return, exact-once
+payment, recall, changed deed, ruin, trouble and death/capture after earning.
+Targeted core crew/collection/succession tests PASS0.428s (25118 terminal),
+`.runtime/crew-collections-tests.log`. Final frontend build PASS2.57s (98875
+terminal), `.runtime/crew-collections-build.log`; git diff check passes.
+Browser acceptance of this selector addition and full clean integration remain
+pending. No main save writes or local release. Broader goal remains active;
+legacy standalone collections still exist for pre-family progression and need
+further lifecycle consolidation, while additional practical adapters remain.
