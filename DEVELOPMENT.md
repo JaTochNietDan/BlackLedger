@@ -3719,3 +3719,25 @@ rear-corner framing. No outside substitution or load error. This is bounded
 casino revolver playback evidence, not all-venue or all-variant visual approval.
 Clean Go integration17026 remains RUNNING, freshly polled; do not restart.
 Broad goal, remaining room production and other job adapters remain active.
+
+
+### Owned apartment accounts at the front of Market
+
+Previous turn improved casino attack staging and verified collected proceeds.
+Reviewed actual RentalMoveDay: daily rotation of households checks affordability,
+upgrades/downsizes, vacancies, condition>=60 and no trouble without transferring
+deeds or displacing tenants. Occupancy is conditional, not guaranteed. Added a
+prominent ownership overview before broker listings: grouped by building with
+owned/tenanted/vacant counts, scheduled rent, today's actual collections, current
+tenant arrears and broker offers. Links filter the existing deed register and
+inspect the address. Existing public projection supplies all values; no API or
+simulation changes. Added apartment-portfolio fixture with six owned units and
+explicit synthetic rent-account values for visual QA.
+
+Build7362 terminal PASS5.64s, `.runtime/apartment-portfolio-build.log`. Fresh
+fixture30542 terminal PASS. Server9002/session22719 serves clean c36e51a backend
+and root frontend against `.runtime/apartment-portfolio-qa.sqlite3`. Browser116
+at1235×1053 shows two clear account cards,6 deeds/2 vacancies/$12 collected/$36
+arrears, matching fixture accounts. This is layout evidence, not a live-campaign
+rent report. Main save untouched. Full clean Go test17026 last poll still live;
+do not restart. More housing-management controls and broad goal remain open.

@@ -12,14 +12,14 @@ import (
 
 func main() {
 	if len(os.Args) < 2 || len(os.Args) > 3 {
-		log.Fatal("usage: go run ./cmd/qa-fixture <new-qa.sqlite3> [casino-strike|casino-interior|crew-orders|headquarters|cemetery-interior|crematorium-interior|mortuary-interior|cabstand-interior|docks-interior|chapel-interior|herald-interior|poolhall-interior|tailor-interior|pawn-interior|riverside-interior|precinct-interior|exchange-interior|estate-search|restaurant-interior|household-work-owner|household-work|burglary-search|lodging-strike|estate-strike|home-strike|garage-interior|butcher|ashbury|cypress|burglary|apartments|poker|building-driveby|city3d-dusk|fatal-charge-car|survivor-charge|fatal-charge|faction-planter|strike-unarmed|strike-revolver|strike-shotgun|strike-thompson|raid-presence|city3d-rain|gunfight-killing|gunfight|city3d-walk|city3d-junction|city3d-traffic|city3d|city3d-night|city3d-blast|police|damage|warning|russo-warning|attack|voice|contact|paused-job|leader|doorman|arrest|debt|herald|killing|dead|offer|audience|street|room|gone|post|round|bereaved|inside|writeoff|writeoff-dead|worn|tables|bench|petrol]")
+		log.Fatal("usage: go run ./cmd/qa-fixture <new-qa.sqlite3> [apartment-portfolio|casino-strike|casino-interior|crew-orders|headquarters|cemetery-interior|crematorium-interior|mortuary-interior|cabstand-interior|docks-interior|chapel-interior|herald-interior|poolhall-interior|tailor-interior|pawn-interior|riverside-interior|precinct-interior|exchange-interior|estate-search|restaurant-interior|household-work-owner|household-work|burglary-search|lodging-strike|estate-strike|home-strike|garage-interior|butcher|ashbury|cypress|burglary|apartments|poker|building-driveby|city3d-dusk|fatal-charge-car|survivor-charge|fatal-charge|faction-planter|strike-unarmed|strike-revolver|strike-shotgun|strike-thompson|raid-presence|city3d-rain|gunfight-killing|gunfight|city3d-walk|city3d-junction|city3d-traffic|city3d|city3d-night|city3d-blast|police|damage|warning|russo-warning|attack|voice|contact|paused-job|leader|doorman|arrest|debt|herald|killing|dead|offer|audience|street|room|gone|post|round|bereaved|inside|writeoff|writeoff-dead|worn|tables|bench|petrol]")
 	}
 	scenario := "police"
 	if len(os.Args) == 3 {
 		scenario = os.Args[2]
 	}
 	weaponTier, weaponFixture := map[string]int{"casino-strike": 1, "strike-unarmed": 0, "strike-revolver": 1, "strike-shotgun": 2, "strike-thompson": 3}[scenario]
-	if !weaponFixture && scenario != "casino-interior" && scenario != "crew-orders" && scenario != "headquarters" && scenario != "cemetery-interior" && scenario != "crematorium-interior" && scenario != "mortuary-interior" && scenario != "cabstand-interior" && scenario != "docks-interior" && scenario != "chapel-interior" && scenario != "herald-interior" && scenario != "poolhall-interior" && scenario != "tailor-interior" && scenario != "pawn-interior" && scenario != "riverside-interior" && scenario != "precinct-interior" && scenario != "exchange-interior" && scenario != "estate-search" && scenario != "restaurant-interior" && scenario != "household-work-owner" && scenario != "household-work" && scenario != "burglary-search" && scenario != "lodging-strike" && scenario != "estate-strike" && scenario != "home-strike" && scenario != "garage-interior" && scenario != "butcher" && scenario != "ashbury" && scenario != "cypress" && scenario != "burglary" && scenario != "apartments" && scenario != "poker" && scenario != "building-driveby" && scenario != "city3d-dusk" && scenario != "fatal-charge-car" && scenario != "survivor-charge" && scenario != "fatal-charge" && scenario != "faction-planter" && scenario != "raid-presence" && scenario != "city3d-rain" && scenario != "gunfight-killing" && scenario != "gunfight" && scenario != "city3d-walk" && scenario != "city3d-junction" && scenario != "city3d-traffic" && scenario != "city3d-blast" && scenario != "city3d" && scenario != "city3d-night" && scenario != "police" && scenario != "damage" && scenario != "warning" && scenario != "russo-warning" && scenario != "attack" && scenario != "voice" && scenario != "contact" && scenario != "paused-job" && scenario != "leader" && scenario != "doorman" && scenario != "arrest" && scenario != "debt" && scenario != "herald" && scenario != "killing" && scenario != "dead" && scenario != "offer" && scenario != "audience" && scenario != "street" && scenario != "room" && scenario != "gone" && scenario != "post" && scenario != "round" && scenario != "bereaved" && scenario != "inside" && scenario != "writeoff" && scenario != "writeoff-dead" && scenario != "worn" && scenario != "tables" && scenario != "bench" && scenario != "petrol" {
+	if !weaponFixture && scenario != "apartment-portfolio" && scenario != "casino-interior" && scenario != "crew-orders" && scenario != "headquarters" && scenario != "cemetery-interior" && scenario != "crematorium-interior" && scenario != "mortuary-interior" && scenario != "cabstand-interior" && scenario != "docks-interior" && scenario != "chapel-interior" && scenario != "herald-interior" && scenario != "poolhall-interior" && scenario != "tailor-interior" && scenario != "pawn-interior" && scenario != "riverside-interior" && scenario != "precinct-interior" && scenario != "exchange-interior" && scenario != "estate-search" && scenario != "restaurant-interior" && scenario != "household-work-owner" && scenario != "household-work" && scenario != "burglary-search" && scenario != "lodging-strike" && scenario != "estate-strike" && scenario != "home-strike" && scenario != "garage-interior" && scenario != "butcher" && scenario != "ashbury" && scenario != "cypress" && scenario != "burglary" && scenario != "apartments" && scenario != "poker" && scenario != "building-driveby" && scenario != "city3d-dusk" && scenario != "fatal-charge-car" && scenario != "survivor-charge" && scenario != "fatal-charge" && scenario != "faction-planter" && scenario != "raid-presence" && scenario != "city3d-rain" && scenario != "gunfight-killing" && scenario != "gunfight" && scenario != "city3d-walk" && scenario != "city3d-junction" && scenario != "city3d-traffic" && scenario != "city3d-blast" && scenario != "city3d" && scenario != "city3d-night" && scenario != "police" && scenario != "damage" && scenario != "warning" && scenario != "russo-warning" && scenario != "attack" && scenario != "voice" && scenario != "contact" && scenario != "paused-job" && scenario != "leader" && scenario != "doorman" && scenario != "arrest" && scenario != "debt" && scenario != "herald" && scenario != "killing" && scenario != "dead" && scenario != "offer" && scenario != "audience" && scenario != "street" && scenario != "room" && scenario != "gone" && scenario != "post" && scenario != "round" && scenario != "bereaved" && scenario != "inside" && scenario != "writeoff" && scenario != "writeoff-dead" && scenario != "worn" && scenario != "tables" && scenario != "bench" && scenario != "petrol" {
 		log.Fatal("unsupported QA scenario")
 	}
 	path := os.Args[1]
@@ -480,7 +480,7 @@ func main() {
 			}
 			return nil
 		}
-		if scenario == "apartments" || scenario == "ashbury" {
+		if scenario == "apartment-portfolio" || scenario == "apartments" || scenario == "ashbury" {
 			w.Player.Cash, w.Player.Respect = 6000, 30
 			w.Player.Home, w.Player.Location = "mercercourt", "mercercourt"
 			w.District = 2
@@ -494,6 +494,32 @@ func main() {
 				}
 			}
 			w.SettleApartments()
+			if scenario == "apartment-portfolio" {
+				counts := map[string]int{}
+				for i := range w.Apartments {
+					u := &w.Apartments[i]
+					if u.Building != "mercercourt" && u.Building != "apartment" {
+						continue
+					}
+					key := u.Building + ":occupied"
+					limit := 2
+					if u.Resident == "" {
+						key, limit = u.Building+":vacant", 1
+					}
+					if counts[key] >= limit {
+						continue
+					}
+					counts[key]++
+					u.Owner = fmt.Sprintf("player:%d", w.Life)
+					if n := w.NPC(u.Resident); n != nil {
+						p := w.Properties[u.Building]
+						if p.Rents == nil {
+							p.Rents = map[string]*core.RentAccount{}
+						}
+						p.Rents[n.ID] = &core.RentAccount{Day: w.Minute/1440 + 1, Due: w.NPCRent(n), Paid: 3, Arrears: 9, Collected: 3}
+					}
+				}
+			}
 			return nil
 		}
 		if scenario == "poker" {

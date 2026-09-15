@@ -1,0 +1,12 @@
+.apartment-portfolio{margin:20px 0 28px;padding:20px;border:1px solid #a18b65;background:#e5d5b5;color:#392f20}
+.apartment-portfolio h2{font:26px Georgia,serif;margin:6px 0 12px}
+.portfolio-buildings{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:14px}
+.portfolio-buildings article{padding:16px;border:1px solid #b39b71;background:#efe1c4}
+.portfolio-buildings h3{font:20px Georgia,serif;margin:0 0 8px}
+.portfolio-buildings p,.portfolio-note{font-size:12px;line-height:1.6}
+.portfolio-buildings dl{margin:14px 0;font-size:12px}
+.portfolio-buildings dl div{display:flex;justify-content:space-between;gap:16px;padding:7px 0;border-top:1px solid #c5b18e}
+.portfolio-buildings dd{margin:0;font-weight:700;white-space:nowrap;font-variant-numeric:tabular-nums}
+.portfolio-buildings a{display:inline-block;color:#3e513b;font:600 12px Georgia,serif;padding:8px 0;margin-right:16px;text-underline-offset:3px}
+.portfolio-buildings :focus-visible{outline:2px solid #754020;outline-offset:3px}
+#apartment-register{scroll-margin-top:20px}

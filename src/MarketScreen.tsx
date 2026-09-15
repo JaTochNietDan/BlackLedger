@@ -1,5 +1,6 @@
 import {useState} from 'react';
 import type {Snapshot} from './types';
+import './apartmentPortfolio.css';
 
 // The underground market was a block inside the ledger.
 //
@@ -37,6 +38,21 @@ export function MarketScreen({world,onFind}: {world: Snapshot;onFind?:(id:string
     <section className="section-content">
       <div className="eyebrow">PRICES &amp; WHAT YOU ARE HOLDING</div>
       <h1 className="screen-title">Market notices</h1>
+      {!!ownedUnits.length && <section className="apartment-portfolio" aria-label="Your real estate portfolio">
+        <div className="eyebrow">YOUR REAL ESTATE</div><h2>Apartment accounts</h2>
+        <p>{ownedUnits.length} deeds · {ownedUnits.filter(u=>u.vacant).length} vacant · {money(ownedUnits.reduce((sum,u)=>sum+(u.rent_paid_today||0),0))} collected today · {money(ownedUnits.reduce((sum,u)=>sum+(u.rent_arrears||0),0))} in current tenant arrears</p>
+        <div className="portfolio-buildings">{[...new Set(ownedUnits.map(u=>u.building))].map(building=>{
+          const homes=ownedUnits.filter(u=>u.building===building),vacant=homes.filter(u=>u.vacant).length,ownHome=homes.filter(u=>u.home).length;
+          return <article key={building}>
+            <h3>{homes[0].address}</h3>
+            <p>{homes.length} owned · {homes.length-vacant-ownHome} tenanted · {vacant} vacant{ownHome?' · Your home':''}</p>
+            <dl><div><dt>Scheduled daily rent</dt><dd>{money(homes.reduce((sum,u)=>sum+(u.home?0:u.daily_rent),0))}</dd></div><div><dt>Collected today</dt><dd>{money(homes.reduce((sum,u)=>sum+(u.rent_paid_today||0),0))}</dd></div><div><dt>Current tenant arrears</dt><dd>{money(homes.reduce((sum,u)=>sum+(u.rent_arrears||0),0))}</dd></div><div><dt>Broker offers</dt><dd>{money(homes.reduce((sum,u)=>sum+u.offer,0))}</dd></div></dl>
+            <a href="#apartment-register" onClick={()=>{setApartmentFilter('owned');setApartmentQuery(homes[0].address);}}>View these deeds ↓</a>
+            {onFind&&<button className="plain" disabled={homes.every(u=>u.locked)} onClick={()=>onFind(building)}>Inspect building ↗</button>}
+          </article>;
+        })}</div>
+        <p className="portfolio-note">Scheduled rent is not guaranteed income. Collections depend on residents’ cash. Vacancies earn nothing; households consider affordable moves daily. Repairs and resolving building trouble help keep flats eligible for new tenants.</p>
+      </section>}
       {!!world.property_market?.length && <section className="property-exchange" aria-label="Property exchange">
         <h2>Property exchange</h2>
         <p>Deeds and standing broker offers. Visit an address to inspect the terms and complete a purchase or sale.</p>
@@ -50,7 +66,7 @@ export function MarketScreen({world,onFind}: {world: Snapshot;onFind?:(id:string
           {onFind && <button className="plain" disabled={property.locked} onClick={()=>onFind(property.id)}>{property.locked?'District not yet accessible':'Inspect the address ↗'}</button>}
         </article>)}</div>
       </section>}
-      {!!world.apartment_market?.length && <section className="property-exchange" aria-label="Apartment exchange">
+      {!!world.apartment_market?.length && <section id="apartment-register" className="property-exchange" aria-label="Apartment exchange">
         <h2>Apartment ownership &amp; exchange</h2><p>Buy your home or a rental investment. Existing tenants stay; rent comes from their available cash. Vacant flats earn nothing until occupied. The broker lists a few homes at a time, with new listings as they sell.</p>
         <p className="apartment-holdings"><b>{ownedUnits.length} apartment {ownedUnits.length===1?'deed':'deeds'} held</b> · {money(ownedUnits.reduce((sum,u)=>sum+u.offer,0))} in current broker offers · {money(ownedUnits.reduce((sum,u)=>sum+(u.home?0:u.daily_rent),0))} scheduled rent per day. Actual collections depend on tenants’ cash.</p>
         <p><button onClick={()=>setApartmentFilter('owned')}>Manage your apartments</button> <button onClick={()=>setApartmentFilter('vacant')}>Vacancies · {ownedUnits.filter(u=>u.vacant).length}</button></p><p>Households review vacant rentals daily as their means change. A suitable tenant must be able to afford the move; occupancy is not guaranteed.</p><div className="apartment-filters">
