@@ -284,13 +284,18 @@ func (w *World) ApartmentMarket() []map[string]any {
 			resident = n.Name
 			rent = w.NPCRent(n)
 		}
-		paid, arrears := 0, 0
+		var paid any = 0
+		arrears := 0
 		if owned && u.Resident != "" {
 			if prop := w.Properties[u.Building]; prop != nil {
 				if account := prop.Rents[u.Resident]; account != nil {
 					arrears = account.Arrears
 					if account.Day == w.Minute/1440+1 {
-						paid = account.Paid
+						if account.PaidTo == owner {
+							paid = account.Paid
+						} else if account.PaidTo == "" && account.Paid > 0 {
+							paid = nil // Older records cannot identify the recipient.
+						}
 					}
 				}
 			}

@@ -51,7 +51,7 @@ export function MarketScreen({world,onFind}: {world: Snapshot;onFind?:(id:string
             {onFind&&<button className="plain" disabled={homes.every(u=>u.locked)} onClick={()=>onFind(building)}>Inspect building ↗</button>}
           </article>;
         })}</div>
-        <p className="portfolio-note">Scheduled rent is not guaranteed income. Collections depend on residents’ cash. Vacancies earn nothing; households consider affordable moves daily. Repairs and resolving building trouble help keep flats eligible for new tenants.</p>
+        <p className="portfolio-note">Older payments without a recorded recipient are excluded from collected totals. Scheduled rent is not guaranteed income. Collections depend on residents’ cash. Vacancies earn nothing; households consider affordable moves daily. Repairs and resolving building trouble help keep flats eligible for new tenants.</p>
       </section>}
       {!!world.property_market?.length && <section className="property-exchange" aria-label="Property exchange">
         <h2>Property exchange</h2>
@@ -81,7 +81,7 @@ export function MarketScreen({world,onFind}: {world: Snapshot;onFind?:(id:string
           {unit.neighborhood_index!==undefined&&<p>{unit.neighborhood_index<100?`Neighborhood prices ${100-unit.neighborhood_index}% below normal after local violence. Quiet days help prices recover.`:'Neighborhood prices are at their normal level.'}</p>}
           <p>{unit.owned?'Your deed':`Owned by ${unit.owner}`} · {unit.home?'Your current home':unit.resident}</p>
           {(unit.owned || unit.available) && <p>{unit.home?(unit.owned?'No rent to pay':'Buying ends your rent'):unit.daily_rent>0?`${money(unit.daily_rent)} daily rent, collected from the resident’s available cash`:'No tenant income'}</p>}
-          {unit.owned&&<p>Collected today: {money(unit.rent_paid_today??0)} · Current tenant arrears: {money(unit.rent_arrears??0)}</p>}
+          {unit.owned&&<p>Collected today: {unit.rent_paid_today===null?'Recipient not recorded':money(unit.rent_paid_today??0)} · Current tenant arrears: {money(unit.rent_arrears??0)}</p>}
           {onFind && <button className="plain" disabled={unit.locked} onClick={()=>onFind(unit.building)}>{unit.locked?'District not yet accessible':'Inspect the address ↗'}</button>}
         </article>)}</div>
       </section>}

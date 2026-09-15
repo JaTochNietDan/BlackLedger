@@ -3741,3 +3741,26 @@ at1235×1053 shows two clear account cards,6 deeds/2 vacancies/$12 collected/$36
 arrears, matching fixture accounts. This is layout evidence, not a live-campaign
 rent report. Main save untouched. Full clean Go test17026 last poll still live;
 do not restart. More housing-management controls and broad goal remain open.
+
+
+### Rent recipient attribution after purchasing an occupied flat
+
+Previous turn added and visually verified the grouped ownership overview.
+Found that rent_paid_today used the tenant account without checking who received
+it, so a newly purchased flat could claim the former landlord's payment. Rent
+accounts now retain paid_to; public totals count only actual player receipts.
+Current-day legacy positive receipts without recipient identity return null and
+individual rows explain the missing attribution. Unknown values are excluded
+from totals. No retroactive money transfer or inferred previous ownership.
+Updated synthetic portfolio fixture to name its receipt recipient.
+
+Tests exercise old-owner collection, actual BuyApartment, reload, next-day
+payment and missing legacy recipient. Targeted rent/move/investment tests
+PASS0.270s; build PASS7.67s, session43564 terminal. Logs
+`.runtime/rent-recipient-tests.log` and `.runtime/rent-recipient-build.log`.
+Clean checkout `.runtime/check-portfolio-1cba625` build54155 terminal PASS;
+full frontend86445 remains RUNNING (freshly polled), log in that checkout's
+`.runtime/frontend-tests.log`. It predates this accounting correction. Clean
+c36e51a full Go17026 remains RUNNING at last poll. Do not restart these handles.
+Prior portfolio browser116 was no longer available when revisited; no browser
+navigation acceptance claimed this turn. No live release or main save writes.

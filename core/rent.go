@@ -5,11 +5,12 @@ import "math"
 // RentAccount belongs to the premises, including any outstanding tenant debt.
 // A transfer of the premises transfers these receivables; a visit does not.
 type RentAccount struct {
-	Day       int `json:"day"`
-	Due       int `json:"due"`
-	Paid      int `json:"paid"`
-	Arrears   int `json:"arrears"`
-	Collected int `json:"collected"`
+	PaidTo    string `json:"paid_to,omitempty"`
+	Day       int    `json:"day"`
+	Due       int    `json:"due"`
+	Paid      int    `json:"paid"`
+	Arrears   int    `json:"arrears"`
+	Collected int    `json:"collected"`
 }
 
 // The former $12 allowance included $8 lodging and $4 other necessities.
@@ -85,14 +86,17 @@ func (w *World) collectRent(n *NPC) {
 	account.Arrears -= account.Paid
 	account.Collected += account.Paid
 	if u := w.apartmentForResident(n.ID); u != nil && u.Building == n.Home {
+		account.PaidTo = u.Owner
 		if u.Owner == w.playerDeedID() {
 			w.Earn(account.Paid)
 		} else if owner := w.NPC(u.Owner); owner != nil && !owner.Dead {
 			owner.Purse += account.Paid
 		}
 	} else if w.Own(n.Home) {
+		account.PaidTo = w.playerDeedID()
 		w.Earn(account.Paid)
 	} else {
+		account.PaidTo = p.Owner
 		w.changeBusinessFunds(n.Home, account.Paid)
 	}
 }

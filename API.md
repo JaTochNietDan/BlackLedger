@@ -1495,3 +1495,12 @@ the deed/condition/trouble. Each address permits one outstanding round; legacy
 collections and headquarters rounds cannot overlap. Recall before completion
 pays nothing; death/capture forfeits carried proceeds. Existing succession and
 request-idempotency rules apply. No new request or save fields.
+
+
+Rent accounts now save optional `paid_to`, the recipient of the recorded daily
+payment. Apartment `rent_paid_today` counts that payment only when its recipient
+is the current player's deed identity; buying a flat does not credit the seller's
+prior receipt to the buyer. For an older positive payment on the current day
+with no recorded recipient, the public field is null. The ownership overview
+excludes unknown receipts from totals and labels them in individual rows.
+No backfilled ownership inference or retroactive cash transfer occurs.

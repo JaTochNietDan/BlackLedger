@@ -516,7 +516,7 @@ func main() {
 						if p.Rents == nil {
 							p.Rents = map[string]*core.RentAccount{}
 						}
-						p.Rents[n.ID] = &core.RentAccount{Day: w.Minute/1440 + 1, Due: w.NPCRent(n), Paid: 3, Arrears: 9, Collected: 3}
+						p.Rents[n.ID] = &core.RentAccount{PaidTo: u.Owner, Day: w.Minute/1440 + 1, Due: w.NPCRent(n), Paid: 3, Arrears: 9, Collected: 3}
 					}
 				}
 			}
