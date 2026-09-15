@@ -3627,3 +3627,17 @@ packages, core530.209s and sim499.772s. Final output is in
 `.runtime/guard-integration-full.log`; do not restart or poll this completed run.
 It predates the separately passing same-version HQ store fix and this room.
 No main campaign QA writes or live release in this increment. Broad goal active.
+
+
+### Headquarters budget custody correction
+
+Found a mismatch between forfeited loot/charges and remotely refunded unused
+job cash when an operative died or was captured. Reserved funds now follow the
+carrier consistently; missing, dead or imprisoned operatives clear all carried
+order balances without crediting player, estate or personal purse. Existing
+living-return/recall and successor settlement behavior is preserved. New tests
+exercise outbound, working and recalled return legs for death, capture and
+missing actors, with reloads before and after cancellation to check exact-once
+settlement. Targeted crew/succession tests PASS0.441s, session69063 terminal,
+`.runtime/crew-custody-budget-tests.log`. Updated the current headquarters
+implementation summary; remaining command coverage is still explicit.

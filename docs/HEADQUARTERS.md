@@ -26,16 +26,24 @@ shows a known family's base; personal homes are not exposed by this field.
 
 ## Current operations implementation
 
-Saved named orders now cover restocking, robbery, assassination and bombing, with outbound/work/
-return stages, parallel operatives, cash reservations, recall, arrival/commit
-validation and HTTP retry coverage. The Business panel at headquarters and the
-Families page contain an order selector and register. Assassination follows a
-recent sighting rather than hidden movement and shares combat/scene effects.
-Restocking shares the player supply effect. Bombing reserves one charge and
-shares demolition consequences with named injury, death and scene attribution. Losing the issuing life cancels
-orders; surviving operatives retain unused budget. This is not yet the full
-succession-continuation design below. Other operation adapters, comprehensive
-resource custody and all remaining practical-command coverage are outstanding.
+Saved named orders cover restocking, robbery, assassination, bombing, repairs,
+business remedies and persistent guarding. They support outbound/work/return
+stages, concurrent operatives, reserved resources, recall, arrival/commit
+validation and HTTP retry coverage. The headquarters Business panel and Families
+page contain the selector and order register. Each operation uses shared gameplay
+effects and the actual operative; assassination follows recent sightings.
+Guards occupy a real post until relieved, recalled or the post becomes invalid.
+
+On leader death, surviving sworn members return unused budgets and committed
+proceeds to the successor family. Uncommitted work is recalled; established
+family guards retain their posts. Paid personal associates do not automatically
+join the successor family. No assignment transfers money or authority to the
+next protagonist. Missing, dead or captured carriers lose job cash, loot and
+charges; a surviving returning operative settles unused resources once.
+
+Broader operation adapters, equipment/cargo allocation and continuation of
+uncommitted offensive work under new leadership remain outstanding. Legacy
+collections and immediate delegation paths still require consolidation.
 
 ## Operations expansion to implement
 

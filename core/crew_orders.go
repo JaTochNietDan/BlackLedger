@@ -191,6 +191,13 @@ func (w *World) RecallCrewOrder(id string) error {
 	return fmt.Errorf("That assignment is no longer active")
 }
 func (w *World) refundCrewOrder(o *CrewOrder) {
+	// Reserved job funds travel with the operative, just like loot and charges.
+	// Losing the carrier cannot remotely restore their wallet to headquarters.
+	carrier := w.NPC(o.Actor)
+	if carrier == nil || carrier.Dead || w.Inside(carrier) {
+		o.Reserved, o.Loot, o.Charges = 0, 0, 0
+		return
+	}
 	if o.Estate != "" {
 		// These funds belong to the successor organization, never a new protagonist.
 		// Cash carried by a dead or captured operative is lost with them.

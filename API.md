@@ -1477,3 +1477,10 @@ Existing families with missing headquarters are settled on every successful save
 decode, including saves already at the current version. Explicit player choices
 (including a lost deed awaiting replacement) are preserved. Decode does not
 incorporate independent proprietors or advance simulation time.
+
+
+Crew job budgets are carried funds: death, custody or removal of the operative
+forfeits unused reserved cash as well as loot and charges. Cancellation clears
+these balances once, including after reload; a living operative returning from
+a recalled or invalidated job still returns unused budget under the existing
+issuer/succession rules. No request or save field changes.
