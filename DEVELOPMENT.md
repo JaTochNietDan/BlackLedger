@@ -3691,3 +3691,31 @@ browser review. Command GOMAXPROCS=4 go test -p2 ./... -count=1 -timeout25m;
 log `.runtime/check-collections-c36e51a/.runtime/full-go.log`. It covers c36e51a
 before this cosmetic change. Do not restart on observation timeout. Main8791
 and its campaign have not been modified. Broader goal remains active.
+
+
+### Casino attack staging and collection return acceptance
+
+Previous turn verified collections dispatch and improved button contrast. The
+same isolated8999 campaign now completed its collection order through four
+ordinary wait API commands: working at545/605, returning at665 carrying65,
+done at725 with zero carried loot. Evidence
+`.runtime/collections-browser-settlement.json`; main campaign untouched.
+
+Added casino-strike fixture through the actual Strike handler, and actual-GLB
+coverage for all four assassination variants in Blue Hour. Initial browser replay
+showed actors alive at the start inside the casino, but staging chose a rear
+corner beside slot machines. Placement now ranks valid candidates by the cast's
+midpoint distance from room center before testing the full approach/fall. It
+retains the floor/furniture safety checks and avoids preferring corners solely
+because of iteration order. Home/venue tests PASS6 in7.892s, build PASS4.26s;
+logs `.runtime/casino-strike-tests.log` and `.runtime/casino-strike-build.log`.
+Session70630 terminal PASS. Fixture creation81626 terminal PASS.
+
+Isolated9001/session6787 uses clean c36e51a backend and current frontend with
+`.runtime/casino-strike-qa.sqlite3`. Browser115 at1280×720 visibly shows central
+approach with both actors standing, then victim fallen on clear floor and the
+attacker withdrawing. Browser114 prior1235×1053 screenshot documents the old
+rear-corner framing. No outside substitution or load error. This is bounded
+casino revolver playback evidence, not all-venue or all-variant visual approval.
+Clean Go integration17026 remains RUNNING, freshly polled; do not restart.
+Broad goal, remaining room production and other job adapters remain active.

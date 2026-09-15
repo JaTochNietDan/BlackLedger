@@ -73,3 +73,12 @@ test('venue assassination finds a clear approach in the bar and dispatch office'
   assert.ok(interiorStrikePlacement(room,cast,{x:7,z:7}),model);
  }
 });
+
+test('Blue Hour stages all recorded assassination variants inside the casino',async()=>{
+ const {interiorStrikePlacement}=await import('../.runtime/frontend-test/interiorStrikePlacement.js');
+ const room=await load('interior-blue-hour');
+ for(const [model,variant,gun] of [['person','back-of-head','revolver'],['woman','close-shot','shotgun'],['person','burst','thompson'],['woman','close-quarters',undefined]]){
+  const cast=new CityAssassination(await load(model),await load(model),gun?await load(gun):undefined,variant,gun);
+  assert.ok(interiorStrikePlacement(room,cast,{x:6,z:6}),`casino ${variant}`);
+ }
+});

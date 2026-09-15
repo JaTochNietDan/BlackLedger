@@ -26,7 +26,16 @@ export function interiorStrikePlacement(room:THREE.Object3D,cast:CityAssassinati
   }
   return true;
  };
+ // Prefer the room's open central floor before trying its rear corners. The
+ // cast spans roughly five metres from its origin along local X; rank its
+ // midpoint, not the attacker's starting point, for balanced framing.
+ const candidates:{x:number;z:number;yaw:number;score:number}[]=[];
  for(const yaw of [0,Math.PI/2,Math.PI,-Math.PI/2])for(let z=-bounds.z+1;z<bounds.z;z++)for(let x=-bounds.x+1;x<bounds.x;x++){
+  const cx=x+2.5*Math.cos(yaw),cz=z-2.5*Math.sin(yaw);
+  candidates.push({x,z,yaw,score:cx*cx+cz*cz});
+ }
+ candidates.sort((a,b)=>a.score-b.score);
+ for(const {x,z,yaw} of candidates){
   if(clear(x,z,yaw)){cast.update(0);return{x,z,yaw};}
  }
  cast.update(0);return undefined;
