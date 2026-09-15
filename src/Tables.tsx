@@ -938,7 +938,7 @@ export function BackRoom({
         {cards.seats.map(s => (
           <div key={s.who} className={'seat player-seat' + (s.folded ? ' folded' : '')}>
             <span className="seat-name">{s.name}</span>
-            <span className="poker-card-text">{s.cards?.map(c=>`${c.rank}${pipOf(c.suit)}`).join(" · ") || "Two hidden cards"}</span>
+            <span className="poker-card-text">{s.folded ? "Cards folded" : s.cards?.map(c=>`${c.rank}${pipOf(c.suit)}`).join(" · ") || "Two hidden cards"}</span>
             <small className="seat-said">
               {s.folded ? 'out' : s.said || 'waiting'}
               {s.in > 0 && !s.folded ? ` · ${money(s.in)} in` : ''}

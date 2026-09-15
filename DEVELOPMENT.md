@@ -3421,3 +3421,24 @@ Clean checkout `.runtime/check-settled-routines` verified empty git status at
 bc169160cdf07255e15f3916152f3f226f1f2d61. Full `go test ./... -count=1 -timeout 20m`
 is running as session22511, output `.runtime/settled-routines-clean-full.log`.
 Poll that handle to terminal before assessing or restarting it.
+
+
+### Poker close-camera browser acceptance
+
+Previous turn progressed with settled-routine validation and clean suite launch.
+Fresh `.runtime/poker-readable-qa.sqlite3` on8994 (server session3443) loaded a
+funded hand at Saint Agnes. Browser108,1235×1053 screenshot review verified the
+main-scene poker table, readable10♥/5♥ player cards, and6♥/J♠/J♦ flop after a
+real Check command. Pot48→168, player stack588, and call48 correspond to the
+public hand state. Whole-table framing showed the actual seated roster while
+keeping the cards present. A folded player had no3D cards but was incorrectly
+labelled Two hidden cards below; changed that to Cards folded. Browser109
+`?review=folded` confirmed the rebuilt summary, while active opponents retained
+hidden-card labels. `.runtime/poker-readable-build.log` passed in5.53s.
+
+This proves this desktop hand/view, not full poker visual acceptance. Character
+fidelity, compact-window review, other card games and full scene choreography
+remain open. No8791 actions or release. Clean Go full-suite session22511 remains
+running (polled this turn); do not restart. Frontend test session37161 also
+started in the clean checkout; initial optional dependency-link setup used an
+incorrect relative path, so inspect the test's terminal result before retrying.
