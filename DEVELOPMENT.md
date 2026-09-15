@@ -3562,3 +3562,10 @@ formation of independent property owners. Candidate8996 predates this fix.
 Clean Go integration16200 remains running on bf4dd93; do not restart it, and do
 not treat its result as covering this later store fix. Live promotion remains
 pending; the broad goal and missing gameplay/visual acceptance remain active.
+
+Clean f52edbc store tests also pass0.470s; build session73988 is terminal PASS.
+Isolated upgraded-copy server8997/session78482 uses that clean binary. Public
+Jamie Moretti family headquarters now resolves to butcher (Fassano Meats).
+Against the pre-fix candidate, only factions changed; player, clock, revision
+and every ordered receipt are equal. Evidence:
+`.runtime/headquarters-upgrade-candidate-evidence.json`. No main save written.
