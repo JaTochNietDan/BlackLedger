@@ -149,3 +149,54 @@ func TestHeadquartersGuardDoesNotWalkOutOfTheSameBuilding(t *testing.T) {
 		t.Fatal("same-address report not settled")
 	}
 }
+
+func TestLegacyGuardPostBlocksAllDelegation(t *testing.T) {
+	w := ordersFixture(t)
+	n := w.NPC("leo")
+	n.Faction = w.PlayerOrganizationID()
+	postAndArrive(t, w, "garage")
+	hand, _ := w.NamedHands(n.ID)
+	if w.HandReadiness(hand) == "" || w.DelegateReadiness() == "" {
+		t.Fatal("legacy guard sent on a second job")
+	}
+	if err := w.Unpost("garage"); err != nil {
+		t.Fatal(err)
+	}
+	if w.HandReadiness(hand) != "" {
+		t.Fatal("relieved guard stayed unavailable", w.HandReadiness(hand))
+	}
+}
+func TestLegacyPostingSkipsTravellersAndNamedErrands(t *testing.T) {
+	for _, reason := range []string{"travel", "named-task"} {
+		t.Run(reason, func(t *testing.T) {
+			w := ordersFixture(t)
+			n := w.NPC("leo")
+			n.Faction = w.PlayerOrganizationID()
+			if reason == "travel" {
+				n.Heading = "garage"
+				n.Sets = 0
+				n.Arrives = w.Minute + 30
+			} else {
+				w.Homes = []TaskHome{{Task: "errand", Person: n.ID, Where: "laundry"}}
+			}
+			for _, free := range w.Unposted() {
+				if free.ID == n.ID {
+					t.Fatal("busy operative offered for guard duty")
+				}
+			}
+		})
+	}
+}
+
+func TestLegacyGuardCancelsAnUnstartedRoutine(t *testing.T) {
+	w := ordersFixture(t)
+	n := w.NPC("leo")
+	n.Faction = w.PlayerOrganizationID()
+	n.Heading, n.Sets, n.Arrives = "bar", w.Minute+100, w.Minute+140
+	if err := w.Post("laundry"); err != nil {
+		t.Fatal(err)
+	}
+	if n.Heading != "" || n.Sets != 0 || n.Arrives != 0 {
+		t.Fatal("guard kept a pending departure")
+	}
+}

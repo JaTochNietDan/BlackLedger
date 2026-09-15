@@ -60,16 +60,8 @@ func (w *World) DelegateReadiness() string {
 	if len(w.Tasks) > 0 {
 		return w.Player.Crew[0].Name + " is already on assignment"
 	}
-	// The jobs this gates are aimed at a place, and the man who does them is
-	// named nowhere in their ids, so the sweep that asks whether a subject can
-	// be reached never saw them. Ask here, where all of them pass.
-	if reason := w.OutOfReach(w.Player.Crew[0].ID); reason != "" {
-		return reason
-	}
-	if w.Player.Crew[0].Loyalty < HandLoyalty {
-		return fmt.Sprintf("%s will not do this below %d loyalty", w.Player.Crew[0].Name, HandLoyalty)
-	}
-	return ""
+	hand, _ := w.CrewHands()
+	return w.HandReadiness(hand)
 }
 
 // NamedHands resolves either an original associate or a signed family member.
@@ -120,14 +112,13 @@ func (w *World) HandReadiness(hand Hand) string {
 	if why := w.OutOfReach(c.ID); why != "" {
 		return why
 	}
-	for _, task := range w.Homes {
-		if task.Person == c.ID {
-			return c.Name + " is already on assignment"
-		}
-	}
-	// Saves predating named task homes assigned every task to the first associate.
-	if len(w.Tasks) > 0 && len(w.Homes) == 0 && len(w.Player.Crew) > 0 && w.Player.Crew[0].ID == c.ID {
+	if w.personHasLegacyTask(c.ID) {
 		return c.Name + " is already on assignment"
+	}
+	for _, place := range Locations {
+		if n := w.PostedAt(place.ID); n != nil && n.ID == c.ID {
+			return "Relieve " + c.Name + " from guard duty first"
+		}
 	}
 	if c.Loyalty < HandLoyalty {
 		return fmt.Sprintf("%s will not do this below %d loyalty", c.Name, HandLoyalty)
@@ -213,4 +204,14 @@ func (w *World) HandHeat(hand Hand, full int) int {
 		return full
 	}
 	return max(0, full-HandHeatRelief)
+}
+
+// Older tasks carry their actor in Homes; pre-named saves used the first hire.
+func (w *World) personHasLegacyTask(id string) bool {
+	for _, task := range w.Homes {
+		if task.Person == id {
+			return true
+		}
+	}
+	return len(w.Tasks) > 0 && len(w.Homes) == 0 && len(w.Player.Crew) > 0 && w.Player.Crew[0].ID == id
 }

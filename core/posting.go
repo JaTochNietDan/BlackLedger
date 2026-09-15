@@ -53,7 +53,7 @@ func (w *World) Unposted() []*NPC {
 	out := []*NPC{}
 	for _, n := range w.OwnPeople() {
 		// Somebody the police are holding is not standing anywhere.
-		if !posted[n.ID] && !w.Inside(n) && w.CrewOrderFor(n.ID) == nil {
+		if !posted[n.ID] && w.OutOfReach(n.ID) == "" && !w.personHasLegacyTask(n.ID) {
 			out = append(out, n)
 		}
 	}
@@ -103,6 +103,8 @@ func (w *World) Post(id string) error {
 			best = n
 		}
 	}
+	// Replace a scheduled routine before it starts; active travel was excluded.
+	best.Heading, best.Arrives, best.Sets, best.Errand = "", 0, 0, ""
 	w.Properties[id].Posted = best.ID
 	place, _ := PlaceByID(id)
 	if best.Location == id {
@@ -114,6 +116,7 @@ func (w *World) Post(id string) error {
 	// defended from the moment of the decision rather than from the moment
 	// somebody was standing in it.
 	best.Heading = id
+	best.Sets = 0
 	best.Errand = "sent to stand on the door at " + place.Name
 	best.Arrives = w.Minute + TravelMinutes(best.Location, id)
 	w.noticed(best, true)

@@ -3512,3 +3512,23 @@ sim630.138s, all other packages passed in`.runtime/settled-routines-clean-full.l
 It tested clean bc16916, before subsequent guard changes; it must not be reported
 as a full pass of the current HEAD. Clean frontend37161 previously passed405.
 No live promotion; full latest integration/campaign/visual acceptance remain.
+
+
+### Shared availability for legacy guard and delegation paths
+
+Previous turn progressed with hired guarding and confirmed clean full-suite pass.
+Legacy direct crime delegation now uses named-hand readiness, including existing
+guard posts and named legacy errands. Legacy guard nomination excludes actual
+travellers and named errands, and posting replaces an unstarted routine journey
+so a newly posted guard does not immediately leave on an old schedule. Existing
+HQ queue checks remain shared rather than bypassed. No additional loyalty floor
+was imposed on legacy guard nominations.
+
+`.runtime/guard-availability-tests.log` passes0.409s. Added legacy-post→delegation,
+relief, traveller/task→post nomination checks; expanded final run additionally
+covers pending routine cancellation. Final test handle63917 targets Door/Post/
+Delegation/Crew cases; inspect terminal result before starting full integration.
+No live release or campaign changes.
+
+Final availability test63917 is terminal PASS, core10.843s, recorded in
+`.runtime/guard-availability-final.log`.
