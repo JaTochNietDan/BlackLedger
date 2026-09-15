@@ -3532,3 +3532,8 @@ No live release or campaign changes.
 
 Final availability test63917 is terminal PASS, core10.843s, recorded in
 `.runtime/guard-availability-final.log`.
+
+Clean full integration started atbf4dd93 in`.runtime/check-guard-integration`,
+`GOMAXPROCS=4 go test -p 2 ./... -count=1 -timeout 25m`, session16200,
+log`.runtime/guard-integration-full.log`. Poll this handle before restarting.
+Prior clean full session22511 and frontend37161 are terminal PASS; do not poll them.
