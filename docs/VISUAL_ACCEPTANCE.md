@@ -15,3 +15,40 @@ Record evidence and unresolved items; never mark an item passed solely because t
 - [ ] Missing art/iframe failure still offers usable directory navigation and retry; no lost campaign state.
 - [ ] Browser console inspected; `npm run build` and `npm test` pass. Run `go test -race ./...` if any shared behavioral code changed.
 - [ ] Deliver screenshots, commit list, asset provenance, remaining limitations and API proposals. Never claim Steam readiness or full campaign coverage from this visual checklist.
+
+
+## 2026-09-14 authored interior coverage audit
+
+The 3D revision in GOAL.md supersedes the older painted-only delivery language
+above. At f52edbc,22 of33 public addresses map through interiorSettings to an
+existing GLB. The24 interior GLBs include two private-room variants; those do
+not add public addresses. This is routing/file evidence, not per-room visual
+acceptance. Interior.tsx still renders the other11 addresses through its painted
+or SVG room branch with HTML occupants. Poker/blackjack/billiards table scenes
+are separate and do not establish completion of each venue's general interior.
+
+| Missing authored public room | Address ID |
+| --- | --- |
+| The Monarch | `club` |
+| The Blue Hour | `casino` |
+| Kerrigan Haulage | `haulage` |
+| The Golden Lily | `goldenlily` |
+| Ordway Steam Laundry | `steamworks` |
+| The Paper Moon | `burlesque` |
+| Ferris Motor Sales | `dealer` |
+| Archway Motor Repairs | `archway` |
+| Devlin Salvage | `scrapyard` |
+| Kessler's Filling Station | `filling` |
+| The Viaduct Pumps | `pumps` |
+
+Next room-production groups: casino/club floors (Monarch, Blue Hour, Golden Lily,
+Paper Moon), industrial premises (haulage and steam laundry), then vehicle
+businesses (dealer, repair garage, salvage and filling stations). Reusing props
+is appropriate; a generic borrowed room does not prove an address's fixtures,
+occupancy, movement clearance, interaction points or incident choreography.
+
+For every added room, verify authored props and materials, camera framing at
+normal/compact windows, wall cutaways, actual public occupants, seated/standing
+clearance, selectable actions, arrival paths and relevant indoor incidents.
+Existing22 rooms still require broader fidelity/incident review. The current
+poker desktop review and automated GLB tests are narrower evidence.

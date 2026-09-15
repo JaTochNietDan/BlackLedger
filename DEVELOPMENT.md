@@ -3591,3 +3591,20 @@ Clean f52edbc frontend session32557 is terminal PASS405 tests in38.449s,
 active on bf4dd93; last polled this turn. This run predates the separately tested
 store migration fix. Do not restart it. No release promoted, and broader job,
 interior, billiards physics and visual acceptance requirements remain open.
+
+
+### Release validation and remaining interior coverage inventory
+
+Previous turn progressed through an existing-save dispatch/retry/settlement
+sequence. Clean f52edbc API and store run72778 is terminal PASS: command package
+2.749s, store0.443s, frontend build3.99s. Logs:
+`.runtime/headquarters-upgrade-api-tests.log` and
+`.runtime/headquarters-upgrade-release-build.log`. Full integration16200 remains
+active on bf4dd93 (processes confirmed live this turn); no restart or promotion.
+
+Reviewed all33 public addresses against interiorSettings and on-disk GLBs:
+22 mapped rooms,11 older painted/SVG rooms.24 interior GLBs include2 private
+variants. Exact missing address inventory and per-room completion requirements
+are now in docs/VISUAL_ACCEPTANCE.md. This is a scope audit, not visual approval
+of the22 existing rooms; it prevents3D gambling-table views being mistaken for
+complete venue interiors. Broader goal remains active.
