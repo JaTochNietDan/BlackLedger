@@ -2470,7 +2470,7 @@ func (w *World) Advance(minutes int) {
 			next = min(next, max(w.Minute+1, w.NextPressure))
 		}
 		for _, order := range w.CrewOrders {
-			if order.active() {
+			if order.active() && order.Due > 0 {
 				next = min(next, max(w.Minute+1, order.Due))
 			}
 		}

@@ -3466,3 +3466,24 @@ Clean frontend session37161 is terminal PASS:405 tests,142.494s, in
 parent checkout despite the earlier failed optional symlink setup. Go full-suite
 session22511 remains active on clean bc16916; its result will not cover these
 later guard changes. Continue polling the same handle.
+
+
+### Named headquarters guard orders
+
+Previous turn progressed with physical guard/succession fixes (9ca2ad7). Added
+crew_order:guard through the standard saved assignment catalogue: named signed
+member, owned business, journey,45-minute setup, persistent guarding stage and
+recall home. Guarding is active for busy-state exclusion but has no due clock,
+avoiding one-minute boundary polling. Recheck deed/post availability at arrival
+and commitment. Recall, relief, destroyed/lost premises and member loss clear
+only this operative's posting. Established posts persist into successor-family
+authority. UI lists On guard among active orders and quotes time to take the post.
+
+`.runtime/crew-guard-final.log` passes crew/HQ/posting checks (core0.464s,
+command package0.210s). Added travel/no-remote-defence, setup, routine exclusion,
+reload/recall, succession, lost deed before and after setup, and departed-member
+cases. `.runtime/crew-guard-build.log` passes TypeScript/Vite4.29s. Browser
+acceptance of this new operation remains pending, as do temporary hired-associate
+guarding and broader practical order coverage. No live release or save changes.
+Clean full Go run22511 remains active on bc16916; do not restart it. That run
+predates later guard changes. Clean frontend37161 is already terminal PASS405.

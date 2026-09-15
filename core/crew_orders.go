@@ -24,7 +24,7 @@ type CrewOrder struct {
 }
 
 func (o CrewOrder) active() bool {
-	return o.Stage == "outbound" || o.Stage == "working" || o.Stage == "returning"
+	return o.Stage == "outbound" || o.Stage == "working" || o.Stage == "returning" || o.Stage == "guarding"
 }
 func (w *World) CrewOrderFor(id string) *CrewOrder {
 	for i := range w.CrewOrders {
@@ -77,6 +77,11 @@ func (w *World) CrewOrderReadiness(kind, actor, target string) string {
 		}
 	}
 	switch kind {
+	case "guard":
+		if w.NPC(actor).Faction != w.PlayerOrganizationID() {
+			return "Sign this operative into the family before assigning a permanent guard post"
+		}
+		return w.crewGuardTarget(target, "")
 	case "repair", "remedy":
 		cost, why := w.crewPropertyWork(kind, target)
 		if why != "" {
@@ -179,8 +184,8 @@ func (w *World) RecallCrewOrder(id string) error {
 		}
 		o.Recall = true
 		// Finish the street leg before returning; no teleport to its starting point.
-		if o.Stage == "working" {
-			w.returnCrewOrder(o, "Recalled before the work was committed")
+		if o.Stage == "working" || o.Stage == "guarding" {
+			w.returnCrewOrder(o, "Recalled to headquarters")
 		}
 		return nil
 	}
@@ -233,7 +238,15 @@ func (w *World) refundCrewOrder(o *CrewOrder) {
 	}
 	o.Reserved = 0
 }
+func (w *World) releaseCrewGuard(o *CrewOrder) {
+	if o.Kind == "guard" {
+		if p := w.Properties[o.Target]; p != nil && p.Posted == o.Actor {
+			p.Posted = ""
+		}
+	}
+}
 func (w *World) returnCrewOrder(o *CrewOrder, result string) {
+	w.releaseCrewGuard(o)
 	o.Result = result
 	o.Stage = "returning"
 	w.crewOrderJourney(o, o.Base)
@@ -247,15 +260,30 @@ func (w *World) SettleCrewOrders() {
 		n := w.NPC(o.Actor)
 		_, hired := w.NamedHands(o.Actor)
 		issuerAvailable := o.Life == w.Life && w.Player.Alive
+		if o.Kind == "guard" {
+			hired = n != nil && n.Faction == w.PlayerOrganizationID()
+		}
 		if o.Estate != "" {
 			hired = n != nil && n.Faction == o.Estate
 			issuerAvailable = w.faction(o.Estate) != nil
 		}
 		if n == nil || n.Dead || w.Inside(n) || !hired || !issuerAvailable {
+			w.releaseCrewGuard(o)
 			w.refundCrewOrder(o)
 			o.Stage, o.Result = "cancelled", "Assignment ended: operative or issuing family unavailable"
 			if n != nil && (n.Dead || w.Inside(n)) && n.Errand == "on a headquarters assignment" {
 				n.Heading, n.Arrives, n.Sets, n.Errand = "", 0, 0, ""
+			}
+			continue
+		}
+		if o.Stage == "guarding" {
+			owner := w.PlayerOrganizationID()
+			if o.Estate != "" {
+				owner = o.Estate
+			}
+			p := w.Properties[o.Target]
+			if p == nil || p.Owner != owner || p.Posted != o.Actor || p.Condition <= 0 || n.Location != o.Place || w.Travelling(n) {
+				w.returnCrewOrder(o, "The guard post is no longer available")
 			}
 			continue
 		}
@@ -300,6 +328,10 @@ func (w *World) SettleCrewOrders() {
 					continue
 				}
 			}
+			if o.Kind == "guard" && w.crewGuardTarget(o.Target, "") != "" {
+				w.returnCrewOrder(o, "The guard post is no longer available")
+				continue
+			}
 			o.Stage = "working"
 			o.Due = w.Minute + 30
 			if o.Kind == "assassinate" {
@@ -314,10 +346,21 @@ func (w *World) SettleCrewOrders() {
 			if o.Kind == "repair" || o.Kind == "remedy" {
 				o.Due = w.Minute + PropertyWorkMinutes
 			}
+			if o.Kind == "guard" {
+				o.Due = w.Minute + PostingMinutes
+			}
 		case "working":
 			result := "The target is no longer available"
 			if n.Location == o.Place && !w.Travelling(n) {
 				switch o.Kind {
+				case "guard":
+					if w.crewGuardTarget(o.Target, "") == "" {
+						w.Properties[o.Target].Posted = o.Actor
+						o.Stage, o.Due, o.Result = "guarding", 0, "On guard until recalled or relieved"
+						w.Log(o.Name+" takes the guard post", o.Result, "work")
+						continue
+					}
+
 				case "repair", "remedy":
 					cost, why := w.crewPropertyWork(o.Kind, o.Target)
 					if why == "" && cost <= o.Reserved {
@@ -446,6 +489,9 @@ func (w *World) CrewOrderOffers() []CrewOrderOffer {
 				back = 1
 			}
 			duration := outbound + work + back
+			if kind == "guard" {
+				duration = outbound + work
+			}
 			if at == "" {
 				duration = 0
 			}
@@ -457,6 +503,9 @@ func (w *World) CrewOrderOffers() []CrewOrderOffer {
 		}
 		for _, l := range Locations {
 			if p := w.Properties[l.ID]; p != nil && w.Own(l.ID) {
+				if p.Income > 0 {
+					offer("guard", l.ID, l.ID, "Guard "+l.Name, 0, PostingMinutes)
+				}
 				offer("repair", l.ID, l.ID, "Repair "+l.Name, RepairCost, PropertyWorkMinutes)
 				if trade, ok := TradeOf(l.ID); ok {
 					offer("remedy", l.ID, l.ID, trade.Remedy+" at "+l.Name, trade.RemedyCost, PropertyWorkMinutes)
@@ -513,7 +562,7 @@ func (w *World) inheritCrewOrders(estate string) {
 		if base := w.Headquarters(estate); base != "" {
 			o.Base = base
 		}
-		if o.Stage == "returning" {
+		if o.Stage == "returning" || o.Stage == "guarding" {
 			continue
 		}
 		o.Recall = true
@@ -522,4 +571,18 @@ func (w *World) inheritCrewOrders(estate string) {
 			w.returnCrewOrder(o, o.Result)
 		}
 	}
+}
+
+func (w *World) crewGuardTarget(id, actor string) string {
+	p := w.Properties[id]
+	if p == nil || !w.Own(id) || p.Income <= 0 {
+		return "Choose a business your family owns"
+	}
+	if p.Condition <= 0 {
+		return "The building is destroyed"
+	}
+	if n := w.PostedAt(id); n != nil && n.ID != actor {
+		return n.Name + " is already on the door"
+	}
+	return ""
 }
