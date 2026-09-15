@@ -8,3 +8,21 @@
 .crew-order-register article{padding:12px 0;border-top:1px solid #b49a70}
 .crew-order-register span{display:block;font-size:12px;margin:5px 0}
 .crew-orders button:disabled{opacity:1;color:#67563c;background:#cfbc94;border-color:#b29a70;cursor:default}
+
+.crew-order-fields{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+.crew-order-fields label{margin:0;min-width:0}
+.crew-order-target{grid-column:1/-1}
+.crew-order-register-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12px}
+.crew-order-register-heading button{font-size:11px}
+.crew-orders{overflow-wrap:anywhere}
+.crew-orders button{max-width:100%;white-space:normal}
+@media(max-height:800px){
+ .crew-orders{padding:12px}
+ .crew-orders h2{font-size:21px;margin:4px 0 6px}
+ .crew-orders p{margin:7px 0;font-size:12px}
+ .crew-orders select{padding:7px}
+ .crew-order-fields{gap:7px}
+}
+@media(max-width:460px){.crew-order-fields{grid-template-columns:minmax(0,1fr)}}
+
+.crew-orders :focus-visible{outline:2px solid #754020;outline-offset:3px}

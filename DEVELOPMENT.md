@@ -3371,3 +3371,28 @@ or capture, dissolved family and recall of an unfinished assassination. No live
 campaign was mutated or release promoted. Full offensive-order continuation
 under successor authority remains unfinished, along with broader job coverage,
 visual acceptance and the previously recorded full-suite routine failure.
+
+
+### Compact headquarters overlay review
+
+Previous turn progressed with successor-family assignment custody (1e24bf2).
+Current isolated browser review at1280×720 found the three stacked selectors
+pushed the dispatch button below the interior overlay. The form now places
+operative and operation side by side, retains a full-width target, and tightens
+spacing on short windows. Screenshot review shows the quote, dispatch control
+and disabled reason together while the laundry scene remains visible. Assignment
+history now keeps active orders first, folds completed reports behind a counted
+toggle, and uses readable operation/stage labels. The register is keyboard
+focusable with a visible focus indicator.
+
+QA: fresh `.runtime/hq-layout-qa.sqlite3`, server8993 (session62494), browser107
+`?layout=compact`. Browser interaction dispatched Leo to restock Russo Motor
+Works: cash6000→5871 (130 reserved plus1 ordinary income), time08:00→08:05,
+busy reason and1 active assignment displayed. No actions taken on8791.
+`.runtime/hq-layout-final-build.log` passed TypeScript/Vite in2.58s before the
+final focus-only accessibility change; final build recorded separately below.
+Desktop widths below1280, complete report-toggle interaction and other interior
+panels still need acceptance; this targeted check is not full UI acceptance.
+
+Final `.runtime/hq-layout-reviewed-build.log` passed in2.70s, including keyboard
+focus changes. No live release promoted.
