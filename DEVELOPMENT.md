@@ -3665,3 +3665,29 @@ Browser acceptance of this selector addition and full clean integration remain
 pending. No main save writes or local release. Broader goal remains active;
 legacy standalone collections still exist for pre-family progression and need
 further lifecycle consolidation, while additional practical adapters remain.
+
+
+### Collection dispatch browser acceptance and button contrast
+
+Previous turn implemented named collections and passing targeted tests. Created
+clean checkout `.runtime/check-collections-c36e51a` at c36e51a, built binary and
+frontend, and created fresh crew-orders QA save. Server8999/session82471 serves
+that isolated build. Browser112 at1235×1053: entered laundry with G, selected
+Make collections/Russo Motor Works, saw200-minute quote and65-on-return terms,
+dispatched Leo, observed08:05 and outbound order with35-minute remaining leg.
+The register and actual departure reflected the command; player stayed at HQ.
+
+The enabled dispatch button looked like a grey disabled control. Added explicit
+dark-green enabled styling, cream type, inset border, hover and distinct muted
+disabled state. Root frontend build20923 terminal PASS3.27s; log
+`.runtime/crew-dispatch-contrast-build.log`. Separate clean-backend/root-frontend
+preview9000/session20532 uses another fresh fixture. Browser113 at1280×720 shows
+all collection selectors, payment terms and the enabled button above the panel
+fold, with unobscured header and visible interior. This verifies those desktop
+sizes, not phone or every operation/long register layout.
+
+Clean full Go integration session17026 is still RUNNING, freshly polled after
+browser review. Command GOMAXPROCS=4 go test -p2 ./... -count=1 -timeout25m;
+log `.runtime/check-collections-c36e51a/.runtime/full-go.log`. It covers c36e51a
+before this cosmetic change. Do not restart on observation timeout. Main8791
+and its campaign have not been modified. Broader goal remains active.

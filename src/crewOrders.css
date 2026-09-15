@@ -26,3 +26,7 @@
 @media(max-width:460px){.crew-order-fields{grid-template-columns:minmax(0,1fr)}}
 
 .crew-orders :focus-visible{outline:2px solid #754020;outline-offset:3px}
+
+.crew-orders button.crew-order-dispatch{display:block;min-height:40px;padding:10px 16px;border:1px solid #182e27;border-radius:0;background:#294438;color:#fff1d0;font:600 13px Georgia,serif;letter-spacing:.02em;cursor:pointer;box-shadow:inset 0 0 0 2px #294438,inset 0 0 0 3px #71816b}
+.crew-orders button.crew-order-dispatch:hover:not(:disabled){background:#365746;box-shadow:inset 0 0 0 2px #365746,inset 0 0 0 3px #a2ab89}
+.crew-orders button.crew-order-dispatch:disabled{background:#cfbc94;color:#67563c;border-color:#b29a70;box-shadow:none;cursor:default}
