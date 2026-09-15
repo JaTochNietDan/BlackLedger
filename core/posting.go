@@ -28,7 +28,7 @@ func (w *World) PostedAt(id string) *NPC {
 		return nil
 	}
 	n := w.NPC(prop.Posted)
-	if n == nil || n.Dead || w.Inside(n) || n.Faction != w.PlayerOrganizationID() {
+	if n == nil || n.Dead || w.Inside(n) || n.Faction == "" || n.Faction != prop.Owner {
 		prop.Posted = ""
 		return nil
 	}
@@ -59,7 +59,7 @@ func (w *World) Unposted() []*NPC {
 func (w *World) PostingDefenceAt(id string) int {
 	n := w.PostedAt(id)
 	// Somebody still on their way to the door is not on the door.
-	if n == nil || w.Travelling(n) {
+	if n == nil || n.Location != id || w.Travelling(n) {
 		return 0
 	}
 	return PostingDefence + w.Poise(n)/4 + n.Trust/10
@@ -118,6 +118,9 @@ func (w *World) Post(id string) error {
 
 // Unpost takes somebody off a door.
 func (w *World) Unpost(id string) error {
+	if !w.Own(id) {
+		return fmt.Errorf("this is not a business of yours")
+	}
 	n := w.PostedAt(id)
 	if n == nil {
 		return fmt.Errorf("nobody is on the door there")
@@ -141,9 +144,11 @@ func (w *World) PostingDescription(id string) map[string]any {
 	// Naming somebody on a door they have not reached tells the player the
 	// place is held when it is not, which is exactly the moment they would
 	// stop worrying about it.
-	if w.Travelling(n) {
+	if w.Travelling(n) && n.Heading == id {
 		out["coming"] = true
 		out["minutes"] = max(1, n.Arrives-w.Minute)
+	} else if n.Location != id || w.Travelling(n) {
+		out["away"] = true
 	}
 	return out
 }
@@ -153,5 +158,9 @@ func (w *World) PostingDescription(id string) map[string]any {
 // not: they are standing in the doorway either way. Without one, the raid reaches
 // whoever the organization can least afford to lose, as before.
 func (w *World) StoodInIt(id string) *NPC {
-	return w.PostedAt(id)
+	n := w.PostedAt(id)
+	if n == nil || n.Location != id || w.Travelling(n) {
+		return nil
+	}
+	return n
 }

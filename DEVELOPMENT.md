@@ -3442,3 +3442,27 @@ remain open. No8791 actions or release. Clean Go full-suite session22511 remains
 running (polled this turn); do not restart. Frontend test session37161 also
 started in the clean checkout; initial optional dependency-link setup used an
 incorrect relative path, so inspect the test's terminal result before retrying.
+
+
+### Guard custody, location and family continuity
+
+Previous turn progressed with poker browser verification and folded-card fix.
+Found and fixed two guard invariants before broader HQ guard dispatch: PostedAt
+validated every guard against the current protagonist rather than the deed's
+family, and defence/raid-victim selection could count a living guard standing
+at another address. Inherited guards now remain attached to their family deed;
+only guards physically present defend or get caught there. Unpost checks owner
+authority, and guide completion counts only the player's own posts. Public
+posting and premise text distinguish arrival toward the post from other absence.
+
+`.runtime/guard-custody-final.log` passes focused posting, succession, guide and
+raid-defence checks (core4.536s). Added cases for successor/new-life retention,
+no new-player dismissal or guide credit, loss of deed, absent guard defence/raid
+exclusion, public absence and resuming protection on return. No live mutation or
+promotion. Named HQ guard dispatch and fuller guard scheduling remain open.
+
+Clean frontend session37161 is terminal PASS:405 tests,142.494s, in
+`.runtime/settled-routines-clean-frontend.log`. Dependencies resolved via the
+parent checkout despite the earlier failed optional symlink setup. Go full-suite
+session22511 remains active on clean bc16916; its result will not cover these
+later guard changes. Continue polling the same handle.

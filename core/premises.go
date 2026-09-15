@@ -78,9 +78,11 @@ func (w *World) PlaceNote(id string) string {
 		return fmt.Sprintf("The district says everything out loud in here: +%d to what you hear", BarReach)
 	case HasBackRoom(id):
 		return "There is a game in the back most evenings"
-	case w.PostedAt(id) != nil && w.Travelling(w.PostedAt(id)):
+	case w.PostedAt(id) != nil && w.Travelling(w.PostedAt(id)) && w.PostedAt(id).Heading == id:
 		n := w.PostedAt(id)
 		return n.Name + " is on the way, " + counted(max(1, n.Arrives-w.Minute), "minute", "minutes") + " out"
+	case w.PostedAt(id) != nil && (w.PostedAt(id).Location != id || w.Travelling(w.PostedAt(id))):
+		return w.PostedAt(id).Name + " is assigned here but away from the door"
 	case w.PostedAt(id) != nil:
 		return w.PostedAt(id).Name + " is on the door"
 	case running && w.Custom(id) < 40:

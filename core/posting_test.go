@@ -195,3 +195,44 @@ func TestTheManOnTheDoorIsTheOneWhoPaysForIt(t *testing.T) {
 	}
 	t.Logf("%d raids on a manned laundry cost the man on the door his life %d times", runs, lost)
 }
+
+func TestGuardPostFollowsTheInheritedDeed(t *testing.T) {
+	w, member := doorman(t)
+	postAndArrive(t, w, "laundry")
+	w.Die("Test succession")
+	w.Dissolve(w.PlayerOrganizationID())
+	w.Life++
+	w.Player = newPerson(w.Life)
+	if w.PostedAt("laundry") != member || w.PostingDefenceAt("laundry") == 0 {
+		t.Fatal("successor lost a living guard")
+	}
+	if w.anyPosted() {
+		t.Fatal("new player received old family's guide credit")
+	}
+	if err := w.Unpost("laundry"); err == nil {
+		t.Fatal("new player dismissed another family's guard")
+	}
+	w.Properties["laundry"].Owner = "independent"
+	if w.PostedAt("laundry") != nil {
+		t.Fatal("guard retained after deed left family")
+	}
+}
+
+func TestAnAbsentGuardCannotDefendOrBeCaughtInARaid(t *testing.T) {
+	w, member := doorman(t)
+	postAndArrive(t, w, "laundry")
+	member.Location = "garage"
+	if w.PostedAt("laundry") != member {
+		t.Fatal("temporary absence erased assignment")
+	}
+	if w.PostingDefenceAt("laundry") != 0 || w.StoodInIt("laundry") != nil {
+		t.Fatal("absent guard defended or was caught at remote door")
+	}
+	if d := w.PostingDescription("laundry"); d["away"] != true || d["worth"] != 0 {
+		t.Fatal("absence not reported", d)
+	}
+	member.Location = "laundry"
+	if w.PostingDefenceAt("laundry") == 0 || w.StoodInIt("laundry") != member {
+		t.Fatal("returning guard did not resume protection")
+	}
+}

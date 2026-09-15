@@ -1453,3 +1453,10 @@ operative retains them. Personal associates outside the inherited family retain
 the prior cancellation behavior. Unused charges are removed from circulation;
 no successor explosives inventory is implemented. This is an orderly wind-down,
 not automatic continuation of offensive orders under a new leader.
+
+Guard postings are validated against the property's owning family, so a valid
+sworn guard survives family succession. `posted.worth` is zero while the guard
+is physically absent or travelling. `posted.coming` and `minutes` apply only to
+a journey toward that door; optional `posted.away` marks other absences. An
+absent guard cannot be selected as the person caught in a raid at that building.
+The personal unpost command still requires the player's property ownership.

@@ -152,7 +152,7 @@ func firstOpenPerson(w *World, check func(string) string) string {
 
 func (w *World) anyPosted() bool {
 	for _, l := range Locations {
-		if w.PostedAt(l.ID) != nil {
+		if w.Own(l.ID) && w.PostedAt(l.ID) != nil {
 			return true
 		}
 	}
