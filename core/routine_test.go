@@ -105,13 +105,59 @@ func TestTheEveningLooksDifferentFromTheMorning(t *testing.T) {
 // wartime floor is measured separately in TestAWarThinsTheStreetWithoutErasing.
 func TestAFaceIsFoundInTheSamePlaceAtTheSameHour(t *testing.T) {
 	t.Parallel()
-	moved, _, place := weekUnder(t, 404, 14, keepPeace)
+	// Housing and employment can change during the fortnight. Measure consecutive
+	// settled episodes, without treating a new address as random movement.
+	type context struct {
+		home, post, role, faction string
+		rank                      int
+	}
+	type episode struct {
+		id      string
+		context context
+		hours   map[int]map[string]int
+	}
+	w := New(404)
+	episodes := []*episode{}
+	current := map[string]*episode{}
+	moved := map[string]int{}
+	last := map[string]string{}
+	for step := 0; step < 14*24; step++ {
+		keepPeace(w)
+		before := w.Minute
+		w.Advance(60)
+		if w.Minute != before+60 {
+			t.Fatal("campaign stopped before routine sampling completed")
+		}
+		for i := range w.NPCs {
+			n := &w.NPCs[i]
+			if n.Dead {
+				continue
+			}
+			ctx := context{n.Home, n.Post, n.Role, n.Faction, int(n.Rank)}
+			e := current[n.ID]
+			if e == nil || e.context != ctx {
+				e = &episode{id: n.ID, context: ctx, hours: map[int]map[string]int{}}
+				episodes = append(episodes, e)
+				current[n.ID] = e
+			}
+			if previous, ok := last[n.ID]; ok && previous != n.Location {
+				moved[n.ID]++
+			}
+			last[n.ID] = n.Location
+			hour := w.Minute % 1440 / 60
+			if e.hours[hour] == nil {
+				e.hours[hour] = map[string]int{}
+			}
+			e.hours[hour][n.Location]++
+		}
+	}
+
 	reliable, samples := 0, 0
-	for id, hours := range place {
-		if moved[id] == 0 {
+	for _, episode := range episodes {
+		if moved[episode.id] == 0 {
 			continue // furniture is reliable for the wrong reason
 		}
-		for _, places := range hours {
+		for _, places := range episode.hours {
 			best, sum := 0, 0
 			for _, n := range places {
 				sum += n
@@ -119,15 +165,19 @@ func TestAFaceIsFoundInTheSamePlaceAtTheSameHour(t *testing.T) {
 					best = n
 				}
 			}
+			if sum < 4 {
+				continue
+			} // At least four separate days at this hour.
 			samples++
 			if best*4 >= sum*3 {
 				reliable++
 			}
 		}
 	}
-	if samples == 0 {
-		t.Fatal("nobody in the city moves, so this proves nothing")
+	if len(moved) == 0 || samples < len(moved)*12 {
+		t.Fatalf("only %d repeated person-hours for %d moving residents; insufficient settled routine coverage", samples, len(moved))
 	}
+	t.Logf("%d settled person-hours from %d moving residents across %d episodes: %.1f%% reliable", samples, len(moved), len(episodes), 100*float64(reliable)/float64(samples))
 	if share := float64(reliable) / float64(samples); share < .9 {
 		t.Fatalf("a moving face is where it usually is on only %.0f%% of person-hours", share*100)
 	}

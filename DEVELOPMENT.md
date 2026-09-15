@@ -3396,3 +3396,23 @@ panels still need acceptance; this targeted check is not full UI acceptance.
 
 Final `.runtime/hq-layout-reviewed-build.log` passed in2.70s, including keyboard
 focus changes. No live release promoted.
+
+
+### Routine acceptance follows changes of home and work
+
+Previous turn progressed with verified compact HQ layout (50e1966). Traced the
+remaining routine-test failure: the old measure mixes fourteen days of changing
+homes, workplaces, roles and family positions into a single expected address.
+The settled-routine test now groups consecutive unchanged contexts and requires
+four distinct days at each sampled hour. It retains the90% reliable person-hour
+threshold and75% modal-address criterion, excludes residents who never move,
+requires at least12 repeated person-hours per moving resident in aggregate, and
+fails if the world stops advancing during sampling. Housing/job changes remain
+fully simulated rather than frozen to satisfy the check. Other city movement,
+evening, stable-haunt and wartime tests remain separate.
+
+`.runtime/routine-settled-tests.log` passes (core0.793s):2307 repeated person-hours,
+81 moving residents,211 contextual episodes. Diagnostic raw evidence remains in
+`.runtime/routine-episodes.log`; temporary diagnostic source removed. This is a
+measurement correction, not a claim that all NPC routing is perfect. Fresh clean
+full-suite validation is next; no live campaign mutation or promotion.
