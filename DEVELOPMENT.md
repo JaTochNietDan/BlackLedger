@@ -3569,3 +3569,25 @@ Jamie Moretti family headquarters now resolves to butcher (Fassano Meats).
 Against the pre-fix candidate, only factions changed; player, clock, revision
 and every ordered receipt are equal. Evidence:
 `.runtime/headquarters-upgrade-candidate-evidence.json`. No main save written.
+
+
+### Existing campaign management and request retry acceptance
+
+Previous turn progressed with same-version HQ migration and isolated upgrade
+comparison. Exercised the upgraded campaign copy on8997 through normal API
+commands: travel to Fassano headquarters, observe authoritative no-dispatch
+reasons (low loyalty or existing guard duty), travel to chapel, relieve Anton
+Iordan's existing post, return to headquarters, dispatch Anton to restock Fassano
+for200 reserved, then let two ordinary hours pass. Order reached done with
+Supplies delivered, zero reserved funds, and45 supplies at the premises. The
+identical dispatch request was retried and returned byte-identical output with
+one active order. Evidence `.runtime/campaign-copy-dispatch-evidence.json`.
+This is a bounded existing-save management sequence, not a full20–30-minute
+campaign acceptance. Copied campaign advanced2182→2189; live raw state and all
+2184 ordered receipts remain equal to the original copy baseline.
+
+Clean f52edbc frontend session32557 is terminal PASS405 tests in38.449s,
+`.runtime/headquarters-upgrade-frontend.log`. Full guard integration16200 remains
+active on bf4dd93; last polled this turn. This run predates the separately tested
+store migration fix. Do not restart it. No release promoted, and broader job,
+interior, billiards physics and visual acceptance requirements remain open.
