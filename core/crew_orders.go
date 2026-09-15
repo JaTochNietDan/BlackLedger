@@ -78,9 +78,6 @@ func (w *World) CrewOrderReadiness(kind, actor, target string) string {
 	}
 	switch kind {
 	case "guard":
-		if w.NPC(actor).Faction != w.PlayerOrganizationID() {
-			return "Sign this operative into the family before assigning a permanent guard post"
-		}
 		return w.crewGuardTarget(target, "")
 	case "repair", "remedy":
 		cost, why := w.crewPropertyWork(kind, target)
@@ -164,7 +161,9 @@ func (w *World) crewOrderJourney(o *CrewOrder, to string) {
 	}
 	duration := max(1, TravelMinutes(n.Location, to))
 	if n.Location == to {
-		duration = 1
+		o.Due = w.Minute + 1
+		n.Heading, n.Arrives, n.Sets, n.Errand = "", 0, 0, ""
+		return
 	}
 	o.Due = w.Minute + duration
 	n.Heading, n.Arrives, n.Sets, n.Errand = to, o.Due, 0, "on a headquarters assignment"
@@ -260,9 +259,6 @@ func (w *World) SettleCrewOrders() {
 		n := w.NPC(o.Actor)
 		_, hired := w.NamedHands(o.Actor)
 		issuerAvailable := o.Life == w.Life && w.Player.Alive
-		if o.Kind == "guard" {
-			hired = n != nil && n.Faction == w.PlayerOrganizationID()
-		}
 		if o.Estate != "" {
 			hired = n != nil && n.Faction == o.Estate
 			issuerAvailable = w.faction(o.Estate) != nil

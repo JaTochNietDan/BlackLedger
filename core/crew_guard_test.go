@@ -91,8 +91,61 @@ func TestCrewGuardCannotRemainOnDutyAfterLeavingFamily(t *testing.T) {
 	orderStep(w)
 	orderStep(w)
 	n.Faction = ""
+	w.Player.Crew = nil
 	w.SettleCrewOrders()
 	if w.CrewOrders[0].active() || w.Properties["garage"].Posted != "" {
 		t.Fatal("departed member retained guard order")
+	}
+}
+
+func TestHiredAssociateCanGuardWithoutJoiningFamily(t *testing.T) {
+	w := ordersFixture(t)
+	n := w.NPC("leo")
+	n.Faction = ""
+	n.Trust = 0
+	if err := w.StartCrewOrder("guard", n.ID, "garage"); err != nil {
+		t.Fatal(err)
+	}
+	orderStep(w)
+	orderStep(w)
+	if w.PostedAt("garage") != n || w.PostingDefenceAt("garage") <= PostingDefence {
+		t.Fatal("associate did not defend business")
+	}
+	if got := w.PostingDescription("garage")["trust"]; got != 80 {
+		t.Fatal("hired guard ignored loyalty", got)
+	}
+	if n.Faction != "" {
+		t.Fatal("guard order forced family membership")
+	}
+	if w.CrewOrderReadiness("restock", n.ID, "laundry") == "" {
+		t.Fatal("guard double booked")
+	}
+	w.Die("Test employee contract ends")
+	w.SettleCrewOrders()
+	if w.CrewOrders[0].active() || w.PostedAt("garage") != nil {
+		t.Fatal("personal employment survived employer death")
+	}
+}
+
+func TestHeadquartersGuardDoesNotWalkOutOfTheSameBuilding(t *testing.T) {
+	w := ordersFixture(t)
+	n := w.NPC("leo")
+	if err := w.StartCrewOrder("guard", n.ID, "laundry"); err != nil {
+		t.Fatal(err)
+	}
+	if w.Travelling(n) || n.Heading != "" {
+		t.Fatal("same-address dispatch created a street journey")
+	}
+	orderStep(w)
+	orderStep(w)
+	if err := w.RecallCrewOrder(w.CrewOrders[0].ID); err != nil {
+		t.Fatal(err)
+	}
+	if w.Travelling(n) || n.Heading != "" || n.Location != "laundry" {
+		t.Fatal("same-address report-back left the building")
+	}
+	orderStep(w)
+	if w.CrewOrders[0].Stage != "done" {
+		t.Fatal("same-address report not settled")
 	}
 }

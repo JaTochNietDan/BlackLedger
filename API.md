@@ -1461,12 +1461,14 @@ a journey toward that door; optional `posted.away` marks other absences. An
 absent guard cannot be selected as the person caught in a raid at that building.
 The personal unpost command still requires the player's property ownership.
 
-`crew_order:guard` dispatches a named signed family member to an owned business.
+`crew_order:guard` dispatches a named hired associate or signed family member to an owned business.
 After travel and45 minutes of setup, the order enters `guarding` with `due:0`.
 It stays active and reserves the person until recalled, relieved, ownership is
 lost, the building is destroyed, or the operative is unavailable. Offer minutes
 quote arrival plus setup, since duty has no automatic end. Recall clears the
 post and starts the return journey. Established sworn-family posts continue with
 the successor estate; uncommitted guard orders follow succession recall rules.
-Personal hired associates must first sign into the family under the existing
-permanent-post rules. Temporary associate guard contracts remain open.
+Hired associates use their paid loyalty for guard reliability and remain personally
+employed rather than becoming family members. Their orders end on employer death;
+sworn members retain the existing succession rules. Same-address dispatch and
+report-back keep a one-minute processing stage without creating a street journey.

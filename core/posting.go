@@ -28,7 +28,13 @@ func (w *World) PostedAt(id string) *NPC {
 		return nil
 	}
 	n := w.NPC(prop.Posted)
-	if n == nil || n.Dead || w.Inside(n) || n.Faction == "" || n.Faction != prop.Owner {
+	employed := n != nil && n.Faction != "" && n.Faction == prop.Owner
+	if w.Player.Alive && w.Own(id) {
+		if _, hired := w.NamedHands(prop.Posted); hired {
+			employed = true
+		}
+	}
+	if n == nil || n.Dead || w.Inside(n) || !employed {
 		prop.Posted = ""
 		return nil
 	}
@@ -62,7 +68,7 @@ func (w *World) PostingDefenceAt(id string) int {
 	if n == nil || n.Location != id || w.Travelling(n) {
 		return 0
 	}
-	return PostingDefence + w.Poise(n)/4 + n.Trust/10
+	return PostingDefence + w.Poise(n)/4 + w.guardReliability(id, n)/10
 }
 
 // PostReadiness explains why nobody can be put on the door here, or returns "".
@@ -138,7 +144,7 @@ func (w *World) PostingDescription(id string) map[string]any {
 		return nil
 	}
 	out := map[string]any{
-		"id": n.ID, "name": n.Name, "trust": n.Trust,
+		"id": n.ID, "name": n.Name, "trust": w.guardReliability(id, n),
 		"worth": w.PostingDefenceAt(id),
 	}
 	// Naming somebody on a door they have not reached tells the player the
@@ -163,4 +169,16 @@ func (w *World) StoodInIt(id string) *NPC {
 		return nil
 	}
 	return n
+}
+
+// Signed members answer through trust; hired associates through paid loyalty.
+func (w *World) guardReliability(id string, n *NPC) int {
+	if w.Own(id) && w.Player.Alive {
+		for _, c := range w.Player.Crew {
+			if c.ID == n.ID {
+				return c.Loyalty
+			}
+		}
+	}
+	return n.Trust
 }

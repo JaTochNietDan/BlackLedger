@@ -3487,3 +3487,28 @@ acceptance of this new operation remains pending, as do temporary hired-associat
 guarding and broader practical order coverage. No live release or save changes.
 Clean full Go run22511 remains active on bc16916; do not restart it. That run
 predates later guard changes. Clean frontend37161 is already terminal PASS405.
+
+
+### Hired associates can guard, with browser acceptance
+
+Previous turn progressed with saved guard orders (4c395cd). Removed the signed-
+member-only restriction for HQ guarding; existing hired associates can now take
+posts without being forced into family membership. Their defence/public guard
+reliability uses paid loyalty, while sworn successors use trust. An employee's
+personal contract ends on employer death; signed-family posts retain succession.
+The prior departure test now removes both employment and membership explicitly.
+
+Fresh `.runtime/guard-dispatch-qa.sqlite3`, backend8995/session18136, browser110:
+Leo received Guard Bluebird Laundry, entered setup with41 minutes remaining,
+and reached On guard after an hour's action. The building showed38 defence;
+Recall immediately removed protection and entered Returning. This exposed a
+same-address phantom street journey; fixed crewOrderJourney to keep the operative
+present during its one-minute dispatch/report processing. This final fix has
+regression coverage but was not rebuilt into that browser server yet.
+`.runtime/associate-guard-final.log` passes core crew/HQ/guard tests0.428s.
+
+Clean full Go session22511 is terminal PASS, explicitly polled: core602.792s,
+sim630.138s, all other packages passed in`.runtime/settled-routines-clean-full.log`.
+It tested clean bc16916, before subsequent guard changes; it must not be reported
+as a full pass of the current HEAD. Clean frontend37161 previously passed405.
+No live promotion; full latest integration/campaign/visual acceptance remain.
