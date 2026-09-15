@@ -3416,3 +3416,8 @@ evening, stable-haunt and wartime tests remain separate.
 `.runtime/routine-episodes.log`; temporary diagnostic source removed. This is a
 measurement correction, not a claim that all NPC routing is perfect. Fresh clean
 full-suite validation is next; no live campaign mutation or promotion.
+
+Clean checkout `.runtime/check-settled-routines` verified empty git status at
+bc169160cdf07255e15f3916152f3f226f1f2d61. Full `go test ./... -count=1 -timeout 20m`
+is running as session22511, output `.runtime/settled-routines-clean-full.log`.
+Poll that handle to terminal before assessing or restarting it.
