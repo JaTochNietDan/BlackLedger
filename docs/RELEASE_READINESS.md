@@ -130,3 +130,21 @@ Local evidence is in `.runtime/public-campaign-20260921/` (public snapshots at
 revisions 6, 14 and 23), `.runtime/release-quantity-*.log` and
 `.runtime/release-deposit-tests.log`. The explicitly isolated campaign save is
 `/var/folders/2k/kck2sk4n08q6d_w_53nggjj80000gn/T/black-ledger-public-campaign-yzsqt19b/campaign.sqlite3`.
+
+## Backup and workflow checks — 2026-09-21
+
+The shared native archive smoke test now restores a stopped-game backup,
+including existing WAL/SHM sidecars, into a separate save and replacement game
+folder. It verifies persisted player/revision and command receipts, successfully
+advances the restored game, and compares the original save bytes afterward.
+Mac ARM64 passed using game source at 11c5eb9 in an isolated worktree, plus the
+new smoke script. Fresh npm install/build and packaging also passed. This is
+same-version folder replacement, not a general historical-save migration claim.
+Evidence: `.runtime/release-current-{install,build,package,smoke}.log`.
+
+Actionlint 1.7.12 passed the workflow and is now part of the verification job.
+The older 1.7.7 checker did not recognize the current macos-15-intel label; the
+current checker accepts it without a custom-label override. No hosted run has
+occurred. The local Docker command has no running daemon, so this check adds no
+Linux execution evidence. GitHub authentication and media permissions remain
+unresolved; neither source nor binaries have been published.

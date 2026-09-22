@@ -29,6 +29,8 @@ jobs:
           node-version: '22'
           cache: npm
       - run: npm ci
+      - name: Validate release workflow
+        run: go run github.com/rhysd/actionlint/cmd/actionlint@v1.7.12 .github/workflows/build.yml
       - run: go vet ./...
       - run: go test -race -timeout 50m ./...
       - run: npm test

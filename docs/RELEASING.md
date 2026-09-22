@@ -10,7 +10,7 @@ Do not claim OSI open-source status or that third-party media rights are settled
 ## Automated builds
 
 `.github/workflows/build.yml` runs on branch pushes, pull requests, manual dispatch
-and version tags. A Linux verification job runs Go vet/race tests, frontend tests
+and version tags. A Linux verification job validates the workflow and runs Go vet/race tests, frontend tests
 and the production build. Five native runner jobs then build, archive and smoke
 test Windows x64, macOS x64/ARM64 and Linux x64/ARM64 distributions. Artifacts
 expire after 14 days. Version tags beginning with `v` create a **draft prerelease**
@@ -22,6 +22,9 @@ beginning with `v` require a clean committed checkout; use `dev-` labels for loc
 are still necessary: successfully cross-compiling does not establish that a build
 runs on another OS. Native smoke tests start the extracted executable from an
 unrelated directory, fetch the UI/bundles and API, and create only a temporary save.
+They also restore a stopped-game backup into a replacement game folder, verify
+receipt persistence and check that the original save remains untouched. This
+tests same-version folder replacement, not compatibility with all old saves.
 They do not establish graphics performance, installer acceptance or a full campaign.
 
 ## First-publication gates

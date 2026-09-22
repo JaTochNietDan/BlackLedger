@@ -3814,3 +3814,11 @@ builds, server tests and focused banking/deposit tests (including race) passed.
 Detailed evidence and limitations are in docs/RELEASE_READINESS.md. This session
 included debugging pauses and does not sign off the full campaign acceptance.
 The main save and unrelated working changes were preserved.
+
+### 2026-09-21 — verify archive backup restoration
+
+Extended native smoke checks to restore stopped-game saves and receipts from a
+replacement game folder, advance the restored copy, and ensure the original
+save is unchanged. Mac ARM64 passed on an isolated build of 11c5eb9. Added pinned
+actionlint 1.7.12 workflow validation; it passes. No hosted/native Windows/Linux
+run is claimed. See release readiness for exact evidence and remaining gates.

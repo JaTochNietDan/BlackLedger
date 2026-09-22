@@ -7,6 +7,7 @@ import json
 import os
 from pathlib import Path
 import re
+import shutil
 import subprocess
 import sys
 import tarfile
@@ -119,7 +120,31 @@ def main():
             assert restored['revision'] == committed['revision']
             assert restored['player'] == committed['player']
             assert action(base) == committed, 'retry after restart changed committed state'
-        print('PASS: checksum, archive, unrelated directory, frontend, per-user save, port conflict, command/retry, restart/retry')
+        # Follow PLAY.txt's stopped-game backup instructions, then restore into
+        # a separate save under a replacement extracted game directory. Include
+        # WAL sidecars: forced process termination can leave committed data there.
+        backup = root / 'restored user config' / 'campaign.sqlite3'
+        backup.parent.mkdir()
+        original = {}
+        for suffix in ('', '-wal', '-shm'):
+            source = Path(str(db) + suffix)
+            if source.exists():
+                original[suffix] = source.read_bytes()
+                shutil.copyfile(source, Path(str(backup) + suffix))
+        replacement = root / 'replacement game folder'
+        game.rename(replacement)
+        with server(replacement / executable.name, root,
+                    {**env, 'BLACK_LEDGER_DB': str(backup)}, 'restore.log') as base:
+            restored = json.loads(get(base + '/api/state'))
+            assert restored['revision'] == committed['revision']
+            assert restored['player'] == committed['player']
+            assert action(base) == committed, 'restored backup lost the saved receipt'
+            command = {**command, 'revision': restored['revision'],
+                       'request_id': 'release-smoke-restored-wait'}
+            assert action(base)['revision'] == restored['revision'] + 1
+        for suffix, data in original.items():
+            assert Path(str(db) + suffix).read_bytes() == data, 'restored game touched original save'
+        print('PASS: checksum, archive, unrelated directory, frontend, per-user save, port conflict, command/retry, restart/retry, backup restore, replacement game folder')
 
 
 if __name__ == '__main__':
