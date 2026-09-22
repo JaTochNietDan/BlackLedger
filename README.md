@@ -17,7 +17,7 @@ take jobs, buy businesses and put together a crew. Rivals hold grudges and the
 police take an interest. If your character dies, another life begins in the
 same city—with the history you helped create.
 
-[Play the preview](#play-the-preview) · [The AI experiment](#the-ai-director-experiment) · [Features](#features) · [Screenshots](#screenshots) · [Build from source](docs/BUILDING.md)
+[Visit the game website](https://jatochnietdan.github.io/BlackLedger/) · [Play the preview](#play-the-preview) · [The AI experiment](#the-ai-director-experiment) · [Features](#features) · [Screenshots](#screenshots) · [Build from source](docs/BUILDING.md)
 
 ![Bellwether's streets, businesses and apartment blocks in the current development build](docs/screenshots/bellwether-city.jpg)
 

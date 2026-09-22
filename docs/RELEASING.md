@@ -69,6 +69,6 @@ release automatically. Test manual runs without tags to verify the workflow firs
 Runner labels are taken from GitHub's [hosted runner reference](https://docs.github.com/en/actions/reference/runners/github-hosted-runners).
 The workflow grants release writes only to the final job, following the
 [workflow permissions reference](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax).
-Actions are pinned to reviewed commit IDs; Dependabot proposes updates.
+Actions are pinned to reviewed commit IDs; dependency updates are reviewed manually.
 The original [PolyForm license source](https://github.com/polyformproject/polyform-licenses/blob/1.0.0/PolyForm-Noncommercial-1.0.0.md)
 is included verbatim, with project-specific required attribution kept in NOTICE.

@@ -31,3 +31,6 @@ for the screenshot dialog, and browser console checks. The workflow passed
 `actionlint`. Download links describe development artifacts separately from
 published releases; platform acceptance and asset provenance work remain tracked
 in `docs/RELEASING.md` and `ASSETS.md`.
+
+The first deployment was verified live on GitHub Pages, including its project
+subpath assets. Pages uses GitHub Actions as the source with HTTPS enforced.
