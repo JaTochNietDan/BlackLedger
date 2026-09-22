@@ -1,4 +1,4 @@
-const {BrowserWindow,ipcMain}=require('electron');
+const {app,BrowserWindow,ipcMain}=require('electron');
 const path=require('node:path');
 const fs=require('node:fs/promises');
 const {install,installed}=require('./install.cjs');
@@ -10,6 +10,8 @@ async function chooseAI(root,{force=false}={}){
  return new Promise((resolve,reject)=>{
   const window=new BrowserWindow({title:'Black Ledger — Local AI',width:780,height:650,resizable:false,
    backgroundColor:'#17140f',webPreferences:{preload:path.join(__dirname,'preload.cjs'),contextIsolation:true,nodeIntegration:false,sandbox:true}});
+  const focus=()=>{if(!window.isDestroyed()){if(window.isMinimized())window.restore();window.show();window.focus();}};
+  app.on('second-instance',focus);
   window.setMenu(null);window.webContents.setWindowOpenHandler(()=>({action:'deny'}));
   window.webContents.on('will-navigate',event=>event.preventDefault());
   let controller,task,settled=false,last=0;
@@ -33,7 +35,7 @@ async function chooseAI(root,{force=false}={}){
   };
   const action=(event,value)=>{handleAction(event,value).catch(error=>report({label:error.message,error:true}));};
   ipcMain.on('ai-setup-action',action);
-  window.on('closed',()=>{controller?.abort();ipcMain.removeListener('ai-setup-action',action);if(!settled)reject(new Error('AI setup closed'));});
+  window.on('closed',()=>{app.removeListener('second-instance',focus);controller?.abort();ipcMain.removeListener('ai-setup-action',action);if(!settled)reject(new Error('AI setup closed'));});
   window.loadFile(path.join(__dirname,'setup.html')).catch(reject);
  });
 }
