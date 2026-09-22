@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#14201c">
+  <meta name="description" content="Black Ledger: an experiment in AI-directed storytelling inside a persistent 1950s mafia life sim. Build a name. Leave a history. Bellwether remembers.">
+  <meta property="og:title" content="Black Ledger — An AI director. A city that remembers.">
+  <meta property="og:description" content="A local AI director, a persistent city, and a criminal career of your own. Explore the Black Ledger development preview.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://jatochnietdan.github.io/BlackLedger/">
+  <meta property="og:image" content="https://jatochnietdan.github.io/BlackLedger/assets/saint-agnes.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://jatochnietdan.github.io/BlackLedger/">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <script src="site.js" defer></script>
+  <title>Black Ledger — An AI director. A city that remembers.</title>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="masthead wrap">
+  <a class="brand" href="#" aria-label="Black Ledger home"><span class="monogram" aria-hidden="true">B<span>L</span></span><span>BLACK LEDGER<small>A CITY REMEMBERS</small></span></a>
+  <nav aria-label="Main navigation"><a href="#director">The experiment</a><a href="#city">The city</a><a href="#story">A story</a><a class="nav-cta" href="#download">Get the preview <span aria-hidden="true">↗</span></a></nav>
+</header>
+<main id="main">
+  <section class="hero wrap" aria-labelledby="hero-title">
+    <div class="hero-copy">
+      <p class="eyebrow"><span class="live-dot" aria-hidden="true"></span> AN EXPERIMENT IN AI-DIRECTED STORYTELLING</p>
+      <h1 id="hero-title">An AI director.<br>A city that<br><em>remembers.</em></h1>
+      <p class="hero-intro">Make your way in a 1950s mafia life sim where a local AI director creates new encounters—and the city keeps the consequences.</p>
+      <a class="button button-light" href="#director">Discover the experiment <span aria-hidden="true">↘</span></a>
+      <p class="hero-note">Single player. Runs locally. Every life leaves a mark.</p>
+    </div>
+    <div class="hero-visual">
+      <div class="photo-topline"><span>BELLWETHER, 1953</span><span>FIELD NOTES / 001</span></div>
+      <figure class="hero-photo"><img src="assets/saint-agnes.jpg" width="1280" height="720" alt="Inside Saint Agnes: the bar, booths and people of Bellwether in the development game" fetchpriority="high"><figcaption><span>Saint Agnes</span><span>Coffee. Contacts. An opportunity.</span></figcaption></figure>
+      <div class="hero-bottom"><span class="edition">THE BLACK LEDGER EXPERIMENT<br><b>DEVELOPMENT PREVIEW</b></span><p>You start with a rented room.<br>What comes next is your business.</p></div>
+    </div>
+  </section>
+  <div class="ticker" aria-label="Game highlights"><div class="wrap"><span>LOCAL AI DIRECTOR</span><span aria-hidden="true">✦</span><span>A PERSISTENT CITY</span><span aria-hidden="true">✦</span><span>PERMANENT CONSEQUENCES</span><span aria-hidden="true">✦</span><span>YOUR OWN WAY UP</span></div></div>
+
+  <section id="director" class="section wrap director" aria-labelledby="director-title">
+    <div class="section-heading"><p class="eyebrow">01 / THE REASON WE BUILT IT</p><h2 id="director-title">A world with rules.<br><em>Room for improvisation.</em></h2></div>
+    <div class="director-intro"><p>Black Ledger exists to explore an idea: an AI director that can turn the state of a living game world into a story worth playing.</p><p>Your contacts, past dealings and the places you can reach give the director something to work with. It proposes new encounters. The simulation checks them, sets the stakes, and remembers what you do.</p></div>
+    <div class="process">
+      <article><span class="number">01</span><h3>The city gives context.</h3><p>People have relationships. Businesses have owners. Your campaign has a history. The director draws on that world.</p></article>
+      <article><span class="number">02</span><h3>The director proposes.</h3><p>A new job. A difficult conversation. A different approach. Locally generated encounters give familiar streets new possibilities.</p></article>
+      <article><span class="number">03</span><h3>You make the decision.</h3><p>Time, money, respect and police attention are real game rules. Choose your approach and live with the result.</p></article>
+    </div>
+    <p class="margin-note">The experiment is still evolving. Today, the director creates courier, collection and mediation encounters. Narrative coherence is an active area of development.</p>
+  </section>
+
+  <section id="story" class="story-section" aria-labelledby="story-title"><div class="wrap">
+    <div class="story-heading"><p class="eyebrow">02 / FROM AN ACTUAL AI PLAYTEST</p><span class="paper-stamp">LOCAL AI<br>GENERATED ENCOUNTER</span></div>
+    <div class="story-grid">
+      <div class="story-copy"><p class="byline">MARA BELL HAS A PROPOSITION</p><h2 id="story-title">A disagreement<br>at The Mariner.</h2><p>Two staff members. One shared work area. Neither willing to give way. Mara would rather settle it before somebody draws blood.</p><blockquote>“I need you to hear both of them out and find a way to share the work area without turning this into a fight. It's a simple matter of scheduling and access, but they're both stubborn.”</blockquote><p class="source-note">An excerpt from a real Qwen3 14B encounter. The AI wrote the situation and alternative approach labels; the game supplied the stakes.</p></div>
+      <div class="decision"><p class="eyebrow">HOW WOULD YOU HANDLE IT?</p><p class="decision-instruction">A recorded encounter. Choose an approach to compare its stakes.</p>
+        <div class="approaches" role="group" aria-label="Encounter approaches">
+          <button type="button" data-choice="accept" aria-pressed="true"><span><small>THE STRAIGHTFORWARD WAY</small>Mediate the dispute</span><span class="choice-arrow" aria-hidden="true">↗</span></button>
+          <button type="button" data-choice="approach:careful" aria-pressed="false"><span><small>TAKE YOUR TIME</small>Listen quietly</span><span class="choice-arrow" aria-hidden="true">↗</span></button>
+          <button type="button" data-choice="approach:press" aria-pressed="false"><span><small>MAKE IT QUICK</small>Press for resolution</span><span class="choice-arrow" aria-hidden="true">↗</span></button>
+          <button type="button" data-choice="decline" aria-pressed="false"><span><small>WALK AWAY</small>Decline the arrangement</span><span class="choice-arrow" aria-hidden="true">↗</span></button>
+        </div>
+        <div class="decision-result" role="status" aria-live="polite" aria-atomic="true"><div class="stakes"><div><span>YOUR TIME</span><strong id="choice-time">60 min</strong></div><div><span>PAY ON COMPLETION</span><strong id="choice-pay">$55</strong></div><div><span>ADDED HEAT</span><strong id="choice-heat">None</strong></div></div><p id="choice-note">A measured resolution. Completion earns 5 respect. Existing police attention can complicate the job.</p></div>
+        <noscript><p>Listen quietly: 90 minutes, $40, no added heat. Press for resolution: 45 minutes, $75, +5 heat. Decline: no time, payment or added heat.</p></noscript>
+      </div>
+    </div>
+  </div></section>
+
+  <section id="city" class="section wrap" aria-labelledby="city-title">
+    <div class="city-heading"><div><p class="eyebrow">03 / WELCOME TO BELLWETHER</p><h2 id="city-title">Start with a room.<br><em>Build something worth losing.</em></h2></div><p>The clock advances with your actions. Take your time planning the next move. The city will be waiting.</p></div>
+    <figure class="city-panorama"><button class="image-button" type="button" data-gallery="0" aria-label="Enlarge Bellwether city screenshot"><img src="assets/bellwether-city.jpg" width="1280" height="720" alt="An overhead view of Bellwether's streets, apartment blocks and businesses" loading="lazy"><span class="image-label">BELLWETHER / A CITY OF OPPORTUNITIES <span aria-hidden="true">↗</span></span></button></figure>
+    <div class="features"><article><h3>A name on the street.</h3><p>Find work, build trust and earn respect. Buy property and businesses. Recruit associates and send your crew to collect, guard, repair or take risks on your behalf.</p></article><article><h3>Nothing comes without a cost.</h3><p>Negotiate with the families. Manage income, stock and security. Debts, raids and retaliation can turn yesterday's opportunity into today's problem.</p></article><article><h3>Another life. The same city.</h3><p>Death is permanent for your character. Begin a new life in a city shaped by the people, property and history that came before you.</p></article></div>
+    <div class="gallery"><figure><button class="image-button" type="button" data-gallery="1" aria-label="Enlarge Saint Agnes screenshot"><img src="assets/saint-agnes.jpg" width="1280" height="720" alt="Saint Agnes café and bar interior with seated patrons" loading="lazy"><span class="image-label">SAINT AGNES <span aria-hidden="true">↗</span></span></button><figcaption>Step inside. Put a face to the name.</figcaption></figure><figure><button class="image-button" type="button" data-gallery="2" aria-label="Enlarge The Green Baize screenshot"><img src="assets/green-baize.jpg" width="1280" height="720" alt="The Green Baize pool hall with six billiard tables" loading="lazy"><span class="image-label">THE GREEN BAIZE <span aria-hidden="true">↗</span></span></button><figcaption>Play eight-ball. Enter a tournament. Own the hall.</figcaption></figure></div>
+    <p class="margin-note">Actual screenshots from the development build. Visuals, gameplay and balance are still being improved.</p>
+  </section>
+
+  <section id="download" class="download-section"><div class="wrap download-grid"><div><p class="eyebrow">04 / YOUR FIRST DAY IN BELLWETHER</p><h2>Every career<br>starts <em>somewhere.</em></h2><p>Follow the experiment. Try a development build.<br>Tell us what happened in your city.</p><div class="download-actions"><a class="button button-light" href="https://github.com/JaTochNietDan/BlackLedger/actions/workflows/build.yml">View development builds <span aria-hidden="true">↗</span></a><a class="text-link" href="https://github.com/JaTochNietDan/BlackLedger/releases">Published releases <span aria-hidden="true">↗</span></a></div><p class="download-note">Download artifacts from successful GitHub Actions runs (GitHub sign-in required). Public releases appear separately when published. Builds are development previews and currently unsigned.</p><div class="platforms"><span>WINDOWS <small>x64</small></span><span>macOS <small>Intel · Apple Silicon</small></span><span>LINUX <small>x64 · ARM64</small></span></div></div><aside class="setup-note"><span class="eyebrow">YOUR DIRECTOR. ON YOUR COMPUTER.</span><h3>Set it up once.<br>Keep the stories local.</h3><p>The desktop app can download the AI director and generated voices during first-run setup. No account, subscription, API key or separate Python installation is needed for local AI.</p><dl><div><dt>Initial download</dt><dd>About 10–12 GB</dd></div><div><dt>Free installation space</dt><dd>About 20 GB</dd></div><div><dt>After setup</dt><dd>Works offline</dd></div></dl><p class="small">The director needs substantial memory and can be slow on lower-end computers. You can also play authored encounters without AI and enable it later.</p><a class="text-link" href="https://github.com/JaTochNietDan/BlackLedger/blob/main/docs/LOCAL_AI.md">Setup details & current limitations <span aria-hidden="true">↗</span></a></aside></div></section>
+</main>
+<footer class="wrap footer"><a class="brand" href="#">BLACK LEDGER</a><p>A game about making a name.<br>An experiment in how stories get made.</p><div><a href="https://github.com/JaTochNietDan/BlackLedger">Source & development</a><a href="https://github.com/JaTochNietDan/BlackLedger/issues">Feedback & bugs</a><a href="https://github.com/JaTochNietDan/BlackLedger/blob/main/LICENSE">Noncommercial license</a></div><p class="fine-print">© 2026 Black Ledger contributors. Source-available under PolyForm Noncommercial 1.0.0, with attribution required. Third-party assets and dependencies retain their own terms. Fictional violence, crime and gambling; no real-money gambling.</p></footer>
+<dialog id="lightbox" aria-labelledby="lightbox-caption"><button id="close-lightbox" class="close-lightbox" type="button" aria-label="Close screenshot">Close ×</button><img id="lightbox-image" alt=""><p id="lightbox-caption"></p></dialog>
+<script type="application/json" id="encounter-data">__ENCOUNTER_JSON__</script>
+</body>
+</html>
