@@ -1,21 +1,53 @@
 # Black Ledger
 
-### Every favor has a price. Every life leaves a mark.
+### An AI director. A city that remembers.
 
-**Black Ledger is a single-player mafia life sim set in a 1950s city.**
-Start with a rented room and a little cash. Find someone willing to trust you,
-take the jobs nobody wants on the books, and turn a name on the street into
-businesses, a crew, and a place among the families.
+**Black Ledger is an experiment in AI-directed storytelling, built inside a
+single-player 1950s mafia life sim.** A local AI director draws on your campaign
+to create new encounters, while a persistent simulation gives those stories
+people, relationships, money and consequences to work with.
 
-Bellwether keeps moving as you act. People go to work, money changes hands,
-rivals hold grudges, and the police take an interest. If your character dies,
-you begin another life in the same city—with the history you helped create.
+That experiment is why Black Ledger exists: to explore how an AI director can
+respond to an evolving game world and make each criminal career feel personal.
+The game provides the rules and the stakes. The director proposes the stories
+that unfold within them.
 
-[Play the preview](#play-the-preview) · [Features](#features) · [Screenshots](#screenshots) · [Build from source](docs/BUILDING.md)
+You start with a rented room and a little cash in Bellwether. Build contacts,
+take jobs, buy businesses and put together a crew. Rivals hold grudges and the
+police take an interest. If your character dies, another life begins in the
+same city—with the history you helped create.
+
+[Play the preview](#play-the-preview) · [The AI experiment](#the-ai-director-experiment) · [Features](#features) · [Screenshots](#screenshots) · [Build from source](docs/BUILDING.md)
 
 ![Bellwether's streets, businesses and apartment blocks in the current development build](docs/screenshots/bellwether-city.jpg)
 
 *One city. More than one lifetime.*
+
+## The AI director experiment
+
+The director works with the campaign you're actually playing: available
+contacts, existing relationships, places you can reach, and the record of
+previous arrangements. It uses that context to propose new encounters and
+conversations for your character.
+
+- **Stories grounded in your campaign.** The director builds around people and
+  places already in the city, with context from your progress and past dealings.
+- **Choices with defined stakes.** Generated encounters go through game-side
+  validation. The simulation controls money, time, rewards and outcomes, keeping
+  the director's storytelling connected to playable decisions.
+- **A voice for the cast.** Local speech generation gives characters consistent
+  voices and lets the newspaper narrate the city's events.
+- **An experiment you can run locally.** The director and voices run on your
+  computer, without an account, subscription or cloud API. Once the models are
+  installed, they work offline.
+
+The current director creates contact-led **courier, collection and mediation
+encounters**, including optional alternative approaches. Expanding and improving
+that relationship between generated stories and the simulation is the heart of
+the project. Narrative coherence remains an active area of development, and
+feedback from real campaigns helps guide the experiment.
+
+[How to enable the director](#set-up-the-ai-director-and-voices) · [How local AI works](docs/LOCAL_AI.md)
 
 ## Make your way in Bellwether
 
@@ -29,6 +61,9 @@ neighborhood, step inside its businesses, and decide what comes next.
 
 ## Features
 
+- **An AI director at the heart of the project.** Experiment with locally
+  generated encounters grounded in your campaign, alongside authored stories
+  and a persistent world.
 - **Rise from rented rooms to ownership.** Earn money, build respect, improve
   your living situation, and buy businesses and property.
 - **Run an operation.** Manage income, stock, repairs and security. Recruit
@@ -47,9 +82,6 @@ neighborhood, step inside its businesses, and decide what comes next.
   hall's proprietor.
 - **Read your city's story.** Follow events through the ledger and the
   *Bellwether Herald*, with newspaper reports shaped by what actually happened.
-- **Add a local AI director and voices.** Optional AI creates new encounters
-  within the game's rules, while generated character voices bring conversations
-  to life. Both run on your computer.
 
 ## Screenshots
 
@@ -95,7 +127,7 @@ game folder preserves your campaign. See [save locations and backups](docs/BUILD
 Current builds are unsigned, and macOS notarization is not yet configured.
 Platform testing and other release checks are tracked in [release readiness](docs/RELEASING.md).
 
-### Optional AI setup
+### Set up the AI director and voices
 
 Choose **Download and enable AI** on first launch to set up the director and
 voices automatically. No account, subscription, API key, Python or separate
