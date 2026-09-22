@@ -91,8 +91,11 @@ def main():
         subprocess.run(['go', 'build', '-trimpath', '-ldflags=-s -w', '-o', str(stage / executable), './cmd/blackledger'], cwd=ROOT,
                        env={**os.environ, 'GOOS': args.os, 'GOARCH': args.arch, 'CGO_ENABLED': '0'}, check=True)
         shutil.copytree(ROOT / 'dist', stage / 'dist')
-        for file in ['LICENSE', 'NOTICE', 'README.md', 'ASSETS.md', 'THIRD_PARTY_NOTICES.md']:
+        for file in ['LICENSE', 'NOTICE', 'README.md', 'ASSETS.md', 'THIRD_PARTY_NOTICES.md', 'CONTRIBUTING.md', 'API.md']:
             shutil.copyfile(ROOT / file, stage / file)
+        (stage / 'docs').mkdir()
+        for file in ['GOAL.md', 'RELEASING.md', 'RELEASE_READINESS.md', 'MEDIA_RIGHTS_REVIEW.md']:
+            shutil.copyfile(ROOT / 'docs' / file, stage / 'docs' / file)
         shutil.copyfile(ROOT / 'packaging/PLAY.txt', stage / 'PLAY.txt')
         notices(stage / 'licenses')
         metadata = {'version': args.version, 'os': args.os, 'arch': args.arch,

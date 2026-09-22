@@ -16,3 +16,9 @@ Do not publish the repository history or a game archive until unresolved media
 rights are resolved. Removing a file from the current tree does not remove it
 from Git history. Record a source URL, author, license, and any required credit
 for imported replacements. Do not import assets from the separate Afterlight project.
+
+The [focused media review](docs/MEDIA_RIGHTS_REVIEW.md) lists the 23 recordings,
+textures, imported originals/derivative and style references requiring source
+evidence, with exact SHA-256 hashes. Ground-texture history describes photographs
+but does not identify a source license. These are unresolved facts, not a finding
+that the files are infringing.

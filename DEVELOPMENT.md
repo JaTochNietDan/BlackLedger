@@ -3784,3 +3784,20 @@ Gitleaks reported no leaks across 919 commits. Detailed evidence and remaining
 publication/acceptance gates are in docs/RELEASE_READINESS.md and docs/RELEASING.md.
 Nothing was published; media permission and GitHub authentication are unresolved.
 The main campaign and port 8791 were not used or modified by these checks.
+
+### 2026-09-21 — verify a clean release checkout and narrow media review
+
+Created a detached QA worktree at b10f7b8, preserving the original dirty worktree.
+Fresh npm install/build, 407 frontend tests, Go short suite across all packages
+(core100.6s, sim313.1s), clean-tree versioned Mac packaging and native archive
+restart/retry checks passed. build.json confirms b10f7b8 with modified:false.
+This removes dependence on uncommitted local work from the packaging evidence;
+it does not replace full/native hosted CI or campaign acceptance.
+
+Added docs/MEDIA_RIGHTS_REVIEW.md with exact hashes and history evidence for23
+files needing source/permission records. The four ground photographs have no
+recorded provider/license; the imported shop's commit identifies Grok provenance.
+No asset was removed or rights declared without evidence. Packaged linked docs
+and exercised the actual Unix launcher from a path with spaces. Follow-up archive
+smoke and document membership checks passed. GitHub integration was offered but
+is not confirmed installed/connected; no publication or main-save access occurred.

@@ -25,8 +25,12 @@ def get(url):
 @contextmanager
 def server(executable, root, env, log_name):
     with (root / log_name).open('w+') as log:
-        process = subprocess.Popen([str(executable), '-desktop', '-browser=false', '-addr', ':0'],
-                                   cwd=root, env=env, stdout=log, stderr=log)
+        command = [str(executable), '-desktop', '-browser=false', '-addr', ':0']
+        if os.name != 'nt':
+            # Exercise the actual Unix launcher, including its quoting/cwd logic.
+            launcher = executable.parent / ('Play.command' if sys.platform == 'darwin' else 'Play.sh')
+            command = [str(launcher), '-browser=false', '-addr', ':0']
+        process = subprocess.Popen(command, cwd=root, env=env, stdout=log, stderr=log)
         try:
             deadline = time.monotonic() + 45
             while time.monotonic() < deadline:

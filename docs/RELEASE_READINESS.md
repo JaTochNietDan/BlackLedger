@@ -62,3 +62,36 @@ Linux and Intel Mac archives have only cross-compilation evidence locally.
 Unsigned/unnotarized packages are not native installers. A fresh sustained
 campaign, save-upgrade/backups, wider browser/device testing and the gameplay/
 visual gaps in docs/GOAL.md remain part of first-public-preview acceptance.
+
+## Clean-checkout verification — 2026-09-21
+
+A separate detached worktree at `b10f7b8319b877aeef84efc269102aae4185bcb4`
+was created under `.runtime/release-clean-b10f7b8`. It contains committed source
+only; none of the original checkout's uncommitted gameplay changes were copied.
+`npm ci`, the production frontend build, and all 407 frontend tests passed.
+The versioned local Mac ARM64 archive was accepted by the clean-tree guard;
+its build.json records the exact commit above and `modified: false`. Its native
+archive smoke test passed, including save/retry persistence after restart.
+This remains a local QA build, not a tagged or published release.
+
+A focused media review now identifies 23 current files with exact hashes in
+`docs/MEDIA_RIGHTS_REVIEW.md`: 14 supplied recordings, four ground textures,
+three imported shop originals/derivative and two style references. Commit history
+identifies the shop as a Grok image, but describes the ground as photographic
+textures without recording a provider or source license. No redistribution
+permission has been invented. Older versions and other provenance records still
+need review when deciding whether to publish complete Git history.
+
+The GitHub integration was discovered and offered, but is not confirmed installed
+or connected. It does not yet supply authenticated repository access.
+
+The clean checkout's `go test -short ./...` completed successfully: core 100.6s,
+sim 313.1s, and all other packages passed. This is the short suite; tests that
+explicitly skip under `testing.Short()` were not run by that command. Logs are
+`.runtime/release-clean-go-tests.log` and `.runtime/release-clean-frontend-tests.log`.
+The updated Unix smoke path executes Play.command/Play.sh directly rather than
+bypassing the launcher. On the Mac it passed from a path with spaces through
+launch, command/retry, shutdown, reload and saved-receipt replay. Windows smoke
+still executes the binary directly; validating the .cmd UI remains a Windows
+acceptance item. The follow-up `dev-media-review` archive also includes the local
+documents directly linked from README/ASSETS; archive membership was verified.
