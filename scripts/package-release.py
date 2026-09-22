@@ -123,8 +123,9 @@ def main():
         for file in ['LICENSE', 'NOTICE', 'README.md', 'ASSETS.md', 'THIRD_PARTY_NOTICES.md', 'CONTRIBUTING.md', 'API.md']:
             shutil.copyfile(ROOT / file, stage / file)
         (stage / 'docs').mkdir()
-        for file in ['GOAL.md', 'RELEASING.md', 'RELEASE_READINESS.md', 'MEDIA_RIGHTS_REVIEW.md', 'LOCAL_AI.md']:
+        for file in ['GOAL.md', 'RELEASING.md', 'RELEASE_READINESS.md', 'MEDIA_RIGHTS_REVIEW.md', 'LOCAL_AI.md', 'BUILDING.md']:
             shutil.copyfile(ROOT / 'docs' / file, stage / 'docs' / file)
+        shutil.copytree(ROOT / 'docs/screenshots', stage / 'docs/screenshots')
         shutil.copyfile(ROOT / 'packaging/PLAY.txt', stage / 'PLAY.txt')
         notices(stage / 'licenses')
         metadata = {'version': args.version, 'os': args.os, 'arch': args.arch,

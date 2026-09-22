@@ -1,104 +1,133 @@
 # Black Ledger
 
-A single-player 1950s mafia game: start with a rented room, find work, build a
-crew, own businesses, and live with the consequences in a persistent city.
-The Go simulation owns the rules and transactional SQLite saves; a React/Three.js
-browser client presents the city, interiors, encounters and gambling tables.
+### Every favor has a price. Every life leaves a mark.
 
-**Development preview.** Gameplay, visual quality and balance are still evolving.
-This is not a finished 1.0 release. The game contains fictional violence, crime,
-gambling and permanent character death. No real-money gambling is involved.
+**Black Ledger is a single-player mafia life sim set in a 1950s city.**
+Start with a rented room and a little cash. Find someone willing to trust you,
+take the jobs nobody wants on the books, and turn a name on the street into
+businesses, a crew, and a place among the families.
 
-## Play a downloaded build
+Bellwether keeps moving as you act. People go to work, money changes hands,
+rivals hold grudges, and the police take an interest. If your character dies,
+you begin another life in the same city—with the history you helped create.
 
-Extract the archive and open **BlackLedger.exe** (Windows), **Black Ledger.app**
-(macOS), or **BlackLedger** (Linux). The game runs in its own desktop window.
-Close the window or choose Game → Quit to stop it. Keep the supporting files
-beside the Windows/Linux executable; the Mac app is self-contained and can move
-to Applications. No separate browser, terminal, Go, Node, Python or AI models
-are needed. A working graphics driver is required.
+[Play the preview](#play-the-preview) · [Features](#features) · [Screenshots](#screenshots) · [Build from source](docs/BUILDING.md)
 
-Distribution targets: Windows x64, macOS Intel and Apple Silicon, Linux x64 and
-ARM64. These are portable application archives, not installers. Initial builds
-are unsigned; macOS notarization is not yet configured. Published downloads
-will appear in [GitHub Releases](https://github.com/JaTochNietDan/BlackLedger/releases).
-CI artifacts are available from successful Actions runs before a release is published.
+![Bellwether's streets, businesses and apartment blocks in the current development build](docs/screenshots/bellwether-city.jpg)
 
-Saves live in the per-user `BlackLedger` folder under `%AppData%` on Windows,
-`~/Library/Application Support` on macOS, or `$XDG_CONFIG_HOME` (normally
-`~/.config`) on Linux. Updating the extracted game folder preserves those saves.
-Stop the game before backing up its SQLite files. Development-checkout saves
-are separate and are never automatically imported.
+*One city. More than one lifetime.*
 
-## Build from source
+## Make your way in Bellwether
 
-Install Go 1.23 or newer and Node.js 22.12 or newer with npm. Python 3.12 is needed only for
-packaging. CI uses the current stable Go release. From the repository root:
+A discreet delivery can buy you another day's rent. A useful contact can open a
+door. A business can give you steady income—and something a rival can threaten.
+How far you go depends on the people you cultivate, the risks you take, and what
+you can afford to lose.
 
-```sh
-npm ci
-npm run build
-go run ./cmd/blackledger
-```
+Plan at your own pace: the game clock advances with your actions. Walk the
+neighborhood, step inside its businesses, and decide what comes next.
 
-Open `http://127.0.0.1:8791`. Rebuild after frontend edits. The server binds only
-to localhost; this is a local single-player application, not an internet-facing
-multiplayer server. The source workflow saves to `.runtime/campaign.sqlite3`.
-Override it with `-db /path/to/save.sqlite3` or `BLACK_LEDGER_DB`.
-Use a different port with `-addr :8795` or `BLACK_LEDGER_PORT`.
+## Features
 
-```sh
-go vet ./...
-go test ./...
-npm test
-npm ci --prefix desktop
-npm test --prefix desktop
-python3 scripts/package-release.py --os darwin --arch arm64 --version dev-local
-python3 scripts/smoke-release.py release/black-ledger-dev-local-darwin-arm64.tar.gz
-```
+- **Rise from rented rooms to ownership.** Earn money, build respect, improve
+  your living situation, and buy businesses and property.
+- **Run an operation.** Manage income, stock, repairs and security. Recruit
+  associates and dispatch operatives to collect proceeds, guard a property,
+  handle maintenance or take on dangerous work.
+- **Deal with the families.** Build relationships, negotiate protection for
+  your businesses, navigate rivalries, and establish your own organization.
+- **Live with the consequences.** Robberies, debts, retaliation, arrests and
+  raids leave their mark. Violence can end your character's life permanently.
+- **Return to a city that remembers.** Begin a new life without wiping the
+  city's history. People, property and the aftermath of earlier lives persist.
+- **Explore a 3D neighborhood.** Pan, rotate and zoom around Bellwether, follow
+  street journeys, and enter its cafés, garages, homes and gambling venues.
+- **Take a seat at the tables.** Play cards, dice, roulette and slots, or aim a
+  shot in physical eight-ball. Enter pool tournaments—or arrange them as the
+  hall's proprietor.
+- **Read your city's story.** Follow events through the ledger and the
+  *Bellwether Herald*, with newspaper reports shaped by what actually happened.
+- **Add a local AI director and voices.** Optional AI creates new encounters
+  within the game's rules, while generated character voices bring conversations
+  to life. Both run on your computer.
 
-Choose the OS/architecture for your machine to run the archive smoke test.
-The packager also supports cross-compilation. It refuses to overwrite an
-existing archive. It includes the frontend, assets, desktop app and game server,
-license notices, build metadata and SHA-256 checksum, never a campaign save.
+## Screenshots
 
-## Optional AI and voice
+Screenshots captured from the development build. Visuals and interface are still
+being improved.
 
-The desktop app offers **Download and enable AI** on first launch. It downloads
-Ollama, Qwen3 14B (about 9.3 GB), and the quantized Kokoro voice model, then runs
-them locally. No accounts, API keys, Python or separate Ollama installation are
-needed. Downloads resume after interruption and are verified against pinned
-SHA-256 checksums. Choose **Play without AI** to skip; use **Game → AI setup**
-to enable or retry later. After setup, stories and speech work offline.
+### Saint Agnes
 
-Allow roughly 10–12 GB of downloads plus installation space. The director needs
-substantial memory and can be slow on lower-end computers; generated encounters
-still pass the game's validation before appearing. AI files live in the `ai/`
-folder beside the default save and survive app updates. Speech can be toggled
-in the game. See [local AI details](docs/LOCAL_AI.md) for limitations and QA.
+Coffee by daylight, whispered arrangements after dark. Step inside to meet the
+people behind the names.
 
-For source-checkout development, AI requests use
-`BLACK_LEDGER_OLLAMA` (default `http://127.0.0.1:11435`) and
-`BLACK_LEDGER_MODEL` (default `qwen3:14b`). Speech uses the legacy-named
-`AFTERLIGHT_DIRECTOR_URL` (default `http://127.0.0.1:8787`). These services receive
-game text when enabled. These environment settings apply to developer servers;
-the desktop app selects its own private local services.
-`BLACK_LEDGER_DIRECTOR_THINK=1` enables experimental reasoning; it is off by default.
+![Saint Agnes interior with its bar, booths and occupants](docs/screenshots/saint-agnes.jpg)
 
-`scripts/run-services.sh` is a development helper for a previously provisioned
-local `.tools/` installation. It does not install models or make a fresh checkout
-self-contained. This repository is independent of the archived Afterlight game.
+### The Green Baize
 
-## License and contributions
+A neighborhood pool hall with tables to play and a business to aspire to own.
+
+![The Green Baize pool hall interior](docs/screenshots/green-baize.jpg)
+
+## Play the preview
+
+**Black Ledger is in active development.** Expect rough edges and changes to
+visuals, balance and gameplay. This is a development preview, not a finished
+1.0 release.
+
+[GitHub Releases](https://github.com/JaTochNietDan/BlackLedger/releases) will host
+published builds. In the meantime, development archives are available as
+artifacts from successful [build runs](https://github.com/JaTochNietDan/BlackLedger/actions/workflows/build.yml).
+
+| Platform | Build targets | Open after extracting |
+| --- | --- | --- |
+| Windows | x64 | `BlackLedger.exe` |
+| macOS | Apple Silicon and Intel | `Black Ledger.app` |
+| Linux | x64 and ARM64 | `BlackLedger` |
+
+Extract the whole archive, then open the application. The game runs in its own
+desktop window; no terminal or separate browser is needed. Keep supporting files
+beside the executable on Windows and Linux. On macOS, you can move the app to
+Applications. A working graphics driver is required.
+
+Saves are automatic and stored separately from the application, so replacing the
+game folder preserves your campaign. See [save locations and backups](docs/BUILDING.md#saves).
+Current builds are unsigned, and macOS notarization is not yet configured.
+Platform testing and other release checks are tracked in [release readiness](docs/RELEASING.md).
+
+### Optional AI setup
+
+Choose **Download and enable AI** on first launch to set up the director and
+voices automatically. No account, subscription, API key, Python or separate
+Ollama installation is needed. After setup, AI works offline.
+
+Allow roughly **10–12 GB of downloads** and about **20 GB of free disk space**
+for installation. The director needs substantial memory and can be slow on
+lower-end computers. Downloads resume after interruption and are verified before
+installation.
+
+You can choose **Play without AI** and enjoy authored encounters, then return
+through **Game → AI setup** whenever you like. [More about local AI](docs/LOCAL_AI.md).
+
+## Follow along or contribute
+
+Have feedback from a campaign, found a bug, or want to help build Bellwether?
+[Open an issue](https://github.com/JaTochNietDan/BlackLedger/issues) or read the
+[contribution guide](CONTRIBUTING.md).
+
+For developers: [build and run locally](docs/BUILDING.md), explore the
+[simulation API](API.md), or read the [current goals](docs/GOAL.md).
+The game uses Go and SQLite for its simulation and saves, React and Three.js
+for its presentation, and Electron for desktop distributions.
+
+## License
 
 Original project code is **source-available under PolyForm Noncommercial 1.0.0**,
-with required attribution in [NOTICE](NOTICE). Noncommercial use, modification
+with attribution required by [NOTICE](NOTICE). Noncommercial use, modification
 and redistribution are permitted subject to [LICENSE](LICENSE). Commercial use
 requires a separate license; contact [JaTochNietDan](https://github.com/JaTochNietDan).
-This is not an OSI open-source license. Dependencies keep their own licenses;
-media scope and unresolved provenance are documented in [ASSETS.md](ASSETS.md).
+This is not an OSI open-source license. Dependencies retain their own licenses;
+see [third-party notices](THIRD_PARTY_NOTICES.md) and [asset provenance](ASSETS.md).
 
-Read [CONTRIBUTING.md](CONTRIBUTING.md), [API.md](API.md) and [docs/GOAL.md](docs/GOAL.md)
-before changing gameplay or interfaces. [docs/RELEASING.md](docs/RELEASING.md)
-describes automated builds and the remaining public-release gates.
-The archived `prototype-python` is reference material, not the running backend.
+*Contains fictional violence, crime, gambling and permanent character death.
+No real-money gambling is involved.*
