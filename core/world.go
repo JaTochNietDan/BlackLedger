@@ -1340,7 +1340,7 @@ func (w *World) Actions(id string) []Action {
 				fmt.Sprintf("$%d. Every one of their places loses %d trade and the organization loses %d strength. A paper full of crime is a paper full of crime whoever it is about, so the whole city gets harder — and about one time in five they find out who paid for it.", SmearCost, SmearCustom, SmearPower))
 		}
 	case "market":
-		add("deposit", "Wire money out of the city", 45, 0, w.DepositReadiness(0),
+		add("deposit", "Wire money out of the city", 45, 0, w.DepositReadiness(min(DepositLot, p.Cash)),
 			fmt.Sprintf("The arrangement takes %d%% of whatever you send; $%d of a $%d wire arrives. It survives you, and whoever comes next can reach it if they can afford to.", DepositCut, DepositLot*(100-DepositCut)/100, DepositLot))
 		sum(DepositLeast, p.Cash, DepositLot, "Sent out")
 		asks("offshore_access", "Establish that the account is yours", AccessMinutes, AccessCost, w.AccessReadiness(),

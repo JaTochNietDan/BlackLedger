@@ -3801,3 +3801,16 @@ No asset was removed or rights declared without evidence. Packaged linked docs
 and exercised the actual Unix launcher from a path with spaces. Follow-up archive
 smoke and document membership checks passed. GitHub integration was offered but
 is not confirmed installed/connected; no publication or main-save access occurred.
+
+### 2026-09-21 — fix amount controls found during release campaign
+
+An isolated browser campaign reached first ownership through jobs and trade.
+Fixed trade quantities incorrectly rendered as dollars/stepped by five, using
+public goods units with one-unit steps. Fixed wire offer eligibility below the
+legacy $500 lot while retaining the $100 minimum and command validation. Browser
+verification covered five-crate buy/sell, a $100 wire, midnight upkeep, business
+purchase/income and persistence across restart. 409 frontend tests, production
+builds, server tests and focused banking/deposit tests (including race) passed.
+Detailed evidence and limitations are in docs/RELEASE_READINESS.md. This session
+included debugging pauses and does not sign off the full campaign acceptance.
+The main save and unrelated working changes were preserved.

@@ -1,3 +1,4 @@
+import {actionUnit} from './sumAmount';
 import {CrewOrdersPanel} from './CrewOrdersPanel';
 import {PoolTournamentRoom,PoolTournamentNotice} from './PoolTournamentRoom';
 import {BilliardsRoom,PoolChallenges} from './BilliardsRoom';
@@ -407,7 +408,14 @@ function App() {
   function actionButton(a: Action) {
     if (a.sum)
       return (
-        <SumAction key={a.id} a={a} money={money} disabled={busy || !!journey} commit={commit} />
+        <SumAction
+          key={a.id}
+          a={a}
+          money={money}
+          unit={actionUnit(a.id, world?.goods)}
+          disabled={busy || !!journey}
+          commit={commit}
+        />
       );
     // What you are buying, drawn. Three cars were three lines of text that
     // looked identical on the way past.

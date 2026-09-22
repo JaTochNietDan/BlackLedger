@@ -1,4 +1,5 @@
 import {useState} from 'react';
+import {formatActionAmount} from './sumAmount';
 import type {Action, Command} from './types';
 
 // Money into and out of a business used to move in lots somebody else chose:
@@ -12,15 +13,18 @@ import type {Action, Command} from './types';
 export function SumAction({
   a,
   money,
+  unit,
   disabled,
   commit,
 }: {
   a: Action;
   money: (n: number) => string;
+  unit?: string;
   disabled: boolean;
   commit: (c: Command) => void;
 }) {
   const sum = a.sum!;
+  const format = (amount: number) => formatActionAmount(amount, money, unit);
   const [typed, setTyped] = useState<number | ''>(sum.preset);
   const amount = typed === '' ? 0 : typed;
   const over = amount > sum.most;
@@ -29,7 +33,7 @@ export function SumAction({
   // "More than the $18 there is" reads as a statement about the player's
   // pocket, which is true of a stake and false of a wage: the ceiling on what a
   // laundry pays a hand is what the trade will carry, not what is in the till.
-  const bad = over ? `${money(sum.most)} is the most` : under ? `At least ${money(sum.least)}` : '';
+  const bad = over ? `${format(sum.most)} is the most` : under ? `At least ${format(sum.least)}` : '';
 
   return (
     <div
@@ -40,7 +44,7 @@ export function SumAction({
       <span className="meta">
         {a.minutes ? `${a.minutes} min` : ''}
         <span>
-          {money(sum.least)}–{money(sum.most)}
+          {format(sum.least)}–{format(sum.most)}
         </span>
       </span>
       <span className="desc">{a.reason || a.detail}</span>
@@ -52,10 +56,10 @@ export function SumAction({
             inputMode="numeric"
             min={sum.least}
             max={sum.most}
-            step={5}
+            step={unit ? 1 : 5}
             value={typed}
             disabled={a.disabled || disabled}
-            aria-label={`${sum.label} — ${money(sum.least)} to ${money(sum.most)}`}
+            aria-label={`${sum.label} — ${format(sum.least)} to ${format(sum.most)}`}
             onChange={e =>
               setTyped(e.target.value === '' ? '' : Math.floor(Number(e.target.value)))
             }
@@ -76,7 +80,7 @@ export function SumAction({
         disabled={a.disabled || disabled || !!bad}
         onClick={() => commit({kind: a.id, target: a.target, choice: a.choice, amount})}
       >
-        {bad || `${a.label} — ${money(amount)}`}
+        {bad || `${a.label} — ${format(amount)}`}
       </button>
     </div>
   );

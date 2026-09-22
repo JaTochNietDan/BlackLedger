@@ -95,3 +95,38 @@ launch, command/retry, shutdown, reload and saved-receipt replay. Windows smoke
 still executes the binary directly; validating the .cmd UI remains a Windows
 acceptance item. The follow-up `dev-media-review` archive also includes the local
 documents directly linked from README/ASSETS; archive membership was verified.
+
+## Campaign amount controls — 2026-09-21
+
+A fresh packaged Mac campaign on isolated port 8879 reached its first owned
+business through normal browser controls: courier work, an authored private
+job, a laundry order, dock shifts, five-crate trading, a wire, midnight upkeep,
+and purchasing Bluebird Laundry. No gameplay fixture or main save was edited.
+At revision 23 (day 2, 04:25), the player had $88 cash, $82 offshore, 19 respect,
+100 health and the laundry. The first hour after purchase earned $13; the
+previous midnight shift paid $75 less $15 upkeep. The books and ownership
+controls were usable. The campaign survived a backend process replacement.
+
+This uncovered and fixed two defects:
+
+- Trade amounts were displayed as dollars and incremented by five. They now
+  use the existing public goods unit, including accessible labels, range errors
+  and submit text, and increment by one. Five moonshine crates cost $180 and
+  subsequently sold for $275 in the browser; money controls retained dollars.
+- The market wire offer tested the legacy $500 default even when the typed
+  minimum was $100. Readiness now tests its affordable preset. A $100 wire from
+  $485 left $385 cash and $82 offshore. Backend amount limits, fees and legacy
+  zero-amount behavior are unchanged and covered by regression tests.
+
+409 frontend tests, production frontend builds, the server package tests and
+focused banking/deposit tests passed; the focused Go race run passed too.
+The patched QA build came from the isolated committed-source worktree plus only
+these fixes, excluding unrelated local changes. This was a debugging campaign
+with development pauses, not the required uninterrupted 20–30-minute acceptance
+run. Crew/family progression, major consequences, broader devices and native
+Windows/Linux launch acceptance remain open.
+
+Local evidence is in `.runtime/public-campaign-20260921/` (public snapshots at
+revisions 6, 14 and 23), `.runtime/release-quantity-*.log` and
+`.runtime/release-deposit-tests.log`. The explicitly isolated campaign save is
+`/var/folders/2k/kck2sk4n08q6d_w_53nggjj80000gn/T/black-ledger-public-campaign-yzsqt19b/campaign.sqlite3`.

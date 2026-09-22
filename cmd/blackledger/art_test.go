@@ -579,7 +579,7 @@ func TestATypedFigureDoesNotClaimToKnowWhatIsInYourPocket(t *testing.T) {
 	if holds(sum, "More than the ${money(sum.most)} there is") {
 		t.Error("the figure field tells a business owner what is in their pocket")
 	}
-	if !holds(sum, "`${money(sum.most)} is the most`") {
+	if !holds(sum, "`${format(sum.most)} is the most`") {
 		t.Error("the figure field no longer says what the most is")
 	}
 }
