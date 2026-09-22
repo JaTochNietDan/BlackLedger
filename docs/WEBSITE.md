@@ -1,7 +1,7 @@
 # Game website
 
 The public landing page is built from `website/` and published to
-https://jatochnietdan.github.io/BlackLedger/ by `.github/workflows/pages.yml`.
+https://blackledger.oleary.club/ by `.github/workflows/pages.yml`.
 GitHub repository Settings → Pages must use **GitHub Actions** as its source.
 Changes to the website, screenshots, recorded encounter or build script on
 `main` publish automatically. Pull requests build without deploying.
@@ -34,3 +34,14 @@ in `docs/RELEASING.md` and `ASSETS.md`.
 
 The first deployment was verified live on GitHub Pages, including its project
 subpath assets. Pages uses GitHub Actions as the source with HTTPS enforced.
+
+## Custom domain
+
+`blackledger.oleary.club` is configured in the repository's Pages settings.
+Its DNS-only CNAME points to `jatochnietdan.github.io` (without a repository
+path). Terraform owns this record in the `ops` repository at
+`terraform/zones/oleary.club/cloudflare_record.tf`.
+
+GitHub Actions publishing uses the Pages custom-domain setting; it does not
+require a source `CNAME` file. Keep the canonical and social preview URLs in
+`website/index.html` and the README website link aligned with that setting.
