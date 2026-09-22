@@ -49,6 +49,38 @@ feedback from real campaigns helps guide the experiment.
 
 [How to enable the director](#set-up-the-ai-director-and-voices) · [How local AI works](docs/LOCAL_AI.md)
 
+### A story the director actually generated
+
+In a development playtest, Mara Bell offered **“A disagreement at The Mariner.”**
+Two staff members were arguing over a shared work area, and she wanted someone
+to settle it before it turned violent:
+
+> I need you to hear both of them out and find a way to share the work area
+> without turning this into a fight. It's a simple matter of scheduling and
+> access, but they're both stubborn. If you can smooth this over, it'll save
+> us a lot of trouble.
+
+The encounter offered four choices:
+
+| Your approach | Time | Pay on completion | Added police attention |
+| --- | --- | --- | --- |
+| Mediate the dispute | 60 minutes | $55 | None |
+| Listen quietly | 90 minutes | $40 | None |
+| Press for resolution | 45 minutes | $75 | +5 heat |
+| Decline the arrangement | No time | No payment | None |
+
+Do you spend longer keeping things quiet, push for a quicker payday, or leave
+someone else to handle it? Completing the mediation also earns five respect.
+Your existing police attention can complicate completion.
+
+**The director wrote the situation and the alternative approach labels. The
+game supplied the costs, rewards and consequences.** That connection between
+an improvised story and a concrete decision is what we're experimenting with.
+
+*Actual Qwen3 14B output from a local playtest; the passage above is an excerpt.
+[View the saved example](docs/examples/director-encounter.json). Values reflect
+that development build.*
+
 ## Make your way in Bellwether
 
 A discreet delivery can buy you another day's rent. A useful contact can open a

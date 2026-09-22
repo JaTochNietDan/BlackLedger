@@ -126,6 +126,7 @@ def main():
         for file in ['GOAL.md', 'RELEASING.md', 'RELEASE_READINESS.md', 'MEDIA_RIGHTS_REVIEW.md', 'LOCAL_AI.md', 'BUILDING.md']:
             shutil.copyfile(ROOT / 'docs' / file, stage / 'docs' / file)
         shutil.copytree(ROOT / 'docs/screenshots', stage / 'docs/screenshots')
+        shutil.copytree(ROOT / 'docs/examples', stage / 'docs/examples')
         shutil.copyfile(ROOT / 'packaging/PLAY.txt', stage / 'PLAY.txt')
         notices(stage / 'licenses')
         metadata = {'version': args.version, 'os': args.os, 'arch': args.arch,

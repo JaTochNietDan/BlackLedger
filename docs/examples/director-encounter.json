@@ -1,0 +1,79 @@
+{
+  "description": "An unplayed, validated offer from an isolated local AI integration test. Outcome text describes successful completion; it is not a record that the job was played.",
+  "captured": "2026-09-21",
+  "model": "qwen3:14b",
+  "speaker_name": "Mara Bell",
+  "event": {
+    "operation": "mediation",
+    "alternatives": {
+      "approach:careful": {
+        "reward": 40,
+        "respect": 5,
+        "heat": 0,
+        "minutes": 90
+      },
+      "approach:press": {
+        "reward": 75,
+        "respect": 5,
+        "heat": 5,
+        "minutes": 45
+      }
+    },
+    "target": "room",
+    "id": "6c59a56c39beb33bc62e354240ae286f",
+    "title": "A disagreement at The Mariner",
+    "body": "The Mariner is where the two staff members are having their disagreement. I need you to hear both of them out and find a way to share the work area without turning this into a fight. It's a simple matter of scheduling and access, but they're both stubborn. If you can smooth this over, it'll save us a lot of trouble.",
+    "speaker": "mara",
+    "choices": [
+      {
+        "id": "accept",
+        "label": "Mediate the dispute",
+        "detail": "",
+        "cost": 0,
+        "pay": 55,
+        "minutes": 60,
+        "respect": 5,
+        "disabled": false
+      },
+      {
+        "id": "approach:careful",
+        "label": "Listen quietly",
+        "detail": "",
+        "cost": 0,
+        "pay": 40,
+        "minutes": 90,
+        "respect": 5,
+        "disabled": false
+      },
+      {
+        "id": "approach:press",
+        "label": "Press for resolution",
+        "detail": "",
+        "cost": 0,
+        "pay": 75,
+        "minutes": 45,
+        "respect": 5,
+        "heat": 5,
+        "disabled": false
+      },
+      {
+        "id": "decline",
+        "label": "Decline the arrangement",
+        "detail": "No cost or time.",
+        "cost": 0,
+        "disabled": false
+      }
+    ],
+    "conditions": "The Mariner · At 15 heat, police may stop completion.",
+    "kind": "proposal",
+    "source": "local-ai",
+    "minute": 480,
+    "effect": {
+      "reward": 55,
+      "respect": 5,
+      "heat": 0,
+      "minutes": 60
+    },
+    "outcome": "You completed the requested mediation without violence."
+  }
+}
