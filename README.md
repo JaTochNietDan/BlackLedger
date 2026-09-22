@@ -11,18 +11,18 @@ gambling and permanent character death. No real-money gambling is involved.
 
 ## Play a downloaded build
 
-Extract the entire archive, then run `Play.cmd` (Windows), `Play.command`
-(macOS), or `./Play.sh` (Linux). The game opens in your default browser. Keep the
-launcher terminal running; close it or press Ctrl+C to stop the server.
-No Go, Node, Python or AI models are required to play. A modern browser with
-WebGL2 and a working graphics driver is required. See the archive's `PLAY.txt`
-for saves, startup options and troubleshooting.
+Extract the archive and open **BlackLedger.exe** (Windows), **Black Ledger.app**
+(macOS), or **BlackLedger** (Linux). The game runs in its own desktop window.
+Close the window or choose Game → Quit to stop it. Keep the supporting files
+beside the Windows/Linux executable; the Mac app is self-contained and can move
+to Applications. No separate browser, terminal, Go, Node, Python or AI models
+are needed. A working graphics driver is required.
 
-Planned distribution targets: Windows x64, macOS Intel and Apple Silicon,
-Linux x64 and ARM64. Initial archives are unsigned; macOS notarization and
-native installers are not yet implemented. Published downloads will appear in
-[GitHub Releases](https://github.com/JaTochNietDan/BlackLedger/releases) once the
-publication checklist is cleared. Do not assume releases exist yet.
+Distribution targets: Windows x64, macOS Intel and Apple Silicon, Linux x64 and
+ARM64. These are portable application archives, not installers. Initial builds
+are unsigned; macOS notarization is not yet configured. Published downloads
+will appear in [GitHub Releases](https://github.com/JaTochNietDan/BlackLedger/releases).
+CI artifacts are available from successful Actions runs before a release is published.
 
 Saves live in the per-user `BlackLedger` folder under `%AppData%` on Windows,
 `~/Library/Application Support` on macOS, or `$XDG_CONFIG_HOME` (normally
@@ -32,7 +32,7 @@ are separate and are never automatically imported.
 
 ## Build from source
 
-Install Go 1.23 or newer and Node.js 22 with npm. Python 3.12 is needed only for
+Install Go 1.23 or newer and Node.js 22.12 or newer with npm. Python 3.12 is needed only for
 packaging. CI uses the current stable Go release. From the repository root:
 
 ```sh
@@ -51,13 +51,15 @@ Use a different port with `-addr :8795` or `BLACK_LEDGER_PORT`.
 go vet ./...
 go test ./...
 npm test
+npm ci --prefix desktop
+npm test --prefix desktop
 python3 scripts/package-release.py --os darwin --arch arm64 --version dev-local
 python3 scripts/smoke-release.py release/black-ledger-dev-local-darwin-arm64.tar.gz
 ```
 
 Choose the OS/architecture for your machine to run the archive smoke test.
 The packager also supports cross-compilation. It refuses to overwrite an
-existing archive. It includes the frontend, assets, executable, launchers,
+existing archive. It includes the frontend, assets, desktop app and game server,
 license notices, build metadata and SHA-256 checksum, never a campaign save.
 
 ## Optional AI and voice

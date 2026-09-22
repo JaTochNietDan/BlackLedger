@@ -440,6 +440,7 @@ func main() {
 		"the campaign to open")
 	desktop := flag.Bool("desktop", false, "use installed game files and a per-user save")
 	browser := flag.Bool("browser", true, "open a browser in desktop mode")
+	parentStdio := flag.Bool("parent-stdio", false, "stop when the desktop parent closes stdin")
 	flag.Parse()
 	if *desktop {
 		executable, err := os.Executable()
@@ -497,5 +498,23 @@ func main() {
 			}
 		}()
 	}
-	log.Fatal((&http.Server{Handler: a, ReadHeaderTimeout: 5 * time.Second}).Serve(listener))
+	server := &http.Server{Handler: a, ReadHeaderTimeout: 5 * time.Second}
+	shutdownDone := make(chan struct{})
+	if *parentStdio {
+		go func() {
+			defer close(shutdownDone)
+			_, _ = io.Copy(io.Discard, os.Stdin)
+			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+			defer cancel()
+			if err := server.Shutdown(ctx); err != nil {
+				_ = server.Close()
+			}
+		}()
+	}
+	if err := server.Serve(listener); err != nil && !errors.Is(err, http.ErrServerClosed) {
+		log.Fatal(err)
+	}
+	if *parentStdio {
+		<-shutdownDone // Finish in-flight commands before closing the save.
+	}
 }

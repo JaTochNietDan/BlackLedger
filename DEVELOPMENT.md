@@ -3847,3 +3847,13 @@ name in attribution, download links and release docs. GitHub initially reported
 zero registered workflows/runs despite build.yml being present. A follow-up
 push will exercise the branch build trigger. Public availability does not by
 itself resolve the media provenance questions or prove native build acceptance.
+
+### 2026-09-21 — package an own-window desktop game
+
+Added Electron desktop packaging with locked dependencies, a single-instance
+window, isolated renderer and lifecycle-managed Go child process. The original
+per-user save path remains. Native CI now starts the packaged app as well as
+checking its Go API/save behavior. Mac window, city/interior rendering, travel,
+second launch and quit were verified against an isolated save. Automated Mac
+archive, desktop lifecycle, server package, workflow lint and audit checks passed.
+See RELEASE_READINESS.md for scope and Windows/Linux/signing limitations.

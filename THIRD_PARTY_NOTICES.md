@@ -6,9 +6,13 @@ transitive dependencies for local saves. The Go runtime is included in binaries.
 
 These dependencies retain their upstream licenses. The project’s noncommercial
 restriction does not replace or restrict rights granted by those licenses.
-Exact versions are recorded in `package-lock.json` and `go.sum`.
+Exact versions are recorded in `package-lock.json`, `desktop/package-lock.json`
+and `go.sum`. The desktop shell bundles Electron and Chromium; their upstream
+license files and Chromium third-party notices are retained in the application
+distribution. Desktop packaging tools are build-only dependencies.
 
-Release archives contain a `licenses/` directory with copies of license/notice
+The bundled `resources/game` (macOS: `Contents/Resources/game`) contains a
+`licenses/` directory with copies of license/notice
 files from installed npm packages and downloaded Go modules, a machine-readable
 inventory, and the Go license. This intentionally includes build dependencies
 as well as runtime dependencies so bundled notices are not silently omitted.

@@ -1,0 +1,9 @@
+{
+  "name": "black-ledger-desktop",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Black Ledger desktop application",
+  "license": "PolyForm-Noncommercial-1.0.0",
+  "scripts": {"test": "node --test *.test.cjs"},
+  "devDependencies": {"@electron/packager": "20.3.0", "electron": "44.4.3"}
+}

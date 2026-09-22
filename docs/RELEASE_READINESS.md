@@ -148,3 +148,31 @@ current checker accepts it without a custom-label override. No hosted run has
 occurred. The local Docker command has no running daemon, so this check adds no
 Linux execution evidence. GitHub authentication and media permissions remain
 unresolved; neither source nor binaries have been published.
+
+## Desktop application packaging — 2026-09-21
+
+The user selected an own-window application. The release packager now bundles
+Electron 44.4.3, the Go server and frontend as BlackLedger.exe (Windows),
+Black Ledger.app (Mac), and BlackLedger (Linux), with supporting runtime files.
+Command launch scripts are no longer the player entry point. The application
+uses a free local port, a single-instance lock, a sandboxed renderer without
+Node integration, and the existing per-user BlackLedger save location. The
+parent stdin pipe ends the server on quit or parent exit; normal shutdown waits
+for in-flight requests before closing the database.
+
+Mac ARM64 archive smoke checks passed for frontend/API, saves, retry receipts,
+backup restoration and the packaged Electron window's close/relaunch lifecycle.
+A separate visible app check rendered city and Saint Agnes interior, travelled
+to the bar, focused the existing game on a second launch, and exited with Cmd-Q.
+It used only .runtime/desktop-window-qa/campaign.sqlite3. The primary game save
+was not used. Electron and Chromium notices are retained inside the Mac bundle
+as well as in the surrounding distribution. Server package tests, two desktop
+lifecycle tests, actionlint and the desktop dependency audit passed (zero audit
+findings). Logs: .runtime/desktop-*.log.
+
+CI now installs the locked desktop toolchain and launches the actual native app
+on each target (Xvfb for Linux). Windows/Linux GUI acceptance is pending those
+runs; local Mac evidence does not establish their results. These are unsigned
+portable app archives, not signed installers. Downloads are larger because the
+browser engine is bundled. The earlier command-launcher evidence above describes
+previous builds and is superseded for the new desktop distributions.

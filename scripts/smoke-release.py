@@ -27,10 +27,6 @@ def get(url):
 def server(executable, root, env, log_name):
     with (root / log_name).open('w+') as log:
         command = [str(executable), '-desktop', '-browser=false', '-addr', ':0']
-        if os.name != 'nt':
-            # Exercise the actual Unix launcher, including its quoting/cwd logic.
-            launcher = executable.parent / ('Play.command' if sys.platform == 'darwin' else 'Play.sh')
-            command = [str(launcher), '-browser=false', '-addr', ':0']
         process = subprocess.Popen(command, cwd=root, env=env, stdout=log, stderr=log)
         try:
             deadline = time.monotonic() + 45
@@ -80,9 +76,12 @@ def main():
         for file in game.rglob('*'):
             assert not any(part in {'.runtime', '.tools', '.git', 'node_modules'} for part in file.relative_to(game).parts)
             assert '.sqlite' not in file.name, 'a save was packaged'
-        assert (game / 'licenses/inventory.json').is_file()
+        resources = next(game.rglob('game/licenses/inventory.json')).parent.parent
+        assert (resources / 'licenses/inventory.json').is_file()
+        assert 'Electron' in (resources / 'licenses/Electron-LICENSE').read_text()
+        assert (resources / 'licenses/Chromium-LICENSES.html').stat().st_size > 1000
         assert (game / 'LICENSE').is_file() and (game / 'NOTICE').is_file()
-        executable = game / ('blackledger.exe' if os.name == 'nt' else 'blackledger')
+        executable = resources / ('blackledger.exe' if os.name == 'nt' else 'blackledger')
         config = root / 'test user config'
         home = root / 'test home'
         if sys.platform == 'darwin':
@@ -132,8 +131,9 @@ def main():
                 original[suffix] = source.read_bytes()
                 shutil.copyfile(source, Path(str(backup) + suffix))
         replacement = root / 'replacement game folder'
+        relative_executable = executable.relative_to(game)
         game.rename(replacement)
-        with server(replacement / executable.name, root,
+        with server(replacement / relative_executable, root,
                     {**env, 'BLACK_LEDGER_DB': str(backup)}, 'restore.log') as base:
             restored = json.loads(get(base + '/api/state'))
             assert restored['revision'] == committed['revision']
@@ -144,7 +144,32 @@ def main():
             assert action(base)['revision'] == restored['revision'] + 1
         for suffix, data in original.items():
             assert Path(str(db) + suffix).read_bytes() == data, 'restored game touched original save'
-        print('PASS: checksum, archive, unrelated directory, frontend, per-user save, port conflict, command/retry, restart/retry, backup restore, replacement game folder')
+        if sys.platform == 'darwin':
+            application = replacement / 'Black Ledger.app/Contents/MacOS/BlackLedger'
+        else:
+            application = replacement / ('BlackLedger.exe' if os.name == 'nt' else 'BlackLedger')
+        desktop_save = root / 'desktop smoke'
+        desktop_env = {**env, 'BLACK_LEDGER_SMOKE_DIR': str(desktop_save)}
+        desktop_env.pop('ELECTRON_RUN_AS_NODE', None)
+        for attempt in range(2):
+            launched = subprocess.run([str(application), '--smoke-test'], cwd=root, env=desktop_env,
+                                      capture_output=True, timeout=75)
+            assert launched.returncode == 0, launched.stderr.decode(errors='replace')
+            assert not (desktop_save / 'error.txt').exists(), (desktop_save / 'error.txt').read_text() if (desktop_save / 'error.txt').exists() else ''
+            ready = json.loads((desktop_save / 'ready.json').read_text())
+            assert ready['url'].rstrip('/') == ready['origin']
+            assert (desktop_save / 'campaign.sqlite3').is_file()
+            try:
+                get(ready['origin'] + '/api/health')
+            except (OSError, urllib.error.URLError):
+                pass
+            else:
+                raise AssertionError('closing the desktop window left the server running')
+            if attempt == 0:
+                first = ready
+            else:
+                assert ready['player'] == first['player'] and ready['revision'] == first['revision']
+        print('PASS: desktop window, close/relaunch, checksum, archive, unrelated directory, frontend, per-user save, port conflict, command/retry, restart/retry, backup restore, replacement game folder')
 
 
 if __name__ == '__main__':

@@ -85,7 +85,7 @@ def main():
     if archive.exists():
         parser.error(f'refusing to overwrite {archive}')
     with tempfile.TemporaryDirectory(prefix='black-ledger-package-') as temp:
-        stage = Path(temp) / name
+        stage = Path(temp) / 'game'
         stage.mkdir()
         executable = 'blackledger.exe' if args.os == 'windows' else 'blackledger'
         subprocess.run(['go', 'build', '-trimpath', '-ldflags=-s -w', '-o', str(stage / executable), './cmd/blackledger'], cwd=ROOT,
@@ -101,15 +101,29 @@ def main():
         metadata = {'version': args.version, 'os': args.os, 'arch': args.arch,
                     'revision': run('git', 'rev-parse', 'HEAD'),
                     'modified': modified,
-                    'go': run('go', 'version'), 'node': run('node', '--version')}
+                    'go': run('go', 'version'), 'node': run('node', '--version'),
+                    'electron': json.loads((ROOT / 'desktop/package.json').read_text())['devDependencies']['electron']}
         (stage / 'build.json').write_text(json.dumps(metadata, indent=2) + '\n')
-        if args.os == 'windows':
-            (stage / 'Play.cmd').write_bytes(b'@echo off\r\n"%~dp0blackledger.exe" -desktop %*\r\nif errorlevel 1 pause\r\n')
-        else:
-            launcher = stage / ('Play.command' if args.os == 'darwin' else 'Play.sh')
-            launcher.write_text('#!/bin/sh\nset -eu\ncd -- "$(dirname -- "$0")"\nexec ./blackledger -desktop "$@"\n')
-            launcher.chmod(0o755)
+        if args.os != 'windows':
             (stage / executable).chmod(0o755)
+        packaged = Path(temp) / 'packaged'
+        subprocess.run(['node', str(ROOT / 'desktop/package.mjs'), str(stage), str(packaged),
+                        'win32' if args.os == 'windows' else args.os,
+                        'x64' if args.arch == 'amd64' else args.arch], cwd=ROOT, check=True)
+        app = Path((packaged / 'package-path.txt').read_text())
+        # Packager leaves Electron notices beside the app. Retain them inside
+        # the Mac bundle too, so moving only the .app cannot lose attribution.
+        resources = app / ('Black Ledger.app/Contents/Resources/game' if args.os == 'darwin' else 'resources/game')
+        for source_name, notice_name in [('LICENSE', 'Electron-LICENSE'), ('LICENSES.chromium.html', 'Chromium-LICENSES.html')]:
+            source = app / source_name
+            if not source.is_file():
+                raise RuntimeError(f'Electron notice missing: {source}')
+            shutil.copyfile(source, resources / 'licenses' / notice_name)
+        (app / 'LICENSE').rename(app / 'LICENSE.electron.txt')
+        # Keep instructions and attribution accessible without opening app internals.
+        for file in ['PLAY.txt', 'LICENSE', 'NOTICE', 'THIRD_PARTY_NOTICES.md', 'build.json']:
+            shutil.copyfile(stage / file, app / file)
+        stage = app.rename(Path(temp) / name)
         if args.os == 'windows':
             with zipfile.ZipFile(archive, 'w', zipfile.ZIP_DEFLATED) as bundle:
                 for path in sorted(stage.rglob('*')):

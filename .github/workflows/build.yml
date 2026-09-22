@@ -29,11 +29,13 @@ jobs:
           node-version: '22'
           cache: npm
       - run: npm ci
+      - run: npm ci --prefix desktop
       - name: Validate release workflow
         run: go run github.com/rhysd/actionlint/cmd/actionlint@v1.7.12 .github/workflows/build.yml
       - run: go vet ./...
       - run: go test -race -timeout 50m ./...
       - run: npm test
+      - run: npm test --prefix desktop
       - run: npm run build
 
   package:
@@ -74,6 +76,7 @@ jobs:
         with:
           python-version: '3.12'
       - run: npm ci
+      - run: npm ci --prefix desktop
       - run: npm run build
       - name: Choose archive version
         shell: bash
@@ -94,7 +97,11 @@ jobs:
         run: |
           for archive in release/*.zip release/*.tar.gz; do
             [ -f "$archive" ] || continue
-            python scripts/smoke-release.py "$archive"
+            if [ "${{ runner.os }}" = Linux ]; then
+              xvfb-run -a python scripts/smoke-release.py "$archive"
+            else
+              python scripts/smoke-release.py "$archive"
+            fi
           done
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:

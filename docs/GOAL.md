@@ -1,3 +1,10 @@
+# September 21 amendment — standalone desktop window
+
+Distributions must open the game in their own desktop window, not require a
+command launcher or external browser. Electron bundles the renderer with the Go
+server; quitting the app stops its server while retaining the existing user save.
+Windows, macOS and Linux remain distribution targets.
+
 # September 21 amendment — public distribution
 
 Prepare Black Ledger for publication under `JaTochNietDan/BlackLedger`, with
