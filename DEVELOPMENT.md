@@ -3822,3 +3822,19 @@ replacement game folder, advance the restored copy, and ensure the original
 save is unchanged. Mac ARM64 passed on an isolated build of 11c5eb9. Added pinned
 actionlint 1.7.12 workflow validation; it passes. No hosted/native Windows/Linux
 run is claimed. See release readiness for exact evidence and remaining gates.
+
+### 2026-09-21 — integrate remaining work on main
+
+Reviewed the pending armed-resistance rules, death-cause diagnostic, police
+arrival presentation and legacy rent receipt regression. Added focused coverage
+for fatal personal robberies, absent-player safety and armour. Updated action
+copy to disclose lethal resistance. The death diagnostic now skips with -short;
+its complete 260-campaign report was not rerun in this integration pass.
+
+The arrival test exposed an immediate jump to the end of the traffic route.
+The first reservation now starts at zero; subsequent frames permit movement,
+and officers wait for the car to arrive. The traffic integration test confirms
+completion and officer visibility. This is automated scene coverage, not a new
+visual/browser approval. All 410 frontend tests and the production build pass;
+focused armed-resistance race tests and Go vet pass. The simulation diagnostic
+compiles and its explicit short-mode skip passes. The full core and store suites also passed. Logs: .runtime/remaining-*.

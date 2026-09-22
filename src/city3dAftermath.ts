@@ -4,8 +4,9 @@ import {pedestrianModel} from './city3dCast.js';
 import {groundCharacter} from './city3dGround.js';
 import {availableSceneSlot} from './city3dEvents.js';
 import type {SceneSlot} from './city3dEvents.js';
-import type {Lot} from './city3dPlan.js';
-import {vehicleRootHeight} from './city3dPlan.js';
+import type {Lot, Point} from './city3dPlan.js';
+import {vehicleRootHeight, PITCH, LANE} from './city3dPlan.js';
+import type {TrafficPlacement} from './city3dTraffic.js';
 import {dressPedestrian, wardrobe} from './city3dWardrobe.js';
 import type {Snapshot} from './types';
 
@@ -17,10 +18,12 @@ export function captureBodyJoints(actor:THREE.Group):BodyJoints {
   for(const name of bodyJointNames){const joint=actor.getObjectByName(name);if(joint)pose[name]=joint.quaternion.toArray();}
   return pose;
 }
-type Entry = {group: THREE.Group; slot: SceneSlot; owned: THREE.Material[]; victim?:string};
+type Entry = {group: THREE.Group; slot: SceneSlot; owned: THREE.Material[]; victim?:string;
+  approach?:Point[]; approachStarted?:boolean; waitingFor?:string; wheelDistance?:number};
 export class CityAftermath {
   readonly root = new THREE.Group();
   private entries = new Map<string, Entry>();
+  private minute?:number;
   private bodyPoses=new Map<string,{slot:SceneSlot;yaw:number;joints?:BodyJoints}>();
   private blood = new THREE.MeshStandardMaterial({color: 0x480a0b, roughness: .31, metalness: .05, polygonOffset: true, polygonOffsetFactor: -1});
   private pool: THREE.ShapeGeometry;
@@ -42,6 +45,7 @@ export class CityAftermath {
   update(records: NonNullable<Snapshot['aftermath']>, minute: number, lots: Map<string,Lot>, models: Map<string,THREE.Group>,
     modelFor: (id:string)=>string, occupied: SceneSlot[], animating: Set<string>, presence: NonNullable<Snapshot['police_presence']> = [], activeRaids = new Set<string>(), fires: NonNullable<Snapshot['building_fires']> = []) {
     const desired=new Set<string>();
+    const before=this.minute;this.minute=minute;
     for(const id of this.bodyPoses.keys())if(!records.some(r=>r.victim.id===id&&minute<r.cleanup_at))this.bodyPoses.delete(id);
     const scenes = [
       ...records.map(record=>({...record,raid:false,fire:false})),
@@ -90,7 +94,11 @@ export class CityAftermath {
         object.traverse(part=>{if(part instanceof THREE.Mesh){part.castShadow=true;part.receiveShadow=true;}});
         group.add(object);
         if(kind==='body'&&!accident)groundCharacter(object,.205);
-        this.root.add(group);this.entries.set(key,{group,slot,owned,victim:record.victim.id||undefined});
+        const arriving=!record.raid&&!record.fire&&kind==='police'&&before!==undefined&&before<record.police_at&&minute>=record.police_at;
+        const approach=arriving?[{x:slot.root.x,z:lot.row*PITCH+LANE},{...slot.root}]:undefined;
+        if(approach){group.position.set(approach[0].x,vehicleRootHeight(approach[0]),approach[0].z);group.visible=false;}
+        const waitingFor=!record.raid&&!record.fire&&kind.startsWith('officer')?`aftermath:${record.id}:police`:undefined;
+        this.root.add(group);this.entries.set(key,{group,slot,owned,victim:record.victim.id||undefined,approach,waitingFor,wheelDistance:0});
       }
     }
     for(const [key,entry] of this.entries) if(!desired.has(key)) {
@@ -98,11 +106,24 @@ export class CityAftermath {
     }
   }
   object(id:string){return this.entries.get(id)?.group;}
-  reservations() {return [...this.entries].map(([id,e])=>({id,model:e.slot.model,points:[e.slot.pose],progress:0}));}
+  reservations() {return [...this.entries].map(([id,e])=>({id,model:e.approach?'police':e.slot.model,points:e.approach||[e.slot.pose],progress:e.approach&&e.approachStarted?1:0}));}
   slots() {return [...this.entries.values()].map(e=>e.slot);}
-  show(placements: Map<string,{waiting:boolean}>) {
-    for(const [id,e] of this.entries)e.group.visible=!!placements.get(id)&&!placements.get(id)!.waiting;
+  show(placements: Map<string,{waiting:boolean}&Partial<TrafficPlacement>>) {
+    for(const [id,e] of this.entries){
+      const placement=placements.get(id);
+      const transport=e.waitingFor?this.entries.get(e.waitingFor):undefined;
+      e.group.visible=!!placement&&!placement.waiting&&(!e.waitingFor||!!transport&&!transport.approach&&transport.group.visible);
+      if(e.approach&&placement?.pose&&!placement.waiting){
+        e.approachStarted=true;
+        const at=placement.pose;
+        const distance=Math.hypot(at.x-e.group.position.x,at.z-e.group.position.z);
+        e.wheelDistance=(e.wheelDistance||0)+distance;
+        e.group.position.set(at.x,vehicleRootHeight(at),at.z);e.group.rotation.y=at.heading;
+        e.group.traverse(part=>{if(part.name.startsWith('wheel-spin'))part.rotation.x=e.wheelDistance!/.37;});
+        if((placement.progress||0)>=1)e.approach=undefined;
+      }
+    }
   }
-  inspect(){return [...this.entries].map(([id,e])=>({id,x:e.slot.root.x,z:e.slot.root.z,visible:e.group.visible}));}
+  inspect(){return [...this.entries].map(([id,e])=>({id,x:e.group.position.x,z:e.group.position.z,visible:e.group.visible,arriving:!!e.approach}));}
   dispose(){this.bodyPoses.clear();for(const e of this.entries.values())e.owned.forEach(m=>m.dispose());this.entries.clear();this.root.clear();this.pool.dispose();this.blood.dispose();}
 }

@@ -153,6 +153,11 @@ func (w *World) Mug(location string, hand Hand) error {
 		}
 		if w.Player.Health <= 0 {
 			w.DieOf("robbing somebody in the street", "A robbery at "+place.Name+" that should have been simple.")
+			return nil
+		}
+		// A man worth stopping in this city has thought about being stopped.
+		if w.armedResistance(PocketGun, defence, hand) {
+			w.DieOf("robbing somebody in the street", mark.Name+" was carrying, at "+place.Name+", and got to it first.")
 		}
 		return nil
 	}

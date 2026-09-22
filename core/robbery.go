@@ -109,6 +109,16 @@ func (w *World) robWithOrder(id string, hand Hand, order *CrewOrder) error {
 		}
 		if w.Player.Health <= 0 {
 			w.DieOf("robbing a business", "A robbery at "+place.Name+" went wrong.")
+			return nil
+		}
+		// And sometimes it is not a beating. Somebody behind the counter was
+		// armed, and a till is not worth what it costs to find that out.
+		power := 0
+		if owner != nil {
+			power = owner.Power
+		}
+		if w.armedResistance(TillGun, power, hand) {
+			w.DieOf("robbing a business", "Somebody behind the counter at "+place.Name+" was armed.")
 		}
 		return nil
 	}

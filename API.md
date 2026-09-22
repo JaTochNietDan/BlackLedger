@@ -1504,3 +1504,12 @@ prior receipt to the buyer. For an older positive payment on the current day
 with no recorded recipient, the public field is null. The ownership overview
 excludes unknown receipts from totals and labels them in individual rows.
 No backfilled ownership inference or retroactive cash transfer occurs.
+
+## Armed resistance during personal robberies
+
+A failed personal business robbery or mugging can now end the current life even
+when the initial beating was survivable. Business-owner power or the mark's
+existing defence raises the armed-resistance chance; player armour reduces it.
+Delegated work never applies this player-death roll. Death uses the existing
+cause/history mechanism; no command or projection fields change. Action details
+now disclose that personal attempts can be fatal.

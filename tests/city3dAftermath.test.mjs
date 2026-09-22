@@ -88,3 +88,22 @@ test('travel response retains expired records until the displayed clock reaches 
  const updated={...before[0],cleanup_at:488};assert.deepEqual(responseRecords(before,[updated]),[updated]);
  city.dispose();
 });
+
+test('arriving police complete a traffic approach before officers appear', async()=>{
+ const {StreetTraffic}=await import('../.runtime/frontend-test/city3dTraffic.js');
+ const city=new CityAftermath(),traffic=new StreetTraffic();
+ const lot={id:'bar',x:80,z:48,row:1,col:2};
+ const models=new Map([['person',new THREE.Group()],['police',new THREE.Group()],['police-officer',new THREE.Group()]]);
+ const records=[{id:'arrival',target:'bar',victim:{id:'mara'},minute:480,police_at:485,cleanup_at:660}];
+ const update=minute=>city.update(records,minute,new Map([['bar',lot]]),models,()=> 'person',[],new Set());
+ update(484);update(485);
+ city.show(traffic.update(city.reservations(),0));
+ assert.ok(city.inspect().find(e=>e.id.endsWith(':police')).arriving);
+ assert.ok(city.inspect().filter(e=>e.id.includes(':officer')).every(e=>!e.visible));
+ for(let frame=0;frame<600;frame++)city.show(traffic.update(city.reservations(),1/60));
+ const police=city.inspect().find(e=>e.id.endsWith(':police'));
+ assert.equal(police.arriving,false,'traffic approach must be able to finish');
+ assert.equal(police.visible,true);
+ assert.ok(city.inspect().filter(e=>e.id.includes(':officer')).every(e=>e.visible));
+ city.dispose();
+});

@@ -1667,7 +1667,7 @@ func (w *World) Actions(id string) []Action {
 	}
 	if prop := w.Properties[id]; prop != nil && prop.Income > 0 && !w.Own(id) {
 		add("rob", "Take the day's cash yourself", 45, 0, w.RobberyReadiness(id),
-			fmt.Sprintf("Walk out with what is in the till at %s. Your standing and whatever you are carrying improve the odds. A haul, police attention, and an owner who will work out who would dare. Going wrong means a beating, and it is yours.", l.Name))
+			fmt.Sprintf("Walk out with what is in the till at %s. Your standing and whatever you are carrying improve the odds. A haul, police attention, and an owner who will work out who would dare. Going wrong means a beating, and somebody armed behind the counter can kill you.", l.Name))
 		if hand, ok := w.CrewHands(); ok {
 			reason := w.RobberyReadiness(id)
 			if reason == "" {
@@ -1740,7 +1740,7 @@ func (w *World) Actions(id string) []Action {
 			carrying = "Nothing worth taking, by the look of them."
 		}
 		add("mug", "Take what "+mark.Name+" is carrying", MuggingMinutes, 0, w.MuggingReadiness(id),
-			fmt.Sprintf("%s Your standing improves the odds and makes you the person they describe afterwards: above %d presence they can name you. They will hold it against you either way, and so will %s.", carrying, RecognisedAt, w.factionName(mark.Faction)))
+			fmt.Sprintf("%s Your standing improves the odds and makes you the person they describe afterwards: above %d presence they can name you. They will hold it against you either way, and so will %s. If they fight back with a gun, you may not survive.", carrying, RecognisedAt, w.factionName(mark.Faction)))
 		about(mark.ID)
 		if hand, ok := w.CrewHands(); ok {
 			reason := w.MuggingReadiness(id)
