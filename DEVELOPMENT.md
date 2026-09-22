@@ -3838,3 +3838,12 @@ completion and officer visibility. This is automated scene coverage, not a new
 visual/browser approval. All 410 frontend tests and the production build pass;
 focused armed-resistance race tests and Go vet pass. The simulation diagnostic
 compiles and its explicit short-mode skip passes. The full core and store suites also passed. Logs: .runtime/remaining-*.
+
+### 2026-09-21 — connect published repository
+
+The owner pushed main to the public JaTochNietDan/BlackLedger repository.
+Verified remote main at 37dfc3d and corrected the previously proposed repository
+name in attribution, download links and release docs. GitHub initially reported
+zero registered workflows/runs despite build.yml being present. A follow-up
+push will exercise the branch build trigger. Public availability does not by
+itself resolve the media provenance questions or prove native build acceptance.

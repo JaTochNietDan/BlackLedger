@@ -1,6 +1,6 @@
 # Preparing public previews
 
-Target repository: https://github.com/JaTochNietDan/black-ledger
+Target repository: https://github.com/JaTochNietDan/BlackLedger
 
 The latest user scope prioritizes publishing source and automated distributions.
 The license requirement is attribution plus no free commercial use: original code

@@ -21,7 +21,7 @@ for saves, startup options and troubleshooting.
 Planned distribution targets: Windows x64, macOS Intel and Apple Silicon,
 Linux x64 and ARM64. Initial archives are unsigned; macOS notarization and
 native installers are not yet implemented. Published downloads will appear in
-[GitHub Releases](https://github.com/JaTochNietDan/black-ledger/releases) once the
+[GitHub Releases](https://github.com/JaTochNietDan/BlackLedger/releases) once the
 publication checklist is cleared. Do not assume releases exist yet.
 
 Saves live in the per-user `BlackLedger` folder under `%AppData%` on Windows,
