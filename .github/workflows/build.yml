@@ -98,9 +98,9 @@ jobs:
           for archive in release/*.zip release/*.tar.gz; do
             [ -f "$archive" ] || continue
             if [ "${{ runner.os }}" = Linux ]; then
-              xvfb-run -a python scripts/smoke-release.py "$archive"
+              xvfb-run -a python scripts/smoke-release.py "$archive" --with-ai-voice
             else
-              python scripts/smoke-release.py "$archive"
+              python scripts/smoke-release.py "$archive" --with-ai-voice
             fi
           done
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4

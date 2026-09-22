@@ -60,6 +60,7 @@ def server(executable, root, env, log_name):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('archive', type=Path)
+    parser.add_argument('--with-ai-voice', action='store_true', help='download the verified speech model and test real synthesis')
     args = parser.parse_args()
     checksum = args.archive.with_name(args.archive.name + '.sha256').read_text().split()[0]
     with args.archive.open('rb') as data:
@@ -74,7 +75,10 @@ def main():
                 archive.extractall(root, filter='data')
         game = next(p for p in root.iterdir() if p.is_dir())
         for file in game.rglob('*'):
-            assert not any(part in {'.runtime', '.tools', '.git', 'node_modules'} for part in file.relative_to(game).parts)
+            parts = file.relative_to(game).parts
+            assert not any(part in {'.runtime', '.tools', '.git'} for part in parts)
+            if 'node_modules' in parts:
+                assert 'app.asar.unpacked' in parts, 'unexpected development dependencies were packaged'
             assert '.sqlite' not in file.name, 'a save was packaged'
         resources = next(game.rglob('game/licenses/inventory.json')).parent.parent
         assert (resources / 'licenses/inventory.json').is_file()
@@ -150,10 +154,12 @@ def main():
             application = replacement / ('BlackLedger.exe' if os.name == 'nt' else 'BlackLedger')
         desktop_save = root / 'desktop smoke'
         desktop_env = {**env, 'BLACK_LEDGER_SMOKE_DIR': str(desktop_save)}
+        if args.with_ai_voice:
+            desktop_env['BLACK_LEDGER_SMOKE_VOICE'] = '1'
         desktop_env.pop('ELECTRON_RUN_AS_NODE', None)
         for attempt in range(2):
             launched = subprocess.run([str(application), '--smoke-test'], cwd=root, env=desktop_env,
-                                      capture_output=True, timeout=75)
+                                      capture_output=True, timeout=360 if args.with_ai_voice else 75)
             assert launched.returncode == 0, launched.stderr.decode(errors='replace')
             assert not (desktop_save / 'error.txt').exists(), (desktop_save / 'error.txt').read_text() if (desktop_save / 'error.txt').exists() else ''
             ready = json.loads((desktop_save / 'ready.json').read_text())
@@ -169,6 +175,9 @@ def main():
                 first = ready
             else:
                 assert ready['player'] == first['player'] and ready['revision'] == first['revision']
+        if args.with_ai_voice:
+            assert (desktop_save / 'ai-check/smoke-voice.wav').stat().st_size > 44
+            print('PASS: real speech synthesis from packaged runtime and verified downloaded model')
         print('PASS: desktop window, close/relaunch, checksum, archive, unrelated directory, frontend, per-user save, port conflict, command/retry, restart/retry, backup restore, replacement game folder')
 
 

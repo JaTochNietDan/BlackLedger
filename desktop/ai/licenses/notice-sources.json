@@ -1,0 +1,8 @@
+{
+  "ONNX-1.21-LICENSE": "https://raw.githubusercontent.com/microsoft/onnxruntime/v1.21.0/LICENSE",
+  "ONNX-1.21-NOTICES": "https://raw.githubusercontent.com/microsoft/onnxruntime/v1.21.0/ThirdPartyNotices.txt",
+  "ONNX-1.22-LICENSE": "https://raw.githubusercontent.com/microsoft/onnxruntime/89f8206ba4/LICENSE",
+  "ONNX-1.22-NOTICES": "https://raw.githubusercontent.com/microsoft/onnxruntime/89f8206ba4/ThirdPartyNotices.txt",
+  "libvips-NOTICES": "https://raw.githubusercontent.com/lovell/sharp-libvips/v1.3.3/THIRD-PARTY-NOTICES.md",
+  "eSpeak-COPYING": "https://raw.githubusercontent.com/espeak-ng/espeak-ng/master/COPYING"
+}

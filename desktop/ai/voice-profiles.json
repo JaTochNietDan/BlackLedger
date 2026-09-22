@@ -1,0 +1,410 @@
+{
+  "cast2-00": {
+    "voices": [
+      "af_alloy"
+    ],
+    "weight": 1.0,
+    "speed": 1.0,
+    "language": "a"
+  },
+  "cast2-01": {
+    "voices": [
+      "af_alloy",
+      "af_aoede"
+    ],
+    "weight": 0.7,
+    "speed": 0.96,
+    "language": "a"
+  },
+  "cast2-02": {
+    "voices": [
+      "af_aoede"
+    ],
+    "weight": 1.0,
+    "speed": 1.0,
+    "language": "a"
+  },
+  "cast2-03": {
+    "voices": [
+      "af_aoede",
+      "af_bella"
+    ],
+    "weight": 0.7,
+    "speed": 1.0,
+    "language": "a"
+  },
+  "cast2-04": {
+    "voices": [
+      "af_bella"
+    ],
+    "weight": 1.0,
+    "speed": 1.0,
+    "language": "a"
+  },
+  "cast2-05": {
+    "voices": [
+      "af_bella",
+      "af_heart"
+    ],
+    "weight": 0.7,
+    "speed": 1.04,
+    "language": "a"
+  },
+  "cast2-06": {
+    "voices": [
+      "af_heart"
+    ],
+    "weight": 1.0,
+    "speed": 1.0,
+    "language": "a"
+  },
+  "cast2-07": {
+    "voices": [
+      "af_heart",
+      "af_jessica"
+    ],
+    "weight": 0.7,
+    "speed": 0.96,
+    "language": "a"
+  },
+  "cast2-08": {
+    "voices": [
+      "af_jessica"
+    ],
+    "weight": 1.0,
+    "speed": 1.0,
+    "language": "a"
+  },
+  "cast2-09": {
+    "voices": [
+      "af_jessica",
+      "af_kore"
+    ],
+    "weight": 0.7,
+    "speed": 1.0,
+    "language": "a"
+  },
+  "cast2-10": {
+    "voices": [
+      "af_kore"
+    ],
+    "weight": 1.0,
+    "speed": 1.0,
+    "language": "a"
+  },
+  "cast2-11": {
+    "voices": [
+      "af_kore",
+      "af_nicole"
+    ],
+    "weight": 0.7,
+    "speed": 1.04,
+    "language": "a"
+  },
+  "cast2-12": {
+    "voices": [
+      "af_nicole"
+    ],
+    "weight": 1.0,
+    "speed": 1.0,
+    "language": "a"
+  },
+  "cast2-13": {
+    "voices": [
+      "af_nicole",
+      "af_nova"
+    ],
+    "weight": 0.7,
+    "speed": 0.96,
+    "language": "a"
+  },
+  "cast2-14": {
+    "voices": [
+      "af_nova"
+    ],
+    "weight": 1.0,
+    "speed": 1.0,
+    "language": "a"
+  },
+  "cast2-15": {
+    "voices": [
+      "af_nova",
+      "af_river"
+    ],
+    "weight": 0.7,
+    "speed": 1.0,
+    "language": "a"
+  },
+  "cast2-16": {
+    "voices": [
+      "af_river"
+    ],
+    "weight": 1.0,
+    "speed": 1.0,
+    "language": "a"
+  },
+  "cast2-17": {
+    "voices": [
+      "af_river",
+      "af_sarah"
+    ],
+    "weight": 0.7,
+    "speed": 1.04,
+    "language": "a"
+  },
+  "cast2-18": {
+    "voices": [
+      "af_sarah"
+    ],
+    "weight": 1.0,
+    "speed": 1.0,
+    "language": "a"
+  },
+  "cast2-19": {
+    "voices": [
+      "af_sarah",
+      "af_alloy"
+    ],
+    "weight": 0.7,
+    "speed": 0.96,
+    "language": "a"
+  },
+  "cast2-20": {
+    "voices": [
+      "am_echo"
+    ],
+    "weight": 1.0,
+    "speed": 1.0,
+    "language": "a"
+  },
+  "cast2-21": {
+    "voices": [
+      "am_echo",
+      "am_eric"
+    ],
+    "weight": 0.7,
+    "speed": 0.96,
+    "language": "a"
+  },
+  "cast2-22": {
+    "voices": [
+      "am_eric"
+    ],
+    "weight": 1.0,
+    "speed": 1.0,
+    "language": "a"
+  },
+  "cast2-23": {
+    "voices": [
+      "am_eric",
+      "am_fenrir"
+    ],
+    "weight": 0.7,
+    "speed": 1.0,
+    "language": "a"
+  },
+  "cast2-24": {
+    "voices": [
+      "am_fenrir"
+    ],
+    "weight": 1.0,
+    "speed": 1.0,
+    "language": "a"
+  },
+  "cast2-25": {
+    "voices": [
+      "am_fenrir",
+      "am_liam"
+    ],
+    "weight": 0.7,
+    "speed": 1.04,
+    "language": "a"
+  },
+  "cast2-26": {
+    "voices": [
+      "am_liam"
+    ],
+    "weight": 1.0,
+    "speed": 1.0,
+    "language": "a"
+  },
+  "cast2-27": {
+    "voices": [
+      "am_liam",
+      "am_michael"
+    ],
+    "weight": 0.7,
+    "speed": 0.96,
+    "language": "a"
+  },
+  "cast2-28": {
+    "voices": [
+      "am_michael"
+    ],
+    "weight": 1.0,
+    "speed": 1.0,
+    "language": "a"
+  },
+  "cast2-29": {
+    "voices": [
+      "am_michael",
+      "am_onyx"
+    ],
+    "weight": 0.7,
+    "speed": 1.0,
+    "language": "a"
+  },
+  "cast2-30": {
+    "voices": [
+      "am_onyx"
+    ],
+    "weight": 1.0,
+    "speed": 1.0,
+    "language": "a"
+  },
+  "cast2-31": {
+    "voices": [
+      "am_onyx",
+      "am_puck"
+    ],
+    "weight": 0.7,
+    "speed": 1.04,
+    "language": "a"
+  },
+  "cast2-32": {
+    "voices": [
+      "am_puck"
+    ],
+    "weight": 1.0,
+    "speed": 1.0,
+    "language": "a"
+  },
+  "cast2-33": {
+    "voices": [
+      "am_puck",
+      "am_echo"
+    ],
+    "weight": 0.7,
+    "speed": 0.96,
+    "language": "a"
+  },
+  "cast2-34": {
+    "voices": [
+      "bf_alice"
+    ],
+    "weight": 1.0,
+    "speed": 1.0,
+    "language": "b"
+  },
+  "cast2-35": {
+    "voices": [
+      "bf_alice",
+      "bf_emma"
+    ],
+    "weight": 0.7,
+    "speed": 0.96,
+    "language": "b"
+  },
+  "cast2-36": {
+    "voices": [
+      "bf_emma"
+    ],
+    "weight": 1.0,
+    "speed": 1.0,
+    "language": "b"
+  },
+  "cast2-37": {
+    "voices": [
+      "bf_emma",
+      "bf_isabella"
+    ],
+    "weight": 0.7,
+    "speed": 1.0,
+    "language": "b"
+  },
+  "cast2-38": {
+    "voices": [
+      "bf_isabella"
+    ],
+    "weight": 1.0,
+    "speed": 1.0,
+    "language": "b"
+  },
+  "cast2-39": {
+    "voices": [
+      "bf_isabella",
+      "bf_lily"
+    ],
+    "weight": 0.7,
+    "speed": 1.04,
+    "language": "b"
+  },
+  "cast2-40": {
+    "voices": [
+      "bf_lily"
+    ],
+    "weight": 1.0,
+    "speed": 1.0,
+    "language": "b"
+  },
+  "cast2-41": {
+    "voices": [
+      "bf_lily",
+      "bf_alice"
+    ],
+    "weight": 0.7,
+    "speed": 0.96,
+    "language": "b"
+  },
+  "cast2-42": {
+    "voices": [
+      "bm_daniel"
+    ],
+    "weight": 1.0,
+    "speed": 1.0,
+    "language": "b"
+  },
+  "cast2-43": {
+    "voices": [
+      "bm_daniel",
+      "bm_fable"
+    ],
+    "weight": 0.7,
+    "speed": 0.96,
+    "language": "b"
+  },
+  "cast2-44": {
+    "voices": [
+      "bm_fable"
+    ],
+    "weight": 1.0,
+    "speed": 1.0,
+    "language": "b"
+  },
+  "cast2-45": {
+    "voices": [
+      "bm_fable",
+      "bm_lewis"
+    ],
+    "weight": 0.7,
+    "speed": 1.0,
+    "language": "b"
+  },
+  "cast2-46": {
+    "voices": [
+      "bm_lewis"
+    ],
+    "weight": 1.0,
+    "speed": 1.0,
+    "language": "b"
+  },
+  "cast2-47": {
+    "voices": [
+      "bm_lewis",
+      "bm_daniel"
+    ],
+    "weight": 0.7,
+    "speed": 1.04,
+    "language": "b"
+  }
+}

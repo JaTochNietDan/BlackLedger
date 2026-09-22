@@ -64,11 +64,25 @@ license notices, build metadata and SHA-256 checksum, never a campaign save.
 
 ## Optional AI and voice
 
-Authored gameplay works without either service. AI requests use
+The desktop app offers **Download and enable AI** on first launch. It downloads
+Ollama, Qwen3 14B (about 9.3 GB), and the quantized Kokoro voice model, then runs
+them locally. No accounts, API keys, Python or separate Ollama installation are
+needed. Downloads resume after interruption and are verified against pinned
+SHA-256 checksums. Choose **Play without AI** to skip; use **Game → AI setup**
+to enable or retry later. After setup, stories and speech work offline.
+
+Allow roughly 10–12 GB of downloads plus installation space. The director needs
+substantial memory and can be slow on lower-end computers; generated encounters
+still pass the game's validation before appearing. AI files live in the `ai/`
+folder beside the default save and survive app updates. Speech can be toggled
+in the game. See [local AI details](docs/LOCAL_AI.md) for limitations and QA.
+
+For source-checkout development, AI requests use
 `BLACK_LEDGER_OLLAMA` (default `http://127.0.0.1:11435`) and
 `BLACK_LEDGER_MODEL` (default `qwen3:14b`). Speech uses the legacy-named
 `AFTERLIGHT_DIRECTOR_URL` (default `http://127.0.0.1:8787`). These services receive
-game text when enabled. They are separate installations, not bundled downloads.
+game text when enabled. These environment settings apply to developer servers;
+the desktop app selects its own private local services.
 `BLACK_LEDGER_DIRECTOR_THINK=1` enables experimental reasoning; it is off by default.
 
 `scripts/run-services.sh` is a development helper for a previously provisioned

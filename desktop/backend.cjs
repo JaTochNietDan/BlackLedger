@@ -3,12 +3,13 @@ const {setTimeout: delay} = require('node:timers/promises');
 
 // The pipe is a lifetime lease: Go exits when this process closes or crashes.
 function startBackend(executable, args, options = {}) {
-  const child = spawn(executable, args, {windowsHide: true, stdio: ['pipe', 'pipe', 'pipe'], ...options});
+  const {originPattern = /http:\/\/127\.0\.0\.1:\d+/, ...spawnOptions} = options;
+  const child = spawn(executable, args, {windowsHide: true, stdio: ['pipe', 'pipe', 'pipe'], ...spawnOptions});
   let output = '', origin, exited = false, failure;
   child.stdin.on('error', () => {});
   for (const stream of [child.stdout, child.stderr]) stream.on('data', chunk => {
     output = (output + chunk).slice(-16000);
-    origin ||= output.match(/http:\/\/127\.0\.0\.1:\d+/)?.[0];
+    origin ||= output.match(originPattern)?.[0]?.match(/http:\/\/127\.0\.0\.1:\d+/)?.[0];
   });
   child.on('error', error => { failure = error; });
   const closed = new Promise(resolve => child.once('close', () => { exited = true; resolve(); }));
@@ -28,7 +29,7 @@ function startBackend(executable, args, options = {}) {
         }
         await delay(100);
       }
-      throw new Error('The game server did not become ready within 45 seconds. ' + output);
+      throw new Error(`The local service did not become ready within ${Math.round(timeout/1000)} seconds. ` + output);
     },
     async stop() {
       if (exited) return;

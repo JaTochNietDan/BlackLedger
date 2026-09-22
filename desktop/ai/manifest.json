@@ -1,0 +1,104 @@
+{
+  "version": 1,
+  "ollama": {
+    "version": "0.34.2",
+    "platforms": {
+      "darwin-arm64": {
+        "url": "https://github.com/ollama/ollama/releases/download/v0.34.2/ollama-darwin.tgz",
+        "size": 158526160,
+        "sha256": "f33b2a5aa59bc6c961ed3ec23ba9dc646ca6d99ced8d2a0d46eb3a522167dd3f",
+        "archive": "ollama-darwin.tgz"
+      },
+      "darwin-x64": {
+        "url": "https://github.com/ollama/ollama/releases/download/v0.34.2/ollama-darwin.tgz",
+        "size": 158526160,
+        "sha256": "f33b2a5aa59bc6c961ed3ec23ba9dc646ca6d99ced8d2a0d46eb3a522167dd3f",
+        "archive": "ollama-darwin.tgz"
+      },
+      "win32-x64": {
+        "url": "https://github.com/ollama/ollama/releases/download/v0.34.2/ollama-windows-amd64.zip",
+        "size": 1460928014,
+        "sha256": "8f3fd071a2a2f9497b562f43502c77c2b701a99d1ee5dfda28da8c786373063b",
+        "archive": "ollama-windows-amd64.zip"
+      },
+      "linux-x64": {
+        "url": "https://github.com/ollama/ollama/releases/download/v0.34.2/ollama-linux-amd64.tar.zst",
+        "size": 1427542079,
+        "sha256": "e155b83589986d2c581fdbf1381ea3ebdb16549883679cd5a0627f7cdc05b12b",
+        "archive": "ollama-linux-amd64.tar.zst"
+      },
+      "linux-arm64": {
+        "url": "https://github.com/ollama/ollama/releases/download/v0.34.2/ollama-linux-arm64.tar.zst",
+        "size": 1549897885,
+        "sha256": "8edcfe99eb7546d9422cfa8297d341dcd50e090e192ce1a8092a6ab6d182867b",
+        "archive": "ollama-linux-arm64.tar.zst"
+      }
+    }
+  },
+  "director": {
+    "name": "qwen3:14b",
+    "manifest": {
+      "schemaVersion": 2,
+      "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+      "config": {
+        "mediaType": "application/vnd.docker.container.image.v1+json",
+        "digest": "sha256:78b3b822087d5199783c8203553a5a92ce5eb7b683a5a81003f8efea9b399d74",
+        "size": 488
+      },
+      "layers": [
+        {
+          "mediaType": "application/vnd.ollama.image.model",
+          "digest": "sha256:a8cc1361f3145dc01f6d77c6c82c9116b9ffe3c97b34716fe20418455876c40e",
+          "size": 9276184896
+        },
+        {
+          "mediaType": "application/vnd.ollama.image.template",
+          "digest": "sha256:ae370d884f108d16e7cc8fd5259ebc5773a0afa6e078b11f4ed7e39a27e0dfc4",
+          "size": 1723
+        },
+        {
+          "mediaType": "application/vnd.ollama.image.license",
+          "digest": "sha256:d18a5cc71b84bc4af394a31116bd3932b42241de70c77d2b76d69a314ec8aa12",
+          "size": 11338
+        },
+        {
+          "mediaType": "application/vnd.ollama.image.params",
+          "digest": "sha256:cff3f395ef3756ab63e58b0ad1b32bb6f802905cae1472e6a12034e4246fbbdb",
+          "size": 120
+        }
+      ]
+    },
+    "manifestSHA256": "bdbd181c33f2ed1b31c972991882db3cf4d192569092138a7d29e973cd9debe8"
+  },
+  "voice": {
+    "repository": "onnx-community/Kokoro-82M-v1.0-ONNX",
+    "revision": "1939ad2a8e416c0acfeecc08a694d14ef25f2231",
+    "dtype": "q8",
+    "files": [
+      {
+        "path": "config.json",
+        "url": "https://huggingface.co/onnx-community/Kokoro-82M-v1.0-ONNX/resolve/1939ad2a8e416c0acfeecc08a694d14ef25f2231/config.json",
+        "size": 44,
+        "sha256": "df34b4f930b23447cd4dc410fabfb42eb3f24e803e6c3f97d618fb359380a36f"
+      },
+      {
+        "path": "onnx/model_quantized.onnx",
+        "url": "https://huggingface.co/onnx-community/Kokoro-82M-v1.0-ONNX/resolve/1939ad2a8e416c0acfeecc08a694d14ef25f2231/onnx/model_quantized.onnx",
+        "size": 92361116,
+        "sha256": "fbae9257e1e05ffc727e951ef9b9c98418e6d79f1c9b6b13bd59f5c9028a1478"
+      },
+      {
+        "path": "tokenizer.json",
+        "url": "https://huggingface.co/onnx-community/Kokoro-82M-v1.0-ONNX/resolve/1939ad2a8e416c0acfeecc08a694d14ef25f2231/tokenizer.json",
+        "size": 3497,
+        "sha256": "77a02c8e164413299b4b4c403b14f8e0e1c1b727db4d46a09d6327b861060a34"
+      },
+      {
+        "path": "tokenizer_config.json",
+        "url": "https://huggingface.co/onnx-community/Kokoro-82M-v1.0-ONNX/resolve/1939ad2a8e416c0acfeecc08a694d14ef25f2231/tokenizer_config.json",
+        "size": 113,
+        "sha256": "be1cb066d6ef6b074b3f15e6a6dd21ac88ff3cdaedf325f0aaed686c70f75d20"
+      }
+    ]
+  }
+}

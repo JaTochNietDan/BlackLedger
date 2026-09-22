@@ -40,6 +40,35 @@ def notices(destination):
         elif name == 'node_modules/@pixi/colord':
             directory = ROOT / 'packaging/licenses'
         copy_notices(directory, destination / name.replace('/', '_'))
+    desktop = ROOT / 'desktop'
+    desktop_lock = json.loads((desktop / 'package-lock.json').read_text())
+    for name, metadata in desktop_lock['packages'].items():
+        if not name or metadata.get('dev') or metadata.get('devOptional'):
+            continue
+        directory = desktop / name
+        if not directory.exists() and metadata.get('optional'):
+            continue
+        inventory.append({'package': 'desktop/' + name, 'version': metadata.get('version'),
+                          'license': metadata.get('license')})
+        target = destination / ('desktop_' + name.replace('/', '_'))
+        if name.startswith('node_modules/onnxruntime-'):
+            target.mkdir()
+            version = '1.22' if metadata['version'].startswith('1.22') else '1.21'
+            for notice in ['LICENSE', 'NOTICES']:
+                shutil.copyfile(desktop / 'ai/licenses' / f'ONNX-{version}-{notice}', target / notice)
+        elif name.startswith('node_modules/@img/sharp-libvips-'):
+            target.mkdir()
+            shutil.copyfile(desktop / 'ai/licenses/libvips-NOTICES', target / 'NOTICE.md')
+            for notice in ['README.md', 'versions.json', 'package.json']:
+                shutil.copyfile(directory / notice, target / notice)
+        elif name == 'node_modules/guid-typescript':
+            # Upstream declares ISC but publishes no standalone license text.
+            # Preserve its original declaration; see LOCAL_AI.md release gates.
+            target.mkdir()
+            shutil.copyfile(directory / 'package.json', target / 'LICENSE-declaration.json')
+        else:
+            copy_notices(directory, target)
+    shutil.copytree(desktop / 'ai/licenses', destination / 'ai')
     subprocess.run(['go', 'mod', 'download'], cwd=ROOT, check=True)
     remaining = run('go', 'list', '-m', '-json', 'all')
     decoder = json.JSONDecoder()
@@ -94,7 +123,7 @@ def main():
         for file in ['LICENSE', 'NOTICE', 'README.md', 'ASSETS.md', 'THIRD_PARTY_NOTICES.md', 'CONTRIBUTING.md', 'API.md']:
             shutil.copyfile(ROOT / file, stage / file)
         (stage / 'docs').mkdir()
-        for file in ['GOAL.md', 'RELEASING.md', 'RELEASE_READINESS.md', 'MEDIA_RIGHTS_REVIEW.md']:
+        for file in ['GOAL.md', 'RELEASING.md', 'RELEASE_READINESS.md', 'MEDIA_RIGHTS_REVIEW.md', 'LOCAL_AI.md']:
             shutil.copyfile(ROOT / 'docs' / file, stage / 'docs' / file)
         shutil.copyfile(ROOT / 'packaging/PLAY.txt', stage / 'PLAY.txt')
         notices(stage / 'licenses')

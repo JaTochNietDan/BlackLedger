@@ -21,13 +21,15 @@ The packager produces an Electron desktop application with a CGO-disabled Go
 server, frontend and notices. Run `npm ci --prefix desktop` before packaging.
 The desktop app manages the server lifetime and uses a free local port.
 Windows and Linux archives contain an executable with supporting files; macOS
-contains Black Ledger.app. Native packaging is preferred, particularly for
-Windows executable metadata. Version labels
+contains Black Ledger.app. Packaging requires the target OS and architecture
+because speech includes native dependencies. The five CI jobs use native runners. Version labels
 beginning with `v` require a clean committed checkout; use `dev-` labels for local QA. Native CI checks
 are still necessary: successfully cross-compiling does not establish that a build
 runs on another OS. Native smoke tests start the extracted executable from an
 unrelated directory, fetch the UI/bundles and API, and create only a temporary save.
-They launch the packaged desktop window, check close/relaunch and server
+They load the native AI dependencies and generate speech with verified downloaded
+Kokoro weights (about 92 MB, isolated and never included in the archive),
+launch the packaged desktop window, check close/relaunch and server
 shutdown, and restore a stopped-game backup into a replacement game folder, verify
 receipt persistence and check that the original save remains untouched. This
 tests same-version folder replacement, not compatibility with all old saves.

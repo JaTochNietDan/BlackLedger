@@ -16,10 +16,20 @@ The bundled `resources/game` (macOS: `Contents/Resources/game`) contains a
 files from installed npm packages and downloaded Go modules, a machine-readable
 inventory, and the Go license. This intentionally includes build dependencies
 as well as runtime dependencies so bundled notices are not silently omitted.
-The packaging command fails if a dependency's notice cannot be found.
+Missing upstream notices and declarations are tracked in docs/LOCAL_AI.md.
 
-Optional Ollama, model weights, Python voice services and their dependencies are
-not included in release archives. Install them separately under their own terms.
+Desktop archives also contain Kokoro.js, Transformers.js, ONNX Runtime and their
+runtime dependencies. Their notices and inventory are included in `licenses/`.
+Ollama and model weights are fetched from their official sources during optional
+first-run setup, under their own terms. Pinned versions and checksums are in
+`desktop/ai/manifest.json`; their licenses are copied into the installed AI folder.
+The Qwen3 and Kokoro weights retain Apache 2.0 terms; Ollama retains MIT terms.
+The game's noncommercial restriction does not replace third-party licenses.
+
+Phonemizer.js declares Apache 2.0 but embeds the GPL eSpeak NG engine; sharp also
+includes LGPL components. Full corresponding-source/provenance review for these
+binary dependencies remains a public binary-release gate in `docs/LOCAL_AI.md`.
+Do not treat the npm top-level license strings as complete redistribution approval.
 See ASSETS.md for media, which is distinct from software dependencies.
 
 `@pixi/colord` omits the MIT license text from its npm archive. The upstream

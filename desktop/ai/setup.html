@@ -1,0 +1,8 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'unsafe-inline'"><title>Black Ledger — Local AI</title><style>
+body{margin:0;background:#17140f;color:#eee0c5;font:17px system-ui;line-height:1.6}main{max-width:650px;padding:48px;margin:auto}h1{font:36px Georgia;margin:0 0 20px}p{color:#cfbea2}button{padding:12px 18px;margin:12px 12px 0 0;border:1px solid #ae9569;border-radius:4px;background:#d4bc8c;color:#17140f;font:inherit;cursor:pointer}button.secondary{background:transparent;color:#eee0c5}button:disabled{opacity:.5;cursor:wait}progress{width:100%;height:18px;margin-top:20px}#status{min-height:54px}small{display:block;color:#b5a68d;margin-top:24px}a{color:#d4bc8c}</style></head><body><main>
+<h1>A city with more to say</h1><p>Install local AI to generate new encounters and give the city's characters their voices. Stories and speech run on your computer; no account or subscription is needed.</p>
+<p>The first setup downloads about 10–12 GB. Allow about 20 GB of free disk space for installation. The story model needs substantial memory; generation can be slow on older computers.</p>
+<progress id="progress" max="1" value="0" aria-label="AI setup progress"></progress><p id="status" role="status">Internet is needed for setup. Once installed, AI works offline.</p>
+<button id="install">Download and enable AI</button><button id="skip" class="secondary">Play without AI</button>
+<small>Downloads come from GitHub, Ollama and Hugging Face. Closing setup keeps partial downloads for retry. You can reopen this screen from Game → AI setup. Authored encounters remain playable without AI.</small>
+</main><script src="setup.js"></script></body></html>

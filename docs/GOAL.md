@@ -1,3 +1,12 @@
+# September 21 amendment — automatic local AI setup
+
+Desktop releases must offer first-run automatic downloads for the AI director
+and generated voices. Keep Qwen3 14B, preserve the established character voice
+profiles, and run everything locally without requiring a terminal, accounts,
+Python or a separately installed Ollama. Downloads must resume and verify;
+players can skip setup and reopen it later. See `docs/LOCAL_AI.md` for evidence
+and outstanding cross-platform/distribution checks.
+
 # September 21 amendment — standalone desktop window
 
 Distributions must open the game in their own desktop window, not require a

@@ -21,8 +21,13 @@ The desktop app picks a free local port automatically.
 
 No Go, Node, Python, account, AI model, or separate browser is needed to play.
 The app includes Electron/Chromium and the Go game server.
-AI-generated dialogue and speech require separately installed optional services.
-They are not bundled. No model weights are included in this download.
+On first launch, choose Download and enable AI for automatic local director and
+voice setup. It downloads about 10–12 GB; allow extra installation space and
+substantial system memory. No model weights are in the app archive.
+Downloads are verified and can resume after interruption. After setup, AI works
+offline. Choose Play without AI to skip, or Game > AI setup to enable/retry later.
+AI files are kept in the ai folder beside the default save and survive app updates.
+Quitting the app stops its local AI services as well as the game server.
 
 These builds are currently unsigned and macOS builds are not notarized.
 Your OS may block an unrecognized downloaded application. Source builds remain
