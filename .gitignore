@@ -10,3 +10,12 @@ dist/
 .tools/
 .venv/
 .venv-blender/
+
+# Distribution archives and local credentials
+/release/
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+.DS_Store

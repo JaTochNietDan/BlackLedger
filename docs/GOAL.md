@@ -1,3 +1,13 @@
+# September 21 amendment — public distribution
+
+Prepare Black Ledger for publication under `JaTochNietDan/black-ledger`, with
+attribution and noncommercial licensing, and automated Windows, macOS and Linux
+distributions. The requested commercial restriction means source-available,
+not OSI open source. PolyForm Noncommercial 1.0.0 and required notices implement
+that direction. See `docs/RELEASING.md` for pipeline and remaining acceptance;
+asset redistribution, authenticated publication and native CI results remain
+unresolved. Existing gameplay/visual acceptance is not erased by packaging work.
+
 # Current goal and workstream ownership
 
 ## User amendment — proprietor tournaments (2026-09-14)

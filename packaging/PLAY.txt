@@ -1,0 +1,35 @@
+BLACK LEDGER — development preview
+
+Extract the entire archive before launching. Keep dist beside the executable.
+Windows: double-click Play.cmd.
+macOS: double-click Play.command.
+Linux: run ./Play.sh from a graphical desktop terminal.
+A terminal stays open while the game runs. Close it or press Ctrl+C to stop.
+Your default browser opens the game at http://127.0.0.1:8791.
+If it does not open, visit that address in a browser yourself.
+A modern WebGL2-capable browser and graphics driver are required.
+
+Saves are automatic and survive replacing the extracted game folder:
+Windows: %AppData%\BlackLedger\campaign.sqlite3
+macOS: ~/Library/Application Support/BlackLedger/campaign.sqlite3
+Linux: $XDG_CONFIG_HOME/BlackLedger/campaign.sqlite3
+       (normally ~/.config/BlackLedger/campaign.sqlite3)
+Stop the game before copying/backing up the save, including any -wal/-shm files.
+Developer-checkout saves are not automatically imported or overwritten.
+For an explicit save: blackledger -desktop -db /path/to/campaign.sqlite3
+
+If port 8791 is occupied, stop the other game instance or launch:
+blackledger -desktop -addr :8792
+Windows executable name: blackledger.exe.
+To prevent automatic browser opening, add -browser=false.
+
+No Go, Node, Python, account, AI model, or voice service is needed to play.
+AI-generated dialogue and speech require separately installed optional services.
+They are not bundled. No model weights are included in this download.
+
+These builds are currently unsigned and macOS builds are not notarized.
+Your OS may block an unrecognized downloaded application. Source builds remain
+available; never disable system-wide security protections to run this game.
+
+This is unfinished software with fictional violence, crime, gambling and death.
+See README.md for status and LICENSE / NOTICE for redistribution terms.

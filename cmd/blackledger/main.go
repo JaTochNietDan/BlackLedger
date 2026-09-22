@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -437,8 +438,43 @@ func main() {
 		"address to listen on, as :port")
 	db := flag.String("db", env("BLACK_LEDGER_DB", ".runtime/campaign.sqlite3"),
 		"the campaign to open")
+	desktop := flag.Bool("desktop", false, "use installed game files and a per-user save")
+	browser := flag.Bool("browser", true, "open a browser in desktop mode")
 	flag.Parse()
+	if *desktop {
+		executable, err := os.Executable()
+		if err != nil {
+			log.Fatal(err)
+		}
+		config, err := os.UserConfigDir()
+		if err != nil {
+			log.Fatal(err)
+		}
+		web, save, err := desktopPaths(executable, config)
+		if err != nil {
+			log.Fatal(err)
+		}
+		if os.Getenv("BLACK_LEDGER_WEB") == "" {
+			_ = os.Setenv("BLACK_LEDGER_WEB", web)
+		}
+		explicitDB := os.Getenv("BLACK_LEDGER_DB") != ""
+		flag.Visit(func(f *flag.Flag) {
+			if f.Name == "db" {
+				explicitDB = true
+			}
+		})
+		if !explicitDB {
+			*db = save
+		}
+	}
 	port := strings.TrimPrefix(*addr, ":")
+	// Bind before opening a save: a second launch must not touch a running campaign.
+	listener, e := net.Listen("tcp", "127.0.0.1:"+port)
+	if e != nil {
+		log.Fatal(e)
+	}
+	defer listener.Close()
+	port = fmt.Sprint(listener.Addr().(*net.TCPAddr).Port)
 	s, e := store.Open(*db)
 	if e != nil {
 		log.Fatal(e)
@@ -453,5 +489,13 @@ func main() {
 	})
 	a := &app{s: s, port: port, client: &http.Client{}}
 	log.Printf("Black Ledger Go core · http://127.0.0.1:%s", port)
-	log.Fatal((&http.Server{Addr: "127.0.0.1:" + port, Handler: a, ReadHeaderTimeout: 5 * time.Second}).ListenAndServe())
+	log.Printf("Save: %s", *db)
+	if *desktop && *browser {
+		go func() {
+			if err := openBrowser("http://127.0.0.1:" + port); err != nil {
+				log.Printf("Open the game URL above in your browser: %v", err)
+			}
+		}()
+	}
+	log.Fatal((&http.Server{Handler: a, ReadHeaderTimeout: 5 * time.Second}).Serve(listener))
 }

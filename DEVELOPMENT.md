@@ -3764,3 +3764,23 @@ full frontend86445 remains RUNNING (freshly polled), log in that checkout's
 c36e51a full Go17026 remains RUNNING at last poll. Do not restart these handles.
 Prior portfolio browser116 was no longer available when revisited; no browser
 navigation acceptance claimed this turn. No live release or main save writes.
+
+## 2026-09-21 — source publication and distribution foundation
+
+Prepared PolyForm Noncommercial licensing with required attribution (the user
+requires no free commercial use), cross-platform browser-game archives, isolated
+per-user desktop saves, launchers, dependency notices/checksums, and GitHub CI
+with five native package jobs and tag-triggered draft prereleases. The license
+means source-available, not OSI open source. Existing uncommitted gameplay and
+visual work was preserved and is not included in the release-setup commit.
+
+All five targets cross-compiled; native Apple Silicon archive launch, assets,
+command/retry, restart/receipt persistence, per-user save and occupied-port
+checks passed. City and Saint Agnes interior rendered in the browser. A 100-command
+isolated API run had no invariant failures. Frontend 407/407, production build,
+Go vet, server/save race tests and workflow validation passed. Initial full Go
+run timed out in the pre-existing untracked 260-campaign diagnostic; core passed.
+Gitleaks reported no leaks across 919 commits. Detailed evidence and remaining
+publication/acceptance gates are in docs/RELEASE_READINESS.md and docs/RELEASING.md.
+Nothing was published; media permission and GitHub authentication are unresolved.
+The main campaign and port 8791 were not used or modified by these checks.
