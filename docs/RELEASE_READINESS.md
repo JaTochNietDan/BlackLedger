@@ -31,6 +31,10 @@ record `modified: true`. They are internal QA artifacts, not published releases.
 - Initial `go test ./...`: core passed in 391.8s and other listed packages passed;
   sim timed out at 600s with only the pre-existing untracked TestWhatKillsThem
   diagnostic still running (260 campaigns). This is not an all-green full suite.
+- `go test -timeout 30m -skip '^TestWhatKillsThem$' ./sim`: passed in 345.1s;
+  only that pre-existing untracked diagnostic was excluded.
+- Versioned packaging from the dirty working tree was correctly rejected; local
+  QA uses an explicit `dev-` label.
 - All five target archives compiled locally; each checksum validated, archive
   contents inspected and no campaign/.runtime/.tools content present.
 - Native Apple Silicon archive smoke: passed launch from unrelated directory,
