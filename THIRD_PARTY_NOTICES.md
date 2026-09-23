@@ -37,3 +37,15 @@ notice is retained in `packaging/licenses/colord-LICENSE.md`, obtained from
 https://github.com/omgovich/colord/blob/master/LICENSE.md on 2026-09-21.
 Esbuild and Rollup platform binary packages use the notices shipped by their
 respective parent packages.
+
+`@napi-rs/lzma-linux-x64-gnu` 1.5.1 is an optional Rollup build dependency
+present on Linux x64. Its npm archive declares MIT but contains no license text;
+neither does its parent `@napi-rs/lzma` 1.5.1 archive or upstream source revision
+`f164df92d83e095f195d628b1a68a141ae2eb638` at
+https://github.com/Brooooooklyn/lzma/tree/f164df92d83e095f195d628b1a68a141ae2eb638
+(checked 2026-09-22). The archive's package.json is retained verbatim as
+`LICENSE-declaration.json`, alongside its README and inventory entry. This records
+the upstream declaration; it is not a substitute for a missing license notice.
+The native compressor is a build dependency, not a shipped game runtime module.
+The packaging exception is limited to this version; review notice availability
+when updating it.

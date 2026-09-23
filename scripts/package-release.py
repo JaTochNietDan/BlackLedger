@@ -39,6 +39,15 @@ def notices(destination):
             directory = ROOT / 'node_modules/rollup'
         elif name == 'node_modules/@pixi/colord':
             directory = ROOT / 'packaging/licenses'
+        elif name == 'node_modules/@napi-rs/lzma-linux-x64-gnu' and metadata.get('version') == '1.5.1':
+            # This Rollup build dependency declares MIT but publishes no
+            # license text, including at its matching upstream revision.
+            # Retain the declaration; see THIRD_PARTY_NOTICES.md.
+            target = destination / name.replace('/', '_')
+            target.mkdir()
+            shutil.copyfile(directory / 'package.json', target / 'LICENSE-declaration.json')
+            shutil.copyfile(directory / 'README.md', target / 'README.md')
+            continue
         copy_notices(directory, destination / name.replace('/', '_'))
     desktop = ROOT / 'desktop'
     desktop_lock = json.loads((desktop / 'package-lock.json').read_text())
