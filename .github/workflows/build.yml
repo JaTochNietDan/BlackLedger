@@ -1,4 +1,4 @@
-name: Test and distribute
+name: Build and distribute
 on:
   push:
     branches: ['**']
@@ -14,32 +14,7 @@ concurrency:
   cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
 
 jobs:
-  verify:
-    runs-on: ubuntu-24.04
-    timeout-minutes: 60
-    steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-        with:
-          persist-credentials: false
-      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
-        with:
-          go-version: stable
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
-        with:
-          node-version: '22'
-          cache: npm
-      - run: npm ci
-      - run: npm ci --prefix desktop
-      - name: Validate release workflow
-        run: go run github.com/rhysd/actionlint/cmd/actionlint@v1.7.12 .github/workflows/build.yml
-      - run: go vet ./...
-      - run: go test -race -timeout 50m ./...
-      - run: npm test
-      - run: npm test --prefix desktop
-      - run: npm run build
-
   package:
-    needs: verify
     strategy:
       fail-fast: false
       matrix:
@@ -92,17 +67,6 @@ jobs:
       - name: Package game and notices
         shell: bash
         run: python scripts/package-release.py --os ${{ matrix.os }} --arch ${{ matrix.arch }} --version "$RELEASE_VERSION"
-      - name: Smoke test native archive
-        shell: bash
-        run: |
-          for archive in release/*.zip release/*.tar.gz; do
-            [ -f "$archive" ] || continue
-            if [ "${{ runner.os }}" = Linux ]; then
-              xvfb-run -a python scripts/smoke-release.py "$archive" --with-ai-voice
-            else
-              python scripts/smoke-release.py "$archive" --with-ai-voice
-            fi
-          done
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: black-ledger-${{ matrix.os }}-${{ matrix.arch }}

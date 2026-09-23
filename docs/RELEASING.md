@@ -10,11 +10,15 @@ Do not claim OSI open-source status or that third-party media rights are settled
 ## Automated builds
 
 `.github/workflows/build.yml` runs on branch pushes, pull requests, manual dispatch
-and version tags. A Linux verification job validates the workflow and runs Go vet/race tests, frontend tests
-and the production build. Five native runner jobs then build, archive and smoke
-test Windows x64, macOS x64/ARM64 and Linux x64/ARM64 distributions. Artifacts
-expire after 14 days. Version tags beginning with `v` create a **draft prerelease**
-with archives and SHA-256 files once all jobs pass. Review then publish the draft.
+and version tags. At the owner's request, automated tests are temporarily disabled
+on GitHub-hosted runners: the previous Go race-test step took almost 52 minutes
+and failed before packaging began. Five native runner jobs now immediately build
+and archive Windows x64, macOS x64/ARM64 and Linux x64/ARM64 distributions.
+Compilation and frontend type checking remain part of packaging; Go tests, npm
+tests and native archive smoke tests must be run locally for now.
+Artifacts expire after 14 days. Version tags beginning with `v` create a
+**draft prerelease** with archives and SHA-256 files once all package jobs pass.
+A successful build is not a test pass. Review and test before publishing the draft.
 Non-tag builds never create releases. Only the release job has contents-write.
 
 The packager produces an Electron desktop application with a CGO-disabled Go
@@ -23,9 +27,9 @@ The desktop app manages the server lifetime and uses a free local port.
 Windows and Linux archives contain an executable with supporting files; macOS
 contains Black Ledger.app. Packaging requires the target OS and architecture
 because speech includes native dependencies. The five CI jobs use native runners. Version labels
-beginning with `v` require a clean committed checkout; use `dev-` labels for local QA. Native CI checks
+beginning with `v` require a clean committed checkout; use `dev-` labels for local QA. Native platform checks
 are still necessary: successfully cross-compiling does not establish that a build
-runs on another OS. Native smoke tests start the extracted executable from an
+runs on another OS. The local `scripts/smoke-release.py` checks start the extracted executable from an
 unrelated directory, fetch the UI/bundles and API, and create only a temporary save.
 They load the native AI dependencies and generate speech with verified downloaded
 Kokoro weights (about 92 MB, isolated and never included in the archive),
