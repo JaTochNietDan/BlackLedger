@@ -76,3 +76,12 @@ The workflow grants release writes only to the final job, following the
 Actions are pinned to reviewed commit IDs; dependency updates are reviewed manually.
 The original [PolyForm license source](https://github.com/polyformproject/polyform-licenses/blob/1.0.0/PolyForm-Noncommercial-1.0.0.md)
 is included verbatim, with project-specific required attribution kept in NOTICE.
+
+## Clean-runner license collection
+
+The packager downloads the full Go module graph with `go mod download all`
+before collecting notices. A bare download can leave graph-only dependencies
+without a local `Dir`, even after the game compiles. On September 22, an isolated
+empty module cache reproduced 11 such missing directories; the corrected notice
+collector passed with licenses for all 21 Go modules (122 total dependency
+inventory entries). Hosted tests remain disabled as requested.

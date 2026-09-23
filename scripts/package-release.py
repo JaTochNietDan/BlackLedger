@@ -69,7 +69,10 @@ def notices(destination):
         else:
             copy_notices(directory, target)
     shutil.copytree(desktop / 'ai/licenses', destination / 'ai')
-    subprocess.run(['go', 'mod', 'download'], cwd=ROOT, check=True)
+    # `go list -m all` includes the full module graph. With lazy module
+    # loading, a bare download only fetches modules required by go.mod and
+    # can leave graph-only entries without Dir on a fresh runner.
+    subprocess.run(['go', 'mod', 'download', 'all'], cwd=ROOT, check=True)
     remaining = run('go', 'list', '-m', '-json', 'all')
     decoder = json.JSONDecoder()
     while remaining.strip():
@@ -77,6 +80,8 @@ def notices(destination):
         remaining = remaining.lstrip()[end:]
         if module.get('Main'):
             continue
+        if not module.get('Dir'):
+            raise RuntimeError(f"Go module was not downloaded: {module['Path']}@{module.get('Version', '')}")
         inventory.append({'module': module['Path'], 'version': module.get('Version')})
         copy_notices(Path(module['Dir']), destination / module['Path'].replace('/', '_'))
     shutil.copyfile(Path(run('go', 'env', 'GOROOT')) / 'LICENSE', destination / 'Go-LICENSE')
